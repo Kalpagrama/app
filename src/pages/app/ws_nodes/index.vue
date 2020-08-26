@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.justify-center
         div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
           q-tab-panels(
-            v-model="type" swipeable infinite animated
+            v-model="type" infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
             q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="querySavedNodes" :sliceSize="1000")

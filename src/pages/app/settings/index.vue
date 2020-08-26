@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
+//- div(:style=`{position: 'relative'}`).column.fit
   //- header
   div(:style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
@@ -7,14 +7,14 @@ div(:style=`{position: 'relative'}`).column.fit
         span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('pageApp_settings_title', 'Настройки')}}
   .col.full-width
     kalpa-profile
+q-layout(view="hHh Lpr lff")
+  q-page-container
+    router-view
 </template>
 
 <script>
-import menuRight from './menu_right'
-// TODO: add page router, and reuse kalpa-profile or not?
-
 export default {
-  name: 'pageAppSettings',
-  components: {menuRight},
+  name: 'pageApp_settings',
+  components: {},
 }
 </script>

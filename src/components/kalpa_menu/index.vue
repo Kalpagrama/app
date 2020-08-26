@@ -83,42 +83,33 @@
             :style=`{height: '50px'}`).full-width
             span(:style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- version
-        div(v-if="true").row.full-width.items-center.q-pa-md
+        .row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
-import { i18n } from 'src/boot/i18n'
 
 export default {
   name: 'kalpaMenu',
   data () {
     return {
-      width: 300,
       pages: [
         {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
-        {id: 'trends', name: this.$t('pageCategories', 'Категории'), icon: 'whatshot'},
-        // {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter', color: 'blue-5'},
-        {id: 'workspace', name: this.$t('pageWorkspace', 'Мастерская'), icon: 'school'},
-        // {id: 'subscriptions', name: this.$t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
+        {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
+        {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'settings', name: this.$t('pageSettings', 'Настройки'), icon: 'tune'},
+        {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,
-      nodeEditorOpened: false,
-      node: null,
     }
-  },
-  computed: {
   },
   methods: {
     async refresh () {
       this.$log('refresh')
       this.refreshLoading = true
-      await this.$wait(1000)
+      await this.$wait(300)
       await this.$rxdb.clearAll()
       window.location.reload()
       this.refreshLoading = false
@@ -127,39 +118,9 @@ export default {
       this.$log('logout')
       if (!confirm('Really logout ?')) return
       this.logoutLoading = true
-      await this.$wait(500)
+      await this.$wait(300)
       await AuthApi.logout()
       this.logoutLoading = false
-    },
-    async createNodeStart () {
-      this.$log('createNodeStart')
-      this.$store.commit('ui/stateSet', ['active', false])
-      let nodeInput = {
-        name: '',
-        wsItemType: 'WS_NODE',
-        items: [],
-        spheres: [],
-        category: 'FUN',
-        layout: 'PIP',
-        stage: 'draft'
-      }
-      this.$log('nodeInput', nodeInput)
-      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      this.$log('nodeAddStart item', item)
-      this.node = item
-      this.nodeEditorOpened = true
-    },
-    nodeEdited () {
-      this.$log('nodeEdited')
-      this.$store.commit('ui/stateSet', ['active', true])
-      this.nodeEditorOpened = false
-      this.node = null
-    },
-    async nodePublished () {
-      this.$log('nodePublished')
-      this.nodeEdited()
-      await this.$wait(200)
-      this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
     }
   },
 }

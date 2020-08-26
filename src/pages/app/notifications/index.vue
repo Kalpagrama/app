@@ -5,11 +5,9 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
         div(:style=`{height: '50px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
-          q-icon(name="view_week" color="white" size="30px").q-mr-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Уведомления
+          q-icon(name="notifications_none" color="white" size="30px").q-mr-sm
           .col
-          //- q-btn(round flat color="green" icon="add" to="/settings/feeds")
-          //- q-btn(round flat color="white" icon="settings" to="/settings/feeds")
+            span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Уведомления
   q-page-container
     q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`)
       .row.full-width.items-start.content-start.justify-center
