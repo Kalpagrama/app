@@ -142,7 +142,7 @@ export default {
         this.$log('$route.params.oid TO', to)
         if (to) {
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+          this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
         }
       }
     },

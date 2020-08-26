@@ -53,7 +53,7 @@ class NodeApi {
     let compositionLen = 0
     for (let l of composition.layers) {
       // assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
-      assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
+      // assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
       assert(Array.isArray(l.figuresAbsolute))
       if (l.figuresAbsolute.length > 1) {
         assert.ok(l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')

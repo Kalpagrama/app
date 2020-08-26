@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async serviceClick (s, si) {
-      let services = await this.$rxdb.get(RxCollectionEnum.OTHER, 'services')
+      let services = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'services')
       assert(services, '!services')
       this.$log('serviceClick', s, si, services)
       let url = services[s.id]

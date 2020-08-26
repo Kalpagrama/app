@@ -25,6 +25,12 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
   try {
+    let kDebug = localStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
+    if (kDebug == null) {
+      kDebug = '0'
+      localStorage.setItem('k_debug', kDebug)
+    }
+    kDebug = kDebug === '1'
     // Vue.use(VueApollo)
     let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
     // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
@@ -83,7 +89,7 @@ export default async ({ Vue, store, app }) => {
       link: createHttpLink({
         uri: SERVICES_URL,
         fetch (uri, options) {
-          if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
+          if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
           return fetch(uri, options)
         }
       }),
@@ -106,7 +112,7 @@ export default async ({ Vue, store, app }) => {
       }
     }
 
-    let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', { fetchFunc, clientFirst: true, force: true, onFetchFunc })
+    let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services', { fetchFunc, clientFirst: true, force: true, onFetchFunc })
 
     logD('services', services)
     let linkAuth = services.authUrl
@@ -122,7 +128,7 @@ export default async ({ Vue, store, app }) => {
             // logD('authApollo::fetch', localStorage.getItem('k_token'))
             const token = localStorage.getItem('k_token')
             if (token) options.headers.Authorization = token
-            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
+            if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -139,7 +145,7 @@ export default async ({ Vue, store, app }) => {
           fetch (uri, options) {
             const token = localStorage.getItem('k_token')
             if (token) options.headers.Authorization = token
-            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
+            if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -161,7 +167,7 @@ export default async ({ Vue, store, app }) => {
             connectionParams: () => {
               return {
                 Authorization: localStorage.getItem('k_token'),
-                'X-Kalpagrama-debug': localStorage.getItem('k_debug') != null ? 'k_debug' : ''
+                'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
               }
             }
           }
@@ -178,7 +184,7 @@ export default async ({ Vue, store, app }) => {
           fetch (uri, options) {
             const token = localStorage.getItem('k_token')
             if (token) options.headers.Authorization = token
-            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
+            if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
         })

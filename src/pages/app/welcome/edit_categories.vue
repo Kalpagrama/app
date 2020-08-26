@@ -71,7 +71,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.categories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+    this.categories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
   }
 }
 </script>

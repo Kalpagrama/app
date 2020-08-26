@@ -26,7 +26,7 @@ const RxCollectionEnum = Object.freeze({
   ...WsCollectionEnum, // списки мастерской
   ...LstCollectionEnum, // списки из objectShort
   OBJ: 'OBJ', // список закэшированных объектов
-  OTHER: 'OTHER', // иное
+  GQL_QUERY: 'GQL_QUERY', // иное
   META: 'META'
 })
 const RxModuleEnum = Object.freeze({
@@ -222,7 +222,7 @@ class RxDBWrapper {
       }
     }
     // console.time('get categories from server')
-    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', {fetchFunc: fetchCategoriesFunc})
+    let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', {fetchFunc: fetchCategoriesFunc})
     // console.timeEnd('get categories from server')
     if (currentUser) { // синхронизация мастерской с сервером
       this.workspace.switchOnSynchro(currentUser)
@@ -315,7 +315,7 @@ class RxDBWrapper {
     if (rxCollectionEnum in WsCollectionEnum) {
       rxDoc = await this.workspace.get(id)
     } else if (rxCollectionEnum in LstCollectionEnum ||
-      rxCollectionEnum === RxCollectionEnum.OTHER) {
+      rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
       rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
     } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
       rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
@@ -338,11 +338,17 @@ class RxDBWrapper {
       id = makeId(rxCollectionEnum, rawId)
     } else {
       assert(!rxCollectionEnum)
-      assert(id)
-      assert(id.includes('::'))
     }
-    let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
-    if (cachedReactiveItem) return cachedReactiveItem
+    assert(id)
+    assert(id.includes('::'))
+    if (!force) { // вернем из быстрого кэша реактивных элементов
+      let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
+      if (cachedReactiveItem) {
+        if ([RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY].includes(rxCollectionEnum)) {
+          if (this.cache.isActual(id)) return cachedReactiveItem // элемент из RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY может устареть (тогда надо запросить заново)
+        } else return cachedReactiveItem // остальные элементы не устаревают
+      }
+    }
     let rxDoc = await this.getRxDoc(id, {fetchFunc, clientFirst, priority, force, onFetchFunc})
     if (!rxDoc) return null
     let reactiveItem = getReactive(rxDoc)

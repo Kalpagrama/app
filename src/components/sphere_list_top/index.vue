@@ -48,7 +48,7 @@ export default {
   // },
   async beforeCreate () {
     this.$log('beforeCreate')
-    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
   }
 }
 </script>

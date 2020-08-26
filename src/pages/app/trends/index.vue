@@ -54,7 +54,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route CHANGED', to)
-        if (this.nodeCategories.length === 0) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+        if (this.nodeCategories.length === 0) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
         if (to) {
           this.category = this.nodeCategories.find(c => c.sphere.oid === to)
         }
