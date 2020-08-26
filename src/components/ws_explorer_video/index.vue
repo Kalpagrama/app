@@ -1,16 +1,17 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
+  //- q-header(reveal)
     .row.full-width.justify-center.q-pt-sm
       div(
         :style=`{maxWidth: '800px', height: '50px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.q-px-md.b-40
         q-icon(name="select_all" color="white" size="30px").q-mr-sm
-        span(:style=`{fontSize: '16px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspaceName }}
+        div(:style=`{overflow: 'hidden'}`).col
+          span(:style=`{fontSize: '16px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspaceName }}
   q-page-container
     q-page(:style=`{paddingTop: '8px', paddingBottom: '50px',}`)
       .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+        div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
           //- content wrapper
           div(
             :style=`{position: 'relative'}`
@@ -20,7 +21,7 @@ q-layout(view="hHh Lpr lff")
                 threshold: 0.8
               }
             }`
-            ).row.full-width.items-start.content-start
+            ).row.full-width.items-start.content-start.justify-center
             q-resize-observer(@resize="contentHeight = $event.height")
             //- content preview image
             img(
@@ -28,7 +29,7 @@ q-layout(view="hHh Lpr lff")
               :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
             ws-content-player(
               :contentKalpa="contentKalpa" :contentWorkspace="contentWorkspace"
-              :bars="bars" :barsShow="!nodeSelectedId"
+              :bars="bars" :barsShow="true"
               @player="player = $event"
               @error="playerErrorHandle"
               :style=`{
@@ -36,21 +37,19 @@ q-layout(view="hHh Lpr lff")
                 borderRadius: '10px', overflow: 'hidden',}`).fit
                 template(v-slot:actions)
                   q-btn(
-                    @click="nodeAddStart()"
+                    @click="$refs[`page-${pageId}`].nodeCreateStart()"
                     round push color="green" dense icon="add"
                     :style=`{borderRadius: '50%'}`)
           //- page wrapper
           div(v-if="player").row.full-width.items-start.content-start
             component(
               :is="`page-${pageId}`"
+              :ref="`page-${pageId}`"
               :contentWorkspace="contentWorkspace" :contentKalpa="contentKalpa" :player="player"
               :pageHeight="pageHeight"
-              :nodeSelectedId="nodeSelectedId"
-              @nodeSelected="nodeSelectedId = $event"
-              @nodeUnselected="nodeSelectedId = null"
               @bars="bars = $event")
       //- footer: page control
-      q-page-sticky(expand position="bottom" :style=`{zIndex: 1000}`)
+      //- q-page-sticky(expand position="bottom" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px', height: '50px', zIndex:1000}`
             ).row.full-width.items-center.content-center.b-30
@@ -92,7 +91,7 @@ export default {
         KALPA: 'player-kalpa',
       },
       bars: [],
-      nodeSelectedId: null,
+      // nodeSelectedId: null,
     }
   },
   computed: {
@@ -128,39 +127,6 @@ export default {
     playerErrorHandle () {
       this.$log('playerErrorHandle')
       confirm('Player error! Try on desktop!')
-    },
-    async nodeAddStart () {
-      this.$log('nodeAddStart')
-      let node = await this.nodeAdd()
-      this.nodeSelectedId = node.id
-    },
-    async nodeAdd () {
-      this.$log('nodeAdd')
-      // start/end
-      let start = this.player.currentTime
-      let end = start + 10 > this.player.duration ? this.player.duration : start + 10
-      let nodeInput = {
-        name: '',
-        spheres: [],
-        category: 'FUN',
-        layout: 'PIP',
-        stage: 'draft',
-        wsItemType: 'WS_NODE',
-        items: [
-          {
-            id: Date.now().toString(),
-            thumbUrl: this.contentKalpa.thumbUrl,
-            outputType: 'VIDEO',
-            layers: [
-              {contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
-            ],
-            operation: { items: null, operations: null, type: 'CONCAT'},
-          }
-        ]
-      }
-      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      this.$log('node', node)
-      return node
     },
     keydownHandle (e) {
       this.$log('keydownHandle', e)

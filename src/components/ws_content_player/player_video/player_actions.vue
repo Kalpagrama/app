@@ -14,7 +14,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
       background: 'rgba(0,0,0,0.5)', borderRadius: '10px', overflow: 'hidden',}`
     ).row.items-center.content-center
     q-btn(round flat dense :color="color" icon="fast_rewind" @click="backward()")
-    q-btn(round flat dense :color="color")
+    //- q-btn(round flat dense :color="color")
       q-icon(
         :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
         :color="player.mutedLocal ? 'red' : color"
@@ -24,7 +24,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
       :style=`{}`
       )
       small.text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
-    q-btn(round flat dense :color="color" icon="fullscreen" @click="fullscreenToggle()")
+    //- q-btn(round flat dense :color="color" icon="fullscreen" @click="fullscreenToggle()")
     q-btn(round flat dense :color="color" icon="fast_forward" @click="forward()")
   slot
   //- q-btn(
