@@ -33,7 +33,7 @@ div(
         }`)
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      node-bookmark(v-show="isActive" :isActive="isActive" :oid="node.oid" type="NODE" :name="node.name")
+      node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
     img(
       :src="thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`

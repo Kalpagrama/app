@@ -17,7 +17,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeLite__nodeBookmark',
-  props: ['oid', 'type', 'name', 'isActive'],
+  props: ['node', 'isActive'],
   data () {
     return {
       loading: false,
@@ -43,7 +43,7 @@ export default {
       this.$log('bookmarkFind')
       let {items: [item]} = await this.$rxdb.find({
       selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid, type: 'NODE'
+        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
       }
       })
       this.$log('bookmarkFind item', item)
@@ -63,13 +63,15 @@ export default {
         this.laoding = true
         await this.$wait(500)
         let bookmarkInput = {
-          oid: this.oid,
-          type: this.type,
-          name: this.name,
+          oid: this.node.oid,
+          type: 'NODE',
+          name: this.node.name,
+          thumbOid: this.node.meta.items[0].thumbUrl,
           wsItemType: 'WS_BOOKMARK'
         }
         let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         this.$log('bookmarkCreate bookmark', bookmark)
+        this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark added!'})
         this.loading = false
         this.bookmarked = true
       }

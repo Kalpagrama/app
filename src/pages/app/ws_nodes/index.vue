@@ -32,7 +32,8 @@ q-layout(view="hHh Lpr lff")
                   .row.full-width.items-start.content-start.justify-center.q-px-sm
                     node-bookmark(
                       v-for="(i,ii) in items" :key="i.id"
-                      :node="i" :nodeIndex="ii")
+                      :node="i" :nodeIndex="ii"
+                      @remove="nodeRemove(i)")
             q-tab-panel(name="draft" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="queryDraftNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)

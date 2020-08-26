@@ -36,8 +36,6 @@ export default {
         KALPA: 'player-kalpa',
       },
     }
-  },
-  methods: {
   }
 }
 </script>
