@@ -103,11 +103,11 @@ const routes = [
         ]
       },
       {
-        name: 'notifications',
+        // name: 'notifications',
         path: 'notifications',
         component: () => import('pages/app/notifications/index.vue'),
         children: [
-          { name: 'notifications.home', path: '', component: () => import('pages/app/notifications/view_home.vue') },
+          { name: 'notifications', path: '', component: () => import('pages/app/notifications/view_home.vue') },
         ]
       },
     ]

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm.q-pt-sm
+.row.full-width.q-px-sm
   div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).col
     q-input(
       v-model="searchStringRaw"

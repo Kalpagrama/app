@@ -4,7 +4,7 @@
     v-for="n in 100" :key="n"
     :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.b-50.q-px-md.q-mb-sm
-    span.text-white Notification {{ n }}
+    span.text-white Уведомление {{ n }}
 </template>
 
 <script>
