@@ -79,7 +79,6 @@ div(
   //- label panning time
   div(
     v-if="panning"
-    :class="barClass"
     :style=`{
       position: 'absolute', zIndex: 9999, top: '-40px',
       left: 'calc('+currentTimePercent+'% - 2px)',
@@ -87,7 +86,7 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm {{ $time(currentTimePercent/100*player.duration) }}
+    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
   //- bars
   //- div(
     v-if="bars.length > 0"

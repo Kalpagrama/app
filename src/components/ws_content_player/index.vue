@@ -3,7 +3,9 @@ component(
   v-if="contentKalpa"
   :is="playerComponent[contentKalpa.type]"
   :contentKalpa="contentKalpa" :contentWorkspace="contentWorkspace"
-  :source="contentKalpa.contentSource" :url="contentKalpa.url" :bars="bars"
+  :source="contentKalpa.contentSource"
+  :url="contentKalpa.url"
+  :bars="bars"
   @player="$emit('player', $event)")
   template(v-slot:actions)
     slot(name="actions")
