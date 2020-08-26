@@ -71,6 +71,7 @@ export default {
       currentTime: 0,
       duration: 0,
       mutedLocal: false,
+      events: {}
     }
   },
   watch: {
@@ -140,6 +141,17 @@ export default {
           this.player.addEventListener('timeupdate', this.timeupdateHandle, false)
           this.player.addEventListener('pause', this.pauseHandle)
           this.player.addEventListener('play', this.playHandle)
+          this.events = {
+            on: (event, cb) => {
+              this.$refs.videoRef.addEventListener(event, cb)
+            },
+            off: (event, cb) => {
+              this.$refs.videoRef.removeEventListener(event, cb)
+            },
+            emit: (event, val) => {
+              this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+            }
+          }
           // })
           this.$emit('player', this)
           this.player.play()

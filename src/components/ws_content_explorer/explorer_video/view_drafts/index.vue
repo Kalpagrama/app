@@ -1,7 +1,8 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: nodeEditingId ? '0px' : '8px'
+    marginTop: nodeEditingId ? '-10px' : '0px',
+    paddingTop: nodeEditingId ? '0px' : '8px',
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
@@ -31,6 +32,7 @@ q-page(
                 @select="nodeEditingId = null, nodeSelectedId = n.id"
                 @edit="nodeSelectedId = null, nodeEditingId = n.id"
                 @edited="nodeEditingId = null, nodeSelectedId = n.id"
+                @delete="nodeDelete(n)"
                 :style=`{
                 }`)
             q-btn(
@@ -108,6 +110,11 @@ export default {
       this.$log('nodeCreate node', node)
       return node
     },
+    async nodeDelete (node) {
+      this.$log('nodeDelete', node)
+      if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
+      await this.$rxdb.remove(node.id)
+    }
   }
 }
 </script>

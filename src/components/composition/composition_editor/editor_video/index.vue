@@ -29,6 +29,7 @@
       }`)
   //- debug
   .row.full-width
+    q-btn(flat dense no-caps color="green" @click="layerAdd()") Add layer
     small.text-white layersChecked: {{ layersChecked }}
 </template>
 
@@ -45,6 +46,16 @@ export default {
       layerSelectedId: null,
       layerEditingId: null,
       layersChecked: []
+    }
+  },
+  methods: {
+    layerAdd (t) {
+      this.$log('layerAdd', t)
+      let start = t || this.player.currentTime
+      let end = start + 10 > this.player.duration ? this.player.duration : start + 10
+      let layerInput = {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]}
+      this.$set(this.composition.layers, this.composition.layers.length, layerInput)
+      this.player.setCurrentTime(start)
     }
   },
   mounted () {

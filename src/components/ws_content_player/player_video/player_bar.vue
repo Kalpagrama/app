@@ -130,6 +130,7 @@ export default {
       // this.$log('left/width', left, width)
       let t = (left / width) * this.player.duration
       this.$log('t', this.$time(t))
+      this.player.events.emit('bar-click', {t: t})
       this.player.setCurrentTime(t)
       this.$wait(400).then(() => {
         this.currentTimeMove = null

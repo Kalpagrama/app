@@ -27,9 +27,15 @@
       v-if="isSelected || isEditing"
       :style=`{
         borderRadius: '10px',
+        paddingLeft: isEditing ? '40px' : '0px',
+        paddingRight: isEditing ? '40px' : '0px',
       }`
       ).row.full-width
       //- isSelected & isEditing node.name editor...
+      //- .row.full-width.q-px-md.q-py-xs
+        span.text-white.text-bold В чем суть?
+      div().row.full-width.q-py-sm
+        composition-bar(:composition="item" :player="player")
       div(
         :style=`{
           position: 'relative', zIndex: 100,
@@ -38,11 +44,18 @@
         ).row.full-width.b-50
         q-input(
           v-model="node.name"
-          filled dark color="grey-6"
+          filled dark color="grey-6" type="textarea" autogrow
           placeholder="В чем суть?"
+          @focus="$store.commit('ui/stateSet', ['isTyping', true])"
+          @blur="$store.commit('ui/stateSet', ['isTyping', false])"
           :style=`{
           }`
           ).full-width
+      div(
+        v-if="isEditing"
+        :style=`{}`
+        ).row.full-width.q-pa-md
+        span.text-white #sphere, #sphere, #sphere, #sphere
       //- isSelected footer
       div(
         v-if="isSelected && !isEditing"
@@ -51,6 +64,7 @@
           borderRadius: '0 0 10px 10px', overflow: 'hidden',
         }`
         ).row.full-width.q-px-sm.q-pb-sm.bg-green
+        q-btn(flat color="red" no-caps @click="$emit('delete')") Delete
         .col
         q-btn(flat color="white" no-caps @click="$emit('edit')") Edit
       //- isEditing composition editor
@@ -74,10 +88,11 @@
 
 <script>
 import compositionEditor from 'components/composition/composition_editor/index.vue'
+import compositionBar from 'components/composition/composition_bar/index.vue'
 
 export default {
   name: 'viewDrafts_draftItem',
-  components: {compositionEditor},
+  components: {compositionEditor, compositionBar},
   props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
@@ -90,6 +105,18 @@ export default {
     item () {
       return this.items[0]
     }
+  },
+  methods: {
+    barClickHandle (e) {
+      this.$log('barClickHandle', e)
+    }
+  },
+  mounted () {
+    // this.$log('mounted')
+    this.player.events.on('bar-click', this.barClickHandle)
+  },
+  beforeDestroy () {
+    this.player.events.off('bar-click', this.barClickHandle)
   }
 }
 </script>
