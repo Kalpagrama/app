@@ -63,8 +63,8 @@ export default {
         }
         else {
           acc.push({
-            from: arr[idx - 1].to,
-            to: arr[idx - 1].to + layer.percent,
+            from: acc[idx - 1].to,
+            to: acc[idx - 1].to + layer.percent,
           })
         }
         return acc
