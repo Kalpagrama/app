@@ -19,7 +19,7 @@ class ObjectsApi {
   }
 
   static async objectList (oids) {
-    const f = ObjectsApi.objectFull
+    const f = ObjectsApi.objectList
     logD(f, 'start')
     const t1 = performance.now()
     let { data: { objectList } } = await apollo.clients.api.query({
@@ -33,6 +33,7 @@ class ObjectsApi {
       `,
       variables: { oids }
     })
+    logD('objectList=', objectList)
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return objectList
   }

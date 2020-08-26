@@ -58,7 +58,6 @@ class ReactiveItemDbMemCache {
   set(id, reactiveItem) {
     assert(id, '!id')
     assert(reactiveItem, '!reactiveItem')
-    assert(!this.cacheLru.has(id), '!this.cacheLru.has(id)')
     this.cacheLru.set(id, reactiveItem)
   }
 

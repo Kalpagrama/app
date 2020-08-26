@@ -234,17 +234,17 @@ class Cache {
       assert(this.created, '!this.created')
       assert(id)
       const f = this.get
-      // logD(f, 'start', id)
-      // const t1 = performance.now()
+      logD(f, 'start', id)
+      const t1 = performance.now()
       if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
       let cachedInfo = this.cacheLru.get(id) // {actualUntil, actualAge, failReason}
       if (force || !this.isActual(id, cachedInfo)) { // данные отсутствуют в кэше, либо устарели
         if (fetchFunc) {
           let processFetchErrorFunc = async (err) => {
             if (err === 'queued item was evicted legally') { // ничего не делаем
-              logD(f, 'Данные не получены! запрос на сервер был отброшен(легально) по причне переполнения очереди!', err)
+              logD(f, `Данные не получены(${id})! запрос на сервер был отброшен(легально) по причне переполнения очереди!`, err)
             } else {
-              logE('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
+              logE(`Данные не получены (${id})! Произошла ошибка. Через минуту  можно пробовать еще`, err)
               const min = 1000 * 60
               this.cacheLru.set(id, {
                 actualUntil: Date.now() + min,
@@ -265,11 +265,12 @@ class Cache {
             if (onFetchFunc) await onFetchFunc(existing, fetchRes.item)
             return res
           }
-          logD(f, 'запрашиваем данные с сервера...')
           if (clientFirst && (cachedInfo && !cachedInfo.failReason)) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
+            logD(f, 'запрашиваем данные с сервера асинхронно...')
             fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
           } else { // ждем ответа сервра
             try {
+              logD(f, 'запрашиваем данные с сервера синхронно...', clientFirst, cachedInfo)
               await saveFunc(await fetchFunc())
             } catch (err) {
               await processFetchErrorFunc(err)
@@ -285,11 +286,11 @@ class Cache {
         if (cachedInfo && cachedInfo.failReason) {
           cachedInfo = this.cacheLru.get(id) || cachedInfo // изменилось actualUntil
           let tryAfter = Math.max(0, (cachedInfo.actualUntil - Date.now()) / 1000)
-          throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + cachedInfo.failReason)
+          throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек. failReason=` + cachedInfo.failReason)
         }
         return null
       }
-      // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
     } finally {
       // this.release()

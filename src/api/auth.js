@@ -13,12 +13,15 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 let currentWebPushToken
 const apiMutex = new Mutex()
 
-async function resetAuthData() {
-  localStorage.removeItem('k_token')
-  localStorage.removeItem('k_token_expires')
-  localStorage.removeItem('k_user_oid')
-  localStorage.removeItem('k_user_role')
-  await systemReset()
+async function resetLocalStorageData() {
+  // localStorage.removeItem('k_token')
+  // localStorage.removeItem('k_token_expires')
+  // localStorage.removeItem('k_user_oid')
+  // localStorage.removeItem('k_user_role')
+  for (let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i)
+    if (key.startsWith('k_')) localStorage.removeItem(key)
+  }
 }
 
 class AuthApi {
@@ -72,7 +75,8 @@ class AuthApi {
     } finally {
       try {
         if (!token || token === localStorage.getItem('k_token')) {
-          await resetAuthData()
+          await resetLocalStorageData()
+          await systemReset()
           window.location.reload()
         }
       } finally {
@@ -87,7 +91,8 @@ class AuthApi {
     logD(f, 'start. userId=', userId_)
     const t1 = performance.now()
     assert(userId_)
-    await resetAuthData()
+    await resetLocalStorageData()
+    await systemReset()
     let { data: { userIdentify: { userId, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
       query: gql`
         query  ($userId: String!){
@@ -203,4 +208,4 @@ class AuthApi {
   }
 }
 
-export { AuthApi }
+export { AuthApi, resetLocalStorageData }

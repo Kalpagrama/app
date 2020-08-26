@@ -1,27 +1,28 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { Notify, Platform } from 'quasar'
-import { i18n } from 'src/boot/i18n'
+import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
+import {Notify, Platform} from 'quasar'
+import {i18n} from 'src/boot/i18n'
 import {RxCollectionEnum, rxdb} from 'src/system/rxdb'
-import { askForPwaWebPushPerm, initPWA, pwaReset } from 'src/system/pwa'
-import { router } from 'src/boot/main'
+import {askForPwaWebPushPerm, initPWA, pwaReset} from 'src/system/pwa'
+import {router} from 'src/boot/main'
 import assert from 'assert';
 import i18next from 'i18next'
+import {resetLocalStorageData} from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
 
-async function initServices (store) {
+async function initServices(store) {
   const f = initServices
   logD(f, 'start', Platform.is, process.env.MODE)
   const t1 = performance.now()
   if (process.env.MODE === 'pwa') {
     await initPWA(store)
   } else if (Platform.is.capacitor) {
-    const { initCapacitor } = await import('src/system/capacitor.js')
+    const {initCapacitor} = await import('src/system/capacitor.js')
     await initCapacitor(store)
   } else if (Platform.is.cordova) {
-    const { initCordova } = await import('src/system/cordova.js')
+    const {initCordova} = await import('src/system/cordova.js')
     await initCordova(store)
   }
   initOfflineEvents(store)
@@ -30,8 +31,8 @@ async function initServices (store) {
   logD(f, `complete: ${performance.now() - t1} msec`, hasPerm)
 }
 
-function initOfflineEvents (store) {
-  function handleNetworkChange (event) {
+function initOfflineEvents(store) {
+  function handleNetworkChange(event) {
     logD('handleNetworkChange', navigator.onLine)
     store.commit('core/stateSet', ['online', navigator.onLine])
     Notify.create(
@@ -48,8 +49,8 @@ function initOfflineEvents (store) {
   store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-// очистить кэш сервис-воркера
-async function systemReset () {
+// очистить кэши и БД
+async function systemReset() {
   const f = systemReset
   logD(f, 'start')
   const t1 = performance.now()
@@ -59,21 +60,21 @@ async function systemReset () {
   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
-async function askForWebPushPerm (store) {
+async function askForWebPushPerm(store) {
   if (Platform.is.capacitor) {
-    const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
+    const {initCapacitorPushPlugin} = await import('src/system/capacitor.js')
     await initCapacitorPushPlugin(store)
     return true
   } else if (Platform.is.cordova) {
-    const { initCordovaPushPlugin } = await import('src/system/cordova.js')
+    const {initCordovaPushPlugin} = await import('src/system/cordova.js')
     await initCordovaPushPlugin(store)
     return true
-  } else if (process.env.MODE === 'pwa'){
+  } else if (process.env.MODE === 'pwa') {
     return await askForPwaWebPushPerm(store)
   }
 }
 
-async function systemInit(store){
+async function systemInit(store) {
   const f = systemInit
   logD(f, 'start')
   const t1 = performance.now()
@@ -87,8 +88,9 @@ async function systemInit(store){
       await store.dispatch('init', currentUser)
       await i18next.changeLanguage(currentUser.profile.lang)
       res.authenticated = true
-    } catch (err){
+    } catch (err) {
       logE('error on systemInit!', err)
+      await resetLocalStorageData()
       await systemReset()
       throw err
     }
@@ -97,4 +99,4 @@ async function systemInit(store){
   return res
 }
 
-export { initServices, systemReset, systemInit }
+export {initServices, systemReset, systemInit}

@@ -228,7 +228,7 @@ export default async ({Vue, store, app}) => {
       logger.critical(detectModuleName(this), ...msg)
     }
     Vue.config.errorHandler = function (err, vm, info) {
-      console.log('Vue.config.errorHandler')
+      // console.log('Vue.config.errorHandler')
       if (err) {
         if (err.processed) return
         err.processed = true
