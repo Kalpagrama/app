@@ -66,7 +66,7 @@ export default {
         this.$emit('error')
       }
       this.nodeFull = nodeFull
-      this.$log(f, `complete: ${performance.now() - t1} msec`)
+      this.$log(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     },
     async nodeDestroy () {
       // this.$log('nodeDestroy', this.node.oid)

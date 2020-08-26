@@ -2,7 +2,7 @@ import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
 import {Notify, Platform} from 'quasar'
 import {i18n} from 'src/boot/i18n'
 import {RxCollectionEnum, rxdb} from 'src/system/rxdb'
-import {askForPwaWebPushPerm, initPWA, pwaReset} from 'src/system/pwa'
+import {askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith} from 'src/system/pwa'
 import {router} from 'src/boot/main'
 import assert from 'assert';
 import i18next from 'i18next'
@@ -28,7 +28,30 @@ async function initServices(store) {
   initOfflineEvents(store)
   // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
   const hasPerm = await askForWebPushPerm(store)
-  logD(f, `complete: ${performance.now() - t1} msec`, hasPerm)
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
+}
+
+async function shareWith(object){
+  const f = shareWith
+  logD(f, 'start', Platform.is, process.env.MODE)
+  const t1 = performance.now()
+  let title, text, url
+  assert(object && object.oid && object.type)
+  switch (object.type){
+    case 'NODE':
+      title = object.name
+      text = object.name
+      url = location.origin + '/node/' + object.oid
+      break
+    case 'USER':
+      title = object.name
+      text = object.name
+      url = location.origin + '/user/' + object.oid
+  }
+  if (process.env.MODE === 'pwa' || process.env.MODE === 'spa') {
+    if (url) await pwaShareWith(title, text, url)
+  }
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 function initOfflineEvents(store) {
@@ -99,4 +122,4 @@ async function systemInit(store) {
   return res
 }
 
-export {initServices, systemReset, systemInit}
+export {initServices, systemReset, systemInit, shareWith}

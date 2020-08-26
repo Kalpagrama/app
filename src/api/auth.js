@@ -139,7 +139,7 @@ class AuthApi {
     })
     localStorage.setItem('k_user_role', role)
     if (oid) localStorage.setItem('k_user_oid', oid)
-    logD(f, `complete: ${performance.now() - t1} msec`, { result, role, oid, nextAttemptDate, attempts, failReason })
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, { result, role, oid, nextAttemptDate, attempts, failReason })
     return { result, role, nextAttemptDate, attempts, failReason }
   }
 

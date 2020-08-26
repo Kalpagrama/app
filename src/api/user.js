@@ -52,7 +52,7 @@ class UserApi {
         oid
       }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`, subscribe)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, subscribe)
     return subscribe
   }
 
@@ -70,7 +70,7 @@ class UserApi {
     })
     let currentUserOid = localStorage.getItem('k_user_oid')
     let res = items.find(item => item.oid === currentUserOid) ? true : false
-    logD(f, `complete: ${performance.now() - t1} msec`, res)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
     return res
   }
 

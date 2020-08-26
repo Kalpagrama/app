@@ -122,6 +122,14 @@ async function initPWA (store) {
   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
+async function pwaShareWith(title, text, url){
+  if (!('share' in navigator)) {
+    alert('Web Share API not supported!')
+    return
+  }
+  await navigator.share({title, text, url})
+}
+
 async function pwaReset () {
   const f = pwaReset
   logD(f, 'start')
@@ -290,4 +298,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { askForPwaWebPushPerm, initPWA, pwaReset }
+export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith }

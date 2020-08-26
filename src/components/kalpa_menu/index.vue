@@ -91,6 +91,7 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
 import { i18n } from 'src/boot/i18n'
+import {systemReset, shareWith} from 'src/system/services'
 
 export default {
   name: 'kalpaMenu',
@@ -118,8 +119,9 @@ export default {
     async refresh () {
       this.$log('refresh')
       this.refreshLoading = true
-      await this.$wait(1000)
-      await this.$rxdb.clearAll()
+      // await this.$wait(1000)
+      await shareWith(this.$store.getters.currentUser())
+      await systemReset()
       window.location.reload()
       this.refreshLoading = false
     },
