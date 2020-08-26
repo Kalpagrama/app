@@ -187,7 +187,7 @@ export default {
     layerLoop () {},
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.layerPlay()
   }
 }
