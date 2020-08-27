@@ -10,6 +10,10 @@ const routes = [
     ]
   },
   {
+    path: '/share_target/:page?',
+    component: () => import('layouts/share_layout.vue'),
+  },
+  {
     path: '/',
     component: () => import('layouts/main_layout'),
     children: [

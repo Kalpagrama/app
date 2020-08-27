@@ -1,4 +1,4 @@
-const swVer = 5
+const swVer = 6
 const useCache = true
 let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -182,7 +182,7 @@ function sendMsg (type, msgData) {
             logLevel = event.data.logLevel
             logLevelSentry = event.data.logLevelSentry
             try {
-              if (logDbgFilter !== 'gui') workbox.setConfig({ debug: true })
+              // if (logDbgFilter !== 'gui') workbox.setConfig({ debug: true })
             } catch (err) {
               logDebug('error on setConfig', err)
             }
