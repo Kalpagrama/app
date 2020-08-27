@@ -3,16 +3,14 @@ div(
   :style=`{
     borderRadius: '0 0 10px 10px',
   }`
-  ).row.full-width.items-start.content-start.q-pt-md.q-mb-sm.b-50
+  ).row.full-width.items-start.content-start.q-pt-xl.b-50
   .row.full-width.items-center.content-center
-    //- q-btn(round flat color="white" icon="play_arrow")
-    //- q-btn(round flat color="white" icon="edit")
     q-btn(round flat color="grey-6" @click="layerSet(0)")
       q-icon(name="flip" size="40px" color="grey-7").rotate-180
     .col
       div(
         :style=`{
-          position: 'relative', height: '32px',
+          position: 'relative', height: '36px',
           borderRadius: '6px',
         }`).row.full-width.b-100
         q-btn(
@@ -22,9 +20,9 @@ div(
           :icon="layerPlaying ? 'pause' : 'play_arrow'"
           :style=`{
             position: 'absolute', zIndex: 120,
-            left: '0px', top: '0px',
-          }`
-          )
+            left: 'calc(25% - 10px)',
+            top: '-40px',
+          }`)
         //- layer currentTime line
         //- div(
           :style=`{
@@ -69,7 +67,7 @@ div(
           :style=`{
             position: 'absolute', zIndex: 100,
             left: 'calc(25% - 20px + 4px)',
-            height: '30px', width: '30px',
+            height: '36px', width: '36px',
             borderRadius: '50%',
             opacity: 0.3,
           }`
@@ -79,12 +77,11 @@ div(
           :style=`{
             position: 'absolute', zIndex: 100,
             right: 'calc(25% - 20px + 4px)',
-            height: '30px', width: '30px',
+            height: '36px', width: '36px',
             borderRadius: '50%',
             opacity: 0.3
           }`
           ).bg-green
-    //- q-btn(round flat color="white" icon="refresh")
     q-btn(round flat color="grey-7" @click="layerSet(1)")
       q-icon(name="flip" size="40px" color="grey-7")
   .row.full-width
@@ -193,7 +190,7 @@ export default {
   },
   mounted () {
     // this.$log('mounted')
-    this.layerPlay()
+    // this.layerPlay()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

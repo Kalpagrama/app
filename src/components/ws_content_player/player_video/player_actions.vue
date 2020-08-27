@@ -4,9 +4,9 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
   q-btn(
     @click="player.playing ? player.pause() : player.play()"
     round flat dense
-    :color="player.playing ? 'red' : color"
+    :color="player.playing ? color : color"
     :icon="player.playing ? 'pause' : 'play_arrow'"
-    :style=`{borderRadius: '50%', background: 'rgba(0,0,0,0.5)'}`)
+    :style=`{borderRadius: '50%', background: 'rgba(0,0,0,0.2)'}`)
   //- stats
   div(
     :style=`{
@@ -20,9 +20,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
         :color="player.mutedLocal ? 'red' : color"
         size="20px" @click="player.volumeToggle()")
     q-btn(
-      flat dense :color="color"
-      :style=`{}`
-      )
+      flat dense :color="color")
       small.text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
     //- q-btn(round flat dense :color="color" icon="fullscreen" @click="fullscreenToggle()")
     q-btn(round flat dense :color="color" icon="fast_forward" @click="forward()")

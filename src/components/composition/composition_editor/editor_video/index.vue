@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-pa-sm
+.row.full-width
   //- layers list or one layer?
   .row.full-width.items-start.content-start
     div(
@@ -10,7 +10,7 @@
         v-model="layersChecked" :val="l.id"
         flat dense dark color="green"
         :style=`{opacity: layersChecked.includes(l.id) ? 1 : 0.3}`).q-ma-sm
-      div(:style=`{maxWidth: '600px',}`).col
+      div(:style=`{maxWidth: '100%',}`).col
         layer-figures(
           :layer="l" :layerIndex="li"
           :player="player" :composition="composition"
@@ -22,15 +22,18 @@
         @click="layerDelete(l,li)"
         round flat dense color="grey-6" icon="drag_indicator")
   //- composition bar
-  div(v-if="composition.layers.length > 1").row.full-width.justify-center
+  div(v-if="true || composition.layers.length > 1").row.full-width.justify-center
     composition-bar(
       :composition="composition" :player="player" :contentKalpa="contentKalpa"
+      actionsPosition="top"
       :style=`{
         maxWidth: '600px',
       }`)
+  //- actions
+  //- .row.full-width.justify-center
+    q-btn(flat dense no-caps color="green" icon="add" @click="layerAdd()").q-px-sm Add layer
   //- debug
-  .row.full-width
-    q-btn(flat dense no-caps color="green" @click="layerAdd()") Add layer
+  //- .row.full-width
     small.text-white layersChecked: {{ layersChecked }}
 </template>
 

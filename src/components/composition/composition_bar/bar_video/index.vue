@@ -1,13 +1,15 @@
 <template lang="pug">
-.row.full-width.q-py-xs
+.row.full-width
+  //- bar
   div(
     @click="barClick"
     :style=`{
       position: 'relative',
-      height: '36px',
+      height: '50px',
       borderRadius: '10px',
+      border: '2px solid #4caf50',
     }`
-    ).row.full-width.b-60
+    ).row.full-width
     div(
       v-for="(l,li) in layersMeta" :key="li"
       :class=`{
@@ -16,6 +18,7 @@
       :style=`{
         position: 'relative',
         borderLeft: li === 0 ? 'none' : '2px solid #4caf50',
+        borderRadius: '10px',
         width: l.percent*100+'%',
         pointerEvents: 'none',
       }`
@@ -23,18 +26,24 @@
       div(
         v-if="player.currentTime >= l.start && player.currentTime <= l.end"
         :style=`{
-          position: 'absolute',
+          position: 'absolute', zIndex: 9999,
           left: ((player.currentTime-l.start)/l.duration)*100+'%',
-          height: 'calc(100% + 16px)',
-          top: '-8px',
+          height: 'calc(100% + 8px)',
+          top: '-4px',
           width: '4px', borderRadius: '2px',
           pointerEvents: 'none',
         }`
         ).row.bg-red
-  .row.full-width.q-pa-sm
+  //- actions
+  div(
+    :style=`{
+      order: actionsPosition === 'bottom' ? 1 : -1,
+    }`
+    ).row.full-width.q-px-sm
     q-btn(
       v-if="!compositionPlaying"
-      round flat dense color="white" icon="play_arrow" @click="compositionPlay()")
+      @click="compositionPlay()"
+      round flat dense color="white" icon="play_arrow")
     q-btn(
       v-if="compositionPlaying"
       @click="compositionPlayPause()"
@@ -42,14 +51,34 @@
       :icon="player.playing ? 'pause' : 'play_arrow'")
     q-btn(
       v-if="compositionPlaying"
-      round flat dense color="red" icon="stop" @click="compositionStop()")
+      @click="compositionStop()"
+      round flat dense color="red")
+      q-icon(name="stop" size="28px" color="red")
+  //- debug
+  div(v-if="showDebug" :style=`{fontSize: '10px'}`).row.full-width.bg-green
     small.text-white layersPlayed {{layersPlayed}}
 </template>
 
 <script>
 export default {
   name: 'compositionBar_video',
-  props: ['player', 'composition', 'contentKalpa'],
+  props: {
+    player: {type: Object, required: true},
+    composition: {type: Object, required: true},
+    contentKalpa: {type: Object, required: true},
+    actionsPosition: {
+      type: String,
+      default () {
+        return 'bottom' // bottom, top
+      }
+    },
+    showDebug: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    }
+  },
   data () {
     return {
       compositionPlaying: false,
@@ -149,7 +178,7 @@ export default {
       this.compositionStop()
       let left = e.layerX
       let width = e.target.clientWidth
-      // if (left > width) return
+      if (left > width) return
       this.$log('left/width', left, width)
       let d = left / width
       this.$log('d', d)
@@ -168,15 +197,21 @@ export default {
         this.$log('layerT', layerT)
         this.player.setCurrentTime(layerT)
       }
+    },
+    playerBarClickHandle () {
+      this.$log('playerBarClickHandle')
+      this.compositionStop()
     }
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['wsContentLayers', this.composition.layers])
-    // TODO: listen to events and stop composition from playing...
+    this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(this.composition.layers))])
+    this.player.events.on('bar-click', this.playerBarClickHandle)
+    this.compositionPlay()
   },
   beforeDestroy () {
     this.$store.commit('ui/stateSet', ['wsContentLayers', null])
+    this.player.events.off('bar-click', this.playerBarClickHandle)
   }
 }
 </script>

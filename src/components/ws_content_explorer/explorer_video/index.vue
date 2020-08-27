@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.justify-center.b-30
+    div(:style=`{opacity: 1}`).row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
         .row.full-width.items-start.content-start
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")

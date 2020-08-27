@@ -63,7 +63,8 @@ q-layout(view="lHh lpR lFf")
     router-view(v-if="!loading")
     div(
       v-if="loading"
-      ).row.full-width.window-height.items-center.content-center.justify-center
+      :style=`{height: $q.screen.height-50+'px'}`
+      ).row.full-width.items-center.content-center.justify-center
       q-spinner(color="green" size="100px" :thickness="4")
 </template>
 

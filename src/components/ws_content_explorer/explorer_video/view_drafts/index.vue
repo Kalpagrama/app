@@ -14,7 +14,7 @@ q-page(
             v-if="nodeEditingId ? nodeEditingId === n.id : true"
             :style=`{
             }`
-            ).row.full-width.items-start.content-start.q-mb-sm
+            ).row.full-width.items-start.content-start
             q-checkbox(
               v-if="!nodeEditingId"
               v-model="nodesChecked" :val="n.id"
@@ -30,6 +30,7 @@ q-page(
                 :isSelected="n.id === nodeSelectedId"
                 :isEditing="n.id === nodeEditingId"
                 @select="nodeEditingId = null, nodeSelectedId = n.id"
+                @unselect="nodeSelectedId = null"
                 @edit="nodeSelectedId = null, nodeEditingId = n.id"
                 @edited="nodeEditingId = null, nodeSelectedId = n.id"
                 @delete="nodeDelete(n)"
@@ -37,7 +38,19 @@ q-page(
                 }`)
             q-btn(
               v-if="!nodeEditingId"
-              round flat dense color="grey-8" icon="more_vert")
+              @click="nodeMoreStart(n)"
+              round flat dense color="grey-8" icon="more_vert").q-ml-xs.q-mt-xs
+  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-page-sticky(
+      v-if="nodesChecked.length > 0"
+      expand position="bottom")
+      .row.full-width.justify-center.q-pb-sm
+        div(:style=`{maxWidth: '800px', borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.b-40.q-pa-md
+          q-btn(flat color="white" no-caps @click="nodesChecked = []") Close
+          q-btn(flat color="red" no-caps @click="nodesCheckedDelete()") Delete
+          .col
+          q-btn(color="green" no-caps @click="nodesCheckedCreateNode()") Create node
 </template>
 
 <script>
@@ -110,10 +123,46 @@ export default {
       this.$log('nodeCreate node', node)
       return node
     },
+    nodeMoreStart (node) {
+      this.$log('nodeMoreStart', node)
+      this.$q.bottomSheet({
+        dark: true,
+        title: node.name,
+        persistent: false,
+        seamless: false,
+        grid: false,
+        style: {
+          borderRadius: '10px',
+          overflow: 'hidden',
+          paddingBottom: '50px',
+          marginLeft: '10px',
+          marginRight: '10px',
+          marginBottom: '50px',
+          background: 'rgb(60,60,60)',
+        },
+        actions: [
+          {id: 'share', label: 'Share'},
+          {id: 'create-node', label: 'Create node'},
+        ]
+      })
+    },
     async nodeDelete (node) {
       this.$log('nodeDelete', node)
       if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
       await this.$rxdb.remove(node.id)
+    },
+    nodesCheckedDelete () {
+      this.$log('nodesCheckedDelete')
+      if (!confirm(this.$t('confirm_Really delete?', 'Удалить?'))) return
+      this.nodesChecked.map(id => {
+        this.$rxdb.remove(id)
+      })
+      this.nodesChecked = []
+    },
+    nodesCheckedCreateNode () {
+      this.$log('nodesCheckedCreateNode')
+      // TODO go to the editor of nodes... multinode?
+      this.nodesChecked = []
     },
     nodesLoaded (nodes) {
       this.$log('nodesLoaded', nodes)
@@ -129,7 +178,7 @@ export default {
         return acc
       }, [])
       this.$log('layers', layers)
-      this.$store.commit('ui/stateSet', ['wsContentLayers', layers])
+      this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
     }
   },
   beforeDestroy () {
