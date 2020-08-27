@@ -71,6 +71,7 @@ export default {
       currentTime: 0,
       duration: 0,
       mutedLocal: false,
+      events: {}
     }
   },
   watch: {
@@ -97,8 +98,13 @@ export default {
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
+      // if (this.currentTimeBlocked) return
+      this.currentTime = t
+      this.currentTimeBlocked = true
       this.player.setCurrentTime(t)
-      this.curerntTime = t
+      this.$wait(500).then(() => {
+        this.currentTimeBlocked = false
+      })
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
@@ -106,6 +112,7 @@ export default {
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
+      if (this.currentTimeBlocked) return
       this.currentTime = this.player.currentTime
     },
     playHandle (e) {
@@ -138,6 +145,17 @@ export default {
           this.player.addEventListener('timeupdate', this.timeupdateHandle, false)
           this.player.addEventListener('pause', this.pauseHandle)
           this.player.addEventListener('play', this.playHandle)
+          this.events = {
+            on: (event, cb) => {
+              this.$refs.videoRef.addEventListener(event, cb)
+            },
+            off: (event, cb) => {
+              this.$refs.videoRef.removeEventListener(event, cb)
+            },
+            emit: (event, val) => {
+              this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+            }
+          }
           // })
           this.$emit('player', this)
           this.player.play()

@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
+.column.full-width
   //- header
   div(
     :style=`{borderRadius: '10px',}`
@@ -18,7 +18,7 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.content-center.justify-center.cursor-pointer
         kalpa-logo(:width="40" :height="40")
-      .col
+      div(v-if="showRightSide").col
         div(
           @click="$router.push('/').catch(e => e)"
           ).row.fit.items-center.content-center.cursor-pointer
@@ -32,11 +32,11 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
       :class=`{
         'b-60': $route.path.split('/')[1] === 'user'
       }`
-      :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
+      :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.items-center.content-center.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
-      .col.full-height
+      div(v-if="showRightSide").col.full-height
         .row.fit.items-center.content-center
           span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
           small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
@@ -54,72 +54,78 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
             'b-60': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 600 ? '55px' : '40px',
+            height: $q.screen.width > 600 ? '55px' : '55px',
             borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="22px" :name="p.icon" :color="p.color || 'white'")
-          span(:style=`{fontSize: '16px'}`).text-white {{ p.name }}
+          span(
+            v-if="showRightSide"
+            :style=`{fontSize: '16px'}`).text-white {{ p.name }}
         //- refresh
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="refresh()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
+          span(
+            v-if="showRightSide"
+            :style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
+          span(
+            v-if="showRightSide"
+            :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
         //- create node
         .row.full-width.items-center.content-center
           q-btn(
             :to="'/workspace/node/new'"
             flat color="green" no-caps align="left" icon="add" size="md"
-            :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
+            :style=`{height: '60px'}`).full-width
+            span(
+              v-if="showRightSide"
+              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- version
-        div(v-if="true").row.full-width.items-center.q-pa-md
+        div(v-if="showRightSide").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
-import { i18n } from 'src/boot/i18n'
 import {systemReset, shareWith} from 'src/system/services'
 
 export default {
   name: 'kalpaMenu',
+  props: ['inDrawer'],
   data () {
     return {
-      width: 300,
       pages: [
-        {id: 'home', name: i18n.t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
-        {id: 'trends', name: i18n.t('pageCategories', 'Категории'), icon: 'whatshot'},
-        {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter', color: 'blue-5'},
-        {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
-        {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
-        {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'settings', name: i18n.t('pageSettings', 'Настройки'), icon: 'tune'},
+        {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
+        {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
+        {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
+        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
+        {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,
-      nodeEditorOpened: false,
-      node: null,
     }
   },
   computed: {
+    showRightSide () {
+      if (this.inDrawer) return true
+      else return this.$q.screen.width > 1260
+    }
   },
   methods: {
     async refresh () {
       this.$log('refresh')
       this.refreshLoading = true
-      // await this.$wait(1000)
+      await this.$wait(300)
       await shareWith(this.$store.getters.currentUser())
       await systemReset()
       window.location.reload()
@@ -129,39 +135,9 @@ export default {
       this.$log('logout')
       if (!confirm('Really logout ?')) return
       this.logoutLoading = true
-      await this.$wait(500)
+      await this.$wait(300)
       await AuthApi.logout()
       this.logoutLoading = false
-    },
-    async createNodeStart () {
-      this.$log('createNodeStart')
-      this.$store.commit('ui/stateSet', ['active', false])
-      let nodeInput = {
-        name: '',
-        wsItemType: 'WS_NODE',
-        items: [],
-        spheres: [],
-        category: 'FUN',
-        layout: 'PIP',
-        stage: 'draft'
-      }
-      this.$log('nodeInput', nodeInput)
-      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      this.$log('nodeAddStart item', item)
-      this.node = item
-      this.nodeEditorOpened = true
-    },
-    nodeEdited () {
-      this.$log('nodeEdited')
-      this.$store.commit('ui/stateSet', ['active', true])
-      this.nodeEditorOpened = false
-      this.node = null
-    },
-    async nodePublished () {
-      this.$log('nodePublished')
-      this.nodeEdited()
-      await this.$wait(200)
-      this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
     }
   },
 }

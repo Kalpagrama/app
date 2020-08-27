@@ -5,14 +5,27 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
         div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.br
   q-page-container
-    q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`)
+    q-page(
+      :style=`{
+        paddingTop: '50px', paddingBottom: '200px',
+      }`)
       .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+        div(
+          :class=`{
+            'q-px-sm': $q.screen.width > 800,
+          }`
+          :style=`{
+            maxWidth: '800px',
+            borderLeft: '1px solid rgb(40,40,40)',
+            borderRight: '1px solid rgb(40,40,40)',
+          }`
+          ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
             template(v-slot=`{items,itemsMore}`)
               list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
                   node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
+                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
@@ -26,9 +39,11 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import nodeFeed from 'pages/app/twitter/node_item.vue'
 
 export default {
   name: 'pageApp__trends',
+  components: {nodeFeed},
   data () {
     return {
       nodeCategories: [],

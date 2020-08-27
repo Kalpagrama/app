@@ -3,7 +3,9 @@ component(
   v-if="contentKalpa"
   :is="playerComponent[contentKalpa.type]"
   :contentKalpa="contentKalpa" :contentWorkspace="contentWorkspace"
-  :source="contentKalpa.contentSource" :url="contentKalpa.url" :bars="bars"
+  :source="contentKalpa.contentSource"
+  :url="contentKalpa.url"
+  :options="options"
   @player="$emit('player', $event)")
   template(v-slot:actions)
     slot(name="actions")
@@ -20,7 +22,7 @@ export default {
   props: {
     contentKalpa: {type: Object, required: true},
     contentWorkspace: {type: Object},
-    bars: {type: Array, default () { return [] }},
+    options: {type: Object},
   },
   data () {
     return {

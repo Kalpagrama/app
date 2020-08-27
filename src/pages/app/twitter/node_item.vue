@@ -28,22 +28,30 @@
 <template lang="pug">
 div(:style=`{borderTop: '1px solid rgb(50,50,50)'}`).row.full-width.items-start.content-start.q-pt-sm
   //- left column for author
-  div(:style=`{width: '70px'}`).row.full-height.items-start.content-start.justify-center.q-px-sm
-    user-avatar(:url="node.meta.author.thumbUrl" :width="50" :height="50")
+  //- div(:style=`{width: '70px'}`).row.full-height.items-start.content-start.justify-center.q-px-sm
+    router-link(:to="'/user/'+node.meta.author.oid").row.full-width.justify-center
+      user-avatar(:url="node.meta.author.thumbUrl" :width="50" :height="50")
   //- right column for the node
   .col
-    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pr-sm
+    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
       //- node author... router-link...
       .row.full-width.items-end.content-end.q-py-xs.q-px-sm
-        span.text-white.text-bold {{ node.meta.author.name }}
-        .col
-        small.text-grey-7 {{ createdAt }}
-        q-icon(round flat dense color="grey-7" size="20px" name="more_horiz").q-ml-sm
+        router-link(:to="'/user/'+node.meta.author.oid").row.full-width
+          user-avatar(:url="node.meta.author.thumbUrl" :width="20" :height="20")
+          span.text-white.text-bold.q-ml-sm {{ node.meta.author.name }}
+          .col.full-width
+          small.text-grey-7 {{ createdAt }}
+        //- .col
+        //- q-icon(round flat dense color="grey-7" size="20px" name="more_horiz").q-ml-sm
       //- node items, item[0] wrapper
-      div(:style=`{borderRadius: '10px',}`).row.full-width.items-start.content-start.b-40
+      div(:style=`{position: 'relative', borderRadius: '10px',}`).row.full-width.items-start.content-start.b-40
+        div(:style=`{position: 'absolute', zIndex: 1000, top: '0px'}`).row.full-width
+          q-btn(round flat color="white" icon="select_all")
+          .col
+          q-btn(round flat color="white" icon="bookmark_outline")
         //- node.name
-        div(:style=`{}`).row.full-width.q-px-sm.q-py-xs
-          span(v-for="(n,ni) in node.name" :key="ni").text-white {{ node.name }}
+        div(:style=`{order: 10}`).row.full-width.q-px-sm.q-py-md
+          span().text-white {{ node.name }}
         //- node items, item[0],
         //- TODO: onClick() ???
         img(
@@ -53,28 +61,30 @@ div(:style=`{borderTop: '1px solid rgb(50,50,50)'}`).row.full-width.items-start.
       //- footer: actions
       .row.full-width.justify-between
         //- share/reNode/spheres
-        .row.full-height.items-center.content-center.q-py-sm
-          q-btn(flat dense color="grey-8" icon="share" @click="shareStart()")
+        .row.full-height.items-center.content-center.q-py-sm.q-px-md
+          q-btn(flat dense color="grey-7" icon="share" @click="shareStart()")
             small.text-grey-8 11
-          q-btn(flat dense color="grey-8" icon="loop" @click="reNodeStart()")
+          //- q-btn(flat dense color="grey-7" icon="loop" @click="reNodeStart()")
             small.text-grey-8 1230
-          q-btn(flat dense color="grey-8" icon="blur_on" @click="spheresStart()")
+          //- q-btn(flat dense color="grey-7" icon="style" @click="spheresStart()")
             small.text-grey-8 4
         //- voting
         .row.full-height.items-center.content-center.q-py-xs
+          span.text-bold.text-grey-6 3.4
           q-btn(
             @click="voteStart()"
-            flat
-            :color="voteColor"
+            flat round
+            :color="'green'"
             :loading="voting"
+            icon="blur_on"
             @mouseenter="voteColor = 'green'"
-            @mouseleave="voteColor = 'grey-7'").voter
-            q-icon(name="thumb_down" :color="voteColor" :style=`{marginTop: '10px'}`)
-            span.text-grey-5.text-bold.q-mt-xs.q-mx-xs 8.2
-            q-icon(name="thumb_up" :color="voteColor")
+            @mouseleave="voteColor = 'grey-7'").voter.q-mr-sm
+            //- q-icon(name="thumb_down" :color="voteColor" :style=`{marginTop: '10px'}`)
+            //- span.text-grey-5.text-bold.q-mt-xs.q-mx-xs 8.2
+            //- q-icon(name="thumb_up" :color="voteColor")
       //- footer: explore chain node
       .row.full-width.q-pb-lg
-        q-btn(
+        //- q-btn(
           flat dense no-caps color="green" :to="'/twitter/node/'+node.oid").q-px-sm
           span.text-bold Explore chain
 </template>
@@ -111,7 +121,7 @@ export default {
       this.$q.bottomSheet({
         dark: true,
         title: 'Не сыкуй, голосуй!',
-        persistent: true,
+        persistent: false,
         seamless: false,
         grid: false,
         style: {

@@ -28,12 +28,12 @@ div(
         round flat color="grey-2" icon="select_all"
         :style=`{
           position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-          top: '0px', left: '0px',
-          background: 'rgba(0,0,0,0.2)',
+          top: '8px', left: '8px',
+          background: 'rgba(0,0,0,0.15)',
         }`)
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      node-bookmark(v-show="isActive" :isActive="isActive" :oid="node.oid" type="NODE" :name="node.name")
+      node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
     img(
       :src="thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`
@@ -43,7 +43,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
       }`
-      ).row.fit.br
+      ).row.fit
       video(
         v-if="itemType === 'VIDEO'"
         @click="videoClicked"
@@ -57,15 +57,16 @@ div(
         }`
         ).fit
   //- essence link...
-  router-link(
-    :to="'/node/'+node.oid"
-    :class=`{
-    }`
-    :style=`{
-      cursor: 'pointer'
-    }`
-    ).row.full-width.items-center.q-py-sm.q-px-md
-    span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
+  div(:style=`{position: 'relative'}`).row.full-width
+    router-link(
+      :to="'/node/'+node.oid"
+      :class=`{
+      }`
+      :style=`{
+        cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
+      }`
+      ).row.full-width.items-center.q-py-sm.q-px-md
+      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   //- .row.full-width
     slot(name="footer" :node="nodeFull")
 </template>

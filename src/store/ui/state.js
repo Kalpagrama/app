@@ -21,5 +21,6 @@ export default {
   // new
   showMobileNavigation: true,
   showLeftDrawer: false,
-  isTyping: false
+  isTyping: false,
+  wsContentLayers: null,
 }

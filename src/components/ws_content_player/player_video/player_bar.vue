@@ -6,8 +6,29 @@ div(
   @mouseenter="barMouseenter"
   v-touch-pan.left.right.prevent.mouse="barPan"
   :style=`{
-    position: 'relative', height: '40px', borderRadius: '10px',
-  }`).row.full-width.b-50.shadow-20
+    position: 'relative', height: '20px', borderRadius: '10px',
+  }`).row.full-width.b-50
+  //- ws content layers from global store...
+  div(
+    v-if="$store.state.ui.wsContentLayers"
+    :style=`{
+      position: 'absolute', zIndex: 9999,
+      pointerEvents: 'none',
+    }`
+    ).row.fit
+    div(
+      v-for="(l,li) in $store.state.ui.wsContentLayers" :key="li"
+      :style=`{
+        position: 'absolute', zIndex: 9999,
+        top: '-2px',
+        left: l.figuresAbsolute[0].t/player.duration*100+'%',
+        width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+        height: 'calc(100% + 4px)',
+        border: '2px solid #4caf50',
+        borderRadius: '4px',
+        pointerEvents: 'none',
+      }`
+      ).row
   //- currentTime width/line
   div(
     :style=`{
@@ -16,20 +37,19 @@ div(
       pointerEvents: 'none',
       borderRadius: '10px 0 0 10px',
     }`
-    ).row.full-height.b-150
+    ).row.full-height.b-110
     div(
-      :class="barClass"
       :style=`{
         position: 'absolute', zIndex: 200, right: '-2px', top: '-4px',
         height: 'calc(100% + 8px)',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
       }`
-      ).row
+      ).row.bg-red
   //- currentTimeMove line
+  //- :class="barClass"
   div(
     v-if="currentTimeMove"
-    :class="barClass"
     :style=`{
       position: 'absolute', zIndex: 200, top: '-4px',
       left: 'calc('+(currentTimeMove/player.duration)*100+'% - 2px)',
@@ -38,11 +58,11 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row
+    ).row.bg-red
   //- label currentTime moving
+  //- :class="barClass"
   div(
     v-if="currentTimeMove"
-    :class="barClass"
     :style=`{
       position: 'absolute', zIndex: 9999, top: '-40px',
       left: 'calc('+(currentTimeMove/player.duration)*100+'% - 2px)',
@@ -50,11 +70,10 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm {{ $time(currentTimeMove) }}
+    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimeMove) }}
   //- currentTimePecent panning line
   div(
     v-if="panning"
-    :class="barClass"
     :style=`{
       position: 'absolute', zIndex: 200, top: '-4px',
       left: 'calc('+currentTimePercent+'% - 2px)',
@@ -63,11 +82,10 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row
+    ).row.bg-red
   //- label panning time
   div(
     v-if="panning"
-    :class="barClass"
     :style=`{
       position: 'absolute', zIndex: 9999, top: '-40px',
       left: 'calc('+currentTimePercent+'% - 2px)',
@@ -75,9 +93,9 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm {{ $time(currentTimePercent/100*player.duration) }}
+    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
   //- bars
-  div(
+  //- div(
     v-if="bars.length > 0"
     :style=`{
       position: 'absolute', zIndex: 210, transform: 'translate3d(0,0,0)',
@@ -100,7 +118,7 @@ div(
 <script>
 export default {
   name: 'playerBar',
-  props: ['player', 'bars'],
+  props: ['player', 'bars', 'layers'],
   data () {
     return {
       panning: false,
@@ -119,6 +137,7 @@ export default {
       // this.$log('left/width', left, width)
       let t = (left / width) * this.player.duration
       this.$log('t', this.$time(t))
+      this.player.events.emit('bar-click', {t: t})
       this.player.setCurrentTime(t)
       this.$wait(400).then(() => {
         this.currentTimeMove = null

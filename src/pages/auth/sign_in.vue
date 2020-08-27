@@ -15,6 +15,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               q-input(
                 v-model="login"
                 placeholder="Username"
+                autocomplete="username"
                 filled dark color="white" name="username"
                 type="text" required
                 :style=`{}`
@@ -25,8 +26,8 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="password"
-                placeholder="Create password"
-                autocomplete="new-password"
+                placeholder="Enter password"
+                autocomplete="current-password"
                 type="password" required name="password"
                 filled dark color="white"
                 @keyup.enter="signIn()").full-width

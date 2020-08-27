@@ -2,21 +2,21 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        div(
-          v-if="mode === 'standalone'"
-          :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
-          span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsContentList_title', 'Контент')}}
+      div(:style=`{maxWidth: '800px'}`).row.full-width
+        slot(name="header")
         content-search(
           @content="contentPicked"
           @searchString="searchString = $event"
           :style=`{}`)
+        .row.full-width.q-px-md
+          q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).full-width.text-grey-8
+            q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   q-page-container
-    q-page(style="padding-top: 60px")
+    q-page(style="padding-top: 8px")
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start
+        div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
           q-tab-panels(
-            v-model="type" swipeable infinite animated
+            v-model="type" infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
             q-tab-panel(
               v-for="t in types" :key="t.id" :name="t.id"
@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
               kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
                   list-masonry(
-                    v-if="t.id === 'IMAGE'" :items="items").full-width
+                    v-if="t.id === 'IMAGE'" :items="items").full-width.q-px-sm
                     template(v-slot:item=`{item}`)
                       content-item(:content="item" @pick="contentPicked(item)")
                   div(
@@ -32,7 +32,7 @@ q-layout(view="hHh Lpr lff")
                     content-item(
                       v-for="(c,ci) in items" :key="c.id" :content="c"
                       @pick="contentPicked(c)")
-      q-page-sticky(expand position="top" :style=`{zIndex: 1000}`)
+      //- q-page-sticky(expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
             q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8

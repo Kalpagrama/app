@@ -30,34 +30,45 @@
         v-if="contentKalpa"
         :contentKalpa="contentKalpa"
         @player="playerCreated"
+        :options=`{
+          showBar: false,
+          showActions: false,
+        }`
         :style=`{
           position: 'absolute', zIndex: 100,
         }`).fit
-        template(v-slot:actions)
-          .row.full-height.items-center.content-center
-            q-btn(
-              round dense color="red" icon="delete_outline" flat
-              :style=`{borderRadius: '50%'}`).q-mr-sm
-            q-btn(
-              round dense color="green" icon="edit"
-              :style=`{borderRadius: '50%'}`)
-  //- layers editor
-  div(
-    v-if="player"
-    :style=`{}`).row.full-width.items-start.content-start
-    layer-editor(
-      v-for="(l,li) in item.layers" :key="li"
-      :layer="l" :layerIndex="li" :player="player")
+    //- composition bar wrapper
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 2000,
+        bottom: '6px', height: '75px',
+      }`
+      ).row.full-width.items-start.content-start.justify-center
+      div(
+        :style=`{
+          maxWidth: '600px',
+          background: 'rgba(0,0,0,0.1)',
+          borderRadius: '10px',
+        }`
+        ).row.fit
+        composition-bar(
+          v-if="player"
+          :player="player" :contentKalpa="contentKalpa"
+          :composition="item"
+          actionsPosition="top"
+          :style=`{
+            maxHeight: '40px',
+          }`)
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import wsContentPlayer from 'components/ws_content_player/index.vue'
-import layerEditor from 'components/ws_explorer_video/page_drafts/node_item/layer_editor'
+import compositionBar from 'components/composition/composition_bar/index.vue'
 
 export default {
   name: 'wsNodeEditor__editItem',
-  components: {wsContentPlayer, layerEditor},
+  components: {wsContentPlayer, compositionBar},
   props: ['item', 'itemIndex'],
   data () {
     return {

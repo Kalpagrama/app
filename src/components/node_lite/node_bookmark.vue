@@ -2,13 +2,13 @@
 q-btn(
   @click="bookmarked ? bookmarkDelete() : bookmarkCreate()"
   round flat
-  :color="bookmarked ? 'white' : 'grey-2'"
+  color="white"
   :icon="bookmarked ? 'bookmark' : 'bookmark_outline'"
   :loading="loading"
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-    top: '0px', right: '0px',
-    background: 'rgba(0,0,0,0.2)',
+    top: '8px', right: '8px',
+    background: 'rgba(0,0,0,0.15)',
   }`)
 </template>
 
@@ -17,7 +17,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeLite__nodeBookmark',
-  props: ['oid', 'type', 'name', 'isActive'],
+  props: ['node', 'isActive'],
   data () {
     return {
       loading: false,
@@ -43,7 +43,7 @@ export default {
       this.$log('bookmarkFind')
       let {items: [item]} = await this.$rxdb.find({
       selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid, type: 'NODE'
+        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
       }
       })
       this.$log('bookmarkFind item', item)
@@ -63,13 +63,15 @@ export default {
         this.laoding = true
         await this.$wait(500)
         let bookmarkInput = {
-          oid: this.oid,
-          type: this.type,
-          name: this.name,
+          oid: this.node.oid,
+          type: 'NODE',
+          name: this.node.name,
+          thumbOid: this.node.meta.items[0].thumbUrl,
           wsItemType: 'WS_BOOKMARK'
         }
         let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         this.$log('bookmarkCreate bookmark', bookmark)
+        this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark added!'})
         this.loading = false
         this.bookmarked = true
       }

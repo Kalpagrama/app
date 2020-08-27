@@ -2,8 +2,29 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
+      div(:style=`{maxWidth: '800px'}`).row.full-width
+        slot(name="header")
+        .row.full-width.q-px-sm
+          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+            q-input(
+              v-model="searchString"
+              filled dark dense color="white"
+              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+              ).full-width
+              template(v-slot:append)
+                q-btn(
+                  v-if="searchString.length > 0"
+                  flat dense color="white" icon="clear" @click="searchString = ''")
+                q-btn(
+                  flat dense color="white" icon="filter_list")
+        .row.full-width.q-px-md
+            q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
+              q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
+      q-page-sticky(position="bottom" :offset="[0, 60]")
+  //- q-header(reveal)
+    .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        div(
+        //- div(
           :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
           span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
         div().row.full-width.q-px-sm.q-pt-sm
@@ -20,11 +41,11 @@ q-layout(view="hHh Lpr lff")
                 q-btn(
                   flat dense color="white" icon="filter_list")
   q-page-container
-    q-page(style="padding-top: 60px")
+    q-page(style="padding-top: 8px")
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start
+        div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
           q-tab-panels(
-            v-model="type" swipeable infinite animated
+            v-model="type" infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
             q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="querySavedNodes" :sliceSize="1000")
@@ -32,7 +53,8 @@ q-layout(view="hHh Lpr lff")
                   .row.full-width.items-start.content-start.justify-center.q-px-sm
                     node-bookmark(
                       v-for="(i,ii) in items" :key="i.id"
-                      :node="i" :nodeIndex="ii")
+                      :node="i" :nodeIndex="ii"
+                      @remove="nodeRemove(i)")
             q-tab-panel(name="draft" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="queryDraftNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
@@ -51,12 +73,12 @@ q-layout(view="hHh Lpr lff")
                       :node="i" :nodeIndex="ii"
                       @edit="nodeEdit(i)"
                       @remove="nodeRemove(i)").q-mb-sm
-      q-page-sticky(expand position="top")
+      //- q-page-sticky(expand position="top")
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
             q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
               q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
-      q-page-sticky(position="bottom" :offset="[0, 60]")
+      q-page-sticky(position="bottom" :offset="[0, 10]")
         q-btn(
           v-if="mode === 'standalone'"
           @click="nodeAddBtn()"

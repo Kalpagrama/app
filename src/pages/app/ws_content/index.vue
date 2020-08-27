@@ -1,22 +1,18 @@
 <template lang="pug">
-component(
+ws-content-explorer(
   v-if="contentKalpa && contentWorkspace"
-  :is="contentComponent[contentKalpa.type]"
   :contentWorkspace="contentWorkspace"
   :contentKalpa="contentKalpa"
-  @back="$router.back()")
+  @out="outHandle")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-
-import videoExplorer from 'components/ws_explorer_video/index.vue'
-import imageExplorer from 'components/ws_explorer_image/index.vue'
-// import bookExplorer from 'components/ws_book_explorer/index.vue'
+import wsContentExplorer from 'components/ws_content_explorer/index.vue'
 
 export default {
   name: 'pageApp_wsContent',
-  components: {videoExplorer, imageExplorer},
+  components: {wsContentExplorer},
   meta () {
     return {
       title: this.contentWorkspace ? this.contentWorkspace.name : ''
@@ -26,11 +22,6 @@ export default {
     return {
       contentWorkspace: null,
       contentKalpa: null,
-      contentComponent: {
-        VIDEO: 'video-explorer',
-        IMAGE: 'image-explorer',
-        BOOK: 'book-explorer',
-      }
     }
   },
   watch: {
@@ -46,10 +37,18 @@ export default {
             }
           })
           this.contentWorkspace = item
-          // this.$log('contentWorkspace', this.contentWorkspace)
+          this.$log('contentWorkspace', this.contentWorkspace)
           this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, item.contentOid)
-          // this.$log('contentKalpa', this.contentKalpa)
+          this.$log('contentKalpa', this.contentKalpa)
         }
+      }
+    }
+  },
+  methods: {
+    outHandle ([type, val]) {
+      this.$log('outHandle', type, val)
+      if (type === 'back') {
+        this.$router.back()
       }
     }
   },
