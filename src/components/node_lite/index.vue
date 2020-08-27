@@ -28,8 +28,8 @@ div(
         round flat color="grey-2" icon="select_all"
         :style=`{
           position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-          top: '0px', left: '0px',
-          background: 'rgba(0,0,0,0.2)',
+          top: '8px', left: '8px',
+          background: 'rgba(0,0,0,0.15)',
         }`)
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -43,7 +43,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
       }`
-      ).row.fit.br
+      ).row.fit
       video(
         v-if="itemType === 'VIDEO'"
         @click="videoClicked"

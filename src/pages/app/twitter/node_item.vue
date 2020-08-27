@@ -73,7 +73,7 @@ div(:style=`{borderTop: '1px solid rgb(50,50,50)'}`).row.full-width.items-start.
           span.text-bold.text-grey-6 3.4
           q-btn(
             @click="voteStart()"
-            flat round dense
+            flat round
             :color="'green'"
             :loading="voting"
             icon="blur_on"
@@ -121,7 +121,7 @@ export default {
       this.$q.bottomSheet({
         dark: true,
         title: 'Не сыкуй, голосуй!',
-        persistent: true,
+        persistent: false,
         seamless: false,
         grid: false,
         style: {

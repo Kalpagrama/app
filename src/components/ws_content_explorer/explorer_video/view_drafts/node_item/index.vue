@@ -70,12 +70,21 @@
             v-model="node.name"
             filled dark dense color="grey-6"
             type="textarea" autogrow
+            placeholder="В чем суть?"
             @focus="$store.commit('ui/stateSet', ['isTyping', true])"
             @blur="$store.commit('ui/stateSet', ['isTyping', false])").full-width
         //- node.spheres editor
-        div().row.full-width.items-center.q-pa-sm
-          //- span.text-white #sphere, #sphere, #sphere
-          q-btn(round flat dense color="grey-6" icon="add")
+        div().row.full-width.items-center.content-center.q-pa-sm
+          q-btn(
+            v-for="s in 3" :key="s"
+            flat dense no-caps
+            :style=`{
+              whiteSpace: 'nowrap',
+              borderRadius: '10px',
+              }`).text-white.q-mr-sm.b-60.q-pa-xs #сфера сути {{s}},
+          q-btn(round flat dense icon="add" color="grey-4").b-60
+          //- q-btn(round flat dense color="grey-6" icon="add")
+          //- edit-spheres(:node="node" :player="player")
     //- footer: actions close, createNode
     div().row.full-width.q-pa-md
       q-btn(flat color="white" no-caps @click="$emit('edited')").b-40 Close
@@ -86,10 +95,11 @@
 <script>
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
+import editSpheres from './edit_spheres.vue'
 
 export default {
   name: 'viewDrafts_draftItem',
-  components: {compositionEditor, compositionBar},
+  components: {compositionEditor, compositionBar, editSpheres},
   props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
