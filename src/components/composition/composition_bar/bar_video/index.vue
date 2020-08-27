@@ -1,11 +1,11 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.fit
   //- bar
   div(
     @click="barClick"
     :style=`{
       position: 'relative',
-      height: '50px',
+      height: '100%',
       borderRadius: '10px',
       border: '2px solid #4caf50',
     }`
@@ -13,7 +13,7 @@
     div(
       v-for="(l,li) in layersMeta" :key="li"
       :class=`{
-        'bg-red': layersPlayed.includes(li),
+        //- 'bg-red': layersPlayed.includes(li),
       }`
       :style=`{
         position: 'relative',
@@ -21,8 +21,22 @@
         borderRadius: '10px',
         width: l.percent*100+'%',
         pointerEvents: 'none',
+        background: layersPlayed.includes(li) ? 'rgba(76,175,79, 0.7)' : 'none',
       }`
       ).row.full-height
+      //- currentTime width tint
+      div(
+        v-if="true"
+        :style=`{
+          position: 'absolute', zIndex: 2000, top: '0px',
+          left: '0px',
+          width: ((player.currentTime-l.start)/l.duration)*100+'%',
+          borderRadius: '10px 0 0 10px',
+          background: 'rgba(76,175,79, 0.7)',
+          //- opacity: 0.7,
+        }`
+        ).row.full-height
+      //- currentTime line
       div(
         v-if="player.currentTime >= l.start && player.currentTime <= l.end"
         :style=`{
@@ -39,7 +53,7 @@
     :style=`{
       order: actionsPosition === 'bottom' ? 1 : -1,
     }`
-    ).row.full-width.q-px-sm
+    ).row.full-width
     q-btn(
       v-if="!compositionPlaying"
       @click="compositionPlay()"
@@ -54,6 +68,11 @@
       @click="compositionStop()"
       round flat dense color="red")
       q-icon(name="stop" size="28px" color="red")
+    q-btn(
+      v-if="compositionPlaying"
+      @click="compositionRefresh()"
+      round flat dense color="white" icon="refresh"
+      :style=`{transform: 'scale(-1, 1)'}`)
   //- debug
   div(v-if="showDebug" :style=`{fontSize: '10px'}`).row.full-width.bg-green
     small.text-white layersPlayed {{layersPlayed}}
@@ -166,6 +185,10 @@ export default {
       if (this.player.playing) this.player.pause()
       else this.player.play()
     },
+    compositionRefresh () {
+      this.$log('compositionRefresh')
+      this.compositionPlay()
+    },
     compositionStop () {
       this.$log('compositionStop')
       this.compositionPlaying = false
@@ -175,7 +198,7 @@ export default {
     barClick (e) {
       this.$log('barClick', e)
       // TODO: stop composition playing...
-      this.compositionStop()
+      // this.compositionStop()
       let left = e.layerX
       let width = e.target.clientWidth
       if (left > width) return

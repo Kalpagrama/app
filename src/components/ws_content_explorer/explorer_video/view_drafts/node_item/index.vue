@@ -20,6 +20,7 @@
         :style=`{
           position: 'absolute', zIndex: 2000,
           top: '0px', left: '0px', right: '0px',
+          maxHeight: '50px',
         }`)
     //- node.name preview, cut it?
     div(
@@ -44,7 +45,7 @@
           .col
           q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`) Close
           q-btn(flat dense color="white" no-caps @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-sm.q-mr-md Edit
-          q-btn(outline dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-px-md Create node
+          q-btn(outline dense color="white" no-caps @click="nodeCreate()" :style=`{zIndex: 2000}`).q-px-md Create node
   //- isEditing wrapper
   div(
     v-if="isEditing"
@@ -79,7 +80,7 @@
     div().row.full-width.q-pa-md
       q-btn(flat color="white" no-caps @click="$emit('edited')").b-40 Close
       .col
-      q-btn(color="green" no-caps @click="$emit('edited')") Create node
+      q-btn(color="green" no-caps @click="nodeCreate()") Create node
 </template>
 
 <script>
@@ -105,6 +106,10 @@ export default {
   methods: {
     barClickHandle (e) {
       this.$log('barClickHandle', e)
+    },
+    nodeCreate () {
+      this.$log('nodeCreate')
+      this.$router.push(`/workspace/node/${this.node.id}`)
     }
   },
   mounted () {

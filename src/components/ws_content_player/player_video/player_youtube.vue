@@ -100,11 +100,11 @@ export default {
       // this.$log('setCurrentTime', t)
       // if (this.currentTimeBlocked) return
       this.currentTime = t
-      // this.currentTimeBlocked = true
+      this.currentTimeBlocked = true
       this.player.setCurrentTime(t)
-      // this.$wait(500).then(() => {
-      //   this.currentTimeBlocked = false
-      // })
+      this.$wait(500).then(() => {
+        this.currentTimeBlocked = false
+      })
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
@@ -112,6 +112,7 @@ export default {
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
+      if (this.currentTimeBlocked) return
       this.currentTime = this.player.currentTime
     },
     playHandle (e) {

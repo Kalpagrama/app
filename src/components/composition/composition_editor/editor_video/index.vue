@@ -1,5 +1,26 @@
 <template lang="pug">
 .row.full-width
+  //- one layer composition
+  div(
+    v-if="composition.layers.length === 1"
+    :style=`{}`
+    ).row.full-width
+    layer-frames(
+      :player="player"
+      :layer="composition.layers[0]"
+      :layerStart="composition.layers[0].figuresAbsolute[0].t"
+      :layerEnd="composition.layers[0].figuresAbsolute[1].t"
+      :layerDuration="composition.layers[0].figuresAbsolute[1].t-composition.layers[0].figuresAbsolute[0].t"
+      )
+      template(v-slot:meta)
+        composition-bar(
+          :player="player" :composition="composition" :contentKalpa="contentKalpa"
+          actionsPosition="top"
+          :style=`{position: 'absolute', top: '-34px', zIndex: 99999}`)
+    //- .row.full-width
+      span.text-white {{ composition.layers[0].figuresAbsolute[1].t-composition.layers[0].figuresAbsolute[0].t }}
+  //- multi layer composition
+//- .row.full-width
   //- layers list or one layer?
   .row.full-width.items-start.content-start
     div(
@@ -25,7 +46,7 @@
   div(v-if="true || composition.layers.length > 1").row.full-width.justify-center
     composition-bar(
       :composition="composition" :player="player" :contentKalpa="contentKalpa"
-      actionsPosition="top"
+      actionsPosition=""
       :style=`{
         maxWidth: '600px',
       }`)
@@ -40,10 +61,11 @@
 <script>
 import layerFigures from './layer_figures/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
+import layerFrames from './layer_frames.vue'
 
 export default {
   name: 'compositionEditor_video',
-  components: {layerFigures, compositionBar},
+  components: {layerFigures, compositionBar, layerFrames},
   props: ['composition', 'player', 'contentKalpa'],
   data () {
     return {
