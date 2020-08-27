@@ -8,20 +8,27 @@ div(
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
   }`).row.full-width.b-50
-  //- ws content layer
+  //- ws content layers from global store...
   div(
-    v-if="$store.state.ui.wsContentLayer"
+    v-if="$store.state.ui.wsContentLayers"
     :style=`{
       position: 'absolute', zIndex: 9999,
-      top: '-2px',
-      left: $store.state.ui.wsContentLayer.figuresAbsolute[0].t/player.duration*100+'%',
-      width: (($store.state.ui.wsContentLayer.figuresAbsolute[1].t-$store.state.ui.wsContentLayer.figuresAbsolute[0].t)/player.duration)*100+'%',
-      height: 'calc(100% + 4px)',
-      border: '2px solid #4caf50',
-      borderRadius: '4px',
       pointerEvents: 'none',
     }`
-    ).row
+    ).row.fit
+    div(
+      v-for="(l,li) in $store.state.ui.wsContentLayers" :key="li"
+      :style=`{
+        position: 'absolute', zIndex: 9999,
+        top: '-2px',
+        left: l.figuresAbsolute[0].t/player.duration*100+'%',
+        width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+        height: 'calc(100% + 4px)',
+        border: '2px solid #4caf50',
+        borderRadius: '4px',
+        pointerEvents: 'none',
+      }`
+      ).row
   //- currentTime width/line
   div(
     :style=`{

@@ -114,7 +114,26 @@ export default {
       this.$log('nodeDelete', node)
       if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
       await this.$rxdb.remove(node.id)
+    },
+    nodesLoaded (nodes) {
+      this.$log('nodesLoaded', nodes)
+      if (this.nodeSelectedId || this.nodeEditingId) return
+      let layers = nodes.reduce((acc, node) => {
+        node.items.map(n => {
+          n.layers.map(l => {
+            if (l.contentOid === this.contentKalpa.oid) {
+              acc.push(l)
+            }
+          })
+        })
+        return acc
+      }, [])
+      this.$log('layers', layers)
+      this.$store.commit('ui/stateSet', ['wsContentLayers', layers])
     }
+  },
+  beforeDestroy () {
+    this.$store.commit('ui/stateSet', ['wsContentLayers', null])
   }
 }
 </script>

@@ -19,6 +19,7 @@
           )
       q-btn(
         v-if="composition.layers.length > 1 && !layerEditingId"
+        @click="layerDelete(l,li)"
         round flat dense color="grey-6" icon="drag_indicator")
   //- composition bar
   div(v-if="composition.layers.length > 1").row.full-width.justify-center
@@ -56,6 +57,10 @@ export default {
       let layerInput = {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]}
       this.$set(this.composition.layers, this.composition.layers.length, layerInput)
       this.player.setCurrentTime(start)
+    },
+    layerDelete (l, li) {
+      this.$log('layerDelete', l, li)
+      this.$delete(this.composition.layers, li)
     }
   },
   mounted () {

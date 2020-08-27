@@ -121,7 +121,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$store.commit('ui/stateSet', ['wsContentLayer', JSON.parse(JSON.stringify(to))])
+        this.$store.commit('ui/stateSet', ['wsContentLayers', [JSON.parse(JSON.stringify(to))]])
       }
     },
     'player.currentTime': {

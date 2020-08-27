@@ -121,22 +121,22 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$store.commit('ui/stateSet', ['wsContentLayer', JSON.parse(JSON.stringify(to))])
+        this.$store.commit('ui/stateSet', ['wsContentLayers', [JSON.parse(JSON.stringify(to))]])
       }
     },
     'player.currentTime': {
       handler (to, from) {
-        if (this.layerPlaying) {
-          // this.$log('player.currentTime TO', to)
-          if (to < this.layerStart) {
-            this.player.setCurrentTime(this.layerStart)
-          }
-          if (to > this.layerEnd) {
-            this.player.pause()
-            this.layerPlaying = false
-            // this.player.setCurrentTime(this.layerStart)
-          }
-        }
+        // if (this.layerPlaying) {
+        //   // this.$log('player.currentTime TO', to)
+        //   if (to < this.layerStart) {
+        //     this.player.setCurrentTime(this.layerStart)
+        //   }
+        //   if (to > this.layerEnd) {
+        //     this.player.pause()
+        //     this.layerPlaying = false
+        //     // this.player.setCurrentTime(this.layerStart)
+        //   }
+        // }
       }
     }
   },
@@ -197,7 +197,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['wsContentLayer', null])
+    this.$store.commit('ui/stateSet', ['wsContentLayers', null])
   }
 }
 </script>
