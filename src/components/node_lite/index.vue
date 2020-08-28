@@ -33,7 +33,7 @@ div(
       :style=`{
         cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
       }`
-      ).row.full-width.items-center.q-py-sm.q-px-md
+      ).row.full-width.items-center.q-py-md.q-px-md
       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   .row.full-width
     slot(name="footer" :node="nodeFull")

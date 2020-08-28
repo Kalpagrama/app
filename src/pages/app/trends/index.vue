@@ -1,9 +1,15 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- q-header(reveal)
+  q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.br
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
+        div(:style=`{height: '50px', borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
+          q-icon(name="whats_hot" color="white" size="30px").q-mr-sm
+          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_trends', 'Категории')}}
+          .col
+          //- q-btn(round flat color="green" icon="add" to="/settings/feeds")
+          //- q-btn(round flat color="white" icon="settings" to="/settings/feeds")
   q-page-container
     q-page(
       :style=`{
@@ -24,17 +30,17 @@ q-layout(view="hHh Lpr lff")
             template(v-slot=`{items,itemsMore}`)
               list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                  //- node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
-                  node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
+                  node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
+                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px', height: '50px',}`).row.full-width
+          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
             q-tabs(
               :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
-              no-caps active-color="white"
-              ).fit.text-grey-8
-              q-tab(v-for="c in nodeCategories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias")
+              dense no-caps active-color="white" switch-indicator
+              ).full-width.text-grey-8
+              q-tab(v-for="c in nodeCategories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias" dense)
 </template>
 
 <script>
