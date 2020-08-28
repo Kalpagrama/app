@@ -119,6 +119,7 @@ export default {
     },
     nodeCreate () {
       this.$log('nodeCreate')
+      this.node.stage = 'draft'
       this.$router.push(`/workspace/node/${this.node.id}`)
     }
   },

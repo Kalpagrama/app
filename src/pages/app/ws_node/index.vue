@@ -1,7 +1,9 @@
 <template lang="pug">
 ws-node-editor(
-  v-if="node" :node="node"
-  :title="title")
+  v-if="node"
+  :node="node"
+  :title="title"
+  @outHanlde="outHandle")
 </template>
 
 <script>
@@ -14,7 +16,7 @@ export default {
   components: {nodeItem},
   meta () {
     return {
-      title: 'Ядро' + this.node ? this.node.name : ''
+      title: this.node ? this.node.name : ''
     }
   },
   data () {
@@ -46,7 +48,7 @@ export default {
         if (to) {
           if (to === 'new') {
             this.$q.notify({type: 'positive', message: 'Creating new node'})
-            this.node = this.nodeNew
+            this.node = JSON.parse(JSON.stringify(this.nodeNew))
           }
           else {
             let {items: [item]} = await this.$rxdb.find({
@@ -55,51 +57,18 @@ export default {
                 id: to
               }
             })
-            this.$log('item', item)
+            this.$log('FOUND node', item)
             this.node = item
           }
         }
       }
     },
-    // node: {},
   },
   methods: {
-    nodeAdd () {
-      this.$log('nodeAdd')
-    },
-    publishCheck () {
-      if (!this.node.category) throw new Error('No node.category !')
-      // if (this.node.name.length === 0) throw new Error('No node.essence !')
-      if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
-      if (this.node.items.length > 5) throw new Error('5 items maximum !')
-      if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')
-      // throw new Error('Wrong!')
-    },
-    async publish () {
-      try {
-        this.$log('publish start')
-        this.publishing = true
-        await this.$wait(500)
-        this.publishCheck()
-        let createdNode = await NodeApi.nodeCreate(this.node)
-        await this.node.updateExtended('stage', 'published', false)
-        await this.node.updateExtended('oid', createdNode.oid, false)
-        this.$log('publish done', createdNode.oid)
-        this.publishing = false
-        this.$q.notify({
-          type: 'positive',
-          progress: true,
-          position: 'top',
-          message: 'Ядро отправлено на публикацию!'})
-      }
-      catch (e) {
-        this.$log('publish error', e)
-        this.$q.notify({
-          type: 'negative',
-          progress: true,
-          position: 'top',
-          message: e.toString()})
-        this.publishing = false
+    outHandle ([type, val]) {
+      this.$log('outHandle', type, val)
+      if (type === 'back') {
+        this.$router.back()
       }
     }
   },

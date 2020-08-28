@@ -14,6 +14,7 @@
     img(
       :src="item.thumbUrl" draggable="false"
       :style=`{borderRadius: '10px'}`).full-width
+    //- item edit
     //- item add
     q-btn(
       @click="$emit('itemAdd')"
@@ -26,10 +27,10 @@
     //- item player
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       ws-content-player(
-        v-show="playerStarted"
+        v-show="player"
         v-if="contentKalpa"
         :contentKalpa="contentKalpa"
-        @player="playerCreated"
+        @player="player = $event"
         :options=`{
           showBar: false,
           showActions: false,
@@ -41,7 +42,7 @@
     div(
       :style=`{
         position: 'absolute', zIndex: 2000,
-        bottom: '6px', height: '75px',
+        bottom: '0px', height: '74px',
       }`
       ).row.full-width.items-start.content-start.justify-center
       div(
@@ -51,14 +52,15 @@
           borderRadius: '10px',
         }`
         ).row.fit
-        composition-bar(
-          v-if="player"
-          :player="player" :contentKalpa="contentKalpa"
-          :composition="item"
-          actionsPosition="top"
-          :style=`{
-            maxHeight: '40px',
-          }`)
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          composition-bar(
+            v-if="player"
+            :player="player" :contentKalpa="contentKalpa"
+            :composition="item"
+            actionsPosition="top"
+            :style=`{
+              maxHeight: '40px',
+            }`)
 </template>
 
 <script>
@@ -78,26 +80,26 @@ export default {
     }
   },
   watch: {
-    'player.currentTime': {
-      handler (to, from) {
-        this.$log('player.currentTime TO', to)
-        if (!this.playerStarted) {
-          this.playerStarted = true
-        }
-        // handle T changes...
-      }
-    }
+    // 'player.currentTime': {
+    //   handler (to, from) {
+    //     this.$log('player.currentTime TO', to)
+    //     if (!this.playerStarted) {
+    //       this.playerStarted = true
+    //     }
+    //     // handle T changes...
+    //   }
+    // }
   },
   methods: {
-    playerCreated (player) {
-      this.$log('playerCreated', player)
-      this.player = player
-      let t = this.item.layers[0].figuresAbsolute[0].t
-      this.player.setCurrentTime(t)
-      this.$wait(500).then(() => {
-        this.playerStarted = true
-      })
-    },
+    // playerCreated (player) {
+    //   this.$log('playerCreated', player)
+    //   this.player = player
+    //   let t = this.item.layers[0].figuresAbsolute[0].t
+    //   this.player.setCurrentTime(t)
+    //   this.$wait(500).then(() => {
+    //     this.playerStarted = true
+    //   })
+    // },
   },
   async mounted () {
     this.$log('mounted')

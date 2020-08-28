@@ -24,8 +24,8 @@ q-layout(view="hHh Lpr lff")
             template(v-slot=`{items,itemsMore}`)
               list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                  node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
-                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
+                  //- node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
+                  node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30

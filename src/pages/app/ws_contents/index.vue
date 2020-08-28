@@ -67,6 +67,11 @@ export default {
       }
     }
   },
+  meta () {
+    return {
+      title: 'Content'
+    }
+  },
   data () {
     return {
       type: 'VIDEO',

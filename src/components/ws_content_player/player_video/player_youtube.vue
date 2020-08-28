@@ -147,13 +147,13 @@ export default {
           this.player.addEventListener('play', this.playHandle)
           this.events = {
             on: (event, cb) => {
-              this.$refs.videoRef.addEventListener(event, cb)
+              if (this.$refs.videoRef) this.$refs.videoRef.addEventListener(event, cb)
             },
             off: (event, cb) => {
-              this.$refs.videoRef.removeEventListener(event, cb)
+              if (this.$refs.videoRef) this.$refs.videoRef.removeEventListener(event, cb)
             },
             emit: (event, val) => {
-              this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+              if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
             }
           }
           // })
@@ -179,7 +179,7 @@ export default {
       this.player.removeEventListener('timeupdate', this.timeupdateHandle)
       this.player.removeEventListener('play', this.playHandle)
       this.player.removeEventListener('pause', this.pauseHandle)
-      this.player.pause()
+      // this.player.pause()
       this.player.remove()
     }
   }

@@ -74,10 +74,8 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          // contentOid: this.contentKalpa.oid,
-          // stage: 'draft', // published? saved?
           contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          stage: 'draft',
+          stage: 'fragment',
         },
         sort: [{updatedAt: 'desc'}],
       }
@@ -105,7 +103,7 @@ export default {
         spheres: [],
         category: 'FUN',
         layout: 'PIP',
-        stage: 'draft',
+        stage: 'fragment',
         wsItemType: 'WS_NODE',
         items: [
           {
@@ -165,8 +163,8 @@ export default {
       this.nodesChecked = []
     },
     nodesLoaded (nodes) {
-      this.$log('nodesLoaded', nodes)
       if (this.nodeSelectedId || this.nodeEditingId) return
+      this.$log('nodesLoaded', nodes)
       let layers = nodes.reduce((acc, node) => {
         node.items.map(n => {
           n.layers.map(l => {

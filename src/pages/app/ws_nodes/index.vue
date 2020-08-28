@@ -21,25 +21,6 @@ q-layout(view="hHh Lpr lff")
             q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
               q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
       q-page-sticky(position="bottom" :offset="[0, 60]")
-  //- q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        //- div(
-          :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
-          span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
-        div().row.full-width.q-px-sm.q-pt-sm
-          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="searchString"
-              filled dark dense color="white"
-              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-              ).full-width
-              template(v-slot:append)
-                q-btn(
-                  v-if="searchString.length > 0"
-                  flat dense color="white" icon="clear" @click="searchString = ''")
-                q-btn(
-                  flat dense color="white" icon="filter_list")
   q-page-container
     q-page(style="padding-top: 8px")
       .row.full-width.justify-center
@@ -47,6 +28,8 @@ q-layout(view="hHh Lpr lff")
           q-tab-panels(
             v-model="type" infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
+            q-tab-panel(name="fragments" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              nodes-fragments(:searchString="searchString")
             q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="querySavedNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
@@ -73,14 +56,7 @@ q-layout(view="hHh Lpr lff")
                       :node="i" :nodeIndex="ii"
                       @edit="nodeEdit(i)"
                       @remove="nodeRemove(i)").q-mb-sm
-      //- q-page-sticky(expand position="top")
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
-            q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
-              q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
-      q-page-sticky(position="bottom" :offset="[0, 10]")
-        q-btn(
-          v-if="mode === 'standalone'"
+        //- q-btn(
           @click="nodeAddBtn()"
           push round color="green" icon="add"
           :style=`{borderRadius: '50%'}`)
@@ -93,15 +69,16 @@ import { NodeApi } from 'src/api/node'
 
 import nodeItem from './node_item.vue'
 import nodeBookmark from './node_bookmark.vue'
+import nodesFragments from './nodes_fragments.vue'
 
 export default {
   name: 'pageApp__wsNodes',
-  components: {nodeItem, nodeBookmark},
+  components: {nodeItem, nodeBookmark, nodesFragments},
   props: {
     mode: {
       type: String,
       default () {
-        return 'standalone' // standalone, picker, readonly, etc...
+        return 'standalone'
       }
     },
     options: {
@@ -113,6 +90,11 @@ export default {
         }
       }
     },
+  },
+  meta () {
+    return {
+      title: 'Nodes'
+    }
   },
   data () {
     return {
@@ -128,6 +110,7 @@ export default {
     typesFiltered () {
       let arr = [
         {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
+        {id: 'fragments', name: this.$t('nodes_fragments', 'Фрагменты')},
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
       ]

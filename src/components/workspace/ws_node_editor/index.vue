@@ -4,7 +4,8 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.justify-center.b-30
       div(
         :style=`{maxWidth: maxWidth+'px', height: '50px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-px-md.b-30
+        ).row.full-width.items-center.content-center.b-30
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
         .col
           span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактора ядра
         q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
@@ -71,29 +72,17 @@ export default {
             acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
             return acc
           }, 0)
-          this.$log('layersDuration', layersDuration)
+          this.$log('check layersDuration:', layersDuration)
           if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
           if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
         }
       })
-    },
-    checkExtend () {
-      this.$log('checkExtend')
-      if (this.node.name.length === 0) {
-        if (this.node.spheres[0]) {
-          this.node.name = this.node.spheres[0].name
-        }
-        else {
-          throw new Error('Essence or one sphere!')
-        }
-      }
     },
     async publish () {
       try {
         this.$log('publish start')
         this.publishing = true
         this.check()
-        // this.checkExtend()
         // publish
         let createdNode = await NodeApi.nodeCreate(this.node)
         this.$log('publish createdNode', createdNode)
@@ -109,7 +98,7 @@ export default {
           position: 'top',
           message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро отправлено на публикацию!')
         })
-        this.$router.push(`/node/${createdNode.oid}?creating=true`)
+        this.$router.push(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }
       catch (e) {
         this.$log('publish error', e)
@@ -141,11 +130,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
     // if (this.nodeIsEmpty()) {
     //   await this.$rxdb.remove(this.node.id)
     // }

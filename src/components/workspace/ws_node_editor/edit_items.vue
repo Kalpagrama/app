@@ -11,8 +11,12 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     }`).full-width
     //- :img-src="i.thumbUrl"
     q-carousel-slide(
-      v-for="(i,ii) in node.items" :key="i.id" :name="i.id"
-      :style=`{padding: 0, margin: 0}`)
+      v-for="(i,ii) in node.items" :key="i.id"
+      :name="i.id"
+      :style=`{
+        padding: 0,
+        margin: 0
+      }`)
       edit-item(:item="i" :itemIndex="ii"
       @itemAdd="")
 </template>

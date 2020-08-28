@@ -68,8 +68,16 @@ q-layout(view="hHh Lpr lff")
               ).row.full-width.items-center.content-center.q-px-sm.b-50
               q-icon(name="blur_on" color="white" size="20px").q-mr-xs
               span.text-white {{ s.name }}
+          //- dubug
+          .row.full-width.justify-center.q-pa-sm
+            span(
+              v-if="$store.state.core.progressInfo.CREATE[$route.params.oid]"
+              :style=`{fontSize: '200px',}`
+              ).text-bold.text-grey-6 {{ $store.state.core.progressInfo.CREATE[$route.params.oid] }}
           router-view(v-if="node" :node="node")
-      q-page-sticky(position="bottom" :offset="[0, 60]")
+      q-page-sticky(
+        v-if="node"
+        position="bottom" :offset="[0, 60]")
         q-btn(
           @click="nodeAddStart()"
           no-caps color="green" icon="add"
@@ -141,10 +149,43 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.oid TO', to)
         if (to) {
-          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+          if (this.$store.state.core.progressInfo.CREATE[to]) {
+            var unwatch = this.$watch(
+              '$store.state.core.progressInfo.CREATE',
+              (valOld, valNew) => {
+                if (valNew) {
+                  this.$log('CREATE valOld/valNew', valOld, valNew[to])
+                  if (valNew[to] === 100) {
+                    this.nodeLoad(to)
+                    unwatch()
+                    this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])
+                  }
+                }
+                else {
+                  if (unwatch) unwatch()
+                }
+              },
+              {
+                immediate: true,
+                deep: true
+              }
+            )
+          }
+          else {
+            this.nodeLoad(to)
+          }
         }
       }
+    },
+    '$route.query.creating': {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        this.$log('$route.query.creating TO', to)
+        if (to) {
+          // confirm('Node is creating !' + to)
+        }
+      },
     },
   },
   methods: {
@@ -160,6 +201,11 @@ export default {
       else {
         this.nodeActive = false
       }
+    },
+    async nodeLoad (oid) {
+      this.$log('nodeLoad', oid)
+      this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+      this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     }
   },
   mounted () {

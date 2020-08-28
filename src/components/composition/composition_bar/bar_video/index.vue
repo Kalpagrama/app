@@ -12,9 +12,6 @@
     ).row.full-width
     div(
       v-for="(l,li) in layersMeta" :key="li"
-      :class=`{
-        //- 'bg-red': layersPlayed.includes(li),
-      }`
       :style=`{
         position: 'relative',
         borderLeft: li === 0 ? 'none' : '2px solid #4caf50',
@@ -26,14 +23,13 @@
       ).row.full-height
       //- currentTime width tint
       div(
-        v-if="true"
+        v-if="showCurrentTimeTint(li)"
         :style=`{
           position: 'absolute', zIndex: 2000, top: '0px',
           left: '0px',
           width: ((player.currentTime-l.start)/l.duration)*100+'%',
-          borderRadius: '10px 0 0 10px',
+          borderRadius: '8px 0 0 8px',
           background: 'rgba(76,175,79, 0.7)',
-          //- opacity: 0.7,
         }`
         ).row.full-height
       //- currentTime line
@@ -106,6 +102,14 @@ export default {
     }
   },
   computed: {
+    layerPlayingObject () {
+      if (this.layerPlaying >= 0) return this.composition.layers[this.layerPlaying]
+      else return null
+    },
+    // showCurrentTimeTint () {
+    //   // layerPlayingObject && player.currentTime < layerPlayingObject.figuresAbsolute[0].1
+    //   if (this.layerPlaying)
+    // },
     compositionDuration () {
       return this.composition.layers.reduce((acc, val) => {
         acc += (val.figuresAbsolute[1].t - val.figuresAbsolute[0].t)
@@ -172,6 +176,14 @@ export default {
     }
   },
   methods: {
+    showCurrentTimeTint (li) {
+      if (li === this.layerPlaying) {
+        let start = this.composition.layers[this.layerPlaying].figuresAbsolute[0].t
+        let end = this.composition.layers[this.layerPlaying].figuresAbsolute[1].t
+        return this.player.currentTime > start && this.player.currentTime < end
+      }
+      else return false
+    },
     compositionPlay () {
       this.$log('compositionPlay')
       this.compositionPlaying = true
