@@ -126,7 +126,7 @@ export default {
       this.$log('refresh')
       this.refreshLoading = true
       await this.$wait(300)
-      await shareWith(this.$store.getters.currentUser())
+      // await shareWith(this.$store.getters.currentUser())
       await systemReset()
       window.location.reload()
       this.refreshLoading = false
