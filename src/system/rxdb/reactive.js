@@ -16,15 +16,8 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function getReactive (rxDoc) {
   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-  return getItemData(reactiveItemHolder.reactiveItem)
+  return reactiveItemHolder.reactiveItem
 }
-
-function getItemData (item) {
-  if (item.valueString) return item.valueString // schemaKeyValue
-  if (item.cached) return item.cached.data // cacheSchema
-  return item // wsSchemaItem
-}
-
 function mergeReactiveItem (reactiveItem, change) {
   return merge(reactiveItem, change, (objValue, srcValue) => {
     if (Array.isArray(objValue) && Array.isArray(srcValue)) {
@@ -100,6 +93,11 @@ class ReactiveItemHolder {
         }
       })
       this.reactiveItem = this.vm.reactiveItem
+      this.reactiveItem.getData = () => {
+        if (this.reactiveItem.valueString) return this.reactiveItem.valueString // schemaKeyValue
+        if (this.reactiveItem.cached) return this.reactiveItem.cached.data // cacheSchema
+        return this.reactiveItem // wsSchemaItem
+      }
       this.reactiveItem.itemSubscribe = this.itemSubscribe // иногда надо временно отписаться
       this.reactiveItem.itemUnsubscribe = this.itemUnsubscribe
       this.debouncedSave = true

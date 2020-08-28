@@ -8,10 +8,10 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_DBG)
 
 export function addReactiveItem (state, { id, reactiveItem }) {
    if (process.env.NODE_ENV !== 'development') return
-   state.allReactiveItems.push(cloneDeep({ id, reactiveItem }))
+   state.allReactiveItems[id] = cloneDeep(reactiveItem)
 }
 
-export function addFindResult(state, {queryId, findResult}) {
+export function addFindResult (state, { queryId, findResult }) {
    if (process.env.NODE_ENV !== 'development') return
-   state.allFindResults.push(cloneDeep({queryId, findResult}))
+   state.allFindResults[queryId] = cloneDeep(findResult)
 }

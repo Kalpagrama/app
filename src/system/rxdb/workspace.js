@@ -190,6 +190,7 @@ class Workspace {
         } finally {
           this.release()
         }
+        logD(f, 'next loop complete')
         await this.synchroLoopWaitObj.wait()
       }
     }
@@ -216,10 +217,11 @@ class Workspace {
       try {
         this.ignoreWsChanges = true
         let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
+        let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
-        if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
+        if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
           let wsServer = await WorkspaceApi.getWs()
-          logD(f, 'try merge ws...')
+          logD(f, 'try merge ws...', wsServer)
           // console.time('tm merge ws')
           let itemsServer = []
           for (let wsItemTypeEnum in WsItemTypeEnum) {
@@ -244,39 +246,7 @@ class Workspace {
           await this.db.ws_items.bulkInsert(newItems)
           for (let outdated of outdatedItems) await this.db.ws_items.atomicUpsert(outdated)
           await this.db.ws_items.find({ selector: { id: { $in: extraItems.map(item => item.id) } } }).remove() // удаялем те, которых нет на сервере
-          // console.timeEnd('tm merge ws')
-
-          // !!!!так очень долго! один запрос к rxdb ~ 100 ms
-          // for (let wsItemTypeEnum in WsItemTypeEnum) {
-          //   for (let itemServer of itemsServer) {
-          //     console.time('for cycle')
-          //
-          //     console.time('findOne')
-          //     let itemLocalDoc = await this.db.ws_items.findOne(itemServer.id).exec()
-          //     console.timeEnd('findOne')
-          //     if (!itemLocalDoc || itemServer.rev !== itemLocalDoc.rev || itemsServer.updatedAt > itemLocalDoc.updatedAt) { // берем с сервера, то, чего у нас нет, либо что у нас устарело
-          //       logD(f, 'принимаем версию сервера.', itemServer, itemLocalDoc)
-          //       console.time('atomicUpsert')
-          //       itemLocalDoc = await this.db.ws_items.atomicUpsert(itemServer)
-          //       console.timeEnd('atomicUpsert')
-          //       console.time('find')
-          //       await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
-          //       console.timeEnd('find')
-          //     }
-          //     console.timeEnd('for cycle')
-          //   }
-          //   // смотрим что есть у нас
-          //   for (let itemLocalDoc of await this.db.ws_items.find({ selector: { wsItemType: wsItemTypeEnum } }).exec()) {
-          //     if (!serverIds.has(itemLocalDoc.id)) { // есть у нас, но нет на сервере
-          //       let unsavedChanges = await this.db.ws_changes.findOne(itemLocalDoc.id).exec()
-          //       if (!unsavedChanges) { // есть у нас и мы ничего не меняли c момента последнего сохранения
-          //         logD(f, 'удаляем item', itemLocalDoc)
-          //         await itemLocalDoc.remove()
-          //         await this.db.ws_changes.find({ selector: { id: itemLocalDoc.id } }).remove() // см onCollectionUpdate
-          //       }
-          //     }
-          //   }
-          // }
+          await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
           await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
           this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
           logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

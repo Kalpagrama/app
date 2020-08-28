@@ -294,33 +294,34 @@ class RxDBWrapper {
    async find (mangoQuery) {
       const queryId = JSON.stringify(mangoQuery)
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
-      let cachedReactiveList = this.reactiveItemDbMemCache.get(queryId)
-      if (cachedReactiveList) return cachedReactiveList
-
-      mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-      assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       let findResult
-      if (rxCollectionEnum in WsCollectionEnum) {
-         let rxQuery = await this.workspace.find(mangoQuery)
-         const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-         assert(reactiveList, '!reactiveList')
-         findResult = {
-            items: reactiveList,
-            count: reactiveList.length,
-            totalCount: reactiveList.length,
-            nextPageToken: null
+      let cachedReactiveList = this.reactiveItemDbMemCache.get(queryId)
+      if (cachedReactiveList) findResult = cachedReactiveList
+      if (!findResult) {
+         mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+         let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+         assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+         if (rxCollectionEnum in WsCollectionEnum) {
+            let rxQuery = await this.workspace.find(mangoQuery)
+            const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
+            assert(reactiveList, '!reactiveList')
+            findResult = reactiveList
+         } else if (rxCollectionEnum in LstCollectionEnum) {
+            let rxDoc = await this.lists.find(mangoQuery)
+            findResult = getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
+         } else {
+            throw new Error('bad collection: ' + rxCollectionEnum)
          }
-      } else if (rxCollectionEnum in LstCollectionEnum) {
-         let rxDoc = await this.lists.find(mangoQuery)
-         findResult = getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
-      } else {
-         throw new Error('bad collection: ' + rxCollectionEnum)
+         assert(findResult, '!findResult' + JSON.stringify(findResult))
+         this.reactiveItemDbMemCache.set(queryId, findResult)
       }
-      assert(findResult, '!findResult' + JSON.stringify(findResult))
-      this.reactiveItemDbMemCache.set(queryId, findResult)
       this.store.commit('debug/addFindResult', { queryId, findResult })
-      return findResult
+      return findResult.getData ? findResult.getData() : {
+         items: findResult,
+         count: findResult.length,
+         totalCount: findResult.length,
+         nextPageToken: null
+      }
    }
 
    async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
@@ -356,20 +357,24 @@ class RxDBWrapper {
       }
       assert(id)
       assert(id.includes('::'))
+      let reactiveItem
       if (!force) { // вернем из быстрого кэша реактивных элементов
          let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
          if (cachedReactiveItem) {
             if ([RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY].includes(rxCollectionEnum)) {
-               if (this.cache.isActual(id)) return cachedReactiveItem // элемент из RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY может устареть (тогда надо запросить заново)
-            } else return cachedReactiveItem // остальные элементы не устаревают
+               if (this.cache.isActual(id)) reactiveItem = cachedReactiveItem // элемент из RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY может устареть (тогда надо запросить заново)
+            } else reactiveItem = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc })
-      if (!rxDoc) return null
-      let reactiveItem = getReactive(rxDoc)
+      if (!reactiveItem) {
+         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc })
+         if (!rxDoc) return null
+         reactiveItem = getReactive(rxDoc)
+         this.reactiveItemDbMemCache.set(id, reactiveItem)
+      }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem })
-      this.reactiveItemDbMemCache.set(id, reactiveItem)
-      return reactiveItem
+      assert(reactiveItem.getData)
+      return reactiveItem.getData()
    }
 
    // actualAge - актуально только для кэша
@@ -391,7 +396,7 @@ class RxDBWrapper {
          throw new Error('bad collection' + rxCollectionEnum)
       }
       if (!rxDoc) return null
-      return getReactive(rxDoc)
+      return getReactive(rxDoc).getData()
    }
 
    async remove (id) {
