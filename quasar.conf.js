@@ -60,7 +60,7 @@ module.exports = function (ctx) {
         'QResizeObserver',
         'QInput',
         'QDialog',
-        'QScrollArea'
+        'QScrollArea',
       ],
       directives: [
         'Ripple',

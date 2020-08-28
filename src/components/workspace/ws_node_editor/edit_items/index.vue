@@ -1,8 +1,16 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-  q-dialog(v-model="itemEditorOpened" position="bottom")
+  q-dialog(
+    v-model="itemEditorOpened" position="bottom"
+    maximized
+    @show="itemsActive = false"
+    @hide="itemsActive = true")
     item-editor(:item="item" @close="itemEditorOpened = false")
-  q-dialog(v-model="itemFinderOpened" position="bottom")
+  q-dialog(
+    v-model="itemFinderOpened" position="bottom"
+    maximized
+    @show="itemsActive = false"
+    @hide="itemsActive = true")
     item-finder(@item="itemFound" @close="itemFinderOpened = false")
   //- thumbnails
   //- q-carousel(
@@ -24,7 +32,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       edit-item(:item="i" :itemIndex="ii"
       @itemAdd="")
   div(:style=`{position: 'relative',}`).row.full-width
-    item-player(:item="node.items[0]" :itemIndex="0")
+    item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
     //- q-btn(
       @click="itemAdd()"
       round push color="green" icon="add"
@@ -55,6 +63,7 @@ export default {
   data () {
     return {
       slide: null,
+      itemsActive: true,
       itemEditorOpened: false,
       itemFinderOpened: false,
     }
@@ -73,6 +82,7 @@ export default {
     },
     itemEdit (item, itemIndex) {
       this.$log('itemEdit', item, itemIndex)
+      this.itemsActive = false
       this.item = item
       this.itemEditorOpened = true
     },

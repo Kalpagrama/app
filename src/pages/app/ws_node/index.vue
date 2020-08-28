@@ -3,7 +3,7 @@ ws-node-editor(
   v-if="node"
   :node="node"
   :title="title"
-  @outHanlde="outHandle")
+  @out="outHandle")
 </template>
 
 <script>

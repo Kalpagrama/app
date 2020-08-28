@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
 import editSpheres from './edit_spheres.vue'
@@ -117,10 +118,18 @@ export default {
     barClickHandle (e) {
       this.$log('barClickHandle', e)
     },
-    nodeCreate () {
+    async nodeCreate () {
       this.$log('nodeCreate')
-      this.node.stage = 'draft'
-      this.$router.push(`/workspace/node/${this.node.id}`)
+      // make draft copy, create new draft, go to it
+      let nodeInput = JSON.parse(JSON.stringify(this.node))
+      nodeInput.stage = 'draft'
+      delete nodeInput.id
+      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeCreate node', node)
+      this.$router.push(`/workspace/node/${node.id}`)
+      // mutate fragment to draft
+      // this.node.stage = 'draft'
+      // this.$router.push(`/workspace/node/${this.node.id}`)
     }
   },
   mounted () {

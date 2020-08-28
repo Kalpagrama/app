@@ -156,6 +156,11 @@ export default {
                 if (valNew) {
                   this.$log('CREATE valOld/valNew', valOld, valNew[to])
                   if (valNew[to] === 100) {
+                    this.$q.notify({
+                      type: 'positive',
+                      position: 'top',
+                      message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро готово!')
+                    })
                     this.nodeLoad(to)
                     unwatch()
                     this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])

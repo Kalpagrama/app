@@ -97,9 +97,10 @@ export default {
         this.$q.notify({
           type: 'positive',
           position: 'top',
-          message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро отправлено на публикацию!')
+          message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро создается...')
         })
-        this.$router.push(`/node/${createdNode.oid}?creating=true`).catch(e => e)
+        // need to replace router cos we deleted it...
+        this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }
       catch (e) {
         this.$log('publish error', e)
@@ -131,7 +132,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

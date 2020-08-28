@@ -50,18 +50,31 @@ export default {
       return item
     },
     async bookmarkDelete () {
-      this.$log('bookmarkDelete')
-      let bookmark = await this.bookmarkFind()
-      if (bookmark) {
-        await this.$rxdb.remove(bookmark.id)
-        this.bookmarked = false
+      try {
+        this.$log('bookmarkDelete')
+        this.loading = true
+        await this.$wait(300)
+        let bookmark = await this.bookmarkFind()
+        if (bookmark) {
+          await this.$rxdb.remove(bookmark.id)
+          this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark deleted!'})
+          this.bookmarked = false
+          this.loading = false
+        }
+        else {
+          throw new Error('No such bookmark!')
+        }
+      }
+      catch (e) {
+        this.$log('bookmarkDelete error', e)
+        this.loading = false
       }
     },
     async bookmarkCreate () {
       try {
         this.$log('bookmarkCreate start')
-        this.laoding = true
-        await this.$wait(500)
+        this.loading = true
+        await this.$wait(300)
         let bookmarkInput = {
           oid: this.node.oid,
           type: 'NODE',

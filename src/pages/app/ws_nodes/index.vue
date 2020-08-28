@@ -112,7 +112,7 @@ export default {
     typesFiltered () {
       let arr = [
         {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
-        {id: 'fragments', name: this.$t('nodes_fragments', 'Фрагменты')},
+        // {id: 'fragments', name: this.$t('nodes_fragments', 'Фрагменты')},
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
       ]

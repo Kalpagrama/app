@@ -39,7 +39,7 @@ export default {
     return {
       feed: 'one',
       feeds: [
-        {oid: 'one', name: 'Всякое говно'},
+        {oid: 'one', name: 'Все подряд'},
         {oid: 'two', name: 'Программисты'},
         {oid: 'three', name: 'Стартапы'},
         {oid: 'four', name: 'Саморазвитие'},
