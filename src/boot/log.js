@@ -33,6 +33,7 @@ const LogSystemModulesEnum = Object.freeze({
   VUEX: 'vx',
   VUEX_CACHE: 'vx_cache',
   VUEX_CORE: 'vx_core',
+  VUEX_DBG: 'vx_core',
   RXDB: 'rxdb',
   RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',
@@ -93,7 +94,7 @@ class Logger {
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
       if (highlightColor) msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
+      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
     } else if (highlightColor) {
       msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
     }
@@ -109,9 +110,9 @@ class Logger {
   }
 
   debug(module, ...msg) {
-    assert(['gui', 'any', 'system'].includes(this.store.state.core.logDbgFilter))
+    assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
     if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
-    if (this.store.state.core.logDbgFilter === 'system' && !logSystemModulesValueSet.has(module)) return
+    if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
       this.getLoggerFunc(module, null)(...msg)

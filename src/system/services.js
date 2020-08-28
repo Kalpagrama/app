@@ -108,6 +108,7 @@ async function systemInit(store) {
       await rxdb.init(userOid)
       let currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
       assert(currentUser, 'currentUser обязан быть после rxdb.init')
+      // logD(f, 'currentUser= ', currentUser)
       await store.dispatch('init', currentUser)
       await i18next.changeLanguage(currentUser.profile.lang)
       res.authenticated = true

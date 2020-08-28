@@ -20,9 +20,9 @@ function getReactive (rxDoc) {
 }
 
 function getItemData (item) {
-  if (item.valueString) return item.valueString
-  if (item.cached) return item.cached.data
-  return item
+  if (item.valueString) return item.valueString // schemaKeyValue
+  if (item.cached) return item.cached.data // cacheSchema
+  return item // wsSchemaItem
 }
 
 function mergeReactiveItem (reactiveItem, change) {
@@ -79,7 +79,7 @@ class ReactiveItemHolder {
   constructor (rxDoc) {
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
     assert(rxDoc.id, '!rxDoc.id')
-    // logD('ReactiveItemHolder::constructor', rxDoc.id)
+    logD('ReactiveItemHolder::constructor', rxDoc.id)
     this.rxDoc = rxDoc
     if (rxDoc.reactiveItemHolderMaster) {
       this.id = rxDoc.reactiveItemHolderMaster.id
@@ -194,7 +194,7 @@ class ReactiveItemHolder {
 
 class ReactiveListHolder {
   async create (rxQuery) {
-    logD('ReactiveListHolder::constructor', rxQuery)
+    logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
     assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
     try {
       if (rxQuery.reactiveListHolderMaster) {

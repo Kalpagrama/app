@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import core from './core'
 import ui from './ui'
+import debug from './debug'
 import i18next from 'i18next'
 import {RxCollectionEnum, rxdb} from 'src/system/rxdb'
 import assert from 'assert'
@@ -20,7 +21,8 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       core,
-      ui
+      ui,
+      debug
     },
     strict: process.env.DEV,
     state: {},
