@@ -84,7 +84,9 @@ export default {
       // this.$log('itemsLoad start', mangoQuery)
       mangoQuery = mangoQuery || {selector: {}}
       try {
-        let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
+        let findRes = await this.$rxdb.find(mangoQuery)
+        this.$log('this.$rxdb.find  items =  ', findRes)
+        let { items, count, totalCount, nextPageToken } = findRes
         this.items = items
         this.itemsSliced = items.slice(0, this.sliceSize)
         this.$emit('items', items)
