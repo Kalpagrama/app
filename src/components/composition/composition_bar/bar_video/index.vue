@@ -49,7 +49,7 @@
     :style=`{
       order: actionsPosition === 'bottom' ? 1 : -1,
     }`
-    ).row.full-width
+    ).row.full-width.no-wrap
     q-btn(
       v-if="!compositionPlaying"
       @click="compositionPlay()"
@@ -78,6 +78,9 @@
 export default {
   name: 'compositionBar_video',
   props: {
+    isActive: {
+      type: Boolean, default () { return true },
+    },
     player: {type: Object, required: true},
     composition: {type: Object, required: true},
     contentKalpa: {type: Object, required: true},
@@ -156,7 +159,7 @@ export default {
     'player.currentTime': {
       handler (to, from) {
         if (this.compositionPlaying) {
-          this.$log('player.currentTime TO', to)
+          // this.$log('player.currentTime TO', to)
           let layer = this.composition.layers[this.layerPlaying]
           if (to >= layer.figuresAbsolute[1].t) {
             this.layersPlayed.push(this.layerPlaying)

@@ -9,14 +9,18 @@
 <template lang="pug">
 .row.full-width.b-30
   //- item player wrapper...
-  div(:style=`{position: 'relative'}`).row.full-width.b-30
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.b-30
     //- item preview
     img(
       :src="item.thumbUrl" draggable="false"
-      :style=`{borderRadius: '10px'}`).full-width
+      :style=`{
+        borderRadius: '10px',
+        opacity: 0.1,
+      }`).full-width
     //- item edit
     //- item add
     q-btn(
+      v-if="player"
       @click="$emit('itemAdd')"
       round push color="green" icon="add"
       :style=`{
@@ -25,21 +29,20 @@
         borderRadius: '50%'
       }`)
     //- item player
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      ws-content-player(
-        v-show="player"
-        v-if="contentKalpa"
-        :contentKalpa="contentKalpa"
-        @player="player = $event"
-        :options=`{
-          showBar: false,
-          showActions: false,
-        }`
-        :style=`{
-          position: 'absolute', zIndex: 100,
-        }`).fit
+    ws-content-player(
+      v-if="contentKalpa"
+      :contentKalpa="contentKalpa"
+      @player="player = $event"
+      :options=`{
+        showBar: false,
+        showActions: false,
+      }`
+      :style=`{
+        position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
+      }`).fit
     //- composition bar wrapper
     div(
+      v-if="player"
       :style=`{
         position: 'absolute', zIndex: 2000,
         bottom: '0px', height: '74px',
@@ -51,16 +54,14 @@
           background: 'rgba(0,0,0,0.1)',
           borderRadius: '10px',
         }`
-        ).row.fit
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          composition-bar(
-            v-if="player"
-            :player="player" :contentKalpa="contentKalpa"
-            :composition="item"
-            actionsPosition="top"
-            :style=`{
-              maxHeight: '40px',
-            }`)
+        ).row.fit.br
+        composition-bar(
+          :player="player" :contentKalpa="contentKalpa"
+          :composition="item"
+          actionsPosition="top"
+          :style=`{
+            maxHeight: '40px',
+          }`)
 </template>
 
 <script>

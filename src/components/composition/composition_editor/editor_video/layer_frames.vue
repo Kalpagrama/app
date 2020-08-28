@@ -4,7 +4,7 @@
   //- overflowY: 'hidden',
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '50px'}`).row.full-width.scroll.q-pb-md
+    :style=`{paddingTop: '50px', paddingBottom: '50px'}`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -28,9 +28,9 @@
             }`
             ).row.items-center.content-center.justify-center
             span(:style=`{userSelect: 'none', pointerEvents: 'none'}`) {{ $time((f - 1)*10) }}
-        //- currentTime
-        //- div(
-          v-show="!poingDragging"
+        //- currentTime line
+        div(
+          v-show="!poingDragging && (player.currentTime < layerStart || player.currentTime > layerEnd)"
           :style=`{
             position: 'absolute', zIndex: 200,
             left: 'calc('+(player.currentTime/player.duration)*100+'% - 0px)',
@@ -49,14 +49,14 @@
             width: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% + 8px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
-            borderRadius: $store.state.ui.borderRadius+'px',
+            borderRadius: '10px',
           }`)
         //- left drag
         div(
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 35px)',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 30px)',
             height: '50px', width: '50px',
             cursor: 'grabbing',
             borderRadius: '50%',
@@ -71,14 +71,14 @@
             width: 'calc('+((player.duration-layer.figuresAbsolute[1].t)/player.duration)*100+'% + 1px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
-            borderRadius: $store.state.ui.borderRadius+'px',
+            borderRadius: '10px',
           }`)
         //- right drag
         div(
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% - 15px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% - 10px)',
             height: '50px', width: '50px',
             cursor: 'grabbing',
             borderRadius: '50%',
@@ -93,7 +93,6 @@
             width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 8px)',
             height: 50+8+8+'px',
             borderRadius: '12px',
-            //- border: '8px solid '+layer.color,
             border: '8px solid rgb(76,175,80)',
             pointerEvents: 'none',
           }`)
@@ -104,7 +103,45 @@
           width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 8px)',
           height: 50+8+8+'px',
           }`).row
-          slot(name="meta")
+          slot(name="meta" :panning="pointDragging")
+        //- start actions
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 300, bottom: '-46px',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 60px)',
+          }`
+          ).row.no-wrap
+          q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
+            div(:style=`{
+              position: 'absolute', zIndex: 100,
+              left: 'calc(50% - 2px)', width: '3px',
+              height: '80%', top: '10%',
+              borderRadius: '2px',
+              opacity: 0.9
+            }`).row.bg-red
+          q-btn(round flat dense color="white" @click="layerForward(0,false)")
+            q-icon(name="keyboard_arrow_left" color="white" size="30px")
+          q-btn(round flat dense color="white" @click="layerForward(0,true)")
+            q-icon(name="keyboard_arrow_right" color="white" size="30px")
+        //- end actions
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 300, bottom: '-46px',
+            left: 'calc('+((layer.figuresAbsolute[0].t + (layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t))/player.duration)*100+'% - 30px)',
+          }`
+          ).row.no-wrap
+          q-btn(round flat dense color="white" @click="layerForward(1,false)")
+            q-icon(name="keyboard_arrow_left" color="white" size="30px")
+          q-btn(round flat dense color="white" @click="layerForward(1,true)")
+            q-icon(name="keyboard_arrow_right" color="white" size="30px")
+          q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
+            div(:style=`{
+              position: 'absolute', zIndex: 100,
+              left: 'calc(50% - 2px)', width: '3px',
+              height: '80%', top: '10%',
+              borderRadius: '2px',
+              opacity: 0.9
+            }`).row.bg-red
       //- right margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
 </template>
@@ -154,6 +191,13 @@ export default {
     },
   },
   watch: {
+    layer: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$store.commit('ui/stateSet', ['wsContentLayers', [JSON.parse(JSON.stringify(to))]])
+      }
+    },
     tickFramesLayerCenter: {
       handler (to, from) {
         if (to) {
@@ -164,6 +208,39 @@ export default {
     }
   },
   methods: {
+    async layerSet (pointIndex) {
+      this.$log('layerSet', pointIndex)
+      let t = this.player.currentTime
+      this.$set(this.layer.figuresAbsolute[pointIndex], 't', t)
+      if (pointIndex === 0) {
+        this.player.setCurrentTime(t)
+        this.player.play()
+      }
+      if (pointIndex === 1) {
+        this.player.setCurrentTime(t - 1)
+        this.player.play()
+      }
+      await this.$wait(300)
+      this.framesLayerCenter()
+    },
+    layerForward (pointIndex, goingForward) {
+      this.$log('layerForward', pointIndex, goingForward)
+      let t = this.layer.figuresAbsolute[pointIndex].t
+      if (goingForward) t += 0.1
+      else t -= 0.1
+      this.$log('t', t)
+      this.$set(this.layer.figuresAbsolute[pointIndex], 't', t)
+      if (pointIndex === 0) {
+        this.player.setCurrentTime(t)
+        // this.player.play()
+      }
+      if (pointIndex === 1) {
+        this.player.setCurrentTime(t)
+        // this.player.setCurrentTime(t - 1)
+        // this.player.play()
+      }
+      // TODO: at the end of clicking this.framesLayerCenter(), end go to -1 if the end...
+    },
     async pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
       let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.player.duration)

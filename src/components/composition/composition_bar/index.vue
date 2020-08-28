@@ -14,7 +14,7 @@ import barVideo from './bar_video/index.vue'
 export default {
   name: 'compositionBar',
   components: {barVideo},
-  props: ['player', 'composition', 'contentKalpa', 'actionsPosition'],
+  props: ['isActive', 'player', 'composition', 'contentKalpa', 'actionsPosition'],
   data () {
     return {
       barComponent: {

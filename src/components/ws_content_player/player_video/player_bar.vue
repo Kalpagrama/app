@@ -27,6 +27,7 @@ div(
         border: '2px solid #4caf50',
         borderRadius: '4px',
         pointerEvents: 'none',
+        background: 'rgba(255,255,255,0.3)',
       }`
       ).row
   //- currentTime width/line

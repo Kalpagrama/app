@@ -48,7 +48,8 @@ q-layout(view="hHh Lpr lff")
                       @edit="nodeEdit(i)"
                       @remove="nodeRemove(i)").q-mb-sm
             q-tab-panel(name="published" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
-              kalpa-loader(:mangoQuery="queryPublishedNodes" :sliceSize="1000")
+              nodes-published(:searchString="searchString")
+              //- kalpa-loader(:mangoQuery="queryPublishedNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
                   .row.full-width.items-start.content-start.justify-center.q-px-sm
                     node-item(
@@ -70,10 +71,11 @@ import { NodeApi } from 'src/api/node'
 import nodeItem from './node_item.vue'
 import nodeBookmark from './node_bookmark.vue'
 import nodesFragments from './nodes_fragments.vue'
+import nodesPublished from './nodes_pubished.vue'
 
 export default {
   name: 'pageApp__wsNodes',
-  components: {nodeItem, nodeBookmark, nodesFragments},
+  components: {nodeItem, nodeBookmark, nodesFragments, nodesPublished},
   props: {
     mode: {
       type: String,
