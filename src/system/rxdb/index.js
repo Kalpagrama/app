@@ -316,11 +316,15 @@ class RxDBWrapper {
          this.reactiveItemDbMemCache.set(queryId, findResult)
       }
       this.store.commit('debug/addFindResult', { queryId, findResult })
-      return findResult.getData ? findResult.getData() : {
-         items: findResult,
-         count: findResult.length,
-         totalCount: findResult.length,
-         nextPageToken: null
+      if (findResult.getData) return findResult.getData()
+      else {
+         assert(Array.isArray(findResult))
+         return {
+            items: findResult,
+            count: findResult.length,
+            totalCount: findResult.length,
+            nextPageToken: null
+         }
       }
    }
 
@@ -373,7 +377,7 @@ class RxDBWrapper {
          this.reactiveItemDbMemCache.set(id, reactiveItem)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem })
-      assert(reactiveItem.getData)
+      assert(reactiveItem.getData, '!reactiveItem.getData' + JSON.stringify(reactiveItem))
       return reactiveItem.getData()
    }
 

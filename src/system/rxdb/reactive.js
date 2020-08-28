@@ -207,7 +207,7 @@ class ReactiveListHolder {
         assert(Array.isArray(docs), 'Array.isArray(docs)')
         this.vm = new Vue({
           data: {
-            reactiveList: docs.map(rxDoc => getReactive(rxDoc))
+            reactiveList: docs.map(rxDoc => getReactive(rxDoc).getData())
           }
         })
         this.reactiveList = this.vm.reactiveList
