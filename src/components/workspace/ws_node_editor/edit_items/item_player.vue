@@ -20,7 +20,7 @@
     //- div(:style=`{height: '400px',}`).row.full-width.bg-red
     //- item edit
     //- item add
-    q-btn(
+    //- q-btn(
       v-if="player"
       @click="$emit('itemAdd')"
       round push color="green" icon="add"
@@ -78,7 +78,7 @@ import wsContentPlayer from 'components/ws_content_player/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
 
 export default {
-  name: 'wsNodeEditor__editItem',
+  name: 'wsNodeEditor_itemPlayer',
   components: {wsContentPlayer, compositionBar},
   props: ['item', 'itemIndex'],
   data () {
