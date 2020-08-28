@@ -31,7 +31,7 @@
       }`)
     //- item player
     ws-content-player(
-      v-if="contentKalpa"
+      v-if="isActive && contentKalpa"
       :contentKalpa="contentKalpa"
       @player="player = $event"
       :options=`{
@@ -49,7 +49,7 @@
       }`
       ).row.full-width.bg-yellow
     div(
-      v-if="player"
+      v-if="isActive && player"
       :style=`{
         position: 'absolute', zIndex: 3000, order: -1,
         bottom: '0px', height: '74px',
@@ -80,7 +80,7 @@ import compositionBar from 'components/composition/composition_bar/index.vue'
 export default {
   name: 'wsNodeEditor_itemPlayer',
   components: {wsContentPlayer, compositionBar},
-  props: ['item', 'itemIndex'],
+  props: ['isActive', 'item', 'itemIndex'],
   data () {
     return {
       contentKalpa: null,

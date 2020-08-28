@@ -20,42 +20,10 @@ div(
       cursor: 'pointer',
     }`
     ).row.full-width.items-start.content-start
-    //- content
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      q-btn(
-        v-if="isActive"
-        @click="$router.push('/content/'+node.meta.items[0].layers[0].contentOid)"
-        round flat color="grey-2" icon="select_all"
-        :style=`{
-          position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-          top: '8px', left: '8px',
-          background: 'rgba(0,0,0,0.15)',
-        }`)
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
-    img(
-      :src="thumbUrl" draggable="false"
-      :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`
-      ).full-width
-    div(
-      v-if="isActive && isVisible"
-      :style=`{
-        position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
-      }`
-      ).row.fit
-      video(
-        v-if="itemType === 'VIDEO'"
-        @click="videoClicked"
-        @loadedmetadata="videoLoadedmetadata"
-        ref="nodeLiteVideoRef" :src="itemSrc"
-        :muted="muted"
-        playsinline loop
-        :style=`{
-          objectFit: 'contain',
-          borderRadius: '10px', overflow: 'hidden',
-        }`
-        ).fit
+    composition-player(:isActive="isActive" :isVisible="isVisible" :composition="node.meta.items[0]")
   //- essence link...
   div(:style=`{position: 'relative'}`).row.full-width
     router-link(
@@ -67,17 +35,18 @@ div(
       }`
       ).row.full-width.items-center.q-py-sm.q-px-md
       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
-  //- .row.full-width
+  .row.full-width
     slot(name="footer" :node="nodeFull")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeBookmark from './node_bookmark.vue'
+import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark},
+  components: {nodeBookmark, compositionPlayer},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
@@ -87,39 +56,18 @@ export default {
     }
   },
   computed: {
-    thumbUrl () {
-      return this.node.meta.items[0].thumbUrl
-    },
-    itemType () {
-      return this.node.meta.items[0].outputType
-    },
-    itemSrc () {
-      return this.node.meta.items[0].url
-    }
   },
   watch: {
-    isActive: {
-      handler (to, from) {
-        // this.$log('isActive TO', to, this.node.name)
-        if (!this.$refs.nodeLiteVideoRef) return
-        if (to) {
-          this.$refs.nodeLiteVideoRef.play()
-        }
-        else {
-          this.$refs.nodeLiteVideoRef.pause()
-        }
-      }
-    },
-    isVisible: {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('isVisible TO', to, this.node.name)
-        if (to) {
-          // if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-          // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
-        }
-      }
-    },
+    // isVisible: {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     // this.$log('isVisible TO', to, this.node.name)
+    //     if (to) {
+    //       // if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
+    //       // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
+    //     }
+    //   }
+    // },
   },
   methods: {
     videoClicked (e) {
