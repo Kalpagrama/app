@@ -29,7 +29,7 @@ export default {
     sphereOid () {
       return this.$store.getters.currentUser().oid
     },
-    mangoQuery () {
+    query () {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
