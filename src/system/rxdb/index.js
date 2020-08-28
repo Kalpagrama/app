@@ -292,6 +292,9 @@ class RxDBWrapper {
 
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
    async find (mangoQuery) {
+      const f = this.find
+      logD(f, 'start')
+      const t1 = performance.now()
       const queryId = JSON.stringify(mangoQuery)
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
       let findResult
@@ -316,16 +319,19 @@ class RxDBWrapper {
          this.reactiveItemDbMemCache.set(queryId, findResult)
       }
       this.store.commit('debug/addFindResult', { queryId, findResult })
-      if (findResult.getData) return findResult.getData()
+      let result
+      if (findResult.getData) result = findResult.getData()
       else {
          assert(Array.isArray(findResult))
-         return {
+         result = {
             items: findResult,
             count: findResult.length,
             totalCount: findResult.length,
             nextPageToken: null
          }
       }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return result
    }
 
    async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
@@ -384,9 +390,10 @@ class RxDBWrapper {
    // actualAge - актуально только для кэша
    async set (rxCollectionEnum, data, { actualAge, notEvict = false } = {}) {
       const f = this.set
+      logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
+      const t1 = performance.now()
       assert(data, '!data')
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-      logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       let rxDoc
       if (rxCollectionEnum in WsCollectionEnum) {
          rxDoc = await this.workspace.set(data)
@@ -400,16 +407,21 @@ class RxDBWrapper {
          throw new Error('bad collection' + rxCollectionEnum)
       }
       if (!rxDoc) return null
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return getReactive(rxDoc).getData()
    }
 
    async remove (id) {
+      const f = this.remove
+      logD(f, 'start')
+      const t1 = performance.now()
       let collection = getRxCollectionEnumFromId(id)
       if (collection in WsCollectionEnum) {
-         return await this.workspace.remove(id)
+         await this.workspace.remove(id)
       } else {
          throw new Error('bad id!!' + id)
       }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }
 

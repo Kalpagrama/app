@@ -183,12 +183,14 @@ class Workspace {
         logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
         try {
           await this.lock()
+          logD(f, 'locked')
           if (rxdb.isLeader()) await this.synchronize()
         } catch (err) {
           logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
           this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
         } finally {
           this.release()
+          logD(f, 'unlocked')
         }
         logD(f, 'next loop complete')
         await this.synchroLoopWaitObj.wait()
@@ -322,19 +324,19 @@ class Workspace {
   // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
   async processEvent (event) {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
+    const f = this.processEvent
+    logD(f, 'start')
+    const t1 = performance.now()
     try {
       await this.lock()
+      logD(f, 'locked')
       this.ignoreWsChanges = true
-      const f = this.processEvent
-      logD(f, 'start')
-      const t1 = performance.now()
       if (!rxdb.isLeader()) return
       let { type, wsItem: itemServer, wsRevision } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
-
       let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
@@ -371,13 +373,15 @@ class Workspace {
     } finally {
       this.ignoreWsChanges = false
       this.release()
+      logD(f, 'unlocked')
     }
   }
 
   async find (mangoQuery) {
+    const f = this.find
     try {
       await this.lock()
-      const f = this.find
+      logD(f, 'locked')
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -387,13 +391,17 @@ class Workspace {
       return rxQuery
     } finally {
       this.release()
+      logD(f, 'unlocked')
     }
   }
 
   async set (item) {
+    const f = this.set
+    logD(f, 'start')
+    const t1 = performance.now()
     try {
       await this.lock()
-      const f = this.set
+      logD(f, 'locked')
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
       if (itemCopy.wsItemType === 'WS_NODE') {
@@ -407,8 +415,6 @@ class Workspace {
         //   itemCopy.thumbUrl
         // }
       }
-      logD(f, `start. item: ${JSON.stringify(item)}`)
-      const t1 = performance.now()
       assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
       itemCopy.updatedAt = Date.now()
       if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
@@ -424,26 +430,36 @@ class Workspace {
       return rxDoc
     } finally {
       this.release()
+      logD(f, 'unlocked')
     }
   }
 
   async get (id) {
+    const f = this.get
+    logD(f, 'start', id)
+    const t1 = performance.now()
     try {
-      await this.lock()
+      // await this.lock() вызывается внутри processEvent
+      // logD(f, 'locked')
       let rxDoc = await this.db.ws_items.findOne(id).exec()
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
     } finally {
-      this.release()
+      // this.release()
+      // logD(f, 'unlocked')
     }
   }
 
   async remove (id) {
+    const f = this.remove
     try {
       await this.lock()
+      logD(f, 'locked')
       assert(this.created, '!this.created')
       await this.db.ws_items.find({ selector: { id: id } }).remove()
     } finally {
       this.release()
+      logD(f, 'unlocked')
     }
   }
 
