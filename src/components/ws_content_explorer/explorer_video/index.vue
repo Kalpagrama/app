@@ -139,7 +139,7 @@ export default {
     }
   },
   created () {
-    let lastViewId = localStorage.getItem('wsContentExplorer_lastViewId')
+    let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
     if (lastViewId) this.viewId = lastViewId
   },
   mounted () {
@@ -149,7 +149,7 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
-    localStorage.setItem('wsContentExplorer_lastViewId', this.viewId)
+    localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
   }
 }
 </script>

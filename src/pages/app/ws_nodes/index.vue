@@ -131,7 +131,7 @@ export default {
       return res
     },
     queryDraftNodes () {
-      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}, stage: 'draft'}
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, stage: 'draft'}}
       // name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')

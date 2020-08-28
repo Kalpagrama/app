@@ -104,6 +104,7 @@
           height: 50+8+8+'px',
           }`).row
           slot(name="meta" :panning="pointDragging")
+          //- slot(name="meta")
         //- start actions
         div(
           :style=`{
@@ -211,15 +212,32 @@ export default {
     async layerSet (pointIndex) {
       this.$log('layerSet', pointIndex)
       let t = this.player.currentTime
-      this.$set(this.layer.figuresAbsolute[pointIndex], 't', t)
       if (pointIndex === 0) {
-        this.player.setCurrentTime(t)
-        this.player.play()
+        // wanna start AFTER the end
+        if (t >= this.layerEnd) {
+          this.$set(this.layer.figuresAbsolute[0], 't', t)
+          this.$set(this.layer.figuresAbsolute[1], 't', Math.min(t + 10, this.player.duration))
+        }
+        // before the end is OK
+        else {
+          this.$set(this.layer.figuresAbsolute[0], 't', t)
+        }
       }
       if (pointIndex === 1) {
-        this.player.setCurrentTime(t - 1)
-        this.player.play()
+        // wanna end BEFORE the start
+        if (t <= this.layerStart) {
+          this.$set(this.layer.figuresAbsolute[0], 't', t)
+          this.$set(this.layer.figuresAbsolute[1], 't', Math.min(t + 10, this.player.duration))
+        }
+        // after the start is OK
+        else {
+          this.$set(this.layer.figuresAbsolute[1], 't', t)
+        }
       }
+      // go to the layer new (maybe) start and play
+      this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+      this.player.play()
+      // center frames
       await this.$wait(300)
       this.framesLayerCenter()
     },

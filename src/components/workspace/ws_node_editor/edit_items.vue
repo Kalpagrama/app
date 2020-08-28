@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
   //- thumbnails
-  q-carousel(
+  //- q-carousel(
     swipeable
     animated
     v-model="slide"
@@ -19,6 +19,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       }`)
       edit-item(:item="i" :itemIndex="ii"
       @itemAdd="")
+  div().row.full-width
+    edit-item(:item="node.items[0]" :itemIndex="0")
 </template>
 
 <script>

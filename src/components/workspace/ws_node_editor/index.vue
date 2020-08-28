@@ -38,7 +38,7 @@ import editLayout from './edit_layout'
 import editCategory from './edit_category'
 import editSpheres from './edit_spheres'
 import editEssence from './edit_essence'
-import editItems from './edit_items'
+import editItems from './edit_items/index.vue'
 
 export default {
   name: 'wsNodeEditor',
