@@ -25,6 +25,7 @@ q-page
 
 <script>
 import { WorkspaceApi } from 'src/api/workspace'
+import { systemReset } from 'src/system/services'
 
 export default {
   name: 'pageApp_settings_viewWorkspace',
@@ -34,6 +35,7 @@ export default {
       this.$log('wsClear start')
       let wsClear = await WorkspaceApi.wsClear()
       this.$log('wsClear done', wsClear)
+      await systemReset()
       window.location.reload()
     },
     wsExport () {
