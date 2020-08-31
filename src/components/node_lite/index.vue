@@ -3,7 +3,6 @@
 //-  @mouseleave="active = false"
 div(
   :style=`{
-    position: 'relative',
     borderRadius: '10px', overflow: 'hidden',
     //- minHeight: '200px',
   }`
@@ -23,7 +22,15 @@ div(
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
-    composition-player(:isActive="isActive" :isVisible="isVisible" :composition="node.meta.items[0]")
+    composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
+    q-btn(
+      @click="isFullscreen = true"
+      flat round color="white" icon="fullscreen"
+      :style=`{position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px'}`)
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    node-fullscreen(
+      v-if="isFullscreen" :node="node"
+      @close="isFullscreen = false")
   //- essence link...
   div(:style=`{position: 'relative'}`).row.full-width
     router-link(
@@ -43,19 +50,24 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeBookmark from './node_bookmark.vue'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
+import nodeFullscreen from './node_fullscreen.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer},
+  components: {nodeBookmark, compositionPlayer, nodeFullscreen},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
       nodeFull: null,
       composition: null,
-      muted: true
+      muted: true,
+      isFullscreen: false,
     }
   },
   computed: {
+    itemsActive () {
+      return this.isActive && !this.isFullscreen
+    }
   },
   watch: {
     // isVisible: {

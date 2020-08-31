@@ -36,10 +36,11 @@ export default {
       this.$log('fileChanged', e)
       this.file = e.target.files[0]
       // this.avatarUrl = URL.createObjectURL(this.avatarFile)
-      let content = await ContentApi.contentCreateFromFile(this.file)
-      this.$log('content', content)
-      // add content to ws...
-      this.$emit('content', content)
+      // let content = await ContentApi.contentCreateFromFile(this.file)
+      // this.$log('content', content)
+      // // add content to ws...
+      // this.$emit('content', content)
+      this.$emit('file', this.file)
     },
   },
   // mounted () {
