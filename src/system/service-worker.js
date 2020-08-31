@@ -94,7 +94,7 @@ function sendMsg (type, msgData) {
    initWebPush()
    // workbox init
    {
-      workbox.setConfig({ debug: true })
+      // workbox.setConfig({ debug: true })
       /* global workbox */
       // This will trigger the importScripts() for workbox.strategies and its dependencies:
       const { strategies } = workbox
@@ -444,9 +444,8 @@ if (useCache) {
                credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
                mode: 'cors', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
                headers: {
-                  ppv_header: 'ppv_header',
-                  'Cache-Control': 'no-cache',
-                  'x-my-custom-header': 'The Most Amazing Header Ever'
+                  'Cache-Control': 'no-cache', // нужно тк иначе браузер кэширует картинки и они так оказваются без cors-заголовков (при получении такой картинки - происходит ошибка)
+                  // 'x-my-custom-header': 'The Most Amazing Header Ever'
 
                }
             }

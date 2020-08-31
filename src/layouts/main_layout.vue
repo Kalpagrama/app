@@ -70,6 +70,7 @@ q-layout(view="lHh lpR lFf")
 
 <script>
 import {systemInit} from 'src/system/services'
+import { AuthApi } from 'src/api/auth'
 export default {
   name: 'mainLayout',
   data () {
@@ -101,6 +102,8 @@ export default {
     if (!res.authenticated){
       this.$log('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
+    } else {
+      await AuthApi.afterLogin()
     }
     // if (!await this.$store.dispatch('init')) {
     //   this.$log('GO LOGIN')

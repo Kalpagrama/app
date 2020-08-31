@@ -20,11 +20,22 @@ async function resetLocalStorageData() {
   // localStorage.removeItem('k_user_role')
   for (let i = 0; i < localStorage.length; i++) {
     let key = localStorage.key(i)
-    if (key.startsWith('k_')) localStorage.removeItem(key)
+    if (key.startsWith('k_') && key !== 'k_originalUrl') localStorage.removeItem(key)
   }
 }
 
 class AuthApi {
+  static async afterLogin() {
+    const f = this.afterLogin
+    logD(f, 'start')
+    let originalUrl = localStorage.getItem('k_originalUrl') // переход на полную версию после ссылки "поделиться"
+    if (originalUrl){
+      localStorage.removeItem('k_originalUrl')
+      logD(f, 'redirect to ' + originalUrl)
+      await router.push(originalUrl)
+    }
+  }
+
   static async checkExpire () {
     if (localStorage.getItem('k_token_expires')) {
       let expires = localStorage.getItem('k_token_expires')

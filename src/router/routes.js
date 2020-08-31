@@ -1,3 +1,6 @@
+import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
 
 const routes = [
   {
@@ -114,7 +117,19 @@ const routes = [
           { name: 'notifications', path: '', component: () => import('pages/app/notifications/view_home.vue') },
         ]
       },
-    ]
+      {
+        name: 'fallback',
+        path: '*',
+        redirect: '/home'
+      },
+    ],
+    beforeEnter: (to, from, next) => {
+      if (to.query.originalUrl){ // редирект на полную версию
+        logD('redirect command received!', to.query.originalUrl)
+        localStorage.setItem('k_originalUrl', to.query.originalUrl)
+      }
+      next()
+    }
   }
 ]
 

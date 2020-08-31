@@ -6,7 +6,7 @@ import {askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith} from 'src/system/
 import {router} from 'src/boot/main'
 import assert from 'assert';
 import i18next from 'i18next'
-import {resetLocalStorageData} from 'src/api/auth'
+import { AuthApi, resetLocalStorageData } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
