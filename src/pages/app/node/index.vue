@@ -59,6 +59,11 @@ q-layout(view="hHh Lpr lff")
                 threshold: 0.8
               }
             }`)
+          //- actions
+          div(
+            v-if="node"
+            ).row.full-width
+            q-btn(round flat icon="share" color="white" @click="nodeShare()")
           div(v-if="node").row.full-width.q-pa-sm
             .row.full-width.items-center.content-center.q-pa-sm
               span.text-bold.text-grey-7 Сферы сути
@@ -98,6 +103,7 @@ q-layout(view="hHh Lpr lff")
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
 import { date } from 'quasar'
+import { shareWith } from 'src/system/services'
 
 export default {
   name: 'pageApp__node',
@@ -194,6 +200,11 @@ export default {
     },
   },
   methods: {
+    nodeShare () {
+      this.$log('nodeShare')
+      // is can be shared ???
+      shareWith(this.node)
+    },
     nodeAddStart () {
       this.$log('nodeAddStart')
       this.nodeAddDialogOpened = true

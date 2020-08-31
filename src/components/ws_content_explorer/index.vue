@@ -8,13 +8,13 @@ component(
 
 <script>
 import explorerVideo from './explorer_video/index.vue'
-// import explorerImage from './explorer_image/index.vue'
+import explorerImage from './explorer_image/index.vue'
 // import explorerBook from './explorer_book/index.vue'
 // import explorerWeb from './explorer_web/index.vue'
 
 export default {
   name: 'wsContentExplorer',
-  components: {explorerVideo},
+  components: {explorerVideo, explorerImage},
   props: ['contentKalpa', 'contentWorkspace'],
   data () {
     return {
