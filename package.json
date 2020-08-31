@@ -49,6 +49,7 @@
     "body-scroll-lock": "^2.7.1",
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "2",
+    "cropperjs": "^1.5.7",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "epubjs": "^0.3.88",

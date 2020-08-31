@@ -1,5 +1,10 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+div(
+  :style=`{
+    position: 'relative',
+    height: options.isFit ? '100%' : 'auto',
+    }`
+  ).row.full-width.items-start.content-start
   //- content explorer btn
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
@@ -21,14 +26,16 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       }`)
       q-btn(round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
         q-spinner-audio(size="25px" color="white").q-mx-sm
-        q-btn(round flat color="white" icon="fullscreen")
+        //- q-btn(round flat color="white" icon="fullscreen")
   //- preview
   img(
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
-      userSelect: 'none'
+      userSelect: 'none',
+      height: options.isFit ? '100%' : 'auto',
+      objectFit: options.isFit ? 'contain' : 'contain'
     }`
     ).full-width
   //- video wrapper
@@ -55,7 +62,20 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
 <script>
 export default {
   name: 'compositionPlayer_playerVideo',
-  props: ['isVisible', 'isActive', 'composition'],
+  // props: ['isVisible', 'isActive', 'composition', 'options'],
+  props: {
+    isVisible: {type: Boolean},
+    isActive: {type: Boolean},
+    composition: {type: Object, required: true},
+    options: {
+      type: Object,
+      default () {
+        return {
+          isFit: false,
+        }
+      }
+    }
+  },
   data () {
     return {
     }

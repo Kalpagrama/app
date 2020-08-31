@@ -4,7 +4,7 @@ component(
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
-  )
+ :options="options")
 </template>
 
 <script>
@@ -13,7 +13,7 @@ import playerVideo from './player_video/index.vue'
 export default {
   name: 'compositionPlayer',
   components: {playerVideo},
-  props: ['isActive', 'isVisible', 'composition'],
+  props: ['isActive', 'isVisible', 'composition', 'options'],
   data () {
     return {
       playerComponent: {

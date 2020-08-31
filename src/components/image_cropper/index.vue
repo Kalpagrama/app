@@ -1,0 +1,57 @@
+<template lang="pug">
+.row.full-width.items-start.content-start.b-30
+  //- image wrapper
+  div(
+    :style=`{
+      position: 'relative',
+      borderRadius: '10px', overflow: 'hidden',
+    }`).row.full-width.items-start.content-start
+    img(
+      ref="imageRef"
+      :src="src"
+      :style=`{
+        maxHeight: '500px',
+        objectFit: 'contain',
+      }`
+      ).full-width
+  //- footer with actions
+  //- TODO: add flip?
+  .row.full-width.q-pa-sm
+    q-btn(
+      @click="cropper.reset()"
+      round flat color="white" icon="autorenew")
+    .col
+    q-btn(
+      @click="cropper.rotate(90)"
+      round flat color="white" icon="rotate_left")
+    q-btn(
+      @click="cropper.rotate(-90)"
+      round flat color="white" icon="rotate_right")
+</template>
+
+<script>
+import 'cropperjs/dist/cropper.css'
+import Cropper from 'cropperjs'
+
+export default {
+  name: 'imageCropper',
+  props: ['src', 'options'],
+  data () {
+    return {
+      croppper: null,
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.cropper = new Cropper(this.$refs.imageRef, {
+      ...this.options,
+      // aspectRatio: 16 / 9,
+      // viewMode: 1,
+      // initialAspectRatio: 10 / 10,
+      crop: (event) => {
+        this.$emit('crop', event)
+      }
+    })
+  }
+}
+</script>
