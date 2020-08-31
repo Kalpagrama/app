@@ -72,6 +72,8 @@ q-page(:style=`{paddingBottom: '200px',}`)
             }`
             ).full-width
             span(:style=`{fontSize: '18px',}`).text-white.text-bold Create account
+      .row.full-width.q-px-sm
+        with-socials
       .row.full-width.items-center.content-center.q-pa-md
         q-btn(
           color="green" outline dense no-caps
@@ -82,9 +84,11 @@ q-page(:style=`{paddingBottom: '200px',}`)
 
 <script>
 import { AuthApi } from 'src/api/auth'
+import withSocials from './with_socials.vue'
 
 export default {
   name: 'pageAuth__signUp',
+  components: {withSocials},
   data () {
     return {
       login: '',

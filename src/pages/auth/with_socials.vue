@@ -6,7 +6,7 @@
 
 <template lang="pug">
 div(
-  :style=`{height: '56px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', background: 'rgba(255,255,255,0.1)'}`
+  :style=`{height: '56px', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
   div(v-if="!userIdentified").row.full-width.justify-between.q-py-md
     q-btn(
@@ -16,9 +16,10 @@ div(
 </template>
 
 <script>
-  import assert from 'assert'
-  import { Platform } from 'quasar'
-  import { RxCollectionEnum } from 'src/system/rxdb'
+import assert from 'assert'
+import { Platform } from 'quasar'
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'pageAuth-withSocials',
   data () {
