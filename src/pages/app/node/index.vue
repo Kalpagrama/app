@@ -43,10 +43,10 @@ q-layout(view="hHh Lpr lff")
               :style=`{fontSize: '16px'}`
               ).text-white.text-bold.q-px-sm {{ categoryName }}
           .col
-          span.text-white.q-mx-sm {{ createdAt }}
-          q-btn(v-if="node" dense flat no-caps :to="`/user/${node.author.oid}`").q-px-sm
-            span.text-white.text-bold.q-mx-sm {{ node.author.name }}
-            user-avatar(:url="node.author.thumbUrl" :width="36" :height="36")
+          //- span.text-white.q-mx-sm {{ createdAt }}
+          //- q-btn(v-if="node" dense flat no-caps :to="`/user/${node.author.oid}`").q-px-sm
+          //-   span.text-white.text-bold.q-mx-sm {{ node.author.name }}
+          //-   user-avatar(:url="node.author.thumbUrl" :width="36" :height="36")
   q-page-container
     q-page(:style=`{paddingTop: '0px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
