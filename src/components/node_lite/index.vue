@@ -74,7 +74,6 @@ export default {
     return {
       nodeFull: null,
       composition: null,
-      muted: true,
       isFullscreen: false,
     }
   },

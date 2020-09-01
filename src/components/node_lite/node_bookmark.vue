@@ -40,18 +40,18 @@ export default {
   },
   methods: {
     async bookmarkFind () {
-      this.$log('bookmarkFind')
+      // this.$log('bookmarkFind')
       let {items: [item]} = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
       }
       })
-      this.$log('bookmarkFind item', item)
+      // this.$log('bookmarkFind item', item)
       return item
     },
     async bookmarkDelete () {
       try {
-        this.$log('bookmarkDelete')
+        // this.$log('bookmarkDelete')
         this.loading = true
         await this.$wait(300)
         let bookmark = await this.bookmarkFind()
@@ -72,7 +72,7 @@ export default {
     },
     async bookmarkCreate () {
       try {
-        this.$log('bookmarkCreate start')
+        // this.$log('bookmarkCreate start')
         this.loading = true
         await this.$wait(300)
         let bookmarkInput = {
@@ -83,7 +83,7 @@ export default {
           wsItemType: 'WS_BOOKMARK'
         }
         let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-        this.$log('bookmarkCreate bookmark', bookmark)
+        // this.$log('bookmarkCreate bookmark', bookmark)
         this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark added!'})
         this.loading = false
         this.bookmarked = true

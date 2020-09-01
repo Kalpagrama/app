@@ -95,7 +95,7 @@ q-layout(view="hHh Lpr lff")
           @click="nodeAddStart()"
           no-caps color="green" icon="add"
           ) Добавить ядро
-      q-page-sticky(
+      //- q-page-sticky(
         expand position="bottom" :style=`{zIndex: 100}`)
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px', height: '50px', paddingLeft: '50px', paddingRight: '50px',}`).row.full-width

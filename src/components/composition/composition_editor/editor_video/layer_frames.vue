@@ -110,6 +110,7 @@
           :style=`{
             position: 'absolute', zIndex: 300, bottom: '-46px',
             left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 60px)',
+            width: 'calc('+(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration*100+'% + 120px)',
           }`
           ).row.no-wrap
           q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
@@ -124,13 +125,7 @@
             q-icon(name="keyboard_arrow_left" color="white" size="30px")
           q-btn(round flat dense color="white" @click="layerForward(0,true)")
             q-icon(name="keyboard_arrow_right" color="white" size="30px")
-        //- end actions
-        div(
-          :style=`{
-            position: 'absolute', zIndex: 300, bottom: '-46px',
-            left: 'calc('+((layer.figuresAbsolute[0].t + (layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t))/player.duration)*100+'% - 30px)',
-          }`
-          ).row.no-wrap
+          .col
           q-btn(round flat dense color="white" @click="layerForward(1,false)")
             q-icon(name="keyboard_arrow_left" color="white" size="30px")
           q-btn(round flat dense color="white" @click="layerForward(1,true)")

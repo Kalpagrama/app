@@ -20,8 +20,14 @@ div(
         bottom: '8px', left: '8px',
       }`)
       q-btn(round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
-        q-spinner-audio(size="25px" color="white").q-mx-sm
-        //- q-btn(round flat color="white" icon="fullscreen")
+        q-spinner-audio(
+          v-if="!muted"
+          @click="mutedOn()"
+          size="25px" color="white").q-mx-sm
+        q-icon(
+          v-if="muted"
+          @click="mutedOff()"
+          size="25px" color="red" name="volume_off").q-mx-sm
   //- preview
   img(
     :src="composition.thumbUrl"
@@ -75,6 +81,7 @@ export default {
   },
   data () {
     return {
+      muted: true,
       contentKalpa: null,
     }
   },
@@ -82,6 +89,7 @@ export default {
     isActive: {
       handler (to, from) {
         // this.$log('isActive TO', to, composition.oid)
+        this.mutedCheck()
         if (!this.$refs.compositionVideoRef) return
         if (to) {
           this.$refs.compositionVideoRef.play()
@@ -93,6 +101,29 @@ export default {
     },
   },
   methods: {
+    mutedOff () {
+      this.$log('mutedOff')
+      this.muted = false
+      localStorage.setItem('k_sound_on', 'true')
+    },
+    mutedOn () {
+      this.$log('mutedOn')
+      this.muted = true
+      localStorage.removeItem('k_sound_on')
+    },
+    mutedCheck () {
+      // this.$log('mutedCheck')
+      if (this.$q.platform.is.desktop) {
+        let soundOn = localStorage.getItem('k_sound_on')
+        // this.$log('mutedCheck soundOn', soundOn)
+        if (soundOn === 'true') {
+          this.muted = false
+        }
+        else {
+          this.muted = true
+        }
+      }
+    },
     videoClicked (e) {
       this.$log('videoClicked', e)
       if (this.muted) {
@@ -110,6 +141,10 @@ export default {
         e.target.play()
       }
     },
+  },
+  mounted () {
+    this.mutedCheck()
+    // this.$log('mounted')
   }
 }
 </script>
