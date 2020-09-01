@@ -32,7 +32,7 @@ export default {
         {id: 'workspace.contents', name: this.$t('pageWs_content', 'Контент')},
         {id: 'workspace.nodes', name: this.$t('pageWs_nodes', 'Ядра')},
         {id: 'workspace.spheres', name: this.$t('pageWs_spheres', 'Сферы')},
-        {id: 'workspace.boards', name: this.$t('pageWs_boards', 'Доски')}
+        // {id: 'workspace.boards', name: this.$t('pageWs_boards', 'Доски')}
         // {id: 'chain-list', path: 'chains', name: this.$t('pageWs_chains', 'Цепочки')},
         // {id: 'ws-settings', path: 'settings', name: this.$t('pageWs_settings', 'Настройки')}
       ]

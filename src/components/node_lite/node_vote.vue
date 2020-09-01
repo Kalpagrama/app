@@ -24,8 +24,10 @@
 <template lang="pug">
 q-btn(
   @click="voteStart()"
-  round flat color="green" icon="favorite_border"
+  flat color="green"
   :loading="voting").voter
+  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4 78
+  q-icon(name="blur_on" size="30px" color='green')
 </template>
 
 <script>

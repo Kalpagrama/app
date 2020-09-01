@@ -1,8 +1,8 @@
 <template lang="pug">
 q-btn(
   @click="shareStart()"
-  round flat icon="share"
-  :color="shareDialogOpened ? 'green' : 'grey-9'")
+  flat icon="share"
+  :color="shareDialogOpened ? 'green' : 'grey-7'")
   q-dialog(v-model="shareDialogOpened")
     div(
       :style=`{

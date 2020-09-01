@@ -28,9 +28,9 @@ q-layout(view="hHh Lpr lff")
           q-tab-panels(
             v-model="type" infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
-            q-tab-panel(name="fragments" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+            //- q-tab-panel(name="fragments" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               nodes-fragments(:searchString="searchString")
-            q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+            //- q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="querySavedNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
                   .row.full-width.items-start.content-start.justify-center.q-px-sm
@@ -111,7 +111,7 @@ export default {
   computed: {
     typesFiltered () {
       let arr = [
-        {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
+        // {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
         // {id: 'fragments', name: this.$t('nodes_fragments', 'Фрагменты')},
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},

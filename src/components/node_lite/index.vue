@@ -14,6 +14,8 @@
         user-avatar(:url="node.meta.author.thumbUrl" :width="24" :height="24")
         span.text-grey-4.q-ml-sm {{ node.meta.author.name }}
       .col
+      small.text-grey-8.q-mr-xs 11922
+      q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
     //- wrapper: composition + essence
     div(
@@ -33,7 +35,7 @@
           node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
         composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
         //- fullscreen toggler
-        q-btn(
+        //- q-btn(
           @click="isFullscreen = true"
           flat round color="white" icon="fullscreen"
           :style=`{position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px'}`)
@@ -43,19 +45,22 @@
             v-if="isFullscreen" :node="node"
             @close="isFullscreen = false")
       //- essence
-      div(:style=`{position: 'relative'}`).row.full-width
-        router-link(
-          :to="'/node/'+node.oid"
-          :style=`{
-            cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
-          }`
-          ).row.full-width.items-center.q-py-md.q-px-md
-          span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
-    //- actions: share, vote, explore
-  div().row.full-width.q-py-xs
-    node-share(:node="node")
-    .col
-    node-vote(:node="node")
+      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+        .col
+          router-link(
+            :to="'/node/'+node.oid"
+            :style=`{
+              cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.full-width.items-center.q-py-md.q-pl-md
+            span(
+              :style=`{userSelect: 'none', fontSize: '1.4rem'}`).text-white.text-bold {{ node.name }}
+        .row.full-height.items-start.content-start.q-pt-md.q-px-sm
+          node-share(:node="node")
+          node-vote(:node="node")
+  //- footer
+  .row.full-width
+    slot(name="footer")
 </template>
 
 <script>

@@ -1,3 +1,9 @@
+<style lang="sass">
+.sphere-item
+  &:hover
+    background: rgb(40,40,40) !important
+</style>
+
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-dialog(
@@ -40,16 +46,18 @@ q-layout(view="hHh Lpr lff")
           .col
             div(:style=`{borderRadius: '10px',}`
               ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
-              div(:style=`{overflowX: 'auto'}`).col
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+              .col
+                div(@click="headerClick()").row.full-width
+                  q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
+                  div(:style=`{overflowX: 'auto'}`).col
+                    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
               //- q-btn(round flat color="grey-8" icon="more_vert")
               q-btn(
                 flat no-caps
                 :to="`/trends/${categoryOid}`"
                 :style=`{fontSize: '16px'}`
                 ).text-white.text-bold.q-px-sm {{ categoryName }}
-            div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
+            //- div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
               q-tabs(
                 v-model="viewId"
                 no-caps dense active-color="white" switch-indicator).text-grey-8
@@ -66,13 +74,28 @@ q-layout(view="hHh Lpr lff")
                 threshold: 0.8
               }
             }`)
+            template(v-slot:footer)
+              div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-pt-sm
+                router-link(
+                  v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+                  :style=`{height: '40px',borderRadius: '10px'}`
+                  ).row.items-center.content-center.q-px-sm.b-40.sphere-item
+                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+                  span.text-white {{ s.name }}
+                div(
+                  :style=`{
+                    position: 'absolute', top: '0px',
+                    height: 'calc(100% + 200px)',
+                    width: '80px', right: '0px',}`).row.justify-center
+                    div(:style=`{height: '100%', width: '1px'}`).bg-green
+          //- div(:style=`{position: 'relative', height: '60px'}`).row.full-width.bg-red
           //- actions
-          div(
+          //- div(
             v-if="node"
             ).row.full-width
             //- q-btn(round flat icon="share" color="white" @click="nodeShare()")
           //- spheres
-          div(v-if="node").row.full-width.q-pa-sm
+          //- div(v-if="node").row.full-width.q-pa-sm
             .row.full-width.items-center.content-center.q-pa-sm
               span.text-bold.text-grey-7 Сферы сути
             router-link(
@@ -82,7 +105,7 @@ q-layout(view="hHh Lpr lff")
               q-icon(name="blur_on" color="white" size="20px").q-mr-xs
               span.text-white {{ s.name }}
           //- dubug
-          .row.full-width.justify-center.q-pa-sm
+          //- .row.full-width.justify-center.q-pa-sm
             span(
               v-if="$store.state.core.progressInfo.CREATE[$route.params.oid]"
               :style=`{fontSize: '200px',}`
@@ -95,16 +118,6 @@ q-layout(view="hHh Lpr lff")
           @click="nodeAddStart()"
           no-caps color="green" icon="add"
           ) Добавить ядро
-      //- q-page-sticky(
-        expand position="bottom" :style=`{zIndex: 100}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px', height: '50px', paddingLeft: '50px', paddingRight: '50px',}`).row.full-width
-            q-tabs(
-              :value="$route.name" @input="$router.replace({name: $event})"
-              no-caps active-color="white"
-              ).fit.text-grey-8
-              q-tab(name="nodes" label="Ядра")
-              q-tab(name="chains" label="Связи")
 </template>
 
 <script>
@@ -215,6 +228,10 @@ export default {
     },
   },
   methods: {
+    headerClick () {
+      this.$log('headerClick')
+      window.scrollTo(0, 0)
+    },
     nodeShare () {
       this.$log('nodeShare')
       // is can be shared ???
