@@ -22,7 +22,10 @@ div(
           :isActive="true" :isVisible="true"
           :composition="node.meta.items[0]"
           :options=`{isFit: true}`)
-  .col.full-height.bg-red
+  //- right side of heaven
+  div(
+    v-if="$q.screen.width > 800"
+    ).col.full-height.bg-red
   //- right side with nodes, comments, and etc
   //- div(:style=`{width: '300px'}`).column.full-height
 </template>

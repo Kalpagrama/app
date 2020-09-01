@@ -34,21 +34,28 @@ q-layout(view="hHh Lpr lff")
               :style=`{borderRadius: '50%'}`)
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between
-          div(v-if="node").row.full-height.items-center.content-center
-            q-btn(
-              flat dense no-caps
-              :to="`/trends/${categoryOid}`"
-              :style=`{fontSize: '16px'}`
-              ).text-white.text-bold.q-px-sm {{ categoryName }}
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
+        .row.full-width.items-start.content-start
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
           .col
-          //- span.text-white.q-mx-sm {{ createdAt }}
-          //- q-btn(v-if="node" dense flat no-caps :to="`/user/${node.author.oid}`").q-px-sm
-          //-   span.text-white.text-bold.q-mx-sm {{ node.author.name }}
-          //-   user-avatar(:url="node.author.thumbUrl" :width="36" :height="36")
+            div(:style=`{borderRadius: '10px',}`
+              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
+              //- q-icon(name="select_all" color="white" size="30px").q-mx-sm
+              div(:style=`{overflowX: 'auto'}`).col.q-px-md
+                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+              //- q-btn(round flat color="grey-8" icon="more_vert")
+              q-btn(
+                flat no-caps
+                :to="`/trends/${categoryOid}`"
+                :style=`{fontSize: '16px'}`
+                ).text-white.text-bold.q-px-sm {{ categoryName }}
+            div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
+              q-tabs(
+                v-model="viewId"
+                no-caps dense active-color="white" switch-indicator).text-grey-8
+                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
-    q-page(:style=`{paddingTop: '0px', paddingBottom: '400px'}`)
+    q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
           node-lite(
@@ -63,7 +70,8 @@ q-layout(view="hHh Lpr lff")
           div(
             v-if="node"
             ).row.full-width
-            q-btn(round flat icon="share" color="white" @click="nodeShare()")
+            //- q-btn(round flat icon="share" color="white" @click="nodeShare()")
+          //- spheres
           div(v-if="node").row.full-width.q-pa-sm
             .row.full-width.items-center.content-center.q-pa-sm
               span.text-bold.text-grey-7 Сферы сути
@@ -118,10 +126,17 @@ export default {
       nodeActive: true,
       nodeVisible: true,
       nodeCategories: [],
-      nodeAddDialogOpened: false
+      nodeAddDialogOpened: false,
+      viewId: 'nodes',
     }
   },
   computed: {
+    views () {
+      return [
+        {id: 'nodes', name: this.$t('pageApp_node_viewNodes_title', 'Ядра')},
+        {id: 'chains', name: this.$t('pageApp_node_viewChains_title', 'Связи')}
+      ]
+    },
     createdAt () {
       if (this.node) {
         return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')

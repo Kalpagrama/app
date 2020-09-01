@@ -55,7 +55,7 @@
   div().row.full-width.q-py-xs
     node-share(:node="node")
     .col
-    q-btn(round flat color="green" icon="blur_on")
+    node-vote(:node="node")
 </template>
 
 <script>
@@ -64,10 +64,11 @@ import nodeBookmark from './node_bookmark.vue'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 import nodeFullscreen from './node_fullscreen.vue'
 import nodeShare from './node_share.vue'
+import nodeVote from './node_vote.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare},
+  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
@@ -83,39 +84,18 @@ export default {
     }
   },
   watch: {
-    // isVisible: {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     // this.$log('isVisible TO', to, this.node.name)
-    //     if (to) {
-    //       // if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-    //       // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
-    //     }
-    //   }
-    // },
+    isActive: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('isActive TO', to, this.node.name)
+        if (to) {
+          if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
+          // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
+        }
+      }
+    },
   },
   methods: {
-    videoClicked (e) {
-      this.$log('videoClicked', e)
-      if (this.muted) {
-        this.muted = false
-        e.target.play()
-      }
-      else {
-        if (e.target.paused) e.target.play()
-        else e.target.pause()
-      }
-    },
-    videoLoadedmetadata (e) {
-      // this.$log('videoLoadedmetadata', e)
-      if (this.isActive) {
-        e.target.play()
-      }
-    },
-    nodeEssenceClick () {
-      this.$log('nodeEssenceClick')
-      this.$router.push(`/node/${this.node.oid}`).catch(e => e)
-    }
   }
 }
 </script>

@@ -2,7 +2,7 @@
 div().row.items-center.content-center.justify-center.q-px-xs
   q-btn(
     @click.native="start()"
-    round flat dense color="grey-2" icon="attach_file"
+    round flat dense color="green" icon="add"
     :style=`{
     }`).full-height.q-px-xs
   input(

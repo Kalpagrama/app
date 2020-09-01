@@ -17,6 +17,29 @@ q-layout(view="hHh Lpr lff")
                 v-model="viewId"
                 no-caps dense active-color="white" switch-indicator).text-grey-8
                 q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+  //- fullscreen
+  div(
+    v-if="isFullscreen"
+    :style=`{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,}`
+    ).row.fit.bg-black
+    q-btn(
+      round flat color="white" icon="keyboard_arrow_left" @click="isFullscreen = false"
+      :style=`{position: 'absolute', left: '8px', top: '8px', zIndex: 99999,}`)
+    ws-content-player(
+      :contentKalpa="contentKalpa"
+      :contentWorkspace="contentWorkspace"
+      @player="player = $event"
+      @error="playerErrorHandle"
+      :style=`{
+        position: 'absolute', top: '0px',
+        borderRadius: '10px', overflow: 'hidden',
+      }`).fit
+      template(v-slot:actions)
+        q-btn(
+          v-if="viewId === 'fragments'"
+          @click="$refs[`view-${viewId}`].nodeCreateStart()"
+          round push color="green" dense icon="add"
+          :style=`{borderRadius: '50%'}`)
   q-page-container
     //- header
     div(:style=`{opacity: 1}`).row.full-width.justify-center.b-30
@@ -36,7 +59,9 @@ q-layout(view="hHh Lpr lff")
                 no-caps dense active-color="white" switch-indicator).text-grey-8
                 q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
     //- player
-    .row.full-width.items-start.content-start.justify-center.q-pt-sm
+    div(
+      v-if="!isFullscreen"
+      ).row.full-width.items-start.content-start.justify-center.q-pt-sm
       div(:style=`{maxWidth: '800px'}`).row.full-width
         div(
           v-observe-visibility=`{
@@ -64,12 +89,17 @@ q-layout(view="hHh Lpr lff")
             }`).fit
             template(v-slot:actions)
               q-btn(
+                @click="isFullscreen = true"
+                round flat dense color="white" icon="fullscreen"
+                )
+              q-btn(
                 v-if="viewId === 'fragments'"
                 @click="$refs[`view-${viewId}`].nodeCreateStart()"
                 round push color="green" dense icon="add"
                 :style=`{borderRadius: '50%'}`)
     //- view dynamic component
     component(
+      v-if="!isFullscreen"
       :is="`view-${viewId}`"
       :ref="`view-${viewId}`"
       :player="player"
@@ -91,7 +121,8 @@ export default {
     return {
       viewId: 'fragments',
       player: null,
-      playerIsVisible: false
+      playerIsVisible: false,
+      isFullscreen: false,
     }
   },
   computed: {
