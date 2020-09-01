@@ -6,7 +6,7 @@ iframe[id$="_youtube_iframe"]
   border-radius: 10px
   overflow: hidden
   pointer-events: none
-@media (min-width: 600px)
+@media (min-width: 900px)
   iframe[id$="_youtube_iframe"]
     width: 1000%
     height: 1000%
@@ -71,7 +71,8 @@ export default {
       currentTime: 0,
       duration: 0,
       mutedLocal: false,
-      events: {}
+      events: {},
+      isFullscreen: false,
     }
   },
   watch: {
@@ -83,6 +84,10 @@ export default {
     }
   },
   methods: {
+    fullscreenToggle () {
+      this.$log('fullscreenToggle')
+      this.isFullscreen = !this.isFullscreen
+    },
     volumeToggle () {
       this.$log('volumeToggle')
       this.mutedLocal = !this.mutedLocal

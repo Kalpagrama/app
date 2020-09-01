@@ -4,13 +4,14 @@ div(
     position: 'fixed', zIndex: 999999,
     top: 0, left: 0, right: 0, bottom: 0,
     height: $q.screen.height+'px',
+    background: 'rgba(30,30,30,0.99)'
   }`
-  ).row.full-width.bg-black
+  ).row.full-width
   //- left side with items
   .col.full-height
     .column.fit
       //- header to exit?
-      .row.full-width.items-center.content-center.bg-black.q-pa-sm
+      .row.full-width.items-center.content-center.q-pa-sm
         q-btn(
           @click="$emit('close')"
           flat round color="white" icon="clear")
@@ -25,7 +26,7 @@ div(
   //- right side of heaven
   div(
     v-if="$q.screen.width > 800"
-    ).col.full-height.bg-red
+    ).col.full-height
   //- right side with nodes, comments, and etc
   //- div(:style=`{width: '300px'}`).column.full-height
 </template>

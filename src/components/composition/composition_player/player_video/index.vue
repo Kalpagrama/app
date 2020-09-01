@@ -7,15 +7,10 @@ div(
   ).row.full-width.items-start.content-start
   //- content explorer btn
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
+    content-explorer(
       v-if="isActive"
-      @click="$router.push('/content/'+composition.layers[0].contentOid)"
-      round flat color="grey-2" icon="select_all"
-      :style=`{
-        position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-        top: '8px', left: '8px',
-        background: 'rgba(0,0,0,0.15)',
-      }`)
+      :composition="composition"
+      :options="options")
   //- video spinner
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -60,9 +55,11 @@ div(
 </template>
 
 <script>
+import contentExplorer from './content_explorer.vue'
+
 export default {
   name: 'compositionPlayer_playerVideo',
-  // props: ['isVisible', 'isActive', 'composition', 'options'],
+  components: {contentExplorer},
   props: {
     isVisible: {type: Boolean},
     isActive: {type: Boolean},
@@ -78,6 +75,7 @@ export default {
   },
   data () {
     return {
+      contentKalpa: null,
     }
   },
   watch: {

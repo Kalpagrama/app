@@ -1,45 +1,5 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- q-header(reveal)
-    div(:style=`{opacity: 1}`).row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        .row.full-width.items-start.content-start
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
-          .col
-            div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40
-              q-icon(name="select_all" color="white" size="30px").q-mx-sm
-              div(:style=`{overflowX: 'auto'}`).col
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
-              q-btn(round flat color="grey-8" icon="more_vert")
-            div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
-              q-tabs(
-                v-model="viewId"
-                no-caps dense active-color="white" switch-indicator).text-grey-8
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
-  //- fullscreen
-  div(
-    v-if="isFullscreen"
-    :style=`{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,}`
-    ).row.fit.bg-black
-    q-btn(
-      round flat color="white" icon="keyboard_arrow_left" @click="isFullscreen = false"
-      :style=`{position: 'absolute', left: '8px', top: '8px', zIndex: 99999,}`)
-    ws-content-player(
-      :contentKalpa="contentKalpa"
-      :contentWorkspace="contentWorkspace"
-      @player="player = $event"
-      @error="playerErrorHandle"
-      :style=`{
-        position: 'absolute', top: '0px',
-        borderRadius: '10px', overflow: 'hidden',
-      }`).fit
-      template(v-slot:actions)
-        q-btn(
-          v-if="viewId === 'fragments'"
-          @click="$refs[`view-${viewId}`].nodeCreateStart()"
-          round push color="green" dense icon="add"
-          :style=`{borderRadius: '50%'}`)
   q-page-container
     //- header
     div(:style=`{opacity: 1}`).row.full-width.justify-center.b-30
@@ -60,9 +20,15 @@ q-layout(view="hHh Lpr lff")
                 q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
     //- player
     div(
-      v-if="!isFullscreen"
-      ).row.full-width.items-start.content-start.justify-center.q-pt-sm
-      div(:style=`{maxWidth: '800px'}`).row.full-width
+      :style=`{
+        ...playerStyles(),
+      }`
+      ).row.full-width.items-start.content-start.justify-center
+      div(
+        :style=`{
+          maxWidth: (player && player.isFullscreen) ? '100%' : '800px',
+          height: (player && player.isFullscreen) ? '100%' : 'auto',
+        }`).row.full-width
         div(
           v-observe-visibility=`{
             callback: playerVisibilityCallback,
@@ -70,36 +36,44 @@ q-layout(view="hHh Lpr lff")
               threshold: 0.8
             }
           }`
-          :style=`{position: 'relative'}`).row.full-width.items-start.content-start
+          :style=`{
+            position: 'relative',
+            height: (player && player.isFullscreen) ? '100%' : 'auto',
+          }`).row.full-width.items-start.content-start
           img(
             :src="contentKalpa.thumbUrl"
             draggable="false"
             :style=`{
               borderRadius: '10px', overflow: 'hidden',
+              height: (player && player.isFullscreen) ? '100%' : 'auto',
+              opacity: 0.1,
+              objectFit: 'contain',
             }`
             ).full-width
           ws-content-player(
             :contentKalpa="contentKalpa"
             :contentWorkspace="contentWorkspace"
-            @player="player = $event"
+            @player="playerLoaded"
             @error="playerErrorHandle"
             :style=`{
               position: 'absolute', top: '0px',
               borderRadius: '10px', overflow: 'hidden',
+              background: (player && player.isFullscreen) ? 'black' : 'none'
             }`).fit
             template(v-slot:actions)
-              q-btn(
-                @click="isFullscreen = true"
-                round flat dense color="white" icon="fullscreen"
-                )
               q-btn(
                 v-if="viewId === 'fragments'"
                 @click="$refs[`view-${viewId}`].nodeCreateStart()"
                 round push color="green" dense icon="add"
                 :style=`{borderRadius: '50%'}`)
+    view-fullscreen(
+      v-if="(player && player.isFullscreen)"
+      :player="player"
+      :contentKalpa="contentKalpa"
+      :contentWorkspace="contentWorkspace")
     //- view dynamic component
     component(
-      v-if="!isFullscreen"
+      v-if="player ? !player.isFullscreen : true"
       :is="`view-${viewId}`"
       :ref="`view-${viewId}`"
       :player="player"
@@ -112,10 +86,11 @@ import wsContentPlayer from 'components/ws_content_player/index.vue'
 import viewDetails from './view_details/index.vue'
 import viewFragments from './view_fragments/index.vue'
 import viewNodes from './view_nodes/index.vue'
+import viewFullscreen from './view_fullscreen/index.vue'
 
 export default {
   name: 'wsContentExplorer_video',
-  components: {wsContentPlayer, viewDetails, viewFragments, viewNodes},
+  components: {wsContentPlayer, viewDetails, viewFragments, viewNodes, viewFullscreen},
   props: ['contentKalpa', 'contentWorkspace'],
   data () {
     return {
@@ -135,6 +110,16 @@ export default {
     }
   },
   methods: {
+    playerStyles () {
+      if (this.player && this.player.isFullscreen) {
+        return {
+          position: 'fixed', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, transform: 'translate3d(0,0,0)'
+        }
+      }
+      else {
+        return {}
+      }
+    },
     playerErrorHandle () {
       this.$log('playerErrorHandle')
       confirm('Player error! Try on desktop!')
@@ -145,6 +130,16 @@ export default {
       if (this.player) {
         if (isVisible) this.player.play()
         else this.player.pause()
+      }
+    },
+    playerLoaded (player) {
+      this.$log('playerLoaded', player)
+      this.player = player
+      let startat = this.$route.query.startat
+      if (startat) {
+        // alert('startat', startat)
+        // this.$router.replace()
+        this.player.setCurrentTime(startat)
       }
     },
     keydownHandle (e) {
@@ -167,6 +162,10 @@ export default {
         if (this.player.playing) this.player.pause()
         else this.player.play()
       }
+      // handle Escape when in isFullscreen player mode
+      if (e.key === 'Escape') {
+        if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
+      }
     }
   },
   created () {
@@ -176,6 +175,12 @@ export default {
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
+    // window.addEventListener('focusin', (e) => {
+    //   this.$log('focus!!!', e)
+    // })
+    // window.addEventListener('focusout', (e) => {
+    //   this.$log('blur!!!', e)
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

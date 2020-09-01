@@ -40,8 +40,8 @@ q-layout(view="hHh Lpr lff")
           .col
             div(:style=`{borderRadius: '10px',}`
               ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              //- q-icon(name="select_all" color="white" size="30px").q-mx-sm
-              div(:style=`{overflowX: 'auto'}`).col.q-px-md
+              q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
+              div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
               //- q-btn(round flat color="grey-8" icon="more_vert")
               q-btn(
