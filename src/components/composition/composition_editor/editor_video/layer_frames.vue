@@ -225,7 +225,7 @@ export default {
           this.$set(this.layer.figuresAbsolute[0], 't', t)
         }
       }
-      if (pointIndex === 1) {
+      else if (pointIndex === 1) {
         // wanna end BEFORE the start
         if (t <= this.layerStart) {
           this.$set(this.layer.figuresAbsolute[0], 't', t)
@@ -237,7 +237,14 @@ export default {
         }
       }
       // go to the layer new (maybe) start and play
-      this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+      if (pointIndex === 0) {
+        this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+      }
+      else if (pointIndex === 1) {
+        let t = this.layer.figuresAbsolute[1].t - 1.5
+        if (t < this.layer.figuresAbsolute[0].t) t = this.layer.figuresAbsolute[0].t
+        this.player.setCurrentTime(t)
+      }
       this.player.play()
       // center frames
       await this.$wait(300)
