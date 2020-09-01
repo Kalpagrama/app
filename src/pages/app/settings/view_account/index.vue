@@ -33,10 +33,11 @@ q-page.row.full-width.justify-center
       //- name
       .col-xs-12.col-sm-8.q-pa-sm
         .row.full-width.q-pa-xs
-          q-input(
-            v-model="name"
-            :label="$t('Whats your name?', 'Введите ваше имя')"
-            filled dark color="white").full-width
+          div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+            q-input(
+              v-model="name"
+              :label="$t('Whats your name?', 'Введите ваше имя')"
+              filled dark color="white").full-width
         .row.full-width.q-pa-xs
           q-select(
             filled

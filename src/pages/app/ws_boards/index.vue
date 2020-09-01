@@ -59,6 +59,7 @@ q-layout(view="hHh Lpr lff")
                     }`
                     ).row.q-mr-sm.q-mb-sm.b-40.board-item
                     div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+                      //- left side: main image
                       div(
                         :style=`{
                           width: '200px', height: '200px',
@@ -67,27 +68,29 @@ q-layout(view="hHh Lpr lff")
                         img(
                           :src="i.thumbOid"
                           :style=`{
-                            //- borderRadius: '10px', overflow: 'hidden',
                             objectFit: 'cover'
                           }`).fit
+                      //- right side
                       .col
                         .column.fit
-                          .col.full-width
-                            img(
-                              :src="i.thumbOid"
-                              :style=`{
-                                //- borderRadius: '10px', overflow: 'hidden',
-                                objectFit: 'cover'
-                              }`).fit
+                          //- second image
                           div(:style=`{borderBottom: '1px solid rgb(50,50,50)'}`).col.full-width
                             img(
                               :src="i.thumbOid"
                               :style=`{
-                                //- borderRadius: '10px', overflow: 'hidden',
                                 objectFit: 'cover'
                               }`).fit
+                          //- third image
+                          div(:style=`{}`).col.full-width
+                            img(
+                              :src="i.thumbOid"
+                              :style=`{
+                                objectFit: 'cover'
+                              }`).fit
+                    //- board.name
                     .row.full-width.q-px-sm.q-pt-sm
                       span.text-white.text-bold {{ i.name }}
+                    //- board.stats
                     .row.full-width.q-px-md.q-pb-xs
                       small.text-grey-5 {{ii}} items
 </template>
