@@ -26,10 +26,7 @@ let apollo
 export default async ({ Vue, store, app }) => {
    try {
       let kDebug = localStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
-      if (kDebug == null) {
-         kDebug = '0'
-         localStorage.setItem('k_debug', kDebug)
-      }
+      assert(kDebug) // '0' | '1'
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)

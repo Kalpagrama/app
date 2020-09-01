@@ -976,7 +976,7 @@
         "description": null,
         "fields": [
           {
-            "name": "userIsAuthorized",
+            "name": "userIsIdentified",
             "description": "пользователь вошел",
             "args": [],
             "type": {
@@ -992,7 +992,7 @@
             "deprecationReason": null
           },
           {
-            "name": "userIsConfirmed",
+            "name": "userIsAuthenticated",
             "description": "текущий пользователь подтвержден",
             "args": [],
             "type": {

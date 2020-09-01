@@ -99,20 +99,12 @@ export default {
       await this.$router.push('/').catch(e => e)
     }
     let res = await systemInit(this.$store)
-    if (!res.authenticated){
+    if (!this.$store.getters.currentUser() || this.$store.getters.currentUser().profile.role === 'UNCONFIRMED'){
       this.$log('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     } else {
       await AuthApi.afterLogin()
     }
-    // if (!await this.$store.dispatch('init')) {
-    //   this.$log('GO LOGIN')
-    //   await this.$router.push('/auth').catch(e => e)
-    // }
-    // else {
-    //   // check welcomepage
-    //   // if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
-    // }
     this.loading = false
   }
 }

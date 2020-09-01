@@ -1,7 +1,7 @@
 // import VueI18n from 'vue-i18n'
 // import messages from 'src/i18n'
 
-import { initServices } from 'src/system/services'
+import { initServices, systemInit } from 'src/system/services'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
@@ -14,6 +14,7 @@ function t (str) {
 export default async ({ app, store, Vue }) => {
   try {
     await initServices(store)
+    await systemInit(store)
   } catch (err) {
     logE('error on system init', err)
   }

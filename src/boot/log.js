@@ -54,20 +54,11 @@ class Logger {
     this.store = store
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
-
     let logLevel = localStorage.getItem('k_log_level')
-    if (logLevel == null) {
-      if (process.env.NODE_ENV === 'development') logLevel = LogLevelEnum.DEBUG
-      else logLevel = LogLevelEnum.WARNING
-      localStorage.setItem('k_log_level', logLevel)
-    }
+    assert(logLevel)
     this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
-
     let logDbgFilter = localStorage.getItem('k_log_filter')
-    if (!logDbgFilter) {
-      logDbgFilter = 'gui'
-      localStorage.setItem('k_log_filter', logDbgFilter)
-    }
+    assert(logDbgFilter)
     this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
   }
 

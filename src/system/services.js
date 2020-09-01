@@ -101,7 +101,7 @@ async function systemInit(store) {
   const f = systemInit
   logD(f, 'start')
   const t1 = performance.now()
-  let res = {authenticated: false}
+  let res = { goToLogin: true}
   let userOid = localStorage.getItem('k_user_oid')
   if (userOid) {
     try {
@@ -111,13 +111,29 @@ async function systemInit(store) {
       // logD(f, 'currentUser= ', currentUser)
       await store.dispatch('init', currentUser)
       await i18next.changeLanguage(currentUser.profile.lang)
-      res.authenticated = true
+      res.goToLogin = currentUser.profile.role !== 'UNCONFIRMED' && currentUser.profile.role !== 'GUEST'
     } catch (err) {
       logE('error on systemInit!', err)
-      await resetLocalStorageData()
+      resetLocalStorageData()
       await systemReset()
       throw err
     }
+  } else { // пытаемсся войти без логина
+    try {
+      if (!localStorage.getItem('k_token')) {
+        const {userExist, userId, needInvite, needConfirm, dummyUser, loginType} = await AuthApi.userIdentify(null)
+        res.goToLogin = needConfirm
+      } else res.goToLogin = false
+    } catch (err) {
+      logE('error on systemInit!', err)
+      resetLocalStorageData()
+      await systemReset()
+      throw err
+    }
+  }
+  if (res.goToLogin){
+    resetLocalStorageData()
+    await systemReset()
   }
   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   return res

@@ -254,6 +254,16 @@ module.exports = function (ctx) {
     capacitor: {
       // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
       // backButtonExit: false // Quasar handles app exit on mobile phone back button
-    }
+    },
+    // vendor: {
+    //   remove: ['vue', 'rxdb', 'rxjs', 'quasar', 'axios', 'mediaelement', 'lodash']
+    // }
+    // chainWebpack (chain) {
+    //   chain.optimization.get('splitChunks').cacheGroups.vendors.name = (_module, chunks) => {
+    //     const allChunksNames = chunks.map((item) => item.name).join('~')
+    //     if (allChunksNames) return 'vendor'
+    //     else return !ctx.prod
+    //   }
+    // }
   }
 }
