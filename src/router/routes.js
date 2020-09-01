@@ -107,6 +107,8 @@ const routes = [
           // { name: 'workspace.sphere.editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
           // other
           // { name: 'workspace.settings', path: 'settings', component: () => import('pages/app/ws_settings/index.vue') },
+          { name: 'workspace.boards', path: 'boards', component: () => import('pages/app/ws_boards/index.vue') },
+          { name: 'workspace.board', path: 'board/:id', component: () => import('pages/app/ws_board/index.vue') }
         ]
       },
       {
