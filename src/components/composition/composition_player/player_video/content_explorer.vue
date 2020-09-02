@@ -35,7 +35,7 @@ export default {
       this.$log('start startat', start)
       let contentWorkspace = await this.contentAdd(this.contentKalpa)
       this.loading = false
-      this.$router.push(`/workspace/content/${contentWorkspace.id}?startat=${start}&removeonempty=true`)
+      this.$router.push(`/workspace/content/${contentWorkspace.id}?viewid=nodes&startat=${start}&removeonempty=true`)
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)

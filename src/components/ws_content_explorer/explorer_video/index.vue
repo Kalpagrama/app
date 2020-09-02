@@ -108,6 +108,17 @@ export default {
       ]
     }
   },
+  watch: {
+    '$route.query.viewid': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.query.viewId TO', to)
+        if (to) {
+          this.viewId = to
+        }
+      }
+    }
+  },
   methods: {
     async nodeCreateStart () {
       this.$log('nodeCreateStart')
@@ -180,8 +191,8 @@ export default {
     }
   },
   created () {
-    let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
-    if (lastViewId) this.viewId = lastViewId
+    // let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
+    // if (lastViewId) this.viewId = lastViewId
   },
   mounted () {
     this.$log('mounted')
@@ -196,7 +207,7 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
-    localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
+    // localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
   }
 }
 </script>
