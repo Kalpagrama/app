@@ -8,47 +8,38 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     item-editor(:item="item" @close="itemEditorOpened = false")
   q-dialog(
     v-model="itemFinderOpened" position="bottom"
-    maximized
     @show="itemsActive = false"
     @hide="itemsActive = true")
     item-finder(@item="itemFound" @close="itemFinderOpened = false")
-  //- thumbnails
-  //- q-carousel(
-    swipeable
-    animated
-    v-model="slide"
-    infinite
+  div(
     :style=`{
-      borderRadius: '10px',
-    }`).full-width
-    //- :img-src="i.thumbUrl"
-    q-carousel-slide(
-      v-for="(i,ii) in node.items" :key="i.id"
-      :name="i.id"
-      :style=`{
-        padding: 0,
-        margin: 0
-      }`)
-      edit-item(:item="i" :itemIndex="ii"
-      @itemAdd="")
-  div(:style=`{position: 'relative',}`).row.full-width
-    item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
-    //- q-btn(
-      @click="itemAdd()"
-      round push color="green" icon="add"
-      :style=`{
-        position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-        right: '20px', top: 'calc(50% - 20px)',
-        borderRadius: '50%'
-      }`)
-    q-btn(
-      @click="itemEdit(node.items[0], 0)"
-      round color="green" icon="edit"
-      :style=`{
-        position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-        right: '20px', top: 'calc(50% - 20px)',
-        borderRadius: '50%'
-      }`)
+      position: 'relative',
+      borderRadius: '10px', overflow: 'hidden',
+      minHeight: '400px',
+    }`).row.full-width.b-40
+    //- empty
+    div(
+      v-if="node.items.length === 0"
+      :style=`{height: '400px'}`
+      ).row.full-width
+      q-btn(
+        @click="itemFind()"
+        round flat color="green" icon="add" size="lg").fit
+    //- one
+    div(
+      v-if="node.items.length > 0"
+      :style=`{height: '400px', paddingRight: '50px'}`
+      ).row.full-width
+      //- item wrapper
+      div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60
+        //- one
+        div(v-if="node.items.length === 1").row.fit
+          item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
+        //- two, three, four, five, six, seven,
+      q-btn(
+        @click="itemFind()"
+        round flat color="green" icon="add"
+        :style=`{position: 'absolute', zIndex: 100, top: '0px', right: '0px', width: '50px', height: '100%'}`)
 </template>
 
 <script>
@@ -69,12 +60,12 @@ export default {
     }
   },
   watch: {
-    node: {
-      immediate: true,
-      handler (to, from) {
-        this.slide = to.items[0].id
-      }
-    }
+    // node: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.slide = to.items[0].id
+    //   }
+    // }
   },
   methods: {
     itemAdd () {
@@ -86,7 +77,10 @@ export default {
       this.item = item
       this.itemEditorOpened = true
     },
-    itemFind () {},
+    itemFind () {
+      this.$log('itemFind')
+      this.itemFinderOpened = true
+    },
     itemFound (item) {},
     itemDelete (item, itemIndex) {
       this.$log('itemDelete', item, itemIndex)

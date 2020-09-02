@@ -103,8 +103,8 @@ const routes = [
           // { name: 'workspace.chains', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
           // { name: 'workspace.chain', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
           // sphere
-          { name: 'workspace.spheres', path: 'sphere', component: () => import('pages/app/ws_spheres/index.vue') },
-          // { name: 'workspace.sphere.editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
+          { name: 'workspace.spheres', path: 'spheres', component: () => import('pages/app/ws_spheres/index.vue') },
+          { name: 'workspace.sphere', path: 'sphere/:id', component: () => import('pages/app/ws_sphere/index.vue') },
           // other
           // { name: 'workspace.settings', path: 'settings', component: () => import('pages/app/ws_settings/index.vue') },
           { name: 'workspace.boards', path: 'boards', component: () => import('pages/app/ws_boards/index.vue') },

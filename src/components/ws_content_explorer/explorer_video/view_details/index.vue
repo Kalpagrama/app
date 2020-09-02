@@ -2,7 +2,7 @@
 q-page(
   :style=`{paddingTop: '8px'}`
   ).row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start.q-px-sm
+  div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm
     //- small.text-white {{ contentKalpa }}
     span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
     .row.full-width.q-py-md
@@ -10,13 +10,16 @@ q-page(
         q-btn(
           v-if="contentKalpa.contentSource !== 'KALPA'"
           @click="gotToOriginal"
-          color="green" no-caps dense).q-px-sm Перейти на оригинал
-      .row.full-width.q-px-sm
+          icon="fab fa-youtube"
+          color="green" outline no-caps dense).full-width.q-px-sm
+          span.q-mx-sm View original
+      //- .row.full-width.q-px-sm
         small(:style=`{}`).text-white {{ contentKalpa.contentSource }}
     //- spheres
-    .row.full-width.q-py-md
-      .row.full-width.q-px-sm
-        span.text-white.text-bold Сферы
+    .row.full-width.q-py-sm
+      .row.full-width
+        //- span.text-white.text-bold Сферы
+        q-btn(flat no-caps icon="add" color="grey-7") Add spheres
 </template>
 
 <script>

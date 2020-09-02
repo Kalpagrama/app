@@ -16,7 +16,7 @@ q-layout(view="lHh lpR lFf")
     div(
       v-if="$q.screen.width > 960"
       :style=`{
-        position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+        position: 'fixed', zIndex: 3000, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
       }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
         v-if="!loading && $route.name !== 'welcome'"

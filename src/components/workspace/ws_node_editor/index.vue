@@ -2,33 +2,43 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(
-        :style=`{maxWidth: maxWidth+'px', height: '50px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.b-30
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
-        .col
-          span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактора ядра
-        q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
+        .row.full-width.items-center.content-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
+          .col
+            div(:style=`{borderRadius: '10px',}`
+              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
+              .col
+                div().row.full-width
+                  q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
+                  div(:style=`{overflowX: 'auto'}`).col
+                    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактор ядра
+              q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
   q-page-container
-    q-page(:style=`{paddingBottom: '200px'}`)
+    q-page(:style=`{paddingTop: '20px', paddingBottom: '200px'}`)
       .row.full-width.justify-center
         div(:style=`{maxWidth: maxWidth+'px',}`).row.full-width
           //- edit-layout(:node="node")
-          div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-70.q-mb-sm
+          div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-50.q-mb-sm
             edit-items(:node="node")
             edit-essence(:node="node")
-          edit-category(:node="node")
-          edit-spheres(:node="node")
-      q-page-sticky(expand position="bottom" :style=`{zIndex: 1000}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: maxWidth+'px', height: '50px',}`).row.full-width.items-center.content-center.q-px-sm
-            .col
-            q-btn(
-              @click="publish()"
-              color="green" no-caps
-              :loading="publishing"
-              )
-              span.text-white.text-bold {{ $t('ws_node_editor_publish', 'Опубликовать') }}
+          //- wrapper: category, spheres, publish
+          .row.full-width.items-start.content-start.q-px-sm
+            .row.full-width.q-px-sm.q-mt-md
+              span.text-bold.text-grey-7 Категория и сферы ядра
+            .row.full-width
+              edit-spheres(:node="node")
+                edit-category(:node="node").q-mr-sm
+            .row.full-width.q-py-xl
+              q-btn(
+                @click="publish()"
+                no-caps color="green" size="xl"
+                :loading="publishing"
+                :class=`{
+                  'full-width': $q.screen.width < 600
+                }`
+                ).q-px-xl
+                span.text-white.text-bold Опубликовать
 </template>
 
 <script>
@@ -49,7 +59,7 @@ export default {
   },
   data () {
     return {
-      maxWidth: 700,
+      maxWidth: 716,
       publishing: false,
     }
   },
@@ -82,6 +92,7 @@ export default {
       try {
         this.$log('publish start')
         this.publishing = true
+        await this.$wait(300)
         this.check()
         // publish
         let createdNode = await NodeApi.nodeCreate(this.node)

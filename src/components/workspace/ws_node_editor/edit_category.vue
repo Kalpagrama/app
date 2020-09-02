@@ -1,16 +1,34 @@
 <template lang="pug">
-.row.full-width
-  q-select(
-    filled
-    dark color="white"
-    :label="$t('Choose category', 'Выбери категорию')"
-    :value="category(node.category)" @input="categorySelected"
-    :options="categories"
-    :style=`{
-      borderRadius: '10px', overflow: 'hidden',
-      zIndex: 2000, transform: 'translate3d(0,0,0)',
-      background: 'none',
-    }`).full-width
+//- q-select(
+  filled dark color="white" dense
+  :label="$t('wsNodeEditor_editCategory_label', 'Категория')"
+  placeholder="Выбери категорию"
+  :value="category(node.category)" @input="categorySelected"
+  :options="categories"
+  :style=`{
+    borderRadius: '10px', overflow: 'hidden',
+    zIndex: 2000, transform: 'translate3d(0,0,0)',
+    background: 'none',
+  }`).b-50
+div(:style=`{position: 'relative'}`).row
+  q-btn(
+    no-caps flat color="grey-5" align="between"
+    icon-right="keyboard_arrow_down"
+    :style=`{height: '40px'}`
+    ).q-px-sm.b-50 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
+    q-menu(
+      ref="nodeCategoryMenu"
+      fit)
+      div(
+        :style=`{
+          maxWidth: '300px',
+          borderRadius: '10px',overflow: 'hidden',}`
+        ).row.full-width.items-start.content-start.b-50
+        q-btn(
+          v-for="n in categories" :key="n.value"
+          @click="node.category = n.value, $refs.nodeCategoryMenu.hide()"
+          flat color="grey-5" no-caps
+          ).full-width {{ n.label }}
 </template>
 
 <script>

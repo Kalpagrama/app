@@ -43,9 +43,9 @@
           }`
           ).row.full-width.items-center.content-center.q-pa-xs.bg-green
           .col
-          q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`) Close
-          q-btn(flat dense color="white" no-caps @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-sm.q-mr-md Edit
-          q-btn(outline dense color="white" no-caps @click="nodeCreate()" :style=`{zIndex: 2000}`).q-px-md Create node
+          q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-mr-md Close
+          q-btn(flat dense color="white" no-caps icon="edit" @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-md
+          q-btn(round outline dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
   //- isEditing wrapper
   div(
     v-if="isEditing"

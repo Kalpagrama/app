@@ -19,21 +19,22 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{maxWidth: '800px'}`).row.full-width
         slot(name="header")
         .row.full-width.q-px-sm
-          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="searchString"
-              filled dark dense color="white"
-              :placeholder="$t('wsSpheres_searchPlaceholder', 'Найти сферу')"
-              ).full-width
-              template(v-slot:append)
-                q-btn(
-                  v-if="searchString.length > 0"
-                  flat dense color="white" icon="clear" @click="searchString = ''")
-                //- q-btn(
-                  flat dense color="white" icon="filter_list")
-                q-btn(
-                  @click="sphereAdd"
-                  round flat dense color="green" icon="add")
+          .col
+            div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+              q-input(
+                v-model="searchString"
+                filled dark dense color="white"
+                :placeholder="$t('wsSpheres_searchPlaceholder', 'Найти сферу')"
+                ).full-width
+                template(v-slot:append)
+                  q-btn(
+                    v-if="searchString.length > 0"
+                    flat dense color="white" icon="clear" @click="searchString = ''")
+                  q-btn(
+                    flat dense color="white" icon="tune")
+          q-btn(
+            @click="sphereAdd()"
+            round flat dense color="green" icon="add")
   q-page-container
     q-page(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width
@@ -42,23 +43,24 @@ q-layout(view="hHh Lpr lff")
             .row.full-width.items-start.content-start.q-px-sm
               div(
                 v-for="(s,si) in items" :key="s.id"
-                :style=`{borderRadius: '10px', overflow: 'hidden'}`
-                ).row.full-width.q-mb-sm.b-40.sphere-item
-                .row.full-width.items-center.content-center.q-pa-md
-                  q-icon(name="blur_on" color="grey-7" size="24px").q-mr-sm
-                  span.text-white.text-bold.q-mb-xs {{ s.name }}
-                .row.full-width.items-start.content-start.q-px-sm
-                  div(
-                    v-for="(i,ii) in s.items" :key="ii"
-                    :style=`{
-                      width: '50px', height: '50px',
-                      borderRadius: '10px', overflow: 'hidden',
-                    }`).row.q-mr-sm.q-mb-sm
-                    img(
-                      :src="i.thumbOid" draggable="false"
+                @click="sphereClick(s)"
+                ).col-6.q-pr-sm.q-pb-sm
+                div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.b-40.sphere-item
+                  .row.full-width.items-center.content-center.q-pa-md
+                    q-icon(name="blur_on" color="grey-7" size="24px").q-mr-sm
+                    span.text-white.text-bold.q-mb-xs {{ s.name }}
+                  .row.full-width.items-start.content-start.q-px-sm
+                    div(
+                      v-for="(i,ii) in s.items" :key="ii"
                       :style=`{
-                        objectFit: 'cover'
-                      }`).fit
+                        width: '50px', height: '50px',
+                        borderRadius: '10px', overflow: 'hidden',
+                      }`).row.q-mr-sm.q-mb-sm
+                      img(
+                        :src="i.thumbOid" draggable="false"
+                        :style=`{
+                          objectFit: 'cover'
+                        }`).fit
 </template>
 
 <script>
@@ -74,26 +76,32 @@ export default {
   computed: {
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE}}
-      // if (this.searchString.length > 0) {
-      //   let nameRegExp = new RegExp(this.searchString, 'i')
-      //   res.selector.name = {$regex: nameRegExp}
-      // }
-      // selector: props, import selector from props...
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
       return res
     }
   },
   methods: {
+    sphereClick (s) {
+      this.$log('sphereClick', s)
+      this.$router.push(`/workspace/sphere/${s.id}`).catch(e => e)
+    },
     async sphereAdd () {
       this.$log('sphereAdd')
-      let sphereInput = {
-        wsItemType: 'WS_SPHERE',
-        name: this.searchString,
-        items: []
+      let name = prompt('Sphere name', this.searchString)
+      if (name) {
+        let sphereInput = {
+          wsItemType: 'WS_SPHERE',
+          name: name,
+          items: []
+        }
+        let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+        this.$router.push(`/workspace/sphere/${sphere.id}`)
+        this.searchString = ''
       }
-      let res = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
-      // item: {oid: '', id: '', name: '', thumbOid: '', type: 'NODE', 'USER', 'WS_NODE', 'WS_CONTENT'}
-      this.searchString = ''
-    }
+    },
   }
 }
 </script>

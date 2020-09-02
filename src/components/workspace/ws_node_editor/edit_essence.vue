@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden',}`).row.full-width
   q-input(
     v-model="node.name"
     dark color="white"
@@ -8,7 +8,7 @@ div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width
     :input-style=`{
       minHeight: '60px',
       padding: '10px',
-      fontSize: '16px',
+      fontSize: '1.3rem',
       fontWeight: 'bold',
     }`
     :style=`{

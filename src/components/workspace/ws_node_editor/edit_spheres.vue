@@ -8,7 +8,7 @@
 <template lang="pug">
 .row.full-width.q-py-sm
   //- sphere dialog
-  q-dialog(
+  //- q-dialog(
     v-model="sphereDialogOpened"
     :position="$q.screen.xs ? 'bottom' : 'standard'")
     div(
@@ -59,28 +59,47 @@
   //- sphere adding
   //- spheres list
   .row.full-width.items-start.content-start
+    slot
     div(
       v-for="(s,si) in node.spheres" :key="si"
       @click="sphereDelete(s,si)"
       :style=`{
         height: '40px', borderRadius: '10px', overflow: 'hidden',
       }`
-      ).row.full-width.items-center.content-center.sphere-item.q-px-md.b-60.q-mb-xs
+      ).row.items-center.content-center.sphere-item.q-px-md.b-60.q-mb-xs.q-mr-sm
       q-icon(name="blur_on" color="grey-6" size="20px").q-mr-sm
       span.text-white {{ s.name }}
     //- sphere add btn
+    div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden',}`).row
+      q-input(
+        v-if="sphereAdding"
+        v-model="sphere" autofocus
+        placeholder="Найти сферу"
+        filled dark dense color="grey-6"
+        @keyup.enter="$refs.wsSphereFinder.sphereCreate()")
+      q-menu(
+        v-model="sphereAdding"
+        dark fit anchor="bottom left" self="top left" no-focus)
+        ws-sphere-finder(ref="wsSphereFinder" :searchString="sphere" @sphere="sphereAdd")
     q-btn(
-      v-if="node.spheres.length < 6"
+      v-if="sphereAdding"
+      @click="sphereAdding = false"
+      round flat color="grey-6" icon="clear"
+      :style=`{height: '40px',}`)
+    q-btn(
+      v-if="!sphereAdding && node.spheres.length < 6"
       @click="sphereAddStart()"
-      flat color="green" icon="add" no-caps
-      :style=`{height: '40px',}`).full-width {{$t('wsNodeEditor_sphereAddFirst', 'Добавь сферу сути')}}
+      flat color="green" icon="add" no-caps dense
+      :style=`{height: '40px'}`) {{$t('wsNodeEditor_sphereAddFirst', 'Добавь сферу')}}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
 
 export default {
   name: 'editSpheres',
+  components: {wsSphereFinder},
   props: {
     node: {type: Object},
     sphereFirstEditable: {type: Boolean, default () { return true }},
@@ -121,12 +140,16 @@ export default {
     },
     sphereAddStart (s) {
       this.$log('sphereAddStart')
-      this.sphereDialogOpened = true
+      this.sphereAdding = true
+      // this.sphereDialogOpened = true
     },
     sphereAdd (s) {
       this.$log('sphereAdd', s)
-      this.node.spheres.push(s)
-      this.sphereDialogOpened = false
+      let sphereFind = this.node.spheres.find(i => i.name === s.name)
+      if (!sphereFind) {
+        this.node.spheres.push(JSON.parse(JSON.stringify(s)))
+      }
+      this.sphereAdding = false
       this.sphere = ''
     },
     async sphereCreate () {
