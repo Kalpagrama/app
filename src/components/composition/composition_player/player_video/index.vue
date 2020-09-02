@@ -19,14 +19,14 @@ div(
         position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
         bottom: '8px', left: '8px',
       }`)
-      q-btn(round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
+      q-btn(
+        @click="muted ? mutedOff() : mutedOn()"
+        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
         q-spinner-audio(
           v-if="!muted"
-          @click="mutedOn()"
           size="25px" color="white").q-mx-sm
         q-icon(
           v-if="muted"
-          @click="mutedOff()"
           size="25px" color="red" name="volume_off").q-mx-sm
   //- preview
   img(

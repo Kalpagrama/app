@@ -46,6 +46,31 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
             round color="green" icon="edit"
             :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
           item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
+        //- two
+        div(
+          v-if="node.items.length === 2"
+          :style=`{position: 'relative',}`
+          ).row.fit
+          .col.full-height
+            q-btn(
+              @click="itemDelete(node.items[0], 0)"
+              round color="red" icon="delete_outline"
+              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
+            q-btn(
+              @click="itemEdit(node.items[0])"
+              round color="green" icon="edit"
+              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
+            item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
+          .col.full-height
+            q-btn(
+              @click="itemDelete(node.items[0], 0)"
+              round color="red" icon="delete_outline"
+              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
+            q-btn(
+              @click="itemEdit(node.items[0])"
+              round color="green" icon="edit"
+              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
+            item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
         //- two, three, four, five, six, seven,
       q-btn(
         @click="itemFind()"
@@ -92,7 +117,16 @@ export default {
       this.$log('itemFind')
       this.itemFinderOpened = true
     },
-    itemFound (item) {},
+    itemFound (item) {
+      this.$log('itemFound', item)
+      if (this.node.name.length === 0) {
+        this.node.name = item.name
+      }
+      item.items.map(i => {
+        this.node.items.push(i)
+      })
+      this.itemFinderOpened = false
+    },
     itemDelete (item, itemIndex) {
       this.$log('itemDelete', item, itemIndex)
       if (!confirm('Delete item?')) return

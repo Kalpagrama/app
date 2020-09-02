@@ -92,7 +92,7 @@ export default {
         {id: 'workspace.contents.image', name: this.$t('Images', 'Картинки')},
         {id: 'workspace.contents.audio', name: this.$t('Audio', 'Аудио')},
         {id: 'workspace.contents.books', name: this.$t('Books', 'Книги')},
-        {id: 'workspace.contents.web', name: this.$t('Web', 'Веб')}
+        // {id: 'workspace.contents.web', name: this.$t('Web', 'Веб')}
       ]
     },
     mangoQuery () {
