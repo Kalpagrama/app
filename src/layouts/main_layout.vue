@@ -90,21 +90,8 @@ export default {
     this.$log('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
-    // take token from redirect url
-    let token = this.$route.query.token
-    let expires = this.$route.query.expires
-    if (token) {
-      localStorage.setItem('k_token', token)
-      localStorage.setItem('ktokenExpires', expires)
-      await this.$router.push('/').catch(e => e)
-    }
-    let res = await systemInit(this.$store)
-    if (!this.$store.getters.currentUser() || this.$store.getters.currentUser().profile.role === 'UNCONFIRMED'){
-      this.$log('GO LOGIN')
-      await this.$router.push('/auth').catch(e => e)
-    } else {
-      await AuthApi.afterLogin()
-    }
+    this.$log('tryLogin...')
+    await AuthApi.tryLogin()
     this.loading = false
   }
 }

@@ -74,6 +74,7 @@
             :style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
         //- logout
         div(
+          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -81,6 +82,16 @@
           span(
             v-if="showRightSide"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
+        //- login
+        div(
+          v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="login()"
+        ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+          div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round dense flat icon="power" color="white" :loading="loginLoading")
+          span(
+            v-if="showRightSide"
+            :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
         //- create node
         .row.full-width.items-center.content-center
           q-btn(
@@ -113,6 +124,8 @@ export default {
       ],
       refreshLoading: false,
       logoutLoading: false,
+      loginLoading: false,
+      loginButtonShow: true
     }
   },
   computed: {
@@ -138,6 +151,13 @@ export default {
       await this.$wait(300)
       await AuthApi.logout()
       this.logoutLoading = false
+    },
+    async login () {
+      this.$log('logout')
+      this.loginLoading = true
+      await this.$wait(300)
+      await this.$router.push('/auth')
+      this.loginLoading = false
     }
   },
 }

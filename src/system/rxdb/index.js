@@ -334,7 +334,7 @@ class RxDBWrapper {
             nextPageToken: null
          }
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       return result
    }
 

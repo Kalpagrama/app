@@ -65,6 +65,34 @@ export default {
       loading: false,
     }
   },
+  watch: {
+    '$route.query.token': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('$route.query.token CHANGED', to)
+        if (to) {
+          this.$log('GOT TOKEN', to)
+          // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
+          let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
+          // await this.$wait(200)
+          this.userIdentifying = false
+          this.userIdentified = true
+          this.login = userId
+          this.loginType = loginType
+          this.userExist = userExist === 'true' ? true : false
+          this.needInvite = needInvite === 'true' ? true : false
+          this.$log('this.needInvite = ', this.needInvite)
+          if (this.needInvite){
+            // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
+          }
+          await AuthApi.userAuthenticate('', '8888')
+          await this.$router.push('/home')
+          // if userExist and !needInvite... this.userAuthenticate()
+          // this.$router.replace('/auth')
+        }
+      }
+    }
+  },
   methods: {
     check () {
       this.$log('check')
@@ -78,6 +106,7 @@ export default {
         this.check()
         this.loading = true
         // await this.$wait(1000)
+        await AuthApi.tryLogin() // TODO ?
         let {userExist, userId, needInvite, loginType} = await AuthApi.userIdentify(this.login)
         if (!userExist) throw new Error('No such user!')
         if (loginType !== 'USERNAME') throw new Error('Invalid login type!')

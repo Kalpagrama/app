@@ -5,10 +5,6 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CORE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_CORE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_CORE)
 
-export function init (state) {
-  state.initialized = true
-}
-
 export function stateSet (state, [key, val]) {
   assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   state[key] = val

@@ -3,14 +3,16 @@ import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
-import { router } from 'src/boot/main'
 import assert from 'assert';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
+import store from 'src/store/index'
+import utils from 'src/system/utils' // расширяет String и RegExp
+utils()
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SYSTEM)
 
 async function initServices (store) {
    const f = initServices
@@ -54,6 +56,20 @@ async function shareWith (object) {
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
+async function askForWebPushPerm (store) {
+   if (Platform.is.capacitor) {
+      const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
+      await initCapacitorPushPlugin(store)
+      return true
+   } else if (Platform.is.cordova) {
+      const { initCordovaPushPlugin } = await import('src/system/cordova.js')
+      await initCordovaPushPlugin(store)
+      return true
+   } else if (process.env.MODE === 'pwa') {
+      return await askForPwaWebPushPerm(store)
+   }
+}
+
 function initOfflineEvents (store) {
    function handleNetworkChange (event) {
       logD('handleNetworkChange', navigator.onLine)
@@ -72,97 +88,12 @@ function initOfflineEvents (store) {
    store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-// очистить кэши и БД
-async function systemReset () {
-   const f = systemReset
-   logD(f, 'start')
-   const t1 = performance.now()
-   if (process.env.MODE === 'pwa') await pwaReset()
-   await rxdb.clearAll()
-   await rxdb.deinit()
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-}
-
-async function askForWebPushPerm (store) {
-   if (Platform.is.capacitor) {
-      const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
-      await initCapacitorPushPlugin(store)
-      return true
-   } else if (Platform.is.cordova) {
-      const { initCordovaPushPlugin } = await import('src/system/cordova.js')
-      await initCordovaPushPlugin(store)
-      return true
-   } else if (process.env.MODE === 'pwa') {
-      return await askForPwaWebPushPerm(store)
-   }
-}
-
-async function systemInit (store) {
-   const f = systemInit
-   logD(f, 'start')
-   const t1 = performance.now()
-   let res = { goToLogin: true }
-   let userOid = localStorage.getItem('k_user_oid')
-   if (userOid) { // пользователь зарегестрирован
-      try {
-         await rxdb.init(userOid)
-         let currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
-         assert(currentUser, 'currentUser обязан быть после rxdb.init')
-         // logD(f, 'currentUser= ', currentUser)
-         await store.dispatch('init', currentUser)
-         await i18next.changeLanguage(currentUser.profile.lang)
-         res.goToLogin = currentUser.profile.role !== 'UNCONFIRMED' && currentUser.profile.role !== 'GUEST'
-      } catch (err) {
-         logE('error on systemInit!', err)
-         resetLocalStorageData()
-         await systemReset()
-         throw err
-      }
-   } else { // пытаемсся войти без логина
-      try {
-         if (!localStorage.getItem('k_token')) {
-            const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
-            if (needConfirm === false && dummyUser) {
-               localStorage.setItem('k_dummy_user', JSON.stringify(dummyUser))
-               await store.dispatch('init', dummyUser)
-               res.goToLogin = false
-            }
-         } else {
-            let dummyUser = localStorage.getItem('k_dummy_user')
-            if (dummyUser) {
-               dummyUser = JSON.parse(dummyUser)
-               await store.dispatch('init', dummyUser)
-               res.goToLogin = false
-            }
-         }
-         if (!res.goToLogin) await rxdb.init(null)
-      } catch (err) {
-         logE('error on systemInit!', err)
-         resetLocalStorageData()
-         await systemReset()
-         throw err
-      }
-   }
-   if (res.goToLogin) {
-      resetLocalStorageData()
-      await systemReset()
-   }
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   return res
-}
-
 function resetLocalStorageData () {
-   // localStorage.removeItem('k_token')
-   // localStorage.removeItem('k_token_expires')
-   // localStorage.removeItem('k_user_oid')
-   // localStorage.removeItem('k_user_role')
    const f = resetLocalStorageData
    logD(f, 'start')
-   // alert('resetLocalStorageData!!!!!' + process.env.NODE_ENV)
-   // console.log('resetLocalStorageData')
    for (let i = 0; i < localStorage.length; i++) {
       let key = localStorage.key(i)
-      if (process.env.NODE_ENV === 'development' && (key === 'k_debug' || key === 'k_log_level' || key === 'k_log_filter')) continue
+      if (process.env.NODE_ENV === 'development' && (key === 'k_debug' || key === 'k_log_level' || key === 'k_log_filter' || key === 'k_login_date')) continue
       if (key === 'k_originalUrl') continue
       if (key.startsWith('k_')) localStorage.removeItem(key)
    }
@@ -178,4 +109,66 @@ function checkLocalStorage () {
    if (!localStorage.getItem('k_log_level') || !localStorage.getItem('k_log_filter') || !localStorage.getItem('k_debug')) resetLocalStorageData()
 }
 
-export { initServices, systemReset, systemInit, shareWith, checkLocalStorage, resetLocalStorageData }
+// очистить кэши и БД
+async function systemReset (resetLocalStorage = false) {
+   const f = systemReset
+   logD(f, 'start')
+   if (resetLocalStorage) resetLocalStorageData()
+   const t1 = performance.now()
+   if (process.env.MODE === 'pwa') await pwaReset()
+   await rxdb.clearAll()
+   await rxdb.deinit()
+   await store.dispatch('setCurrentUser', null)
+   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+}
+
+// async function systemInit (store) {
+//    const f = systemInit
+//    logD(f, 'start')
+//    const t1 = performance.now()
+//    let userOid = localStorage.getItem('k_user_oid')
+//    if (userOid) { // пользователь зарегестрирован
+//       try {
+//          await rxdb.init(userOid)
+//          let currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
+//          assert(currentUser, 'currentUser обязан быть после rxdb.init')
+//          // logD(f, 'currentUser= ', currentUser)
+//          await store.dispatch('init', currentUser)
+//          await i18next.changeLanguage(currentUser.profile.lang)
+//       } catch (err) {
+//          logE('error on systemInit!', err)
+//          await systemReset(true)
+//          throw err
+//       }
+//    } else { // пытаемсся войти без логина
+//       try {
+//          if (!localStorage.getItem('k_token')) {
+//             const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
+//             if (needConfirm === false && dummyUser) {
+//                localStorage.setItem('k_dummy_user', JSON.stringify(dummyUser))
+//                await store.dispatch('init', dummyUser)
+//             }
+//          } else {
+//             let dummyUser = localStorage.getItem('k_dummy_user')
+//             if (dummyUser) {
+//                dummyUser = JSON.parse(dummyUser)
+//                await store.dispatch('init', dummyUser)
+//             }
+//          }
+//          if (store.getters.currentUser()) {
+//             await rxdb.init(null)
+//          }
+//       } catch (err) {
+//          logE('error on systemInit!', err)
+//          await systemReset(true)
+//          throw err
+//       }
+//    }
+//    if (!store.getters.currentUser()) {
+//       await systemReset(true)
+//    }
+//
+//    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+// }
+
+export { initServices, systemReset, shareWith, checkLocalStorage }
