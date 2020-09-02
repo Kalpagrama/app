@@ -1,10 +1,11 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { router } from 'src/boot/main'
-import { systemReset } from 'src/system/services'
+import { resetLocalStorageData, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
 import { Mutex } from 'src/system/rxdb/reactive'
+import { fragments } from 'src/api/fragments'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
@@ -12,21 +13,6 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
 const apiMutex = new Mutex()
-
-function resetLocalStorageData () {
-   // localStorage.removeItem('k_token')
-   // localStorage.removeItem('k_token_expires')
-   // localStorage.removeItem('k_user_oid')
-   // localStorage.removeItem('k_user_role')
-   for (let i = 0; i < localStorage.length; i++) {
-      let key = localStorage.key(i)
-      if (key.startsWith('k_') && key !== 'k_originalUrl') localStorage.removeItem(key)
-   }
-   localStorage.setItem('k_debug', '0')
-   if (process.env.NODE_ENV === 'development') localStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
-   else localStorage.setItem('k_log_level', LogLevelEnum.WARNING)
-   localStorage.setItem('k_log_filter', 'gui')
-}
 
 class AuthApi {
    static async afterLogin () {
@@ -107,14 +93,19 @@ class AuthApi {
       const t1 = performance.now()
       resetLocalStorageData()
       await systemReset()
-      let { data: { userIdentify: { userId, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
+      let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
+             ${fragments.dummyUserFragment}
              query  ($userId: String){
                  userIdentify(userId: $userId){
                      userId
                      loginType
                      userExist
                      needInvite
+                     needConfirm
+                     dummyUser {
+                         ...dummyUserFragment
+                     }
                      token
                      expires
                  }
@@ -129,7 +120,7 @@ class AuthApi {
       // setWebPushToken мог быть вызван до userIdentify
       if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return { userId, loginType, userExist, needInvite, token, expires }
+      return { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires }
    }
 
    static async userAuthenticate (password, inviteCode) {
@@ -229,4 +220,4 @@ class AuthApi {
    }
 }
 
-export { AuthApi, resetLocalStorageData }
+export { AuthApi }

@@ -37,7 +37,7 @@ export default async ({ Vue, store, app }) => {
             for (let err of graphQLErrors) {
                logE('gql error', err)
                err.message = err.code + ':' + err.message
-               if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION') {
+               if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
                   AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)

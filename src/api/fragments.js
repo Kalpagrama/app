@@ -296,6 +296,36 @@ const userFragment = gql`
     }
   }
 `
+const dummyUserFragment = gql`
+  ${objectShortFragment}
+  fragment dummyUserFragment on DummyUser {
+    type
+    thumbUrl(preferWidth: 600)
+    name
+    username
+    settings
+    subscriptions{...objectShortFragment}
+    profile{
+      tutorial
+      about
+      status
+      photoUrl
+      coverUrl
+      city
+      country
+      dateBirth
+      gender
+      lang
+      nameFirst
+      nameFull
+      nameSecond
+      role
+      email
+      phone
+      password
+    }
+  }
+`
 const objectFullFragment = gql`
   ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
   ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
@@ -315,6 +345,7 @@ const fragments = {
   eventFragment,
   objectFullFragment,
   userFragment,
+  dummyUserFragment,
   objectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,

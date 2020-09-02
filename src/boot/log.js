@@ -1,4 +1,5 @@
 import assert from 'assert'
+
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
   // eslint-disable-next-line no-extend-native
@@ -191,6 +192,9 @@ function getLogFunc(level, module) {
 
 export default async ({Vue, store, app}) => {
   try {
+    // import { checkLocalStorage } from 'src/system/services'
+    require('src/system/services').checkLocalStorage()
+    // checkLocalStorage()
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName

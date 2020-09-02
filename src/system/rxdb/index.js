@@ -189,7 +189,7 @@ class RxDBWrapper {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
-      assert(userOid)
+      // assert(userOid)
       assert(this.created, '!created')
       this.event.init()
       // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
@@ -202,17 +202,20 @@ class RxDBWrapper {
       }
       // console.time('get user from server')
       // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
-      let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-         fetchFunc: fetchCurrentUserFunc,
-         force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-         clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
-         onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-            assert(newVal.wsRevision)
-            if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
-               this.workspace.synchroLoopWaitObj.break()
+      let currentUser
+      if (userOid) {
+         currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
+            fetchFunc: fetchCurrentUserFunc,
+            force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+            clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+            onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+               assert(newVal.wsRevision)
+               if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
+                  this.workspace.synchroLoopWaitObj.break()
+               }
             }
-         }
-      })
+         })
+      }
       logD(f, 'currentUser= ', currentUser)
       // console.timeEnd('get user from server')
       let fetchCategoriesFunc = async () => {
@@ -224,6 +227,7 @@ class RxDBWrapper {
       }
       // console.time('get categories from server')
       let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
+      assert(nodeCategories, '!nodeCategories')
       // console.timeEnd('get categories from server')
       if (currentUser) { // синхронизация мастерской с сервером
          this.workspace.switchOnSynchro(currentUser)
