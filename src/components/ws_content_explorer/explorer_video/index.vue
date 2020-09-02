@@ -62,18 +62,18 @@ q-layout(view="hHh Lpr lff")
             }`).fit
             template(v-slot:actions)
               q-btn(
-                v-if="viewId === 'fragments'"
-                @click="$refs[`view-${viewId}`].nodeCreateStart()"
+                v-if="true"
+                @click="nodeCreateStart()"
                 round push color="green" dense icon="add"
                 :style=`{borderRadius: '50%'}`)
-    view-fullscreen(
+    //- view-fullscreen(
       v-if="(player && player.isFullscreen)"
       :player="player"
       :contentKalpa="contentKalpa"
       :contentWorkspace="contentWorkspace")
     //- view dynamic component
     component(
-      v-if="player ? !player.isFullscreen : true"
+      v-if="player"
       :is="`view-${viewId}`"
       :ref="`view-${viewId}`"
       :player="player"
@@ -97,7 +97,6 @@ export default {
       viewId: 'fragments',
       player: null,
       playerIsVisible: false,
-      isFullscreen: false,
     }
   },
   computed: {
@@ -110,6 +109,14 @@ export default {
     }
   },
   methods: {
+    async nodeCreateStart () {
+      this.$log('nodeCreateStart')
+      this.player.fullscreenToggle(false)
+      this.viewId = 'fragments'
+      this.$nextTick(() => {
+        this.$refs['view-fragments'].nodeCreateStart()
+      })
+    },
     playerStyles () {
       if (this.player && this.player.isFullscreen) {
         return {
@@ -144,7 +151,7 @@ export default {
     },
     keydownHandle (e) {
       if (this.$store.state.ui.isTyping) return
-      // this.$log('keydownHandle', e)
+      this.$log('keydownHandle', e)
       // left/right keys for fast navigations
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         if (!this.player) return
@@ -165,6 +172,10 @@ export default {
       // handle Escape when in isFullscreen player mode
       if (e.key === 'Escape') {
         if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
+      }
+      // handle nodeCreateStart()
+      if (e.keyCode === 78) {
+        this.nodeCreateStart()
       }
     }
   },
