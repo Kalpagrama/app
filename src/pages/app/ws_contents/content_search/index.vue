@@ -32,7 +32,7 @@
           @click="searchStringRaw = ''"
           flat dense color="white" icon="clear")
         q-btn(
-          flat dense color="white" icon="filter_list")
+          flat dense color="white" icon="tune")
   content-uploader(@file="contentFile = $event, contentImporterShow = true")
 </template>
 

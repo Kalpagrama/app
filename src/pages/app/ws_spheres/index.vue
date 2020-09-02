@@ -45,7 +45,9 @@ q-layout(view="hHh Lpr lff")
                 v-for="(s,si) in items" :key="s.id"
                 @click="sphereClick(s)"
                 ).col-6.q-pr-sm.q-pb-sm
-                div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.b-40.sphere-item
+                div(
+                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
+                  ).row.fit.b-40.sphere-item
                   .row.full-width.items-center.content-center.q-pa-md
                     q-icon(name="blur_on" color="grey-7" size="24px").q-mr-sm
                     span.text-white.text-bold.q-mb-xs {{ s.name }}

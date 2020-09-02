@@ -33,7 +33,18 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       //- item wrapper
       div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60
         //- one
-        div(v-if="node.items.length === 1").row.fit
+        div(
+          v-if="node.items.length === 1"
+          :style=`{position: 'relative',}`
+          ).row.fit
+          q-btn(
+            @click="itemDelete(node.items[0], 0)"
+            round color="red" icon="delete_outline"
+            :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
+          q-btn(
+            @click="itemEdit(node.items[0])"
+            round color="green" icon="edit"
+            :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
           item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
         //- two, three, four, five, six, seven,
       q-btn(
@@ -84,6 +95,8 @@ export default {
     itemFound (item) {},
     itemDelete (item, itemIndex) {
       this.$log('itemDelete', item, itemIndex)
+      if (!confirm('Delete item?')) return
+      this.$delete(this.node.items, itemIndex)
     }
   }
 }

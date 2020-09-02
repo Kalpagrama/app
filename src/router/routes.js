@@ -91,24 +91,45 @@ const routes = [
         redirect: 'workspace/contents',
         component: () => import('pages/app/ws_index/index.vue'),
         children: [
-          // content
-          { name: 'workspace.contents', path: 'contents', component: () => import('pages/app/ws_contents/index.vue') },
+          // contents
+          {
+            name: 'workspace.contents',
+            path: 'contents',
+            redirect: 'contents/video',
+            component: () => import('pages/app/ws_contents/index.vue'),
+            children: [
+              { name: 'workspace.contents.video', path: 'video', component: () => import('pages/app/ws_contents/type_video.vue') },
+              { name: 'workspace.contents.image', path: 'image', component: () => import('pages/app/ws_contents/type_image.vue') },
+              { name: 'workspace.contents.audio', path: 'audio', component: () => import('pages/app/ws_contents/type_audio.vue') },
+              { name: 'workspace.contents.books', path: 'books', component: () => import('pages/app/ws_contents/type_books.vue') },
+            ]
+          },
           { name: 'workspace.content', path: 'content/:id', component: () => import('pages/app/ws_content/index.vue') },
           // { name: 'workspace.content.import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
-          // node
-          { name: 'workspace.nodes', path: 'nodes', component: () => import('pages/app/ws_nodes/index.vue') },
+          // nodes
+          {
+            name: 'workspace.nodes',
+            path: 'nodes',
+            redirect: 'nodes/drafts',
+            component: () => import('pages/app/ws_nodes/index.vue'),
+            children: [
+              { name: 'workspace.nodes.drafts', path: 'drafts', component: () => import('pages/app/ws_nodes/type_drafts.vue') },
+              { name: 'workspace.nodes.published', path: 'published', component: () => import('pages/app/ws_nodes/type_published.vue') },
+            ]
+          },
           { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
-          // { name: 'workspace.node.import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
-          // chain
-          // { name: 'workspace.chains', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
-          // { name: 'workspace.chain', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
-          // sphere
+          // spheres
           { name: 'workspace.spheres', path: 'spheres', component: () => import('pages/app/ws_spheres/index.vue') },
-          { name: 'workspace.sphere', path: 'sphere/:id', component: () => import('pages/app/ws_sphere/index.vue') },
-          // other
-          // { name: 'workspace.settings', path: 'settings', component: () => import('pages/app/ws_settings/index.vue') },
-          { name: 'workspace.boards', path: 'boards', component: () => import('pages/app/ws_boards/index.vue') },
-          { name: 'workspace.board', path: 'board/:id', component: () => import('pages/app/ws_board/index.vue') }
+          {
+            name: 'workspace.sphere',
+            path: 'sphere/:id',
+            redirect: 'sphere/:id/items',
+            component: () => import('pages/app/ws_sphere/index.vue'),
+            children: [
+              { name: 'workspace.sphere.items', path: 'items', component: () => import('pages/app/ws_sphere/sphere_items.vue') },
+              { name: 'workspace.sphere.explore', path: 'explore', component: () => import('pages/app/ws_sphere/sphere_explore.vue') }
+            ]
+          },
         ]
       },
       {

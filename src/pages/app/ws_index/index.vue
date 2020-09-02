@@ -4,23 +4,24 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '0px',}`)
       router-view
         template(v-slot:header)
-          .row.full-width.items-center.content-center.q-pa-sm
+          .row.full-width.items-center.content-center.q-px-sm
             //- q-btn(
               v-if="$q.screen.width > 960"
               round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+            //- q-icon(name="school" size="30px" color="white")
             .col
-              .row.fit.items-center.content-center.q-pl-md
+              .row.fit.items-center.content-center.justify-start.q-py-sm
                 router-link(
                   :to=`{name: p.id}`
                   v-for="p in pages" :key="p.id"
                   :class=`{
-                    'text-bold': p.id === $route.name,
-                    'text-grey-8': p.id !== $route.name,
-                    'text-white': p.id === $route.name,
+                    'text-bold': $route.name.includes(p.id),
+                    'text-grey-8': !$route.name.includes(p.id),
+                    'text-white': $route.name.includes(p.id),
                   }`
                   :style=`{
                     fontSize: '18px'
-                  }`).text-bold.q-mr-md {{ p.name }}
+                  }`).text-bold.q-pa-md {{ p.name }}
 </template>
 
 <script>
@@ -32,9 +33,6 @@ export default {
         {id: 'workspace.contents', name: this.$t('pageWs_content', 'Контент')},
         {id: 'workspace.nodes', name: this.$t('pageWs_nodes', 'Ядра')},
         {id: 'workspace.spheres', name: this.$t('pageWs_spheres', 'Сферы')},
-        // {id: 'workspace.boards', name: this.$t('pageWs_boards', 'Доски')}
-        // {id: 'chain-list', path: 'chains', name: this.$t('pageWs_chains', 'Цепочки')},
-        // {id: 'ws-settings', path: 'settings', name: this.$t('pageWs_settings', 'Настройки')}
       ]
     },
   }

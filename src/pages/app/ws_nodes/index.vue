@@ -5,24 +5,30 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{maxWidth: '800px'}`).row.full-width
         slot(name="header")
         .row.full-width.q-px-sm
-          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="searchString"
-              filled dark dense color="white"
-              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-              ).full-width
-              template(v-slot:append)
-                q-btn(
-                  v-if="searchString.length > 0"
-                  flat dense color="white" icon="clear" @click="searchString = ''")
-                q-btn(
-                  flat dense color="white" icon="filter_list")
+          .col
+            div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+              q-input(
+                v-model="searchString"
+                filled dark dense color="white"
+                :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+                ).full-width
+                template(v-slot:append)
+                  q-btn(
+                    v-if="searchString.length > 0"
+                    flat dense color="white" icon="clear" @click="searchString = ''")
+                  q-btn(
+                    flat dense color="white" icon="tune")
+          q-btn(round flat color="green" icon="add" @click="$router.push('/workspace/node/new')")
         .row.full-width.q-px-md
-            q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
-              q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
+            q-tabs(
+              :value="$route.name" @input="$router.push({name: $event})"
+              dense no-caps active-color="white" align="left" switch-indicator
+              ).full-width.text-grey-8
+              q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
       q-page-sticky(position="bottom" :offset="[0, 60]")
   q-page-container
-    q-page(style="padding-top: 8px")
+    router-view(:searchString="searchString")
+    //- q-page(style="padding-top: 8px")
       .row.full-width.justify-center
         div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
           q-tab-panels(
@@ -87,8 +93,8 @@ export default {
       type: Object,
       default () {
         return {
-          types: [],
-          typesAll: true
+          // types: [],
+          // typesAll: true
         }
       }
     },
@@ -109,16 +115,11 @@ export default {
     }
   },
   computed: {
-    typesFiltered () {
-      let arr = [
-        // {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
-        // {id: 'fragments', name: this.$t('nodes_fragments', 'Фрагменты')},
-        {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
-        {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
+    types () {
+      return [
+        {id: 'workspace.nodes.drafts', name: this.$t('nodes_drafts', 'Черновики')},
+        {id: 'workspace.nodes.published', name: this.$t('nodes_published', 'Опубликованные')},
       ]
-      // if (this.options.typesAll) return this.arr
-      // else return arr.filter(i => this.options.types.includes(i.id))
-      return arr
     },
     querySavedNodes () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK}}

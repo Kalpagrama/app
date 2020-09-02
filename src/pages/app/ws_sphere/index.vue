@@ -9,59 +9,37 @@ q-layout(view="hHh Lpr lff")
             div(:style=`{borderRadius: '10px',}`
               ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
               q-icon(name="blur_on" color="white" size="30px").q-mx-sm
-              div(:style=`{overflowX: 'auto'}`).col
-                span(
-                  v-if="sphere"
-                  :style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ sphere.name }}
-              //- q-btn(round flat color="grey-8" icon="more_vert")
+              div(:style=`{overflowX: 'auto'}`).col.full-height
+                div(
+                  v-if="sphere && !sphereNameEditing"
+                  @click="sphereNameEditing = true").row.fit.cursor-pointer
+                  span(
+                    :style=`{fontSize: '18px', whiteSpace: 'nowrap', marginLeft: '12px',}`
+                    ).fit.text-white.text-bold {{ sphere.name }}
+                div(
+                  v-if="sphere && sphereNameEditing"
+                  :style=`{
+                    position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden',
+                  }`
+                  ).row.full-width
+                  q-input(
+                    v-model="sphere.name"
+                    filled dark dense color="grey-6" autofocus
+                    :input-style=`{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                    }`
+                    @blur="sphereNameEditing = false"
+                    @keydown.enter="sphereNameEditing = false"
+                    ).full-width
               q-btn(round flat color="red" icon="delete_outline" @click="sphereDelete()")
             div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
               q-tabs(
-                v-model="viewId"
+                :value="$route.name" @input="$router.replace({name: $event})"
                 no-caps dense active-color="white" switch-indicator).text-grey-8
                 q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
-    q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
-      .row.full-width.items-start.content-start.justify-center
-        div(
-          v-if="sphere"
-          :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
-          div(
-            v-if="viewId === 'items'"
-            ).row.full-width
-            div(
-              v-for="(i,ii) in sphere.items"
-              :style=`{
-                height: '100px',
-              }`
-              ).row.q-mr-sm.q-mb-sm
-              img(
-                :src="i.thumbOid" draggable="false"
-                :style=`{height: '100%', borderRadius: '10px', overflow: 'hidden'}`
-                )
-          //- span.text-white {{ sphere }}
-          //- div(
-            v-if="board && viewId === 'items'").row.full-width
-            img(
-              v-for="(i,ii) in 20" :key="ii"
-              :src="board.thumbOid"
-              :style=`{
-                width: '200px',
-                height: '200px',
-                objectFit: 'cover',
-                borderRadius: '10px', overflow: 'hidden',
-              }`).q-mr-sm.q-mb-sm
-          //- div(
-            v-if="board && viewId === 'more'").row.full-width
-            img(
-              v-for="(i,ii) in 100" :key="ii"
-              :src="board.thumbOid"
-              :style=`{
-                width: '100px',
-                height: '100px',
-                objectFit: 'cover',
-                borderRadius: '10px', overflow: 'hidden',
-              }`).q-mr-sm.q-mb-sm
+    router-view(v-if="sphere" :sphere="sphere")
 </template>
 
 <script>
@@ -77,10 +55,11 @@ export default {
   data () {
     return {
       sphere: null,
+      sphereNameEditing: false,
       viewId: 'items',
       views: [
-        {id: 'items', name: 'Items'},
-        {id: 'more', name: 'More ideas'}
+        {id: 'workspace.sphere.items', name: 'Items'},
+        {id: 'workspace.sphere.explore', name: 'Explore'}
       ]
     }
   },
@@ -104,6 +83,7 @@ export default {
   methods: {
     async sphereDelete () {
       this.$log('sphereDelete')
+      if (!confirm('Delete sphere?')) return
       // TODO what to do if we got items on this sphere ???
       await this.$rxdb.remove(this.sphere.id)
       this.$router.replace('/workspace/spheres')
@@ -117,11 +97,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
   }
 }
 </script>

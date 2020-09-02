@@ -108,6 +108,9 @@ export default {
           this.$emit('close')
         }
       }
+      else {
+        this.$emit('close')
+      }
     },
     save () {
       this.$log('save')

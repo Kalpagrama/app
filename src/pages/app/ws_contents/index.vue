@@ -9,10 +9,14 @@ q-layout(view="hHh Lpr lff")
           @searchString="searchString = $event"
           :style=`{}`)
         .row.full-width.q-px-md
-          q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).full-width.text-grey-8
+          q-tabs(
+            :value="$route.name" @input="$router.push({name: $event})"
+            no-caps dense active-color="white" align="left" switch-indicator
+            ).full-width.text-grey-8
             q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   q-page-container
-    q-page(style="padding-top: 8px")
+    router-view(:searchString="searchString")
+    //- q-page(style="padding-top: 8px")
       .row.full-width.justify-center
         div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
           q-tab-panels(
@@ -84,10 +88,11 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'VIDEO', name: this.$t('Video', 'Видео')},
-        {id: 'IMAGE', name: this.$t('Images', 'Картинки')},
-        {id: 'BOOK', name: this.$t('Books', 'Книги')},
-        {id: 'WEB', name: this.$t('Web', 'Веб')}
+        {id: 'workspace.contents.video', name: this.$t('Video', 'Видео')},
+        {id: 'workspace.contents.image', name: this.$t('Images', 'Картинки')},
+        {id: 'workspace.contents.audio', name: this.$t('Audio', 'Аудио')},
+        {id: 'workspace.contents.books', name: this.$t('Books', 'Книги')},
+        {id: 'workspace.contents.web', name: this.$t('Web', 'Веб')}
       ]
     },
     mangoQuery () {
