@@ -32,6 +32,7 @@ export default {
       currentTime: 0,
       duration: 0,
       mutedLocal: false,
+      isFullscreen: false,
     }
   },
   watch: {
@@ -43,6 +44,10 @@ export default {
     }
   },
   methods: {
+    fullscreenToggle () {
+      this.$log('fullscreenToggle')
+      this.isFullscreen = !this.isFullscreen
+    },
     volumeToggle () {
       this.$log('volumeToggle')
       this.mutedLocal = !this.mutedLocal

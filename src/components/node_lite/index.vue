@@ -1,49 +1,66 @@
 <template lang="pug">
-//-  @mouseenter="active = true"
-//-  @mouseleave="active = false"
-div(
-  :style=`{
-    borderRadius: '10px', overflow: 'hidden',
-    //- minHeight: '200px',
-  }`
-  ).row.full-width.items-start.content-start.b-50
-  //- div(:style=`{position: 'absolute',zIndex: 1000, transform: 'translate3d(0,0,0)', top: '0px', opacity: 0.5}`).row.full-width.q-pa-sm.b-40
-    small.text-white.full-width isActive: {{isActive}}
-    small.text-white.full-width isVisible: {{isVisible}}
-  .row.full-width
-    slot(name="header")
-  //- composition wrapper
+.row.full-width.items-start.content-start.q-mb-xl
   div(
     :style=`{
-      position: 'relative', borderRadius: '10px', overflow: 'hidden',
-      cursor: 'pointer',
+      borderRadius: '10px', overflow: 'hidden',
     }`
-    ).row.full-width.items-start.content-start
-    //- bookmark
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
-    composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
-    q-btn(
-      @click="isFullscreen = true"
-      flat round color="white" icon="fullscreen"
-      :style=`{position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px'}`)
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    node-fullscreen(
-      v-if="isFullscreen" :node="node"
-      @close="isFullscreen = false")
-  //- essence link...
-  div(:style=`{position: 'relative'}`).row.full-width
-    router-link(
-      :to="'/node/'+node.oid"
-      :class=`{
-      }`
+    ).row.full-width.items-start.content-start.b-40
+    //- header: author, createdAt
+    .row.full-width.items-center.content-center.q-pa-sm
+      q-btn(
+        :to="'/user/'+node.meta.author.oid"
+        flat color="white" dense no-caps
+        )
+        user-avatar(:url="node.meta.author.thumbUrl" :width="24" :height="24")
+        span.text-grey-4.q-ml-sm {{ node.meta.author.name }}
+      .col
+      small.text-grey-8.q-mr-xs 11922
+      q-icon(name="visibility" color="grey-8").q-mr-md
+      small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+    //- wrapper: composition + essence
+    div(
       :style=`{
-        cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
+        borderRadius: '10px', overflow: 'hidden',
       }`
-      ).row.full-width.items-center.q-py-md.q-px-md
-      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
+      ).row.full-width.items-start.content-start
+      //- composition wrapper
+      div(
+        :style=`{
+          position: 'relative', borderRadius: '10px', overflow: 'hidden',
+          cursor: 'pointer',
+        }`
+        ).row.full-width.items-start.content-start
+        //- bookmark
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
+        composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
+        //- fullscreen toggler
+        //- q-btn(
+          @click="isFullscreen = true"
+          flat round color="white" icon="fullscreen"
+          :style=`{position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px'}`)
+        //- fullscreen
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-fullscreen(
+            v-if="isFullscreen" :node="node"
+            @close="isFullscreen = false")
+      //- essence
+      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+        .col
+          router-link(
+            :to="'/node/'+node.oid"
+            :style=`{
+              cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.full-width.items-center.q-py-md.q-pl-md
+            span(
+              :style=`{userSelect: 'none', fontSize: '1.4rem'}`).text-white.text-bold {{ node.name }}
+        .row.full-height.items-start.content-start.q-pt-md.q-px-sm
+          node-share(:node="node")
+          node-vote(:node="node")
+  //- footer
   .row.full-width
-    slot(name="footer" :node="nodeFull")
+    slot(name="footer")
 </template>
 
 <script>
@@ -51,16 +68,17 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeBookmark from './node_bookmark.vue'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 import nodeFullscreen from './node_fullscreen.vue'
+import nodeShare from './node_share.vue'
+import nodeVote from './node_vote.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer, nodeFullscreen},
+  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
       nodeFull: null,
       composition: null,
-      muted: true,
       isFullscreen: false,
     }
   },
@@ -70,39 +88,18 @@ export default {
     }
   },
   watch: {
-    // isVisible: {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     // this.$log('isVisible TO', to, this.node.name)
-    //     if (to) {
-    //       // if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-    //       // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
-    //     }
-    //   }
-    // },
+    isActive: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('isActive TO', to, this.node.name)
+        if (to) {
+          if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
+          // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
+        }
+      }
+    },
   },
   methods: {
-    videoClicked (e) {
-      this.$log('videoClicked', e)
-      if (this.muted) {
-        this.muted = false
-        e.target.play()
-      }
-      else {
-        if (e.target.paused) e.target.play()
-        else e.target.pause()
-      }
-    },
-    videoLoadedmetadata (e) {
-      // this.$log('videoLoadedmetadata', e)
-      if (this.isActive) {
-        e.target.play()
-      }
-    },
-    nodeEssenceClick () {
-      this.$log('nodeEssenceClick')
-      this.$router.push(`/node/${this.node.oid}`).catch(e => e)
-    }
   }
 }
 </script>

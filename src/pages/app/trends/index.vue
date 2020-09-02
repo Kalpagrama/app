@@ -18,12 +18,9 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.items-start.content-start.justify-center
         div(
           :class=`{
-            'q-px-sm': $q.screen.width > 800,
           }`
           :style=`{
             maxWidth: '800px',
-            borderLeft: '1px solid rgb(40,40,40)',
-            borderRight: '1px solid rgb(40,40,40)',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")

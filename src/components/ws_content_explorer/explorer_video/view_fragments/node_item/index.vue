@@ -75,14 +75,14 @@
             @blur="$store.commit('ui/stateSet', ['isTyping', false])").full-width
         //- node.spheres editor
         div().row.full-width.items-center.content-center.q-py-sm
-          q-btn(
+          //- q-btn(
             v-for="s in 3" :key="s"
             flat dense no-caps
             :style=`{
               whiteSpace: 'nowrap',
               borderRadius: '10px',
               }`).text-white.q-mr-sm.b-60.q-px-xs #сфера сути {{s}},
-          q-btn(round flat dense icon="add" color="grey-4").b-60
+          q-btn(round flat dense no-caps icon="add" color="grey-4") Add spheres
           //- q-btn(round flat dense color="grey-6" icon="add")
           //- edit-spheres(:node="node" :player="player")
     //- footer: actions close, createNode

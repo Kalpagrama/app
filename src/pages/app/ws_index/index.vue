@@ -21,25 +21,18 @@ q-layout(view="hHh Lpr lff")
                   :style=`{
                     fontSize: '18px'
                   }`).text-bold.q-mr-md {{ p.name }}
-      //- q-page-sticky(
-        v-if="!$route.params.id"
-        expand position="bottom").row.full-width.justify-center.b-30
-        div(:style=`{maxWidth: '800px', height: '50px', paddingLeft: '50px', paddingRight: '50px',}`).row.full-width
-          q-tabs(
-            :value="$route.name" @input="$router.push({name: $event})"
-            no-caps dense active-color="white").fit.text-grey-8
-            q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
 </template>
 
 <script>
 export default {
-  name: 'wsIndex',
+  name: 'pageApp_wsIndex',
   computed: {
     pages () {
       return [
         {id: 'workspace.contents', name: this.$t('pageWs_content', 'Контент')},
         {id: 'workspace.nodes', name: this.$t('pageWs_nodes', 'Ядра')},
         {id: 'workspace.spheres', name: this.$t('pageWs_spheres', 'Сферы')},
+        // {id: 'workspace.boards', name: this.$t('pageWs_boards', 'Доски')}
         // {id: 'chain-list', path: 'chains', name: this.$t('pageWs_chains', 'Цепочки')},
         // {id: 'ws-settings', path: 'settings', name: this.$t('pageWs_settings', 'Настройки')}
       ]

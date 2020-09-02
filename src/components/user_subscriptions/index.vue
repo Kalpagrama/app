@@ -8,17 +8,18 @@ div(:style=`{position: 'relative',}`).column.fit
   div(
     ).row.full-width.q-pa-sm
     .col.q-pr-sm
-      q-input(
-        v-model="searchString"
-        filled dense dark color="white"
-        :placeholder="$t('userSubscriptions_findPlaceholder', 'Найти подписку')"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            @click="searchString = ''"
-            flat dense color="white" icon="clear")
-          q-btn(flat dense color="white" icon="filter_list")
+      div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+        q-input(
+          v-model="searchString"
+          filled dense dark color="white"
+          :placeholder="$t('userSubscriptions_findPlaceholder', 'Найти подписку')"
+          ).full-width
+          template(v-slot:append)
+            q-btn(
+              v-if="searchString.length > 0"
+              @click="searchString = ''"
+              flat dense color="white" icon="clear")
+            q-btn(flat dense color="white" icon="filter_list")
     q-btn(v-if="!editing" round flat color="white" icon="edit" @click="editing = true").q-mr-xs
     q-btn(v-if="editing" round flat color="green" icon="check" @click="editing = false").q-mr-xs
   //- body
