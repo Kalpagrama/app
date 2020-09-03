@@ -14,7 +14,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
 
 Vue.use(Vuex)
 
-let currentUser = null
+let currentUser = null // не делаем реактивным!!! (итак реактивен (reactiveItem))
 
 // todo action currentUser instead of mutation!!!!
 
@@ -27,18 +27,8 @@ const store = new Vuex.Store({
   strict: process.env.DEV,
   state: {},
   actions: {
-    init: async (context, user) => {
-      // if (!localStorage.getItem('k_user_oid')) return false
-      // await rxdb.init(localStorage.getItem('k_user_oid'))
-      // currentUser = await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid'))
-      // logD('currentUser', currentUser)
-      // assert(currentUser, '!currentUser')
-      // await context.dispatch('core/init')
-      // await i18next.changeLanguage(currentUser.profile.lang)
-      // // logD('vuex init done!')
-      // return true
+    setCurrentUser: async (context, user) => {
       currentUser = user
-      await context.dispatch('core/init')
     }
   },
   getters: {

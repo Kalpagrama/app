@@ -6,12 +6,12 @@ import { router } from 'src/boot/main'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_EVENT)
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 class Event {
   constructor (workspace, objects, lists) {
@@ -26,9 +26,6 @@ class Event {
 
   deInit () {
     EventApi.deInit()
-  }
-
-  async clear () {
   }
 
   // от сервера прилетел эвент (поправим данные в кэше)

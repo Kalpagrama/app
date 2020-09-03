@@ -1,4 +1,7 @@
 import assert from 'assert'
+import { initUtils } from 'src/system/utils'
+initUtils()
+
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
   // eslint-disable-next-line no-extend-native
@@ -26,6 +29,7 @@ const LogLevelEnum = Object.freeze({
 })
 Object.freeze(LogLevelEnum)
 const LogSystemModulesEnum = Object.freeze({
+  SYSTEM: 'sys',
   SW: 'sw',
   PWA: 'pwa',
   AUTH: 'auth',
@@ -39,6 +43,7 @@ const LogSystemModulesEnum = Object.freeze({
   RXDB_WS: 'rxdb_ws',
   RXDB_CACHE: 'rxdb_cache',
   RXDB_OBJ: 'rxdb_obj',
+  RXDB_GQL: 'rxdb_gql',
   RXDB_LST: 'rxdb_lst',
   RXDB_EVENT: 'rxdb_ev',
   BOOT: 'boot',
@@ -54,20 +59,11 @@ class Logger {
     this.store = store
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
-
     let logLevel = localStorage.getItem('k_log_level')
-    if (logLevel == null) {
-      if (process.env.NODE_ENV === 'development') logLevel = LogLevelEnum.DEBUG
-      else logLevel = LogLevelEnum.WARNING
-      localStorage.setItem('k_log_level', logLevel)
-    }
+    assert(logLevel)
     this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
-
     let logDbgFilter = localStorage.getItem('k_log_filter')
-    if (!logDbgFilter) {
-      logDbgFilter = 'gui'
-      localStorage.setItem('k_log_filter', logDbgFilter)
-    }
+    assert(logDbgFilter)
     this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
   }
 
@@ -200,6 +196,9 @@ function getLogFunc(level, module) {
 
 export default async ({Vue, store, app}) => {
   try {
+    // import { checkLocalStorage } from 'src/system/services'
+    require('src/system/services').checkLocalStorage()
+    // checkLocalStorage()
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName

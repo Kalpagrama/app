@@ -67,6 +67,7 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
 import { ContentApi } from 'src/api/content'
 
 import imageCropper from 'components/image_cropper/index.vue'
+import assert from 'assert'
 
 export default {
   name: 'contentImporter',
@@ -114,12 +115,17 @@ export default {
         if (!this.imageValid) this.imageValid = true
       }
     },
+
+    async imageCompress(){
+
+    },
+
     async imageSave () {
       this.$log('imageSave start')
       this.loading = true
-      this.$refs.imageCropper.cropper.getCroppedCanvas()
+      this.$refs.imageCropper.cropper.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1080 })
         .toBlob(async (blob) => {
-          this.$log('imageSave blob', blob)
+          this.$log('imageSave blob size=', blob.size)
           let contentKalpa = await ContentApi.contentCreateFromFile(blob)
           this.$log('imageSave contentKalpa', contentKalpa)
           this.$emit('contentKalpa', contentKalpa)

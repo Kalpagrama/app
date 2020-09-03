@@ -119,7 +119,7 @@ export default {
         await this.$wait(500)
         this.check()
         this.loading = true
-        let {userExist, userId, needInvite, loginType} = await AuthApi.userIdentify(this.login)
+        let {userExist, userId, needInvite, needConfirm, loginType} = await AuthApi.userIdentify(this.login)
         if (userExist) throw new Error('This user already exists')
         if (loginType !== 'USERNAME') throw new Error('Invalid login type!')
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password, this.promo)
@@ -128,7 +128,8 @@ export default {
         this.$log('signUp done', oid)
         this.loading = false
         this.$q.notify({type: 'positive', position: 'top', message: 'Welcome!'})
-        this.$router.replace('/')
+        await this.$router.replace('/')
+        window.location.reload() // иначе не обновляется юзер (при входе без логина - фейковый юзер)
       }
       catch (e) {
         this.$log('signUp error', e)

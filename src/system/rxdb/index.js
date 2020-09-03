@@ -16,6 +16,7 @@ import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
+import { GqlQueries } from 'src/system/rxdb/gql_query'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -31,7 +32,6 @@ const RxCollectionEnum = Object.freeze({
 })
 const RxModuleEnum = Object.freeze({
    WS: 'WS',
-   SETTINGS: 'SETTINGS',
    CACHE: 'CACHE'
 })
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
@@ -163,6 +163,7 @@ class RxDBWrapper {
          this.objects = new Objects(this.cache)
          this.lists = new Lists(this.cache)
          this.event = new Event(this.workspace, this.objects, this.lists)
+         this.gqlQueries = new GqlQueries(this.cache)
          // console.time('workspace.create')
          await this.workspace.create()
          // console.timeEnd('workspace.create')
@@ -189,7 +190,7 @@ class RxDBWrapper {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
-      assert(userOid)
+      // assert(userOid)
       assert(this.created, '!created')
       this.event.init()
       // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
@@ -202,28 +203,25 @@ class RxDBWrapper {
       }
       // console.time('get user from server')
       // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
-      let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-         fetchFunc: fetchCurrentUserFunc,
-         force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-         clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
-         onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-            assert(newVal.wsRevision)
-            if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
-               this.workspace.synchroLoopWaitObj.break()
+      let currentUser
+      if (userOid) {
+         currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
+            fetchFunc: fetchCurrentUserFunc,
+            force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+            clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+            onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+               assert(newVal.wsRevision)
+               if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
+                  this.workspace.synchroLoopWaitObj.break()
+               }
             }
-         }
-      })
+         })
+      }
       logD(f, 'currentUser= ', currentUser)
       // console.timeEnd('get user from server')
-      let fetchCategoriesFunc = async () => {
-         return {
-            notEvict: true, // живет в кэше вечно
-            item: await NodeApi.nodeCategories(),
-            actualAge: 'day' // обновляется раз в день
-         }
-      }
       // console.time('get categories from server')
-      let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
+      let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
+      assert(nodeCategories, '!nodeCategories')
       // console.timeEnd('get categories from server')
       if (currentUser) { // синхронизация мастерской с сервером
          this.workspace.switchOnSynchro(currentUser)
@@ -231,44 +229,22 @@ class RxDBWrapper {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async deinit () {
-      const f = this.deinit
-      logD(f, 'start')
-      const t1 = performance.now()
-      assert(this.created, '!created')
-      this.event.deInit()
-      this.workspace.switchOffSynchro()
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
-
-   async clearAll () {
+   async erase (clearCache = true) {
       try {
          await this.lock()
-         const f = this.clearAll
+         const f = this.deinit
          logD(f, 'start')
          const t1 = performance.now()
-         for (let module in RxModuleEnum) await this.clearModule(module)
+         assert(this.created, '!created')
+         this.event.deInit()
+         this.workspace.switchOffSynchro()
+         await this.workspace.clearCollections()
          await this.db.meta.remove()
          await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+         if (clearCache) await this.cache.clearCollections()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
-      }
-   }
-
-   async clearModule (rxModuleEnum) {
-      assert(rxModuleEnum in RxModuleEnum, 'bad rxModuleEnum')
-      switch (rxModuleEnum) {
-         case RxModuleEnum.WS:
-            this.workspace.switchOffSynchro()
-            return await this.workspace.clearCollections()
-         case RxModuleEnum.SETTINGS:
-            // throw new Error('not impl' + rxModuleEnum)
-            return
-         case RxModuleEnum.CACHE:
-            return await this.cache.clearCollections()
-         default:
-            throw new Error('bad module' + rxModuleEnum)
       }
    }
 
@@ -330,21 +306,22 @@ class RxDBWrapper {
             nextPageToken: null
          }
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       return result
    }
 
-   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
+   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null } = {}) {
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       let rawId = getRawIdFromId(id)
       let rxDoc
       if (rxCollectionEnum in WsCollectionEnum) {
          rxDoc = await this.workspace.get(id)
-      } else if (rxCollectionEnum in LstCollectionEnum ||
-         rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
+      } else if (rxCollectionEnum in LstCollectionEnum) {
          rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
+      } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
+         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, servicesApollo)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          rxDoc = await this.db.meta.findOne(rawId).exec()
       } else {
@@ -355,7 +332,7 @@ class RxDBWrapper {
 
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
-   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
+   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null } = {}) {
       const f = this.get
       if (rawId) {
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -377,7 +354,7 @@ class RxDBWrapper {
          }
       }
       if (!reactiveItem) {
-         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc })
+         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc, servicesApollo })
          if (!rxDoc) return null
          reactiveItem = getReactive(rxDoc)
          this.reactiveItemDbMemCache.set(id, reactiveItem)

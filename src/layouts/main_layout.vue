@@ -69,7 +69,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-import {systemInit} from 'src/system/services'
+import { systemLogin } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 export default {
   name: 'mainLayout',
@@ -90,29 +90,8 @@ export default {
     this.$log('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
-    // take token from redirect url
-    let token = this.$route.query.token
-    let expires = this.$route.query.expires
-    if (token) {
-      localStorage.setItem('k_token', token)
-      localStorage.setItem('ktokenExpires', expires)
-      await this.$router.push('/').catch(e => e)
-    }
-    let res = await systemInit(this.$store)
-    if (!res.authenticated){
-      this.$log('GO LOGIN')
-      await this.$router.push('/auth').catch(e => e)
-    } else {
-      await AuthApi.afterLogin()
-    }
-    // if (!await this.$store.dispatch('init')) {
-    //   this.$log('GO LOGIN')
-    //   await this.$router.push('/auth').catch(e => e)
-    // }
-    // else {
-    //   // check welcomepage
-    //   // if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
-    // }
+    this.$log('systemLogin...')
+    await systemLogin()
     this.loading = false
   }
 }

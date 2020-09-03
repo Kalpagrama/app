@@ -12,10 +12,9 @@ import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
-import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { cache } from 'src/boot/cache'
 import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
@@ -26,10 +25,7 @@ let apollo
 export default async ({ Vue, store, app }) => {
    try {
       let kDebug = localStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
-      if (kDebug == null) {
-         kDebug = '0'
-         localStorage.setItem('k_debug', kDebug)
-      }
+      assert(kDebug) // '0' | '1'
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
@@ -40,7 +36,7 @@ export default async ({ Vue, store, app }) => {
             for (let err of graphQLErrors) {
                logE('gql error', err)
                err.message = err.code + ':' + err.message
-               if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION') {
+               if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
                   AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)
@@ -99,13 +95,6 @@ export default async ({ Vue, store, app }) => {
          cache
       })
 
-      const fetchFunc = async () => {
-         return {
-            notEvict: true, // живет вечно
-            item: await AuthApi.services(servicesApollo),
-            actualAge: 'day'
-         }
-      }
       const onFetchFunc = async (oldVal, newVal) => {
          logD(' services onFetchFunc...')
          if (oldVal && !isEqual(oldVal, newVal)) {
@@ -114,12 +103,8 @@ export default async ({ Vue, store, app }) => {
          }
       }
 
-      let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services', {
-         fetchFunc,
-         clientFirst: true,
-         force: true,
-         onFetchFunc
-      })
+      let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
+         { clientFirst: true, force: true, onFetchFunc, servicesApollo })
 
       logD('services', services)
       let linkAuth = services.authUrl

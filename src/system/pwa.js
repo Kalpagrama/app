@@ -4,6 +4,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)
@@ -11,7 +12,6 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.PWA)
 
 let registration = null // ServiceWorkerRegistration
 const forceUpdatePWA = true // обновлять приложение без разрешения прользователя
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function initPWA (store) {
   const f = initPWA
