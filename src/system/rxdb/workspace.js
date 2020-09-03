@@ -46,6 +46,7 @@ class WaitBreakable {
 }
 
 const WsItemTypeEnum = Object.freeze({
+  WS_ANY: 'WS_ANY',
   WS_NODE: 'WS_NODE',
   WS_CONTENT: 'WS_CONTENT',
   WS_CHAIN: 'WS_CHAIN',
@@ -384,7 +385,7 @@ class Workspace {
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       delete mangoQuery.selector.rxCollectionEnum
-      mangoQuery.selector.wsItemType = rxCollectionEnum
+      if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
       let rxQuery = this.db.ws_items.find(mangoQuery)
       return rxQuery
     } finally {

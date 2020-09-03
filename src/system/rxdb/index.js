@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/workspace'
+import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
@@ -11,7 +11,6 @@ import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
-import { NodeApi } from 'src/api/node'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
@@ -281,6 +280,7 @@ class RxDBWrapper {
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
          if (rxCollectionEnum in WsCollectionEnum) {
+            // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
             let rxQuery = await this.workspace.find(mangoQuery)
             const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
             assert(reactiveList, '!reactiveList')
