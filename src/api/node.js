@@ -4,11 +4,16 @@ import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
+import store from 'src/store/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
-import store from 'src/store/index'
+
+const LinkTypeEnum = Object.freeze({
+   CAUSE_EFFECT: 'CAUSE_EFFECT',
+   ESSENCE: 'ESSENCE'
+})
 
 class NodeApi {
    static async nodeCategories () {
@@ -293,6 +298,25 @@ class NodeApi {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return createdChain
    }
+
+   static async makeLink ({oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType) {
+      switch (linkType){
+         case LinkTypeEnum.CAUSE_EFFECT:
+            throw 'not impl!'
+            // break
+         case LinkTypeEnum.ESSENCE:
+         {
+            // временное решение: связываем через сферы
+            assert(oidLeft && nodeInputRight)
+            let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
+            assert(leftNode && leftNode.sphereFromName)
+            nodeInputRight.spheres.unshift(leftNode.sphereFromName)
+            nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
+            await NodeApi.nodeCreate(nodeInputRight)
+            break
+         }
+      }
+   }
 }
 
-export { NodeApi }
+export { NodeApi, LinkTypeEnum }
