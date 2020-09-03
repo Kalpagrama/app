@@ -1,6 +1,7 @@
 <template lang="pug">
 //- @click="bookmarked ? bookmarkDelete() : bookmarkCreate()"
 q-btn(
+  @click="start()"
   round flat
   color="white"
   :icon="bookmarked ? 'bookmark' : 'bookmark_outline'"
@@ -10,7 +11,7 @@ q-btn(
     top: '8px', right: '8px',
     background: 'rgba(0,0,0,0.15)',
   }`)
-  q-menu(
+  //- q-menu(
     ref="sphereSelectorMenu"
     dark cover anchor="top right")
     div(
@@ -86,6 +87,9 @@ export default {
     }
   },
   methods: {
+    start () {
+      this.$log('start')
+    },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
       s.items.push({
@@ -120,9 +124,9 @@ export default {
     async bookmarkFind () {
       // this.$log('bookmarkFind')
       let {items: [item]} = await this.$rxdb.find({
-      selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
-      }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
+        }
       })
       // this.$log('bookmarkFind item', item)
       return item

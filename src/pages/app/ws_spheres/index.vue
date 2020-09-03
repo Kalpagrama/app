@@ -38,7 +38,12 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width
-        kalpa-loader(:mangoQuery="mangoQuery" :sliseSize="1000")
+        kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+          template(v-slot=`{items}`)
+            .row.full-width.items-start.content-start
+              div(v-for="i in items" :key="i").row.full-width.q-mb-sm.br
+                small {{ i }}
+        //- kalpa-loader(:mangoQuery="mangoQuery" :sliseSize="1000")
           template(v-slot=`{items}`)
             .row.full-width.items-start.content-start.q-px-sm
               div(
@@ -83,6 +88,11 @@ export default {
         res.selector.name = {$regex: nameRegExp}
       }
       return res
+    },
+    query () {
+      return {
+        selector: {}
+      }
     }
   },
   methods: {

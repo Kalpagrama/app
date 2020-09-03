@@ -26,8 +26,8 @@ q-btn(
   @click="voteStart()"
   flat color="green"
   :loading="voting").voter
-  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4 78
-  q-icon(name="blur_on" size="30px" color='green')
+  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm 78
+  q-icon(name="adjust" size="30px" color='green')
 </template>
 
 <script>
