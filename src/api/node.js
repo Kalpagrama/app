@@ -307,9 +307,9 @@ class NodeApi {
          case LinkTypeEnum.ESSENCE:
          {
             // временное решение: связываем через сферы
-            assert(oidLeft && nodeInputRight)
+            assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
             let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
-            assert(leftNode && leftNode.sphereFromName)
+            assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
             nodeInputRight.spheres.unshift(leftNode.sphereFromName)
             nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
             await NodeApi.nodeCreate(nodeInputRight)
