@@ -30,6 +30,7 @@ div(
           size="25px" color="red" name="volume_off").q-mx-sm
   //- preview
   img(
+    @click="$emit('previewClick')"
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
@@ -49,10 +50,12 @@ div(
     video(
       @click="videoClicked"
       @loadedmetadata="videoLoadedmetadata"
+      @ended="videoEnded"
       ref="compositionVideoRef"
       :src="composition.url"
       :muted="muted"
-      playsinline loop
+      playsinline
+      :loop="false"
       :style=`{
         objectFit: 'contain',
         borderRadius: '10px', overflow: 'hidden',
@@ -123,6 +126,10 @@ export default {
           this.muted = true
         }
       }
+    },
+    videoEnded (e) {
+      this.$log('videoEnded', e)
+      this.$emit('ended')
     },
     videoClicked (e) {
       this.$log('videoClicked', e)

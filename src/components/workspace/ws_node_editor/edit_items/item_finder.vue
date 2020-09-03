@@ -1,5 +1,9 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
+  //- q-dialog(v-model="contentItemOpened" position="bottom")
+  //-   q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
+  //-     q-page-container
+  //-       q-page.row.full-width.items-start.content-start.justify-center
   q-header(reveal)
     .row.full-width.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width.b-30
@@ -24,11 +28,12 @@ q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
       div(v-if="type === 'content'").row.full-width.q-px-md
         div(
           v-for="(i,ii) in contents" :key="i.id"
+          @click="contentClick(i)"
           :style=`{
             height: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`
-          ).row.full-width.b-40.q-mb-sm.k-item
+          ).row.full-width.items-start.content-start.b-40.q-mb-sm.k-item
           img(
             :src="i.thumbOid"
             :style=`{
@@ -121,9 +126,12 @@ q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import compositionEditor from 'components/composition/composition_editor/index.vue'
+import wsContentPlayer from 'components/ws_content_player/index.vue'
 
 export default {
   name: 'wsNodeEditor_itemFinder',
+  components: {wsContentPlayer, compositionEditor},
   data () {
     return {
       searchString: '',
@@ -134,6 +142,9 @@ export default {
     }
   },
   methods: {
+    contentClick (content) {
+      this.$log('contentClick', content)
+    },
     sphereClick (s) {
       this.$log('sphereClick', s)
       this.sphereOpened = s.id

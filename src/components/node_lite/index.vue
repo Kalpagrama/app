@@ -33,7 +33,10 @@
         //- bookmark
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
-        composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
+        node-items(
+          :previewUrl="node.meta.items[0].thumbUrl" :items="node.meta.items"
+          :isActive="isActive" :isVisible="isVisible")
+        //- composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
         //- fullscreen toggler
         //- q-btn(
           @click="isFullscreen = true"
@@ -70,10 +73,11 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 import nodeFullscreen from './node_fullscreen.vue'
 import nodeShare from './node_share.vue'
 import nodeVote from './node_vote.vue'
+import nodeItems from './node_items.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote},
+  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote, nodeItems},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {

@@ -4,7 +4,9 @@ component(
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
- :options="options")
+  :options="options"
+  @previewClick="$emit('previewClick')"
+  @ended="$emit('ended')")
 </template>
 
 <script>

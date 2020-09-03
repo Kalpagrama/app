@@ -28,10 +28,31 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     //- one
     div(
       v-if="node.items.length > 0"
-      :style=`{height: '400px', paddingRight: '50px'}`
+      :style=`{height: 'auto', paddingRight: '0px'}`
       ).row.full-width
-      //- item wrapper
-      div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60
+      //- items list
+      div().row.full-width.items-start.content-start
+        div(
+          v-for="(i,ii) in node.items" :key="i.id"
+          :style=`{position: 'relative'}`
+          ).row.full-width.items-start.content-start
+          q-btn(
+            @click="itemDelete(i,ii)"
+            round color="red" icon="delete_outline"
+            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
+          q-btn(
+            @click="itemEdit(i,ii)"
+            round color="green" icon="edit"
+            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
+          item-player(:isActive="itemsActive" :item="i" :itemIndex="ii")
+        //- item add one more
+        q-btn(
+          @click="itemFind()"
+          flat color="green" icon="add" no-caps
+          :style=`{height: '60px'}`
+          ).full-width Add item
+      //- item wrapper one by one
+      //- div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60
         //- one
         div(
           v-if="node.items.length === 1"
@@ -51,7 +72,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
           v-if="node.items.length === 2"
           :style=`{position: 'relative',}`
           ).row.fit
-          .col.full-height
+          .col.full-height.br
             q-btn(
               @click="itemDelete(node.items[0], 0)"
               round color="red" icon="delete_outline"
@@ -61,18 +82,18 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
               round color="green" icon="edit"
               :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
             item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
-          .col.full-height
+          .col.full-height.br
             q-btn(
-              @click="itemDelete(node.items[0], 0)"
+              @click="itemDelete(node.items[1], 1)"
               round color="red" icon="delete_outline"
               :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
             q-btn(
-              @click="itemEdit(node.items[0])"
+              @click="itemEdit(node.items[1])"
               round color="green" icon="edit"
               :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
-            item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
+            item-player(:isActive="itemsActive" :item="node.items[1]" :itemIndex="1")
         //- two, three, four, five, six, seven,
-      q-btn(
+      //- q-btn(
         @click="itemFind()"
         round flat color="green" icon="add"
         :style=`{position: 'absolute', zIndex: 100, top: '0px', right: '0px', width: '50px', height: '100%'}`)

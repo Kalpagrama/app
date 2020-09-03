@@ -61,25 +61,29 @@ export default {
   },
   methods: {
     async sphereCreate () {
-      this.$log('sphereCreate')
-      if (this.searchString.length > 0) {
-        let sphereInput = {
-          wsItemType: 'WS_SPHERE',
-          name: this.searchString,
-          items: [
-            // {
-            //   oid: this.node.oid,
-            //   thumbOid: this.node.meta.items[0].thumbUrl,
-            //   type: 'NODE',
-            //   name: this.node.name
-            // }
-          ]
+      return new Promise(async (resolve, reject) => {
+        this.$log('sphereCreate')
+        if (this.searchString.length > 0) {
+          let sphereInput = {
+            wsItemType: 'WS_SPHERE',
+            name: this.searchString,
+            items: [
+              // {
+              //   oid: this.node.oid,
+              //   thumbOid: this.node.meta.items[0].thumbUrl,
+              //   type: 'NODE',
+              //   name: this.node.name
+              // }
+            ]
+          }
+          let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          this.$emit('sphere', sphere)
+          resolve(sphere)
         }
-        let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
-        this.$emit('sphere', sphere)
-        // this.searchString = ''
-        // this.$refs.sphereSelectorMenu.hide()
-      }
+        else {
+          resolve(null)
+        }
+      })
     },
   }
 }

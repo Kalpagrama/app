@@ -66,7 +66,7 @@
       :style=`{
         height: '40px', borderRadius: '10px', overflow: 'hidden',
       }`
-      ).row.items-center.content-center.sphere-item.q-px-md.b-60.q-mb-xs.q-mr-sm
+      ).row.items-center.content-center.sphere-item.q-px-md.b-40.q-mb-xs.q-mr-sm
       q-icon(name="blur_on" color="grey-6" size="20px").q-mr-sm
       span.text-white {{ s.name }}
     //- sphere add btn
@@ -76,7 +76,7 @@
         v-model="sphere" autofocus
         placeholder="Найти сферу"
         filled dark dense color="grey-6"
-        @keyup.enter="$refs.wsSphereFinder.sphereCreate()")
+        @keyup.enter="$refs.wsSphereFinder.sphereCreate().then(sphereAdd)")
       q-menu(
         v-model="sphereAdding"
         dark fit anchor="bottom left" self="top left" no-focus)
@@ -145,6 +145,7 @@ export default {
     },
     sphereAdd (s) {
       this.$log('sphereAdd', s)
+      if (!s) return
       let sphereFind = this.node.spheres.find(i => i.name === s.name)
       if (!sphereFind) {
         this.node.spheres.push(JSON.parse(JSON.stringify(s)))

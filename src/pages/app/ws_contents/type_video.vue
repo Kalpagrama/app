@@ -26,7 +26,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                 position: 'relative', zIndex: 100,
                 borderRadius: '10px', overflow: 'hidden',
               }`
-              ).row.full-width.b-40.item
+              ).row.full-width.items-start.content-start.b-40.item
               img(
                 :src="i.thumbOid" draggable="false"
                 :style=`{

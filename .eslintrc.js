@@ -73,6 +73,7 @@ module.exports = {
         'no-unneeded-ternary': 0,
         'prefer-const': 0,
         'no-lone-blocks': 0,
-        'brace-style': 0
+        'brace-style': 0,
+        'no-async-promise-executor': 0
     }
 }
