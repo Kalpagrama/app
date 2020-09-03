@@ -5,13 +5,12 @@ import { updateRxDoc } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
 import set from 'lodash/set'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
-
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const QUEUE_MAX_SZ = 20
 class QueryAccumulator {

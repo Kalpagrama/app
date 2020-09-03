@@ -69,7 +69,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-import {systemInit} from 'src/system/services'
+import { systemLogin } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 export default {
   name: 'mainLayout',
@@ -90,8 +90,8 @@ export default {
     this.$log('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
-    this.$log('tryLogin...')
-    await AuthApi.tryLogin()
+    this.$log('systemLogin...')
+    await systemLogin()
     this.loading = false
   }
 }

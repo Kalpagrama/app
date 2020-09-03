@@ -1,4 +1,6 @@
 import assert from 'assert'
+import { initUtils } from 'src/system/utils'
+initUtils()
 
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
@@ -41,6 +43,7 @@ const LogSystemModulesEnum = Object.freeze({
   RXDB_WS: 'rxdb_ws',
   RXDB_CACHE: 'rxdb_cache',
   RXDB_OBJ: 'rxdb_obj',
+  RXDB_GQL: 'rxdb_gql',
   RXDB_LST: 'rxdb_lst',
   RXDB_EVENT: 'rxdb_ev',
   BOOT: 'boot',

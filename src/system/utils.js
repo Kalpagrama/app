@@ -1,5 +1,5 @@
 
-export default function () {
+export function initUtils() {
    Object.assign(RegExp.prototype, {
       toJSON (...args) {
          return this.toString()
@@ -15,3 +15,5 @@ export default function () {
       }
    })
 }
+
+export const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))

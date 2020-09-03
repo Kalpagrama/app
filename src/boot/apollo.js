@@ -12,10 +12,9 @@ import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
-import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { cache } from 'src/boot/cache'
 import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
@@ -96,13 +95,6 @@ export default async ({ Vue, store, app }) => {
          cache
       })
 
-      const fetchFunc = async () => {
-         return {
-            notEvict: true, // живет вечно
-            item: await AuthApi.services(servicesApollo),
-            actualAge: 'day'
-         }
-      }
       const onFetchFunc = async (oldVal, newVal) => {
          logD(' services onFetchFunc...')
          if (oldVal && !isEqual(oldVal, newVal)) {
@@ -111,12 +103,8 @@ export default async ({ Vue, store, app }) => {
          }
       }
 
-      let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services', {
-         fetchFunc,
-         clientFirst: true,
-         force: true,
-         onFetchFunc
-      })
+      let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
+         { clientFirst: true, force: true, onFetchFunc, servicesApollo })
 
       logD('services', services)
       let linkAuth = services.authUrl

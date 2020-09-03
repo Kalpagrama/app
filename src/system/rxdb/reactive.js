@@ -8,11 +8,11 @@ import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import merge from 'lodash/merge'
 import set from 'lodash/set'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function getReactive (rxDoc) {
   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)

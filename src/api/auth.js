@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { router } from 'src/boot/main'
-import { resetLocalStorageData, systemReset } from 'src/system/services'
+import { resetLocalStorageData, loginReset, systemLogin, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { Mutex } from 'src/system/rxdb/reactive'
@@ -15,77 +15,8 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
 const apiMutex = new Mutex()
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 class AuthApi {
-   static async redirectIfNeed () {
-      const f = this.afterLogin
-      logD(f, 'start')
-      let originalUrl = localStorage.getItem('k_originalUrl') // переход на полную версию после ссылки "поделиться"
-      if (originalUrl) {
-         localStorage.removeItem('k_originalUrl')
-         logD(f, 'redirect to ' + originalUrl)
-         await router.push(originalUrl)
-      }
-   }
-
-   // если уже войдено - ничего не сделает (опирается на k_user_oid и k_token)
-   // если не войдено - попытается войти
-   static async tryLogin () {
-      const f = AuthApi.tryLogin
-      if (store.getters.currentUser()) return // уже войдено!
-      logD(f, 'start')
-      let currDate = Date.now()
-      let lastLoginDate = localStorage.getItem('k_login_date')
-      if (lastLoginDate){
-         lastLoginDate = parseInt(lastLoginDate)
-         if (currDate - lastLoginDate < 1000 * 10){
-            logW('too often tryLogin. SLEEP for 5 sec!!!')
-            await wait(1000 * 5) // защита от частого срабатывания
-         }
-      }
-      localStorage.setItem('k_login_date', currDate.toString())
-      const t1 = performance.now()
-      let userOid = localStorage.getItem('k_user_oid')
-      try {
-         if (userOid) { // пользователь зарегестрирован
-            await rxdb.init(userOid)
-            let currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
-            assert(currentUser, 'currentUser обязан быть после rxdb.init')
-            await store.dispatch('setCurrentUser', currentUser)
-            await i18next.changeLanguage(currentUser.profile.lang)
-         } else { // пытаемся войти без логина
-            if (!localStorage.getItem('k_token')) {
-               const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
-               if (needConfirm === false && dummyUser) {
-                  localStorage.setItem('k_dummy_user', JSON.stringify(dummyUser))
-                  await store.dispatch('setCurrentUser', dummyUser)
-               }
-            } else {
-               let dummyUser = localStorage.getItem('k_dummy_user')
-               if (dummyUser) {
-                  dummyUser = JSON.parse(dummyUser)
-                  await store.dispatch('setCurrentUser', dummyUser)
-               }
-            }
-            if (store.getters.currentUser()) {
-               await rxdb.init(null)
-            }
-         }
-         if (!store.getters.currentUser()) { // не удалось залогиниться
-            await systemReset(true)
-            logD('GO LOGIN')
-            return await router.push('/auth')
-         }
-      } catch (err) {
-         logE('error on tryLogin!', err)
-         await systemReset(true)
-         throw err
-      }
-      await AuthApi.redirectIfNeed()
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
-
    static async checkExpire () {
       if (localStorage.getItem('k_token_expires')) {
          let expires = localStorage.getItem('k_token_expires')
@@ -150,7 +81,7 @@ class AuthApi {
       const f = this.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      // await systemReset(true) нельзя!!! (это потрет services(см apollo.js))
+      await loginReset()
       let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
@@ -196,12 +127,7 @@ class AuthApi {
          needInvite = route.query.needInvite
          needConfirm = route.query.needConfirm
          userExist = route.query.userExist
-         if (token && expires) {
-            await systemReset(true)
-            localStorage.setItem('k_token', token)
-            localStorage.setItem('ktokenExpires', expires)
-            // await this.router.push('/')
-         }
+         await loginReset()
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }
@@ -232,7 +158,7 @@ class AuthApi {
       })
       localStorage.setItem('k_user_role', role)
       if (oid) localStorage.setItem('k_user_oid', oid)
-      if (result) await AuthApi.tryLogin()
+      if (result) await systemLogin()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, {
          result,
          role,

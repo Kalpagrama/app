@@ -153,7 +153,7 @@ export default {
       this.logoutLoading = false
     },
     async login () {
-      this.$log('logout')
+      this.$log('login')
       this.loginLoading = true
       await this.$wait(300)
       await this.$router.push('/auth')

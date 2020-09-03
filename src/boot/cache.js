@@ -9,6 +9,7 @@ import {
   Store
 } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CACHE)
 const logI = getLogFunc(LogLevelEnum.INFO, LogSystemModulesEnum.VUEX_CACHE)
@@ -16,7 +17,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_CACHE)
 
 // todo DEPRECATED!!!!! модуль не нужен (не выкинул - тк код рабочий и может пригодиться)
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // долговременное(между запусками) хранилище объектов
 class CachePersist {

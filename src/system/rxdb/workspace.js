@@ -10,14 +10,12 @@ import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb, getRawIdFromId } from 'src/system/rxdb/index'
-import LruCache from 'lru-cache'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
-
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const synchroTimeMin = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 class WaitBreakable {
