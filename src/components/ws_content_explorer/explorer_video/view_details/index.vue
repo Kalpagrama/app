@@ -27,7 +27,10 @@ q-page(
       .row.full-width
         ws-sphere-item(
           v-for="(s,si) in contentWorkspace.spheres" :key="s" :id="s"
-          @clicked="sphereClicked").q-mb-sm.q-mr-sm
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden',
+          }`
+          @clicked="sphereClicked").q-mb-sm.q-mr-sm.b-40
           template(v-slot:append)
             q-btn(
               v-if="sphereEditing === s"

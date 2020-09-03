@@ -3,7 +3,7 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
   //- content from url: youtube, image, vimeo, vk, already got contentKalpa
   div(
     v-if="contentKalpa && contentKalpa.type === 'VIDEO' && contentKalpa.contentSource === 'YOUTUBE'"
-    ).row.full-width
+    ).row.full-width.items-start.content-start
     //- header
     div().row.full-width.items-center.content-center.q-pa-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
@@ -26,6 +26,29 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
         color="green" no-caps
         :loading="loading"
         ).q-px-md Add
+  //- image from url?
+  div(
+    v-if="contentKalpa && contentKalpa.type === 'IMAGE' && contentKalpa.contentSource === 'KALPA'"
+    ).row.full-width.items-start.content-start
+    //- header
+    div().row.full-width.items-center.content-center.q-pa-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Add image to workspace
+    //- body
+    img(
+      :src="contentKalpa.thumbUrl" draggable="false"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      ).full-width
+    //- footer edit youtube video name?
+    .row.full-width.items-center.content-center.q-pa-md
+      .col
+      q-btn(
+        @click="$emit('contentKalpa', contentKalpa)"
+        color="green" no-caps
+        :loading="loading"
+        ).q-px-md Add
+      //- q-icon(name="fab fa-youtube" color="white" size="40px").q-mr-sm
+      //- span.text-bold.text-white {{ contentKalpa.name }}
   //- content from file, crop it, rename it, them create contentKalpa, them emit content...
   div(
     v-if="contentFile && contentFile.type.split('/')[0] === 'image'"

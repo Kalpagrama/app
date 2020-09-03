@@ -4,7 +4,7 @@ q-btn(
   @click="start()"
   round flat
   color="white"
-  :icon="bookmarked ? 'bookmark' : 'bookmark_outline'"
+  :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
   :loading="loading"
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
@@ -53,11 +53,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeLite__nodeBookmark',
-  props: ['node', 'isActive'],
+  props: ['node', 'nodeFull', 'isActive', 'isVisible'],
   data () {
     return {
       loading: false,
-      bookmarked: false,
+      bookmark: null,
       searchString: '',
     }
   },
@@ -78,10 +78,8 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          let bookmark = await this.bookmarkFind()
-          if (bookmark) {
-            this.bookmarked = true
-          }
+          this.bookmark = await this.bookmarkFind()
+          this.$log('bookmark', this.bookmark)
         }
       }
     }
@@ -89,6 +87,12 @@ export default {
   methods: {
     start () {
       this.$log('start')
+      this.loading = true
+      // create bookmark of this node
+      if (!this.bookmark) this.bookmarkCreate()
+      // create spheres from this node if we dont have them
+      // then maybe add spheres to created bookmark
+      this.loading = false
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
@@ -162,13 +166,41 @@ export default {
           type: 'NODE',
           name: this.node.name,
           thumbOid: this.node.meta.items[0].thumbUrl,
-          wsItemType: 'WS_BOOKMARK'
+          wsItemType: 'WS_BOOKMARK',
+          spheres: []
         }
-        let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-        // this.$log('bookmarkCreate bookmark', bookmark)
+        this.$log('bookmarkCreate bookmarkInput', bookmarkInput)
+        let bookmarkSpheres = await Promise.all(
+          this.nodeFull.spheres.map(async (s) => {
+            // for every sphere try to find this sphere in ws
+            let {items: [sphere]} = await this.$rxdb.find({
+              selector: {
+                rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
+              }
+            })
+            this.$log('sphere', sphere)
+            if (!sphere) {
+              this.$log('sphere NOT FOUND, creating...')
+              let sphereInput = {
+                wsItemType: 'WS_SPHERE',
+                name: s.name,
+                oid: s.oid,
+                spheres: []
+              }
+              sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+            }
+            // add this sphere.id bookmark.spheres array
+            this.$log('adding sphere...', sphere.name)
+            return sphere.id
+          })
+        )
+        this.$log('bookmarkCreate bookmarkSpheres', bookmarkSpheres)
+        bookmarkInput.spheres = bookmarkSpheres
+        this.$log('bookmarkCreate bookmarkInput final', bookmarkInput)
+        this.bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        this.$log('bookmarkCreate bookmark', this.bookmark)
         this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark added!'})
         this.loading = false
-        this.bookmarked = true
       }
       catch (e) {
         this.$log('bookmarkCreate error', e)

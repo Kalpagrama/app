@@ -32,7 +32,7 @@
         ).row.full-width.items-start.content-start
         //- bookmark
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
+          node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node" :nodeFull="nodeFull")
         node-items(
           :previewUrl="node.meta.items[0].thumbUrl" :items="node.meta.items"
           :isActive="isActive" :isVisible="isVisible")

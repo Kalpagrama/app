@@ -54,7 +54,7 @@ export default {
       handler (to, from) {
         // this.$log('items TO', to)
         this.$emit('itemsCount', to.length)
-        this.$emit('items', to)
+        // this.$emit('items', to)
         // alert('item CHANGED: ' + to.length)
         this.itemsSlice = 1
         this.itemsSliced = to.slice(0, this.sliceSize)

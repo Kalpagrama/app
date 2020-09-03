@@ -95,7 +95,7 @@ export default {
       try {
         this.$log('contentFromURL start', url)
         let content = await ContentApi.contentCreateFromUrl(url)
-        this.$log('contentFromURL done')
+        this.$log('contentFromURL done', content)
         return content
       } catch (e) {
         this.$log('contentFromURL error', e)

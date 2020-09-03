@@ -2,22 +2,23 @@
 .sphere-item
   cursor: pointer
   &:hover
-    background: rgb(50,50,50)
+    background: rgb(60,60,60)
 </style>
 
 <template lang="pug">
 div().row
   slot(name="prepend")
-  div(
-    v-if="sphere"
-    @click="$emit('clicked', sphere)"
-    :style=`{
-      borderRadius: '10px', overflow: 'hidden',
-      height: '40px',
-    }`
-    ).row.items-center.content-center.q-pa-sm.b-40.sphere-item
-    q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-    span.text-white {{ sphere.name }}
+  .col
+    div(
+      v-if="sphere"
+      @click="$emit('clicked', sphere)"
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden',
+        height: '40px',
+      }`
+      ).row.full-widthitems-center.content-center.q-pa-sm.cursor-pointer
+      q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+      span.text-white {{ sphere.name }}
   slot(name="append")
 </template>
 
