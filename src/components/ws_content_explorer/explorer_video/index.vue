@@ -185,9 +185,9 @@ export default {
         if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
       }
       // handle nodeCreateStart()
-      if (e.keyCode === 78) {
-        this.nodeCreateStart()
-      }
+      // if (e.keyCode === 78) {
+      //   this.nodeCreateStart()
+      // }
     }
   },
   created () {

@@ -8,15 +8,15 @@ q-layout(view="hHh Lpr lff")
           .col
             div(:style=`{borderRadius: '10px',}`
               ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              q-icon(name="blur_on" color="white" size="30px").q-mx-sm
+              q-icon(name="blur_on" color="white" size="30px").q-ml-sm
               div(:style=`{overflowX: 'auto'}`).col.full-height
                 div(
-                  v-if="sphere && !sphereNameEditing"
+                  v-if="sphere"
                   @click="sphereNameEditing = true").row.fit.cursor-pointer
                   span(
                     :style=`{fontSize: '18px', whiteSpace: 'nowrap', marginLeft: '12px',}`
                     ).fit.text-white.text-bold {{ sphere.name }}
-                div(
+                //- div(
                   v-if="sphere && sphereNameEditing"
                   :style=`{
                     position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden',
@@ -83,10 +83,10 @@ export default {
   methods: {
     async sphereDelete () {
       this.$log('sphereDelete')
-      if (!confirm('Delete sphere?')) return
+      // if (!confirm('Delete sphere?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(this.sphere.id)
-      this.$router.replace('/workspace/spheres')
+      // await this.$rxdb.remove(this.sphere.id)
+      // this.$router.replace('/workspace/spheres')
     },
     outHandle ([type, val]) {
       this.$log('outHandle', type, val)

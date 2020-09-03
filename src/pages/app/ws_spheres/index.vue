@@ -38,11 +38,15 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width
-        kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+        kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
           template(v-slot=`{items}`)
-            .row.full-width.items-start.content-start
-              div(v-for="i in items" :key="i").row.full-width.q-mb-sm.br
-                small {{ i }}
+            .row.full-width.items-start.content-start.q-px-sm
+              div(v-for="(s,si) in spheresFromItems(items)" :key="i").row.full-width.q-mb-sm
+                ws-sphere-item(
+                  @clicked="sphereClicked(s)"
+                  :id="s"
+                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
+                  ).full-width.b-40
         //- kalpa-loader(:mangoQuery="mangoQuery" :sliseSize="1000")
           template(v-slot=`{items}`)
             .row.full-width.items-start.content-start.q-px-sm
@@ -82,23 +86,30 @@ export default {
   },
   computed: {
     mangoQuery () {
-      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE}}
+      let res = {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_ANY
+        }
+      }
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
       return res
     },
-    query () {
-      return {
-        selector: {}
-      }
-    }
   },
   methods: {
-    sphereClick (s) {
-      this.$log('sphereClick', s)
-      this.$router.push(`/workspace/sphere/${s.id}`).catch(e => e)
+    spheresFromItems (items) {
+      return items.reduce((acc, val) => {
+        if (val.spheres && val.spheres.length > 0) {
+          val.spheres.map(s => acc.push(s))
+        }
+        return acc
+      }, [])
+    },
+    sphereClicked (sphereId) {
+      this.$log('sphereClick', sphereId)
+      this.$router.push(`/workspace/sphere/${sphereId}`).catch(e => e)
     },
     async sphereAdd () {
       this.$log('sphereAdd')
@@ -114,6 +125,6 @@ export default {
         this.searchString = ''
       }
     },
-  }
+  },
 }
 </script>

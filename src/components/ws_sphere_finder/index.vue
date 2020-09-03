@@ -20,14 +20,14 @@ div(
     .col.full-width.scroll
       kalpa-loader(:mangoQuery="spheresQuery" :sliseSize="1000")
         template(v-slot=`{items}`)
-          .row.full-width.items-start.content-start.q-pt-sm
+          .row.full-width.items-start.content-start.q-pa-sm
             div(
               v-for="(s,si) in items" :key="s.id"
               @click="$emit('sphere', s)"
-              ).row.full-width.items-center.content-center
+              ).row.full-width.items-center.content-center.justify-start
               q-btn(
-                flat icon="blur_on" align="start" no-caps
-                ).full-width.q-pl-sm
+                flat icon="blur_on" align="left" no-caps
+                ).full-width
                 span.q-ml-sm {{s.name}}
     //- footer
     .row.full-width.q-pa-sm
@@ -67,14 +67,7 @@ export default {
           let sphereInput = {
             wsItemType: 'WS_SPHERE',
             name: this.searchString,
-            items: [
-              // {
-              //   oid: this.node.oid,
-              //   thumbOid: this.node.meta.items[0].thumbUrl,
-              //   type: 'NODE',
-              //   name: this.node.name
-              // }
-            ]
+            spheres: [],
           }
           let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
           this.$emit('sphere', sphere)

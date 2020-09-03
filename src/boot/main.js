@@ -97,6 +97,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
+    Vue.component('wsSphereItem', () => import('components/ws_sphere_item'))
     // Vue.component('wsContentPlayer')
   } catch (err) {
     logE(err)

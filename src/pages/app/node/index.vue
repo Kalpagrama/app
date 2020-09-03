@@ -7,37 +7,10 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-dialog(
-    v-model="nodeAddDialogOpened" position="bottom"
+    v-model="nodeLinkerOpened" position="bottom"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    q-layout(view="hHh Lpr lff").b-30
-      q-header(reveal)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px',height: '50px',}`).row.full-width.items-center.content-center.q-px-md
-            span(:style=`{fontSize: '18px',}`).text-bold.text-white Find node
-      q-page-container
-        q-page(:style=`{paddingBottom: '200px',}`).row.full-width.justify-center
-          div(:style=`{maxWidth: '800px'}`)
-            kalpa-loader(:mangoQuery="queryNodeAdd" :sliceSize="1000")
-              template(v-slot=`{items, itemsMore}`)
-                .row.full-width.items-start.content-start.q-pa-sm
-                  div(
-                    v-for="(n,ni) in items" :key="n.id"
-                    :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden',}`
-                    ).row.full-width.items-start.content-start.q-mb-sm.b-50
-                    img(:src="n.color" :style=`{height: '100px'}`)
-                    .col
-                      .row.fit.q-pa-md
-                        span.text-bold {{ n.name }}
-          q-page-sticky(expand position="bottom" :offset="[0,0]" :style=`{zIndex: 1000}`)
-            .row.full-width.justify-center.b-30
-              div(:style=`{maxWidth: '800px', height: '50px',}`).row.full-width
-                q-btn(round flat color="white" icon="keyboard_arrow_down" @click="nodeAddDialogOpened = false")
-                .col
-          q-page-sticky(position="bottom-right" :offset="[25,25]" :style=`{zIndex: 2000}`)
-            q-btn(
-              round push color="green" icon="add" size="lg"
-              :style=`{borderRadius: '50%'}`)
+    node-linker(:node="node" @close="nodeLinkerOpened = false")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
@@ -51,21 +24,16 @@ q-layout(view="hHh Lpr lff")
                   q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
                   div(:style=`{overflowX: 'auto'}`).col
                     span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
-              //- q-btn(round flat color="grey-8" icon="more_vert")
               q-btn(
                 flat no-caps
                 :to="`/trends/${categoryOid}`"
                 :style=`{fontSize: '16px'}`
                 ).text-white.text-bold.q-px-sm {{ categoryName }}
-            //- div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
-              q-tabs(
-                v-model="viewId"
-                no-caps dense active-color="white" switch-indicator).text-grey-8
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+          //- got node is created!
           node-lite(
             v-if="node" :node="node" :isActive="nodeActive" :isVisible="nodeVisible"
             v-observe-visibility=`{
@@ -76,48 +44,35 @@ q-layout(view="hHh Lpr lff")
             }`)
             template(v-slot:footer)
               div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-pt-sm
+                //- node spheres
                 router-link(
                   v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
                   :style=`{height: '40px',borderRadius: '10px'}`
                   ).row.items-center.content-center.q-px-sm.b-40.sphere-item
                   q-icon(name="blur_on" color="white" size="20px").q-mr-xs
                   span.text-white {{ s.name }}
+                //- node link start...
                 div(
                   :style=`{
                     position: 'absolute', top: '0px',
                     height: 'calc(100% + 200px)',
                     width: '80px', right: '0px',}`).row.justify-center
                     div(:style=`{height: '100%', width: '1px'}`).bg-green
-          //- div(:style=`{position: 'relative', height: '60px'}`).row.full-width.bg-red
-          //- actions
-          //- div(
-            v-if="node"
-            ).row.full-width
-            //- q-btn(round flat icon="share" color="white" @click="nodeShare()")
-          //- spheres
-          //- div(v-if="node").row.full-width.q-pa-sm
-            .row.full-width.items-center.content-center.q-pa-sm
-              span.text-bold.text-grey-7 Сферы сути
-            router-link(
-              v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
-              :style=`{height: '40px',borderRadius: '10px'}`
-              ).row.full-width.items-center.content-center.q-px-sm.b-50
-              q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-              span.text-white {{ s.name }}
-          //- dubug
-          //- .row.full-width.justify-center.q-pa-sm
-            span(
-              v-if="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-              :style=`{fontSize: '200px',}`
-              ).text-bold.text-grey-6 {{ $store.state.core.progressInfo.CREATE[$route.params.oid] }}
-          router-view(v-if="node" :node="node")
+          //- node is creating, wait...
+          node-mockup(
+            v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
+            :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
+          //- router-view(v-if="node" :node="node")
       q-page-sticky(
         v-if="node"
-        position="bottom" :offset="[0, 60]")
-        q-btn(
-          @click="nodeAddStart()"
-          no-caps color="green" icon="add"
-          ) Добавить ядро
+        position="bottom" :offset="[0, 60]"
+        :style=`{zIndex: 99999}`)
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          q-btn(
+            v-if="!nodeLinkerOpened"
+            @click="nodeLinkerOpened = true"
+            no-caps color="green" icon="insert_link")
+            span.text-white.text-bold.q-ml-sm Link node
 </template>
 
 <script>
@@ -126,8 +81,12 @@ import { NodeApi } from 'src/api/node'
 import { date } from 'quasar'
 import { shareWith } from 'src/system/services'
 
+import nodeMockup from './node_mockup/index.vue'
+import nodeLinker from './node_linker/index.vue'
+
 export default {
   name: 'pageApp__node',
+  components: {nodeMockup, nodeLinker},
   meta () {
     return {
       title: this.node?.name,
@@ -139,8 +98,7 @@ export default {
       nodeActive: true,
       nodeVisible: true,
       nodeCategories: [],
-      nodeAddDialogOpened: false,
-      viewId: 'nodes',
+      nodeLinkerOpened: false,
     }
   },
   computed: {
@@ -166,15 +124,6 @@ export default {
     categoryOid () {
       return this.category?.sphere.oid
     },
-    queryNodeAdd () {
-      return {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'draft'
-        },
-        sort: [{updatedAt: 'desc'}]
-      }
-    }
   },
   watch: {
     '$route.params.oid': {
@@ -184,31 +133,7 @@ export default {
         this.$log('$route.params.oid TO', to)
         if (to) {
           if (this.$store.state.core.progressInfo.CREATE[to]) {
-            var unwatch = this.$watch(
-              '$store.state.core.progressInfo.CREATE',
-              (valOld, valNew) => {
-                if (valNew) {
-                  this.$log('CREATE valOld/valNew', valOld, valNew[to])
-                  if (valNew[to] === 100) {
-                    this.$q.notify({
-                      type: 'positive',
-                      position: 'top',
-                      message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро готово!')
-                    })
-                    this.nodeLoad(to)
-                    unwatch()
-                    this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])
-                  }
-                }
-                else {
-                  if (unwatch) unwatch()
-                }
-              },
-              {
-                immediate: true,
-                deep: true
-              }
-            )
+            this.nodeWatch(to)
           }
           else {
             this.nodeLoad(to)
@@ -216,30 +141,11 @@ export default {
         }
       }
     },
-    '$route.query.creating': {
-      deep: true,
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route.query.creating TO', to)
-        if (to) {
-          // confirm('Node is creating !' + to)
-        }
-      },
-    },
   },
   methods: {
     headerClick () {
       this.$log('headerClick')
       window.scrollTo(0, 0)
-    },
-    nodeShare () {
-      this.$log('nodeShare')
-      // is can be shared ???
-      shareWith(this.node)
-    },
-    nodeAddStart () {
-      this.$log('nodeAddStart')
-      this.nodeAddDialogOpened = true
     },
     nodeVisibilityCallback (isVisible, entry) {
       // this.$log('nodeVisibilityCallback', isVisible, entry)
@@ -249,6 +155,34 @@ export default {
       else {
         this.nodeActive = false
       }
+    },
+    nodeWatch (oid) {
+      this.$log('nodeWatch', oid)
+      var unwatch = this.$watch(
+        '$store.state.core.progressInfo.CREATE',
+        (valOld, valNew) => {
+          if (valNew) {
+            this.$log('CREATE valOld/valNew', valOld, valNew[oid])
+            if (valNew[oid] === 100) {
+              this.$q.notify({
+                type: 'positive',
+                position: 'top',
+                message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро готово!')
+              })
+              this.nodeLoad(oid)
+              unwatch()
+              this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])
+            }
+          }
+          else {
+            if (unwatch) unwatch()
+          }
+        },
+        {
+          immediate: true,
+          deep: true
+        }
+      )
     },
     async nodeLoad (oid) {
       this.$log('nodeLoad', oid)
