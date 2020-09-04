@@ -123,7 +123,9 @@ const routes = [
             redirect: 'nodes/drafts',
             component: () => import('pages/app/ws_nodes/index.vue'),
             children: [
+              { name: 'workspace.nodes.saved', path: 'saved', component: () => import('pages/app/ws_nodes/type_saved.vue') },
               { name: 'workspace.nodes.drafts', path: 'drafts', component: () => import('pages/app/ws_nodes/type_drafts.vue') },
+              { name: 'workspace.nodes.fragments', path: 'fragments', component: () => import('pages/app/ws_nodes/type_fragments.vue') },
               { name: 'workspace.nodes.published', path: 'published', component: () => import('pages/app/ws_nodes/type_published.vue') },
             ]
           },

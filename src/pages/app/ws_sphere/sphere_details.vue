@@ -2,7 +2,7 @@
 q-page(
   :style=`{paddingTop: '20px', paddingBottom: '400px'}`)
   .row.full-width.items-start.content-start.justify-center
-    div(:style=`{maxWidth: '800px', overflow: 'hidden'}`).row.full-width
+    div(:style=`{maxWidth: '716px', overflow: 'hidden'}`).row.full-width
       small.text-white {{sphere}}
       .row.full-width
         ws-sphere-item(
@@ -46,9 +46,14 @@ q-page(
           @click="sphereAdding = true"
           flat color="green" icon="add" no-caps dense
           :style=`{height: '40px'}`) {{$t('wsNodeEditor_sphereAddFirst', 'Добавь сферу')}}
+      .row.full-width.q-mt-xl
+          q-btn(outline color="green" no-caps @click="renameStart()") Rename sphere
+      .row.full-widthq.q-py-xl
+        q-btn(outline color="red" no-caps @click="deletStart()") Delete sphere
 </template>
 
 <script>
+import { ObjectsApi } from 'src/api/objects'
 import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
 
 export default {
@@ -73,7 +78,22 @@ export default {
     sphereDelete (sphereId) {
       this.$log('sphereDelete', sphereId)
       this.sphere.spheres = this.sphere.spheres.filter(id => id !== sphereId)
-    }
+    },
+    async renameStart () {
+      this.$log('renameStart')
+      let newName = prompt('New sphere name', this.sphere.name)
+      if (newName && newName.length > 0 && newName !== this.sphere.name) {
+        this.sphere.name = newName
+        let sphere = await ObjectsApi.getSphere(newName)
+        this.$log('sphere', sphere)
+        if (sphere) {
+          this.sphere.oid = sphere.oid
+        }
+      }
+    },
+    deleteStart () {
+      this.$log('deleteStart')
+    },
   }
 }
 </script>

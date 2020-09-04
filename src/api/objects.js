@@ -85,6 +85,23 @@ class ObjectsApi {
     await rxdb.set(RxCollectionEnum.OBJ, objectChange, {actualAge: 'day'})
     return objectChange
   }
+
+  static async getSphere (name) {
+    logD('getSphere start')
+    let {data: {sphere}} = await apollo.clients.api.query({
+      query: gql`
+        query getSphere ($name: String!) {
+          sphere (name: $name) {
+            oid
+          }
+        }
+      `,
+      variables: {
+        name
+      }
+    })
+    return sphere
+  }
 }
 
 export { ObjectsApi }

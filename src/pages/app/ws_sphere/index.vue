@@ -16,23 +16,7 @@ q-layout(view="hHh Lpr lff")
                   span(
                     :style=`{fontSize: '18px', whiteSpace: 'nowrap', marginLeft: '12px',}`
                     ).fit.text-white.text-bold {{ sphere.name }}
-                //- div(
-                  v-if="sphere && sphereNameEditing"
-                  :style=`{
-                    position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.full-width
-                  q-input(
-                    v-model="sphere.name"
-                    filled dark dense color="grey-6" autofocus
-                    :input-style=`{
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                    }`
-                    @blur="sphereNameEditing = false"
-                    @keydown.enter="sphereNameEditing = false"
-                    ).full-width
-              q-btn(round flat color="red" icon="delete_outline" @click="sphereDelete()")
+              //- q-btn(round flat color="red" icon="delete_outline" @click="sphereDelete()")
             div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
               q-tabs(
                 :value="$route.name" @input="$router.replace({name: $event})"

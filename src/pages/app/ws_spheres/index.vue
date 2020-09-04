@@ -68,6 +68,7 @@ q-layout(view="hHh Lpr lff")
             div(v-if="s.items.length > 0").row.full-width.q-pa-sm
               div(
                 v-for="(i,ii) in s.items" :key="i.id"
+                v-if="i.thumbOid"
                 :style=`{
                   width: '50px', height: '50px',
                   borderRadius: '10px', overflow: 'hidden',

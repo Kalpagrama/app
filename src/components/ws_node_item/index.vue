@@ -37,13 +37,13 @@
             img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
         //- 3 items
         div(v-if="node.items.length === 3").row.fit
-          .col.full-height
+          div(:style=`{borderRight: '1px solid rgb(50,50,50)'}`).col.full-height
             img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
           .col.full-height
             .column.fit
-              .col-full-width
+              div(:style=`{borderBottom: '1px solid rgb(50,50,50)'}`).col.full-width
                 img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-              .col-full-width
+              .col.full-width
                 img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
         //- 4 items
         div(v-if="node.items.length === 4").row.fit
@@ -55,15 +55,14 @@
                 img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
           .col.full-height
             .column.fit
-              .col-full-width
+              .col.full-width
                 img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-              .col-full-width
+              .col.full-width
                 img(:src="node.items[3].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
     //- essense
     div(
-      v-if="node.items.length > 0"
-      ).row.full-width.q-py-xs.q-px-md
-      small.text-white {{ node.name }}
+      ).row.full-width.q-py-sm.q-px-md
+      small(v-if="node.items.length > 0").text-white {{ node.name }}
   slot(name="footer")
 </template>
 

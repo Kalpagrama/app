@@ -29,7 +29,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
-  name: 'wsNodes_typeDrafts',
+  name: 'wsNodes_typeFragments',
   components: {wsNodeItem},
   props: ['searchString'],
   data () {
@@ -42,7 +42,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'draft'
+          stage: 'fragment'
         },
         sort: [{updatedAt: 'desc'}]
       }

@@ -29,7 +29,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
-  name: 'wsNodes_typeDrafts',
+  name: 'wsNodes_typeSaved',
   components: {wsNodeItem},
   props: ['searchString'],
   data () {
@@ -42,15 +42,17 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'draft'
-        },
-        sort: [{updatedAt: 'desc'}]
+          stage: 'saved'
+        }
       }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
+      // add sort
+      res.sort = [{updatedAt: 'desc'}]
+      // TODO: add spheres
       return res
     }
   },

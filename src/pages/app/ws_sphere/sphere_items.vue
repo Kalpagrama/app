@@ -17,7 +17,9 @@ q-page(
             :gutter="{default: 10}")
             div(
               v-for="(i,ii) in items" :key="i.id"
-              :style=`{}`
+              :style=`{
+                minWidth: '200px',
+              }`
               ).q-mb-sm
               //- node
               ws-node-item(
@@ -26,7 +28,7 @@ q-page(
                 template(v-slot:footer)
                   div(
                     v-if="itemSelected === i.id"
-                    :style=`{marginTop: '-10px', paddingTop: '15px', borderRadius: '0 0 10px 10px'}`
+                    :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
                     ).row.full-width.bg-green.q-px-xs.q-pb-xs
                     q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
                     .col
@@ -38,16 +40,31 @@ q-page(
                   borderRadius: '10px', overflow: 'hidden',
                 }`
                 ).row.items-center.content-center.b-40
-                img(
-                  :src="i.thumbOid"
+                div(
+                  @click="itemSelected = i.id"
                   :style=`{
-                    width: '40px', height: '40px',
+                    position: 'relative', zIndex: 100,
+                    cursor: 'pointer',
                     borderRadius: '10px', overflow: 'hidden',
-                    objectFit: 'cover'
-                  }`).q-ma-md
-                .col.full-height
-                  .row.fit.items-center.content-center.q-pr-sm
-                    small.text-white {{ i.name.slice(0, 100) }}
+                  }`
+                  ).row.full-width.items-center.content-center.sphere-item.b-40
+                  img(
+                    :src="i.thumbOid"
+                    :style=`{
+                      width: '40px', height: '40px',
+                      borderRadius: '10px', overflow: 'hidden',
+                      objectFit: 'cover'
+                    }`).q-ma-md
+                  .col.full-height
+                    .row.fit.items-center.content-center.q-pr-sm
+                      small(:style=`{userSelect: 'none'}`).text-white {{ i.name.slice(0, 100) }}
+                div(
+                  v-if="itemSelected === i.id"
+                  :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
+                  ).row.full-width.bg-green.q-px-xs.q-pb-xs
+                  q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                  .col
+                  q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
               //- sphere
               ws-sphere-item(
                 v-if="i.wsItemType === 'WS_SPHERE'" :id="i.id"

@@ -11,54 +11,35 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
       template(v-slot=`{items, itemsMore}`)
         masonry(
-          :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
-          :gutter="{default: 10}")
-          div(
-            v-for="(i,ii) in items" :key="i.id"
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.full-width.q-mb-sm.b-40
-            //- default header
-            div(
-              @click="itemSelected === i.id ? itemSelected = null : itemSelected = i.id"
-              :style=`{
-                position: 'relative', zIndex: 100,
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.full-width.b-40.item
-              img(
-                v-if="i.items[0] && i.items[0].thumbUrl"
-                :src="i.items[0].thumbUrl" draggable="false"
-                :style=`{
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).full-width
+          :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 4"
+          :gutter="{default: 10}").full-width
+          ws-node-item(
+            v-for="(i,ii) in items" :key="i.id" :node="i"
+            @clicked="itemSelected = i.id")
+            template(v-slot:footer)
+              //- selected
               div(
-                v-else
-                :style=`{height: '100px', width: '400px', borderRadius: '10px', overflow: 'hidden'}`
-                ).row.b-40
-              //- footer with name
-              div(v-if="i.name.length > 0").row.full-width.q-pa-sm
-                span.text-white {{ i.name }}
-            //- selected
-            div(
-              v-if="itemSelected === i.id"
-              :style=`{
-                position: 'relative', zIndex: 90,
-                marginTop: '-10px', paddingTop: '18px',
-              }`
-              ).row.full-width.items-center.content-center.bg-green.q-px-sm.q-pb-sm
-              q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-              .col
-              q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+                v-if="itemSelected === i.id"
+                :style=`{
+                  position: 'relative',
+                  marginTop: '-10px', paddingTop: '14px',
+                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
+                }`
+                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+                q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(i)")
+                .col
+                q-btn(round flat dense color="white" icon="launch" @click="nodeExplore(i)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { NodeApi } from 'src/api/node'
+
+import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'wsNodes_typePublished',
+  components: {wsNodeItem},
   props: ['searchString'],
   data () {
     return {
@@ -71,34 +52,29 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
           stage: 'published'
-        }
+        },
+        sort: [{updatedAt: 'desc'}]
       }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
-      // // add type filter
-      // if (this.type !== 'all') {
-      //   res.selector.contentType = this.type
-      // }
-      // add sort
-      res.sort = [{updatedAt: 'desc'}]
-      // TODO: add spheres
       return res
     }
   },
   methods: {
-    async itemDelete (item) {
-      this.$log('itemDelete', item)
-      if (!confirm('Delete node?')) return
-      // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(item.id)
+    async nodeUnpublish (node) {
+      this.$log('nodeUnpublish', node)
+      if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
+      await node.updateExtended('stage', 'draft', false) // без debounce
+      await node.updateExtended('oid', node.oid, false) // без debounce
+      await NodeApi.nodeDelete(node.oid)
+      this.$log('nodeUnPublish complete')
     },
-    itemEdit (item) {
-      this.$log('itemEdit', item)
-      this.$router.push(`/workspace/node/${item.id}`).catch(e => e)
-    },
+    nodeExplore (node) {
+      this.$log('nodeExplore', node)
+    }
   }
 }
 </script>
