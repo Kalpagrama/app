@@ -77,9 +77,10 @@ class NodeApi {
                figuresAbsolute: l.figuresAbsolute.map(f => {
                   return {
                      t: f.t,
-                     points: f.points.map(p => {
-                        return { x: p.x, y: p.y }
-                     })
+                     points: [],
+                     // points: f.points.map(p => {
+                     //    return { x: p.x, y: p.y }
+                     // })
                   }
                }),
                color: l.color,

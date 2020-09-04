@@ -24,7 +24,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       ).row.full-width
       q-btn(
         @click="itemFind()"
-        round flat color="green" icon="add" size="lg").fit
+        round flat color="green" icon="add" size="xl").fit
     //- one
     div(
       v-if="node.items.length > 0"
@@ -38,12 +38,12 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
           ).row.full-width.items-start.content-start
           q-btn(
             @click="itemDelete(i,ii)"
-            round color="red" icon="delete_outline"
-            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
+            round flat color="red" icon="delete_outline" size="xl"
+            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 40px)', borderRadius: '50%', left: '8px',}`)
           q-btn(
             @click="itemEdit(i,ii)"
-            round color="green" icon="edit"
-            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
+            round flat color="green" icon="edit" size="xl"
+            :style=`{position: 'absolute', zIndex: 300, top: 'calc(50% - 40px)', borderRadius: '50%', right: '8px',}`)
           item-player(:isActive="itemsActive" :item="i" :itemIndex="ii")
         //- item add one more
         q-btn(
@@ -51,58 +51,12 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
           flat color="green" icon="add" no-caps
           :style=`{height: '50px'}`
           ).full-width Add item
-      //- item wrapper one by one
-      //- div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60
-        //- one
-        div(
-          v-if="node.items.length === 1"
-          :style=`{position: 'relative',}`
-          ).row.fit
-          q-btn(
-            @click="itemDelete(node.items[0], 0)"
-            round color="red" icon="delete_outline"
-            :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
-          q-btn(
-            @click="itemEdit(node.items[0])"
-            round color="green" icon="edit"
-            :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
-          item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
-        //- two
-        div(
-          v-if="node.items.length === 2"
-          :style=`{position: 'relative',}`
-          ).row.fit
-          .col.full-height.br
-            q-btn(
-              @click="itemDelete(node.items[0], 0)"
-              round color="red" icon="delete_outline"
-              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
-            q-btn(
-              @click="itemEdit(node.items[0])"
-              round color="green" icon="edit"
-              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
-            item-player(:isActive="itemsActive" :item="node.items[0]" :itemIndex="0")
-          .col.full-height.br
-            q-btn(
-              @click="itemDelete(node.items[1], 1)"
-              round color="red" icon="delete_outline"
-              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', left: '8px',}`)
-            q-btn(
-              @click="itemEdit(node.items[1])"
-              round color="green" icon="edit"
-              :style=`{position: 'absolute', zIndex: 99999, top: 'calc(50% - 20px)', borderRadius: '50%', right: '8px',}`)
-            item-player(:isActive="itemsActive" :item="node.items[1]" :itemIndex="1")
-        //- two, three, four, five, six, seven,
-      //- q-btn(
-        @click="itemFind()"
-        round flat color="green" icon="add"
-        :style=`{position: 'absolute', zIndex: 100, top: '0px', right: '0px', width: '50px', height: '100%'}`)
 </template>
 
 <script>
 import itemPlayer from './item_player.vue'
 import itemEditor from './item_editor.vue'
-import itemFinder from './item_finder.vue'
+import itemFinder from './item_finder/index.vue'
 
 export default {
   name: 'wsNodeEditor__editItems',

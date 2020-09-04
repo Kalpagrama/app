@@ -45,7 +45,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
               ).row.full-width.items-center.content-center.bg-green.q-px-sm.q-pb-sm
               q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
               .col
-              q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+              q-btn(round flat dense color="white" icon="launch" @click="itemEdit(i,ii)")
 </template>
 
 <script>

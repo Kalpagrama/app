@@ -1,13 +1,12 @@
-<style lang="sass" scoped>
-.item
-  cursor: pointer
-  &:hover
-    background: rgb(50,50,50) !important
-</style>
-
 <template lang="pug">
-q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
+q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.items-start.content-start
+  .row.full-width.q-px-md
+    div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+      q-input(
+        v-model="searchString"
+        placeholder="Find fragment"
+        filled dark dense color="grey-6").full-width
+  .row.full-width.items-start.content-start.q-pt-md
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
       template(v-slot=`{items, itemsMore}`)
         masonry(
@@ -26,23 +25,19 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                   borderRadius: '0 0 10px 10px', overflow: 'hidden',
                 }`
                 ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(i)")
+                //- q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
                 .col
-                q-btn(round flat dense color="white" icon="launch" @click="nodeExplore(i)")
+                //- q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
-
-import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
-  name: 'wsNodes_typePublished',
-  components: {wsNodeItem},
-  props: ['searchString'],
+  name: 'itemFinder_fromFragment',
   data () {
     return {
+      searchString: '',
       itemSelected: null,
     }
   },
@@ -51,30 +46,28 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'published'
-        },
-        sort: [{updatedAt: 'desc'}]
+          stage: 'fragment'
+        }
       }
-      // add name filter
+      // name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
+      res.sort = [{updatedAt: 'desc'}]
       return res
-    }
+    },
   },
   methods: {
-    async nodeUnpublish (node) {
-      this.$log('nodeUnpublish', node)
-      if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-      await node.updateExtended('stage', 'draft', false) // без debounce
-      await node.updateExtended('oid', node.oid, false) // без debounce
-      await NodeApi.nodeDelete(node.oid)
-      this.$log('nodeUnPublish complete')
-    },
-    nodeExplore (node) {
-      this.$log('nodeExplore', node)
-      this.$router.push(`/node/${node.oid}`).catch(e => e)
+    fragmentClick (fragment) {
+      this.$log('fragmentClick', fragment)
+      let item = JSON.parse(JSON.stringify(fragment))
+      let itemInput = {
+        items: item.items,
+        spheres: item.spheres,
+        name: item.name
+      }
+      this.$emit('item', itemInput)
     }
   }
 }

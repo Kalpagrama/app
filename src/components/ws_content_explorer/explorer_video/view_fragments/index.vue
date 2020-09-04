@@ -211,6 +211,7 @@ export default {
                     id: `${Date.now().toString()}-${itemIndex}-layer`,
                     contentOid: layer.contentOid,
                     figuresAbsolute: layer.figuresAbsolute,
+                    points: layer.points || []
                   }
                 })
               }

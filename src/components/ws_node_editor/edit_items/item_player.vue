@@ -17,21 +17,30 @@
         borderRadius: '10px', zIndex: 100,
         opacity: 0.1,
       }`).full-width
-    //- div(:style=`{height: '400px',}`).row.full-width.bg-red
-    //- item edit
-    //- item add
-    //- q-btn(
-      v-if="player"
-      @click="$emit('itemAdd')"
-      round push color="green" icon="add"
+    //- item player toggle...
+    q-btn(
+      v-if="!playerPlaying"
+      @click="playerPlaying = true"
+      round flat color="white"
       :style=`{
-        position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-        right: '20px', top: 'calc(50% - 20px)',
-        borderRadius: '50%'
+        position: 'absolute', zIndex: 1000,
+        top: 'calc(50% - 50px)', left: 'calc(50% - 50px)',
+        borderRadius: '50%',
       }`)
+      q-icon(name="play_arrow" color="white" size="100px")
+    q-btn(
+      v-if="playerPlaying"
+      @click="playerPlaying = false, player = null"
+      round flat color="white"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        top: '10px', left: 'calc(50% - 25px)',
+        borderRadius: '50%',
+      }`)
+      q-icon(name="clear" color="white" size="50px")
     //- item player
     ws-content-player(
-      v-if="isActive && contentKalpa"
+      v-if="playerPlaying && contentKalpa"
       :contentKalpa="contentKalpa"
       @player="player = $event"
       :options=`{
@@ -42,14 +51,8 @@
         position: 'absolute', zIndex: 100,
       }`).fit
     //- composition bar wrapper
-    //- div(
-      :style=`{
-        position: 'absolute', zIndex: 3100, bottom: '0px',
-        height: '50px',
-      }`
-      ).row.full-width.bg-yellow
     div(
-      v-if="isActive && player"
+      v-if="player"
       :style=`{
         position: 'absolute', zIndex: 3000, order: -1,
         bottom: '0px', height: '74px',
@@ -74,6 +77,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import wsContentPlayer from 'components/ws_content_player/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
 
@@ -85,30 +89,12 @@ export default {
     return {
       contentKalpa: null,
       player: null,
-      playerStarted: false,
+      playerPlaying: false
     }
   },
   watch: {
-    // 'player.currentTime': {
-    //   handler (to, from) {
-    //     this.$log('player.currentTime TO', to)
-    //     if (!this.playerStarted) {
-    //       this.playerStarted = true
-    //     }
-    //     // handle T changes...
-    //   }
-    // }
   },
   methods: {
-    // playerCreated (player) {
-    //   this.$log('playerCreated', player)
-    //   this.player = player
-    //   let t = this.item.layers[0].figuresAbsolute[0].t
-    //   this.player.setCurrentTime(t)
-    //   this.$wait(500).then(() => {
-    //     this.playerStarted = true
-    //   })
-    // },
   },
   async mounted () {
     this.$log('mounted')

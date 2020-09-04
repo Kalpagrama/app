@@ -1,9 +1,5 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
-  //- q-dialog(v-model="contentItemOpened" position="bottom")
-  //-   q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
-  //-     q-page-container
-  //-       q-page.row.full-width.items-start.content-start.justify-center
   q-header(reveal)
     .row.full-width.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width.b-30
@@ -30,10 +26,9 @@ q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
           v-for="(i,ii) in contents" :key="i.id"
           @click="contentClick(i)"
           :style=`{
-            height: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`
-          ).row.full-width.items-start.content-start.b-40.q-mb-sm.k-item
+          ).row.full-width.items-start.content-start.b-40.q-mb-sm.k-item.q-pa-md
           img(
             :src="i.thumbOid"
             :style=`{
@@ -41,8 +36,8 @@ q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
               objectFit: 'cover',
               borderRadius: '10px', overflow: 'hidden'}`).b-50
           .col.full-height
-            .row.fit.items-center.content-center.q-px-md
-              span.text-white {{ i.name.slice(0, 50) }}
+            .row.fit.items-start.content-start.q-px-md
+              span.text-white {{ i.name.slice(0, 40) }}
               .row.full-width
                 small.text-grey-7 {{i.contentType}}
       div(v-if="type === 'fragment'").row.full-width.q-px-md
