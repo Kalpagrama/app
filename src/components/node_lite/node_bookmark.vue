@@ -1,20 +1,27 @@
 <template lang="pug">
-//- @click="bookmarked ? bookmarkDelete() : bookmarkCreate()"
 q-btn(
   @click="start()"
   round flat
   color="white"
-  :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
+  :icon="nodeWorkspace ? 'bookmark' : 'bookmark_outline'"
   :loading="loading"
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
     top: '8px', right: '8px',
     background: 'rgba(0,0,0,0.15)',
   }`)
-  //- q-menu(
-    ref="sphereSelectorMenu"
+  q-menu(
+    v-model="spheresAdding"
+    ref="sphereSelectorMenu" separate-close-popup
     dark cover anchor="top right")
-    div(
+    ws-sphere-finder(
+      v-if="nodeWorkspace"
+      ref="wsSphereFinder"
+      :useSearch="true"
+      :selectedIds="nodeWorkspace.spheres"
+      :hiddenIds="[]"
+      @sphere="sphereAdd")
+    //- div(
       :style=`{
         width: '300px', height: '300px',
         borderRadius: '10px', overflow: 'hidden',
@@ -50,14 +57,16 @@ q-btn(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
 
 export default {
   name: 'nodeLite__nodeBookmark',
+  components: {wsSphereFinder},
   props: ['node', 'nodeFull', 'isActive', 'isVisible'],
   data () {
     return {
       loading: false,
-      bookmark: null,
+      nodeWorkspace: null,
       searchString: '',
     }
   },
@@ -78,8 +87,12 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          this.bookmark = await this.bookmarkFind()
-          this.$log('bookmark', this.bookmark)
+          this.nodeWorkspace = await this.nodeWorkspaceFind()
+          this.$log('nodeWorkspace', this.nodeWorkspace)
+        }
+        else {
+          this.loading = false
+          this.spheresAdding = false
         }
       }
     }
@@ -88,20 +101,21 @@ export default {
     start () {
       this.$log('start')
       this.loading = true
-      // create bookmark of this node
-      if (!this.bookmark) this.bookmarkCreate()
-      // create spheres from this node if we dont have them
+      // create bookmark of this node, with creating missing spheres, add them
+      if (!this.nodeWorkspace) this.nodeWorkspaceCreate()
       // then maybe add spheres to created bookmark
+      this.spheresAdding = true
       this.loading = false
     },
-    sphereClick (s, si) {
-      this.$log('sphereClick', s, si)
-      s.items.push({
-        oid: this.node.oid,
-        thumbOid: this.node.meta.items[0].thumbUrl,
-        type: 'NODE',
-        name: this.node.name
-      })
+    sphereAdd (sphere) {
+      this.$log('sphereAdd', sphere)
+      let sphereFind = this.nodeWorkspace.spheres.find(id => id === sphere.id)
+      if (sphereFind) {
+        this.nodeWorkspace.spheres = this.nodeWorkspace.spheres.filter(id => id !== sphere.id)
+      }
+      else {
+        this.nodeWorkspace.spheres.push(sphere.id)
+      }
       this.$refs.sphereSelectorMenu.hide()
     },
     async sphereCreate () {
@@ -125,11 +139,11 @@ export default {
         this.$refs.sphereSelectorMenu.hide()
       }
     },
-    async bookmarkFind () {
+    async nodeWorkspaceFind () {
       // this.$log('bookmarkFind')
       let {items: [item]} = await this.$rxdb.find({
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid, type: 'NODE'
+          rxCollectionEnum: RxCollectionEnum.WS_NODE, oid: this.node.oid,
         }
       })
       // this.$log('bookmarkFind item', item)
@@ -156,49 +170,70 @@ export default {
         this.loading = false
       }
     },
-    async bookmarkCreate () {
-      try {
-        // this.$log('bookmarkCreate start')
-        this.loading = true
-        await this.$wait(300)
-        let bookmarkInput = {
-          oid: this.node.oid,
-          type: 'NODE',
-          name: this.node.name,
-          thumbOid: this.node.meta.items[0].thumbUrl,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: []
-        }
-        this.$log('bookmarkCreate bookmarkInput', bookmarkInput)
-        let bookmarkSpheres = await Promise.all(
-          this.nodeFull.spheres.map(async (s) => {
-            // for every sphere try to find this sphere in ws
-            let {items: [sphere]} = await this.$rxdb.find({
-              selector: {
-                rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
-              }
-            })
-            this.$log('sphere', sphere)
-            if (!sphere) {
-              this.$log('sphere NOT FOUND, creating...')
-              let sphereInput = {
-                wsItemType: 'WS_SPHERE',
-                name: s.name,
-                oid: s.oid,
-                spheres: []
-              }
-              sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+    async getSpheres () {
+      return await Promise.all(
+        this.nodeFull.spheres.map(async (s) => {
+          // for every sphere try to find this sphere in ws
+          let {items: [sphere]} = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
             }
-            // add this sphere.id bookmark.spheres array
-            this.$log('adding sphere...', sphere.name)
-            return sphere.id
           })
-        )
-        this.$log('bookmarkCreate bookmarkSpheres', bookmarkSpheres)
-        bookmarkInput.spheres = bookmarkSpheres
-        this.$log('bookmarkCreate bookmarkInput final', bookmarkInput)
-        this.bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-        this.$log('bookmarkCreate bookmark', this.bookmark)
+          this.$log('sphere', sphere)
+          if (!sphere) {
+            this.$log('sphere NOT FOUND, creating...')
+            let sphereInput = {
+              wsItemType: 'WS_SPHERE',
+              name: s.name,
+              oid: s.oid,
+              spheres: []
+            }
+            sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          }
+          // add this sphere.id bookmark.spheres array
+          this.$log('adding sphere...', sphere.name)
+          return sphere.id
+        })
+      )
+    },
+    getItems () {
+      return this.node.meta.items.map((item, itemIndex) => {
+        return {
+          id: `${Date.now().toString()}-${itemIndex}-item`,
+          outputType: item.outputType,
+          thumbUrl: item.thumbUrl,
+          operation: { items: null, operations: null, type: 'CONCAT'},
+          layers: item.layers.map((layer, layerIndex) => {
+            return {
+              id: `${Date.now().toString()}-${itemIndex}-layer`,
+              contentOid: layer.contentOid,
+              figuresAbsolute: layer.figuresAbsolute,
+            }
+          })
+        }
+      })
+    },
+    async nodeWorkspaceCreate () {
+      try {
+        this.$log('nodeWorkspaceCreate start')
+        this.loading = true
+        // await this.$wait(300)
+        let nodeInput = {
+          oid: this.node.oid,
+          name: this.node.name,
+          wsItemType: 'WS_NODE',
+          thumbOid: this.node.meta.items[0].thumbUrl,
+          category: this.node.category,
+          stage: 'saved',
+          layout: 'PIP',
+          spheres: [],
+          items: [],
+        }
+        nodeInput.spheres = await this.getSpheres()
+        nodeInput.items = this.getItems()
+        this.$log('nodeWorkspaceCreate nodeInput', nodeInput)
+        this.nodeWorkspace = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+        this.$log('bookmarkCreate nodeWorkspace', this.nodeWorkspace)
         this.$q.notify({type: 'positive', position: 'top', message: 'Bookmark added!'})
         this.loading = false
       }

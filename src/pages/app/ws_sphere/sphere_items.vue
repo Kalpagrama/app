@@ -17,25 +17,44 @@ q-page(
             :gutter="{default: 10}")
             div(
               v-for="(i,ii) in items" :key="i.id"
-              @click="itemSelected = i.oid"
-              :style=`{
-                position: 'relative',
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.full-width.items-start.content-start.b-40.q-mb-sm
-              //- default header
+              :style=`{}`
+              ).q-mb-sm
+              //- node
+              ws-node-item(
+                v-if="i.wsItemType === 'WS_NODE'" :node="i"
+                @clicked="itemSelected = i.id")
+                template(v-slot:footer)
+                  div(
+                    v-if="itemSelected === i.id"
+                    :style=`{marginTop: '-10px', paddingTop: '15px', borderRadius: '0 0 10px 10px'}`
+                    ).row.full-width.bg-green.q-px-xs.q-pb-xs
+                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                    .col
+                    q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
+              //- content
               div(
-                :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden',}`
-                ).row.full-width.items-start.content-start.b-40.sphere-item
-                q-icon(
-                  :name="itemIcon(i)" color="grey-4" size="24px"
-                  :style=`{position: 'absolute', zIndex: 200, top: '8px', left: '8px'}`).q-mr-sm
+                v-if="i.wsItemType === 'WS_CONTENT'" :content="i"
+                :style=`{
+                  borderRadius: '10px', overflow: 'hidden',
+                }`
+                ).row.items-center.content-center.b-40
                 img(
-                  :src="i.thumbOid" draggable="false"
-                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
-                  ).full-width
-                .row.full-width.q-pa-sm
-                  small.text-white {{ i.name }}
+                  :src="i.thumbOid"
+                  :style=`{
+                    width: '40px', height: '40px',
+                    borderRadius: '10px', overflow: 'hidden',
+                    objectFit: 'cover'
+                  }`).q-ma-md
+                .col.full-height
+                  .row.fit.items-center.content-center.q-pr-sm
+                    small.text-white {{ i.name.slice(0, 100) }}
+              //- sphere
+              ws-sphere-item(
+                v-if="i.wsItemType === 'WS_SPHERE'" :id="i.id"
+                :style=`{borderRadius: '10px',}`).b-40
+            //- masonry(
+              :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 4"
+              :gutter="{default: 10}")
               //- selected
               div(
                 v-if="itemSelected === i.oid"
@@ -51,9 +70,11 @@ q-page(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'pageApp_wsSphere_items',
+  components: {wsNodeItem},
   props: ['sphere'],
   data () {
     return {
@@ -80,8 +101,19 @@ export default {
     },
     itemLaunch (item) {
       this.$log('itemLaunch', item)
-      if (item.type === 'NODE') {
-        this.$router.push(`/node/${item.oid}`).catch(e => e)
+      if (item.wsItemType) {
+        if (item.wsItemType === 'WS_NODE') {
+          this.$router.push(`/workspace/node/${item.id}`)
+        }
+        else if (item.wsItemType === 'WS_CONTENT') {
+          this.$router.push(`/workspace/content/${item.id}`)
+        }
+        else if (item.wsItemType === 'WS_SPHERE') {
+          this.$router.push(`/workspace/sphere/${item.id}`)
+        }
+        else {
+          this.$q.notify({type: 'negative', position: 'top', message: 'Not supported :('})
+        }
       }
       else {
         this.$q.notify({type: 'negative', position: 'top', message: 'Not supported :('})
@@ -97,6 +129,10 @@ export default {
       if (item.wsItemType) {
         if (item.wsItemType === 'WS_CONTENT') return 'select_all'
         else if (item.wsItemType === 'WS_NODE') return 'filter_tilt_shift'
+        else if (item.wsItemType === 'WS_BOOKMARK') {
+          if (item.type === 'NODE') return 'filter_tilt_shift'
+          else return ''
+        }
       }
       else {
         return ''

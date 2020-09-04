@@ -136,6 +136,7 @@ const routes = [
             redirect: 'sphere/:id/items',
             component: () => import('pages/app/ws_sphere/index.vue'),
             children: [
+              { name: 'workspace.sphere.details', path: 'details', component: () => import('pages/app/ws_sphere/sphere_details.vue') },
               { name: 'workspace.sphere.items', path: 'items', component: () => import('pages/app/ws_sphere/sphere_items.vue') },
               { name: 'workspace.sphere.explore', path: 'explore', component: () => import('pages/app/ws_sphere/sphere_explore.vue') }
             ]

@@ -58,6 +58,7 @@ export default {
       sphereNameEditing: false,
       viewId: 'items',
       views: [
+        {id: 'workspace.sphere.details', name: 'Details'},
         {id: 'workspace.sphere.items', name: 'Items'},
         {id: 'workspace.sphere.explore', name: 'Explore'}
       ]

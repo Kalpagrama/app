@@ -49,7 +49,7 @@ q-page(
             v-model="sphereAdding"
             dark fit no-focus
             anchor="top left" self="bottom left")
-            ws-sphere-finder(ref="wsSphereFinder" :searchString="sphere" @sphere="sphereAdd")
+            ws-sphere-finder(ref="wsSphereFinder" :useSearch="false" :searchString="sphere" @sphere="sphereAdd")
         q-btn(
           v-if="sphereAdding"
           @click="sphereAdding = false"

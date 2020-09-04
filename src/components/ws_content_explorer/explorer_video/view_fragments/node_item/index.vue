@@ -74,7 +74,7 @@
             @focus="$store.commit('ui/stateSet', ['isTyping', true])"
             @blur="$store.commit('ui/stateSet', ['isTyping', false])").full-width
         //- node.spheres editor
-        div().row.full-width.items-center.content-center.q-py-sm
+        div(:style=`{minHeight: '40px'}`).row.full-width.items-center.content-center.br
           //- q-btn(
             v-for="s in 3" :key="s"
             flat dense no-caps
@@ -82,7 +82,18 @@
               whiteSpace: 'nowrap',
               borderRadius: '10px',
               }`).text-white.q-mr-sm.b-60.q-px-xs #сфера сути {{s}},
-          q-btn(round flat dense no-caps icon="add" color="grey-4") Add spheres
+          q-btn(
+            @click="spheresAdding = true"
+            round flat dense no-caps icon="add" color="grey-4") Add spheres
+            q-menu(
+              ref="sphereSelectorMenu"
+              dark anchor="bottom left")
+              ws-sphere-finder(
+                ref="wsSphereFinder"
+                :useSearch="true"
+                :selectedIds="node.spheres"
+                :hiddenIds="[]"
+                @sphere="sphereAdd")
           //- q-btn(round flat dense color="grey-6" icon="add")
           //- edit-spheres(:node="node" :player="player")
     //- footer: actions close, createNode
@@ -94,16 +105,18 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
-import editSpheres from './edit_spheres.vue'
+import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
 
 export default {
   name: 'viewDrafts_draftItem',
-  components: {compositionEditor, compositionBar, editSpheres},
+  components: {compositionEditor, compositionBar, wsSphereFinder},
   props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
+      spheresAdding: false
     }
   },
   computed: {
@@ -115,6 +128,17 @@ export default {
     }
   },
   methods: {
+    sphereAdd (sphere) {
+      this.$log('sphereAdd', sphere)
+      let sphereFind = this.node.spheres.find(id => id === sphere.id)
+      if (sphereFind) {
+        this.node.spheres = this.nodeWorkspace.spheres.filter(id => id !== sphere.id)
+      }
+      else {
+        this.node.spheres.push(sphere.id)
+      }
+      this.$refs.sphereSelectorMenu.hide()
+    },
     barClickHandle (e) {
       this.$log('barClickHandle', e)
     },

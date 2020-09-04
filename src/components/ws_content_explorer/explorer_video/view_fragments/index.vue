@@ -105,6 +105,7 @@ export default {
         layout: 'PIP',
         stage: 'fragment',
         wsItemType: 'WS_NODE',
+        thumbOid: this.contentKalpa.thumbUrl,
         items: [
           {
             id: Date.now().toString(),
