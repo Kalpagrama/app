@@ -43,14 +43,14 @@ q-layout(view="hHh Lpr lff")
               }
             }`)
             template(v-slot:footer)
-              div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-pt-sm
+              div(:style=`{position: 'relative', paddingRight: '80px',}`).row.full-width.items-start.content-start.q-pt-sm
                 //- node spheres
                 router-link(
                   v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
                   :style=`{height: '40px',borderRadius: '10px'}`
-                  ).row.items-center.content-center.q-px-sm.b-40.sphere-item.q-mr-sm
+                  ).row.items-center.content-center.q-px-sm.b-40.sphere-item.q-mr-sm.q-mb-sm
                   q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-                  span.text-white {{ s.name }}
+                  span.text-white.q-mr-md {{ s.name }}
                 //- node link start...
                 div(
                   :style=`{

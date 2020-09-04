@@ -40,10 +40,7 @@ q-layout(view="hHh Lpr lff")
             no-caps dense active-color="white" align="left" :switch-indicator="true").full-width.text-grey-8
             q-route-tab(v-for="t in pages" :key="t.id" :to="t.id" :name="t.id" :label="t.name")
   q-page-container
-    q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`)
-      .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
-          router-view(:oid="$route.params.oid")
+    router-view(:oid="$route.params.oid")
 </template>
 
 <script>
@@ -70,7 +67,7 @@ export default {
       return [
         {id: 'created', name: this.$t('Nodes', 'Ядра')},
         {id: 'voted', name: this.$t('Votes', 'Голоса')},
-        {id: 'following', name: this.$t('Subscriptions', 'Подписки')},
+        // {id: 'following', name: this.$t('Subscriptions', 'Подписки')},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики')},
       ]
     },

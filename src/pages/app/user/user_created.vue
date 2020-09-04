@@ -1,9 +1,11 @@
 <template lang="pug">
-kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-  template(v-slot=`{items,itemsMore}`)
-    list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-        node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
+q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
+  div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+    kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+      template(v-slot=`{items,itemsMore}`)
+        list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
+          template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+            node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
