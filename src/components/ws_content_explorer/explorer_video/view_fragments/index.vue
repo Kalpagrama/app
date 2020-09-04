@@ -158,10 +158,72 @@ export default {
       })
       this.nodesChecked = []
     },
-    nodesCheckedCreateNode () {
+    async nodesCheckedCreateNode () {
       this.$log('nodesCheckedCreateNode')
-      // TODO go to the editor of nodes... multinode?
-      this.nodesChecked = []
+      let nodeInput = {
+        name: '',
+        category: 'FUN',
+        layout: 'PIP',
+        stage: 'draft',
+        wsItemType: 'WS_NODE',
+        thumbOid: '',
+        spheres: [],
+        items: []
+      }
+      // get nodes
+      await Promise.all(
+        this.nodesChecked.map(async (nodeId) => {
+          let {items: [node]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_NODE, id: nodeId } })
+          // if we got node
+          if (node) {
+            // add names to spheres
+            if (node.name && node.name.length > 0) {
+              let {items: [sphere]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: node.name } })
+              // create sphere if there is no one
+              if (!sphere) {
+                let sphereInput = {
+                  wsItemType: 'WS_SPHERE',
+                  name: node.name,
+                  spheres: []
+                }
+                sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+              }
+              // add to nodeInput unique array of spheres
+              if (!nodeInput.spheres.includes(sphere.id)) nodeInput.spheres.push(sphere.id)
+            }
+            // add spheres
+            if (node.spheres && node.spheres.length > 0) {
+              node.spheres.map(sphereId => {
+                if (!nodeInput.spheres.includes(sphereId)) nodeInput.spheres.push(sphereId)
+              })
+            }
+            // add items
+            node.items.map((itemRaw, itemIndex) => {
+              let item = JSON.parse(JSON.stringify(itemRaw))
+              let itemInput = {
+                id: `${Date.now().toString()}-${itemIndex}`,
+                thumbUrl: item.thumbUrl,
+                contentOid: item.contentOid,
+                outputType: item.outputType,
+                operation: item.operation,
+                layers: item.layers.map((layer, layerIndex) => {
+                  return {
+                    id: `${Date.now().toString()}-${itemIndex}-layer`,
+                    contentOid: layer.contentOid,
+                    figuresAbsolute: layer.figuresAbsolute,
+                  }
+                })
+              }
+              nodeInput.items.push(itemInput)
+            })
+          }
+        })
+      )
+      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
+      this.nodesChecked.map(id => {
+        this.$rxdb.remove(id)
+      })
     },
     nodesLoaded (nodes) {
       if (this.nodeSelectedId || this.nodeEditingId) return

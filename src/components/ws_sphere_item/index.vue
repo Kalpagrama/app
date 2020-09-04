@@ -6,9 +6,14 @@
 </style>
 
 <template lang="pug">
-div().row
+div(
+  :style=`{
+      position: 'relative',
+      borderRadius: '10px', overflow: 'hidden'
+    }`
+  ).row.b-40
   slot(name="prepend")
-  .col
+  .col.sphere-item
     div(
       v-if="sphere"
       @click="$emit('clicked', sphere)"

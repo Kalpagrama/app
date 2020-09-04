@@ -160,6 +160,18 @@ export default {
         this.player.setCurrentTime(startat)
       }
     },
+    handleFocusin (e) {
+      this.$log('handleFocusin', e)
+      if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$store.commit('ui/stateSet', ['isTyping', true])
+      }
+    },
+    handleFocusout (e) {
+      this.$log('handleFocusout', e)
+      if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$store.commit('ui/stateSet', ['isTyping', false])
+      }
+    },
     keydownHandle (e) {
       if (this.$store.state.ui.isTyping) return
       this.$log('keydownHandle', e)
@@ -197,16 +209,14 @@ export default {
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
-    // window.addEventListener('focusin', (e) => {
-    //   this.$log('focus!!!', e)
-    // })
-    // window.addEventListener('focusout', (e) => {
-    //   this.$log('blur!!!', e)
-    // })
+    window.addEventListener('focusin', this.handleFocusin)
+    window.addEventListener('focusout', this.handleFocusout)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
+    window.removeEventListener('focusin', this.handleFocusin)
+    window.removeEventListener('focusout', this.handleFocusout)
     // localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
   }
 }

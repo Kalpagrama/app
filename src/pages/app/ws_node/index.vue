@@ -29,15 +29,12 @@ export default {
         category: 'FUN',
         layout: 'PIP',
         wsItemType: 'WS_NODE',
+        thumbOid: '',
         stage: 'draft',
       }
     }
   },
   computed: {
-    title () {
-      if (this.$route.params.id) return 'Node creator'
-      else return 'Node editor'
-    }
   },
   watch: {
     '$route.params.id': {

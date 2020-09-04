@@ -15,7 +15,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
           :gutter="{default: 10}").full-width
           ws-node-item(
             v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="itemSelected = i.id")
+            @clicked="itemSelected = i.id").q-mb-sm
             template(v-slot:footer)
               //- selected
               div(

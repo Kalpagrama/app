@@ -14,11 +14,10 @@ q-page(
         template(v-slot=`{items}`)
           masonry(
             :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 4"
-            :gutter="{default: 10}")
+            :gutter="{default: 10}").full-width
             div(
               v-for="(i,ii) in items" :key="i.id"
               :style=`{
-                minWidth: '200px',
               }`
               ).q-mb-sm
               //- node
@@ -69,20 +68,6 @@ q-page(
               ws-sphere-item(
                 v-if="i.wsItemType === 'WS_SPHERE'" :id="i.id"
                 :style=`{borderRadius: '10px',}`).b-40
-            //- masonry(
-              :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 4"
-              :gutter="{default: 10}")
-              //- selected
-              div(
-                v-if="itemSelected === i.oid"
-                :style=`{
-                  position: 'relative', zIndex: 90,
-                  marginTop: '-10px', paddingTop: '10px',
-                }`
-                ).row.full-width.items-center.content-center.bg-green
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-                .col
-                q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
 </template>
 
 <script>

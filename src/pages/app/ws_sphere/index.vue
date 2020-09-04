@@ -16,7 +16,6 @@ q-layout(view="hHh Lpr lff")
                   span(
                     :style=`{fontSize: '18px', whiteSpace: 'nowrap', marginLeft: '12px',}`
                     ).fit.text-white.text-bold {{ sphere.name }}
-              //- q-btn(round flat color="red" icon="delete_outline" @click="sphereDelete()")
             div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
               q-tabs(
                 :value="$route.name" @input="$router.replace({name: $event})"
@@ -66,13 +65,6 @@ export default {
     }
   },
   methods: {
-    async sphereDelete () {
-      this.$log('sphereDelete')
-      // if (!confirm('Delete sphere?')) return
-      // TODO what to do if we got items on this sphere ???
-      // await this.$rxdb.remove(this.sphere.id)
-      // this.$router.replace('/workspace/spheres')
-    },
     outHandle ([type, val]) {
       this.$log('outHandle', type, val)
       if (type === 'back') {

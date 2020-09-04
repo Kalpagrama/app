@@ -6,13 +6,6 @@
 </style>
 
 <template lang="pug">
-//- q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
-        div(
-          :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
-          span(:style=`{fontSize: '19px'}`).text-white.text-bold {{ $t('wsSpheres_title', 'Сферы') }}
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
@@ -40,77 +33,46 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(
         :class=`{
-          //- 'q-px-xs': $q.screen.width < 800,
         }`
-        :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.q-px-xs
+        :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.q-pr-sm
         kalpa-loader(:mangoQuery="querySpheres" :sliceSize="1000" @items="spheresLoaded")
           template(v-slot=`{items}`)
         kalpa-loader(
           v-if="spheresMapped"
           :mangoQuery="queryItems" :sliceSize="1000" @items="itemsLoaded")
           template(v-slot=`{items}`)
-        div(
-          v-for="(s,si) in spheresMap" :key="s.id"
-          ).col-xs-12.col-sm-6.q-pa-xs
+        masonry(
+          :cols="$q.screen.width < 500 ? 1 : 2"
+          :gutter="{default: 10}").full-width
           div(
-            @click="sphereClick(s,si)"
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.full-width.b-40.sphere-item
-            //- header: sphere.name
+            v-for="(s,si) in spheresMap" :key="s.id"
+            ).row.full-width.justify-start.q-mb-sm
             div(
-              :style=`{height: '40px'}`
-              ).row.full-width.items-center.content-center.q-px-sm
-              q-icon(name="blur_on" color="white" size="20px").q-mr-sm
-              span.text-white {{ s.name }}
-            //- items
-            div(v-if="s.items.length > 0").row.full-width.q-pa-sm
+              @click="sphereClick(s,si)"
+              :style=`{
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).row.full-width.b-40.sphere-item
+              //- header: sphere.name
               div(
-                v-for="(i,ii) in s.items" :key="i.id"
-                v-if="i.thumbOid"
-                :style=`{
-                  width: '50px', height: '50px',
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).b-50
-                img(
-                  :src="i.thumbOid" draggable="false"
-                  :style=`{borderRadius: '10px', overflow: 'hidden', objectFit: 'cover'}`
-                  ).fit
-          //- template(v-slot=`{items}`)
-            .row.full-width.items-start.content-start.q-px-sm
-              div(v-for="(s,si) in items" :key="i").row.full-width.q-mb-sm
-                ws-sphere-item(
-                  @clicked="sphereClicked(s)"
-                  :id="s.id" :sphere="s"
-                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
-                  ).full-width.b-40
-        //- kalpa-loader(:mangoQuery="mangoQuery" :sliseSize="1000")
-          template(v-slot=`{items}`)
-            .row.full-width.items-start.content-start.q-px-sm
-              div(
-                v-for="(s,si) in items" :key="s.id"
-                @click="sphereClick(s)"
-                ).col-6.q-pr-sm.q-pb-sm
+                :style=`{height: '40px'}`
+                ).row.full-width.items-center.content-center.q-px-sm
+                q-icon(name="blur_on" color="white" size="20px").q-mr-sm
+                span.text-white {{ s.name }}
+              //- items
+              div(v-if="s.items.length > 0").row.full-width.q-pa-sm
                 div(
-                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
-                  ).row.fit.b-40.sphere-item
-                  .row.full-width.items-center.content-center.q-pa-md
-                    q-icon(name="blur_on" color="grey-7" size="24px").q-mr-sm
-                    span.text-white.text-bold.q-mb-xs {{ s.name }}
-                  .row.full-width.items-start.content-start.q-px-sm
-                    div(
-                      v-for="(i,ii) in s.items" :key="ii"
-                      :style=`{
-                        width: '50px', height: '50px',
-                        borderRadius: '10px', overflow: 'hidden',
-                      }`).row.q-mr-sm.q-mb-sm
-                      img(
-                        :src="i.thumbOid" draggable="false"
-                        :style=`{
-                          objectFit: 'cover'
-                        }`).fit
+                  v-for="(i,ii) in s.items" :key="i.id"
+                  v-if="i.thumbOid"
+                  :style=`{
+                    width: '50px', height: '50px',
+                    borderRadius: '10px', overflow: 'hidden',
+                  }`
+                  ).b-50
+                  img(
+                    :src="i.thumbOid" draggable="false"
+                    :style=`{borderRadius: '10px', overflow: 'hidden', objectFit: 'cover'}`
+                    ).fit
 </template>
 
 <script>

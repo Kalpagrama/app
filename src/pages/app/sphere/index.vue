@@ -19,8 +19,6 @@ q-layout(view="hHh Lpr lff")
           }`
           :style=`{
             maxWidth: '800px',
-            //- borderLeft: '1px solid rgb(40,40,40)',
-            //- borderRight: '1px solid rgb(40,40,40)',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphere" :mangoQuery="mangoQuery")
@@ -28,16 +26,14 @@ q-layout(view="hHh Lpr lff")
               list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '0px',}`)
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
                   node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
-                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeFeed from 'pages/app/twitter/node_item.vue'
 
 export default {
   name: 'pageApp_sphere',
-  components: {nodeFeed},
+  components: {},
   data () {
     return {
       sphere: null,

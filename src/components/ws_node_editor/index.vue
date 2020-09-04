@@ -26,9 +26,8 @@ q-layout(view="hHh Lpr lff")
           .row.full-width.items-start.content-start.q-px-sm
             .row.full-width.q-px-sm.q-mt-md
               span.text-bold.text-grey-7 Категория и сферы ядра
-            .row.full-width
-              edit-spheres(:node="node")
-                edit-category(:node="node").q-mr-sm
+            ws-sphere-editor(:item="node")
+              edit-category(:node="node").q-mr-sm
             .row.full-width.q-py-xl
               q-btn(
                 @click="publish()"
@@ -43,16 +42,16 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { NodeApi } from 'src/api/node'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 import editLayout from './edit_layout'
 import editCategory from './edit_category'
-import editSpheres from './edit_spheres'
 import editEssence from './edit_essence'
 import editItems from './edit_items/index.vue'
 
 export default {
   name: 'wsNodeEditor',
-  components: {editLayout, editCategory, editSpheres, editEssence, editItems},
+  components: {editLayout, editCategory, editEssence, editItems},
   props: {
     node: {type: Object},
     title: {type: String},
@@ -64,8 +63,6 @@ export default {
     }
   },
   methods: {
-    // node
-    // TODO Эти проверки могут находится в UI коде - только если это валидация (но это вроде не валидация, поэтому надо перенести в NodeApi)
     check () {
       this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
@@ -90,27 +87,39 @@ export default {
     },
     async publish () {
       try {
-        this.$log('publish start')
+        this.$log('publish start', this.node)
         this.publishing = true
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        let spheres = []
+        await Promise.all(
+          nodeInput.spheres.map(async (sphereId) => {
+            let {items: [sphere]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, id: sphereId } })
+            if (sphere) {
+              spheres.push({name: sphere.name})
+            }
+          })
+        )
+        nodeInput.spheres = spheres
         await this.$wait(300)
         this.check()
         // publish
-        let createdNode = await NodeApi.nodeCreate(this.node)
+        let createdNode = await NodeApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
-        // update this node: stage, oid, thumbUrls from all the items
-        // await this.node.updateExtended('stage', 'published', false)
-        // await this.node.updateExtended('oid', createdNode.oid, false)
-        // createdNode.items.map((i, ii) => {
-        //   this.node.items[ii].thumbUrl = i.thumbUrl
-        // })
-        await this.$rxdb.remove(this.node.id)
+        // // update this node: stage, oid, thumbUrls from all the items
+        await this.node.updateExtended('stage', 'published', false)
+        await this.node.updateExtended('oid', createdNode.oid, false)
+        // update item thumbUrl, oid, stage, sphere oid...
+        // // createdNode.items.map((i, ii) => {
+        // //   this.node.items[ii].thumbUrl = i.thumbUrl
+        // // })
+        // // await this.$rxdb.remove(this.node.id)
         this.publishing = false
         this.$q.notify({
           type: 'positive',
           position: 'top',
           message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро создается...')
         })
-        // need to replace router cos we deleted it...
+        // need to replace router, cos we deleted it...
         this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }
       catch (e) {
@@ -128,28 +137,14 @@ export default {
       this.$log('nodeDelete')
       if (!confirm(this.$t('wsNodeEditor_conifrmNodeDelete', 'Удалить ядро?'))) return
       await this.$rxdb.remove(this.node.id)
+      this.$emit('out', ['back'])
     },
-    nodeIsEmpty () {
-      this.$log('nodeIsEmpty')
-      if (this.node.name.length === 0 &&
-        this.node.spheres.length === 0 &&
-        this.node.items.length === 0) {
-        return true
-      }
-      else {
-        return false
-      }
-    }
   },
   mounted () {
     this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-    // if (this.nodeIsEmpty()) {
-    //   await this.$rxdb.remove(this.node.id)
-    // }
   }
 }
 </script>

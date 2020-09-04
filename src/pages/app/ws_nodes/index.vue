@@ -18,7 +18,7 @@ q-layout(view="hHh Lpr lff")
                     flat dense color="white" icon="clear" @click="searchString = ''")
                   q-btn(
                     flat dense color="white" icon="tune")
-          q-btn(round flat color="green" icon="add" @click="$router.push('/workspace/node/new')")
+          q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/node/new')")
         .row.full-width.q-px-md
             q-tabs(
               :value="$route.name" @input="$router.push({name: $event})"

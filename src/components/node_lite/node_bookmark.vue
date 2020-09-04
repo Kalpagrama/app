@@ -11,8 +11,7 @@ q-btn(
     background: 'rgba(0,0,0,0.15)',
   }`)
   q-menu(
-    v-model="spheresAdding"
-    ref="sphereSelectorMenu" separate-close-popup
+    ref="sphereSelectorMenu"
     dark cover anchor="top right")
     ws-sphere-finder(
       v-if="nodeWorkspace"
@@ -21,38 +20,6 @@ q-btn(
       :selectedIds="nodeWorkspace.spheres"
       :hiddenIds="[]"
       @sphere="sphereAdd")
-    //- div(
-      :style=`{
-        width: '300px', height: '300px',
-        borderRadius: '10px', overflow: 'hidden',
-      }`).column.items-start.content-start.b-50
-      .row.full-width
-        div(
-          :style=`{
-            position: 'relative', zIndex: 100,
-            borderRadius: '10px', overflow: 'hidden'
-          }`).row.full-width
-          q-input(
-            v-model="searchString"
-            placeholder="Find sphere"
-            filled dark dense color="grey-7"
-            :input-style=`{paddingLeft: '15px',}`).full-width.b-50
-      .col.full-width.scroll
-        kalpa-loader(:mangoQuery="spheresQuery" :sliseSize="1000")
-          template(v-slot=`{items}`)
-            .row.full-width.items-start.content-start.q-pt-sm
-              div(
-                v-for="(s,si) in items" :key="s.id"
-                @click="sphereClick(s,si)"
-                ).row.full-width.items-center.content-center
-                q-btn(
-                  flat icon="blur_on" align="start" no-caps
-                  ).full-width.q-pl-sm
-                  span.q-ml-sm {{s.name}}
-      .row.full-width.q-pa-sm
-        q-btn(
-          @click="sphereCreate()"
-          flat color="green" icon="add" no-caps align="left").full-width Create sphere
 </template>
 
 <script>
@@ -93,6 +60,7 @@ export default {
         else {
           this.loading = false
           this.spheresAdding = false
+          if (this.$refs.sphereSelectorMenu) this.$refs.sphereSelectorMenu.hide()
         }
       }
     }

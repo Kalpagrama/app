@@ -23,7 +23,7 @@
       }`
       :style=`{
         margin: 0,
-        paddingRight: '0px',
+        //- paddingRight: '0px',
       }`
       ).full-width
       template(v-slot:append)
@@ -65,13 +65,6 @@ export default {
           this.searchStringLoading = true
           this.contentKalpa = await this.contentFromURL(to)
           this.contentImporterShow = true
-          // this.$q.loading.show({spinnerColor: 'green', message: 'Loading content...'})
-          // this.searchStringRaw = ''
-          // this.$refs.searchStringInput.blur()
-          // await this.$wait(2000)
-          // this.$q.loading.hide()
-          // this.searchStringLoading = false
-          // this.$emit('content', await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
