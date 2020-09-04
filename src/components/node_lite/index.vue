@@ -60,7 +60,7 @@
               :style=`{userSelect: 'none', fontSize: '1.4rem'}`).text-white.text-bold {{ node.name }}
         .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
-          node-vote(:node="node")
+          node-vote(:node="node" :nodeFull="nodeFull")
   //- footer
   .row.full-width
     slot(name="footer")
