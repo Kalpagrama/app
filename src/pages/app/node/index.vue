@@ -62,7 +62,7 @@ q-layout(view="hHh Lpr lff")
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
-          //- router-view(v-if="node" :node="node")
+          router-view(v-if="node" :node="node")
       q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
@@ -192,9 +192,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
   }
 }
 </script>

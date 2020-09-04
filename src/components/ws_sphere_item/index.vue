@@ -47,7 +47,7 @@ export default {
     id: {
       immediate: true,
       async handler (to, from) {
-        this.$log('id TO', to)
+        // this.$log('id TO', to)
         let {items: [sphere]} = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.WS_SPHERE,

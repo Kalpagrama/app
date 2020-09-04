@@ -15,8 +15,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     :style=`{
       position: 'relative',
       borderRadius: '10px', overflow: 'hidden',
-      minHeight: '400px',
-    }`).row.full-width.b-40
+      minHeight: node.items.length === 0 ? '400px' : 'null',
+    }`).row.full-width.items-start.content-start.b-40
     //- empty
     div(
       v-if="node.items.length === 0"
@@ -28,8 +28,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     //- one
     div(
       v-if="node.items.length > 0"
-      :style=`{height: 'auto', paddingRight: '0px'}`
-      ).row.full-width
+      :style=`{paddingRight: '0px'}`
+      ).row.full-width.items-start.content-start
       //- items list
       div().row.full-width.items-start.content-start
         div(
@@ -49,7 +49,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
         q-btn(
           @click="itemFind()"
           flat color="green" icon="add" no-caps
-          :style=`{height: '60px'}`
+          :style=`{height: '50px'}`
           ).full-width Add item
       //- item wrapper one by one
       //- div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-60

@@ -2,7 +2,11 @@
 q-page(
   :style=`{paddingTop: '20px', paddingBottom: '400px'}`)
   .row.full-width.items-start.content-start.justify-center
-    div(:style=`{maxWidth: '716px', overflow: 'hidden'}`).row.full-width
+    div(
+      :class=`{
+        'q-px-sm': $q.screen.width < 800
+      }`
+      :style=`{maxWidth: '716px', overflow: 'hidden'}`).row.full-width
       //- small.text-white {{sphere}}
       ws-sphere-editor(:item="sphere" :hiddenIds="[sphere.id]")
       .row.full-width.q-mt-xl

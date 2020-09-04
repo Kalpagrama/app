@@ -288,6 +288,7 @@ export default {
       this.player.setCurrentTime(t)
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
+        this.player.pause()
         this.pointDragging = true
         this.pointDraggingIndex = index
         // this.player.pause()

@@ -1,10 +1,10 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width
+  div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
       template(v-slot=`{items, itemsMore}`)
         masonry(
-          :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 4"
+          :cols="$q.screen.width < 800 ? 2 : 4"
           :gutter="{default: 10}").full-width
           ws-node-item(
             v-for="(i,ii) in items" :key="i.id" :node="i"

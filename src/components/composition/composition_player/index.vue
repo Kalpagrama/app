@@ -11,10 +11,11 @@ component(
 
 <script>
 import playerVideo from './player_video/index.vue'
+import playerImage from './player_image/index.vue'
 
 export default {
   name: 'compositionPlayer',
-  components: {playerVideo},
+  components: {playerVideo, playerImage},
   props: ['isActive', 'isVisible', 'composition', 'options'],
   data () {
     return {

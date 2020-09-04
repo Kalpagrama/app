@@ -31,7 +31,7 @@
         borderRadius: '10px',
       }`
       ).row.full-width.items-center.content-center.item.q-px-md.b-50
-      span.text-white {{ node.name }}
+      span.text-white {{ node.name.length > 0 ? node.name.slice(0, 40) : '' }}
     //- isSelected actions: close, edit, createNode
     div(:style=`{marginTop: '-10px', overflow: 'hidden',}`).row.full-width
       transition(appear enter-active-class="animated slideInDown")

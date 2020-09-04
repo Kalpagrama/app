@@ -23,7 +23,11 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
         }`
         @previewClick="next()"
         @started="started(itemIndex), itemsStarted()"
-        @ended="itemEnded(itemIndex, ended)"
+        @ended="ended(itemIndex)"
+        :options=`{
+          isFit: false,
+          loop: items.length === 1
+        }`
         :style=`{
           position: 'relative',
           borderRadius: '10px',

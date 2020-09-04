@@ -31,6 +31,7 @@ q-btn(
   q-menu(
     ref="nodeVoteMenu"
     anchor="top right" self="bottom right" :offset="[8,16]")
+    //- rate again
     div(
       v-if="nodeFull && !nodeFull.rateUser"
       :style=`{
@@ -48,6 +49,7 @@ q-btn(
           v-if="voting !== a.value" name="adjust" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
         q-spinner(
           v-if="voting === a.value" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
+    //- rate USER
     div(
       v-if="nodeFull && nodeFull.rateUser"
       :style=`{
@@ -57,6 +59,10 @@ q-btn(
       .row.full-width.items-center.content-center
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Your vote:
         span(:style=`{fontSize: '26px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
+      .row.full-width
+        div(v-for="v in 4" :key="v").row.full-width.items-center.content-center.q-py-xs
+          div(:style=`{width: '24px', height: '24px', borderRadius: '50%'}`).row.b-60.q-mr-sm
+          small.text-white some user vote
 </template>
 
 <script>
