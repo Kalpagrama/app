@@ -23,17 +23,18 @@
 
 <template lang="pug">
 q-btn(
-  @click="voteStart2()"
+  @click="voteMenuOpened = true"
   flat color="green"
   :loading="voting").voter
   span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm {{ nodeFull ? nodeFull.rate*100 : '' }}
   q-icon(name="adjust" size="30px" color='green')
   q-menu(
-    ref="nodeVoteMenu"
-    anchor="top right" self="bottom right" :offset="[8,16]")
+    v-model="voteMenuOpened" no-parent-event separate-close-popup
+    anchor="top right" self="bottom right" :offset="[8,16]"
+    @hide="voting = false, votingAgain = false")
     //- rate again
     div(
-      v-if="nodeFull && !nodeFull.rateUser"
+      v-if="nodeFull && (!nodeFull.rateUser || votingAgain) && nodeFull.author.oid !== $store.getters.currentUser().oid"
       :style=`{
         position: 'relative',
         maxWidth: '240px',
@@ -51,15 +52,22 @@ q-btn(
           v-if="voting === a.value" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
     //- rate USER
     div(
-      v-if="nodeFull && nodeFull.rateUser"
+      v-if="!votingAgain && nodeFull && nodeFull.rateUser"
       :style=`{
-        width: '180px', height: '200px',
+        width: '180px', height: '180px',
         borderRadius: '10px', overflow: 'hidden',
       }`).row.items-start.content-start.b-50.q-pa-md
-      .row.full-width.items-center.content-center
+      .row.full-width.items-center.content-center.justify-center
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Your vote:
-        span(:style=`{fontSize: '26px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
-      .row.full-width
+        .row.full-width.justify-center
+          span(:style=`{fontSize: '46px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
+        div(
+          v-if="$store.getters.currentUser().oid !== nodeFull.author.oid"
+          ).row.full-width.justify-center.q-py-sm
+          q-btn(
+            @click="votingAgain = true, $wait(300).then(() => (voteMenuOpened = true))"
+            round flat color="green" icon="refresh" size="lg")
+      //- .row.full-width
         div(v-for="v in 4" :key="v").row.full-width.items-center.content-center.q-py-xs
           div(:style=`{width: '24px', height: '24px', borderRadius: '50%'}`).row.b-60.q-mr-sm
           small.text-white some user vote
@@ -74,6 +82,8 @@ export default {
   data () {
     return {
       voting: false,
+      votingAgain: false,
+      voteMenuOpened: false
     }
   },
   computed: {
@@ -88,49 +98,6 @@ export default {
     }
   },
   methods: {
-    voteStart2 () {
-      this.$log('voteStart2')
-    },
-    voteStart () {
-      this.$log('voteStart')
-      this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
-      this.$q.bottomSheet({
-        dark: true,
-        title: this.node.name,
-        persistent: false,
-        seamless: false,
-        grid: false,
-        style: {
-          borderRadius: '10px 10px 0 0',
-          overflow: 'hidden',
-          paddingBottom: '50px',
-          fontSize: '18px',
-        },
-        actions: [
-          // {id: 1, label: this.$t('nodeVote100', 'Прямо в точку!'), icon: '😝', value: 100},
-          // {id: 0.7, label: this.$t('nodeVote70', 'Близко'), icon: '😌', value: 70},
-          // {id: 0.5, label: this.$t('nodeVote50', 'Где-то рядом'), icon: '🤔', value: 50},
-          // {id: 0.3, label: this.$t('nodeVote30', 'Ну такое...'), icon: '🤥', value: 30},
-          // {id: 0, label: this.$t('nodeVote0', 'Очень далеко'), icon: '🥵', value: 0},
-          {id: 1, label: this.$t('nodeVote100', 'Прямо в точку!'), value: 100},
-          {id: 0.7, label: this.$t('nodeVote70', 'Близко'), value: 70},
-          {id: 0.5, label: this.$t('nodeVote50', 'Где-то рядом'), value: 50},
-          {id: 0.3, label: this.$t('nodeVote30', 'Ну такое...'), value: 30},
-          {id: 0, label: this.$t('nodeVote0', 'Очень далеко'), value: 0},
-        ]
-      })
-        .onOk(action => {
-          this.$log('voteStart onOk', action)
-          this.vote(action.value)
-        })
-        .onDismiss(() => {
-          this.$log('voteStart onDismiss')
-          this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-        })
-        .onCancel(() => {
-          this.$log('voteStart onCancel')
-        })
-    },
     async vote (val) {
       try {
         this.$log('vote start', this.node.oid, val)
@@ -139,11 +106,15 @@ export default {
         let res = await NodeApi.nodeVote(this.node.oid, val)
         this.$log('vote done', res)
         this.voting = false
-        if (this.$refs.nodeVoteMenu) this.$refs.nodeVoteMenu.hide()
+        this.votingAgain = false
+        this.voteMenuOpened = false
       }
       catch (e) {
         this.$log('vote error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.voting = false
+        this.votingAgain = false
+        this.voteMenuOpened = false
       }
     }
   }
