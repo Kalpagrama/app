@@ -55,7 +55,7 @@ export default {
         // this.$log('isActive TO', to)
         if (to) {
           this.nodeWorkspace = await this.nodeWorkspaceFind()
-          this.$log('nodeWorkspace', this.nodeWorkspace)
+          // this.$log('nodeWorkspace', this.nodeWorkspace)
         }
         else {
           this.loading = false

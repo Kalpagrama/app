@@ -1,6 +1,6 @@
 <template lang="pug">
 //- kalpa-loader(:mangoQuery="queryBySphere")
-  template(v-slot=`{items,itemsMore}`)
+  template(v-slot=`{items,next}`)
     list-masonry(:items="items" :itemsHidden="[node.oid]").q-pt-md
       template(v-slot:item=`{item}`)
         node-lite(:node="item")

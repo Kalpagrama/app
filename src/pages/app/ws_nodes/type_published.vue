@@ -9,7 +9,7 @@
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
-      template(v-slot=`{items, itemsMore}`)
+      template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
           :gutter="{default: 10}").full-width

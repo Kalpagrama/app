@@ -7,7 +7,7 @@ q-page(
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesLoaded")
-      template(v-slot=`{items, itemsMore}`)
+      template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           div(
             v-for="(n,ni) in items" :key="n.id"

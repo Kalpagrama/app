@@ -5,7 +5,7 @@ q-page(
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="nodesQuery" @items="nodesChanged")
-      template(v-slot=`{items, itemsMore}`)
+      template(v-slot=`{items, next}`)
         list-masonry(:items="items" :class=`{}`).q-pt-md
           template(v-slot:item=`{item}`)
             div(

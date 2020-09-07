@@ -8,7 +8,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.ite
         filled dark dense color="grey-6").full-width
   .row.full-width.items-start.content-start.q-pt-md
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
-      template(v-slot=`{items, itemsMore}`)
+      template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start.q-px-md
           div(
             v-for="(i,ii) in items" :key="i.id"

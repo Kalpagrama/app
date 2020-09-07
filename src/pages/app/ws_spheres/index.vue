@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     async spheresLoaded (spheres) {
-      this.$log('spheresLoaded', spheres)
+      // this.$log('spheresLoaded', spheres)
       this.spheresMapped = false
       this.spheresMap = {}
       await this.$wait(300)
@@ -129,7 +129,7 @@ export default {
       this.spheresMapped = true
     },
     itemsLoaded (items) {
-      this.$log('itemsLoaded', items)
+      // this.$log('itemsLoaded', items)
       items.map(i => {
         if (i.spheres && i.spheres.length > 0) {
           i.spheres.map(s => {

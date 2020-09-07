@@ -59,7 +59,6 @@ q-layout(view="lHh lpR lFf")
             @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
             round flat dense color='white' icon="menu")
   q-page-container
-    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     router-view(v-if="!loading")
     div(
       v-if="loading"
@@ -71,6 +70,7 @@ q-layout(view="lHh lpR lFf")
 <script>
 import { systemLogin } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
+
 export default {
   name: 'mainLayout',
   data () {
@@ -82,15 +82,15 @@ export default {
     '$q.appVisible': {
       immediate: true,
       async handler (to, from) {
-        this.$log('appVisible TO', to)
+        // this.$log('appVisible TO', to)
       }
     }
   },
   async created () {
-    this.$log('created')
+    // this.$log('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
-    this.$log('systemLogin...')
+    // this.$log('systemLogin...')
     await systemLogin()
     this.loading = false
   }
