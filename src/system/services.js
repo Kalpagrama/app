@@ -8,7 +8,7 @@ import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
 import store from 'src/store/index'
 import { wait } from 'src/system/utils'
-import { router } from 'src/boot/main' // расширяет String и RegExp
+import { router } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)

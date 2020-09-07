@@ -5,6 +5,7 @@ import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { wait } from 'src/system/utils'
+import { router } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)
@@ -96,8 +97,8 @@ async function initPWA (store) {
           let eventData = event.data
           if (eventData.firebaseMessaging) {
             logD('web push message recieved!!!', eventData.firebaseMessaging.payload.data)
-            const notificationTitle = `${eventData.firebaseMessaging.payload.data.type} event received!`
-            showNotification(notificationTitle, 'body')
+            const event = JSON.parse(eventData.firebaseMessaging.payload.data.event)
+            showNotification(event)
           } else if (eventData.type === 'swVer') {
             logD('sw version =', eventData.msgData)
             store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
@@ -269,32 +270,36 @@ function checkSafariRemotePermission (permissionData, vuexContext) {
   }
 }
 
-async function showNotification (title, body) {
-  let options = {
-    body: body,
-    icon: '/statics/icons/icon-192x192.png',
-    badge: '/statics/icons/badge3.png',
-    vibrate: [500, 100, 500],
-    tag: 'tag: sample'
-  }
-  // let notification = new Notification('direct:' + title, options)
-  // logD('notification=', notifications)
-
+async function showNotification (event) {
   if (registration) {
-    // todo
+    const notificationTitle = `${event.type}`
+    let options = {
+      body: `${event.object.name}`,
+      data: event,
+      icon: '/statics/icons/icon-192x192.png',
+      badge: '/statics/icons/badge3.png',
+      vibrate: [500, 100, 500],
+      tag: 'tag: sample'
+    }
+    // let notification = new Notification('direct:' + title, options)
+    // logD('notification=', notifications)
     if ('actions' in Notification.prototype) {
       // Action buttons are supported.
       options.actions = [
         {
-          action: 'test',
-          title: 'action-test',
-          icon: '/statics/icons/favicon-32x32.png'
+          action: 'goto',
+          title: 'go node',
+          icon: '/statics/icons/favicon-32x32.png',
+          handler: async () => {
+            logD('action = go 1')
+            await router.push('/node/' + event.object.oid)
+          }
         }
       ]
     } else {
       // Action buttons are NOT supported.
     }
-    registration.showNotification(title, options)
+    registration.showNotification(notificationTitle, options)
   }
 }
 
