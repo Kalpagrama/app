@@ -1,12 +1,18 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-mb-xl
+div(
+  :style=`{
+    marginBottom: marginBottom+'px',
+  }`
+  ).row.full-width.items-start.content-start
   div(
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
     }`
     ).row.full-width.items-start.content-start.b-40
     //- header: author, createdAt
-    .row.full-width.items-center.content-center.q-pa-sm
+    div(
+      v-if="showAuthor"
+      ).row.full-width.items-center.content-center.q-pa-sm
       q-btn(
         :to="'/user/'+node.meta.author.oid"
         flat color="white" dense no-caps
@@ -32,8 +38,11 @@
         ).row.full-width.items-start.content-start
         //- bookmark
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-bookmark(v-show="isActive" :isActive="isActive" :node="node")
-        composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
+          node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node" :nodeFull="nodeFull")
+        node-items(
+          :previewUrl="node.meta.items[0].thumbUrl" :items="node.meta.items"
+          :isActive="isActive" :isVisible="isVisible")
+        //- composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
         //- fullscreen toggler
         //- q-btn(
           @click="isFullscreen = true"
@@ -45,7 +54,9 @@
             v-if="isFullscreen" :node="node"
             @close="isFullscreen = false")
       //- essence
-      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+      div(
+        v-if="showEssence"
+        :style=`{position: 'relative'}`).row.full-width.items-start.content-start
         .col
           router-link(
             :to="'/node/'+node.oid"
@@ -54,10 +65,10 @@
             }`
             ).row.full-width.items-center.q-py-md.q-pl-md
             span(
-              :style=`{userSelect: 'none', fontSize: '1.4rem'}`).text-white.text-bold {{ node.name }}
+              :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
         .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
-          node-vote(:node="node")
+          node-vote(:node="node" :nodeFull="nodeFull")
   //- footer
   .row.full-width
     slot(name="footer")
@@ -70,11 +81,20 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 import nodeFullscreen from './node_fullscreen.vue'
 import nodeShare from './node_share.vue'
 import nodeVote from './node_vote.vue'
+import nodeItems from './node_items.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote},
-  props: ['node', 'isActive', 'isVisible'],
+  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote, nodeItems},
+  // props: ['node', 'isActive', 'isVisible'],
+  props: {
+    node: {type: Object, required: true},
+    isActive: {type: Boolean, required: true},
+    isVisible: {type: Boolean, required: true},
+    showEssence: {type: Boolean, default () { return true }},
+    showAuthor: {type: Boolean, default () { return true }},
+    marginBottom: {type: Number, default () { return 50 }}
+  },
   data () {
     return {
       nodeFull: null,

@@ -4,15 +4,18 @@ component(
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
- :options="options")
+  :options="options"
+  @previewClick="$emit('previewClick')"
+  @ended="$emit('ended')")
 </template>
 
 <script>
 import playerVideo from './player_video/index.vue'
+import playerImage from './player_image/index.vue'
 
 export default {
   name: 'compositionPlayer',
-  components: {playerVideo},
+  components: {playerVideo, playerImage},
   props: ['isActive', 'isVisible', 'composition', 'options'],
   data () {
     return {

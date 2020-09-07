@@ -84,9 +84,9 @@ export default {
     }
   },
   methods: {
-    fullscreenToggle () {
+    fullscreenToggle (to) {
       this.$log('fullscreenToggle')
-      this.isFullscreen = !this.isFullscreen
+      this.isFullscreen = to === undefined ? !this.isFullscreen : to
     },
     volumeToggle () {
       this.$log('volumeToggle')

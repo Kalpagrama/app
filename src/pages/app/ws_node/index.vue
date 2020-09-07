@@ -9,11 +9,10 @@ ws-node-editor(
 <script>
 import { NodeApi } from 'src/api/node'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeItem from './node_item/index.vue'
 
 export default {
   name: 'pageApp_wsNode',
-  components: {nodeItem},
+  components: {},
   meta () {
     return {
       title: this.node ? this.node.name : ''
@@ -27,18 +26,15 @@ export default {
         name: '',
         items: [],
         spheres: [],
-        category: null,
+        category: 'FUN',
         layout: 'PIP',
         wsItemType: 'WS_NODE',
+        thumbOid: '',
         stage: 'draft',
       }
     }
   },
   computed: {
-    title () {
-      if (this.$route.params.id) return 'Node creator'
-      else return 'Node editor'
-    }
   },
   watch: {
     '$route.params.id': {
@@ -49,6 +45,20 @@ export default {
           if (to === 'new') {
             this.$q.notify({type: 'positive', message: 'Creating new node'})
             this.node = JSON.parse(JSON.stringify(this.nodeNew))
+            var unwatch = this.$watch(
+              'node',
+              async (_from, _to) => {
+                this.$log('node _TO', to)
+                // create node...
+                if (unwatch) unwatch()
+                let nodeInput = JSON.parse(JSON.stringify(this.node))
+                let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+                this.$router.replace(`/workspace/node/${node.id}`)
+              },
+              {
+                deep: true,
+              }
+            )
           }
           else {
             let {items: [item]} = await this.$rxdb.find({

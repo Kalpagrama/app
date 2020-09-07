@@ -19,17 +19,23 @@ div(
         position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
         bottom: '8px', left: '8px',
       }`)
-      q-btn(round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
+      q-btn(
+        @click="muted ? mutedOff() : mutedOn()"
+        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
         q-spinner-audio(
           v-if="!muted"
-          @click="mutedOn()"
           size="25px" color="white").q-mx-sm
+        //- q-icon(
+          v-if="!muted && !playing"
+          name="play_arrow" size="25px" color="white"
+          ).q-mx-sm
         q-icon(
           v-if="muted"
-          @click="mutedOff()"
           size="25px" color="red" name="volume_off").q-mx-sm
+        span.text-white.text-bold.q-mr-sm {{ $time(duration-currentTime) }}
   //- preview
   img(
+    @click="$emit('previewClick')"
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
@@ -48,11 +54,16 @@ div(
     ).row.fit
     video(
       @click="videoClicked"
+      @timeupdate="videoTimeupdate"
       @loadedmetadata="videoLoadedmetadata"
+      @play="videoPlay"
+      @pause="videoPause"
+      @ended="videoEnded"
       ref="compositionVideoRef"
       :src="composition.url"
       :muted="muted"
-      playsinline loop
+      :loop="options.loop"
+      playsinline
       :style=`{
         objectFit: 'contain',
         borderRadius: '10px', overflow: 'hidden',
@@ -75,6 +86,7 @@ export default {
       default () {
         return {
           isFit: false,
+          loop: true,
         }
       }
     }
@@ -82,7 +94,9 @@ export default {
   data () {
     return {
       muted: true,
-      contentKalpa: null,
+      playing: false,
+      currentTime: 0,
+      duration: 0
     }
   },
   watch: {
@@ -124,6 +138,18 @@ export default {
         }
       }
     },
+    videoPlay (e) {
+      // this.$log('videoPlay', e)
+      this.playing = true
+    },
+    videoPause (e) {
+      // this.$log('videoPause', e)
+      this.playing = false
+    },
+    videoEnded (e) {
+      // this.$log('videoEnded', e)
+      this.$emit('ended')
+    },
     videoClicked (e) {
       this.$log('videoClicked', e)
       if (this.muted) {
@@ -135,8 +161,13 @@ export default {
         else e.target.pause()
       }
     },
+    videoTimeupdate (e) {
+      // this.$log('videoTimeupdate', e.target.currentTime)
+      this.currentTime = e.target.currentTime
+    },
     videoLoadedmetadata (e) {
       // this.$log('videoLoadedmetadata', e)
+      this.duration = e.target.duration
       if (this.isActive) {
         e.target.play()
       }

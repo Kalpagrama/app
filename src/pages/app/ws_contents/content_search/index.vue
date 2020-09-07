@@ -23,7 +23,7 @@
       }`
       :style=`{
         margin: 0,
-        paddingRight: '0px',
+        //- paddingRight: '0px',
       }`
       ).full-width
       template(v-slot:append)
@@ -32,7 +32,7 @@
           @click="searchStringRaw = ''"
           flat dense color="white" icon="clear")
         q-btn(
-          flat dense color="white" icon="filter_list")
+          flat dense color="white" icon="tune")
   content-uploader(@file="contentFile = $event, contentImporterShow = true")
 </template>
 
@@ -65,13 +65,6 @@ export default {
           this.searchStringLoading = true
           this.contentKalpa = await this.contentFromURL(to)
           this.contentImporterShow = true
-          // this.$q.loading.show({spinnerColor: 'green', message: 'Loading content...'})
-          // this.searchStringRaw = ''
-          // this.$refs.searchStringInput.blur()
-          // await this.$wait(2000)
-          // this.$q.loading.hide()
-          // this.searchStringLoading = false
-          // this.$emit('content', await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
@@ -95,7 +88,7 @@ export default {
       try {
         this.$log('contentFromURL start', url)
         let content = await ContentApi.contentCreateFromUrl(url)
-        this.$log('contentFromURL done')
+        this.$log('contentFromURL done', content)
         return content
       } catch (e) {
         this.$log('contentFromURL error', e)

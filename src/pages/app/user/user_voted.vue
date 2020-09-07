@@ -1,27 +1,19 @@
 <template lang="pug">
-kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-  template(v-slot=`{items, itemsMore}`)
-    list-middle(:items="items" :more="itemsMore")
-      //- item first for padding
-      template(v-slot:itemFirst)
-        div(:style=`{height: '110px'}`).row.full-width
-      template(v-slot:item=`{item, index, indexMiddle}`)
-        node(
-          ctx="list" layout="PIP"
-          :node="item" :index="index" :essence="true"
-          :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-          :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-          :active="index === indexMiddle"
-          :mini="false")
-      //- item last for padding
-      template(v-slot:itemLast)
-        div(:style=`{height: '400px'}`).row.full-width
+q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
+  div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+    kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+      template(v-slot=`{items,next}`)
+        list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+          q-infinite-scroll(@load="next" :offset="250")
+          template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+            node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
-  import { RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
-  name: 'userExplorer-userVoted',
+  name: 'userExplorer_userVoted',
   components: {},
   data () {
     return {

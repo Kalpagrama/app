@@ -74,7 +74,7 @@ export const wsSchemaItem = {
       maxItems: 888,
       uniqueItems: false,
       items: {
-        type: 'object'
+        type: ['object', 'string']
       }
     },
     category: {

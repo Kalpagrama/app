@@ -171,7 +171,11 @@ export default {
             }
             // this is the last layer to play, and loop, or stop...
             else {
-              this.player.pause()
+              // this.player.pause()
+              this.layerPlaying = 0
+              this.layersPlayed = []
+              let t = this.composition.layers[0].figuresAbsolute[0].t
+              this.player.setCurrentTime(t)
             }
           }
         }
@@ -202,6 +206,7 @@ export default {
     },
     compositionRefresh () {
       this.$log('compositionRefresh')
+      this.layersPlayed = []
       this.compositionPlay()
     },
     compositionStop () {

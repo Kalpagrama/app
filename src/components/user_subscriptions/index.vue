@@ -25,7 +25,7 @@ div(:style=`{position: 'relative',}`).column.fit
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items, itemsMore}`)
+      template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(s,si) in items" :key="s.oid"

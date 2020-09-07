@@ -31,7 +31,7 @@
         borderRadius: '10px',
       }`
       ).row.full-width.items-center.content-center.item.q-px-md.b-50
-      span.text-white {{ node.name }}
+      span.text-white {{ node.name.length > 0 ? node.name.slice(0, 40) : '' }}
     //- isSelected actions: close, edit, createNode
     div(:style=`{marginTop: '-10px', overflow: 'hidden',}`).row.full-width
       transition(appear enter-active-class="animated slideInDown")
@@ -43,9 +43,9 @@
           }`
           ).row.full-width.items-center.content-center.q-pa-xs.bg-green
           .col
-          q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`) Close
-          q-btn(flat dense color="white" no-caps @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-sm.q-mr-md Edit
-          q-btn(outline dense color="white" no-caps @click="nodeCreate()" :style=`{zIndex: 2000}`).q-px-md Create node
+          q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-mr-md Close
+          q-btn(flat dense color="white" no-caps icon="edit" @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-md
+          q-btn(round outline dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
   //- isEditing wrapper
   div(
     v-if="isEditing"
@@ -69,22 +69,10 @@
           q-input(
             v-model="node.name"
             filled dark dense color="grey-6"
-            type="textarea" autogrow
+            autogrow type="textarea"
             placeholder="В чем суть?"
-            @focus="$store.commit('ui/stateSet', ['isTyping', true])"
-            @blur="$store.commit('ui/stateSet', ['isTyping', false])").full-width
-        //- node.spheres editor
-        div().row.full-width.items-center.content-center.q-py-sm
-          //- q-btn(
-            v-for="s in 3" :key="s"
-            flat dense no-caps
-            :style=`{
-              whiteSpace: 'nowrap',
-              borderRadius: '10px',
-              }`).text-white.q-mr-sm.b-60.q-px-xs #сфера сути {{s}},
-          q-btn(round flat dense no-caps icon="add" color="grey-4") Add spheres
-          //- q-btn(round flat dense color="grey-6" icon="add")
-          //- edit-spheres(:node="node" :player="player")
+            ).full-width
+        ws-sphere-editor(:item="node").q-py-sm
     //- footer: actions close, createNode
     div().row.full-width.q-pa-md
       q-btn(flat color="white" no-caps @click="$emit('edited')").b-40 Close
@@ -94,19 +82,20 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
-import editSpheres from './edit_spheres.vue'
 
 export default {
   name: 'viewDrafts_draftItem',
-  components: {compositionEditor, compositionBar, editSpheres},
+  components: {compositionEditor, compositionBar},
   props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
     }
   },
   computed: {
+    // TODO: find items of this content ???
     items () {
       return this.node.items
     },
@@ -115,18 +104,21 @@ export default {
     }
   },
   methods: {
-    barClickHandle (e) {
-      this.$log('barClickHandle', e)
-    },
+    // barClickHandle (e) {
+    //   this.$log('barClickHandle', e)
+    // },
     async nodeCreate () {
       this.$log('nodeCreate')
       // make draft copy, create new draft, go to it
-      let nodeInput = JSON.parse(JSON.stringify(this.node))
-      nodeInput.stage = 'draft'
-      delete nodeInput.id
-      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      this.$log('nodeCreate node', node)
-      this.$router.push(`/workspace/node/${node.id}`)
+      // let nodeInput = JSON.parse(JSON.stringify(this.node))
+      // nodeInput.stage = 'draft'
+      // delete nodeInput.id
+      // let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      // this.node.stage = 'draft'
+      await this.node.updateExtended('stage', 'draft', false)
+      // await this.node.updateExtended('oid', createdNode.oid, false)
+      // this.$log('nodeCreate node', node)
+      this.$router.push(`/workspace/node/${this.node.id}`).catch(e => e)
       // mutate fragment to draft
       // this.node.stage = 'draft'
       // this.$router.push(`/workspace/node/${this.node.id}`)

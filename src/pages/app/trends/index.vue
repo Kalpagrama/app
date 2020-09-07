@@ -8,8 +8,6 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="whatshot" color="white" size="30px").q-mr-sm
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_trends', 'Категории')}}
           .col
-          //- q-btn(round flat color="green" icon="add" to="/settings/feeds")
-          //- q-btn(round flat color="white" icon="settings" to="/settings/feeds")
   q-page-container
     q-page(
       :style=`{
@@ -24,11 +22,11 @@ q-layout(view="hHh Lpr lff")
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-            template(v-slot=`{items,itemsMore}`)
-              list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '50px',}`)
+            template(v-slot=`{items,next}`)
+              list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+                q-infinite-scroll(@load="next" :offset="250")
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
                   node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
-                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
@@ -42,11 +40,10 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeFeed from 'pages/app/twitter/node_item.vue'
 
 export default {
   name: 'pageApp__trends',
-  components: {nodeFeed},
+  components: {},
   data () {
     return {
       nodeCategories: [],

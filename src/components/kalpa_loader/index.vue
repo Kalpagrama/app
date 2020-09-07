@@ -3,7 +3,7 @@ export default {
   render () {
     return this.$scopedSlots.default({
       items: this.itemsSliced,
-      itemsMore: this.itemsMore,
+      next: this.next,
     })
   },
   name: 'kalpaLoader',
@@ -11,14 +11,12 @@ export default {
     sliceSize: {
       type: Number,
       default () {
-        return 10
+        return 3
       }
     },
     mangoQuery: {
       type: Object,
-      default () {
-        return null
-      }
+      required: true,
     }
   },
   data () {
@@ -30,7 +28,6 @@ export default {
       itemsSliced: [],
       itemsSlicing: false,
       itemsLoading: false,
-      itemsMoreLoading: false,
       pageToken: null,
       pageTokenNext: null,
       totalCount: 0,
@@ -54,7 +51,7 @@ export default {
       handler (to, from) {
         // this.$log('items TO', to)
         this.$emit('itemsCount', to.length)
-        this.$emit('items', to)
+        // this.$emit('items', to)
         // alert('item CHANGED: ' + to.length)
         this.itemsSlice = 1
         this.itemsSliced = to.slice(0, this.sliceSize)
@@ -62,9 +59,8 @@ export default {
     }
   },
   methods: {
-    async itemsMore () {
-      if (this.itemsSlicing) return
-      this.$log('itemsMore')
+    async next (index, done) {
+      this.$log('next', index)
       this.itemsSlicing = true
       // check
       let start = this.itemsSliced.length
@@ -77,8 +73,9 @@ export default {
       this.itemsSliced.splice(start, 0, ...arr)
       this.itemsSlice += 1
       // this.$q.notify('Loading... ' + this.itemsSlice)
-      await this.$wait(1500)
+      await this.$wait(1000)
       this.itemsSlicing = false
+      done()
     },
     async itemsLoad (mangoQuery, append = false) {
       // this.$log('itemsLoad start', mangoQuery)
@@ -99,12 +96,6 @@ export default {
         this.$logE('itemsLoad error', e)
       }
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

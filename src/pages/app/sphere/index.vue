@@ -3,15 +3,16 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        div(:style=`{height: '50px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
-          q-icon(name="blur_on" color="white" size="30px").q-mr-sm
+        div(:style=`{borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-between.q-pa-xs.b-40
+          q-icon(name="blur_on" color="white" size="30px").q-mx-sm
           span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
           .col
+          kalpa-follow(:oid="$route.params.oid")
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '8px', paddingBottom: '200px',
+        paddingTop: '16px', paddingBottom: '200px',
       }`)
       .row.full-width.items-start.content-start.justify-center
         div(
@@ -19,25 +20,22 @@ q-layout(view="hHh Lpr lff")
           }`
           :style=`{
             maxWidth: '800px',
-            //- borderLeft: '1px solid rgb(40,40,40)',
-            //- borderRight: '1px solid rgb(40,40,40)',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphere" :mangoQuery="mangoQuery")
-            template(v-slot=`{items,itemsMore}`)
-              list-middle(:items="items" :more="itemsMore" :itemStyles=`{marginBottom: '0px',}`)
+            template(v-slot=`{items,next}`)
+              list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
+                q-infinite-scroll(@load="next" :offset="250")
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
                   node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
-                  //- node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeFeed from 'pages/app/twitter/node_item.vue'
 
 export default {
   name: 'pageApp_sphere',
-  components: {nodeFeed},
+  components: {},
   data () {
     return {
       sphere: null,

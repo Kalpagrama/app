@@ -8,11 +8,13 @@ q-layout(view="hHh Lpr lff")
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
           .col
             div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40
+              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
               q-icon(name="select_all" color="white" size="30px").q-mx-sm
               div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
-              q-btn(round flat color="grey-8" icon="more_vert")
+              kalpa-follow(
+                v-if="contentKalpa"
+                :oid="contentKalpa.oid")
             div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
               q-tabs(
                 v-model="viewId"
@@ -62,18 +64,18 @@ q-layout(view="hHh Lpr lff")
             }`).fit
             template(v-slot:actions)
               q-btn(
-                v-if="viewId === 'fragments'"
-                @click="$refs[`view-${viewId}`].nodeCreateStart()"
+                v-if="true"
+                @click="nodeCreateStart()"
                 round push color="green" dense icon="add"
                 :style=`{borderRadius: '50%'}`)
-    view-fullscreen(
+    //- view-fullscreen(
       v-if="(player && player.isFullscreen)"
       :player="player"
       :contentKalpa="contentKalpa"
       :contentWorkspace="contentWorkspace")
     //- view dynamic component
     component(
-      v-if="player ? !player.isFullscreen : true"
+      v-if="player"
       :is="`view-${viewId}`"
       :ref="`view-${viewId}`"
       :player="player"
@@ -97,7 +99,6 @@ export default {
       viewId: 'fragments',
       player: null,
       playerIsVisible: false,
-      isFullscreen: false,
     }
   },
   computed: {
@@ -109,7 +110,33 @@ export default {
       ]
     }
   },
+  watch: {
+    '$route.query.viewid': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.query.viewId TO', to)
+        // set viewId force, from feed or from workspace
+        if (to) {
+          this.viewId = to
+        }
+        // catch lastViewId
+        else {
+          let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
+          this.$log('lastViewId', lastViewId)
+          if (lastViewId) this.viewId = lastViewId
+        }
+      }
+    }
+  },
   methods: {
+    async nodeCreateStart () {
+      this.$log('nodeCreateStart')
+      this.player.fullscreenToggle(false)
+      this.viewId = 'fragments'
+      this.$nextTick(() => {
+        this.$refs['view-fragments'].nodeCreateStart()
+      })
+    },
     playerStyles () {
       if (this.player && this.player.isFullscreen) {
         return {
@@ -142,9 +169,21 @@ export default {
         this.player.setCurrentTime(startat)
       }
     },
+    handleFocusin (e) {
+      if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$log('handleFocusin', e)
+        this.$store.commit('ui/stateSet', ['isTyping', true])
+      }
+    },
+    handleFocusout (e) {
+      if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$log('handleFocusout', e)
+        this.$store.commit('ui/stateSet', ['isTyping', false])
+      }
+    },
     keydownHandle (e) {
       if (this.$store.state.ui.isTyping) return
-      // this.$log('keydownHandle', e)
+      this.$log('keydownHandle', e)
       // left/right keys for fast navigations
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         if (!this.player) return
@@ -166,25 +205,24 @@ export default {
       if (e.key === 'Escape') {
         if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
       }
+      // create Fragment with N or F
+      if (e.keyCode === 78 || e.keyCode === 70) {
+        this.nodeCreateStart()
+      }
     }
-  },
-  created () {
-    let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
-    if (lastViewId) this.viewId = lastViewId
   },
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
-    // window.addEventListener('focusin', (e) => {
-    //   this.$log('focus!!!', e)
-    // })
-    // window.addEventListener('focusout', (e) => {
-    //   this.$log('blur!!!', e)
-    // })
+    // prevent text,textarea events...
+    window.addEventListener('focusin', this.handleFocusin)
+    window.addEventListener('focusout', this.handleFocusout)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
+    window.removeEventListener('focusin', this.handleFocusin)
+    window.removeEventListener('focusout', this.handleFocusout)
     localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
   }
 }

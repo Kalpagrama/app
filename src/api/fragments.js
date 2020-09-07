@@ -88,6 +88,7 @@ const videoFragment = gql`${objectFragment}
     frameUrls
     contentProvider
     contentSource
+    contentProvider
   }
 `
 const imageFragment = gql`${objectFragment}

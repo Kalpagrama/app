@@ -5,7 +5,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span().text-white Sign in with username/password
+            span().text-white {{$t('auth_Sign in with username/password', 'Войти с логином и паролем')}}
           //- form
           form().full-width.q-py-md
             //- username
@@ -14,7 +14,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="login"
-                placeholder="Username"
+                :placeholder="$t('auth_Username', 'Логин')"
                 autocomplete="username"
                 filled dark color="white" name="username"
                 type="text" required
@@ -26,7 +26,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="password"
-                placeholder="Enter password"
+                :placeholder="$t('auth_Enter password', 'Введите пароль')"
                 autocomplete="current-password"
                 type="password" required name="password"
                 filled dark color="white"
@@ -40,15 +40,15 @@ q-page(:style=`{paddingBottom: '200px',}`)
               height: '60px',
             }`
             ).full-width
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold Enter kalpa
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
       .row.full-width.q-px-sm
         with-socials
       .row.full-width.items-center.content-center.q-pa-md
         q-btn(
           color="green" outline dense no-caps
-          @click="$router.push('/auth/sign-up')").full-width Sign up
+          @click="$router.push('/auth/sign-up')").full-width {{$t('auth__Sign up', 'Регистрация')}}
         .row.full-width.justify-center.q-pa-xs
-          small.text-green No account?
+          small.text-green {{$t('auth_No account ?', 'Нет аккаунта?')}}
 </template>
 
 <script>
