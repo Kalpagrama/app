@@ -59,6 +59,8 @@ q-layout(view="lHh lpR lFf")
             @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
             round flat dense color='white' icon="menu")
   q-page-container
+    //- keep-alive(:max="10")
+      router-view(v-if="!loading")
     router-view(v-if="!loading")
     div(
       v-if="loading"

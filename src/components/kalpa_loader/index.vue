@@ -21,8 +21,6 @@ export default {
   },
   data () {
     return {
-      loaded: false,
-      query: null,
       items: [],
       itemsSlice: 1,
       itemsSliced: [],
@@ -62,13 +60,19 @@ export default {
     async next (index, done) {
       this.$log('next', index)
       this.itemsSlicing = true
+      // TODO: if we are in a bottom... what to do???
       // check
+      // if (this.itemsSliced.length === this.items.length) {
+      //   return
+      // }
       let start = this.itemsSliced.length
       let end = (this.itemsSlice + 1) * this.sliceSize
       this.$log('start/end', start, end)
-      if (end > this.items.length) end = this.items.length
+      if (end > this.items.length) {
+        end = this.items.length
+      }
       let arr = this.items.slice(start, end)
-      this.$log('arr', arr)
+      // this.$log('arr', arr)
       // set
       this.itemsSliced.splice(start, 0, ...arr)
       this.itemsSlice += 1

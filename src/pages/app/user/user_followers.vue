@@ -19,7 +19,7 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
             }`
             ).row.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
             img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
-            div(@click="subscriptionClick(s,si)").col.q-px-sm
+            div(@click="subscriptionClick(s,si)").col.q-pl-sm
               span.text-white {{ s.name }}
 </template>
 
