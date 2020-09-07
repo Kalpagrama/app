@@ -49,7 +49,7 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'workspace.nodes.fragments', name: this.$t('pageApp_wsNodes_fragments', 'Фрагменты')},
+        // {id: 'workspace.nodes.fragments', name: this.$t('pageApp_wsNodes_fragments', 'Фрагменты')},
         {id: 'workspace.nodes.drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
         {id: 'workspace.nodes.published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
         {id: 'workspace.nodes.saved', name: this.$t('pageApp_wsNodes_saved', 'Сохраненные')},

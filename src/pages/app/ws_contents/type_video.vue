@@ -45,7 +45,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
               ).row.full-width.items-center.content-center.bg-green.q-px-sm.q-pb-sm
               q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
               .col
-              q-btn(round flat dense color="white" icon="launch" @click="itemEdit(i,ii)")
+              q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
 </template>
 
 <script>
@@ -89,9 +89,9 @@ export default {
       // TODO what to do if we got items on this sphere ???
       await this.$rxdb.remove(item.id)
     },
-    itemEdit (item) {
-      this.$log('itemEdit', item)
-      this.$router.push(`/workspace/content/${item.id}`).catch(e => e)
+    itemLaunch (item) {
+      this.$log('itemLaunch', item)
+      this.$router.push(`/workspace/content/${item.id}?viewid=fragments`).catch(e => e)
     },
   }
 }

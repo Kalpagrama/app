@@ -3,18 +3,18 @@
 q-layout(view="hHh lpR fFf").b-30
   q-page-container
     div(
-      @click="$router.replace('/auth')"
+      @click="$router.replace('/auth').catch(e => e)"
       :style=`{height: '200px', overflow: 'hidden',}`).row.full-width.items-center.content-center.justify-center.b-30
       kalpa-logo(:width="100" :height="100").q-mb-md
-      h5.text-white.text-bold.q-ma-xs.q-pa-xs Kalpagramma
+      h5.text-white.text-bold.q-ma-xs.q-pa-xs Кальпаграма
     router-view
 </template>
 
 <script>
 export default {
   name: 'authLayout',
-  meta: {
-    title: 'Kalpa - Authentication'
+  meta () {
+    return this.$t('Kalpagrama - Authentication', 'Кальпаграма - Авторизация')
   },
   data () {
     return {

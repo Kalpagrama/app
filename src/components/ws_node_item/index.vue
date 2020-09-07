@@ -8,13 +8,13 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   div(
+    @click="$emit('clicked')"
     :style=`{
       position: 'relative', zIndex: 100,
       borderRadius: '10px', overflow: 'hidden',
     }`
     ).row.full-width.b-40.node-item.q-px-md.q-pt-md
     div(
-      @click="$emit('clicked')"
       :style=`{
         position: 'relative', zIndex: 100,
         height: 0, paddingBottom: '100%',
@@ -62,7 +62,9 @@
     //- essense
     div(
       ).row.full-width.q-py-sm.q-px-md
-      small(v-if="node.items.length > 0").text-white {{ node.name }}
+      small(
+        v-if="node.items.length > 0"
+        :style=`{userSelect: 'none',}`).text-white {{ node.name }}
   slot(name="footer")
 </template>
 

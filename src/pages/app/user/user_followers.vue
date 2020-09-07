@@ -1,11 +1,11 @@
 <style lang="sass" scoped>
 .subscription
   &:hover
-    background: rgb(90,90,90)
+    background: rgb(50,50,50)
 </style>
 
 <template lang="pug">
-q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
+q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
   div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
       template(v-slot=`{items, itemsMore}`)

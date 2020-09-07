@@ -29,6 +29,7 @@ q-layout(view="hHh Lpr lff")
                 :to="`/trends/${categoryOid}`"
                 :style=`{fontSize: '16px'}`
                 ).text-white.text-bold.q-px-sm {{ categoryName }}
+              kalpa-follow(:oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
@@ -77,7 +78,6 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
 import { date } from 'quasar'
 import { shareWith } from 'src/system/services'
 

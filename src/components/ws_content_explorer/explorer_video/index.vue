@@ -8,11 +8,13 @@ q-layout(view="hHh Lpr lff")
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
           .col
             div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40
+              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
               q-icon(name="select_all" color="white" size="30px").q-mx-sm
               div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
-              q-btn(round flat color="grey-8" icon="more_vert")
+              kalpa-follow(
+                v-if="contentKalpa"
+                :oid="contentKalpa.oid")
             div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
               q-tabs(
                 v-model="viewId"
@@ -113,8 +115,15 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('$route.query.viewId TO', to)
+        // set viewId force, from feed or from workspace
         if (to) {
           this.viewId = to
+        }
+        // catch lastViewId
+        else {
+          let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
+          this.$log('lastViewId', lastViewId)
+          if (lastViewId) this.viewId = lastViewId
         }
       }
     }
@@ -161,14 +170,14 @@ export default {
       }
     },
     handleFocusin (e) {
-      this.$log('handleFocusin', e)
       if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$log('handleFocusin', e)
         this.$store.commit('ui/stateSet', ['isTyping', true])
       }
     },
     handleFocusout (e) {
-      this.$log('handleFocusout', e)
       if (e.target.type === 'text' || e.target.type === 'textarea') {
+        this.$log('handleFocusout', e)
         this.$store.commit('ui/stateSet', ['isTyping', false])
       }
     },
@@ -196,19 +205,16 @@ export default {
       if (e.key === 'Escape') {
         if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
       }
-      // handle nodeCreateStart()
-      // if (e.keyCode === 78) {
-      //   this.nodeCreateStart()
-      // }
+      // create Fragment with N or F
+      if (e.keyCode === 78 || e.keyCode === 70) {
+        this.nodeCreateStart()
+      }
     }
-  },
-  created () {
-    // let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
-    // if (lastViewId) this.viewId = lastViewId
   },
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
+    // prevent text,textarea events...
     window.addEventListener('focusin', this.handleFocusin)
     window.addEventListener('focusout', this.handleFocusout)
   },
@@ -217,7 +223,7 @@ export default {
     window.removeEventListener('keydown', this.keydownHandle)
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)
-    // localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
+    localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
   }
 }
 </script>

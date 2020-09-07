@@ -3,15 +3,16 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        div(:style=`{height: '50px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
-          q-icon(name="blur_on" color="white" size="30px").q-mr-sm
+        div(:style=`{borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-between.q-pa-xs.b-40
+          q-icon(name="blur_on" color="white" size="30px").q-mx-sm
           span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
           .col
+          kalpa-follow(:oid="$route.params.oid")
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '8px', paddingBottom: '200px',
+        paddingTop: '16px', paddingBottom: '200px',
       }`)
       .row.full-width.items-start.content-start.justify-center
         div(

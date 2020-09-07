@@ -16,31 +16,6 @@ q-layout(view="hHh Lpr lff")
             q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   q-page-container
     router-view(:searchString="searchString")
-    //- q-page(style="padding-top: 8px")
-      .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px', paddingBottom: '200px',}`).row.full-width.items-start.content-start
-          q-tab-panels(
-            v-model="type" infinite animated
-            :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
-            q-tab-panel(
-              v-for="t in types" :key="t.id" :name="t.id"
-              :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
-              kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-                template(v-slot=`{items, itemsMore}`)
-                  list-masonry(
-                    v-if="t.id === 'IMAGE'" :items="items").full-width.q-px-sm
-                    template(v-slot:item=`{item}`)
-                      content-item(:content="item" @pick="contentPicked(item)")
-                  div(
-                    v-else).row.full-width.q-px-sm
-                    content-item(
-                      v-for="(c,ci) in items" :key="c.id" :content="c"
-                      @pick="contentPicked(c)")
-      //- q-page-sticky(expand position="top" :style=`{zIndex: 1000}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
-            q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
-              q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
 </template>
 
 <script>

@@ -12,7 +12,7 @@
     ).row.full-width.items-center.content-center.b-40.q-pt-md
     //- home
     router-link(
-      :to="'/'"
+      :to="$store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/'"
       ).row.full-width
       div(
         :style=`{height: '60px', width: '60px'}`
@@ -20,14 +20,14 @@
         kalpa-logo(:width="40" :height="40")
       div(v-if="showRightSide").col
         div(
-          @click="$router.push('/').catch(e => e)"
+          @click="$router.push($store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/').catch(e => e)"
           ).row.fit.items-center.content-center.cursor-pointer
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
           .row.full-width
             small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
     //- user
     router-link(
-      v-if="$store.getters.currentUser()"
+      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
       :to="'/user/'+$store.getters.currentUser().oid"
       :class=`{
         'b-60': $route.path.split('/')[1] === 'user'
@@ -49,6 +49,7 @@
       ).column.full-width.q-pt-sm
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
+          v-if="p.id === 'trends' ? true : $store.getters.currentUser().profile.role !== 'GUEST'"
           :to="{name: p.id}"
           :class=`{
             'b-60': $route.path.split('/')[1] === p.id
@@ -86,14 +87,16 @@
         div(
           v-if="$store.getters.currentUser().profile.role === 'GUEST'"
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="login()"
-        ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+          ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power" color="white" :loading="loginLoading")
           span(
             v-if="showRightSide"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
         //- create node
-        .row.full-width.items-center.content-center
+        div(
+          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+          ).row.full-width.items-center.content-center
           q-btn(
             :to="'/workspace/node/new'"
             flat color="green" no-caps align="left" icon="add" size="md"
@@ -116,7 +119,8 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
+        // {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
+        {id: 'home', name: this.$t('pageApp_Home_title', 'Домашняя'), icon: 'home'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
@@ -139,7 +143,6 @@ export default {
       this.$log('refresh')
       this.refreshLoading = true
       await this.$wait(300)
-      // await shareWith(this.$store.getters.currentUser())
       await systemReset()
       window.location.reload()
       this.refreshLoading = false
@@ -150,13 +153,14 @@ export default {
       this.logoutLoading = true
       await this.$wait(300)
       await AuthApi.logout()
+      this.$router.replace('/auth').catch(e => e)
       this.logoutLoading = false
     },
     async login () {
       this.$log('login')
       this.loginLoading = true
       await this.$wait(300)
-      await this.$router.push('/auth')
+      await this.$router.push('/auth').catch(e => e)
       this.loginLoading = false
     }
   },

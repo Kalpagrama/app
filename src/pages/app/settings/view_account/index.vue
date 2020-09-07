@@ -41,7 +41,8 @@ q-page.row.full-width.justify-center
         .row.full-width.q-pa-xs
           q-select(
             filled
-            dark color="white" label="Language"
+            dark color="white"
+            :label="$t('settings_Language', 'Язык')"
             v-model="lang"
             option-value="value"
             option-label="label"
