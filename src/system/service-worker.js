@@ -1,4 +1,4 @@
-const swVer = 3
+const swVer = 11
 const useCache = true
 let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
@@ -68,17 +68,20 @@ function sendMsg (type, msgData) {
                logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
                // Customize notification here
-               const notificationTitle = `#${++i} ${payload.data.type} event received!`
+               const event = JSON.parse(payload.data.event)
+               // const notificationTitle = `#${++i} ${event.type} event received!`
+               const notificationTitle = `${event.type}`
                const notificationOptions = {
-                  body: `payload: ${JSON.stringify(payload.data.type)} ${payload.data.message ? 'message' + payload.data.message : ''}`,
+                  body: `${event.object.name}`,
+                  data: event,
                   icon: '/statics/icons/icon-192x192.png',
                   badge: '/statics/icons/badge3.png',
                   vibrate: [500, 100, 500],
                   tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
                   actions: [
                      {
-                        action: 'test',
-                        title: 'action-test',
+                        action: 'goto',
+                        title: 'go to node',
                         icon: '/statics/logo.png'
                      }
                   ]
@@ -212,17 +215,31 @@ function sendMsg (type, msgData) {
          }
       })
       self.addEventListener('notificationclick', function (event) {
+         logDebug('notificationclick', event)
+         logDebug('notificationclick', event.notification.data)
          event.notification.close()
-         logDebug('notificationclick')
+         const dbEvent = event.notification.data
+         logDebug('notificationclick dbEvent', dbEvent)
+
+         let route = '/'
+         if (event.action === 'goto') {
+            route = '/node/' + dbEvent.object.oid
+         } else {
+            route = '/node/' + dbEvent.object.oid
+         }
          event.waitUntil(
             // Получаем список клиентов SW.
-            self.clients.matchAll().then(function (clientList) {
+            self.clients.matchAll({ type: 'window' }).then(function (clientList) {
                // Если есть хотя бы один клиент, фокусируем его.
                if (clientList.length > 0) {
-                  return clientList[0].focus()
+                  if ('navigate' in clientList[0]){
+                     clientList[0].focus()
+                     clientList[0].navigate(route)
+                     return
+                  }
                }
                // В противном случае открываем новую страницу.
-               return self.clients.openWindow('/')
+               return self.clients.openWindow(route)
             })
          )
       }, false)
@@ -253,9 +270,9 @@ function sendMsg (type, msgData) {
                // * 1, страница сфокусирована;
                // * 2, страница по-прежнему открыта, но не сфокусирована;
                // * 3, страница закрыта).
-               return self.registration.showNotification('Unforgiveable Curses', {
-                  body: notificationMessage
-               })
+               // return self.registration.showNotification('Unforgiveable Curses', {
+               //    body: notificationMessage
+               // })
             })
          )
       })
@@ -444,7 +461,7 @@ if (useCache) {
                credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
                mode: 'cors', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
                headers: {
-                  'Cache-Control': 'no-cache', // нужно тк иначе браузер кэширует картинки и они так оказваются без cors-заголовков (при получении такой картинки - происходит ошибка)
+                  'Cache-Control': 'no-cache' // нужно тк иначе браузер кэширует картинки и они так оказваются без cors-заголовков (при получении такой картинки - происходит ошибка)
                   // 'x-my-custom-header': 'The Most Amazing Header Ever'
 
                }

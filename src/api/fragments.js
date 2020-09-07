@@ -86,6 +86,7 @@ const videoFragment = gql`${objectFragment}
     urlOriginal
     duration
     frameUrls
+    contentProvider
     contentSource
     contentProvider
   }
@@ -95,8 +96,8 @@ const imageFragment = gql`${objectFragment}
     ...objectFragment
     url
     urlOriginal
-    contentSource
     contentProvider
+    contentSource
   }
 `
 const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment}
@@ -242,25 +243,29 @@ const eventFragment = gql`
       wsRevision
       wsItem
     }
-    ... on EventChange{
+    ... on EventObjectUpdate{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
       path
       value
+      matter {reason subscription}
     }
     ... on EventGeneral{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
+      matter {reason subscription}
     }
     ... on EventObjectCreateDelete{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
       sphereOids
+      matter {reason subscription}
     }
-    ... on EventRate{
+    ... on EventObjectRate{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
       rate
+      matter {reason subscription}
     }
   }
 `
@@ -344,6 +349,19 @@ const objectFullFragment = gql`
   }
 `
 
+const findResultFragment = gql`
+  ${eventFragment} ${objectShortWithMetaFragment}
+  fragment findResultFragment on FindResult {
+    count
+    totalCount
+    nextPageToken
+    prevPageToken
+    ... on EventFindResult { events {...eventFragment} }
+    ... on ObjectsFindResult { objects{...objectShortWithMetaFragment} }
+    ... on WSFindResult { items }
+  }
+`
+
 const fragments = {
   eventFragment,
   objectFullFragment,
@@ -352,7 +370,8 @@ const fragments = {
   objectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,
-  sphereFragment
+  sphereFragment,
+  findResultFragment
 }
 
 export {

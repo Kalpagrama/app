@@ -19,7 +19,7 @@ class WorkspaceApi {
         }
       `
     })
-    await rxdb.clearModule(RxModuleEnum.WS)
+    await rxdb.eraseWs()
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsClear
   }

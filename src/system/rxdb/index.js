@@ -228,6 +228,11 @@ class RxDBWrapper {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
+   async eraseWs () {
+      this.workspace.switchOffSynchro()
+      await this.workspace.clearCollections()
+   }
+
    async erase (clearCache = true) {
       try {
          await this.lock()
@@ -236,8 +241,7 @@ class RxDBWrapper {
          const t1 = performance.now()
          assert(this.created, '!created')
          this.event.deInit()
-         this.workspace.switchOffSynchro()
-         await this.workspace.clearCollections()
+         await this.eraseWs()
          await this.db.meta.remove()
          await this.db.collection({ name: 'meta', schema: schemaKeyValue })
          if (clearCache) await this.cache.clearCollections()

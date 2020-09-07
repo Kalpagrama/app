@@ -1,6 +1,5 @@
 import assert from 'assert'
-import { initUtils } from 'src/system/utils'
-initUtils()
+import 'src/system/utils' // Object.assign...
 
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
