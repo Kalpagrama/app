@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
-  kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery" :sliseSize="100")
+  kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery" :sliceSize="100")
     template(v-slot=`{items,next}`)
       div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
         div(

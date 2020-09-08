@@ -146,6 +146,7 @@ export default {
       this.$log('link')
       this.linking = true
       await this.$wait(1000)
+      // impl
       this.linking = false
     },
   },

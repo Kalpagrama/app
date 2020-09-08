@@ -41,6 +41,7 @@ const routes = [
         children: [
           { name: 'settings.account', path: 'account', component: () => import('pages/app/settings/view_account/index.vue') },
           { name: 'settings.feeds', path: 'feeds', component: () => import('pages/app/settings/view_feeds/index.vue') },
+          { name: 'settings.feed', path: 'feed/:id', component: () => import('pages/app/settings/view_feeds/feed_editor.vue') },
           { name: 'settings.workspace', path: 'workspace', component: () => import('pages/app/settings/view_workspace/index.vue') }
         ]
       },
