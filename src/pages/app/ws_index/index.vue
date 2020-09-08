@@ -30,6 +30,7 @@ export default {
   computed: {
     pages () {
       return [
+        // {id: 'workspace.pages', name: this.$t('pageWs_pages', 'Цепочки')},
         {id: 'workspace.contents', name: this.$t('pageWs_content', 'Контент')},
         {id: 'workspace.nodes', name: this.$t('pageWs_nodes', 'Ядра')},
         {id: 'workspace.spheres', name: this.$t('pageWs_spheres', 'Сферы')},

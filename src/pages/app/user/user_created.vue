@@ -1,5 +1,35 @@
 <template lang="pug">
-q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
+//- q-page(:style=`{paddingTop: '8px', minHeight: '100vh'}`).row.full-width.justify-center
+  kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery" :sliceSize="1000" v-slot=`{items,next}`)
+    dynamic-scroller(
+      :items="items"
+      :min-item-size="60"
+      key-field="oid"
+      :style=`{height: $q.screen.height-110+'px',}`).full-width.br
+      template(v-slot="{ item, index, active }")
+        dynamic-scroller-item(
+          :item="item"
+          :active="active"
+          :size-dependencies=`[
+            item.name,
+          ]`
+          :data-index="index")
+          .row.full-width.justify-center.br
+            node-lite(
+              :node="item" :isActive="indexMiddle === index" :isVisible="true"
+              :accessKey="index"
+              v-observe-visibility=`{
+                callback: indexMiddleHandler,
+                intersection: {
+                  rootMargin: '-50% 0px'
+                }
+              }`
+              :style=`{
+                maxWidth: '800px',
+                marginBottom: '70px',
+              }`
+              )
+q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
   div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items,next}`)
@@ -18,6 +48,7 @@ export default {
   },
   data () {
     return {
+      indexMiddle: 0
     }
   },
   computed: {
@@ -31,6 +62,19 @@ export default {
           oidSphere: this.sphereOid,
           oidAuthor: {$eq: this.sphereOid},
           sortStrategy: 'AGE',
+        }
+      }
+    }
+  },
+  methods: {
+    indexMiddleHandler (isVisible, entry) {
+      let index = parseInt(entry.target.accessKey)
+      if (isVisible) {
+        this.indexMiddle = index
+      }
+      else {
+        if (index === this.indexMiddle) {
+          this.indexMiddle = -1
         }
       }
     }

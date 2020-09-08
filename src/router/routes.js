@@ -92,6 +92,18 @@ const routes = [
         redirect: 'workspace/contents',
         component: () => import('pages/app/ws_index/index.vue'),
         children: [
+          // pages
+          {
+            name: 'workspace.pages',
+            path: 'pages',
+            // redirect: '',
+            component: () => import('pages/app/ws_pages/index.vue'),
+          },
+          {
+            name: 'workspace.page',
+            path: 'page/:id',
+            component: () => import('pages/app/ws_pages/page_editor.vue'),
+          },
           // contents
           {
             name: 'workspace.contents',

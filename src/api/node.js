@@ -300,7 +300,7 @@ class NodeApi {
       return createdChain
    }
 
-   static async makeLink ({oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType) {
+   static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType) {
       switch (linkType){
          case LinkTypeEnum.CAUSE_EFFECT:
             throw 'not impl!'

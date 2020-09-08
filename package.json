@@ -73,6 +73,8 @@
     "rxjs": "^6.5.5",
     "serve-static": "^1.14.1",
     "subscriptions-transport-ws": "github:4321ip/subscriptions-transport-ws#fix/min-connect-timeout",
+    "tiptap": "^1.29.6",
+    "tiptap-extensions": "^1.32.7",
     "typescript": "^3.7.2",
     "v-viewer": "^1.5.1",
     "vue": "^2.6.10",
