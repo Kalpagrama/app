@@ -12,6 +12,17 @@ q-layout(view="lHh lpR lFf")
       :inDrawer="true"
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40
+  //- auth
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="$store.state.ui.showAuth"
+      :style=`{
+        position: 'fixed', zIndex: 4000, top: 0, left: 0, bottom: 0, right: 0,
+        background: 'rgba(0,0,0,0.5)',
+      }`
+      ).row.fit
+      auth-layout(container :style=`{width: '400px', height: '500px',}`)
+  //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.width > 960"
@@ -73,8 +84,11 @@ q-layout(view="lHh lpR lFf")
 import { systemLogin } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 
+import authLayout from 'layouts/auth_layout.vue'
+
 export default {
   name: 'mainLayout',
+  components: {authLayout},
   data () {
     return {
       loading: true,
