@@ -224,55 +224,38 @@ class NodeApi {
       return reactiveNode
    }
 
-   // chains
-   static makeChainInput (chain) {
-      {
-         // checks
-         // assert.ok(chain.spheres.length >= 0 && chain.spheres.length <= 10, 'chain spheres')
-         assert.ok(chain.links.length > 0, 'chain.links.length > 0')
-         // assert.ok(chain.category, '!chain.category')
-      }
+   static makeJointInput (joint) {
       let chainInput = {}
-      // chainInput.name = chain.name
-      // chainInput.spheres = chain.spheres.map(s => {
-      //   return { name: s.name, oid: s.oid }
-      // })
-      // chainInput.category = chain.category
-      chainInput.links = chain.links.map(link => {
-         assert(link.leftItem.oid, '!link.leftItem.oid')
-         assert(link.rightItem.oid, '!link.rightItem.oid')
-         assert(link.type, '!link.type')
-         // let resultLink = { name: link.name, type: link.type }
-         // if (link.leftOid) resultLink.leftOid = link.leftOid
-         // if (link.leftSphere) resultLink.leftSphere = link.leftSphere
-         // if (link.leftNode) resultLink.leftNode = NodeApi.makeNodeInput(link.leftNode)
-         // if (link.leftComposition) resultLink.leftComposition = NodeApi.makeCompositionInput(link.leftComposition)
-         // if (link.rightOid) resultLink.rightOid = link.rightOid
-         // if (link.rightSphere) resultLink.rightSphere = link.rightSphere
-         // if (link.rightNode) resultLink.rightNode = NodeApi.makeNodeInput(link.rightNode)
-         // if (link.rightComposition) resultLink.rightComposition = NodeApi.makeCompositionInput(link.rightComposition)
-         return link
-      })
-      return chainInput
+      assert(joint.leftItem.oid || joint.leftItem.node, '!link.leftItem.oid')
+      assert(joint.rightItem.oid || joint.rightItem.node, '!link.rightItem.oid')
+      assert(joint.jointType, '!link.type')
+      if (joint.leftItem.node) joint.leftItem.node = NodeApi.makeNodeInput(joint.leftItem.node)
+      if (joint.rightItem.node) joint.rightItem.node = NodeApi.makeNodeInput(joint.rightItem.node)
+      return {
+         jointType: joint.jointType,
+         leftItem: joint.leftItem,
+         rightItem: joint.rightItem,
+         name: joint.name
+      }
    }
 
-   static async chainCreate (chain) {
-      const f = this.chainCreate
+   static async jointCreate (joint) {
+      const f = this.jointCreate
       logD(f, 'start')
       const t1 = performance.now()
-      let chainInput = NodeApi.makeChainInput(chain)
-      logD('chainCreate chainInput', chainInput)
+      let jointInput = NodeApi.makeJointInput(joint)
+      logD('chainCreate jointInput', jointInput)
       let { data: { chainCreate: createdChain } } = await apollo.clients.api.mutate({
          mutation: gql`
              ${fragments.objectFullFragment}
-             mutation chainCreate($chain: ChainInput!) {
-                 chainCreate (chain: $chain){
+             mutation jointCreate($joint: JointInput!) {
+                 jointCreate (joint: $joint){
                      ...objectFullFragment
                  }
              }
          `,
          variables: {
-            chain: chainInput
+            joint: jointInput
          }
       })
       let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
