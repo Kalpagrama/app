@@ -11,12 +11,12 @@ q-layout(
         //- header
         .row.full-width.items-center.content-center.q-py-sm
           q-btn(round flat color="white" icon="insert_link" @click="$emit('close')")
-          span(:style=`{fontSize: '18px',}`).text-bold.text-white Link this node
+          span(:style=`{fontSize: '18px',}`).text-bold.text-white Связать это ядро
         //- with picker
         div(
           v-if="withType"
           :style=`{paddingLeft: '40px',}`).row.full-width.items-center.content-center
-          span(:style=`{fontSize: '18px',}`).text-bold.text-white with
+          span(:style=`{fontSize: '18px',}`).text-bold.text-white с
           q-btn(
             flat dense no-caps color="white"
             icon-right="keyboard_arrow_down"
@@ -65,14 +65,14 @@ q-layout(
             ).full-width
         //- by pick
         div(:style=`{paddingLeft: '40px',}`).row.full-width.items-center.content-center
-          span(:style=`{fontSize: '18px',}`).text-bold.text-white how
+          //- span(:style=`{fontSize: '18px',}`).text-bold.text-white how
           q-btn(
             flat dense no-caps color="white"
             icon-right="keyboard_arrow_down"
-            ).b-40.q-mx-sm
+            ).b-40.q-mr-sm
             span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ byTypes.find(t => t.id === byType).name }}
             q-menu(fit)
-              div(:style=`{maxWidth: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
+              div(:style=`{maxWidth: '300px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
                 q-btn(
                   v-for="t in byTypes" :key="t.id" @click="byType = t.id"
                   flat dense no-caps color="white" align="left"
@@ -80,7 +80,7 @@ q-layout(
                   span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ t.name }}
         //- by body
         div(
-          v-if="byType === 'essence'"
+          v-if="byType === 'ESSENCE'"
           :style=`{paddingLeft: '40px',}`).row.full-width.q-py-sm.q-mb-md
           div(:style=`{position: 'relative', zIndex: 1000, borderRadius: '10px', overflow: 'hidden'}`).full-width
             q-input(
@@ -101,6 +101,7 @@ q-layout(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { NodeApi } from 'src/api/node'
 
 import withContent from './with_content.vue'
 import withSphere from './with_sphere.vue'
@@ -114,7 +115,7 @@ export default {
     return {
       searchString: '',
       withType: null,
-      byType: 'essence',
+      byType: 'ESSENCE',
       item: null,
       linking: false,
       name: '',
@@ -123,17 +124,23 @@ export default {
   computed: {
     withTypes () {
       return [
-        {id: 'sphere', name: 'sphere'},
-        {id: 'node', name: 'node'},
-        {id: 'content', name: 'content'}
+        {id: 'sphere', name: 'сферой'},
+        {id: 'node', name: 'ядром'},
+        {id: 'content', name: 'контентом'}
       ]
     },
     byTypes () {
       return [
-        {id: 'essence', name: 'по сути'},
-        {id: 'prich', name: 'причина'},
-        {id: 'sled', name: 'следсвие'},
-        {id: 'asso', name: 'ассоциация'}
+        {id: 'ESSENCE', name: 'по сути'},
+        {id: 'ASSOCIATIVE', name: 'как ассоциацию'},
+        {id: 'CAUSE_EFFECT', name: 'как следсвие'},
+        {id: 'EFFECT_CAUSE', name: 'как причину'},
+        {id: 'PROBLEM_SOLUTION', name: 'как решение'},
+        {id: 'SOLUTION_PROBLEM', name: 'как источник проблемы'},
+        {id: 'FALSE_TRUE', name: 'как опровержение'},
+        {id: 'TRUE_FALSE', name: 'как фейк'},
+        {id: 'FROM_TO', name: 'нужно перед'},
+        {id: 'TO_FROM', name: 'нужно после'}
       ]
     },
     width () {
@@ -143,11 +150,37 @@ export default {
   },
   methods: {
     async link () {
-      this.$log('link')
-      this.linking = true
-      await this.$wait(1000)
-      // impl
-      this.linking = false
+      try {
+        this.$log('link start')
+        this.linking = true
+        await this.$wait(500)
+        let oid
+        if (this.item.wsItemType === 'WS_CONTENT') oid = this.item.contentOid
+        else oid = this.item.oid
+        if (!oid) throw new Error('No oid!')
+        let jointInput
+        if (['EFFECT_CAUSE', 'SOLUTION_PROBLEM', 'TRUE_FALSE', 'TO_FROM'].includes(this.byType)) {
+          jointInput = { leftItem: {oid: this.node.oid}, rightItem: {oid: this.item.oid} }
+        }
+        else {
+          jointInput = { leftItem: {oid: this.item.oid}, rightItem: {oid: this.node.oid} }
+        }
+        if (this.byType === 'ESSENCE') {
+          if (this.name.length === 0) throw new Error('No name for ESSENCE!')
+          jointInput.name = this.name
+        }
+        jointInput.jointType = this.byType
+        this.$log('jointInput', jointInput)
+        let joint = await NodeApi.jointCreate(jointInput)
+        this.$log('link done joint', joint)
+        this.linking = false
+        this.$emit('close')
+      }
+      catch (e) {
+        this.$log('link error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.linking = false
+      }
     },
   },
   async mounted () {

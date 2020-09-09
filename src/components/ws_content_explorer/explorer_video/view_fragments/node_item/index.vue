@@ -38,7 +38,7 @@
         name="filter_tilt_shift" color="grey-6" size="20px").q-mx-md
       q-icon(
         v-else
-        name="crop_free" color="grey-6" size="20px").q-mx-md
+        name="center_focus_strong" color="grey-6" size="20px").q-mx-md
     //- isSelected actions: close, edit, createNode
     div(:style=`{marginTop: '-10px', overflow: 'hidden',}`).row.full-width
       transition(appear enter-active-class="animated slideInDown")
@@ -53,14 +53,21 @@
             v-if="node.stage === 'fragment'"
             ).row.fit.items-center.content-center
             .col
-            q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-mr-md Close
-            q-btn(flat dense color="white" no-caps icon="edit" @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-md
-            q-btn(round outline dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
+            q-btn(
+              @click="$emit('edit')"
+              flat dense color="white" no-caps icon="edit"
+              :style=`{zIndex: 2000, marginRight: '6px'}`)
+            //- q-btn(round dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
+            q-btn(
+              @click="$emit('unselect')"
+              flat dense color="white" icon="keyboard_arrow_up"
+              :style=`{zIndex: 2000, marginRight: '6px'}`)
+          //- saved, published, draft
           div(
-            v-if="node.stage === 'published'"
+            v-if="['saved', 'published', 'draft'].includes(node.stage)"
             ).row.fit.items-center.content-center
             .col
-            span.text-white Published
+            span.text-white {{node.stage}}
             q-btn(
               round flat dense color="white" icon="content_copy"
               :style=`{zIndex: 2000, marginRight: '6px'}`)
@@ -68,16 +75,6 @@
               @click="$emit('unselect')"
               flat dense color="white" icon="keyboard_arrow_up"
               :style=`{zIndex: 2000, marginRight: '6px'}`)
-          div(
-            v-if="node.stage === 'saved'"
-            ).row.fit.items-center.content-center
-            .col
-            span.text-white Saved
-          div(
-            v-if="node.stage === 'draft'"
-            ).row.fit.items-center.content-center
-            .col
-            span.text-white Draft
   //- isEditing wrapper
   div(
     v-if="isEditing"
@@ -127,12 +124,8 @@ export default {
     }
   },
   computed: {
-    // TODO: find items of this content ???
-    items () {
-      return this.node.items
-    },
     item () {
-      return this.items[0]
+      return this.node.items[0]
     }
   },
   methods: {
