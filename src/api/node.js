@@ -82,7 +82,7 @@ class NodeApi {
                figuresAbsolute: l.figuresAbsolute.map(f => {
                   return {
                      t: f.t,
-                     points: [],
+                     points: []
                      // points: f.points.map(p => {
                      //    return { x: p.x, y: p.y }
                      // })
@@ -224,26 +224,6 @@ class NodeApi {
       return reactiveNode
    }
 
-   static async nodeCreateMulti (nodeInput) {
-      logD('nodeCreateMulti start')
-      let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
-         mutation: gql`
-             ${fragments.objectFullFragment}
-             mutation nodeCreateMulti($node: NodeInput!) {
-                 nodeCreate (node: $node){
-                     ...objectFullFragment
-                 }
-             }
-         `,
-         variables: {
-            node: nodeInput
-         }
-      })
-      let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-      logD('nodeCreateMulti done')
-      return createdNode
-   }
-
    // chains
    static makeChainInput (chain) {
       {
@@ -300,21 +280,40 @@ class NodeApi {
       return createdChain
    }
 
-   static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType) {
-      switch (linkType){
-         case LinkTypeEnum.CAUSE_EFFECT:
-            throw 'not impl!'
-            // break
-         case LinkTypeEnum.ESSENCE:
-         {
-            // временное решение: связываем через сферы
-            assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
-            let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
-            assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
-            nodeInputRight.spheres.unshift(leftNode.sphereFromName)
-            nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
-            await NodeApi.nodeCreate(nodeInputRight)
+   static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
+      switch (linkType) {
+         case LinkTypeEnum.CAUSE_EFFECT: {
+            let chain = {
+               links: [
+                  { leftItem: { oid: oidLeft }, rightItem: { oid: oidRight }, type: linkType }
+               ]
+            }
+            await NodeApi.chainCreate(chain)
             break
+         }
+         case LinkTypeEnum.ESSENCE: {
+            let multiNodeInput = {
+               layout: 'PIP',
+               name,
+               category: 'FUN',
+               spheres,
+               items: [{ oid: oidLeft, nodeInput: nodeInputLeft }, { oid: oidRight, nodeInput: nodeInputRight }]
+                  .map(({ oid, nodeInput }) => {
+                     assert(oid || nodeInput)
+                     if (oid) return { oid }
+                     else return NodeApi.makeNodeInput(nodeInput)
+                  })
+            }
+            await NodeApi.nodeCreate(multiNodeInput)
+            break
+            // временное решение: связываем через сферы
+            // assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
+            // let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
+            // assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
+            // nodeInputRight.spheres.unshift(leftNode.sphereFromName)
+            // nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
+            // await NodeApi.nodeCreate(nodeInputRight)
+            // break
          }
       }
    }
