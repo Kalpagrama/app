@@ -9,26 +9,30 @@ q-layout(
       div(:style=`{maxWidth: '800px',}`
         ).row.full-width.items-center.content-center.q-px-sm.b-30
         //- header
-        .row.full-width.items-center.content-center.q-py-sm
+        //- .row.full-width.items-center.content-center.q-py-sm
           q-btn(round flat color="white" icon="insert_link" @click="$emit('close')")
           span(:style=`{fontSize: '18px',}`).text-bold.text-white Связать это ядро
         //- with picker
         div(
           v-if="withType"
-          :style=`{paddingLeft: '40px',}`).row.full-width.items-center.content-center
-          span(:style=`{fontSize: '18px',}`).text-bold.text-white с
-          q-btn(
-            flat dense no-caps color="white"
-            icon-right="keyboard_arrow_down"
-            ).b-40.q-mx-sm
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ withTypes.find(t => t.id === withType).name }}
-            q-menu(fit)
-              div(:style=`{maxWidth: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
-                q-btn(
-                  v-for="t in withTypes" :key="t.id" @click="withType = t.id, item = null"
-                  flat dense no-caps color="white" align="left"
-                  v-close-popup).full-width
-                  span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ t.name }}
+          :style=`{paddingLeft: '0px',}`).row.full-width.items-center.content-center.q-py-sm
+          q-btn(round flat color="white" icon="insert_link")
+          .col
+            .row.fit.items-center.content-center
+              span(:style=`{fontSize: '18px',}`).text-bold.text-white Связать
+              q-btn(
+                flat dense no-caps color="white"
+                icon-right="keyboard_arrow_down"
+                ).q-mx-sm.b-40
+                span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ withTypes.find(t => t.id === withType).name }}
+                q-menu(fit)
+                  div(:style=`{maxWidth: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
+                    q-btn(
+                      v-for="t in withTypes" :key="t.id" @click="withType = t.id, item = null"
+                      flat dense no-caps color="white" align="left"
+                      v-close-popup).full-width
+                      span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ t.name }}
+          q-btn(round flat color="white" icon="clear" @click="$emit('close')")
         //- filters
         div(v-if="!item && withType").row.full-width.items-start.content-start.q-pa-sm
           div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
@@ -124,9 +128,9 @@ export default {
   computed: {
     withTypes () {
       return [
-        {id: 'sphere', name: 'сферой'},
-        {id: 'node', name: 'ядром'},
-        {id: 'content', name: 'контентом'}
+        {id: 'sphere', name: 'со сферой'},
+        {id: 'node', name: 'с ядром'},
+        {id: 'content', name: 'с контентом'}
       ]
     },
     byTypes () {
@@ -169,8 +173,14 @@ export default {
           if (this.name.length === 0) throw new Error('No name for ESSENCE!')
           jointInput.name = this.name
         }
-        jointInput.jointType = this.byType
+        // jointType
+        if (this.byType === 'EFFECT_CAUSE') jointInput.jointType = 'CAUSE_EFFECT'
+        else if (this.byType === 'SOLUTION_PROBLEM') jointInput.jointType = 'PROBLEM_SOLUTION'
+        else if (this.byType === 'TRUE_FALSE') jointInput.jointType = 'FALSE_TRUE'
+        else if (this.byType === 'TO_FROM') jointInput.jointType = 'FROM_TO'
+        else jointInput.jointType = this.byType
         this.$log('jointInput', jointInput)
+        // jointCreate
         let joint = await NodeApi.jointCreate(jointInput)
         this.$log('link done joint', joint)
         this.linking = false

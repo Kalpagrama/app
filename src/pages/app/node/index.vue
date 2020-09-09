@@ -73,7 +73,7 @@ q-layout(view="hHh Lpr lff")
             v-if="!nodeLinkerOpened"
             @click="nodeLinkerOpened = true"
             no-caps color="green" icon="insert_link")
-            span.text-white.text-bold.q-ml-sm Link node
+            span.text-white.text-bold.q-ml-sm Связать ядро
 </template>
 
 <script>

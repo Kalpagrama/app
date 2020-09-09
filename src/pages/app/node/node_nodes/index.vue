@@ -1,10 +1,13 @@
 <template lang="pug">
-//- kalpa-loader(:mangoQuery="queryBySphere")
+kalpa-loader(:mangoQuery="queryBySphere")
   template(v-slot=`{items,next}`)
-    list-masonry(:items="items" :itemsHidden="[node.oid]").q-pt-md
+    .row.full-width.items-start.content-start
+      div(v-for="(i,ii) in items" :key="ii").row.full-width.q-mb-sm.br
+        small.text-white {{ i }}
+    //- list-masonry(:items="items" :itemsHidden="[node.oid]").q-pt-md
       template(v-slot:item=`{item}`)
         node-lite(:node="item")
-.row.full-width.items-start.content-start.q-pt-xl
+//- .row.full-width.items-start.content-start.q-pt-xl
   div(
     v-for="(n,ni) in 10" :key="ni"
     :style=`{position: 'relative'}`
@@ -43,7 +46,7 @@ export default {
     queryBySphere () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
           oidSphere: this.node.sphereFromName.oid
         }
       }
