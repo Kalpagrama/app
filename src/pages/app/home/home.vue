@@ -25,9 +25,11 @@ q-layout(view="hHh Lpr lff")
                     ).row.full-width
                     //- event reason and subject
                     .row.full-width.q-py-xs.q-px-sm
-                      .col
-                      small.text-grey-6.q-mr-md why: {{ item.matter.reason }}
-                      small.text-grey-6 from: {{ item.subject.name }}
+                      //- .col
+                      small.text-grey-6.q-mr-sm {{ item.type }}
+                      small.text-grey-6.q-mr-sm subject: {{ item.subject.name }}
+                      small.text-grey-6.q-mr-sm why: {{ item.matter.reason }}
+                      //- small.text-grey-6 to: {{ item.object.name }}
                     //- event object : node wrapper
                     div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width.b-40
                       node-lite(

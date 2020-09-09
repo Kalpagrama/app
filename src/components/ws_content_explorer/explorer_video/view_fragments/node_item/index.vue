@@ -22,7 +22,7 @@
           top: '0px', left: '0px', right: '0px',
           maxHeight: '50px',
         }`)
-    //- node.name preview, cut it?
+    //- node.name
     div(
       @click="$emit('select')"
       :style=`{
@@ -30,8 +30,15 @@
         height: '50px',
         borderRadius: '10px',
       }`
-      ).row.full-width.items-center.content-center.item.q-px-md.b-50
-      span.text-white {{ node.name.length > 0 ? node.name.slice(0, 40) : '' }}
+      ).row.full-width.items-center.content-center.item.b-50
+      div(:style=`{overflow: 'hidden'}`).col.q-px-md
+        span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ node.name }}
+      q-icon(
+        v-if="['saved', 'published', 'draft'].includes(node.stage)"
+        name="filter_tilt_shift" color="grey-6" size="20px").q-mx-md
+      q-icon(
+        v-else
+        name="crop_free" color="grey-6" size="20px").q-mx-md
     //- isSelected actions: close, edit, createNode
     div(:style=`{marginTop: '-10px', overflow: 'hidden',}`).row.full-width
       transition(appear enter-active-class="animated slideInDown")
@@ -39,13 +46,31 @@
           v-if="isSelected"
           :style=`{
             marginTop: '-10px', paddingTop: '22px',
-            borderRadius: '0 0 10px 10px',
+            borderRadius: '0 0 10px 10px', overflow: 'hidden',
           }`
-          ).row.full-width.items-center.content-center.q-pa-xs.bg-green
-          .col
-          q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-mr-md Close
-          q-btn(flat dense color="white" no-caps icon="edit" @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-md
-          q-btn(round outline dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
+          ).row.full-width.items-start.content-start.q-pa-xs.bg-green
+          div(
+            v-if="node.stage === 'fragment'"
+            ).row.fit.items-center.content-center
+            .col
+            q-btn(flat dense color="white" no-caps @click="$emit('unselect')" :style=`{zIndex: 2000}`).q-mr-md Close
+            q-btn(flat dense color="white" no-caps icon="edit" @click="$emit('edit')" :style=`{zIndex: 2000}`).q-px-md
+            q-btn(round outline dense color="white" no-caps icon="filter_tilt_shift" @click="nodeCreate()" :style=`{zIndex: 2000}`)
+          div(
+            v-if="node.stage === 'published'"
+            ).row.fit.items-center.content-center
+            .col
+            span.text-white Published
+          div(
+            v-if="node.stage === 'saved'"
+            ).row.fit.items-center.content-center
+            .col
+            span.text-white Saved
+          div(
+            v-if="node.stage === 'draft'"
+            ).row.fit.items-center.content-center
+            .col
+            span.text-white Draft
   //- isEditing wrapper
   div(
     v-if="isEditing"

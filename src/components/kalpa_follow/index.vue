@@ -43,7 +43,8 @@ export default {
     oid: {
       immediate: true,
       async handler (to, from) {
-        this.subscribed = await UserApi.isSubscribed(this.oid)
+        this.$log('oid TO', to)
+        this.subscribed = await UserApi.isSubscribed(to)
       }
     }
   },
@@ -60,6 +61,9 @@ export default {
       await this.$wait(300)
       this.subscribed = await UserApi.isSubscribed(this.oid)
     }
+  },
+  mounted () {
+    this.$log('mounted')
   }
 }
 </script>

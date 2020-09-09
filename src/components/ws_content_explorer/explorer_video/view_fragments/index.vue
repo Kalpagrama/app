@@ -6,11 +6,11 @@ q-page(
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
-    kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesLoaded")
+    kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesLoaded($event), fragmentsLoaded($event)")
       template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           div(
-            v-for="(n,ni) in items" :key="n.id"
+            v-for="(n,ni) in fragments" :key="n.id"
             v-if="nodeEditingId ? nodeEditingId === n.id : true"
             :style=`{
             }`
@@ -59,14 +59,15 @@ import { NodeApi } from 'src/api/node'
 import nodeItem from './node_item/index.vue'
 
 export default {
-  name: 'wsContentExplorer_video_viewDrafts',
+  name: 'wsContentExplorer_video_viewFragments',
   components: {nodeItem},
   props: ['contentKalpa', 'contentWorkspace', 'player'],
   data () {
     return {
       nodeSelectedId: null,
       nodeEditingId: null,
-      nodesChecked: []
+      nodesChecked: [],
+      fragments: []
     }
   },
   computed: {
@@ -75,7 +76,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
           contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          stage: 'fragment',
+          stage: {$in: ['fragment', 'draft', 'saved', 'published']},
         },
         sort: [{updatedAt: 'desc'}],
       }
@@ -241,6 +242,29 @@ export default {
       }, [])
       this.$log('layers', layers)
       this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
+    },
+    fragmentsLoaded (nodes) {
+      if (this.nodeSelectedId || this.nodeEditingId) return
+      this.$log('fragmentsLoaded', nodes)
+      let fragments = nodes.reduce((acc, node) => {
+        if (node.stage === 'fragment') {
+          acc.push(node)
+        }
+        else {
+          node.items.map(i => {
+            if (i.layers[0].contentOid === this.contentKalpa.oid) {
+              let fragmentInput = JSON.parse(JSON.stringify(node))
+              fragmentInput.id = i.id
+              fragmentInput.items = [JSON.parse(JSON.stringify(i))]
+              acc.push(fragmentInput)
+            }
+          })
+        }
+        return acc
+      }, [])
+      this.$log('fragments', fragments)
+      this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
+      this.fragments = fragments
     }
   },
   beforeDestroy () {

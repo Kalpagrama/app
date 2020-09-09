@@ -82,18 +82,37 @@ export default {
     },
     nodesChanged (nodes) {
       this.$log('nodesChanged', nodes)
-      let layers = nodes.reduce((acc, node) => {
-        node.meta.items.map(n => {
-          n.layers.map(l => {
-            if (l.contentOid === this.contentKalpa.oid) {
-              acc.push(l)
-            }
-          })
-        })
+      // let layers = nodes.reduce((acc, node) => {
+      //   node.meta.items.map(n => {
+      //     n.layers.map(l => {
+      //       if (l.contentOid === this.contentKalpa.oid) {
+      //         acc.push(l)
+      //       }
+      //     })
+      //   })
+      //   return acc
+      // }, [])
+      // this.$log('nodesChanged layers', layers)
+      // this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
+      let fragments = nodes.reduce((acc, node) => {
+        // node.meta.items.map(i => {
+        //   if (i.layers[0].contentOid === this.contentKalpa.oid) {
+        //     let fragmentInput = JSON.parse(JSON.stringify(node))
+        //     // fragmentInput.id = i.id
+        //     fragmentInput.items = [JSON.parse(JSON.stringify(i))]
+        //     acc.push(fragmentInput)
+        //   }
+        // })
+        let fragmentInput = {
+          name: node.name,
+          items: [node.meta.items[0]],
+          spheres: []
+        }
+        acc.push(fragmentInput)
         return acc
       }, [])
-      this.$log('nodesChanged layers', layers)
-      this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
+      this.$log('fragments', fragments)
+      this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
     }
   }
 }
