@@ -26,11 +26,9 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'wsNodes_typeDrafts',
-  components: {wsNodeItem},
   props: ['searchString'],
   data () {
     return {

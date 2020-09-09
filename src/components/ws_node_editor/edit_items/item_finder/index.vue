@@ -25,8 +25,7 @@ q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
     component(
       v-if="type"
       :is="`from-${type}`"
-      @item="$emit('item', $event)"
-      )
+      @item="$emit('item', $event)")
 </template>
 
 <script>
@@ -59,7 +58,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(500)
+    await this.$wait(1000)
     this.type = 'content'
   }
 }

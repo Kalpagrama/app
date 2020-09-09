@@ -41,6 +41,7 @@ const routes = [
         children: [
           { name: 'settings.account', path: 'account', component: () => import('pages/app/settings/view_account/index.vue') },
           { name: 'settings.feeds', path: 'feeds', component: () => import('pages/app/settings/view_feeds/index.vue') },
+          { name: 'settings.feed', path: 'feed/:id', component: () => import('pages/app/settings/view_feeds/feed_editor.vue') },
           { name: 'settings.workspace', path: 'workspace', component: () => import('pages/app/settings/view_workspace/index.vue') }
         ]
       },
@@ -92,6 +93,18 @@ const routes = [
         redirect: 'workspace/contents',
         component: () => import('pages/app/ws_index/index.vue'),
         children: [
+          // pages
+          {
+            name: 'workspace.pages',
+            path: 'pages',
+            // redirect: '',
+            component: () => import('pages/app/ws_pages/index.vue'),
+          },
+          {
+            name: 'workspace.page',
+            path: 'page/:id',
+            component: () => import('pages/app/ws_pages/page_editor.vue'),
+          },
           // contents
           {
             name: 'workspace.contents',

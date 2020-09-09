@@ -66,7 +66,7 @@ export const wsSchemaItem = {
       maxItems: 88,
       uniqueItems: false,
       items: {
-        type: 'object'
+        type: ['object', 'string']
       }
     },
     spheres: {

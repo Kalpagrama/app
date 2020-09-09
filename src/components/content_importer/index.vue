@@ -49,8 +49,10 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
         ).q-px-md Add
       //- q-icon(name="fab fa-youtube" color="white" size="40px").q-mr-sm
       //- span.text-bold.text-white {{ contentKalpa.name }}
-  //- content from file, crop it, rename it, them create contentKalpa, them emit content...
-  div(
+  //- image content from file, crop it, rename it, them create contentKalpa, them emit content...
+  image-from-device(
+    v-if="contentFile && contentFile.type.split('/')[0] === 'image'")
+  //- div(
     v-if="contentFile && contentFile.type.split('/')[0] === 'image'"
     ).row.full-width
     //- header
@@ -89,12 +91,11 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
 <script>
 import { ContentApi } from 'src/api/content'
 
-import imageCropper from 'components/image_cropper/index.vue'
-import assert from 'assert'
+import imageFromDevice from './image_from_device.vue'
 
 export default {
   name: 'contentImporter',
-  components: {imageCropper},
+  components: {imageFromDevice},
   props: {
     contentKalpa: {type: Object},
     contentFile: {type: [String, Object]}
@@ -107,8 +108,6 @@ export default {
       allowAutoUpload_youtube: false,
       // video device
       // image
-      imageSrc: null,
-      imageValid: false,
       // image url
     }
   },
@@ -127,33 +126,6 @@ export default {
     }
   },
   methods: {
-    imageCropped (e) {
-      let wh = event.detail.width / event.detail.height
-      let hw = event.detail.height / event.detail.width
-      this.$log('wh/hw', wh, hw)
-      if (wh < 0.5 || hw < 0.5) {
-        this.imageValid = false
-      }
-      else {
-        if (!this.imageValid) this.imageValid = true
-      }
-    },
-
-    async imageCompress(){
-
-    },
-
-    async imageSave () {
-      this.$log('imageSave start')
-      this.loading = true
-      this.$refs.imageCropper.cropper.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1080 })
-        .toBlob(async (blob) => {
-          this.$log('imageSave blob size=', blob.size)
-          let contentKalpa = await ContentApi.contentCreateFromFile(blob)
-          this.$log('imageSave contentKalpa', contentKalpa)
-          this.$emit('contentKalpa', contentKalpa)
-        })
-    }
   }
 }
 </script>

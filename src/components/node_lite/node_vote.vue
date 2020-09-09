@@ -23,7 +23,7 @@
 
 <template lang="pug">
 q-btn(
-  @click="voteMenuOpened = true"
+  @click="voteStart()"
   flat color="green"
   :loading="voting").voter
   span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm {{ nodeFull ? nodeFull.rate*100 : '' }}
@@ -98,6 +98,11 @@ export default {
     }
   },
   methods: {
+    voteStart () {
+      this.$log('voteStart')
+      // this.$store.commit('ui/stateSet', ['showAuth', true])
+      this.voteMenuOpened = true
+    },
     async vote (val) {
       try {
         this.$log('vote start', this.node.oid, val)

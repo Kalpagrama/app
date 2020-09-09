@@ -26,11 +26,11 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import wsNodeItem from 'components/ws_node_item/index.vue'
+// import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'wsNodes_typeSaved',
-  components: {wsNodeItem},
+  // components: {wsNodeItem},
   props: ['searchString'],
   data () {
     return {
@@ -63,9 +63,17 @@ export default {
       // TODO what to do if we got items on this sphere ???
       await this.$rxdb.remove(item.id)
     },
-    itemEdit (item) {
+    async itemEdit (item) {
       this.$log('itemEdit', item)
-      this.$router.push(`/workspace/node/${item.id}`).catch(e => e)
+      // can we edit this? or make a copy? delete?
+      let nodeInput = JSON.parse(JSON.stringify(item))
+      delete nodeInput.id
+      delete nodeInput.oid
+      nodeInput.stage = 'draft'
+      nodeInput.name += ' COPY'
+      this.$log('itemEdit nodeInput', nodeInput)
+      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
     },
   }
 }

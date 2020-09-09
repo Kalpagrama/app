@@ -222,6 +222,8 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 const eventFragment = gql`
   ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
+    id
+    createdAt
     type
     ... on EventError{
       operation

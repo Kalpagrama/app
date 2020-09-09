@@ -7,6 +7,7 @@ import { LoadingBar, Screen, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import VueMasonry from 'vue-masonry-css'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
@@ -99,6 +100,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     Vue.component('wsNodeEditor', () => import('components/ws_node_editor/index.vue'))
     Vue.component('wsNodeItem', () => import('components/ws_node_item/index.vue'))
+    Vue.component('wsContentItem', () => import('components/ws_content_item/index.vue'))
     // spheres
     Vue.component('wsSphereItem', () => import('components/ws_sphere_item/index.vue'))
     Vue.component('wsSphereFinder', () => import('components/ws_sphere_finder/index.vue'))

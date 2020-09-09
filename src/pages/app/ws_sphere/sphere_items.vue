@@ -33,37 +33,17 @@ q-page(
                     .col
                     q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
               //- content
-              div(
+              ws-content-item(
                 v-if="i.wsItemType === 'WS_CONTENT'" :content="i"
-                :style=`{
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).row.items-center.content-center.b-40
-                div(
-                  @click="itemSelected = i.id"
-                  :style=`{
-                    position: 'relative', zIndex: 100,
-                    cursor: 'pointer',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.full-width.items-center.content-center.sphere-item.b-40
-                  img(
-                    :src="i.thumbOid"
-                    :style=`{
-                      width: '40px', height: '40px',
-                      borderRadius: '10px', overflow: 'hidden',
-                      objectFit: 'cover'
-                    }`).q-ma-md
-                  .col.full-height
-                    .row.fit.items-center.content-center.q-pr-sm
-                      small(:style=`{userSelect: 'none'}`).text-white {{ i.name.slice(0, 100) }}
-                div(
-                  v-if="itemSelected === i.id"
-                  :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
-                  ).row.full-width.bg-green.q-px-xs.q-pb-xs
-                  q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-                  .col
-                  q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
+                @clicked="itemSelected = i.id")
+                template(v-slot:footer)
+                  div(
+                    v-if="itemSelected === i.id"
+                    :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
+                    ).row.full-width.bg-green.q-px-xs.q-pb-xs
+                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                    .col
+                    q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
               //- sphere
               ws-sphere-item(
                 v-if="i.wsItemType === 'WS_SPHERE'" :id="i.id"
@@ -72,11 +52,10 @@ q-page(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'pageApp_wsSphere_items',
-  components: {wsNodeItem},
+  components: {},
   props: ['sphere'],
   data () {
     return {

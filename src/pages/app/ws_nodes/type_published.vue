@@ -28,7 +28,9 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                 ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
                 q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(i)")
                 .col
-                q-btn(round flat dense color="white" icon="launch" @click="nodeExplore(i)")
+                q-btn(
+                  :to="'/node/'+i.oid"
+                  round flat dense color="white" icon="launch")
 </template>
 
 <script>
