@@ -177,23 +177,17 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
     contentSource
   }
 `
-const chainFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
-  fragment chainFragment on Chain {
+const jointFragment = gql` ${objectFragment} ${objectShortWithMetaFragment} ${objectShortFragment}
+  fragment jointFragment on Joint {
     ...objectFragment
+    jointType
+    leftItem {...objectShortWithMetaFragment}
+    rightItem {...objectShortWithMetaFragment}
     rate
+    weight
     rateUser
     viewCnt
-    author {
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 50)
-    }
-    links{
-      leftItem{...objectShortFragment}
-      rightItem{...objectShortFragment}
-      type
-    }
+    childrenCnt
   }
 `
 const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
@@ -338,7 +332,7 @@ const dummyUserFragment = gql`
 `
 const objectFullFragment = gql`
   ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
-  ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
+  ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
   fragment objectFullFragment on Object {
     ...objectFragment
     ...on Video {...videoFragment}
@@ -346,8 +340,8 @@ const objectFullFragment = gql`
     ...on Node {... nodeFragment}
     ...on Sphere {... sphereFragment}
     ...on User {... userFragment}
-    ...on Chain {...chainFragment}
     ...on Composition {...compositionFragment}
+    ...on Joint {...jointFragment}
   }
 `
 
