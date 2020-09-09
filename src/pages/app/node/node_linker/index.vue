@@ -67,8 +67,21 @@ q-layout(
             v-if="item.wsItemType === 'WS_CONTENT'" :content="item"
             :style=`{}`
             ).full-width
+        //- by ASSOCIATIVE
+        div(
+          :style=`{paddingLeft: '32px',}`
+          ).row.full-width
+          q-checkbox(
+            :label="'Расширенный вариант'"
+            dark color="green"
+            v-model="byTypeDescribed"
+            @input="e => e ? byType = 'ESSENCE' : byType = 'ASSOCIATIVE'"
+            :style=`{}`
+            ).text-grey-6
         //- by pick
-        div(:style=`{paddingLeft: '40px',}`).row.full-width.items-center.content-center
+        div(
+          v-if="byType !== 'ASSOCIATIVE'"
+          :style=`{paddingLeft: '40px',}`).row.full-width.items-center.content-center
           //- span(:style=`{fontSize: '18px',}`).text-bold.text-white how
           q-btn(
             flat dense no-caps color="white"
@@ -100,7 +113,10 @@ q-layout(
             icon="insert_link"
             :loading="linking"
             :style=`{minWidth: '200px',}`)
-            span(:style=`{}`).text-white.text-bold.q-ml-md Link
+            span(:style=`{}`).text-white.text-bold.q-ml-md Связать
+        //- debug
+        //- div(:style=`{paddingLeft: '40px',}`).row.full-width
+          small.text-grey-6 {{byType}}
 </template>
 
 <script>
@@ -119,7 +135,8 @@ export default {
     return {
       searchString: '',
       withType: null,
-      byType: 'ESSENCE',
+      byType: 'ASSOCIATIVE',
+      byTypeDescribed: false,
       item: null,
       linking: false,
       name: '',
@@ -136,7 +153,7 @@ export default {
     byTypes () {
       return [
         {id: 'ESSENCE', name: 'по сути'},
-        {id: 'ASSOCIATIVE', name: 'как ассоциацию'},
+        // {id: 'ASSOCIATIVE', name: 'как ассоциацию'},
         {id: 'CAUSE_EFFECT', name: 'как следсвие'},
         {id: 'EFFECT_CAUSE', name: 'как причину'},
         {id: 'PROBLEM_SOLUTION', name: 'как решение'},
