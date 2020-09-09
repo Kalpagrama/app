@@ -244,8 +244,8 @@ class NodeApi {
       logD(f, 'start')
       const t1 = performance.now()
       let jointInput = NodeApi.makeJointInput(joint)
-      logD('chainCreate jointInput', jointInput)
-      let { data: { chainCreate: createdChain } } = await apollo.clients.api.mutate({
+      logD('jointCreate jointInput', jointInput)
+      let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
          mutation: gql`
              ${fragments.objectFullFragment}
              mutation jointCreate($joint: JointInput!) {
@@ -258,9 +258,9 @@ class NodeApi {
             joint: jointInput
          }
       })
-      let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return createdChain
+      return createdJoint
    }
 
    // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
