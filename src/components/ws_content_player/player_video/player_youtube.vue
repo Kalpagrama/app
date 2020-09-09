@@ -6,18 +6,18 @@ iframe[id$="_youtube_iframe"]
   border-radius: 10px
   overflow: hidden
   pointer-events: none
-@media (min-width: 900px)
-  iframe[id$="_youtube_iframe"]
-    width: 1000%
-    height: 1000%
-    min-width: 1000%
-    min-height: 1000%
-    z-index: 100
-    border-radius: 10px
-    overflow: hidden
-    transform: scale(0.1)
-    transform-origin: top left
-    pointer-events: none
+// @media (min-width: 900px)
+//   iframe[id$="_youtube_iframe"]
+//     width: 1000%
+//     height: 1000%
+//     min-width: 1000%
+//     min-height: 1000%
+//     z-index: 100
+//     border-radius: 10px
+//     overflow: hidden
+//     transform: scale(0.1)
+//     transform-origin: top left
+//     pointer-events: none
 .mejs__overlay
   width: 100% !important
   height: 100% !important
@@ -184,8 +184,8 @@ export default {
       this.player.removeEventListener('timeupdate', this.timeupdateHandle)
       this.player.removeEventListener('play', this.playHandle)
       this.player.removeEventListener('pause', this.pauseHandle)
-      // this.player.pause()
       this.player.remove()
+      this.player = null
     }
   }
 }

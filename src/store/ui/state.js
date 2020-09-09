@@ -24,4 +24,5 @@ export default {
   showAuth: false,
   isTyping: false,
   wsContentLayers: null,
+  wsContentFragments: null,
 }

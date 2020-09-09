@@ -29,7 +29,7 @@ q-layout(view="hHh Lpr lff")
                 :to="`/trends/${categoryOid}`"
                 :style=`{fontSize: '16px'}`
                 ).text-white.text-bold.q-px-sm {{ categoryName }}
-              kalpa-follow(:oid="$route.params.oid")
+              kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center

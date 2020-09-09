@@ -8,21 +8,21 @@ div(
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
   }`).row.full-width.b-50
-  //- ws content layers from global store...
+  //- ws content fragments from global store...
   div(
-    v-if="$store.state.ui.wsContentLayers"
+    v-if="$store.state.ui.wsContentFragments"
     :style=`{
       position: 'absolute', zIndex: 9999,
       pointerEvents: 'none',
     }`
     ).row.fit
     div(
-      v-for="(l,li) in $store.state.ui.wsContentLayers" :key="li"
+      v-for="(f,fi) in $store.state.ui.wsContentFragments" :key="fi"
       :style=`{
         position: 'absolute', zIndex: 9999,
         top: '-2px',
-        left: l.figuresAbsolute[0].t/player.duration*100+'%',
-        width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+        left: f.items[0].layers[0].figuresAbsolute[0].t/player.duration*100+'%',
+        width: ((f.items[0].layers[0].figuresAbsolute[1].t-f.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
         height: 'calc(100% + 4px)',
         border: '2px solid #4caf50',
         borderRadius: '4px',
@@ -30,6 +30,8 @@ div(
         background: 'rgba(255,255,255,0.3)',
       }`
       ).row
+      //- q-tooltip
+        small.text-white.text-bold {{ f.name }}
   //- currentTime width/line
   div(
     :style=`{

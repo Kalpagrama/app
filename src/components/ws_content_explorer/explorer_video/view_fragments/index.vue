@@ -1,22 +1,20 @@
 <template lang="pug">
 q-page(
   :style=`{
-    marginTop: nodeEditingId ? '-10px' : '0px',
-    paddingTop: nodeEditingId ? '0px' : '8px',
+    marginTop: nodeEditing ? '-10px' : '0px',
+    paddingTop: nodeEditing ? '0px' : '8px',
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
-    kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesLoaded")
+    //- SELCTING
+    kalpa-loader(
+      v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
       template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           div(
-            v-for="(n,ni) in items" :key="n.id"
-            v-if="nodeEditingId ? nodeEditingId === n.id : true"
-            :style=`{
-            }`
+            v-for="(n,ni) in fragments" :key="n.id"
             ).row.full-width.items-start.content-start
             q-checkbox(
-              v-if="!nodeEditingId"
               v-model="nodesChecked" :val="n.id"
               flat dense dark color="green"
               :style=`{opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-ma-sm
@@ -28,18 +26,37 @@ q-page(
                 :node="n"
                 :nodeIndex="ni"
                 :isSelected="n.id === nodeSelectedId"
-                :isEditing="n.id === nodeEditingId"
-                @select="nodeEditingId = null, nodeSelectedId = n.id"
+                :isEditing="false"
+                @select="nodeEditing = null, nodeSelectedId = n.id"
                 @unselect="nodeSelectedId = null"
-                @edit="nodeSelectedId = null, nodeEditingId = n.id"
-                @edited="nodeEditingId = null, nodeSelectedId = n.id"
+                @edit="nodeSelectedId = null, nodeEditing = n"
+                @edited="nodeEditing = null, nodeSelectedId = n.id"
                 @delete="nodeDelete(n)"
                 :style=`{
                 }`)
-            q-btn(
+            //- q-btn(
               v-if="!nodeEditingId"
               @click="nodeMoreStart(n)"
               round flat dense color="grey-8" icon="more_vert").q-ml-xs.q-mt-xs
+    //- EDITING
+    div(
+      v-if="nodeEditing"
+      :style=`{position: 'relative'}`).row.full-width
+      node-item(
+        :player="player"
+        :contentKalpa="contentKalpa"
+        :contentWorkspace="contentWorkspace"
+        :node="nodeEditing"
+        :nodeIndex="ni"
+        :isSelected="false"
+        :isEditing="true"
+        @select="nodeSelectedId = nodeEditing.id, nodeEditing = null"
+        @unselect="nodeSelectedId = null"
+        @edit="nodeSelectedId = null, nodeEditingId = n.id"
+        @edited="nodeSelectedId = nodeEditing.id, nodeEditing = null"
+        @delete="nodeDelete(n)"
+        :style=`{
+        }`)
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-page-sticky(
       v-if="nodesChecked.length > 0"
@@ -59,14 +76,16 @@ import { NodeApi } from 'src/api/node'
 import nodeItem from './node_item/index.vue'
 
 export default {
-  name: 'wsContentExplorer_video_viewDrafts',
+  name: 'wsContentExplorer_video_viewFragments',
   components: {nodeItem},
   props: ['contentKalpa', 'contentWorkspace', 'player'],
   data () {
     return {
       nodeSelectedId: null,
       nodeEditingId: null,
-      nodesChecked: []
+      nodeEditing: null,
+      nodesChecked: [],
+      fragments: []
     }
   },
   computed: {
@@ -75,7 +94,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
           contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          stage: 'fragment',
+          stage: {$in: ['fragment', 'draft', 'saved', 'published']},
         },
         sort: [{updatedAt: 'desc'}],
       }
@@ -226,21 +245,28 @@ export default {
         this.$rxdb.remove(id)
       })
     },
-    nodesLoaded (nodes) {
-      if (this.nodeSelectedId || this.nodeEditingId) return
-      this.$log('nodesLoaded', nodes)
-      let layers = nodes.reduce((acc, node) => {
-        node.items.map(n => {
-          n.layers.map(l => {
-            if (l.contentOid === this.contentKalpa.oid) {
-              acc.push(l)
+    nodesChanged (nodes) {
+      this.$log('nodesChanged', nodes)
+      let fragments = nodes.reduce((acc, node) => {
+        if (node.stage === 'fragment') {
+          acc.push(node)
+        }
+        else {
+          node.items.map(i => {
+            if (i.layers[0].contentOid === this.contentKalpa.oid) {
+              let fragmentInput = JSON.parse(JSON.stringify(node))
+              fragmentInput.id = i.id
+              fragmentInput.items = [JSON.parse(JSON.stringify(i))]
+              acc.push(fragmentInput)
             }
           })
-        })
+        }
         return acc
       }, [])
-      this.$log('layers', layers)
-      this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
+      this.$log('fragments', fragments)
+      this.fragments = fragments
+      if (this.nodeSelectedId || this.nodeEditingId) return
+      this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
     }
   },
   beforeDestroy () {
