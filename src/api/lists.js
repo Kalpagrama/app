@@ -60,6 +60,7 @@ class ListsApi {
             break
          case RxCollectionEnum.LST_SPHERE_NODES:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+            mangoQuery.selector.objectTypeEnum = 'NODE'
             // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
             break
