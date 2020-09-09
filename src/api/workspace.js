@@ -35,30 +35,30 @@ class WorkspaceApi {
     return ws
   }
 
-  static async wsItemUpsert (item) {
+  static async wsItemUpsert (item, wsRevision) {
     const f = this.wsItemUpsert
     logD(f, 'start')
     const t1 = performance.now()
     let { data: { wsItemUpsert } } = await apollo.clients.api.mutate({
-      mutation: gql`mutation wsItemUpsert($item: RawJSON!) {
-        wsItemUpsert (item: $item)
+      mutation: gql`mutation wsItemUpsert($item: RawJSON!, $wsRevision: Int!) {
+        wsItemUpsert (item: $item, wsRevision: $wsRevision)
       }`,
-      variables: { item }
+      variables: { item, wsRevision }
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsItemUpsert
   }
 
-  static async wsItemDelete (item) {
+  static async wsItemDelete (item, wsRevision) {
     const f = this.wsItemDelete
     logD(f, 'start')
     const t1 = performance.now()
     let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
       mutation: gql`
-        mutation wsItemDelete($item: RawJSON!) {
-          wsItemDelete (item: $item)
+        mutation wsItemDelete($item: RawJSON!, $wsRevision: Int!) {
+          wsItemDelete (item: $item, wsRevision: $wsRevision)
         }`,
-      variables: { item }
+      variables: { item, wsRevision }
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsItemUpsert

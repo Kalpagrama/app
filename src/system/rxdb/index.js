@@ -373,9 +373,6 @@ class RxDBWrapper {
       const f = this.set
       logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
-      if (!data){
-         logE('!data!!!!!')
-      }
       assert(data, '!data')
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       let rxDoc
