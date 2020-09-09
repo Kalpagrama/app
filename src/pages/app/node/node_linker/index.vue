@@ -151,7 +151,7 @@ export default {
   methods: {
     async link () {
       try {
-        this.$log('link start')
+        this.$log('link start', this.item)
         this.linking = true
         await this.$wait(500)
         let oid
@@ -160,10 +160,10 @@ export default {
         if (!oid) throw new Error('No oid!')
         let jointInput
         if (['EFFECT_CAUSE', 'SOLUTION_PROBLEM', 'TRUE_FALSE', 'TO_FROM'].includes(this.byType)) {
-          jointInput = { leftItem: {oid: this.node.oid}, rightItem: {oid: this.item.oid} }
+          jointInput = { leftItem: {oid: this.node.oid}, rightItem: {oid: oid} }
         }
         else {
-          jointInput = { leftItem: {oid: this.item.oid}, rightItem: {oid: this.node.oid} }
+          jointInput = { leftItem: {oid: oid}, rightItem: {oid: this.node.oid} }
         }
         if (this.byType === 'ESSENCE') {
           if (this.name.length === 0) throw new Error('No name for ESSENCE!')
