@@ -61,6 +61,13 @@
             ).row.fit.items-center.content-center
             .col
             span.text-white Published
+            q-btn(
+              round flat dense color="white" icon="content_copy"
+              :style=`{zIndex: 2000, marginRight: '6px'}`)
+            q-btn(
+              @click="$emit('unselect')"
+              flat dense color="white" icon="keyboard_arrow_up"
+              :style=`{zIndex: 2000, marginRight: '6px'}`)
           div(
             v-if="node.stage === 'saved'"
             ).row.fit.items-center.content-center

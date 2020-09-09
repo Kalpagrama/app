@@ -6,7 +6,7 @@ q-page(
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
-    kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesLoaded($event), fragmentsLoaded($event)")
+    kalpa-loader(:mangoQuery="queryDrafts" :sliceSize="1000" @items="fragmentsLoaded")
       template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           div(
@@ -36,7 +36,7 @@ q-page(
                 @delete="nodeDelete(n)"
                 :style=`{
                 }`)
-            q-btn(
+            //- q-btn(
               v-if="!nodeEditingId"
               @click="nodeMoreStart(n)"
               round flat dense color="grey-8" icon="more_vert").q-ml-xs.q-mt-xs
@@ -227,22 +227,6 @@ export default {
         this.$rxdb.remove(id)
       })
     },
-    nodesLoaded (nodes) {
-      if (this.nodeSelectedId || this.nodeEditingId) return
-      this.$log('nodesLoaded', nodes)
-      let layers = nodes.reduce((acc, node) => {
-        node.items.map(n => {
-          n.layers.map(l => {
-            if (l.contentOid === this.contentKalpa.oid) {
-              acc.push(l)
-            }
-          })
-        })
-        return acc
-      }, [])
-      this.$log('layers', layers)
-      this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(layers))])
-    },
     fragmentsLoaded (nodes) {
       if (this.nodeSelectedId || this.nodeEditingId) return
       this.$log('fragmentsLoaded', nodes)
@@ -263,7 +247,7 @@ export default {
         return acc
       }, [])
       this.$log('fragments', fragments)
-      this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
+      this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
       this.fragments = fragments
     }
   },
