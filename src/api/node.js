@@ -263,43 +263,43 @@ class NodeApi {
       return createdChain
    }
 
-   static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
-      switch (linkType) {
-         case LinkTypeEnum.CAUSE_EFFECT: {
-            let chain = {
-               links: [
-                  { leftItem: { oid: oidLeft }, rightItem: { oid: oidRight }, type: linkType }
-               ]
-            }
-            await NodeApi.chainCreate(chain)
-            break
-         }
-         case LinkTypeEnum.ESSENCE: {
-            let multiNodeInput = {
-               layout: 'PIP',
-               name,
-               category: 'FUN',
-               spheres,
-               items: [{ oid: oidLeft, nodeInput: nodeInputLeft }, { oid: oidRight, nodeInput: nodeInputRight }]
-                  .map(({ oid, nodeInput }) => {
-                     assert(oid || nodeInput)
-                     if (oid) return { oid }
-                     else return NodeApi.makeNodeInput(nodeInput)
-                  })
-            }
-            await NodeApi.nodeCreate(multiNodeInput)
-            break
-            // временное решение: связываем через сферы
-            // assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
-            // let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
-            // assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
-            // nodeInputRight.spheres.unshift(leftNode.sphereFromName)
-            // nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
-            // await NodeApi.nodeCreate(nodeInputRight)
-            // break
-         }
-      }
-   }
+   // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
+   //    switch (linkType) {
+   //       case LinkTypeEnum.CAUSE_EFFECT: {
+   //          let chain = {
+   //             links: [
+   //                { leftItem: { oid: oidLeft }, rightItem: { oid: oidRight }, type: linkType }
+   //             ]
+   //          }
+   //          await NodeApi.chainCreate(chain)
+   //          break
+   //       }
+   //       case LinkTypeEnum.ESSENCE: {
+   //          let multiNodeInput = {
+   //             layout: 'PIP',
+   //             name,
+   //             category: 'FUN',
+   //             spheres,
+   //             items: [{ oid: oidLeft, nodeInput: nodeInputLeft }, { oid: oidRight, nodeInput: nodeInputRight }]
+   //                .map(({ oid, nodeInput }) => {
+   //                   assert(oid || nodeInput)
+   //                   if (oid) return { oid }
+   //                   else return NodeApi.makeNodeInput(nodeInput)
+   //                })
+   //          }
+   //          await NodeApi.nodeCreate(multiNodeInput)
+   //          break
+   //          // временное решение: связываем через сферы
+   //          // assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
+   //          // let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
+   //          // assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
+   //          // nodeInputRight.spheres.unshift(leftNode.sphereFromName)
+   //          // nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
+   //          // await NodeApi.nodeCreate(nodeInputRight)
+   //          // break
+   //       }
+   //    }
+   // }
 }
 
 export { NodeApi, LinkTypeEnum }

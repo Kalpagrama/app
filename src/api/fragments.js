@@ -4,30 +4,46 @@ const metaFragment = gql`
   fragment metaComposition on MetaComposition {
     thumbUrl(preferWidth: 600)
   }
-  fragment metaFragment on Meta {
-    type
-    ...on MetaNode {
-      items{
+  fragment metaNodeFragment on MetaNode {
+    name
+    layout
+    author {
+      oid
+      type
+      name
+      thumbUrl(preferWidth: 50)
+    }
+    items{
+      oid
+      thumbUrl(preferWidth: 600)
+      ...on Composition {
         oid
-        thumbUrl(preferWidth: 600)
-        ...on Composition {
-          oid
-          url
-          outputType
-          layers {
-            contentOid
-            figuresAbsolute {
-              t
-            }
+        url
+        outputType
+        layers {
+          contentOid
+          figuresAbsolute {
+            t
           }
         }
       }
-      layout
-      author {
+    }
+  }
+  fragment metaFragment on Meta {
+    type
+    ...on MetaNode {... metaNodeFragment}
+    ... on MetaJoint {
+      jointType
+      name
+      sphereFromName{
         oid
-        type
         name
-        thumbUrl(preferWidth: 50)
+      }
+      leftItem {
+        ...on MetaNode {... metaNodeFragment}
+      }
+      rightItem {
+        ...on MetaNode {... metaNodeFragment}
       }
     }
     ...on MetaContent{
