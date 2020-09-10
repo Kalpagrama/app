@@ -23,6 +23,7 @@ export default {
       // this.loading = true
       let contentOid = this.composition.layers[0].contentOid
       let start = this.composition.layers[0].figuresAbsolute[0].t
+      this.$log('contentOid/start', contentOid, start)
       this.$router.push(`/content/${contentOid}?viewid=nodes&startat=${start}`)
     },
   }

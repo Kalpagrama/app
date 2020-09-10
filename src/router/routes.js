@@ -80,12 +80,12 @@ const routes = [
       {
         name: 'content',
         path: 'content/:oid',
-        redirect: 'content/:oid/nodes',
+        // redirect: 'content/:oid',
         component: () => import('pages/app/content/index.vue'),
-        children: [
-          { name: 'content.details', path: 'details', component: () => import('pages/app/content/content_details.vue') },
-          { name: 'content.nodes', path: 'nodes', component: () => import('pages/app/content/content_nodes.vue') },
-        ]
+        // children: [
+        //   { name: 'content.details', path: 'details', component: () => import('pages/app/content/content_details.vue') },
+        //   { name: 'content.nodes', path: 'nodes', component: () => import('pages/app/content/content_nodes.vue') },
+        // ]
       },
       {
         name: 'workspace',
@@ -118,17 +118,17 @@ const routes = [
               { name: 'workspace.contents.books', path: 'books', component: () => import('pages/app/ws_contents/type_books.vue') },
             ]
           },
-          {
-            name: 'workspace.content',
-            path: 'content/:id',
-            // redirect: 'content/:id/fragments',
-            component: () => import('pages/app/ws_content/index.vue'),
-            children: [
-              // { name: 'workspace.content.details', path: 'details', component: () => import('pages/app/ws_content/view_details.vue') },
-              // { name: 'workspace.content.fragments', path: 'fragments', component: () => import('pages/app/ws_content/view_fragments.vue') },
-              // { name: 'workspace.content.nodes', path: 'nodes', component: () => import('pages/app/ws_content/view_nodes.vue') }
-            ]
-          },
+          // {
+          //   name: 'workspace.content',
+          //   path: 'content/:id',
+          //   // redirect: 'content/:id/fragments',
+          //   component: () => import('pages/app/ws_content/index.vue'),
+          //   children: [
+          //     // { name: 'workspace.content.details', path: 'details', component: () => import('pages/app/ws_content/view_details.vue') },
+          //     // { name: 'workspace.content.fragments', path: 'fragments', component: () => import('pages/app/ws_content/view_fragments.vue') },
+          //     // { name: 'workspace.content.nodes', path: 'nodes', component: () => import('pages/app/ws_content/view_nodes.vue') }
+          //   ]
+          // },
           // { name: 'workspace.content.import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
           // nodes
           {

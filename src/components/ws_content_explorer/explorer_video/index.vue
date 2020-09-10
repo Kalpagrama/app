@@ -84,7 +84,7 @@ q-layout(view="hHh Lpr lff")
 </template>
 
 <script>
-import wsContentPlayer from 'components/ws_content_player/index.vue'
+import wsContentPlayer from 'components/content_player/index.vue'
 import viewDetails from './view_details/index.vue'
 import viewFragments from './view_fragments/index.vue'
 import viewNodes from './view_nodes/index.vue'

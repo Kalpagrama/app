@@ -78,7 +78,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import wsContentPlayer from 'components/ws_content_player/index.vue'
+import wsContentPlayer from 'components/content_player/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
 
 export default {

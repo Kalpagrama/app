@@ -59,7 +59,7 @@ q-layout(view="hHh Lpr lff").b-30
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import compositionEditor from 'components/composition/composition_editor/index.vue'
-import wsContentPlayer from 'components/ws_content_player/index.vue'
+import wsContentPlayer from 'components/content_player/index.vue'
 
 export default {
   name: 'editItems_itemEditor',
