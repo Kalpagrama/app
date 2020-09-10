@@ -43,18 +43,18 @@ export default {
         }
       }
     },
-    // items: {
-    //   deep: true,
-    //   immediate: false,
-    //   handler (to, from) {
-    //     // this.$log('items TO', to)
-    //     this.$emit('itemsCount', to.length)
-    //     this.$emit('items', to)
-    //     // alert('item CHANGED: ' + to.length)
-    //     this.itemsSlice = 1
-    //     this.itemsSliced = to.slice(0, this.sliceSize)
-    //   }
-    // }
+    items: {
+      deep: true,
+      immediate: false,
+      handler (to, from) {
+        // this.$log('items TO', to)
+        this.$emit('itemsCount', to.length)
+        this.$emit('items', to)
+        // alert('item CHANGED: ' + to.length)
+        this.itemsSlice = 1
+        this.itemsSliced = to.slice(0, this.sliceSize)
+      }
+    }
   },
   methods: {
     async next (index, done) {
