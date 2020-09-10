@@ -173,6 +173,7 @@ class Workspace {
   switchOnSynchro (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
     const f = this.switchOnSynchro
     assert(reactiveUser, '!reactiveUser')
+    // reactiveUser.wsRevision - версия мастерской по мнению сервера
     assert(reactiveUser.wsRevision >= 0, '!reactiveUser.wsRevision')
     this.reactiveUser = reactiveUser
     // синхроним изменения в цикле
@@ -220,7 +221,8 @@ class Workspace {
         let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
         let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
-        if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
+        //  reactiveUser.wsRevision - версия мастерской по мнению сервера (меняется в processEvent и при первой загрузке приложения)
+        if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate) {
           let wsServer = await WorkspaceApi.getWs()
           logD(f, 'try merge ws...', wsServer)
           // console.time('tm merge ws')
@@ -257,8 +259,9 @@ class Workspace {
       }
     }
     // отправить изменения на сервер
-    const saveToServer = async (wsOperationEnum, item) => {
+    const saveToServer = async (wsOperationEnum, item, wsRevision) => {
       const f = saveToServer
+      assert(wsRevision)
       assert(item, '!item')
       logD(f, `start ${item.id} rev:${item.rev}`)
       const t1 = performance.now()
@@ -268,9 +271,9 @@ class Workspace {
       assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
       let wsItemUpsert, wsItemDelete
       if (wsOperationEnum === WsOperationEnum.UPSERT) {
-        wsItemUpsert = await WorkspaceApi.wsItemUpsert(item)
+        wsItemUpsert = await WorkspaceApi.wsItemUpsert(item, wsRevision)
       } else {
-        wsItemDelete = await WorkspaceApi.wsItemDelete(item)
+        wsItemDelete = await WorkspaceApi.wsItemDelete(item, wsRevision)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return { wsItemUpsert, wsItemDelete }
@@ -279,6 +282,7 @@ class Workspace {
     // заполняем с сервера (если еще не заполено)
     await synchronizeWsWhole()
     let unsavedItems = await this.db.ws_changes.find().exec()
+    let wsRevision = this.reactiveUser.wsRevision
     for (let rxDocUnsavedItem of unsavedItems) {
       let { id, operation, updatedAt } = rxDocUnsavedItem
       let plainDoc
@@ -295,7 +299,7 @@ class Workspace {
       try {
         // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
         await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
-        await saveToServer(operation, plainDoc)
+        await saveToServer(operation, plainDoc, wsRevision++)
         this.synchroLoopWaitObj.setTimeout(synchroTimeMin)
       } catch (err) {
         if (err.networkError) { // если ошибка не сетевая - увеличить интервал
@@ -339,14 +343,13 @@ class Workspace {
       let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
-      if (wsRevisionLocal + 1 !== this.reactiveUser.wsRevision) {
-        logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${this.reactiveUser.wsRevision}`)
+      if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения
+        logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
         // здесь нельзя явно вызывать synchronizeWsWhole (только в рамках synchronize, тк оно работает параллельно)
         this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
         return
       }
       // ищем изменившейся item
-      // const rxDoc = await this.db.ws_items.findOne(itemServer.id).exec()
       assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
       let reactiveItem = await rxdb.get(null, null, {id: itemServer.id})
       // применим изменения
@@ -364,10 +367,9 @@ class Workspace {
         logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
         // просто возьмем ревизию с сервера
         await reactiveItem.updateExtended('rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
-        // await updateRxDoc(rxDoc, 'rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
+      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     } finally {
       this.ignoreWsChanges = false

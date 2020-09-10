@@ -177,13 +177,14 @@ class Lists {
           let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
           if (event.type === 'OBJECT_CREATED') {
             if (indx === -1) {
+              logD(f, 'add created object to begin of list.', event.object)
               reactiveItem.items.splice(0, 0, event.object)
               reactiveItem.count++
               reactiveItem.totalCount++
             }
           } else if (event.type === 'OBJECT_DELETED') {
-            logD(f, 'delete object indx=', indx)
             if (indx >= 0) {
+              logD(f, 'delete object from list', indx)
               reactiveItem.items.splice(indx, 1)
               reactiveItem.count--
               reactiveItem.totalCount--
