@@ -161,7 +161,7 @@ class RxDBWrapper {
          this.cache = new Cache(this.db)
          this.objects = new Objects(this.cache)
          this.lists = new Lists(this.cache)
-         this.event = new Event(this.workspace, this.objects, this.lists)
+         this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
          // console.time('workspace.create')
          await this.workspace.create()

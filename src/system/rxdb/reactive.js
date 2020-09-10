@@ -163,7 +163,7 @@ class ReactiveItemHolder {
                   await this.mutex.lock() // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() // не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!)
 
-                  // logD(f, `try to change rxDoc ${this.reactiveItem.id} ${this.reactiveItem._rev} ${this.rxDoc._rev}`)
+                  logD(f, `try to change rxDoc ${this.reactiveItem.id} ${this.reactiveItem._rev} ${this.rxDoc._rev}`)
                   assert(this.reactiveItem.id, '!this.reactiveItem.id')
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
                      let actualData = JSON.parse(JSON.stringify(this.reactiveItem))
