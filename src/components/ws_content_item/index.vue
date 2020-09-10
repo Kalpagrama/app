@@ -22,7 +22,7 @@
         }`).q-ma-md
       .col.full-height
         .row.fit.items-center.content-center.q-pr-sm
-          small(:style=`{userSelect: 'none'}`).text-white {{ content.name.slice(0, 100) }}
+          small(:style=`{userSelect: 'none'}`).text-white {{ content.name.slice(0, 40) }}
   slot(name="footer")
 </template>
 

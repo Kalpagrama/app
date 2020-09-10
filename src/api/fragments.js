@@ -5,6 +5,7 @@ const metaFragment = gql`
     thumbUrl(preferWidth: 600)
   }
   fragment metaNodeFragment on MetaNode {
+    oid
     name
     layout
     author {
@@ -40,10 +41,24 @@ const metaFragment = gql`
         name
       }
       leftItem {
-        ...on MetaNode {... metaNodeFragment}
+        type
+        oid
+        name
+        thumbUrl(preferWidth: 600)
+        createdAt
+        meta{
+          ...on MetaNode {... metaNodeFragment}
+        }
       }
       rightItem {
-        ...on MetaNode {... metaNodeFragment}
+        type
+        oid
+        name
+        thumbUrl(preferWidth: 600)
+        createdAt
+        meta{
+          ...on MetaNode {... metaNodeFragment}
+        }
       }
     }
     ...on MetaContent{

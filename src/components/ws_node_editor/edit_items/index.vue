@@ -10,7 +10,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     v-model="itemFinderOpened" position="bottom"
     @show="itemsActive = false"
     @hide="itemsActive = true")
-    item-finder(@item="itemFound" @close="itemFinderOpened = false")
+    item-finder(:id="node.id" @item="itemFound" @close="itemFinderOpened = false")
   div(
     :style=`{
       position: 'relative',
@@ -34,7 +34,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       div().row.full-width.items-start.content-start
         div(
           v-for="(i,ii) in node.items" :key="i.id"
-          :style=`{position: 'relative'}`
+          :style=`{position: 'relative', minHeight: '200px',}`
           ).row.full-width.items-start.content-start
           q-btn(
             @click="itemDelete(i,ii)"
@@ -94,12 +94,7 @@ export default {
     },
     itemFound (item) {
       this.$log('itemFound', item)
-      if (this.node.name.length === 0) {
-        this.node.name = item.name
-      }
-      item.items.map(i => {
-        this.node.items.push(i)
-      })
+      this.node.items.push(JSON.parse(JSON.stringify(item)))
       this.itemFinderOpened = false
     },
     itemDelete (item, itemIndex) {

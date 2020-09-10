@@ -48,6 +48,37 @@ q-page(
               ws-sphere-item(
                 v-if="i.wsItemType === 'WS_SPHERE'" :id="i.id"
                 :style=`{borderRadius: '10px',}`).b-40
+              //- bookmark
+              div(
+                v-if="i.wsItemType === 'WS_BOOKMARK'"
+                :style=`{borderRadius: '10px'}`
+                ).row.full-width.b-40
+                ws-content-item(
+                  v-if="i.type === 'CONTENT'" :content="i"
+                  @clicked="itemSelected = i.id")
+                  template(v-slot:footer)
+                    div(
+                      v-if="itemSelected === i.id"
+                      :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
+                      ).row.full-width.bg-green.q-px-xs.q-pb-xs
+                      q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                      .col
+                      q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
+                ws-node-item(
+                  v-else-if="i.type === 'NODE'" :node="{name: i.name, oid: i.oid, items: [{thumbUrl: i.thumbOid}]}"
+                  @clicked="itemSelected = i.id")
+                  template(v-slot:footer)
+                    div(
+                      v-if="itemSelected === i.id"
+                      :style=`{marginTop: '-10px', paddingTop: '14px', borderRadius: '0 0 10px 10px'}`
+                      ).row.full-width.bg-green.q-px-xs.q-pb-xs
+                      q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                      .col
+                      q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
+                div(
+                  v-else
+                  ).row.full-width
+                  span.text-white {{i.name}}
 </template>
 
 <script>
@@ -92,6 +123,11 @@ export default {
         else if (item.wsItemType === 'WS_SPHERE') {
           this.$router.push(`/workspace/sphere/${item.id}`)
         }
+        else if (item.wsItemType === 'WS_BOOKMARK') {
+          if (item.type === 'NODE') this.$router.push(`/node/${item.oid}`)
+          else if (item.type === 'CONTENT') this.$router.push(`/content/${item.oid}`)
+          else if (item.type === 'USER') this.$router.push(`/user/${item.oid}`)
+        }
         else {
           this.$q.notify({type: 'negative', position: 'top', message: 'Not supported :('})
         }
@@ -112,6 +148,8 @@ export default {
         else if (item.wsItemType === 'WS_NODE') return 'filter_tilt_shift'
         else if (item.wsItemType === 'WS_BOOKMARK') {
           if (item.type === 'NODE') return 'filter_tilt_shift'
+          else if (item.type === 'CONTENT') return 'select_all'
+          // else if (item)
           else return ''
         }
       }

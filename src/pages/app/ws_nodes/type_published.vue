@@ -15,7 +15,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
           :gutter="{default: 10}").full-width
           div(
             v-for="(node, ii) in items" :key="node.oid"
-            ).row.full-width
+            ).row.full-width.q-mb-sm
             div(
               @click="nodeSelectedOid = node.oid"
               :style=`{

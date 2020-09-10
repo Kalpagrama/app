@@ -7,7 +7,7 @@
     content-importer(
       :contentKalpa="contentKalpa"
       :contentFile="contentFile"
-      @contentKalpa="$emit('contentKalpa', $event)"
+      @contentKalpa="$emit('contentKalpa', $event), contentImporterShow = false"
       @close="contentImporterShow = false")
   div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).col
     q-input(
