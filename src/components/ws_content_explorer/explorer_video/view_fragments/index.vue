@@ -34,10 +34,6 @@ q-page(
                 @delete="nodeDelete(n)"
                 :style=`{
                 }`)
-            //- q-btn(
-              v-if="!nodeEditingId"
-              @click="nodeMoreStart(n)"
-              round flat dense color="grey-8" icon="more_vert").q-ml-xs.q-mt-xs
     //- EDITING
     div(
       v-if="nodeEditing"
@@ -52,7 +48,7 @@ q-page(
         :isEditing="true"
         @select="nodeSelectedId = nodeEditing.id, nodeEditing = null"
         @unselect="nodeSelectedId = null"
-        @edit="nodeSelectedId = null, nodeEditingId = n.id"
+        @edit="nodeSelectedId = null"
         @edited="nodeSelectedId = nodeEditing.id, nodeEditing = null"
         @delete="nodeDelete(n)"
         :style=`{
@@ -82,7 +78,6 @@ export default {
   data () {
     return {
       nodeSelectedId: null,
-      nodeEditingId: null,
       nodeEditing: null,
       nodesChecked: [],
       fragments: []
@@ -110,7 +105,7 @@ export default {
     async nodeCreateStart () {
       this.$log('nodeCreateStart')
       let node = await this.nodeCreate()
-      this.nodeEditingId = node.id
+      this.nodeEditing = node
     },
     async nodeCreate () {
       this.$log('nodeCreate')
@@ -265,7 +260,7 @@ export default {
       }, [])
       this.$log('fragments', fragments)
       this.fragments = fragments
-      if (this.nodeSelectedId || this.nodeEditingId) return
+      if (this.nodeSelectedId || this.nodeEditing) return
       this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
     }
   },
