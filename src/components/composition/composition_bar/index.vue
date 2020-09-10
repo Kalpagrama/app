@@ -5,6 +5,7 @@ component(
   :contentKalpa="contentKalpa"
   :player="player"
   :actionsPosition="actionsPosition"
+  :barStyles="barStyles"
   )
 </template>
 
@@ -14,7 +15,7 @@ import barVideo from './bar_video/index.vue'
 export default {
   name: 'compositionBar',
   components: {barVideo},
-  props: ['isActive', 'player', 'composition', 'contentKalpa', 'actionsPosition'],
+  props: ['isActive', 'player', 'composition', 'contentKalpa', 'actionsPosition', 'barStyles'],
   data () {
     return {
       barComponent: {

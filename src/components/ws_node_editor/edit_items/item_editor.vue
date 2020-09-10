@@ -92,8 +92,8 @@ export default {
       deep: true,
       immediate: false,
       handler (to, from) {
-        this.$log('itemCopyChanged', to)
-        this.itemCopyChanged = true
+        // this.$log('itemCopyChanged', to)
+        if (!this.itemCopyChanged) this.itemCopyChanged = true
       }
     }
   },
