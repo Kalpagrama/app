@@ -3059,6 +3059,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "wsRevision",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -3086,6 +3100,20 @@
                   "ofType": {
                     "kind": "SCALAR",
                     "name": "RawJSON",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "wsRevision",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   }
                 },
@@ -8289,7 +8317,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "Meta",
+                "name": "ObjectShort",
                 "ofType": null
               }
             },
@@ -8305,7 +8333,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "Meta",
+                "name": "ObjectShort",
                 "ofType": null
               }
             },
@@ -8357,6 +8385,22 @@
         "name": "MetaNode",
         "description": null,
         "fields": [
+          {
+            "name": "oid",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "OID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "type",
             "description": null,

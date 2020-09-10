@@ -4,7 +4,7 @@ import {cacheSchema} from 'src/system/rxdb/schemas'
 import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
 import {Mutex} from 'src/system/rxdb/reactive'
 import debounce from 'lodash/debounce'
-import {getRxCollectionEnumFromId, RxCollectionEnum, rxdb} from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
@@ -97,20 +97,22 @@ class Cache {
       })
 
       // заполняем cacheLru из idb
-      let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump')
-      if (lruDump) {
+      // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') // так не делаем чтобы reactiveItem не дергался каждый раз при измнении
+      let lruDumpDoc = await rxdb.db.meta.findOne('lruDump').exec()
+      if (lruDumpDoc) {
         logD(f, 'восстанавливаем Lru')
-        lruDump = JSON.parse(lruDump)
+        let lruDump = JSON.parse(lruDumpDoc.valueString)
         this.cacheLru.load(lruDump)
       }
 
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
         if (!rxdb.isLeader()) return
-        logD(f, 'start')
+        logD(f, 'start', 'debouncedDumpLru')
         const t1 = performance.now()
         let lruDump = this.cacheLru.dump()
-        await rxdb.set(RxCollectionEnum.META, {id: 'lruDump', valueString: JSON.stringify(lruDump)})
+        // await rxdb.set(RxCollectionEnum.META, {id: 'lruDump', valueString: JSON.stringify(lruDump)})
+        await this.db.meta.atomicUpsert({ id: 'lruDump', valueString: JSON.stringify(lruDump) })
         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }, debounceIntervalDumpLru)
 

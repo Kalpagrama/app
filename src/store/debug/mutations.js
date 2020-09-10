@@ -12,6 +12,8 @@ export function addReactiveItem (state, { id, reactiveItem }) {
 }
 
 export function addFindResult (state, { queryId, findResult }) {
+   const f = addFindResult
+   // logD(f, 'start', queryId)
    if (process.env.NODE_ENV !== 'development') return
    state.allFindResults[queryId] = cloneDeep(findResult)
 }

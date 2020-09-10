@@ -155,7 +155,7 @@ class NodeApi {
       const f = this.nodeVote
       logD(f, 'start')
       const t1 = performance.now()
-      assert(oid && rate, 'oid && rate')
+      assert(oid, 'oid && rate')
       let { data: { nodeRate } } = await apollo.clients.api.mutate({
          mutation: gql`
              ${fragments.objectFullFragment}
@@ -260,7 +260,7 @@ class NodeApi {
       })
       let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return createdJoint
+      return reactiveJoint
    }
 
    // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
