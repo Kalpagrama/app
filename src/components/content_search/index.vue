@@ -7,7 +7,7 @@
     content-importer(
       :contentKalpa="contentKalpa"
       :contentFile="contentFile"
-      @contentKalpa="contentKalpaSelected"
+      @contentKalpa="$emit('contentKalpa', $event)"
       @close="contentImporterShow = false")
   div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).col
     q-input(
@@ -23,7 +23,6 @@
       }`
       :style=`{
         margin: 0,
-        //- paddingRight: '0px',
       }`
       ).full-width
       template(v-slot:append)
@@ -44,7 +43,7 @@ import contentUploader from './content_uploader/index.vue'
 import contentImporter from 'components/content_importer/index.vue'
 
 export default {
-  name: 'wsContentList_contentSearch',
+  name: 'contentSearch',
   components: {contentUploader, contentImporter},
   data () {
     return {
@@ -63,7 +62,7 @@ export default {
         this.$log('searchString CHANGED', to)
         if (this.isURL(to)) {
           this.searchStringLoading = true
-          this.contentKalpa = await this.contentFromURL(to)
+          this.contentKalpa = await ContentApi.contentCreateFromUrl(to)
           this.contentImporterShow = true
         }
         else {
@@ -83,58 +82,6 @@ export default {
       let a = document.createElement('a')
       a.href = str
       return (a.host && a.host !== window.location.host)
-    },
-    async contentFromURL (url) {
-      try {
-        this.$log('contentFromURL start', url)
-        let content = await ContentApi.contentCreateFromUrl(url)
-        this.$log('contentFromURL done', content)
-        return content
-      } catch (e) {
-        this.$log('contentFromURL error', e)
-      }
-    },
-    async contentKalpaSelected (contentKalpa) {
-      this.$log('contentKalpaSelected', contentKalpa)
-      this.contentImporterShow = false
-      // show loading progress
-      // contentAdd to workspace...
-      let contentWorkspace = await this.contentAdd(contentKalpa)
-      this.$emit('content', contentWorkspace)
-    },
-    async contentAdd (content) {
-      this.$log('contentAdd content', content)
-      // todo неверное решение! мастерская автономна! oid появится только после синхронизации!!!!
-      let {items: contentFind} = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-          contentOid: content.oid
-        }
-      })
-      this.$log('contentAdd contentFind', contentFind)
-      // create rxDoc
-      if (contentFind.length === 0) {
-        let contentInput = {
-          wsItemType: 'WS_CONTENT',
-          thumbOid: content.thumbUrl,
-          name: content.name,
-          layers: [],
-          spheres: [],
-          contentOid: content.oid,
-          contentType: content.type,
-          operation: {
-            items: null,
-            operations: null,
-            type: 'CONCAT'
-          }
-        }
-        this.$log('contentAdd contentInput', contentInput)
-        let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
-        this.$log('contentAdd res', res)
-        return res
-      } else {
-        return contentFind[0]
-      }
     },
     searchStringFocused () {
       this.$log('searchStringFocused')

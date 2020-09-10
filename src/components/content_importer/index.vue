@@ -51,7 +51,9 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
       //- span.text-bold.text-white {{ contentKalpa.name }}
   //- image content from file, crop it, rename it, them create contentKalpa, them emit content...
   image-from-device(
-    v-if="contentFile && contentFile.type.split('/')[0] === 'image'")
+    v-if="contentFile && contentFile.type.split('/')[0] === 'image'"
+    :src="imageSrc"
+    @contentKalpa="$emit('contentKalpa', $event)")
   //- div(
     v-if="contentFile && contentFile.type.split('/')[0] === 'image'"
     ).row.full-width

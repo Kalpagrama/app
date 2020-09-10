@@ -8,9 +8,9 @@
   //- body
   div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
     image-cropper(
-      v-if="imageSrc"
+      v-if="src"
       ref="imageCropper"
-      :src="imageSrc"
+      :src="src"
       :options=`{
         viewMode: 1,
         initialAspectRatio: 10/10,
@@ -41,6 +41,7 @@ import imageCropper from 'components/image_cropper/index.vue'
 export default {
   name: 'imageFromDevice',
   components: {imageCropper},
+  props: ['src'],
   data () {
     return {
       loading: false,

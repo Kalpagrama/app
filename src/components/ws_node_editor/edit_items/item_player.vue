@@ -40,7 +40,7 @@
       q-icon(name="clear" color="white" size="50px")
     //- item player
     ws-content-player(
-      v-if="playerPlaying && contentKalpa"
+      v-if="playerPlaying && isActive && contentKalpa"
       :contentKalpa="contentKalpa"
       @player="player = $event"
       :options=`{

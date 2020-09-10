@@ -29,13 +29,20 @@ export default {
       // this.$router.push('/content/'+composition.layers[0].contentOid)
       // try to find this content in workspace ? go for it : create a dummy?
       let contentOid = this.composition.layers[0].contentOid
-      this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, contentOid)
-      this.$log('start contentKalpa', this.contentKalpa)
       let start = this.composition.layers[0].figuresAbsolute[0].t
-      this.$log('start startat', start)
-      let contentWorkspace = await this.contentAdd(this.contentKalpa)
-      this.loading = false
-      this.$router.push(`/workspace/content/${contentWorkspace.id}?viewid=nodes&startat=${start}&removeonempty=true`)
+      this.$router.push(`/content/${contentOid}?viewid=nodes&startat=${start}`)
+      // let {items: contentFind} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, contentOid: contentOid}})
+      // this.$log('contentFind', contentFind)
+      // if (contentFind) {
+      // }
+      // // try to find this content in workspace...
+      // this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, contentOid)
+      // this.$log('start contentKalpa', this.contentKalpa)
+      // let start = this.composition.layers[0].figuresAbsolute[0].t
+      // this.$log('start startat', start)
+      // let contentWorkspace = await this.contentAdd(this.contentKalpa)
+      // this.loading = false
+      // this.$router.push(`/workspace/content/${contentWorkspace.id}?viewid=nodes&startat=${start}&removeonempty=true`)
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)

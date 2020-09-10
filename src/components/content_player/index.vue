@@ -2,7 +2,7 @@
 component(
   v-if="contentKalpa"
   :is="playerComponent[contentKalpa.type]"
-  :contentKalpa="contentKalpa" :contentWorkspace="contentWorkspace"
+  :contentKalpa="contentKalpa"
   :source="contentKalpa.contentSource"
   :url="contentKalpa.url"
   :options="options"
@@ -21,7 +21,7 @@ export default {
   },
   props: {
     contentKalpa: {type: Object, required: true},
-    contentWorkspace: {type: Object},
+    // contentWorkspace: {type: Object},
     options: {type: Object},
   },
   data () {

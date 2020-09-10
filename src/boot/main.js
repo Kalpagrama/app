@@ -98,6 +98,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('kalpaFollow', () => import('components/kalpa_follow/index.vue'))
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
+    // content
+    Vue.component('contentSearch', () => import('components/content_search/index.vue'))
     Vue.component('wsNodeEditor', () => import('components/ws_node_editor/index.vue'))
     Vue.component('wsNodeItem', () => import('components/ws_node_item/index.vue'))
     Vue.component('wsContentItem', () => import('components/ws_content_item/index.vue'))
