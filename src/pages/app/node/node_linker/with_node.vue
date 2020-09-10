@@ -1,30 +1,54 @@
 <template lang="pug">
 q-page.row.full-width.items-start.content-start.justify-center
-  kalpa-loader(:mangoQuery="queryNodes" :sliceSize="1000" v-slot=`{items,next}`)
-    masonry(
-      :cols="$q.screen.width < 800 ? 2 : 4"
-      :gutter="{default: 10}").full-width.q-pt-sm.q-pr-sm
-      ws-node-item(
-        v-for="(i,ii) in items" :key="i.id" :node="i"
-        @clicked="nodeClicked(i)").q-mb-sm
+  .row.full-width.q-px-md
+    q-tabs(
+      v-model="type"
+      dense no-caps active-color="white" align="left" switch-indicator
+      ).full-width.text-grey-8
+      q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+  type-published(
+    v-if="type === 'published'"
+    mode="clicked"
+    :searchString="searchString"
+    @clicked="nodeClicked")
+  type-saved(
+    v-if="type === 'saved'"
+    mode="clicked"
+    :searchString="searchString"
+    @clicked="nodeClicked")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+// import typeDrafts from 'pages/app/ws_nodes/type_drafts.vue'
+import typeSaved from 'pages/app/ws_nodes/type_saved.vue'
+import typePublished from 'pages/app/ws_nodes/type_published.vue'
+
 export default {
   name: 'nodeLinker_withNode',
+  components: {typeSaved, typePublished},
   props: ['searchString'],
   data () {
     return {
+      type: 'published'
     }
   },
   computed: {
+    types () {
+      return [
+        // {id: 'workspace.nodes.fragments', name: this.$t('pageApp_wsNodes_fragments', 'Фрагменты')},
+        // {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
+        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
+        {id: 'saved', name: this.$t('pageApp_wsNodes_saved', 'Сохраненные')},
+      ]
+    },
     queryNodes () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: {$in: ['saved', 'published']}
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          type: 'NODE'
+          // stage: {$in: ['saved', 'published']}
         }
       }
       if (this.searchString.length > 0) {

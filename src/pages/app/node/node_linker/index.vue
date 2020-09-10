@@ -34,7 +34,7 @@ q-layout(
                       span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ t.name }}
           q-btn(round flat color="white" icon="clear" @click="$emit('close')")
         //- filters
-        div(v-if="!item && withType").row.full-width.items-start.content-start.q-pa-sm
+        div(v-if="!item && withType").row.full-width.items-start.content-start.q-px-sm
           div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
             q-input(
               v-model="searchString"
@@ -57,6 +57,14 @@ q-layout(
           ws-node-item(
             v-if="item.wsItemType === 'WS_NODE'" :node="item"
             :style=`{maxWidth: '50%'}`)
+          ws-node-item(
+            v-if="item.wsItemType === 'WS_BOOKMARK' && item.type === 'NODE'"
+            :node="{oid: item.oid, name: item.name, items: [{thumbUrl: item.thumbOid}]}"
+            :style=`{maxWidth: '50%'}`)
+          ws-node-item(
+            v-if="!item.wsItemType && item.type === 'NODE'"
+            :node="{oid: item.oid, name: item.name, items: item.meta.items}"
+            :style=`{maxWidth: '50%'}`)
           div(
             v-if="item.wsItemType === 'WS_SPHERE'"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
@@ -64,7 +72,7 @@ q-layout(
             q-icon(name="blur_on" size="40px" color="white").q-mr-sm
             span(:style=`{fontSize: '24px',}`).text-white.text-bold.q-mr-lg {{ item.name }}
           ws-content-item(
-            v-if="item.wsItemType === 'WS_CONTENT'" :content="item"
+            v-if="item.wsItemType === 'WS_BOOKMARK' && item.type === 'CONTENT'" :content="item"
             :style=`{}`
             ).full-width
         //- by ASSOCIATIVE

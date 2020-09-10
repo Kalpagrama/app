@@ -22,7 +22,8 @@ export default {
     querySpheres () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_CONTENT
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          type: 'CONTENT'
         }
       }
       if (this.searchString.length > 0) {
