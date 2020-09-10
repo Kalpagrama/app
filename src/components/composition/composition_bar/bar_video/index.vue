@@ -7,7 +7,8 @@
       position: 'relative',
       height: '100%',
       borderRadius: '10px',
-      border: '2px solid #4caf50',
+      //- border: '2px solid #4caf50',
+      ...barStyles,
     }`
     ).row.full-width
     div(
@@ -95,6 +96,12 @@ export default {
       default () {
         return false
       }
+    },
+    barStyles: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   data () {
@@ -180,6 +187,16 @@ export default {
           }
         }
       }
+    },
+    composition: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        // this.$log('composition TO', to)
+        let _composition = JSON.parse(JSON.stringify(to))
+        let fragments = [{name: '', items: [_composition]}]
+        this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
+      }
     }
   },
   methods: {
@@ -244,17 +261,24 @@ export default {
     playerBarClickHandle () {
       this.$log('playerBarClickHandle')
       this.compositionStop()
+    },
+    playerEditHandle () {
+      this.compositionStop()
     }
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['wsContentLayers', JSON.parse(JSON.stringify(this.composition.layers))])
+    // let fragments = []
+    // JSON.parse(JSON.stringify(this.composition))
+    // this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
     this.player.events.on('bar-click', this.playerBarClickHandle)
+    this.player.events.on('edit-event', this.playerEditHandle)
     this.compositionPlay()
   },
   beforeDestroy () {
-    this.$store.commit('ui/stateSet', ['wsContentLayers', null])
+    this.$store.commit('ui/stateSet', ['wsContentFragments', null])
     this.player.events.off('bar-click', this.playerBarClickHandle)
+    this.player.events.off('edit-event', this.playerEditHandle)
   }
 }
 </script>

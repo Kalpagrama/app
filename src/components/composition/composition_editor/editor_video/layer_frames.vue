@@ -1,10 +1,10 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
   q-resize-observer(@resize="e => width = e.width")
   //- overflowY: 'hidden',
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '50px', paddingBottom: '50px'}`).row.full-width.scroll
+    :style=`{paddingTop: '56px', paddingBottom: '50px'}`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -42,7 +42,7 @@
           }`
           ).bg-red
         //- left tint
-        div(
+        //- div(
           :style=`{
             position: 'absolute', zIndex: 100,
             left: '0px',
@@ -56,18 +56,23 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 30px)',
-            height: '50px', width: '50px',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 50px)',
+            height: '50px',
+            width: '50px',
             cursor: 'grabbing',
-            borderRadius: '50%',
-            opacity: 0.5,
+            borderRadius: '10px',
+            //- opacity: 0.55,
+            background: 'rgba(76,175,79,0.55)'
           }`
-          ).bg-green
+          ).row.items-center.content-center.justify-center
+          q-icon(
+            name="drag_indicator" color="white" size="24px"
+            :style=`{pointerEvents: 'none'}`)
         //- right tint
-        div(
+        //- div(
           :style=`{
             position: 'absolute', zIndex: 100,
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% - 0px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 8px)',
             width: 'calc('+((player.duration-layer.figuresAbsolute[1].t)/player.duration)*100+'% + 1px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
@@ -78,27 +83,32 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% - 10px)',
-            height: '50px', width: '50px',
+            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 8px)',
+            height: '50px',
+            width: '50px',
             cursor: 'grabbing',
-            borderRadius: '50%',
-            opacity: 0.5,
+            borderRadius: '10px',
+            //- opacity: 0.55,
+            background: 'rgba(76,175,79,0.55)'
           }`
-          ).bg-green
+          ).row.items-center.content-center.justify-center
+          q-icon(
+            name="drag_indicator" color="white" size="24px"
+            :style=`{pointerEvents: 'none'}`)
         //- rect
         div(
           :style=`{
             position: 'absolute', zIndex: 300, top: '-8px',
-            left: (layer.figuresAbsolute[0].t/player.duration)*100+'%',
-            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 8px)',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 8px)',
+            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 24px)',
             height: 50+8+8+'px',
-            borderRadius: '12px',
+            borderRadius: '18px',
             border: '8px solid rgb(76,175,80)',
             pointerEvents: 'none',
           }`)
         //- meta
         div(:style=`{
-          position: 'absolute', zIndex: 400, top: '-8px',
+          position: 'absolute', zIndex: 400, top: '-7px',
           left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% + 0px)',
           width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 8px)',
           height: 50+8+8+'px',
@@ -106,13 +116,13 @@
           slot(name="meta" :panning="pointDragging")
           //- slot(name="meta")
         //- start actions
-        div(
+        //- div(
           :style=`{
             position: 'absolute', zIndex: 300, bottom: '-46px',
             left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 60px)',
             width: 'calc('+(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration*100+'% + 120px)',
           }`
-          ).row.items-center.content-center.no-wrap
+          ).row.items-center.content-center.justify-center.no-wrap
           q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
             div(:style=`{
               position: 'absolute', zIndex: 100,
@@ -147,6 +157,45 @@
             }`).row.bg-red
       //- right margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 300, bottom: '0px',
+      left: '0px', width: '100%',
+    }`
+    ).row.items-center.content-center.justify-center
+    div(:style=`{maxWidth: '70%'}`).row.full-width.items-center.content-center.no-wrap
+      q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
+        div(:style=`{
+          position: 'absolute', zIndex: 100,
+          left: 'calc(50% - 2px)', width: '3px',
+          height: '80%', top: '10%',
+          borderRadius: '2px',
+          opacity: 0.9
+        }`).row.bg-red
+      q-btn(round flat dense color="white" @click="layerForward(0,false)")
+        q-icon(name="keyboard_arrow_left" color="white" size="30px")
+      q-btn(round flat dense color="white" @click="layerForward(0,true)")
+        q-icon(name="keyboard_arrow_right" color="white" size="30px")
+      .col
+      small(
+        :class=`{
+          'text-red': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t > 60,
+          'text-white': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t <= 60
+        }`
+        ) {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
+      .col
+      q-btn(round flat dense color="white" @click="layerForward(1,false)")
+        q-icon(name="keyboard_arrow_left" color="white" size="30px")
+      q-btn(round flat dense color="white" @click="layerForward(1,true)")
+        q-icon(name="keyboard_arrow_right" color="white" size="30px")
+      q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
+        div(:style=`{
+          position: 'absolute', zIndex: 100,
+          left: 'calc(50% - 2px)', width: '3px',
+          height: '80%', top: '10%',
+          borderRadius: '2px',
+          opacity: 0.9
+        }`).row.bg-red
 </template>
 
 <script>
@@ -179,7 +228,7 @@ export default {
       let duration = this.player.duration
       // durationScreen === widthScreen
       // duration === x
-      widthFrames = (duration * widthScreen) / durationScreen
+      widthFrames = (duration * widthScreen) / this.durationScreen
       return widthFrames
     },
     frameWidth () {
@@ -205,6 +254,13 @@ export default {
       handler (to, from) {
         if (to) {
           this.$log('tickFramesLayerCenter TO', to)
+          this.framesLayerCenter()
+        }
+      }
+    },
+    framesWidth: {
+      handler (to, from) {
+        if (to > 0) {
           this.framesLayerCenter()
         }
       }
@@ -253,6 +309,7 @@ export default {
     layerForward (pointIndex, goingForward) {
       this.$log('layerForward', pointIndex, goingForward)
       let t = this.layer.figuresAbsolute[pointIndex].t
+      this.player.events.emit('edit-event', {t: t})
       if (goingForward) t += 0.1
       else t -= 0.1
       this.$log('t', t)
@@ -291,6 +348,7 @@ export default {
         this.player.pause()
         this.pointDragging = true
         this.pointDraggingIndex = index
+        this.player.events.emit('edit-event', {t: t})
         // this.player.pause()
       }
       if (e.isFinal) {
@@ -304,6 +362,7 @@ export default {
     framesClick (e) {
       this.$log('framesClick', e.offsetX, e.target.accessKey)
       if (e.target.accessKey !== 'frames') return
+      // this.player.events.emit('edit-event', {t: t})
       let t = e.offsetX / this.framesWidth * this.player.duration
       this.$log('t', t)
       this.player.setCurrentTime(t)
@@ -313,6 +372,7 @@ export default {
       }
       else {
         this.$emit('clickOutside')
+        this.player.events.emit('edit-event', {t: t})
       }
     },
     framesDrag (e) {
@@ -324,7 +384,10 @@ export default {
       if (e.isFinal) this.framesDragging = false
     },
     framesLayerCenter () {
-      this.$log('framesLayerCenter')
+      this.$log('framesLayerCenter width:', this.width)
+      this.$log('framesLayerCenter layerDuration:', this.layerDuration)
+      this.$log('framesLayerCenter layerStart:', this.layerStart)
+      this.$log('framesLayerCenter framesWidth:', this.framesWidth)
       let layerLeft = ((this.layerStart / this.player.duration) * this.framesWidth) + (this.width / 2)
       let layerWidth = (this.layerDuration / this.player.duration) * this.framesWidth
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
@@ -332,9 +395,10 @@ export default {
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    this.framesLayerCenter()
+    // await this.$wait(300)
+    // this.framesLayerCenter()
   }
 }
 </script>

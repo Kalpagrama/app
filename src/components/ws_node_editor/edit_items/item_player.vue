@@ -70,6 +70,10 @@
           :player="player" :contentKalpa="contentKalpa"
           :composition="item"
           actionsPosition="top"
+          :barStyles=`{
+            background: 'rgba(0,0,0,0.5)',
+            border: '2px solid #4caf50',
+          }`
           :style=`{
             maxHeight: '40px',
           }`)
