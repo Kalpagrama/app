@@ -12,7 +12,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 5"
-          :gutter="{default: 10}")
+          :gutter="{default: 10}").full-width
           div(
             v-for="(i,ii) in items" :key="i.id"
             :style=`{
@@ -43,9 +43,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
               ).row.full-width.items-center.content-center.bg-green.q-px-sm.q-pb-sm
               q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
               .col
-              q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
-              //- .row.full-width.q-pa-sm
-                span.text-white {{ i.name }}
+              q-btn(round flat dense color="white" icon="launch" @click="itemEdit(i)")
 </template>
 
 <script>
@@ -63,31 +61,30 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-          contentType: 'IMAGE'
-        }
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          contentType: 'IMAGE',
+          type: 'CONTENT',
+        },
+        sort: [{updatedAt: 'desc'}]
       }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
-      // add sort
-      res.sort = [{updatedAt: 'desc'}]
-      // TODO: add spheres
       return res
     }
   },
   methods: {
-    async itemDelete (item) {
-      this.$log('itemDelete', item)
+    async itemDelete (contentBookmark) {
+      this.$log('itemDelete', contentBookmark)
       if (!confirm('Delete content?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(item.id)
+      await this.$rxdb.remove(contentBookmark.id)
     },
-    itemEdit (item) {
-      this.$log('itemEdit', item)
-      this.$router.push(`/workspace/content/${item.id}`).catch(e => e)
+    itemEdit (contentBookmark) {
+      this.$log('itemEdit', contentBookmark)
+      this.$router.push(`/content/${contentBookmark.oid}?viewid=fragments`).catch(e => e)
     },
   }
 }

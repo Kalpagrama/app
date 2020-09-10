@@ -47,6 +47,7 @@ export default {
       let index = parseInt(entry.target.accessKey)
       if (isVisible) {
         this.indexMiddle = index
+        this.$log('indexMiddle', index)
       }
       else {
         if (index === this.indexMiddle) {

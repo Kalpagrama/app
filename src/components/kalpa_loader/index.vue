@@ -24,7 +24,7 @@ export default {
       items: [],
       itemsSlice: 1,
       itemsSliced: [],
-      itemsSlicing: false,
+      // itemsSlicing: false,
       itemsLoading: false,
       pageToken: null,
       pageTokenNext: null,
@@ -43,28 +43,28 @@ export default {
         }
       }
     },
-    // items: {
-    //   deep: true,
-    //   immediate: false,
-    //   handler (to, from) {
-    //     // this.$log('items TO', to)
-    //     this.$emit('itemsCount', to.length)
-    //     this.$emit('items', to)
-    //     // alert('item CHANGED: ' + to.length)
-    //     this.itemsSlice = 1
-    //     this.itemsSliced = to.slice(0, this.sliceSize)
-    //   }
-    // }
+    items: {
+      deep: true,
+      immediate: false,
+      handler (to, from) {
+        // this.$log('items TO', to)
+        this.$emit('itemsCount', to.length)
+        this.$emit('items', to)
+        // alert('item CHANGED: ' + to.length)
+        this.itemsSlice = 1
+        this.itemsSliced = to.slice(0, this.sliceSize)
+      }
+    }
   },
   methods: {
     async next (index, done) {
       this.$log('next', index)
-      this.itemsSlicing = true
+      // this.itemsSlicing = true
       // TODO: if we are in a bottom... what to do???
       // check
-      // if (this.itemsSliced.length === this.items.length) {
-      //   return
-      // }
+      if (this.itemsSlice > 1 && this.itemsSliced.length === this.items.length) {
+        return
+      }
       let start = this.itemsSliced.length
       let end = (this.itemsSlice + 1) * this.sliceSize
       this.$log('start/end', start, end)
@@ -78,7 +78,7 @@ export default {
       this.itemsSlice += 1
       // this.$q.notify('Loading... ' + this.itemsSlice)
       await this.$wait(1000)
-      this.itemsSlicing = false
+      // this.itemsSlicing = false
       done()
     },
     async itemsLoad (mangoQuery, append = false) {

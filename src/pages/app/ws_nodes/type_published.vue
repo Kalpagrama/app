@@ -8,74 +8,153 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+    kalpa-loader(:mangoQuery="queryNodes" :sliceSize="1000")
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
           :gutter="{default: 10}").full-width
-          ws-node-item(
-            v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="itemSelected = i.id").q-mb-sm
-            template(v-slot:footer)
-              //- selected
+          div(
+            v-for="(node, ii) in items" :key="node.oid"
+            ).row.full-width.q-mb-sm
+            div(
+              @click="nodeSelectedOid = node.oid"
+              :style=`{
+                position: 'relative', zIndex: 100,
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).row.full-width.q-px-md.q-pt-md.b-40.node-item
               div(
-                v-if="itemSelected === i.id"
                 :style=`{
-                  position: 'relative',
-                  marginTop: '-10px', paddingTop: '14px',
-                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
+                  position: 'relative', zIndex: 100,
+                  height: 0, paddingBottom: '100%',
+                  borderRadius: '10px', overflow: 'hidden',
                 }`
-                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(i)")
-                .col
-                q-btn(
-                  :to="'/node/'+i.oid"
-                  round flat dense color="white" icon="launch")
+                ).full-width
+                div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
+                  img(
+                    :src="node.meta.items[0].thumbUrl" draggable="false"
+                    :style=`{
+                      objectFit: 'cover',
+                      borderRadius: '10px', overflow: 'hidden',
+                    }`).fit
+              .row.full-width.q-py-sm.q-px-md
+                small.text-white {{ node.name }}
+            //- selected
+            div(
+              v-if="nodeSelectedOid === node.oid"
+              :style=`{
+                position: 'relative',
+                marginTop: '-10px', paddingTop: '14px',
+                borderRadius: '0 0 10px 10px', overflow: 'hidden',
+              }`
+              ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+              q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(node)")
+              .col
+              q-btn(round flat dense color="white" icon="edit" @click="nodeEdit(node)").q-mr-sm
+              q-btn(round flat dense color="white" icon="launch" @click="nodeLaunch(node)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
 
-import wsNodeItem from 'components/ws_node_item/index.vue'
-
 export default {
   name: 'wsNodes_typePublished',
-  components: {wsNodeItem},
   props: ['searchString'],
   data () {
     return {
-      itemSelected: null,
+      nodeSelectedOid: null,
     }
   },
   computed: {
-    query () {
-      let res = {
+    queryNodes () {
+      return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'published'
-        },
-        sort: [{updatedAt: 'desc'}]
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidSphere: this.$store.getters.currentUser().oid,
+          oidAuthor: {$eq: this.$store.getters.currentUser().oid},
+          sortStrategy: 'AGE',
+        }
       }
-      // add name filter
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
-      }
-      return res
     }
   },
   methods: {
     async nodeUnpublish (node) {
       this.$log('nodeUnpublish', node)
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-      await node.updateExtended('stage', 'draft', false) // без debounce
-      await node.updateExtended('oid', node.oid, false) // без debounce
       await NodeApi.nodeDelete(node.oid)
+      // await node.updateExtended('stage', 'draft', false) // без debounce
+      // await node.updateExtended('oid', node.oid, false) // без debounce
       this.$log('nodeUnPublish complete')
     },
-    nodeExplore (node) {
-      this.$log('nodeExplore', node)
+    async getSpheres (spheres) {
+      return await Promise.all(
+        spheres.map(async (s) => {
+          // for every sphere try to find this sphere in ws
+          let {items: [sphere]} = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
+            }
+          })
+          // this.$log('sphere', sphere)
+          if (!sphere) {
+            this.$log('sphere NOT FOUND, creating...')
+            let sphereInput = {
+              wsItemType: 'WS_SPHERE',
+              name: s.name,
+              oid: s.oid,
+              spheres: []
+            }
+            sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          }
+          // add this sphere.id bookmark.spheres array
+          this.$log('adding sphere...', sphere.name)
+          return sphere.id
+        })
+      )
+    },
+    async nodeEdit (node) {
+      this.$log('nodeEdit', node)
+      // get nodeFull
+      let nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, node.oid)
+      this.$log('nodeFull', nodeFull)
+      // create nodeInput
+      let nodeInput = {
+        wsItemType: 'WS_NODE',
+        stage: 'draft',
+        name: nodeFull.name,
+        layout: nodeFull.layout,
+        category: nodeFull.category,
+        thumbOid: nodeFull.meta.items[0].thumbUrl,
+        items: nodeFull.meta.items.map((item, itemIndex) => {
+          return {
+            id: `${Date.now()}-${itemIndex}`,
+            outputType: item.outputType,
+            thumbUrl: nodeFull.meta.items[0].thumbUrl,
+            operation: { items: null, operations: null, type: 'CONCAT'},
+            layers: item.layers.map((layer, layerIndex) => {
+              return {
+                id: `${Date.now()}-${layerIndex}`,
+                contentOid: layer.contentOid,
+                figuresAbsolute: layer.figuresAbsolute.map(figure => {
+                  return {
+                    t: figure.t,
+                    points: []
+                  }
+                })
+              }
+            })
+          }
+        }),
+        spheres: [],
+      }
+      this.$log('nodeInput', nodeInput)
+      nodeInput.spheres = await this.getSpheres(nodeFull.spheres)
+      let nodeDraft = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$router.push(`/workspace/node/${nodeDraft.id}`).catch(e => e)
+    },
+    nodeLaunch (node) {
+      this.$log('nodeLaunch', node)
       this.$router.push(`/node/${node.oid}`).catch(e => e)
     }
   }

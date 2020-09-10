@@ -11,10 +11,16 @@ q-layout(view="hHh Lpr lff")
               ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
               q-icon(name="select_all" color="white" size="30px").q-mx-sm
               div(:style=`{overflowX: 'auto'}`).col
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
+                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
               kalpa-follow(
                 v-if="contentKalpa"
                 :oid="contentKalpa.oid")
+              q-btn(
+                @click="contentBookmarkCreate()"
+                round flat color="green")
+                q-icon(
+                  size="45px"
+                  :name="contentBookmark ? 'bookmark' : 'bookmark_outline'")
             div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
               q-tabs(
                 v-model="viewId"
@@ -52,9 +58,8 @@ q-layout(view="hHh Lpr lff")
               objectFit: 'contain',
             }`
             ).full-width
-          ws-content-player(
+          content-player(
             :contentKalpa="contentKalpa"
-            :contentWorkspace="contentWorkspace"
             @player="playerLoaded"
             @error="playerErrorHandle"
             :style=`{
@@ -80,25 +85,28 @@ q-layout(view="hHh Lpr lff")
       :ref="`view-${viewId}`"
       :player="player"
       :contentKalpa="contentKalpa"
-      :contentWorkspace="contentWorkspace")
+      :contentBookmark="contentBookmark")
 </template>
 
 <script>
-import wsContentPlayer from 'components/content_player/index.vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
+import contentPlayer from 'components/content_player/index.vue'
+
 import viewDetails from './view_details/index.vue'
 import viewFragments from './view_fragments/index.vue'
 import viewNodes from './view_nodes/index.vue'
 import viewFullscreen from './view_fullscreen/index.vue'
 
 export default {
-  name: 'wsContentExplorer_video',
-  components: {wsContentPlayer, viewDetails, viewFragments, viewNodes, viewFullscreen},
-  props: ['contentKalpa', 'contentWorkspace'],
+  name: 'contentExplorer_video',
+  components: {contentPlayer, viewDetails, viewFragments, viewNodes, viewFullscreen},
+  props: ['contentKalpa'],
   data () {
     return {
       viewId: 'fragments',
       player: null,
       playerIsVisible: false,
+      contentBookmark: null,
     }
   },
   computed: {
@@ -113,7 +121,7 @@ export default {
   watch: {
     '$route.query.viewid': {
       immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('$route.query.viewId TO', to)
         // set viewId force, from feed or from workspace
         if (to) {
@@ -125,10 +133,32 @@ export default {
           this.$log('lastViewId', lastViewId)
           if (lastViewId) this.viewId = lastViewId
         }
+        // find bookmark
+        let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        this.$log('contentBookmark', contentBookmark)
+        if (contentBookmark) this.contentBookmark = contentBookmark
       }
     }
   },
   methods: {
+    async contentBookmarkCreate () {
+      this.$log('contentBookmarkCreate')
+      let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+      if (!contentBookmark) {
+        let contentBookmarkInput = {
+          oid: this.contentKalpa.oid,
+          name: this.contentKalpa.name,
+          thumbOid: this.contentKalpa.thumbUrl,
+          type: 'CONTENT',
+          contentType: this.contentKalpa.type,
+          wsItemType: 'WS_BOOKMARK',
+          spheres: []
+        }
+        contentBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, contentBookmarkInput)
+      }
+      this.$log('contentBookmark', contentBookmark)
+      this.contentBookmark = contentBookmark
+    },
     async nodeCreateStart () {
       this.$log('nodeCreateStart')
       this.player.fullscreenToggle(false)

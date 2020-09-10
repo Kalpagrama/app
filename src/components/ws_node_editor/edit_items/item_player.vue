@@ -40,7 +40,7 @@
       q-icon(name="clear" color="white" size="50px")
     //- item player
     ws-content-player(
-      v-if="playerPlaying && contentKalpa"
+      v-if="playerPlaying && isActive && contentKalpa"
       :contentKalpa="contentKalpa"
       @player="player = $event"
       :options=`{
@@ -78,7 +78,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import wsContentPlayer from 'components/ws_content_player/index.vue'
+import wsContentPlayer from 'components/content_player/index.vue'
 import compositionBar from 'components/composition/composition_bar/index.vue'
 
 export default {

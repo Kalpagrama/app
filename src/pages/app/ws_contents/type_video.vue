@@ -12,7 +12,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
-          :gutter="{default: 10}")
+          :gutter="{default: 10}").full-width
           div(
             v-for="(i,ii) in items" :key="i.id"
             :style=`{
@@ -63,22 +63,17 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-          contentType: 'VIDEO'
-        }
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          contentType: 'VIDEO',
+          type: 'CONTENT',
+        },
+        sort: [{updatedAt: 'desc'}]
       }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
-      // // add type filter
-      // if (this.type !== 'all') {
-      //   res.selector.contentType = this.type
-      // }
-      // add sort
-      res.sort = [{updatedAt: 'desc'}]
-      // TODO: add spheres
       return res
     }
   },
@@ -89,9 +84,9 @@ export default {
       // TODO what to do if we got items on this sphere ???
       await this.$rxdb.remove(item.id)
     },
-    itemLaunch (item) {
-      this.$log('itemLaunch', item)
-      this.$router.push(`/workspace/content/${item.id}?viewid=fragments`).catch(e => e)
+    itemLaunch (contentBookmark) {
+      this.$log('itemLaunch', contentBookmark)
+      this.$router.push(`/content/${contentBookmark.oid}?viewid=fragments`).catch(e => e)
     },
   }
 }

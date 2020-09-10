@@ -62,7 +62,7 @@ import compositionEditor from 'components/composition/composition_editor/index.v
 import wsContentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'editItems_itemEditor',
+  name: 'itemFinder_fromContentSelect',
   components: {wsContentPlayer, compositionEditor},
   props: ['item'],
   data () {

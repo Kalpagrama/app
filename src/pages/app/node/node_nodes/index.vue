@@ -1,42 +1,23 @@
 <template lang="pug">
 kalpa-loader(:mangoQuery="queryBySphere")
   template(v-slot=`{items,next}`)
-    .row.full-width.items-start.content-start
-      div(v-for="(i,ii) in items" :key="ii").row.full-width.q-mb-sm.br
-        small.text-white {{ i }}
-    //- list-masonry(:items="items" :itemsHidden="[node.oid]").q-pt-md
-      template(v-slot:item=`{item}`)
-        node-lite(:node="item")
-//- .row.full-width.items-start.content-start.q-pt-xl
-  div(
-    v-for="(n,ni) in 10" :key="ni"
-    :style=`{position: 'relative'}`
-    ).row.full-width.items-between
-    .col.full-height
-      node-lite(:node="node" :isActive="false" :isVisible="false")
-    div(:style=`{width: '80px',}`).row.full-height.justify-center
-    div(
-      :style=`{
-        position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
-        width: '80px', minHeight: '100px',
-      }`
-      ).row.full-height.justify-center
-      div(:style=`{height: '100%', width: '1px'}`).bg-green
-      div(
-        :style=`{position: 'absolute', zIndex: 1100, bottom: '100px'}`
-        ).row.full-width.justify-center
-        q-btn(
-          round flat icon="insert_link" color="green" stack
-          size="lg"
-          ).b-30 88
+    list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+      q-infinite-scroll(@load="next" :offset="250")
+      template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+        joint-item(
+          :joint="item" :node="node"
+          :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 import { NodeApi } from 'src/api/node'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import jointItem from './joint_item.vue'
+
 export default {
   name: 'pageApp__node__nodeNodes',
+  components: {jointItem},
   props: ['node'],
   data () {
     return {

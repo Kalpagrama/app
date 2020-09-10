@@ -43,7 +43,7 @@ export default {
         this.$log('id TO', to)
         if (to) {
           if (to === 'new') {
-            this.$q.notify({type: 'positive', message: 'Creating new node'})
+            this.$q.notify({type: 'positive', position: 'top', message: 'Creating new node'})
             this.node = JSON.parse(JSON.stringify(this.nodeNew))
             var unwatch = this.$watch(
               'node',
