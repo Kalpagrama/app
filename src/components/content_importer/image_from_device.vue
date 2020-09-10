@@ -8,7 +8,7 @@
   //- body
   div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
     image-cropper(
-      v-if="src"
+      v-if="src && imageEditing"
       ref="imageCropper"
       :src="src"
       :options=`{
@@ -22,8 +22,19 @@
         border: imageValid ? 'none' : '2px solid red',
         borderRadius: '10px', overflow: 'hidden',
       }`)
+    img(
+      v-if="src && !imageEditing"
+      :src="src"
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden',
+      }`
+      ).full-width
   //- footer
   .row.full-width.q-pa-sm
+    q-btn(
+      v-if="!imageEditing"
+      @click="imageEditing = true"
+      round flat icon="crop" color="white")
     .col
     q-btn(
       @click="imageSave"
@@ -46,7 +57,8 @@ export default {
     return {
       loading: false,
       imageSrc: null,
-      imageValid: false,
+      imageValid: true,
+      imageEditing: false,
     }
   },
   methods: {

@@ -17,7 +17,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
             v-for="(nodeBookmark, ii) in items" :key="nodeBookmark.id"
             ).row.full-width.q-mb-sm
             div(
-              @click="nodeBookmarkSelectedId = nodeBookmark.id"
+              @click="mode === 'standalone' ? nodeBookmarkSelectedId = nodeBookmark.id : $emit('clicked', nodeBookmark)"
               :style=`{
                 position: 'relative', zIndex: 100,
                 borderRadius: '10px', overflow: 'hidden',
@@ -56,12 +56,19 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-// import wsNodeItem from 'components/ws_node_item/index.vue'
 
 export default {
   name: 'wsNodes_typeSaved',
-  // components: {wsNodeItem},
-  props: ['searchString'],
+  // props: ['searchString'],
+  props: {
+    searchString: {type: String},
+    mode: {
+      type: String,
+      default () {
+        return 'standalone'
+      }
+    }
+  },
   data () {
     return {
       nodeBookmarkSelectedId: null,

@@ -8,7 +8,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
           :gutter="{default: 10}").full-width
           ws-node-item(
             v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="itemSelected = i.id").q-mb-sm
+            @clicked="mode === 'standalone' ? itemSelected = i.id : $emit('clicked', i)").q-mb-sm
             template(v-slot:footer)
               //- selected
               div(
@@ -29,7 +29,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsNodes_typeDrafts',
-  props: ['searchString'],
+  // props: ['searchString'],
+  props: {
+    searchString: {type: String},
+    mode: {
+      type: String,
+      default () {
+        return 'standalone'
+      }
+    }
+  },
   data () {
     return {
       itemSelected: null,

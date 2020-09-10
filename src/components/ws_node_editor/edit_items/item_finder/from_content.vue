@@ -11,7 +11,7 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
   .row.full-width.items-start.content-start.q-pt-md
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
       template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start.q-px-md
+        .row.full-width.items-start.content-start.q-px-sm
           ws-content-item(
             v-for="(content,ii) in items" :key="content.id"
             :content="content"
@@ -67,23 +67,16 @@ export default {
     },
     contentClick (contentBookmark) {
       this.$log('contentClick contentBookmark', contentBookmark)
-      // let item = JSON.parse(JSON.stringify(content))
-      // let itemInput = {
-      //   items: [
-      //     {
-      //       id: Date.now().toString(),
-      //       thumbUrl: content.thumbOid,
-      //       outputType: content.contentType,
-      //       layers: [
-      //         {id: Date.now().toString(), contentOid: content.contentOid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
-      //       ],
-      //       operation: { items: null, operations: null, type: 'CONCAT'},
-      //     }
-      //   ],
-      //   spheres: item.spheres,
-      //   name: ''
-      // }
-      // this.$emit('item', itemInput)
+      let itemInput = {
+        id: Date.now().toString(),
+        thumbUrl: contentBookmark.thumbOid,
+        outputType: contentBookmark.contentType,
+        layers: [
+          {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
+        ],
+        operation: { items: null, operations: null, type: 'CONCAT'},
+      }
+      this.$emit('item', itemInput)
     }
   }
 }

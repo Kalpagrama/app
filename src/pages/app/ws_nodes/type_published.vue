@@ -17,7 +17,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
             v-for="(node, ii) in items" :key="node.oid"
             ).row.full-width.q-mb-sm
             div(
-              @click="nodeSelectedOid = node.oid"
+              @click="mode === 'standalone' ? nodeSelectedOid = node.oid : $emit('clicked', node)"
               :style=`{
                 position: 'relative', zIndex: 100,
                 borderRadius: '10px', overflow: 'hidden',
@@ -60,7 +60,16 @@ import { NodeApi } from 'src/api/node'
 
 export default {
   name: 'wsNodes_typePublished',
-  props: ['searchString'],
+  // props: ['searchString'],
+  props: {
+    searchString: {type: String},
+    mode: {
+      type: String,
+      default () {
+        return 'standalone'
+      }
+    }
+  },
   data () {
     return {
       nodeSelectedOid: null,

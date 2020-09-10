@@ -12,7 +12,7 @@ q-layout(view="hHh Lpr lff")
                 ).row.full-width.items-center.content-center.justify-between.b-40
                 q-icon(name="select_all" color="white" size="30px").q-mx-sm
                 div(:style=`{overflowX: 'auto'}`).col
-                  span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
+                  span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
                 q-btn(round flat color="grey-8" icon="more_vert")
               div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
                 q-tabs(
@@ -39,21 +39,22 @@ q-layout(view="hHh Lpr lff")
         :ref="`view-${viewId}`"
         :player="player"
         :contentKalpa="contentKalpa"
-        :contentWorkspace="contentWorkspace")
+        :contentBookmark="contentBookmark")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import viewDetails from './view_details/index.vue'
 
 export default {
   name: 'wsContentExplorer_image',
-  // components: {wsContentPlayer, viewDetails, viewFragments, viewNodes},
   components: {viewDetails},
-  props: ['contentKalpa', 'contentWorkspace'],
+  props: ['contentKalpa'],
   data () {
     return {
       viewId: 'fragments',
       player: null,
+      contentBookmark: null
     }
   },
   computed: {
@@ -65,5 +66,16 @@ export default {
       ]
     }
   },
+  watch: {
+    '$route.query.viewId': {
+      immediate: true,
+      async handler (to, from) {
+        // find bookmark
+        let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        this.$log('contentBookmark', contentBookmark)
+        if (contentBookmark) this.contentBookmark = contentBookmark
+      }
+    }
+  }
 }
 </script>

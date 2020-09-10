@@ -61,7 +61,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(1000)
+    await this.$wait(300)
     this.type = 'content'
   }
 }

@@ -20,11 +20,11 @@ q-layout(view="hHh Lpr lff")
                     flat dense color="white" icon="tune")
           q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/node/new')")
         .row.full-width.q-px-md
-            q-tabs(
-              :value="$route.name" @input="$router.push({name: $event})"
-              dense no-caps active-color="white" align="left" switch-indicator
-              ).full-width.text-grey-8
-              q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+          q-tabs(
+            :value="$route.name" @input="$router.push({name: $event})"
+            dense no-caps active-color="white" align="left" switch-indicator
+            ).full-width.text-grey-8
+            q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
       q-page-sticky(position="bottom" :offset="[0, 60]")
   q-page-container
     router-view(:searchString="searchString")
