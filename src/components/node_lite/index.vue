@@ -42,14 +42,8 @@ div(
         node-items(
           :previewUrl="node.meta.items[0].thumbUrl" :items="node.meta.items"
           :isActive="isActive" :isVisible="isVisible")
-        //- composition-player(:isActive="itemsActive" :isVisible="isVisible" :composition="node.meta.items[0]")
-        //- fullscreen toggler
-        //- q-btn(
-          @click="isFullscreen = true"
-          flat round color="white" icon="fullscreen"
-          :style=`{position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px'}`)
         //- fullscreen
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-fullscreen(
             v-if="isFullscreen" :node="node"
             @close="isFullscreen = false")
@@ -76,8 +70,8 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import nodeBookmark from './node_bookmark.vue'
-import compositionPlayer from 'components/composition/composition_player/index.vue'
 import nodeFullscreen from './node_fullscreen.vue'
 import nodeShare from './node_share.vue'
 import nodeVote from './node_vote.vue'
@@ -85,8 +79,7 @@ import nodeItems from './node_items.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, compositionPlayer, nodeFullscreen, nodeShare, nodeVote, nodeItems},
-  // props: ['node', 'isActive', 'isVisible'],
+  components: {nodeBookmark, nodeFullscreen, nodeShare, nodeVote, nodeItems},
   props: {
     node: {type: Object, required: true},
     isActive: {type: Boolean, required: true},
@@ -98,7 +91,6 @@ export default {
   data () {
     return {
       nodeFull: null,
-      composition: null,
       isFullscreen: false,
     }
   },
@@ -114,7 +106,6 @@ export default {
         // this.$log('isActive TO', to, this.node.name)
         if (to) {
           if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-          // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
         }
       }
     },

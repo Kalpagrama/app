@@ -1,3 +1,10 @@
+<style lang="sass" scoped>
+.node-item
+  cursor: pointer
+  &:hover
+    background: rgb(50,50,50) !important
+</style>
+
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
@@ -6,22 +13,45 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
           :gutter="{default: 10}").full-width
-          ws-node-item(
-            v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="itemSelected = i.id").q-mb-sm
-            template(v-slot:footer)
-              //- selected
+          div(
+            v-for="(nodeBookmark, ii) in items" :key="nodeBookmark.id"
+            ).row.full-width
+            div(
+              @click="nodeBookmarkSelectedId = nodeBookmark.id"
+              :style=`{
+                position: 'relative', zIndex: 100,
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).row.full-width.q-px-md.q-pt-md.b-40.node-item
               div(
-                v-if="itemSelected === i.id"
                 :style=`{
-                  position: 'relative',
-                  marginTop: '-10px', paddingTop: '14px',
-                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
+                  position: 'relative', zIndex: 100,
+                  height: 0, paddingBottom: '100%',
+                  borderRadius: '10px', overflow: 'hidden',
                 }`
-                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-                .col
-                q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+                ).full-width
+                div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
+                  img(
+                    :src="nodeBookmark.thumbOid" draggable="false"
+                    :style=`{
+                      objectFit: 'cover',
+                      borderRadius: '10px', overflow: 'hidden',
+                    }`).fit
+              .row.full-width.q-py-sm.q-px-md
+                small.text-white {{ nodeBookmark.name }}
+            //- selected
+            div(
+              v-if="nodeBookmarkSelectedId === nodeBookmark.id"
+              :style=`{
+                position: 'relative',
+                marginTop: '-10px', paddingTop: '14px',
+                borderRadius: '0 0 10px 10px', overflow: 'hidden',
+              }`
+              ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+              q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(nodeBookmark)")
+              .col
+              q-btn(round flat dense color="white" icon="edit" @click="itemEdit(nodeBookmark)").q-mr-sm
+              q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(nodeBookmark)")
 </template>
 
 <script>
@@ -34,46 +64,102 @@ export default {
   props: ['searchString'],
   data () {
     return {
-      itemSelected: null,
+      nodeBookmarkSelectedId: null,
     }
   },
   computed: {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'saved'
-        }
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          type: 'NODE',
+        },
+        sort: [{updatedAt: 'desc'}]
       }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
-      // add sort
-      res.sort = [{updatedAt: 'desc'}]
-      // TODO: add spheres
       return res
     }
   },
   methods: {
-    async itemDelete (item) {
-      this.$log('itemDelete', item)
+    async itemDelete (nodeBookmark) {
+      this.$log('itemDelete', nodeBookmark)
       if (!confirm('Delete node?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(item.id)
+      await this.$rxdb.remove(nodeBookmark.id)
     },
-    async itemEdit (item) {
-      this.$log('itemEdit', item)
-      // can we edit this? or make a copy? delete?
-      let nodeInput = JSON.parse(JSON.stringify(item))
-      delete nodeInput.id
-      delete nodeInput.oid
-      nodeInput.stage = 'draft'
-      nodeInput.name += ' COPY'
-      this.$log('itemEdit nodeInput', nodeInput)
-      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
+    async itemLaunch (nodeBookmark) {
+      this.$log('itemLaunch', nodeBookmark)
+      this.$router.push(`/node/${nodeBookmark.oid}`).catch(e => e)
+    },
+    async getSpheres (spheres) {
+      return await Promise.all(
+        spheres.map(async (s) => {
+          // for every sphere try to find this sphere in ws
+          let {items: [sphere]} = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
+            }
+          })
+          // this.$log('sphere', sphere)
+          if (!sphere) {
+            this.$log('sphere NOT FOUND, creating...')
+            let sphereInput = {
+              wsItemType: 'WS_SPHERE',
+              name: s.name,
+              oid: s.oid,
+              spheres: []
+            }
+            sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          }
+          // add this sphere.id bookmark.spheres array
+          this.$log('adding sphere...', sphere.name)
+          return sphere.id
+        })
+      )
+    },
+    async itemEdit (nodeBookmark) {
+      this.$log('itemEdit', nodeBookmark)
+      // get nodeFull
+      let nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
+      this.$log('nodeFull', nodeFull)
+      // create nodeInput
+      let nodeInput = {
+        wsItemType: 'WS_NODE',
+        stage: 'draft',
+        name: nodeFull.name,
+        layout: nodeFull.layout,
+        category: nodeFull.category,
+        thumbOid: nodeFull.meta.items[0].thumbUrl,
+        items: nodeFull.meta.items.map((item, itemIndex) => {
+          return {
+            id: `${Date.now()}-${itemIndex}`,
+            outputType: item.outputType,
+            thumbUrl: nodeFull.meta.items[0].thumbUrl,
+            operation: { items: null, operations: null, type: 'CONCAT'},
+            layers: item.layers.map((layer, layerIndex) => {
+              return {
+                id: `${Date.now()}-${layerIndex}`,
+                contentOid: layer.contentOid,
+                figuresAbsolute: layer.figuresAbsolute.map(figure => {
+                  return {
+                    t: figure.t,
+                    points: []
+                  }
+                })
+              }
+            })
+          }
+        }),
+        spheres: [],
+      }
+      this.$log('nodeInput', nodeInput)
+      nodeInput.spheres = await this.getSpheres(nodeFull.spheres)
+      let nodeDraft = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$router.push(`/workspace/node/${nodeDraft.id}`).catch(e => e)
     },
   }
 }
