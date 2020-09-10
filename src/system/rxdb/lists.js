@@ -59,8 +59,15 @@ class Lists {
     let fetchFunc = async () => {
       let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
       let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
+
+      // todo
+      let itemFilter = () => {
+        // фильтровать items по mangoQuery
+        return true
+      }
+      items = items.filter(itemFilter)
       return {
-        item: { items, count, totalCount, nextPageToken, oid },
+        item: { items, count: items.leftItem, totalCount, nextPageToken, oid },
         actualAge: 'day',
         mangoQuery
       }
