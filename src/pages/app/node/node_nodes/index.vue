@@ -1,5 +1,5 @@
 <template lang="pug">
-kalpa-loader(:mangoQuery="queryBySphere")
+kalpa-loader(:mangoQuery="queryBySphere" @items="nodesLoaded")
   template(v-slot=`{items,next}`)
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
       q-infinite-scroll(@load="next" :offset="250")
@@ -37,6 +37,12 @@ export default {
     },
     queryByNode () {
       return {}
+    }
+  },
+  methods: {
+    nodesLoaded (nodes) {
+      this.$log('nodesLoaded', nodes)
+      if (nodes.length > 0) this.$emit('nodesLoaded')
     }
   }
 }

@@ -54,6 +54,7 @@ q-layout(view="hHh Lpr lff")
                   span.text-white.q-mr-md {{ s.name }}
                 //- node link start...
                 div(
+                  v-if="nodesLoaded"
                   :style=`{
                     position: 'absolute', top: '0px',
                     height: 'calc(100% + 200px)',
@@ -63,7 +64,7 @@ q-layout(view="hHh Lpr lff")
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
-          router-view(v-if="node" :node="node")
+          router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
@@ -99,6 +100,7 @@ export default {
       nodeVisible: true,
       nodeCategories: [],
       nodeLinkerOpened: false,
+      nodesLoaded: false,
     }
   },
   computed: {
