@@ -1,6 +1,9 @@
 import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
+import { AuthApi } from 'src/api/auth'
+import { systemLogin } from 'src/system/services'
+import assert from 'assert'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 
 const routes = [
   {
@@ -10,7 +13,16 @@ const routes = [
     children: [
       { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
       { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') },
-    ]
+    ],
+    beforeEnter: (to, from, next) => {
+      // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
+      // if (AuthApi.isAuthorized()) {
+      //   logD('user is Auth! goto /root')
+      //   return next('/')
+      // }
+      // else return next()
+      next()
+    }
   },
   {
     path: '/share_target/:page?',
@@ -18,7 +30,6 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/home',
     component: () => import('layouts/main_layout'),
     children: [
       {
@@ -26,12 +37,13 @@ const routes = [
         path: 'home',
         // component: () => import('pages/app/home/index.vue'),
         component: () => import('pages/app/home/home.vue'),
+        meta: { roleMinimal: 'MEMBER' }
       },
       {
         name: 'welcome',
         path: 'welcome',
         component: () => import('pages/app/welcome/index.vue'),
-        // children: []
+         meta: { roleMinimal: 'MEMBER' }
       },
       {
         name: 'settings',
@@ -39,11 +51,12 @@ const routes = [
         redirect: 'settings/account',
         component: () => import('pages/app/settings'),
         children: [
-          { name: 'settings.account', path: 'account', component: () => import('pages/app/settings/view_account/index.vue') },
-          { name: 'settings.feeds', path: 'feeds', component: () => import('pages/app/settings/view_feeds/index.vue') },
-          { name: 'settings.feed', path: 'feed/:id', component: () => import('pages/app/settings/view_feeds/feed_editor.vue') },
-          { name: 'settings.workspace', path: 'workspace', component: () => import('pages/app/settings/view_workspace/index.vue') }
-        ]
+          { name: 'settings.account', path: 'account', component: () => import('pages/app/settings/view_account/index.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'settings.feeds', path: 'feeds', component: () => import('pages/app/settings/view_feeds/index.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'settings.feed', path: 'feed/:id', component: () => import('pages/app/settings/view_feeds/feed_editor.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'settings.workspace', path: 'workspace', component: () => import('pages/app/settings/view_workspace/index.vue'), meta: { roleMinimal: 'GUEST' } }
+        ],
+        meta: { roleMinimal: 'MEMBER' }
       },
       {
         name: 'user',
@@ -51,11 +64,12 @@ const routes = [
         redirect: 'user/:oid/created',
         component: () => import('pages/app/user/index.vue'),
         children: [
-          { name: 'user.created', path: 'created', component: () => import('pages/app/user/user_created.vue') },
-          { name: 'user.voted', path: 'voted', component: () => import('pages/app/user/user_voted.vue') },
-          { name: 'user.following', path: 'following', component: () => import('pages/app/user/user_following.vue') },
-          { name: 'user.followers', path: 'followers', component: () => import('pages/app/user/user_followers.vue') },
-        ]
+          { name: 'user.created', path: 'created', component: () => import('pages/app/user/user_created.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'user.voted', path: 'voted', component: () => import('pages/app/user/user_voted.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'user.following', path: 'following', component: () => import('pages/app/user/user_following.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'user.followers', path: 'followers', component: () => import('pages/app/user/user_followers.vue'), meta: { roleMinimal: 'GUEST' } },
+        ],
+         meta: { roleMinimal: 'GUEST' }
       },
       {
         name: 'node',
@@ -63,29 +77,33 @@ const routes = [
         redirect: 'node/:oid/nodes',
         component: () => import('pages/app/node/index.vue'),
         children: [
-          { name: 'node.nodes', path: 'nodes', component: () => import('pages/app/node/node_nodes/index.vue') },
-          { name: 'node.chains', path: 'chains', component: () => import('pages/app/node/node_chains/index.vue') },
-        ]
+          { name: 'node.nodes', path: 'nodes', component: () => import('pages/app/node/node_nodes/index.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'node.chains', path: 'chains', component: () => import('pages/app/node/node_chains/index.vue'), meta: { roleMinimal: 'GUEST' } },
+        ],
+         meta: { roleMinimal: 'GUEST' }
       },
       {
         name: 'sphere',
         path: 'sphere/:oid',
         component: () => import('pages/app/sphere/index.vue'),
         children: [
-          { name: 'sphere.nodes', path: 'nodes', component: () => import('pages/app/sphere/view_nodes/index.vue') },
-          { name: 'sphere.spheres', path: 'spheres', component: () => import('pages/app/sphere/view_spheres/index.vue') }
-        ]
+          { name: 'sphere.nodes', path: 'nodes', component: () => import('pages/app/sphere/view_nodes/index.vue'), meta: { roleMinimal: 'GUEST' } },
+          { name: 'sphere.spheres', path: 'spheres', component: () => import('pages/app/sphere/view_spheres/index.vue'), meta: { roleMinimal: 'GUEST' } }
+        ],
+         meta: { roleMinimal: 'GUEST' }
       },
-      { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trends/index.vue') },
+      {
+         name: 'trends',
+         path: 'trends/:oid?',
+         component: () => import('pages/app/trends/index.vue'),
+         meta: { roleMinimal: 'GUEST' }
+      },
       {
         name: 'content',
         path: 'content/:oid',
         // redirect: 'content/:oid',
         component: () => import('pages/app/content/index.vue'),
-        // children: [
-        //   { name: 'content.details', path: 'details', component: () => import('pages/app/content/content_details.vue') },
-        //   { name: 'content.nodes', path: 'nodes', component: () => import('pages/app/content/content_nodes.vue') },
-        // ]
+        meta: { roleMinimal: 'MEMBER' }
       },
       {
         name: 'workspace',
@@ -112,10 +130,10 @@ const routes = [
             redirect: 'contents/video',
             component: () => import('pages/app/ws_contents/index.vue'),
             children: [
-              { name: 'workspace.contents.video', path: 'video', component: () => import('pages/app/ws_contents/type_video.vue') },
-              { name: 'workspace.contents.image', path: 'image', component: () => import('pages/app/ws_contents/type_image.vue') },
-              { name: 'workspace.contents.audio', path: 'audio', component: () => import('pages/app/ws_contents/type_audio.vue') },
-              { name: 'workspace.contents.books', path: 'books', component: () => import('pages/app/ws_contents/type_books.vue') },
+              { name: 'workspace.contents.video', path: 'video', component: () => import('pages/app/ws_contents/type_video.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.contents.image', path: 'image', component: () => import('pages/app/ws_contents/type_image.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.contents.audio', path: 'audio', component: () => import('pages/app/ws_contents/type_audio.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.contents.books', path: 'books', component: () => import('pages/app/ws_contents/type_books.vue'), meta: { roleMinimal: 'MEMBER' } },
             ]
           },
           // {
@@ -137,10 +155,10 @@ const routes = [
             redirect: 'nodes/drafts',
             component: () => import('pages/app/ws_nodes/index.vue'),
             children: [
-              { name: 'workspace.nodes.saved', path: 'saved', component: () => import('pages/app/ws_nodes/type_saved.vue') },
-              { name: 'workspace.nodes.drafts', path: 'drafts', component: () => import('pages/app/ws_nodes/type_drafts.vue') },
-              { name: 'workspace.nodes.fragments', path: 'fragments', component: () => import('pages/app/ws_nodes/type_fragments.vue') },
-              { name: 'workspace.nodes.published', path: 'published', component: () => import('pages/app/ws_nodes/type_published.vue') },
+              { name: 'workspace.nodes.saved', path: 'saved', component: () => import('pages/app/ws_nodes/type_saved.vue'), meta: { roleMinimal: 'MEMBER' }},
+              { name: 'workspace.nodes.drafts', path: 'drafts', component: () => import('pages/app/ws_nodes/type_drafts.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.nodes.fragments', path: 'fragments', component: () => import('pages/app/ws_nodes/type_fragments.vue'), meta: { roleMinimal: 'MEMBER' }},
+              { name: 'workspace.nodes.published', path: 'published', component: () => import('pages/app/ws_nodes/type_published.vue'), meta: { roleMinimal: 'MEMBER' } },
             ]
           },
           { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
@@ -152,33 +170,41 @@ const routes = [
             redirect: 'sphere/:id/items',
             component: () => import('pages/app/ws_sphere/index.vue'),
             children: [
-              { name: 'workspace.sphere.details', path: 'details', component: () => import('pages/app/ws_sphere/sphere_details.vue') },
-              { name: 'workspace.sphere.items', path: 'items', component: () => import('pages/app/ws_sphere/sphere_items.vue') },
-              { name: 'workspace.sphere.explore', path: 'explore', component: () => import('pages/app/ws_sphere/sphere_explore.vue') }
+              { name: 'workspace.sphere.details', path: 'details', component: () => import('pages/app/ws_sphere/sphere_details.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.sphere.items', path: 'items', component: () => import('pages/app/ws_sphere/sphere_items.vue'), meta: { roleMinimal: 'MEMBER' } },
+              { name: 'workspace.sphere.explore', path: 'explore', component: () => import('pages/app/ws_sphere/sphere_explore.vue'), meta: { roleMinimal: 'MEMBER' } }
             ]
           },
-        ]
+        ],
+        meta: { roleMinimal: 'MEMBER' }
       },
       {
         // name: 'notifications',
         path: 'notifications',
         component: () => import('pages/app/notifications/index.vue'),
         children: [
-          { name: 'notifications', path: '', component: () => import('pages/app/notifications/view_home.vue') },
-        ]
+          { name: 'notifications', path: '', component: () => import('pages/app/notifications/view_home.vue'), meta: { roleMinimal: 'MEMBER' } },
+        ],
+        meta: { roleMinimal: 'MEMBER' }
       },
       {
         name: 'fallback',
         path: '*',
-        redirect: '/home'
+        redirect: AuthApi.isGuest() ? '/trends' : '/home'
       },
     ],
-    beforeEnter: (to, from, next) => {
-      if (to.query.originalUrl){ // редирект на полную версию
+    meta: { roleMinimal: 'GUEST' },
+    beforeEnter: async (to, from, next) => {
+      if (to.query.originalUrl){ // редирект на полную версию (после успешного входа перейдет на этот url)
         logD('redirect command received!', to.query.originalUrl)
         localStorage.setItem('k_originalUrl', to.query.originalUrl)
       }
-      next()
+      logD('systemLogin...', to, AuthApi.checkRoleCredentials(to.meta.roleMinimal))
+       await systemLogin() // для гостей тоже надо входить (если уже войдено - ничего не сделает).
+       // если маршрут требует повышения - переходим на форму входа
+      assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
+      if (!AuthApi.checkRoleCredentials(to.meta.roleMinimal)) return next('/auth')
+      else return next()
     }
   }
 ]

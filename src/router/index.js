@@ -6,7 +6,7 @@ debug.enabled = true
 Vue.use(VueRouter)
 
 export default function (/* { store, ssrContext } */) {
-  const Router = new VueRouter({
+  const router = new VueRouter({
     scrollBehavior (to, from, savedPosition) {
       // debug('sb', to, from)
       // debug('scrollBehavior', to, from)
@@ -24,6 +24,5 @@ export default function (/* { store, ssrContext } */) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE,
   })
-
-  return Router
+  return router
 }

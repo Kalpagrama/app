@@ -33,6 +33,7 @@ const LogSystemModulesEnum = Object.freeze({
   PWA: 'pwa',
   AUTH: 'auth',
   GQL: 'gql',
+  ROUTER: 'rtr',
   VUEX: 'vx',
   VUEX_CACHE: 'vx_cache',
   VUEX_CORE: 'vx_core',
