@@ -26,14 +26,14 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
         @started="started(itemIndex), itemsStarted()"
         @ended="ended(itemIndex)"
         :options=`{
-          isFit: false,
+          isFit: itemActive || itemNexting,
           loop: items.length === 1
         }`
         :style=`{
           position: 'relative',
           borderRadius: '10px',
           overflow: 'hidden',
-        }`)
+        }`).bg-black
 </template>
 
 <script>

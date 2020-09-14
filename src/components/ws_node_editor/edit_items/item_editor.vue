@@ -18,7 +18,7 @@ q-layout(view="hHh Lpr lff").b-30
                 borderRadius: '10px', overflow: 'hidden',
               }`
               ).full-width
-            ws-content-player(
+            content-player(
               v-if="contentKalpa"
               :contentKalpa="contentKalpa"
               @player="player = $event"
@@ -59,11 +59,11 @@ q-layout(view="hHh Lpr lff").b-30
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import compositionEditor from 'components/composition/composition_editor/index.vue'
-import wsContentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'components/content_player/index.vue'
 
 export default {
   name: 'editItems_itemEditor',
-  components: {wsContentPlayer, compositionEditor},
+  components: {contentPlayer, compositionEditor},
   props: ['item'],
   data () {
     return {

@@ -3,20 +3,21 @@ q-page(
   :style=`{paddingTop: '8px'}`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start.q-px-sm
-    //- small.text-white {{ contentKalpa }}
-    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspace.name }}
+    //- small.text-white {{ contentBookmark }}
+    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentBookmark.name }}
     .row.full-width.q-py-md
       .row.full-width
         //- q-btn(
           v-if="contentKalpa.contentSource !== 'KALPA'"
           @click="gotToOriginal"
           color="green" no-caps dense).q-px-sm Перейти на оригинал
-      .row.full-width.q-px-sm
+      //- .row.full-width.q-px-sm
         small(:style=`{}`).text-white {{ contentKalpa.contentSource }}
     //- spheres
-    .row.full-width.q-py-md
-      .row.full-width.q-px-sm
-        span.text-white.text-bold Сферы
+    .row.full-width.q-py-sm
+      .row.full-width.q-py-md
+        span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
+      ws-sphere-editor(v-if="contentBookmark" :item="contentBookmark")
 </template>
 
 <script>
@@ -24,7 +25,7 @@ import { openURL } from 'quasar'
 
 export default {
   name: 'wsContentExplorer_video_viewDetails',
-  props: ['contentKalpa', 'contentWorkspace'],
+  props: ['contentKalpa', 'contentBookmark'],
   data () {
     return {
     }
