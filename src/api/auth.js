@@ -8,6 +8,9 @@ import { Mutex } from 'src/system/rxdb/reactive'
 import { fragments } from 'src/api/fragments'
 import i18next from 'i18next'
 import store from 'src/store/index'
+import { UserApi } from 'src/api/user'
+import { WsCollectionEnum } from 'src/system/rxdb/workspace'
+import { LstCollectionEnum } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
@@ -16,7 +19,57 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 let currentWebPushToken
 const apiMutex = new Mutex()
 
+const ActionEnum = Object.freeze({
+   VOTE: 'VOTE'
+})
+
 class AuthApi {
+   static isAuthorized () {
+      return !!localStorage.getItem('k_user_oid')
+   }
+
+   static getRole () {
+      return localStorage.getItem('k_user_role') || 'GUEST'
+   }
+
+   static isGuest () {
+      let role = localStorage.getItem('k_user_role')
+      return !role || role.in('GUEST', 'UNCONFIRMED')
+   }
+
+   // проверка соответствия текущего пользователя минимальным требованиям
+   static checkMinimalRoleAbidance (roleMinimal) {
+      let role = localStorage.getItem('k_user_role') || 'GUEST'
+      logD('role = ', role, roleMinimal)
+      switch (roleMinimal) {
+         case 'GUEST':
+            return role.in('GUEST', 'MEMBER', 'MODERATOR', 'ADMIN')
+         case 'MEMBER':
+            return role.in('MEMBER', 'MODERATOR', 'ADMIN')
+         case 'MODERATOR':
+            return role.in('MODERATOR', 'ADMIN')
+         case 'ADMIN':
+            return role.in('ADMIN')
+         default:
+            throw new Error('bad role' + roleMinimal)
+      }
+   }
+
+   static async hasPermitionForAction (action) {
+      let role = localStorage.getItem('k_user_role') || 'GUEST'
+      assert(action in ActionEnum)
+      let hasPermition = false
+      switch (action) {
+         case ActionEnum.VOTE:
+            hasPermition = role.in('MEMBER', 'MODERATOR', 'ADMIN')
+            break
+         default:
+            throw new Error('bad action: ' + action)
+      }
+      return hasPermition
+      // if (!hasPermition) await router.push('/auth')
+   }
+
    static async checkExpire () {
       if (localStorage.getItem('k_token_expires')) {
          let expires = localStorage.getItem('k_token_expires')
@@ -118,7 +171,7 @@ class AuthApi {
       logD(f, 'start. route=', route)
       const t1 = performance.now()
       let token, expires, userId, loginType, needInvite, needConfirm, userExist
-      if (route && route.query && route.query.token){
+      if (route && route.query && route.query.token) {
          // take token from redirect url
          token = route.query.token
          expires = route.query.expires
@@ -221,7 +274,7 @@ class AuthApi {
       assert(token)
       currentWebPushToken = token
       if (!localStorage.getItem('k_token')) return
-      if (localStorage.getItem('k_user_role') !== 'MEMBER') return
+      if (UserApi.isGuest()) return
       if (localStorage.getItem('k_web_push_token') === currentWebPushToken) return // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
 
       let { data: { setWebPushToken } } = await apollo.clients.auth.query({
@@ -235,4 +288,4 @@ class AuthApi {
    }
 }
 
-export { AuthApi }
+export { AuthApi, ActionEnum }

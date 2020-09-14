@@ -106,8 +106,6 @@ export default {
     // this.$log('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
-    // this.$log('systemLogin...')
-    await systemLogin()
     this.loading = false
   }
 }

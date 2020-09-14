@@ -5,6 +5,7 @@ import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
+import { ActionEnum, AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -156,6 +157,7 @@ class NodeApi {
       logD(f, 'start')
       const t1 = performance.now()
       assert(oid, 'oid && rate')
+      assert(AuthApi.hasPermitionForAction(ActionEnum.VOTE))
       let { data: { nodeRate } } = await apollo.clients.api.mutate({
          mutation: gql`
              ${fragments.objectFullFragment}
