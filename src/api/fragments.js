@@ -304,6 +304,7 @@ const userFragment = gql`
     weightVal
     settings
     wsRevision
+    wsVersion
     subscriptions{...objectShortFragment}
     profile{
       tutorial

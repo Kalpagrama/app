@@ -147,6 +147,7 @@ class ListsApi {
          variables: { collection, mangoQuery }
       })
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      assert(count >= 0, 'count >= 0')
       return { items: items || events || objects, count, totalCount, nextPageToken }
    }
 
@@ -243,14 +244,18 @@ class ListsApi {
       }
    }
 
+   // внимание ! вернет НЕ реактивный элемент!!!
    static async objSubscribers (oid, pagination) {
-      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid)
-      assert(obj && obj.subscribers, '!obj')
-      assert(Array.isArray(obj.subscribers), '!Array.isArray(obj.subscribers)')
+      const f = ListsApi.objSubscribers
+      logD(f, 'start')
+      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, {clientFirst: false}) // clientFirst: false - из-за того, что при создании ядра
+      assert(obj, '!obj')
+      let subscribers = obj.subscribers || [] // внимание ! не реактивно!!!!
+      assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')
       return {
-         items: obj.subscribers,
-         count: obj.subscribers.length,
-         totalCount: obj.subscribers.length,
+         items: subscribers,
+         count: subscribers.length,
+         totalCount: subscribers.length,
          nextPageToken: null
       }
    }

@@ -135,6 +135,7 @@ class RxDBWrapper {
       const f = this.create
       logD(f, 'start')
       const t1 = performance.now()
+      assert(!this.created, 'this.created')
       try {
          this.store = store
          // console.time('createRxDatabase')
@@ -161,7 +162,7 @@ class RxDBWrapper {
          this.cache = new Cache(this.db)
          this.objects = new Objects(this.cache)
          this.lists = new Lists(this.cache)
-         this.event = new Event(this.workspace, this.objects, this.lists)
+         this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
          // console.time('workspace.create')
          await this.workspace.create()
@@ -193,6 +194,8 @@ class RxDBWrapper {
       assert(this.created, '!created')
       this.event.init()
       // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
+      let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
+      assert(nodeCategories, '!nodeCategories')
       let fetchCurrentUserFunc = async () => {
          return {
             notEvict: true, // живет вечно
@@ -200,7 +203,6 @@ class RxDBWrapper {
             actualAge: 'day'
          }
       }
-      // console.time('get user from server')
       // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
       let currentUser
       if (userOid) {
@@ -209,22 +211,12 @@ class RxDBWrapper {
             force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
             clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
             onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-               assert(newVal.wsRevision)
-               if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
-                  this.workspace.synchroLoopWaitObj.break()
-               }
+               this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
             }
          })
+         this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
       }
-      logD(f, 'currentUser= ', currentUser)
-      // console.timeEnd('get user from server')
-      // console.time('get categories from server')
-      let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
-      assert(nodeCategories, '!nodeCategories')
-      // console.timeEnd('get categories from server')
-      if (currentUser) { // синхронизация мастерской с сервером
-         this.workspace.switchOnSynchro(currentUser)
-      }
+      // logD(f, 'currentUser= ', currentUser)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
@@ -274,44 +266,51 @@ class RxDBWrapper {
       const f = this.find
       logD(f, 'start')
       const t1 = performance.now()
-      const queryId = JSON.stringify(mangoQuery)
-      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
-      let findResult
-      let cachedReactiveList = this.reactiveItemDbMemCache.get(queryId)
-      if (cachedReactiveList) findResult = cachedReactiveList
-      if (!findResult) {
-         mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-         let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-         assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-         if (rxCollectionEnum in WsCollectionEnum) {
-            // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
-            let rxQuery = await this.workspace.find(mangoQuery)
-            const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-            assert(reactiveList, '!reactiveList')
-            findResult = reactiveList
-         } else if (rxCollectionEnum in LstCollectionEnum) {
-            let rxDoc = await this.lists.find(mangoQuery)
-            findResult = getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
-         } else {
-            throw new Error('bad collection: ' + rxCollectionEnum)
+      try {
+         await this.lock() // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
+         const queryId = JSON.stringify(mangoQuery)
+         assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
+         let findResult
+         let cachedReactiveList = this.reactiveItemDbMemCache.get(queryId)
+         logD(f, 'addFindResult')
+         if (cachedReactiveList) findResult = cachedReactiveList
+         if (!findResult) {
+            mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+            let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+            assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+            if (rxCollectionEnum in WsCollectionEnum) {
+               // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
+               let rxQuery = await this.workspace.find(mangoQuery)
+               const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
+               assert(reactiveList, '!reactiveList')
+               findResult = reactiveList
+            } else if (rxCollectionEnum in LstCollectionEnum) {
+               let rxDoc = await this.lists.find(mangoQuery)
+               findResult = getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
+            } else {
+               throw new Error('bad collection: ' + rxCollectionEnum)
+            }
+            assert(findResult, '!findResult' + JSON.stringify(findResult))
+            this.reactiveItemDbMemCache.set(queryId, findResult)
          }
-         assert(findResult, '!findResult' + JSON.stringify(findResult))
-         this.reactiveItemDbMemCache.set(queryId, findResult)
-      }
-      this.store.commit('debug/addFindResult', { queryId, findResult })
-      let result
-      if (findResult.getData) result = findResult.getData()
-      else {
-         assert(Array.isArray(findResult))
-         result = {
-            items: findResult,
-            count: findResult.length,
-            totalCount: findResult.length,
-            nextPageToken: null
+
+         this.store.commit('debug/addFindResult', { queryId, findResult })
+         let result
+         if (findResult.getData) result = findResult.getData()
+         else {
+            assert(Array.isArray(findResult))
+            result = {
+               items: findResult,
+               count: findResult.length,
+               totalCount: findResult.length,
+               nextPageToken: null
+            }
          }
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
+         return result
+      } finally {
+         this.release()
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
-      return result
    }
 
    async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null } = {}) {

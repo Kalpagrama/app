@@ -59,8 +59,15 @@ class Lists {
     let fetchFunc = async () => {
       let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
       let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
+
+      // todo
+      let itemFilter = () => {
+        // фильтровать items по mangoQuery
+        return true
+      }
+      items = items.filter(itemFilter)
       return {
-        item: { items, count, totalCount, nextPageToken, oid },
+        item: { items, count: items.length, totalCount, nextPageToken, oid },
         actualAge: 'day',
         mangoQuery
       }
@@ -96,6 +103,7 @@ class Lists {
         for (let rxDoc of rxDocsSubscribers) {
           let reactiveItem = getReactive(rxDoc).getData()
           assert(reactiveItem.items, '!reactiveItem.items')
+          logD(f, 'add subscriber to list')
           reactiveItem.items.push(event.subject)
           reactiveItem.count++
           reactiveItem.totalCount++
@@ -103,6 +111,7 @@ class Lists {
         for (let rxDoc of rxDocsSubscriptions) {
           let reactiveItem = getReactive(rxDoc).getData()
           assert(reactiveItem.items, '!reactiveItem.items')
+          logD(f, 'add subscription to list')
           reactiveItem.items.push(event.object)
           reactiveItem.count++
           reactiveItem.totalCount++
@@ -130,6 +139,7 @@ class Lists {
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
           if (indx >= 0) {
+            logD(f, 'remove subscriber from list')
             reactiveItem.items.splice(indx, 1)
             reactiveItem.count--
             reactiveItem.totalCount--
@@ -140,6 +150,7 @@ class Lists {
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
           if (indx >= 0) {
+            logD(f, 'remove subscription from list')
             reactiveItem.items.splice(indx, 1)
             reactiveItem.count--
             reactiveItem.totalCount--
