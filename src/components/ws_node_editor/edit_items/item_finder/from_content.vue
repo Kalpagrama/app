@@ -67,14 +67,28 @@ export default {
     },
     contentClick (contentBookmark) {
       this.$log('contentClick contentBookmark', contentBookmark)
-      let itemInput = {
-        id: Date.now().toString(),
-        thumbUrl: contentBookmark.thumbOid,
-        outputType: contentBookmark.contentType,
-        layers: [
-          {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
-        ],
-        operation: { items: null, operations: null, type: 'CONCAT'},
+      let itemInput
+      if (contentBookmark.contentType === 'IMAGE') {
+        itemInput = {
+          id: Date.now().toString(),
+          thumbUrl: contentBookmark.thumbOid,
+          outputType: contentBookmark.contentType,
+          layers: [
+            {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: null, points: []}]},
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT'},
+        }
+      }
+      else if (contentBookmark.contentType === 'VIDEO') {
+        itemInput = {
+          id: Date.now().toString(),
+          thumbUrl: contentBookmark.thumbOid,
+          outputType: contentBookmark.contentType,
+          layers: [
+            {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT'},
+        }
       }
       this.$emit('item', itemInput)
     }
