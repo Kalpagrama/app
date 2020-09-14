@@ -18,6 +18,18 @@
   //- TODO: add flip?
   .row.full-width.q-pa-sm
     q-btn(
+      @click="cropper.setDragMode('move'), cropping = false"
+      icon="open_with"
+      round flat
+      :color="cropping ? 'white' : 'green'")
+    q-btn(
+      @click="cropper.setDragMode('crop'), cropping = true"
+      icon="crop"
+      round flat
+      :color="cropping ? 'green' : 'white'")
+    .col
+    small(v-if="cropper").text-white {{cropper.mode}}
+    q-btn(
       @click="cropper.reset()"
       round flat color="white" icon="autorenew")
     .col
@@ -38,7 +50,8 @@ export default {
   props: ['src', 'options'],
   data () {
     return {
-      croppper: null,
+      cropper: null,
+      cropping: false,
     }
   },
   mounted () {

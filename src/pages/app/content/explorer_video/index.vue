@@ -188,6 +188,7 @@ export default {
         if (isVisible) this.player.play()
         else this.player.pause()
       }
+      // this.$log('contentPlayer', contentPlayer)
     },
     playerLoaded (player) {
       this.$log('playerLoaded', player)

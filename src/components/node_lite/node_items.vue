@@ -8,6 +8,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-300+'px',
+      minHeight: '300px',
       //- minHeight: '300px',
       opacity: started ? 0 : 1,
     }`
