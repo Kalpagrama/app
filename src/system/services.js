@@ -188,7 +188,7 @@ async function systemLogin () {
       let originalUrl = localStorage.getItem('k_originalUrl') // переход на полную версию после ссылки "поделиться"
       if (originalUrl) {
          localStorage.removeItem('k_originalUrl')
-         logD(f, 'redirect to ' + originalUrl)
+         logD(f, 'redirect to originalUrl: ' + originalUrl)
          await router.push(originalUrl)
       }
    }

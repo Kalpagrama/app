@@ -190,7 +190,7 @@ const routes = [
       {
         name: 'fallback',
         path: '*',
-        redirect: AuthApi.isGuest() ? '/trends' : '/home'
+        redirect: '/home'
       },
     ],
     meta: { roleMinimal: 'GUEST' },

@@ -55,7 +55,7 @@ class AuthApi {
       }
    }
 
-   static async hasPermitionForAction (action) {
+   static hasPermitionForAction (action) {
       let role = localStorage.getItem('k_user_role') || 'GUEST'
       assert(action in ActionEnum)
       let hasPermition = false
