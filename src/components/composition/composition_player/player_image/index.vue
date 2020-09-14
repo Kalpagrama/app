@@ -29,7 +29,7 @@ div(
 import contentExplorer from './content_explorer.vue'
 
 export default {
-  name: 'compositionPlayer_playerVideo',
+  name: 'compositionPlayer_playerImage',
   components: {contentExplorer},
   props: {
     isVisible: {type: Boolean},
@@ -58,8 +58,6 @@ export default {
   methods: {
   },
   mounted () {
-    this.mutedCheck()
-    // this.$log('mounted')
   }
 }
 </script>

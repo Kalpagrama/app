@@ -1,5 +1,17 @@
+<style lang="sass">
+.items-min-height
+  &:before
+    content: ""
+    display: block
+    padding-top: 50%
+    float: left
+</style>
+
 <template lang="pug">
-div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start
+//- :class=`{'items-min-height': true}`
+div(
+  :class=`{'items-min-height': true}`
+  :style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start
   //- items preview: first item from meta => shaping the size
   img(
     @load="previewLoad"
@@ -8,8 +20,6 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-300+'px',
-      //- minHeight: '300px',
-      //- minHeight: '300px',
       opacity: started ? 0 : 1,
     }`
     ).full-width

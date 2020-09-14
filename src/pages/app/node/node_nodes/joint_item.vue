@@ -6,7 +6,8 @@ div(
     node-lite(
       v-if="item && item.type === 'NODE'"
       :isActive="isActive" :isVisible="isVisible"
-      :node="item")
+      :node="item"
+      :marginBottom="80")
   div(:style=`{width: '80px',}`).row.full-height.justify-center
   div(
     :style=`{

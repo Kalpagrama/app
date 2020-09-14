@@ -11,7 +11,7 @@ export default {
     sliceSize: {
       type: Number,
       default () {
-        return 3
+        return 10
       }
     },
     mangoQuery: {
