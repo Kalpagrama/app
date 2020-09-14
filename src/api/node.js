@@ -216,7 +216,8 @@ class NodeApi {
             node: nodeInput
          }
       })
-      let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      let reactiveNode = await rxdb.get(RxCollectionEnum.OBJ, createdNode.oid)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveNode.oid, progress: 1 }
       assert(store, '!store')
@@ -258,7 +259,8 @@ class NodeApi {
             joint: jointInput
          }
       })
-      let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      let reactiveJoint = await rxdb.get(RxCollectionEnum.OBJ, createdJoint.oid)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return reactiveJoint
    }

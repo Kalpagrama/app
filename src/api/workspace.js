@@ -35,33 +35,33 @@ class WorkspaceApi {
     return ws
   }
 
-  static async wsItemUpsert (item, wsRevision) {
+  static async wsItemUpsert (item, wsRevision, wsVersion) {
     const f = this.wsItemUpsert
     logD(f, 'start')
     const t1 = performance.now()
-    let { data: { wsItemUpsert } } = await apollo.clients.api.mutate({
-      mutation: gql`mutation wsItemUpsert($item: RawJSON!, $wsRevision: Int!) {
-        wsItemUpsert (item: $item, wsRevision: $wsRevision)
+    let { data: { wsItem, wsRevision: wsRevisionServer } } = await apollo.clients.api.mutate({
+      mutation: gql`mutation wsItemUpsert($item: RawJSON!, $wsRevision: Int!, $wsVersion: String!) {
+        wsItemUpsert (item: $item, wsRevision: $wsRevision, wsVersion: $wsVersion)
       }`,
-      variables: { item, wsRevision }
+      variables: { item, wsRevision, wsVersion }
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-    return wsItemUpsert
+    return { wsItem, wsRevisionServer }
   }
 
-  static async wsItemDelete (item, wsRevision) {
+  static async wsItemDelete (item, wsRevision, wsVersion) {
     const f = this.wsItemDelete
     logD(f, 'start')
     const t1 = performance.now()
-    let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
+    let { data: { wsItem, wsRevision: wsRevisionServer } } = await apollo.clients.api.mutate({
       mutation: gql`
-        mutation wsItemDelete($item: RawJSON!, $wsRevision: Int!) {
-          wsItemDelete (item: $item, wsRevision: $wsRevision)
+        mutation wsItemDelete($item: RawJSON!, $wsRevision: Int!, $wsVersion: String!) {
+          wsItemDelete (item: $item, wsRevision: $wsRevision, wsVersion: $wsVersion)
         }`,
-      variables: { item, wsRevision }
+      variables: { item, wsRevision, wsVersion }
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-    return wsItemUpsert
+    return { wsItem, wsRevisionServer }
   }
 }
 

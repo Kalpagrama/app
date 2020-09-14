@@ -288,7 +288,7 @@ class Cache {
         if (cachedInfo && cachedInfo.failReason) {
           cachedInfo = this.cacheLru.get(id) || cachedInfo // изменилось actualUntil
           let tryAfter = Math.max(0, (cachedInfo.actualUntil - Date.now()) / 1000)
-          throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек. failReason=` + cachedInfo.failReason)
+          throw new Error(`При извлечении id=${id} из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек. failReason=` + cachedInfo.failReason)
         }
         return null
       }
