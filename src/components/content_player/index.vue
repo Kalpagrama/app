@@ -21,7 +21,6 @@ export default {
   },
   props: {
     contentKalpa: {type: Object, required: true},
-    // contentWorkspace: {type: Object},
     options: {type: Object},
   },
   data () {

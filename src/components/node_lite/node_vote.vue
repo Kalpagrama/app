@@ -26,7 +26,7 @@ q-btn(
   @click="voteStart()"
   flat color="green"
   :loading="voting").voter
-  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm {{ nodeFull ? nodeFull.rate*100 : '' }}
+  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
   q-icon(name="adjust" size="30px" color='green')
   q-menu(
     v-model="voteMenuOpened" no-parent-event separate-close-popup
@@ -93,7 +93,7 @@ export default {
         {id: 0.7, label: this.$t('nodeVote70', 'Близко'), value: 70, color: '#8f4067'},
         {id: 0.5, label: this.$t('nodeVote50', 'Где-то рядом'), value: 50, color: '#99718f'},
         {id: 0.3, label: this.$t('nodeVote30', 'Ну такое...'), value: 30, color: '#a4a9bc'},
-        {id: 0, label: this.$t('nodeVote0', 'Очень далеко'), value: 0, color: '#aedce6'},
+        {id: 0.1, label: this.$t('nodeVote0', 'Очень далеко'), value: 0, color: '#aedce6'},
       ]
     }
   },

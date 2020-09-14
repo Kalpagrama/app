@@ -16,8 +16,8 @@
         composition-bar(
           :isActive="panning"
           :player="player" :composition="composition" :contentKalpa="contentKalpa"
-          actionsPosition="top"
-          :style=`{position: 'absolute', top: '-34px', zIndex: 99999}`)
+          actionsPosition="bottom"
+          :style=`{position: 'absolute', top: '0px', zIndex: 99999}`)
     //- .row.full-width
       span.text-white {{ composition.layers[0].figuresAbsolute[1].t-composition.layers[0].figuresAbsolute[0].t }}
 </template>

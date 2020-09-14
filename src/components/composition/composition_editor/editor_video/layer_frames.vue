@@ -4,7 +4,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
   //- overflowY: 'hidden',
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '56px', paddingBottom: '50px'}`).row.full-width.scroll
+    :style=`{paddingTop: '20px', paddingBottom: '50px'}`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -182,7 +182,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           'text-red': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t > 60,
           'text-white': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t <= 60
         }`
-        ) {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
+        ).q-mt-sm {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
       .col
       q-btn(round flat dense color="white" @click="layerForward(1,false)")
         q-icon(name="keyboard_arrow_left" color="white" size="30px")
