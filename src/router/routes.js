@@ -199,11 +199,10 @@ const routes = [
         logD('redirect command received!', to.query.originalUrl)
         localStorage.setItem('k_originalUrl', to.query.originalUrl)
       }
-      logD('systemLogin...', to, AuthApi.checkRoleCredentials(to.meta.roleMinimal))
-       await systemLogin() // для гостей тоже надо входить (если уже войдено - ничего не сделает).
-       // если маршрут требует повышения - переходим на форму входа
+      logD('try systemLogin...')
+      await systemLogin() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
       assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
-      if (!AuthApi.checkRoleCredentials(to.meta.roleMinimal)) return next('/auth')
+      if (!AuthApi.checkMinimalRoleAbidance(to.meta.roleMinimal)) return next('/auth') // если маршрут требует повышения - переходим на форму входа
       else return next()
     }
   }

@@ -9,6 +9,8 @@ import { fragments } from 'src/api/fragments'
 import i18next from 'i18next'
 import store from 'src/store/index'
 import { UserApi } from 'src/api/user'
+import { WsCollectionEnum } from 'src/system/rxdb/workspace'
+import { LstCollectionEnum } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
@@ -16,6 +18,10 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
 const apiMutex = new Mutex()
+
+const ActionEnum = Object.freeze({
+   VOTE: 'VOTE'
+})
 
 class AuthApi {
    static isAuthorized () {
@@ -31,7 +37,8 @@ class AuthApi {
       return !role || role.in('GUEST', 'UNCONFIRMED')
    }
 
-   static checkRoleCredentials (roleMinimal) {
+   // проверка соответствия текущего пользователя минимальным требованиям
+   static checkMinimalRoleAbidance (roleMinimal) {
       let role = localStorage.getItem('k_user_role') || 'GUEST'
       logD('role = ', role, roleMinimal)
       switch (roleMinimal) {
@@ -46,6 +53,21 @@ class AuthApi {
          default:
             throw new Error('bad role' + roleMinimal)
       }
+   }
+
+   static async hasPermitionForAction (action) {
+      let role = localStorage.getItem('k_user_role') || 'GUEST'
+      assert(action in ActionEnum)
+      let hasPermition = false
+      switch (action) {
+         case ActionEnum.VOTE:
+            hasPermition = role.in('MEMBER', 'MODERATOR', 'ADMIN')
+            break
+         default:
+            throw new Error('bad action: ' + action)
+      }
+      return hasPermition
+      // if (!hasPermition) await router.push('/auth')
    }
 
    static async checkExpire () {
@@ -266,4 +288,4 @@ class AuthApi {
    }
 }
 
-export { AuthApi }
+export { AuthApi, ActionEnum }
