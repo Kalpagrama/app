@@ -43,16 +43,17 @@ q-layout(view="hHh Lpr lff").b-30
               :player="player"
               )
           //- footer
-          .row.full-width.items-center.content-center.q-py-sm
-            q-btn(round flat no-caps color="grey-6" @click="close()").q-px-sm.b-50 Close
-            .col
-              small.text-white itemCopyChanged: {{itemCopyChanged}}
-            q-btn(
-              @click="save()"
-              no-caps
-              :disable="!itemCopyChanged"
-              :color="itemCopyChanged ? 'green' : 'grey-9'"
-              ).q-px-md Save
+          .row.full-width.justify-center
+            div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center.q-pa-md
+              q-btn(flat no-caps color="white" @click="close()") Close
+              .col
+                //- small.text-white itemCopyChanged: {{itemCopyChanged}}
+              q-btn(
+                @click="save()"
+                no-caps
+                :disable="!itemCopyChanged"
+                :color="itemCopyChanged ? 'green' : 'grey-9'"
+                ).q-px-md Save
 </template>
 
 <script>

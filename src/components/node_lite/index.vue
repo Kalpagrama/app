@@ -60,9 +60,13 @@ div(
             ).row.full-width.items-center.q-py-md.q-pl-md
             span(
               :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
-        .row.full-height.items-start.content-start.q-pt-md.q-px-sm
+        //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
           node-vote(:node="node" :nodeFull="nodeFull")
+  .row.full-width.items-center.content-center
+    node-share(:node="node")
+    .col
+    node-vote(:node="node" :nodeFull="nodeFull")
   //- footer
   .row.full-width
     slot(name="footer")

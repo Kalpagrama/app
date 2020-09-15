@@ -1,13 +1,13 @@
 <template lang="pug">
 q-btn(
   @click="shareStart()"
-  flat icon="share"
-  :color="shareDialogOpened ? 'green' : 'grey-7'")
+  round flat dense icon="share"
+  :color="shareDialogOpened ? 'green' : 'grey-8'")
   q-dialog(v-model="shareDialogOpened")
     div(
       :style=`{
         width: '400px',
-        height: '250px',
+        minHeight: '250px',
         borderRadius: '10px', overflow: 'hidden',
       }`).row.full-width.items-start.content-start.b-30
       //- header
@@ -36,8 +36,10 @@ q-btn(
               q-btn(color="green" flat no-caps @click="shareLinkCopy()")
                 span.text-bold Copy
       //- links
-      .row.full-width.q-px-md
+      div(
+        v-if="!shareTarget").row.full-width.q-px-md
         q-btn(
+          @click="shareEmbed"
           round icon="code" color="grey-5" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
         q-btn(
@@ -47,6 +49,21 @@ q-btn(
         q-btn(
           round icon="fab fa-vk" color="blue-8" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
+      //- embed
+      div(
+        v-if="shareTarget === 'embed'"
+        ).row.full-width.q-pa-md
+        div(
+          :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+          q-input(
+            :value="shareEmbedText"
+            filled dark dense color="grey-6"
+            type="textarea" autogrow
+            :input-style=`{minHeight: '100px',}`).full-width
+        .row.full-width
+          .col
+          q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
+            span.text-bold Copy
 </template>
 
 <script>
@@ -60,7 +77,12 @@ export default {
     return {
       shareLink: '',
       shareDialogOpened: false,
-      embedText: '<iframe width="560" height="315" src="https://www.youtube.com/embed/qnlXQMSXkBQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+      shareTarget: null,
+    }
+  },
+  computed: {
+    shareEmbedText () {
+      return `<iframe width="100%" height="315" src="${location.origin}/node/${this.node.oid}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
     }
   },
   methods: {
@@ -76,12 +98,26 @@ export default {
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
+      this.clipboardWrite(this.shareLink, 'Link copied to clipboard!')
+      await this.$wait(500)
+      this.shareDialogOpened = false
+    },
+    shareEmbed () {
+      this.$log('shareEmbed')
+      this.shareTarget = 'embed'
+    },
+    async shareEmbedCopy () {
+      this.$log('shareEmbedCopy')
+      this.clipboardWrite(this.shareEmbedText, 'Copied to clipboard!')
+      await this.$wait(500)
+      this.shareDialogOpened = false
+    },
+    clipboardWrite (val, message) {
+      this.$log('clipboardWrite', val)
       navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
         if (result.state === 'granted' || result.state === 'prompt') {
-          await navigator.clipboard.writeText(this.shareLink)
-          this.$q.notify({type: 'positive', position: 'top', message: 'Link copied to clipboard'})
-          await this.$wait(500)
-          this.shareDialogOpened = false
+          await navigator.clipboard.writeText(val)
+          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
         }
       })
     },

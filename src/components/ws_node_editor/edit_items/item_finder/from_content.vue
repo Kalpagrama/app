@@ -1,10 +1,13 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.items-start.content-start
-  //- q-dialog(
-  //-   v-model="contentSelectorOpened" position="bottom"
-  //-   @show="itemsActive = false"
-  //-   @hide="itemsActive = true")
-  //-   item-finder(@item="itemFound" @close="contentSelectorOpened = false")
+  q-dialog(
+    v-model="contentFragmentOpened" position="bottom" maximized
+    @hide="contentBookmark = null")
+    from-content-fragment(
+      :contentBookmark="contentBookmark"
+      :style=`{maxWidth: width+'px',}`
+      @fragment="$emit('item', $event), contentFragmentOpened = false"
+      @close="contentFragmentOpened = false")
   content-search(
     @contentKalpa="contentKalpaFound"
     @searchString="searchString = $event")
@@ -13,19 +16,23 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
       template(v-slot=`{items, next}`)
         .row.full-width.items-start.content-start.q-px-sm
           ws-content-item(
-            v-for="(content,ii) in items" :key="content.id"
-            :content="content"
-            @clicked="contentClick(content)").q-mb-sm
+            v-for="(contentBookmark,ii) in items" :key="contentBookmark.id"
+            :content="contentBookmark"
+            @clicked="contentBookmarkClick(contentBookmark)").q-mb-sm
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import fromContentFragment from './from_content_fragment.vue'
 
 export default {
   name: 'itemFinder_fromContent',
+  components: {fromContentFragment},
   data () {
     return {
       searchString: '',
+      contentBookmark: null,
+      contentFragmentOpened: false,
     }
   },
   computed: {
@@ -44,6 +51,10 @@ export default {
       }
       return res
     },
+    width () {
+      if (this.$q.screen.width < 800) return this.$q.screen.width
+      else return 800
+    },
   },
   methods: {
     async contentKalpaFound (contentKalpa) {
@@ -61,36 +72,38 @@ export default {
           spheres: [],
         }
         bookmarkFound = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-        this.$log('bookmarkFound')
+        this.$log('bookmarkFound', bookmarkFound)
       }
-      this.contentClick(bookmarkFound)
+      this.contentBookmarkClick(bookmarkFound)
     },
-    contentClick (contentBookmark) {
-      this.$log('contentClick contentBookmark', contentBookmark)
-      let itemInput
-      if (contentBookmark.contentType === 'IMAGE') {
-        itemInput = {
-          id: Date.now().toString(),
-          thumbUrl: contentBookmark.thumbOid,
-          outputType: contentBookmark.contentType,
-          layers: [
-            {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: null, points: []}]},
-          ],
-          operation: { items: null, operations: null, type: 'CONCAT'},
-        }
-      }
-      else if (contentBookmark.contentType === 'VIDEO') {
-        itemInput = {
-          id: Date.now().toString(),
-          thumbUrl: contentBookmark.thumbOid,
-          outputType: contentBookmark.contentType,
-          layers: [
-            {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
-          ],
-          operation: { items: null, operations: null, type: 'CONCAT'},
-        }
-      }
-      this.$emit('item', itemInput)
+    contentBookmarkClick (contentBookmark) {
+      this.$log('contentBookmarkClick', contentBookmark)
+      this.contentBookmark = contentBookmark
+      this.contentFragmentOpened = true
+      // let itemInput
+      // if (contentBookmark.contentType === 'IMAGE') {
+      //   itemInput = {
+      //     id: Date.now().toString(),
+      //     thumbUrl: contentBookmark.thumbOid,
+      //     outputType: contentBookmark.contentType,
+      //     layers: [
+      //       {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: null, points: []}]},
+      //     ],
+      //     operation: { items: null, operations: null, type: 'CONCAT'},
+      //   }
+      // }
+      // else if (contentBookmark.contentType === 'VIDEO') {
+      //   itemInput = {
+      //     id: Date.now().toString(),
+      //     thumbUrl: contentBookmark.thumbOid,
+      //     outputType: contentBookmark.contentType,
+      //     layers: [
+      //       {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},
+      //     ],
+      //     operation: { items: null, operations: null, type: 'CONCAT'},
+      //   }
+      // }
+      // this.$emit('item', itemInput)
     }
   }
 }
