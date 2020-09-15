@@ -281,7 +281,7 @@ class AuthApi {
       assert(token)
       currentWebPushToken = token
       if (!localStorage.getItem('k_token')) return
-      if (UserApi.isGuest()) return
+      if (AuthApi.isGuest()) return
       if (localStorage.getItem('k_web_push_token') === currentWebPushToken) return // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
 
       let { data: { setWebPushToken } } = await apollo.clients.auth.query({
