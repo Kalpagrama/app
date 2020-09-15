@@ -4,7 +4,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
   //- overflowY: 'hidden',
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '20px', paddingBottom: '50px'}`).row.full-width.scroll
+    :style=`{paddingTop: '20px', paddingBottom: '70px'}`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
