@@ -9,6 +9,7 @@ div(
     position: 'relative', height: '20px', borderRadius: '10px',
   }`).row.full-width.b-50
   //- ws content fragments from global store...
+  //- TODO: only for video fragments...
   div(
     v-if="$store.state.ui.wsContentFragments"
     :style=`{
@@ -18,6 +19,7 @@ div(
     ).row.fit
     div(
       v-for="(f,fi) in $store.state.ui.wsContentFragments" :key="fi"
+      v-if="f.items[0].layers[0].figuresAbsolute[0].t && f.items[0].layers[0].figuresAbsolute[1].t"
       :style=`{
         position: 'absolute', zIndex: 9999,
         top: '-2px',

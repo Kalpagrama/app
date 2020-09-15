@@ -81,14 +81,20 @@ export default {
       }
     },
     nodesChanged (nodes) {
-      this.$log('nodesChanged', nodes)
+      // this.$log('nodesChanged', nodes)
+      // this.$log('%c nodesChanged', 'color:white;background:red;padding: 10px', nodes)
+      // console.table(nodes)
       let fragments = nodes.reduce((acc, node) => {
-        let fragmentInput = {
-          name: node.name,
-          items: [node.meta.items[0]],
-          spheres: []
-        }
-        acc.push(fragmentInput)
+        node.meta.items.map(item => {
+          if (item.layers[0].contentOid === this.contentKalpa.oid) {
+            let fragmentInput = {
+              name: node.name,
+              items: [item],
+              spheres: []
+            }
+            acc.push(fragmentInput)
+          }
+        })
         return acc
       }, [])
       this.$log('fragments', fragments)

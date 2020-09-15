@@ -100,8 +100,13 @@ export default {
   methods: {
     voteStart () {
       this.$log('voteStart')
-      // this.$store.commit('ui/stateSet', ['showAuth', true])
-      this.voteMenuOpened = true
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        // this.$store.commit('ui/stateSet', ['showAuth', true])
+        this.$router.push('/auth/sign-in')
+      }
+      else {
+        this.voteMenuOpened = true
+      }
     },
     async vote (val) {
       try {
