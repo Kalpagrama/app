@@ -23,7 +23,7 @@ class ListsApi {
       let ex = {
          selector: {
             oidSphere: 'AGKAwKuAwCU=',
-            objectTypeEnum: 'NODE',
+            objectTypeEnums: { $in: ['WORD', 'SENTENCE'] },
             oidAuthor: 'AF6H7dLAoAI=',
             pageToken: null,
             sortStrategy: 'HOT'
@@ -32,13 +32,13 @@ class ListsApi {
       }
       assert(mangoQuery, '!mangoQuery')
       assert(mangoQuery.selector, '!mangoQuery.selector')
-      assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+      assert(mangoQuery.selector.oidSphere || mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SEARCH, '!mangoQuery.selector.oidSphere')
       delete mangoQuery.selector.rxCollectionEnum
       for (let key in mangoQuery) {
          assert(['selector', 'limit'].includes(key), '[selector, sort, limit].includes(key)')
       }
       for (let key in mangoQuery.selector) {
-         assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
+         assert(['objectTypeEnums', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy', 'name'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
@@ -60,13 +60,13 @@ class ListsApi {
             break
          case RxCollectionEnum.LST_SPHERE_NODES:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            mangoQuery.selector.objectTypeEnum = 'NODE'
+            mangoQuery.selector.objectTypeEnums = { $in: ['NODE'] }
             // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
             break
          case RxCollectionEnum.LST_SPHERE_JOINTS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            mangoQuery.selector.objectTypeEnum = 'JOINT'
+            mangoQuery.selector.objectTypeEnums = { $in: ['JOINT'] }
             // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
             break
@@ -77,6 +77,9 @@ class ListsApi {
          case RxCollectionEnum.LST_SUBSCRIPTIONS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
             res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere, pagination)
+            break
+         case RxCollectionEnum.LST_SEARCH:
+            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
             break
          default:
             throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)

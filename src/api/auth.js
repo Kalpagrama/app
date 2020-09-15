@@ -38,7 +38,7 @@ class AuthApi {
    }
 
    // проверка соответствия текущего пользователя минимальным требованиям
-   static checkMinimalRoleAbidance (roleMinimal) {
+   static userMatchMinimalRole (roleMinimal) {
       let role = localStorage.getItem('k_user_role') || 'GUEST'
       logD('role = ', role, roleMinimal)
       switch (roleMinimal) {
@@ -55,13 +55,20 @@ class AuthApi {
       }
    }
 
-   static async hasPermitionForAction (action) {
-      let role = localStorage.getItem('k_user_role') || 'GUEST'
+   static hasPermitionForAction (action, object) {
       assert(action in ActionEnum)
       let hasPermition = false
       switch (action) {
          case ActionEnum.VOTE:
-            hasPermition = role.in('MEMBER', 'MODERATOR', 'ADMIN')
+            if (object && object.author.oid === localStorage.getItem('k_user_oid')) hasPermition = false
+            else hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
+            break
+         case ActionEnum.DELETE:
+            if (object && object.author.oid === localStorage.getItem('k_user_oid')) hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
+            else hasPermition = AuthApi.userMatchMinimalRole('MODERATOR')
+            break
+         case ActionEnum.CREATE:
+            hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
             break
          default:
             throw new Error('bad action: ' + action)
@@ -274,7 +281,7 @@ class AuthApi {
       assert(token)
       currentWebPushToken = token
       if (!localStorage.getItem('k_token')) return
-      if (UserApi.isGuest()) return
+      if (AuthApi.isGuest()) return
       if (localStorage.getItem('k_web_push_token') === currentWebPushToken) return // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
 
       let { data: { setWebPushToken } } = await apollo.clients.auth.query({

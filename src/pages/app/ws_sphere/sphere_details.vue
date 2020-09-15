@@ -17,6 +17,7 @@ q-page(
 
 <script>
 import { ObjectsApi } from 'src/api/objects'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_wsSphere_details',
@@ -32,7 +33,8 @@ export default {
       let newName = prompt('New sphere name', this.sphere.name)
       if (newName && newName.length > 0 && newName !== this.sphere.name) {
         this.sphere.name = newName
-        let sphere = await ObjectsApi.getSphere(newName)
+        // let sphere = await ObjectsApi.getSphere(newName)
+        let {items: [sphere]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: newName, objectTypeEnums: ['CHAR', 'WORD', 'SENTENCE']}})
         this.$log('sphere', sphere)
         if (sphere) {
           this.sphere.oid = sphere.oid

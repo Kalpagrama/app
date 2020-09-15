@@ -217,6 +217,8 @@ class RxDBWrapper {
          this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
       }
       // logD(f, 'currentUser= ', currentUser)
+      // let {items: [sphere2]} = await this.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnums: ['CHAR', 'WORD', 'SENTENCE']}})
+      // logD('!!! sphere2 = ', sphere2)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 

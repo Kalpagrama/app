@@ -15,7 +15,8 @@ const LstCollectionEnum = Object.freeze({
   LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
   LST_FEED: 'LST_FEED',
   LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
-  LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS' // подписки пользователя
+  LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
+  LST_SEARCH: 'LST_SEARCH' // подписки пользователя
 })
 
 function makeListCacheId (mangoQuery) {
