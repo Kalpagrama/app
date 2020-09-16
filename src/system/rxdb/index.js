@@ -195,8 +195,8 @@ class RxDBWrapper {
       this.event.init()
       // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
       let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
-      let emojiList = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiList', { clientFirst: true })
-      assert(nodeCategories && emojiList, '!nodeCategories && emojiList')
+      let emojiSpheres = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiSpheres', { clientFirst: true })
+      assert(nodeCategories && emojiSpheres, '!nodeCategories && emojiSpheres')
       let fetchCurrentUserFunc = async () => {
          return {
             notEvict: true, // живет вечно

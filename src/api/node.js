@@ -42,14 +42,14 @@ class NodeApi {
       return nodeCategories
    }
 
-   static async emojiList () {
-      const f = this.emojiList
+   static async emojiSpheres () {
+      const f = this.emojiSpheres
       logD(f, 'start')
       const t1 = performance.now()
-      let { data: { emojiList } } = await apollo.clients.auth.query({
+      let { data: { emojiSpheres } } = await apollo.clients.auth.query({
          query: gql`
-             query emojiList{
-                 emojiList{
+             query emojiSpheres{
+                 emojiSpheres{
                      oid
                      type
                      name
@@ -58,7 +58,7 @@ class NodeApi {
          `
       })
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return emojiList
+      return emojiSpheres
    }
 
    static makeCompositionInput (composition) {
