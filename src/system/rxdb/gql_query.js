@@ -42,11 +42,11 @@ class GqlQueries {
                }
             }
             break
-         case 'emojiList' :
+         case 'emojiSpheres' :
             fetchFunc = async () => {
                return {
                   notEvict: true, // живет в кэше вечно
-                  item: await NodeApi.emojiList(),
+                  item: await NodeApi.emojiSpheres(),
                   actualAge: 'day' // обновляется раз в день
                }
             }
