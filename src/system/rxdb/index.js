@@ -220,6 +220,8 @@ class RxDBWrapper {
       // logD(f, 'currentUser= ', currentUser)
       // let {items: [sphere2]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }}})
       // logD('!!! sphere2 = ', sphere2)
+      // let votes = await this.get(RxCollectionEnum.GQL_QUERY, 'votes', {params: {oid: '79994642858295300'}})
+      // logD('VOTES= ', votes)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
@@ -316,7 +318,7 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null } = {}) {
+   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       let rawId = getRawIdFromId(id)
       let rxDoc
@@ -327,7 +329,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
-         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, servicesApollo)
+         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, servicesApollo, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          rxDoc = await this.db.meta.findOne(rawId).exec()
       } else {
@@ -338,7 +340,8 @@ class RxDBWrapper {
 
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
-   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null } = {}) {
+   // params - допюпараметры для RxCollectionEnum.GQL_QUERY
+   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
       const f = this.get
       if (rawId) {
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -360,7 +363,7 @@ class RxDBWrapper {
          }
       }
       if (!reactiveItem) {
-         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc, servicesApollo })
+         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc, servicesApollo, params })
          if (!rxDoc) return null
          reactiveItem = getReactive(rxDoc)
          this.reactiveItemDbMemCache.set(id, reactiveItem)

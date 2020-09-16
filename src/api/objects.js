@@ -110,7 +110,7 @@ class ObjectsApi {
     const t1 = performance.now()
     assert(oid, '!oid')
     let { data: { votes } } = await apollo.clients.api.query({
-      mutation: gql`
+      query: gql`
         ${fragments.objectShortFragment}
         query votes ($oid: OID!) {
           votes (oid: $oid){
