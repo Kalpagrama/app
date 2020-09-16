@@ -116,9 +116,6 @@ class Event {
             await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
             break
          case 'USER_SUBSCRIBED':
-            this.notifyUserActionComplete(event.type, event.object)
-            await this.lists.processEvent(event)
-            break
          case 'USER_UNSUBSCRIBED':
             this.notifyUserActionComplete(event.type, event.object)
             await this.lists.processEvent(event)

@@ -91,15 +91,15 @@ export default {
     async userFollow () {
       this.$log('userFollow')
       let res = await UserApi.subscribe(this.user.oid)
-      await this.$wait(1000)
-      this.userSubscribed = await UserApi.isSubscribed(this.user.oid)
+      // await this.$wait(1000)
+      this.userSubscribed = true // await UserApi.isSubscribed(this.user.oid)
       this.$log('res', res)
     },
     async userUnfollow () {
       this.$log('userUnfollow')
       let res = await UserApi.unSubscribe(this.user.oid)
-      this.userSubscribed = await UserApi.isSubscribed(this.user.oid)
-      await this.$wait(1000)
+      // await this.$wait(1000)
+      this.userSubscribed = false // await UserApi.isSubscribed(this.user.oid)
       this.$log('res', res)
     }
   },
