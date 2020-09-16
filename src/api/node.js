@@ -21,10 +21,10 @@ class NodeApi {
       const f = this.nodeCategories
       logD(f, 'start')
       const t1 = performance.now()
-      let { data: { categories } } = await apollo.clients.auth.query({
+      let { data: { nodeCategories } } = await apollo.clients.auth.query({
          query: gql`
-             query {
-                 categories{
+             query nodeCategories{
+                 nodeCategories{
                      alias
                      icon
                      name
@@ -39,7 +39,26 @@ class NodeApi {
          `
       })
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return categories
+      return nodeCategories
+   }
+
+   static async emojiList () {
+      const f = this.emojiList
+      logD(f, 'start')
+      const t1 = performance.now()
+      let { data: { emojiList } } = await apollo.clients.auth.query({
+         query: gql`
+             query emojiList{
+                 emojiList{
+                     oid
+                     type
+                     name
+                 }
+             }
+         `
+      })
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return emojiList
    }
 
    static makeCompositionInput (composition) {

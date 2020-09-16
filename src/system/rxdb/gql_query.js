@@ -42,6 +42,15 @@ class GqlQueries {
                }
             }
             break
+         case 'emojiList' :
+            fetchFunc = async () => {
+               return {
+                  notEvict: true, // живет в кэше вечно
+                  item: await NodeApi.emojiList(),
+                  actualAge: 'day' // обновляется раз в день
+               }
+            }
+            break
          default: throw new Error(`bad id ${id}`)
       }
 
