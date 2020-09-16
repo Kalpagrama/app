@@ -63,8 +63,9 @@ div(
         //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
           node-vote(:node="node" :nodeFull="nodeFull")
-  .row.full-width.items-center.content-center
-    node-share(:node="node")
+  div(v-if="showEssence").row.full-width.items-center.content-center
+    node-share(:node="node").q-ml-sm
+    node-emoji(:node="node")
     .col
     node-vote(:node="node" :nodeFull="nodeFull")
   //- footer
@@ -79,11 +80,12 @@ import nodeBookmark from './node_bookmark.vue'
 import nodeFullscreen from './node_fullscreen.vue'
 import nodeShare from './node_share.vue'
 import nodeVote from './node_vote.vue'
+import nodeEmoji from './node_emoji.vue'
 import nodeItems from './node_items.vue'
 
 export default {
   name: 'nodeLite',
-  components: {nodeBookmark, nodeFullscreen, nodeShare, nodeVote, nodeItems},
+  components: {nodeBookmark, nodeFullscreen, nodeShare, nodeVote, nodeItems, nodeEmoji},
   props: {
     node: {type: Object, required: true},
     isActive: {type: Boolean, required: true},

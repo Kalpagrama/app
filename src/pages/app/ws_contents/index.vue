@@ -4,11 +4,12 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: '800px'}`).row.full-width
         slot(name="header")
-        content-search(
-          @contentKalpa="contentKalpaFound"
-          @searchString="searchString = $event"
-          :style=`{}`)
-        .row.full-width.q-px-md
+        .row.full-width.q-px-sm
+          content-search(
+            @contentKalpa="contentKalpaFound"
+            @searchString="searchString = $event"
+            :style=`{}`)
+        div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
             no-caps dense active-color="white" align="left" switch-indicator

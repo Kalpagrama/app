@@ -5,7 +5,9 @@ q-layout(view="hHh Lpr lff").b-30
       div(:style=`{maxWidth: '800px'}`).row.full-width.b-30
         div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="close()")
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Pick content fragment
+          .col
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Pick content fragment
+          q-btn(round flat color="white" icon="launch" @click="explore()")
   q-page-container
     q-page(:style=`{paddingTop: '0px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px', height: $q.screen.height-60+'px',}`).column.full-width.items-start.content-start
@@ -36,7 +38,7 @@ q-layout(view="hHh Lpr lff").b-30
             :style=`{
               position: 'absolute', top: 0, zIndex: 300,
             }`).fit
-            template(v-slot:actions)
+            //- template(v-slot:actions)
               q-btn(
                 v-if="true"
                 @click="fragmentCreateBtn()"
@@ -55,6 +57,8 @@ q-layout(view="hHh Lpr lff").b-30
               :composition="itemCopy"
               :player="player"
               )
+        //- div(v-if="['fragments', 'nodes'].includes(viewId)").col.full-width.bg-red
+          div(v-if="viewId === 'fragments'").row.full-width.items-start.content-start
         div(
           v-if="viewId === 'fragment'"
           :style=`{height: 'auto'}`).row.full-width
@@ -65,14 +69,23 @@ q-layout(view="hHh Lpr lff").b-30
             :player="player")
           .row.full-width.justify-center
             div(:style=`{maxWidth: '600px'}`).row.full-width.q-pa-md
-              q-btn(flat no-caps color="white" @click="$emit('close')") Close
+              q-btn(
+                @click="$emit('close')"
+                flat no-caps color="white"
+                ) {{ $t('cancel', 'Отмена') }}
               .col
-              q-btn(color="green" no-caps @click="$emit('fragment', fragment)") Save
+              q-btn(
+                @click="$emit('fragment', fragment)"
+                color="green" no-caps
+                ) {{$t('save', 'Сохранить')}}
           //- item here...
         div(
           v-if="viewId !== 'fragment'"
-          :style=`{}`).row.full-width
-          q-tabs(v-model="viewId" active-color="white" dense full-width no-caps).full-width.text-grey-8
+          :style=`{}`).row.full-width.justify-center.q-pa-sm
+          q-btn(
+            @click="fragmentCreateBtn()"
+            flat color="green" icon="add" no-caps) Add fragment here
+          //- q-tabs(v-model="viewId" active-color="white" dense full-width no-caps).full-width.text-grey-8
             q-tab(name="fragments" label="Fragments")
             //- q-tab(name="fragment" label="Fragment")
             q-tab(name="nodes" label="Nodes")
@@ -134,6 +147,10 @@ export default {
     // }
   },
   methods: {
+    explore () {
+      this.$log('expore')
+      this.$router.push(`/content/${this.contentBookmark.oid}`)
+    },
     fragmentCreateBtn () {
       this.$log('fragmentCreateBtn')
       // if content is VIDEO???

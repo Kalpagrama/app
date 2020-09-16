@@ -9,13 +9,14 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
   div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
       template(v-slot=`{items,next}`)
-        .row.full-width.items-start.content-start
+        .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(s,si) in items" :key="s.oid"
             :style=`{
               position: 'relative',
               height: '50px',
-              borderRadius: '10px'
+              borderRadius: '10px',
+              overflow: 'hidden'
             }`
             ).row.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
             div(
@@ -41,7 +42,8 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
               @click="subscriptionClick(s)"
               ).row.fit.items-center.content-center
               q-icon(name="select_all" color="white" size="30px").q-mr-sm
-              span.text-white {{ s.name }}
+              div(:style=`{overflow: 'hidden'}`).col
+                span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ s.name }}
 </template>
 
 <script>

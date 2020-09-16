@@ -16,10 +16,10 @@ q-layout(view="hHh Lpr lff")
                   q-btn(
                     v-if="searchString.length > 0"
                     flat dense color="white" icon="clear" @click="searchString = ''")
-                  q-btn(
+                  //- q-btn(
                     flat dense color="white" icon="tune")
           q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/node/new')")
-        .row.full-width.q-px-md
+        div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
             dense no-caps active-color="white" align="left" switch-indicator

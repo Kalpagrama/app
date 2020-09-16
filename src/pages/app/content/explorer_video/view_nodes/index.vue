@@ -6,9 +6,13 @@ q-page(
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="nodesQuery" @items="nodesChanged")
       template(v-slot=`{items, next}`)
-        list-masonry(:items="items" :class=`{}`).q-pt-md
-          template(v-slot:item=`{item}`)
+          //- list-masonry(:items="items" :class=`{}`).q-pt-md
+          masonry(
+            :cols="$q.screen.width < 600 ? 2 : 4"
+            :gutter="{default: 10}").full-width.q-pt-sm.q-pr-sm
+            //- template(v-slot:item=`{item}`)
             div(
+              v-for="item in items" :key="item.oid"
               :style=`{
                 borderRadius: '10px', overflow: 'hidden',
               }`

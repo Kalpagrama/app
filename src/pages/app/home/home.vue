@@ -2,11 +2,11 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        div(:style=`{height: '50px', borderRadius: '10px',}`
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+        div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
-          q-icon(name="home" color="white" size="30px").q-mr-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_Home_title', 'Домашняя')}}
+          q-icon(name="rss_feed" color="white" size="30px").q-mr-sm
+          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Мои ленты
           .col
   q-page-container
     q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`)

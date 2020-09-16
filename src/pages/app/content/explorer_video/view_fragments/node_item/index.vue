@@ -118,7 +118,7 @@ import compositionBar from 'components/composition/composition_bar/index.vue'
 export default {
   name: 'viewDrafts_draftItem',
   components: {compositionEditor, compositionBar},
-  props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
+  props: ['player', 'contentKalpa', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
     }

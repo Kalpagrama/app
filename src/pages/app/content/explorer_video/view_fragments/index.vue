@@ -10,10 +10,10 @@ q-page(
     kalpa-loader(
       v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
       template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start
+        .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(n,ni) in fragments" :key="n.id"
-            ).row.full-width.items-start.content-start
+            ).row.full-width.items-center.content-center
             q-checkbox(
               v-model="nodesChecked" :val="n.id"
               flat dense dark color="green"
@@ -22,7 +22,6 @@ q-page(
               node-item(
                 :player="player"
                 :contentKalpa="contentKalpa"
-                :contentWorkspace="contentWorkspace"
                 :node="n"
                 :nodeIndex="ni"
                 :isSelected="n.id === nodeSelectedId"
@@ -41,7 +40,6 @@ q-page(
       node-item(
         :player="player"
         :contentKalpa="contentKalpa"
-        :contentWorkspace="contentWorkspace"
         :node="nodeEditing"
         :nodeIndex="ni"
         :isSelected="false"
@@ -74,7 +72,7 @@ import nodeItem from './node_item/index.vue'
 export default {
   name: 'wsContentExplorer_video_viewFragments',
   components: {nodeItem},
-  props: ['contentKalpa', 'contentWorkspace', 'player'],
+  props: ['contentKalpa', 'player'],
   data () {
     return {
       nodeSelectedId: null,

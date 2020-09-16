@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
                   q-btn(
                     v-if="searchString.length > 0"
                     flat dense color="white" icon="clear" @click="searchString = ''")
-                  q-btn(
+                  //- q-btn(
                     flat dense color="white" icon="tune")
           q-btn(
             @click="sphereAdd()"

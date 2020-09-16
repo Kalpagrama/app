@@ -2,18 +2,24 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        .row.full-width.items-center.content-center
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
-          .col
-            div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              .col
-                div().row.full-width
-                  q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
-                  div(:style=`{overflowX: 'auto'}`).col
-                    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактор ядра
-              q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+        div(:style=`{height: '60px',}`
+          ).row.full-width.items-between.content-between
+          q-btn(
+            @click="$emit('out', ['back'])"
+            round flat color="white" icon="keyboard_arrow_left"
+            )
+          .col.full-height.q-px-xs
+            div(
+              :style=`{borderRadius: '10px', overflow: 'hidden',}`
+              ).row.fit.items-center.content-center.justify-between.b-40.q-pa-xs
+              q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
+              div(:style=`{overflowX: 'auto'}`).col
+                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактор ядра
+              q-btn(
+                outline color="grey-7" no-caps
+                @click="nodeDelete()"
+                ) Удалить
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '200px'}`)
       .row.full-width.justify-center
@@ -24,8 +30,8 @@ q-layout(view="hHh Lpr lff")
             edit-essence(:node="node")
           //- wrapper: category, spheres, publish
           .row.full-width.items-start.content-start.q-px-sm
-            .row.full-width.q-px-sm.q-mt-md
-              span.text-bold.text-grey-7 Категория и сферы ядра
+            .row.full-width.q-px-sm.q-mt-md.q-mb-sm
+              span.text-bold.text-grey-7 Выбери категорию и добавь сфер
             ws-sphere-editor(:item="node")
               edit-category(:node="node").q-mr-sm
             .row.full-width.q-py-xl
@@ -58,7 +64,7 @@ export default {
   },
   data () {
     return {
-      maxWidth: 716,
+      maxWidth: 708,
       publishing: false,
     }
   },

@@ -50,7 +50,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
           @click="itemFind()"
           flat color="green" icon="add" no-caps
           :style=`{height: '50px'}`
-          ).full-width Add item
+          ).full-width {{ $t('Add fragment to node', 'Добавить фрагмент') }}
 </template>
 
 <script>

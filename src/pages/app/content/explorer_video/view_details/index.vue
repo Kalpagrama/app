@@ -3,7 +3,7 @@ q-page(
   :style=`{paddingTop: '8px'}`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm
-    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ contentKalpa.name }}
     .row.full-width.q-py-md
       .row.full-width
         q-btn(
@@ -12,6 +12,10 @@ q-page(
           icon="fab fa-youtube"
           color="green" outline no-caps dense).full-width.q-px-sm
           span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+      .row.full-width.q-py-md
+        kalpa-follow(
+          v-if="contentKalpa"
+          :oid="contentKalpa.oid").full-width
     //- spheres
     .row.full-width.q-py-sm
       .row.full-width.q-py-md

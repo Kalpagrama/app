@@ -2,7 +2,7 @@
 q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
   div(:style=`{height: $q.screen.height-105+'px', maxWidth: '800px',}`).row.full-width.items-start.content-start
     .row.full-width.q-py-md
-      .col
+      .col.q-pl-sm
         div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
           q-input(
             v-model="searchString"
@@ -14,7 +14,7 @@ q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
         round flat color="green" icon="add")
     .row.full-width.items-start.contents-start.q-pt-sm
       kalpa-loader(:mangoQuery="queryFeeds" :sliceSize="1000" v-slot=`{items,next}`)
-        .row.full-width.items-start.content-start
+        .row.full-width.items-start.content-start.q-px-sm
           router-link(
             v-for="(f,fi) in items" :key="f.id"
             :to="`/settings/feed/${f.id}`"

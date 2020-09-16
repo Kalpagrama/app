@@ -3,10 +3,11 @@ div.row
   q-btn(
     v-if="subscribed === false"
     @click="follow()"
-    outline color="green" no-caps) {{ $t('follow', 'Подписаться') }}
+    round outline color="green" no-caps icon="rss_feed")
+    //- {{ $t('follow', 'Подписаться') }}
   q-btn(
     v-if="subscribed === true"
-    outline color="green" no-caps) {{ $t('unfollow', 'Отписаться') }}
+    outline color="grey-7" no-caps) {{ $t('unfollow', 'Отписаться') }}
     q-menu(
       ref="userUnfollowMenu"
       dark anchor="bottom right" self="top right")
@@ -44,7 +45,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('oid TO', to)
-        this.subscribed = await UserApi.isSubscribed(to)
+        if (to) this.subscribed = await UserApi.isSubscribed(to)
       }
     }
   },
@@ -52,13 +53,13 @@ export default {
     async follow () {
       this.$log('follow')
       let res = await UserApi.subscribe(this.oid)
-      await this.$wait(300)
+      // await this.$wait(300)
       this.subscribed = await UserApi.isSubscribed(this.oid)
     },
     async unFollow () {
       this.$log('unFollow')
       let res = await UserApi.unSubscribe(this.oid)
-      await this.$wait(300)
+      // await this.$wait(300)
       this.subscribed = await UserApi.isSubscribed(this.oid)
     }
   },

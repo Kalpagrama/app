@@ -2,17 +2,20 @@
 div(
   :style=`{position: 'relative'}`
   ).row.full-width.items-between
+  //- left side with content: node, sphere, content, user
   .col.full-height
     node-lite(
       v-if="item && item.type === 'NODE'"
       :isActive="isActive" :isVisible="isVisible"
       :node="item"
       :marginBottom="80")
-  div(:style=`{width: '80px',}`).row.full-height.justify-center
+  //- right padding for real
+  div(:style=`{width: '70px',}`).row.full-height.justify-center
+  //- right side for line and voting for the joint...
   div(
     :style=`{
       position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
-      width: '80px', minHeight: '100px',
+      width: '70px', minHeight: '100px',
     }`
     ).row.full-height.justify-center
     div(:style=`{height: '100%', width: '1px'}`).bg-green
@@ -51,6 +54,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('isActive TO', to)
+        // TODO: if we got all in meta need? we to load jointFull...
         if (!this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.oid)
         if (to) {
           // if (this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)

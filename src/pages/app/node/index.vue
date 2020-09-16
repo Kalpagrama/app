@@ -11,14 +11,14 @@ q-layout(view="hHh Lpr lff")
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
     node-linker(:node="node" @close="nodeLinkerOpened = false")
-  q-header(reveal)
+  //- q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        .row.full-width.items-start.content-start
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+        div(:style=`{height: '60px',}`).row.full-width.items-between.content-between
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
           .col
             div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
+              ).row.full-width.items-center.content-center.justify-between.b-40
               .col
                 div(@click="headerClick()").row.full-width
                   q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
@@ -30,6 +30,27 @@ q-layout(view="hHh Lpr lff")
                 :style=`{fontSize: '16px'}`
                 ).text-white.text-bold.q-px-sm {{ categoryName }}
               kalpa-follow(v-if="node" :oid="$route.params.oid")
+  q-header(reveal)
+    .row.full-width.justify-center.b-30
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+        div(:style=`{height: '60px',}`
+          ).row.full-width.items-between.content-between
+          q-btn(
+            @click="$router.back()"
+            round flat color="white" icon="keyboard_arrow_left"
+            )
+          .col.full-height.q-px-xs
+            div(
+              :style=`{borderRadius: '10px', overflow: 'hidden',}`
+              ).row.fit.items-center.content-center.justify-between.b-40.q-pa-xs
+              q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
+              div(:style=`{overflowX: 'auto'}`).col
+                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+              kalpa-follow(v-if="node" :oid="$route.params.oid")
+          //- q-btn(
+          //-   round flat color="red-5" icon="delete_outline"
+          //-   @click="nodeDelete()"
+          //-   ).br
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
@@ -44,7 +65,9 @@ q-layout(view="hHh Lpr lff")
               }
             }`)
             template(v-slot:footer)
-              div(:style=`{position: 'relative', paddingRight: '80px',}`).row.full-width.items-start.content-start.q-pt-sm
+              div(
+                :style=`{position: 'relative', paddingRight: '80px',}`
+                ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
                 //- node spheres
                 router-link(
                   v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
@@ -58,12 +81,13 @@ q-layout(view="hHh Lpr lff")
                   :style=`{
                     position: 'absolute', top: '0px',
                     height: 'calc(100% + 200px)',
-                    width: '80px', right: '0px',}`).row.justify-center
+                    width: '70px', right: '0px',}`).row.justify-center
                     div(:style=`{height: '100%', width: '1px'}`).bg-green
           //- node is creating, wait...
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
+          //- view to nodes, explores and shit...
           router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
@@ -73,7 +97,7 @@ q-layout(view="hHh Lpr lff")
           q-btn(
             v-if="!nodeLinkerOpened"
             @click="nodeLinkerOpened = true"
-            no-caps color="green" icon="insert_link")
+            no-caps color="green" icon="insert_link" size="md")
             span.text-white.text-bold.q-ml-sm Связать ядро
 </template>
 
