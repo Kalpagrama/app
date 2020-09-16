@@ -3,6 +3,7 @@ import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import assert from 'assert'
+import { ActionEnum, AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -101,6 +102,33 @@ class ObjectsApi {
       }
     })
     return sphere
+  }
+
+  static async votes (oid) {
+    const f = this.votes
+    logD(f, 'start')
+    const t1 = performance.now()
+    assert(oid, '!oid')
+    let { data: { votes } } = await apollo.clients.api.query({
+      mutation: gql`
+        ${fragments.objectShortFragment}
+        query votes ($oid: OID!) {
+          votes (oid: $oid){
+            user{...objectShortFragment}
+            history{
+              date
+              rate
+              weight
+            }
+          }
+        }
+      `,
+      variables: {
+        oid: oid
+      }
+    })
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+    return votes
   }
 }
 

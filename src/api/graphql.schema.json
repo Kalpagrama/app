@@ -341,7 +341,7 @@
             "deprecationReason": null
           },
           {
-            "name": "categories",
+            "name": "nodeCategories",
             "description": null,
             "args": [],
             "type": {
@@ -356,6 +356,30 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "Category",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "emojiSpheres",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
                     "ofType": null
                   }
                 }
@@ -453,7 +477,7 @@
             "deprecationReason": null
           },
           {
-            "name": "userVotes",
+            "name": "votes",
             "description": "голоса пользователей за сущность(например, ядро)",
             "args": [
               {
@@ -3073,6 +3097,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "wsVersion",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -3118,6 +3156,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "wsVersion",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -3125,7 +3177,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Boolean",
+                "name": "RawJSON",
                 "ofType": null
               }
             },
@@ -9889,6 +9941,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "wsVersion",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },
