@@ -38,7 +38,7 @@ class ListsApi {
          assert(['selector', 'limit'].includes(key), '[selector, sort, limit].includes(key)')
       }
       for (let key in mangoQuery.selector) {
-         assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy', 'name'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
+         assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy', 'name', 'isEmojiJoint'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }

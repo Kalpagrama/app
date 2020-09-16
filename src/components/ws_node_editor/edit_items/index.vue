@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     :style=`{
       position: 'relative',
       borderRadius: '10px', overflow: 'hidden',
-      minHeight: node.items.length === 0 ? '400px' : 'null',
+      minHeight: node.items.length === 0 ? '400px' : '0px',
     }`).row.full-width.items-start.content-start.b-40
     //- empty
     div(
