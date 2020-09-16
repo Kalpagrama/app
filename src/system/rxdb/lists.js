@@ -10,9 +10,8 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
 
 const LstCollectionEnum = Object.freeze({
-  LST_SPHERE_NODES: 'LST_SPHERE_NODES',
-  LST_SPHERE_JOINTS: 'LST_SPHERE_JOINTS',
-  LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
+  LST_SPHERE_NODES: 'LST_SPHERE_NODES', // ядра на контенте например
+  LST_SPHERE_JOINTS: 'LST_SPHERE_JOINTS', // связи ядра с чем-либо
   LST_FEED: 'LST_FEED',
   LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
   LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя

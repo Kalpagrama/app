@@ -195,7 +195,8 @@ class RxDBWrapper {
       this.event.init()
       // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
       let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
-      assert(nodeCategories, '!nodeCategories')
+      let emojiList = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiList', { clientFirst: true })
+      assert(nodeCategories && emojiList, '!nodeCategories && emojiList')
       let fetchCurrentUserFunc = async () => {
          return {
             notEvict: true, // живет вечно
@@ -217,7 +218,7 @@ class RxDBWrapper {
          this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
       }
       // logD(f, 'currentUser= ', currentUser)
-      // let {items: [sphere2]} = await this.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnums: ['CHAR', 'WORD', 'SENTENCE']}})
+      // let {items: [sphere2]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }}})
       // logD('!!! sphere2 = ', sphere2)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
