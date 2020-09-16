@@ -1,5 +1,7 @@
 <template lang="pug">
-insert-emoji(color="grey-8")
+insert-emoji(
+  @click="start()"
+  color="grey-8")
 </template>
 
 <script>
@@ -9,5 +11,10 @@ export default {
   name: 'nodeEmoji',
   components: {insertEmoji},
   props: ['node'],
+  metods: {
+    start () {
+      this.$log('start')
+    }
+  }
 }
 </script>

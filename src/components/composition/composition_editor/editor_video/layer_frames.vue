@@ -209,6 +209,8 @@ export default {
       pointDragging: false,
       pointDraggingIndex: null,
       pointDraggingError: false,
+      // layerForwarding: false,
+      layerForwarding: null
     }
   },
   computed: {
@@ -308,21 +310,22 @@ export default {
     },
     layerForward (pointIndex, goingForward) {
       this.$log('layerForward', pointIndex, goingForward)
+      if (this.player.playing) this.player.pause()
       let t = this.layer.figuresAbsolute[pointIndex].t
-      this.player.events.emit('edit-event', {t: t})
+      this.player.events.emit('edit-start', {t: t})
       if (goingForward) t += 0.1
       else t -= 0.1
       this.$log('t', t)
       this.$set(this.layer.figuresAbsolute[pointIndex], 't', t)
-      if (pointIndex === 0) {
-        this.player.setCurrentTime(t)
-        // this.player.play()
+      this.player.setCurrentTime(t)
+      // waiting for the end of clicking...
+      if (this.layerForwarding) {
+        clearTimeout(this.layerForwarding)
       }
-      if (pointIndex === 1) {
-        this.player.setCurrentTime(t)
-        // this.player.setCurrentTime(t - 1)
-        // this.player.play()
-      }
+      this.layerForwarding = setTimeout(() => {
+        alert('layerForwarding DONE')
+        this.layerForwarding = null
+      }, 500)
       // TODO: at the end of clicking this.framesLayerCenter(), end go to -1 if the end...
     },
     async pointDrag (e, index) {
