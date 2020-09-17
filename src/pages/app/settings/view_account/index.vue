@@ -117,7 +117,7 @@ export default {
         await this.$wait(1000)
         let oid = localStorage.getItem('k_user_oid')
         // set avatar,name,lang
-        if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
+        // if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
         if (this.lang.value && this.lang.value !== this.currentUser.profile.lang) {
           this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang.value)
           this.$i18n.i18next.changeLanguage(this.lang.value).catch(err => this.$logE(err))
