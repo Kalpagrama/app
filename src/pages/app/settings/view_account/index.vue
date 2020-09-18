@@ -14,30 +14,37 @@ q-page.row.full-width.justify-center
       .col-xs-12.col-sm-4.q-pa-sm
         .row.full-width.justify-center
           input(ref="inputAvatar" type="file" @input="avatarChanged" :style=`{display: 'none',}`)
-          div(
-            :style=`{width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden',}`
-            ).row.items-center.content-center.justify-center.b-70
-            q-btn(
-              v-if="!avatarUrl"
-              @click="$refs.inputAvatar.click()"
-              round flat color="white" icon="attach_file" size="lg"
-              :style=`{borderRadius: '50%',}`)
-            img(
-              v-if="avatarUrl"
-              @click="$refs.inputAvatar.click()"
-              :src="$store.getters.currentUser().thumbUrl"
-              :style=`{
-                width: '100%', height: '100%',
-                borderRadius: '50%', overflow: 'hidden',
-              }`)
-      //- name
+          .row.full-width.q-py-sm
+            div(
+              :style=`{width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden',}`
+              ).row.items-center.content-center.justify-center.b-70
+              q-btn(
+                v-if="!avatarUrl"
+                @click="$refs.inputAvatar.click()"
+                round flat color="white" icon="attach_file" size="lg"
+                :style=`{borderRadius: '50%',}`)
+              img(
+                v-if="avatarUrl"
+                @click="$refs.inputAvatar.click()"
+                :src="$store.getters.currentUser().thumbUrl"
+                :style=`{
+                  width: '100%', height: '100%',
+                  borderRadius: '50%', overflow: 'hidden',
+                }`)
+          div(:style=`{order: -1}`).row.full-width.q-px-md
+            span.text-bold.text-white Avatar
+      //- right side
       .col-xs-12.col-sm-8.q-pa-sm
+        .row.full-width.q-px-md
+          span.text-white.text-bold Profile
+        //- name
         .row.full-width.q-pa-xs
           div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
             q-input(
               v-model="name"
               :label="$t('Whats your name?', 'Введите ваше имя')"
               filled dark color="white").full-width
+        //- lang
         .row.full-width.q-pa-xs
           q-select(
             filled
@@ -51,15 +58,18 @@ q-page.row.full-width.justify-center
               borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
               minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
-    //- save
-    .row.full-width.q-pa-sm
-      .col
-      q-btn(
-        @click="save()"
-        color="green" no-caps
-        :disabled="nextDisabled"
-        :loading="loading"
-        ).q-px-md {{$t('save', 'Сохранить')}}
+        //- password
+        email-editor()
+        password-editor()
+        //- save
+        .row.full-width.justify-start.q-pa-md
+          //- .col
+          q-btn(
+            @click="save()"
+            color="green" no-caps size="lg"
+            :disabled="nextDisabled"
+            :loading="loading"
+            ).q-px-md {{$t('save', 'Сохранить')}}
 </template>
 
 <script>
@@ -68,7 +78,9 @@ import { ObjectsApi } from 'src/api/objects'
 export default {
   name: 'pageApp_settigns_viewAccount',
   components: {
-    avatarEditor: () => import('./avatar_editor.vue')
+    avatarEditor: () => import('./avatar_editor.vue'),
+    emailEditor: () => import('./email_editor.vue'),
+    passwordEditor: () => import('./password_editor.vue'),
   },
   data () {
     return {
