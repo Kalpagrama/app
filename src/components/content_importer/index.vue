@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px',}`).row.full-width.b-30
+div(:style=`{borderRadius: '10px',}`).row.full-width.items-start.content-start.b-30
   //- content from url: youtube, image, vimeo, vk, already got contentKalpa
   div(
     v-if="contentKalpa && contentKalpa.type === 'VIDEO' && contentKalpa.contentSource === 'YOUTUBE'"

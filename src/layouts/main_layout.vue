@@ -34,7 +34,7 @@ q-layout(view="lHh lpR lFf")
         :inDrawer="false"
         :style=`{
           borderRadius: '10px',
-          maxWidth: $q.screen.width < 1260 ? '60px' : '300px',
+          maxWidth: $q.screen.width < 1260 ? '60px' : '250px',
         }`).b-40
   //- mobile navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -48,7 +48,7 @@ q-layout(view="lHh lpR lFf")
             round flat dense color="white" icon="keyboard_arrow_left")
           q-btn(
             :to="{name: 'home'}"
-            round flat dense icon="view_week"
+            round flat dense icon="rss_feed"
             :color="$route.name.split('.')[0] === 'home' ? 'green' : 'grey-4'")
           //- router-link(
             v-if="$store.getters.currentUser()"

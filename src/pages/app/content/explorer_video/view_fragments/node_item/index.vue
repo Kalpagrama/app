@@ -92,7 +92,7 @@
           :player="player" :composition="item"
           :contentKalpa="contentKalpa")
       //- node.name/node.sphers editors wrapper
-      div(:style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+      div(:style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.q-pt-sm
         //- node.name editor
         div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100,}`).row.full-width
           q-input(
@@ -100,13 +100,15 @@
             filled dark dense color="grey-6"
             autogrow type="textarea"
             placeholder="В чем суть?"
-            ).full-width
+            :input-style=`{
+              minHeight: '60px',
+            }`).full-width
         ws-sphere-editor(:item="node").q-py-sm
     //- footer: actions close, createNode
     div().row.full-width.q-pa-md
       q-btn(flat color="white" no-caps @click="$emit('edited')").b-40 Close
       .col
-      q-btn(color="green" no-caps @click="nodeCreate()") Create node
+      q-btn(color="green" no-caps @click="nodeCreate()") Publish
 </template>
 
 <script>
@@ -118,7 +120,7 @@ import compositionBar from 'components/composition/composition_bar/index.vue'
 export default {
   name: 'viewDrafts_draftItem',
   components: {compositionEditor, compositionBar},
-  props: ['player', 'contentKalpa', 'contentWorkspace', 'node', 'isSelected', 'isEditing'],
+  props: ['player', 'contentKalpa', 'node', 'isSelected', 'isEditing'],
   data () {
     return {
     }
@@ -140,7 +142,7 @@ export default {
       // delete nodeInput.id
       // let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       // this.node.stage = 'draft'
-      await this.node.updateExtended('stage', 'draft', false)
+      // await this.node.updateExtended('stage', 'draft', false)
       // await this.node.updateExtended('oid', createdNode.oid, false)
       // this.$log('nodeCreate node', node)
       this.$router.push(`/workspace/node/${this.node.id}`).catch(e => e)

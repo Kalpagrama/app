@@ -3,10 +3,12 @@ div.row
   q-btn(
     v-if="subscribed === false"
     @click="follow()"
-    outline color="green" no-caps) {{ $t('follow', 'Подписаться') }}
+    round flat color="green" no-caps icon="rss_feed"
+    :loading="loading")
   q-btn(
     v-if="subscribed === true"
-    outline color="green" no-caps) {{ $t('unfollow', 'Отписаться') }}
+    round flat color="red" no-caps icon="rss_feed"
+    :loading="loading")
     q-menu(
       ref="userUnfollowMenu"
       dark anchor="bottom right" self="top right")
@@ -37,6 +39,7 @@ export default {
   data () {
     return {
       subscribed: false,
+      loading: false,
     }
   },
   watch: {
@@ -44,26 +47,48 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('oid TO', to)
-        this.subscribed = await UserApi.isSubscribed(to)
+        if (to) this.subscribed = await UserApi.isSubscribed(to)
       }
     }
   },
   methods: {
     async follow () {
-      this.$log('follow')
-      let res = await UserApi.subscribe(this.oid)
-      await this.$wait(300)
-      this.subscribed = await UserApi.isSubscribed(this.oid)
+      try {
+        this.$log('follow start')
+        this.loading = true
+        let res = await UserApi.subscribe(this.oid)
+        await this.$wait(500)
+        this.subscribed = await UserApi.isSubscribed(this.oid)
+        this.subscribed = true
+        this.$log('follow done')
+        this.loading = false
+      }
+      catch (e) {
+        this.$log('follow error', e)
+        this.loading = false
+      }
     },
     async unFollow () {
-      this.$log('unFollow')
-      let res = await UserApi.unSubscribe(this.oid)
-      await this.$wait(300)
-      this.subscribed = await UserApi.isSubscribed(this.oid)
+      try {
+        this.$log('unFollow')
+        this.loading = false
+        let res = await UserApi.unSubscribe(this.oid)
+        await this.$wait(500)
+        this.subscribed = await UserApi.isSubscribed(this.oid)
+        this.subscribed = false
+        this.$log('unFollow done')
+        this.loading = false
+      }
+      catch (e) {
+        this.$log('unFollow error', e)
+        this.loading = false
+      }
     }
   },
   mounted () {
     this.$log('mounted')
+    // TODO add event animation to PULSE in menu mobile?
+    // signs that we subscribed to something...
   }
 }
 </script>

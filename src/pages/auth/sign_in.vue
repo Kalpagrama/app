@@ -5,7 +5,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span().text-white {{$t('auth_Sign in with username/password', 'Войти с логином и паролем')}}
+            span().text-white {{$t('auth_Sign in with email/password', 'Войти с почтой и паролем')}}
           //- form
           form().full-width.q-py-md
             //- username
@@ -14,10 +14,10 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="login"
-                :placeholder="$t('auth_Username', 'Логин')"
+                :placeholder="$t('auth_Enter email', 'Введите почту')"
                 autocomplete="username"
                 filled dark color="white" name="username"
-                type="text" required
+                type="email" required
                 :style=`{}`
                 ).full-width
             //- password
@@ -102,7 +102,7 @@ export default {
     async signIn () {
       try {
         this.$log('signIn start')
-        await this.$wait(500)
+        // await this.$wait(500)
         this.check()
         this.loading = true
         // await this.$wait(1000)

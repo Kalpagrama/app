@@ -9,7 +9,7 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
   div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
       template(v-slot=`{items,next}`)
-        .row.full-width.items-start.content-start
+        .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(s,si) in items" :key="s.oid"
             :style=`{

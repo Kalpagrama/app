@@ -2,13 +2,18 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        div(:style=`{borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pa-xs.b-40
-          q-icon(name="blur_on" color="white" size="30px").q-mx-sm
-          span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
-          .col
-          kalpa-follow(:oid="$route.params.oid")
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+        div(:style=`{height: '60px'}`).row.full-width.items-between.content-between
+          q-btn(
+            @click="$router.back()"
+            round flat color="white" icon="keyboard_arrow_left")
+          .col.full-height.q-px-xs
+            div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.fit.items-center.content-center.q-pa-xs.b-40
+              q-icon(name="blur_on" color="white" size="30px").q-mx-sm
+              .col
+                span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
+                //- .col
+              kalpa-follow(:oid="$route.params.oid")
   q-page-container
     q-page(
       :style=`{

@@ -83,9 +83,9 @@ export const wsSchemaItem = {
     layout: {
       type: 'string'
     },
-    stage: {
-      type: 'string'
-    },
+    // stage: {
+    //   type: 'string'
+    // },
     // ---- content ----
     thumbUrl: {
       type: 'string'
@@ -120,7 +120,7 @@ export const wsSchemaItem = {
     },
   },
   required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'stage']
+  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']
 }
 
 export const wsSchemaLocalChanges = {

@@ -49,7 +49,7 @@
   q-btn(
     v-if="!sphereAdding"
     @click="sphereAdding = true"
-    flat color="green" icon="add" no-caps dense
+    flat color="grey-6" icon="add" no-caps dense
     :style=`{height: '40px'}`) {{ $t('wsNodeEditor_sphereAddFirst', 'Добавь сферу') }}
 </template>
 

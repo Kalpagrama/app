@@ -1,31 +1,116 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+div(:style=`{height: $q.screen.height+'px'}`).column.full-width
+  .row.full-width.justify-center.b-30
+    div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-pb-sm
+      div(:style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
+        q-btn(
+          @click="$emit('out', ['back'])"
+          round flat color="white" icon="keyboard_arrow_left")
+        .col.full-height.q-mx-xs
+          div(
+            :style=`{borderRadius: '10px', overflow: 'hidden'}`
+            ).row.fit.items-center.content-center.b-40.q-pa-sm
+            q-icon(name="select_all" color="white" size="30px").q-mx-xs
+            div(:style=`{overflowX: 'auto'}`).col.q-mr-md
+              //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+              span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
+            q-btn(
+              @click="viewId = 'details'"
+              round flat color="white" icon="info")
+            kalpa-follow(
+              v-if="contentKalpa"
+              :oid="contentKalpa.oid")
+        q-btn(
+          @click="contentBookmarkCreate()"
+          round flat color="white" :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
+      div(:style=`{paddingLeft: '66px', paddingRight: '60px',}`).row.full-width.justify-start
+        q-tabs(
+          v-model="viewId"
+          no-caps dense active-color="white" switch-indicator).full-width.text-grey-8
+          q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+  div(
+    :style=`{
+      ...playerStyles(),
+    }`
+    ).row.full-width.items-start.content-start.justify-center
+    div(
+      :style=`{
+        maxWidth: (player && player.isFullscreen) ? '100%' : '800px',
+        height: (player && player.isFullscreen) ? '100%' : 'auto',
+      }`).row.full-width
+      div(
+        v-observe-visibility=`{
+          callback: playerVisibilityCallback,
+          intersection: {
+            threshold: 0.8
+          }
+        }`
+        :style=`{
+          position: 'relative',
+          height: (player && player.isFullscreen) ? '100%' : 'auto',
+        }`).row.full-width.items-start.content-start
+        img(
+          :src="contentKalpa.thumbUrl"
+          draggable="false"
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden',
+            height: (player && player.isFullscreen) ? '100%' : 'auto',
+            opacity: 0.1,
+            objectFit: 'contain',
+          }`
+          ).full-width
+        content-player(
+          :contentKalpa="contentKalpa"
+          @player="playerLoaded"
+          @error="playerErrorHandle"
+          :style=`{
+            position: 'absolute', top: '0px',
+            borderRadius: '10px', overflow: 'hidden',
+            background: (player && player.isFullscreen) ? 'black' : 'none'
+          }`).fit
+          template(v-slot:actions)
+            q-btn(
+              v-if="true"
+              @click="nodeCreateStart()"
+              round push color="green" dense icon="add"
+              :style=`{borderRadius: '50%'}`)
+  .col.full-width.scroll
+    component(
+      v-if="player"
+      :is="`view-${viewId}`"
+      :ref="`view-${viewId}`"
+      :player="player"
+      :contentKalpa="contentKalpa"
+      :contentBookmark="contentBookmark")
+//- q-layout(
+  view="hHh Lpr lff"
+  container :style=`{height: $q.screen.height+50+'px'}`).br
   q-page-container
-    //- header
-    div(:style=`{opacity: 1}`).row.full-width.justify-center.b-30
+    .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        .row.full-width.items-start.content-start
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
-          .col
-            div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              q-icon(name="select_all" color="white" size="30px").q-mx-sm
-              div(:style=`{overflowX: 'auto'}`).col
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+        div(:style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
+          q-btn(
+            @click="$emit('out', ['back'])"
+            round flat color="white" icon="keyboard_arrow_left")
+          .col.full-height.q-mx-xs
+            div(
+              :style=`{borderRadius: '10px', overflow: 'hidden'}`
+              ).row.fit.items-center.content-center.b-40.q-pa-sm
+              q-icon(name="select_all" color="white" size="30px").q-mx-xs
+              div(:style=`{overflowX: 'auto'}`).col.q-mr-md
+                //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
               kalpa-follow(
                 v-if="contentKalpa"
                 :oid="contentKalpa.oid")
-              q-btn(
-                @click="contentBookmarkCreate()"
-                round flat color="green")
-                q-icon(
-                  size="45px"
-                  :name="contentBookmark ? 'bookmark' : 'bookmark_outline'")
-            div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
-              q-tabs(
-                v-model="viewId"
-                no-caps dense active-color="white" switch-indicator).text-grey-8
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+          q-btn(
+            @click="contentBookmarkCreate()"
+            round flat color="white" :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
+        div(:style=`{paddingLeft: '66px', paddingRight: '60px',}`).row.full-width.justify-start
+          q-tabs(
+            v-model="viewId"
+            no-caps dense active-color="white" switch-indicator).full-width.text-grey-8
+            q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
     //- player
     div(
       :style=`{
@@ -79,13 +164,14 @@ q-layout(view="hHh Lpr lff")
       :contentKalpa="contentKalpa"
       :contentWorkspace="contentWorkspace")
     //- view dynamic component
-    component(
-      v-if="player"
-      :is="`view-${viewId}`"
-      :ref="`view-${viewId}`"
-      :player="player"
-      :contentKalpa="contentKalpa"
-      :contentBookmark="contentBookmark")
+    .col.full-width.scroll
+      component(
+        v-if="player"
+        :is="`view-${viewId}`"
+        :ref="`view-${viewId}`"
+        :player="player"
+        :contentKalpa="contentKalpa"
+        :contentBookmark="contentBookmark")
 </template>
 
 <script>
@@ -113,8 +199,8 @@ export default {
     views () {
       return [
         {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
-        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewDrafts_title', 'Фрагменты')},
-        {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
+        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
+        // {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
       ]
     }
   },
@@ -202,13 +288,13 @@ export default {
     },
     handleFocusin (e) {
       if (e.target.type === 'text' || e.target.type === 'textarea') {
-        this.$log('handleFocusin', e)
+        // this.$log('handleFocusin', e)
         this.$store.commit('ui/stateSet', ['isTyping', true])
       }
     },
     handleFocusout (e) {
       if (e.target.type === 'text' || e.target.type === 'textarea') {
-        this.$log('handleFocusout', e)
+        // this.$log('handleFocusout', e)
         this.$store.commit('ui/stateSet', ['isTyping', false])
       }
     },
@@ -255,6 +341,7 @@ export default {
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)
     localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
+    this.$store.commit('ui/stateSet', ['wsContentFragments', null])
   }
 }
 </script>

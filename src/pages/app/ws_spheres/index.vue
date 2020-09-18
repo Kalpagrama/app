@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
                   q-btn(
                     v-if="searchString.length > 0"
                     flat dense color="white" icon="clear" @click="searchString = ''")
-                  q-btn(
+                  //- q-btn(
                     flat dense color="white" icon="tune")
           q-btn(
             @click="sphereAdd()"
@@ -119,22 +119,25 @@ export default {
   },
   methods: {
     async spheresLoaded (spheres) {
-      // this.$log('spheresLoaded', spheres)
+      this.$log('spheresLoaded', spheres.length)
       this.spheresMapped = false
+      // this.$set(this.spheresMap, {})
       this.spheresMap = {}
       await this.$wait(300)
       spheres.map(s => {
+        this.$log('s', s)
         this.$set(this.spheresMap, s.id, {id: s.id, oid: s.oid, name: s.name, items: []})
       })
       this.spheresMapped = true
     },
     itemsLoaded (items) {
-      // this.$log('itemsLoaded', items)
+      this.$log('itemsLoaded', items.length)
       items.map(i => {
         if (i.spheres && i.spheres.length > 0) {
           i.spheres.map(s => {
             if (this.spheresMap[s]) {
-              this.spheresMap[s].items.push(i)
+              // this.spheresMap[s].items.push(i)
+              this.$set(this.spheresMap[s].items, this.spheresMap[s].items.length, i)
             }
           })
         }

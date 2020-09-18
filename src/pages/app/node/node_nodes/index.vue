@@ -28,8 +28,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
-          oidSphere: this.node.sphereFromName.oid
-        }
+          oidSphere: this.node.sphereFromName.oid,
+          jointItemType: {$nin: ['EMOJI']}
+        },
       }
     },
     queryByChains () {

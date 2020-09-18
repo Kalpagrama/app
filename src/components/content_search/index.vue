@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm
+.row.full-width
   q-dialog(
     v-model="contentImporterShow"
     :maximized="$q.screen.width < 800"
@@ -30,7 +30,7 @@
           v-if="searchStringRaw.length > 0"
           @click="searchStringRaw = ''"
           flat dense color="white" icon="clear")
-        q-btn(
+        //- q-btn(
           flat dense color="white" icon="tune")
   content-uploader(@file="contentFile = $event, contentImporterShow = true")
 </template>

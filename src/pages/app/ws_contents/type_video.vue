@@ -12,7 +12,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
-          :gutter="{default: 10}").full-width
+          :gutter="{default: 10}").full-width.q-pr-sm
           div(
             v-for="(i,ii) in items" :key="i.id"
             :style=`{

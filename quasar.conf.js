@@ -87,7 +87,7 @@ module.exports = function (ctx) {
         BUILD_VERSION: JSON.stringify(require('./package.json').version)
       },
       scopeHoisting: true,
-      vueRouterMode: 'history',
+      vueRouterMode: ctx.mode.bex ? 'hash' : 'history',
       vueCompiler: true,
       distDir: 'dist',
       // gzip: true,

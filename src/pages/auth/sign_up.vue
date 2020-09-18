@@ -5,7 +5,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span().text-white Sign up with username/password
+            span().text-white Sign up with email/password
           //- form
           form().full-width.q-py-md
             //- username
@@ -14,9 +14,9 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="login"
-                placeholder="Username"
+                placeholder="Email"
                 filled dark color="white" name="username"
-                type="text" required
+                type="email" required
                 :style=`{}`
                 ).full-width
             //- password
@@ -116,7 +116,7 @@ export default {
     async signUp () {
       try {
         this.$log('signUp start')
-        await this.$wait(500)
+        // await this.$wait(500)
         this.check()
         this.loading = true
         let {userExist, userId, needInvite, needConfirm, loginType} = await AuthApi.userIdentify(this.login)

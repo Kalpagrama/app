@@ -332,8 +332,8 @@ const routes = [
          }
          logD('try systemLogin...')
          await systemLogin() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
-         assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
-         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal)) return next('/auth') // если маршрут требует повышения - переходим на форму входа
+        //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
+         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) return next('/auth') // если маршрут требует повышения - переходим на форму входа
          else return next()
       }
    }

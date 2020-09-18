@@ -70,6 +70,8 @@
       @click="compositionRefresh()"
       round flat dense color="white" icon="refresh"
       :style=`{transform: 'scale(-1, 1)'}`)
+    .col
+      slot(name="actions")
   //- debug
   div(v-if="showDebug" :style=`{fontSize: '10px'}`).row.full-width.bg-green
     small.text-white layersPlayed {{layersPlayed}}
@@ -262,8 +264,12 @@ export default {
       this.$log('playerBarClickHandle')
       this.compositionStop()
     },
-    playerEditHandle () {
+    playerEditStartHandle () {
       this.compositionStop()
+    },
+    playerEditEndHandle () {
+      this.$log('playerEditEndHandle')
+      this.compositionPlaying = true
     }
   },
   mounted () {
@@ -272,13 +278,15 @@ export default {
     // JSON.parse(JSON.stringify(this.composition))
     // this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
     this.player.events.on('bar-click', this.playerBarClickHandle)
-    this.player.events.on('edit-event', this.playerEditHandle)
+    this.player.events.on('edit-start', this.playerEditStartHandle)
+    this.player.events.on('edit-end', this.playerEditEndHandle)
     this.compositionPlay()
   },
   beforeDestroy () {
     this.$store.commit('ui/stateSet', ['wsContentFragments', null])
     this.player.events.off('bar-click', this.playerBarClickHandle)
-    this.player.events.off('edit-event', this.playerEditHandle)
+    this.player.events.off('edit-start', this.playerEditStartHandle)
+    this.player.events.off('edit-end', this.playerEditEndHandle)
   }
 }
 </script>

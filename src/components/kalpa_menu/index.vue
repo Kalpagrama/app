@@ -9,15 +9,15 @@
   //- header
   div(
     :style=`{borderRadius: '10px',}`
-    ).row.full-width.items-center.content-center.b-40.q-pt-md
+    ).row.full-width.items-center.content-center.b-40
     //- home
     router-link(
       :to="$store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/'"
       ).row.full-width
       div(
-        :style=`{height: '60px', width: '60px'}`
+        :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
         ).row.items-center.content-center.justify-center.cursor-pointer
-        kalpa-logo(:width="40" :height="40")
+        kalpa-logo(:width="40" :height="40" :style=`{pointEvents: 'none'}`)
       div(v-if="showRightSide").col
         div(
           @click="$router.push($store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/').catch(e => e)"
@@ -119,8 +119,8 @@ export default {
   data () {
     return {
       pages: [
-        // {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
-        {id: 'home', name: this.$t('pageApp_Home_title', 'Домашняя'), icon: 'home'},
+        {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'rss_feed'},
+        // {id: 'home', name: this.$t('pageApp_Home_title', 'Домашняя'), icon: 'home'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},

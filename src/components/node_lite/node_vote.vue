@@ -14,63 +14,70 @@
     transform: translate3d(2px, 0, 0)
     color: #4caf50 !important
   30%, 50%, 70%
-    transform: translate3d(-4px, 0, 0)
+    transform: translate3d(-2px, 0, 0)
     color: #4caf50 !important
   40%, 60%
-    transform: translate3d(4px, 0, 0)
+    transform: translate3d(2px, 0, 0)
     color: #4caf50 !important
 </style>
 
 <template lang="pug">
-q-btn(
-  @click="voteStart()"
-  flat color="green"
-  :loading="voting").voter
-  span(:style=`{fontSize: '20px'}`).text-bold.text-grey-4.q-mr-sm {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
-  q-icon(name="adjust" size="30px" color='green')
-  q-menu(
-    v-model="voteMenuOpened" no-parent-event separate-close-popup
-    anchor="top right" self="bottom right" :offset="[8,16]"
-    @hide="voting = false, votingAgain = false")
-    //- rate again
-    div(
-      v-if="nodeFull && (!nodeFull.rateUser || votingAgain) && nodeFull.author.oid !== $store.getters.currentUser().oid"
-      :style=`{
-        position: 'relative',
-        maxWidth: '240px',
-        borderRadius: '10px', overflow: 'hidden',
-      }`).row.full-width.b-50
-      q-btn(
-        v-for="a in actions" :key="id"
-        @click="vote(a.value)"
-        flat color="white" no-caps size="lg" align="right"
-        ).full-width.cursor-pointer.voter
-        span(:style=`{fontSize: '18px'}`).text-bold {{ a.label }}
-        q-icon(
-          v-if="voting !== a.value" name="adjust" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
-        q-spinner(
-          v-if="voting === a.value" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
-    //- rate USER
-    div(
-      v-if="!votingAgain && nodeFull && nodeFull.rateUser"
-      :style=`{
-        width: '180px', height: '180px',
-        borderRadius: '10px', overflow: 'hidden',
-      }`).row.items-start.content-start.b-50.q-pa-md
-      .row.full-width.items-center.content-center.justify-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold Your vote:
-        .row.full-width.justify-center
-          span(:style=`{fontSize: '46px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
+div().row.items-center.content-center.voter
+  q-btn(
+    round flat color="white")
+    span(:style=`{fontSize: '24px'}`).text-bold.text-grey-4 {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
+  q-btn(
+    @click="voteStart()"
+    round flat color="green"
+    :loading="voting").voter
+    .row.full-width.justify-center
+      q-icon(name="keyboard_arrow_up" size="20px" color='grey-8')
+    .row.full-width.justify-center
+      q-icon(name="adjust" size="30px" color='green')
+    .row.full-width.justify-center
+      q-icon(name="keyboard_arrow_down" size="20px" color='grey-8')
+    q-menu(
+      v-model="voteMenuOpened" no-parent-event separate-close-popup
+      anchor="top right" self="bottom right" :offset="[0,16]"
+      @hide="voting = false, votingAgain = false")
+      div(:style=`{width: '300px', height: '300px',}`).row
+        //- rate again
         div(
-          v-if="$store.getters.currentUser().oid !== nodeFull.author.oid"
-          ).row.full-width.justify-center.q-py-sm
+          v-if="nodeFull && (!nodeFull.rateUser || votingAgain) && nodeFull.author.oid !== $store.getters.currentUser().oid"
+          :style=`{
+            position: 'relative',
+            borderRadius: '10px', overflow: 'hidden',
+          }`).row.fit.b-50
           q-btn(
-            @click="votingAgain = true, $wait(300).then(() => (voteMenuOpened = true))"
-            round flat color="green" icon="refresh" size="lg")
-      //- .row.full-width
-        div(v-for="v in 4" :key="v").row.full-width.items-center.content-center.q-py-xs
-          div(:style=`{width: '24px', height: '24px', borderRadius: '50%'}`).row.b-60.q-mr-sm
-          small.text-white some user vote
+            v-for="a in actions" :key="id"
+            @click="vote(a.value)"
+            flat color="white" no-caps size="lg" align="right"
+            ).full-width.cursor-pointer
+            span(:style=`{fontSize: '18px'}`).text-bold {{ a.label }}
+            q-icon(
+              v-if="voting !== a.value" name="adjust" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
+            q-spinner(
+              v-if="voting === a.value" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
+        //- rate USER
+        div(
+          v-if="!votingAgain && nodeFull && nodeFull.rateUser"
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden',
+          }`).row.fit.items-start.content-start.b-50.q-pa-md
+          .row.full-width.items-center.content-center.justify-center
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Your vote:
+            .row.full-width.justify-center
+              span(:style=`{fontSize: '46px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
+            div(
+              v-if="$store.getters.currentUser().oid !== nodeFull.author.oid"
+              ).row.full-width.justify-center.q-py-sm
+              q-btn(
+                @click="votingAgain = true, $wait(300).then(() => (voteMenuOpened = true))"
+                round flat color="green" icon="refresh" size="lg")
+        //- .row.full-width
+          div(v-for="v in 4" :key="v").row.full-width.items-center.content-center.q-py-xs
+            div(:style=`{width: '24px', height: '24px', borderRadius: '50%'}`).row.b-60.q-mr-sm
+            small.text-white some user vote
 </template>
 
 <script>
