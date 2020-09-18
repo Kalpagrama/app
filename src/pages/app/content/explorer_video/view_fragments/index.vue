@@ -23,11 +23,12 @@ q-page(
       //- q-btn(flat dense no-caps color="white").q-mr-sm Kalpa
     //- SELCTING
     kalpa-loader(
-      v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
-      template(v-slot=`{items, next}`)
+      v-if="nodeEditing === null" :mangoQuery="queryNodes" :sliceSize="1000" @items="nodesWorkspaceLoaded" v-slot=`{items, next}`)
+    kalpa-loader(
+      v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesKalpaLoaded" v-slot=`{items, next}`)
         .row.full-width.items-start.content-start.q-px-sm.q-pt-lg
           div(
-            v-for="(n,ni) in fragments" :key="n.id"
+            v-for="(n,ni) in nodes" :key="n.id"
             ).row.full-width.items-start.content-start.q-mb-xl
             q-checkbox(
               v-model="nodesChecked" :val="n.id"
@@ -118,10 +119,28 @@ export default {
       nodeSelectedId: null,
       nodeEditing: null,
       nodesChecked: [],
-      fragments: []
+      fragments: [],
+      nodesWorkspace: [],
+      nodesKalpa: []
     }
   },
   computed: {
+    nodes () {
+      // return [...this.nodesWorkspace, ...this.nodesKalpa].sort((nA, nB) => {
+      //   return nA.items[0].layers[0].figuresAbsolute[0].t
+      // })
+      return [...this.nodesWorkspace, ...this.nodesKalpa]
+    },
+    queryNodes () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidAuthor: {$eq: this.$store.getters.currentUser().oid},
+          oidSphere: this.contentKalpa.oid,
+          sortStrategy: 'AGE',
+        }
+      }
+    },
     queryDrafts () {
       let res = {
         selector: {
@@ -260,29 +279,36 @@ export default {
     nodesCheckedGroup () {
       this.$log('nodesCheckedGroup')
     },
-    nodesChanged (nodes) {
+    nodesWorkspaceLoaded (nodes) {
+      this.$log('nodesWorkspaceLoaded', nodes)
+      this.nodesWorkspace = nodes.map(n => {
+        return {id: n.oid, ...n.meta}
+      })
+    },
+    nodesKalpaLoaded (nodes) {
       this.$log('nodesChanged', nodes)
-      let fragments = nodes.reduce((acc, node) => {
-        acc.push(node)
-        // if (node.stage === 'fragment') {
-        //   acc.push(node)
-        // }
-        // else {
-        //   node.items.map(i => {
-        //     if (i.layers[0].contentOid === this.contentKalpa.oid) {
-        //       let fragmentInput = JSON.parse(JSON.stringify(node))
-        //       fragmentInput.id = i.id
-        //       fragmentInput.items = [JSON.parse(JSON.stringify(i))]
-        //       acc.push(fragmentInput)
-        //     }
-        //   })
-        // }
-        return acc
-      }, [])
-      this.$log('fragments', fragments)
-      this.fragments = fragments
-      if (this.nodeSelectedId || this.nodeEditing) return
-      this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
+      this.nodesKalpa = nodes
+      // let fragments = nodes.reduce((acc, node) => {
+      //   acc.push(node)
+      //   // if (node.stage === 'fragment') {
+      //   //   acc.push(node)
+      //   // }
+      //   // else {
+      //   //   node.items.map(i => {
+      //   //     if (i.layers[0].contentOid === this.contentKalpa.oid) {
+      //   //       let fragmentInput = JSON.parse(JSON.stringify(node))
+      //   //       fragmentInput.id = i.id
+      //   //       fragmentInput.items = [JSON.parse(JSON.stringify(i))]
+      //   //       acc.push(fragmentInput)
+      //   //     }
+      //   //   })
+      //   // }
+      //   return acc
+      // }, [])
+      // this.$log('fragments', fragments)
+      // this.fragments = fragments
+      // if (this.nodeSelectedId || this.nodeEditing) return
+      // this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
     }
   },
   beforeDestroy () {

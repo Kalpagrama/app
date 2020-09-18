@@ -14,7 +14,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
             div(:style=`{overflowX: 'auto'}`).col.q-mr-md
               //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
               span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
-            q-btn(
+            //- q-btn(
               @click="viewId = 'details'"
               round flat color="white" icon="info")
             kalpa-follow(
@@ -199,8 +199,8 @@ export default {
     views () {
       return [
         {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
-        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
-        // {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
+        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewNodesMine_title', 'Мои ядра')},
+        {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodesKalpa_title', 'Чужие')},
       ]
     }
   },

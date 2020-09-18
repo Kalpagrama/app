@@ -69,6 +69,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidAuthor: {$ne: this.$store.getters.currentUser().oid},
           oidSphere: this.contentKalpa.oid
         }
       }
