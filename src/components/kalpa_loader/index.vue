@@ -86,7 +86,7 @@ export default {
       mangoQuery = mangoQuery || {selector: {}}
       try {
         let findRes = await this.$rxdb.find(mangoQuery)
-        this.$log('this.$rxdb.find  items =  ', findRes)
+        // this.$log('this.$rxdb.find  items =  ', findRes)
         let { items, count, totalCount, nextPageToken } = findRes
         this.items = items
         this.itemsSliced = items.slice(0, this.sliceSize)

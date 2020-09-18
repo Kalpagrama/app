@@ -46,6 +46,7 @@ q-layout(view="hHh Lpr lff")
           :gutter="{default: 10}").full-width
           div(
             v-for="(s,si) in spheresMap" :key="s.id"
+            v-if="sphereFilter(s)"
             ).row.full-width.justify-start.q-mb-sm
             div(
               @click="sphereClick(s,si)"
@@ -93,6 +94,7 @@ export default {
       searchString: '',
       spheresMap: {},
       spheresMapped: false,
+      itemsMapped: false,
     }
   },
   computed: {
@@ -118,20 +120,33 @@ export default {
     }
   },
   methods: {
+    sphereFilter (sphere) {
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        return nameRegExp.test(sphere.name)
+      }
+      else return true
+    },
     async spheresLoaded (spheres) {
       this.$log('spheresLoaded', spheres.length)
-      this.spheresMapped = false
+      if (this.spheresMapped) return
+      this.spheresMapped = true
+      // this.spheresLoadedDone = true
+      // if (this.sp)
+      // this.spheresMapped = false
       // this.$set(this.spheresMap, {})
-      this.spheresMap = {}
-      await this.$wait(300)
+      // this.spheresMap = {}
+      // await this.$wait(300)
       spheres.map(s => {
-        this.$log('s', s)
+        // this.$log('s', s)
         this.$set(this.spheresMap, s.id, {id: s.id, oid: s.oid, name: s.name, items: []})
       })
-      this.spheresMapped = true
+      // this.spheresMapped = true
     },
     itemsLoaded (items) {
       this.$log('itemsLoaded', items.length)
+      if (this.itemsMapped) return
+      this.itemsMapped = true
       items.map(i => {
         if (i.spheres && i.spheres.length > 0) {
           i.spheres.map(s => {
