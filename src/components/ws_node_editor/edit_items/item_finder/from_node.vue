@@ -56,7 +56,7 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
                 ).full-width
                 div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
                   img(
-                    :src="nodeBookmark.thumbOid" draggable="false"
+                    :src="nodeBookmark.thumbUrl" draggable="false"
                     :style=`{
                       objectFit: 'cover',
                       borderRadius: '10px', overflow: 'hidden',
@@ -135,7 +135,7 @@ export default {
         return {
           id: `${Date.now()}-${itemIndex}`,
           outputType: item.outputType,
-          thumbUrl: _node.thumbOid,
+          thumbUrl: _node.thumbUrl,
           operation: { items: null, operations: null, type: 'CONCAT'},
           layers: item.layers.map((layer, layerIndex) => {
             return {

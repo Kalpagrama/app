@@ -14,7 +14,7 @@
       }`
       ).row.full-width.items-center.content-center.sphere-item.b-40
       img(
-        :src="content.thumbOid"
+        :src="content.thumbUrl"
         :style=`{
           width: '40px', height: '40px',
           borderRadius: '10px', overflow: 'hidden',

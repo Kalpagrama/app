@@ -87,22 +87,22 @@ class ObjectsApi {
     return objectChange
   }
 
-  static async getSphere (name) {
-    logD('getSphere start')
-    let {data: {sphere}} = await apollo.clients.api.query({
-      query: gql`
-        query getSphere ($name: String!) {
-          sphere (name: $name) {
-            oid
-          }
-        }
-      `,
-      variables: {
-        name
-      }
-    })
-    return sphere
-  }
+  // static async getSphere (name) {
+  //   logD('getSphere start')
+  //   let {data: {sphere}} = await apollo.clients.api.query({
+  //     query: gql`
+  //       query getSphere ($name: String!) {
+  //         sphere (name: $name) {
+  //           oid
+  //         }
+  //       }
+  //     `,
+  //     variables: {
+  //       name
+  //     }
+  //   })
+  //   return sphere
+  // }
 
   static async votes (oid) {
     const f = this.votes
@@ -110,7 +110,7 @@ class ObjectsApi {
     const t1 = performance.now()
     assert(oid, '!oid')
     let { data: { votes } } = await apollo.clients.api.query({
-      mutation: gql`
+      query: gql`
         ${fragments.objectShortFragment}
         query votes ($oid: OID!) {
           votes (oid: $oid){

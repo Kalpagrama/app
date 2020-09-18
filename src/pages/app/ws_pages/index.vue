@@ -54,7 +54,7 @@ export default {
         category: 'FUN',
         layout: 'PIP',
         wsItemType: 'WS_NODE',
-        thumbOid: '',
+        thumbUrl: '',
         stage: 'page',
       },
       searchString: ''

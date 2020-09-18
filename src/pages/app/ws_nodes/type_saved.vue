@@ -32,7 +32,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                 ).full-width
                 div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
                   img(
-                    :src="nodeBookmark.thumbOid" draggable="false"
+                    :src="nodeBookmark.thumbUrl" draggable="false"
                     :style=`{
                       objectFit: 'cover',
                       borderRadius: '10px', overflow: 'hidden',
@@ -140,7 +140,7 @@ export default {
         name: nodeFull.name,
         layout: nodeFull.layout,
         category: nodeFull.category,
-        thumbOid: nodeFull.meta.items[0].thumbUrl,
+        thumbUrl: nodeFull.meta.items[0].thumbUrl,
         items: nodeFull.meta.items.map((item, itemIndex) => {
           return {
             id: `${Date.now()}-${itemIndex}`,

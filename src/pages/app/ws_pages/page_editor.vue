@@ -94,7 +94,7 @@ export default {
         category: 'FUN',
         layout: 'PIP',
         wsItemType: 'WS_NODE',
-        thumbOid: '',
+        thumbUrl: '',
         stage: 'page-item',
       }
       let {id} = await this.$rxdb.set(RxCollectionEnum.WS_NODE, itemInput)
