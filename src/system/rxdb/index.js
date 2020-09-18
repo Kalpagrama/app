@@ -1,4 +1,5 @@
 import assert from 'assert'
+import Vue from 'vue'
 import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
@@ -16,6 +17,9 @@ import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
+import { AppVisibility } from 'quasar'
+import debounce from 'lodash/debounce'
+import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -96,16 +100,19 @@ function makeId (rxCollectionEnum, rawId) {
 
 class RxDBWrapper {
    constructor () {
-      this.isLeader_ = false
+      this.instanceId = Date.now().toString() // должен быть обязательно строкой
       this.mutex = new Mutex()
       this.store = null // vuex
       this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
-      addRxPlugin(RxDBLeaderElectionPlugin)
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
-      this.isLeader = () => this.isLeader_
+      // addRxPlugin(RxDBLeaderElectionPlugin)
+      // this.isLeader_ = false
+      this.isLeader = async () => {
+         assert(false, 'нельзя вызывать до вызова this.create()')
+      }
    }
 
    onRxDocDelete (id) {
@@ -125,9 +132,14 @@ class RxDBWrapper {
          logD(f, 'skip.')
          return
       }
-      await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
-      let dump = await this.db.dump()
-      await this.db.importDump(dump)
+      try {
+         let dump = await this.db.dump()
+         await this.db.importDump(dump)
+         await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
+      } catch (err){
+         logE('cant purgeDb', err)
+         throw err
+      }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
@@ -138,7 +150,6 @@ class RxDBWrapper {
       assert(!this.created, 'this.created')
       try {
          this.store = store
-         // console.time('createRxDatabase')
          this.db = await createRxDatabase({
             name: 'rxdb',
             adapter: 'idb', // <- storage-adapter
@@ -146,43 +157,74 @@ class RxDBWrapper {
             eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             pouchSettings: { revs_limit: 1 }
          })
-         // console.timeEnd('createRxDatabase')
-         // console.time('await this.db.collection')
          await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-         // console.timeEnd('await this.db.collection')
-         // console.time('purgeDb')
-         await this.purgeDb() // очистит бд от старых данных
-         // console.timeEnd('purgeDb')
+         if ((await this.get(RxCollectionEnum.META, 'createRxdbInProgress')) === 'true') { // какая то вкладка первой начала инициилизировать rxdb. даем ей на это время
+            logD(f, 'какая то вкладка первой начала инициилизировать rxdb. даем ей на это время')
+            await wait(5000)
+         } else {
+            await this.purgeDb() // очистит бд от старых данных
+         }
+         await this.set(RxCollectionEnum.META, { id: 'initInProgress', valueString: 'true' })
+         // leader detection
+         {
+            this.setLeader = async () => {
+               logD('change leader to ', this.instanceId)
+               await this.set(RxCollectionEnum.META, {
+                  id: 'currentLeaderInstanceId',
+                  valueString: this.instanceId
+               })
+            }
+            this.isLeader = async () => {
+               let currentLeaderInstanceId = await this.get(RxCollectionEnum.META, 'currentLeaderInstanceId')
+               if (!currentLeaderInstanceId) {
+                  await this.setLeader()
+                  currentLeaderInstanceId = this.instanceId
+               }
+               return currentLeaderInstanceId === this.instanceId
+            }
+            // отслеживание открыта ли вкладка
+            let thiz = this
+            this.vm = new Vue({
+               data: {
+                  appVisibility: AppVisibility
+               },
+               watch: {
+                  appVisibility: {
+                     deep: true,
+                     immediate: true,
+                     async handler (to, from) {
+                        assert(to, '!to!')
+                        // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
+                        if (to && to.appVisible && !(await thiz.isLeader())) await thiz.setLeader()
+                     }
+                  }
+               }
+            })
+         }
          this.reactiveItemDbMemCache.reset()
-         this.db.waitForLeadership().then(() => {
-            logD(f, 'RXDB::LEADER!!!!')
-            this.isLeader_ = true
-         })
          this.workspace = new Workspace(this.db)
          this.cache = new Cache(this.db)
          this.objects = new Objects(this.cache)
          this.lists = new Lists(this.cache)
          this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
-         // console.time('workspace.create')
          await this.workspace.create()
-         // console.timeEnd('workspace.create')
-         // console.time('this.cache.create()')
          await this.cache.create()
-         // console.timeEnd('this.cache.create()')
          this.created = true
       } catch (err) {
          if (recursive) throw err
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) {
-            await this.db.remove()
-         }// предпочтительно, тк removeRxDatabase иногда глючит
+            await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
+         }
          else {
             await removeRxDatabase('rxdb', 'idb')
          }
          await this.init(store, true)
+      } finally {
+         await this.set(RxCollectionEnum.META, { id: 'createRxdbInProgress', valueString: 'false' })
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
    }
 
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской)
@@ -363,7 +405,15 @@ class RxDBWrapper {
          }
       }
       if (!reactiveItem) {
-         let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc, servicesApollo, params })
+         let rxDoc = await this.getRxDoc(id, {
+            fetchFunc,
+            clientFirst,
+            priority,
+            force,
+            onFetchFunc,
+            servicesApollo,
+            params
+         })
          if (!rxDoc) return null
          reactiveItem = getReactive(rxDoc)
          this.reactiveItemDbMemCache.set(id, reactiveItem)
@@ -387,7 +437,7 @@ class RxDBWrapper {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
+         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data)) // valueString не должен быть null! (cм getReactive(rxDoc).getData())
          rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)

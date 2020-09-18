@@ -30,6 +30,24 @@ async function initServices (store) {
    initOfflineEvents(store)
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
+
+   // подписываемся на добавление localStorage (Событие не работает на вкладке, которая вносит изменения)
+   window.addEventListener('storage', async function (event) {
+      // logD('storage event:', event)
+      if (event.key.in('k_dummy_user', 'k_user_oid')) {
+         logD('storage auth event:', event)
+         if (event.newValue){
+            await wait(2000) // даем время инициатору первым перейти и инициализировать rxdb
+            await router.replace('/home')
+            await wait(2000) // даем время инициатору первым перейти и инициализировать rxdb
+            await window.location.reload()
+         } else {
+            await wait(2000) // даем время инициатору первым перейти и очистить rxdb
+            await router.replace('/auth')
+            // await window.location.reload()
+         }
+      }
+   })
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
 }
 
@@ -125,7 +143,7 @@ async function systemReset (resetLocalStorage = false) {
    if (lastResetDate) {
       lastResetDate = parseInt(lastResetDate)
       if (currDate - lastResetDate < 1000 * 8) {
-         logW('too often systemLogin. SLEEP for 5 sec!!!')
+         logW('too often systemLogin. SLEEP for 10 sec!!!')
          await wait(1000 * 10) // защита от частого срабатывания
       }
    }
@@ -173,10 +191,9 @@ async function systemLogin () {
          }
       }
       if (!store.getters.currentUser()) { // не удалось залогиниться
-         await systemReset(true)
          logD('GO LOGIN')
-         await router.push('/auth')
-         window.location.reload()
+         resetLocalStorageData()
+         await router.replace('/auth')
          return
       }
    } catch (err) {

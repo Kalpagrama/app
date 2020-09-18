@@ -18,6 +18,8 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+// const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
+// logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
    constructor (ms) {
       assert(ms >= synchroTimeDefault, 'bad ms')
@@ -96,7 +98,7 @@ class Workspace {
       // обработка события измения мастерской пользователем (запоминает измененные элементы)
       let onWsChangedByUser = async (id, operation) => {
          const f = onWsChangedByUser
-         if (this.ignoreWsChanges || !rxdb.isLeader()) return
+         if (this.ignoreWsChanges || !(await rxdb.isLeader())) return
          assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
          await this.db.ws_changes.atomicUpsert({ id, operation })
          // logD(f, `complete. ${id}`)
@@ -173,7 +175,7 @@ class Workspace {
                      logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
                      await this.lock()
                      logD(f, 'locked')
-                     if (rxdb.isLeader()) await this.synchronize()
+                     if (await rxdb.isLeader()) await this.synchronize()
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
@@ -220,7 +222,7 @@ class Workspace {
       const f = this.synchronize
       logD(f, 'start')
       const t1 = performance.now()
-      assert(rxdb.isLeader(), '!isLeader')
+      assert(await rxdb.isLeader(), '!isLeader')
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
@@ -289,7 +291,7 @@ class Workspace {
          assert(item, '!item')
          logD(f, `start ${item.id} rev:${item.rev}`)
          const t1 = performance.now()
-         assert(rxdb.isLeader(), '!this.isLeader')
+         assert(await rxdb.isLeader(), '!this.isLeader')
          assert(this.created, '!this.created')
          assert(item && item.id, '!item')
          assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
@@ -348,7 +350,7 @@ class Workspace {
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
-      assert(rxdb.isLeader(), 'rxdb.isLeader()')
+      assert(await rxdb.isLeader(), 'rxdb.isLeader()')
       const f = this.processEvent
       logD(f, 'start')
       const t1 = performance.now()
@@ -356,7 +358,7 @@ class Workspace {
          await this.lock()
          logD(f, 'locked')
          this.ignoreWsChanges = true
-         if (!rxdb.isLeader()) return
+         if (!(await rxdb.isLeader())) return
          logD(f, 'try apply event')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')

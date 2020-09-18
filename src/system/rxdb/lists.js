@@ -79,7 +79,7 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(rxdb.isLeader(), 'rxdb.isLeader()')
+    assert(await rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     const t1 = performance.now()

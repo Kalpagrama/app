@@ -129,7 +129,7 @@ export default {
         this.loading = false
         this.$q.notify({type: 'positive', position: 'top', message: 'Welcome!'})
         await this.$router.replace('/')
-        window.location.reload() // иначе не обновляется юзер (при входе без логина - фейковый юзер)
+        // window.location.reload() // TODO раскомментировать! иначе не обновляется юзер (при входе без логина - фейковый юзер)
       }
       catch (e) {
         this.$log('signUp error', e)

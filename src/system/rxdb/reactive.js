@@ -206,6 +206,7 @@ class ReactiveListHolder {
          if (rxQuery.reactiveListHolderMaster) {
             await rxQuery.reactiveListHolderMaster.mutex.lock()
             this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
+            assert(this.reactiveList, '!this.reactiveList!')
          } else {
             this.mutex = new Mutex()
             await this.mutex.lock()
@@ -230,7 +231,7 @@ class ReactiveListHolder {
             this.mutex.release()
          }
       }
-
+      assert(this.reactiveList, '!this.reactiveList!2')
       return this.reactiveList
    }
 

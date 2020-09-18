@@ -12,7 +12,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_CACHE)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_CACHE)
 
 const debounceIntervalDumpLru = 1000 * 8 // сохраняем весь LRU в idb с дебаунсом 8 сек
-const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию)
+const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию час)
 const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 50 МБ после тестирования
 if (defaultCacheSize < 20 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
 
@@ -107,7 +107,7 @@ class Cache {
 
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
-        if (!rxdb.isLeader()) return
+        if (!(await rxdb.isLeader())) return
         logD(f, 'start', 'debouncedDumpLru')
         const t1 = performance.now()
         let lruDump = this.cacheLru.dump()

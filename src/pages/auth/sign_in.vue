@@ -86,7 +86,7 @@ export default {
             // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
           }
           await AuthApi.userAuthenticate('', '8888')
-          await this.$router.push('/home')
+          await this.$router.replace('/')
           // if userExist and !needInvite... this.userAuthenticate()
           // this.$router.replace('/auth')
         }
@@ -115,7 +115,7 @@ export default {
         this.loading = false
         this.$q.notify({type: 'positive', position: 'top', message: 'Welcome!'})
         await this.$router.replace('/')
-        window.location.reload() // иначе не обновляется юзер (при входе без логина - фейковый юзер)
+        // window.location.reload() // TODO раскомментировать! иначе не обновляется юзер (при входе без логина - фейковый юзер)
       }
       catch (e) {
         this.$log('signIn error', e)

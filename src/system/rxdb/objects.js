@@ -271,11 +271,11 @@ class Objects {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(rxdb.isLeader(), 'rxdb.isLeader()')
+    assert(await rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
-    logD(f, 'start', rxdb.isLeader())
+    logD(f, 'start', await rxdb.isLeader())
     const t1 = performance.now()
-    if (!rxdb.isLeader()) return
+    if (!(await rxdb.isLeader())) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
         await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)

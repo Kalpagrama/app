@@ -33,9 +33,9 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start', rxdb.isLeader())
+      logD(f, 'start', (await rxdb.isLeader()))
       const t1 = performance.now()
-      if (!rxdb.isLeader()) return
+      if (!(await rxdb.isLeader())) return
 
       // добавляем эвент на ленту
       let rxDocsFeed = await this.cache.find({
