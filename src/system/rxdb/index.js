@@ -104,7 +104,7 @@ class RxDBWrapper {
       addRxPlugin(RxDBLeaderElectionPlugin)
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
-      if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
+      // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
       this.isLeader = () => this.isLeader_
    }
 
