@@ -70,6 +70,8 @@
       @click="compositionRefresh()"
       round flat dense color="white" icon="refresh"
       :style=`{transform: 'scale(-1, 1)'}`)
+    .col
+      slot(name="actions")
   //- debug
   div(v-if="showDebug" :style=`{fontSize: '10px'}`).row.full-width.bg-green
     small.text-white layersPlayed {{layersPlayed}}

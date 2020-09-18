@@ -2,34 +2,55 @@
 q-page(
   :style=`{
     marginTop: nodeEditing ? '-10px' : '0px',
-    paddingTop: nodeEditing ? '0px' : '8px',
+    paddingTop: nodeEditing ? '0px' : '0px',
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
     div(
       v-if="nodeEditing === null"
-      ).row.full-width.q-px-md
+      ).row.full-width.q-px-lg.q-py-xs
       q-tabs(
         v-model="viewId"
         dense active-color="white" no-caps switch-indicator
         ).full-width.text-grey-7
         q-tab(name="mine" label="Mine")
         q-tab(name="kalpa" label="Kalpa")
-        //- q-btn(flat dense color="white" no-caps) Mine
-        //- q-btn(flat dense color="white" no-caps) Kalpa
+      //- q-btn(flat dense no-caps color="white"
+        :class=`{
+          'bg-green': viewId === 'mine',
+          'b-40': viewId !== 'mine',
+        }`).b-40.q-mr-sm.q-px-sm Mine
+      //- q-btn(flat dense no-caps color="white").q-mr-sm Kalpa
     //- SELCTING
     kalpa-loader(
       v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
       template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start.q-px-sm
+        .row.full-width.items-start.content-start.q-px-sm.q-pt-lg
           div(
             v-for="(n,ni) in fragments" :key="n.id"
-            ).row.full-width.items-center.content-center
+            ).row.full-width.items-start.content-start.q-mb-xl
             q-checkbox(
               v-model="nodesChecked" :val="n.id"
               flat dense dark color="green"
-              :style=`{opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-ma-sm
+              :style=`{
+                marginTop: '10px',
+                opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-mx-sm
             .col
+              node-list(
+                :player="player"
+                :contentKalpa="contentKalpa"
+                :node="n"
+                :nodeIndex="ni"
+                :isSelected="n.id === nodeSelectedId"
+                :isEditing="false"
+                @select="nodeEditing = null, nodeSelectedId = n.id"
+                @edit="nodeSelectedId = null, nodeEditing = n")
+            //- span {{ n }}
+            //- q-checkbox(
+              v-model="nodesChecked" :val="n.id"
+              flat dense dark color="green"
+              :style=`{opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-ma-sm
+            //- .col
               node-item(
                 :player="player"
                 :contentKalpa="contentKalpa"
@@ -72,17 +93,24 @@ q-page(
           q-btn(flat color="white" no-caps @click="nodesChecked = []") Close
           q-btn(flat color="red" no-caps @click="nodesCheckedDelete()") Delete
           .col
-          q-btn(color="green" no-caps @click="nodesCheckedCreateNode()") Create node
+          q-btn(
+            v-if="nodesChecked.length === 1"
+            color="green" no-caps @click="nodesCheckedCreateNode()") Publish
+          q-btn(
+            v-if="nodesChecked.length > 1"
+            color="green" no-caps @click="nodesCheckedCreateNode()") Group & Publish
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
+
 import nodeItem from './node_item/index.vue'
+import nodeList from './node_list/index.vue'
 
 export default {
   name: 'wsContentExplorer_video_viewFragments',
-  components: {nodeItem},
+  components: {nodeItem, nodeList},
   props: ['contentKalpa', 'player'],
   data () {
     return {
@@ -99,7 +127,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
           contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          stage: {$in: ['fragment', 'draft', 'saved', 'published']},
+          // stage: {$in: ['fragment', 'draft', 'saved', 'published']},
         },
         sort: [{updatedAt: 'desc'}],
       }
@@ -127,7 +155,7 @@ export default {
         spheres: [],
         category: 'FUN',
         layout: 'PIP',
-        stage: 'fragment',
+        // stage: 'fragment',
         wsItemType: 'WS_NODE',
         thumbUrl: this.contentKalpa.thumbUrl,
         items: [
@@ -145,29 +173,6 @@ export default {
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeCreate node', node)
       return node
-    },
-    nodeMoreStart (node) {
-      this.$log('nodeMoreStart', node)
-      this.$q.bottomSheet({
-        dark: true,
-        title: node.name,
-        persistent: false,
-        seamless: false,
-        grid: false,
-        style: {
-          borderRadius: '10px',
-          overflow: 'hidden',
-          paddingBottom: '50px',
-          marginLeft: '10px',
-          marginRight: '10px',
-          marginBottom: '50px',
-          background: 'rgb(60,60,60)',
-        },
-        actions: [
-          {id: 'share', label: 'Share'},
-          {id: 'create-node', label: 'Create node'},
-        ]
-      })
     },
     async nodeDelete (node) {
       this.$log('nodeDelete', node)
@@ -188,7 +193,7 @@ export default {
         name: '',
         category: 'FUN',
         layout: 'PIP',
-        stage: 'draft',
+        // stage: 'draft',
         wsItemType: 'WS_NODE',
         thumbUrl: '',
         spheres: [],
@@ -198,6 +203,7 @@ export default {
       await Promise.all(
         this.nodesChecked.map(async (nodeId) => {
           let {items: [node]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_NODE, id: nodeId } })
+          this.$log('node', node)
           // if we got node
           if (node) {
             // add names to spheres
@@ -244,28 +250,33 @@ export default {
           }
         })
       )
+      this.$log('nodeInput', nodeInput)
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
       this.nodesChecked.map(id => {
         this.$rxdb.remove(id)
       })
     },
+    nodesCheckedGroup () {
+      this.$log('nodesCheckedGroup')
+    },
     nodesChanged (nodes) {
       this.$log('nodesChanged', nodes)
       let fragments = nodes.reduce((acc, node) => {
-        if (node.stage === 'fragment') {
-          acc.push(node)
-        }
-        else {
-          node.items.map(i => {
-            if (i.layers[0].contentOid === this.contentKalpa.oid) {
-              let fragmentInput = JSON.parse(JSON.stringify(node))
-              fragmentInput.id = i.id
-              fragmentInput.items = [JSON.parse(JSON.stringify(i))]
-              acc.push(fragmentInput)
-            }
-          })
-        }
+        acc.push(node)
+        // if (node.stage === 'fragment') {
+        //   acc.push(node)
+        // }
+        // else {
+        //   node.items.map(i => {
+        //     if (i.layers[0].contentOid === this.contentKalpa.oid) {
+        //       let fragmentInput = JSON.parse(JSON.stringify(node))
+        //       fragmentInput.id = i.id
+        //       fragmentInput.items = [JSON.parse(JSON.stringify(i))]
+        //       acc.push(fragmentInput)
+        //     }
+        //   })
+        // }
         return acc
       }, [])
       this.$log('fragments', fragments)

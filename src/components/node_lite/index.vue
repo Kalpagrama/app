@@ -65,7 +65,7 @@ div(
           node-vote(:node="node" :nodeFull="nodeFull")
   div(v-if="showEssence").row.full-width.items-center.content-center
     node-share(:node="node").q-ml-sm
-    node-emoji(:node="node")
+    node-emoji(v-if="node" :node="node" :nodeFull="nodeFull" :isActive="isActive" :isVisible="isVisible")
     .col
     node-vote(:node="node" :nodeFull="nodeFull")
   //- footer

@@ -7,9 +7,16 @@
 </style>
 
 <template lang="pug">
-insert-emoji(
-  @click.native="start()"
-  color="grey-8")
+.row
+  insert-emoji(
+    @click.native="start()"
+    color="grey-8")
+  kalpa-loader(:mangoQuery="queryEmojis" :sliceSize="1000" v-slot=`{items,next}`)
+    .row
+      span(
+        v-for="(i,ii) in items" :key="i.oid"
+        :style=`{fontSize: '20px',}`
+        ) {{ i.leftItem.oid === node.oid ? i.rightItem.name : i.leftItem.name }}
 </template>
 
 <script>
@@ -21,7 +28,7 @@ import insertEmoji from 'components/kalpa_icons/insert_emoji.vue'
 export default {
   name: 'nodeEmoji',
   components: {insertEmoji},
-  props: ['node'],
+  props: ['node', 'nodeFull'],
   data () {
     return {
       emojiSpheres: []
@@ -35,7 +42,16 @@ export default {
           id: e.oid,
         }
       })
-    }
+    },
+    queryEmojis () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          oidSphere: this.node.sphereFromName.oid,
+          jointItemType: {$in: ['EMOJI']}
+        },
+      }
+    },
   },
   methods: {
     async start () {

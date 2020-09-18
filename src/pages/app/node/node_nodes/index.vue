@@ -29,7 +29,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
           oidSphere: this.node.sphereFromName.oid,
-          // isEmojiJoint: true
+          jointItemType: {$nin: ['EMOJI']}
         },
       }
     },

@@ -12,7 +12,7 @@ q-page(
           icon="fab fa-youtube"
           color="green" outline no-caps dense).full-width.q-px-sm
           span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
-      .row.full-width.q-py-md
+      //- .row.full-width.q-py-md
         kalpa-follow(
           v-if="contentKalpa"
           :oid="contentKalpa.oid").full-width

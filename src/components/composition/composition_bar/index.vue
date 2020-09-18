@@ -5,8 +5,9 @@ component(
   :contentKalpa="contentKalpa"
   :player="player"
   :actionsPosition="actionsPosition"
-  :barStyles="barStyles"
-  )
+  :barStyles="barStyles")
+  template(v-slot:actions)
+    slot(name="actions")
 </template>
 
 <script>

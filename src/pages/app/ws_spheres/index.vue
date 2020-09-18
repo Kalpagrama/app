@@ -121,10 +121,11 @@ export default {
     async spheresLoaded (spheres) {
       this.$log('spheresLoaded', spheres.length)
       this.spheresMapped = false
-      this.$set(this.spheresMap, {})
-      // this.spheresMap = {}
+      // this.$set(this.spheresMap, {})
+      this.spheresMap = {}
       await this.$wait(300)
       spheres.map(s => {
+        this.$log('s', s)
         this.$set(this.spheresMap, s.id, {id: s.id, oid: s.oid, name: s.name, items: []})
       })
       this.spheresMapped = true
