@@ -6,6 +6,17 @@ q-page(
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
+    div(
+      v-if="nodeEditing === null"
+      ).row.full-width.q-px-md
+      q-tabs(
+        v-model="viewId"
+        dense active-color="white" no-caps switch-indicator
+        ).full-width.text-grey-7
+        q-tab(name="mine" label="Mine")
+        q-tab(name="kalpa" label="Kalpa")
+        //- q-btn(flat dense color="white" no-caps) Mine
+        //- q-btn(flat dense color="white" no-caps) Kalpa
     //- SELCTING
     kalpa-loader(
       v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
@@ -75,6 +86,7 @@ export default {
   props: ['contentKalpa', 'player'],
   data () {
     return {
+      viewId: 'mine',
       nodeSelectedId: null,
       nodeEditing: null,
       nodesChecked: [],

@@ -113,8 +113,8 @@ export default {
     views () {
       return [
         {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
-        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewDrafts_title', 'Фрагменты')},
-        {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
+        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
+        // {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodes_title', 'Ядра')},
       ]
     }
   },

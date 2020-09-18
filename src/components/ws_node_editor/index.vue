@@ -118,7 +118,7 @@ export default {
         // // createdNode.items.map((i, ii) => {
         // //   this.node.items[ii].thumbUrl = i.thumbUrl
         // // })
-        // // await this.$rxdb.remove(this.node.id)
+        // await this.$rxdb.remove(this.node.id)
         this.publishing = false
         this.$q.notify({
           type: 'positive',

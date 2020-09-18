@@ -14,9 +14,9 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="login"
-                placeholder="Username"
+                placeholder="Email"
                 filled dark color="white" name="username"
-                type="text" required
+                type="email" required
                 :style=`{}`
                 ).full-width
             //- password

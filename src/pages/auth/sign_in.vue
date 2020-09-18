@@ -17,7 +17,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 :placeholder="$t('auth_Username', 'Логин')"
                 autocomplete="username"
                 filled dark color="white" name="username"
-                type="text" required
+                type="email" required
                 :style=`{}`
                 ).full-width
             //- password

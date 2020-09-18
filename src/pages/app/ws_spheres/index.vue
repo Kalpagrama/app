@@ -119,9 +119,10 @@ export default {
   },
   methods: {
     async spheresLoaded (spheres) {
-      // this.$log('spheresLoaded', spheres)
+      this.$log('spheresLoaded', spheres.length)
       this.spheresMapped = false
-      this.spheresMap = {}
+      this.$set(this.spheresMap, {})
+      // this.spheresMap = {}
       await this.$wait(300)
       spheres.map(s => {
         this.$set(this.spheresMap, s.id, {id: s.id, oid: s.oid, name: s.name, items: []})
@@ -129,12 +130,13 @@ export default {
       this.spheresMapped = true
     },
     itemsLoaded (items) {
-      // this.$log('itemsLoaded', items)
+      this.$log('itemsLoaded', items.length)
       items.map(i => {
         if (i.spheres && i.spheres.length > 0) {
           i.spheres.map(s => {
             if (this.spheresMap[s]) {
-              this.spheresMap[s].items.push(i)
+              // this.spheresMap[s].items.push(i)
+              this.$set(this.spheresMap[s].items, this.spheresMap[s].items.length, i)
             }
           })
         }
