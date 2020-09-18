@@ -7,16 +7,20 @@
 </style>
 
 <template lang="pug">
-.row
+.row.items-center.content-center
   insert-emoji(
     @click.native="start()"
-    color="grey-8")
+    color="grey-8").q-mr-sm
   kalpa-loader(:mangoQuery="queryEmojis" :sliceSize="1000" v-slot=`{items,next}`)
-    .row
-      span(
+    .row.items-center-content-center
+      q-btn(
         v-for="(i,ii) in items" :key="i.oid"
-        :style=`{fontSize: '20px',}`
-        ) {{ i.leftItem.oid === node.oid ? i.rightItem.name : i.leftItem.name }}
+        round flat dense
+        :style=`{
+          borderRadius: '50%',
+        }`
+        ).b-40.q-mr-sm
+        span(:style=`{fontSize: '20px', marginLeft: '2px'}`) {{ i.meta.leftItem.oid === node.oid ? i.meta.rightItem.name : i.meta.leftItem.name }}
 </template>
 
 <script>
@@ -47,8 +51,8 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
-          oidSphere: this.node.sphereFromName.oid,
-          jointItemType: {$in: ['EMOJI']}
+          oidSphere: this.node.oid,
+          jointItemType: {$in: ['EMOJI']},
         },
       }
     },
