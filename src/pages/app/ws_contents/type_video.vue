@@ -28,7 +28,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
               }`
               ).row.full-width.items-start.content-start.b-40.item
               img(
-                :src="i.thumbOid" draggable="false"
+                :src="i.thumbUrl" draggable="false"
                 :style=`{
                   borderRadius: '10px', overflow: 'hidden',
                 }`

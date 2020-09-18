@@ -148,7 +148,7 @@ export default {
         let contentBookmarkInput = {
           oid: this.contentKalpa.oid,
           name: this.contentKalpa.name,
-          thumbOid: this.contentKalpa.thumbUrl,
+          thumbUrl: this.contentKalpa.thumbUrl,
           type: 'CONTENT',
           contentType: this.contentKalpa.type,
           wsItemType: 'WS_BOOKMARK',

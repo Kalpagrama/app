@@ -134,7 +134,7 @@ export default {
         name: nodeFull.name,
         layout: nodeFull.layout,
         category: nodeFull.category,
-        thumbOid: nodeFull.meta.items[0].thumbUrl,
+        thumbUrl: nodeFull.meta.items[0].thumbUrl,
         items: nodeFull.meta.items.map((item, itemIndex) => {
           return {
             id: `${Date.now()}-${itemIndex}`,

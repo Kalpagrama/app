@@ -58,7 +58,7 @@ export default {
         let bookmarkInput = {
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbOid: contentKalpa.thumbUrl,
+          thumbUrl: contentKalpa.thumbUrl,
           type: 'CONTENT',
           contentType: contentKalpa.type,
           wsItemType: 'WS_BOOKMARK',

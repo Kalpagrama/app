@@ -173,9 +173,10 @@ class NodeApi {
    // общая оценка ядра придет с эвентом
    static async nodeVote (oid, rate) {
       const f = this.nodeVote
-      logD(f, 'start')
+      logD(f, 'start', rate)
       const t1 = performance.now()
       assert(oid, 'oid && rate')
+      if (rate > 1) rate = rate / 100
       assert(AuthApi.hasPermitionForAction(ActionEnum.VOTE))
       let { data: { nodeRate } } = await apollo.clients.api.mutate({
          mutation: gql`

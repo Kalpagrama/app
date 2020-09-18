@@ -87,7 +87,7 @@ export const wsSchemaItem = {
       type: 'string'
     },
     // ---- content ----
-    thumbOid: {
+    thumbUrl: {
       type: 'string'
     },
     layers: {

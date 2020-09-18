@@ -48,7 +48,8 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
    if (isRxDocument(rxDocOrId)) {
       rxDoc = rxDocOrId
    } else {
-      rxDoc = await rxdb.getRxDoc(rxDocOrId)
+      // rxDoc = await rxdb.getRxDoc(rxDocOrId) так нельзя (будет запрашивать отсутствующие)
+      rxDoc = await rxdb.cache.get(rxDocOrId) // берем только те что есть в кэше ( с сервера не запрашиваем)
    }
    if (rxDoc) {
       let reactiveItemHolder = new ReactiveItemHolder(rxDoc)

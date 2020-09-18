@@ -446,7 +446,7 @@ class Workspace {
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
             let wsSynchroDateStr = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate')
             let wsSynchroDate = wsSynchroDateStr ? new Date(wsSynchroDateStr) : new Date(0)
-            if ((new Date()) - wsSynchroDate > synchroTimeDefault){
+            if ((new Date()) - wsSynchroDate > synchroTimeDefault) {
                this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
             }
          }

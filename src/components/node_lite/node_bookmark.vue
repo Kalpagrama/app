@@ -73,7 +73,7 @@ export default {
         let nodeBookmarkInput = {
           oid: this.node.oid,
           name: this.node.name,
-          thumbOid: this.node.meta.items[0].thumbUrl,
+          thumbUrl: this.node.meta.items[0].thumbUrl,
           type: 'NODE',
           wsItemType: 'WS_BOOKMARK',
           spheres: []

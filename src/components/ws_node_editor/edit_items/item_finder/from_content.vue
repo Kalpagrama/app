@@ -54,7 +54,7 @@ export default {
         let bookmarkInput = {
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbOid: contentKalpa.thumbUrl,
+          thumbUrl: contentKalpa.thumbUrl,
           type: 'CONTENT',
           contentType: contentKalpa.type,
           wsItemType: 'WS_BOOKMARK',
@@ -71,7 +71,7 @@ export default {
       if (contentBookmark.contentType === 'IMAGE') {
         itemInput = {
           id: Date.now().toString(),
-          thumbUrl: contentBookmark.thumbOid,
+          thumbUrl: contentBookmark.thumbUrl,
           outputType: contentBookmark.contentType,
           layers: [
             {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: null, points: []}]},
@@ -82,7 +82,7 @@ export default {
       else if (contentBookmark.contentType === 'VIDEO') {
         itemInput = {
           id: Date.now().toString(),
-          thumbUrl: contentBookmark.thumbOid,
+          thumbUrl: contentBookmark.thumbUrl,
           outputType: contentBookmark.contentType,
           layers: [
             {id: Date.now().toString(), contentOid: contentBookmark.oid, figuresAbsolute: [{t: 0, points: []}, {t: 10, points: []}]},

@@ -59,7 +59,7 @@ q-layout(
             :style=`{maxWidth: '50%'}`)
           ws-node-item(
             v-if="item.wsItemType === 'WS_BOOKMARK' && item.type === 'NODE'"
-            :node="{oid: item.oid, name: item.name, items: [{thumbUrl: item.thumbOid}]}"
+            :node="{oid: item.oid, name: item.name, items: [{thumbUrl: item.thumbUrl}]}"
             :style=`{maxWidth: '50%'}`)
           ws-node-item(
             v-if="!item.wsItemType && item.type === 'NODE'"

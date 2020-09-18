@@ -119,7 +119,7 @@ export default {
         layout: 'PIP',
         stage: 'fragment',
         wsItemType: 'WS_NODE',
-        thumbOid: this.contentKalpa.thumbUrl,
+        thumbUrl: this.contentKalpa.thumbUrl,
         items: [
           {
             id: Date.now().toString(),
@@ -180,7 +180,7 @@ export default {
         layout: 'PIP',
         stage: 'draft',
         wsItemType: 'WS_NODE',
-        thumbOid: '',
+        thumbUrl: '',
         spheres: [],
         items: []
       }

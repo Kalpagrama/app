@@ -63,14 +63,14 @@ q-layout(view="hHh Lpr lff")
               div(v-if="s.items.length > 0").row.full-width.q-pa-sm
                 div(
                   v-for="(i,ii) in s.items" :key="i.id"
-                  v-if="ii < 5 && i.thumbOid"
+                  v-if="ii < 5 && i.thumbUrl"
                   :style=`{
                     width: '50px', height: '50px',
                     borderRadius: '10px', overflow: 'hidden',
                   }`
                   ).b-50.q-mr-xs.q-mb-xs
                   img(
-                    :src="i.thumbOid" draggable="false"
+                    :src="i.thumbUrl" draggable="false"
                     :style=`{borderRadius: '10px', overflow: 'hidden', objectFit: 'cover'}`
                     ).fit
                 div(

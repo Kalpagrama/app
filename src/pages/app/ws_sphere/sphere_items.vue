@@ -65,7 +65,7 @@ q-page(
                       .col
                       q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(i,ii)")
                 ws-node-item(
-                  v-else-if="i.type === 'NODE'" :node="{name: i.name, oid: i.oid, items: [{thumbUrl: i.thumbOid}]}"
+                  v-else-if="i.type === 'NODE'" :node="{name: i.name, oid: i.oid, items: [{thumbUrl: i.thumbUrl}]}"
                   @clicked="itemSelected = i.id")
                   template(v-slot:footer)
                     div(
