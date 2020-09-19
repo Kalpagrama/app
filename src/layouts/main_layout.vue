@@ -81,7 +81,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-import { systemLogin } from 'src/system/services'
+import { systemInit } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 
 import authLayout from 'layouts/auth_layout.vue'

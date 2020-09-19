@@ -144,7 +144,6 @@ export default {
       this.refreshLoading = true
       await this.$wait(300)
       await systemReset()
-      window.location.reload()
       this.refreshLoading = false
     },
     async logout () {

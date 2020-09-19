@@ -83,9 +83,10 @@ export default {
           this.needInvite = needInvite === 'true' ? true : false
           this.$log('this.needInvite = ', this.needInvite)
           if (this.needInvite){
+            alert('TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!')
             // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
           }
-          await AuthApi.userAuthenticate('', '8888')
+          await AuthApi.userAuthenticate('', '!!!TODO!!!')
           await this.$router.replace('/')
           // if userExist and !needInvite... this.userAuthenticate()
           // this.$router.replace('/auth')
@@ -115,7 +116,6 @@ export default {
         this.loading = false
         this.$q.notify({type: 'positive', position: 'top', message: 'Welcome!'})
         await this.$router.replace('/')
-        // window.location.reload() // TODO раскомментировать! иначе не обновляется юзер (при входе без логина - фейковый юзер)
       }
       catch (e) {
         this.$log('signIn error', e)

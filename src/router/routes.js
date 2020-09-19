@@ -1,6 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
-import { systemLogin } from 'src/system/services'
+import { systemInit } from 'src/system/services'
 import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
@@ -23,12 +23,11 @@ const routes = [
       ],
       beforeEnter: (to, from, next) => {
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
-         // if (AuthApi.isAuthorized()) {
-         //   logD('user is Auth! goto /root')
-         //   return next('/')
-         // }
-         // else return next()
-         next()
+         if (AuthApi.isAuthorized()) {
+           logD('user is Auth! goto /root')
+           return next('/')
+         }
+         else return next()
       }
    },
    {
@@ -330,8 +329,8 @@ const routes = [
             logD('redirect command received!', to.query.originalUrl)
             localStorage.setItem('k_originalUrl', to.query.originalUrl)
          }
-         logD('try systemLogin...')
-         await systemLogin() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
+         logD('try systemInit...')
+         await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
         //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
          if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) return next('/auth') // если маршрут требует повышения - переходим на форму входа
          else return next()

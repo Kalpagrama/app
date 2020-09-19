@@ -19,6 +19,7 @@ import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 let apollo
 
@@ -107,6 +108,7 @@ export default async ({ Vue, store, app }) => {
          { clientFirst: true, force: true, onFetchFunc, servicesApollo })
 
       logD('services', services)
+      assert(services, '!services!!!')
       let linkAuth = services.authUrl
       let linkApi = services.apiUrl
       let linkWs = services.subscriptionsUrl
@@ -195,7 +197,8 @@ export default async ({ Vue, store, app }) => {
       }
       logD('apollo init done')
    } catch (err) {
-      logE(err)
+      logC(err)
+      throw err // без apollo работать не можем!
    }
 }
 

@@ -13,13 +13,15 @@ import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { ObjectsApi } from 'src/api/objects'
-import { schemaKeyValue } from 'src/system/rxdb/schemas'
+import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { AppVisibility } from 'quasar'
 import debounce from 'lodash/debounce'
 import { wait } from 'src/system/utils'
+import { getInstanceId, systemHardReset } from 'src/system/services'
+import { router } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -100,7 +102,8 @@ function makeId (rxCollectionEnum, rawId) {
 
 class RxDBWrapper {
    constructor () {
-      this.instanceId = Date.now().toString() // должен быть обязательно строкой
+      this.created = false
+      this.initialized = false
       this.mutex = new Mutex()
       this.store = null // vuex
       this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
@@ -114,21 +117,16 @@ class RxDBWrapper {
       // leader detection
       {
          this.setLeader = async () => {
-            logD('change leader to ', this.instanceId)
-            localStorage.setItem('k_currentLeaderInstanceId', this.instanceId)
-            // await this.set(RxCollectionEnum.META, {
-            //    id: 'currentLeaderInstanceId',
-            //    valueString: this.instanceId
-            // })
+            logD('change leader to ', getInstanceId())
+            localStorage.setItem('k_currentLeaderInstanceId', getInstanceId())
          }
          this.isLeader = async () => {
             let currentLeaderInstanceId = localStorage.getItem('k_currentLeaderInstanceId')
-            // let currentLeaderInstanceId = await this.get(RxCollectionEnum.META, 'currentLeaderInstanceId')
             if (!currentLeaderInstanceId) {
                await this.setLeader()
-               currentLeaderInstanceId = this.instanceId
+               currentLeaderInstanceId = getInstanceId()
             }
-            return currentLeaderInstanceId === this.instanceId
+            return currentLeaderInstanceId === getInstanceId()
          }
          // отслеживание открыта ли вкладка
          let thiz = this
@@ -149,6 +147,18 @@ class RxDBWrapper {
             }
          })
       }
+
+      window.addEventListener('storage', async (event) => {
+         if (event.key.in('k_rxdb_clear')) { // одна из вкладок выполнила rxdb.clear. Надо обновить коллекции
+            if (this.created && event.newValue) {
+               logD('localStorage k_rxdb_clear event:', event)
+               assert(this.workspace && this.cache, '!this.workspace && this.cache')
+               await this.cache.updateCollections('create')
+               await this.workspace.updateCollections('create')
+               await this.updateCollections('create')
+            }
+         }
+      })
    }
 
    onRxDocDelete (id) {
@@ -162,8 +172,9 @@ class RxDBWrapper {
       const f = this.purgeDb
       logD(f, 'start')
       const t1 = performance.now()
-      let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
-      let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
+      assert(this.db, '!this.db')
+
+      let purgeLastDate = parseInt(localStorage.getItem('k_rxdb_last_purge_date') || '0')
       if (Date.now() - purgeLastDate < purgePeriod) {
          logD(f, 'skip.')
          return
@@ -171,10 +182,28 @@ class RxDBWrapper {
       try {
          let dump = await this.db.dump()
          await this.db.importDump(dump)
-         await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
-      } catch (err){
+      } catch (err) {
          logE('cant purgeDb', err)
          throw err
+      } finally {
+         localStorage.setItem('k_rxdb_last_purge_date', getInstanceId())
+      }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   }
+
+   async updateCollections (operation) {
+      assert(operation.in('create', 'delete', 'recreate'))
+      const f = this.updateCollections
+      logD(f, 'start')
+      const t1 = performance.now()
+      if (operation.in('delete', 'recreate')){
+         if (this.db.meta) await this.db.meta.remove()
+      }
+      if (operation.in('create', 'delete', 'recreate')){
+         if (this.db.meta) await this.db.meta.destroy()
+      }
+      if (operation.in('create', 'recreate')){
+         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
@@ -185,7 +214,16 @@ class RxDBWrapper {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
+         if (localStorage.getItem('k_rxdb_locked_by')) { // какая то вкладка первой начала инициилизировать rxdb. даем ей на это время (но не больще 10 сек)
+            let check = 0
+            while (localStorage.getItem('k_rxdb_locked_by') && check < 10) {
+               logD('wait for other instance' + check, localStorage.getItem('k_rxdb_locked_by'))
+               await wait(1000)
+               check++
+            }
+         } else localStorage.setItem('k_rxdb_locked_by', getInstanceId())
          this.store = store
+         logD('before createRxDatabase')
          this.db = await createRxDatabase({
             name: 'rxdb',
             adapter: 'idb', // <- storage-adapter
@@ -193,14 +231,9 @@ class RxDBWrapper {
             eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             pouchSettings: { revs_limit: 1 }
          })
-         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-         if ((await this.get(RxCollectionEnum.META, 'createRxdbInProgress')) === 'true') { // какая то вкладка первой начала инициилизировать rxdb. даем ей на это время
-            logD(f, 'какая то вкладка первой начала инициилизировать rxdb. даем ей на это время')
-            await wait(5000)
-         } else {
-            await this.purgeDb() // очистит бд от старых данных
-         }
-         await this.set(RxCollectionEnum.META, { id: 'initInProgress', valueString: 'true' })
+         logD('after createRxDatabase')
+         await this.purgeDb() // очистит бд от старых данных
+         await this.updateCollections('create')
          this.reactiveItemDbMemCache.reset()
          this.workspace = new Workspace(this.db)
          this.cache = new Cache(this.db)
@@ -212,19 +245,18 @@ class RxDBWrapper {
          await this.cache.create()
          this.created = true
       } catch (err) {
-         if (recursive) throw err
+         if (recursive) {
+            logE(f, 'ПОВТОРНАЯ ошибка при создания RxDatabase! (пересоздание не помогло)', err)
+            throw err
+         }
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
-         if (this.db) {
-            await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         }
-         else {
-            await removeRxDatabase('rxdb', 'idb')
-         }
-         await this.init(store, true)
+         await this.clear(true)
+         await this.create(store, true)
+         localStorage.removeItem('k_rxdb_locked_by')
       } finally {
-         await this.set(RxCollectionEnum.META, { id: 'createRxdbInProgress', valueString: 'false' })
+         localStorage.removeItem('k_rxdb_locked_by')
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
    }
 
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской)
@@ -232,61 +264,79 @@ class RxDBWrapper {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
-      // assert(userOid)
       assert(this.created, '!created')
-      this.event.init()
-      // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
-      let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
-      let emojiSpheres = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiSpheres', { clientFirst: true })
-      assert(nodeCategories && emojiSpheres, '!nodeCategories && emojiSpheres')
-      let fetchCurrentUserFunc = async () => {
-         return {
-            notEvict: true, // живет вечно
-            item: await ObjectsApi.objectFull(userOid),
-            actualAge: 'day'
-         }
-      }
-      // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
-      let currentUser
-      if (userOid) {
-         currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-            fetchFunc: fetchCurrentUserFunc,
-            force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-            clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
-            onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-               this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
+      assert(!this.initialized, '!!initialized')
+      try {
+         if (localStorage.getItem('k_rxdb_locked_by')) { // какая то вкладка первой начала запрашивать nodeCategories + emojiSpheres . даем ей на это время (но не больще 5 сек)
+            let check = 0
+            while (localStorage.getItem('k_rxdb_locked_by') && check < 5) {
+               logD('wait for other instance', localStorage.getItem('k_rxdb_locked_by'))
+               await wait(1000)
+               check++
             }
-         })
-         this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
+         } else localStorage.setItem('k_rxdb_locked_by', getInstanceId())
+         this.event.init()
+         // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
+         let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
+         let emojiSpheres = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiSpheres', { clientFirst: true })
+         assert(nodeCategories && emojiSpheres, '!nodeCategories && emojiSpheres')
+         let fetchCurrentUserFunc = async () => {
+            return {
+               notEvict: true, // живет вечно
+               item: await ObjectsApi.objectFull(userOid),
+               actualAge: 'day'
+            }
+         }
+         // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
+         let currentUser
+         if (userOid) {
+            currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
+               fetchFunc: fetchCurrentUserFunc,
+               force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+               clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+               onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+                  this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
+               }
+            })
+            this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
+         }
+         this.initialized = true
+         // logD(f, 'currentUser= ', currentUser)
+         // let {items: [sphere2]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }}})
+         // logD('!!! sphere2 = ', sphere2)
+         // let votes = await this.get(RxCollectionEnum.GQL_QUERY, 'votes', {params: {oid: '79994642858295300'}})
+         // logD('VOTES= ', votes)
+      } finally {
+         localStorage.removeItem('k_rxdb_locked_by')
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
       }
-      // logD(f, 'currentUser= ', currentUser)
-      // let {items: [sphere2]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }}})
-      // logD('!!! sphere2 = ', sphere2)
-      // let votes = await this.get(RxCollectionEnum.GQL_QUERY, 'votes', {params: {oid: '79994642858295300'}})
-      // logD('VOTES= ', votes)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async eraseWs () {
-      this.workspace.switchOffSynchro()
-      await this.workspace.clearCollections()
-   }
-
-   async erase (clearCache = true) {
+   // удалит данные в rxdb
+   async clear (clearCache = true) {
+      const f = this.clear
+      logD(f, 'start', this.created, clearCache)
+      const t1 = performance.now()
       try {
          await this.lock()
-         const f = this.deinit
-         logD(f, 'start')
-         const t1 = performance.now()
-         assert(this.created, '!created')
-         this.event.deInit()
-         await this.eraseWs()
-         await this.db.meta.remove()
-         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-         if (clearCache) await this.cache.clearCollections()
+         // this.event.deInit()
+         // this.workspace.switchOffSynchro()
+         if (this.created) {
+            assert(this.event && this.workspace && this.cache, 'this.events && this.workspace && this.cache')
+            if (clearCache) await this.cache.updateCollections('recreate')
+            await this.workspace.updateCollections('recreate')
+            await this.updateCollections('recreate')
+         } else {
+            if (this.cache) await this.cache.updateCollections('delete')
+            if (this.workspace) await this.workspace.updateCollections('delete')
+            await this.updateCollections('delete')
+            if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
+            else await removeRxDatabase('rxdb', 'idb')
+         }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
+         localStorage.setItem('k_rxdb_clear', Date.now().toString())
       }
    }
 
@@ -361,6 +411,7 @@ class RxDBWrapper {
    }
 
    async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
+      assert(this.created, '!created!')
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       let rawId = getRawIdFromId(id)
       let rxDoc
@@ -385,6 +436,7 @@ class RxDBWrapper {
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
    async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
       const f = this.get
+      assert(this.created, '!created!')
       if (rawId) {
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
          assert(!rawId.includes('::'), '')

@@ -6,6 +6,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.SW)
 
 function t (str) {
   return str
@@ -15,7 +16,8 @@ export default async ({ app, store, Vue }) => {
   try {
     await initServices(store)
   } catch (err) {
-    logE('error on system init', err)
+    logC(err)
+    throw err // без initServices работать не можем!
   }
 }
 

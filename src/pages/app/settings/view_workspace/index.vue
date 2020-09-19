@@ -35,8 +35,6 @@ export default {
       this.$log('wsClear start')
       let wsClear = await WorkspaceApi.wsClear()
       this.$log('wsClear done', wsClear)
-      await systemReset()
-      window.location.reload()
     },
     wsExport () {
       this.$log('wsExport')
