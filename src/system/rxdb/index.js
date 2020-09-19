@@ -110,8 +110,44 @@ class RxDBWrapper {
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
       // addRxPlugin(RxDBLeaderElectionPlugin)
       // this.isLeader_ = false
-      this.isLeader = async () => {
-         assert(false, 'нельзя вызывать до вызова this.create()')
+
+      // leader detection
+      {
+         this.setLeader = async () => {
+            logD('change leader to ', this.instanceId)
+            localStorage.setItem('k_currentLeaderInstanceId', this.instanceId)
+            // await this.set(RxCollectionEnum.META, {
+            //    id: 'currentLeaderInstanceId',
+            //    valueString: this.instanceId
+            // })
+         }
+         this.isLeader = async () => {
+            let currentLeaderInstanceId = localStorage.getItem('k_currentLeaderInstanceId')
+            // let currentLeaderInstanceId = await this.get(RxCollectionEnum.META, 'currentLeaderInstanceId')
+            if (!currentLeaderInstanceId) {
+               await this.setLeader()
+               currentLeaderInstanceId = this.instanceId
+            }
+            return currentLeaderInstanceId === this.instanceId
+         }
+         // отслеживание открыта ли вкладка
+         let thiz = this
+         this.vm = new Vue({
+            data: {
+               appVisibility: AppVisibility
+            },
+            watch: {
+               appVisibility: {
+                  deep: true,
+                  immediate: true,
+                  async handler (to, from) {
+                     assert(to, '!to!')
+                     // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
+                     if (to && to.appVisible && !(await thiz.isLeader())) await thiz.setLeader()
+                  }
+               }
+            }
+         })
       }
    }
 
@@ -165,42 +201,6 @@ class RxDBWrapper {
             await this.purgeDb() // очистит бд от старых данных
          }
          await this.set(RxCollectionEnum.META, { id: 'initInProgress', valueString: 'true' })
-         // leader detection
-         {
-            this.setLeader = async () => {
-               logD('change leader to ', this.instanceId)
-               await this.set(RxCollectionEnum.META, {
-                  id: 'currentLeaderInstanceId',
-                  valueString: this.instanceId
-               })
-            }
-            this.isLeader = async () => {
-               let currentLeaderInstanceId = await this.get(RxCollectionEnum.META, 'currentLeaderInstanceId')
-               if (!currentLeaderInstanceId) {
-                  await this.setLeader()
-                  currentLeaderInstanceId = this.instanceId
-               }
-               return currentLeaderInstanceId === this.instanceId
-            }
-            // отслеживание открыта ли вкладка
-            let thiz = this
-            this.vm = new Vue({
-               data: {
-                  appVisibility: AppVisibility
-               },
-               watch: {
-                  appVisibility: {
-                     deep: true,
-                     immediate: true,
-                     async handler (to, from) {
-                        assert(to, '!to!')
-                        // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-                        if (to && to.appVisible && !(await thiz.isLeader())) await thiz.setLeader()
-                     }
-                  }
-               }
-            })
-         }
          this.reactiveItemDbMemCache.reset()
          this.workspace = new Workspace(this.db)
          this.cache = new Cache(this.db)
