@@ -3,7 +3,7 @@ import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, DEFAULT_UNEXECUTED_LIFETME, removeRxDatabase } from 'rxdb'
 // import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -211,13 +211,14 @@ class RxDBWrapper {
       }
    }
 
-   // получит юзера, запустит обработку эвентов и синхронмзацию мастерской)
-   async init ({userOid, dummyUser}) {
+   // получит юзера, запустит обработку эвентов и синхронмзацию мастерской) dummyUser - для входа без регистрации
+   async init ({userOid, dummyUser}) пше {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
       assert(this.created, '!created')
-      // assert(!this.initialized, '!!initialized') можно
+      assert(!this.initialized, '!!initialized')
+      assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
          await globalLock() // иначе все вкладки ломанутся запрашивать nodeCategories emojiSpheres параллельно
          await this.lock()
@@ -226,16 +227,16 @@ class RxDBWrapper {
          let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
          let emojiSpheres = await this.get(RxCollectionEnum.GQL_QUERY, 'emojiSpheres', { clientFirst: true })
          assert(nodeCategories && emojiSpheres, '!nodeCategories && emojiSpheres')
-         let fetchCurrentUserFunc = async () => {
-            return {
-               notEvict: true, // живет вечно
-               item: await ObjectsApi.objectFull(userOid),
-               actualAge: 'day'
-            }
-         }
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
          let currentUser
          if (userOid) {
+            let fetchCurrentUserFunc = async () => {
+               return {
+                  notEvict: true, // живет вечно
+                  item: await ObjectsApi.objectFull(userOid),
+                  actualAge: 'day'
+               }
+            }
             currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
                fetchFunc: fetchCurrentUserFunc,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
@@ -245,13 +246,23 @@ class RxDBWrapper {
                }
             })
             this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
+         } else {
+            assert(dummyUser, '!dummyUser')
+            let fetchCurrentUserFunc = async () => {
+               return {
+                  notEvict: true, // живет вечно
+                  item: dummyUser,
+                  actualAge: 'century' // dummyUser не устаревает
+               }
+            }
+            assert(dummyUser.oid, 'dummyUser.oid')
+            currentUser = await this.get(RxCollectionEnum.OBJ, dummyUser.oid, {
+               fetchFunc: fetchCurrentUserFunc,
+               force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+               clientFirst: false, // обязательно брать из fetchFunc
+            })
          }
          this.initialized = true
-         // logD(f, 'currentUser= ', currentUser)
-         // let {items: [sphere2]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.LST_SEARCH, name: 'Golf', objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }}})
-         // logD('!!! sphere2 = ', sphere2)
-         // let votes = await this.get(RxCollectionEnum.GQL_QUERY, 'votes', {params: {oid: '79994642858295300'}})
-         // logD('VOTES= ', votes)
       } finally {
          this.release()
          globalRelease()
@@ -289,6 +300,7 @@ class RxDBWrapper {
       finally {
          this.release()
          globalRelease()
+         this.initialized = false
          localStorage.setItem('k_rxdb_clear', Date.now().toString())
       }
    }

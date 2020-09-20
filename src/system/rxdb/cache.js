@@ -181,6 +181,9 @@ class Cache {
             case 'year':
                actualAge = 1000 * 60 * 60 * 24 * 360
                break
+            case 'century':
+               actualAge = 1000 * 60 * 60 * 24 * 360
+               break
             case 'prolong': {
                let current = this.cacheLru.get(id)
                if (current) {
