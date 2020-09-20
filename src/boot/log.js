@@ -89,8 +89,8 @@ class Logger {
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      if (highlightColor) msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
+      if (highlightColor) msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+      else msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
     } else if (highlightColor) {
       msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
     }

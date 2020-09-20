@@ -62,14 +62,13 @@ class Cache {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create (recursive = false) {
+   async create () {
       const f = this.create
       logD(f, 'start')
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
          this.mutex = new Mutex()
-         await this.updateCollections('create')
          // используется для контроля места
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
@@ -126,12 +125,8 @@ class Cache {
             }
          }
          this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } catch (err) {
-         if (recursive) throw err
-         logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
-         await this.updateCollections('delete')
-         await this.create(true)
+      } finally {
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
       }
    }
 

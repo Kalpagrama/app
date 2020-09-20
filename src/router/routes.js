@@ -23,7 +23,7 @@ const routes = [
       ],
       beforeEnter: (to, from, next) => {
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
-         if (AuthApi.isAuthorized()) {
+         if (localStorage.getItem('k_user_oid')) {
            logD('user is Auth! goto /root')
            return next('/')
          }

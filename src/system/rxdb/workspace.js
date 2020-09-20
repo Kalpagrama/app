@@ -164,22 +164,25 @@ class Workspace {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create (recursive = false) {
+   async create () {
       const f = this.create
+      const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         await this.updateCollections('create')
          // синхроним изменения в цикле
          this.synchroLoop = async () => {
             const f = this.synchroLoop
+            f.nameExtra = 'synchroLoop'
+            logD(f, 'start')
             this.synchroStarted = true // защита от двойного запуска
             while (true) {
                if (this.reactiveUser && this.synchro) {
+                  const tLoop = performance.now()
                   try {
-                     logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
-                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.clear и др)
+                     logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deinit и др)
                      await this.lock()
-                     logD(f, 'locked')
+                     // logD(f, 'locked')
                      if (isLeader()) await this.synchronize()
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
@@ -187,20 +190,17 @@ class Workspace {
                   } finally {
                      this.release()
                      globalRelease()
-                     logD(f, 'unlocked')
+                     // logD(f, 'unlocked')
+                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }
-                  logD(f, 'next loop complete')
                }
                await this.synchroLoopWaitObj.wait()
             }
          }
          if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          this.created = true
-      } catch (err) {
-         if (recursive) throw err
-         logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
-         await this.updateCollections('delete')
-         await this.create(true)
+      } finally {
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
       }
    }
 

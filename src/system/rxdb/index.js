@@ -108,12 +108,10 @@ class RxDBWrapper {
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
 
       window.addEventListener('storage', async (event) => {
-         if (event.key.in('k_rxdb_clear')) { // одна из вкладок выполнила rxdb.clear. Надо обновить коллекции
+         if (event.key.in('k_rxdb_deinit')) { // одна из вкладок выполнила rxdb.deinit. Надо обновить коллекции
             if (this.created && event.newValue) {
-               logD('localStorage k_rxdb_clear event:', event)
+               logD('localStorage k_rxdb_deinit event:', event)
                assert(this.workspace && this.cache, '!this.workspace && this.cache')
-               await this.cache.updateCollections('create')
-               await this.workspace.updateCollections('create')
                await this.updateCollections('create')
             }
          }
@@ -150,24 +148,7 @@ class RxDBWrapper {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async updateCollections (operation) {
-      assert(operation.in('create', 'delete', 'recreate'))
-      const f = this.updateCollections
-      logD(f, 'start')
-      const t1 = performance.now()
-      if (operation.in('delete', 'recreate')){
-         if (this.db.meta) await this.db.meta.remove()
-      }
-      if (operation.in('create', 'delete', 'recreate')){
-         if (this.db.meta) await this.db.meta.destroy()
-      }
-      if (operation.in('create', 'recreate')){
-         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-      }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
-
-   async create (store, recursive = false) {
+   async create (store) {
       const f = this.create
       logD(f, 'start')
       const t1 = performance.now()
@@ -185,7 +166,7 @@ class RxDBWrapper {
          })
          logD('after createRxDatabase')
          await this.purgeDb() // очистит бд от старых данных
-         await this.updateCollections('create')
+
          this.reactiveItemDbMemCache.reset()
          this.workspace = new Workspace(this.db)
          this.cache = new Cache(this.db)
@@ -193,26 +174,43 @@ class RxDBWrapper {
          this.lists = new Lists(this.cache)
          this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
+         await this.updateCollections('create')
          await this.workspace.create()
          await this.cache.create()
          this.created = true
       } catch (err) {
-         if (recursive) {
-            logE(f, 'ПОВТОРНАЯ ошибка при создания RxDatabase! (пересоздание не помогло)', err)
-            alert('secondary error on create RxDatabase!')
-            throw err
-         }
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
-         await this.clear(true)
-         await this.create(store, true)
+         if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
+         else await removeRxDatabase('rxdb', 'idb')
+         throw err
       } finally {
          globalRelease()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`, this.created)
       }
    }
 
+   async updateCollections (operation, collections = ['workspace', 'cache']) {
+      assert(operation.in('create', 'delete', 'recreate'))
+      const f = this.updateCollections
+      logD(f, 'start')
+      const t1 = performance.now()
+      if (operation.in('delete', 'recreate')) {
+         if (this.db.meta) await this.db.meta.remove()
+      }
+      if (operation.in('create', 'delete', 'recreate')) {
+         if (this.db.meta) await this.db.meta.destroy()
+      }
+      if (operation.in('create', 'recreate')) {
+         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      }
+      for (let collection of collections) {
+         if (this[collection]) await this[collection].updateCollections(operation)
+      }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   }
+
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской) dummyUser - для входа без регистрации
-   async init ({userOid, dummyUser}) пше {
+   async init ({ userOid, dummyUser }) {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
@@ -259,8 +257,12 @@ class RxDBWrapper {
             currentUser = await this.get(RxCollectionEnum.OBJ, dummyUser.oid, {
                fetchFunc: fetchCurrentUserFunc,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-               clientFirst: false, // обязательно брать из fetchFunc
+               clientFirst: false // обязательно брать из fetchFunc
             })
+         }
+         assert(currentUser, '!currentUser!!')
+         this.getCurrentUser = () => {
+            return currentUser
          }
          this.initialized = true
       } finally {
@@ -270,9 +272,9 @@ class RxDBWrapper {
       }
    }
 
-   // удалит данные в rxdb
-   async clear (clearCache = true) {
-      const f = this.clear
+   // удалит данные в rxdb (сообщит об этом другим вкладкам)
+   async deinit (clearCache = true) {
+      const f = this.deinit
       logD(f, 'start', this.created, clearCache, isLeader())
       const t1 = performance.now()
       try {
@@ -282,27 +284,25 @@ class RxDBWrapper {
          // this.workspace.switchOffSynchro()
          if (this.created) {
             assert(this.event && this.workspace && this.cache, 'this.events && this.workspace && this.cache')
-            if (clearCache) await this.cache.updateCollections('recreate')
-            await this.workspace.updateCollections('recreate')
-            await this.updateCollections('recreate')
+            await this.updateCollections('recreate', clearCache ? ['workspace', 'cache'] : ['workspace'])
          } else {
-            if (this.cache) await this.cache.updateCollections('delete')
-            if (this.workspace) await this.workspace.updateCollections('delete')
-            await this.updateCollections('delete')
+            await this.updateCollections('delete', clearCache ? ['workspace', 'cache'] : ['workspace'])
             if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
             else await removeRxDatabase('rxdb', 'idb')
          }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } catch (err){
-         logE(f, 'error on clear rxdb!', err)
-         await systemReset(true, false, false, true) // внимание!!! clearRxdbWs = false, clearRxdbCache = false (иначе рекурсия!)
-      }
-      finally {
+         this.reactiveItemDbMemCache.reset()
+         delete this.getCurrentUser
+      } finally {
          this.release()
          globalRelease()
          this.initialized = false
-         localStorage.setItem('k_rxdb_clear', Date.now().toString())
+         localStorage.setItem('k_rxdb_deinit', Date.now().toString()) // сообщаем другим вкладкам
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
+   }
+
+   isInitialized () {
+      return this.initialized
    }
 
    async lock () {
@@ -316,7 +316,7 @@ class RxDBWrapper {
    async processEvent (event) {
       try {
          if (!isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
-         await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.clear, synchronize ws и др)
+         await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deinit, synchronize ws и др)
          await this.lock()
          assert(this.store, '!this.store')
          await this.event.processEvent(event, this.store)

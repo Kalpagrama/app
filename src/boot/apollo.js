@@ -39,6 +39,7 @@ export default async ({ Vue, store, app }) => {
                err.message = err.code + ':' + err.message
                if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
                   AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+                  window.location.reload()
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)
                }
@@ -48,6 +49,7 @@ export default async ({ Vue, store, app }) => {
             logE('gql network error', networkError)
             if (networkError.message === 'bad auth token!') {
                AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+               window.location.reload()
             }
          }
       })

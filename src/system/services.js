@@ -219,10 +219,17 @@ async function resetLocalStorage () {
 }
 
 // очистить кэши и БД
+// todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
 async function systemReset (clearAuthData = false, clearRxdbWs = true, clearRxdbCache = true, reload = true) {
    const f = systemReset
    const t1 = performance.now()
    logD(f, 'start')
+   // let hardReset = confirm('critical error on startup: ' + JSON.stringify(err) + '\n\nMake hardReset?')
+   // if (hardReset) {
+   //   const { systemHardReset } = require('src/system/services')
+   //   await systemHardReset()
+   //   window.location.reload()
+   // }
    let currDate = Date.now()
    try {
       await globalLock()
@@ -236,12 +243,17 @@ async function systemReset (clearAuthData = false, clearRxdbWs = true, clearRxdb
          }
       }
       if (clearAuthData) await resetLocalStorage()
-      await store.dispatch('setCurrentUser', null) // обнуляем юзера в vuex
       if (clearRxdbWs || clearRxdbCache) {
-         await rxdb.clear(clearRxdbCache)
+         await rxdb.deinit(clearRxdbCache)
       }
       if (process.env.MODE === 'pwa') await pwaReset()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   } catch (err) {
+      let hardReset = confirm('critical error on systemReset: ' + JSON.stringify(err) + '\n\n Make hardReset?')
+      if (hardReset) {
+        await systemHardReset()
+        window.location.reload()
+      }
    } finally {
       globalRelease()
       localStorage.setItem('k_system_reset_date', currDate.toString())
@@ -255,8 +267,8 @@ async function systemInit () {
    const f = systemInit
    logD(f, 'start')
    const t1 = performance.now()
-   if (rxdb.initialized && AuthApi.isAuthorized()) {
-      logD(f, 'skip systemInit', rxdb.initialized, AuthApi.isAuthorized())
+   if (rxdb.isInitialized()) {
+      logD(f, 'skip systemInit')
       return
    } // уже войдено!
    try {
@@ -282,8 +294,7 @@ async function systemInit () {
             await rxdb.init({dummyUser: currentUser})
          }
       }
-      if (rxdb.initialized) {
-         await store.dispatch('setCurrentUser', currentUser)
+      if (rxdb.isInitialized()) {
          await i18next.changeLanguage(currentUser.profile.lang)
          if (localStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
             localStorage.removeItem('k_originalUrl')
@@ -338,7 +349,5 @@ export {
    systemReset,
    shareWith,
    initLocalStorage,
-   systemInit,
-   systemHardReset,
-   resetLocalStorage
+   systemInit
 }

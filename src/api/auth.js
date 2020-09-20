@@ -24,9 +24,6 @@ const ActionEnum = Object.freeze({
 })
 
 class AuthApi {
-   static isAuthorized () {
-      return !!(localStorage.getItem('k_user_oid') || localStorage.getItem('k_dummy_user'))
-   }
 
    static getRole () {
       return localStorage.getItem('k_user_role') || 'GUEST'
@@ -140,7 +137,7 @@ class AuthApi {
       const f = this.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      await resetLocalStorage()
+      await systemReset(true, true, true, false)
       let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
@@ -187,7 +184,7 @@ class AuthApi {
          needInvite = route.query.needInvite
          needConfirm = route.query.needConfirm
          userExist = route.query.userExist
-         await resetLocalStorage()
+         await systemReset(true, true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }
@@ -227,7 +224,7 @@ class AuthApi {
          attempts,
          failReason
       })
-      await rxdb.clear(false) // вошли успешно. На всякий случай удалим мастерскую
+      await rxdb.deinit(false) // вошли успешно. На всякий случай удалим мастерскую
       return { result, role, nextAttemptDate, attempts, failReason }
    }
 
