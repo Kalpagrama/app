@@ -7,6 +7,7 @@ import { EventApi } from 'src/api/event'
 import { getReactive, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
+import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
@@ -33,9 +34,9 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start', (await rxdb.isLeader()))
+      logD(f, 'start', isLeader())
       const t1 = performance.now()
-      if (!(await rxdb.isLeader())) return
+      assert(isLeader(), '!Leader')
 
       // добавляем эвент на ленту
       let rxDocsFeed = await this.cache.find({

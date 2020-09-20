@@ -140,7 +140,7 @@ class AuthApi {
       const f = this.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      resetLocalStorage()
+      await resetLocalStorage()
       let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
@@ -187,7 +187,7 @@ class AuthApi {
          needInvite = route.query.needInvite
          needConfirm = route.query.needConfirm
          userExist = route.query.userExist
-         resetLocalStorage()
+         await resetLocalStorage()
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }

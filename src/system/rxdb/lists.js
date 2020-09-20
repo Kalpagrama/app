@@ -3,6 +3,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
+import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
@@ -79,7 +80,7 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(await rxdb.isLeader(), 'rxdb.isLeader()')
+    assert(isLeader(), 'isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     const t1 = performance.now()

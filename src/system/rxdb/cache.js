@@ -7,6 +7,7 @@ import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
+import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
@@ -106,7 +107,7 @@ class Cache {
          }
          this.debouncedDumpLru = debounce(async () => {
             const f = this.debouncedDumpLru
-            if (!(await rxdb.isLeader())) return
+            if (!isLeader()) return
             logD(f, 'start', 'debouncedDumpLru')
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()

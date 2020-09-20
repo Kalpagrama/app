@@ -1,27 +1,22 @@
 import assert from 'assert'
-import Vue from 'vue'
 import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
+// import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
-import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { ObjectsApi } from 'src/api/objects'
-import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
+import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { AppVisibility } from 'quasar'
-import debounce from 'lodash/debounce'
 import { wait } from 'src/system/utils'
-import { getInstanceId, systemHardReset } from 'src/system/services'
-import { router } from 'src/boot/main'
+import { getInstanceId, globalLock, globalRelease, isLeader, systemReset } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -111,42 +106,6 @@ class RxDBWrapper {
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
-      // addRxPlugin(RxDBLeaderElectionPlugin)
-      // this.isLeader_ = false
-
-      // leader detection
-      {
-         this.setLeader = async () => {
-            logD('change leader to ', getInstanceId())
-            localStorage.setItem('k_currentLeaderInstanceId', getInstanceId())
-         }
-         this.isLeader = async () => {
-            let currentLeaderInstanceId = localStorage.getItem('k_currentLeaderInstanceId')
-            if (!currentLeaderInstanceId) {
-               await this.setLeader()
-               currentLeaderInstanceId = getInstanceId()
-            }
-            return currentLeaderInstanceId === getInstanceId()
-         }
-         // отслеживание открыта ли вкладка
-         let thiz = this
-         this.vm = new Vue({
-            data: {
-               appVisibility: AppVisibility
-            },
-            watch: {
-               appVisibility: {
-                  deep: true,
-                  immediate: true,
-                  async handler (to, from) {
-                     assert(to, '!to!')
-                     // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-                     if (to && to.appVisible && !(await thiz.isLeader())) await thiz.setLeader()
-                  }
-               }
-            }
-         })
-      }
 
       window.addEventListener('storage', async (event) => {
          if (event.key.in('k_rxdb_clear')) { // одна из вкладок выполнила rxdb.clear. Надо обновить коллекции
@@ -214,14 +173,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         if (localStorage.getItem('k_rxdb_locked_by')) { // какая то вкладка первой начала инициилизировать rxdb. даем ей на это время (но не больще 10 сек)
-            let check = 0
-            while (localStorage.getItem('k_rxdb_locked_by') && check < 10) {
-               logD('wait for other instance' + check, localStorage.getItem('k_rxdb_locked_by'))
-               await wait(1000)
-               check++
-            }
-         } else localStorage.setItem('k_rxdb_locked_by', getInstanceId())
+         await globalLock()
          this.store = store
          logD('before createRxDatabase')
          this.db = await createRxDatabase({
@@ -247,34 +199,28 @@ class RxDBWrapper {
       } catch (err) {
          if (recursive) {
             logE(f, 'ПОВТОРНАЯ ошибка при создания RxDatabase! (пересоздание не помогло)', err)
+            alert('secondary error on create RxDatabase!')
             throw err
          }
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          await this.clear(true)
          await this.create(store, true)
-         localStorage.removeItem('k_rxdb_locked_by')
       } finally {
-         localStorage.removeItem('k_rxdb_locked_by')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
+         globalRelease()
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`)
       }
    }
 
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской)
-   async init (userOid) {
+   async init ({userOid, dummyUser}) {
       const f = this.init
       logD(f, 'start')
       const t1 = performance.now()
       assert(this.created, '!created')
-      assert(!this.initialized, '!!initialized')
+      // assert(!this.initialized, '!!initialized') можно
       try {
-         if (localStorage.getItem('k_rxdb_locked_by')) { // какая то вкладка первой начала запрашивать nodeCategories + emojiSpheres . даем ей на это время (но не больще 5 сек)
-            let check = 0
-            while (localStorage.getItem('k_rxdb_locked_by') && check < 5) {
-               logD('wait for other instance', localStorage.getItem('k_rxdb_locked_by'))
-               await wait(1000)
-               check++
-            }
-         } else localStorage.setItem('k_rxdb_locked_by', getInstanceId())
+         await globalLock() // иначе все вкладки ломанутся запрашивать nodeCategories emojiSpheres параллельно
+         await this.lock()
          this.event.init()
          // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
          let nodeCategories = await this.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories', { clientFirst: true })
@@ -307,17 +253,19 @@ class RxDBWrapper {
          // let votes = await this.get(RxCollectionEnum.GQL_QUERY, 'votes', {params: {oid: '79994642858295300'}})
          // logD('VOTES= ', votes)
       } finally {
-         localStorage.removeItem('k_rxdb_locked_by')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${await this.isLeader()}`)
+         this.release()
+         globalRelease()
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`)
       }
    }
 
    // удалит данные в rxdb
    async clear (clearCache = true) {
       const f = this.clear
-      logD(f, 'start', this.created, clearCache)
+      logD(f, 'start', this.created, clearCache, isLeader())
       const t1 = performance.now()
       try {
+         await globalLock()
          await this.lock()
          // this.event.deInit()
          // this.workspace.switchOffSynchro()
@@ -334,8 +282,13 @@ class RxDBWrapper {
             else await removeRxDatabase('rxdb', 'idb')
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } finally {
+      } catch (err){
+         logE(f, 'error on clear rxdb!', err)
+         await systemReset(true, false, false, true) // внимание!!! clearRxdbWs = false, clearRxdbCache = false (иначе рекурсия!)
+      }
+      finally {
          this.release()
+         globalRelease()
          localStorage.setItem('k_rxdb_clear', Date.now().toString())
       }
    }
@@ -350,11 +303,14 @@ class RxDBWrapper {
 
    async processEvent (event) {
       try {
+         if (!isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
+         await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.clear, synchronize ws и др)
          await this.lock()
          assert(this.store, '!this.store')
          await this.event.processEvent(event, this.store)
       } finally {
          this.release()
+         globalRelease()
       }
    }
 

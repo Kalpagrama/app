@@ -6,6 +6,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
 import set from 'lodash/set'
 import { wait } from 'src/system/utils'
+import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -271,11 +272,11 @@ class Objects {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(await rxdb.isLeader(), 'rxdb.isLeader()')
+    assert(isLeader(), 'isLeader()')
     const f = this.processEvent
-    logD(f, 'start', await rxdb.isLeader())
+    logD(f, 'start', isLeader())
     const t1 = performance.now()
-    if (!(await rxdb.isLeader())) return
+    if (!isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
         await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)

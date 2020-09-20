@@ -1,5 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { Notify, Platform } from 'quasar'
+import { AppVisibility, Notify, Platform } from 'quasar'
+import Vue from 'vue'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
@@ -15,10 +16,52 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SYSTEM)
 
 let initialized = false
-let instanceId = Date.now().toString() // дб строкой!
+let setLeader = () => {
+   logD('change leader to ', getInstanceId())
+   localStorage.setItem('k_leader_instance_id', getInstanceId())
+}
+let isLeader = () => {
+   let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
+   if (!currentLeaderInstanceId) {
+      setLeader()
+      currentLeaderInstanceId = getInstanceId()
+   }
+   return currentLeaderInstanceId === getInstanceId()
+}
+
+// синхронизация вкладок (globalLock следит за синхронизацией ws, очисткой rxdb, и др)
+const maxLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
+let globalLock = async (recursive = true) => {
+   const f = globalLock
+   logD(f, 'start')
+   const t1 = performance.now()
+   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
+   assert('dt' in current && 'instanceId' in current)
+   if (!recursive || getInstanceId() !== current.instanceId) {
+      while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxLockTimeFuse) {
+         await wait(100)
+         if (Date.now() % 10 === 0) logD(f, `wait for release. ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
+      }
+   }
+   localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId() }))
+   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+}
+let globalRelease = () => {
+   const f = globalRelease
+   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
+   assert('dt' in current && 'instanceId' in current)
+   if (current.instanceId === getInstanceId()) {
+      localStorage.removeItem('k_global_lock')
+   } else if (current.instanceId) logW(f, `other instance (${current.instanceId}) lock while work is not complete. maybe work is too heavy`) // такое возможно из-за maxLockTimeFuse
+}
+
+const instanceId = sessionStorage.getItem('k_instance_id') ? sessionStorage.getItem('k_instance_id') : (Math.ceil(Math.random() * Date.now())).toString()
+sessionStorage.removeItem('k_instance_id') // контроль дублирования (при удблированиии вкладок дублируется sessionStorage) https://stackoverflow.com/questions/11896160/any-way-to-identify-browser-tab-in-javascript
+window.addEventListener('beforeunload', () => {
+   sessionStorage.setItem('k_instance_id', instanceId)
+})
 
 function getInstanceId () {
-   assert(instanceId && typeof instanceId === 'string', '!instanceId')
    return instanceId
 }
 
@@ -68,6 +111,27 @@ async function initServices (store) {
          }, 1000)
       }
    })
+   // leader detection
+   {
+      // отслеживание открыта ли вкладка
+      this.vm = new Vue({
+         data: {
+            appVisibility: AppVisibility
+         },
+         watch: {
+            appVisibility: {
+               deep: true,
+               immediate: true,
+               async handler (to, from) {
+                  assert(to, '!to!')
+                  // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
+                  if (to && to.appVisible && !isLeader()) setLeader()
+               }
+            }
+         }
+      })
+   }
+
    initialized = true
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
 }
@@ -127,26 +191,31 @@ function initOfflineEvents (store) {
    store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-function initLocalStorage () {
-   if (!localStorage.getItem('k_log_level') || !localStorage.getItem('k_log_filter') || !localStorage.getItem('k_debug')) resetLocalStorage()
+async function initLocalStorage () {
+   if (!localStorage.getItem('k_log_level') || !localStorage.getItem('k_log_filter') || !localStorage.getItem('k_debug')) await resetLocalStorage()
 }
 
-function resetLocalStorage () {
+async function resetLocalStorage () {
    const f = resetLocalStorage
    logD(f, 'start')
-   for (let i = 0; i < localStorage.length; i++) {
-      let key = localStorage.key(i)
-      if (process.env.NODE_ENV === 'development' && (key === 'k_debug' || key === 'k_log_level' || key === 'k_log_filter')) continue
-      if (key === 'k_system_reset_date') continue
-      if (key === 'k_originalUrl') continue
-      if (key.startsWith('k_')) localStorage.removeItem(key)
+   try {
+      await globalLock()
+      for (let i = 0; i < localStorage.length; i++) {
+         let key = localStorage.key(i)
+         if (process.env.NODE_ENV === 'development' && (key === 'k_debug' || key === 'k_log_level' || key === 'k_log_filter')) continue
+         if (key === 'k_system_reset_date') continue
+         if (key === 'k_originalUrl') continue
+         if (key.startsWith('k_')) localStorage.removeItem(key)
+      }
+      if (!localStorage.getItem('k_debug')) localStorage.setItem('k_debug', '0')
+      if (!localStorage.getItem('k_log_level')) {
+         if (process.env.NODE_ENV === 'development') localStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
+         else localStorage.setItem('k_log_level', LogLevelEnum.WARNING)
+      }
+      if (!localStorage.getItem('k_log_filter')) localStorage.setItem('k_log_filter', 'gui')
+   } finally {
+      globalRelease()
    }
-   if (!localStorage.getItem('k_debug')) localStorage.setItem('k_debug', '0')
-   if (!localStorage.getItem('k_log_level')) {
-      if (process.env.NODE_ENV === 'development') localStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
-      else localStorage.setItem('k_log_level', LogLevelEnum.WARNING)
-   }
-   if (!localStorage.getItem('k_log_filter')) localStorage.setItem('k_log_filter', 'gui')
 }
 
 // очистить кэши и БД
@@ -156,22 +225,25 @@ async function systemReset (clearAuthData = false, clearRxdbWs = true, clearRxdb
    logD(f, 'start')
    let currDate = Date.now()
    try {
+      await globalLock()
       let lastResetDate = localStorage.getItem('k_system_reset_date')
       if (lastResetDate) {
          lastResetDate = parseInt(lastResetDate)
-         if (currDate - lastResetDate < 1000 * 10) {
-            let waitTime = Math.max(1000 * 10 - Math.max(currDate - lastResetDate, 0), 0)
+         if (currDate - lastResetDate < 1000 * 8) {
+            let waitTime = Math.max(1000 * 8 - Math.max(currDate - lastResetDate, 0), 0)
             logW(`too often systemReset. SLEEP for ${waitTime / 1000} sec!!!`)
             await wait(waitTime) // защита от частого срабатывания
          }
       }
-      if (clearAuthData) resetLocalStorage()
+      if (clearAuthData) await resetLocalStorage()
       await store.dispatch('setCurrentUser', null) // обнуляем юзера в vuex
-      if (clearRxdbWs || clearRxdbCache) await rxdb.clear(clearRxdbCache)
-      rxdb.initialized = false // нужно для systemInit
+      if (clearRxdbWs || clearRxdbCache) {
+         await rxdb.clear(clearRxdbCache)
+      }
       if (process.env.MODE === 'pwa') await pwaReset()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } finally {
+      globalRelease()
       localStorage.setItem('k_system_reset_date', currDate.toString())
       if (reload) window.location.reload()
    }
@@ -183,12 +255,16 @@ async function systemInit () {
    const f = systemInit
    logD(f, 'start')
    const t1 = performance.now()
-   if (rxdb.initialized) return // уже войдено!
+   if (rxdb.initialized && AuthApi.isAuthorized()) {
+      logD(f, 'skip systemInit', rxdb.initialized, AuthApi.isAuthorized())
+      return
+   } // уже войдено!
    try {
+      await globalLock()
       let userOid = localStorage.getItem('k_user_oid')
       let currentUser
       if (userOid) { // пользователь зарегистрирован
-         await rxdb.init(userOid)
+         await rxdb.init({userOid})
          currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
          assert(currentUser, 'currentUser обязан быть после rxdb.init')
       } else { // пытаемся войти без регистрации
@@ -203,7 +279,7 @@ async function systemInit () {
             currentUser = JSON.parse(localStorage.getItem('k_dummy_user'))
          }
          if (currentUser) {
-            await rxdb.init(null)
+            await rxdb.init({dummyUser: currentUser})
          }
       }
       if (rxdb.initialized) {
@@ -216,7 +292,7 @@ async function systemInit () {
          }
       } else { // не удалось залогиниться
          logD(f, 'GO LOGIN')
-         resetLocalStorage()
+         await resetLocalStorage()
          await router.replace('/auth')
       }
    } catch (err) {
@@ -224,6 +300,7 @@ async function systemInit () {
       await systemReset(true, true, true)
       throw err
    } finally {
+      globalRelease()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }
@@ -253,12 +330,15 @@ async function systemHardReset () {
 }
 
 export {
+   getInstanceId,
+   isLeader,
+   globalLock,
+   globalRelease,
    initServices,
    systemReset,
    shareWith,
    initLocalStorage,
    systemInit,
-   getInstanceId,
    systemHardReset,
    resetLocalStorage
 }

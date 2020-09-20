@@ -199,8 +199,8 @@ function getLogFunc(level, module) {
 export default async ({Vue, store, app}) => {
   try {
     // import { initLocalStorage } from 'src/system/services'
-    require('src/system/services').initLocalStorage()
-    // initLocalStorage()
+    await require('src/system/services').initLocalStorage()
+    // await initLocalStorage()
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName
