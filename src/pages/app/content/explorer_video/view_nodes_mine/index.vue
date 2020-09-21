@@ -1,9 +1,6 @@
 <template lang="pug">
-q-page(
-  :style=`{
-    marginTop: nodeEditing ? '-10px' : '0px',
-    paddingTop: nodeEditing ? '0px' : '0px',
-  }`
+div(
+  :style=`{marginBottom: '100px'}`
   ).row.full-width.items-start.content-start.justify-center
   //- body
   div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
@@ -32,15 +29,16 @@ q-page(
             :isSelected="node.id === nodeSelectedId || node.oid === nodeSelectedId"
             @select="nodeSelectedId = node.id || node.oid"
             @edit="$emit('node', node)")
-        div(:style=`{width: '40px'}`).row.full-height.justify-center
-          q-btn(
-            v-if="nodeSelectedId === node.id || nodeSelectedId === node.oid"
-            @click="nodeSelectedId = null"
-            flat dense round color="grey-6" icon="keyboard_arrow_up")
-          div(
-            v-if="nodeSelectedId === node.id || nodeSelectedId === node.oid"
-            :style=`{paddingTop: '11px'}`).row.full-width.justify-center
-            q-btn(round flat dense icon="edit" color="grey-6" @click="nodeEdit(node)")
+        //- right side
+        div(:style=`{width: '40px'}`).row.full-height.items-start.content-start
+          div(v-if="nodeSelectedId === node.id || nodeSelectedId === node.oid").row.full-width.justify-center
+            q-btn(
+              @click="nodeSelectedId = null"
+              flat dense round color="grey-6" icon="keyboard_arrow_up")
+            div(
+              :style=`{paddingTop: '11px'}`).row.full-width.justify-center
+              q-btn(round flat dense icon="edit" color="grey-6" @click="nodeEdit(node)")
+            slot(name="nodeActionMine" :node="node")
   //- nodes checked menu
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-page-sticky(
@@ -53,12 +51,14 @@ q-page(
           q-btn(flat color="white" no-caps @click="nodesChecked = []") {{$t('cance', 'Отмена')}}
           q-btn(flat color="red" no-caps @click="nodesCheckedDelete()") Delete
           .col
-          q-btn(
-            v-if="nodesChecked.length === 1"
-            color="green" no-caps @click="nodesCheckedCreateNode()") Publish
-          q-btn(
-            v-if="nodesChecked.length > 1"
-            color="green" no-caps @click="nodesCheckedCreateNode()") Group & Publish
+          slot(name="nodeActionMine" :node="null")
+          div(v-if="!$scopedSlots.nodeActionMine").row.full-height.items-center.content-center
+            q-btn(
+              v-if="nodesChecked.length === 1"
+              color="green" no-caps @click="nodesCheckedCreateNode()") Publish
+            q-btn(
+              v-if="nodesChecked.length > 1"
+              color="green" no-caps @click="nodesCheckedCreateNode()") Group & Publish
 </template>
 
 <script>
@@ -131,10 +131,38 @@ export default {
     }
   },
   methods: {
-    nodeEdit (node) {
+    async nodeEdit (node) {
       this.$log('nodeEdit', node)
       if (node.oid) {
         this.$log('COPY AND EDIT', node.oid)
+        let nodeInput = {
+          name: node.name,
+          category: 'FUN',
+          layout: node.layout,
+          wsItemType: 'WS_NODE',
+          thumbUrl: this.contentKalpa.thumbUrl,
+          spheres: [],
+          items: [
+            {
+              id: `${Date.now().toString()}-0`,
+              thumbUrl: node.items[0].thumbUrl,
+              contentOid: node.items[0].contentOid,
+              outputType: node.items[0].outputType,
+              operation: node.items[0].operation,
+              layers: node.items[0].layers.map((layer, layerIndex) => {
+                return {
+                  id: `${Date.now().toString()}-0-layer`,
+                  contentOid: layer.contentOid,
+                  figuresAbsolute: layer.figuresAbsolute,
+                  points: layer.points || []
+                }
+              })
+            }
+          ]
+        }
+        this.$log('nodeInput', nodeInput)
+        let nodeCopied = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+        this.$emit('node', nodeCopied)
       }
       else {
         this.$emit('node', node)
@@ -159,7 +187,6 @@ export default {
         name: '',
         category: 'FUN',
         layout: 'PIP',
-        // stage: 'draft',
         wsItemType: 'WS_NODE',
         thumbUrl: '',
         spheres: [],

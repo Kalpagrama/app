@@ -31,9 +31,10 @@ div(
         ws-sphere-editor(:item="node").q-py-sm
     //- footer: actions close, createNode
     .row.full-width.q-pa-md
-      q-btn(flat color="white" no-caps @click="$emit('close')").b-40 Close
+      q-btn(flat color="white" no-caps @click="$emit('close')").b-40 {{$t('close', 'Закрыть')}}
       .col
-      q-btn(color="green" no-caps) Publish
+      slot(name="nodeAction" :node="node")
+      q-btn(v-if="!$scopedSlots.nodeAction" color="green" no-caps @click="publish()") Publish
 </template>
 
 <script>
@@ -52,5 +53,11 @@ export default {
       return this.node.items[0]
     }
   },
+  methods: {
+    publish () {
+      this.$log('publish')
+      this.$router.push('/workspace/node/' + this.node.id)
+    }
+  }
 }
 </script>

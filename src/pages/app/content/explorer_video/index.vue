@@ -2,7 +2,8 @@
 div(:style=`{height: $q.screen.height+'px'}`).column.full-width
   .row.full-width.justify-center.b-30
     div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-pb-sm
-      div(:style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
+      slot(name="header")
+      div(v-if="!$slots.header" :style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
         q-btn(
           @click="$emit('out', ['back'])"
           round flat color="white" icon="keyboard_arrow_left")
@@ -85,6 +86,12 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
       :contentBookmark="contentBookmark"
       @node="viewId = 'node', node = $event"
       @close="viewId = 'nodes-mine', node = null")
+      template(v-slot:nodeAction=`{node}`)
+        slot(name="nodeAction" :node="node")
+      template(v-slot:nodeActionMine=`{node}`)
+        slot(name="nodeActionMine" :node="node")
+      template(v-slot:nodeActionAll=`{node}`)
+        slot(name="nodeActionAll" :node="node")
 </template>
 
 <script>

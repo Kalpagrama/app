@@ -22,9 +22,11 @@
               borderRadius: '0 0 10px 10px',
             }`
             ).row.full-width.bg-green.q-py-xs.q-px-xs
-            q-btn(round flat dense color="white" icon="edit")
-            .col
-            q-btn(round flat dense color="white" icon="launch" @click="$router.push(`/node/${item.oid}`)")
+            slot(name="nodeActionAll" :node="item")
+            div(v-if="!$scopedSlots.nodeActionAll").row.full-width
+              q-btn(round flat dense color="white" icon="edit")
+              .col
+              q-btn(round flat dense color="white" icon="launch" @click="$router.push(`/node/${item.oid}`)")
 </template>
 
 <script>

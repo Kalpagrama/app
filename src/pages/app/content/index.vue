@@ -5,6 +5,14 @@ component(
   :contentKalpa="contentKalpa"
   :query="query"
   @out="outHandle")
+  template(v-slot:header)
+    slot(name="header")
+  template(v-slot:nodeAction=`{node}`)
+    slot(name="nodeAction" :node="node")
+  template(v-slot:nodeActionMine=`{node}`)
+    slot(name="nodeActionMine" :node="node")
+  template(v-slot:nodeActionAll=`{node}`)
+    slot(name="nodeActionAll" :node="node")
 </template>
 
 <script>
