@@ -48,8 +48,10 @@ div(
       .row.full-width.justify-center.q-pb-sm
         div(:style=`{maxWidth: '800px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-md
-          q-btn(flat color="white" no-caps @click="nodesChecked = []") {{$t('cance', 'Отмена')}}
-          q-btn(flat color="red" no-caps @click="nodesCheckedDelete()") Delete
+          q-btn(flat color="white" no-caps @click="nodesChecked = []") {{ $t('cance', 'Отмена') }}
+          q-btn(
+            v-if="nodesCheckedDeleteCan"
+            flat color="red" no-caps @click="nodesCheckedDelete()") {{ $t('Delete', 'Удалить') }}
           .col
           slot(name="nodeActionMine" :node="null")
           div(v-if="!$scopedSlots.nodeActionMine").row.full-height.items-center.content-center
@@ -90,6 +92,9 @@ export default {
           return -1
         }
       })
+    },
+    nodesCheckedDeleteCan () {
+      return !this.nodesChecked.find(id => !id.startsWith('WS_NODE::'))
     },
     queryNodesWorkspace () {
       let res = {
