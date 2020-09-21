@@ -108,11 +108,16 @@ class RxDBWrapper {
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
 
       window.addEventListener('storage', async (event) => {
-         if (event.key.in('k_rxdb_deinit')) { // одна из вкладок выполнила rxdb.deinit. Надо обновить коллекции
+         if (event.key && event.key.in('k_rxdb_deinit_date')) { // одна из вкладок выполнила rxdb.deinit. Надо обновить коллекции
             if (this.created && event.newValue) {
-               logD('localStorage k_rxdb_deinit event:', event)
-               assert(this.workspace && this.cache, '!this.workspace && this.cache')
-               await this.updateCollections('create')
+               logD('localStorage k_rxdb_deinit_date event:', event)
+               try {
+                  assert(this.workspace && this.cache, '!this.workspace && this.cache')
+                  await this.updateCollections('create')
+               } catch (err) {
+                  logE('cant updateCollections!', err)
+                  await window.location.reload()
+               }
             }
          }
       })
@@ -264,6 +269,7 @@ class RxDBWrapper {
          this.getCurrentUser = () => {
             return currentUser
          }
+         await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          this.initialized = true
       } finally {
          this.release()
@@ -292,16 +298,21 @@ class RxDBWrapper {
          }
          this.reactiveItemDbMemCache.reset()
          delete this.getCurrentUser
+         this.initialized = false
       } finally {
          this.release()
          globalRelease()
-         this.initialized = false
-         localStorage.setItem('k_rxdb_deinit', Date.now().toString()) // сообщаем другим вкладкам
+         localStorage.setItem('k_rxdb_deinit_date', Date.now().toString()) // сообщаем другим вкладкам
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
 
-   isInitialized () {
+   async isInitialized (autoInitialize = true) {
+      if (!this.initialized && autoInitialize) {
+         // пытаемся проиницилизироваться запомненным пользователем
+         let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init
+         if (authUser) await this.init(authUser)
+      }
       return this.initialized
    }
 

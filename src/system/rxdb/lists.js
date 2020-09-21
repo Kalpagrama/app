@@ -206,14 +206,14 @@ class Lists {
         break
       }
       case 'VOTED': {
-        if (event.subject.oid === localStorage.getItem('k_user_oid')) {
+        if (event.subject.oid === rxdb.getCurrentUser().oid) {
           // если голосовал текущий юзер - положить в список "проголосованные ядра"
           logD(f, 'find voted nodes start')
           let rxDocs = await this.cache.find({
             selector: {
               'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
-              'props.oid': localStorage.getItem('k_user_oid'),
-              'props.mangoQuery.selector.oidAuthor.$ne': localStorage.getItem('k_user_oid')
+              'props.oid': rxdb.getCurrentUser().oid,
+              'props.mangoQuery.selector.oidAuthor.$ne': rxdb.getCurrentUser().oid
             }
           })
           logD(f, 'find voted nodes complete', rxDocs)

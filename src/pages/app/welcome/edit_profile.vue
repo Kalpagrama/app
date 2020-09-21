@@ -50,6 +50,7 @@
 
 <script>
 import { ObjectsApi } from 'src/api/objects'
+import { rxdb } from 'src/system/rxdb'
 
 export default {
   name: 'editProfile',
@@ -91,7 +92,7 @@ export default {
       this.$log('next')
       this.loading = true
       await this.$wait(1000)
-      let oid = localStorage.getItem('k_user_oid')
+      let oid = this.$rxdb.getCurrentUser().oid
       // set avatar,name,lang
       if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
       if (this.lang) await ObjectsApi.update(oid, 'profile.lang', this.lang.value)

@@ -327,7 +327,7 @@ const routes = [
       beforeEnter: async (to, from, next) => {
          if (to.query.originalUrl) { // редирект на полную версию (после успешного входа перейдет на этот url)
             logD('redirect command received!', to.query.originalUrl)
-            localStorage.setItem('k_originalUrl', to.query.originalUrl)
+            sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
          }
          logD('try systemInit...')
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)

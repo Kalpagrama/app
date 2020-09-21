@@ -96,7 +96,7 @@ class Event {
             await this.objects.processEvent(event)
             break
          case 'OBJECT_CREATED':
-            if (event.subject.oid === localStorage.getItem('k_user_oid')) { // если это мы создали ядро
+            if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
                logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
                await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true }) // обновит ядро в rxdb (изначально у нас был фейковый вариант)
                logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
@@ -110,7 +110,7 @@ class Event {
             await this.lists.processEvent(event) // удалить объект из всех лент
             break
          case 'VOTED':
-            if (event.subject.oid === localStorage.getItem('k_user_oid')) {
+            if (event.subject.oid === rxdb.getCurrentUser().oid) {
                this.notifyUserActionComplete(event.type, event.object)
             }
             await this.objects.processEvent(event) // обновить ядро

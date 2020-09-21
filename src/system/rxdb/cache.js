@@ -282,7 +282,8 @@ class Cache {
             await fetch()
          }
          let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
-         if (cachedInfo && !rxDoc) { // из-за параллельной работы на нескольких вкладках наблюдается баг (в cacheLru запись есть, а в rxdb - нет) Не разобрался до конца как это происходит...
+         if (cachedInfo && !rxDoc) { // наблюдается баг (в cacheLru запись есть, а в rxdb - нет) Не разобрался до конца как это происходит... Возможно это связано с ручной очисткой storage
+            clientFirst = false // ждем отвера сервера
             await fetch()
             rxDoc = await this.db.cache.findOne(id).exec()
          }
