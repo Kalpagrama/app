@@ -6,8 +6,8 @@ q-layout(view="hHh Lpr lff").b-30
         div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="close()")
           .col
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Pick content fragment
-          q-btn(round flat color="white" icon="launch" @click="explore()")
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold From content
+          //- q-btn(round flat color="white" icon="launch" @click="explore()")
   q-page-container
     q-page(:style=`{paddingTop: '0px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px', height: $q.screen.height-60+'px',}`).column.full-width.items-start.content-start
@@ -38,7 +38,7 @@ q-layout(view="hHh Lpr lff").b-30
             :style=`{
               position: 'absolute', top: 0, zIndex: 300,
             }`).fit
-            //- template(v-slot:actions)
+            template(v-slot:actions)
               q-btn(
                 v-if="true"
                 @click="fragmentCreateBtn()"
@@ -81,25 +81,14 @@ q-layout(view="hHh Lpr lff").b-30
           //- item here...
         div(
           v-if="viewId !== 'fragment'"
-          :style=`{}`).row.full-width.justify-center.q-pa-sm
-          q-btn(
+          :style=`{}`).row.full-width.justify-center
+          //- q-btn(
             @click="fragmentCreateBtn()"
             flat color="green" icon="add" no-caps) Add fragment here
-          //- q-tabs(v-model="viewId" active-color="white" dense full-width no-caps).full-width.text-grey-8
-            q-tab(name="fragments" label="Fragments")
+          q-tabs(v-model="viewId" active-color="white" dense full-width no-caps).full-width.text-grey-8
+            q-tab(name="nodesMine" label="Mine nodes")
             //- q-tab(name="fragment" label="Fragment")
-            q-tab(name="nodes" label="Nodes")
-          //- footer
-          //- .row.full-width.items-center.content-center.q-py-sm
-            q-btn(round flat no-caps color="grey-6" @click="close()").q-px-sm.b-50 Close
-            .col
-              small.text-white itemCopyChanged: {{itemCopyChanged}}
-            q-btn(
-              @click="save()"
-              no-caps
-              :disable="!itemCopyChanged"
-              :color="itemCopyChanged ? 'green' : 'grey-9'"
-              ).q-px-md Save
+            q-tab(name="nodesKalpa" label="Nodes kalpa")
 </template>
 
 <script>

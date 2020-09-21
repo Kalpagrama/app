@@ -197,7 +197,7 @@ export default {
         // this.$log('composition TO', to)
         let _composition = JSON.parse(JSON.stringify(to))
         let fragments = [{name: '', items: [_composition]}]
-        this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
+        this.$store.commit('ui/stateSet', ['contentNodes', fragments])
       }
     }
   },
@@ -274,16 +274,13 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // let fragments = []
-    // JSON.parse(JSON.stringify(this.composition))
-    // this.$store.commit('ui/stateSet', ['wsContentFragments', fragments])
     this.player.events.on('bar-click', this.playerBarClickHandle)
     this.player.events.on('edit-start', this.playerEditStartHandle)
     this.player.events.on('edit-end', this.playerEditEndHandle)
     this.compositionPlay()
   },
   beforeDestroy () {
-    this.$store.commit('ui/stateSet', ['wsContentFragments', null])
+    this.$store.commit('ui/stateSet', ['contentNodes', null])
     this.player.events.off('bar-click', this.playerBarClickHandle)
     this.player.events.off('edit-start', this.playerEditStartHandle)
     this.player.events.off('edit-end', this.playerEditEndHandle)

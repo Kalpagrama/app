@@ -8,9 +8,10 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
       :style=`{maxWidth: width+'px',}`
       @fragment="$emit('item', $event), contentFragmentOpened = false"
       @close="contentFragmentOpened = false")
-  content-search(
-    @contentKalpa="contentKalpaFound"
-    @searchString="searchString = $event")
+  .row.full-width.q-px-sm
+    content-search(
+      @contentKalpa="contentKalpaFound"
+      @searchString="searchString = $event")
   .row.full-width.items-start.content-start.q-pt-md
     kalpa-loader(:mangoQuery="query" :sliceSize="1000")
       template(v-slot=`{items, next}`)

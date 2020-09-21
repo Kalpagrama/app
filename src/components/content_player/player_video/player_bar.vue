@@ -8,17 +8,17 @@ div(
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
   }`).row.full-width.b-50
-  //- ws content fragments from global store...
-  //- TODO: only for video fragments...
+  //- contentNodes, we need nodes with first item of this content!
+  //- with t, content type video
   div(
-    v-if="$store.state.ui.wsContentFragments"
+    v-if="$store.state.ui.contentNodes"
     :style=`{
       position: 'absolute', zIndex: 9999,
       pointerEvents: 'none',
     }`
     ).row.fit
     div(
-      v-for="(f,fi) in $store.state.ui.wsContentFragments" :key="fi"
+      v-for="(f,fi) in $store.state.ui.contentNodes" :key="fi"
       v-if="f.items[0].layers[0].figuresAbsolute[0].t && f.items[0].layers[0].figuresAbsolute[1].t"
       :style=`{
         position: 'absolute', zIndex: 9999,
@@ -32,6 +32,7 @@ div(
         background: 'rgba(255,255,255,0.3)',
       }`
       ).row
+      //- TODO: add hover effect on contentNodes...
       //- q-tooltip
         small.text-white.text-bold {{ f.name }}
   //- currentTime width/line
@@ -52,7 +53,6 @@ div(
       }`
       ).row.bg-red
   //- currentTimeMove line
-  //- :class="barClass"
   div(
     v-if="currentTimeMove"
     :style=`{
@@ -65,7 +65,6 @@ div(
     }`
     ).row.bg-red
   //- label currentTime moving
-  //- :class="barClass"
   div(
     v-if="currentTimeMove"
     :style=`{
@@ -99,38 +98,18 @@ div(
       opacity: 0.9,
     }`
     ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
-  //- bars
-  //- div(
-    v-if="bars.length > 0"
-    :style=`{
-      position: 'absolute', zIndex: 210, transform: 'translate3d(0,0,0)',
-      borderRadius: '10px', overflow: 'hidden',
-      pointerEvents: 'none',
-    }`
-    ).row.fit
-    div(
-      v-for="(b,bi) in bars" :key="bi"
-      :style=`{
-        position: 'absolute', zIndex: 210, transform: 'translate3d(0,0,0)',
-        left: b/player.duration*100+'%',
-        pointerEvents: 'none',
-        width: '1.5px',
-        opacity: 0.5,
-      }`
-      ).row.full-height.bg-white
 </template>
 
 <script>
 export default {
   name: 'playerBar',
-  props: ['player', 'bars', 'layers'],
+  props: ['player'],
   data () {
     return {
       panning: false,
       currentTimeMove: 0,
       currentTimePercent: null,
       currentTimePanned: 0,
-      barClass: {'bg-green': true}
     }
   },
   methods: {

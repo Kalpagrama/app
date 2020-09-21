@@ -261,7 +261,7 @@ export default {
       this.$log('fragments', fragments)
       this.fragments = fragments
       if (this.nodeSelectedId || this.nodeEditing) return
-      this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
+      this.$store.commit('ui/stateSet', ['contentNodes', JSON.parse(JSON.stringify(fragments))])
     }
   },
   beforeDestroy () {

@@ -23,6 +23,5 @@ export default {
   showLeftDrawer: false,
   showAuth: false,
   isTyping: false,
-  wsContentLayers: null,
-  wsContentFragments: null,
+  contentNodes: null,
 }

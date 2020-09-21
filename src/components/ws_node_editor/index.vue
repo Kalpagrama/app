@@ -112,13 +112,13 @@ export default {
         let createdNode = await NodeApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         // // update this node: stage, oid, thumbUrls from all the items
-        await this.node.updateExtended('stage', 'published', false)
-        await this.node.updateExtended('oid', createdNode.oid, false)
+        // await this.node.updateExtended('stage', 'published', false)
+        // await this.node.updateExtended('oid', createdNode.oid, false)
         // update item thumbUrl, oid, stage, sphere oid...
         // // createdNode.items.map((i, ii) => {
         // //   this.node.items[ii].thumbUrl = i.thumbUrl
         // // })
-        // await this.$rxdb.remove(this.node.id)
+        await this.$rxdb.remove(this.node.id)
         this.publishing = false
         this.$q.notify({
           type: 'positive',

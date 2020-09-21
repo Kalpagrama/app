@@ -130,7 +130,7 @@ export default {
       // create nodeInput
       let nodeInput = {
         wsItemType: 'WS_NODE',
-        stage: 'draft',
+        // stage: 'draft',
         name: nodeFull.name,
         layout: nodeFull.layout,
         category: nodeFull.category,

@@ -70,108 +70,21 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
           }`).fit
           template(v-slot:actions)
             q-btn(
-              v-if="true"
-              @click="nodeCreateStart()"
+              v-if="viewId !== 'node'"
+              @click="nodeCreate()"
               round push color="green" dense icon="add"
               :style=`{borderRadius: '50%'}`)
-  .col.full-width.scroll
+  div(:style=`{position: 'relative'}`).col.full-width.scroll
     component(
       v-if="player"
       :is="`view-${viewId}`"
       :ref="`view-${viewId}`"
+      :node="node"
       :player="player"
       :contentKalpa="contentKalpa"
-      :contentBookmark="contentBookmark")
-//- q-layout(
-  view="hHh Lpr lff"
-  container :style=`{height: $q.screen.height+50+'px'}`).br
-  q-page-container
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
-        div(:style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
-          q-btn(
-            @click="$emit('out', ['back'])"
-            round flat color="white" icon="keyboard_arrow_left")
-          .col.full-height.q-mx-xs
-            div(
-              :style=`{borderRadius: '10px', overflow: 'hidden'}`
-              ).row.fit.items-center.content-center.b-40.q-pa-sm
-              q-icon(name="select_all" color="white" size="30px").q-mx-xs
-              div(:style=`{overflowX: 'auto'}`).col.q-mr-md
-                //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
-              kalpa-follow(
-                v-if="contentKalpa"
-                :oid="contentKalpa.oid")
-          q-btn(
-            @click="contentBookmarkCreate()"
-            round flat color="white" :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
-        div(:style=`{paddingLeft: '66px', paddingRight: '60px',}`).row.full-width.justify-start
-          q-tabs(
-            v-model="viewId"
-            no-caps dense active-color="white" switch-indicator).full-width.text-grey-8
-            q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
-    //- player
-    div(
-      :style=`{
-        ...playerStyles(),
-      }`
-      ).row.full-width.items-start.content-start.justify-center
-      div(
-        :style=`{
-          maxWidth: (player && player.isFullscreen) ? '100%' : '800px',
-          height: (player && player.isFullscreen) ? '100%' : 'auto',
-        }`).row.full-width
-        div(
-          v-observe-visibility=`{
-            callback: playerVisibilityCallback,
-            intersection: {
-              threshold: 0.8
-            }
-          }`
-          :style=`{
-            position: 'relative',
-            height: (player && player.isFullscreen) ? '100%' : 'auto',
-          }`).row.full-width.items-start.content-start
-          img(
-            :src="contentKalpa.thumbUrl"
-            draggable="false"
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden',
-              height: (player && player.isFullscreen) ? '100%' : 'auto',
-              opacity: 0.1,
-              objectFit: 'contain',
-            }`
-            ).full-width
-          content-player(
-            :contentKalpa="contentKalpa"
-            @player="playerLoaded"
-            @error="playerErrorHandle"
-            :style=`{
-              position: 'absolute', top: '0px',
-              borderRadius: '10px', overflow: 'hidden',
-              background: (player && player.isFullscreen) ? 'black' : 'none'
-            }`).fit
-            template(v-slot:actions)
-              q-btn(
-                v-if="true"
-                @click="nodeCreateStart()"
-                round push color="green" dense icon="add"
-                :style=`{borderRadius: '50%'}`)
-    //- view-fullscreen(
-      v-if="(player && player.isFullscreen)"
-      :player="player"
-      :contentKalpa="contentKalpa"
-      :contentWorkspace="contentWorkspace")
-    //- view dynamic component
-    .col.full-width.scroll
-      component(
-        v-if="player"
-        :is="`view-${viewId}`"
-        :ref="`view-${viewId}`"
-        :player="player"
-        :contentKalpa="contentKalpa"
-        :contentBookmark="contentBookmark")
+      :contentBookmark="contentBookmark"
+      @node="viewId = 'node', node = $event"
+      @close="viewId = 'nodes-mine', node = null")
 </template>
 
 <script>
@@ -179,45 +92,47 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 import viewDetails from './view_details/index.vue'
-import viewFragments from './view_fragments/index.vue'
-import viewNodes from './view_nodes/index.vue'
+import viewNode from './view_node/index.vue'
+import viewNodesMine from './view_nodes_mine/index.vue'
+import viewNodesAll from './view_nodes_all/index.vue'
 import viewFullscreen from './view_fullscreen/index.vue'
 
 export default {
-  name: 'contentExplorer_video',
-  components: {contentPlayer, viewDetails, viewFragments, viewNodes, viewFullscreen},
-  props: ['contentKalpa'],
+  name: 'contentExplorerVideo',
+  components: {contentPlayer, viewDetails, viewNode, viewNodesAll, viewNodesMine, viewFullscreen},
+  props: ['contentKalpa', 'query'],
   data () {
     return {
-      viewId: 'fragments',
+      viewId: 'nodes-mine',
       player: null,
       playerIsVisible: false,
       contentBookmark: null,
+      node: null,
     }
   },
   computed: {
     views () {
       return [
         {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
-        {id: 'fragments', name: this.$t('wsContentExplorer_video_viewNodesMine_title', 'Мои ядра')},
-        {id: 'nodes', name: this.$t('wsContentExplorer_video_viewNodesKalpa_title', 'Чужие')},
+        {id: 'nodes-mine', name: this.$t('wsContentExplorer_video_viewNodesMine_title', 'Мои ядра')},
+        {id: 'nodes-all', name: this.$t('wsContentExplorer_video_viewNodesAll_title', 'Все ядра')},
       ]
     }
   },
   watch: {
-    '$route.query.viewid': {
+    query: {
       immediate: true,
       async handler (to, from) {
-        this.$log('$route.query.viewId TO', to)
+        this.$log('query TO', to)
         // set viewId force, from feed or from workspace
-        if (to) {
-          this.viewId = to
+        if (to.viewid) {
+          this.viewId = to.viewid
         }
         // catch lastViewId
         else {
-          let lastViewId = localStorage.getItem('k_wsContentExplorer_lastViewId')
-          this.$log('lastViewId', lastViewId)
-          if (lastViewId) this.viewId = lastViewId
+          let viewId = localStorage.getItem('k_contentExplorer_viewid')
+          this.$log('viewId', viewId)
+          if (viewId) this.viewId = viewId
         }
         // find bookmark
         let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
@@ -245,13 +160,35 @@ export default {
       this.$log('contentBookmark', contentBookmark)
       this.contentBookmark = contentBookmark
     },
-    async nodeCreateStart () {
-      this.$log('nodeCreateStart')
+    async nodeCreate () {
+      this.$log('nodeCreate')
       this.player.fullscreenToggle(false)
-      this.viewId = 'fragments'
-      this.$nextTick(() => {
-        this.$refs['view-fragments'].nodeCreateStart()
-      })
+      // start/end
+      let start = this.player.currentTime
+      let end = start + 10 > this.player.duration ? this.player.duration : start + 10
+      let nodeInput = {
+        name: '',
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        wsItemType: 'WS_NODE',
+        thumbUrl: this.contentKalpa.thumbUrl,
+        items: [
+          {
+            id: Date.now().toString(),
+            thumbUrl: this.contentKalpa.thumbUrl,
+            outputType: 'VIDEO',
+            layers: [
+              {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
+            ],
+            operation: { items: null, operations: null, type: 'CONCAT'},
+          }
+        ]
+      }
+      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeCreate node', node)
+      this.node = node
+      this.viewId = 'node'
     },
     playerStyles () {
       if (this.player && this.player.isFullscreen) {
@@ -274,15 +211,13 @@ export default {
         if (isVisible) this.player.play()
         else this.player.pause()
       }
-      // this.$log('contentPlayer', contentPlayer)
     },
     playerLoaded (player) {
       this.$log('playerLoaded', player)
       this.player = player
-      let startat = this.$route.query.startat
+      let startat = this.query.startat
+      this.$log('startat', startat)
       if (startat) {
-        // alert('startat', startat)
-        // this.$router.replace()
         this.player.setCurrentTime(startat)
       }
     },
@@ -340,8 +275,8 @@ export default {
     window.removeEventListener('keydown', this.keydownHandle)
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)
-    localStorage.setItem('k_wsContentExplorer_lastViewId', this.viewId)
-    this.$store.commit('ui/stateSet', ['wsContentFragments', null])
+    localStorage.setItem('k_contentExplorer_viewid', this.viewId)
+    this.$store.commit('ui/stateSet', ['contentNodes', null])
   }
 }
 </script>
