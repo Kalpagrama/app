@@ -28,12 +28,11 @@ div(
       height: '40px',
       borderRadius: '10px 10px 0 0',
     }`).row.full-width
+  //- top is selected
   div(
     :style=`{
       height: '40px',
     }`).row.full-width.items-stretch.content-stretch.q-px-sm
-    //- q-btn(flat no-caps dense).q-px-sm
-      span.text-green.text-bold {{ $time(start) }}
     div(
       :class=`{
         'b-50': isSelected
@@ -64,14 +63,13 @@ div(
           top: '-33px', left: '0px', right: '0px',
           maxHeight: '40px',
         }`)
-    //- q-btn(flat no-caps dense).q-px-sm
-      span.text-grey-9.text-bold {{ $time(end) }}
+  //- essence editor
   .row.full-width
     q-input(
       v-model="node.name"
       borderless dark dense
       type="textarea" autogrow
-      placeholder="What do you see?"
+      :placeholder="isSelected ? 'What do you see?' : ''"
       :input-style=`{
         minHeight: '40px',
         paddingLeft: '20px',

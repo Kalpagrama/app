@@ -30,7 +30,6 @@ export default {
         layout: 'PIP',
         wsItemType: 'WS_NODE',
         thumbUrl: '',
-        stage: 'draft',
       }
     }
   },

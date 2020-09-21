@@ -60,16 +60,37 @@
       @click="compositionPlayPause()"
       round flat dense color="white"
       :icon="player.playing ? 'pause' : 'play_arrow'")
-    q-btn(
-      v-if="compositionPlaying"
-      @click="compositionStop()"
-      round flat dense color="red")
-      q-icon(name="stop" size="28px" color="red")
+    //- q-btn(
+    //-   v-if="compositionPlaying"
+    //-   @click="compositionStop()"
+    //-   round flat dense color="red")
+    //-   q-icon(name="stop" size="28px" color="red")
     q-btn(
       v-if="compositionPlaying"
       @click="compositionRefresh()"
-      round flat dense color="white" icon="refresh"
-      :style=`{transform: 'scale(-1, 1)'}`)
+      round flat dense color="white" icon="first_page"
+      :style=`{}`)
+    q-btn(
+      v-if="compositionPlaying"
+      @click="compositionBeforeEnd()"
+      round flat dense color="white" icon="last_page"
+      :style=`{}`)
+    q-btn(
+      v-if="compositionPlaying"
+      @click="compositionLooping = !compositionLooping"
+      round flat dense)
+      q-icon(
+        size="22px" color="white" name="loop"
+        :class=`{
+          'rotating': compositionLooping,
+        }`
+        :color="compositionLooping ? 'green' : 'white'")
+    //- .col
+    q-btn(
+      v-if="compositionPlaying"
+      @click="compositionStop()"
+      round flat dense color="white")
+      q-icon(name="clear" size="22px" color="white")
     .col
       slot(name="actions")
   //- debug
@@ -109,6 +130,7 @@ export default {
   data () {
     return {
       compositionPlaying: false,
+      compositionLooping: true,
       layerPlaying: null,
       layersPlayed: [],
     }
@@ -180,11 +202,15 @@ export default {
             }
             // this is the last layer to play, and loop, or stop...
             else {
-              // this.player.pause()
-              this.layerPlaying = 0
-              this.layersPlayed = []
-              let t = this.composition.layers[0].figuresAbsolute[0].t
-              this.player.setCurrentTime(t)
+              if (this.compositionLooping) {
+                this.layerPlaying = 0
+                this.layersPlayed = []
+                let t = this.composition.layers[0].figuresAbsolute[0].t
+                this.player.setCurrentTime(t)
+              }
+              else {
+                this.player.pause()
+              }
             }
           }
         }
@@ -228,6 +254,14 @@ export default {
       this.layersPlayed = []
       this.compositionPlay()
     },
+    compositionBeforeEnd () {
+      this.$log('compositionBeforeEnd')
+      let layerStart = this.composition.layers[0].figuresAbsolute[0].t
+      let layerEnd = this.composition.layers[0].figuresAbsolute[1].t
+      let t = layerEnd - 3 > layerStart ? layerEnd - 3 : (layerEnd - layerStart) / 2
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
+    },
     compositionStop () {
       this.$log('compositionStop')
       this.compositionPlaying = false
@@ -270,6 +304,7 @@ export default {
     playerEditEndHandle () {
       this.$log('playerEditEndHandle')
       this.compositionPlaying = true
+      this.layerPlaying = 0
     }
   },
   mounted () {

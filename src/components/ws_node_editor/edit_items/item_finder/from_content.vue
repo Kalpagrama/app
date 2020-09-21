@@ -6,7 +6,7 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
     from-content-fragment(
       :contentBookmark="contentBookmark"
       :style=`{maxWidth: width+'px',}`
-      @fragment="$emit('item', $event), contentFragmentOpened = false"
+      @item="$emit('item', $event), contentFragmentOpened = false"
       @close="contentFragmentOpened = false")
   .row.full-width.q-px-sm
     content-search(

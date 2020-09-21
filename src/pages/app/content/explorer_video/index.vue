@@ -58,6 +58,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
             height: (player && player.isFullscreen) ? '100%' : 'auto',
             opacity: 0.1,
             objectFit: 'contain',
+            maxHeight: ($q.screen.height/2)-60+'px',
           }`
           ).full-width
         content-player(
@@ -75,6 +76,34 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
               @click="nodeCreate()"
               round push color="green" dense icon="add"
               :style=`{borderRadius: '50%'}`)
+  div(
+    v-if="player && player.isFullscreen"
+    :style=`{
+      position: 'fixed', zIndex: 9999, right: '0px', top: '70px',
+      width: '500px', height: '400px',
+      background: 'rgba(30,30,30,0.5)',
+      borderRadius: '10px', overflow: 'hidden',
+    }`).row.items-start.content-start
+    q-tabs(
+      v-model="viewId"
+      no-caps dense active-color="white" switch-indicator).full-width.text-grey-8
+      q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+    component(
+      v-if="player"
+      :is="`view-${viewId}`"
+      :ref="`view-${viewId}`"
+      :node="node"
+      :player="player"
+      :contentKalpa="contentKalpa"
+      :contentBookmark="contentBookmark"
+      @node="viewId = 'node', node = $event"
+      @close="viewId = 'nodes-mine', node = null")
+      template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
+        slot(name="nodeAction" :node="node")
+      template(v-if="$scopedSlots.nodeActionMine" v-slot:nodeActionMine=`{node}`)
+        slot(name="nodeActionMine" :node="node")
+      template(v-if="$scopedSlots.nodeActionAll" v-slot:nodeActionAll=`{node}`)
+        slot(name="nodeActionAll" :node="node")
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     component(
       v-if="player"
@@ -86,11 +115,11 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
       :contentBookmark="contentBookmark"
       @node="viewId = 'node', node = $event"
       @close="viewId = 'nodes-mine', node = null")
-      template(v-slot:nodeAction=`{node}`)
+      template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
         slot(name="nodeAction" :node="node")
-      template(v-slot:nodeActionMine=`{node}`)
+      template(v-if="$scopedSlots.nodeActionMine" v-slot:nodeActionMine=`{node}`)
         slot(name="nodeActionMine" :node="node")
-      template(v-slot:nodeActionAll=`{node}`)
+      template(v-if="$scopedSlots.nodeActionAll" v-slot:nodeActionAll=`{node}`)
         slot(name="nodeActionAll" :node="node")
 </template>
 

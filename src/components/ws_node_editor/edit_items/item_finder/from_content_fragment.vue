@@ -17,10 +17,10 @@ content-explorer(:oid="contentBookmark.oid" :query=`{viewid: 'nodes-mine'}`).b-3
     q-btn(color="green" no-caps @click="nodePick(node)") Pick node
   //- from view-nodes-mine
   template(v-slot:nodeActionMine=`{node}`)
-    q-btn(color="red" icon="check" @click="nodePick(node)")
+    q-btn(round dense color="green" icon="add" @click="nodePick(node)").q-mt-md
   //- from view-nodes-all
   template(v-slot:nodeActionAll=`{node}`)
-    q-btn(color="red" icon="check" @click="nodePick(node)")
+    q-btn(round flat dense color="white" align="center" no-caps icon="add" @click="nodePick(node)").full-width Pick node
 </template>
 
 <script>
@@ -45,6 +45,33 @@ export default {
   methods: {
     nodePick (node) {
       this.$log('nodePick', node)
+      if (node.oid) {
+        let itemInput = {
+          id: `${Date.now().toString()}-0`,
+          thumbUrl: node.meta.items[0].thumbUrl,
+          contentOid: node.meta.items[0].contentOid,
+          outputType: node.meta.items[0].outputType,
+          // operation: node.meta.items[0].operation,
+          operation: { items: null, operations: null, type: 'CONCAT'},
+          layers: node.meta.items[0].layers.map((layer, layerIndex) => {
+            return {
+              id: `${Date.now().toString()}-0-layer`,
+              contentOid: layer.contentOid,
+              figuresAbsolute: layer.figuresAbsolute.map(figure => {
+                return {
+                  t: figure.t,
+                  points: figure.points || []
+                }
+              })
+            }
+          })
+        }
+        this.$log('itemInput', itemInput)
+        this.$emit('item', itemInput)
+      }
+      else {
+        this.$emit('item', node.items[0])
+      }
     }
   },
   async mounted () {

@@ -53,11 +53,27 @@ export default {
       return this.node.items[0]
     }
   },
+  watch: {
+    node: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        // this.$log('node TO', to)
+        // TODO: optimize for items[0].layers[0].figuresAbsolute[0].t compare to from value
+        if (to) this.$store.commit('ui/stateSet', ['contentNodes', [JSON.parse(JSON.stringify(to))]])
+      }
+    }
+  },
   methods: {
     publish () {
       this.$log('publish')
       this.$router.push('/workspace/node/' + this.node.id)
     }
+  },
+  async mounted () {
+    this.$log('mounted')
+    await this.$wait(300)
+    this.$store.commit('ui/stateSet', ['contentNodes', [JSON.parse(JSON.stringify(this.node))]])
   }
 }
 </script>
