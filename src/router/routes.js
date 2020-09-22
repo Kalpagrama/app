@@ -329,11 +329,16 @@ const routes = [
             logD('redirect command received!', to.query.originalUrl)
             sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
          }
-         logD('try systemInit...')
+         logD('router :: try systemInit...')
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
         //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
-         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) return next('/auth') // если маршрут требует повышения - переходим на форму входа
-         else return next()
+         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
+            logD('router::need more privileges')
+            return next('/auth') // если маршрут требует повышения - переходим на форму входа
+         } else {
+            logD('router:: its ok! ')
+            return next()
+         }
       }
    }
 ]

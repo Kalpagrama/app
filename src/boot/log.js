@@ -109,6 +109,7 @@ class Logger {
     assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
     if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
     if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
+    if (this.store.state.core.logDbgModulesBlackList.includes(module)) return
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
       this.getLoggerFunc(module, null)(...msg)

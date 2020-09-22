@@ -319,6 +319,8 @@ class Mutex {
    constructor () {
       this.queue = []
       this.locked = false
+      this.timerWarnId = null
+      this.timerErrId = null
    }
 
    lock () {
@@ -326,6 +328,8 @@ class Mutex {
          if (this.locked) {
             this.queue.push([resolve, reject])
          } else {
+            this.timerWarnId = setTimeout(() => logW('possible deadlock detected!'), 10 * 1000)
+            this.timerErrId = setTimeout(() => logE('deadlock detected!'), 60 * 1000)
             this.locked = true
             resolve()
          }
@@ -337,6 +341,8 @@ class Mutex {
          const [resolve, reject] = this.queue.shift()
          resolve()
       } else {
+         clearTimeout(this.timerWarnId)
+         clearTimeout(this.timerErrId)
          this.locked = false
       }
    }

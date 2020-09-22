@@ -257,12 +257,12 @@ class Cache {
                   logD(f, 'данные с сервера получены', fetchRes)
                   assert(fetchRes, '!fetchRes')
                   assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
-                  let notEvict = fetchRes.notEvict || false
-                  let existing = await this.db.cache.findOne(id).exec()
-                  if (existing) existing = existing.toJSON().cached.data
+                  let existingRxDoc = await this.db.cache.findOne(id).exec()
+                  let existingItem = existingRxDoc ? existingRxDoc.toJSON().cached.data : null
+                  let notEvict = fetchRes.notEvict || (existingRxDoc ? existingRxDoc.props.notEvict : false) // если у старой сущности стоял notEvict - храним его
                   let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
                   logD(f, 'записаны в кэш')
-                  if (onFetchFunc) await onFetchFunc(existing, fetchRes.item)
+                  if (onFetchFunc) await onFetchFunc(existingItem, fetchRes.item)
                   return res
                }
                if (clientFirst && (cachedInfo && !cachedInfo.failReason)) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
@@ -283,6 +283,7 @@ class Cache {
          }
          let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
          if (cachedInfo && !rxDoc) { // наблюдается баг (в cacheLru запись есть, а в rxdb - нет) Не разобрался до конца как это происходит... Возможно это связано с ручной очисткой storage
+            logW(f, 'record has in cacheLru but not in rxdb!', cachedInfo)
             clientFirst = false // ждем отвера сервера
             await fetch()
             rxDoc = await this.db.cache.findOne(id).exec()

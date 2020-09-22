@@ -27,7 +27,7 @@ class WaitBreakable {
    }
 
    break () {
-      logD('форсированное прерывание тайменра ожидания... ')
+      logD('форсированное прерывание таймера ожидания(WaitBreakable)... ')
       this.waitUntil = Date.now()
    }
 
@@ -100,17 +100,14 @@ class Workspace {
                }
             })
          }
-         logD(f, '1')
          if (operation.in('delete', 'recreate')) {
             if (this.db.ws_items) await this.db.ws_items.remove()
             if (this.db.ws_changes) await this.db.ws_changes.remove()
          }
-         logD(f, '2')
          if (operation.in('create', 'delete', 'recreate')) {
             if (this.db.ws_items) await this.db.ws_items.destroy()
             if (this.db.ws_changes) await this.db.ws_changes.destroy()
          }
-         logD(f, '3')
          if (operation.in('create', 'recreate')) {
             await this.db.collection({
                name: 'ws_items',
@@ -156,7 +153,6 @@ class Workspace {
                rxdb.onRxDocDelete(plainData.id)
             }, false)
          }
-         logD(f, '4')
       } finally {
          this.ignoreWsChanges = false
          this.release()
@@ -179,8 +175,8 @@ class Workspace {
                if (this.reactiveUser && this.synchro) {
                   const tLoop = performance.now()
                   try {
-                     logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
-                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deinit и др)
+                     logD(f, 'next loop start...', isLeader(), this.synchroLoopWaitObj.getTimeOut())
+                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal и др)
                      await this.lock()
                      // logD(f, 'locked')
                      if (isLeader()) await this.synchronize()
@@ -411,7 +407,7 @@ class Workspace {
       const f = this.find
       try {
          await this.lock()
-         logD(f, 'locked')
+         // logD(f, 'locked')
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -421,7 +417,7 @@ class Workspace {
          return rxQuery
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 
@@ -484,14 +480,15 @@ class Workspace {
 
    async remove (id) {
       const f = this.remove
+      logD(f, 'start', id)
       try {
          await this.lock()
-         logD(f, 'locked')
+         // logD(f, 'locked')
          assert(this.created, '!this.created')
          await this.db.ws_items.find({ selector: { id: id } }).remove()
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 

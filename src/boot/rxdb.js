@@ -10,7 +10,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     await rxdb.create(store)
     Vue.prototype.$rxdb = rxdb // rxdbProxy
   } catch (err) {
-    logE(err)
+    logE('cant create rxdb!', err)
     await systemReset(false)
     throw err // без rxdb работать не можем!
   }

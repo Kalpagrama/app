@@ -20,7 +20,7 @@ class WorkspaceApi {
              }
          `
       })
-      await systemReset(false, true, false)
+      await systemReset(false, true, true)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return wsClear
    }

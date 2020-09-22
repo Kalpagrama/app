@@ -122,7 +122,7 @@ class AuthApi {
       } finally {
          try {
             if (!token || token === localStorage.getItem('k_token')) {
-               await systemReset(true, true, true, false)
+               await systemReset(true, true, false)
             }
          } finally {
             apiMutex.release()
@@ -135,7 +135,7 @@ class AuthApi {
       const f = this.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      await systemReset(true, true, true, false)
+      await systemReset(true, true, false)
       let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
@@ -182,7 +182,7 @@ class AuthApi {
          needInvite = route.query.needInvite
          needConfirm = route.query.needConfirm
          userExist = route.query.userExist
-         await systemReset(true, true, true, false)
+         await systemReset(true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }
