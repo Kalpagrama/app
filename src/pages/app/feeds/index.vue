@@ -9,7 +9,7 @@ q-layout(view="hHh Lpr lff")
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_MyFeedsSettings_title', 'Мои ленты, настройка')}}
           .col
           //- q-btn(round flat color="green" icon="add" to="/feeds/add")
-          q-btn(round flat color="white" icon="settings" to="/feeds")
+          q-btn(round flat color="white" icon="settings" to="/settings/feeds")
   q-page-container
     q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`)
       .row.full-width.items-start.content-start.justify-center
