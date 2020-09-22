@@ -62,8 +62,15 @@ export default {
         this.$log('searchString CHANGED', to)
         if (this.isURL(to)) {
           this.searchStringLoading = true
-          this.contentKalpa = await ContentApi.contentCreateFromUrl(to)
-          this.contentImporterShow = true
+          try {
+            this.contentKalpa = await ContentApi.contentCreateFromUrl(to)
+            this.contentImporterShow = true
+          }
+          catch (e) {
+            this.searchString = ''
+            this.searchStringRaw = ''
+            this.searchStringLoading = false
+          }
         }
         else {
           this.searchString = to

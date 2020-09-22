@@ -50,7 +50,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['wsContentLayers', null])
+    // this.$store.commit('ui/stateSet', ['contentNodes', null])
   }
 }
 </script>

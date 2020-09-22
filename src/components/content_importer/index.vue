@@ -11,8 +11,11 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.items-start.content-start.b
     //- body
     img(
       :src="contentKalpa.thumbUrl" draggable="false"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
-      ).full-width
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden',
+        minHeight: '300px',
+      }`
+      ).full-width.b-40
     //- footer edit youtube video name?
     .row.full-width.items-center.content-center.q-pa-md
       q-icon(name="fab fa-youtube" color="white" size="40px").q-mr-sm

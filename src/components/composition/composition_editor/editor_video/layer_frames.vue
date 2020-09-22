@@ -114,49 +114,9 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           height: 50+8+8+'px',
           }`).row
           slot(name="meta" :panning="pointDragging")
-          //- slot(name="meta")
-        //- start actions
-        //- div(
-          :style=`{
-            position: 'absolute', zIndex: 300, bottom: '-46px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 60px)',
-            width: 'calc('+(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration*100+'% + 120px)',
-          }`
-          ).row.items-center.content-center.justify-center.no-wrap
-          q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
-            div(:style=`{
-              position: 'absolute', zIndex: 100,
-              left: 'calc(50% - 2px)', width: '3px',
-              height: '80%', top: '10%',
-              borderRadius: '2px',
-              opacity: 0.9
-            }`).row.bg-red
-          q-btn(round flat dense color="white" @click="layerForward(0,false)")
-            q-icon(name="keyboard_arrow_left" color="white" size="30px")
-          q-btn(round flat dense color="white" @click="layerForward(0,true)")
-            q-icon(name="keyboard_arrow_right" color="white" size="30px")
-          .col
-          small(
-            :class=`{
-              'text-red': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t > 60,
-              'text-white': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t <= 60
-            }`
-            ) {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
-          .col
-          q-btn(round flat dense color="white" @click="layerForward(1,false)")
-            q-icon(name="keyboard_arrow_left" color="white" size="30px")
-          q-btn(round flat dense color="white" @click="layerForward(1,true)")
-            q-icon(name="keyboard_arrow_right" color="white" size="30px")
-          q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
-            div(:style=`{
-              position: 'absolute', zIndex: 100,
-              left: 'calc(50% - 2px)', width: '3px',
-              height: '80%', top: '10%',
-              borderRadius: '2px',
-              opacity: 0.9
-            }`).row.bg-red
       //- right margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
+  //- actions at the bottom
   div(
     :style=`{
       position: 'absolute', zIndex: 300, bottom: '0px',
@@ -209,15 +169,14 @@ export default {
       pointDragging: false,
       pointDraggingIndex: null,
       pointDraggingError: false,
-      // layerForwarding: false,
       layerForwarding: null
     }
   },
   computed: {
     durationScreen () {
       let res
-      if (this.player.duration > 90) res = 60
-      else res = 10
+      if (this.player.duration > 120) res = 60
+      else res = this.player.duration
       return res
     },
     framesCount () {
@@ -249,7 +208,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$store.commit('ui/stateSet', ['wsContentLayers', [JSON.parse(JSON.stringify(to))]])
+        // this.$store.commit('ui/stateSet', ['contentNodes', ])
       }
     },
     tickFramesLayerCenter: {
@@ -302,6 +261,7 @@ export default {
         let t = this.layer.figuresAbsolute[1].t - 1.5
         if (t < this.layer.figuresAbsolute[0].t) t = this.layer.figuresAbsolute[0].t
         this.player.setCurrentTime(t)
+        this.player.events.emit('edit-end')
       }
       this.player.play()
       // center frames
@@ -312,7 +272,7 @@ export default {
       this.$log('layerForward', pointIndex, goingForward)
       if (this.player.playing) this.player.pause()
       let t = this.layer.figuresAbsolute[pointIndex].t
-      this.player.events.emit('edit-start', {t: t})
+      this.player.events.emit('edit-start')
       if (goingForward) t += 0.1
       else t -= 0.1
       this.$log('t', t)
@@ -323,10 +283,20 @@ export default {
         clearTimeout(this.layerForwarding)
       }
       this.layerForwarding = setTimeout(() => {
-        alert('layerForwarding DONE')
+        this.$log('layerForwarding DONE')
+        if (pointIndex === 0) {
+          // do nothing...
+        }
+        else {
+          let tBeforeTheEnd = t - 3 > this.layerStart ? t - 3 : this.layerStart
+          this.$log('tBeforeTheEnd', tBeforeTheEnd)
+          this.player.setCurrentTime(tBeforeTheEnd)
+        }
+        this.framesLayerCenter()
+        this.player.play()
+        this.player.events.emit('edit-end')
         this.layerForwarding = null
       }, 500)
-      // TODO: at the end of clicking this.framesLayerCenter(), end go to -1 if the end...
     },
     async pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
@@ -349,12 +319,12 @@ export default {
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
         this.player.pause()
+        this.player.events.emit('edit-start')
         this.pointDragging = true
         this.pointDraggingIndex = index
-        this.player.events.emit('edit-event', {t: t})
-        // this.player.pause()
       }
       if (e.isFinal) {
+        this.player.events.emit('edit-end')
         this.pointDragging = false
         this.pointDraggingIndex = null
         await this.$wait(300)
@@ -371,11 +341,14 @@ export default {
       this.player.setCurrentTime(t)
       // play layer if got this frames...
       if (t > this.layerStart && t < this.layerEnd) {
-        this.$emit('clickInside')
+        // do nothing...
+        // TODO: unreacheable code,cos we listen only for targer === frames!
+        this.$log('framesClick INside')
+        this.player.events.emit('edit-end')
       }
       else {
-        this.$emit('clickOutside')
-        this.player.events.emit('edit-event', {t: t})
+        this.$log('framesClick OUTside')
+        this.player.events.emit('edit-start')
       }
     },
     framesDrag (e) {
@@ -400,8 +373,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // await this.$wait(300)
-    // this.framesLayerCenter()
   }
 }
 </script>

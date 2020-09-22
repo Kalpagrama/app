@@ -63,6 +63,11 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
                     }`).fit
               .row.full-width.q-py-sm.q-px-md
                 small.text-white {{ nodeBookmark.name }}
+    kalpa-loader(
+      v-if="type === 'published'"
+      :mangoQuery="queryPublished" :sliceSize="1000"
+      v-slot=`{items,next}`)
+      span.text-white {{items}}
 </template>
 
 <script>
@@ -82,7 +87,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'draft'
+          // stage: 'draft'
         },
         sort: [{updatedAt: 'desc'}]
       }

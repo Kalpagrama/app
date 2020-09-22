@@ -47,9 +47,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import viewDetails from './view_details/index.vue'
 import viewNodes from './view_nodes/index.vue'
+// viewNodesMine, viewNodesAll
 
 export default {
-  name: 'wsContentExplorer_image',
+  name: 'contentExplorerImage',
   components: {viewDetails, viewNodes},
   props: ['contentKalpa'],
   data () {
