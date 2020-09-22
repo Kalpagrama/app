@@ -19,6 +19,7 @@ import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 let apollo
 
@@ -38,6 +39,8 @@ export default async ({ Vue, store, app }) => {
                err.message = err.code + ':' + err.message
                if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
                   AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+                  alert('error on gql request: ' + JSON.stringify(err))
+                  window.location.reload()
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)
                }
@@ -47,6 +50,8 @@ export default async ({ Vue, store, app }) => {
             logE('gql network error', networkError)
             if (networkError.message === 'bad auth token!') {
                AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+               alert('error on gql request2: ' + JSON.stringify(networkError))
+               window.location.reload()
             }
          }
       })
@@ -102,11 +107,11 @@ export default async ({ Vue, store, app }) => {
             window.location.reload() // новые данные будут подхвачены после перезагрузки
          }
       }
-
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
          { clientFirst: true, force: true, onFetchFunc, servicesApollo })
 
       logD('services', services)
+      assert(services, '!services!!!')
       let linkAuth = services.authUrl
       let linkApi = services.apiUrl
       let linkWs = services.subscriptionsUrl
@@ -193,9 +198,11 @@ export default async ({ Vue, store, app }) => {
             ws: wsApollo
          }
       }
+      await rxdb.init() // после инициализации apollo (нужно для event.init())
       logD('apollo init done')
    } catch (err) {
-      logE(err)
+      logC(err)
+      throw err // без apollo работать не можем!
    }
 }
 

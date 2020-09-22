@@ -144,7 +144,6 @@ export default {
       this.refreshLoading = true
       await this.$wait(300)
       await systemReset()
-      window.location.reload()
       this.refreshLoading = false
     },
     async logout () {
@@ -153,14 +152,16 @@ export default {
       this.logoutLoading = true
       await this.$wait(300)
       await AuthApi.logout()
-      this.$router.replace('/auth').catch(e => e)
+      this.$log('AuthApi.logout() complete')
+      await this.$router.replace('/auth')
+      this.$log('this.$router.replace auth complete')
       this.logoutLoading = false
     },
     async login () {
       this.$log('login')
       this.loginLoading = true
       await this.$wait(300)
-      await this.$router.push('/auth').catch(e => e)
+      await this.$router.push('/auth')
       this.loginLoading = false
     }
   },

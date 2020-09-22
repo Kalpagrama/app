@@ -70,7 +70,7 @@ class UserApi {
         oidSphere: oid
       }
     })
-    let currentUserOid = localStorage.getItem('k_user_oid')
+    let currentUserOid = rxdb.getCurrentUser().oid // localStorage.getItem('k_user_oid')
     let res = items.find(item => item.oid === currentUserOid) ? true : false
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
     return res

@@ -89,8 +89,8 @@ class Logger {
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      if (highlightColor) msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
+      if (highlightColor) msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+      else msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
     } else if (highlightColor) {
       msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
     }
@@ -109,6 +109,7 @@ class Logger {
     assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
     if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
     if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
+    if (this.store.state.core.logDbgModulesBlackList.includes(module)) return
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
       this.getLoggerFunc(module, null)(...msg)
@@ -157,6 +158,8 @@ class Logger {
   critical(module, ...msg) {
     try {
       if (showAlert) this.showAlert(msg)
+      let reload = confirm('critical error: ' + JSON.stringify(...msg) + '\n\nReload page?')
+      if (reload) window.location.reload()
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
         this.prepareParams(msg, 'Red', 'Lime')
         this.getLoggerFunc(module)(...msg)
@@ -196,9 +199,9 @@ function getLogFunc(level, module) {
 
 export default async ({Vue, store, app}) => {
   try {
-    // import { checkLocalStorage } from 'src/system/services'
-    require('src/system/services').checkLocalStorage()
-    // checkLocalStorage()
+    // import { initLocalStorage } from 'src/system/services'
+    await require('src/system/services').initLocalStorage()
+    // await initLocalStorage()
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName
@@ -258,8 +261,14 @@ export default async ({Vue, store, app}) => {
         } else {
           logE('window.onerror', message, source, line, column, error)
         }
-        // const { clearCache } = require('src/system/services')
-        // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
+        // let hardReset = confirm('critical error: ' + JSON.stringify(error) + '\n\nMake hardReset?')
+        // if (hardReset) {
+        //   const { systemHardReset } = require('src/system/services')
+        //   systemHardReset()
+        //   // const { systemReset } = require('src/system/services')
+        //   // systemReset(true) // todo нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
+        //   // window.location.reload()
+        // }
       } catch (e) {
         console.error(e)
       }

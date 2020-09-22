@@ -3,6 +3,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
+import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
@@ -79,7 +80,7 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(rxdb.isLeader(), 'rxdb.isLeader()')
+    assert(isLeader(), 'isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     const t1 = performance.now()
@@ -205,14 +206,14 @@ class Lists {
         break
       }
       case 'VOTED': {
-        if (event.subject.oid === localStorage.getItem('k_user_oid')) {
+        if (event.subject.oid === rxdb.getCurrentUser().oid) {
           // если голосовал текущий юзер - положить в список "проголосованные ядра"
           logD(f, 'find voted nodes start')
           let rxDocs = await this.cache.find({
             selector: {
               'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
-              'props.oid': localStorage.getItem('k_user_oid'),
-              'props.mangoQuery.selector.oidAuthor.$ne': localStorage.getItem('k_user_oid')
+              'props.oid': rxdb.getCurrentUser().oid,
+              'props.mangoQuery.selector.oidAuthor.$ne': rxdb.getCurrentUser().oid
             }
           })
           logD(f, 'find voted nodes complete', rxDocs)

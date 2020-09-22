@@ -1,7 +1,7 @@
 import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 
 import assert from 'assert'
-import { wsSchemaLocalChanges, wsSchemaItem } from 'src/system/rxdb/schemas'
+import { wsSchemaLocalChanges, wsSchemaItem, schemaKeyValue } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { getReactive, Mutex, updateRxDoc } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
@@ -11,6 +11,7 @@ import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb, getRawIdFromId } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
+import { globalLock, globalRelease, isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
@@ -18,14 +19,15 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+// const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
+// logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
    constructor (ms) {
-      assert(ms >= synchroTimeDefault, 'bad ms')
       this.timeout = ms
    }
 
    break () {
-      logD('форсированная синхронизация мастерской... ')
+      logD('форсированное прерывание таймера ожидания(WaitBreakable)... ')
       this.waitUntil = Date.now()
    }
 
@@ -40,7 +42,7 @@ class WaitBreakable {
    async wait () {
       this.waitUntil = Date.now() + this.timeout
       while (this.waitUntil > Date.now()) {
-         await wait(Math.min(1000, synchroTimeDefault / 2))
+         await wait(Math.min(1000, this.timeout / 2))
       }
    }
 }
@@ -71,86 +73,86 @@ class Workspace {
       this.synchro = false
    }
 
-   async createCollections () {
-      const f = this.createCollections
+   async updateCollections (operation) {
+      assert(operation.in('create', 'delete', 'recreate'))
+      const f = this.updateCollections
       logD(f, 'start')
       const t1 = performance.now()
-      // добавлет дефолтный вариант для пропущенных стратегий
-      const migrationProxy = (migrationStrategies) => {
-         return new Proxy(migrationStrategies, {
-            get (target, prop) {
-               if (prop in target) {
-                  let value = target[prop]
-                  return (typeof value === 'function') ? value.bind(target) : value // иначе - внутри this - будет указывать на Proxy
-               } else {
-                  return (oldDoc) => {
-                     let newDoc = oldDoc
-                     return newDoc
-                  }
-               }
-            }
-         })
-      }
-      await this.db.collection({ name: 'ws_items', schema: wsSchemaItem, migrationStrategies: migrationProxy({}) })
-      await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
-      // обработка события измения мастерской пользователем (запоминает измененные элементы)
-      let onWsChangedByUser = async (id, operation) => {
-         const f = onWsChangedByUser
-         if (this.ignoreWsChanges || !rxdb.isLeader()) return
-         assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
-         await this.db.ws_changes.atomicUpsert({ id, operation })
-         // logD(f, `complete. ${id}`)
-      }
-      this.db.ws_items.preSave(async (plainData, rxDoc) => {
-         plainData.ignoreChanges = false
-         let plainDataCopy = cloneDeep(plainData) // newVal
-         delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
-         let rxDocCopy = rxDoc.toJSON() // oldVal
-         // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
-         delete plainDataCopy.rev
-         delete rxDocCopy.rev
-         // logD(f, 'preSave', rxDocCopy, plainDataCopy, isEqual(plainDataCopy, rxDocCopy))
-         if (isEqual(plainDataCopy, rxDocCopy)) {
-            // изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
-            logD(f, ' ignoreChanges', rxDocCopy, plainDataCopy)
-            plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
-         }
-      }, false)
-      this.db.ws_items.postSave(async (plainData, rxDoc) => {
-         // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
-         if (!plainData.ignoreChanges) {
-            await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
-         }
-      }, false)
-      this.db.ws_items.postInsert(async (plainData) => {
-         await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
-      }, false)
-      this.db.ws_items.postRemove(async (plainData) => {
-         await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
-         rxdb.onRxDocDelete(plainData.id)
-      }, false)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
-
-   // удалить все данные из мастерской
-   async clearCollections () {
-      const f = this.clearCollections
-      logD(f, 'start')
-      const t1 = performance.now()
-      // assert(!this.ignoreWsChanges, 'ignoreWsChanges === true')
       while (this.ignoreWsChanges) { // подождем пока отработают synchronize и processEvent
-         await wait(100)
+         await wait(200)
       }
       try {
          await this.lock()
          this.ignoreWsChanges = true
-         if (this.db.ws_items) {
-            await this.db.ws_items.remove()
+         // добавлет дефолтный вариант для пропущенных стратегий
+         const migrationProxy = (migrationStrategies) => {
+            return new Proxy(migrationStrategies, {
+               get (target, prop) {
+                  if (prop in target) {
+                     let value = target[prop]
+                     return (typeof value === 'function') ? value.bind(target) : value // иначе - внутри this - будет указывать на Proxy
+                  } else {
+                     return (oldDoc) => {
+                        let newDoc = oldDoc
+                        return newDoc
+                     }
+                  }
+               }
+            })
          }
-         if (this.db.ws_changes) {
-            await this.db.ws_changes.remove()
+         if (operation.in('delete', 'recreate')) {
+            if (this.db.ws_items) await this.db.ws_items.remove()
+            if (this.db.ws_changes) await this.db.ws_changes.remove()
          }
-         await this.createCollections()
+         if (operation.in('create', 'delete', 'recreate')) {
+            if (this.db.ws_items) await this.db.ws_items.destroy()
+            if (this.db.ws_changes) await this.db.ws_changes.destroy()
+         }
+         if (operation.in('create', 'recreate')) {
+            await this.db.collection({
+               name: 'ws_items',
+               schema: wsSchemaItem,
+               migrationStrategies: migrationProxy({})
+            })
+            await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
+            assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
+            // обработка события измения мастерской пользователем (запоминает измененные элементы)
+            let onWsChangedByUser = async (id, operation) => {
+               const f = onWsChangedByUser
+               if (this.ignoreWsChanges || !isLeader()) return
+               assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
+               await this.db.ws_changes.atomicUpsert({ id, operation })
+               // logD(f, `complete. ${id}`)
+            }
+            this.db.ws_items.preSave(async (plainData, rxDoc) => {
+               plainData.ignoreChanges = false
+               let plainDataCopy = cloneDeep(plainData) // newVal
+               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+               let rxDocCopy = rxDoc.toJSON() // oldVal
+               // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
+               delete plainDataCopy.rev
+               delete rxDocCopy.rev
+               // logD(f, 'preSave', rxDocCopy, plainDataCopy, isEqual(plainDataCopy, rxDocCopy))
+               if (isEqual(plainDataCopy, rxDocCopy)) {
+                  // изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+                  logD(f, ' ignoreChanges', rxDocCopy, plainDataCopy)
+                  plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
+               }
+            }, false)
+            this.db.ws_items.postSave(async (plainData, rxDoc) => {
+               // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
+               if (!plainData.ignoreChanges) {
+                  await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+               }
+            }, false)
+            this.db.ws_items.postInsert(async (plainData) => {
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+            }, false)
+            this.db.ws_items.postRemove(async (plainData) => {
+               await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
+               rxdb.onRxDocDelete(plainData.id)
+            }, false)
+         }
       } finally {
          this.ignoreWsChanges = false
          this.release()
@@ -158,41 +160,43 @@ class Workspace {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create (recursive = false) {
+   async create () {
       const f = this.create
+      const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         await this.createCollections()
          // синхроним изменения в цикле
          this.synchroLoop = async () => {
             const f = this.synchroLoop
+            f.nameExtra = 'synchroLoop'
+            logD(f, 'start')
             this.synchroStarted = true // защита от двойного запуска
             while (true) {
                if (this.reactiveUser && this.synchro) {
+                  const tLoop = performance.now()
                   try {
-                     logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
+                     logD(f, 'next loop start...', isLeader(), this.synchroLoopWaitObj.getTimeOut())
+                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal и др)
                      await this.lock()
-                     logD(f, 'locked')
-                     if (rxdb.isLeader()) await this.synchronize()
+                     // logD(f, 'locked')
+                     if (isLeader()) await this.synchronize()
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                   } finally {
                      this.release()
-                     logD(f, 'unlocked')
+                     globalRelease()
+                     // logD(f, 'unlocked')
+                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }
-                  logD(f, 'next loop complete')
                }
                await this.synchroLoopWaitObj.wait()
             }
          }
          if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          this.created = true
-      } catch (err) {
-         if (recursive) throw err
-         logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
-         await this.clearCollections()
-         await this.create(true)
+      } finally {
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
       }
    }
 
@@ -220,7 +224,7 @@ class Workspace {
       const f = this.synchronize
       logD(f, 'start')
       const t1 = performance.now()
-      assert(rxdb.isLeader(), '!isLeader')
+      assert(isLeader(), '!isLeader')
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
@@ -289,7 +293,7 @@ class Workspace {
          assert(item, '!item')
          logD(f, `start ${item.id} rev:${item.rev}`)
          const t1 = performance.now()
-         assert(rxdb.isLeader(), '!this.isLeader')
+         assert(isLeader(), '!isLeader')
          assert(this.created, '!this.created')
          assert(item && item.id, '!item')
          assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
@@ -348,7 +352,7 @@ class Workspace {
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
-      assert(rxdb.isLeader(), 'rxdb.isLeader()')
+      assert(isLeader(), 'isLeader()')
       const f = this.processEvent
       logD(f, 'start')
       const t1 = performance.now()
@@ -356,7 +360,7 @@ class Workspace {
          await this.lock()
          logD(f, 'locked')
          this.ignoreWsChanges = true
-         if (!rxdb.isLeader()) return
+         if (!isLeader()) return
          logD(f, 'try apply event')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')
@@ -403,7 +407,7 @@ class Workspace {
       const f = this.find
       try {
          await this.lock()
-         logD(f, 'locked')
+         // logD(f, 'locked')
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -413,7 +417,7 @@ class Workspace {
          return rxQuery
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 
@@ -476,14 +480,15 @@ class Workspace {
 
    async remove (id) {
       const f = this.remove
+      logD(f, 'start', id)
       try {
          await this.lock()
-         logD(f, 'locked')
+         // logD(f, 'locked')
          assert(this.created, '!this.created')
          await this.db.ws_items.find({ selector: { id: id } }).remove()
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 

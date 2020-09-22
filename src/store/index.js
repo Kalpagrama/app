@@ -4,8 +4,7 @@ import Vuex from 'vuex'
 import core from './core'
 import ui from './ui'
 import debug from './debug'
-import i18next from 'i18next'
-import {RxCollectionEnum, rxdb} from 'src/system/rxdb'
+import {rxdb} from 'src/system/rxdb'
 import assert from 'assert'
 import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
 
@@ -13,10 +12,6 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
 
 Vue.use(Vuex)
-
-let currentUser = null // не делаем реактивным!!! (итак реактивен (reactiveItem))
-
-// todo action currentUser instead of mutation!!!!
 
 const store = new Vuex.Store({
   modules: {
@@ -26,14 +21,12 @@ const store = new Vuex.Store({
   },
   strict: process.env.DEV,
   state: {},
-  actions: {
-    setCurrentUser: async (context, user) => {
-      currentUser = user
-    }
-  },
   getters: {
     currentUser: (state, getters, rootState, rootGetters) => id => {
-      return currentUser
+      assert(rxdb, '!rxdb')
+      assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
+      assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
+      return rxdb.getCurrentUser()
     }
   }
 })

@@ -1,6 +1,7 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 // import VueYandexMetrika from 'vue-yandex-metrika'
 
 import { LoadingBar, Screen, date } from 'quasar'
@@ -108,7 +109,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('wsSphereFinder', () => import('components/ws_sphere_finder/index.vue'))
     Vue.component('wsSphereEditor', () => import('components/ws_sphere_editor/index.vue'))
   } catch (err) {
-    logE(err)
+    logC(err)
+    throw err
   }
 }
 

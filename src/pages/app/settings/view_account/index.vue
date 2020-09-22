@@ -74,6 +74,7 @@ q-page.row.full-width.justify-center
 
 <script>
 import { ObjectsApi } from 'src/api/objects'
+import { rxdb } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_settigns_viewAccount',
@@ -127,7 +128,7 @@ export default {
       try {
         this.loading = true
         await this.$wait(1000)
-        let oid = localStorage.getItem('k_user_oid')
+        let oid = this.$rxdb.getCurrentUser().oid
         // set avatar,name,lang
         // if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
         if (this.lang.value && this.lang.value !== this.currentUser.profile.lang) {

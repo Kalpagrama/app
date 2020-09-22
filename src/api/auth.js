@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { router } from 'src/boot/main'
-import { resetLocalStorageData, loginReset, systemLogin, systemReset } from 'src/system/services'
+import { resetLocalStorage, systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { Mutex } from 'src/system/rxdb/reactive'
@@ -24,22 +24,17 @@ const ActionEnum = Object.freeze({
 })
 
 class AuthApi {
-   static isAuthorized () {
-      return !!localStorage.getItem('k_user_oid')
-   }
-
    static getRole () {
-      return localStorage.getItem('k_user_role') || 'GUEST'
+      return rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
    }
 
    static isGuest () {
-      let role = localStorage.getItem('k_user_role')
-      return !role || role.in('GUEST', 'UNCONFIRMED')
+      return AuthApi.getRole() === 'GUEST'
    }
 
    // проверка соответствия текущего пользователя минимальным требованиям
    static userMatchMinimalRole (roleMinimal) {
-      let role = localStorage.getItem('k_user_role') || 'GUEST'
+      let role = AuthApi.getRole()
       logD('role = ', role, roleMinimal)
       switch (roleMinimal) {
          case 'GUEST':
@@ -60,11 +55,11 @@ class AuthApi {
       let hasPermition = false
       switch (action) {
          case ActionEnum.VOTE:
-            if (object && object.author.oid === localStorage.getItem('k_user_oid')) hasPermition = false
+            if (object && object.author.oid === rxdb.getCurrentUser().oid) hasPermition = false
             else hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
             break
          case ActionEnum.DELETE:
-            if (object && object.author.oid === localStorage.getItem('k_user_oid')) hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
+            if (object && object.author.oid === rxdb.getCurrentUser().oid) hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
             else hasPermition = AuthApi.userMatchMinimalRole('MODERATOR')
             break
          case ActionEnum.CREATE:
@@ -127,8 +122,7 @@ class AuthApi {
       } finally {
          try {
             if (!token || token === localStorage.getItem('k_token')) {
-               await systemReset(true)
-               window.location.reload()
+               await systemReset(true, true, false)
             }
          } finally {
             apiMutex.release()
@@ -141,7 +135,7 @@ class AuthApi {
       const f = this.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      await loginReset()
+      await systemReset(true, true, false)
       let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
@@ -172,6 +166,7 @@ class AuthApi {
       return { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires }
    }
 
+   // oauth вход
    static async userIdentifyByRoute (route) {
       assert(route, '!route')
       const f = this.userIdentifyByRoute
@@ -187,7 +182,7 @@ class AuthApi {
          needInvite = route.query.needInvite
          needConfirm = route.query.needConfirm
          userExist = route.query.userExist
-         await loginReset()
+         await systemReset(true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }
@@ -216,9 +211,8 @@ class AuthApi {
          `,
          variables: { password, inviteCode }
       })
-      localStorage.setItem('k_user_role', role)
       if (oid) localStorage.setItem('k_user_oid', oid)
-      if (result) await systemLogin()
+      if (result) await systemInit()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, {
          result,
          role,
