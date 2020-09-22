@@ -221,20 +221,18 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    const f = systemReset
    const t1 = performance.now()
    logD(f, 'start')
-   // let hardReset = confirm('critical error on startup: ' + JSON.stringify(err) + '\n\nMake hardReset?')
-   // if (hardReset) {
-   //   const { systemHardReset } = require('src/system/services')
-   //   await systemHardReset()
-   //   window.location.reload()
-   // }
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
    resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
       await globalLock()
-      // if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
-      //    logW('too often systemReset. SLEEP for 10 sec!!!')
-      //    await wait(10 * 1000) // защита от частого срабатывания
-      // }
+      if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
+         logW('too often systemReset!')
+         let hardReset = confirm('Too often system reset. \n Make app hard reset?')
+         if (hardReset) {
+           await systemHardReset()
+           window.location.reload()
+         }
+      }
       if (clearRxdb) await rxdb.deInitGlobal() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (process.env.MODE === 'pwa') await pwaReset()
