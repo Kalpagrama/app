@@ -86,7 +86,7 @@ export default {
     },
     itemLaunch (contentBookmark) {
       this.$log('itemLaunch', contentBookmark)
-      this.$router.push(`/content/${contentBookmark.oid}?viewid=fragments`).catch(e => e)
+      this.$router.push(`/content/${contentBookmark.oid}?viewid=nodes-mine`).catch(e => e)
     },
   }
 }

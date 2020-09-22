@@ -13,14 +13,10 @@ q-btn(
       //- header
       .row.full-width.items-center.content-center.q-pa-md
         .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Share
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Share node', 'Поделиться ядром')}}
         q-btn(
           @click="shareDialogOpened = false"
           round flat color="grey-8" icon="clear")
-      //- embed node
-      //- div()
-        q-input(
-          v-model="embedText")
       //- copy link
       .row.full-width.q-pa-md
         div(
@@ -34,7 +30,7 @@ q-btn(
             ).full-width
             template(v-slot:append)
               q-btn(color="green" flat no-caps @click="shareLinkCopy()")
-                span.text-bold Copy
+                span.text-bold {{$t('Copy', 'Скопировать')}}
       //- links
       div(
         v-if="!shareTarget").row.full-width.q-px-md
@@ -60,10 +56,9 @@ q-btn(
             filled dark dense color="grey-6"
             type="textarea" autogrow
             :input-style=`{minHeight: '100px',}`).full-width
-        .row.full-width
-          .col
-          q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
-            span.text-bold Copy
+            template(v-slot:append)
+              q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
+                span.text-bold {{$t('Copy', 'Скопировать')}}
 </template>
 
 <script>

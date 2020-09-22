@@ -49,7 +49,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'draft'
+          // stage: 'draft'
         },
         sort: [{updatedAt: 'desc'}]
       }

@@ -41,8 +41,9 @@ export default {
     queryFeeds () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          stage: 'feed'
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          type: 'feed'
+          // stage: 'feed'
         }
       }
       if (this.searchString.length > 0) {
@@ -60,13 +61,14 @@ export default {
         this.$log('feedCreateStart name', name)
         let feedInput = {
           name: name,
-          items: [],
           spheres: [],
           // category: 'FUN',
           // layout: 'PIP',
-          wsItemType: 'WS_NODE',
+          wsItemType: 'WS_BOOKMARK',
+          type: 'feed',
+          items: [],
           thumbUrl: '',
-          stage: 'feed',
+          // stage: 'feed',
         }
         let feed = await this.$rxdb.set(RxCollectionEnum.WS_NODE, feedInput)
         this.$log('feedCreateStart feed', feed)

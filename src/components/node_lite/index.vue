@@ -57,7 +57,7 @@ div(
             :style=`{
               cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
             }`
-            ).row.full-width.items-center.q-py-md.q-pl-md
+            ).row.full-width.items-center.justify-center.q-py-md.q-pl-md
             span(
               :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
         //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm

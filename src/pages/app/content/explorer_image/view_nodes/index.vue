@@ -92,7 +92,7 @@ export default {
       //   return acc
       // }, [])
       // this.$log('fragments', fragments)
-      // this.$store.commit('ui/stateSet', ['wsContentFragments', JSON.parse(JSON.stringify(fragments))])
+      // this.$store.commit('ui/stateSet', ['contentNodes', JSON.parse(JSON.stringify(fragments))])
     }
   }
 }

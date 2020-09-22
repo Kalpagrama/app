@@ -3,11 +3,11 @@ div.row
   q-btn(
     v-if="subscribed === false"
     @click="follow()"
-    round flat color="green" no-caps icon="rss_feed"
+    round flat color="white" no-caps icon="rss_feed"
     :loading="loading")
   q-btn(
     v-if="subscribed === true"
-    round flat color="red" no-caps icon="rss_feed"
+    round flat color="green" no-caps icon="rss_feed"
     :loading="loading")
     q-menu(
       ref="userUnfollowMenu"

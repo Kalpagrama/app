@@ -15,7 +15,7 @@ div(
       borderRadius: '10px',
     }`
     ).col.full-height.b-40
-    view-fragments(
+    //- view-fragments(
       v-if="viewId === 'fragments'"
       :player="player"
       :contentKalpa="contentKalpa"
@@ -49,12 +49,12 @@ div(
 </template>
 
 <script>
-import viewFragments from '../view_fragments/index.vue'
+// import viewFragments from '../view_fragments/index.vue'
 
 export default {
   name: 'wsContentExplorer_video_viewFullscreen',
   props: ['contentKalpa', 'contentWorkspace', 'player'],
-  components: {viewFragments},
+  // components: {viewFragments},
   data () {
     return {
       viewId: 'fragments',
