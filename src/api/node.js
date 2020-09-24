@@ -63,7 +63,7 @@ class NodeApi {
 
    static makeCompositionInput (composition) {
       assert.ok(Array.isArray(composition.layers), '!composition.layers')
-      assert(composition.operation, 'operation')
+      assert(composition.operation, '!operation')
       if (composition.layers.length === 0) { // если ничего не выделено - считаем что выделен весь контент
          assert(composition.contentOid)
          composition.layers.push(
@@ -238,8 +238,7 @@ class NodeApi {
             node: nodeInput
          }
       })
-      await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-      let reactiveNode = await rxdb.get(RxCollectionEnum.OBJ, createdNode.oid)
+      let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveNode.oid, progress: 1 }
       assert(store, '!store')
@@ -281,8 +280,7 @@ class NodeApi {
             joint: jointInput
          }
       })
-      await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-      let reactiveJoint = await rxdb.get(RxCollectionEnum.OBJ, createdJoint.oid)
+      let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return reactiveJoint
    }

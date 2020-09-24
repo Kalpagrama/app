@@ -39,7 +39,7 @@ export default {
   computed: {
     // находим первую грань для входа и просмотра ядра
     item () {
-      return this.node.meta.items.find(item => {
+      return this.node.metaStatic.items.find(item => {
         return item.layers[0].contentOid === this.contentKalpa.oid
       })
     }

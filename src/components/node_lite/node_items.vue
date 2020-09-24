@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     // previewUrl () {
-    //   return this.node.meta.items[0].thumbUrl
+    //   return this.node.metaStatic.items[0].thumbUrl
     // },
     // items () {
     //   if (!this.nodeFull) return []

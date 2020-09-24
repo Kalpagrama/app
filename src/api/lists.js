@@ -90,9 +90,9 @@ class ListsApi {
       //   // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
       //   const getDistance = (contentOid, t, node) => {
       //     assert(contentOid && node, 'contentOid && node')
-      //     assert(node.meta && node.meta.items && node.meta.items.length > 0, 'node.meta && node.meta.items && node.meta.items.length > 0')
+      //     assert(node.metaStatic && node.metaStatic.items && node.metaStatic.items.length > 0, 'node.metaStatic && node.metaStatic.items && node.metaStatic.items.length > 0')
       //     // ищем первый layer на этот контент
-      //     for (let c of node.meta.items) {
+      //     for (let c of node.metaStatic.items) {
       //       assert(c.layers, 'c.layers')
       //       for (let l of c.layers) {
       //         assert(l.figuresAbsolute, 'l.figuresAbsolute')
@@ -174,13 +174,13 @@ class ListsApi {
    //   logD(f, 'start')
    //   let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
    //     query: gql`
-   //       ${fragments.objectShortWithMetaFragment}
+   //       ${fragments.objectShortWithMetaStaticFragment}
    //       query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
    //         sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
    //           count
    //           totalCount
    //           nextPageToken
-   //           items {... objectShortWithMetaFragment}
+   //           items {... objectShortWithMetaStaticFragment}
    //         }
    //       }
    //     `,
@@ -196,13 +196,13 @@ class ListsApi {
    //   // const t1 = performance.now()
    //   let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
    //     query: gql`
-   //       ${fragments.objectShortWithMetaFragment}
+   //       ${fragments.objectShortWithMetaStaticFragment}
    //       query feed ($pagination: PaginationInput!) {
    //         feed (pagination: $pagination) {
    //           count
    //           totalCount
    //           nextPageToken
-   //           items {... objectShortWithMetaFragment}
+   //           items {... objectShortWithMetaStaticFragment}
    //         }
    //       }
    //     `,

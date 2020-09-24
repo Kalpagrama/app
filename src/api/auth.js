@@ -137,7 +137,7 @@ class AuthApi {
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
       await systemReset(true, true, false)
-      let { data: { userIdentify: { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires } } } = await apollo.clients.auth.query({
+      let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
              query  ($userId: String){
@@ -158,7 +158,7 @@ class AuthApi {
          variables: {
             userId: userId_
          }
-      }) || {data: {userIdentify: {}}}
+      })
       if (!token){ // сервер отверг userIdentify
          alert('cant login!') // TODO
       }

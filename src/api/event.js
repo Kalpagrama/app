@@ -10,7 +10,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
 class EventApi{
   static init(){
-    assert(apollo.clients.ws, '!apollo.clients.ws')
+    assert(apollo.clients.ws, '!apollo.clients.ws1')
     assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
     const observerEvent = apollo.clients.ws.subscribe({
       client: 'wsApollo',
@@ -35,9 +35,11 @@ class EventApi{
   }
 
   static deInit(){
-    assert(EventApi.subscription, '!apollo.clients.ws')
-    assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
-    if (EventApi.subscription) EventApi.subscription.unsubscribe()
+    if (EventApi.subscription) {
+      assert(apollo.clients.ws, '!apollo.clients.ws2')
+      assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
+      EventApi.subscription.unsubscribe()
+    }
     return true
   }
 }

@@ -1699,12 +1699,12 @@
             "deprecationReason": null
           },
           {
-            "name": "meta",
+            "name": "metaStatic",
             "description": null,
             "args": [],
             "type": {
               "kind": "INTERFACE",
-              "name": "Meta",
+              "name": "MetaStatic",
               "ofType": null
             },
             "isDeprecated": false,
@@ -1750,8 +1750,8 @@
       },
       {
         "kind": "INTERFACE",
-        "name": "Meta",
-        "description": "Meta - неизменяемые после создания данные. Можно запрашивать у ObjectShort.\n(бэкенд имеет право кэшировать эти данные локально)",
+        "name": "MetaStatic",
+        "description": "MetaStatic - неизменяемые после создания данные. Можно запрашивать у\nObjectShort. (бэкенд имеет право кэшировать эти данные локально)",
         "fields": [
           {
             "name": "type",
@@ -1776,27 +1776,27 @@
         "possibleTypes": [
           {
             "kind": "OBJECT",
-            "name": "MetaComposition",
+            "name": "MetaStaticComposition",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "MetaContent",
+            "name": "MetaStaticContent",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "MetaJoint",
+            "name": "MetaStaticJoint",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "MetaNode",
+            "name": "MetaStaticNode",
             "ofType": null
           },
           {
             "kind": "OBJECT",
-            "name": "MetaUser",
+            "name": "MetaStaticUser",
             "ofType": null
           }
         ]
@@ -2413,18 +2413,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
               "ofType": null
             },
             "isDeprecated": false,
@@ -3922,18 +3910,6 @@
             "deprecationReason": null
           },
           {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "createdAt",
             "description": null,
             "args": [],
@@ -4469,18 +4445,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
               "ofType": null
             },
             "isDeprecated": false,
@@ -5877,18 +5841,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
               "ofType": null
             },
             "isDeprecated": false,
@@ -8035,18 +7987,6 @@
             "deprecationReason": null
           },
           {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "createdAt",
             "description": null,
             "args": [],
@@ -8192,7 +8132,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaComposition",
+        "name": "MetaStaticComposition",
         "description": null,
         "fields": [
           {
@@ -8267,7 +8207,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "Meta",
+            "name": "MetaStatic",
             "ofType": null
           }
         ],
@@ -8276,7 +8216,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaContent",
+        "name": "MetaStaticContent",
         "description": null,
         "fields": [
           {
@@ -8312,7 +8252,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "Meta",
+            "name": "MetaStatic",
             "ofType": null
           }
         ],
@@ -8321,7 +8261,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaJoint",
+        "name": "MetaStaticJoint",
         "description": null,
         "fields": [
           {
@@ -8437,7 +8377,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "Meta",
+            "name": "MetaStatic",
             "ofType": null
           }
         ],
@@ -8446,7 +8386,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaNode",
+        "name": "MetaStaticNode",
         "description": null,
         "fields": [
           {
@@ -8581,7 +8521,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "Meta",
+            "name": "MetaStatic",
             "ofType": null
           }
         ],
@@ -8590,7 +8530,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaUser",
+        "name": "MetaStaticUser",
         "description": null,
         "fields": [
           {
@@ -8614,7 +8554,7 @@
         "interfaces": [
           {
             "kind": "INTERFACE",
-            "name": "Meta",
+            "name": "MetaStatic",
             "ofType": null
           }
         ],
@@ -8964,12 +8904,12 @@
             "deprecationReason": null
           },
           {
-            "name": "meta",
+            "name": "metaStatic",
             "description": null,
             "args": [],
             "type": {
               "kind": "INTERFACE",
-              "name": "Meta",
+              "name": "MetaStatic",
               "ofType": null
             },
             "isDeprecated": false,
@@ -9624,18 +9564,6 @@
             "deprecationReason": null
           },
           {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "createdAt",
             "description": null,
             "args": [],
@@ -9830,18 +9758,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
               "ofType": null
             },
             "isDeprecated": false,
@@ -10336,18 +10252,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "meta",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "Meta",
               "ofType": null
             },
             "isDeprecated": false,

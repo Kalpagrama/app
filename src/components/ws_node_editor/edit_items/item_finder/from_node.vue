@@ -165,11 +165,11 @@ export default {
       // get nodeFull
       let nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
       this.$log('nodeBookmarkClick nodeFull', nodeFull)
-      let items = nodeFull.meta.items.map((item, itemIndex) => {
+      let items = nodeFull.items.map((item, itemIndex) => {
         return {
           id: `${Date.now()}-${itemIndex}`,
           outputType: item.outputType,
-          thumbUrl: nodeFull.meta.items[0].thumbUrl,
+          thumbUrl: nodeFull.items[0].thumbUrl,
           operation: { items: null, operations: null, type: 'CONCAT'},
           layers: item.layers.map((layer, layerIndex) => {
             return {
