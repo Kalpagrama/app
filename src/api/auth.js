@@ -212,7 +212,7 @@ class AuthApi {
                  }
              }
          `,
-         variables: { password, inviteCode }
+         variables: { password: password || '', inviteCode }
       })
       if (oid) localStorage.setItem('k_user_oid', oid)
       if (result) await systemInit()

@@ -73,13 +73,13 @@ q-page(:style=`{paddingBottom: '200px',}`)
             ).full-width
             span(:style=`{fontSize: '18px',}`).text-white.text-bold Create account
       .row.full-width.q-px-sm
-        with-socials
+        with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
       .row.full-width.items-center.content-center.q-pa-md
         q-btn(
           color="green" outline dense no-caps
-          @click="$router.push('/auth/sign-in')").full-width Sign in
+          @click="$router.push('/auth/sign-in')").full-width Войти
         .row.full-width.justify-center.q-pa-xs
-          small.text-green Already got account?
+          small.text-green Уже есть аккаунт?
 </template>
 
 <script>

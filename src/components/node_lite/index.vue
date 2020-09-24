@@ -40,7 +40,8 @@ div(
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node" :nodeFull="nodeFull")
         node-items(
-          :previewUrl="node.meta.items[0].thumbUrl" :items="node.meta.items"
+          :previewUrl="node.meta.items[0].thumbUrl"
+          :previewName="node.name" :items="node.meta.items"
           :isActive="isActive" :isVisible="isVisible")
         //- fullscreen
         //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")

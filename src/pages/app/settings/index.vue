@@ -32,6 +32,10 @@ export default {
         {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')}
       ]
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$log('currentUser', this.$store.getters.currentUser())
   }
 }
 </script>

@@ -8,7 +8,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
             span().text-white {{$t('auth_Sign in with email/password', 'Войти с почтой и паролем')}}
           //- form
           form().full-width.q-py-md
-            //- username
+            //- email
             div(
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
               ).row.full-width.items-center.content-center.q-mb-xs
@@ -42,7 +42,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
             ).full-width
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
       .row.full-width.q-px-sm
-        with-socials
+        with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
       .row.full-width.items-center.content-center.q-pa-md
         q-btn(
           color="green" outline dense no-caps
@@ -66,33 +66,33 @@ export default {
     }
   },
   watch: {
-    '$route.query.token': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route.query.token CHANGED', to)
-        if (to) {
-          this.$log('GOT TOKEN', to)
-          // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
-          let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
-          // await this.$wait(200)
-          this.userIdentifying = false
-          this.userIdentified = true
-          this.login = userId
-          this.loginType = loginType
-          this.userExist = userExist === 'true' ? true : false
-          this.needInvite = needInvite === 'true' ? true : false
-          this.$log('this.needInvite = ', this.needInvite)
-          if (this.needInvite){
-            alert('TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!')
-            // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
-          }
-          await AuthApi.userAuthenticate('', '8888')
-          await this.$router.replace('/')
-          // if userExist and !needInvite... this.userAuthenticate()
-          // this.$router.replace('/auth')
-        }
-      }
-    }
+    // '$route.query.token': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('$route.query.token CHANGED', to)
+    //     if (to) {
+    //       this.$log('GOT TOKEN', to)
+    //       // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
+    //       let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
+    //       // await this.$wait(200)
+    //       this.userIdentifying = false
+    //       this.userIdentified = true
+    //       this.login = userId
+    //       this.loginType = loginType
+    //       this.userExist = userExist === 'true' ? true : false
+    //       this.needInvite = needInvite === 'true' ? true : false
+    //       this.$log('this.needInvite = ', this.needInvite)
+    //       if (this.needInvite){
+    //         alert('TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!')
+    //         // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
+    //       }
+    //       await AuthApi.userAuthenticate('', '!!!TODO!!!')
+    //       await this.$router.replace('/')
+    //       // if userExist and !needInvite... this.userAuthenticate()
+    //       // this.$router.replace('/auth')
+    //     }
+    //   }
+    // }
   },
   methods: {
     check () {
