@@ -44,7 +44,6 @@ export default {
             await this.$router.replace('/')
           }
           catch (e) {
-            this.$log('needInvite error', e)
             this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
           }
         }

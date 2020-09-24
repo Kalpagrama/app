@@ -79,8 +79,9 @@ class AuthApi {
       }
    }
 
-   static async services (servicesApollo) {
-      let { data: { services } } = await servicesApollo.query({
+   static async services () {
+      assert(apollo.clients.services, '!apollo.clients.services')
+      let { data: { services } } = await apollo.clients.services.query({
          query: gql`query {
              services {
                  authUrl

@@ -21,15 +21,14 @@ class GqlQueries {
    // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
    // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
    // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-   async get (id, clientFirst, force, onFetchFunc = null, servicesApollo = null, params = null) {
+   async get (id, clientFirst, force, onFetchFunc = null, params = null) {
       let fetchFunc
       switch (getRawIdFromId(id)) {
          case 'services' :
-            assert(servicesApollo, '!servicesApollo')
             fetchFunc = async () => {
                return {
                   notEvict: true, // живет вечно
-                  item: await AuthApi.services(servicesApollo),
+                  item: await AuthApi.services(),
                   actualAge: 'day'
                }
             }
@@ -61,7 +60,8 @@ class GqlQueries {
                }
             }
             break
-         default: throw new Error(`bad id ${id}`)
+         default:
+            throw new Error(`bad id ${id}`)
       }
 
       // logD('objects::get start')
