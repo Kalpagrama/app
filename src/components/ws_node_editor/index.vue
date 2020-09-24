@@ -120,11 +120,11 @@ export default {
         // // })
         await this.$rxdb.remove(this.node.id)
         this.publishing = false
-        this.$q.notify({
-          type: 'positive',
-          position: 'top',
-          message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро создается...')
-        })
+        // this.$q.notify({
+        //   type: 'positive',
+        //   position: 'top',
+        //   message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро создается...')
+        // })
         // need to replace router, cos we deleted it...
         this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }

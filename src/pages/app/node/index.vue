@@ -10,7 +10,7 @@ q-layout(view="hHh Lpr lff")
     v-model="nodeLinkerOpened" position="bottom"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    node-linker(:node="node" @close="nodeLinkerOpened = false")
+    node-linker(v-if="node" :node="node" @close="nodeLinkerOpened = false")
   //- q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
@@ -159,9 +159,11 @@ export default {
         this.$log('$route.params.oid TO', to)
         if (to) {
           if (this.$store.state.core.progressInfo.CREATE[to]) {
+            this.$log('CREATE intital', this.$store.state.core.progressInfo.CREATE[to])
             this.nodeWatch(to)
           }
           else {
+            this.$log('LOADING NODE...')
             this.nodeLoad(to)
           }
         }

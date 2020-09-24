@@ -47,9 +47,12 @@ export default {
                 this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
               }
             }
+            this.$q.notify({type: 'negative', position: 'top', message: 'No code, no app!'})
           }
+          // go to app
           else {
-            // go to app
+            await AuthApi.userAuthenticate(null, null)
+            await this.$router.replace('/')
           }
         }
         // if (to) {
@@ -74,7 +77,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', true, 'true', false, 'false')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
