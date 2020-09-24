@@ -190,8 +190,13 @@ function initOfflineEvents (store) {
    store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-async function initLocalStorage () {
-   if (!localStorage.getItem('k_log_level') || !localStorage.getItem('k_log_filter') || !localStorage.getItem('k_debug')) await resetLocalStorage()
+async function initSessionStorage () {
+   if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
+   if (!sessionStorage.getItem('k_log_level')) {
+      if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
+      else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
+   }
+   if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'gui')
 }
 
 async function resetLocalStorage () {
@@ -201,15 +206,8 @@ async function resetLocalStorage () {
       await globalLock()
       for (let i = 0; i < localStorage.length; i++) {
          let key = localStorage.key(i)
-         if (process.env.NODE_ENV === 'development' && (key === 'k_debug' || key === 'k_log_level' || key === 'k_log_filter')) continue
          if (key.startsWith('k_')) localStorage.removeItem(key)
       }
-      if (!localStorage.getItem('k_debug')) localStorage.setItem('k_debug', '0')
-      if (!localStorage.getItem('k_log_level')) {
-         if (process.env.NODE_ENV === 'development') localStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
-         else localStorage.setItem('k_log_level', LogLevelEnum.WARNING)
-      }
-      if (!localStorage.getItem('k_log_filter')) localStorage.setItem('k_log_filter', 'gui')
    } finally {
       globalRelease()
    }
@@ -336,6 +334,6 @@ export {
    initServices,
    systemReset,
    shareWith,
-   initLocalStorage,
+   initSessionStorage,
    systemInit
 }

@@ -25,7 +25,7 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
-      let kDebug = localStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
+      let kDebug = sessionStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
       assert(kDebug) // '0' | '1'
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)

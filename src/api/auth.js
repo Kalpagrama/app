@@ -157,7 +157,10 @@ class AuthApi {
          variables: {
             userId: userId_
          }
-      })
+      }) || {data: {userIdentify: {}}}
+      if (!token){ // сервер отверг userIdentify
+         alert('cant login!') // TODO
+      }
       localStorage.setItem('k_token', token)
       localStorage.setItem('k_token_expires', expires)
       // setWebPushToken мог быть вызван до userIdentify
@@ -179,9 +182,9 @@ class AuthApi {
          expires = route.query.expires
          userId = route.query.userId
          loginType = route.query.loginType
-         needInvite = route.query.needInvite
-         needConfirm = route.query.needConfirm
-         userExist = route.query.userExist
+         needInvite = route.query.needInvite === 'true'
+         needConfirm = route.query.needConfirm === 'true'
+         userExist = route.query.userExist === 'true'
          await systemReset(true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
