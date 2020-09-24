@@ -86,7 +86,7 @@ export default {
             alert('TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!')
             // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
           }
-          await AuthApi.userAuthenticate('', '!!!TODO!!!')
+          await AuthApi.userAuthenticate('', '8888')
           await this.$router.replace('/')
           // if userExist and !needInvite... this.userAuthenticate()
           // this.$router.replace('/auth')

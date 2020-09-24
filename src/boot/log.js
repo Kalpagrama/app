@@ -59,10 +59,10 @@ class Logger {
     this.store = store
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
-    let logLevel = localStorage.getItem('k_log_level')
+    let logLevel = sessionStorage.getItem('k_log_level')
     assert(logLevel)
     this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
-    let logDbgFilter = localStorage.getItem('k_log_filter')
+    let logDbgFilter = sessionStorage.getItem('k_log_filter')
     assert(logDbgFilter)
     this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
   }
@@ -199,9 +199,9 @@ function getLogFunc(level, module) {
 
 export default async ({Vue, store, app}) => {
   try {
-    // import { initLocalStorage } from 'src/system/services'
-    await require('src/system/services').initLocalStorage()
-    // await initLocalStorage()
+    // import { initSessionStorage } from 'src/system/services'
+    await require('src/system/services').initSessionStorage()
+    // await initSessionStorage()
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName

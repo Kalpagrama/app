@@ -157,7 +157,10 @@ class AuthApi {
          variables: {
             userId: userId_
          }
-      })
+      }) || {data: {userIdentify: {}}}
+      if (!token){ // сервер отверг userIdentify
+         alert('cant login!') // TODO
+      }
       localStorage.setItem('k_token', token)
       localStorage.setItem('k_token_expires', expires)
       // setWebPushToken мог быть вызван до userIdentify
