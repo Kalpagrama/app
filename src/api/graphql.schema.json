@@ -109,13 +109,9 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "userIdentifyResult",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "userIdentifyResult",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -205,11 +201,21 @@
             "deprecationReason": null
           },
           {
-            "name": "resetPassword",
-            "description": "Восстановление пароля по почте. Если к учетке привязана почта, то на нее придет новый пароль",
+            "name": "setPermanentPassword",
+            "description": "установить/изменить постоянный пароль",
             "args": [
               {
-                "name": "userId",
+                "name": "oldPassword",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "newPassword",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -246,37 +252,6 @@
                   "kind": "SCALAR",
                   "name": "String",
                   "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "restorePassword",
-            "description": "Восстановление userId в соответствии с настройками, указанными в профиле (по-умолчанию - через почту)",
-            "args": [
-              {
-                "name": "userId",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
                 },
                 "defaultValue": null
               }
@@ -384,33 +359,6 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "sphere",
-            "description": null,
-            "args": [
-              {
-                "name": "name",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "INTERFACE",
-              "name": "ObjectShort",
-              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -962,6 +910,22 @@
           },
           {
             "name": "needConfirm",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hasPermanentPassword",
             "description": null,
             "args": [],
             "type": {
@@ -3020,7 +2984,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeSetViewed",
+            "name": "setViewed",
             "description": null,
             "args": [
               {
@@ -4176,6 +4140,54 @@
                 "kind": "SCALAR",
                 "name": "Int",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jointsWithSpheres",
+            "description": "lookup для списка джойнтов (вместо отдельного find)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "jointsWithEmojis",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,

@@ -302,18 +302,18 @@ class RxDBWrapper {
       }
    }
 
-   async deInit (recreateDbGlobal = false) {
+   async deInit (fromDeinitGlobal = false) {
       const f = this.deInit
       const t1 = performance.now()
       try {
-         logD(f, 'start', recreateDbGlobal)
+         logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
          await this.lock()
-         this.event.deInit()
+         if (fromDeinitGlobal) this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
          this.reactiveItemDbMemCache.reset()
-         if (recreateDbGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // recreateDbGlobal - кейс только для  deInitGlobal
+         if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
       } finally {
          this.release()
