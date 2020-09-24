@@ -11,6 +11,8 @@ q-layout(view="hHh lpR fFf").b-30
 </template>
 
 <script>
+import { AuthApi } from 'src/api/auth'
+
 export default {
   name: 'authLayout',
   meta () {
@@ -24,25 +26,50 @@ export default {
     '$route.query.token': {
       immediate: true,
       async handler (to, from) {
-        this.$log('$route.query.token CHANGED', to)
         if (to) {
-          this.$log('GOT TOKEN', to)
-          // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
-          let q = this.$route.query
-          this.$log('q=', q)
-          localStorage.setItem('k_token', q.token)
-          localStorage.setItem('k_token_expires', q.expires)
-          // await this.$wait(200)
-          // this.userIdentifying = false
-          // this.userIdentified = true
-          // this.login = q.userId
-          // this.loginType = q.loginType
-          // this.userExist = q.userExist === 'true' ? true : false
-          // this.needInvite = q.needInvite === 'true' ? true : false
-          // this.$log('this.needInvite = ', this.needInvite)
-          // if userExist and !needInvite... this.userAuthenticate()
-          // this.$router.replace('/auth')
+          this.$log('$route.query.token TO', to)
+          let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
+          this.$log('userId', userId)
+          this.$log('loginType', loginType)
+          this.$log('needInvite', needInvite)
+          this.$log('needConfirm', needConfirm)
+          if (needInvite) {
+            // go to invite code...
+            let code = prompt('Enter invite code...')
+            if (code) {
+              try {
+                let {result, failReason, oid} = await AuthApi.userAuthenticate('', code)
+                if (result === false) throw new Error(`Error: ${failReason}`)
+                await this.$router.replace('/')
+              }
+              catch (e) {
+                this.$log('needInvite error', e)
+                this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+              }
+            }
+          }
+          else {
+            // go to app
+          }
         }
+        // if (to) {
+        //   this.$log('GOT TOKEN', to)
+        //   // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
+        //   let q = this.$route.query
+        //   this.$log('q=', q)
+        //   localStorage.setItem('k_token', q.token)
+        //   localStorage.setItem('k_token_expires', q.expires)
+        //   // await this.$wait(200)
+        //   // this.userIdentifying = false
+        //   // this.userIdentified = true
+        //   // this.login = q.userId
+        //   // this.loginType = q.loginType
+        //   // this.userExist = q.userExist === 'true' ? true : false
+        //   // this.needInvite = q.needInvite === 'true' ? true : false
+        //   // this.$log('this.needInvite = ', this.needInvite)
+        //   // if userExist and !needInvite... this.userAuthenticate()
+        //   // this.$router.replace('/auth')
+        // }
       }
     }
   },

@@ -16,7 +16,10 @@ div(
   img(
     @load="previewLoad"
     @error="previewErrored"
-    :src="previewUrl" draggable="false"
+    :src="previewUrl"
+    :alt="previewName"
+    draggable="false"
+    loading="lazy"
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-300+'px',
@@ -54,7 +57,7 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 export default {
   name: 'nodeLite_nodeItems',
   components: {listPip, compositionPlayer},
-  props: ['previewUrl', 'items', 'isActive', 'isVisible'],
+  props: ['previewUrl', 'previewName', 'items', 'isActive', 'isVisible'],
   data () {
     return {
       started: false,

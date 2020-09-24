@@ -6,13 +6,17 @@
 
 <template lang="pug">
 div(
-  :style=`{height: '56px', overflow: 'hidden'}`
+  :style=`{overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
-  div(v-if="!userIdentified").row.full-width.justify-between.q-py-md
-    q-btn(
+  .row.full-width.justify-between.q-py-sm
+    //- q-btn(
       v-for="(s,si) in socials" :key="s.id" @click="serviceClick(s,si)"
       flat round color="white" :icon="s.icon"
       :style=`{width: '40px', height: '40px'}`).s-item
+    q-btn(
+      @click="serviceClick({id: 'oAuthUrlGoogle'})"
+      flat color="white" icon="fab fa-google" no-caps).full-width.b-40.q-py-xs
+      span.q-ml-sm {{title}}
 </template>
 
 <script>
@@ -22,6 +26,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageAuth-withSocials',
+  props: ['title'],
   data () {
     return {
       socials: [
