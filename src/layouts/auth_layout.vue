@@ -33,23 +33,19 @@ export default {
           this.$log('loginType', loginType)
           this.$log('needInvite', needInvite)
           this.$log('needConfirm', needConfirm)
+          let code
           if (needInvite) {
             // go to invite code...
-            let code = prompt('Enter invite code...')
-            if (code) {
-              try {
-                let {result, failReason, oid} = await AuthApi.userAuthenticate('', code)
-                if (result === false) throw new Error(`Error: ${failReason}`)
-                await this.$router.replace('/')
-              }
-              catch (e) {
-                this.$log('needInvite error', e)
-                this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
-              }
-            }
+            code = prompt('Enter invite code...')
           }
-          else {
-            // go to app
+          try {
+            let {result, failReason, oid} = await AuthApi.userAuthenticate('', code)
+            if (result === false) throw new Error(`Error: ${failReason}`)
+            await this.$router.replace('/')
+          }
+          catch (e) {
+            this.$log('needInvite error', e)
+            this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
           }
         }
         // if (to) {
