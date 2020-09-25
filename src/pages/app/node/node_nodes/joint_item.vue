@@ -7,7 +7,7 @@ div(
     node-lite(
       v-if="item && item.type === 'NODE'"
       :isActive="isActive" :isVisible="isVisible"
-      :node="item"
+      :node="item.metaStatic"
       :marginBottom="80")
     div(
       v-if="item && item.type === 'WORD'"

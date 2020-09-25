@@ -21,7 +21,7 @@ div(
       .col.full-width
         composition-player(
           :isActive="true" :isVisible="true"
-          :composition="node.metaStatic.items[0]"
+          :composition="node.items[0]"
           :options=`{isFit: true}`)
   //- right side of heaven
   div(

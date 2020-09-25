@@ -84,8 +84,8 @@ q-layout(view="hHh Lpr lff")
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
           //- view to nodes, explores and shit...
-          router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
-      q-page-sticky(
+          //- router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
+      //- q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
         :style=`{zIndex: 99999}`)

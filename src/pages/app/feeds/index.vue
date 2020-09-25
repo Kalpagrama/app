@@ -75,7 +75,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.$store.getters.currentUser().oid,
-          subscriptions: {$in: this.subscriptions}
+          subscription: {$in: this.subscriptions}
         }
       }
     }

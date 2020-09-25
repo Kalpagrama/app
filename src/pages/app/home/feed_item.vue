@@ -24,7 +24,7 @@
     div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width
       node-lite(
         v-if="item.object.type === 'NODE'"
-        :node="item.object" :isActive="isActive" :isVisible="isVisible"
+        :node="item.object.metaStatic" :isActive="isActive" :isVisible="isVisible"
         :marginBottom="0")
       div(
         v-if="item.object.type === 'WORD'"
