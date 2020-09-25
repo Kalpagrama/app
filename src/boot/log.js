@@ -81,7 +81,7 @@ class Logger {
       // loggerModule = require('debug')(`[${module}]`)
       // loggerModule.enabled = true
       loggerModule = (...args) => {
-        console.log(args)
+        console.log(module, ...args)
       }
       this.loggerFuncs[module] = loggerModule
     }
@@ -89,6 +89,8 @@ class Logger {
   }
 
   prepareParams(msg, highlightColor, textColor) { // #69f542
+    return
+    // eslint-disable-next-line no-unreachable
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
