@@ -40,9 +40,8 @@ const routes = [
       children: [
          {
             name: 'home',
-            path: 'home',
-            // component: () => import('pages/app/home/index.vue'),
-            component: () => import('pages/app/home/home.vue'),
+            path: 'home/:id?',
+            component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          {

@@ -47,10 +47,6 @@ q-layout(view="hHh Lpr lff")
               div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
               kalpa-follow(v-if="node" :oid="$route.params.oid")
-          //- q-btn(
-          //-   round flat color="red-5" icon="delete_outline"
-          //-   @click="nodeDelete()"
-          //-   ).br
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center

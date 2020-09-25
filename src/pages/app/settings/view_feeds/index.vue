@@ -62,13 +62,10 @@ export default {
         let feedInput = {
           name: name,
           spheres: [],
-          // category: 'FUN',
-          // layout: 'PIP',
           wsItemType: 'WS_BOOKMARK',
           type: 'feed',
           items: [],
           thumbUrl: '',
-          // stage: 'feed',
         }
         let feed = await this.$rxdb.set(RxCollectionEnum.WS_NODE, feedInput)
         this.$log('feedCreateStart feed', feed)

@@ -11,7 +11,7 @@
   insert-emoji(
     @click.native="start()"
     color="grey-8").q-mr-sm
-  kalpa-loader(:mangoQuery="queryEmojis" :sliceSize="1000" v-slot=`{items,next}`)
+  //- kalpa-loader(:mangoQuery="queryEmojis" :sliceSize="1000" v-slot=`{items,next}`)
     .row.items-center-content-center
       q-btn(
         v-for="(i,ii) in items" :key="i.oid"
