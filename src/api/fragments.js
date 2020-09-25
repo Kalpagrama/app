@@ -117,7 +117,7 @@ const imageFragment = gql`${objectFragment}
     contentSource
   }
 `
-const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment}
+const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragment}
   fragment figureFragment on Figure {
     t
     points {
@@ -194,7 +194,7 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
     contentSource
   }
 `
-const jointFragment = gql` ${objectFragment} ${objectShortFragment} ${objectShortFragment}
+const jointFragment = gql` ${objectFragment} ${objectShortFragment}
   fragment jointFragment on Joint {
     ...objectFragment
     jointType
@@ -231,7 +231,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 
 const eventFragment = gql`
-  ${objectShortFragment} ${objectShortFragment}
+  ${objectShortFragment}
   fragment eventFragment on Event {
     id
     createdAt
@@ -364,7 +364,7 @@ const objectFullFragment = gql`
 `
 
 const findResultFragment = gql`
-  ${eventFragment} ${objectShortFragment}
+  ${eventFragment}
   fragment findResultFragment on FindResult {
     count
     totalCount

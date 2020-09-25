@@ -400,11 +400,15 @@ class RxDBWrapper {
       let limit = Math.min(mangoQuery.selector.limit || 10, 10)
       delete mangoQuery.selector.pageToken // мешает нормальному кэшированию запросов в findInternal
       delete mangoQuery.selector.limit // мешает нормальному кэшированию запросов в findInternal
+      // let tx = performance.now()
       let objectShortList = await this.findInternal(mangoQuery)
+      // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
       let startIndx = pageToken.indx
       let objectShortListLimit = objectShortList.items.slice(startIndx, startIndx + limit)
       // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+      // tx = performance.now()
       let fullObjects = await Promise.all(objectShortListLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
+      // logD(f, `fullObjects complete: ${Math.floor(performance.now() - tx)} msec`)
       fullObjects = fullObjects.filter(obj => !!obj)
       let fetchPromises = [] // запросы за вложенными объектами
       for (let objectFull of fullObjects) {
@@ -417,7 +421,9 @@ class RxDBWrapper {
             fetchPromises.push(this.get(RxCollectionEnum.OBJ, objectFull.rightItem.oid, { clientFirst: true }))
          }
       }
+      // tx = performance.now()
       await Promise.all(fetchPromises) // запрашиваем разом (см. objects.js) все вложенные сущности (будут в кэше)
+      // logD(f, `fetchPromises complete: ${Math.floor(performance.now() - tx)} msec`)
       for (let objectFull of fullObjects) {
          if (objectFull.type === 'NODE') {
             for (let i = 0; i < objectFull.items.length; i++) {
