@@ -31,7 +31,7 @@ export default async ({ Vue, store, app }) => {
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
       // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
-      alert('1 SERVICES_URL=' + SERVICES_URL)
+      logD('SERVICES_URL=' + SERVICES_URL)
       const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
          if (graphQLErrors) {
             for (let err of graphQLErrors) {
@@ -87,7 +87,6 @@ export default async ({ Vue, store, app }) => {
             fetchPolicy: 'no-cache'
          }
       }
-      alert('2 SERVICES_URL=' + SERVICES_URL)
       const servicesApollo = new ApolloClient({
          link: createHttpLink({
             uri: SERVICES_URL,
@@ -117,7 +116,6 @@ export default async ({ Vue, store, app }) => {
             window.location.reload() // новые данные будут подхвачены после перезагрузки
          }
       }
-      alert('3 SERVICES_URL=' + SERVICES_URL)
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
          { clientFirst: true, force: true, onFetchFunc })
 
