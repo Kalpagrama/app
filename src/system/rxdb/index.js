@@ -3,7 +3,7 @@ import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase, DEFAULT_UNEXECUTED_LIFETME, removeRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 // import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -15,8 +15,7 @@ import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { wait } from 'src/system/utils'
-import { getInstanceId, globalLock, globalLockedByMe, globalRelease, isLeader, systemReset } from 'src/system/services'
+import { getInstanceId, globalLock, globalRelease, isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -392,9 +391,40 @@ class RxDBWrapper {
       }
    }
 
-   // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
+   // вернет список из objectFull
    async find (mangoQuery) {
       const f = this.find
+      const t1 = performance.now()
+
+      logD(f, 'start', mangoQuery)
+      let pageToken = mangoQuery.selector.pageToken || {indx: 0, oid: null}
+      let limit = Math.min(mangoQuery.selector.limit || 10, 10)
+      delete mangoQuery.selector.pageToken // мешает нормальному кэшированию запросов в findInternal
+      delete mangoQuery.selector.limit // мешает нормальному кэшированию запросов в findInternal
+      let objectShortList = await this.findInternal(mangoQuery)
+      let fullItems = []
+      let startIndx = pageToken.indx
+      for (let itemShort of objectShortList.items.splice(startIndx, limit)) {
+         assert(itemShort.oid)
+         let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
+         // fullItem.metaStatic = fullItem // TODO!!!!! убрать
+         fullItems.push(fullItem)
+      }
+      let nextIndx = startIndx + limit
+      let nextItem = objectShortList.items[nextIndx]
+      return {
+         items: fullItems,
+         count: fullItems.length,
+         totalCount: objectShortList.count,
+         nextPageToken: nextItem ? {indx: nextIndx, oid: nextItem.oid} : null,
+         prevPageToken: pageToken
+      }
+   }
+
+   // вернет список из objectShort
+   // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
+   async findInternal (mangoQuery) {
+      const f = this.findInternal
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
       try {
