@@ -407,7 +407,7 @@ class RxDBWrapper {
       for (let itemShort of objectShortList.items.splice(startIndx + limit, objectShortList.items.length)) {
          assert(itemShort.oid)
          let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
-         fullItem.metaStatic = fullItem // TODO!!!!! убрать
+         // fullItem.metaStatic = fullItem // TODO!!!!! убрать
          fullItems.push(fullItem)
       }
       let nextIndx = startIndx + limit
