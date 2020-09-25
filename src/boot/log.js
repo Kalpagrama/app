@@ -97,14 +97,13 @@ class Logger {
     // } else if (highlightColor) {
     //   msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
     // }
-    msg.splice(0, 1, `%c[${module}]`, 'color: yellow; font-style: italic; padding: 2px;')
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      msg.splice(2, 0, `[${func.name || func.nameExtra}]`, (new Date()).toLocaleTimeString())
-    } else {
-      msg.splice(2, 0, `[${'unknown func'}]`, (new Date()).toLocaleTimeString())
+      msg.splice(0, 1, `[${func.name || func.nameExtra}]`, (new Date()).toLocaleTimeString())
     }
+    assert(module, '!module')
+    msg.splice(0, 0, `%c[${module}]`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
   }
 
   showAlert(msg) {
