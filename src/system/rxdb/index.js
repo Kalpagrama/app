@@ -404,14 +404,14 @@ class RxDBWrapper {
       let objectShortList = await this.findInternal(mangoQuery)
       let fullItems = []
       let startIndx = pageToken.indx
-      for (let itemShort of objectShortList.items.splice(startIndx + limit, objectShortList.items.length)) {
+      for (let itemShort of objectShortList.items.slice(startIndx, startIndx + limit)) {
          assert(itemShort.oid)
          let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
-         // fullItem.metaStatic = fullItem // TODO!!!!! убрать
          fullItems.push(fullItem)
       }
       let nextIndx = startIndx + limit
       let nextItem = objectShortList.items[nextIndx]
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, fullItems)
       return {
          items: fullItems,
          count: fullItems.length,

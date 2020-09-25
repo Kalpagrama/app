@@ -19,6 +19,8 @@ if (!('toJSON' in Error.prototype)) {
   })
 }
 
+// let pino = require('pino')({browser: {asObject: false}})
+
 const LogLevelEnum = Object.freeze({
   DEBUG: 0,
   INFO: 1,
@@ -80,24 +82,28 @@ class Logger {
     if (!loggerModule) {
       // loggerModule = require('debug')(`[${module}]`)
       // loggerModule.enabled = true
-      loggerModule = (...args) => {
-        console.log(module, ...args)
-      }
-      this.loggerFuncs[module] = loggerModule
+      // loggerModule = require('pino')({browser: {nestedKey: 'payload', name: 'WERTY', asObject: false}})
+      // this.loggerFuncs[module] = loggerModule
     }
     return loggerModule
   }
 
   prepareParams(msg, highlightColor, textColor) { // #69f542
-    return
-    // eslint-disable-next-line no-unreachable
+    // let func = null
+    // if (msg.length && typeof msg[0] === 'function') {
+    //   func = msg[0]
+    //   if (highlightColor) msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+    //   else msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
+    // } else if (highlightColor) {
+    //   msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+    // }
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      if (highlightColor) msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      else msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
+      if (highlightColor) msg.splice(0, 1, `[${func.name || func.nameExtra}]`, (new Date()).toLocaleTimeString())
+      else msg.splice(0, 1, `[${func.name || func.nameExtra}]`, (new Date()).toLocaleTimeString())
     } else if (highlightColor) {
-      msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+      msg.splice(0, 0, `[${'______'}]`, (new Date()).toLocaleTimeString())
     }
   }
 
@@ -117,7 +123,8 @@ class Logger {
     if (this.store.state.core.logDbgModulesBlackList.includes(module)) return
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
-      this.getLoggerFunc(module, null)(...msg)
+      console.log(module, ...msg)
+      // this.getLoggerFunc(module, null)(...msg)
     }
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry) {
       // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
@@ -127,7 +134,8 @@ class Logger {
   info(module, ...msg) {
     if (LogLevelEnum.INFO >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
-      this.getLoggerFunc(module)(...msg)
+      console.info(module, ...msg)
+      // this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.INFO >= this.store.state.core.logLevelSentry) {
       // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
@@ -137,7 +145,8 @@ class Logger {
   warn(module, ...msg) {
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevel) {
       this.prepareParams(msg, 'Yellow', 'Black')
-      this.getLoggerFunc(module)(...msg)
+      console.warn(module, ...msg)
+      // this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry) {
       // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
@@ -149,7 +158,8 @@ class Logger {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
         this.prepareParams(msg, 'Red', 'Lime')
-        this.getLoggerFunc(module)(...msg)
+        console.error(module, ...msg)
+        // this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
@@ -167,7 +177,8 @@ class Logger {
       if (reload) window.location.reload()
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
         this.prepareParams(msg, 'Red', 'Lime')
-        this.getLoggerFunc(module)(...msg)
+        console.error(module, ...msg)
+        // this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
