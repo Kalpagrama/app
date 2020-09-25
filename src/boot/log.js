@@ -78,8 +78,11 @@ class Logger {
     let loggerModule
     loggerModule = this.loggerFuncs[module]
     if (!loggerModule) {
-      loggerModule = require('debug')(`[${module}]`)
-      loggerModule.enabled = true
+      // loggerModule = require('debug')(`[${module}]`)
+      // loggerModule.enabled = true
+      loggerModule = (...args) => {
+        console.log(args)
+      }
       this.loggerFuncs[module] = loggerModule
     }
     return loggerModule
