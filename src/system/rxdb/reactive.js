@@ -277,7 +277,7 @@ class ReactiveListHolder {
       const f = this.listSubscribe
       if (this.listUnsubscribeFunc) return
       this.listUnsubscribeFunc = this.vm.$watch('reactiveList', async (newVal, oldVal) => {
-         assert(false, 'изменения списка из UI запрещены')
+         // assert(false, 'изменения списка из UI запрещены')
          // // reactiveList изменился (из UI)
          // if (!this.debouncedListSave) {
          //   this.debouncedListSave = debounce(async (newVal, oldVal) => {

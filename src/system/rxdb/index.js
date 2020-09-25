@@ -407,6 +407,13 @@ class RxDBWrapper {
       for (let itemShort of objectShortList.items.slice(startIndx, startIndx + limit)) {
          assert(itemShort.oid)
          let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
+         let nestedFullItems = []
+         if (fullItem.type === 'NODE'){
+            for (let item of fullItem.items){
+               nestedFullItems.push(await this.get(RxCollectionEnum.OBJ, item.oid))
+            }
+         }
+         fullItem.items = nestedFullItems
          fullItems.push(fullItem)
       }
       let nextIndx = startIndx + limit
