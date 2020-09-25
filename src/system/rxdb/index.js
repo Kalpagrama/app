@@ -407,13 +407,17 @@ class RxDBWrapper {
       for (let itemShort of objectShortList.items.slice(startIndx, startIndx + limit)) {
          assert(itemShort.oid)
          let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
-         let nestedFullItems = []
          if (fullItem.type === 'NODE'){
+            let nestedFullItems = []
             for (let item of fullItem.items){
                nestedFullItems.push(await this.get(RxCollectionEnum.OBJ, item.oid))
             }
+            fullItem.items = nestedFullItems
          }
-         fullItem.items = nestedFullItems
+         if (fullItem.type === 'JOINT'){
+            fullItem.leftItem = await this.get(RxCollectionEnum.OBJ, fullItem.leftItem.oid)
+            fullItem.rightItem = await this.get(RxCollectionEnum.OBJ, fullItem.rightItem.oid)
+         }
          fullItems.push(fullItem)
       }
       let nextIndx = startIndx + limit
