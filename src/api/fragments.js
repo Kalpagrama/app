@@ -77,7 +77,7 @@ const objectShortFragment = gql`
     createdAt
   }
 `
-const objectFragment = gql`${metaStaticFragment} ${objectShortFragment}
+const objectFragment = gql`${objectShortFragment}
   fragment objectFragment on Object {
     type
     oid
