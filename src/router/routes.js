@@ -342,4 +342,10 @@ const routes = [
    }
 ]
 
+// Always leave this as last one
+routes.push({
+   path: '*',
+   redirect: '/auth'
+})
+
 export default routes

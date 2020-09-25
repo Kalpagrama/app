@@ -7,7 +7,7 @@ import {
   keys as idbKeys,
   set as idbSet,
   Store
-} from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+} from 'public/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { wait } from 'src/system/utils'
 
