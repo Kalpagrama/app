@@ -21,24 +21,24 @@ q-layout(view="hHh Lpr lff")
               ).full-width.text-grey-5
               q-tab(v-for="(f,fi) in items" :key="f.id" :name="f.id" :label="f.name")
   q-page-container
-    q-page.row.full-width.justify-center
+    q-page(:style=`{paddingBottom: '0px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px',}`).row.full-width
-        //- small.text-white {{ feeds }}
         kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
-          :mangoQuery="queryFeedItems" :sliceSize="1000" v-slot=`{items,next}`)
-          .row.full-width.items-start.content-start
-            div(
-              v-for="i in items" :key="i.oid"
-              ).row.full-width
-              small.text-white {{ i }}
+          :mangoQuery="queryFeedItems" :sliceSize="3" v-slot=`{items,next}`)
+          list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+            q-infinite-scroll(@load="next" :offset="250")
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+              feed-item(:item="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import feedItem from './feed_item.vue'
 
 export default {
   name: 'pageApp__feeds',
+  components: {feedItem},
   data () {
     return {
       feedId: null,

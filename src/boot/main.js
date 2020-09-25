@@ -10,8 +10,8 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import VueMasonry from 'vue-masonry-css'
-import 'viewerjs/dist/viewer.css'
-import Viewer from 'v-viewer'
+// import 'viewerjs/dist/viewer.css'
+// import Viewer from 'v-viewer'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -45,7 +45,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     //   // env: process.env.NODE_ENV
     //   // other options
     // })
-    Vue.use(Viewer)
+    // Vue.use(Viewer)
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
