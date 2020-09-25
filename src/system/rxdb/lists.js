@@ -247,12 +247,14 @@ class Lists {
     if (filter.oids && !filter.oids.includes(objectShort.oid)) return false
     if (filter.name && filter.name !== objectShort.name) return false
     if (filter.nameRegExp && objectShort.name.search(new RegExp(filter.nameRegExp)) === -1) return false
-    if (filter.compositionOids) {
-      for (let compositionOid of filter.compositionOids) {
-        assert(objectShort.metaStatic, '!objectShort.metaStatic')
-        if (!objectShort.metaStatic.items.map(composition => composition.oid).includes(compositionOid)) return false
-      }
-    }
+
+    // todo metaStatic уже нет. (прилетают ленты где есть только oid)
+    // if (filter.compositionOids) {
+    //   for (let compositionOid of filter.compositionOids) {
+    //     assert(objectShort.metaStatic, '!objectShort.metaStatic')
+    //     if (!objectShort.metaStatic.items.map(composition => composition.oid).includes(compositionOid)) return false
+    //   }
+    // }
     return true
   }
 
