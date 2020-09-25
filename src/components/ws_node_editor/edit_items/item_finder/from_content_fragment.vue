@@ -48,12 +48,11 @@ export default {
       if (node.oid) {
         let itemInput = {
           id: `${Date.now().toString()}-0`,
-          thumbUrl: node.metaStatic.items[0].thumbUrl,
-          contentOid: node.metaStatic.items[0].contentOid,
-          outputType: node.metaStatic.items[0].outputType,
-          // operation: node.metaStatic.items[0].operation,
+          thumbUrl: node.items[0].thumbUrl,
+          contentOid: node.items[0].contentOid,
+          outputType: node.items[0].outputType,
           operation: { items: null, operations: null, type: 'CONCAT'},
-          layers: node.metaStatic.items[0].layers.map((layer, layerIndex) => {
+          layers: node.items[0].layers.map((layer, layerIndex) => {
             return {
               id: `${Date.now().toString()}-0-layer`,
               contentOid: layer.contentOid,

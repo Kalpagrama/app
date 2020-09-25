@@ -7,7 +7,7 @@ div(
     node-lite(
       v-if="item && item.type === 'NODE'"
       :isActive="isActive" :isVisible="isVisible"
-      :node="item.metaStatic"
+      :node="item"
       :marginBottom="80")
     div(
       v-if="item && item.type === 'WORD'"
@@ -70,7 +70,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('isActive TO', to)
-        // TODO: if we got all in metaStatic need? we to load jointFull...
+        // TODO: if we got all in need? we to load jointFull...
         if (!this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.oid)
         if (to) {
           // if (this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)

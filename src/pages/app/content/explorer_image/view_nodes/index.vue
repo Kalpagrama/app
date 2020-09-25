@@ -76,7 +76,7 @@ export default {
       if (this.nodeSelectedOid === node.oid) this.nodeSelectedOid = null
       else {
         this.nodeSelectedOid = node.oid
-        // let t = node.metaStatic.items[0].layers[0].figuresAbsolute[0].t
+        // let t = node.items[0].layers[0].figuresAbsolute[0].t
         // this.player.setCurrentTime(t)
       }
     },
@@ -85,7 +85,7 @@ export default {
       // let fragments = nodes.reduce((acc, node) => {
       //   let fragmentInput = {
       //     name: node.name,
-      //     items: [node.metaStatic.items[0]],
+      //     items: [node.items[0]],
       //     spheres: []
       //   }
       //   acc.push(fragmentInput)

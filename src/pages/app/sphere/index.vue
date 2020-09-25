@@ -32,7 +32,7 @@ q-layout(view="hHh Lpr lff")
               list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
                 q-infinite-scroll(@load="next" :offset="250")
                 template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                  node-lite(:node="item.metaStatic" :isActive="isActive" :isVisible="isVisible")
+                  node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>

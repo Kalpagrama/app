@@ -29,7 +29,7 @@
     div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width
       node-lite(
         v-if="item.object.type === 'NODE'"
-        :node="item.object.metaStatic" :isActive="isActive" :isVisible="isVisible"
+        :node="item.object" :isActive="isActive" :isVisible="isVisible"
         :marginBottom="0")
       div(
         v-else-if="item.object.type === 'WORD'"
@@ -41,7 +41,7 @@
         ).row.full-width
         //- node-node
         div(
-          v-if="item.object.metaStatic.leftItem.type === 'NODE' && item.object.metaStatic.rightItem.type === 'NODE'"
+          v-if="item.object.leftItem.type === 'NODE' && item.object.rightItem.type === 'NODE'"
           ).row.full-width
           //- wrapper
           div(
@@ -57,12 +57,12 @@
                     borderRadius: '10px', overflow: 'hidden'}`).column.fit.b-50
                   .col.full-width
                     img(
-                      :src="item.object.metaStatic.leftItem.metaStatic.items[0].thumbUrl"
+                      :src="item.object.leftItem.items[0].thumbUrl"
                       :style=`{
                         objectFit: 'cover',
                         borderRadius: '10px', overflow: 'hidden'}`).fit
                   .row.full-width.justify-center.q-pa-sm
-                    small.text-white {{ item.object.metaStatic.leftItem.name }}
+                    small.text-white {{ item.object.leftItem.name }}
               div(:style=`{}`).row.full-height.items-center.content-center.justify-center
                 q-btn(round flat dense color="green" icon="link")
               .col.full-height
@@ -72,15 +72,15 @@
                     borderRadius: '10px', overflow: 'hidden'}`).column.fit.b-50
                   .col.full-width
                     img(
-                      :src="item.object.metaStatic.rightItem.metaStatic.items[0].thumbUrl"
+                      :src="item.object.rightItem.items[0].thumbUrl"
                       :style=`{
                         objectFit: 'cover',
                         borderRadius: '10px', overflow: 'hidden'}`).fit
                   .row.full-width.justify-center.q-pa-sm
-                    small.text-white {{ item.object.metaStatic.rightItem.name }}
+                    small.text-white {{ item.object.rightItem.name }}
             //- essence..
             div(:style=`{}`).row.full-width.justify-center.q-py-md
-              span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold {{ item.object.metaStatic.name }}
+              span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold {{ item.object.name }}
           .row.full-width.items-center.content-center.justify-between
             .row.full-height.items-center.content-center.q-pl-sm
               q-btn(
@@ -92,7 +92,7 @@
                 q-icon(name="adjust" size="30px" color='green')
         //- node-sphere
         div(
-          v-else-if="item.object.metaStatic.leftItem.type === 'NODE' && item.object.metaStatic.rightItem.type === 'WORD'"
+          v-else-if="item.object.leftItem.type === 'NODE' && item.object.rightItem.type === 'WORD'"
           :style=`{}`
           ).row.full-width
           div(
@@ -104,7 +104,7 @@
                 height: '200px'
                 }`).col
               img(
-                :src="item.object.metaStatic.leftItem.metaStatic.items[0].thumbUrl"
+                :src="item.object.leftItem.items[0].thumbUrl"
                 :style=`{
                   objectFit: 'cover',
                   borderRadius: '10px', overflow: 'hidden'}`).fit
@@ -116,7 +116,7 @@
                 height: '200px'
               }`).col
               div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.justify-center.b-50
-                span(:style=`{fontSize: '100px'}`).text-white {{ item.object.metaStatic.rightItem.name }}
+                span(:style=`{fontSize: '100px'}`).text-white {{ item.object.rightItem.name }}
           .row.full-width.items-center.content-center.justify-between
             .row.full-height.items-center.content-center.q-pl-sm
               q-btn(
@@ -134,7 +134,7 @@
       div(v-else).row.full-width
         //- small.text-white {{item.object}}
         h1.text-white {{item.object.type}}
-      //- small(v-if="item.object.type === 'NODE'").text-white {{item.object.metaStatic}}
+      //- small(v-if="item.object.type === 'NODE'").text-white {{item.object}}
 </template>
 
 <script>

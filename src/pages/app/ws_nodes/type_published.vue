@@ -32,7 +32,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                 ).full-width
                 div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
                   img(
-                    :src="node.metaStatic.items[0].thumbUrl" draggable="false"
+                    :src="node.items[0].thumbUrl" draggable="false"
                     :style=`{
                       objectFit: 'cover',
                       borderRadius: '10px', overflow: 'hidden',

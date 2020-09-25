@@ -63,7 +63,7 @@ q-layout(
             :style=`{maxWidth: '50%'}`)
           ws-node-item(
             v-if="!item.wsItemType && item.type === 'NODE'"
-            :node="{oid: item.oid, name: item.name, items: item.metaStatic.items}"
+            :node="{oid: item.oid, name: item.name, items: item.items}"
             :style=`{maxWidth: '50%'}`)
           div(
             v-if="item.wsItemType === 'WS_SPHERE'"

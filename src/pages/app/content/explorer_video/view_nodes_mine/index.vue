@@ -266,7 +266,7 @@ export default {
       this.$log('nodesKalpaLoaded', nodes.length)
       let nodesCopy = JSON.parse(JSON.stringify(nodes))
       this.nodesKalpa = nodesCopy.map(n => {
-        let nodeInput = n.metaStatic
+        let nodeInput = n
         nodeInput.items.sort((a, b) => {
           if (a.layers[0].contentOid === this.contentKalpa.oid) {
             return -1

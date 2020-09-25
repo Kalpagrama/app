@@ -59,14 +59,14 @@ export default {
       if (this.nodeSelectedOid === node.oid) this.nodeSelectedOid = null
       else {
         this.nodeSelectedOid = node.oid
-        let t = node.metaStatic.items[0].layers[0].figuresAbsolute[0].t
+        let t = node.items[0].layers[0].figuresAbsolute[0].t
         this.player.setCurrentTime(t)
       }
     },
     nodesLoaded (nodes) {
       this.$log('nodesLoaded', nodes.length)
       let fragments = nodes.reduce((acc, node) => {
-        node.metaStatic.items.map(item => {
+        node.items.map(item => {
           if (item.layers[0].contentOid === this.contentKalpa.oid) {
             let fragmentInput = {
               name: node.name,
