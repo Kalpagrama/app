@@ -81,10 +81,10 @@ module.exports = function (ctx) {
     supportIE: false,
     build: {
       env: {
-        SERVICES_URL: JSON.stringify(process.env.AUTH_URL) || JSON.stringify(process.env.SERVICES_URL),
-        SERVICES_URL_DEBUG: JSON.stringify(process.env.SERVICES_URL_DEBUG),
-        BUILD_DATE: JSON.stringify((new Date().toISOString()).split('T')[0]),
-        BUILD_VERSION: JSON.stringify(require('./package.json').version)
+        SERVICES_URL: process.env.AUTH_URL || process.env.SERVICES_URL,
+        SERVICES_URL_DEBUG: process.env.SERVICES_URL_DEBUG,
+        BUILD_DATE: (new Date().toISOString()).split('T')[0],
+        BUILD_VERSION: require('./package.json').version
       },
       scopeHoisting: true,
       vueRouterMode: ctx.mode.bex ? 'hash' : 'history',
