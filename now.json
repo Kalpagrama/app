@@ -16,6 +16,7 @@
     { "src": "^/statics/icons/(.*)", "dest": "/statics/icons/$1" },
     { "src": "^/(.*).js", "dest": "/$1.js" },
     { "src": "^/(.*).json", "dest": "/$1.json" },
+    { "src": "^/(.*).ico", "dest": "/$1.ico" },
     { "src": ".*", "dest": "/index.html" }
   ]
 }

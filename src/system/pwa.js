@@ -3,7 +3,7 @@ import { AuthApi } from 'src/api/auth'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
-import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+import { Store, get, clear } from 'public/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/main'
 

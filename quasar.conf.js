@@ -30,7 +30,7 @@ module.exports = function (ctx) {
       'fontawesome-v5'
     ],
     framework: {
-      all: true,
+      importStrategy: 'auto',
       animations: 'all',
       components: [
         'QLayout',
@@ -78,7 +78,6 @@ module.exports = function (ctx) {
         'AppVisibility'
       ]
     },
-    supportIE: false,
     build: {
       env: {
         SERVICES_URL: process.env.AUTH_URL || process.env.SERVICES_URL,
@@ -142,7 +141,8 @@ module.exports = function (ctx) {
 
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
-          schema: path.resolve(__dirname, './src/api')
+          schema: path.resolve(__dirname, './src/api'),
+          public: path.resolve(__dirname, './public')
         }
       }
     },
