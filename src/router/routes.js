@@ -119,21 +119,15 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
-            redirect: 'node/:oid/nodes',
+            redirect: 'node/:oid/joints',
             component: () => import('pages/app/node/index.vue'),
             children: [
                {
-                  name: 'node.nodes',
-                  path: 'nodes',
-                  component: () => import('pages/app/node/node_nodes/index.vue'),
+                  name: 'node.joints',
+                  path: 'joints',
+                  component: () => import('pages/app/node/node_joints/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
-               {
-                  name: 'node.chains',
-                  path: 'chains',
-                  component: () => import('pages/app/node/node_chains/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               }
             ],
             meta: { roleMinimal: 'GUEST' }
          },

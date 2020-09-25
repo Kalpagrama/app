@@ -1,7 +1,7 @@
 <style lang="sass">
 .sphere-item
   &:hover
-    background: rgb(40,40,40) !important
+    background: rgb(60,60,60) !important
 </style>
 
 <template lang="pug">
@@ -11,42 +11,18 @@ q-layout(view="hHh Lpr lff")
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
     node-linker(v-if="node" :node="node" @close="nodeLinkerOpened = false")
-  //- q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
-        div(:style=`{height: '60px',}`).row.full-width.items-between.content-between
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-          .col
-            div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40
-              .col
-                div(@click="headerClick()").row.full-width
-                  q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm
-                  div(:style=`{overflowX: 'auto'}`).col
-                    span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
-              q-btn(
-                flat no-caps
-                :to="`/trends/${categoryOid}`"
-                :style=`{fontSize: '16px'}`
-                ).text-white.text-bold.q-px-sm {{ categoryName }}
-              kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
-        div(:style=`{height: '60px',}`
-          ).row.full-width.items-between.content-between
+    .row.full-width.justify-center.q-px-sm.q-pt-sm
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width
+        div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
+          ).row.full-width.items-center.content-center.b-40.q-px-sm
           q-btn(
             @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left"
-            )
-          .col.full-height.q-px-xs
-            div(
-              :style=`{borderRadius: '10px', overflow: 'hidden',}`
-              ).row.fit.items-center.content-center.justify-between.b-40.q-pa-xs
-              q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
-              div(:style=`{overflowX: 'auto'}`).col
-                span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
-              kalpa-follow(v-if="node" :oid="$route.params.oid")
+            round flat color="white" icon="keyboard_arrow_left")
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
+          div(:style=`{overflowX: 'auto'}`).col
+            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+          kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
@@ -63,7 +39,15 @@ q-layout(view="hHh Lpr lff")
             template(v-slot:footer)
               div(
                 :style=`{position: 'relative', paddingRight: '80px',}`
-                ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
+                ).row.full-width.items-start.content-start.q-pt-sm
+                //- node category goes as first sphere
+                router-link(
+                  v-if="category"
+                  :to="'/sphere/'+category.sphere.oid"
+                  :style=`{height: '40px',borderRadius: '10px'}`
+                  ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-sm.q-mb-sm
+                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+                  span.text-white.q-mr-md {{ category.alias }}
                 //- node spheres
                 router-link(
                   v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
@@ -83,9 +67,9 @@ q-layout(view="hHh Lpr lff")
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
-          //- view to nodes, explores and shit...
-          //- router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
-      //- q-page-sticky(
+          //- node joints
+          router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
+      q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
         :style=`{zIndex: 99999}`)

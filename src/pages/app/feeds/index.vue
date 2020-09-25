@@ -25,7 +25,7 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{maxWidth: '800px',}`).row.full-width
         kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
-          :mangoQuery="queryFeedItems" :sliceSize="3" v-slot=`{items,next}`)
+          :mangoQuery="queryFeedItems" :sliceSize="20" v-slot=`{items,next}`)
           list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
             q-infinite-scroll(@load="next" :offset="250")
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)

@@ -22,7 +22,7 @@ div(
       .col
       small.text-grey-8.q-mr-xs 11922
       q-icon(name="visibility" color="grey-8").q-mr-md
-      small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      small(v-if="nodeFull").text-grey-8.q-mr-sm {{ $date(nodeFull.createdAt, 'DD.MM.YYYY') }}
     //- wrapper: composition + essence
     div(
       :style=`{
@@ -64,14 +64,14 @@ div(
         //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
           node-vote(:node="node" :nodeFull="nodeFull")
+  //- footer
+  .row.full-width
+    slot(name="footer")
   div(v-if="showEssence").row.full-width.items-center.content-center
     node-share(:node="node").q-ml-sm
     node-emoji(v-if="node" :node="node" :nodeFull="nodeFull" :isActive="isActive" :isVisible="isVisible")
     .col
     node-vote(:node="node" :nodeFull="nodeFull")
-  //- footer
-  .row.full-width
-    slot(name="footer")
 </template>
 
 <script>

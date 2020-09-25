@@ -48,6 +48,7 @@ div(
       maxHeight: itemIndex === ii ? nowMaxHeight+'%' : nextMaxHeight+'%',
       opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3,
       transform: 'translate3d(0,0,0)',
+      //- transform: 'perspective(1000px) rotateY(-10deg)',
     }`).row.fit.items-end.content-end
     //- slot with props and events
     slot(

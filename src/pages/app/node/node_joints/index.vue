@@ -16,7 +16,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import jointItem from './joint_item.vue'
 
 export default {
-  name: 'pageApp__node__nodeNodes',
+  name: 'pageApp-node-nodeJoints',
   components: {jointItem},
   props: ['node'],
   data () {

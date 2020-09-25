@@ -24,17 +24,18 @@
 <template lang="pug">
 div().row.items-center.content-center.voter
   q-btn(
-    round flat color="white")
-    span(:style=`{fontSize: '24px'}`).text-bold.text-grey-4 {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
+    round flat no-caps color="white")
+    //- span(:style=`{fontSize: '24px'}`).text-bold.text-grey-4 {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
+    span.text-grey-6 Прямо в точку!
   q-btn(
     @click="voteStart()"
     round flat color="green"
     :loading="voting").voter
-    .row.full-width.justify-center
+    //- .row.full-width.justify-center
       q-icon(name="keyboard_arrow_up" size="20px" color='grey-8')
     .row.full-width.justify-center
       q-icon(name="adjust" size="30px" color='green')
-    .row.full-width.justify-center
+    //- .row.full-width.justify-center
       q-icon(name="keyboard_arrow_down" size="20px" color='grey-8')
     q-menu(
       v-model="voteMenuOpened" no-parent-event separate-close-popup
