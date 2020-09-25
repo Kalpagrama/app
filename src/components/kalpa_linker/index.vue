@@ -5,71 +5,109 @@
       maxWidth: '800px',
       height: $q.screen.height+'px'
     }`).column.full-width.b-30.q-pb-sm
-    .row.full-width.q-pa-md
+    .row.full-width.justify-between.q-pt-sm
       div(
         :style=`{
           transform: 'rotate(2deg)',
         }`
         ).row.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left")
+        q-btn(round flat color="grey-6" icon="keyboard_arrow_left")
         span(
           :style=`{
             fontSize: '20px',
           }`).text-bold.text-white Make a joint
+      div(
+        :style=`{
+          transform: 'rotate(-2deg)',
+        }`
+        ).row.items-center.content-center
+        q-btn(round flat color="grey-6" icon="more_vert")
     .row.full-width.q-py-md
-      div(:style=`{height: '300px',}`).row.full-width
+      div(:style=`{height: '340px',}`).row.full-width
         //- left item
         div(
           :style=`{
             transform: 'perspective(1000px) rotateY(20deg)',
             borderRadius: '10px', overflow: 'hidden',
-          }`).col.full-height.b-40.shadow-4
-          div(v-if="leftItem").column.fit
-            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width
-              img(
-                :src="leftItem.url" draggable="false"
-                :style=`{
-                  objectFit: 'cover',
-                }`
-                ).fit
-            div(v-if="leftItem.name").row.full-width.q-pa-sm
-              small.text-white {{ leftItem.name }}
+          }`).col.full-height
+          div(
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).column.fit
+            div(:style=`{height: '40px'}`).row.full-width.items-center.content-center
+              q-btn(
+                v-if="leftItem"
+                flat dense color="grey-6" no-caps)
+                q-icon(name="keyboard_arrow_down" color="green")
+                span.text-white.text-bold {{ itemTypes.find(i => i.id === leftItem.jointType).name }}
+                q-menu(dark)
+                  div(:style=`{width: '100px'}`).row
+                    q-btn(
+                      @click="leftItem.jointType = t.id"
+                      v-for="(t,ti) in itemTypes" :key="t.id"
+                      v-if="t.id !== leftItem.jointType"
+                      flat dense no-caps color='grey-2').full-width {{ t.name }}
+            div(
+              :style=`{
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).col.full-width.b-40.shadow-4
+              div(v-if="leftItem").column.fit
+                div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+                  img(
+                    @click="leftItemCover = !leftItemCover"
+                    :src="leftItem.url" draggable="false"
+                    :style=`{
+                      objectFit: leftItemCover ? 'cover' : 'contain',
+                    }`
+                    ).fit
+                div(v-if="leftItem.name").row.full-width.justify-center.q-pa-sm
+                  small.text-white {{ leftItem.name }}
+        //- divider with link icon
         .row.full-height.items-center.content-center.justify-center
-          q-icon(name="link" color="green" size="20px")
+          q-icon(name="link" color="green" size="24px")
         //- right item
         div(
           :style=`{
             transform: 'perspective(1000px) rotateY(-20deg)',
             borderRadius: '10px', overflow: 'hidden',
-          }`
-          ).col.full-height.b-40.shadow-4
-          div(v-if="rightItem").column.fit
-            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width
-              img(
-                :src="rightItem.url" draggable="false"
-                :style=`{
-                  objectFit: 'cover',
-                }`
-                ).fit
-            div(v-if="rightItem.name").row.full-width.q-pa-sm
-              small.text-white {{ rightItem.name }}
-    .row.full-width.justify-center
-      q-input(
-        v-model="name"
-        borderless autofocus
-        type="textarea" autogrow
-        spellcheck="false"
-        :style=`{
-          maxWidth: '600px',
-        }`
-        :input-style=`{
-          fontSize: '30px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          caretColor: 'rgb(76,175,80)',
-          color: 'white'
-        }`
-        ).full-width.justify-center
+          }`).col.full-height
+          div(
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).column.fit
+            div(:style=`{height: '40px'}`).row.full-width.items-center.content-center.justify-end
+              q-btn(
+                v-if="rightItem"
+                flat dense color="grey-6" no-caps)
+                span.text-white.text-bold {{ itemTypes.find(i => i.id === rightItem.jointType).name }}
+                q-icon(name="keyboard_arrow_down" color="green")
+                q-menu(dark)
+                  div(:style=`{width: '100px'}`).row
+                    q-btn(
+                      @click="rightItem.jointType = t.id"
+                      v-for="(t,ti) in itemTypes" :key="t.id"
+                      v-if="t.id !== rightItem.jointType"
+                      flat dense no-caps color='grey-2').full-width {{ t.name }}
+            div(
+              :style=`{
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).col.full-width.b-40.shadow-4
+              div(v-if="rightItem").column.fit
+                div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+                  img(
+                    @click="rightItemCover = !rightItemCover"
+                    :src="rightItem.url" draggable="false"
+                    :style=`{
+                      objectFit: rightItemCover ? 'cover' : 'contain',
+                    }`
+                    ).fit
+                div(v-if="rightItem.name").row.full-width.justify-center.q-pa-sm
+                  small.text-white {{ rightItem.name }}
+    edit-name(@name="name = $event" :name="name").q-mb-md
     .row.full-width
       q-tabs(
         v-model="viewId"
@@ -79,10 +117,11 @@
     div(
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
-        //- minHeight: '500px',
+        background: 'rgb(35,35,35)',
       }`
-      ).col.full-width.b-40
+      ).col.full-width
       //- .row.full-width.items-start.content-start
+      from-nodes(v-if="viewId === 'nodes'")
       div(v-if="viewId === 'gif'").column.fit
         .row.full-width.q-pa-sm
           div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
@@ -155,14 +194,23 @@
 <script>
 export default {
   name: 'kalpaLinker',
+  components: {
+    editName: () => import('./edit_name.vue'),
+    fromNodes: () => import('./from_nodes.vue')
+  },
   data () {
     return {
       name: '',
       viewId: 'gif',
       views: [
-        {id: 'node', name: 'Nodes'},
-        {id: 'speher', name: 'Sphere'},
-        {id: 'gif', name: 'Gif'},
+        {id: 'nodes', name: 'Nodes'},
+        {id: 'video', name: 'Videos'},
+        {id: 'image', name: 'Images'},
+        {id: 'books', name: 'Books'},
+        {id: 'audio', name: 'Music'},
+        {id: 'speher', name: 'Spheres'},
+        {id: 'bookmarks', name: 'Bookmarks'},
+        {id: 'gif', name: 'GIFs'},
       ],
       tenorSearch: '',
       tenorUrl: 'https://api.tenor.com/v1/search',
@@ -170,15 +218,55 @@ export default {
       gifs: [],
       gifOver: null,
       leftItem: null,
+      leftItemCover: true,
       rightItem: null,
+      rightItemCover: true,
     }
   },
   computed: {
     searchUrl () {
       return `${this.tenorUrl}?q=${this.tenorSearch}&key=${this.tenorKey}&limit=50`
     },
+    itemTypes () {
+      return [
+        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
+        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
+        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
+        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
+        {id: 'TRUE', name: 'Правда', pair: 'FALSE'},
+        {id: 'FALSE', name: 'Ложь', pair: 'TRUE'},
+        {id: 'FROM', name: 'Первое', pair: 'TO'},
+        {id: 'TO', name: 'Второе', pair: 'FROM'},
+      ]
+    },
   },
   watch: {
+    leftItem: {
+      deep: true,
+      handler (to, from) {
+        this.$log('leftItem TO', to)
+        if (to) {
+          if (this.rightItem) {
+            let t = this.itemTypes.find(i => i.id === to.jointType).pair
+            this.$log('leftItem EFFECT rightItem with:', t)
+            this.rightItem.jointType = t
+          }
+        }
+      }
+    },
+    rightItem: {
+      deep: true,
+      handler (to, from) {
+        this.$log('rightItem TO', to)
+        if (to) {
+          if (this.leftItem) {
+            let t = this.itemTypes.find(i => i.id === to.jointType).pair
+            this.$log('rightItem EFFECT leftItem with: ', t)
+            this.leftItem.jointType = t
+          }
+        }
+      }
+    },
     tenorSearch: {
       async handler (to, from) {
         console.log('tenorSearch TO', to)
@@ -194,19 +282,22 @@ export default {
       let itemInput = {
         type: 'EMOJI',
         url: gif.media[0].tinygif.url,
-        name: gif.title
+        name: gif.title,
+        jointType: 'SOLUTION',
       }
       if (isLeft === true) {
+        if (this.rightItem) itemInput.jointType = this.itemTypes.find(i => i.id === this.rightItem.jointType).pair
         this.leftItem = itemInput
       }
       if (isLeft === false) {
+        if (this.leftItem) itemInput.jointType = this.itemTypes.find(i => i.id === this.leftItem.jointType).pair
         this.rightItem = itemInput
       }
     }
   },
   mounted () {
     console.log('mounted')
-    this.tenorSearch = 'cool'
+    this.tenorSearch = 'psyduck'
   }
 }
 </script>
