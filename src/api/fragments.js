@@ -77,19 +77,6 @@ const objectShortFragment = gql`
     createdAt
   }
 `
-
-const objectShortWithMetaStaticFragment = gql`
-  ${metaStaticFragment}
-  fragment objectShortWithMetaStaticFragment on ObjectShort {
-    type
-    oid
-    name
-    thumbUrl(preferWidth: 600)
-    createdAt
-    metaStatic{...metaStaticFragment}
-  }
-`
-
 const objectFragment = gql`${metaStaticFragment} ${objectShortFragment}
   fragment objectFragment on Object {
     type
@@ -207,12 +194,12 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
     contentSource
   }
 `
-const jointFragment = gql` ${objectFragment} ${objectShortWithMetaStaticFragment} ${objectShortFragment}
+const jointFragment = gql` ${objectFragment} ${objectShortFragment} ${objectShortFragment}
   fragment jointFragment on Joint {
     ...objectFragment
     jointType
-    leftItem {...objectShortWithMetaStaticFragment}
-    rightItem {...objectShortWithMetaStaticFragment}
+    leftItem {...objectShortFragment}
+    rightItem {...objectShortFragment}
     rate
     weight
     rateUser
@@ -244,7 +231,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 
 const eventFragment = gql`
-  ${objectShortFragment} ${objectShortWithMetaStaticFragment}
+  ${objectShortFragment} ${objectShortFragment}
   fragment eventFragment on Event {
     id
     createdAt
@@ -271,25 +258,25 @@ const eventFragment = gql`
     }
     ... on EventObjectUpdate{
       subject{... objectShortFragment}
-      object{... objectShortWithMetaStaticFragment}
+      object{... objectShortFragment}
       path
       value
       matter {reason subscription}
     }
     ... on EventGeneral{
       subject{... objectShortFragment}
-      object{... objectShortWithMetaStaticFragment}
+      object{... objectShortFragment}
       matter {reason subscription}
     }
     ... on EventObjectCreateDelete{
       subject{... objectShortFragment}
-      object{... objectShortWithMetaStaticFragment}
+      object{... objectShortFragment}
       sphereOids
       matter {reason subscription}
     }
     ... on EventObjectRate{
       subject{... objectShortFragment}
-      object{... objectShortWithMetaStaticFragment}
+      object{... objectShortFragment}
       rate
       matter {reason subscription}
     }
@@ -377,14 +364,14 @@ const objectFullFragment = gql`
 `
 
 const findResultFragment = gql`
-  ${eventFragment} ${objectShortWithMetaStaticFragment}
+  ${eventFragment} ${objectShortFragment}
   fragment findResultFragment on FindResult {
     count
     totalCount
     nextPageToken
     prevPageToken
     ... on EventFindResult { events {...eventFragment} }
-    ... on ObjectsFindResult { objects{...objectShortWithMetaStaticFragment} }
+    ... on ObjectsFindResult { objects{oid} }
     ... on WSFindResult { items }
   }
 `
@@ -395,7 +382,6 @@ const fragments = {
   userFragment,
   dummyUserFragment,
   objectShortFragment,
-  objectShortWithMetaStaticFragment,
   nodeFragment,
   sphereFragment,
   findResultFragment

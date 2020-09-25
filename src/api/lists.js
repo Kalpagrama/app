@@ -174,13 +174,13 @@ class ListsApi {
    //   logD(f, 'start')
    //   let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
    //     query: gql`
-   //       ${fragments.objectShortWithMetaStaticFragment}
+   //       ${fragments.objectShortFragment}
    //       query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
    //         sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
    //           count
    //           totalCount
    //           nextPageToken
-   //           items {... objectShortWithMetaStaticFragment}
+   //           items {... objectShortFragment}
    //         }
    //       }
    //     `,
@@ -196,13 +196,13 @@ class ListsApi {
    //   // const t1 = performance.now()
    //   let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
    //     query: gql`
-   //       ${fragments.objectShortWithMetaStaticFragment}
+   //       ${fragments.objectShortFragment}
    //       query feed ($pagination: PaginationInput!) {
    //         feed (pagination: $pagination) {
    //           count
    //           totalCount
    //           nextPageToken
-   //           items {... objectShortWithMetaStaticFragment}
+   //           items {... objectShortFragment}
    //         }
    //       }
    //     `,

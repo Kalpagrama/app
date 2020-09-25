@@ -13,7 +13,7 @@ export default {
    logLevelSentry: LogLevelEnum.CRITICAL,
    logDbgFilter: 'any', // gui | system | any
    logDbgModulesBlackList: [
-      // LogSystemModulesEnum.SYSTEM,
+      LogSystemModulesEnum.SYSTEM,
       LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
@@ -25,7 +25,7 @@ export default {
       LogSystemModulesEnum.VUEX_DBG,
       // LogSystemModulesEnum.RXDB,
       LogSystemModulesEnum.RXDB_REACTIVE,
-      // LogSystemModulesEnum.RXDB_WS,
+      LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
       LogSystemModulesEnum.RXDB_OBJ,
       LogSystemModulesEnum.RXDB_GQL,
