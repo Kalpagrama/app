@@ -20,7 +20,7 @@
           borderRadius: '50%',
         }`
         ).b-40.q-mr-sm
-        span(:style=`{fontSize: '20px', marginLeft: '2px'}`) {{ i.meta.leftItem.oid === node.oid ? i.meta.rightItem.name : i.meta.leftItem.name }}
+        span(:style=`{fontSize: '20px', marginLeft: '2px'}`) {{ i.metaStatic.leftItem.oid === node.oid ? i.metaStatic.rightItem.name : i.metaStatic.leftItem.name }}
 </template>
 
 <script>

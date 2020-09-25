@@ -14,11 +14,11 @@ div(
       v-if="showAuthor"
       ).row.full-width.items-center.content-center.q-pa-sm
       q-btn(
-        :to="'/user/'+node.meta.author.oid"
+        :to="'/user/'+node.metaStatic.author.oid"
         flat color="white" dense no-caps
         )
-        user-avatar(:url="node.meta.author.thumbUrl" :width="24" :height="24")
-        span.text-grey-4.q-ml-sm {{ node.meta.author.name }}
+        user-avatar(:url="node.metaStatic.author.thumbUrl" :width="24" :height="24")
+        span.text-grey-4.q-ml-sm {{ node.metaStatic.author.name }}
       .col
       small.text-grey-8.q-mr-xs 11922
       q-icon(name="visibility" color="grey-8").q-mr-md
@@ -40,8 +40,8 @@ div(
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node" :nodeFull="nodeFull")
         node-items(
-          :previewUrl="node.meta.items[0].thumbUrl"
-          :previewName="node.name" :items="node.meta.items"
+          :previewUrl="node.metaStatic.items[0].thumbUrl"
+          :previewName="node.name" :items="node.metaStatic.items"
           :isActive="isActive" :isVisible="isVisible")
         //- fullscreen
         //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")

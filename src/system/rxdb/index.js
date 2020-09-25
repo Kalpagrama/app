@@ -302,18 +302,18 @@ class RxDBWrapper {
       }
    }
 
-   async deInit (recreateDbGlobal = false) {
+   async deInit (fromDeinitGlobal = false) {
       const f = this.deInit
       const t1 = performance.now()
       try {
-         logD(f, 'start', recreateDbGlobal)
+         logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
          await this.lock()
-         this.event.deInit()
+         if (fromDeinitGlobal) this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
          this.reactiveItemDbMemCache.reset()
-         if (recreateDbGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // recreateDbGlobal - кейс только для  deInitGlobal
+         if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
       } finally {
          this.release()
@@ -445,7 +445,7 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
+   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.getRxDoc
       const t1 = performance.now()
       // logD(f, 'start')
@@ -459,7 +459,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
-         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, servicesApollo, params)
+         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          rxDoc = await this.db.meta.findOne(rawId).exec()
       } else {
@@ -472,7 +472,7 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, servicesApollo = null, params = null } = {}) {
+   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
       // logD(f, 'start')
@@ -502,7 +502,6 @@ class RxDBWrapper {
             priority,
             force,
             onFetchFunc,
-            servicesApollo,
             params
          })
          if (!rxDoc) return null

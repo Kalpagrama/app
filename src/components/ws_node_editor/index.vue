@@ -129,7 +129,7 @@ export default {
         this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }
       catch (e) {
-        this.$log('publish error', e)
+        // this.$log('publish error', e) не надо так делать!
         this.publishing = false
         let errorMessage = e.message || e.toString()
         this.$q.notify({
@@ -137,6 +137,7 @@ export default {
           position: 'top',
           message: errorMessage,
         })
+        throw e
       }
     },
     async nodeDelete () {

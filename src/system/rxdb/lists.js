@@ -249,7 +249,8 @@ class Lists {
     if (filter.nameRegExp && objectShort.name.search(new RegExp(filter.nameRegExp)) === -1) return false
     if (filter.compositionOids) {
       for (let compositionOid of filter.compositionOids) {
-        if (!objectShort.meta.items.map(composition => composition.oid).includes(compositionOid)) return false
+        assert(objectShort.metaStatic, '!objectShort.metaStatic')
+        if (!objectShort.metaStatic.items.map(composition => composition.oid).includes(compositionOid)) return false
       }
     }
     return true

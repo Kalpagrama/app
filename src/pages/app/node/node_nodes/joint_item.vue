@@ -60,7 +60,7 @@ export default {
     item () {
       if (this.jointFull) {
         if (this.jointFull.leftItem.oid === this.node.oid) return this.jointFull.rightItem
-        else return this.jointFull.meta.leftItem
+        else return this.jointFull.leftItem
       }
       else return null
     }
@@ -70,7 +70,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('isActive TO', to)
-        // TODO: if we got all in meta need? we to load jointFull...
+        // TODO: if we got all in metaStatic need? we to load jointFull...
         if (!this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.oid)
         if (to) {
           // if (this.jointFull) this.jointFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)

@@ -79,7 +79,6 @@ export default async ({ Vue, store, app }) => {
             }
          }
       })
-
       const defaultOptions = {
          watchQuery: {
             fetchPolicy: 'no-cache'
@@ -99,6 +98,16 @@ export default async ({ Vue, store, app }) => {
          defaultOptions,
          cache
       })
+      apollo = {
+         cache,
+         clients: {
+            services: servicesApollo, // нужно для AuthApi.services
+            auth: null,
+            api: null,
+            upload: null,
+            ws: null
+         }
+      }
 
       const onFetchFunc = async (oldVal, newVal) => {
          logD(' services onFetchFunc...')
@@ -108,7 +117,7 @@ export default async ({ Vue, store, app }) => {
          }
       }
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
-         { clientFirst: true, force: true, onFetchFunc, servicesApollo })
+         { clientFirst: true, force: true, onFetchFunc })
 
       logD('services', services)
       assert(services, '!services!!!')
@@ -189,14 +198,12 @@ export default async ({ Vue, store, app }) => {
          defaultOptions,
          cache
       })
-      apollo = {
-         cache,
-         clients: {
-            auth: authApollo,
-            api: apiApollo,
-            upload: uploadApollo,
-            ws: wsApollo
-         }
+      apollo.clients = {
+         services: servicesApollo,
+         auth: authApollo,
+         api: apiApollo,
+         upload: uploadApollo,
+         ws: wsApollo
       }
       await rxdb.init() // после инициализации apollo (нужно для event.init())
       logD('apollo init done')
