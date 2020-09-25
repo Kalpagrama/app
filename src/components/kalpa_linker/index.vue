@@ -213,7 +213,7 @@ export default {
         {id: 'gif', name: 'GIFs'},
       ],
       tenorSearch: '',
-      tenorUrl: 'https://api.tenor.com/v1/search',
+      tenorUrl: 'https://api.tenor.com/v1',
       tenorKey: 'EVS1EYKI5ZRC',
       gifs: [],
       gifOver: null,
@@ -224,8 +224,11 @@ export default {
     }
   },
   computed: {
-    searchUrl () {
-      return `${this.tenorUrl}?q=${this.tenorSearch}&key=${this.tenorKey}&limit=50`
+    tenorUrlSearch () {
+      return `${this.tenorUrl}/search?key=${this.tenorKey}&q=${this.tenorSearch}&limit=50`
+    },
+    tenorUrlTrending () {
+      return `${this.tenorUrl}/trending?key=${this.tenorKey}&limit=50`
     },
     itemTypes () {
       return [
@@ -270,7 +273,7 @@ export default {
     tenorSearch: {
       async handler (to, from) {
         console.log('tenorSearch TO', to)
-        let {data} = await this.$axios.get(this.searchUrl)
+        let {data} = await this.$axios.get(this.tenorUrlSearch)
         this.gifs = data.results
         console.log('data', data)
       }
@@ -295,9 +298,11 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     console.log('mounted')
-    this.tenorSearch = 'psyduck'
+    // load initial trending gifs
+    let {data} = await this.$axios.get(this.tenorUrlTrending)
+    this.gifs = data.results
   }
 }
 </script>
