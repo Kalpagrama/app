@@ -23,7 +23,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingBottom: '0px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: '800px',}`).row.full-width
-        kalpa-loader(
+        //- kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
           :mangoQuery="queryFeedItems" :sliceSize="20" v-slot=`{items,next}`)
           list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
@@ -35,6 +35,7 @@ q-layout(view="hHh Lpr lff")
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import feedItem from './feed_item.vue'
+// import('https://tenor.com/embed.js')
 
 export default {
   name: 'pageApp__feeds',

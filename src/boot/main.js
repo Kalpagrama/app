@@ -10,8 +10,7 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import VueMasonry from 'vue-masonry-css'
-// import 'viewerjs/dist/viewer.css'
-// import Viewer from 'v-viewer'
+import axios from 'axios'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -49,6 +48,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+    Vue.prototype.$axios = axios
     // quasar stuff
     // Screen.setSizes({ xs: 600, sm: 900, md: 1260, lg: 1600, xl: 1900 })
     LoadingBar.setDefaults({
@@ -91,6 +91,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         document.body.removeEventListener('click', el.clickOutsideEvent)
       },
     })
+    Vue.component('kalpaLinker', () => import('components/kalpa_linker/index.vue'))
     Vue.component('nodeLite', () => import('components/node_lite/index.vue'))
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
