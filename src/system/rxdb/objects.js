@@ -13,7 +13,8 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
-const QUEUE_MAX_SZ = 20
+const QUEUE_MAX_SZ = 88 // макимальное число сущностей в очереди на запрос
+const BATCH_SZ = 16 // сколько за раз запрашивать с сервера
 class QueryAccumulator {
   constructor () {
     this.queueMaster = []
@@ -96,7 +97,7 @@ class QueryAccumulator {
       if (totalQuery.findIndex(item => item.oid === itemMas.oid) === -1) totalQuery.push(itemMas)
     }
     // берем последние добавленные (самые приоритетные - в конце)
-    for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < 5; i--) {
+    for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < BATCH_SZ; i--) {
       let queuedItem = totalQuery[i]
       if (itemsForQuery.findIndex(item => item.oid === queuedItem.oid) >= 0) continue // такой уже есть
       itemsForQuery.push(queuedItem)
@@ -158,8 +159,8 @@ class QueueUpdate {
   }
 
   async next (failCount = 0) {
-    if (failCount > 5) return
     logD('разгребаем очередь...', failCount)
+    if (failCount > 5) return
 
     if (this.inProgress) return
     if (this.queries.length === 0) {
@@ -184,7 +185,7 @@ class QueueUpdate {
         // после обновления страницы данные об изменениях пропадут!!!
         // кладем обратно
         let timeout = Math.min(3000 * (failCount), 20 * 1000) // ждем (не не более 20 сек)
-        logD(`попытка отправки не удалась по причине отсутствия сети. Попробуем через ${timeout / 1000}c`)
+        logD(`попытка запроса не удалась по причине отсутствия сети. Попробуем через ${timeout / 1000}c`)
         this.queries.unshift({ key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc })
         //  todo сделать circuit breaker
         ++failCount
@@ -238,24 +239,9 @@ class Objects {
     this.queryAccumulator = new QueryAccumulator()
   }
 
-  // // вернет реактивный объект
-  // async findOne (oid) {
-  //   let fetchFunc = async () => {
-  //     return {
-  //       type: CacheItemTypeEnum.OBJ,
-  //       item: await ObjectsApi.objectFull(oid),
-  //       actualAge: 'day'
-  //     }
-  //   }
-  //   let rxDoc = await this.cache.get(makeObjectCacheId({oid}), fetchFunc)
-  //   if (!rxDoc) throw new Error('объект не найден на сервере')
-  //   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-  //   return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.cached.data }
-  // }
-
   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-  // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
+  // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 16 штук. Последние запрошенные - в первую очередь
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
   async get (id, priority, clientFirst, force, onFetchFunc = null) {
     const fetchFunc = async () => {

@@ -395,39 +395,47 @@ class RxDBWrapper {
    async find (mangoQuery) {
       const f = this.find
       const t1 = performance.now()
-
       logD(f, 'start', mangoQuery)
-      let pageToken = mangoQuery.selector.pageToken || {indx: 0, oid: null}
+      let pageToken = mangoQuery.selector.pageToken || { indx: 0, oid: null }
       let limit = Math.min(mangoQuery.selector.limit || 10, 10)
       delete mangoQuery.selector.pageToken // мешает нормальному кэшированию запросов в findInternal
       delete mangoQuery.selector.limit // мешает нормальному кэшированию запросов в findInternal
       let objectShortList = await this.findInternal(mangoQuery)
-      let fullItems = []
       let startIndx = pageToken.indx
-      for (let itemShort of objectShortList.items.slice(startIndx, startIndx + limit)) {
-         assert(itemShort.oid)
-         let fullItem = await this.get(RxCollectionEnum.OBJ, itemShort.oid)
-         if (fullItem.type === 'NODE'){
-            let nestedFullItems = []
-            for (let item of fullItem.items){
-               nestedFullItems.push(await this.get(RxCollectionEnum.OBJ, item.oid))
+      let objectShortListLimit = objectShortList.items.slice(startIndx, startIndx + limit)
+      // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+      let fullObjects = await Promise.all(objectShortListLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
+      fullObjects = fullObjects.filter(obj => !!obj)
+      let fetchPromises = [] // запросы за вложенными объектами
+      for (let objectFull of fullObjects) {
+         if (objectFull.type === 'NODE') {
+            for (let item of objectFull.items) {
+               fetchPromises.push(this.get(RxCollectionEnum.OBJ, item.oid, { clientFirst: true }))
             }
-            fullItem.items = nestedFullItems
+         } else if (objectFull.type === 'JOINT') {
+            fetchPromises.push(this.get(RxCollectionEnum.OBJ, objectFull.leftItem.oid, { clientFirst: true }))
+            fetchPromises.push(this.get(RxCollectionEnum.OBJ, objectFull.rightItem.oid, { clientFirst: true }))
          }
-         if (fullItem.type === 'JOINT'){
-            fullItem.leftItem = await this.get(RxCollectionEnum.OBJ, fullItem.leftItem.oid)
-            fullItem.rightItem = await this.get(RxCollectionEnum.OBJ, fullItem.rightItem.oid)
+      }
+      await Promise.all(fetchPromises) // запрашиваем разом (см. objects.js) все вложенные сущности (будут в кэше)
+      for (let objectFull of fullObjects) {
+         if (objectFull.type === 'NODE') {
+            for (let i = 0; i < objectFull.items.length; i++) {
+               objectFull.items[i] = await this.get(RxCollectionEnum.OBJ, objectFull.items[i].oid) // уже лежит в кэше
+            }
+         } else if (objectFull.type === 'JOINT') {
+            objectFull.leftItem = await this.get(RxCollectionEnum.OBJ, objectFull.leftItem.oid) // уже лежит в кэше
+            objectFull.rightItem = await this.get(RxCollectionEnum.OBJ, objectFull.rightItem.oid) // уже лежит в кэше
          }
-         fullItems.push(fullItem)
       }
       let nextIndx = startIndx + limit
       let nextItem = objectShortList.items[nextIndx]
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, fullItems)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, fullObjects)
       return {
-         items: fullItems,
-         count: fullItems.length,
+         items: fullObjects,
+         count: fullObjects.length,
          totalCount: objectShortList.count,
-         nextPageToken: nextItem ? {indx: nextIndx, oid: nextItem.oid} : null,
+         nextPageToken: nextItem ? { indx: nextIndx, oid: nextItem.oid } : null,
          prevPageToken: pageToken
       }
    }
@@ -516,7 +524,7 @@ class RxDBWrapper {
    async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
-      // logD(f, 'start')
+      // logD(f, 'start', rawId)
       if (rawId) {
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
          assert(!rawId.includes('::'), '')
@@ -558,7 +566,7 @@ class RxDBWrapper {
    // actualAge - актуально только для кэша
    async set (rxCollectionEnum, data, { actualAge, notEvict = false } = {}) {
       const f = this.set
-      logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
+      // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
       assert(data, '!data')
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
