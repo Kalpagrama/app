@@ -121,7 +121,6 @@ export default {
         this.loading = true
         let {userExist, userId, needInvite, needConfirm, loginType} = await AuthApi.userIdentify(this.login)
         if (userExist) throw new Error('This user already exists')
-        if (loginType !== 'USERNAME') throw new Error('Invalid login type!')
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password, this.promo)
         if (result === false) throw new Error(`Error: ${failReason}`)
         // await this.$wait(1000)

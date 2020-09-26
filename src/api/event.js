@@ -37,7 +37,7 @@ class EventApi{
   static deInit(){
     if (EventApi.subscription) {
       assert(apollo.clients.ws, '!apollo.clients.ws2')
-      assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
+      // assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
       EventApi.subscription.unsubscribe()
     }
     return true

@@ -109,7 +109,6 @@ export default {
         // await this.$wait(1000)
         let {userExist, userId, needInvite, loginType} = await AuthApi.userIdentify(this.login)
         if (!userExist) throw new Error('No such user!')
-        if (loginType !== 'USERNAME') throw new Error('Invalid login type!')
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password)
         if (result === false) throw new Error(`Error: ${failReason}`)
         this.$log('signIn done', oid)

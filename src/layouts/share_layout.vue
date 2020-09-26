@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { get, Store } from 'public/statics/scripts/idb-keyval/idb-keyval.mjs'
+import { get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 
 export default {
   name: 'shareLayout',

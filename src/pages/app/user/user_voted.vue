@@ -27,6 +27,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          populateObjects: true,
           oidAuthor: {$ne: this.sphereOid},
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',

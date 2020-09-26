@@ -136,6 +136,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
+          populateObjects: false,
           oidSphere: this.$store.getters.currentUser().oid,
         }
       }
