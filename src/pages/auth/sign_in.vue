@@ -5,9 +5,9 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span().text-white {{$t('auth_Sign in with email/password', 'Войти с почтой и паролем')}}
+            span().text-white {{$t('auth Sign in with email', 'Войти через почту')}}
           //- form
-          form().full-width.q-py-md
+          .full-width.q-py-md
             //- email
             div(
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
@@ -19,9 +19,11 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 filled dark color="white" name="username"
                 type="email" required
                 :style=`{}`
+                @keyup.enter="identify()"
                 ).full-width
             //- password
             div(
+              v-if="userId && !needConfirm"
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
@@ -31,8 +33,41 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 type="password" required name="password"
                 filled dark color="white"
                 @keyup.enter="signIn()").full-width
-          //- submit
+            //- code from email...
+            div(v-if="userId && needConfirm").row.full-width
+              input(
+                v-model="password"
+                type="tel" required
+                placeholder="0000"
+                maxlength="4" minlength="4"
+                :style=`{
+                  fontSize: '100px',
+                  fontWeight: 'bold',
+                  height: '130px',
+                  letterSpacing: '6px',
+                  color: 'white',
+                  padding: '4px',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                }`
+                @keyup.enter="signIn()"
+                ).full-width.b-50
+              .row.full-width.justify-center.q-py-xs
+                span.text-bold.text-grey-6 Введите код с почты
+          //- identify
           q-btn(
+            v-if="!userId"
+            @click="identify()"
+            color="green" no-caps
+            :loading="loading"
+            :style=`{
+              height: '60px',
+            }`
+            ).full-width
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold Далее
+          //- signIn
+          q-btn(
+            v-if="userId"
             @click="signIn()"
             color="green" no-caps
             :loading="loading"
@@ -63,52 +98,41 @@ export default {
       login: '',
       password: '',
       loading: false,
+      userId: null,
+      needConfirm: false,
     }
   },
   watch: {
-    // '$route.query.token': {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     this.$log('$route.query.token CHANGED', to)
-    //     if (to) {
-    //       this.$log('GOT TOKEN', to)
-    //       // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
-    //       let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
-    //       // await this.$wait(200)
-    //       this.userIdentifying = false
-    //       this.userIdentified = true
-    //       this.login = userId
-    //       this.loginType = loginType
-    //       this.userExist = userExist === 'true' ? true : false
-    //       this.needInvite = needInvite === 'true' ? true : false
-    //       this.$log('this.needInvite = ', this.needInvite)
-    //       if (this.needInvite){
-    //         alert('TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!')
-    //         // TODO  Ваня? Нужно показать окно ввода инвайт-кода!!!
-    //       }
-    //       await AuthApi.userAuthenticate('', '!!!TODO!!!')
-    //       await this.$router.replace('/')
-    //       // if userExist and !needInvite... this.userAuthenticate()
-    //       // this.$router.replace('/auth')
-    //     }
-    //   }
-    // }
+    login (newVal) {
+      this.$set(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
+    },
   },
   methods: {
-    check () {
-      this.$log('check')
-      if (this.login.length === 0) throw new Error('Login is empty!')
-      if (this.password.length === 0) throw new Error('Password is empty!')
+    async identify () {
+      try {
+        this.$log('identify start')
+        this.loading = true
+        if (this.login.length === 0) throw new Error('Login is empty!')
+        let {userExist, userId, needInvite, needConfirm, loginType} = await AuthApi.userIdentify(this.login)
+        if (loginType !== 'EMAIL') throw new Error('Only emails...')
+        this.userId = userId
+        if (needConfirm) {
+          this.needConfirm = needConfirm
+        }
+        this.$log('identify done')
+        this.loading = false
+      }
+      catch (e) {
+        this.$log('identify error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.loading = false
+      }
     },
     async signIn () {
       try {
         this.$log('signIn start')
-        // await this.$wait(500)
-        this.check()
         this.loading = true
-        // await this.$wait(1000)
-        let {userExist, userId, needInvite, loginType} = await AuthApi.userIdentify(this.login)
-        if (!userExist) throw new Error('No such user!')
+        if (this.password.length === 0) throw new Error('Password is empty!')
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password)
         if (result === false) throw new Error(`Error: ${failReason}`)
         this.$log('signIn done', oid)

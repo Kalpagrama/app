@@ -28,7 +28,7 @@ div(
       maxWidth: '600px',
     }`
     :input-style=`{
-      fontSize: '30px',
+      fontSize: fontSize,
       fontWeight: 'bold',
       textAlign: 'center',
       caretColor: 'rgb(76,175,80)',
@@ -70,6 +70,10 @@ export default {
   computed: {
     showBlink () {
       return this.name.length === 0 && !this.isFocused
+    },
+    fontSize () {
+      if (this.name.length < 50) return '30px'
+      else return '14px'
     }
   },
   methods: {

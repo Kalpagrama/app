@@ -6,7 +6,7 @@ q-layout(view="hHh lpR fFf").b-30
       @click="$router.replace('/auth').catch(e => e)"
       :style=`{height: '200px', overflow: 'hidden',}`).row.full-width.items-center.content-center.justify-center.b-30
       kalpa-logo(:width="100" :height="100").q-mb-md
-      h5.text-white.text-bold.q-ma-xs.q-pa-xs Кальпаграма
+      h4.text-white.text-bold.q-ma-xs.q-pa-xs Kalpa.app
     router-view
 </template>
 
