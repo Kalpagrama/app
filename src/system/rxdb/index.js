@@ -397,10 +397,10 @@ class RxDBWrapper {
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
       let populateObjects = mangoQuery.selector.populateObjects
-      delete mangoQuery.selector.populateObjects
       let pageToken = mangoQuery.selector.pageToken || { indx: 0, oid: null }
       let limit = parseInt(mangoQuery.selector.limit)
-      if (!limit) limit = populateObjects ? 8 : 8888
+      if (!limit) limit = populateObjects ? 88 : 8888
+      delete mangoQuery.selector.populateObjects // мешает нормальному кэшированию запросов в findInternal
       delete mangoQuery.selector.pageToken // мешает нормальному кэшированию запросов в findInternal
       delete mangoQuery.selector.limit // мешает нормальному кэшированию запросов в findInternal
       // let tx = performance.now()
@@ -416,28 +416,6 @@ class RxDBWrapper {
          // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
          items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
          items = items.filter(obj => !!obj)
-         let fetchPromises = [] // запросы за вложенными объектами
-         for (let objectFull of items) {
-            if (objectFull.type === 'NODE') {
-               for (let item of objectFull.items) {
-                  fetchPromises.push(this.get(RxCollectionEnum.OBJ, item.oid, { clientFirst: true }))
-               }
-            } else if (objectFull.type === 'JOINT') {
-               fetchPromises.push(this.get(RxCollectionEnum.OBJ, objectFull.leftItem.oid, { clientFirst: true }))
-               fetchPromises.push(this.get(RxCollectionEnum.OBJ, objectFull.rightItem.oid, { clientFirst: true }))
-            }
-         }
-         await Promise.all(fetchPromises) // запрашиваем разом (см. objects.js) все вложенные сущности (будут в кэше)
-         for (let objectFull of items) {
-            if (objectFull.type === 'NODE') {
-               for (let i = 0; i < objectFull.items.length; i++) {
-                  objectFull.items[i] = await this.get(RxCollectionEnum.OBJ, objectFull.items[i].oid) // уже лежит в кэше
-               }
-            } else if (objectFull.type === 'JOINT') {
-               objectFull.leftItem = await this.get(RxCollectionEnum.OBJ, objectFull.leftItem.oid) // уже лежит в кэше
-               objectFull.rightItem = await this.get(RxCollectionEnum.OBJ, objectFull.rightItem.oid) // уже лежит в кэше
-            }
-         }
       } else items = objectShortItemsLimit
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, items)
       return {

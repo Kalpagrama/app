@@ -188,6 +188,7 @@ module.exports = function (ctx) {
         // importWorkboxFrom: 'local'
         swSrc: 'src/system/service-worker.js',
         swDest: 'service-worker.js',
+        maximumFileSizeToCacheInBytes: 1024 * 1024 * 20,
       },
       manifest: {
         name: 'Kalpagramma',

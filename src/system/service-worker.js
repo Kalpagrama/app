@@ -15,11 +15,13 @@ import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
 import { NavigationRoute } from 'workbox-routing/NavigationRoute'
 import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute'
 
+// отключаем дебаговый вывод workbox
+self.__WB_DISABLE_DEV_LOGS = true
 // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
 precacheAndRoute(self.__WB_MANIFEST)
 
 
-const swVer = 2
+const swVer = 3
 const useCache = true
 let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
