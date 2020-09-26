@@ -28,7 +28,7 @@ q-layout(view="hHh Lpr lff")
               borderRadius: '10px', overflow: 'hidden',
             }`).row.full-width.b-40
             img(
-              :src="contentKalpa.url" draggable="false"
+              :src="contentKalpa.urlOriginal" draggable="false"
               :style=`{
                 objectFit: 'contain'
               }`).fit

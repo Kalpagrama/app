@@ -33,17 +33,19 @@
             :gutter="{default: 10}").full-width
             div(
               v-for="(node, ii) in items" :key="node.oid"
+              :style=`{position: 'relative'}`
               ).row.full-width.q-mb-sm
+              slot(name="tint" :item="node" :itemKey="node.oid")
               div(
                 @click="nodeClick(node)"
                 :style=`{
-                  position: 'relative', zIndex: 100,
+                  position: 'relative',
                   borderRadius: '10px', overflow: 'hidden',
                 }`
                 ).row.full-width.q-px-md.q-pt-md.b-40.node-item
                 div(
                   :style=`{
-                    position: 'relative', zIndex: 100,
+                    position: 'relative',
                     height: 0, paddingBottom: '100%',
                     borderRadius: '10px', overflow: 'hidden',
                   }`
