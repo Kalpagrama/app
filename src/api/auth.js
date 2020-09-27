@@ -137,7 +137,7 @@ class AuthApi {
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
       await systemReset(true, true, false)
-      let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
+      let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, hasPermanentPassword = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
          query: gql`
              ${fragments.dummyUserFragment}
              query  ($userId: String){
@@ -147,6 +147,7 @@ class AuthApi {
                      userExist
                      needInvite
                      needConfirm
+                     hasPermanentPassword
                      dummyUser {
                          ...dummyUserFragment
                      }
@@ -167,7 +168,7 @@ class AuthApi {
       // setWebPushToken мог быть вызван до userIdentify
       if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return { userId, loginType, userExist, needInvite, needConfirm, dummyUser, token, expires }
+      return { userId, loginType, userExist, needInvite, needConfirm, hasPermanentPassword, dummyUser, token, expires }
    }
 
    // oauth вход
