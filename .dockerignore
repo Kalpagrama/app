@@ -3,7 +3,6 @@
 .quasar
 dist
 node_modules
-public
 src-bex
 src-capacitor
 src-capacitor_dummy

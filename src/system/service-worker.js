@@ -1,10 +1,31 @@
-const swVer = 11
+/* eslint-disable */
+
+// InjectManifest in Workbox v5
+// https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
+// https://gist.github.com/jeffposnick/fc761c06856fa10dbf93e62ce7c4bd57
+import { setCacheNameDetails, skipWaiting, clientsClaim } from 'workbox-core'
+import { registerRoute, setDefaultHandler, setCatchHandler } from 'workbox-routing'
+import { getCacheKeyForURL } from 'workbox-precaching'
+import { matchPrecache } from 'workbox-precaching'
+import { createHandlerBoundToURL } from 'workbox-precaching'
+import { CacheableResponsePlugin } from 'workbox-cacheable-response/CacheableResponsePlugin'
+import { CacheFirst } from 'workbox-strategies/CacheFirst'
+import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
+import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
+import { NavigationRoute } from 'workbox-routing/NavigationRoute'
+import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute'
+
+// отключаем дебаговый вывод workbox
+self.__WB_DISABLE_DEV_LOGS = true
+// precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+precacheAndRoute(self.__WB_MANIFEST)
+
+
+const swVer = 3
 const useCache = true
 let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
    cacheVideo, messaging
-
-// let webPushToken = 'empty'
 
 function sendMsg (type, msgData) {
    self.clients.matchAll().then(all => all.map(client => client.postMessage({ type, msgData })))
@@ -35,8 +56,8 @@ function sendMsg (type, msgData) {
 {
    logDebug('common init sw', swVer)
    /* global idbKeyval, MD5 */
-   importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
-   importScripts('/statics/scripts/md5.js')
+   importScripts('/scripts/idb-keyval/idb-keyval-iife.min.js')
+   importScripts('/scripts/md5.js')
    importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js')
    importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-messaging.js')
    logDebug('swVer=', swVer)
@@ -74,15 +95,15 @@ function sendMsg (type, msgData) {
                const notificationOptions = {
                   body: `${event.object.name}`,
                   data: event,
-                  icon: '/statics/icons/icon-192x192.png',
-                  badge: '/statics/icons/badge3.png',
+                  icon: '/icons/icon-192x192.png',
+                  badge: '/icons/badge3.png',
                   vibrate: [500, 100, 500],
                   tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
                   actions: [
                      {
                         action: 'goto',
                         title: 'go to node',
-                        icon: '/statics/logo.png'
+                        icon: '/icons/icon-192x192.png'
                      }
                   ]
                }
@@ -97,26 +118,17 @@ function sendMsg (type, msgData) {
    initWebPush()
    // workbox init
    {
-      // workbox.setConfig({ debug: true })
-      /* global workbox */
-      // This will trigger the importScripts() for workbox.strategies and its dependencies:
-      const { strategies } = workbox
-      workbox.core.setCacheNameDetails({
+      setCacheNameDetails({
          prefix: 'kalpa'
       })
       // force update sw
-      {
-         // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
-         // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
-         // workbox.core.clientsClaim()
-      }
-      self.__precacheManifest = [].concat(self.__precacheManifest || [])
-      // порядок вызовов precacheAndRoute и registerRoute имеет значение
-      // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-      workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-      workbox.routing.registerRoute(/\/share_target\/?$/,
+      // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
+      // skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
+      // clientsClaim()
+
+      registerRoute(/\/share_target\/?$/,
          async ({ url, event, params }) => {
-            logDebug('share_target 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
+            logDebug('share_target 1', url, getCacheKeyForURL('/index.html'))
             // if (event.request.method === 'POST') {
             //   logDebug('redirect to share_target = ')
             //   return Response.redirect('share_target', 303)
@@ -139,9 +151,9 @@ function sendMsg (type, msgData) {
                   logCritical('share_target err', err)
                }
             }
-            if (workbox.precaching.getCacheKeyForURL('/index.html')) {
+            if (getCacheKeyForURL('/index.html')) {
                logDebug('share_target returm from cache', url)
-               return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
+               return caches.match(getCacheKeyForURL('/index.html'))
             } else {
                logDebug('share_target returm from net', url)
                return fetch('/index.html')
@@ -186,11 +198,6 @@ function sendMsg (type, msgData) {
                   logDbgFilter = event.data.logDbgFilter
                   logLevel = event.data.logLevel
                   logLevelSentry = event.data.logLevelSentry
-                  try {
-                     // if (logDbgFilter !== 'gui') workbox.setConfig({ debug: true })
-                  } catch (err) {
-                     logDebug('error on setConfig', err)
-                  }
                   break
                case 'skipWaiting':
                   self.skipWaiting()
@@ -232,7 +239,7 @@ function sendMsg (type, msgData) {
             self.clients.matchAll({ type: 'window' }).then(function (clientList) {
                // Если есть хотя бы один клиент, фокусируем его.
                if (clientList.length > 0) {
-                  if ('navigate' in clientList[0]){
+                  if ('navigate' in clientList[0]) {
                      clientList[0].focus()
                      clientList[0].navigate(route)
                      return
@@ -431,29 +438,33 @@ if (useCache) {
    }
 // routing
    {
-      workbox.routing.registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new workbox.strategies.StaleWhileRevalidate({
+      registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({
          cacheName: 'google',
          plugins: [
-            new workbox.expiration.Plugin({
+            new ExpirationPlugin({
                maxEntries: 100
             })
          ]
       }))
       // vue router ( /menu /create etc looks at index.html)
-      workbox.routing.registerRoute(/\/(?!graphql)\w+\/?$/, async ({ url, event, params }) => {
-         logDebug('vue router 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
-         if (workbox.precaching.getCacheKeyForURL('/index.html')) {
-            return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
+      registerRoute(/\/(?!graphql)\w+\/?$/, async ({ url, event, params }) => {
+         logDebug('vue router 1', url, getCacheKeyForURL('/index.html'))
+         // logDebug('ask url=', url)
+         // let xxx = await createHandlerBoundToURL('/index.html', true)
+         // logDebug('ask url, createHandlerBoundToURL = ', xxx)
+         // return xxx
+         if (getCacheKeyForURL('/index.html')) {
+            return caches.match(getCacheKeyForURL('/index.html'))
          } else {
             return fetch('/index.html')
          }
       })
       // content images
-      workbox.routing.registerRoute(/^http.*(kalpa\.store).+\.jpg$/,
-         new workbox.strategies.CacheFirst({
+      registerRoute(/^http.*(kalpa\.store).+\.jpg$/,
+         new CacheFirst({
             cacheName: 'content_img',
             plugins: [
-               new workbox.expiration.Plugin({
+               new ExpirationPlugin({
                   maxEntries: 2000
                })
             ],
@@ -468,7 +479,7 @@ if (useCache) {
             }
          })
       )
-      // workbox.routing.registerRoute(/^http.*(kalpa\.store).+\.jpg$/, async ({ url, event, params }) => {
+      // registerRoute(/^http.*(kalpa\.store).+\.jpg$/, async ({ url, event, params }) => {
       //    // Response will be "A guide to Workbox"
       //    // return new Response(
       //    //    `A ${params.type} to ${params.name}`
@@ -486,41 +497,35 @@ if (useCache) {
       // })
 
       // // почему-то закэшитрованное видео не играет...
-      // workbox.routing.registerRoute( // content video
+      // registerRoute( // content video
       //   /^http.*(kalpa\.store).+\.mp4$/,
       //   ({ url, event, params }) => {
-      //     logDebug('workbox.routing.registerRoute video', event)
+      //     logDebug('registerRoute video', event)
       //     return cacheVideo(event)
       //   }
       // )
 
       // This "catch" handler is triggered when any of the other routes fail to
       // generate a response.
-      workbox.routing.setCatchHandler(async ({ event }) => {
+      setCatchHandler(async ({ event }) => {
          // The FALLBACK_URL entries must be added to the cache ahead of time, either via runtime
          // or precaching.
-         // If they are precached, then call workbox.precaching.getCacheKeyForURL(FALLBACK_URL)
+         // If they are precached, then call getCacheKeyForURL(FALLBACK_URL)
          // to get the correct cache key to pass in to caches.match().
          //
          // Use event, request, and url to figure out how to respond.
          // One approach would be to use request.destination, see
          // https://medium.com/dev-channel/service-worker-caching-strategies-based-on-request-types-57411dd7652c
-
+         logDebug('setCatchHandler', event)
          switch (event.request.destination) {
             case 'image': {
-               logDebug('fallback image', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/fallback_image.png'))
-               return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_image.png'))
-            }
-            case 'video': {
-               logDebug('fallback video', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
-               return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
+               logDebug('fallback image', event.request.url, 'to', getCacheKeyForURL('/icons/icon-512x512.png'))
+               return matchPrecache('/icons/icon-512x512.png')
             }
             default:
-               logDebug('fallback default (get from network)', event.request)
+               logDebug('fallback default', event.request)
                // If we don't have a fallback, just return an error response.
                return Response.error()
-            // return await fetch(event.request)
-            // return await fetch(event)
          }
       })
    }

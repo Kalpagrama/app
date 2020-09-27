@@ -33,7 +33,7 @@ fetch(`${process.env.SERVICES_URL_DEBUG}`, {
       }
     });
 
-    fs.writeFile('public/statics/scripts/possibleTypes.json', JSON.stringify(possibleTypes), err => {
+    fs.writeFile('public/scripts/possibleTypes.json', JSON.stringify(possibleTypes), err => {
       if (err) {
         console.error('Error writing possibleTypes.json', err);
       } else {

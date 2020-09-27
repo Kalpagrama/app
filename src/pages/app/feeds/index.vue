@@ -75,6 +75,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
+          populateObjects: false,
           oidSphere: this.$store.getters.currentUser().oid,
           subscription: {$in: this.subscriptions}
         }

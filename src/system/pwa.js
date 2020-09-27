@@ -3,7 +3,7 @@ import { AuthApi } from 'src/api/auth'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
-import { Store, get, clear } from 'public/statics/scripts/idb-keyval/idb-keyval.mjs'
+import { Store, get, clear } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/main'
 
@@ -276,8 +276,8 @@ async function showNotification (event) {
     let options = {
       body: `${event.object.name}`,
       data: event,
-      icon: '/statics/icons/icon-192x192.png',
-      badge: '/statics/icons/badge3.png',
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/badge3.png',
       vibrate: [500, 100, 500],
       tag: 'tag: sample'
     }
@@ -289,7 +289,7 @@ async function showNotification (event) {
         {
           action: 'goto',
           title: 'go node',
-          icon: '/statics/icons/favicon-32x32.png',
+          icon: '/icons/favicon-32x32.png',
           handler: async () => {
             logD('action = go 1')
             await router.push('/node/' + event.object.oid)

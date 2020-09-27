@@ -64,6 +64,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
+          populateObjects: false,
           oidSphere: this.sphereOid,
         }
       }

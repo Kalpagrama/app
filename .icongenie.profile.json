@@ -1,7 +1,7 @@
 {
   "params": {
-    "quality": 8,
-    "include": ["all"],
+    "quality": 12,
+    "include":  ["all"],
     "skipTrim": false,
     "padding": [
       0,

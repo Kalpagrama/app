@@ -13,10 +13,10 @@ export default {
    logLevelSentry: LogLevelEnum.CRITICAL,
    logDbgFilter: 'any', // gui | system | any
    logDbgModulesBlackList: [
-      LogSystemModulesEnum.SYSTEM,
-      LogSystemModulesEnum.SW,
+      // LogSystemModulesEnum.SYSTEM,
+      // LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,
-      LogSystemModulesEnum.AUTH,
+      // LogSystemModulesEnum.AUTH,
       LogSystemModulesEnum.GQL,
       LogSystemModulesEnum.ROUTER,
       LogSystemModulesEnum.VUEX,

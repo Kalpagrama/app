@@ -46,9 +46,6 @@ const metaStaticFragment = gql`
         name
         thumbUrl(preferWidth: 600)
         createdAt
-        metaStatic{
-          ...on MetaStaticNode {... metaStaticNodeFragment}
-        }
       }
       rightItem {
         type
@@ -56,9 +53,6 @@ const metaStaticFragment = gql`
         name
         thumbUrl(preferWidth: 600)
         createdAt
-        metaStatic{
-          ...on MetaStaticNode {... metaStaticNodeFragment}
-        }
       }
     }
     ...on MetaStaticContent{
@@ -91,6 +85,72 @@ const objectFragment = gql`${objectShortFragment}
   }
 `
 
+const userFragment = gql`
+  ${objectShortFragment} ${objectFragment}
+  fragment userFragment on User {
+    ...objectFragment
+    username
+    weightVal
+    settings
+    wsRevision
+    wsVersion
+    subscriptions{...objectShortFragment}
+    profile{
+      tutorial
+      about
+      status
+      photoUrl
+      coverUrl
+      city
+      country
+      dateBirth
+      gender
+      lang
+      nameFirst
+      nameFull
+      nameSecond
+      role
+      email
+      phone
+      password
+    }
+    sessions{
+      token
+      ip
+      userAgent
+    }
+  }
+`
+const dummyUserFragment = gql`
+  ${objectShortFragment}
+  fragment dummyUserFragment on DummyUser {
+    type
+    thumbUrl(preferWidth: 600)
+    name
+    username
+    settings
+    subscriptions{...objectShortFragment}
+    profile{
+      tutorial
+      about
+      status
+      photoUrl
+      coverUrl
+      city
+      country
+      dateBirth
+      gender
+      lang
+      nameFirst
+      nameFull
+      nameSecond
+      role
+      email
+      phone
+      password
+    }
+  }
+`
 const sphereFragment = gql`${objectFragment}
   fragment sphereFragment on Object {
     ...objectFragment
@@ -117,7 +177,7 @@ const imageFragment = gql`${objectFragment}
     contentSource
   }
 `
-const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment}
+const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragment}
   fragment figureFragment on Figure {
     t
     points {
@@ -194,20 +254,7 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
     contentSource
   }
 `
-const jointFragment = gql` ${objectFragment} ${objectShortFragment} ${objectShortFragment}
-  fragment jointFragment on Joint {
-    ...objectFragment
-    jointType
-    leftItem {...objectShortFragment}
-    rightItem {...objectShortFragment}
-    rate
-    weight
-    rateUser
-    viewCnt
-    childrenCnt
-  }
-`
-const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
+const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
   fragment nodeFragment on Node {
     ...objectFragment
     sphereFromName{...objectShortFragment}
@@ -226,12 +273,41 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     }
     category
     layout
-    items {...objectShortFragment}
+    items {
+    ...on Composition {...compositionFragment}
+    }
   }
+`
+const jointFragment = gql` ${objectFragment} ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+fragment jointFragment on Joint {
+  ...objectFragment
+  jointType
+  leftItem {
+    ...on Video {...videoFragment}
+    ...on Image {...imageFragment}
+    ...on Node {... nodeFragment}
+    ...on Sphere {... sphereFragment}
+    ...on User {... userFragment}
+    ...on Composition {...compositionFragment}
+  }
+  rightItem {
+    ...on Video {...videoFragment}
+    ...on Image {...imageFragment}
+    ...on Node {... nodeFragment}
+    ...on Sphere {... sphereFragment}
+    ...on User {... userFragment}
+    ...on Composition {...compositionFragment}
+  }
+  rate
+  weight
+  rateUser
+  viewCnt
+  childrenCnt
+}
 `
 
 const eventFragment = gql`
-  ${objectShortFragment} ${objectShortFragment}
+  ${objectShortFragment}
   fragment eventFragment on Event {
     id
     createdAt
@@ -282,72 +358,6 @@ const eventFragment = gql`
     }
   }
 `
-const userFragment = gql`
-  ${objectShortFragment} ${nodeFragment} ${objectFragment}
-  fragment userFragment on User {
-    ...objectFragment
-    username
-    weightVal
-    settings
-    wsRevision
-    wsVersion
-    subscriptions{...objectShortFragment}
-    profile{
-      tutorial
-      about
-      status
-      photoUrl
-      coverUrl
-      city
-      country
-      dateBirth
-      gender
-      lang
-      nameFirst
-      nameFull
-      nameSecond
-      role
-      email
-      phone
-      password
-    }
-    sessions{
-      token
-      ip
-      userAgent
-    }
-  }
-`
-const dummyUserFragment = gql`
-  ${objectShortFragment}
-  fragment dummyUserFragment on DummyUser {
-    type
-    thumbUrl(preferWidth: 600)
-    name
-    username
-    settings
-    subscriptions{...objectShortFragment}
-    profile{
-      tutorial
-      about
-      status
-      photoUrl
-      coverUrl
-      city
-      country
-      dateBirth
-      gender
-      lang
-      nameFirst
-      nameFull
-      nameSecond
-      role
-      email
-      phone
-      password
-    }
-  }
-`
 const objectFullFragment = gql`
   ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
   ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
@@ -364,7 +374,7 @@ const objectFullFragment = gql`
 `
 
 const findResultFragment = gql`
-  ${eventFragment} ${objectShortFragment}
+  ${eventFragment}
   fragment findResultFragment on FindResult {
     count
     totalCount

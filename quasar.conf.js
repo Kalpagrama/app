@@ -7,6 +7,8 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 // const packageJson = fs.readFileSync('./package.json')
 // const version = JSON.parse(packageJson).version || 0
 
+const WorkboxPlugin = require('workbox-webpack-plugin');
+
 module.exports = function (ctx) {
   return {
     preFetch: true,
@@ -180,11 +182,13 @@ module.exports = function (ctx) {
       pwa: false
     },
     pwa: {
-      workboxPluginMode: 'InjectManifest',
+      workboxPluginMode: 'InjectManifest', // 'GenerateSW', //
       workboxOptions: {
         // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
-        swSrc: 'src/system/service-worker.js'
         // importWorkboxFrom: 'local'
+        swSrc: 'src/system/service-worker.js',
+        swDest: 'service-worker.js',
+        maximumFileSizeToCacheInBytes: 1024 * 1024 * 20,
       },
       manifest: {
         name: 'Kalpagramma',
@@ -196,27 +200,27 @@ module.exports = function (ctx) {
         theme_color: '#222222',
         icons: [
           {
-            src: 'statics/icons/icon-128x128.png',
+            src: 'icons/icon-128x128.png',
             sizes: '128x128',
             type: 'image/png'
           },
           {
-            src: 'statics/icons/icon-192x192.png',
+            src: 'icons/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'statics/icons/icon-256x256.png',
+            src: 'icons/icon-256x256.png',
             sizes: '256x256',
             type: 'image/png'
           },
           {
-            src: 'statics/icons/icon-384x384.png',
+            src: 'icons/icon-384x384.png',
             sizes: '384x384',
             type: 'image/png'
           },
           {
-            src: 'statics/icons/icon-512x512.png',
+            src: 'icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png'
           }
@@ -249,7 +253,20 @@ module.exports = function (ctx) {
             ]
           }
         }
-      }
+      },
+
+      metaVariables: {
+        appleMobileWebAppCapable: 'yes',
+        appleMobileWebAppStatusBarStyle: 'default',
+        appleTouchIcon120: 'icons/apple-icon-120x120.png',
+        appleTouchIcon180: 'icons/apple-icon-180x180.png',
+        appleTouchIcon152: 'icons/apple-icon-152x152.png',
+        appleTouchIcon167: 'icons/apple-icon-167x167.png',
+        appleSafariPinnedTab: 'icons/safari-pinned-tab.svg',
+        msapplicationTileImage: 'icons/ms-icon-144x144.png',
+        msapplicationTileColor: '#222222'
+      },
+
     },
     capacitor: {
       // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices

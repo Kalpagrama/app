@@ -228,6 +228,22 @@ class AuthApi {
       return { result, role, nextAttemptDate, attempts, failReason }
    }
 
+   static async setPermanentPassword (oldPassword, newPassword) {
+      const f = this.setPermanentPassword
+      logD(f, 'start')
+      const t1 = performance.now()
+      let { data: { setPermanentPassword } } = await apollo.clients.auth.query({
+         query: gql`
+             query setPermanentPassword($oldPassword: String, $newPassword: String!) {
+                 setPermanentPassword(oldPassword: $oldPassword, newPassword: $newPassword)
+             }
+         `,
+         variables: { oldPassword, newPassword }
+      })
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, setPermanentPassword)
+      return setPermanentPassword
+   }
+
    static async inviteEmail (email) {
       logD('@invite start')
       let { data: { inviteEmail } } = await apollo.clients.auth.query({
