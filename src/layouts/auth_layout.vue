@@ -47,24 +47,6 @@ export default {
             this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
           }
         }
-        // if (to) {
-        //   this.$log('GOT TOKEN', to)
-        //   // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
-        //   let q = this.$route.query
-        //   this.$log('q=', q)
-        //   localStorage.setItem('k_token', q.token)
-        //   localStorage.setItem('k_token_expires', q.expires)
-        //   // await this.$wait(200)
-        //   // this.userIdentifying = false
-        //   // this.userIdentified = true
-        //   // this.login = q.userId
-        //   // this.loginType = q.loginType
-        //   // this.userExist = q.userExist === 'true' ? true : false
-        //   // this.needInvite = q.needInvite === 'true' ? true : false
-        //   // this.$log('this.needInvite = ', this.needInvite)
-        //   // if userExist and !needInvite... this.userAuthenticate()
-        //   // this.$router.replace('/auth')
-        // }
       }
     }
   },
