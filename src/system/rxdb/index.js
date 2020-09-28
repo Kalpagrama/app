@@ -396,6 +396,7 @@ class RxDBWrapper {
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
+      mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       let populateObjects = mangoQuery.selector.populateObjects
       let pageToken = mangoQuery.selector.pageToken || { indx: 0, oid: null }
       let limit = parseInt(mangoQuery.selector.limit)
@@ -443,7 +444,7 @@ class RxDBWrapper {
          // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
-            mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+            // mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
             if (rxCollectionEnum in WsCollectionEnum) {

@@ -47,7 +47,7 @@ let globalLock = async (recursive = true) => {
       if (current.dt) logW('break globalLock by timeout(maxLockTimeFuse)!', current)
    }
    localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId() }))
-   // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, getInstanceId())
+   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, getInstanceId())
 }
 let globalRelease = () => {
    const f = globalRelease
