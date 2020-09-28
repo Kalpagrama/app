@@ -29,25 +29,30 @@ let isLeader = () => {
    }
    return currentLeaderInstanceId === getInstanceId()
 }
+let unloadingInProgress = false
 
 // синхронизация вкладок (globalLock следит за синхронизацией ws, очисткой rxdb, и др)
 const maxLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
-let globalLock = async (recursive = true) => {
+let globalLock = async (recursive = true, lockOwner = '') => {
    const f = globalLock
    // logD(f, 'start', getInstanceId())
+   if (unloadingInProgress) {
+      logW('cant globalLock (unloadingInProgress)')
+      await wait(10 * 1000)
+   }
    const t1 = performance.now()
-   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
+   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '', lockOwner: '' }))
    if (!recursive || getInstanceId() !== current.instanceId) {
       while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxLockTimeFuse) {
          assert('dt' in current && 'instanceId' in current, 'bad current!')
          await wait(100)
-         if (Date.now() % 10 === 0) logD(f, `wait for globalLock release(${JSON.stringify(current)}). MyInstanceId=${getInstanceId()}. ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
-         current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
+         if (Date.now() % 10 === 0) logD(f, `${getInstanceId()}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
+         current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '', lockOwner: '' }))
       }
       if (current.dt) logW('break globalLock by timeout(maxLockTimeFuse)!', current)
    }
-   localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId() }))
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, getInstanceId())
+   localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId(), lockOwner: lockOwner }))
+   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 let globalRelease = () => {
    const f = globalRelease
@@ -67,6 +72,7 @@ const instanceId = sessionStorage.getItem('k_instance_id') ? sessionStorage.getI
 sessionStorage.removeItem('k_instance_id') // контроль дублирования (при удблированиии вкладок дублируется sessionStorage) https://stackoverflow.com/questions/11896160/any-way-to-identify-browser-tab-in-javascript
 window.addEventListener('beforeunload', () => {
    logD('on page unload')
+   unloadingInProgress = true
    sessionStorage.setItem('k_instance_id', instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки - дублируется и instanceId))
    let currentLock = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
    if (currentLock.instanceId === getInstanceId()) {
@@ -94,11 +100,11 @@ async function initServices (store) {
    initOfflineEvents(store)
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
-   let storageEventMutex = new Mutex()
+   let storageEventMutex = new Mutex('storageEventMutex')
    // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
    window.addEventListener('storage', async function (event) {
       try {
-         await storageEventMutex.lock()// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
+         await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
          // одна из вкладок выполнила либо вход либо выход
          if (event.key && event.key.in('k_login_date', 'k_logout_date') && event.newValue) {
             logD(`localStorage auth event: ${event.key}`, event)
@@ -203,7 +209,7 @@ async function resetLocalStorage () {
    const f = resetLocalStorage
    logD(f, 'start')
    try {
-      await globalLock()
+      await globalLock(true, 'system::resetLocalStorage')
       for (let i = 0; i < localStorage.length; i++) {
          let key = localStorage.key(i)
          if (key.startsWith('k_')) localStorage.removeItem(key)
@@ -222,7 +228,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
    resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
-      await globalLock()
+      await globalLock(true, 'system::systemReset')
       if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
          logW('too often systemReset!')
          let hardReset = confirm('Too often system reset. \n Make app hard reset?')
@@ -263,7 +269,7 @@ async function systemInit () {
       return
    } // уже войдено!
    try {
-      await globalLock()
+      await globalLock(true, 'system::systemInit')
       let userOid = localStorage.getItem('k_user_oid')
       if (userOid) { // пользователь зарегистрирован
          await rxdb.initGlobal({ userOid })

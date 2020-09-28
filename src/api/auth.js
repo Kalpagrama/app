@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
-const apiMutex = new Mutex()
+const authApiMutex = new Mutex('authApiMutex')
 
 const ActionEnum = Object.freeze({
    VOTE: 'VOTE'
@@ -105,7 +105,7 @@ class AuthApi {
       logD(f, 'start')
       const t1 = performance.now()
       try {
-         await apiMutex.lock()
+         await authApiMutex.lock('AuthApi::logout')
          if (token) {
             let { data: { logout } } = await apollo.clients.auth.query({
                query: gql`
@@ -126,7 +126,7 @@ class AuthApi {
                await systemReset(true, true, false)
             }
          } finally {
-            apiMutex.release()
+            authApiMutex.release()
          }
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

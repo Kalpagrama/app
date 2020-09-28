@@ -34,12 +34,14 @@ export default {
       if (newName && newName.length > 0 && newName !== this.sphere.name) {
         this.sphere.name = newName
         // let sphere = await ObjectsApi.getSphere(newName)
-        let {items: [sphere]} = await this.$rxdb.find({selector: {
+        let {items: [sphere]} = await this.$rxdb.find({
+          selector: {
             rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
-            populateObjects: false,
             name: newName,
             objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }
-        }})
+          },
+          populateObjects: false
+        })
         this.$log('sphere', sphere)
         if (sphere) {
           this.sphere.oid = sphere.oid

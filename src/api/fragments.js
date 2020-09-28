@@ -1,67 +1,5 @@
 import gql from 'graphql-tag'
 
-const metaStaticFragment = gql`
-  fragment metaStaticCompositionFragment on MetaStaticComposition {
-    thumbUrl(preferWidth: 600)
-  }
-  fragment metaStaticNodeFragment on MetaStaticNode {
-    oid
-    name
-    layout
-    author {
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 50)
-    }
-    items{
-      oid
-      thumbUrl(preferWidth: 600)
-      ...on Composition {
-        oid
-        url
-        outputType
-        layers {
-          contentOid
-          figuresAbsolute {
-            t
-          }
-        }
-      }
-    }
-  }
-  fragment metaStaticFragment on MetaStatic {
-    type
-    ...on MetaStaticNode {... metaStaticNodeFragment}
-    ... on MetaStaticJoint {
-      jointType
-      name
-      sphereFromName{
-        oid
-        name
-      }
-      leftItem {
-        type
-        oid
-        name
-        thumbUrl(preferWidth: 600)
-        createdAt
-      }
-      rightItem {
-        type
-        oid
-        name
-        thumbUrl(preferWidth: 600)
-        createdAt
-      }
-    }
-    ...on MetaStaticContent{
-      type
-      uploadedInfo
-    }
-    ... on MetaStaticComposition {...metaStaticCompositionFragment}
-  }
-`
 const objectShortFragment = gql`
   fragment objectShortFragment on ObjectShort {
     type
@@ -71,6 +9,20 @@ const objectShortFragment = gql`
     createdAt
   }
 `
+
+const objectShortJointFragment = gql`
+  fragment objectShortJointFragment on ObjectShortJoint {
+    oid
+    rate
+    weight
+    userVoteCnt
+    rightItem{
+      oid
+      name
+    }
+  }
+`
+
 const objectFragment = gql`${objectShortFragment}
   fragment objectFragment on Object {
     type
@@ -254,7 +206,7 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     contentSource
   }
 `
-const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
+const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment} ${objectShortJointFragment}
   fragment nodeFragment on Node {
     ...objectFragment
     sphereFromName{...objectShortFragment}
@@ -276,6 +228,8 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     items {
     ...on Composition {...compositionFragment}
     }
+    #    jointsWithEmojis{...objectShortJointFragment}
+    #    jointsWithSpheres{...objectShortJointFragment}
   }
 `
 const jointFragment = gql` ${objectFragment} ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${compositionFragment}

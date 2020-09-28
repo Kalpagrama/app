@@ -30,11 +30,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          populateObjects: true,
           oidSphere: this.sphereOid,
           oidAuthor: {$eq: this.sphereOid},
           sortStrategy: 'AGE',
-        }
+        },
+        populateObjects: true,
       }
     }
   },

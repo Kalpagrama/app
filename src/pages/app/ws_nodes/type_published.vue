@@ -80,11 +80,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          populateObjects: true,
           oidSphere: this.$store.getters.currentUser().oid,
           oidAuthor: {$eq: this.$store.getters.currentUser().oid},
           sortStrategy: 'AGE',
-        }
+        },
+        populateObjects: true,
       }
     }
   },

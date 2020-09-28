@@ -51,10 +51,10 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
-          populateObjects: true,
           oidSphere: this.node.oid,
           jointItemType: {$in: ['EMOJI']},
         },
+        populateObjects: true,
       }
     },
   },

@@ -110,11 +110,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          populateObjects: true,
           oidAuthor: {$eq: this.$store.getters.currentUser().oid},
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
-        }
+        },
+        populateObjects: true,
       }
     },
   },

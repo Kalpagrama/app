@@ -88,7 +88,7 @@ class ReactiveItemHolder {
       } else {
          this.id = rxDoc.id + ':::' + id++
          this.rxDoc = rxDoc
-         this.mutex = new Mutex()
+         this.mutex = new Mutex('ReactiveItemHolder::constructor')
          this.vm = new Vue({
             data: {
                reactiveItem: rxDoc.toJSON()
@@ -128,7 +128,7 @@ class ReactiveItemHolder {
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
          try {
-            await this.mutex.lock() // обязательно сначала блокируем !!! (см itemSubscribe)
+            await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см itemSubscribe)
             assert(this.reactiveItem._rev && change._rev, '!this.reactiveItem._rev && change._rev')
             if (this.reactiveItem._rev === change._rev) return // изменения уже применены к reactiveItem
             this.itemUnsubscribe()
@@ -161,7 +161,7 @@ class ReactiveItemHolder {
                const f = this.itemSaveFunc
                if (this.rxDoc.deleted) return // на всякий случай
                try {
-                  await this.mutex.lock() // обязательно сначала блокируем !!! (см rxDocSubscribe)
+                  await this.mutex.lock('debouncedItemSaveFunc') // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() // не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!)
 
                   // logD(f, `try to change rxDoc ${this.reactiveItem.id} ${this.reactiveItem._rev} ${this.rxDoc._rev}`)
@@ -204,12 +204,12 @@ class ReactiveListHolder {
       assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
       try {
          if (rxQuery.reactiveListHolderMaster) {
-            await rxQuery.reactiveListHolderMaster.mutex.lock()
+            await rxQuery.reactiveListHolderMaster.mutex.lock('ReactiveListHolder::create')
             this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
             assert(this.reactiveList, '!this.reactiveList!')
          } else {
-            this.mutex = new Mutex()
-            await this.mutex.lock()
+            this.mutex = new Mutex('ReactiveListHolder::constructor')
+            await this.mutex.lock('ReactiveListHolder::create')
             rxQuery.reactiveListHolderMaster = this
             this.rxQuery = rxQuery
             let docs = await rxQuery.exec()
@@ -241,7 +241,7 @@ class ReactiveListHolder {
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxQuerySubscription = this.rxQuery.$.pipe(skip(1)).subscribe(async results => {
          try {
-            await this.mutex.lock()
+            await this.mutex.lock('rxQuerySubscribe')
             this.listUnsubscribe()
             // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
             // logD(f, 'rxQuery changed 1', results)
@@ -283,8 +283,8 @@ class ReactiveListHolder {
          //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
          //     const f = this.debouncedListSave
          //     try {
-         //       await this.mutex.lock()
-         //       await rxdb.lock() // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
+         //       await this.mutex.lock('listUnsubscribeFunc')
+         //       await rxdb.lock('listUnsubscribeFunc') // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
          //       this.rxQueryUnsubscribe()
          //       logD(f, 'reactiveList changed from UI', newVal)
          //       let insertedItems = difference(newVal, oldVal, (left, right) => left.id === right.id) // что добавилось в массив
@@ -316,21 +316,26 @@ class ReactiveListHolder {
 }
 
 class Mutex {
-   constructor () {
+   constructor (name) {
+      assert(name, 'name')
       this.queue = []
       this.locked = false
+      this.lockOwner = null
+      this.name = name
       this.timerWarnId = null
       this.timerErrId = null
    }
 
-   lock () {
+   lock (lockOwner) {
+      assert(lockOwner, '!lockOwner')
       return new Promise((resolve, reject) => {
          if (this.locked) {
-            this.queue.push([resolve, reject])
+            this.queue.push([resolve, reject, lockOwner])
          } else {
-            this.timerWarnId = setTimeout(() => logW('possible deadlock detected!'), 10 * 1000)
-            this.timerErrId = setTimeout(() => logE('deadlock detected!'), 60 * 1000)
+            this.timerWarnId = setTimeout(() => logW(`${lockOwner} cant lock ${this.name}! possible deadlock detected! this.lockOwner=${this.lockOwner}`), 10 * 1000)
+            this.timerErrId = setTimeout(() => logE(`${lockOwner} cant lock ${this.name}! deadlock detected! this.lockOwner=${this.lockOwner}`), 60 * 1000)
             this.locked = true
+            this.lockOwner = lockOwner
             resolve()
          }
       })
@@ -338,12 +343,14 @@ class Mutex {
 
    release () {
       if (this.queue.length > 0) {
-         const [resolve, reject] = this.queue.shift()
+         const [resolve, reject, lockOwner] = this.queue.shift()
+         this.lockOwner = lockOwner
          resolve()
       } else {
          clearTimeout(this.timerWarnId)
          clearTimeout(this.timerErrId)
          this.locked = false
+         this.lockOwner = ''
       }
    }
 }

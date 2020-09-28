@@ -58,7 +58,7 @@ export default {
         let query = this.query
         query.limit = this.limit
         query.pageToken = this.itemsPageToken
-        query.selector.populateObjects = true
+        query.populateObjects = true
         this.$log('query', query)
         const { items, count, totalCount, nextPageToken } = await this.$rxdb.find(query)
         this.$log(items, count, totalCount, nextPageToken)

@@ -52,9 +52,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          populateObjects: true,
           oidSphere: this.$route.params.oid
-        }
+        },
+        populateObjects: true,
       }
     }
   },

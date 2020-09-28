@@ -68,7 +68,7 @@ class Cache {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         this.mutex = new Mutex()
+         this.mutex = new Mutex('rxdb::cache')
          // используется для контроля места
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
@@ -130,8 +130,8 @@ class Cache {
       }
    }
 
-   async lock () {
-      await this.mutex.lock()
+   async lock (lockOwner) {
+      await this.mutex.lock(lockOwner)
    }
 
    release () {
@@ -146,7 +146,7 @@ class Cache {
    //   cached: {data} data может быть как объектом, так и любым другим типом
    async set (id, data, actualAge, notEvict, mangoQuery = {}) {
       try {
-         await this.lock()
+         await this.lock('rxdb::cache::set')
          assert(this.created, '!this.created')
          assert(id && data, '!id && data' + id + JSON.stringify(data))
          let rxCollectionEnum = getRxCollectionEnumFromId(id)
@@ -230,7 +230,7 @@ class Cache {
    // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
    async get (id, fetchFunc, clientFirst = true, force = false, onFetchFunc = null) {
       try {
-         // await this.lock() ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
+         // await this.lock('rxdb::get') ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
          assert(this.created, '!this.created')
          assert(id)
          const f = this.get
@@ -306,7 +306,7 @@ class Cache {
 
    async expire (id) {
       try {
-         await this.lock()
+         await this.lock('rxdb::cache::expire')
          let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
          if (actualUntil) this.cacheLru.set(id, { actualUntil: Date.now(), actualAge: 0 })
       } finally {

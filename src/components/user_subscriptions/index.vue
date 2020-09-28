@@ -79,9 +79,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
-          populateObjects: false,
           oidSphere: this.oid || this.$store.getters.currentUser().oid,
-        }
+        },
+        populateObjects: false,
       }
     }
   },
