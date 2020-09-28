@@ -32,11 +32,11 @@ q-page.row.full-width.justify-center
                   borderRadius: '50%', overflow: 'hidden',
                 }`)
           div(:style=`{order: -1}`).row.full-width.q-px-md
-            span.text-bold.text-white Avatar
+            span.text-bold.text-white {{ $t('Avatar', 'Аватар') }}
       //- right side
       .col-xs-12.col-sm-8.q-pa-sm
         .row.full-width.q-px-md
-          span.text-white.text-bold Profile
+          span.text-white.text-bold {{ $t('Profile', 'Профиль') }}
         //- name
         .row.full-width.q-pa-xs
           div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width

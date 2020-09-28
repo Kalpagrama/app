@@ -113,9 +113,11 @@ export default {
         this.$log('identify start')
         this.loading = true
         if (this.login.length === 0) throw new Error('Login is empty!')
-        let {userExist, userId, needInvite, needConfirm, loginType} = await AuthApi.userIdentify(this.login)
+        let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.login)
         if (loginType !== 'EMAIL') throw new Error('Only emails...')
         this.userId = userId
+        this.$log('needConfirm', needConfirm)
+        this.$log('hasPermanentPassword', hasPermanentPassword)
         if (needConfirm) {
           this.needConfirm = needConfirm
         }
