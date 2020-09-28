@@ -7,27 +7,26 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.ite
         placeholder="Find fragment"
         filled dark dense color="grey-6").full-width
   .row.full-width.items-start.content-start.q-pt-md
-    kalpa-loader(:mangoQuery="query" :sliceSize="1000")
-      template(v-slot=`{items, next}`)
-        masonry(
-          :cols="$q.screen.width < 800 ? 2 : 4"
-          :gutter="{default: 10}").full-width
-          ws-node-item(
-            v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="itemSelected = i.id").q-mb-sm
-            template(v-slot:footer)
-              //- selected
-              div(
-                v-if="itemSelected === i.id"
-                :style=`{
-                  position: 'relative',
-                  marginTop: '-10px', paddingTop: '14px',
-                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
-                }`
-                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                //- q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-                .col
-                //- q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+    kalpa-loader(:query="query" :limit="1000" v-slot=`{items, next}`)
+      masonry(
+        :cols="$q.screen.width < 800 ? 2 : 4"
+        :gutter="{default: 10}").full-width
+        ws-node-item(
+          v-for="(i,ii) in items" :key="i.id" :node="i"
+          @clicked="itemSelected = i.id").q-mb-sm
+          template(v-slot:footer)
+            //- selected
+            div(
+              v-if="itemSelected === i.id"
+              :style=`{
+                position: 'relative',
+                marginTop: '-10px', paddingTop: '14px',
+                borderRadius: '0 0 10px 10px', overflow: 'hidden',
+              }`
+              ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+              //- q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+              .col
+              //- q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
 </template>
 
 <script>

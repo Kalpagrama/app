@@ -8,7 +8,7 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width
-    kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+    kalpa-loader(:query="query" :limit="1000")
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"

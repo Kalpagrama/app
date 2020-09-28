@@ -397,12 +397,13 @@ class RxDBWrapper {
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
       let populateObjects = mangoQuery.selector.populateObjects
-      let pageToken = mangoQuery.selector.pageToken || { indx: 0, oid: null }
-      let limit = parseInt(mangoQuery.selector.limit)
+      let pageToken = mangoQuery.pageToken || { indx: 0, oid: null }
+      // console.log('$rxdb.find() --- pageToken', pageToken)
+      let limit = parseInt(mangoQuery.limit)
       if (!limit) limit = populateObjects ? 88 : 8888
       delete mangoQuery.selector.populateObjects // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.selector.pageToken // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.selector.limit // мешает нормальному кэшированию запросов в findInternal
+      delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
+      delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
       // let tx = performance.now()
       let objectShortList = await this.findInternal(mangoQuery)
 

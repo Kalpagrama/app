@@ -13,7 +13,7 @@ q-layout(view="hHh Lpr lff")
             round flat color="white" icon="settings")
         //- feeds tabs
         .row.full-width
-          kalpa-loader(:mangoQuery="queryFeeds" :sliceSize="1000" v-slot=`{items,next}` @items="feedsLoaded")
+          kalpa-loader(:query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feedsLoaded")
             q-tabs(
               :value="$route.params.id"
               @input="$router.push({params: {id: $event}})"
@@ -25,7 +25,7 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width
         //- kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
-          :mangoQuery="queryFeedItems" :sliceSize="20" v-slot=`{items,next}`)
+          :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
           list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
             q-infinite-scroll(@load="next" :offset="250")
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)

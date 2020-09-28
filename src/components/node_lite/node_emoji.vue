@@ -11,7 +11,7 @@
   insert-emoji(
     @click.native="start()"
     color="grey-8").q-mr-sm
-  //- kalpa-loader(:mangoQuery="queryEmojis" :sliceSize="1000" v-slot=`{items,next}`)
+  //- kalpa-loader(:query="queryEmojis" :limit="1000" v-slot=`{items,next}`)
     .row.items-center-content-center
       q-btn(
         v-for="(i,ii) in items" :key="i.oid"
@@ -32,7 +32,7 @@ import insertEmoji from 'components/kalpa_icons/insert_emoji.vue'
 export default {
   name: 'nodeEmoji',
   components: {insertEmoji},
-  props: ['node', 'nodeFull'],
+  props: ['node'],
   data () {
     return {
       emojiSpheres: []

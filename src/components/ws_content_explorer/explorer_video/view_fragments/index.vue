@@ -8,32 +8,33 @@ q-page(
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
     //- SELCTING
     kalpa-loader(
-      v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
-      template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start
-          div(
-            v-for="(n,ni) in fragments" :key="n.id"
-            ).row.full-width.items-start.content-start
-            q-checkbox(
-              v-model="nodesChecked" :val="n.id"
-              flat dense dark color="green"
-              :style=`{opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-ma-sm
-            .col
-              node-item(
-                :player="player"
-                :contentKalpa="contentKalpa"
-                :contentWorkspace="contentWorkspace"
-                :node="n"
-                :nodeIndex="ni"
-                :isSelected="n.id === nodeSelectedId"
-                :isEditing="false"
-                @select="nodeEditing = null, nodeSelectedId = n.id"
-                @unselect="nodeSelectedId = null"
-                @edit="nodeSelectedId = null, nodeEditing = n"
-                @edited="nodeEditing = null, nodeSelectedId = n.id"
-                @delete="nodeDelete(n)"
-                :style=`{
-                }`)
+      v-if="nodeEditing === null"
+      v-slot=`{items, next}`
+      :query="queryDrafts" :limit="1000" @items="nodesChanged")
+      .row.full-width.items-start.content-start
+        div(
+          v-for="(n,ni) in fragments" :key="n.id"
+          ).row.full-width.items-start.content-start
+          q-checkbox(
+            v-model="nodesChecked" :val="n.id"
+            flat dense dark color="green"
+            :style=`{opacity: nodesChecked.includes(n.id) ? 1 : 0.3}`).q-ma-sm
+          .col
+            node-item(
+              :player="player"
+              :contentKalpa="contentKalpa"
+              :contentWorkspace="contentWorkspace"
+              :node="n"
+              :nodeIndex="ni"
+              :isSelected="n.id === nodeSelectedId"
+              :isEditing="false"
+              @select="nodeEditing = null, nodeSelectedId = n.id"
+              @unselect="nodeSelectedId = null"
+              @edit="nodeSelectedId = null, nodeEditing = n"
+              @edited="nodeEditing = null, nodeSelectedId = n.id"
+              @delete="nodeDelete(n)"
+              :style=`{
+              }`)
     //- EDITING
     div(
       v-if="nodeEditing"

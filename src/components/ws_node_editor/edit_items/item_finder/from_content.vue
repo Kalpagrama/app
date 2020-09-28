@@ -13,13 +13,12 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
       @contentKalpa="contentKalpaFound"
       @searchString="searchString = $event")
   .row.full-width.items-start.content-start.q-pt-md
-    kalpa-loader(:mangoQuery="query" :sliceSize="1000")
-      template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start.q-px-sm
-          ws-content-item(
-            v-for="(contentBookmark,ii) in items" :key="contentBookmark.id"
-            :content="contentBookmark"
-            @clicked="contentBookmarkClick(contentBookmark)").q-mb-sm
+    kalpa-loader(:query="query" :limit="1000" v-slot=`{items, next}`)
+      .row.full-width.items-start.content-start.q-px-sm
+        ws-content-item(
+          v-for="(contentBookmark,ii) in items" :key="contentBookmark.id"
+          :content="contentBookmark"
+          @clicked="contentBookmarkClick(contentBookmark)").q-mb-sm
 </template>
 
 <script>

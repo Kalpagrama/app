@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
-    kalpa-loader(:mangoQuery="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`)
+    kalpa-loader(:query="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`)
       masonry(
         :cols="$q.screen.width < 600 ? 2 : 4"
         :gutter="{default: 10}").full-width.q-pt-sm.q-pr-sm

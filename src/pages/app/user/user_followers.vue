@@ -7,20 +7,19 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items,next}`)
-        .row.full-width.items-start.content-start.q-px-sm
-          div(
-            v-for="(s,si) in items" :key="s.oid"
-            :style=`{
-              position: 'relative',
-              height: '50px',
-              borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
-            img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
-            div(@click="subscriptionClick(s,si)").col.q-pl-sm
-              span.text-white {{ s.name }}
+    kalpa-loader(:query="mangoQuery" :limit="1000" v-slot=`{items,next}`)
+      .row.full-width.items-start.content-start.q-px-sm
+        div(
+          v-for="(s,si) in items" :key="s.oid"
+          :style=`{
+            position: 'relative',
+            height: '50px',
+            borderRadius: '10px', overflow: 'hidden',
+          }`
+          ).row.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
+          img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
+          div(@click="subscriptionClick(s,si)").col.q-pl-sm
+            span.text-white {{ s.name }}
 </template>
 
 <script>

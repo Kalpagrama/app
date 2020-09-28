@@ -20,7 +20,7 @@ div(
         @keyup.enter="sphereCreate()").full-width.b-50
   //- body
   .col.full-width.scroll
-    kalpa-loader(:mangoQuery="spheresQuery" :sliceSize="1000")
+    kalpa-loader(:query="spheresQuery" :limit="1000")
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-pa-sm
           div(

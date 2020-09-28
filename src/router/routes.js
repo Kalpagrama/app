@@ -97,6 +97,12 @@ const routes = [
                   meta: { roleMinimal: 'GUEST' }
                },
                {
+                  name: 'user.linked',
+                  path: 'linked',
+                  component: () => import('pages/app/user/user_linked.vue'),
+                  meta: { roleMinimal: 'GUEST' }
+               },
+               {
                   name: 'user.voted',
                   path: 'voted',
                   component: () => import('pages/app/user/user_voted.vue'),

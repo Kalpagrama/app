@@ -2,103 +2,76 @@
 export default {
   render () {
     return this.$scopedSlots.default({
-      items: this.itemsSliced,
+      items: this.items,
       next: this.next,
     })
   },
   name: 'kalpaLoader',
   props: {
-    sliceSize: {
+    query: {
+      type: Object,
+      required: true,
+    },
+    limit: {
       type: Number,
       default () {
         return 10
       }
-    },
-    mangoQuery: {
-      type: Object,
-      required: true,
     }
   },
   data () {
     return {
       items: [],
-      itemsSlice: 1,
-      itemsSliced: [],
-      // itemsSlicing: false,
-      itemsLoading: false,
-      pageToken: null,
-      pageTokenNext: null,
-      totalCount: 0,
-      itemsCount: 0
+      itemsPage: 0,
+      itemsPageToken: null,
+      itemsTotal: 0
     }
   },
   watch: {
-    mangoQuery: {
+    query: {
       deep: true,
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('mangoQuery CHANGED', 'from=', from, ', to=', to)
-        if (to) {
-          this.itemsLoad(to)
-        }
+      handler (to, from) {
+        this.$log('query CHANGED', to)
+        this.reset()
       }
     },
     items: {
       deep: true,
-      immediate: false,
       handler (to, from) {
-        // this.$log('items TO', to)
-        this.$emit('itemsCount', to.length)
         this.$emit('items', to)
-        // alert('item CHANGED: ' + to.length)
-        this.itemsSlice = 1
-        this.itemsSliced = to.slice(0, this.sliceSize)
       }
     }
   },
   methods: {
-    async next (index, done) {
-      this.$log('next', index)
-      // this.itemsSlicing = true
-      // TODO: if we are in a bottom... what to do???
-      // check
-      if (this.itemsSlice > 1 && this.itemsSliced.length === this.items.length) {
-        return
-      }
-      let start = this.itemsSliced.length
-      let end = (this.itemsSlice + 1) * this.sliceSize
-      this.$log('start/end', start, end)
-      if (end > this.items.length) {
-        end = this.items.length
-      }
-      let arr = this.items.slice(start, end)
-      // this.$log('arr', arr)
-      // set
-      this.itemsSliced.splice(start, 0, ...arr)
-      this.itemsSlice += 1
-      // this.$q.notify('Loading... ' + this.itemsSlice)
-      await this.$wait(1000)
-      // this.itemsSlicing = false
-      done()
+    reset () {
+      this.$log('reset')
+      this.items = []
+      this.itemsPage = 0
+      this.itemsPageToken = null
+      this.$emit('reset')
     },
-    async itemsLoad (mangoQuery, append = false) {
-      // this.$log('itemsLoad start', mangoQuery)
-      mangoQuery = mangoQuery || {selector: {}}
-      try {
-        let findRes = await this.$rxdb.find(mangoQuery)
-        // this.$log('this.$rxdb.find  items =  ', findRes)
-        let { items, count, totalCount, nextPageToken } = findRes
-        this.items = items
-        this.itemsSliced = items.slice(0, this.sliceSize)
-        this.$emit('items', items)
-        this.nextPageToken = nextPageToken
-        this.totalCount = totalCount
-        this.itemsCount = items.length
-        // this.$log('this.$rxdb.find = ', items)
+    async next (i, done) {
+      this.$log('next', i, this.items.length < this.itemsTotal)
+      if (this.itemsPage === 0 || this.items.length < this.itemsTotal) {
+        this.$log('itemsGet LOADING MORE ITEMS...')
+        this.itemsPage += 1
+        let query = this.query
+        query.limit = this.limit
+        query.pageToken = this.itemsPageToken
+        query.selector.populateObjects = true
+        this.$log('query', query)
+        const { items, count, totalCount, nextPageToken } = await this.$rxdb.find(query)
+        this.$log(items, count, totalCount, nextPageToken)
+        this.itemsTotal = totalCount
+        this.itemsPageToken = nextPageToken
+        this.items = [...this.items, ...items]
+        done()
       }
-      catch (e) {
-        this.$logE('itemsLoad error', e)
+      else {
+        this.$log('itemsGet NO MORE ITEMS...')
+        done(true)
       }
+      this.$emit('next')
     }
   }
 }

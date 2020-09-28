@@ -10,7 +10,7 @@ q-page(
   :style=`{paddingTop: '20px', paddingBottom: '400px'}`
   ).row.full-width.items-start.content-start.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-      kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+      kalpa-loader(:query="mangoQuery" :limit="1000")
         template(v-slot=`{items}`)
           masonry(
             :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 4"

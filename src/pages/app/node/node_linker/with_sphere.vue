@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page.row.full-width.items-start.content-start.justify-center
-  kalpa-loader(:mangoQuery="querySpheres" :sliceSize="1000" v-slot=`{items,next}`)
+  kalpa-loader(:query="querySpheres" :limit="1000" v-slot=`{items,next}`)
     .row.full-width.items-start.content-start.q-pa-sm
       div(v-for="(s,si) in items" :key="i").row.q-mb-xs.q-mr-xs
         ws-sphere-item(

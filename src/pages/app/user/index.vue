@@ -66,6 +66,7 @@ export default {
     pages () {
       return [
         {id: 'created', name: this.$t('Nodes', 'Ядра')},
+        {id: 'linked', name: this.$t('Links', 'Связи')},
         {id: 'voted', name: this.$t('Votes', 'Голоса')},
         {id: 'following', name: this.$t('Subscriptions', 'Подписки')},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики')},

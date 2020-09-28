@@ -35,11 +35,11 @@ q-layout(view="hHh Lpr lff")
         :class=`{
         }`
         :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pr-sm
-        kalpa-loader(:mangoQuery="querySpheres" :sliceSize="1000" @items="spheresLoaded")
+        kalpa-loader(:query="querySpheres" :limit="1000" @items="spheresLoaded")
           template(v-slot=`{items}`)
         kalpa-loader(
           v-if="spheresMapped"
-          :mangoQuery="queryItems" :sliceSize="1000" @items="itemsLoaded")
+          :query="queryItems" :limit="1000" @items="itemsLoaded")
           template(v-slot=`{items}`)
         masonry(
           :cols="$q.screen.width < 500 ? 1 : 2"
