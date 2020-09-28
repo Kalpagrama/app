@@ -38,9 +38,12 @@ export default async ({ Vue, store, app }) => {
                logE('gql error', err)
                err.message = err.code + ':' + err.message
                if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
-                  AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
                   alert('error on gql request: ' + JSON.stringify(err))
-                  window.location.reload()
+                  AuthApi.logout()
+                     .then(() => {
+                        window.location.reload()
+                     })
+                     .catch(err => logE('AuthApi.logout error', err))
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)
                }
@@ -49,9 +52,12 @@ export default async ({ Vue, store, app }) => {
          if (networkError) {
             logE('gql network error', networkError)
             if (networkError.message === 'bad auth token!') {
-               AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
                alert('error on gql request2: ' + JSON.stringify(networkError))
-               window.location.reload()
+               AuthApi.logout()
+                  .then(() => {
+                     window.location.reload()
+                  })
+                  .catch(err => logE('AuthApi.logout error', err))
             }
          }
       })
