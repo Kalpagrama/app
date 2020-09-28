@@ -13,13 +13,13 @@ div(
   :class=`{'items-min-height': true}`
   :style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start
   //- items preview: first item from meta => shaping the size
+  //- loading="lazy"
   img(
     @load="previewLoad"
     @error="previewErrored"
     :src="previewUrl"
     :alt="previewName"
     draggable="false"
-    loading="lazy"
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-300+'px',
@@ -68,21 +68,8 @@ export default {
     }
   },
   computed: {
-    // previewUrl () {
-    //   return this.node.items[0].thumbUrl
-    // },
-    // items () {
-    //   if (!this.nodeFull) return []
-    //   else return this.nodeFull.items
-    // }
   },
   watch: {
-    // active: {
-    //   handler (to, from) {
-    //     this.$log('active CHANGED', to)
-    //     // alert('nodeItems active CHANGED: ' + to)
-    //   }
-    // },
   },
   methods: {
     itemEnded (i, cb) {

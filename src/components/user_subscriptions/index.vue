@@ -24,35 +24,34 @@ div(:style=`{position: 'relative',}`).column.fit
     q-btn(v-if="editing" round flat color="green" icon="check" @click="editing = false").q-mr-xs
   //- body
   .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start.q-px-sm
-          div(
-            v-for="(s,si) in items" :key="s.oid"
-            :style=`{
-              position: 'relative',
-              height: '50px',
-              borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.full-width.items-center.content-center.b-50.q-mb-sm
-            .col.full-height
-              //- for text: WORK and SENTENCE, they dont have thumbUrl, they got only icon
-              div(v-if="s.type === 'SENTENCE' || s.type === 'WORD'").row.fit.items-center.content-center.q-px-sm
-                q-btn(
-                  round flat dense color="white"
-                  :style=`{borderRadius: '50%',}`)
-                  q-icon(name="blur_on" color="white" size="30px")
-                div(@click="subscriptionClick(s,si)").col.q-px-sm
-                  span.text-white {{ s.name }}
-              //- for user subscriptions, they got thumbUrl
-              div(v-if="s.type === 'USER'").row.fit.items-center.content-center.q-px-sm
-                img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '36px', height: '36px', borderRadius: '50%',}`)
-                div(@click="subscriptionClick(s,si)").col.q-px-sm
-                  span.text-white {{ s.name }}
-            q-btn(
-              v-if="editing"
-              @click="subscriptionDelete(s,si)"
-              round flat color="red" icon="delete_outline").q-mr-xs
+    kalpa-loader(:query="mangoQuery" :limit="1000" v-slot=`{items, next}`)
+      .row.full-width.items-start.content-start.q-px-sm
+        div(
+          v-for="(s,si) in items" :key="s.oid"
+          :style=`{
+            position: 'relative',
+            height: '50px',
+            borderRadius: '10px', overflow: 'hidden',
+          }`
+          ).row.full-width.items-center.content-center.b-50.q-mb-sm
+          .col.full-height
+            //- for text: WORK and SENTENCE, they dont have thumbUrl, they got only icon
+            div(v-if="s.type === 'SENTENCE' || s.type === 'WORD'").row.fit.items-center.content-center.q-px-sm
+              q-btn(
+                round flat dense color="white"
+                :style=`{borderRadius: '50%',}`)
+                q-icon(name="blur_on" color="white" size="30px")
+              div(@click="subscriptionClick(s,si)").col.q-px-sm
+                span.text-white {{ s.name }}
+            //- for user subscriptions, they got thumbUrl
+            div(v-if="s.type === 'USER'").row.fit.items-center.content-center.q-px-sm
+              img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '36px', height: '36px', borderRadius: '50%',}`)
+              div(@click="subscriptionClick(s,si)").col.q-px-sm
+                span.text-white {{ s.name }}
+          q-btn(
+            v-if="editing"
+            @click="subscriptionDelete(s,si)"
+            round flat color="red" icon="delete_outline").q-mr-xs
 </template>
 
 <script>

@@ -35,7 +35,7 @@ class ListsApi {
       assert(mangoQuery.selector.oidSphere || mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SEARCH, '!mangoQuery.selector.oidSphere')
       delete mangoQuery.selector.rxCollectionEnum
       for (let key in mangoQuery) {
-         assert(['selector', 'limit'].includes(key), '[selector, sort, limit].includes(key)')
+         assert(['selector', 'limit', 'pageToken'].includes(key), '[selector, sort, limit].includes(key)')
       }
       for (let key in mangoQuery.selector) {
          // assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy', 'name', 'jointItemType'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')

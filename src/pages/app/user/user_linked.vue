@@ -1,7 +1,8 @@
 <template lang="pug">
-q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
+q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-    kalpa-loader(
+    h1.text-white linked
+    //- kalpa-loader(
       v-if="sphereOid" :query="query" :limit="3" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
@@ -14,12 +15,10 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_user_userCreated',
-  props: {
-  },
+  name: 'userExplorer_userLinked',
+  components: {},
   data () {
     return {
-      indexMiddle: 0
     }
   },
   computed: {
@@ -31,25 +30,20 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           populateObjects: true,
+          oidAuthor: {$ne: this.sphereOid},
           oidSphere: this.sphereOid,
-          oidAuthor: {$eq: this.sphereOid},
           sortStrategy: 'AGE',
         }
       }
     }
   },
   methods: {
-    indexMiddleHandler (isVisible, entry) {
-      let index = parseInt(entry.target.accessKey)
-      if (isVisible) {
-        this.indexMiddle = index
-      }
-      else {
-        if (index === this.indexMiddle) {
-          this.indexMiddle = -1
-        }
-      }
-    }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

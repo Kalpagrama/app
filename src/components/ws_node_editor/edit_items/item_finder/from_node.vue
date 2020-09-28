@@ -22,7 +22,7 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
   .row.full-width.q-pt-md
     kalpa-loader(
       v-if="type === 'draft'"
-      :mangoQuery="queryDraft" :sliceSize="1000")
+      :query="queryDraft" :limit="1000")
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
@@ -32,7 +32,7 @@ q-page(:style=`{paddingTop: '0px', paddingBottom: '200px'}`).row.full-width.item
             @clicked="nodeClick(i)").q-mb-sm
     kalpa-loader(
       v-if="type === 'saved'"
-      :mangoQuery="querySaved" :sliceSize="1000")
+      :query="querySaved" :limit="1000")
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
@@ -163,14 +163,14 @@ export default {
     },
     async nodeBookmarkClick (nodeBookmark) {
       this.$log('nodeBookmarkClick', nodeBookmark)
-      // get nodeFull
-      let nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
-      this.$log('nodeBookmarkClick nodeFull', nodeFull)
-      let items = nodeFull.items.map((item, itemIndex) => {
+      // get node
+      let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
+      this.$log('nodeBookmarkClick node', node)
+      let items = node.items.map((item, itemIndex) => {
         return {
           id: `${Date.now()}-${itemIndex}`,
           outputType: item.outputType,
-          thumbUrl: nodeFull.items[0].thumbUrl,
+          thumbUrl: node.items[0].thumbUrl,
           operation: { items: null, operations: null, type: 'CONCAT'},
           layers: item.layers.map((layer, layerIndex) => {
             return {
@@ -187,7 +187,7 @@ export default {
         }
       })
       this.$log('items', items)
-      let spheres = await this.getSpheres(nodeFull.spheres)
+      let spheres = await this.getSpheres(node.spheres)
       this.$log('spheres', spheres)
       // emit items, spheres...
       spheres.map(s => this.$emit('sphere', s))

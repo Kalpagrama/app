@@ -25,7 +25,7 @@
 div().row.items-center.content-center.voter
   q-btn(
     round flat no-caps color="white")
-    //- span(:style=`{fontSize: '24px'}`).text-bold.text-grey-4 {{ nodeFull ? Math.round(nodeFull.rate*100) : '' }}
+    //- span(:style=`{fontSize: '24px'}`).text-bold.text-grey-4 {{ node ? Math.round(node.rate*100) : '' }}
     span.text-grey-6 Прямо в точку!
   q-btn(
     @click="voteStart()"
@@ -44,7 +44,7 @@ div().row.items-center.content-center.voter
       div(:style=`{width: '300px', height: '300px',}`).row
         //- rate again
         div(
-          v-if="nodeFull && (!nodeFull.rateUser || votingAgain) && nodeFull.author.oid !== $store.getters.currentUser().oid"
+          v-if="node && (!node.rateUser || votingAgain) && node.author.oid !== $store.getters.currentUser().oid"
           :style=`{
             position: 'relative',
             borderRadius: '10px', overflow: 'hidden',
@@ -61,16 +61,16 @@ div().row.items-center.content-center.voter
               v-if="voting === a.value" size="30px" :style=`{color: a.color, marginRight: '12px'}`).q-ml-md
         //- rate USER
         div(
-          v-if="!votingAgain && nodeFull && nodeFull.rateUser"
+          v-if="!votingAgain && node && node.rateUser"
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
           }`).row.fit.items-start.content-start.b-50.q-pa-md
           .row.full-width.items-center.content-center.justify-center
             span(:style=`{fontSize: '18px'}`).text-white.text-bold Your vote:
             .row.full-width.justify-center
-              span(:style=`{fontSize: '46px'}`).text-white.text-bold.q-mx-sm {{ nodeFull.rateUser }}
+              span(:style=`{fontSize: '46px'}`).text-white.text-bold.q-mx-sm {{ node.rateUser }}
             div(
-              v-if="$store.getters.currentUser().oid !== nodeFull.author.oid"
+              v-if="$store.getters.currentUser().oid !== node.author.oid"
               ).row.full-width.justify-center.q-py-sm
               q-btn(
                 @click="votingAgain = true, $wait(300).then(() => (voteMenuOpened = true))"
@@ -86,7 +86,7 @@ import { NodeApi } from 'src/api/node'
 
 export default {
   name: 'nodeVote',
-  props: ['node', 'nodeFull'],
+  props: ['node'],
   data () {
     return {
       voting: false,

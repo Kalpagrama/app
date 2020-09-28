@@ -29,7 +29,7 @@ import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
 export default {
   name: 'nodeLite__nodeBookmark',
   components: {wsSphereFinder},
-  props: ['node', 'nodeFull', 'isActive', 'isVisible'],
+  props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
       loading: false,

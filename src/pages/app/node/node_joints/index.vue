@@ -1,12 +1,13 @@
 <template lang="pug">
-kalpa-loader(:mangoQuery="queryBySphere" @items="nodesLoaded")
-  template(v-slot=`{items,next}`)
-    list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
-      q-infinite-scroll(@load="next" :offset="250")
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-        joint-item(
-          :joint="item" :node="node"
-          :isActive="isActive" :isVisible="isVisible")
+kalpa-loader(
+  v-if="true" :query="queryBySphere" :limit="3" v-slot=`{items, next}`
+  @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
+  list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+    q-infinite-scroll(ref="qis" @load="next" :offset="500")
+    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      joint-item(
+        :joint="item" :node="node"
+        :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>

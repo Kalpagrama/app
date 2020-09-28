@@ -8,7 +8,7 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+    kalpa-loader(:query="query" :limit="1000")
       template(v-slot=`{items,next}`)
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
@@ -130,22 +130,22 @@ export default {
     },
     async itemEdit (nodeBookmark) {
       this.$log('itemEdit', nodeBookmark)
-      // get nodeFull
-      let nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
-      this.$log('nodeFull', nodeFull)
+      // get node
+      let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeBookmark.oid)
+      this.$log('node', node)
       // create nodeInput
       let nodeInput = {
         wsItemType: 'WS_NODE',
         // stage: 'draft',
-        name: nodeFull.name,
-        layout: nodeFull.layout,
-        category: nodeFull.category,
-        thumbUrl: nodeFull.items[0].thumbUrl,
-        items: nodeFull.items.map((item, itemIndex) => {
+        name: node.name,
+        layout: node.layout,
+        category: node.category,
+        thumbUrl: node.items[0].thumbUrl,
+        items: node.items.map((item, itemIndex) => {
           return {
             id: `${Date.now()}-${itemIndex}`,
             outputType: item.outputType,
-            thumbUrl: nodeFull.items[0].thumbUrl,
+            thumbUrl: node.items[0].thumbUrl,
             operation: { items: null, operations: null, type: 'CONCAT'},
             layers: item.layers.map((layer, layerIndex) => {
               return {
@@ -164,7 +164,7 @@ export default {
         spheres: [],
       }
       this.$log('nodeInput', nodeInput)
-      nodeInput.spheres = await this.getSpheres(nodeFull.spheres)
+      nodeInput.spheres = await this.getSpheres(node.spheres)
       let nodeDraft = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$router.push(`/workspace/node/${nodeDraft.id}`).catch(e => e)
     },

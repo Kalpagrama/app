@@ -22,7 +22,7 @@ div(
       .col
       small.text-grey-8.q-mr-xs 11922
       q-icon(name="visibility" color="grey-8").q-mr-md
-      small(v-if="nodeFull").text-grey-8.q-mr-sm {{ $date(nodeFull.createdAt, 'DD.MM.YYYY') }}
+      .text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
     //- wrapper: composition + essence
     div(
       :style=`{
@@ -38,7 +38,7 @@ div(
         ).row.full-width.items-start.content-start
         //- bookmark
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node" :nodeFull="nodeFull")
+          node-bookmark(v-show="isActive" :isActive="isActive" :isVisible="isVisible" :node="node")
         node-items(
           :previewUrl="node.items[0].thumbUrl"
           :previewName="node.name" :items="node.items"
@@ -63,15 +63,15 @@ div(
               :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
         //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
-          node-vote(:node="node" :nodeFull="nodeFull")
+          node-vote(:node="node")
   //- footer
   .row.full-width
     slot(name="footer")
   div(v-if="showEssence").row.full-width.items-center.content-center
     node-share(:node="node").q-ml-sm
-    node-emoji(v-if="node" :node="node" :nodeFull="nodeFull" :isActive="isActive" :isVisible="isVisible")
+    node-emoji(v-if="node" :node="node" :isActive="isActive" :isVisible="isVisible")
     .col
-    node-vote(:node="node" :nodeFull="nodeFull")
+    node-vote(:node="node")
 </template>
 
 <script>
@@ -97,7 +97,6 @@ export default {
   },
   data () {
     return {
-      nodeFull: null,
       isFullscreen: false,
     }
   },
@@ -105,19 +104,6 @@ export default {
     itemsActive () {
       return this.isActive && !this.isFullscreen
     }
-  },
-  watch: {
-    isActive: {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('isActive TO', to, this.node.name)
-        if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-        }
-      }
-    },
-  },
-  methods: {
   }
 }
 </script>

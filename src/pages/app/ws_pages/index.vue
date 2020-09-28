@@ -19,7 +19,7 @@ q-layout(view="hHh Lpr lff")
                   label="Find page"
                   ).full-width
             q-btn(round flat dense color="green" icon="add" @click="pageCreate()")
-          kalpa-loader(:mangoQuery="query" :sliceSize="1000")
+          kalpa-loader(:query="query" :limit="1000")
             template(v-slot=`{items,next}`)
               .row.full-width.items-start.content-start.q-px-xs.q-py-md
                 div(

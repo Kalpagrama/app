@@ -5,9 +5,9 @@ div(
   //- body
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
     kalpa-loader(
-      v-if="nodeEditing === null" :mangoQuery="queryNodesWorkspace" :sliceSize="1000" @items="nodesWorkspaceLoaded" v-slot=`{items, next}`)
+      v-if="nodeEditing === null" :query="queryNodesWorkspace" :limit="1000" @items="nodesWorkspaceLoaded" v-slot=`{items, next}`)
     kalpa-loader(
-      v-if="nodeEditing === null" :mangoQuery="queryNodesKalpa" :sliceSize="1000" @items="nodesKalpaLoaded" v-slot=`{items, next}`)
+      v-if="nodeEditing === null" :query="queryNodesKalpa" :limit="1000" @items="nodesKalpaLoaded" v-slot=`{items, next}`)
     .row.full-width.items-start.content-start.q-px-sm.q-pt-lg
       div(
         v-for="(node, ni) in nodes" :key="node.id || node.oid"

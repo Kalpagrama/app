@@ -71,40 +71,39 @@ q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
               placeholder="Find subscription"
               ).full-width
         .col.full-width.scroll
-          kalpa-loader(:mangoQuery="querySubscriptions" :sliceSize="1000")
-            template(v-slot=`{items,next}`)
-              .row.full-width.items-start.content-start.q-pt-md
+          kalpa-loader(:query="querySubscriptions" :limit="1000" v-slot=`{items,next}`)
+            .row.full-width.items-start.content-start.q-pt-md
+              div(
+                v-for="(s,si) in items" :key="s.oid"
+                v-if="!feed.items.find(i => i.oid === s.oid)"
+                @click="subscriptionClick(s)"
+                :style=`{
+                  position: 'relative',
+                  height: '50px',
+                  borderRadius: '10px'
+                }`
+                ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
                 div(
-                  v-for="(s,si) in items" :key="s.oid"
-                  v-if="!feed.items.find(i => i.oid === s.oid)"
-                  @click="subscriptionClick(s)"
-                  :style=`{
-                    position: 'relative',
-                    height: '50px',
-                    borderRadius: '10px'
-                  }`
-                  ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
-                  div(
-                    v-if="s.type === 'USER'"
-                    ).row.fit.items-center.content-center
-                    img( :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`).q-mr-sm
-                    span.text-white {{ s.name }}
-                  div(
-                    v-if="s.type === 'WORD'"
-                    ).row.fit.items-center.content-center
-                    q-icon(name="blur_on" color="white" size="30px").q-mr-sm
-                    span.text-white {{ s.name }}
-                  div(
-                    v-if="s.type === 'NODE'"
-                    ).row.fit.items-center.content-center
-                    q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm
-                    span.text-white {{ s.name }}
-                  div(
-                    v-if="s.type === 'VIDEO' || s.type === 'IMAGE'"
-                    ).row.fit.items-center.content-center
-                    q-icon(name="select_all" color="white" size="30px").q-mr-sm
-                    div(:style=`{overflow: 'hidden'}`).col
-                      span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ s.name }}
+                  v-if="s.type === 'USER'"
+                  ).row.fit.items-center.content-center
+                  img( :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`).q-mr-sm
+                  span.text-white {{ s.name }}
+                div(
+                  v-if="s.type === 'WORD'"
+                  ).row.fit.items-center.content-center
+                  q-icon(name="blur_on" color="white" size="30px").q-mr-sm
+                  span.text-white {{ s.name }}
+                div(
+                  v-if="s.type === 'NODE'"
+                  ).row.fit.items-center.content-center
+                  q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm
+                  span.text-white {{ s.name }}
+                div(
+                  v-if="s.type === 'VIDEO' || s.type === 'IMAGE'"
+                  ).row.fit.items-center.content-center
+                  q-icon(name="select_all" color="white" size="30px").q-mr-sm
+                  div(:style=`{overflow: 'hidden'}`).col
+                    span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ s.name }}
 </template>
 
 <script>

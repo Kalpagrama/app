@@ -1,12 +1,13 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-    kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-      template(v-slot=`{items,next}`)
-        list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-          q-infinite-scroll(@load="next" :offset="250")
-          template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-            node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
+    kalpa-loader(
+      v-if="sphereOid" :query="query" :limit="3" v-slot=`{items, next}`
+      @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
+      list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+        q-infinite-scroll(ref="qis" @load="next" :offset="500")
+        template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+          node-lite(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -23,7 +24,7 @@ export default {
     sphereOid () {
       return this.$route.params.oid
     },
-    mangoQuery () {
+    query () {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
