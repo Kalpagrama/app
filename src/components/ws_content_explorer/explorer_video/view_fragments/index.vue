@@ -5,7 +5,7 @@ q-page(
     paddingTop: nodeEditing ? '0px' : '8px',
   }`
   ).row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
     //- SELCTING
     kalpa-loader(
       v-if="nodeEditing === null" :mangoQuery="queryDrafts" :sliceSize="1000" @items="nodesChanged")
@@ -58,7 +58,7 @@ q-page(
       v-if="nodesChecked.length > 0"
       expand position="bottom")
       .row.full-width.justify-center.q-pb-sm
-        div(:style=`{maxWidth: '800px', borderRadius: '10px',}`
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-md
           q-btn(flat color="white" no-caps @click="nodesChecked = []") Close
           q-btn(flat color="red" no-caps @click="nodesCheckedDelete()") Delete

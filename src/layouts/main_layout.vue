@@ -25,23 +25,24 @@ q-layout(view="lHh lpR lFf")
   //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$q.screen.width > 960"
+      v-if="$q.screen.width > 1020+200"
       :style=`{
-        position: 'fixed', zIndex: 3000, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+        position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
+        width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',
       }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
         v-if="!loading && $route.name !== 'welcome'"
         :inDrawer="false"
         :style=`{
           borderRadius: '10px',
-          maxWidth: $q.screen.width < 1260 ? '60px' : '250px',
+          maxWidth: $q.screen.width < 1020+400 ? '60px' : '240px',
         }`).b-40
   //- mobile navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width < 960")
       .row.full-width.justify-center
         div(
-          :style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0'}`
+          :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px 10px 0 0'}`
           ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
           q-btn(
             @click="$router.back()"

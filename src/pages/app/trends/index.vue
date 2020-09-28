@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-px-sm
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-xs.b-40
           q-icon(name="whatshot" color="white" size="30px").q-mx-sm
@@ -18,7 +18,7 @@ q-layout(view="hHh Lpr lff")
           :class=`{
           }`
           :style=`{
-            maxWidth: '800px',
+            maxWidth: $store.state.ui.pageMaxWidth+'px',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
@@ -30,7 +30,7 @@ q-layout(view="hHh Lpr lff")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
+          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md
             q-tabs(
               :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
               dense no-caps active-color="white" switch-indicator

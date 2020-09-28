@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.items-start.content-start.q-px-xs
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start.q-px-xs
     div(
         v-for="(i,ii) in 16" :key="ii"
         :style=`{

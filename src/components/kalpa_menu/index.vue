@@ -135,7 +135,7 @@ export default {
   computed: {
     showRightSide () {
       if (this.inDrawer) return true
-      else return this.$q.screen.width > 1260
+      else return this.$q.screen.width > 1020 + 400
     }
   },
   methods: {

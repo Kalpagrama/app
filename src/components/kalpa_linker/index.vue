@@ -59,7 +59,7 @@
 .row.full-width.justify-center
   div(
     :style=`{
-      maxWidth: '800px',
+      maxWidth: $store.state.ui.pageMaxWidth+'px',
       height: $q.screen.height+'px'
     }`).column.full-width.b-30.q-pb-sm
     .row.full-width.justify-between.q-pt-sm
@@ -72,7 +72,7 @@
         span(
           :style=`{
             fontSize: '20px',
-          }`).text-bold.text-white Make a joint
+          }`).text-bold.text-white Make a link
       div(
         :style=`{
           transform: 'rotate(-2deg)',
@@ -80,7 +80,7 @@
         ).row.items-center.content-center
         q-btn(round flat color="grey-6" icon="more_vert")
     .row.full-width.q-py-md
-      div(:style=`{height: '400px',}`).row.full-width
+      div(:style=`{height: '400px',}`).row.full-width.q-px-sm
         //- left item
         div(
           :style=`{
@@ -119,7 +119,7 @@
                       objectFit: leftItem.cover ? 'cover' : 'contain',
                     }`
                     ).fit
-                div(v-if="leftItem.name").row.full-width.justify-center.q-pa-sm
+                //- div(v-if="leftItem.name").row.full-width.justify-center.q-pa-sm
                   small.text-white {{ leftItem.name }}
         //- divider with link icon
         .row.full-height.items-center.content-center.justify-center
@@ -162,7 +162,7 @@
                       objectFit: rightItem.cover ? 'cover' : 'contain',
                     }`
                     ).fit
-                div(v-if="rightItem.name").row.full-width.justify-center.q-pa-sm
+                //- div(v-if="rightItem.name").row.full-width.justify-center.q-pa-sm
                   small.text-white {{ rightItem.name }}
     .row.full-width
       edit-name(@name="name = $event" :name="name").q-mb-md

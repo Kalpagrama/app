@@ -6,7 +6,7 @@ q-layout(
     borderRadius: '10px', overflow: 'hidden'}`).b-30
   q-header(reveal)
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '800px',}`
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`
         ).row.full-width.items-center.content-center.q-px-sm.b-30
         //- header
         //- .row.full-width.items-center.content-center.q-py-sm

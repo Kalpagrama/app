@@ -8,7 +8,7 @@ q-page.row.full-width.justify-center
       :oid="currentUser.oid"
       :avatarUrl="avatarUrl"
       @close="avatarEditorOpened = false")
-  div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
     .row.full-width.items-start.content-start
       //- avatar
       .col-xs-12.col-sm-4.q-pa-sm

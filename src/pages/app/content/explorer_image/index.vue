@@ -4,7 +4,7 @@ q-layout(view="hHh Lpr lff")
     q-page
       //- header
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.q-pt-sm
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
           .row.full-width.items-start.content-start
             q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
             .col
@@ -21,7 +21,7 @@ q-layout(view="hHh Lpr lff")
                   q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
       //- body
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.q-pt-sm
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
           div(
             :style=`{
               position: 'relative', height: '500px',

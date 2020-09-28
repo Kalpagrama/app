@@ -2,12 +2,12 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30.br
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.b-30.br
         div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
   q-page-container
     q-page(style="padding-top: 100px")
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '800px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start
           q-tab-panels(
             v-model="pageId"
             swipeable infinite animated
@@ -23,7 +23,7 @@ q-layout(view="hHh Lpr lff")
       //- pages
       q-page-sticky(expand position="top")
         .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
+          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md
             q-tabs(v-model="pageId" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
               q-tab(v-for="t in pages" :key="t.id" :name="t.id" :label="t.name")
 </template>

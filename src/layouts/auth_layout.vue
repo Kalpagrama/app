@@ -7,7 +7,9 @@ q-layout(view="hHh lpR fFf").b-30
       :style=`{height: '200px', overflow: 'hidden',}`).row.full-width.items-center.content-center.justify-center.b-30
       kalpa-logo(:width="100" :height="100").q-mb-md
       h4.text-white.text-bold.q-ma-xs.q-pa-xs Kalpa.app
-    router-view
+    router-view(v-if="!$route.query.token")
+    div(v-else).row.full-width.justify-center.q-py-xl
+      q-spinner(size="50px" color="green")
 </template>
 
 <script>

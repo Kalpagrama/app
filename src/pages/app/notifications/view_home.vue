@@ -2,7 +2,7 @@
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
   kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery" :sliceSize="100")
     template(v-slot=`{items,next}`)
-      div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
         div(
           v-for="(n,ni) in items" :key="n.id"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`

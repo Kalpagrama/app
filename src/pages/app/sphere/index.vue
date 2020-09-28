@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-px-sm
         div(:style=`{height: '60px'}`).row.full-width.items-between.content-between
           q-btn(
             @click="$router.back()"
@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
           :class=`{
           }`
           :style=`{
-            maxWidth: '800px',
+            maxWidth: $store.state.ui.pageMaxWidth+'px',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(v-if="sphere" :mangoQuery="mangoQuery")

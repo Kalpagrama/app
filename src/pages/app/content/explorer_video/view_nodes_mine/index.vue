@@ -3,7 +3,7 @@ div(
   :style=`{marginBottom: '100px'}`
   ).row.full-width.items-start.content-start.justify-center
   //- body
-  div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
     kalpa-loader(
       v-if="nodeEditing === null" :mangoQuery="queryNodesWorkspace" :sliceSize="1000" @items="nodesWorkspaceLoaded" v-slot=`{items, next}`)
     kalpa-loader(
@@ -46,7 +46,7 @@ div(
       expand position="bottom"
       :style=`{zIndex: 5000}`)
       .row.full-width.justify-center.q-pb-sm
-        div(:style=`{maxWidth: '800px', borderRadius: '10px',}`
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-md
           q-btn(flat color="white" no-caps @click="nodesChecked = []") {{ $t('cance', 'Отмена') }}
           q-btn(

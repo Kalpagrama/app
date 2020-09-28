@@ -23,8 +23,8 @@
     //- search
     div(v-if="viewId === 'search'").row.full-width.items-start.content-start.q-pr-sm
       masonry(
-        :cols="6"
-        :gutter="{default: 8}").full-width
+        :cols="8"
+        :gutter="{default: 6}").full-width
         div(
           v-for="(gif, gi) in gifs" :key="gif.id"
           :style=`{

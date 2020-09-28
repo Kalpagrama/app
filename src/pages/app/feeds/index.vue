@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-px-sm
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
           q-icon(name="rss_feed" color="white" size="30px").q-mr-sm
@@ -22,7 +22,7 @@ q-layout(view="hHh Lpr lff")
               q-tab(v-for="(f,fi) in items" :key="f.id" :name="f.id" :label="f.name")
   q-page-container
     q-page(:style=`{paddingBottom: '0px',}`).row.full-width.justify-center
-      div(:style=`{maxWidth: '800px',}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width
         //- kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
           :mangoQuery="queryFeedItems" :sliceSize="20" v-slot=`{items,next}`)

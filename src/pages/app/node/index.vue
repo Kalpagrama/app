@@ -13,7 +13,7 @@ q-layout(view="hHh Lpr lff")
     node-linker(v-if="node" :node="node" @close="nodeLinkerOpened = false")
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm
-      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-px-sm
           q-btn(
@@ -26,7 +26,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
           //- got node is created!
           node-lite(
             v-if="node" :node="node" :isActive="nodeActive" :isVisible="nodeVisible"

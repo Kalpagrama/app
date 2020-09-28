@@ -2,7 +2,7 @@
 q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
   div(
     v-if="feed"
-    :style=`{height: $q.screen.height-105+'px', maxWidth: '800px',}`).row.full-width.q-px-sm
+    :style=`{height: $q.screen.height-105+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.q-px-sm
     //- feed editor...
     .row.full-width.items-center.content-center
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")

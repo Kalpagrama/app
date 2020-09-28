@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.justify-center
-  div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
     div(
       v-for="(i,ii) in 100" :key="ii"
       :style=`{

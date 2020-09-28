@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page
   .row.full-width.items-start.content-start.justify-center
-    div(:style=`{maxWidth: '800px',}`).row.full-width.items-start.content-start
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
       //- h1.text-white Workspace
       //- something
       div(:style=`{height: '200px'}`).row.full-width.q-px-md

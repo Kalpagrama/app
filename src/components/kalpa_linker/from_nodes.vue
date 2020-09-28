@@ -25,7 +25,7 @@
         ).full-width.text-grey-6
         q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   .col.full-width.scroll
-    div(:style=`{maxWidth: '800px', minHeight: '100vh'}`).row.full-width.q-pr-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
       kalpa-loader(:mangoQuery="queryNodes" :sliceSize="1000")
         template(v-slot=`{items,next}`)
           masonry(

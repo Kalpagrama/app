@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff" :style=`{zIndex: 4000, maxWidth: width+'px'}`).b-30
   q-header(reveal)
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '800px'}`).row.full-width.b-30
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.b-30
         div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
           span(:style=`{fontSize: '18px'}`).text-white.text-bold Добавить элемент в ядро
