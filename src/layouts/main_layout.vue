@@ -25,7 +25,7 @@ q-layout(view="lHh lpR lFf")
   //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$q.screen.width > 1020+200"
+      v-if="$store.state.ui.showDesktopNavigation && $q.screen.width > 1020+200"
       :style=`{
         position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
         width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',

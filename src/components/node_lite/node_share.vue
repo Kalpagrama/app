@@ -1,8 +1,8 @@
 <template lang="pug">
 q-btn(
   @click="shareStart()"
-  round flat dense icon="share"
-  :color="shareDialogOpened ? 'green' : 'grey-8'")
+  round flat icon="share"
+  :color="shareDialogOpened ? 'grey-9' : 'grey-9'")
   q-dialog(v-model="shareDialogOpened")
     div(
       :style=`{
@@ -13,7 +13,7 @@ q-btn(
       //- header
       .row.full-width.items-center.content-center.q-pa-md
         .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Share node', 'Поделиться ядром')}}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Share', 'Поделиться')}}
         q-btn(
           @click="shareDialogOpened = false"
           round flat color="grey-8" icon="clear")
@@ -38,11 +38,11 @@ q-btn(
           @click="shareEmbed"
           round icon="code" color="grey-5" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
-        q-btn(
+        //- q-btn(
           @click="shareWithTwitter"
           round icon="fab fa-twitter" color="blue-6" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
-        q-btn(
+        //- q-btn(
           round icon="fab fa-vk" color="blue-8" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
       //- embed

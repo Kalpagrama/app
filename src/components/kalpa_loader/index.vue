@@ -17,6 +17,12 @@ export default {
       default () {
         return 10
       }
+    },
+    immediate: {
+      type: Boolean,
+      default () {
+        return false
+      }
     }
   },
   data () {
@@ -58,7 +64,7 @@ export default {
         let query = this.query
         query.limit = this.limit
         query.pageToken = this.itemsPageToken
-        query.selector.populateObjects = true
+        // query.selector.populateObjects = true
         this.$log('query', query)
         const { items, count, totalCount, nextPageToken } = await this.$rxdb.find(query)
         this.$log(items, count, totalCount, nextPageToken)
@@ -73,6 +79,10 @@ export default {
       }
       this.$emit('next')
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    if (this.immediate) this.next(0, () => {})
   }
 }
 </script>

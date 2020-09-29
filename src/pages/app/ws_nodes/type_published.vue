@@ -8,11 +8,12 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    kalpa-loader(:query="queryNodes" :limit="1000")
-      template(v-slot=`{items,next}`)
+    kalpa-loader(:query="queryNodes" :limit="1000" v-slot=`{items, next}`)
+      .row.full-width.items-start.content-start
+        q-infinite-scroll(ref="qis" @load="next" :offset="500")
         masonry(
           :cols="$q.screen.width < 800 ? 2 : 4"
-          :gutter="{default: 10}").full-width
+          :gutter="{default: 10}").full-width.justify-start
           div(
             v-for="(node, ii) in items" :key="node.oid"
             ).row.full-width.q-mb-sm

@@ -10,7 +10,7 @@
 .row.items-center.content-center
   insert-emoji(
     @click.native="start()"
-    color="grey-8").q-mr-sm
+    color="grey-8")
   //- kalpa-loader(:query="queryEmojis" :limit="1000" v-slot=`{items,next}`)
     .row.items-center-content-center
       q-btn(

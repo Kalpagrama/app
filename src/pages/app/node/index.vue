@@ -21,7 +21,7 @@ q-layout(view="hHh Lpr lff")
             round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
-            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ $t('Node', 'Ядро') }}
           kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
@@ -67,7 +67,7 @@ q-layout(view="hHh Lpr lff")
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
-          //- node joints
+          //- node links
           router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
@@ -75,10 +75,10 @@ q-layout(view="hHh Lpr lff")
         :style=`{zIndex: 99999}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
-            v-if="!nodeLinkerOpened"
-            @click="nodeLinkerOpened = true"
+            v-if="true"
+            @click="$router.push(`/link-create?leftoid=${node.oid}`)"
             no-caps color="green" icon="insert_link" size="md")
-            span.text-white.text-bold.q-ml-sm Связать ядро
+            span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
 </template>
 
 <script>

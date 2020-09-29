@@ -41,8 +41,8 @@ const routes = [
          {
             name: 'home',
             path: 'home/:id?',
-            // component: () => import('pages/app/feeds/index.vue'),
-            component: () => import('components/kalpa_linker/index.vue'),
+            component: () => import('pages/app/feeds/index.vue'),
+            // component: () => import('components/kalpa_linker/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          {
@@ -137,6 +137,11 @@ const routes = [
                },
             ],
             meta: { roleMinimal: 'GUEST' }
+         },
+         {
+            name: 'link-create',
+            path: 'link-create',
+            component: () => import('pages/app/link_create/index.vue'),
          },
          {
             name: 'sphere',
@@ -304,16 +309,17 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            // name: 'notifications',
+            name: 'notifications',
             path: 'notifications',
-            component: () => import('pages/app/notifications/index.vue'),
+            // component: () => import('pages/app/notifications/index.vue'),
+            component: () => import('components/node_editor/index.vue'),
             children: [
-               {
-                  name: 'notifications',
-                  path: '',
-                  component: () => import('pages/app/notifications/view_home.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               }
+               // {
+               //    name: 'notifications',
+               //    path: '',
+               //    component: () => import('pages/app/notifications/view_home.vue'),
+               //    meta: { roleMinimal: 'MEMBER' }
+               // }
             ],
             meta: { roleMinimal: 'MEMBER' }
          },

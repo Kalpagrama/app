@@ -1,6 +1,6 @@
 <template lang="pug">
 q-btn(
-  round flat dense
+  round flat
   :color="color"
   icon="insert_emoticon"
   :style=`{
@@ -11,7 +11,7 @@ q-btn(
     :color="color"
     :style=`{
       position: 'absolute', zIndex: 100,
-      top: '0px', right: '0px',
+      top: '4px', right: '4px',
     }`
     )
 </template>
