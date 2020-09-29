@@ -114,8 +114,8 @@ export default {
     },
     itemSide () {
       if (this.width <= 900) {
-        return this.width * 0.48
-        // return this.width * 0.9
+        // return this.width * 0.48
+        return this.width * 0.9
       }
       else {
         return 900 / 2

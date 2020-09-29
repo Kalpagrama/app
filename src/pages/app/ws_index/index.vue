@@ -16,10 +16,10 @@ q-layout(view="hHh Lpr lff")
               q-btn(
                 v-if="$q.screen.width < 600"
                 flat color="white" no-caps icon-right="keyboard_arrow_down")
-                span(:style=`{fontSize: '18px'}`).text-bold {{ pages.find(p => p.id.split('.')[1] === $route.name.split('.')[1]).name }}
+                //- span(:style=`{fontSize: '18px'}`).text-bold {{ pages.find(p => p.id.split('.')[1] === $route.name.split('.')[1]).name }}
                 q-menu
                   div(:style=`{maxWidth: '160px'}`).row.b-40
-                    q-btn(
+                    //- q-btn(
                       @click="$router.push({name: p.id})"
                       v-for="p in pages" :key="p.id"
                       v-if="p.id.split('.')[1] !== $route.name.split('.')[1]"

@@ -39,6 +39,16 @@
                   objectFit: 'cover',
                 }`
                 ).fit
+              video(
+                v-if="isActive && itemActive && item.outputType === 'VIDEO'"
+                :src="item.url"
+                muted autoplay playsinline loop
+                :style=`{
+                  position: 'absolute',
+                  objectFit: 'cover',
+                  borderRadius: '10px', overflow: 'hidden',
+                }`
+                ).fit
       //- PIP, VERTICAL
       div(
         v-if="['PIP', 'VERTICAL'].includes(node.layout)"
@@ -53,8 +63,26 @@
           }`
           ).full-width
     //- essence
-    .row.full-width.justify-center.cursor-pointer.q-pa-md
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ node.name }}
+    router-link(
+      :to="'/node/'+node.oid"
+      ).row.full-width.justify-center.cursor-pointer.q-pa-md
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+  //- footer
+  .row.full-width.justify-center.items-center.content-center.q-px-md
+    div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
+      small.text-grey-9 12312
+      q-btn(round flat color="grey-9" icon="cached").shaking
+      .col
+      small.text-grey-9 12312
+      q-btn(round flat color="grey-9" icon="link").shaking
+      .col
+      q-btn(round flat color="grey-9" icon="share").shaking
+      .col
+      q-btn(round flat color="grey-9" icon="bookmark_outline").shaking
+      small.text-grey-9 12312
+      .col
+      q-btn(round flat color="grey-9" icon="adjust").shaking
+      small.text-grey-9 12312
 </template>
 
 <script>

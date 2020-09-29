@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.items-start.content-start
   //- header
   .row.full-width.justify-center
     div(

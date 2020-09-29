@@ -1,3 +1,26 @@
+<style lang="sass">
+.shaking
+  &:hover
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both
+    transform: translate3d(0, 0, 0)
+    backface-visibility: hidden
+    perspective: 1000px
+    color: #4caf50 !important
+@keyframes shake
+  10%, 90%
+    transform: translate3d(-1px, 0, 0)
+    color: #4caf50 !important
+  20%, 80%
+    transform: translate3d(2px, 0, 0)
+    color: #4caf50 !important
+  30%, 50%, 70%
+    transform: translate3d(-2px, 0, 0)
+    color: #4caf50 !important
+  40%, 60%
+    transform: translate3d(2px, 0, 0)
+    color: #4caf50 !important
+</style>
+
 <template lang="pug">
 q-layout(view="lHh lpR lFf")
   q-drawer(
