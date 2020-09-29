@@ -1,14 +1,22 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    //- header
+    .row.full-width.items-start.q-px-sm
+      content-search(
+        @contentKalpa="contentKalpaFound"
+        @searchString="searchString = $event"
+        :style=`{}`)
     div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
       q-tabs(
         :value="typeId" @input="typeIdChanged"
-        no-caps dense active-color="white" align="left"
+        no-caps dense active-color="white" align="left" switch-indicator
         ).full-width.text-grey-8
         q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   .row.full-width
-    component(:is="`type-${typeId}`")
+    component(:is="`type-${typeId}`" :searchString="searchString")
+      template(v-slot:tint=`{item}`)
+        slot(name="tint" :item="item")
 </template>
 
 <script>
@@ -30,6 +38,7 @@ export default {
   data () {
     return {
       typeId: 'video',
+      searchString: '',
     }
   },
   computed: {
@@ -65,8 +74,10 @@ export default {
     },
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
-      // go to content page immediate
-      this.$router.push(`/content/${contentKalpa.oid}`).catch(e => e)
+      if (this.mode === 'standalone') {
+        // go to content page immediate
+        this.$router.push(`/content/${contentKalpa.oid}`).catch(e => e)
+      }
       // add content bookmark async
       let {items: [bookmarkFound]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       this.$log('bookmarkFound', bookmarkFound)
@@ -82,6 +93,9 @@ export default {
         }
         bookmarkFound = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         this.$log('bookmarkFound')
+      }
+      if (this.mode === 'pick') {
+        this.$emit('content', bookmarkFound)
       }
     },
   }

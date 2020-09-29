@@ -8,16 +8,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
-    //- header
-    .row.full-width.q-px-sm
-      .col
-        div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-          q-input(
-            v-model="searchString"
-            filled dark dense color="white"
-            :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-            ).full-width
-      q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/nodenew/new')")
     //- items
     .row.full-width.q-pt-sm.q-pr-sm
       kalpa-loader(
@@ -66,8 +56,6 @@
                 .col
                 q-btn(round flat dense color="white" icon="edit" @click="itemEdit(nodeBookmark)").q-mr-sm
                 q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(nodeBookmark)")
-//- q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
 </template>
 
 <script>
@@ -75,19 +63,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsNodes_typeSaved',
-  // props: ['searchString'],
   props: {
-    // searchString: {type: String},
-    // mode: {
-    //   type: String,
-    //   default () {
-    //     return 'standalone'
-    //   }
-    // }
+    searchString: {type: String},
   },
   data () {
     return {
-      searchString: '',
       nodeBookmarkSelectedId: null,
     }
   },

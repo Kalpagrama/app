@@ -179,7 +179,7 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace',
-            redirect: 'workspace/contents',
+            redirect: 'workspace/contents/video',
             component: () => import('pages/app/ws_index/index.vue'),
             children: [
                // pages

@@ -56,8 +56,8 @@ export default {
       gifs: [],
       viewId: 'search',
       views: [
-        {id: 'favorite', name: 'Favorite'},
-        {id: 'search', name: 'Search'},
+        {id: 'favorite', name: 'Избранные'},
+        {id: 'search', name: 'Поиск'},
       ],
     }
   },

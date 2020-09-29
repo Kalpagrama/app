@@ -6,15 +6,8 @@
 </style>
 
 <template lang="pug">
-//- q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
-    //- header
-    .row.full-width.items-start.q-px-sm
-      content-search(
-        @contentKalpa="contentKalpaFound"
-        @searchString="searchString = $event"
-        :style=`{}`)
     //- items
     .row.full-width.items-start.content-start.q-pt-sm.q-pr-sm
       kalpa-loader(
@@ -27,10 +20,11 @@
             div(
               v-for="(i,ii) in items" :key="i.id"
               :style=`{
+                position: 'relative',
                 borderRadius: '10px', overflow: 'hidden',
               }`
               ).row.full-width.q-mb-sm
-              //- default header
+              //- default
               div(
                 @click="itemSelected === i.id ? itemSelected = null : itemSelected = i.id"
                 :style=`{
@@ -44,6 +38,8 @@
                     borderRadius: '10px', overflow: 'hidden',
                   }`
                   ).full-width
+              //- tint to intercept
+              slot(name="tint" :item="i" :itemIndex="ii")
               //- selected
               div(
                 v-if="itemSelected === i.id"
@@ -62,10 +58,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsContents_typeImage',
-  // props: ['searchString'],
+  props: ['searchString'],
   data () {
     return {
-      searchString: '',
       itemSelected: null,
     }
   },

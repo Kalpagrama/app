@@ -96,6 +96,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listSlider', () => import('components/list_slider/index.vue'))
+    Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaMenu', () => import('components/kalpa_menu/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))

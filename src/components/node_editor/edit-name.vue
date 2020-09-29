@@ -23,7 +23,7 @@ div(
     :value="value" @input="$emit('input', $event)"
     borderless autofocus
     type="textarea" autogrow
-    placeholder="What do you see?"
+    placeholder="В чем суть?"
     spellcheck="false"
     :style=`{
       maxWidth: '600px',

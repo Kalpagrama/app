@@ -2,16 +2,6 @@
 //- q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
-    //- header
-    .row.full-width.q-px-sm
-      .col
-        div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-          q-input(
-            v-model="searchString"
-            filled dark dense color="white"
-            :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-            ).full-width
-      q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/nodenew/new')")
     //- items
     .row.full-width.q-pt-sm.q-pr-sm
       kalpa-loader(
@@ -46,7 +36,7 @@ export default {
   name: 'wsNodes_typeDrafts',
   // props: ['searchString'],
   props: {
-    // searchString: {type: String},
+    searchString: {type: String},
     mode: {
       type: String,
       default () {
@@ -56,7 +46,7 @@ export default {
   },
   data () {
     return {
-      searchString: '',
+      // searchString: '',
       itemSelected: null,
     }
   },
