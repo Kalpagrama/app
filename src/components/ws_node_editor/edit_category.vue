@@ -1,15 +1,4 @@
 <template lang="pug">
-//- q-select(
-  filled dark color="white" dense
-  :label="$t('wsNodeEditor_editCategory_label', 'Категория')"
-  placeholder="Выбери категорию"
-  :value="category(node.category)" @input="categorySelected"
-  :options="categories"
-  :style=`{
-    borderRadius: '10px', overflow: 'hidden',
-    zIndex: 2000, transform: 'translate3d(0,0,0)',
-    background: 'none',
-  }`).b-50
 div(:style=`{position: 'relative'}`).row
   q-btn(
     no-caps flat color="grey-5" align="between"

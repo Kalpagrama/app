@@ -52,26 +52,37 @@ div(
       div(
         v-if="showEssence"
         :style=`{position: 'relative'}`).row.full-width.items-start.content-start
-        .col
-          router-link(
-            :to="'/node/'+node.oid"
-            :style=`{
-              cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.full-width.items-center.justify-center.q-py-md.q-pl-md
-            span(
-              :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
+        router-link(
+          :to="'/node/'+node.oid"
+          :style=`{
+            cursor: 'pointer', borderRadius: '10px', overflow: 'hidden',
+
+          }`
+          ).row.full-width.items-center.justify-center.q-py-md
+          span(
+            :style=`{userSelect: 'none', fontSize: '1.1rem'}`).text-white.text-bold {{ node.name }}
         //- .row.full-height.items-start.content-start.q-pt-md.q-px-sm
           node-share(:node="node")
           node-vote(:node="node")
   //- footer
   .row.full-width
     slot(name="footer")
-  div(v-if="showEssence").row.full-width.items-center.content-center
-    node-share(:node="node").q-ml-sm
-    node-emoji(v-if="node" :node="node" :isActive="isActive" :isVisible="isVisible")
-    .col
-    node-vote(:node="node")
+  div(v-if="showEssence").row.full-width.justify-center
+    div(:style=`{maxWidth: '700px',}`).row.full-width.items-center.content-center
+      .col
+        .row.full-width.justify-start
+          node-share(:node="node")
+      .col
+        q-btn(round flat color="grey-9" icon="refresh")
+      q-btn(
+        @click="$router.push(`/link-create?leftoid=${node.oid}`).catch(e => e)"
+        round flat color="grey-9" icon="link")
+      .col
+        .row.full-width.justify-end
+          q-btn(round flat color="grey-9" icon="refresh")
+      .col
+        .row.full-width.justify-end
+          node-vote(:node="node")
 </template>
 
 <script>

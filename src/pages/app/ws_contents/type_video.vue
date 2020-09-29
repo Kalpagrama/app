@@ -6,20 +6,24 @@
 </style>
 
 <template lang="pug">
-q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width
-    kalpa-loader(:query="query" :limit="1000")
-      template(v-slot=`{items,next}`)
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
+    .row.full-width.q-pr-sm.q-pt-sm
+      kalpa-loader(
+        ref="kl" v-slot=`{items,next}`
+        :query="query" :limit="1000"
+        :immediate="true" @reset="$refs.kl.next(0, () => {})")
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
           :gutter="{default: 10}").full-width.q-pr-sm
           div(
             v-for="(i,ii) in items" :key="i.id"
             :style=`{
+              position: 'relative',
               borderRadius: '10px', overflow: 'hidden',
             }`
             ).row.full-width.q-mb-sm.b-40
-            //- default header
+            //- default
             div(
               @click="itemSelected === i.id ? itemSelected = null : itemSelected = i.id"
               :style=`{
@@ -35,7 +39,9 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
                 ).full-width
               .row.full-width.q-pa-sm
                 span.text-white {{ i.name }}
-            //- selected
+            //- tint to intercept
+            slot(name="tint" :item="i" :itemIndex="ii")
+            //- selected for standalone mode...
             div(
               v-if="itemSelected === i.id"
               :style=`{
@@ -53,9 +59,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsContents_typeVideo',
-  props: ['searchString'],
   data () {
     return {
+      searchString: '',
       itemSelected: null,
     }
   },
@@ -78,6 +84,9 @@ export default {
     }
   },
   methods: {
+    contentKalpaFound (content) {
+      this.$log('contentKalpaFound', content)
+    },
     async itemDelete (item) {
       this.$log('itemDelete', item)
       if (!confirm('Delete content?')) return

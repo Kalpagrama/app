@@ -8,33 +8,9 @@ q-layout(view="hHh Lpr lff")
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col
             span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
-          q-btn(
-            v-if="!itsMe && userSubscribed === false"
-            @click="userFollow()"
-            outline color="green" no-caps) Follow
-          q-btn(
-            v-if="!itsMe && userSubscribed === true"
-            outline color="green" no-caps) Following
-            q-menu(
-              ref="userUnfollowMenu"
-              dark anchor="bottom right" self="top right")
-              div(
-                :style=`{
-                  maxWidth: '240px',
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).row.full-width.b-50.q-pa-md
-                .row.full-width.q-pb-md
-                  span.text-white Unfollow {{ user.name }}? You no longer see his posts.
-                .row.full-width
-                  q-btn(
-                    @click="$refs.userUnfollowMenu.hide()"
-                    flat no-caps).b-60 Cancel
-                  .col
-                  q-btn(
-                    @click="userUnfollow()"
-                    color="red" no-caps) Unfollow
-          //- q-btn(round flat color="grey-8" icon="more_vert")
+          kalpa-follow(
+              v-if="user && user.oid && !itsMe"
+              :oid="user.oid")
         .row.full-width.q-px-md
           q-tabs(
             no-caps dense active-color="white" align="left" :switch-indicator="true").full-width.text-grey-8
@@ -89,20 +65,6 @@ export default {
     },
   },
   methods: {
-    async userFollow () {
-      this.$log('userFollow')
-      let res = await UserApi.subscribe(this.user.oid)
-      // await this.$wait(1000)
-      this.userSubscribed = true // await UserApi.isSubscribed(this.user.oid)
-      this.$log('res', res)
-    },
-    async userUnfollow () {
-      this.$log('userUnfollow')
-      let res = await UserApi.unSubscribe(this.user.oid)
-      // await this.$wait(1000)
-      this.userSubscribed = false // await UserApi.isSubscribed(this.user.oid)
-      this.$log('res', res)
-    }
   },
   mounted () {
     this.$log('mounted')

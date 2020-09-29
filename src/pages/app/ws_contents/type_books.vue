@@ -9,11 +9,11 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
         div(
           :style=`{
             position: 'relative', zIndex: 100,
-            height: 0, paddingBottom: '150%',
+            height: 0, paddingBottom: '130%',
             borderRadius: '10px', overflow: 'hidden',
           }`
           ).row.b-40.q-pa-md
-          div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50
+          div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50.q-mt-xl
           .row.full-width.q-pa-md
             div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50
 </template>

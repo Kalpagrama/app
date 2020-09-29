@@ -100,10 +100,28 @@
           q-btn(
             :to="'/workspace/node/new'"
             flat color="green" no-caps align="left" icon="add" size="md"
-            :style=`{height: '60px'}`).full-width
+            :style=`{height: '60px', paddingLeft: '2px'}`).full-width
             span(
               v-if="showRightSide"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
+        //- create node new
+        q-btn(
+          :to="'/workspace/nodenew/new'"
+          flat color="green" no-caps align="left" icon="amp_stories"
+          :style=`{height: '60px', paddingLeft: '2px'}`
+          ).full-width
+        //- create link
+        q-btn(
+          :to="'/workspace/link/new'"
+          flat color="green" no-caps align="left" icon="link"
+          :style=`{height: '60px', paddingLeft: '2px'}`
+          ).full-width
+        //- create link
+        q-btn(
+          :to="'/link-create'"
+          flat color="red" no-caps align="left" icon="link"
+          :style=`{height: '60px', paddingLeft: '2px'}`
+          ).full-width
         //- version
         div(v-if="showRightSide").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}

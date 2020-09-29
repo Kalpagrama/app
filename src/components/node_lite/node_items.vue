@@ -11,7 +11,7 @@
 //- :class=`{'items-min-height': true}`
 div(
   :class=`{'items-min-height': true}`
-  :style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start
+  :style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start.fit
   //- items preview: first item from meta => shaping the size
   //- loading="lazy"
   img(
@@ -25,10 +25,10 @@ div(
       maxHeight: $q.screen.height-300+'px',
       opacity: started ? 0 : 1,
     }`
-    ).full-width
+    ).full-width.fit
   //- items in pip
   //- list-horizontal(:items="items")
-  list-pip(:items="items" :prevBtnShow="isActive")
+  list-pip(:items="items" :prevBtnShow="isActive").fit
     template(v-slot:item=`{item,itemIsFirst,itemIsLast,itemIndex,itemActive,itemNexting,next,prev,started,ended}`)
       composition-player(
         :isActive="isActive && itemActive" :isVisible="isVisible" :composition="item"
@@ -46,7 +46,7 @@ div(
           position: 'relative',
           borderRadius: '10px',
           overflow: 'hidden',
-        }`).bg-black
+        }`).bg-black.fit
 </template>
 
 <script>

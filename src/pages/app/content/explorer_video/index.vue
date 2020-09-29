@@ -166,9 +166,9 @@ export default {
         }
         // catch lastViewId
         else {
-          let viewId = localStorage.getItem('k_contentExplorer_viewid')
-          this.$log('viewId', viewId)
-          if (viewId) this.viewId = viewId
+          // let viewId = localStorage.getItem('k_contentExplorer_viewid')
+          // this.$log('viewId', viewId)
+          // if (viewId) this.viewId = viewId
         }
         // find bookmark
         let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})

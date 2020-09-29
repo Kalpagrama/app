@@ -1,8 +1,8 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-    h1.text-white linked
-    //- kalpa-loader(
+    //- h1.text-white linked
+    kalpa-loader(
       v-if="sphereOid" :query="query" :limit="3" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
@@ -35,7 +35,7 @@ export default {
         },
         populateObjects: true,
       }
-    }
+    },
   },
   methods: {
   },

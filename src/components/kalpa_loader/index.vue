@@ -17,6 +17,12 @@ export default {
       default () {
         return 10
       }
+    },
+    immediate: {
+      type: Boolean,
+      default () {
+        return false
+      }
     }
   },
   data () {
@@ -73,6 +79,10 @@ export default {
       }
       this.$emit('next')
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    if (this.immediate) this.next(0, () => {})
   }
 }
 </script>

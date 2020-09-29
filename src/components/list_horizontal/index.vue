@@ -1,12 +1,12 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', zIndex: 100,
-  }`).row.fit
+    position: 'relative', zIndex: 100,
+  }`).row.full-width.items-start.content-start
   q-resize-observer(@resize="width = $event.width")
   //- first item
   div(:style=`{position: 'relative'}`).row.fit
-    slot(name="item" :item="items[0]" :itemActive="first" :itemIndex="0" :itemNexting="true" :next="next" :prev="prev"
+    slot(name="item" :item="items[0]" :isActive="first" :itemIndex="0" :itemNexting="true" :next="next" :prev="prev"
       :itemIsFirst="true" :itemIsLast="false"
       :started="itemStarted" :ended="itemEnded")
   //- second item
@@ -15,8 +15,8 @@ div(
     :style=`{
       position: 'absolute', zIndex: 1000, right: 0,
       clipPath: 'inset(0px 0px 0px '+left+'px)',
-    }`).fow.fit
-    slot(name="item" :item="items[1]" :itemActive="!first" :itemIndex="1" :itemNexting="true" :next="next" :prev="prev"
+    }`).row.fit
+    slot(name="item" :item="items[1]" :isActive="!first" :itemIndex="1" :itemNexting="true" :next="next" :prev="prev"
       :itemIsFirst="false" :itemIsLast="false"
       :started="itemStarted" :ended="itemEnded")
   //- resizer wrapper
@@ -45,7 +45,7 @@ div(
       :style=`{position: 'absolute', zIndex: 2001, left: '-30px', width: '60px'}`).row.full-height
     //- resizer btn
     q-btn(
-      round flat color="white" icon="compare"
+      round flat color="white" icon="drag_indicator"
       :style=`{
         position: 'absolute', zIndex: 2002,
         top: 'calc(50% - 20px)',

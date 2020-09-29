@@ -41,8 +41,8 @@ const routes = [
          {
             name: 'home',
             path: 'home/:id?',
-            // component: () => import('pages/app/feeds/index.vue'),
-            component: () => import('components/kalpa_linker/index.vue'),
+            component: () => import('pages/app/feeds/index.vue'),
+            // component: () => import('components/kalpa_linker/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          {
@@ -139,6 +139,11 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'link-create',
+            path: 'link-create',
+            component: () => import('pages/app/link_create/index.vue'),
+         },
+         {
             name: 'sphere',
             path: 'sphere/:oid',
             component: () => import('pages/app/sphere/index.vue'),
@@ -174,7 +179,7 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace',
-            redirect: 'workspace/contents',
+            redirect: 'workspace/contents/video',
             component: () => import('pages/app/ws_index/index.vue'),
             children: [
                // pages
@@ -192,81 +197,21 @@ const routes = [
                // contents
                {
                   name: 'workspace.contents',
-                  path: 'contents',
-                  redirect: 'contents/video',
+                  path: 'contents/:type',
+                  // redirect: 'contents/video',
+                  props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_contents/index.vue'),
-                  children: [
-                     {
-                        name: 'workspace.contents.video',
-                        path: 'video',
-                        component: () => import('pages/app/ws_contents/type_video.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.image',
-                        path: 'image',
-                        component: () => import('pages/app/ws_contents/type_image.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.audio',
-                        path: 'audio',
-                        component: () => import('pages/app/ws_contents/type_audio.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.books',
-                        path: 'books',
-                        component: () => import('pages/app/ws_contents/type_books.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     }
-                  ]
                },
-               // {
-               //   name: 'workspace.content',
-               //   path: 'content/:id',
-               //   // redirect: 'content/:id/fragments',
-               //   component: () => import('pages/app/ws_content/index.vue'),
-               //   children: [
-               //     // { name: 'workspace.content.details', path: 'details', component: () => import('pages/app/ws_content/view_details.vue') },
-               //     // { name: 'workspace.content.fragments', path: 'fragments', component: () => import('pages/app/ws_content/view_fragments.vue') },
-               //     // { name: 'workspace.content.nodes', path: 'nodes', component: () => import('pages/app/ws_content/view_nodes.vue') }
-               //   ]
-               // },
-               // { name: 'workspace.content.import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
                // nodes
                {
                   name: 'workspace.nodes',
-                  path: 'nodes',
-                  redirect: 'nodes/drafts',
+                  path: 'nodes/:type',
+                  // redirect: 'nodes/drafts',
+                  props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_nodes/index.vue'),
-                  children: [
-                     {
-                        name: 'workspace.nodes.saved',
-                        path: 'saved',
-                        component: () => import('pages/app/ws_nodes/type_saved.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.drafts',
-                        path: 'drafts',
-                        component: () => import('pages/app/ws_nodes/type_drafts.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.fragments',
-                        path: 'fragments',
-                        component: () => import('pages/app/ws_nodes/type_fragments.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.published',
-                        path: 'published',
-                        component: () => import('pages/app/ws_nodes/type_published.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     }
-                  ]
                },
+               { name: 'workspace.link', path: 'link/:id', component: () => import('components/link_editor/index.vue') },
+               { name: 'workspace.nodenew', path: 'nodenew/:id', component: () => import('components/node_editor/index.vue') },
                { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
                // spheres
                {
@@ -304,16 +249,17 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            // name: 'notifications',
+            name: 'notifications',
             path: 'notifications',
-            component: () => import('pages/app/notifications/index.vue'),
+            // component: () => import('pages/app/notifications/index.vue'),
+            component: () => import('components/node_editor/index.vue'),
             children: [
-               {
-                  name: 'notifications',
-                  path: '',
-                  component: () => import('pages/app/notifications/view_home.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               }
+               // {
+               //    name: 'notifications',
+               //    path: '',
+               //    component: () => import('pages/app/notifications/view_home.vue'),
+               //    meta: { roleMinimal: 'MEMBER' }
+               // }
             ],
             meta: { roleMinimal: 'MEMBER' }
          },

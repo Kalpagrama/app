@@ -1,27 +1,37 @@
 <template lang="pug">
-q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    kalpa-loader(:query="query" :limit="1000")
-      template(v-slot=`{items,next}`)
-        masonry(
-          :cols="$q.screen.width < 800 ? 2 : 4"
-          :gutter="{default: 10}").full-width
-          ws-node-item(
-            v-for="(i,ii) in items" :key="i.id" :node="i"
-            @clicked="mode === 'standalone' ? itemSelected = i.id : $emit('clicked', i)").q-mb-sm
-            template(v-slot:footer)
-              //- selected
-              div(
-                v-if="itemSelected === i.id"
-                :style=`{
-                  position: 'relative',
-                  marginTop: '-10px', paddingTop: '14px',
-                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
-                }`
-                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
-                .col
-                q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
+    //- items
+    .row.full-width.q-pt-sm.q-pr-sm
+      kalpa-loader(
+        :immediate="true"
+        :query="query" :limit="1000")
+        template(v-slot=`{items,next}`)
+          masonry(
+            :cols="$q.screen.width < 800 ? 2 : 4"
+            :gutter="{default: 10}").full-width
+            div(
+              v-for="(item, ii) in items" :key="item.id"
+              :style=`{position: 'relative'}`
+              ).row.full-width
+              ws-node-item(
+                :node="item"
+                :style=`{position: 'relative'}`
+                @clicked="itemSelected = item.id").q-mb-sm
+                template(v-slot:footer)
+                  //- selected
+                  div(
+                    v-if="itemSelected === item.id"
+                    :style=`{
+                      position: 'relative',
+                      marginTop: '-10px', paddingTop: '14px',
+                      borderRadius: '0 0 10px 10px', overflow: 'hidden',
+                    }`
+                    ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                    .col
+                    q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+              slot(name="tint" :item="item")
 </template>
 
 <script>
@@ -29,15 +39,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsNodes_typeDrafts',
-  // props: ['searchString'],
   props: {
     searchString: {type: String},
-    mode: {
-      type: String,
-      default () {
-        return 'standalone'
-      }
-    }
   },
   data () {
     return {
@@ -49,7 +52,6 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          // stage: 'draft'
         },
         sort: [{updatedAt: 'desc'}]
       }

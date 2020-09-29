@@ -33,8 +33,6 @@ export default {
       }
     }
   },
-  computed: {
-  },
   watch: {
     '$route.params.id': {
       immediate: true,
