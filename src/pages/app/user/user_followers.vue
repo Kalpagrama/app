@@ -41,9 +41,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,
-          populateObjects: false,
           oidSphere: this.sphereOid,
-        }
+        },
+        populateObjects: false,
       }
     }
   },

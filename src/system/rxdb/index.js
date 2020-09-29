@@ -97,7 +97,7 @@ function makeId (rxCollectionEnum, rawId) {
 class RxDBWrapper {
    constructor () {
       this.created = false
-      this.mutex = new Mutex()
+      this.mutex = new Mutex('rxdb')
       this.store = null // vuex
       this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
@@ -175,7 +175,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         await globalLock()
+         await globalLock(true, 'rxdb::create')
          this.store = store
          logD('before createRxDatabase')
          this.db = await createRxDatabase({
@@ -246,7 +246,7 @@ class RxDBWrapper {
          return
       }
       try {
-         await this.lock()
+         await this.lock('rxdb::init')
          this.event.init()
          let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
          assert(authUser, 'authUser')
@@ -307,7 +307,7 @@ class RxDBWrapper {
       try {
          logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
-         await this.lock()
+         await this.lock('rxdb::deInit')
          if (fromDeinitGlobal) this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
@@ -329,7 +329,7 @@ class RxDBWrapper {
       assert(!(await this.isInitializedGlobal()), '!!this.isInitializedGlobal()')
       assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
-         await globalLock()
+         await globalLock(true, 'rxdb::initGlobal')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          localStorage.setItem('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
@@ -345,7 +345,7 @@ class RxDBWrapper {
       logD(f, 'start', this.created, isLeader())
       const t1 = performance.now()
       try {
-         await globalLock()
+         await globalLock(true, 'rxdb::deinitGlobal')
          await this.deInit(true) // деинициализируем текущую вкладку
          localStorage.setItem('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } catch (err) {
@@ -365,8 +365,8 @@ class RxDBWrapper {
       return !!authUser
    }
 
-   async lock () {
-      await this.mutex.lock()
+   async lock (lockOwner) {
+      await this.mutex.lock(lockOwner)
    }
 
    release () {
@@ -380,8 +380,8 @@ class RxDBWrapper {
       try {
          assert(this.initialized, '! this.initialized !')
          if (!isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
-         await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
-         await this.lock()
+         await globalLock(false, 'rxdb::processEvent') // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
+         await this.lock('rxdb::processEvent')
          assert(this.store, '!this.store')
          await this.event.processEvent(event, this.store)
       } finally {
@@ -396,47 +396,62 @@ class RxDBWrapper {
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
-      let populateObjects = mangoQuery.selector.populateObjects
-      let pageToken = mangoQuery.pageToken || { indx: 0, oid: null }
-      // console.log('$rxdb.find() --- pageToken', pageToken)
-      let limit = parseInt(mangoQuery.limit)
-      if (!limit) limit = populateObjects ? 88 : 8888
-      delete mangoQuery.selector.populateObjects // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
-      // let tx = performance.now()
-      let objectShortList = await this.findInternal(mangoQuery)
+      mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
 
-      // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
+      let result = { items: [], count: 0, totalCount: 0, nextPageToken: null, prevPageToken: mangoQuery.pageToken }
+      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+      let pageToken = mangoQuery.pageToken || { indx: 0, id: null }
+      let populateObjects = mangoQuery.populateObjects
+      let limit = parseInt(mangoQuery.limit)
+      delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
+      delete mangoQuery.populateObjects // мешает нормальному кэшированию запросов в findInternal
+      delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
+
+      if (!limit) limit = populateObjects ? 88 : 8888
       let startIndx = pageToken.indx
       let nextIndx = startIndx + limit
-      let nextPageToken = objectShortList.items[nextIndx] ? { indx: nextIndx, oid: objectShortList.items[nextIndx].oid } : null
-      let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
-      let items = []
-      if (populateObjects) {
-         // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-         items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
-         items = items.filter(obj => !!obj)
-      } else items = objectShortItemsLimit
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, items)
-      return {
-         items,
-         count: items.length,
-         totalCount: objectShortList.count,
-         nextPageToken,
-         prevPageToken: pageToken
+
+      if (rxCollectionEnum in WsCollectionEnum) {
+         if (pageToken && pageToken.id) mangoQuery.startkey = pageToken.id
+         else if (pageToken && pageToken.indx) mangoQuery.skip = pageToken.indx
+         result.items = (await this.findInternal(mangoQuery)).items
+         result.count = result.items.length
+         result.totalCount = 100500
+         result.nextPageToken = result.count ? {
+            indx: nextIndx,
+            id: result.items[result.items.length - 1].id
+         } : null
+      } else if (rxCollectionEnum in LstCollectionEnum) {
+         let objectShortList = await this.findInternal(mangoQuery)
+         let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
+         let objectShortItemsPrefetch = objectShortList.items.slice(nextIndx, nextIndx + 3) // упреждающее чтение
+         if (populateObjects) {
+            // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+            result.items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
+            await Promise.all(objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })))
+            result.items = result.items.filter(obj => !!obj)
+         } else result.items = objectShortItemsLimit
+         result.count = result.items.length
+         result.totalCount = objectShortList.items.length
+         result.nextPageToken = objectShortList.items[nextIndx] ? {
+            indx: nextIndx,
+            id: objectShortList.items[nextIndx].oid
+         } : null
       }
+      // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
+      return result
    }
 
-   // вернет список из objectShort
+   // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
    async findInternal (mangoQuery) {
       const f = this.findInternal
       const t1 = performance.now()
-      logD(f, 'start', mangoQuery)
+      // logD(f, 'start', mangoQuery)
       try {
          assert(this.initialized, '! this.initialized !')
-         await this.lock() // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
+         await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
          let findResult
@@ -444,7 +459,7 @@ class RxDBWrapper {
          // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
-            mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+            // mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
             if (rxCollectionEnum in WsCollectionEnum) {

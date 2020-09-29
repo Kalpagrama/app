@@ -28,11 +28,12 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
-          // populateObjects: true,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidAuthor: {$ne: this.sphereOid},
           oidSphere: this.sphereOid,
-          // jointItemType: {$nin: ['EMOJI']}
+          sortStrategy: 'AGE',
         },
+        populateObjects: true,
       }
     },
   },

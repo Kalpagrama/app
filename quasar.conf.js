@@ -154,7 +154,7 @@ module.exports = function (ctx) {
         // const cors = require('cors')
         // app.use(cors())
         // app.use(cors({
-        //   origin: 'api.kalpagramma.com',
+        //   origin: 'api.kalpagrama.com',
         //   credentials: true
         // }))
       },
@@ -191,8 +191,8 @@ module.exports = function (ctx) {
         maximumFileSizeToCacheInBytes: 1024 * 1024 * 20,
       },
       manifest: {
-        name: 'Kalpagramma',
-        short_name: 'Kalpagramma',
+        name: 'Kalpagrama',
+        short_name: 'Kalpagrama',
         description: 'Up the essence',
         display: 'standalone',
         orientation: 'portrait',

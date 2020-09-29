@@ -135,9 +135,9 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
-          populateObjects: false,
           oidSphere: this.$store.getters.currentUser().oid,
-        }
+        },
+        populateObjects: false,
       }
       if (this.searchStringSubs.length > 0) {
         let nameRegExp = new RegExp(this.searchStringSubs, 'i')

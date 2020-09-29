@@ -1,5 +1,5 @@
 {
-  "name": "Kalpagramma GraphQL Schema",
+  "name": "Kalpagrama GraphQL Schema",
   "schemaPath": "src/api/graphql.schema.json",
   "extensions": {
     "endpoints": {}

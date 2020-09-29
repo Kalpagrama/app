@@ -27,9 +27,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
-          populateObjects: false,
           oidSphere: this.sphereOid
-        }
+        },
+        populateObjects: false,
       }
     }
   }

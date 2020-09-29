@@ -43,7 +43,10 @@ export default async ({ Vue, store, app }) => {
                      .then(() => {
                         window.location.reload()
                      })
-                     .catch(err => logE('AuthApi.logout error', err))
+                     .catch(err => {
+                        logE('AuthApi.logout error', err)
+                        window.location.reload()
+                     })
                } else if (err.code === 'BAD_DATA') {
                   alert(err.message)
                }
@@ -57,7 +60,10 @@ export default async ({ Vue, store, app }) => {
                   .then(() => {
                      window.location.reload()
                   })
-                  .catch(err => logE('AuthApi.logout error', err))
+                  .catch(err => {
+                     logE('AuthApi.logout error', err)
+                     window.location.reload()
+                  })
             }
          }
       })

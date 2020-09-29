@@ -67,7 +67,7 @@ class Workspace {
    constructor (db) {
       assert(db, '!rxdb')
       this.db = db
-      this.mutex = new Mutex()
+      this.mutex = new Mutex('rxdb::ws')
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
       this.reactiveUser = null
       this.synchro = false
@@ -82,7 +82,7 @@ class Workspace {
          await wait(200)
       }
       try {
-         await this.lock()
+         await this.lock('ws::updateCollections')
          this.ignoreWsChanges = true
          // добавлет дефолтный вариант для пропущенных стратегий
          const migrationProxy = (migrationStrategies) => {
@@ -176,8 +176,8 @@ class Workspace {
                   const tLoop = performance.now()
                   try {
                      logD(f, 'next loop start...', isLeader(), this.synchroLoopWaitObj.getTimeOut())
-                     await globalLock(false) // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal и др)
-                     await this.lock()
+                     await globalLock(false, 'ws::synchroLoop') // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal и др)
+                     await this.lock('ws::synchroLoop')
                      // logD(f, 'locked')
                      if (isLeader()) await this.synchronize()
                   } catch (err) {
@@ -357,7 +357,7 @@ class Workspace {
       logD(f, 'start')
       const t1 = performance.now()
       try {
-         await this.lock()
+         await this.lock('rxdb::ws::processEvent')
          logD(f, 'locked')
          this.ignoreWsChanges = true
          if (!isLeader()) return
@@ -406,7 +406,7 @@ class Workspace {
    async find (mangoQuery) {
       const f = this.find
       try {
-         await this.lock()
+         await this.lock('rxdb::ws::find')
          // logD(f, 'locked')
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
@@ -426,7 +426,7 @@ class Workspace {
       logD(f, 'start')
       const t1 = performance.now()
       try {
-         await this.lock()
+         await this.lock('rxdb::ws::set')
          logD(f, 'locked')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
@@ -467,7 +467,7 @@ class Workspace {
       logD(f, 'start', id)
       const t1 = performance.now()
       try {
-         // await this.lock() вызывается внутри processEvent
+         // await this.lock('rxdb::ws::get') вызывается внутри processEvent
          // logD(f, 'locked')
          let rxDoc = await this.db.ws_items.findOne(id).exec()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -482,7 +482,7 @@ class Workspace {
       const f = this.remove
       logD(f, 'start', id)
       try {
-         await this.lock()
+         await this.lock('rxdb::ws::remove')
          // logD(f, 'locked')
          assert(this.created, '!this.created')
          await this.db.ws_items.find({ selector: { id: id } }).remove()
@@ -492,8 +492,8 @@ class Workspace {
       }
    }
 
-   async lock () {
-      await this.mutex.lock()
+   async lock (lockOwner) {
+      await this.mutex.lock(lockOwner)
    }
 
    release () {

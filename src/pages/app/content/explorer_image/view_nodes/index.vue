@@ -65,9 +65,9 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          populateObjects: true,
           oidSphere: this.contentKalpa.oid
-        }
+        },
+        populateObjects: true,
       }
     }
   },

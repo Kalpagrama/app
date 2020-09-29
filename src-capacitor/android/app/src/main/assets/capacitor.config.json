@@ -1,6 +1,6 @@
 {
   "appId": "app.kalpa",
-  "appName": "Kalpagramma",
+  "appName": "Kalpagrama",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "www",
