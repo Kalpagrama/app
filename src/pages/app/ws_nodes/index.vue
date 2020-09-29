@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+//- q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -27,7 +27,18 @@ q-layout(view="hHh Lpr lff")
             q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
       q-page-sticky(position="bottom" :offset="[0, 60]")
   q-page-container
-    router-view(:searchString="searchString")
+    //- router-view(:searchString="searchString")
+    component(:is="'type-drafts'" :searchString="searchString")
+.row.full-width.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
+      q-tabs(
+        :value="typeId" @input="typeIdChanged"
+        dense no-caps active-color="white" align="left"
+        ).full-width.text-grey-8
+        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+  .row.full-width
+    component(:is="`type-${typeId}`")
 </template>
 
 <script>
@@ -36,6 +47,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp__wsNodes',
+  props: {
+    mode: {type: String, default () { return 'standalone' }},
+    type: {type: String, default () { return 'drafts' }},
+    query: {type: Object, default () { return {} }}
+  },
+  components: {
+    typeDrafts: () => import('./type_drafts.vue'),
+    typePublished: () => import('./type_published.vue'),
+    typeSaved: () => import('./type_saved.vue'),
+  },
   meta () {
     return {
       title: 'Nodes'
@@ -43,18 +64,37 @@ export default {
   },
   data () {
     return {
-      searchString: '',
+      typeId: 'drafts'
+    }
+  },
+  watch: {
+    type: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('type TO', to)
+        this.typeId = to
+      }
     }
   },
   computed: {
     types () {
       return [
-        // {id: 'workspace.nodes.fragments', name: this.$t('pageApp_wsNodes_fragments', 'Фрагменты')},
-        {id: 'workspace.nodes.drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
-        {id: 'workspace.nodes.published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
-        {id: 'workspace.nodes.saved', name: this.$t('pageApp_wsNodes_saved', 'Сохраненные')},
+        {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
+        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
+        {id: 'saved', name: this.$t('pageApp_wsNodes_saved', 'Сохраненные')},
       ]
     },
   },
+  methods: {
+    typeIdChanged (val) {
+      this.$log('typeIdChanged', val)
+      if (this.mode === 'standalone') {
+        this.$router.push({params: {type: val}})
+      }
+      else {
+        this.typeId = val
+      }
+    }
+  }
 }
 </script>

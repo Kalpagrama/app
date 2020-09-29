@@ -18,6 +18,10 @@
         }`
         ).row.fit.b-40.shadow-10
         small.text-white {{ item }}
+        //- img(
+          :src="item.url"
+          :style=`{objectFit: 'cover'}`
+          ).fit
   edit-name(:value="name" @input="name = $event")
   //- views
   .row.full-width.justify-center.q-pb-md

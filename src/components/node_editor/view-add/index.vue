@@ -29,7 +29,8 @@
 export default {
   name: 'nodeEditor_viewAdd',
   components: {
-    fromGifs: () => import('./from-gifs.vue')
+    fromGifs: () => import('./from-gifs.vue'),
+    fromContent: () => import('./from-content.vue')
   },
   data () {
     return {
@@ -40,13 +41,8 @@ export default {
   computed: {
     froms () {
       return [
-        // { id: 'nodes', name: this.$t('Nodes', 'Ядра') },
-        { id: 'video', name: this.$t('Videos', 'Видео') },
-        { id: 'image', name: this.$t('Images', 'Изображения') },
-        { id: 'books', name: this.$t('Books', 'Книги') },
-        { id: 'audio', name: this.$t('Music', 'Аудио') },
-        // { id: 'speher', name: this.$t('Spheres', 'Сферы') },
-        // { id: 'bookmarks', name: this.$t('Bookmarks', 'Закладки') },
+        { id: 'content', name: this.$t('Content', 'Контент') },
+        { id: 'nodes', name: 'Nodes' },
         { id: 'gifs', name: this.$t('GIFs', 'Гифки') },
       ]
     }

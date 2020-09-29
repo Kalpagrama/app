@@ -1,22 +1,14 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        slot(name="header")
-        .row.full-width.q-px-sm
-          content-search(
-            @contentKalpa="contentKalpaFound"
-            @searchString="searchString = $event"
-            :style=`{}`)
-        div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
-          q-tabs(
-            :value="$route.name" @input="$router.push({name: $event})"
-            no-caps dense active-color="white" align="left" switch-indicator
-            ).full-width.text-grey-8
-            q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
-  q-page-container
-    router-view(:searchString="searchString")
+.row.full-width.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
+      q-tabs(
+        :value="typeId" @input="typeIdChanged"
+        no-caps dense active-color="white" align="left"
+        ).full-width.text-grey-8
+        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+  .row.full-width
+    component(:is="`type-${typeId}`")
 </template>
 
 <script>
@@ -25,29 +17,52 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageApp_wsContents',
   props: {
+    mode: {type: String, default () { return 'standalone' }},
+    type: {type: String, default () { return 'video' }},
+    query: {type: Object, default () { return {} }}
   },
-  meta () {
-    return {
-      title: 'Workspace - Contents'
-    }
+  components: {
+    typeVideo: () => import('./type_video.vue'),
+    typeImage: () => import('./type_image.vue'),
+    typeAudio: () => import('./type_audio.vue'),
+    typeBooks: () => import('./type_books.vue'),
   },
   data () {
     return {
-      searchString: '',
+      typeId: 'video',
     }
   },
   computed: {
     types () {
       return [
-        {id: 'workspace.contents.video', name: this.$t('Video', 'Видео')},
-        {id: 'workspace.contents.image', name: this.$t('Images', 'Картинки')},
-        {id: 'workspace.contents.audio', name: this.$t('Audio', 'Аудио')},
-        {id: 'workspace.contents.books', name: this.$t('Books', 'Книги')},
-        // {id: 'workspace.contents.web', name: this.$t('Web', 'Веб')},
+        {id: 'video', name: this.$t('Video', 'Видео')},
+        {id: 'image', name: this.$t('Images', 'Картинки')},
+        {id: 'audio', name: this.$t('Audio', 'Аудио')},
+        {id: 'books', name: this.$t('Books', 'Книги')},
       ]
     },
   },
+  watch: {
+    type: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('type TO', to)
+        if (to) {
+          this.typeId = to
+        }
+      }
+    }
+  },
   methods: {
+    typeIdChanged (val) {
+      this.$log('typeIdChanged', val)
+      if (this.mode === 'standalone') {
+        this.$router.push({params: {type: val}})
+      }
+      else {
+        this.typeId = val
+      }
+    },
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // go to content page immediate

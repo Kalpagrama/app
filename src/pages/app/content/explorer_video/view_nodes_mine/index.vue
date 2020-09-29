@@ -107,7 +107,6 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
           contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          populateObjects: true,
         },
         sort: [{updatedAt: 'desc'}],
       }

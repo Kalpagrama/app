@@ -197,81 +197,21 @@ const routes = [
                // contents
                {
                   name: 'workspace.contents',
-                  path: 'contents',
-                  redirect: 'contents/video',
+                  path: 'contents/:type',
+                  // redirect: 'contents/video',
+                  props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_contents/index.vue'),
-                  children: [
-                     {
-                        name: 'workspace.contents.video',
-                        path: 'video',
-                        component: () => import('pages/app/ws_contents/type_video.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.image',
-                        path: 'image',
-                        component: () => import('pages/app/ws_contents/type_image.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.audio',
-                        path: 'audio',
-                        component: () => import('pages/app/ws_contents/type_audio.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.contents.books',
-                        path: 'books',
-                        component: () => import('pages/app/ws_contents/type_books.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     }
-                  ]
                },
-               // {
-               //   name: 'workspace.content',
-               //   path: 'content/:id',
-               //   // redirect: 'content/:id/fragments',
-               //   component: () => import('pages/app/ws_content/index.vue'),
-               //   children: [
-               //     // { name: 'workspace.content.details', path: 'details', component: () => import('pages/app/ws_content/view_details.vue') },
-               //     // { name: 'workspace.content.fragments', path: 'fragments', component: () => import('pages/app/ws_content/view_fragments.vue') },
-               //     // { name: 'workspace.content.nodes', path: 'nodes', component: () => import('pages/app/ws_content/view_nodes.vue') }
-               //   ]
-               // },
-               // { name: 'workspace.content.import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
                // nodes
                {
                   name: 'workspace.nodes',
-                  path: 'nodes',
-                  redirect: 'nodes/drafts',
+                  path: 'nodes/:type',
+                  // redirect: 'nodes/drafts',
+                  props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_nodes/index.vue'),
-                  children: [
-                     {
-                        name: 'workspace.nodes.saved',
-                        path: 'saved',
-                        component: () => import('pages/app/ws_nodes/type_saved.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.drafts',
-                        path: 'drafts',
-                        component: () => import('pages/app/ws_nodes/type_drafts.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.fragments',
-                        path: 'fragments',
-                        component: () => import('pages/app/ws_nodes/type_fragments.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     },
-                     {
-                        name: 'workspace.nodes.published',
-                        path: 'published',
-                        component: () => import('pages/app/ws_nodes/type_published.vue'),
-                        meta: { roleMinimal: 'MEMBER' }
-                     }
-                  ]
                },
+               { name: 'workspace.link', path: 'link/:id', component: () => import('components/link_editor/index.vue') },
+               { name: 'workspace.nodenew', path: 'nodenew/:id', component: () => import('components/node_editor/index.vue') },
                { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
                // spheres
                {

@@ -78,7 +78,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
       .row.full-width.q-px-sm
         with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
-      .row.full-width.items-center.content-center.q-pa-md
+      //- .row.full-width.items-center.content-center.q-pa-md
         q-btn(
           color="green" outline dense no-caps
           @click="$router.push('/auth/sign-up')").full-width {{$t('auth__Sign up', 'Регистрация')}}
