@@ -2,9 +2,17 @@
 .row.full-width.justify-center.items-start.content-start.q-pt-md
   q-tabs(
     v-model="fromId"
-    dense active-color="white" no-caps
-    ).full-width.text-grey-6
-    q-tab(v-for="v in froms" :key="v.id" :name="v.id" :label="v.name")
+    active-color="white" no-caps
+    :style=`{
+      fontWeight: 'bold'
+    }`
+    ).full-width.text-grey-6.text-bold
+    q-tab(
+      v-for="v in froms" :key="v.id" :name="v.id"
+      :style=`{
+        fontWeight: 'bold'
+      }`)
+      span(:style=`{fontSize: '18px'}`).text-bold {{v.name}}
   //- from component
   component(
     :is="`from-${fromId}`"

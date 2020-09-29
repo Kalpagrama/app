@@ -6,11 +6,12 @@
 </style>
 
 <template lang="pug">
-//- q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.justify-center
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
     .row.full-width.items-start.content-start.q-pt-sm.q-pr-sm
-      kalpa-loader(:query="queryNodes" :limit="1000" v-slot=`{items, next}`)
+      kalpa-loader(
+        :immediate="true"
+        :query="queryNodes" :limit="1000" v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           q-infinite-scroll(ref="qis" @load="next" :offset="500")
           masonry(
@@ -18,9 +19,13 @@
             :gutter="{default: 10}").full-width.justify-start
             div(
               v-for="(node, ii) in items" :key="node.oid"
+              :style=`{
+                position: 'relative',
+              }`
               ).row.full-width.q-mb-sm
+              //- default
               div(
-                @click="mode === 'standalone' ? nodeSelectedOid = node.oid : $emit('clicked', node)"
+                @click="nodeSelectedOid = node.oid"
                 :style=`{
                   position: 'relative', zIndex: 100,
                   borderRadius: '10px', overflow: 'hidden',
@@ -42,6 +47,7 @@
                       }`).fit
                 .row.full-width.q-py-sm.q-px-md
                   small.text-white {{ node.name }}
+              slot(name="tint" :item="node")
               //- selected
               div(
                 v-if="nodeSelectedOid === node.oid"
@@ -63,15 +69,8 @@ import { NodeApi } from 'src/api/node'
 
 export default {
   name: 'wsNodes_typePublished',
-  // props: ['searchString'],
   props: {
-    searchString: {type: String},
-    mode: {
-      type: String,
-      default () {
-        return 'standalone'
-      }
-    }
+    searchString: {type: String}
   },
   data () {
     return {

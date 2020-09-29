@@ -7,7 +7,9 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-    kalpa-loader(:query="mangoQuery" :limit="1000" v-slot=`{items,next}`)
+    kalpa-loader(
+      :immediate="true"
+      :query="mangoQuery" :limit="1000" v-slot=`{items,next}`)
       .row.full-width.items-start.content-start.q-px-sm
         div(
           v-for="(s,si) in items" :key="s.oid"

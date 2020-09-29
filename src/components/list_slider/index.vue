@@ -21,11 +21,15 @@ div(
   //- wrapper
   div(
     ref="scrollWrapper"
+    :class=`{
+      'q-py-xl': width > 900,
+      'q-py-md': width <= 900
+    }`
     :style=`{
       position: 'relative',
       overflowY: 'hidden',
     }`
-    @scroll="onScroll").row.full-width.scroll.q-py-xl
+    @scroll="onScroll").row.full-width.scroll
     div(
       :style=`{
       }`
@@ -111,7 +115,7 @@ export default {
     itemSide () {
       if (this.width <= 900) {
         return this.width * 0.48
-        // return this.width * 0.8
+        // return this.width * 0.9
       }
       else {
         return 900 / 2

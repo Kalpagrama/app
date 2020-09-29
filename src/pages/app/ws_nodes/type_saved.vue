@@ -20,8 +20,9 @@
             div(
               v-for="(nodeBookmark, ii) in items" :key="nodeBookmark.id"
               ).row.full-width.q-mb-sm
+              //- default
               div(
-                @click="mode === 'standalone' ? nodeBookmarkSelectedId = nodeBookmark.id : $emit('clicked', nodeBookmark)"
+                @click="nodeBookmarkSelectedId = nodeBookmark.id"
                 :style=`{
                   position: 'relative', zIndex: 100,
                   borderRadius: '10px', overflow: 'hidden',
@@ -43,6 +44,8 @@
                       }`).fit
                 .row.full-width.q-py-sm.q-px-md
                   small.text-white {{ nodeBookmark.name }}
+              //- tint
+              slot(name="tint" :item="nodeBookmark")
               //- selected
               div(
                 v-if="nodeBookmarkSelectedId === nodeBookmark.id"

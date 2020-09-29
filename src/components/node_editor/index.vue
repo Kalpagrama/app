@@ -8,9 +8,12 @@
         maxWidth: $store.state.ui.pageMaxWidth+'px',
       }`).row.full-width.items-center.content-center
       q-btn(round flat color="grey-8" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор ядра
+      span(
+        v-if="node.items.length > 0"
+        :style=`{fontSize: '18px'}`).text-white.text-bold Редактор ядра
       .col
       q-btn(
+        v-if="node.items.length > 0"
         flat no-caps color="white" icon-right="keyboard_arrow_down")
         span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ layouts.find(l => l.id === node.layout).name }}
         q-menu(dark)
@@ -64,8 +67,6 @@
         div(
           v-for="(item,ii) in node.items" :key="item.id"
           :style=`{
-            minHeight: '200px',
-            maxHeight: '500px',
             borderRadius: '10px', overflow: 'hidden',
           }`
           ).row.full-width.b-40.shadow-10.q-mb-sm
@@ -81,6 +82,7 @@
     div(
       :style=`{
         maxWidth: 800+'px',
+        marginTop: node.items.length === 0 ? '200px' : '0px',
       }`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         div(
@@ -133,15 +135,15 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'add', name: 'Добавить', icon: 'add'},
-        {id: 'publish', name: 'Публикация', icon: 'check'}
+        {id: 'add', icon: 'add'},
+        {id: 'publish', icon: 'check'}
       ]
     },
     layouts () {
       return [
-        {id: 'SLIDER', name: 'Slider'},
-        {id: 'HORIZONTAL', name: 'Compare'},
-        {id: 'VERTICAL', name: 'Vertical'}
+        {id: 'SLIDER', name: this.$t('Slider', 'Слайдер')},
+        {id: 'HORIZONTAL', name: this.$t('Compare', 'Сравнение')},
+        {id: 'VERTICAL', name: this.$t('Vertical', 'Портянка')}
       ]
     }
   },

@@ -9,6 +9,13 @@
         }`)
     .row.full-width.q-py-sm
       edit-category(:node="node")
+    .row.full-width
+      q-toggle(
+        v-model="meta.isPrivate"
+        dark color="green" label="Private").text-grey-6
+      q-toggle(
+        v-model="meta.isMature"
+        dark color="green" label="Mature").text-grey-6
     .row.full-width.q-py-md
       q-btn(
         @click="publish()"
@@ -38,23 +45,30 @@ export default {
   data () {
     return {
       publishing: false,
+      meta: {
+        isPrivate: false,
+        isMature: false
+      }
     }
   },
   methods: {
     nodeDelete () {
       this.$log('nodeDelete')
     },
-    publishCheck () {},
+    publishCheck () {
+      this.$log('publishCheck')
+    },
     async publish () {
       try {
         this.$log('publish start')
         this.publishing = true
+        this.publishCheck()
         let nodeInput = this.node
         let createdNode = await NodeApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         this.$log('publish done')
         this.publishing = false
-        // this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
+        this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
       }
       catch (e) {
         this.$log('publish error', e)
