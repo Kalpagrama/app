@@ -182,19 +182,6 @@ const routes = [
             redirect: 'workspace/contents/video',
             component: () => import('pages/app/ws_index/index.vue'),
             children: [
-               // pages
-               {
-                  name: 'workspace.pages',
-                  path: 'pages',
-                  // redirect: '',
-                  component: () => import('pages/app/ws_pages/index.vue')
-               },
-               {
-                  name: 'workspace.page',
-                  path: 'page/:id',
-                  component: () => import('pages/app/ws_pages/page_editor.vue')
-               },
-               // contents
                {
                   name: 'workspace.contents',
                   path: 'contents/:type',
@@ -202,7 +189,6 @@ const routes = [
                   props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_contents/index.vue'),
                },
-               // nodes
                {
                   name: 'workspace.nodes',
                   path: 'nodes/:type',
@@ -210,10 +196,8 @@ const routes = [
                   props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_nodes/index.vue'),
                },
-               { name: 'workspace.link', path: 'link/:id', component: () => import('components/link_editor/index.vue') },
-               { name: 'workspace.nodenew', path: 'nodenew/:id', component: () => import('components/node_editor/index.vue') },
+               { name: 'workspace.link', path: 'link/:id', component: () => import('pages/app/ws_link/index.vue') },
                { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
-               // spheres
                {
                   name: 'workspace.spheres',
                   path: 'spheres',
@@ -251,8 +235,8 @@ const routes = [
          {
             name: 'notifications',
             path: 'notifications',
-            // component: () => import('pages/app/notifications/index.vue'),
-            component: () => import('components/node_editor/index.vue'),
+            component: () => import('pages/app/notifications/index.vue'),
+            // component: () => import('components/node_editor/index.vue'),
             children: [
                // {
                //    name: 'notifications',

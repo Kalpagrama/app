@@ -74,7 +74,7 @@
       q-btn(round flat color="grey-9" icon="cached").shaking
       .col
       small.text-grey-9 12312
-      q-btn(round flat color="grey-9" icon="link").shaking
+      q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new')").shaking
       .col
       q-btn(round flat color="grey-9" icon="share").shaking
       .col
