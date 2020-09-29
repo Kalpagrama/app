@@ -10,11 +10,15 @@ import { AuthApi } from 'src/api/auth'
 import store from 'src/store/index'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/main'
-import { Mutex } from 'src/system/rxdb/reactive'
+import { Mutex } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SYSTEM)
+
+const logMD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
+const logME = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
+const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
 let setLeader = () => {
@@ -35,9 +39,9 @@ let unloadingInProgress = false
 const maxLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
 let globalLock = async (recursive = true, lockOwner = '') => {
    const f = globalLock
-   // logD(f, 'start', getInstanceId())
+   // logMD(f, 'start', getInstanceId())
    if (unloadingInProgress) {
-      logW('cant globalLock (unloadingInProgress)')
+      logMW('cant globalLock (unloadingInProgress)')
       await wait(10 * 1000)
    }
    const t1 = performance.now()
@@ -46,22 +50,25 @@ let globalLock = async (recursive = true, lockOwner = '') => {
       while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxLockTimeFuse) {
          assert('dt' in current && 'instanceId' in current, 'bad current!')
          await wait(100)
-         if (Date.now() % 10 === 0) logD(f, `${getInstanceId()}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
+         if (Date.now() % 10 === 0) logMW(f, `${getInstanceId()}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
          current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '', lockOwner: '' }))
       }
-      if (current.dt) logW('break globalLock by timeout(maxLockTimeFuse)!', current)
+      if (current.dt) {
+         logMW(`${getInstanceId()}:${lockOwner} break globalLock by timeout(maxLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
+         localStorage.removeItem('k_global_lock')
+      }
    }
    localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId(), lockOwner: lockOwner }))
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   logMD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 let globalRelease = () => {
    const f = globalRelease
    let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-   // logD(f, 'start', getInstanceId(), current)
    assert('dt' in current && 'instanceId' in current)
    if (current.instanceId === getInstanceId()) {
+      logMD(f, 'release globalLock', getInstanceId(), current)
       localStorage.removeItem('k_global_lock')
-   } else if (current.instanceId) logW(f, `cancel foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`) // такое возможно из-за maxLockTimeFuse
+   } else if (current.instanceId) logMW(f, `release foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`) // такое возможно из-за maxLockTimeFuse
 }
 // let globalLockedByMe = () => {
 //    let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
@@ -198,6 +205,7 @@ function initOfflineEvents (store) {
 
 async function initSessionStorage () {
    if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
+   if (!sessionStorage.getItem('k_log_format')) sessionStorage.setItem('k_log_format', JSON.stringify({time: false, moduleName: true, funcName: true}))
    if (!sessionStorage.getItem('k_log_level')) {
       if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
       else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)

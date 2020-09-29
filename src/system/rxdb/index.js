@@ -9,7 +9,8 @@ import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
-import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { Mutex } from 'src/system/rxdb/mutex'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
@@ -376,7 +377,7 @@ class RxDBWrapper {
    async processEvent (event) {
       const f = this.processEvent
       const t1 = performance.now()
-      logD(f, 'start')
+      logD(f, 'start', event)
       try {
          assert(this.initialized, '! this.initialized !')
          if (!isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
@@ -428,7 +429,7 @@ class RxDBWrapper {
          if (populateObjects) {
             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
             result.items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
-            await Promise.all(objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })))
+            objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })) // в фоне делаем упреждающее чтение
             result.items = result.items.filter(obj => !!obj)
          } else result.items = objectShortItemsLimit
          result.count = result.items.length

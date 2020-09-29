@@ -206,7 +206,7 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     contentSource
   }
 `
-const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment} ${objectShortJointFragment}
+const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
   fragment nodeFragment on Node {
     ...objectFragment
     sphereFromName{...objectShortFragment}
