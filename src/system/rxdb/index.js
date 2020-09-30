@@ -9,13 +9,13 @@ import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
-import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { getInstanceId, globalLock, globalRelease, isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -97,7 +97,7 @@ function makeId (rxCollectionEnum, rawId) {
 class RxDBWrapper {
    constructor () {
       this.created = false
-      this.mutex = new Mutex('rxdb')
+      this.mutex = new MutexLocal('rxdb')
       this.store = null // vuex
       this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
@@ -132,7 +132,7 @@ class RxDBWrapper {
                   alert('error on processStoreEvent: ' + JSON.stringify(err))
                   await window.location.reload()
                } finally {
-                  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`)
+                  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
                }
             }
          }
@@ -164,7 +164,7 @@ class RxDBWrapper {
          logE('cant purgeDb', err)
          throw err
       } finally {
-         localStorage.setItem('k_rxdb_last_purge_date', getInstanceId())
+         localStorage.setItem('k_rxdb_last_purge_date', mutexGlobal.getInstanceId())
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
@@ -175,7 +175,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         await globalLock(true, 'rxdb::create')
+         await mutexGlobal.lock('rxdb::create')
          this.store = store
          logD('before createRxDatabase')
          this.db = await createRxDatabase({
@@ -205,8 +205,8 @@ class RxDBWrapper {
          else await removeRxDatabase('rxdb', 'idb')
          throw err
       } finally {
-         globalRelease()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`, this.created)
+         mutexGlobal.release()
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
       }
    }
 
@@ -329,23 +329,23 @@ class RxDBWrapper {
       assert(!(await this.isInitializedGlobal()), '!!this.isInitializedGlobal()')
       assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
-         await globalLock(true, 'rxdb::initGlobal')
+         await mutexGlobal.lock('rxdb::initGlobal')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          localStorage.setItem('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } finally {
-         globalRelease()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${isLeader()}`)
+         mutexGlobal.release()
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
       }
    }
 
    // удалит данные в rxdb (сообщит об этом другим вкладкам)
    async deInitGlobal () {
       const f = this.deInitGlobal
-      logD(f, 'start', this.created, isLeader())
+      logD(f, 'start', this.created, mutexGlobal.isLeader())
       const t1 = performance.now()
       try {
-         await globalLock(true, 'rxdb::deinitGlobal')
+         await mutexGlobal.lock('rxdb::deinitGlobal')
          await this.deInit(true) // деинициализируем текущую вкладку
          localStorage.setItem('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } catch (err) {
@@ -354,7 +354,7 @@ class RxDBWrapper {
          else await removeRxDatabase('rxdb', 'idb')
          throw err
       } finally {
-         globalRelease()
+         mutexGlobal.release()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
@@ -376,17 +376,17 @@ class RxDBWrapper {
    async processEvent (event) {
       const f = this.processEvent
       const t1 = performance.now()
-      logD(f, 'start')
+      logD(f, 'start', event)
       try {
          assert(this.initialized, '! this.initialized !')
-         if (!isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
-         await globalLock(false, 'rxdb::processEvent') // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
-         await this.lock('rxdb::processEvent')
+         if (!mutexGlobal.isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
+         await mutexGlobal.lock('rxdb::processEvent')
+         await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
          assert(this.store, '!this.store')
          await this.event.processEvent(event, this.store)
       } finally {
          this.release()
-         globalRelease()
+         mutexGlobal.release()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
@@ -428,7 +428,7 @@ class RxDBWrapper {
          if (populateObjects) {
             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
             result.items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
-            await Promise.all(objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })))
+            objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })) // в фоне делаем упреждающее чтение
             result.items = result.items.filter(obj => !!obj)
          } else result.items = objectShortItemsLimit
          result.count = result.items.length

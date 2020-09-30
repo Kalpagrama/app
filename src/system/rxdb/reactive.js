@@ -9,6 +9,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import merge from 'lodash/merge'
 import set from 'lodash/set'
 import { wait } from 'src/system/utils'
+import { MutexLocal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -88,7 +89,7 @@ class ReactiveItemHolder {
       } else {
          this.id = rxDoc.id + ':::' + id++
          this.rxDoc = rxDoc
-         this.mutex = new Mutex('ReactiveItemHolder::constructor')
+         this.mutex = new MutexLocal('ReactiveItemHolder::constructor')
          this.vm = new Vue({
             data: {
                reactiveItem: rxDoc.toJSON()
@@ -208,7 +209,7 @@ class ReactiveListHolder {
             this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
             assert(this.reactiveList, '!this.reactiveList!')
          } else {
-            this.mutex = new Mutex('ReactiveListHolder::constructor')
+            this.mutex = new MutexLocal('ReactiveListHolder::constructor')
             await this.mutex.lock('ReactiveListHolder::create')
             rxQuery.reactiveListHolderMaster = this
             this.rxQuery = rxQuery
@@ -315,44 +316,4 @@ class ReactiveListHolder {
    }
 }
 
-class Mutex {
-   constructor (name) {
-      assert(name, 'name')
-      this.queue = []
-      this.locked = false
-      this.lockOwner = null
-      this.name = name
-      this.timerWarnId = null
-      this.timerErrId = null
-   }
-
-   lock (lockOwner) {
-      assert(lockOwner, '!lockOwner')
-      return new Promise((resolve, reject) => {
-         if (this.locked) {
-            this.queue.push([resolve, reject, lockOwner])
-         } else {
-            this.timerWarnId = setTimeout(() => logW(`${lockOwner} cant lock ${this.name}! possible deadlock detected! this.lockOwner=${this.lockOwner}`), 10 * 1000)
-            this.timerErrId = setTimeout(() => logE(`${lockOwner} cant lock ${this.name}! deadlock detected! this.lockOwner=${this.lockOwner}`), 60 * 1000)
-            this.locked = true
-            this.lockOwner = lockOwner
-            resolve()
-         }
-      })
-   }
-
-   release () {
-      if (this.queue.length > 0) {
-         const [resolve, reject, lockOwner] = this.queue.shift()
-         this.lockOwner = lockOwner
-         resolve()
-      } else {
-         clearTimeout(this.timerWarnId)
-         clearTimeout(this.timerErrId)
-         this.locked = false
-         this.lockOwner = ''
-      }
-   }
-}
-
-export { ReactiveItemHolder, ReactiveListHolder, Mutex, getReactive, updateRxDoc }
+export { ReactiveItemHolder, ReactiveListHolder, getReactive, updateRxDoc }

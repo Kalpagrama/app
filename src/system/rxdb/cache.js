@@ -2,12 +2,11 @@ import LruCache from 'lru-cache'
 import assert from 'assert'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { Mutex } from 'src/system/rxdb/reactive'
+import { MutexLocal, mutexGlobal } from 'src/system/rxdb/mutex'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
-import { isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
@@ -68,7 +67,7 @@ class Cache {
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {
-         this.mutex = new Mutex('rxdb::cache')
+         this.mutex = new MutexLocal('rxdb::cache')
          // используется для контроля места
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
@@ -106,7 +105,7 @@ class Cache {
          }
          this.debouncedDumpLru = debounce(async () => {
             const f = this.debouncedDumpLru
-            if (!isLeader()) return
+            if (!mutexGlobal.isLeader()) return
             logD(f, 'start', 'debouncedDumpLru')
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()
@@ -262,7 +261,9 @@ class Cache {
                   let notEvict = fetchRes.notEvict || (existingRxDoc ? existingRxDoc.props.notEvict : false) // если у старой сущности стоял notEvict - храним его
                   let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
                   logD(f, 'записаны в кэш')
-                  if (onFetchFunc) await onFetchFunc(existingItem, fetchRes.item)
+                  if (onFetchFunc) {
+                     await onFetchFunc(existingItem, fetchRes.item)
+                  }
                   return res
                }
                if (clientFirst && (cachedInfo && !cachedInfo.failReason)) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
@@ -297,7 +298,7 @@ class Cache {
             }
             return null
          }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, rxDoc)
          return rxDoc
       } finally {
          // this.release()

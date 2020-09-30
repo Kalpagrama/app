@@ -3,7 +3,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
-import { isLeader } from 'src/system/services'
+import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
@@ -56,6 +56,8 @@ class Lists {
 
   // вернет  список (из кэша или с сервера)
   async find (mangoQuery) {
+    const f = this.find
+    // logD(f, 'start')
     let id = makeListCacheId(mangoQuery) // запишется в cache.props.oid
     let fetchFunc = async () => {
       let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
@@ -80,7 +82,7 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(isLeader(), 'isLeader()')
+    assert(mutexGlobal.isLeader(), 'isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     const t1 = performance.now()

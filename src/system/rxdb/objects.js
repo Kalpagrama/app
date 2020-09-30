@@ -6,7 +6,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
 import set from 'lodash/set'
 import { wait } from 'src/system/utils'
-import { isLeader } from 'src/system/services'
+import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -19,6 +19,10 @@ class QueryAccumulator {
   constructor () {
     this.queueMaster = []
     this.queueSecondary = []
+    this.queueSz = (queue) => {
+      let set = new Set(queue.map(item => item.oid))
+      return set.size
+    }
   }
 
   // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
@@ -35,10 +39,12 @@ class QueryAccumulator {
         queueMaxSz = 4
       }
       assert(queue && queueMaxSz)
-      if (queue.findIndex(item => item.oid === oid) === -1) {
-        queue.push({ oid, resolve, reject })
-      }
-      while (queue.length > queueMaxSz) {
+
+      // if (queue.findIndex(item => item.oid === oid) === -1) { так нельзя!!!!! нельзя терять resolve'ры
+      //   queue.push({ oid, resolve, reject })
+      // }
+      queue.push({ oid, resolve, reject }) // сохраняем КАЖДЫЙ запрос (даже если oid повторяются)
+      while (this.queueSz(queue) > queueMaxSz) {
         let firstItem = queue.shift()
         let { oid, resolve, reject } = firstItem
         reject('queued item was evicted legally')
@@ -87,34 +93,34 @@ class QueryAccumulator {
   next () {
     // если предыдущий запрос еще выполняется, то подождем...
     if (this.queryInProgress) return
+    const masterOids = this.queueMaster.map(item => item.oid)
+    const secOids = this.queueSecondary.map(item => item.oid)
     // извлечь из очереди сдедующие объекты для запроса на сервер. Проверяем на наличие
-    let itemsForQuery = [] // элементы для следующего запроса
-    let totalQuery = [] // элементы из всех очередей (самые приоритетные - в конце)
-    for (let itemSec of this.queueSecondary) {
-      if (totalQuery.findIndex(item => item.oid === itemSec.oid) === -1) totalQuery.push(itemSec)
+    let oidsForQuery = [] // элементы для следующего запроса
+    let totalOids = [] // элементы из всех очередей (самые приоритетные - в конце)
+    for (let oid of secOids) {
+      if (!totalOids.includes(oid)) totalOids.push(oid)
     }
-    for (let itemMas of this.queueMaster) {
-      if (totalQuery.findIndex(item => item.oid === itemMas.oid) === -1) totalQuery.push(itemMas)
+    for (let oid of masterOids) {
+      if (!totalOids.includes(oid)) totalOids.push(oid)
     }
     // берем последние добавленные (самые приоритетные - в конце)
-    for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < BATCH_SZ; i--) {
-      let queuedItem = totalQuery[i]
-      if (itemsForQuery.findIndex(item => item.oid === queuedItem.oid) >= 0) continue // такой уже есть
-      itemsForQuery.push(queuedItem)
+    for (let i = totalOids.length - 1; i >= 0 && oidsForQuery.length < BATCH_SZ; i--) {
+      if (!oidsForQuery.includes(totalOids[i])) oidsForQuery.push(totalOids[i])
     }
-    if (itemsForQuery.length === 0) return
+    if (oidsForQuery.length === 0) return
     this.queryInProgress = true // Не более одного запроса в единицу времени
-    ObjectsApi.objectList(itemsForQuery.map(item => item.oid)).then(objectList => {
+    ObjectsApi.objectList(oidsForQuery).then(objectList => {
       this.queryInProgress = false
-      for (let item of itemsForQuery) {
-        let object = objectList.find(obj => obj.oid === item.oid)
+      for (let oid of oidsForQuery) {
+        let object = objectList.find(obj => obj.oid === oid)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
         if (object /* && !object.deletedAt */) {
           this.resolveItem(object)
         } else if (object && !object.deletedAt) {
-          this.rejectItem(item.oid, 'deleted')
+          this.rejectItem(oid, 'deleted')
         } else {
-          this.rejectItem(item.oid, 'notFound')
+          this.rejectItem(oid, 'notFound')
         }
       }
       this.next()
@@ -122,7 +128,7 @@ class QueryAccumulator {
       .catch(err => {
         this.queryInProgress = false
         logE('error on fetch objectList', err)
-        for (let item of itemsForQuery) this.rejectItem(item.oid, 'fetchError')
+        for (let oid of oidsForQuery) this.rejectItem(oid, 'fetchError')
       })
   }
 }
@@ -245,11 +251,14 @@ class Objects {
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
   async get (id, priority, clientFirst, force, onFetchFunc = null) {
     const fetchFunc = async () => {
-      // logD('objects::get::fetchFunc start')
+      logD('objects::get::fetchFunc start')
       let promise = this.queryAccumulator.push(getOidFromId(id), priority)
-      return await promise
+      let result = await promise
+      logD('objects::get::fetchFunc complete')
+      return result
     }
-    // logD('objects::get start')
+    const f = this.get
+    // logD(f, 'start')
     let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
@@ -258,11 +267,11 @@ class Objects {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(isLeader(), 'isLeader()')
+    assert(mutexGlobal.isLeader(), 'isLeader()')
     const f = this.processEvent
-    logD(f, 'start', isLeader())
+    logD(f, 'start', mutexGlobal.isLeader())
     const t1 = performance.now()
-    if (!isLeader()) return
+    if (!mutexGlobal.isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
         await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)

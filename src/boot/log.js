@@ -48,6 +48,7 @@ const LogSystemModulesEnum = Object.freeze({
   RXDB_GQL: 'rxdb_gql',
   RXDB_LST: 'rxdb_lst',
   RXDB_EVENT: 'rxdb_ev',
+  MUTEX: 'mutex',
   BOOT: 'boot',
   CP: 'capacitor'
 })
@@ -62,11 +63,12 @@ class Logger {
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
     let logLevel = sessionStorage.getItem('k_log_level')
-    assert(logLevel)
-    this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
+    let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))
     let logDbgFilter = sessionStorage.getItem('k_log_filter')
-    assert(logDbgFilter)
+    assert(logLevel && logFormat && logDbgFilter, '!this.logLevel && this.logFormat && this.logDbgFilter')
+    this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
     this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
+    this.store.commit('core/stateSet', ['logFormat', logFormat])
   }
 
   randomInteger(min, max) {
@@ -99,12 +101,12 @@ class Logger {
     // }
     if (!msg) return
     let func = null
-    if (msg.length && typeof msg[0] === 'function') {
+    if (this.store.state.core.logFormat.funcName && msg.length && typeof msg[0] === 'function') {
       func = msg[0]
       msg.splice(0, 1, `[${func.name || func.nameExtra}]`)
     }
     assert(module, '!module')
-    msg.splice(0, 0, `%c[${module}] ${(new Date()).toLocaleTimeString()}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
+    msg.splice(0, 0, `%c[${module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
   }
 
   showAlert(msg) {
