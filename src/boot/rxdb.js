@@ -3,7 +3,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB)
 
 import { rxdb } from 'src/system/rxdb'
-import { globalRelease, systemHardReset, systemReset } from 'src/system/services'
+import { systemReset } from 'src/system/services'
 
 export default async ({ Vue, store, router: VueRouter }) => {
   try {

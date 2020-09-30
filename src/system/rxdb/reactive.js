@@ -9,7 +9,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import merge from 'lodash/merge'
 import set from 'lodash/set'
 import { wait } from 'src/system/utils'
-import { Mutex } from 'src/system/rxdb/mutex'
+import { MutexLocal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -89,7 +89,7 @@ class ReactiveItemHolder {
       } else {
          this.id = rxDoc.id + ':::' + id++
          this.rxDoc = rxDoc
-         this.mutex = new Mutex('ReactiveItemHolder::constructor')
+         this.mutex = new MutexLocal('ReactiveItemHolder::constructor')
          this.vm = new Vue({
             data: {
                reactiveItem: rxDoc.toJSON()
@@ -209,7 +209,7 @@ class ReactiveListHolder {
             this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
             assert(this.reactiveList, '!this.reactiveList!')
          } else {
-            this.mutex = new Mutex('ReactiveListHolder::constructor')
+            this.mutex = new MutexLocal('ReactiveListHolder::constructor')
             await this.mutex.lock('ReactiveListHolder::create')
             rxQuery.reactiveListHolderMaster = this
             this.rxQuery = rxQuery

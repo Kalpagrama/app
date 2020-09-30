@@ -3,7 +3,7 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import assert from 'assert'
 import { wsSchemaLocalChanges, wsSchemaItem, schemaKeyValue } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { Mutex } from 'src/system/rxdb/mutex'
+import { MutexLocal, mutexGlobal } from 'src/system/rxdb/mutex'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
@@ -11,7 +11,6 @@ import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb, getRawIdFromId } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
-import { globalLock, globalRelease, isLeader } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
@@ -62,12 +61,12 @@ const WsCollectionEnum = Object.freeze({
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
-// Эти ф-ии сериализованы(вызываются строго друг за другом) (см Mutex)
+// Эти ф-ии сериализованы(вызываются строго друг за другом) (см MutexLocal)
 class Workspace {
    constructor (db) {
       assert(db, '!rxdb')
       this.db = db
-      this.mutex = new Mutex('rxdb::ws')
+      this.mutex = new MutexLocal('rxdb::ws')
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
       this.reactiveUser = null
       this.synchro = false
@@ -119,7 +118,7 @@ class Workspace {
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
             let onWsChangedByUser = async (id, operation) => {
                const f = onWsChangedByUser
-               if (this.ignoreWsChanges || !isLeader()) return
+               if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                await this.db.ws_changes.atomicUpsert({ id, operation })
                // logD(f, `complete. ${id}`)
@@ -175,17 +174,19 @@ class Workspace {
                if (this.reactiveUser && this.synchro) {
                   const tLoop = performance.now()
                   try {
-                     logD(f, 'next loop start...', isLeader(), this.synchroLoopWaitObj.getTimeOut())
-                     await globalLock(false, 'ws::synchroLoop') // запускаем без рекурсии (чтобы дождалась пока отработает rxdb.deInitGlobal и др)
+                     logD(f, 'next loop start...', mutexGlobal.isLeader(), this.synchroLoopWaitObj.getTimeOut())
+                     await mutexGlobal.lock('ws::synchroLoop')
+                     await rxdb.lock('ws::synchroLoop')// (чтобы дождалась пока отработает rxdb.deInit и др)
                      await this.lock('ws::synchroLoop')
                      // logD(f, 'locked')
-                     if (isLeader()) await this.synchronize()
+                     if (mutexGlobal.isLeader()) await this.synchronize()
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                   } finally {
                      this.release()
-                     globalRelease()
+                     rxdb.release()
+                     mutexGlobal.release()
                      // logD(f, 'unlocked')
                      logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }
@@ -224,7 +225,7 @@ class Workspace {
       const f = this.synchronize
       logD(f, 'start')
       const t1 = performance.now()
-      assert(isLeader(), '!isLeader')
+      assert(mutexGlobal.isLeader(), '!isLeader')
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
@@ -293,7 +294,7 @@ class Workspace {
          assert(item, '!item')
          logD(f, `start ${item.id} rev:${item.rev}`)
          const t1 = performance.now()
-         assert(isLeader(), '!isLeader')
+         assert(mutexGlobal.isLeader(), '!isLeader')
          assert(this.created, '!this.created')
          assert(item && item.id, '!item')
          assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
@@ -352,7 +353,7 @@ class Workspace {
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
-      assert(isLeader(), 'isLeader()')
+      assert(mutexGlobal.isLeader(), 'isLeader()')
       const f = this.processEvent
       logD(f, 'start')
       const t1 = performance.now()
@@ -360,7 +361,7 @@ class Workspace {
          await this.lock('rxdb::ws::processEvent')
          logD(f, 'locked')
          this.ignoreWsChanges = true
-         if (!isLeader()) return
+         if (!mutexGlobal.isLeader()) return
          logD(f, 'try apply event')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')

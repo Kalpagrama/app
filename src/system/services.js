@@ -1,6 +1,6 @@
+import {mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { AppVisibility, Notify, Platform } from 'quasar'
-import Vue from 'vue'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
@@ -10,7 +10,6 @@ import { AuthApi } from 'src/api/auth'
 import store from 'src/store/index'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/main'
-import { Mutex } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
@@ -21,76 +20,6 @@ const logME = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
 const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
-let setLeader = () => {
-   logD('change leader to ', getInstanceId())
-   localStorage.setItem('k_leader_instance_id', getInstanceId())
-}
-let isLeader = () => {
-   let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
-   if (!currentLeaderInstanceId) {
-      setLeader()
-      currentLeaderInstanceId = getInstanceId()
-   }
-   return currentLeaderInstanceId === getInstanceId()
-}
-let unloadingInProgress = false
-
-// синхронизация вкладок (globalLock следит за синхронизацией ws, очисткой rxdb, и др)
-const maxLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
-let globalLock = async (recursive = true, lockOwner = '') => {
-   const f = globalLock
-   // logMD(f, 'start', getInstanceId())
-   if (unloadingInProgress) {
-      logMW('cant globalLock (unloadingInProgress)')
-      await wait(10 * 1000)
-   }
-   const t1 = performance.now()
-   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '', lockOwner: '' }))
-   if (!recursive || getInstanceId() !== current.instanceId) {
-      while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxLockTimeFuse) {
-         assert('dt' in current && 'instanceId' in current, 'bad current!')
-         await wait(100)
-         if (Date.now() % 10 === 0) logMW(f, `${getInstanceId()}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
-         current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '', lockOwner: '' }))
-      }
-      if (current.dt) {
-         logMW(`${getInstanceId()}:${lockOwner} break globalLock by timeout(maxLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
-         localStorage.removeItem('k_global_lock')
-      }
-   }
-   localStorage.setItem('k_global_lock', JSON.stringify({ dt: Date.now(), instanceId: getInstanceId(), lockOwner: lockOwner }))
-   logMD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-}
-let globalRelease = () => {
-   const f = globalRelease
-   let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-   assert('dt' in current && 'instanceId' in current)
-   if (current.instanceId === getInstanceId()) {
-      logMD(f, 'release globalLock', getInstanceId(), current)
-      localStorage.removeItem('k_global_lock')
-   } else if (current.instanceId) logMW(f, `release foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`) // такое возможно из-за maxLockTimeFuse
-}
-// let globalLockedByMe = () => {
-//    let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-//    return current.instanceId === getInstanceId()
-// }
-
-const instanceId = sessionStorage.getItem('k_instance_id') ? sessionStorage.getItem('k_instance_id') : (Math.ceil(Math.random() * Date.now())).toString()
-sessionStorage.removeItem('k_instance_id') // контроль дублирования (при удблированиии вкладок дублируется sessionStorage) https://stackoverflow.com/questions/11896160/any-way-to-identify-browser-tab-in-javascript
-window.addEventListener('beforeunload', () => {
-   logD('on page unload')
-   unloadingInProgress = true
-   sessionStorage.setItem('k_instance_id', instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки - дублируется и instanceId))
-   let currentLock = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-   if (currentLock.instanceId === getInstanceId()) {
-      localStorage.removeItem('k_global_lock') // если что то блокировали - снимаем блокировку
-   }
-})
-
-function getInstanceId () {
-   return instanceId
-}
-
 async function initServices (store) {
    const f = initServices
    logD(f, 'start', Platform.is, process.env.MODE)
@@ -107,7 +36,7 @@ async function initServices (store) {
    initOfflineEvents(store)
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
-   let storageEventMutex = new Mutex('storageEventMutex')
+   let storageEventMutex = new MutexLocal('storageEventMutex')
    // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
    window.addEventListener('storage', async function (event) {
       try {
@@ -123,27 +52,6 @@ async function initServices (store) {
          storageEventMutex.release()
       }
    })
-   // leader detection
-   {
-      // отслеживание открыта ли вкладка
-      let vm = new Vue({
-         data: {
-            appVisibility: AppVisibility
-         },
-         watch: {
-            appVisibility: {
-               deep: true,
-               immediate: true,
-               async handler (to, from) {
-                  assert(to, '!to!')
-                  // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-                  if (to && to.appVisible && !isLeader()) setLeader()
-               }
-            }
-         }
-      })
-   }
-
    initialized = true
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
 }
@@ -217,13 +125,13 @@ async function resetLocalStorage () {
    const f = resetLocalStorage
    logD(f, 'start')
    try {
-      await globalLock(true, 'system::resetLocalStorage')
+      await mutexGlobal.lock('system::resetLocalStorage')
       for (let i = 0; i < localStorage.length; i++) {
          let key = localStorage.key(i)
          if (key.startsWith('k_')) localStorage.removeItem(key)
       }
    } finally {
-      globalRelease()
+      mutexGlobal.release()
    }
 }
 
@@ -236,7 +144,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
    resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
-      await globalLock(true, 'system::systemReset')
+      await mutexGlobal.lock('system::systemReset')
       if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
          logW('too often systemReset!')
          let hardReset = confirm('Too often system reset. \n Make app hard reset?')
@@ -261,7 +169,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    } finally {
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
-      globalRelease()
+      mutexGlobal.release()
       if (reload) window.location.reload()
    }
 }
@@ -277,7 +185,7 @@ async function systemInit () {
       return
    } // уже войдено!
    try {
-      await globalLock(true, 'system::systemInit')
+      await mutexGlobal.lock('system::systemInit')
       let userOid = localStorage.getItem('k_user_oid')
       if (userOid) { // пользователь зарегистрирован
          await rxdb.initGlobal({ userOid })
@@ -309,7 +217,7 @@ async function systemInit () {
       await systemReset(true, true, true)
       throw err
    } finally {
-      globalRelease()
+      mutexGlobal.release()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }
@@ -341,10 +249,6 @@ async function systemHardReset () {
 }
 
 export {
-   getInstanceId,
-   isLeader,
-   globalLock,
-   globalRelease,
    initServices,
    systemReset,
    shareWith,

@@ -246,7 +246,7 @@ class ListsApi {
    static async objSubscribers (oid, pagination) {
       const f = ListsApi.objSubscribers
       logD(f, 'start')
-      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, {clientFirst: false}) // clientFirst: false - из-за того, что при создании ядра
+      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, {clientFirst: false}) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
       assert(obj, '!obj')
       let subscribers = obj.subscribers || [] // внимание ! не реактивно!!!!
       assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')
