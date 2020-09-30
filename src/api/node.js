@@ -15,6 +15,11 @@ const LinkTypeEnum = Object.freeze({
    CAUSE_EFFECT: 'CAUSE_EFFECT',
    ESSENCE: 'ESSENCE'
 })
+const StatKeyEnum = Object.freeze({
+   VIEWED_TIME: 'VIEWED_TIME',
+   BOOKMARKED: 'BOOKMARKED',
+   REMADE: 'REMADE'
+})
 
 class NodeApi {
    static async nodeCategories () {
