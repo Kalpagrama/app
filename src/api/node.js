@@ -285,6 +285,10 @@ class NodeApi {
       return reactiveJoint
    }
 
+   static async updateStat(key, value){
+      return true
+   }
+
    // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
    //    switch (linkType) {
    //       case LinkTypeEnum.CAUSE_EFFECT: {

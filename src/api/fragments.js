@@ -212,7 +212,12 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     sphereFromName{...objectShortFragment}
     rate
     rateUser
-    viewCnt
+    countVotes
+    countViews
+    countJoints
+    countRemakes
+    countShares
+    countBookmarks
     author {
       oid
       type
@@ -255,7 +260,7 @@ fragment jointFragment on Joint {
   rate
   weight
   rateUser
-  viewCnt
+#  viewCnt
   childrenCnt
 }
 `
