@@ -15,7 +15,6 @@ const objectShortJointFragment = gql`
     oid
     rate
     weight
-    userVoteCnt
     rightItem{
       oid
       name
@@ -260,8 +259,6 @@ fragment jointFragment on Joint {
   rate
   weight
   rateUser
-#  viewCnt
-  childrenCnt
 }
 `
 
