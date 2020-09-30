@@ -10,7 +10,7 @@
     div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
       q-tabs(
         :value="typeId" @input="typeIdChanged"
-        no-caps dense active-color="white" align="left" switch-indicator
+        no-caps dense active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
         q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   .row.full-width

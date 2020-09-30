@@ -3,21 +3,31 @@
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
     .row.full-width.q-px-sm
-      .col
-        div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-          q-input(
-            v-model="searchString"
-            filled dark dense color="white"
-            :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-            ).full-width
-      q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/node/new')")
+      div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width.b-40
+        .col
+          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+            q-input(
+              v-model="searchString"
+              borderless dark dense color="white"
+              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+              :input-style=`{
+                paddingLeft: '10px',
+              }`
+              ).full-width
+        q-btn(
+          @click="$router.push('/workspace/node/new')"
+          round flat dense color="green" icon="add"
+          :style=`{width: '40px'}`)
     //- types
     div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
       q-tabs(
-        :value="typeId" @input="typeIdChanged"
-        dense no-caps active-color="white" align="left" switch-indicator
+        :value="typeId" @input="typeIdChanged" inline-label
+        dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+        //- q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name" :icon="t.icon ? t.icon : null").q-px-xs.br
+        q-tab(name="saved" icon="bookmark")
+        q-tab(name="drafts" label="Drafts")
+        q-tab(name="published" label="Published")
   .row.full-width
     component(:is="`type-${typeId}`" :searchString="searchString")
       template(v-slot:tint=`{item}`)
@@ -62,10 +72,11 @@ export default {
   },
   computed: {
     types () {
+      // name: this.$t('pageApp_wsNodes_saved', 'Сохраненные'),
       return [
-        {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
-        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
-        {id: 'saved', name: this.$t('pageApp_wsNodes_saved', 'Сохраненные')},
+        {id: 'saved', icon: 'bookmark'},
+        {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики'), icon: null},
+        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные'), icon: null},
       ]
     },
   },

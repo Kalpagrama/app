@@ -15,7 +15,7 @@
         :immediate="true" @reset="$refs.kl.next(0, () => {})")
         masonry(
           :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
-          :gutter="{default: 10}").full-width.q-pr-sm
+          :gutter="{default: 10}").full-width
           div(
             v-for="(i,ii) in items" :key="i.id"
             :style=`{
@@ -59,9 +59,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsContents_typeVideo',
+  props: ['searchString'],
   data () {
     return {
-      searchString: '',
       itemSelected: null,
     }
   },

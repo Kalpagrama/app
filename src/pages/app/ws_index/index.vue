@@ -14,43 +14,17 @@ q-layout(view="hHh Lpr lff")
             q-btn(round flat color="white" icon="keyboard_arrow_left")
             q-icon(name="school" size="30px" color="white").q-mr-md
             span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
-          .row.full-width.q-px-md.q-py-sm
+          .row.full-width.q-pa-sm
             router-link(
               :to="p.path"
               v-for="p in pages" :key="p.id"
               :class=`{
+                'text-grey-8': $route.name !== p.id,
+                'text-green': $route.name === p.id,
               }`
               :style=`{
                 fontSize: '1.1rem'
-              }`).text-bold.text-white.q-mr-md {{ p.name }}
-          //- q-btn(round flat color="white" icon="keyboard_arrow_left")
-          //- .col.q-px-sm
-            div(:style=`{height: '60px', borderRadius: '10px',}`).row.full-width.items-center.content-center.b-40
-              q-icon(name="school" size="30px" color="white").q-mx-md
-              span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
-              .col
-              q-btn(
-                v-if="$q.screen.width < 600"
-                flat color="white" no-caps icon-right="keyboard_arrow_down")
-                span(:style=`{fontSize: '1.1rem'}`).text-bold {{ page ? page.name : '' }}
-                q-menu
-                  div(:style=`{maxWidth: '160px'}`).row.b-40
-                    q-btn(
-                      @click="$router.push(p.path)"
-                      v-for="p in pages" :key="p.id"
-                      flat color="white" no-caps
-                      align="right"
-                      ).full-width.q-my-sm.q-pr-lg
-                      span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold {{ p.name }}
-              div(v-if="$q.screen.width >= 600").row.full-height.items-center.content-center
-                router-link(
-                  :to="p.path"
-                  v-for="p in pages" :key="p.id"
-                  :class=`{
-                  }`
-                  :style=`{
-                    fontSize: '1.1rem'
-                  }`).text-bold.text-white.q-mr-md {{ p.name }}
+              }`).text-bold.q-mr-md {{ p.name }}
       router-view
 </template>
 

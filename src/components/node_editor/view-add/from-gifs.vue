@@ -11,10 +11,10 @@
         placeholder="Search GIF"
         :debounce="600"
         ).full-width
-    .row.full-width
+    .row.full-width.q-px-md
       q-tabs(
         v-model="viewId"
-        dense active-color="white" no-caps switch-indicator
+        dense active-color="green" no-caps switch-indicator
         ).full-width.text-grey-6
         q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   //- body

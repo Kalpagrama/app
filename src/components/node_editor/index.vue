@@ -15,16 +15,16 @@
       q-btn(
         v-if="node.items.length > 0"
         flat no-caps color="white" icon-right="keyboard_arrow_down")
-        span(:style=`{fontSize: '0.9rem'}`).text-white.text-bold {{ layoutName }}
+        span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ layoutName }}
         q-menu(dark)
-          div(:style=`{width: '120px'}`).row
+          div(:style=`{width: '110px'}`).row
             q-btn(
               @click="node.layout = l.id"
               v-for="l in layouts" :key="l.id"
               v-if="l.id !== node.layout"
               flat color="white" no-caps align="left"
               ).full-width
-              span(:style=`{fontSize: '0.9rem'}`).text-white.text-bold {{ l.name }}
+              span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ l.name }}
       q-btn(round flat dense color="grey-8" icon="more_vert")
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
@@ -69,7 +69,7 @@
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
           }`
-          ).row.full-width.b-40.shadow-10.q-mb-sm
+          ).row.full-width.b-40.shadow-10.q-mb-md
           edit-item(
             :item="item" :isActive="true"
             @next="itemNext(item)"
@@ -82,7 +82,7 @@
     div(
       :style=`{
         maxWidth: 800+'px',
-        marginTop: node.items.length === 0 ? '200px' : '0px',
+        marginTop: node.items.length === 0 ? '100px' : '0px',
       }`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         div(

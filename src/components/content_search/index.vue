@@ -1,5 +1,9 @@
 <template lang="pug">
-.row.full-width
+div(
+  :style=`{
+    borderRadius: '10px', overflow: 'hidden'
+  }`
+  ).row.full-width.b-40
   q-dialog(
     v-model="contentImporterShow"
     :maximized="$q.screen.width < 800"
@@ -13,13 +17,13 @@
     q-input(
       v-model="searchStringRaw"
       ref="searchStringInput"
-      filled dense dark color="white"
-      :placeholder="$t('find_content_or_paste_url', 'Найди контент или вставь ссылку')"
+      borderless dense dark color="white"
+      :placeholder="$t('Enter URL or search', 'Введите URL или поиск')"
       :loading="searchStringLoading"
       @focus="searchStringFocused"
       @blur="searchStringBlurred"
       :input-style=`{
-        paddingRight: '0px',
+        paddingLeft: '10px',
       }`
       :style=`{
         margin: 0,
@@ -32,7 +36,7 @@
           flat dense color="white" icon="clear")
         //- q-btn(
           flat dense color="white" icon="tune")
-  content-uploader(@file="contentFile = $event, contentImporterShow = true")
+  content-uploader(@file="contentFile = $event, contentImporterShow = true").q-ml-xs
 </template>
 
 <script>

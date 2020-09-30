@@ -6,31 +6,34 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-    .row.full-width.justify-center.b-30
+.row.full-width.items-start.content-start
+  .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        slot(name="header")
         .row.full-width.q-px-sm
-          .col
-            div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-              q-input(
-                v-model="searchString"
-                filled dark dense color="white"
-                :debounce="400"
-                :placeholder="$t('wsSpheres_searchPlaceholder', 'Найти сферу')"
-                ).full-width
-                template(v-slot:append)
-                  q-btn(
-                    v-if="searchString.length > 0"
-                    flat dense color="white" icon="clear" @click="searchString = ''")
-                  //- q-btn(
-                    flat dense color="white" icon="tune")
-          q-btn(
-            @click="sphereAdd()"
-            round flat dense color="green" icon="add")
-  q-page-container
-    q-page(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
+          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
+            .col
+              div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+                q-input(
+                  v-model="searchString"
+                  borderless dark dense color="white"
+                  :debounce="400"
+                  :placeholder="$t('wsSpheres_searchPlaceholder', 'Найти сферу')"
+                  :input-style=`{
+                    paddingLeft: '10px',
+                  }`
+                  ).full-width
+                  template(v-slot:append)
+                    q-btn(
+                      v-if="searchString.length > 0"
+                      flat dense color="white" icon="clear" @click="searchString = ''")
+                    //- q-btn(
+                      flat dense color="white" icon="tune")
+            q-btn(
+              @click="sphereAdd()"
+              round flat dense color="green" icon="add"
+              :style=`{width: '40px',}`)
+  .row.full-width.items-start.content-start
+    div(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(
         :class=`{
         }`

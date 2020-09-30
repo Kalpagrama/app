@@ -6,7 +6,7 @@ q-btn(
 
 <script>
 export default {
-  name: 'nodeRenode',
+  name: 'nodeRemake',
   data () {
     return {
     }
