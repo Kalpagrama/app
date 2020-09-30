@@ -118,7 +118,8 @@ export default {
         return this.width * 0.95
       }
       else {
-        return 900 / 2
+        // return 900 / 2
+        return 900 * 0.48
       }
     },
     itemActive () {

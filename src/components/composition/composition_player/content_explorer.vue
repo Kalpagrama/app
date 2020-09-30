@@ -10,14 +10,15 @@ div(
     maxWidth: 'calc(100% - 8px)',
   }`
   v-ripple=`{color: 'white'}`
-  ).row.items-center.content-center
+  ).row.items-center.content-center.cursor-pointer
   q-btn(
     round flat color="grey-2" icon="select_all" no-caps)
   div(
     v-if="composition.outputType !== 'IMAGE'"
-    :style=`{overflow: 'hidden',}`).col.full-height.q-pr-sm.br
-    .row.fit.items-center.content-center.q-pr-sm
-      span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ content ? content.name : '' }} {{ content ? content.name : '' }}
+    :style=`{overflow: 'hidden', pointerEvents: 'none'}`).col.full-height
+    .row.fit.q-pr-sm
+      div(:style=`{overflow: 'hidden'}`).row.fit.items-center.content-center
+        span(:style=`{userSelect:'none', fontSize: '0.7rem', whiteSpace: 'nowrap'}`).text-white {{ content ? content.name : '' }} {{ content ? content.name : '' }}
 </template>
 
 <script>

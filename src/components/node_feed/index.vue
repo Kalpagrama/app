@@ -86,16 +86,19 @@
   //- footer
   .row.full-width.justify-center.items-center.content-center.q-px-sm
     div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-      q-btn(round flat color="grey-9" icon="cached").shaking
+      //- q-btn(round flat color="grey-9" icon="cached").shaking
+      node-renode(:node="node")
       small.text-grey-9 12
       .col
       q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new')").shaking
       small.text-grey-9 12
       .col
-      q-btn(round flat color="grey-9" icon="share").shaking
+      //- q-btn(round flat color="grey-9" icon="share").shaking
+      node-share(:node="node").shaking
       .col
       small.text-grey-9 12
-      q-btn(round flat color="grey-9" icon="bookmark_outline").shaking
+      node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+      //- q-btn(round flat color="grey-9" icon="bookmark_outline").shaking
       .col
       small.text-grey-9 12
       q-btn(round flat color="purple" icon="adjust").shaking
@@ -106,7 +109,10 @@
 export default {
   name: 'nodeFeed',
   components: {
-    compositionPlayer: () => import('components/composition/composition_player/index.vue')
+    compositionPlayer: () => import('components/composition/composition_player/index.vue'),
+    nodeRenode: () => import('components/node/node_renode.vue'),
+    nodeBookmark: () => import('components/node/node_bookmark.vue'),
+    nodeShare: () => import('components/node/node_share.vue')
   },
   props: ['node', 'isActive', 'isVisible'],
   data () {
