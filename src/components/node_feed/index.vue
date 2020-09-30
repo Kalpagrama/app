@@ -1,5 +1,9 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  q-dialog(
+    v-model="showStats" position="bottom"
+    )
+    node-stats(:node="node" :isActive="isActive" :isVisible="isVisible")
   div(
     :style=`{
       background: 'rgb(35,35,35)',
@@ -65,7 +69,7 @@
       node-share(:node="node").shaking
       .col
       small.text-grey-9 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
-      node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+      node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible" @done="showStats = true").shaking
       .col
       small.text-grey-9 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
       q-btn(round flat color="purple" icon="adjust").shaking
@@ -79,16 +83,24 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeRemake: () => import('components/node/node_remake.vue'),
     nodeBookmark: () => import('components/node/node_bookmark.vue'),
-    nodeShare: () => import('components/node/node_share.vue')
+    nodeShare: () => import('components/node/node_share.vue'),
+    nodeStats: () => import('components/node/node_stats/index.vue')
   },
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
+      showStats: false,
     }
   },
   computed: {
     contentName () {
       return 'Some content name'
+    }
+  },
+  methods: {
+    statsHolded () {
+      this.$log('statsHolded')
+      this.showStats = true
     }
   }
 }

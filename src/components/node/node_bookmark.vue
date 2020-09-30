@@ -79,6 +79,7 @@ export default {
       this.nodeBookmark = nodeBookmark
       this.spheresAdding = true
       this.loading = false
+      this.$emit('done')
     },
     sphereAdd (sphere) {
       this.$log('sphereAdd', sphere)
