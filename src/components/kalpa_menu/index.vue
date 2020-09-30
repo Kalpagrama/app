@@ -105,19 +105,19 @@
               v-if="showRightSide"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- create node new
-        q-btn(
-          :to="'/workspace/nodenew/new'"
+        //- q-btn(
+          :to="'/workspace/node/new'"
           flat color="green" no-caps align="left" icon="amp_stories"
           :style=`{height: '60px', paddingLeft: '2px'}`
           ).full-width
         //- create link
-        q-btn(
+        //- q-btn(
           :to="'/workspace/link/new'"
           flat color="green" no-caps align="left" icon="link"
           :style=`{height: '60px', paddingLeft: '2px'}`
           ).full-width
         //- create link
-        q-btn(
+        //- q-btn(
           :to="'/link-create'"
           flat color="red" no-caps align="left" icon="link"
           :style=`{height: '60px', paddingLeft: '2px'}`

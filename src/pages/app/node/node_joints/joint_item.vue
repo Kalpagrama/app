@@ -4,7 +4,7 @@ div(
   ).row.full-width.items-between
   //- left side with content: node, sphere, content, user
   .col.full-height
-    node-lite(
+    node-mini(
       v-if="item && item.type === 'NODE'"
       :isActive="isActive" :isVisible="isVisible"
       :node="item"
@@ -19,9 +19,9 @@ div(
       ).row.full-width.q-pa-sm.b-40
       span.text-white.q-ml-sm {{ item.name }}
   //- right padding for real
-  div(:style=`{width: '70px',}`).row.full-height.justify-center
+  //- div(:style=`{width: '70px',}`).row.full-height.justify-center
   //- right side for line and voting for the joint...
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
       width: '70px', minHeight: '100px',

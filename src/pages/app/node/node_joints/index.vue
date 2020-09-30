@@ -1,13 +1,18 @@
 <template lang="pug">
 kalpa-loader(
-  v-if="true" :query="queryBySphere" :limit="3" v-slot=`{items, next}`
+  :immediate="true"
+  :query="queryBySphere" :limit="3" v-slot=`{items, next}`
   @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
-  list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-    q-infinite-scroll(ref="qis" @load="next" :offset="500")
-    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      joint-item(
-        :joint="item" :node="node"
-        :isActive="isActive" :isVisible="isVisible")
+  masonry(
+    :cols="2"
+    :gutter="{default: 10}").full-width.q-pr-sm
+    //- list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+    //- q-infinite-scroll(ref="qis" @load="next" :offset="500")
+      //- template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+    joint-item(
+      v-for="(item,ii) in items" :key="item.oid"
+      :joint="item" :node="node"
+      :isActive="false" :isVisible="false").q-mb-md
 </template>
 
 <script>

@@ -13,8 +13,13 @@ q-layout(view="hHh Lpr lff")
               :oid="user.oid")
         .row.full-width.q-px-md
           q-tabs(
-            no-caps dense active-color="white" align="left" :switch-indicator="true").full-width.text-grey-8
-            q-route-tab(v-for="t in pages" :key="t.id" :to="t.id" :name="t.id" :label="t.name")
+            no-caps active-color="green" align="left"
+            stretch :breakpoint="100" inline-label
+            :switch-indicator="true").full-width.text-grey-8
+            q-route-tab(
+              v-for="t in pages" :key="t.id"
+              inline-label
+              :to="t.id" :name="t.id" :label="$q.screen.width > 600 ? t.name : null" :icon="t.icon").q-px-sm
   q-page-container
     router-view(:oid="$route.params.oid")
 </template>
@@ -41,11 +46,11 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'created', name: this.$t('Nodes', 'Ядра')},
-        {id: 'linked', name: this.$t('Links', 'Связи')},
-        {id: 'voted', name: this.$t('Votes', 'Голоса')},
-        {id: 'following', name: this.$t('Subscriptions', 'Подписки')},
-        {id: 'followers', name: this.$t('Subscribers', 'Подписчики')},
+        {id: 'created', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
+        {id: 'linked', name: this.$t('Links', 'Связи'), icon: 'link'},
+        {id: 'voted', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
+        {id: 'following', name: this.$t('Subscriptions', 'Подписки'), icon: 'rss_feed'},
+        {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},
       ]
     },
     itsMe () {

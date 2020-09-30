@@ -4,7 +4,9 @@ q-page(
   }`
   ).row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
-    kalpa-loader(:query="nodesQuery" @items="nodesChanged")
+    kalpa-loader(
+      :immediate="true"
+      :query="nodesQuery" @items="nodesChanged")
       template(v-slot=`{items, next}`)
         list-masonry(:items="items" :class=`{}`).q-pt-md
           template(v-slot:item=`{item}`)
@@ -20,7 +22,8 @@ q-page(
                   borderRadius: '10px', overflow: 'hidden',
                 }`
                 ).row.full-width.items-start.content-start.b-40
-                node-lite(
+                node-mini(:node="item" :isActive="false" :isVisible="false")
+                //- node-lite(
                   :node="item"
                   :showEssence="false"
                   :showAuthor="false"
@@ -30,7 +33,7 @@ q-page(
                     borderRadius: '10px', overflow: 'hidden',
                   }`)
                 //- mini essence
-                div(
+                //- div(
                   :style=`{
                     position: 'relative', zIndex: 100,
                     borderRadius: '10px', overflow: 'hidden',

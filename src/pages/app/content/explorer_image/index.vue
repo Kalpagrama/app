@@ -5,34 +5,43 @@ q-layout(view="hHh Lpr lff")
       //- header
       .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
-          .row.full-width.items-start.content-start
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('out', ['back'])")
+          div(
+            v-if="contentKalpa"
+            :style=`{
+              height: '60px',
+              borderRadius: '10px', overflow: 'hidden',
+            }`).row.full-width.items-center.content-center.b-40.q-px-sm
+            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$rotuer.back()")
+            q-icon(name="select_all" color="white" size="30px").q-mr-sm
             .col
-              div(:style=`{borderRadius: '10px',}`
-                ).row.full-width.items-center.content-center.justify-between.b-40
-                q-icon(name="select_all" color="white" size="30px").q-mx-sm
-                div(:style=`{overflowX: 'auto'}`).col
-                  span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-                q-btn(round flat color="grey-8" icon="more_vert")
-              div(:style=`{paddingLeft: '44px',}`).row.full-width.justify-start
-                q-tabs(
-                  v-model="viewId"
-                  no-caps dense active-color="white" switch-indicator).text-grey-8
-                  q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+              span(:style=`{fontSize: '1rem', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+            kalpa-follow(
+              v-if="contentKalpa"
+              :oid="contentKalpa.oid")
+            q-btn(
+              @click="contentBookmarkCreate()"
+              round flat
+              :color="contentBookmark ? 'green' : 'white'"
+              :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
       //- body
       .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
           div(
             :style=`{
-              position: 'relative', height: '500px',
+              position: 'relative',
               borderRadius: '10px', overflow: 'hidden',
             }`).row.full-width.b-40
             img(
-              :src="contentKalpa.urlOriginal" draggable="false"
+              :src="contentKalpa.url" draggable="false"
               :style=`{
                 objectFit: 'contain'
               }`).fit
-          //- small.text-white {{ contentKalpa }}
+          .row.full-width
+            .row.full-width.justify-start.q-px-md
+              q-tabs(
+                v-model="viewId"
+                no-caps dense active-color="green" switch-indicator).full-width.text-grey-8
+                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
         //- view dynamic component
       component(
         :is="`view-${viewId}`"
@@ -52,7 +61,7 @@ import viewNodes from './view_nodes/index.vue'
 export default {
   name: 'contentExplorerImage',
   components: {viewDetails, viewNodes},
-  props: ['contentKalpa'],
+  props: ['contentKalpa', 'query'],
   data () {
     return {
       viewId: 'fragments',
@@ -63,14 +72,14 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'details', name: this.$t('wsContentExplorer_image_viewDetails_title', 'Детали')},
-        {id: 'fragments', name: this.$t('wsContentExplorer_image_viewDrafts_title', 'Фрагменты')},
-        {id: 'nodes', name: this.$t('wsContentExplorer_image_viewNodes_title', 'Ядра')},
+        {id: 'details', name: 'Детали'},
+        {id: 'fragments', name: 'Мои ядра'},
+        {id: 'nodes', name: 'Все ядра'},
       ]
     }
   },
   watch: {
-    '$route.query.viewId': {
+    query: {
       immediate: true,
       async handler (to, from) {
         // find bookmark
@@ -79,6 +88,26 @@ export default {
         if (contentBookmark) this.contentBookmark = contentBookmark
       }
     }
+  },
+  methods: {
+    async contentBookmarkCreate () {
+      this.$log('contentBookmarkCreate')
+      let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+      if (!contentBookmark) {
+        let contentBookmarkInput = {
+          oid: this.contentKalpa.oid,
+          name: this.contentKalpa.name,
+          thumbUrl: this.contentKalpa.thumbUrl,
+          type: 'CONTENT',
+          contentType: this.contentKalpa.type,
+          wsItemType: 'WS_BOOKMARK',
+          spheres: []
+        }
+        contentBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, contentBookmarkInput)
+      }
+      this.$log('contentBookmark', contentBookmark)
+      this.contentBookmark = contentBookmark
+    },
   }
 }
 </script>

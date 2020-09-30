@@ -77,7 +77,8 @@ module.exports = function (ctx) {
         'BottomSheet',
         'AppFullscreen',
         'AddressbarColor',
-        'AppVisibility'
+        'AppVisibility',
+        'Dialog'
       ]
     },
     build: {

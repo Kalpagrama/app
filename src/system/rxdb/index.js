@@ -527,17 +527,17 @@ class RxDBWrapper {
    async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
-      // logD(f, 'start', rawId)
+      // logW(f, 'start', rxCollectionEnum, rawId)
       if (rawId) {
          assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-         assert(!rawId.includes('::'), '')
-         assert(!id)
+         assert(!rawId.includes('::'), '!rawId.includes(::)')
+         assert(!id, 'NO !id')
          id = makeId(rxCollectionEnum, rawId)
       } else {
-         assert(!rxCollectionEnum)
+         assert(!rxCollectionEnum, '!rxCollectionEnum')
       }
-      assert(id)
-      assert(id.includes('::'))
+      assert(id, 'GOT id')
+      assert(id.includes('::'), 'id.includes(::)')
       let reactiveItem
       if (!force) { // вернем из быстрого кэша реактивных элементов
          let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)

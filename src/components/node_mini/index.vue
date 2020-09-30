@@ -6,7 +6,7 @@
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
     //- header: author, createdAt
-    .row.full-width.items-center.content-center.q-pa-sm
+    //- .row.full-width.items-center.content-center.q-pa-sm
       q-btn(
         :to="'/user/'+node.author.oid"
         flat color="white" dense no-caps
@@ -52,18 +52,18 @@
     router-link(
       :to="'/node/'+node.oid"
       ).row.full-width.justify-center.cursor-pointer.q-pa-md
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+      span(:style=`{fontSize: '1rem'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
   //- footer
-  node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
+  //- node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 
 export default {
-  name: 'nodeFeed',
+  name: 'nodeMini',
   components: {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
-    nodeActions: () => import('components/node/node_actions.vue')
+    // nodeActions: () => import('components/node/node_actions.vue')
   },
   props: ['node', 'isActive', 'isVisible'],
   data () {

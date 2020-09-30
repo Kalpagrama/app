@@ -52,7 +52,8 @@ const WsItemTypeEnum = Object.freeze({
    WS_CONTENT: 'WS_CONTENT',
    WS_CHAIN: 'WS_CHAIN',
    WS_SPHERE: 'WS_SPHERE',
-   WS_BOOKMARK: 'WS_BOOKMARK'
+   WS_BOOKMARK: 'WS_BOOKMARK',
+   WS_JOINT: 'WS_JOINT'
 })
 const WsCollectionEnum = Object.freeze({
    ...WsItemTypeEnum,

@@ -10,7 +10,7 @@
     v-observe-visibility=`{
       callback: indexMiddleHandler,
       intersection: {
-        rootMargin: '-50% 0px'
+        rootMargin: rootMargin
       }
     }`
     ).row.full-width.items-start.content-start
@@ -36,6 +36,7 @@ export default {
       }
     },
     itemStyles: {type: Object, default () { return {} }},
+    rootMargin: {type: String, default () { return '-50% 0px' }}
   },
   data () {
     return {

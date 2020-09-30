@@ -52,8 +52,37 @@ export default {
     }
   },
   methods: {
-    nodeDelete () {
+    async nodeDelete () {
       this.$log('nodeDelete')
+      this.$q.dialog({
+        dark: true,
+        title: 'Удалить ядро ?!',
+        message: 'Это нельзя отменить',
+        persistent: true,
+        'content-style': {
+          borderRadius: '10px',
+          overflow: 'hidden',
+        },
+        ok: {
+          flat: false,
+          color: 'green',
+          label: 'Удалить',
+          'no-caps': true
+        },
+        cancel: {
+          flat: true,
+          color: 'green',
+          label: 'Отмена',
+          'no-caps': true
+        },
+      }).onOk(async () => {
+        await this.$rxdb.remove(this.node.id)
+        this.$router.push('/workspace/nodes/drafts').catch(e => e)
+      }).onCancel(() => {
+        // console.log('>>>> Cancel')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
     },
     publishCheck () {
       this.$log('publishCheck')

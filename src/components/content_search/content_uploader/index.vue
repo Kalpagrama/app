@@ -4,6 +4,7 @@
     @click.native="start()"
     round flat dense color="green" icon="add"
     :style=`{
+      width: '40px',
     }`).full-height
   input(
     ref="inputFile" type="file"

@@ -28,9 +28,9 @@
                       borderRadius: '0 0 10px 10px', overflow: 'hidden',
                     }`
                     ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(i,ii)")
+                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(item,ii)")
                     .col
-                    q-btn(round flat dense color="white" icon="edit" @click="itemEdit(i,ii)")
+                    q-btn(round flat dense color="white" icon="edit" @click="itemEdit(item,ii)")
               slot(name="tint" :item="item")
 </template>
 
