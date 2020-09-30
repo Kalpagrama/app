@@ -2,15 +2,14 @@
 div(
   :style=`{
     position: 'relative',
-    height: options.isFit ? '100%' : 'auto',
+    height: options.height,
     }`
   ).row.full-width.items-start.content-start
   //- content explorer btn
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     content-explorer(
       v-if="isActive"
-      :composition="composition"
-      :options="options")
+      :composition="composition")
   //- video spinner
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -41,8 +40,8 @@ div(
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      height: options.isFit ? '100%' : 'auto',
-      objectFit: options.isFit ? 'contain' : 'contain'
+      height: options.height,
+      objectFit: options.objectFit,
     }`
     ).full-width
   //- video wrapper
@@ -65,18 +64,19 @@ div(
       :loop="options.loop"
       playsinline
       :style=`{
-        objectFit: 'contain',
+        objectFit: options.objectFit,
         borderRadius: '10px', overflow: 'hidden',
       }`
       ).fit
 </template>
 
 <script>
-import contentExplorer from './content_explorer.vue'
 
 export default {
   name: 'compositionPlayer_playerVideo',
-  components: {contentExplorer},
+  components: {
+    contentExplorer: () => import('../content_explorer.vue')
+  },
   props: {
     isVisible: {type: Boolean},
     isActive: {type: Boolean},
@@ -85,7 +85,8 @@ export default {
       type: Object,
       default () {
         return {
-          isFit: false,
+          height: 'auto',
+          objectFit: 'cover',
           loop: true,
         }
       }

@@ -55,6 +55,7 @@ export default {
       this.itemsPage = 0
       this.itemsPageToken = null
       this.$emit('reset')
+      this.next(0, () => {})
     },
     async next (i, done) {
       this.$log('next', i, this.items.length < this.itemsTotal)

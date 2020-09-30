@@ -4,27 +4,26 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
     div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-pb-sm
       slot(name="header")
       div(v-if="!$slots.header" :style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
-        q-btn(
-          @click="$emit('out', ['back'])"
-          round flat color="white" icon="keyboard_arrow_left")
-        .col.full-height.q-mx-xs
-          div(
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`
-            ).row.fit.items-center.content-center.b-40.q-pa-sm
-            q-icon(name="select_all" color="white" size="30px").q-mx-xs
-            div(:style=`{overflowX: 'auto'}`).col.q-mr-md
-              //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-              span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
-            //- q-btn(
-              @click="viewId = 'details'"
-              round flat color="white" icon="info")
-            kalpa-follow(
-              v-if="contentKalpa"
-              :oid="contentKalpa.oid")
-        q-btn(
-          @click="contentBookmarkCreate()"
-          round flat color="white" :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
-      div(:style=`{paddingLeft: '66px', paddingRight: '60px',}`).row.full-width.justify-start
+        div(
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`
+          ).row.fit.items-center.content-center.b-40.q-pa-sm
+          q-btn(
+            @click="$emit('out', ['back'])"
+            round flat color="white" icon="keyboard_arrow_left")
+          q-icon(name="select_all" color="white" size="30px").q-mx-xs
+          div(:style=`{overflowX: 'auto'}`).col.q-mr-md
+            //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
+            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
+          //- q-btn(
+            @click="viewId = 'details'"
+            round flat color="white" icon="info")
+          kalpa-follow(
+            v-if="contentKalpa"
+            :oid="contentKalpa.oid")
+          q-btn(
+            @click="contentBookmarkCreate()"
+            round flat color="white" :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
+      div(:style=`{paddingLeft: '16px', paddingRight: '16px',}`).row.full-width.justify-start
         q-tabs(
           v-model="viewId"
           no-caps dense active-color="white" switch-indicator).full-width.text-grey-8
@@ -76,7 +75,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
               @click="nodeCreate()"
               round push color="green" dense icon="add"
               :style=`{borderRadius: '50%'}`)
-  div(
+  //- div(
     v-if="player && player.isFullscreen"
     :style=`{
       position: 'fixed', zIndex: 9999, right: '0px', top: '70px',

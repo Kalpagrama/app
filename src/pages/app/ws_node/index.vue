@@ -1,5 +1,5 @@
 <template lang="pug">
-ws-node-editor(
+node-editor(
   v-if="node"
   :node="node"
   :title="title"
@@ -12,7 +12,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_wsNode',
-  components: {},
+  components: {
+    nodeEditor: () => import('components/node_editor/index.vue')
+  },
   meta () {
     return {
       title: this.node ? this.node.name : ''
@@ -27,7 +29,7 @@ export default {
         items: [],
         spheres: [],
         category: 'FUN',
-        layout: 'PIP',
+        layout: 'SLIDER',
         wsItemType: 'WS_NODE',
         thumbUrl: '',
       }
@@ -40,7 +42,7 @@ export default {
         this.$log('id TO', to)
         if (to) {
           if (to === 'new') {
-            this.$q.notify({type: 'positive', position: 'top', message: 'Creating new node'})
+            // this.$q.notify({type: 'positive', position: 'top', message: 'Creating new node'})
             this.node = JSON.parse(JSON.stringify(this.nodeNew))
             var unwatch = this.$watch(
               'node',

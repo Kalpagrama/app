@@ -13,7 +13,9 @@ q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
         @click="feedCreateStart()"
         round flat color="green" icon="add")
     .row.full-width.items-start.contents-start.q-pt-sm
-      kalpa-loader(:query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
+      kalpa-loader(
+        :immediate="true"
+        :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
         .row.full-width.items-start.content-start.q-px-sm
           router-link(
             v-for="(f,fi) in items" :key="f.id"

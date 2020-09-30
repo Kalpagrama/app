@@ -12,8 +12,10 @@ q-layout(view="hHh Lpr lff")
             @click="$router.push('/settings/feeds')"
             round flat color="white" icon="settings")
         //- feeds tabs
-        .row.full-width
-          kalpa-loader(:query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feedsLoaded")
+        div(:style=`{paddingLeft: '16px', paddingRight: '16px',}`).row.full-width
+          kalpa-loader(
+            :immediate="true"
+            :query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feedsLoaded")
             q-tabs(
               :value="$route.params.id"
               @input="$router.push({params: {id: $event}})"
@@ -23,7 +25,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingBottom: '0px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width
-        //- kalpa-loader(
+        kalpa-loader(
           v-if="$route.params.id && subscriptions.length > 0"
           :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
           list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
@@ -75,10 +77,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
+          // populateObjects: true,
           oidSphere: this.$store.getters.currentUser().oid,
-          subscription: {$in: this.subscriptions}
+          // subscription: {$in: this.subscriptions}
         },
-        populateObjects: false,
+        // populateObjects: true,
       }
     }
   },

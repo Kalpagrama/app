@@ -71,7 +71,9 @@ q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
               placeholder="Find subscription"
               ).full-width
         .col.full-width.scroll
-          kalpa-loader(:query="querySubscriptions" :limit="1000" v-slot=`{items,next}`)
+          kalpa-loader(
+            :immediate="true"
+            :query="querySubscriptions" :limit="1000" v-slot=`{items,next}`)
             .row.full-width.items-start.content-start.q-pt-md
               div(
                 v-for="(s,si) in items" :key="s.oid"

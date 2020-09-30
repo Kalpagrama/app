@@ -10,7 +10,7 @@
             filled dark dense color="white"
             :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
             ).full-width
-      q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/nodenew/new')")
+      q-btn(round flat dense color="green" icon="add" @click="$router.push('/workspace/node/new')")
     //- types
     div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
       q-tabs(

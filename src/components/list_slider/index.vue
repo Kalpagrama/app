@@ -93,7 +93,7 @@ export default {
       return this.items.reduce((acc, item, i) => {
         // got item before...
         if (acc[i - 1]) {
-          this.$log('item META', i, acc[i - 1].from)
+          // this.$log('item META', i, acc[i - 1].from)
           acc.push({
             from: acc[i - 1].to,
             to: acc[i - 1].to + this.itemSide,
@@ -102,7 +102,7 @@ export default {
         }
         // first item!
         else {
-          this.$log('first item !!!')
+          // this.$log('first item !!!')
           acc.push({
             from: this.itemsPadding,
             to: this.itemsPadding + this.itemSide,
@@ -113,9 +113,9 @@ export default {
       }, [])
     },
     itemSide () {
-      if (this.width <= 900) {
+      if (this.width <= 600) {
         // return this.width * 0.48
-        return this.width * 0.9
+        return this.width * 0.95
       }
       else {
         return 900 / 2
@@ -135,7 +135,7 @@ export default {
   },
   methods: {
     itemGo (item, ii) {
-      this.$log('itemGo', item, ii)
+      // this.$log('itemGo', item, ii)
       let left = item.from - this.itemsPadding
       this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollLeft: left})
     },
@@ -159,8 +159,8 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
-    this.itemsScrollToCenter()
+    // this.$log('mounted')
+    // this.itemsScrollToCenter()
   }
 }
 </script>

@@ -42,7 +42,6 @@ const routes = [
             name: 'home',
             path: 'home/:id?',
             component: () => import('pages/app/feeds/index.vue'),
-            // component: () => import('components/kalpa_linker/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          {
