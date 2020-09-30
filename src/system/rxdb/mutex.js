@@ -38,7 +38,8 @@ class MutexLocal {
             this.timerWarnId = setTimeout(() => logW(`${lockOwner} ${this.name} possible deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
             this.timerErrId = setTimeout(() => {
                logE(`${lockOwner} ${this.name} deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
-               for (let { reject } of this.queue) reject(new Error('deadlock detected! reject all locks'))
+               reject(new Error('deadlock detected! reject all locks')) // current
+               for (let { reject } of this.queue) reject(new Error('deadlock detected! reject all locks')) // queued
                this.locked = false
                this.queue = []
             }, 60 * 1000)
@@ -184,9 +185,25 @@ class MutexGlobal {
 
 const mutexGlobal = new MutexGlobal()
 
-async function atomicLock (mutexList, lockOwner) {
-   assert(mutexList && Array.isArray(mutexList) && lockOwner)
-   let sortedList = mutexList.sort()
-}
+//
+// class Locker{
+//    constructor (mutexArray) {
+//       let mutexes = []
+//       for (let mutexName of mutexArray){
+//          assert(mutexName.in('rxdb', '1global', 'rxdb_cache'))
+//          let mutex = mutexes[mutexName]
+//
+//       }
+//       mutexArray = mutexArray.sort()
+//    }
+//
+//    async lock (){
+//
+//    }
+//
+//    release(){
+//
+//    }
+// }
 
 export { MutexLocal, mutexGlobal }
