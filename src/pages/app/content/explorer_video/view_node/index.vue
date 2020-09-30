@@ -4,7 +4,7 @@ div(
   div(
     :style=`{
       maxWidth: $store.state.ui.pageMaxWidth+'px',
-    }`).row.full-width
+    }`).row.full-width.q-px-sm
     //- editor wrapper
     div(
       :style=`{
@@ -17,7 +17,11 @@ div(
           :player="player" :composition="item"
           :contentKalpa="contentKalpa")
       //- node.name/node.sphers editors wrapper
-      div(:style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.q-pt-sm
+      div(
+        :style=`{
+          paddingLeft: $q.screen.width > 800 ? '40px' : '8px',
+          paddingRight: $q.screen.width > 800 ? '40px' : '8px',
+        }`).row.full-width.q-pt-sm
         //- node.name editor
         div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100,}`).row.full-width
           q-input(
@@ -30,7 +34,7 @@ div(
             }`).full-width
         ws-sphere-editor(:item="node").q-py-sm
     //- footer: actions close, createNode
-    .row.full-width.q-pa-md
+    .row.full-width.q-py-sm
       q-btn(flat color="white" no-caps @click="$emit('close')").b-40 {{$t('close', 'Закрыть')}}
       .col
       slot(name="nodeAction" :node="node")

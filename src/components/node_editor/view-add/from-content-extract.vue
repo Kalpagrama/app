@@ -2,16 +2,16 @@
 content-explorer(:oid="contentBookmark.oid" :query=`{viewid: 'nodes-mine'}`).b-30
   template(v-slot:header)
     div(:style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
-      q-btn(
-        @click="$emit('close')"
-        round flat color="white" icon="keyboard_arrow_left")
-      .col.full-height.q-mx-xs
+      .col.full-height
         div(
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
           ).row.fit.items-center.content-center.b-40.q-pa-sm
-          q-icon(name="select_all" color="white" size="30px").q-mx-xs
+          q-btn(
+            @click="$emit('close')"
+            round flat color="white" icon="keyboard_arrow_left")
+          q-icon(name="select_all" color="white" size="30px").q-mr-sm
           div(:style=`{overflowX: 'auto'}`).col.q-mr-md
-            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Pick node
+            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Content extractor
   //- from view-node
   template(v-slot:nodeAction=`{node}`)
     q-btn(color="green" no-caps @click="nodePick(node)") Pick node
