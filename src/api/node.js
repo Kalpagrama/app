@@ -209,13 +209,13 @@ class NodeApi {
       return rate
    }
 
-   static async nodeDelete (oid) {
+   static async unPublish (oid) {
       logD('nodeDelete start')
       assert.ok(oid)
-      let { data: { deleteObject } } = await apollo.clients.api.mutate({
+      let { data: { unPublish } } = await apollo.clients.api.mutate({
          mutation: gql`
-             mutation nodeDelete($oid: OID!) {
-                 deleteObject (oid: $oid)
+             mutation unPublish($oid: OID!) {
+                 unPublish (oid: $oid)
              }
          `,
          variables: {
@@ -223,7 +223,7 @@ class NodeApi {
          }
       })
       logD('nodeDelete dones')
-      return deleteObject
+      return unPublish
    }
 
    static async nodeCreate (node) {
