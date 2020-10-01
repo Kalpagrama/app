@@ -10,15 +10,13 @@ const objectShortFragment = gql`
   }
 `
 
-const objectShortJointFragment = gql`
-  fragment objectShortJointFragment on ObjectShortJoint {
-    oid
+const objectShortStatFragment = gql`  ${objectShortFragment}
+  fragment objectShortStatFragment on ObjectShortStat {
+    ...objectShortFragment
     rate
     weight
-    rightItem{
-      oid
-      name
-    }
+    date
+    
   }
 `
 
@@ -348,6 +346,7 @@ const fragments = {
   userFragment,
   dummyUserFragment,
   objectShortFragment,
+  objectShortStatFragment,
   nodeFragment,
   sphereFragment,
   findResultFragment

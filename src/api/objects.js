@@ -104,22 +104,23 @@ class ObjectsApi {
   //   return sphere
   // }
 
-  static async votes (oid) {
-    const f = this.votes
+  static async stat (oid) {
+    const f = this.stat
     logD(f, 'start')
     const t1 = performance.now()
     assert(oid, '!oid')
-    let { data: { votes } } = await apollo.clients.api.query({
-      query: gql`
+    let { data: { objectStat } } = await apollo.clients.api.query({
+      query: gql` ${fragments.objectShortStatFragment}
         ${fragments.objectShortFragment}
-        query votes ($oid: OID!) {
-          votes (oid: $oid){
-            user{...objectShortFragment}
-            history{
-              date
-              rate
-              weight
-            }
+        query objectStat ($oid: OID!) {
+          objectStat (oid: $oid){
+            votes{...objectShortStatFragment}
+            views{...objectShortStatFragment}
+            joints{...objectShortStatFragment}
+            researches{...objectShortStatFragment}
+            bookmarks{...objectShortStatFragment}
+            shares{...objectShortStatFragment}
+            remakes{...objectShortStatFragment}
           }
         }
       `,
@@ -128,7 +129,7 @@ class ObjectsApi {
       }
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-    return votes
+    return objectStat
   }
 }
 

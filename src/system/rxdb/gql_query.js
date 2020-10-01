@@ -51,11 +51,11 @@ class GqlQueries {
                }
             }
             break
-         case 'votes' :
+         case 'objectStat' :
             assert(params.oid, '!params.oid')
             fetchFunc = async () => {
                return {
-                  item: await ObjectsApi.votes(params.oid),
+                  item: await ObjectsApi.stat(params.oid),
                   actualAge: 'hour'
                }
             }
