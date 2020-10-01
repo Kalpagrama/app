@@ -426,10 +426,32 @@ class RxDBWrapper {
          let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
          let objectShortItemsPrefetch = objectShortList.items.slice(nextIndx, nextIndx + 3) // упреждающее чтение
          if (populateObjects) {
-            // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-            result.items = await Promise.all(objectShortItemsLimit.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })))
-            objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true, priority: 1 })) // в фоне делаем упреждающее чтение
-            result.items = result.items.filter(obj => !!obj)
+            if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
+               // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+               const itemsFull = await Promise.all(
+                  objectShortItemsLimit.reduce((accumulator, { object, subject }) => {
+                     accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
+                     // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
+                     return accumulator
+                  }, [])
+               )
+               result.items = cloneDeep(objectShortItemsLimit)
+               for (let item of result.items){
+                  item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
+               }
+            logD('asdasdas', result.items)
+            } else {
+               // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+               result.items = await Promise.all(objectShortItemsLimit.map(objShort => {
+                  logD('objShort=', objShort)
+                  return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+               }))
+               objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
+                  clientFirst: true,
+                  priority: 1
+               })) // в фоне делаем упреждающее чтение
+               result.items = result.items.filter(obj => !!obj)
+            }
          } else result.items = objectShortItemsLimit
          result.count = result.items.length
          result.totalCount = objectShortList.items.length
