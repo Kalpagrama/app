@@ -84,28 +84,53 @@
         maxWidth: 800+'px',
         marginTop: node.items.length === 0 ? '100px' : '0px',
       }`).row.full-width.items-start.content-start
-      .row.full-width.justify-center
-        div(
+      //- div(
+        :style=`{
+          position: 'relative',
+          borderRadius: '10px', overflow: 'hidden',
+          background: 'rgb(35,35,35)'
+        }`).row.full-width.justify-center
+        //- div(
           @click="viewId = v.id"
           v-for="v in views" :key="v.id"
           :style=`{
             position: 'relative',
-            width: '50px', height: '40px',
+            //- width: '50px',
+            height: '50px',
             background: v.id === viewId ? 'rgb(35,35,35)' : 'none',
             borderRadius: '10px 10px 0 0',
           }`
           v-ripple=`{color: 'green'}`
-          ).row.items-center.content-center.justify-center.cursor-pointer
-          q-icon(:name="v.icon" :color="v.id === viewId ? 'green' : 'grey-6'" size="30px")
+          ).col
+          .row.fit.items-center.content-center.justify-center.cursor-pointer
+            span(
+              :class=`{
+                'text-green': viewId === v.id,
+                'text-grey-8': viewId !== v.id,
+              }`) {{ v.name }}
+            q-icon(:name="v.icon" :color="v.id === viewId ? 'green' : 'grey-6'" size="30px")
+        //- .row.full-width.justify-end.q-pa-sm
+        //- q-btn(
+          color="green" no-caps @click="viewId = 'publish'"
+          :style=`{
+            position: 'absolute', zIndex: 2000, right: '8px', top: '8px',
+          }`).br Publish
       component(
         :is="`view-${viewId}`"
         :node="node"
         :style=`{
+          position: 'relative',
           borderRadius: '10px', overflow: 'hidden',
           background: 'rgb(35,35,35)',
           minHeight: '500px',
         }`
+        @viewId="viewId = $event"
         @item="itemFound")
+          //- q-btn(
+            color="green" no-caps @click="viewId = 'publish'"
+            :style=`{
+              position: 'absolute', zIndex: 2000, right: '8px', top: '8px',
+            }`).bg Publish
 </template>
 
 <script>
@@ -138,8 +163,8 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'add', icon: 'add'},
-        {id: 'publish', icon: 'check'}
+        {id: 'add', name: 'Образы', icon: 'add'},
+        {id: 'publish', name: 'Publish', icon: 'check'}
       ]
     },
     layoutName () {

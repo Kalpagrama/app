@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.justify-center.items-start.content-start.q-pt-md
-  .row.full-width.q-px-md
+  div(:style=`{position: 'relative',}`).row.full-width.q-px-md
     q-tabs(
       v-model="fromId"
       active-color="green" no-caps
@@ -14,6 +14,12 @@
           fontWeight: 'bold'
         }`)
         span(:style=`{fontSize: '1rem'}`).text-bold {{v.name}}
+    q-btn(
+      @click="$emit('viewId', 'publish')"
+      color="green" no-caps icon-right="keyboard_arrow_right"
+      :style=`{
+        position: 'absolute', zIndex: 2000, right: '8px', top: '0px',
+      }`).q-px-md Далее
   //- from component
   component(
     :is="`from-${fromId}`"

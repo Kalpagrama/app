@@ -1,6 +1,12 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center.q-pt-md.q-px-sm
+.row.full-width.items-start.content-start.justify-center.q-px-sm
   div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-px-sm
+    .row.full-width.q-py-sm
+      q-btn(
+        @click="$emit('viewId', 'add')"
+        flat dense color="grey-2" no-caps icon="keyboard_arrow_left"
+        :style=`{
+        }`).q-pr-sm.q-py-sm вернуться к образам
     .row.full-width
       edit-description(
         :value="node.description" @input="node.description = $event"
