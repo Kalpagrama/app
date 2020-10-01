@@ -18,6 +18,7 @@ const LinkTypeEnum = Object.freeze({
 const StatKeyEnum = Object.freeze({
    VIEWED_TIME: 'VIEWED_TIME',
    BOOKMARKED: 'BOOKMARKED',
+   SHARED: 'SHARED',
    REMADE: 'REMADE'
 })
 
@@ -290,8 +291,31 @@ class NodeApi {
       return reactiveJoint
    }
 
-   static async updateStat(key, value){
-      return true
+   static async updateStat(oid, key, value){
+      const f = this.updateStat
+      logD(f, 'start')
+      const t1 = performance.now()
+      assert(oid, '!oid')
+      assert(key in StatKeyEnum, '!key in StatKeyEnum')
+
+      let { data: { updateStat } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             ${fragments.objectFullFragment}
+             mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
+                 updateStat (oid: $oid, statData: $statData)
+             }
+         `,
+         variables: {
+            oid: oid,
+            statData: {
+               key,
+               valueInt: value
+            }
+         }
+      })
+      // todo update node in apollo cache
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return updateStat
    }
 
    // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
