@@ -35,56 +35,65 @@ div(
     :loading="showVotes").shaking
     q-icon(name="adjust" size="30px" color="purple")
   //- v-touch-pan.prevent.mouse="onPan"
-  div(
-    v-if="showVotearea"
-    @mousemove="onMousemove"
-    @click="vote(hypotenuse)"
-    accessKey="votearea"
-    :style=`{
-      position: 'absolute', zIndex: 1000,
-      width: width+'px', height: width+'px',
-      borderRadius: '50%',
-      background: 'rgba(50,50,50,0.9)',
-      right: -width/2+20+'px',
-    }`
-    ).row.shadow-10
+  transition(
+    appear
+    enter-active-class="animated zoomIn"
+    leave-active-class="animated zoomOut")
     div(
+      v-if="showVotearea"
+      @mousemove="onMousemove"
+      @click="vote(hypotenuse)"
+      accessKey="votearea"
       :style=`{
-        position: 'relative',
-        pointerEvents: 'none',
+        position: 'absolute', zIndex: 1000,
+        width: width+'px', height: width+'px',
+        borderRadius: '50%',
+        background: 'rgba(50,50,50,0.9)',
+        right: -width/2+20+'px',
       }`
-      ).row.fit
+      ).row.shadow-10
       div(
-        icon="adjust" color="purple" round
         :style=`{
-          position: 'absolute', zIndex: 1100,
-          top: y-((60*hypotenuse)/2)+'px',
-          left: x-((60*hypotenuse)/2)+'px',
-          borderRadius: '50%',
-          //- pointerEvents: 'none',
-          width: 60*hypotenuse+'px', height: 60*hypotenuse+'px',
-        }`).row.items-center.content-center.justify-center
-        q-icon(
-          name="adjust" color="purple"
-          :size="100*hypotenuse > 30 ? 100*hypotenuse+'px' : 30+'px'")
-        span(
+          position: 'relative',
+          pointerEvents: 'none',
+        }`
+        ).row.fit
+        div(
+          icon="adjust" color="purple" round
           :style=`{
-            position: 'absolute', zIndex: 1300,
-            top: '-40px',
-            left: ((40*hypotenuse)/2)+'px',
-            fontSize: '20px',
-            whiteSpace: 'nowrap'
-          }`
-          ).text-white.text-bold {{ Math.round(hypotenuse * 100) }} {{ hypotenuseLabel }}
-        //- div(
-          v-touch-pan.prevent.mouse="onPan"
-          accessKey="votepan"
-          :style=`{
-            position: 'absolute', zIndex: 1300,
-            bottom: '-66px',
-            width: '60px', height: '60px'
-          }`
-          ).row.bg-red
+            position: 'absolute', zIndex: 1100,
+            top: y-((60*hypotenuse)/2)+'px',
+            left: x-((60*hypotenuse)/2)+'px',
+            borderRadius: '50%',
+            //- pointerEvents: 'none',
+            width: 60*hypotenuse+'px', height: 60*hypotenuse+'px',
+          }`).row.items-center.content-center.justify-center
+          q-icon(
+            v-if="!voting"
+            name="adjust" color="purple"
+            :size="100*hypotenuse > 30 ? 100*hypotenuse+'px' : 30+'px'")
+          q-spinner(
+            v-if="voting"
+            color="purple"
+            :size="100*hypotenuse > 30 ? 100*hypotenuse+'px' : 30+'px'")
+          span(
+            :style=`{
+              position: 'absolute', zIndex: 1300,
+              top: '-40px',
+              left: ((40*hypotenuse)/2)+'px',
+              fontSize: '20px',
+              whiteSpace: 'nowrap'
+            }`
+            ).text-white.text-bold {{ Math.round(hypotenuse * 100) }} {{ hypotenuseLabel }}
+          //- div(
+            v-touch-pan.prevent.mouse="onPan"
+            accessKey="votepan"
+            :style=`{
+              position: 'absolute', zIndex: 1300,
+              bottom: '-66px',
+              width: '60px', height: '60px'
+            }`
+            ).row.bg-red
 </template>
 
 <script>
@@ -171,6 +180,7 @@ export default {
         this.voting = false
         this.votingAgain = false
         this.showVotes = false
+        this.showVotearea = false
       }
       catch (e) {
         this.$log('vote error', e)

@@ -195,6 +195,13 @@ const routes = [
                   props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_nodes/index.vue'),
                },
+               {
+                  name: 'workspace.links',
+                  path: 'links',
+                  // redirect: 'nodes/drafts',
+                  // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
+                  component: () => import('pages/app/ws_links/index.vue'),
+               },
                { name: 'workspace.link', path: 'link/:id', component: () => import('pages/app/ws_link/index.vue') },
                { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
                {

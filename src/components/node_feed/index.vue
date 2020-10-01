@@ -47,7 +47,7 @@
         ).row.full-width.items-start.content-start
         composition-player(
           :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-          :options=`{height: 'auto', objectFit: 'contain'}`)
+          :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
     //- essence
     router-link(
       :to="'/node/'+node.oid"

@@ -7,7 +7,7 @@
     node-remake(:node="node")
     small.text-grey-9 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
     .col
-    q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new')").shaking
+    q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new?oid='+node.oid)").shaking
     small.text-grey-9 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
     .col
     node-share(:node="node").shaking
@@ -17,6 +17,7 @@
     .col
     small.text-grey-9 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
     node-vote(:node="node")
+    span.text-bold.text-grey-2 {{ node.rate * 100 }}
 </template>
 
 <script>
