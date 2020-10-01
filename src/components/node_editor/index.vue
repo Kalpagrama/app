@@ -26,6 +26,16 @@
               ).full-width
               span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ l.name }}
       q-btn(round flat dense color="grey-8" icon="more_vert")
+  //- items mockup
+  div(v-if="node.items.length === 0").row.full-width.items-start.content-start.justify-center
+    div(
+      :style=`{
+        width: '400px', maxWidth: $q.screen.width+'px',
+        height: '400px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgb(35,35,35)'
+      }`
+      ).row.shadow-5
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
     //- slider
