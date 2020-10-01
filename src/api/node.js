@@ -313,7 +313,7 @@ class NodeApi {
             }
          }
       })
-      // todo update node in apollo cache
+      // todo update stat in cache
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return updateStat
    }
