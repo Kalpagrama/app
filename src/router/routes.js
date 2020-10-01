@@ -138,6 +138,11 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'link',
+            path: 'link/:oid',
+            component: () => import('pages/app/link/index.vue')
+         },
+         {
             name: 'link-create',
             path: 'link-create',
             component: () => import('pages/app/link_create/index.vue'),
@@ -195,7 +200,18 @@ const routes = [
                   props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_nodes/index.vue'),
                },
-               { name: 'workspace.link', path: 'link/:id', component: () => import('pages/app/ws_link/index.vue') },
+               {
+                  name: 'workspace.links',
+                  path: 'links',
+                  // redirect: 'nodes/drafts',
+                  // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
+                  component: () => import('pages/app/ws_links/index.vue'),
+               },
+               {
+                  name: 'workspace.link',
+                  path: 'link/:id/:item?',
+                  component: () => import('pages/app/ws_link/index.vue')
+               },
                { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
                {
                   name: 'workspace.spheres',

@@ -39,7 +39,7 @@ div(
     @blur="onBlur"
     ).full-width.justify-center
   //- blinker
-  div(
+  //- div(
     v-if="showBlink"
     :style=`{
       position: 'absolute', zIndex: 200,

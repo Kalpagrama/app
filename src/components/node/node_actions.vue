@@ -7,7 +7,7 @@
     node-remake(:node="node")
     small.text-grey-9 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
     .col
-    q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new')").shaking
+    q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new?oid='+node.oid)").shaking
     small.text-grey-9 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
     .col
     node-share(:node="node").shaking
@@ -16,7 +16,8 @@
     node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible" @done="showStats = true").shaking
     .col
     small.text-grey-9 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
-    q-btn(round flat color="purple" icon="adjust").shaking
+    node-vote(:node="node")
+    span.text-bold.text-grey-2 {{ node.rate * 100 }}
 </template>
 
 <script>
@@ -28,6 +29,7 @@ export default {
     nodeBookmark: () => import('components/node/node_bookmark.vue'),
     nodeShare: () => import('components/node/node_share.vue'),
     nodeStats: () => import('components/node/node_stats/index.vue'),
+    nodeVote: () => import('components/node/node_vote.vue')
   },
   data () {
     return {

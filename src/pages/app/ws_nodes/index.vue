@@ -30,8 +30,8 @@
         q-tab(name="published" label="Published")
   .row.full-width
     component(:is="`type-${typeId}`" :searchString="searchString")
-      template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="item")
+      template(v-slot:tint=`{item, itemKey}`)
+        slot(name="tint" :item="item" :itemKey="itemKey")
 </template>
 
 <script>

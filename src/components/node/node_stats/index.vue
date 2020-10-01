@@ -22,8 +22,11 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'nodeStats',
+  props: ['node'],
   components: {
     viewRemade: () => import('./view_remade.vue'),
     viewJoined: () => import('./view_joined.vue'),
@@ -50,13 +53,14 @@ export default {
   },
   async created () {
     this.$log('created')
-    this.stats = {
-      remade: [],
-      joined: [],
-      shared: [],
-      bookmarked: [],
-      voted: []
-    }
+    this.stats = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}})
+    // this.stats = {
+    //   remade: [],
+    //   joined: [],
+    //   shared: [],
+    //   bookmarked: [],
+    //   voted: []
+    // }
   }
 }
 </script>

@@ -1,18 +1,121 @@
 <template lang="pug">
 .row.full-width
-  //- h1.text-white wsLink {{link}}
-  div(v-if="link").row.full-width
-    q-input(
-      v-model="link.name"
-      filled dark dense color="grey-6"
-      ).full-width.br
+  div(v-if="$route.params.item === undefined").row.full-width.items-start.content-start
+    //- header
+    .row.full-width.justify-center.q-pt-sm.q-mb-sm
+      div(
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px',overflow: 'hidden'
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.b-40
+        q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
+        q-icon(name="link" color="white" size="30px").q-mr-sm
+        span(:style=`{fontSize: '1rem'}`).text-white.text-bold Link creator
+        .col
+        transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+          q-btn(
+            @click="publish()"
+            v-if="link && link.items.length === 2"
+            dense color="green" no-caps
+            :loading="publishing").q-px-sm
+            span.text-white.text-bold Publish
+    //- items wrapper
+    .row.full-width.justify-center
+      div(
+        v-if="link"
+        :style=`{
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px', overflow: 'hidden'
+        }`).row.full-width.b-40.q-pa-sm
+        .col-6.q-pr-xs
+          div().row.fit.items-end.content-end
+            div(v-if="link.items[0]").row.full-width.justify-start
+              q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(0)")
+              .col
+              q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
+            link-item(
+              @click="$router.push({params: {item: 0}})"
+              v-if="link.items[0]" :item="link.items[0]" :link="link")
+        .col-6.q-pl-xs
+          div().row.fit.items-end.content-end
+            div(v-if="link.items[1]").row.full-width.justify-end
+              q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
+              .col
+              q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(1)")
+            link-item(
+              @click="$router.push({params: {item: 1}})"
+              v-if="link.items[1]" :item="link.items[1]" :link="link")
+    //- connection
+    div(v-if="link").row.full-width.items-center.content-center.justify-center.q-py-xs
+      .col
+        .row.full-width.items-center.content-center.justify-end.q-pa-sm
+          transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+            q-btn(
+              v-if="itemsTypesShow && link.items[0]"
+              icon="keyboard_arrow_down"
+              flat dense color="grey-6" no-caps)
+              span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[0].type).name }}
+              q-menu(dark)
+                div(:style=`{width: '100px'}`).row
+                  q-btn(
+                    @click="itemTypeSet(0, t.id)"
+                    v-for="(t,ti) in itemTypes" :key="t.id"
+                    v-if="t.id !== link.items[0].type"
+                    flat dense no-caps color='grey-2').full-width {{ t.name }}
+      q-icon(name="link" color="green" size="md")
+      .col
+        .row.full-width.items-center.content-center.justify-start.q-pa-sm
+          transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+            q-btn(
+              v-if="itemsTypesShow && link.items[1]"
+              icon-right="keyboard_arrow_down"
+              flat dense color="grey-6" no-caps)
+              span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[1].type).name }}
+              q-menu(dark)
+                div(:style=`{width: '100px'}`).row
+                  q-btn(
+                    @click="itemTypeSet(1, t.id)"
+                    v-for="(t,ti) in itemTypes" :key="t.id"
+                    v-if="t.id !== link.items[1].type"
+                    flat dense no-caps color='grey-2').full-width {{ t.name }}
+      //- name
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '600px',}`).row.full-width
+          q-input(
+            v-model="link.name"
+            borderless dark type="textarea" autogrow
+            placeholder="How are they connected?"
+            :input-style=`{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }`).full-width
+    //- view add wrapper
+    .row.full-width.justify-center.q-mt-md
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          background: 'rgb(35,35,35)',
+          borderRadius: '10px', overflow: 'hidden',
+          minHeight: '500px',
+        }`).row.full-width
+        view-add(v-if="link" :link="link" @item="(item, ii) => itemFound(item, ii)")
+  div(v-else).row.full-width
+    q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { NodeApi } from 'src/api/node'
 
 export default {
   name: 'pageApp_wsLink',
+  components: {
+    linkItem: () => import('./link_item.vue'),
+    viewAdd: () => import('./view_add/index.vue')
+  },
   data () {
     return {
       link: null,
@@ -20,12 +123,54 @@ export default {
         name: '',
         items: [],
         wsItemType: 'WS_JOINT',
-        // leftItem: null,
-        // rightItem: null,
-      }
+      },
+      publishing: false,
+    }
+  },
+  computed: {
+    itemTypes () {
+      return [
+        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
+        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
+        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
+        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
+        {id: 'TRUE', name: 'Правда', pair: 'FALSE'},
+        {id: 'FALSE', name: 'Ложь', pair: 'TRUE'},
+        {id: 'FROM', name: 'Первое', pair: 'TO'},
+        {id: 'TO', name: 'Второе', pair: 'FROM'},
+      ]
+    },
+    itemsTypesShow () {
+      return this.link && this.link.name.length === 0
     }
   },
   watch: {
+    'link.items.0': {
+      deep: true,
+      handler (to, from) {
+        this.$log('link.items[0] TO', to)
+        if (to) {
+          if (this.link.items[1]) {
+            let pair = this.itemTypes.find(i => i.id === to.type).pair
+            this.$log('set PAIR', pair)
+            this.link.items[1].type = pair
+          }
+        }
+      }
+    },
+    'link.items.1': {
+      deep: true,
+      handler (to, from) {
+        this.$log('link.items[1] TO', to)
+        if (to) {
+          if (this.link.items[0]) {
+            let pair = this.itemTypes.find(i => i.id === to.type).pair
+            this.$log('set PAIR', pair)
+            this.link.items[0].type = pair
+          }
+        }
+      }
+    },
     '$route.params.id': {
       immediate: true,
       async handler (to, from) {
@@ -34,6 +179,11 @@ export default {
           if (to === 'new') {
             this.$q.notify({type: 'positive', position: 'top', message: 'Creating new link'})
             this.link = JSON.parse(JSON.stringify(this.linkNew))
+            // get first item
+            if (this.$route.query.oid) {
+              let item = await this.$rxdb.get(RxCollectionEnum.OBJ, this.$route.query.oid)
+              this.itemFound(item, 0)
+            }
             var unwatch = this.$watch(
               'link',
               async (_from, _to) => {
@@ -63,13 +213,98 @@ export default {
       }
     },
   },
+  methods: {
+    itemTypeSet (index, type) {
+      this.$log('itemTypeSet', index, type)
+      this.$set(this.link.items[index], 'type', type)
+    },
+    itemFound (item, index) {
+      this.$log('itemFound', item, index)
+      let itemInput = {
+        type: 'SOLUTION',
+        item: item,
+      }
+      if (index === 0) {
+        if (this.link.items[1]) {
+          itemInput.type = this.itemTypes.find(i => i.id === this.link.items[1].type).pair
+        }
+      }
+      if (index === 1) {
+        if (this.link.items[0]) {
+          itemInput.type = this.itemTypes.find(i => i.id === this.link.items[0].type).pair
+        }
+      }
+      this.$set(this.link.items, index, itemInput)
+    },
+    itemDelete (index) {
+      this.$log('itemDelete', index)
+      this.$set(this.link.items, index, null)
+    },
+    async publish () {
+      try {
+        this.$log('publish start')
+        this.publishing = true
+        await this.$wait(1000)
+        let jointInput = { leftItem: {oid: null}, rightItem: {oid: null} }
+        // check 0 item
+        if (this.link.items[0]) {
+          if (this.link.items[0].item.oid) {
+            jointInput.leftItem.oid = this.link.items[0].item.oid
+          }
+          else if (this.link.items[0].item.oidUrl) {
+            // get content by url...
+          }
+          else if (this.link.items[0].item.wsItemType === 'WS_NODE') {
+            // pre publish node
+          }
+          else {
+            throw new Error('Wrong first item!')
+          }
+        }
+        // check 1 item
+        if (this.link.items[1]) {
+          if (this.link.items[1].item.oid) {
+            jointInput.rightItem.oid = this.link.items[1].item.oid
+          }
+          else if (this.link.items[1].item.oidUrl) {
+            // get content by url...
+          }
+          else if (this.link.items[1].item.wsItemType === 'WS_NODE') {
+            // pre publish node...
+          }
+          else {
+            throw new Error('Wrong second item!')
+          }
+        }
+        jointInput.jointType = 'ASSOCIATIVE'
+        let joint = await NodeApi.jointCreate(jointInput)
+        this.$log('link done joint', joint)
+        this.$log('publish done')
+        // convert items to payloads
+        // if item.item.oidUrl get content from url...
+        // get oid from any item
+        // then submit...
+        // delete this link draft...
+        this.publishing = false
+        this.$router.push('/link/' + joint.oid).catch(e => e)
+        this.$rxdb.remove(this.link.id)
+      }
+      catch (e) {
+        this.$log('publish error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.publishing = false
+      }
+    }
+  },
   mounted () {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

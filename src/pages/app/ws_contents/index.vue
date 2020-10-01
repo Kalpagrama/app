@@ -15,8 +15,8 @@
         q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   .row.full-width
     component(:is="`type-${typeId}`" :searchString="searchString")
-      template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="item")
+      template(v-slot:tint=`{item, itemKey}`)
+        slot(name="tint" :item="item" :itemKey="itemKey")
 </template>
 
 <script>
