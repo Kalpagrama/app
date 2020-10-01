@@ -72,7 +72,7 @@ export default {
   },
   data () {
     return {
-      fromId: 'gifs',
+      fromId: 'nodes',
       itemOver: '',
     }
   },

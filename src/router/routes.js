@@ -138,6 +138,11 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'link',
+            path: 'link/:oid',
+            component: () => import('pages/app/link/index.vue')
+         },
+         {
             name: 'link-create',
             path: 'link-create',
             component: () => import('pages/app/link_create/index.vue'),

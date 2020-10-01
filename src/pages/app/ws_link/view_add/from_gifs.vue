@@ -16,11 +16,12 @@
         v-model="viewId"
         dense active-color="green" no-caps switch-indicator
         ).full-width.text-grey-6
-        q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+        q-tab(name="bookmarked" icon="bookmark")
+        q-tab(name="search" :label="$t('Search', 'Поиск')")
   //- body
   .row.full-width
     //- favorite
-    div(v-if="viewId === 'favorite'").row.full-width.items-start.content-start.justify-center
+    div(v-if="viewId === 'bookmarked'").row.full-width.items-start.content-start.justify-center
       h6.text-white Your favorite GIFs will be here soon :)
     //- search
     div(v-if="viewId === 'search'").row.full-width.items-start.content-start.q-pr-sm
@@ -56,7 +57,7 @@ export default {
       gifs: [],
       viewId: 'search',
       views: [
-        {id: 'favorite', name: 'Избранные'},
+        {id: 'bookmarked', name: 'Избранные'},
         {id: 'search', name: 'Поиск'},
       ],
     }

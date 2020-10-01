@@ -52,7 +52,7 @@ export default {
   },
   data () {
     return {
-      fromId: 'gifs',
+      fromId: 'content',
       itemOver: '',
     }
   },
@@ -62,7 +62,6 @@ export default {
         { id: 'content', name: this.$t('Content', 'Контент') },
         { id: 'nodes', name: this.$t('Nodes', 'Ядра') },
         { id: 'gifs', name: this.$t('GIFs', 'Гифки') },
-        // { id: 'memes', name: this.$t('Memes', 'Мемы') },
       ]
     }
   },
