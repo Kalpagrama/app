@@ -40,7 +40,7 @@
               .row.full-width.q-pa-sm
                 span.text-white {{ i.name }}
             //- tint to intercept
-            slot(name="tint" :item="i" :itemIndex="ii")
+            slot(name="tint" :item="i" :itemKey="i.id")
             //- selected for standalone mode...
             div(
               v-if="itemSelected === i.id"

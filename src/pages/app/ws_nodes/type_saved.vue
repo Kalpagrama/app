@@ -19,6 +19,7 @@
             :gutter="{default: 10}").full-width
             div(
               v-for="(nodeBookmark, ii) in items" :key="nodeBookmark.id"
+              :style=`{position: 'relative'}`
               ).row.full-width.q-mb-sm
               //- default
               div(
@@ -45,7 +46,7 @@
                 .row.full-width.q-py-sm.q-px-md
                   small.text-white {{ nodeBookmark.name }}
               //- tint
-              slot(name="tint" :item="nodeBookmark")
+              slot(name="tint" :item="nodeBookmark" :itemKey="nodeBookmark.id")
               //- selected
               div(
                 v-if="nodeBookmarkSelectedId === nodeBookmark.id"

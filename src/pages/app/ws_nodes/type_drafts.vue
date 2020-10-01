@@ -31,7 +31,7 @@
                     q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(item,ii)")
                     .col
                     q-btn(round flat dense color="white" icon="edit" @click="itemEdit(item,ii)")
-              slot(name="tint" :item="item")
+              slot(name="tint" :item="item" :itemKey="item.id")
 </template>
 
 <script>

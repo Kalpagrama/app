@@ -1,3 +1,9 @@
+<style lang="stylus" scoped>
+.link-item
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -15,28 +21,17 @@
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
           }`
-          ).row.full-width.q-mb-md.q-pa-sm.b-40
-          //- first item
-          div(
-            v-if="l.items[0]"
-            ).row.full-width
-            img(
-              v-if="l.items[0].items"
-              :src="l.items[0].items[0].thumbUrl"
-              :style=`{
-                borderRadius: '10px',
-              }`
-              ).full-width
-            .row.full-width.justify-center.q-pa-sm
-              small.text-white.text-bold {{ l.items[0].name }}
-          //- connection name, link
-          .row.full-width.justify-center
-            q-icon(name="link" color="green" size="30px")
-          //- second item
-          div(
-            v-if="l.items[1]"
-            ).row.full-width.justify-center.q-pa-sm
-            small.text-white.text-bold {{ l.items[1].name }}
+          ).row.full-width.q-mb-md.q-pa-sm.b-40.cursor-pointer.link-item
+          //- items wrapper
+          .row.full-width
+            .col-6.br
+              div(v-if="l.items[0]").row.full-width
+                small.text-white {{l.items[0].name}}
+            .col-6.br
+              div(v-if="l.items[1]").row.full-width
+                small.text-white {{l.items[1].name}}
+          .row.full-width.justify-center.q-pa-sm
+            small.text-white {{ l.name }}
 </template>
 
 <script>

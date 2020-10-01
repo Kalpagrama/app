@@ -19,9 +19,7 @@
             :gutter="{default: 10}").full-width.justify-start
             div(
               v-for="(node, ii) in items" :key="node.oid"
-              :style=`{
-                position: 'relative',
-              }`
+              :style=`{position: 'relative'}`
               ).row.full-width.q-mb-sm
               //- default
               div(
@@ -47,7 +45,7 @@
                       }`).fit
                 .row.full-width.q-py-sm.q-px-md
                   small.text-white {{ node.name }}
-              slot(name="tint" :item="node")
+              slot(name="tint" :item="node" :itemKey="node.oid")
               //- selected
               div(
                 v-if="nodeSelectedOid === node.oid"

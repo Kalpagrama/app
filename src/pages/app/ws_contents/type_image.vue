@@ -39,7 +39,7 @@
                   }`
                   ).full-width
               //- tint to intercept
-              slot(name="tint" :item="i" :itemIndex="ii")
+              slot(name="tint" :item="i" :itemKey="i.id")
               //- selected
               div(
                 v-if="itemSelected === i.id"

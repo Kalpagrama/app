@@ -1,33 +1,68 @@
 <template lang="pug">
 .row.full-width
-  //- header
-  .row.full-width.justify-center.q-pt-sm.q-mb-sm
-    div(
-      :style=`{
-        height: '60px',
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
-        borderRadius: '10px',overflow: 'hidden'
-      }`
-      ).row.full-width.items-center.content-center.q-px-sm.b-40
-      q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '1rem'}`).text-white.text-bold Link creator
-  //- link-item(v-if="link && link.items[0]" :item="link.items[0]" :link="link")
-  //- items wrapper
-  .row.full-width
-    .col-6
-      link-item(v-if="link && link.items[0]" :item="link.items[0]" :link="link")
-    .col-6
-      link-item(v-if="link && link.items[1]" :item="link.items[1]" :link="link")
-  //- connection
-  .row.full-width.justify-center
-    q-icon(name="link" color="green" size="md")
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      q-btn(flat no-caps dark @click="itemDelete(0)") Delete one
-      q-btn(flat no-caps dark @click="itemDelete(1)") Delete two
-  //- right item
-  //- link-item(v-if="link && link.items[1]" :item="link.items[1]" :link="link")
-  view-add(v-if="link && !link.items[1]" :link="link" @item="itemFound($event, 1)")
+  div(v-if="$route.params.item === undefined").row.full-width.items-start.content-start
+    //- header
+    .row.full-width.justify-center.q-pt-sm.q-mb-sm
+      div(
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px',overflow: 'hidden'
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.b-40
+        q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
+        q-icon(name="link" color="white" size="30px").q-mr-sm
+        span(:style=`{fontSize: '1rem'}`).text-white.text-bold Link creator
+    //- items wrapper
+    .row.full-width.justify-center
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px', overflow: 'hidden'
+        }`).row.full-width.b-40.q-pa-sm
+        .col-6.q-pr-xs
+          div(@click="$router.push({params: {item: 0}})").row.fit.items-end.content-end
+            link-item(v-if="link && link.items[0]" :item="link.items[0]" :link="link")
+        .col-6.q-pl-xs
+          div(@click="$router.push({params: {item: 1}})").row.fit.items-end.content-end
+            link-item(v-if="link && link.items[1]" :item="link.items[1]" :link="link")
+    //- connection
+    div(v-if="link").row.full-width.items-center.content-center.justify-center.q-py-xs
+      .col
+        .row.full-width.items-center.content-center.justify-end.q-pa-sm
+          span.text-white.text-bold Причина
+      q-icon(name="link" color="green" size="md")
+      .col
+        .row.full-width.items-center.content-center.justify-start.q-pa-sm
+          span.text-white.text-bold Следствие
+      //- name
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '600px',}`).row.full-width
+          q-input(
+            v-model="link.name"
+            borderless dark type="textarea" autogrow
+            placeholder="How are they connected?"
+            :input-style=`{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }`).full-width
+    //- .row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+        q-btn(flat no-caps dark @click="itemDelete(0)") Delete one
+        q-btn(flat no-caps dark @click="itemDelete(1)") Delete two
+    //- view add wrapper
+    .row.full-width.justify-center.q-mt-md
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          background: 'rgb(35,35,35)',
+          borderRadius: '10px', overflow: 'hidden',
+          minHeight: '500px',
+        }`).row.full-width
+        view-add(v-if="link" :link="link" @item="(item, ii) => itemFound(item, ii)")
+  div(v-else).row.full-width
+    q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
 </template>
 
 <script>
@@ -95,12 +130,12 @@ export default {
   methods: {
     itemFound (item, index) {
       this.$log('itemFound', item, index)
-      // this.$set(this.link.items, index, item)
-      // this.items
+      this.$set(this.link.items, index, item)
     },
     itemDelete (index) {
       this.$log('itemDelete', index)
-      this.$delete(this.link.items, index)
+      // this.$delete(this.link.items, index)
+      this.$set(this.link.items, index, null)
     }
   },
   mounted () {

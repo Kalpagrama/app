@@ -27,7 +27,7 @@
       //- small.text-grey-6 to: {{ item.object.name }}
     //- event object : node wrapper
     div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width
-      node-lite(
+      node-feed(
         v-if="item.object.type === 'NODE'"
         :node="item.object" :isActive="isActive" :isVisible="isVisible"
         :marginBottom="0")
