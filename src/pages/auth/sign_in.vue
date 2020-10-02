@@ -5,7 +5,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span().text-white {{$t('auth Sign in with email', 'Войти через почту')}}
+            span(:style=`{fontSize: '18px'}`).text-bold.text-white {{$t('auth Sign in with email', 'Войти через почту')}}
           //- form
           .full-width.q-py-md
             //- email
@@ -13,7 +13,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
-                v-model="login"
+                v-model="email"
                 :placeholder="$t('auth_Enter email', 'Введите почту')"
                 autocomplete="username"
                 filled dark color="white" name="username"
@@ -23,7 +23,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 ).full-width
             //- password
             div(
-              v-if="userId && !needConfirm"
+              v-if="passwordShow"
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
@@ -33,10 +33,10 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 type="password" required name="password"
                 filled dark color="white"
                 @keyup.enter="signIn()").full-width
-            //- code from email...
-            div(v-if="userId && needConfirm").row.full-width
+            //- email code
+            div(v-if="emailCodeShow").row.full-width
               input(
-                v-model="password"
+                v-model="emailCode"
                 type="tel" required
                 placeholder="0000"
                 maxlength="4" minlength="4"
@@ -54,6 +54,27 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 ).full-width.b-50
               .row.full-width.justify-center.q-py-xs
                 span.text-bold.text-grey-6 Введите код с почты
+            //- invite code
+            div(v-if="inviteCodeShow").row.full-width
+              input(
+                v-model="inviteCode"
+                type="tel" required
+                placeholder="0000"
+                maxlength="4" minlength="4"
+                :style=`{
+                  fontSize: '100px',
+                  fontWeight: 'bold',
+                  height: '130px',
+                  letterSpacing: '6px',
+                  color: 'white',
+                  padding: '4px',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                }`
+                @keyup.enter="signIn()"
+                ).full-width.b-50
+              .row.full-width.justify-center.q-py-xs
+                span.text-bold.text-grey-6 Введите промокод
           //- identify
           q-btn(
             v-if="!userId"
@@ -78,12 +99,6 @@ q-page(:style=`{paddingBottom: '200px',}`)
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
       .row.full-width.q-px-sm
         with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
-      //- .row.full-width.items-center.content-center.q-pa-md
-        q-btn(
-          color="green" outline dense no-caps
-          @click="$router.push('/auth/sign-up')").full-width {{$t('auth__Sign up', 'Регистрация')}}
-        .row.full-width.justify-center.q-pa-xs
-          small.text-green {{$t('auth_No account ?', 'Нет аккаунта?')}}
 </template>
 
 <script>
@@ -95,11 +110,15 @@ export default {
   components: {withSocials},
   data () {
     return {
-      login: '',
-      password: '',
-      loading: false,
       userId: null,
-      needConfirm: false,
+      email: '',
+      emailShow: true,
+      emailCode: '',
+      emailCodeShow: false,
+      password: '',
+      passwordShow: false,
+      inviteCodeShow: false,
+      inviteCode: ''
     }
   },
   watch: {
@@ -112,14 +131,27 @@ export default {
       try {
         this.$log('identify start')
         this.loading = true
-        if (this.login.length === 0) throw new Error('Login is empty!')
-        let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.login)
+        if (this.email.length === 0) throw new Error('Login is empty!')
+        let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.email)
+        // let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = {
+        //   userExist: false,
+        //   userId: 'ivanq3w@gmail.com',
+        //   needInvite: true,
+        //   needConfirm: true,
+        //   loginType: 'EMAIL',
+        //   hasPermanentPassword: true,
+        // }
+        console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
         if (loginType !== 'EMAIL') throw new Error('Only emails...')
         this.userId = userId
-        this.$log('needConfirm', needConfirm)
-        this.$log('hasPermanentPassword', hasPermanentPassword)
+        if (hasPermanentPassword) {
+          this.passwordShow = true
+        }
+        if (needInvite) {
+          this.inviteCodeShow = true
+        }
         if (needConfirm) {
-          this.needConfirm = needConfirm
+          this.emailCodeShow = true
         }
         this.$log('identify done')
         this.loading = false
@@ -134,8 +166,16 @@ export default {
       try {
         this.$log('signIn start')
         this.loading = true
-        if (this.password.length === 0) throw new Error('Password is empty!')
-        let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password)
+        let password
+        if (this.passwordShow) {
+          password = this.password
+        }
+        if (this.emailCodeShow) {
+          password = this.emailCode
+        }
+        if (password.length === 0) throw new Error('Code is empty!')
+        let {result, failReason, oid} = await AuthApi.userAuthenticate(password, this.inviteCode)
+        // let {result, failReason, oid} = {result: false, failReason: 'fuck u', oid: null}
         if (result === false) throw new Error(`Error: ${failReason}`)
         this.$log('signIn done', oid)
         this.loading = false

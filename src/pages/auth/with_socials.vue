@@ -16,7 +16,7 @@ div(
     q-btn(
       @click="serviceClick({id: 'oAuthUrlGoogle'})"
       flat color="white" icon="fab fa-google" no-caps).full-width.b-40.q-py-xs
-      span.q-ml-sm {{title}}
+      span.text-bold.q-ml-md {{title}}
 </template>
 
 <script>
