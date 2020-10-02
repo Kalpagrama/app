@@ -409,7 +409,8 @@ class ReactiveListHolderWithPagination {
                // logD(f, 'rxQuery changed 2', results)
                let listItems = results.map(rxDoc => getReactive(rxDoc).getData())
                this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...listItems)
-               this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...this.reactiveListFull.slice(0, this.nextIndex))
+               this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...this.vm.reactiveListFull.slice(0, this.nextIndex))
+               this.vm.reactiveListPagination.next(3) // если nextIndex === 0, то никто не узнает что можно вызывать next()
             } finally {
                this.listSubscribe()
                this.mutex.release()
