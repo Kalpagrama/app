@@ -32,10 +32,10 @@
             div(:style=`{height: '40px'}`).row.full-width.justify-end
               transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
                 q-btn(
-                  v-if="itemsTypesShow && link.items[0]"
+                  v-if="itemsTypesShow && link.items[0] && !['ESSENCE', 'ASSOCIATIVE'].includes(link.type)"
                   icon-right="keyboard_arrow_down"
                   flat dense color="grey-6" no-caps)
-                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[0].type).name }}
+                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.type.split('_')[0]).name }}
                   q-menu(dark)
                     div(:style=`{width: '100px'}`).row
                       q-btn(
@@ -59,10 +59,10 @@
             div(:style=`{height: '40px',}`).row.full-width.justify-start
               transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
                 q-btn(
-                  v-if="itemsTypesShow && link.items[1]"
+                  v-if="itemsTypesShow && link.items[1] && !['ESSENCE', 'ASSOCIATIVE'].includes(link.type)"
                   icon="keyboard_arrow_down"
                   flat dense color="grey-6" no-caps)
-                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[1].type).name }}
+                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.type.split('_')[1]).name }}
                   q-menu(dark)
                     div(:style=`{width: '100px'}`).row
                       q-btn(
@@ -154,16 +154,16 @@ export default {
   computed: {
     itemTypes () {
       return [
-        {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
-        {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
-        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
-        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
-        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
-        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
-        {id: 'TRUE', name: 'Правда', pair: 'FALSE'},
-        {id: 'FALSE', name: 'Ложь', pair: 'TRUE'},
-        {id: 'FROM', name: 'Первое', pair: 'TO'},
-        {id: 'TO', name: 'Второе', pair: 'FROM'},
+        {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE', origin: 'ESSENCE'},
+        {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE', origin: 'ASSOCIATIVE'},
+        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT', origin: 'CAUSE_EFFECT'},
+        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE', origin: 'CAUSE_EFFECT'},
+        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION', origin: 'PROBLEM_SOLUTION'},
+        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM', origin: 'PROBLEM_SOLUTION'},
+        {id: 'TRUE', name: 'Правда', pair: 'FALSE', origin: 'FALSE_TRUE'},
+        {id: 'FALSE', name: 'Ложь', pair: 'TRUE', origin: 'FALSE_TRUE'},
+        {id: 'FROM', name: 'Первое', pair: 'TO', origin: 'FROM_TO'},
+        {id: 'TO', name: 'Второе', pair: 'FROM', origin: 'FROM_TO'},
       ]
     },
     itemsTypesShow () {
@@ -185,32 +185,32 @@ export default {
         if (to.length > 0) this.link.type = 'ESSENCE'
       }
     },
-    'link.items.0': {
-      deep: true,
-      handler (to, from) {
-        this.$log('link.items[0] TO', to)
-        if (to) {
-          if (this.link.items[1]) {
-            let pair = this.itemTypes.find(i => i.id === to.type).pair
-            this.$log('set PAIR', pair)
-            this.link.items[1].type = pair
-          }
-        }
-      }
-    },
-    'link.items.1': {
-      deep: true,
-      handler (to, from) {
-        this.$log('link.items[1] TO', to)
-        if (to) {
-          if (this.link.items[0]) {
-            let pair = this.itemTypes.find(i => i.id === to.type).pair
-            this.$log('set PAIR', pair)
-            this.link.items[0].type = pair
-          }
-        }
-      }
-    },
+    // 'link.items.0': {
+    //   deep: true,
+    //   handler (to, from) {
+    //     this.$log('link.items[0] TO', to)
+    //     if (to) {
+    //       if (this.link.items[1]) {
+    //         let pair = this.itemTypes.find(i => i.id === to.type).pair
+    //         this.$log('set PAIR', pair)
+    //         this.link.items[1].type = pair
+    //       }
+    //     }
+    //   }
+    // },
+    // 'link.items.1': {
+    //   deep: true,
+    //   handler (to, from) {
+    //     this.$log('link.items[1] TO', to)
+    //     if (to) {
+    //       if (this.link.items[0]) {
+    //         let pair = this.itemTypes.find(i => i.id === to.type).pair
+    //         this.$log('set PAIR', pair)
+    //         this.link.items[0].type = pair
+    //       }
+    //     }
+    //   }
+    // },
     '$route.params.id': {
       immediate: true,
       async handler (to, from) {
@@ -251,24 +251,31 @@ export default {
   methods: {
     itemTypeSet (index, type) {
       this.$log('itemTypeSet', index, type)
-      this.$set(this.link.items[index], 'type', type)
+      let pair = this.itemTypes.find(t => t.id === type).pair
+      this.$log('pair', pair)
+      if (index === 0) {
+        this.link.type = `${type}_${pair}`
+      }
+      if (index === 1) {
+        this.link.type = `${pair}_${type}`
+      }
     },
     itemFound (item, index) {
       this.$log('itemFound', item, index)
       let itemInput = {
-        type: 'SOLUTION',
+        // type: 'SOLUTION',
         item: item,
       }
-      if (index === 0) {
-        if (this.link.items[1]) {
-          itemInput.type = this.itemTypes.find(i => i.id === this.link.items[1].type).pair
-        }
-      }
-      if (index === 1) {
-        if (this.link.items[0]) {
-          itemInput.type = this.itemTypes.find(i => i.id === this.link.items[0].type).pair
-        }
-      }
+      // if (index === 0) {
+      //   if (this.link.items[1]) {
+      //     itemInput.type = this.itemTypes.find(i => i.id === this.link.items[1].type).pair
+      //   }
+      // }
+      // if (index === 1) {
+      //   if (this.link.items[0]) {
+      //     itemInput.type = this.itemTypes.find(i => i.id === this.link.items[0].type).pair
+      //   }
+      // }
       this.$set(this.link.items, index, itemInput)
     },
     itemDelete (index) {
@@ -288,9 +295,11 @@ export default {
           }
           else if (this.link.items[0].item.oidUrl) {
             // get content by url...
+            throw new Error('Need to upload content!')
           }
           else if (this.link.items[0].item.wsItemType === 'WS_NODE') {
             // pre publish node
+            throw new Error('Need to publish node!')
           }
           else {
             throw new Error('Wrong first item!')
@@ -303,9 +312,11 @@ export default {
           }
           else if (this.link.items[1].item.oidUrl) {
             // get content by url...
+            throw new Error('Need to upload content!')
           }
           else if (this.link.items[1].item.wsItemType === 'WS_NODE') {
             // pre publish node...
+            throw new Error('Need to publish node!')
           }
           else {
             throw new Error('Wrong second item!')
@@ -321,10 +332,31 @@ export default {
             jointInput.name = this.link.name
           }
         }
+        else if (this.link.type === 'ASSOCIATIVE') {
+          jointInput.jointType = this.link.type
+        }
         else {
-          jointInput.jointType = 'ASSOCIATIVE'
+          this.$log('*** LINK TYPE *** ', this.link.type)
+          let switchMap = {
+            EFFECT_CAUSE: 'CAUSE_EFFECT',
+            SOLUTION_PROBLEM: 'PROBLEM_SOLUTION',
+            TRUE_FALSE: 'FALSE_TRUE',
+            TO_FROM: 'FROM_TO'
+          }
+          // switch items and set another...
+          if (switchMap[this.link.type]) {
+            this.$log('*** SWITCH ***', this.link.type)
+            let t = jointInput.rightItem
+            jointInput.leftItem = jointInput.rightItem
+            jointInput.rightItem = t
+            jointInput.jointType = switchMap[this.link.type]
+          }
+          else {
+            jointInput.jointType = this.link.type
+          }
         }
         // another types...
+        this.$log('*** JOINT TYPE *** ', jointInput.jointType)
         let joint = await NodeApi.jointCreate(jointInput)
         this.$log('link done joint', joint)
         this.$log('publish done')
