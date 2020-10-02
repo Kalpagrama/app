@@ -15,6 +15,24 @@ div(
     v-if="item.outputType === 'VIDEO'"
     :item="item" :isActive="isActive"
     :style=`{position: 'absolute', zIndex: 50,}`)
+  q-btn(
+    @click="$emit('remove')"
+    flat dense color="red" icon="delete_outline"
+    :style=`{
+        position: 'absolute', zIndex: 1000,
+        top: 'calc(50% - 100px)',
+        right: '0px',
+        background: 'rgba(0,0,0,0.2)'
+      }`)
+  q-btn(
+    @click="$emit('edit')"
+    flat dense color="white" icon="edit"
+    :style=`{
+        position: 'absolute', zIndex: 1000,
+        top: 'calc(50% - 60px)',
+        right: '0px',
+        background: 'rgba(0,0,0,0.2)'
+      }`)
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
       v-if="isActive"
@@ -23,6 +41,7 @@ div(
         position: 'absolute', zIndex: 1000,
         top: 'calc(50% - 20px)',
         right: '0px',
+        background: 'rgba(0,0,0,0.2)'
       }`
       )
       q-menu(dark anchor="center left" self="center right")

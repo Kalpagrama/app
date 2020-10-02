@@ -1,9 +1,11 @@
 <template lang="pug">
-.row.full-width.justify-center.items-center.content-center.q-px-sm
+.row.full-width.justify-center.items-center.content-center
   q-dialog(
     v-model="showStats" position="bottom")
-    node-stats(:node="node" :isActive="isActive" :isVisible="isVisible")
-  div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
+    node-stats(
+      :node="node" :isActive="isActive" :isVisible="isVisible"
+      @close="showStats = false")
+  //- div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
     node-share(:node="node").shaking
     .col
     node-remake(:node="node")
@@ -21,6 +23,41 @@
     small.text-grey-8 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
     node-vote(:node="node")
     span.text-bold.text-grey-2 {{ node.rate * 100 }}
+  div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
+    //- share
+    .row.full-height.justify-center
+      node-share(:node="node").shaking
+      .row.full-width.justify-center
+        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countShares }}
+    //- remake
+    .row.full-height.justify-center
+      node-remake(:node="node").shaking
+      .row.full-width.justify-center
+        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countRemakes }}
+    //- bookmark
+    .row.full-height.justify-center
+      node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+      .row.full-width.justify-center
+        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
+    //- link
+    .row.full-height.justify-center
+      q-btn(
+        @click="$router.push('/workspace/link/new?oid='+node.oid)"
+        round flat color="green").shaking
+        q-icon(name="link" size="30px" color="green")
+      .row.full-width.justify-center
+        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countJoints }}
+    //- vote
+    .col
+      .row.full-width.items-start.content-start.justify-end
+        q-btn(
+          @click="showStats = true"
+          flat dense no-caps color="grey-2").q-mt-sm
+          span.text-white.text-bold Такое себе
+        .row.full-height.justify-center
+          node-vote(:node="node")
+          .row.full-width.justify-center
+            small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countVotes }}
 </template>
 
 <script>

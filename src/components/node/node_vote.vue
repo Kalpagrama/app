@@ -15,8 +15,9 @@ div(
     v-model="showVotes" position="bottom")
     div(
       :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        maxWidth: '300px',
+        zIndex: 9999,
+        borderRadius: '10px 10px 0 0', overflow: 'hidden',
+        maxWidth: $q.screen.width  > 800 ? '400px' : $q.screen.width+'px',
       }`
       ).row.full-width.b-40
       q-btn(
@@ -35,7 +36,7 @@ div(
     :loading="showVotes").shaking
     q-icon(name="adjust" size="30px" color="purple")
   //- v-touch-pan.prevent.mouse="onPan"
-  transition(
+  //- transition(
     appear
     enter-active-class="animated zoomIn"
     leave-active-class="animated zoomOut")
@@ -166,8 +167,8 @@ export default {
         this.$router.push('/auth/sign-in')
       }
       else {
-        // this.showVotes = true
-        this.showVotearea = true
+        this.showVotes = true
+        // this.showVotearea = true
       }
     },
     async vote (val) {

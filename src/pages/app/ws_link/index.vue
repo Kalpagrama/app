@@ -217,7 +217,7 @@ export default {
         this.$log('id TO', to)
         if (to) {
           if (to === 'new') {
-            this.$q.notify({type: 'positive', position: 'top', message: 'Creating new link'})
+            // this.$q.notify({type: 'positive', position: 'top', message: 'Creating new link'})
             this.link = JSON.parse(JSON.stringify(this.linkNew))
             // get first item
             if (this.$route.query.oid) {
@@ -311,15 +311,23 @@ export default {
             throw new Error('Wrong second item!')
           }
         }
-        jointInput.jointType = 'ASSOCIATIVE'
+        // essence
+        if (this.link.type === 'ESSENCE') {
+          if (this.link.name.length === 0) {
+            jointInput.jointType = 'ASSOCIATIVE'
+          }
+          else {
+            jointInput.jointType = 'ESSENCE'
+            jointInput.name = this.link.name
+          }
+        }
+        else {
+          jointInput.jointType = 'ASSOCIATIVE'
+        }
+        // another types...
         let joint = await NodeApi.jointCreate(jointInput)
         this.$log('link done joint', joint)
         this.$log('publish done')
-        // convert items to payloads
-        // if item.item.oidUrl get content from url...
-        // get oid from any item
-        // then submit...
-        // delete this link draft...
         this.publishing = false
         this.$router.replace('/link/' + joint.oid).catch(e => e)
         this.$rxdb.remove(this.link.id)

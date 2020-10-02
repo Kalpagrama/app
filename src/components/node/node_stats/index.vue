@@ -6,7 +6,7 @@ div(
   }`
   ).row.full-width.b-30
   //- header
-  .row.full-width.q-px-md
+  //- .row.full-width.q-px-md
     q-tabs(
       v-model="viewId"
       dark active-color="green"
@@ -15,14 +15,17 @@ div(
   //- views
   div(:style=`{borderRadius: '10px',}`).row.full-width.b-40
     component(
-      :is="`view-${viewId}`" :stats="stats"
+      v-if="stats"
+      :is="`view-voted`" :stats="stats"
       :style=`{
         minHeight: '400px',
-      }`)
+      }`
+      @close="$emit('close')")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import viewVoted from './view_voted.vue'
 
 export default {
   name: 'nodeStats',
@@ -32,7 +35,8 @@ export default {
     viewJoined: () => import('./view_joined.vue'),
     viewShared: () => import('./view_shared.vue'),
     viewBookmarked: () => import('./view_bookmarked.vue'),
-    viewVoted: () => import('./view_voted.vue'),
+    // viewVoted: () => import('./view_voted.vue'),
+    viewVoted,
   },
   data () {
     return {

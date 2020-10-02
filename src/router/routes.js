@@ -212,7 +212,11 @@ const routes = [
                   path: 'link/:id/:item?',
                   component: () => import('pages/app/ws_link/index.vue')
                },
-               { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
+               {
+                  name: 'workspace.node',
+                  path: 'node/:id/:item?',
+                  component: () => import('pages/app/ws_node/index.vue')
+               },
                {
                   name: 'workspace.spheres',
                   path: 'spheres',
@@ -221,28 +225,7 @@ const routes = [
                {
                   name: 'workspace.sphere',
                   path: 'sphere/:id',
-                  // redirect: 'sphere/:id/items',
                   component: () => import('pages/app/ws_sphere/index.vue'),
-                  // children: [
-                  //    {
-                  //       name: 'workspace.sphere.details',
-                  //       path: 'details',
-                  //       component: () => import('pages/app/ws_sphere/sphere_details.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    },
-                  //    {
-                  //       name: 'workspace.sphere.items',
-                  //       path: 'items',
-                  //       component: () => import('pages/app/ws_sphere/sphere_items.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    },
-                  //    {
-                  //       name: 'workspace.sphere.explore',
-                  //       path: 'explore',
-                  //       component: () => import('pages/app/ws_sphere/sphere_explore.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    }
-                  // ]
                }
             ],
             meta: { roleMinimal: 'MEMBER' }

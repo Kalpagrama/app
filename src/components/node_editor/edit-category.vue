@@ -1,20 +1,20 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width
+  q-resize-observer(@resize="width = $event.width")
   q-btn(
     no-caps flat color="grey-5" align="between"
     icon-right="keyboard_arrow_down"
-    :style=`{height: '40px'}`
+    :style=`{position: 'relative', height: '40px'}`
     ).full-width.q-px-sm.b-50 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
-    q-menu(
-      ref="nodeCategoryMenu"
-      fit)
+    q-menu(fit dark)
       div(
         :style=`{
+          maxWidth: width+'px',
           borderRadius: '10px',overflow: 'hidden',}`
         ).row.full-width.items-start.content-start.b-50
         q-btn(
-          v-for="n in categories" :key="n.value"
-          @click="node.category = n.value, $refs.nodeCategoryMenu.hide()"
+          v-for="n in categories" :key="n.value" v-close-popup
+          @click="node.category = n.value"
           flat color="grey-5" no-caps
           ).full-width {{ n.label }}
 </template>
@@ -27,6 +27,7 @@ export default {
   props: ['node'],
   data () {
     return {
+      width: 0,
       nodeCategories: [],
     }
   },

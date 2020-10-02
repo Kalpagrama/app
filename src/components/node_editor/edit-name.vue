@@ -4,7 +4,7 @@ div(
   ).row.full-width.justify-center
   q-input(
     :value="value" @input="$emit('input', $event)"
-    borderless autofocus
+    borderless autofocus dark
     type="textarea" autogrow
     placeholder="В чем суть?"
     spellcheck="false"
@@ -16,8 +16,8 @@ div(
       fontWeight: 'bold',
       textAlign: 'center',
       lineHeight: '1.1',
-      //- caretColor: 'rgb(76,175,80)',
-      color: 'white'
+      caretColor: 'rgb(76,175,80)',
+      //- color: 'white'
     }`
     @focus="onFocus"
     @blur="onBlur"

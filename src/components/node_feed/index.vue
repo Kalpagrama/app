@@ -20,7 +20,7 @@
     //- items wrapper
     .row.full-width
       //- SLIDER
-      div(
+      //- div(
         v-if="node.layout === 'SLIDER'"
         :style=`{
           position: 'relative',
@@ -39,7 +39,7 @@
                 :options=`{height: '100%', objectFit: 'cover', loop: true}`)
       //- PIP, VERTICAL
       div(
-        v-if="['PIP', 'VERTICAL'].includes(node.layout)"
+        v-if="['SLIDER', 'PIP', 'VERTICAL', 'HORIZONTAL'].includes(node.layout)"
         :style=`{
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden',
@@ -48,6 +48,17 @@
         composition-player(
           :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
           :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
+        q-btn(
+          v-if="isActive && isVisible && node.items.length > 1"
+          :to="'/node/'+node.oid"
+          flat dense color="grey-2" no-caps
+          :style=`{
+            position: 'absolute', zIndex: 3000, bottom: '8px',
+            left: 'calc(50% - 20px)',
+            background: 'rgba(0,0,0,0.2)',
+          }`
+          ).q-px-sm
+          small.text-white.text-bold {{ node.items.length }} внутри
     //- essence
     router-link(
       :to="'/node/'+node.oid"
