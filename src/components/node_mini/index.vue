@@ -20,7 +20,7 @@
     //- items wrapper
     .row.full-width
       //- SLIDER
-      div(
+      //- div(
         v-if="node.layout === 'SLIDER'"
         :style=`{
           position: 'relative',
@@ -39,7 +39,7 @@
                 :options=`{height: '100%', objectFit: 'cover', loop: true}`)
       //- PIP, VERTICAL
       div(
-        v-if="['PIP', 'VERTICAL'].includes(node.layout)"
+        v-if="['SLIDER', 'HORIZONTAL', 'PIP', 'VERTICAL'].includes(node.layout)"
         :style=`{
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden',

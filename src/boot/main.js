@@ -76,6 +76,13 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
+    Vue.prototype.$nodeRateTitle = (val) => {
+      if (val <= 0.2) return 'Очень далеко'
+      else if (val <= 0.4) return 'Ну такое'
+      else if (val <= 0.6) return 'Где-то рядом'
+      else if (val <= 0.8) return 'Близко'
+      else return 'Прямо в точку!'
+    }
     Vue.directive('kalpa-click-outside', {
       bind: function (el, binding, vnode) {
         el.clickOutsideEvent = function (event) {

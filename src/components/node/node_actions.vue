@@ -53,7 +53,7 @@
         q-btn(
           @click="showStats = true"
           flat dense no-caps color="grey-2").q-mt-sm
-          span.text-white.text-bold Такое себе
+          span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
         .row.full-height.justify-center
           node-vote(:node="node")
           .row.full-width.justify-center

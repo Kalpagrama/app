@@ -94,11 +94,16 @@
             v-if="showRightSide"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
         //- create link
-        q-btn(
-          :to="'/workspace/link/new'"
-          flat color="green" no-caps align="left" icon="link"
-          :style=`{height: '60px', paddingLeft: '2px'}`
-          ).full-width
+        div(
+          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+          ).row.full-width.items-center.content-center
+          q-btn(
+            :to="'/workspace/link/new'"
+            flat color="green" no-caps align="left" icon="link" size="md"
+            :style=`{height: '60px', paddingLeft: '2px'}`).full-width
+            span(
+              v-if="showRightSide"
+              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create link', 'Создать связь')}}
         //- create node
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
@@ -109,7 +114,7 @@
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width
             span(
               v-if="showRightSide"
-              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
+              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать ядро')}}
         //- version
         div(v-if="showRightSide").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}

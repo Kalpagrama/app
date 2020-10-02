@@ -31,10 +31,13 @@
               v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(link.jointType)"
               :style=`{height: '40px'}`).row.full-width.items-center.content-center.justify-start
               span.text-white.text-bold {{ getItemTypeName(1, link.jointType) }}
+    //- type
+    //- .row.full-width.justify-center
+      small.text-white {{ link.jointType }}
     //- name
     div(
       ).row.full-width.justify-center.q-pa-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{ link.name }}
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ link.name }}
   //- actions
   //- .row.full-width.justify-center
     span.text-white actions
@@ -68,20 +71,23 @@ export default {
     },
     types () {
       return [
-        {id: 'ESSENCE'},
-        {id: 'ASSOCIATIVE'},
-        {id: 'CAUSE_EFFECT'},
-        {id: 'PROBLEM_SOLUTION'},
-        {id: 'FALSE_TRUE'},
-        {id: 'FROM_TO'}
+        // {id: 'ESSENCE'},
+        // {id: 'ASSOCIATIVE'},
+        {id: 'CAUSE_EFFECT', names: ['Причина', 'Следствие']},
+        {id: 'PROBLEM_SOLUTION', names: ['Проблема', 'Решение']},
+        {id: 'FALSE_TRUE', names: ['Ложь', 'Правда']},
+        {id: 'FROM_TO', names: ['Первое', 'Второе']}
       ]
     }
   },
   methods: {
     getItemTypeName (index, val) {
+      this.$log('getItemTypeName', index, val)
       if (['ESSENCE', 'ASSOCIATIVE'].includes(val)) return ''
       else {
-        return this.types.find(t => t.id === val).id
+        let t = this.types.find(t => t.id === val)
+        this.$log('t', t)
+        return t.names[index]
       }
     }
   }
