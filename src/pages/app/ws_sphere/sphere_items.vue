@@ -6,15 +6,36 @@
 </style>
 
 <template lang="pug">
-q-page(
-  :style=`{paddingTop: '20px', paddingBottom: '400px'}`
-  ).row.full-width.items-start.content-start.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
-      kalpa-loader(:query="mangoQuery" :limit="1000")
+.row.full-width.justify-center.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+    .row.full-width.q-px-sm
+      div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+        q-input(
+          v-model="searchString"
+          filled dark dense color="grey-6"
+          placeholder="Поиск"
+          ).full-width
+    .row.full-width.items-start.content-start.q-pt-sm
+      kalpa-loader(
+        :immediate="true"
+        :query="mangoQuery" :limit="1000")
         template(v-slot=`{items}`)
           masonry(
-            :cols="$q.screen.width < 800 ? Math.round($q.screen.width/200) : 4"
-            :gutter="{default: 10}").full-width
+            :cols="$q.screen.width < 800 ? 2 : 4"
+            :gutter="{default: 10}").full-width.q-pr-sm
+            div(
+              :style=`{
+                position: 'relative',
+                height: 0, paddingBottom: '100%',
+              }`
+              ).row.full-width
+              q-btn(
+                round flat color="green" icon="add" size="lg"
+                :style=`{
+                  position: 'absolute', zIndex: 100,
+                  borderRadius: '10px', overflow: 'hidden',
+                }`
+                ).row.fit.items-center.content-center.justify-center.b-40
             div(
               v-for="(i,ii) in items" :key="i.id"
               :style=`{
@@ -90,6 +111,7 @@ export default {
   props: ['sphere'],
   data () {
     return {
+      searchString: '',
       itemSelected: null,
     }
   },
