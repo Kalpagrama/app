@@ -12,7 +12,6 @@
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
         .col
-        //- q-icon(name="link" color="white" size="30px").q-mr-sm
         span(:style=`{fontSize: '1rem'}`).text-grey-6.text-bold Создание связи
         .col
         q-btn(round flat dense color="grey-6" icon="more_vert")
@@ -24,12 +23,9 @@
           maxWidth: $store.state.ui.pageMaxWidth+'px',
           borderRadius: '10px',
         }`).row.full-width.q-px-md.q-pt-md
+        //- left item
         .col
           div(:style=`{transform: 'perspective(600px) rotateY(10deg)'}`).row.fit.items-end.content-end
-            //- div(v-if="link.items[0]").row.full-width.justify-start
-              q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(0)")
-              .col
-              q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
             link-item(
               @click="$router.push({params: {item: 0}})"
               v-if="link.items[0]" :item="link.items[0]" :link="link")
@@ -47,20 +43,14 @@
                         v-for="(t,ti) in itemTypes" :key="t.id" v-close-popup
                         v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(t.id)"
                         flat dense no-caps color='grey-2').full-width {{ t.name }}
+        //- items divider
         div(:style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
           .col
-          q-icon(name="link" color="green" size="30px" :style=`{marginLeft: '0px'}`).q-mt-xl
+          q-icon(name="link" color="green" size="30px")
           .col
-          //- q-btn(
-            @click="linkTuneToggle"
-            :color="itemsTypesShow ? 'green' : 'grey-6'"
-            round flat dense icon="tune" :style=`{bottom: 0, marginLeft: '0px'}`).q-mb-lg
+        //- right item
         .col
           div(:style=`{transform: 'perspective(600px) rotateY(-10deg)'}`).row.fit.items-end.content-end
-            //- div(v-if="link.items[1]").row.full-width.justify-end
-              q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
-              .col
-              q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(1)")
             link-item(
               @click="$router.push({params: {item: 1}})"
               v-if="link.items[1]" :item="link.items[1]" :link="link")

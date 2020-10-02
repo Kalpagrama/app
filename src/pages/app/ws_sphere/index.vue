@@ -1,28 +1,33 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
-        .row.full-width.items-start.content-start
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-          .col
-            div(:style=`{borderRadius: '10px',}`
-              ).row.full-width.items-center.content-center.justify-between.b-40.q-pa-xs
-              q-icon(name="blur_on" color="white" size="30px").q-ml-sm
-              div(:style=`{overflowX: 'auto'}`).col.full-height
-                div(
-                  v-if="sphere"
-                  @click="sphereNameEditing = true").row.fit.cursor-pointer
-                  span(
-                    :style=`{fontSize: '18px', whiteSpace: 'nowrap', marginLeft: '12px',}`
-                    ).fit.text-white.text-bold {{ sphere.name }}
-            div(:style=`{paddingLeft: '14px',}`).row.full-width.justify-start
-              q-tabs(
-                :value="$route.name" @input="$router.replace({name: $event})"
-                no-caps dense active-color="white" switch-indicator).text-grey-8
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
-    router-view(v-if="sphere" :sphere="sphere")
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        .col
+          q-input(
+            v-if="sphere"
+            v-model="sphere.name"
+            borderless
+            :input-style=`{
+              color: 'white',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              //- paddingLeft: '10px',
+            }`
+            ).full-width
+            template(v-slot:prepend)
+              q-icon(name="blur_on" color="white" size="30px")
+              //- span.text-white #
+        q-btn(round flat color="white" icon="launch" @click="sphereLaunch()")
+        div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
+          q-tabs(
+            :value="typeId" @input="typeId = $event" inline-label
+            dense no-caps active-color="green" align="left"
+            ).full-width.text-grey-8
+            q-tab(name="details" label="Детали").q-px-md
+            q-tab(name="items" label="Элементы").q-px-md
+    component(v-if="sphere" :is="`sphere-${typeId}`" :sphere="sphere")
 </template>
 
 <script>
@@ -30,13 +35,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_wsSphere',
-  // meta () {
-  //   return {
-  //     title: this.sphere ? this.sphere.name : ''
-  //   }
-  // },
+  components: {
+    sphereDetails: () => import('./sphere_details.vue'),
+    sphereExplore: () => import('./sphere_explore.vue'),
+    sphereItems: () => import('./sphere_items.vue')
+  },
   data () {
     return {
+      typeId: 'items',
       sphere: null,
       sphereNameEditing: false,
       viewId: 'items',
@@ -66,6 +72,11 @@ export default {
     }
   },
   methods: {
+    sphereLaunch () {
+      this.$log('sphereLaunch')
+      // get sphere oid if there is one?
+      // and go to this
+    },
     outHandle ([type, val]) {
       this.$log('outHandle', type, val)
       if (type === 'back') {
@@ -75,11 +86,13 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

@@ -1,18 +1,16 @@
 <template lang="pug">
-q-page(
-  :style=`{paddingTop: '20px', paddingBottom: '400px'}`)
-  .row.full-width.items-start.content-start.justify-center
-    div(
-      :class=`{
-        'q-px-sm': $q.screen.width < 800
-      }`
-      :style=`{maxWidth: '716px', overflow: 'hidden'}`).row.full-width
-      //- small.text-white {{sphere}}
+.row.full-width.justify-center.q-px-sm
+  div(
+    :style=`{
+      position: 'relative', minHeight: '500px',
+      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      borderRadius: '10px', overflow: 'hidden',
+    }`
+    ).row.full-width.items-between.content-between.q-px-md.b-40
+    .row.full-width.q-py-md
       ws-sphere-editor(:item="sphere" :hiddenIds="[sphere.id]")
-      .row.full-width.q-mt-xl
-          q-btn(outline color="green" no-caps @click="renameStart()") Rename sphere
-      .row.full-widthq.q-py-xl
-        q-btn(outline color="red" no-caps @click="deletStart()") Delete sphere
+    .row.full-widthq.q-py-xl
+      q-btn(flat color="red" no-caps @click="deletStart()") Удалить
 </template>
 
 <script>
