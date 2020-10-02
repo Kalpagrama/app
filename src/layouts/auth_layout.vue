@@ -31,14 +31,18 @@ export default {
         if (to) {
           this.$log('$route.query.token TO', to)
           let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
-          this.$log('userId', userId)
-          this.$log('loginType', loginType)
-          this.$log('needInvite', needInvite)
-          this.$log('needConfirm', needConfirm)
+          // let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = {
+          //   loginType: 'EMAIL',
+          //   userId: 'ivanq3w@gmail.com',
+          //   userExist: true,
+          //   needInvite: true,
+          //   needConfirm: false,
+          // }
+          console.log({loginType, userId, userExist, needInvite, needConfirm, token})
           let code
           if (needInvite) {
             // go to invite code...
-            code = prompt('Enter invite code...')
+            code = prompt('Enter invite code')
           }
           try {
             let {result, failReason, oid} = await AuthApi.userAuthenticate('', code)
