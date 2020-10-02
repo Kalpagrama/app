@@ -33,15 +33,28 @@
             link-item(
               @click="$router.push({params: {item: 0}})"
               v-if="link.items[0]" :item="link.items[0]" :link="link")
-            .row.full-width.justify-end.q-pa-sm
-              //- span(:style=`{fontSize: '18px'}`).text-white.text-bold Причина
+            div(:style=`{height: '40px'}`).row.full-width.justify-end
+              transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+                q-btn(
+                  v-if="itemsTypesShow && link.items[0]"
+                  icon-right="keyboard_arrow_down"
+                  flat dense color="grey-6" no-caps)
+                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[0].type).name }}
+                  q-menu(dark)
+                    div(:style=`{width: '100px'}`).row
+                      q-btn(
+                        @click="itemTypeSet(0, t.id)"
+                        v-for="(t,ti) in itemTypes" :key="t.id"
+                        v-if="t.id !== link.items[0].type"
+                        flat dense no-caps color='grey-2').full-width {{ t.name }}
         div(:style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
           .col
           q-icon(name="link" color="green" size="30px" :style=`{marginLeft: '0px'}`).q-mt-xl
           .col
           q-btn(
             @click="linkTuneToggle"
-            round flat dense color="grey-6" icon="tune" :style=`{bottom: 0, marginLeft: '0px'}`).q-mb-lg
+            :color="itemsTypesShow ? 'green' : 'grey-6'"
+            round flat dense icon="tune" :style=`{bottom: 0, marginLeft: '0px'}`).q-mb-lg
         .col
           div(:style=`{transform: 'perspective(600px) rotateY(-14deg)'}`).row.fit.items-end.content-end
             //- div(v-if="link.items[1]").row.full-width.justify-end
@@ -51,45 +64,26 @@
             link-item(
               @click="$router.push({params: {item: 1}})"
               v-if="link.items[1]" :item="link.items[1]" :link="link")
-            .row.full-width.justify-start.q-pa-sm
-              //- span(:style=`{fontSize: '18px'}`).text-white.text-bold Следствие
-    //- connection
+            div(:style=`{height: '40px',}`).row.full-width.justify-start
+              transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+                q-btn(
+                  v-if="itemsTypesShow && link.items[1]"
+                  icon="keyboard_arrow_down"
+                  flat dense color="grey-6" no-caps)
+                  span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[1].type).name }}
+                  q-menu(dark)
+                    div(:style=`{width: '100px'}`).row
+                      q-btn(
+                        @click="itemTypeSet(1, t.id)"
+                        v-for="(t,ti) in itemTypes" :key="t.id"
+                        v-if="t.id !== link.items[1].type"
+                        flat dense no-caps color='grey-2').full-width {{ t.name }}
+    //- name
     div(v-if="link").row.full-width.items-center.content-center.justify-center.q-py-xs
-      //- .col
-        .row.full-width.items-center.content-center.justify-end.q-pa-sm
-          transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
-            q-btn(
-              v-if="itemsTypesShow && link.items[0]"
-              icon="keyboard_arrow_down"
-              flat dense color="grey-6" no-caps)
-              span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[0].type).name }}
-              q-menu(dark)
-                div(:style=`{width: '100px'}`).row
-                  q-btn(
-                    @click="itemTypeSet(0, t.id)"
-                    v-for="(t,ti) in itemTypes" :key="t.id"
-                    v-if="t.id !== link.items[0].type"
-                    flat dense no-caps color='grey-2').full-width {{ t.name }}
-      //- q-icon(name="link" color="green" size="md")
-      //- .col
-        .row.full-width.items-center.content-center.justify-start.q-pa-sm
-          transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
-            q-btn(
-              v-if="itemsTypesShow && link.items[1]"
-              icon-right="keyboard_arrow_down"
-              flat dense color="grey-6" no-caps)
-              span.text-white.text-bold {{ itemTypes.find(i => i.id === link.items[1].type).name }}
-              q-menu(dark)
-                div(:style=`{width: '100px'}`).row
-                  q-btn(
-                    @click="itemTypeSet(1, t.id)"
-                    v-for="(t,ti) in itemTypes" :key="t.id"
-                    v-if="t.id !== link.items[1].type"
-                    flat dense no-caps color='grey-2').full-width {{ t.name }}
-      //- name
       .row.full-width.justify-center
-        //- div(:style=`{maxWidth: '600px',}`).row.full-width
+        div(:style=`{maxWidth: '600px',}`).row.full-width
           q-input(
+            v-if="['ASSOCIATIVE'].includes(this.link.type)"
             v-model="link.name"
             borderless dark type="textarea" autogrow
             placeholder="How are they connected?"
@@ -144,6 +138,7 @@ export default {
   computed: {
     itemTypes () {
       return [
+        {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
         {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
         {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
         {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
@@ -156,10 +151,24 @@ export default {
       ]
     },
     itemsTypesShow () {
-      return this.link && this.link.name.length === 0
+      if (['ESSENCE', 'ASSOCIATIVE'].includes(this.link.type)) return false
+      else return true
+    },
+    linkNameShow () {
+      if (this.link.items[0] && this.link.items[0].type === 'ESSENCE') return true
+      if (this.link.items[1] && this.link.tiems[1].type === 'ESSENCE') return true
+      else return false
+    },
+    linkExtended () {
+      return ['ESSENCE', 'ASSOCIATIVE'].includes(this.link.type) && this.link.name.length > 0
     }
   },
   watch: {
+    'link.name': {
+      handler (to, from) {
+        if (to.length > 0) this.link.type = 'ESSENCE'
+      }
+    },
     'link.items.0': {
       deep: true,
       handler (to, from) {
@@ -231,22 +240,15 @@ export default {
   methods: {
     linkTuneToggle () {
       this.$log('linkTuneToggle')
-      if (this.link.name === 0) {
-        if (this.link.items[0]) {
-          this.link.items[0].type = 'PROMLEM'
-        }
-        if (this.link.items[1]) {
-          this.link.items[1].type = 'SOLUTION'
-        }
+      if (this.link.type === 'ESSENCE') {
+        this.link.type = 'PROBLEM_SOLUTION'
+        if (this.link.items[0]) this.link.items[0].type = 'PROBLEM'
+        if (this.link.items[1]) this.link.items[0].type = 'SOLUTION'
       }
       else {
-        this.link.name = ''
-        if (this.link.items[0]) {
-          this.link.items[0].type = 'ASSOCIATIVE'
-        }
-        if (this.link.items[1]) {
-          this.link.items[1].type = 'ASSOCIATIVE'
-        }
+        this.link.type = 'ESSENCE'
+        if (this.link.items[0]) this.link.items[0].type = 'ESSENCE'
+        if (this.link.items[1]) this.link.items[0].type = 'ESSENCE'
       }
     },
     itemTypeSet (index, type) {
