@@ -58,7 +58,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.sphereOid
         },
-        populateObjects: false,
+        populateObjects: true,
       }
     }
   }

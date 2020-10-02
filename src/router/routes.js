@@ -253,12 +253,12 @@ const routes = [
             component: () => import('pages/app/notifications/index.vue'),
             // component: () => import('components/node_editor/index.vue'),
             children: [
-               // {
-               //    name: 'notifications',
-               //    path: '',
-               //    component: () => import('pages/app/notifications/view_home.vue'),
-               //    meta: { roleMinimal: 'MEMBER' }
-               // }
+               {
+                  name: 'notifications',
+                  path: '',
+                  component: () => import('pages/app/notifications/view_home.vue'),
+                  meta: { roleMinimal: 'MEMBER' }
+               }
             ],
             meta: { roleMinimal: 'MEMBER' }
          },

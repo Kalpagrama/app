@@ -14,6 +14,10 @@ const FindCollectionEnum = Object.freeze({
    EVENTS: 'EVENTS'
 })
 
+function makeEventDescription(event){
+   return JSON.stringify(event)
+}
+
 class ListsApi {
    // sphereItems query
    static checkMangoQuery (mangoQuery) {
@@ -53,6 +57,9 @@ class ListsApi {
       switch (rxCollectionEnum) {
          case RxCollectionEnum.LST_FEED:
             res = await ListsApi.find(FindCollectionEnum.EVENTS, mangoQuery)
+            for (let event of res.items){
+               event.description = makeEventDescription(event)
+            }
             break
          case RxCollectionEnum.LST_SPHERE_NODES:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')

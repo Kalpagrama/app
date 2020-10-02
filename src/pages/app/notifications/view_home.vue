@@ -1,13 +1,14 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.justify-center
-  kalpa-loader(v-if="sphereOid" :query="query" :limit="100" v-slot=`{items,next}`)
+  kalpa-loader(v-if="sphereOid" :immediate="true" :query="query" :limit="100" v-slot=`{items,next}`)
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-for="(n,ni) in items" :key="n.id"
         :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.b-40.q-px-md.q-mb-sm
         span.text-white {{ n.subject.name }} =>
-        span.text-white {{ n.matter.reason }}
+        span.text-white {{ n.matter.reason }} =>
+        span.text-white {{ n.description }}
 </template>
 
 <script>

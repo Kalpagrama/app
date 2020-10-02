@@ -77,11 +77,10 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
-          // populateObjects: true,
           oidSphere: this.$store.getters.currentUser().oid,
           // subscription: {$in: this.subscriptions}
         },
-        // populateObjects: true,
+        populateObjects: true,
       }
     }
   },

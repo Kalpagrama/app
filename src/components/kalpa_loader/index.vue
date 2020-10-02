@@ -62,7 +62,7 @@ export default {
       this.$log('next')
       if (!this.items || !this.items.next) {
         // this.$log('next2')
-        this.query.populateObjects = true // ?????? ВСЕГДА запрашиваем полные сушности???
+        // this.query.populateObjects = true // ?????? ВСЕГДА запрашиваем полные сушности???
         this.items = await this.$rxdb.find(this.query, false)
       }
       // this.$log('next3')
