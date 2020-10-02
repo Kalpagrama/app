@@ -470,7 +470,7 @@ class RxDBWrapper {
 
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-   async find (mangoQuery) {
+   async find (mangoQuery, autoNext = true) {
       const f = this.find
       const t1 = performance.now()
       // logD(f, 'start', mangoQuery)
@@ -535,6 +535,7 @@ class RxDBWrapper {
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveItemDbMemCache.set(queryId, findResult)
          }
+         if (autoNext) await findResult.next()
          this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult, '!result')
          return findResult

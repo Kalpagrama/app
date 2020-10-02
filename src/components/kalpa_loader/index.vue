@@ -61,8 +61,8 @@ export default {
     async next (i, done) {
       this.$log('next')
       if (!this.items) {
-        this.query.populateObjects = true // ??????
-        this.items = await this.$rxdb.find(this.query)
+        this.query.populateObjects = true // ?????? ВСЕГДА запрашиваем полные сушности???
+        this.items = await this.$rxdb.find(this.query, false)
       }
       let hasMore = await this.items.next(this.limit)
       if (hasMore) done()

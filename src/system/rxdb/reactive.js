@@ -364,6 +364,10 @@ class ReactiveListHolderWithPagination {
             this.nextIndex = 0 // первая незаполненная позиция
             this.populateFunc = populateFunc
             this.reactiveListPagination.next = async (count) => {
+               if (!count && this.nextIndex === 0) { // autoNext
+                  if (this.populateFunc) count = 8
+                  else count = this.reactiveListFull.length
+               }
                if (this.nextIndex >= this.reactiveListFull.length) return false
                let fromIndex = this.nextIndex
                this.nextIndex = this.nextIndex + count
