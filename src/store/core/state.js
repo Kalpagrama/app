@@ -29,7 +29,7 @@ export default {
       LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
       // LogSystemModulesEnum.RXDB_OBJ,
-      LogSystemModulesEnum.RXDB_GQL,
+      // LogSystemModulesEnum.RXDB_GQL,
       // LogSystemModulesEnum.RXDB_LST,
       LogSystemModulesEnum.RXDB_EVENT,
       LogSystemModulesEnum.MUTEX,

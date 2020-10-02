@@ -302,7 +302,9 @@ class Workspace {
          if (wsOperationEnum === WsOperationEnum.UPSERT) {
             await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
          } else {
-            await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
+            if (item.rev){ // если нет rev - то элемент еще не создавался на сервере
+               await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
+            }
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
