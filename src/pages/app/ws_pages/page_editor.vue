@@ -72,7 +72,8 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route.params.id TO', to)
-        let {items: [page]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, id: to}})
+        let page = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
+        // let [page] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, id: to}})
         if (page) {
           this.page = page
         }

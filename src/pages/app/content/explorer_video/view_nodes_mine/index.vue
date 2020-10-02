@@ -207,13 +207,14 @@ export default {
       // get nodes
       await Promise.all(
         this.nodesChecked.map(async (nodeId) => {
-          let {items: [node]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_NODE, id: nodeId } })
+          let node = await this.$rxdb.get(RxCollectionEnum.WS_NODE, nodeId)
+          // let [node] = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_NODE, id: nodeId } })
           this.$log('node', node)
           // if we got node
           if (node) {
             // add names to spheres
             if (node.name && node.name.length > 0) {
-              let {items: [sphere]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: node.name } })
+              let [sphere] = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: node.name } })
               // create sphere if there is no one
               if (!sphere) {
                 let sphereInput = {

@@ -154,7 +154,8 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.id TO', to)
         if (to) {
-          let {items: [feed]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, id: to } })
+          let feed = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, to)
+          // let [feed] = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, id: to } })
           this.$log('FOUND feed', feed)
           this.feed = feed
         }

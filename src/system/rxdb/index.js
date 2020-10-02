@@ -9,7 +9,7 @@ import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
-import { getReactive, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveListHolderWithPagination } from 'src/system/rxdb/reactive'
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
@@ -392,85 +392,89 @@ class RxDBWrapper {
    }
 
    // вернет список из objectFull
-   async find (mangoQuery) {
-      const f = this.find
-      const t1 = performance.now()
-      logD(f, 'start', mangoQuery)
-      mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-
-      let result = { items: [], count: 0, totalCount: 0, nextPageToken: null, prevPageToken: mangoQuery.pageToken }
-      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-      let pageToken = mangoQuery.pageToken || { indx: 0, id: null }
-      let populateObjects = mangoQuery.populateObjects
-      let limit = parseInt(mangoQuery.limit)
-      delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.populateObjects // мешает нормальному кэшированию запросов в findInternal
-      delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
-
-      if (!limit) limit = populateObjects ? 88 : 8888
-      let startIndx = pageToken.indx
-      let nextIndx = startIndx + limit
-
-      if (rxCollectionEnum in WsCollectionEnum) {
-         if (pageToken && pageToken.id) mangoQuery.startkey = pageToken.id
-         else if (pageToken && pageToken.indx) mangoQuery.skip = pageToken.indx
-         result.items = (await this.findInternal(mangoQuery)).items
-         result.count = result.items.length
-         result.totalCount = 100500
-         result.nextPageToken = result.count ? {
-            indx: nextIndx,
-            id: result.items[result.items.length - 1].id
-         } : null
-      } else if (rxCollectionEnum in LstCollectionEnum) {
-         let objectShortList = await this.findInternal(mangoQuery)
-         let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
-         let objectShortItemsPrefetch = objectShortList.items.slice(nextIndx, nextIndx + 3) // упреждающее чтение
-         if (populateObjects) {
-            if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
-               // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-               const itemsFull = await Promise.all(
-                  objectShortItemsLimit.reduce((accumulator, { object, subject }) => {
-                     accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
-                     // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
-                     return accumulator
-                  }, [])
-               )
-               result.items = cloneDeep(objectShortItemsLimit)
-               for (let item of result.items){
-                  item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
-               }
-            logD('asdasdas', result.items)
-            } else {
-               // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-               result.items = await Promise.all(objectShortItemsLimit.map(objShort => {
-                  logD('objShort=', objShort)
-                  return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
-               }))
-               objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
-                  clientFirst: true,
-                  priority: 1
-               })) // в фоне делаем упреждающее чтение
-               result.items = result.items.filter(obj => !!obj)
-            }
-         } else result.items = objectShortItemsLimit
-         result.count = result.items.length
-         result.totalCount = objectShortList.items.length
-         result.nextPageToken = objectShortList.items[nextIndx] ? {
-            indx: nextIndx,
-            id: objectShortList.items[nextIndx].oid
-         } : null
-      }
-      // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
-      return result
-   }
+   // async find___ (mangoQuery) {
+   //    const f = this.find
+   //    const t1 = performance.now()
+   //    logD(f, 'start', mangoQuery)
+   //    mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+   //
+   //    let result = { items: [], count: 0, totalCount: 0, nextPageToken: null, prevPageToken: mangoQuery.pageToken }
+   //    let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+   //    let pageToken = mangoQuery.pageToken || { indx: 0, id: null }
+   //    let populateObjects = mangoQuery.populateObjects
+   //    let limit = parseInt(mangoQuery.limit)
+   //    delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
+   //    delete mangoQuery.populateObjects // мешает нормальному кэшированию запросов в findInternal
+   //    delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
+   //
+   //    if (!limit) limit = populateObjects ? 88 : 8888
+   //    let startIndx = pageToken.indx
+   //    let nextIndx = startIndx + limit
+   //
+   //    if (rxCollectionEnum in WsCollectionEnum) {
+   //       if (pageToken && pageToken.id) mangoQuery.startkey = pageToken.id
+   //       else if (pageToken && pageToken.indx) mangoQuery.skip = pageToken.indx
+   //       result.items = (await this.findInternal(mangoQuery)).items
+   //       result.count = result.items.length
+   //       result.totalCount = 100500
+   //       result.nextPageToken = result.count ? {
+   //          indx: nextIndx,
+   //          id: result.items[result.items.length - 1].id
+   //       } : null
+   //
+   //       const result = await (new ReactiveListHolderWithPagination()).create(rxQuery)
+   //
+   //    } else if (rxCollectionEnum in LstCollectionEnum) {
+   //       let objectShortList = await this.findInternal(mangoQuery)
+   //       let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
+   //       let objectShortItemsPrefetch = objectShortList.items.slice(nextIndx, nextIndx + 3) // упреждающее чтение
+   //       if (populateObjects) {
+   //          if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
+   //             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+   //             const itemsFull = await Promise.all(
+   //                objectShortItemsLimit.reduce((accumulator, { object, subject }) => {
+   //                   accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
+   //                   // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
+   //                   return accumulator
+   //                }, [])
+   //             )
+   //             result.items = cloneDeep(objectShortItemsLimit)
+   //             for (let item of result.items) {
+   //                item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
+   //             }
+   //             logD('asdasdas', result.items)
+   //          } else {
+   //             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+   //             result.items = await Promise.all(objectShortItemsLimit.map(objShort => {
+   //                logD('objShort=', objShort)
+   //                return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+   //             }))
+   //             objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
+   //                clientFirst: true,
+   //                priority: 1
+   //             })) // в фоне делаем упреждающее чтение
+   //             result.items = result.items.filter(obj => !!obj)
+   //          }
+   //       } else result.items = objectShortItemsLimit
+   //       result.count = result.items.length
+   //       result.totalCount = objectShortList.items.length
+   //       result.nextPageToken = objectShortList.items[nextIndx] ? {
+   //          indx: nextIndx,
+   //          id: objectShortList.items[nextIndx].oid
+   //       } : null
+   //    }
+   //    // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
+   //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
+   //    return result
+   // }
 
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-   async findInternal (mangoQuery) {
-      const f = this.findInternal
+   async find (mangoQuery) {
+      const f = this.find
       const t1 = performance.now()
       // logD(f, 'start', mangoQuery)
+      assert(!mangoQuery.pageToken && !mangoQuery.limit)
       try {
          assert(this.initialized, '! this.initialized !')
          await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
@@ -487,32 +491,53 @@ class RxDBWrapper {
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
-               const reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-               assert(reactiveList, '!reactiveList')
-               findResult = reactiveList
+               findResult = await (new ReactiveListHolderWithPagination()).create(rxQuery)
+               assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
+               let populateObjects = mangoQuery.populateObjects
+               delete mangoQuery.populateObjects // мешает нормальному кэшированию
                let rxDoc = await this.lists.find(mangoQuery)
-               findResult = getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
+               let populateFunc = async (itemsForPopulate, itemsForPrefetch) => {
+                  let populatedItems
+                  if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
+                     // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+                     const itemsFull = await Promise.all(
+                        itemsForPopulate.reduce((accumulator, { object, subject }) => {
+                           accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
+                           // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
+                           return accumulator
+                        }, [])
+                     )
+                     populatedItems = cloneDeep(itemsForPopulate)
+                     for (let item of populatedItems) {
+                        item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
+                     }
+                  } else {
+                     // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
+                     populatedItems = await Promise.all(itemsForPopulate.map(objShort => {
+                        logD('objShort=', objShort)
+                        return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+                     }))
+                     if (itemsForPrefetch) {
+                        itemsForPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
+                           clientFirst: true,
+                           priority: 1
+                        })) // в фоне делаем упреждающее чтение
+                     }
+                  }
+                  assert(populatedItems && Array.isArray(populatedItems))
+                  return populatedItems.filter(obj => !!obj)
+               }
+               findResult = await (new ReactiveListHolderWithPagination()).create(rxDoc, populateObjects ? populateFunc : null)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveItemDbMemCache.set(queryId, findResult)
          }
-
          this.store.commit('debug/addFindResult', { queryId, findResult })
-         let result
-         if (findResult.getData) result = findResult.getData()
-         else {
-            assert(Array.isArray(findResult))
-            result = {
-               items: findResult,
-               count: findResult.length,
-               totalCount: findResult.length,
-               nextPageToken: null
-            }
-         }
-         return result
+         assert(findResult, '!result')
+         return findResult
       } finally {
          this.release()
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
@@ -546,20 +571,21 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, rawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
-      // logW(f, 'start', rxCollectionEnum, rawId)
-      if (rawId) {
-         assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-         assert(!rawId.includes('::'), '!rawId.includes(::)')
-         assert(!id, 'NO !id')
-         id = makeId(rxCollectionEnum, rawId)
-      } else {
-         assert(!rxCollectionEnum, '!rxCollectionEnum')
+      // logW(f, 'start', rxCollectionEnum, idOrRawId)
+      if (!id) {
+         assert(idOrRawId)
+         if (idOrRawId.includes('::')) {
+            id = idOrRawId
+         } else {
+            assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+            id = makeId(rxCollectionEnum, idOrRawId)
+         }
       }
-      assert(id, 'GOT id')
-      assert(id.includes('::'), 'id.includes(::)')
+      assert(id, 'bad id: ' + id)
+      rxCollectionEnum = getRxCollectionEnumFromId(id) // иногда вызывается без rxCollectionEnum (когда известен только id)
       let reactiveItem
       if (!force) { // вернем из быстрого кэша реактивных элементов
          let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)

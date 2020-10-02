@@ -53,12 +53,13 @@ export default {
       async handler (to, from) {
         this.$log('id TO', to)
         if (to) {
-          let {items: [item]} = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-              id: to
-            }
-          })
+          let item = await this.$rxdb.get(RxCollectionEnum.WS_SPHERE, to)
+          // let [item] = await this.$rxdb.find({
+          //   selector: {
+          //     rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+          //     id: to
+          //   }
+          // })
           this.sphere = item
         }
       }

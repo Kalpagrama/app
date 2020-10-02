@@ -200,12 +200,13 @@ export default {
             )
           }
           else {
-            let {items: [item]} = await this.$rxdb.find({
-              selector: {
-                rxCollectionEnum: RxCollectionEnum.WS_JOINT,
-                id: to
-              }
-            })
+            let item = await this.$rxdb.get(RxCollectionEnum.WS_JOINT, to)
+            // let [item] = await this.$rxdb.find({
+            //   selector: {
+            //     rxCollectionEnum: RxCollectionEnum.WS_JOINT,
+            //     id: to
+            //   }
+            // })
             this.$log('FOUND link', item)
             this.link = item
           }

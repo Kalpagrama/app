@@ -182,7 +182,8 @@ export default {
           // if (viewId) this.viewId = viewId
         }
         // find bookmark
-        let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        let contentBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.contentKalpa.oid)
+        // let [contentBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
         this.$log('contentBookmark', contentBookmark)
         if (contentBookmark) this.contentBookmark = contentBookmark
       }
@@ -191,7 +192,8 @@ export default {
   methods: {
     async contentBookmarkCreate () {
       this.$log('contentBookmarkCreate')
-      let {items: [contentBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+      let contentBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.contentKalpa.oid)
+      // let [contentBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
       if (!contentBookmark) {
         let contentBookmarkInput = {
           oid: this.contentKalpa.oid,
