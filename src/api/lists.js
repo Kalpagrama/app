@@ -22,6 +22,7 @@ class ListsApi {
       const t1 = performance.now()
       let ex = {
          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
             oidSphere: 'AGKAwKuAwCU=',
             objectTypeEnum: { $in: ['WORD', 'SENTENCE'] },
             oidAuthor: 'AF6H7dLAoAI=',
