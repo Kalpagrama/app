@@ -116,8 +116,9 @@ export default {
   },
   async created () {
     this.$log('created')
-    const items = await this.$rxdb.find(this.queryNodes)
-    this.$log(items)
+    // const items = await this.$rxdb.find(this.queryNodes)
+    // // await items.next(3)
+    // this.$log(items)
   },
   methods: {
     nodeClick (node) {
