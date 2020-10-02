@@ -8,13 +8,11 @@
       q-input(
         v-model="searchString"
         filled dark dense
-        placeholder="Search Meme"
+        placeholder="Поиск"
         :debounce="600"
         ).full-width
   //- items
   .row.full-width.q-pt-sm
-    .row.full-width.justify-center.q-pa-md
-      span.text-white no memes :(
 </template>
 
 <script>

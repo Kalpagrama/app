@@ -28,7 +28,7 @@ kalpa-loader(
         }`
         ).row.full-width.link-item.b-40
         //- items wrapper
-        .row.full-width
+        .row.full-width.items-end.content-end
           div(v-for="(i,ii) in link.items" :key="ii").col-6
             .row.full-width.justify-center.q-pa-xs
               img(
@@ -37,7 +37,7 @@ kalpa-loader(
                 :src="i.item.thumbUrl"
                 :style=`{
                   transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
-                  borderRadius: '10px', overflow: 'hidden'
+                  borderRadius: '10px', overflow: 'hidde n'
                 }`).full-width
               .row.full-width.justify-center.q-pa-xs
                 //- small.text-white {{ i.item.name.slice(0, 40) }}

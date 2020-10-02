@@ -44,7 +44,9 @@
                         v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(t.id)"
                         flat dense no-caps color='grey-2').full-width {{ t.name }}
         //- items divider
-        div(:style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
+        div(
+          v-if="$q.screen.width > 600"
+          :style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
           .col
           q-icon(name="link" color="green" size="30px")
           .col
@@ -239,12 +241,6 @@ export default {
           }
           else {
             let item = await this.$rxdb.get(RxCollectionEnum.WS_JOINT, to)
-            // let [item] = await this.$rxdb.find({
-            //   selector: {
-            //     rxCollectionEnum: RxCollectionEnum.WS_JOINT,
-            //     id: to
-            //   }
-            // })
             this.$log('FOUND link', item)
             this.link = item
           }
@@ -253,19 +249,6 @@ export default {
     },
   },
   methods: {
-    linkTuneToggle () {
-      this.$log('linkTuneToggle')
-      if (this.link.type === 'ESSENCE') {
-        this.link.type = 'PROBLEM_SOLUTION'
-        if (this.link.items[0]) this.link.items[0].type = 'PROBLEM'
-        if (this.link.items[1]) this.link.items[0].type = 'SOLUTION'
-      }
-      else {
-        this.link.type = 'ESSENCE'
-        if (this.link.items[0]) this.link.items[0].type = 'ESSENCE'
-        if (this.link.items[1]) this.link.items[0].type = 'ESSENCE'
-      }
-    },
     itemTypeSet (index, type) {
       this.$log('itemTypeSet', index, type)
       this.$set(this.link.items[index], 'type', type)

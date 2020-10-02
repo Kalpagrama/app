@@ -8,15 +8,15 @@
       q-input(
         v-model="tenorSearch"
         filled dark dense color='grey-7'
-        placeholder="Search GIF"
+        placeholder="Поиск"
         :debounce="600"
         ).full-width
     .row.full-width.q-px-md
       q-tabs(
         v-model="viewId"
-        dense active-color="green" no-caps switch-indicator
+        dense active-color="green" no-caps switch-indicator inline-label
         ).full-width.text-grey-6
-        q-tab(name="bookmarked" icon="bookmark")
+        q-tab(name="bookmarked" icon="bookmark" label="Закладки")
         q-tab(name="search" :label="$t('Search', 'Поиск')")
   //- body
   .row.full-width
