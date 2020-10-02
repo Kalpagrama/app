@@ -212,7 +212,11 @@ const routes = [
                   path: 'link/:id/:item?',
                   component: () => import('pages/app/ws_link/index.vue')
                },
-               { name: 'workspace.node', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
+               {
+                  name: 'workspace.node',
+                  path: 'node/:id/:item?',
+                  component: () => import('pages/app/ws_node/index.vue')
+               },
                {
                   name: 'workspace.spheres',
                   path: 'spheres',

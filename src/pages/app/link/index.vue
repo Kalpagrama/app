@@ -16,7 +16,7 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         link-feed(v-if="link" :link="link")
-        .row.full-width
+        .row.full-width.q-px-md
           q-tabs(
             v-model="viewId"
             dense active-color="green"
@@ -45,7 +45,7 @@ export default {
   computed: {
     title () {
       if (this.link) {
-        if (this.link.jointType === 'ASSOCIATIVE') return 'Associations'
+        if (this.link.jointType === 'ASSOCIATIVE') return ''
         else return this.link.name
       }
       else return ''

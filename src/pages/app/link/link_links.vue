@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-pr-sm
   masonry(
-    :cols="5"
+    :cols="$q.screen.width < 800 ? 2 : 4"
     :gutter="{default: 10}").full-width.q-pr-sm
     div(
       v-for="n in 10" :key="n"

@@ -53,13 +53,26 @@ q-layout(view="hHh Lpr lff")
           div(
             v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
             ).row.full-width.items-start.content-start.justify-center
+            //- node author
+            .row.full-width.justify-center
+              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
+                q-btn(
+                  :to="'/user/'+node.author.oid"
+                  flat color="white" dense no-caps
+                  )
+                  user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
+                  span.text-grey-4.q-ml-sm {{ node.author.name }}
+                .col
+                small.text-grey-8.q-mr-xs {{ node.countViews }}
+                q-icon(name="visibility" color="grey-8").q-mr-md
+                small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
             div(
               :style=`{
                 maxWidth: $store.state.ui.pageMaxWidth+'px',
                 borderRadius: '10px', overflow: 'hidden',}`
               ).row.full-width.b-40.q-px-sm
               list-middle(
-                rootMargin="-40% 0px"
+                rootMargin="-30% 0px"
                 :items="node.items" :itemStyles=`{marginTop: '16px',}`)
                 template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
                   div(
@@ -102,22 +115,24 @@ q-layout(view="hHh Lpr lff")
                 span.text-white {{ node.description }}
         node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
         //- node is creating, wait...
-        node-mockup(
-          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
+        .row.full-width.justify-center
+          node-mockup(
+            v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
+            :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
+            :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
         .row.full-width.justify-center.q-pt-xl
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
             router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
-        :style=`{zIndex: 99999}`)
+        :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
             v-if="true"
             @click="$router.push('/workspace/link/new?oid='+node.oid)"
             no-caps color="green" icon="insert_link" size="md")
-            span.text-white.text-bold.q-ml-sm {{ $t('Link', 'Связать') }}
+            span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
 </template>
 
 <script>
@@ -239,12 +254,12 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
     // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
     // this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }

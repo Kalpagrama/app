@@ -217,7 +217,7 @@ export default {
         this.$log('id TO', to)
         if (to) {
           if (to === 'new') {
-            this.$q.notify({type: 'positive', position: 'top', message: 'Creating new link'})
+            // this.$q.notify({type: 'positive', position: 'top', message: 'Creating new link'})
             this.link = JSON.parse(JSON.stringify(this.linkNew))
             // get first item
             if (this.$route.query.oid) {

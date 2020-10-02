@@ -93,6 +93,12 @@
           span(
             v-if="showRightSide"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
+        //- create link
+        q-btn(
+          :to="'/workspace/link/new'"
+          flat color="green" no-caps align="left" icon="link"
+          :style=`{height: '60px', paddingLeft: '2px'}`
+          ).full-width
         //- create node
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
@@ -104,24 +110,6 @@
             span(
               v-if="showRightSide"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
-        //- create node new
-        //- q-btn(
-          :to="'/workspace/node/new'"
-          flat color="green" no-caps align="left" icon="amp_stories"
-          :style=`{height: '60px', paddingLeft: '2px'}`
-          ).full-width
-        //- create link
-        //- q-btn(
-          :to="'/workspace/link/new'"
-          flat color="green" no-caps align="left" icon="link"
-          :style=`{height: '60px', paddingLeft: '2px'}`
-          ).full-width
-        //- create link
-        //- q-btn(
-          :to="'/link-create'"
-          flat color="red" no-caps align="left" icon="link"
-          :style=`{height: '60px', paddingLeft: '2px'}`
-          ).full-width
         //- version
         div(v-if="showRightSide").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
@@ -137,7 +125,7 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'rss_feed'},
+        // {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
         // {id: 'home', name: this.$t('pageApp_Home_title', 'Домашняя'), icon: 'home'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},

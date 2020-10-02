@@ -41,7 +41,7 @@
 
 <script>
 import { NodeApi } from 'src/api/node'
-// import { RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'viewPublish',
@@ -100,7 +100,17 @@ export default {
         this.$log('publish start')
         this.publishing = true
         this.publishCheck()
-        let nodeInput = this.node
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        // get spheres from workspace
+        let spheres = []
+        await Promise.all(
+          nodeInput.spheres.map(async (sphereId) => {
+            let sphere = await this.$rxdb.get(RxCollectionEnum.WS_SPHERE, sphereId)
+            if (sphere) spheres.push({name: sphere.name})
+          })
+        )
+        nodeInput.spheres = spheres
+        // create node
         let createdNode = await NodeApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         this.$log('publish done')

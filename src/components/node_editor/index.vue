@@ -17,11 +17,13 @@
         height: '70px',
         maxWidth: 800+'px',
       }`).row.full-width.items-center.content-center
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
-      span(
-        :style=`{fontSize: '1rem'}`).text-white.text-bold Редактор ядра
+      q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
       .col
-      q-btn(
+      span(
+        :style=`{fontSize: '1rem'}`).text-grey-6.text-bold Редактор ядра
+      .col
+      q-btn(round flat color='grey-6' icon="more_vert")
+      //- q-btn(
         v-if="node.items.length > 0"
         flat no-caps color="white" icon-right="keyboard_arrow_down")
         span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ layoutName }}
@@ -54,7 +56,7 @@
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
     //- slider
-    list-slider(
+    //- list-slider(
       v-if="node.layout === 'SLIDER'" :items="node.items")
       template(v-slot:item=`{item,isActive,meta}`)
         edit-item(
@@ -64,7 +66,7 @@
           @duplicate="itemDuplicate(item)"
           @remove="itemRemove(item)")
     //- horizontal
-    div(
+    //- div(
       v-if="node.layout === 'HORIZONTAL'"
       ).row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
@@ -86,7 +88,7 @@
                 @remove="itemRemove(item)")
     //- vertical
     div(
-      v-if="node.layout === 'VERTICAL'"
+      v-if="['SLIDER', 'VERTICAL', 'PIP', 'HORIZONTAL'].includes(node.layout)"
       ).row.full-width.items-start.content-start.justify-center
       div(
         :style=`{
@@ -107,10 +109,11 @@
             @next="itemNext(item)"
             @prev="itemPrev(item)"
             @duplicate="itemDuplicate(item)"
-            @remove="itemRemove(item)")
+            @remove="itemRemove(item)"
+            @edit="$router.push({params: {item: ii}})")
         .row.full-width.items-center.content-center.justify-center.q-py-xs
           q-btn(flat color="green" icon="add" no-caps @click="itemFinderOpened = true").full-width Add item
-  .row.full-width.justify-center.q-mb-md
+  .row.full-width.justify-center.q-mb-xl
     div(
       :style=`{
         maxWidth: '800px',
@@ -120,24 +123,6 @@
       }`).row.full-width.b-40
       edit-name(:value="node.name" @input="node.name = $event").q-mb-xl
       view-publish(:node="node")
-  //- views
-  //- .row.full-width.justify-center.q-py-md
-    div(
-      :style=`{
-        maxWidth: 800+'px',
-        marginTop: node.items.length === 0 ? '100px' : '0px',
-      }`).row.full-width.items-start.content-start
-      component(
-        :is="`view-${viewId}`"
-        :node="node"
-        :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden',
-          background: 'rgb(35,35,35)',
-          minHeight: '500px',
-        }`
-        @viewId="viewId = $event"
-        @item="itemFound")
 </template>
 
 <script>
@@ -156,14 +141,6 @@ export default {
   },
   data () {
     return {
-      // node: {
-      //   category: 'FUN',
-      //   layout: 'SLIDER',
-      //   name: '',
-      //   description: '',
-      //   items: [],
-      //   spheres: [],
-      // },
       viewId: '',
       itemFinderOpened: false
     }
@@ -241,11 +218,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

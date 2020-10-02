@@ -1,9 +1,14 @@
 <template lang="pug">
-node-editor(
-  v-if="node"
-  :node="node"
-  :title="title"
-  @out="outHandle")
+.row.full-width
+  node-editor(
+    v-if="node && $route.params.item === undefined"
+    :node="node"
+    :title="title"
+    @out="outHandle")
+  item-editor(
+    v-if="node && $route.params.item !== undefined"
+    :item="node.items[parseInt($route.params.item)]"
+    @close="$router.back()")
 </template>
 
 <script>
@@ -13,13 +18,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageApp_wsNode',
   components: {
-    nodeEditor: () => import('components/node_editor/index.vue')
+    nodeEditor: () => import('components/node_editor/index.vue'),
+    itemEditor: () => import('components/node_editor/item_editor.vue')
   },
-  // meta () {
-  //   return {
-  //     title: this.node ? this.node.name : ''
-  //   }
-  // },
   data () {
     return {
       publishing: false,
@@ -62,12 +63,6 @@ export default {
           }
           else {
             let item = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
-            // let [item] = await this.$rxdb.find({
-            //   selector: {
-            //     rxCollectionEnum: RxCollectionEnum.WS_NODE,
-            //     id: to
-            //   }
-            // })
             this.$log('FOUND node', item)
             this.node = item
           }
@@ -86,10 +81,12 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>
