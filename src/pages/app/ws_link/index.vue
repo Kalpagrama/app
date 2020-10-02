@@ -347,8 +347,8 @@ export default {
           if (switchMap[this.link.type]) {
             this.$log('*** SWITCH ***', this.link.type)
             let t = jointInput.rightItem
-            jointInput.leftItem = jointInput.rightItem
-            jointInput.rightItem = t
+            jointInput.rightItem = jointInput.leftItem
+            jointInput.leftItem = t
             jointInput.jointType = switchMap[this.link.type]
           }
           else {
