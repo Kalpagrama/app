@@ -16,26 +16,16 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         link-feed(v-if="link" :link="link")
+        .row.full-width
+          q-tabs(
+            v-model="viewId"
+            dense active-color="green"
+            no-caps switch-indicator
+            ).full-width.text-grey-6
+            q-tab(name="gallery" label="Gallery")
+            q-tab(name="graph" label="Graph")
         .row.full-width.justify-center.q-pt-xl
-          //- .row.full-width.justify-center
-            span.text-white Something similar... links from items...
-          .row.full-width.q-pr-sm
-            masonry(
-              :cols="5"
-              :gutter="{default: 10}").full-width.q-pr-sm
-              div(
-                v-for="n in 10" :key="n"
-                :style=`{
-                  position: 'relative',
-                  height: 0, paddingBottom: '150%',
-                }`).row.full-width.q-pa-xs.q-mb-md
-                div(
-                  :style=`{
-                    position: 'absolute',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.fit.items-center.content-center.justify-center.b-40
-                  small.text-white link {{ n }}
+          link-links(v-if="link" :link="link")
 </template>
 
 <script>
@@ -43,8 +33,12 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_link',
+  components: {
+    linkLinks: () => import('./link_links.vue')
+  },
   data () {
     return {
+      viewId: 'gallery',
       link: null
     }
   },

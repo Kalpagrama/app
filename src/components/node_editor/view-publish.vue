@@ -15,6 +15,8 @@
         }`)
     .row.full-width.q-px-sm.q-py-sm
       edit-category(:node="node")
+    .row.full-width.q-px-sm
+      ws-sphere-editor(:item="node")
     //- .row.full-width.q-px-sm
       q-toggle(
         v-model="meta.isPrivate"
@@ -22,7 +24,7 @@
       q-toggle(
         v-model="meta.isMature"
         dark color="green" label="Mature").text-grey-6
-    .row.full-width.q-py-md.q-px-sm
+    .row.full-width.q-py-md.q-px-sm.q-mt-md
       q-btn(
         @click="publish()"
         color="green" size="xl" no-caps

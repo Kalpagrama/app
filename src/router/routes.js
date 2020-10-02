@@ -221,28 +221,7 @@ const routes = [
                {
                   name: 'workspace.sphere',
                   path: 'sphere/:id',
-                  // redirect: 'sphere/:id/items',
                   component: () => import('pages/app/ws_sphere/index.vue'),
-                  // children: [
-                  //    {
-                  //       name: 'workspace.sphere.details',
-                  //       path: 'details',
-                  //       component: () => import('pages/app/ws_sphere/sphere_details.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    },
-                  //    {
-                  //       name: 'workspace.sphere.items',
-                  //       path: 'items',
-                  //       component: () => import('pages/app/ws_sphere/sphere_items.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    },
-                  //    {
-                  //       name: 'workspace.sphere.explore',
-                  //       path: 'explore',
-                  //       component: () => import('pages/app/ws_sphere/sphere_explore.vue'),
-                  //       meta: { roleMinimal: 'MEMBER' }
-                  //    }
-                  // ]
                }
             ],
             meta: { roleMinimal: 'MEMBER' }

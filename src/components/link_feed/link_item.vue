@@ -11,7 +11,8 @@
       ).full-width
   //- node
   div(v-if="item.type === 'NODE'").row.full-width
-    node-mini(:node="item" :isActive="false" :isVisible="false")
+    node-mini(:node="item" :isActive="true" :isVisible="true")
+  slot(name="footer")
 </template>
 
 <script>

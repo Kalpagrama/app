@@ -29,7 +29,7 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.items-start.content-start.justify-center
         div(v-if="node").row.full-width
           //- SLIDER
-          div(
+          //- div(
             v-if="node.layout === 'SLIDER'"
             :style=`{
               position: 'relative',
@@ -51,7 +51,7 @@ q-layout(view="hHh Lpr lff")
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
           //- PIP, VERTICAL
           div(
-            v-if="['PIP', 'VERTICAL'].includes(node.layout)"
+            v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
             ).row.full-width.items-start.content-start.justify-center
             div(
               :style=`{
@@ -97,35 +97,14 @@ q-layout(view="hHh Lpr lff")
               //- node name
               .row.full-width.items-start.content-start.justify-center.q-py-md
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+              //- node description
+              .row.full-width
+                span.text-white {{ node.description }}
         node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
-        //- .row.full-width.justify-center
-          div(
-            v-if="node"
-            :style=`{
-              maxWidth: $store.state.ui.pageMaxWidth+'px',
-              position: 'relative', paddingRight: '80px',
-            }`
-            ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
-            //- node category goes as first sphere
-            router-link(
-              v-if="category"
-              :to="'/sphere/'+category.sphere.oid"
-              :style=`{height: '40px',borderRadius: '10px'}`
-              ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-sm.q-mb-sm.shaking
-              q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-              span.text-white.q-mr-md {{ category.alias }}
-            //- node spheres
-            router-link(
-              v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
-              :style=`{height: '40px',borderRadius: '10px'}`
-              ).row.items-center.content-center.q-px-sm.b-40.sphere-item.q-mr-sm.q-mb-sm
-              q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-              span.text-white.q-mr-md {{ s.name }}
-          //- node is creating, wait...
-          node-mockup(
-            v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-            :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
-          //- node links
+        //- node is creating, wait...
+        node-mockup(
+          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
+          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]")
         .row.full-width.justify-center.q-pt-xl
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
             router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
@@ -136,7 +115,7 @@ q-layout(view="hHh Lpr lff")
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
             v-if="true"
-            @click="$router.push(`/link-create?leftoid=${node.oid}`)"
+            @click="$router.push('/workspace/link/new?oid='+node.oid)"
             no-caps color="green" icon="insert_link" size="md")
             span.text-white.text-bold.q-ml-sm {{ $t('Link', 'Связать') }}
 </template>
@@ -157,11 +136,6 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  // meta () {
-  //   return {
-  //     title: this.node?.name,
-  //   }
-  // },
   data () {
     return {
       node: null,

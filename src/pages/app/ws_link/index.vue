@@ -311,15 +311,23 @@ export default {
             throw new Error('Wrong second item!')
           }
         }
-        jointInput.jointType = 'ASSOCIATIVE'
+        // essence
+        if (this.link.type === 'ESSENCE') {
+          if (this.link.name.length === 0) {
+            jointInput.jointType = 'ASSOCIATIVE'
+          }
+          else {
+            jointInput.jointType = 'ESSENCE'
+            jointInput.name = this.link.name
+          }
+        }
+        else {
+          jointInput.jointType = 'ASSOCIATIVE'
+        }
+        // another types...
         let joint = await NodeApi.jointCreate(jointInput)
         this.$log('link done joint', joint)
         this.$log('publish done')
-        // convert items to payloads
-        // if item.item.oidUrl get content from url...
-        // get oid from any item
-        // then submit...
-        // delete this link draft...
         this.publishing = false
         this.$router.replace('/link/' + joint.oid).catch(e => e)
         this.$rxdb.remove(this.link.id)
