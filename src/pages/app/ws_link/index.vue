@@ -9,47 +9,53 @@
           maxWidth: $store.state.ui.pageMaxWidth+'px',
           borderRadius: '10px',overflow: 'hidden'
         }`
-        ).row.full-width.items-center.content-center.q-px-sm.b-40
+        ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
-        q-icon(name="link" color="white" size="30px").q-mr-sm
-        span(:style=`{fontSize: '1rem'}`).text-white.text-bold Link creator
         .col
-        transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
-          q-btn(
-            @click="publish()"
-            v-if="link && link.items.length === 2"
-            dense color="green" no-caps
-            :loading="publishing").q-px-sm
-            span.text-white.text-bold Publish
+        //- q-icon(name="link" color="white" size="30px").q-mr-sm
+        span(:style=`{fontSize: '1rem'}`).text-grey-6.text-bold Создание связи
+        .col
+        q-btn(round flat dense color="grey-6" icon="more_vert")
     //- items wrapper
     .row.full-width.justify-center
       div(
         v-if="link"
         :style=`{
           maxWidth: $store.state.ui.pageMaxWidth+'px',
-          borderRadius: '10px', overflow: 'hidden'
-        }`).row.full-width.b-40.q-pa-sm
-        .col-6.q-pr-xs
-          div().row.fit.items-end.content-end
-            div(v-if="link.items[0]").row.full-width.justify-start
+          borderRadius: '10px',
+        }`).row.full-width.q-px-md.q-pt-md
+        .col
+          div(:style=`{transform: 'perspective(600px) rotateY(14deg)'}`).row.fit.items-end.content-end
+            //- div(v-if="link.items[0]").row.full-width.justify-start
               q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(0)")
               .col
               q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
             link-item(
               @click="$router.push({params: {item: 0}})"
               v-if="link.items[0]" :item="link.items[0]" :link="link")
-        .col-6.q-pl-xs
-          div().row.fit.items-end.content-end
-            div(v-if="link.items[1]").row.full-width.justify-end
+            .row.full-width.justify-end.q-pa-sm
+              //- span(:style=`{fontSize: '18px'}`).text-white.text-bold Причина
+        div(:style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
+          .col
+          q-icon(name="link" color="green" size="30px" :style=`{marginLeft: '0px'}`).q-mt-xl
+          .col
+          q-btn(
+            @click="linkTuneToggle"
+            round flat dense color="grey-6" icon="tune" :style=`{bottom: 0, marginLeft: '0px'}`).q-mb-lg
+        .col
+          div(:style=`{transform: 'perspective(600px) rotateY(-14deg)'}`).row.fit.items-end.content-end
+            //- div(v-if="link.items[1]").row.full-width.justify-end
               q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
               .col
               q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(1)")
             link-item(
               @click="$router.push({params: {item: 1}})"
               v-if="link.items[1]" :item="link.items[1]" :link="link")
+            .row.full-width.justify-start.q-pa-sm
+              //- span(:style=`{fontSize: '18px'}`).text-white.text-bold Следствие
     //- connection
     div(v-if="link").row.full-width.items-center.content-center.justify-center.q-py-xs
-      .col
+      //- .col
         .row.full-width.items-center.content-center.justify-end.q-pa-sm
           transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
             q-btn(
@@ -64,8 +70,8 @@
                     v-for="(t,ti) in itemTypes" :key="t.id"
                     v-if="t.id !== link.items[0].type"
                     flat dense no-caps color='grey-2').full-width {{ t.name }}
-      q-icon(name="link" color="green" size="md")
-      .col
+      //- q-icon(name="link" color="green" size="md")
+      //- .col
         .row.full-width.items-center.content-center.justify-start.q-pa-sm
           transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
             q-btn(
@@ -82,7 +88,7 @@
                     flat dense no-caps color='grey-2').full-width {{ t.name }}
       //- name
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '600px',}`).row.full-width
+        //- div(:style=`{maxWidth: '600px',}`).row.full-width
           q-input(
             v-model="link.name"
             borderless dark type="textarea" autogrow
@@ -92,6 +98,14 @@
               fontWeight: 'bold',
               textAlign: 'center',
             }`).full-width
+      .row.full-width.justify-center
+        transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+          q-btn(
+            @click="publish()"
+            v-if="link && link.items.length === 2"
+            color="green" no-caps
+            :loading="publishing").q-px-sm
+            span.text-white.text-bold Связать
     //- view add wrapper
     .row.full-width.justify-center.q-mt-md
       div(
@@ -130,6 +144,7 @@ export default {
   computed: {
     itemTypes () {
       return [
+        {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
         {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
         {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
         {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
@@ -214,6 +229,26 @@ export default {
     },
   },
   methods: {
+    linkTuneToggle () {
+      this.$log('linkTuneToggle')
+      if (this.link.name === 0) {
+        if (this.link.items[0]) {
+          this.link.items[0].type = 'PROMLEM'
+        }
+        if (this.link.items[1]) {
+          this.link.items[1].type = 'SOLUTION'
+        }
+      }
+      else {
+        this.link.name = ''
+        if (this.link.items[0]) {
+          this.link.items[0].type = 'ASSOCIATIVE'
+        }
+        if (this.link.items[1]) {
+          this.link.items[1].type = 'ASSOCIATIVE'
+        }
+      }
+    },
     itemTypeSet (index, type) {
       this.$log('itemTypeSet', index, type)
       this.$set(this.link.items[index], 'type', type)

@@ -13,11 +13,11 @@ import wsContentExplorer from 'components/ws_content_explorer/index.vue'
 export default {
   name: 'pageApp_wsContent',
   components: {wsContentExplorer},
-  meta () {
-    return {
-      title: this.contentWorkspace ? this.contentWorkspace.name : ''
-    }
-  },
+  // meta () {
+  //   return {
+  //     title: this.contentWorkspace ? this.contentWorkspace.name : ''
+  //   }
+  // },
   data () {
     return {
       contentWorkspace: null,

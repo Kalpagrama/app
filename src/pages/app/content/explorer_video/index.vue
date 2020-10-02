@@ -79,7 +79,7 @@ div(
               @click="nodeCreate()"
               round push color="green" dense icon="add"
               :style=`{borderRadius: '50%'}`)
-  div(
+  //- div(
     v-if="player && player.isFullscreen"
     :style=`{
       position: 'fixed', zIndex: 9999, right: '0px', top: '70px',
@@ -217,7 +217,7 @@ export default {
         name: '',
         spheres: [],
         category: 'FUN',
-        layout: 'SLIDER',
+        layout: 'VERTICAL',
         wsItemType: 'WS_NODE',
         thumbUrl: this.contentKalpa.thumbUrl,
         items: [

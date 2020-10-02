@@ -22,48 +22,57 @@
       }`
       ).full-width
       div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
-        slot(name="leftright")
-        //- 0 items
-        div(v-if="node.items.length === 0").row.fit.items-center.content-center.justify-center
-          small.text-white {{node.name}}
-        //- 1 item
-        div(v-if="node.items.length === 1").row.fit.items-start.content-start
-          img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-        //- 2 items
-        div(v-if="node.items.length === 2").row.fit
-          div(:style=`{borderRight: '1px solid rgb(50,50,50)'}`).col.full-height
-            img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-          .col.full-height
-            img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-        //- 3 items
-        div(v-if="node.items.length === 3").row.fit
-          div(:style=`{borderRight: '1px solid rgb(50,50,50)'}`).col.full-height
-            img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-          .col.full-height
-            .column.fit
-              div(:style=`{borderBottom: '1px solid rgb(50,50,50)'}`).col.full-width
-                img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-              .col.full-width
-                img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-        //- 4 items
-        div(v-if="node.items.length === 4").row.fit
-          .col.full-height
-            .column.fit
-              .col-full-width
-                img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-              .col-full-width
-                img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-          .col.full-height
-            .column.fit
-              .col.full-width
-                img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
-              .col.full-width
-                img(:src="node.items[3].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        img(
+          v-if="node.items.length > 0"
+          draggable="false"
+          :src="node.items[0].thumbUrl"
+          :style=`{objectFit: 'cover'}`).fit
+        div(
+          v-else
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`
+          ).row.fit.b-50
+        //- slot(name="leftright")
+        //- //- 0 items
+        //- div(v-if="node.items.length === 0").row.fit.items-center.content-center.justify-center
+        //-   small.text-white {{node.name}}
+        //- //- 1 item
+        //- div(v-if="node.items.length === 1").row.fit.items-start.content-start
+        //-   img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //- //- 2 items
+        //- div(v-if="node.items.length === 2").row.fit
+        //-   div(:style=`{borderRight: '1px solid rgb(50,50,50)'}`).col.full-height
+        //-     img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-   .col.full-height
+        //-     img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //- //- 3 items
+        //- div(v-if="node.items.length === 3").row.fit
+        //-   div(:style=`{borderRight: '1px solid rgb(50,50,50)'}`).col.full-height
+        //-     img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-   .col.full-height
+        //-     .column.fit
+        //-       div(:style=`{borderBottom: '1px solid rgb(50,50,50)'}`).col.full-width
+        //-         img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-       .col.full-width
+        //-         img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //- //- 4 items
+        //- div(v-if="node.items.length === 4").row.fit
+        //-   .col.full-height
+        //-     .column.fit
+        //-       .col-full-width
+        //-         img(:src="node.items[0].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-       .col-full-width
+        //-         img(:src="node.items[1].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-   .col.full-height
+        //-     .column.fit
+        //-       .col.full-width
+        //-         img(:src="node.items[2].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
+        //-       .col.full-width
+        //-         img(:src="node.items[3].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
     //- essense
     div(
-      ).row.full-width.q-py-sm.q-px-md
+      ).row.full-width.justify-center.q-py-sm
       small(
-        v-if="node.items.length > 0"
+        v-if="node.name.length > 0"
         :style=`{userSelect: 'none',}`).text-white {{ node.name }}
   slot(name="footer")
 </template>

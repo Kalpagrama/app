@@ -157,11 +157,11 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  meta () {
-    return {
-      title: this.node?.name,
-    }
-  },
+  // meta () {
+  //   return {
+  //     title: this.node?.name,
+  //   }
+  // },
   data () {
     return {
       node: null,

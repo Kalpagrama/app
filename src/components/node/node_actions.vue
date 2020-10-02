@@ -4,18 +4,21 @@
     v-model="showStats" position="bottom")
     node-stats(:node="node" :isActive="isActive" :isVisible="isVisible")
   div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-    node-remake(:node="node")
-    small.text-grey-9 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
-    .col
-    q-btn(round flat color="grey-9" icon="link" @click="$router.push('/workspace/link/new?oid='+node.oid)").shaking
-    small.text-grey-9 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
-    .col
     node-share(:node="node").shaking
     .col
-    small.text-grey-9 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
-    node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible" @done="showStats = true").shaking
+    node-remake(:node="node")
+    small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
     .col
-    small.text-grey-9 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
+    node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible" @done="showStats = true").shaking
+    small.text-grey-8 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
+    .col
+    q-btn(
+      @click="$router.push('/workspace/link/new?oid='+node.oid)"
+      round flat color="green").shaking
+      q-icon(name="link" size="30px" color="green")
+    small.text-grey-8 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
+    .col
+    small.text-grey-8 {{ node.countVotes > 100 ? '99+' : node.countVotes }}
     node-vote(:node="node")
     span.text-bold.text-grey-2 {{ node.rate * 100 }}
 </template>

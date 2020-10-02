@@ -15,21 +15,22 @@ export default {
   components: {
     nodeEditor: () => import('components/node_editor/index.vue')
   },
-  meta () {
-    return {
-      title: this.node ? this.node.name : ''
-    }
-  },
+  // meta () {
+  //   return {
+  //     title: this.node ? this.node.name : ''
+  //   }
+  // },
   data () {
     return {
       publishing: false,
       node: null,
       nodeNew: {
         name: '',
+        description: '',
         items: [],
         spheres: [],
         category: 'FUN',
-        layout: 'SLIDER',
+        layout: 'VERTICAL',
         wsItemType: 'WS_NODE',
         thumbUrl: '',
       }

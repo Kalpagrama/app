@@ -30,11 +30,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_wsSphere',
-  meta () {
-    return {
-      title: this.sphere ? this.sphere.name : ''
-    }
-  },
+  // meta () {
+  //   return {
+  //     title: this.sphere ? this.sphere.name : ''
+  //   }
+  // },
   data () {
     return {
       sphere: null,

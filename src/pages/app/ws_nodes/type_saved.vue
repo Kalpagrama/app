@@ -137,7 +137,6 @@ export default {
       // create nodeInput
       let nodeInput = {
         wsItemType: 'WS_NODE',
-        // stage: 'draft',
         name: node.name,
         layout: node.layout,
         category: node.category,
@@ -155,7 +154,7 @@ export default {
                 figuresAbsolute: layer.figuresAbsolute.map(figure => {
                   return {
                     t: figure.t,
-                    points: []
+                    points: figure.points
                   }
                 })
               }

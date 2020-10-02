@@ -38,6 +38,10 @@ export const wsSchemaItem = {
       type: 'string',
       default: '!_unnamed_!'
     },
+    description: {
+      type: 'string',
+      default: ''
+    },
     rev: {
       type: 'integer',
       default: 0
