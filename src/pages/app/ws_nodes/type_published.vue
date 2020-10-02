@@ -8,7 +8,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    .row.full-width.items-start.content-start.q-pt-sm.q-pr-sm
+    .row.full-width.items-start.content-start.q-pt-sm
       kalpa-loader(
         :immediate="true"
         :query="queryNodes" :limit="1000" v-slot=`{items, next}`)
@@ -21,44 +21,25 @@
               v-for="(node, ii) in items" :key="node.oid"
               :style=`{position: 'relative'}`
               ).row.full-width.q-mb-sm
-              //- default
-              div(
-                @click="nodeSelectedOid = node.oid"
-                :style=`{
-                  position: 'relative', zIndex: 100,
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).row.full-width.q-px-md.q-pt-md.b-40.node-item
-                div(
-                  :style=`{
-                    position: 'relative', zIndex: 100,
-                    height: 0, paddingBottom: '100%',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).full-width
-                  div(:style=`{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0,}`).row
-                    img(
-                      :src="node.items[0].thumbUrl" draggable="false"
-                      :style=`{
-                        objectFit: 'cover',
-                        borderRadius: '10px', overflow: 'hidden',
-                      }`).fit
-                .row.full-width.q-py-sm.q-px-md
-                  small.text-white {{ node.name }}
               slot(name="tint" :item="node" :itemKey="node.oid")
-              //- selected
-              div(
-                v-if="nodeSelectedOid === node.oid"
-                :style=`{
-                  position: 'relative',
-                  marginTop: '-10px', paddingTop: '14px',
-                  borderRadius: '0 0 10px 10px', overflow: 'hidden',
-                }`
-                ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(node)")
-                .col
-                q-btn(round flat dense color="white" icon="edit" @click="nodeEdit(node)").q-mr-sm
-                q-btn(round flat dense color="white" icon="launch" @click="nodeLaunch(node)")
+              ws-node-item(
+                :node="node"
+                :style=`{position: 'relative'}`
+                @clicked="nodeSelectedOid = node.oid").q-mb-sm
+                template(v-slot:footer)
+                  //- selected
+                  div(
+                    v-if="nodeSelectedOid === node.oid"
+                    :style=`{
+                      position: 'relative',
+                      marginTop: '-10px', paddingTop: '14px',
+                      borderRadius: '0 0 10px 10px', overflow: 'hidden',
+                    }`
+                    ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
+                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(node)")
+                    .col
+                    q-btn(round flat dense color="white" icon="edit" @click="nodeEdit(node)").q-mr-sm
+                    q-btn(round flat dense color="white" icon="launch" @click="nodeLaunch(node)")
 </template>
 
 <script>

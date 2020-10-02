@@ -1,28 +1,28 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center.q-px-sm
-  div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-px-sm
-    .row.full-width.q-py-sm
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+    //- .row.full-width.q-py-sm
       q-btn(
         @click="$emit('viewId', 'add')"
         flat dense color="grey-2" no-caps icon="keyboard_arrow_left"
         :style=`{
         }`).q-pr-sm.q-py-sm вернуться к образам
-    .row.full-width
+    .row.full-width.q-px-sm
       edit-description(
         :value="node.description" @input="node.description = $event"
         :style=`{
           maxWidth: '600px',
         }`)
-    .row.full-width.q-py-sm
+    .row.full-width.q-px-sm.q-py-sm
       edit-category(:node="node")
-    .row.full-width
+    //- .row.full-width.q-px-sm
       q-toggle(
         v-model="meta.isPrivate"
         dark color="green" label="Private").text-grey-6
       q-toggle(
         v-model="meta.isMature"
         dark color="green" label="Mature").text-grey-6
-    .row.full-width.q-py-md
+    .row.full-width.q-py-md.q-px-sm
       q-btn(
         @click="publish()"
         color="green" size="xl" no-caps
@@ -30,11 +30,11 @@
         :loading="publishing"
         :style=`{maxWidth: '100%'}`
         ).full-width
-        span.text-white.text-bold Publish it
-    .row.full-width.q-py-xl
+        span.text-white.text-bold Опубликовать
+    .row.full-width.q-py-md
       q-btn(
         @click="nodeDelete()"
-        flat dense color="red" no-caps).q-px-sm Delete node
+        flat dense color="red" no-caps).q-px-sm Удалить
 </template>
 
 <script>

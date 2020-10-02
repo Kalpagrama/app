@@ -12,13 +12,16 @@ div(
   v-ripple=`{color: 'white'}`
   ).row.items-center.content-center.cursor-pointer
   q-btn(
+    @mouseenter="mouseOver = true"
+    @mouseleave="mouseOver = false"
     round flat color="grey-2" icon="select_all" no-caps)
-  div(
-    v-if="composition.outputType !== 'IMAGE'"
-    :style=`{overflow: 'hidden', pointerEvents: 'none'}`).col.full-height
-    .row.fit.q-pr-sm
-      div(:style=`{overflow: 'hidden'}`).row.fit.items-center.content-center
-        span(:style=`{userSelect:'none', fontSize: '0.7rem', whiteSpace: 'nowrap'}`).text-white {{ content ? content.name : '' }} {{ content ? content.name : '' }}
+  transition(enter-active-class="animated fadeIn" leave-active-class="none")
+    div(
+      v-if="showContentName"
+      :style=`{overflow: 'hidden', pointerEvents: 'none'}`).col.full-height
+      .row.fit.q-pr-sm
+        div(:style=`{overflow: 'hidden'}`).row.fit.items-center.content-center
+          span(:style=`{userSelect:'none', fontSize: '0.7rem', whiteSpace: 'nowrap'}`).text-white {{ content ? content.name : '' }} {{ content ? content.name : '' }}
 </template>
 
 <script>
@@ -30,12 +33,25 @@ export default {
   data () {
     return {
       content: null,
+      mouseOver: false,
+    }
+  },
+  computed: {
+    showContentName () {
+      if (this.composition.outputType === 'IMAGE') return false
+      else {
+        if (this.$q.platform.is.mobile) {
+          return false
+        }
+        else {
+          return this.mouseOver
+        }
+      }
     }
   },
   methods: {
     async start () {
       this.$log('start')
-      // this.loading = true
       let contentOid = this.composition.layers[0].contentOid
       let start = this.composition.layers[0].figuresAbsolute[0].t
       this.$log('contentOid/start', contentOid, start)

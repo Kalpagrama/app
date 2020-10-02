@@ -14,7 +14,7 @@
           fontWeight: 'bold'
         }`)
         span(:style=`{fontSize: '1rem'}`).text-bold {{v.name}}
-    q-btn(
+    //- q-btn(
       @click="$emit('viewId', 'publish')"
       color="green" no-caps icon-right="keyboard_arrow_right"
       :style=`{

@@ -3,7 +3,7 @@ div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 
   q-input(
     :value="value" @input="$emit('input', $event)"
     filled dark dense type="textarea" autogrow
-    placeholder="Description, #spheres, @mentions"
+    placeholder="Описание,  #сферы,  @упоминания"
     color="grey-8"
     :input-style=`{
       minHeight: '100px',

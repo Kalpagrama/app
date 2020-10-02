@@ -25,9 +25,9 @@
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
         //- q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name" :icon="t.icon ? t.icon : null").q-px-xs.br
-        q-tab(name="saved" icon="bookmark")
-        q-tab(name="drafts" label="Drafts")
-        q-tab(name="published" label="Published")
+        q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
+        q-tab(name="drafts" label="Черновики").q-px-xs
+        q-tab(name="published" label="Опубликованные").q-px-xs
   .row.full-width
     component(:is="`type-${typeId}`" :searchString="searchString")
       template(v-slot:tint=`{item, itemKey}`)
@@ -50,11 +50,11 @@ export default {
     typePublished: () => import('./type_published.vue'),
     typeSaved: () => import('./type_saved.vue'),
   },
-  meta () {
-    return {
-      title: 'Nodes'
-    }
-  },
+  // meta () {
+  //   return {
+  //     title: 'Nodes'
+  //   }
+  // },
   data () {
     return {
       typeId: 'drafts',

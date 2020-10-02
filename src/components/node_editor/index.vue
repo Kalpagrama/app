@@ -1,16 +1,25 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  //- item finder
+  q-dialog(v-model="itemFinderOpened" position="bottom" maximized)
+    div(
+      @click.self="itemFinderOpened = false"
+      :style=`{height: $q.screen.height+'px',}`).row.full-width.justify-center.b-30
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center
+        .row.full-width.items-center.content-center.q-pa-sm
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
+          span(:style=`{fontSize: '1rem'}`).text-white.text-bold Find item
+        view-add(@item="itemFound" @close="itemFinderOpened = false")
   //- header
   .row.full-width.justify-center
     div(
       :style=`{
         height: '70px',
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        maxWidth: 800+'px',
       }`).row.full-width.items-center.content-center
-      q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
       span(
-        v-if="node.items.length > 0"
-        :style=`{fontSize: '0.9rem'}`).text-white.text-bold Редактор ядра
+        :style=`{fontSize: '1rem'}`).text-white.text-bold Редактор ядра
       .col
       q-btn(
         v-if="node.items.length > 0"
@@ -25,17 +34,23 @@
               flat color="white" no-caps align="left"
               ).full-width
               span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ l.name }}
-      q-btn(round flat dense color="grey-8" icon="more_vert")
+      //- q-btn(round flat dense color="grey-8" icon="more_vert")
   //- items mockup
   div(v-if="node.items.length === 0").row.full-width.items-start.content-start.justify-center
     div(
       :style=`{
-        width: '400px', maxWidth: $q.screen.width+'px',
-        height: '400px',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgb(35,35,35)'
-      }`
-      ).row.shadow-5
+        maxWidth: '800px', zIndex: 100,
+        borderRadius: '10px', overflow: 'hidden'
+      }`).row.full-width.q-pa-sm.b-40
+      div(
+        :style=`{
+          position: 'relative',
+          height: 0, paddingBottom: '60%',
+          borderRadius: '10px', overflow: 'hidden',
+        }`
+        ).row.full-width
+        div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
+          q-btn(round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true")
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
     //- slider
@@ -73,58 +88,45 @@
     div(
       v-if="node.layout === 'VERTICAL'"
       ).row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
+      div(
+        :style=`{
+          maxWidth: '800px', zIndex: 100,
+          borderRadius: '10px', overflow: 'hidden',
+        }`).row.full-width.items-start.content-start.b-40
         div(
           v-for="(item,ii) in node.items" :key="item.id"
+          :class=`{
+            'q-mb-md': ii !== node.items.length-1,
+          }`
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
           }`
-          ).row.full-width.b-40.shadow-10.q-mb-md
+          ).row.full-width.b-40.shadow-10
           edit-item(
             :item="item" :isActive="true"
             @next="itemNext(item)"
             @prev="itemPrev(item)"
             @duplicate="itemDuplicate(item)"
             @remove="itemRemove(item)")
-  edit-name(:value="node.name" @input="node.name = $event")
+        .row.full-width.items-center.content-center.justify-center.q-py-xs
+          q-btn(flat color="green" icon="add" no-caps @click="itemFinderOpened = true").full-width Add item
+  .row.full-width.justify-center.q-mb-md
+    div(
+      :style=`{
+        maxWidth: '800px',
+        marginTop: '-20px',
+        paddingTop: '20px',
+        borderRadius: '0 0 10px 10px', overflow: 'hidden',
+      }`).row.full-width.b-40
+      edit-name(:value="node.name" @input="node.name = $event").q-mb-xl
+      view-publish(:node="node")
   //- views
-  .row.full-width.justify-center.q-py-md
+  //- .row.full-width.justify-center.q-py-md
     div(
       :style=`{
         maxWidth: 800+'px',
         marginTop: node.items.length === 0 ? '100px' : '0px',
       }`).row.full-width.items-start.content-start
-      //- div(
-        :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden',
-          background: 'rgb(35,35,35)'
-        }`).row.full-width.justify-center
-        //- div(
-          @click="viewId = v.id"
-          v-for="v in views" :key="v.id"
-          :style=`{
-            position: 'relative',
-            //- width: '50px',
-            height: '50px',
-            background: v.id === viewId ? 'rgb(35,35,35)' : 'none',
-            borderRadius: '10px 10px 0 0',
-          }`
-          v-ripple=`{color: 'green'}`
-          ).col
-          .row.fit.items-center.content-center.justify-center.cursor-pointer
-            span(
-              :class=`{
-                'text-green': viewId === v.id,
-                'text-grey-8': viewId !== v.id,
-              }`) {{ v.name }}
-            q-icon(:name="v.icon" :color="v.id === viewId ? 'green' : 'grey-6'" size="30px")
-        //- .row.full-width.justify-end.q-pa-sm
-        //- q-btn(
-          color="green" no-caps @click="viewId = 'publish'"
-          :style=`{
-            position: 'absolute', zIndex: 2000, right: '8px', top: '8px',
-          }`).br Publish
       component(
         :is="`view-${viewId}`"
         :node="node"
@@ -136,11 +138,6 @@
         }`
         @viewId="viewId = $event"
         @item="itemFound")
-          //- q-btn(
-            color="green" no-caps @click="viewId = 'publish'"
-            :style=`{
-              position: 'absolute', zIndex: 2000, right: '8px', top: '8px',
-            }`).bg Publish
 </template>
 
 <script>
@@ -167,7 +164,8 @@ export default {
       //   items: [],
       //   spheres: [],
       // },
-      viewId: 'add',
+      viewId: '',
+      itemFinderOpened: false
     }
   },
   computed: {
@@ -195,6 +193,7 @@ export default {
       this.$log('itemFound', item)
       item.meta = {cover: true, timeout: 3000}
       this.node.items.push(item)
+      this.itemFinderOpened = false
     },
     itemNext (item) {
       this.$log('itemNext', item)

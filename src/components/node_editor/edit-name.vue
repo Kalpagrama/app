@@ -1,20 +1,3 @@
-<style>
-.blink {
-  animation: blink-animation 1.2s steps(5, start) infinite;
-  -webkit-animation: blink-animation 1.2s steps(5, start) infinite;
-}
-@keyframes blink-animation {
-  to {
-    visibility: hidden;
-  }
-}
-@-webkit-keyframes blink-animation {
-  to {
-    visibility: hidden;
-  }
-}
-</style>
-
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`
@@ -32,26 +15,13 @@ div(
       fontSize: fontSize,
       fontWeight: 'bold',
       textAlign: 'center',
+      lineHeight: '1.1',
       //- caretColor: 'rgb(76,175,80)',
       color: 'white'
     }`
     @focus="onFocus"
     @blur="onBlur"
     ).full-width.justify-center
-  //- blinker
-  //- div(
-    v-if="showBlink"
-    :style=`{
-      position: 'absolute', zIndex: 200,
-      pointerEvents: 'none',
-    }`
-    ).row.fit.items-center.content-center.justify-center
-    div(
-      :style=`{
-        height: '70%',
-        width: '1px',
-      }`
-      ).row.bg-green.blink
 </template>
 
 <script>
@@ -70,7 +40,7 @@ export default {
     fontSize () {
       // TODO: progressive fornSize...
       if (this.value.length < 50) return '30px'
-      else return '14px'
+      else return '20px'
     }
   },
   methods: {
