@@ -25,7 +25,7 @@
           borderRadius: '10px',
         }`).row.full-width.q-px-md.q-pt-md
         .col
-          div(:style=`{transform: 'perspective(600px) rotateY(14deg)'}`).row.fit.items-end.content-end
+          div(:style=`{transform: 'perspective(600px) rotateY(10deg)'}`).row.fit.items-end.content-end
             //- div(v-if="link.items[0]").row.full-width.justify-start
               q-btn(round flat dense color="red" icon="delete_outline" @click="itemDelete(0)")
               .col
@@ -44,19 +44,19 @@
                     div(:style=`{width: '100px'}`).row
                       q-btn(
                         @click="itemTypeSet(0, t.id)"
-                        v-for="(t,ti) in itemTypes" :key="t.id"
-                        v-if="t.id !== link.items[0].type"
+                        v-for="(t,ti) in itemTypes" :key="t.id" v-close-popup
+                        v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(t.id)"
                         flat dense no-caps color='grey-2').full-width {{ t.name }}
         div(:style=`{width: '1px'}`).column.full-height.items-center.content-center.justify-center
           .col
           q-icon(name="link" color="green" size="30px" :style=`{marginLeft: '0px'}`).q-mt-xl
           .col
-          q-btn(
+          //- q-btn(
             @click="linkTuneToggle"
             :color="itemsTypesShow ? 'green' : 'grey-6'"
             round flat dense icon="tune" :style=`{bottom: 0, marginLeft: '0px'}`).q-mb-lg
         .col
-          div(:style=`{transform: 'perspective(600px) rotateY(-14deg)'}`).row.fit.items-end.content-end
+          div(:style=`{transform: 'perspective(600px) rotateY(-10deg)'}`).row.fit.items-end.content-end
             //- div(v-if="link.items[1]").row.full-width.justify-end
               q-btn(round flat dense color="grey-8" icon="keyboard_arrow_down")
               .col
@@ -75,31 +75,54 @@
                     div(:style=`{width: '100px'}`).row
                       q-btn(
                         @click="itemTypeSet(1, t.id)"
-                        v-for="(t,ti) in itemTypes" :key="t.id"
-                        v-if="t.id !== link.items[1].type"
+                        v-for="(t,ti) in itemTypes" :key="t.id" v-close-popup
+                        v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(t.id)"
                         flat dense no-caps color='grey-2').full-width {{ t.name }}
     //- name
     div(v-if="link").row.full-width.items-center.content-center.justify-center.q-py-xs
       .row.full-width.justify-center
         div(:style=`{maxWidth: '600px',}`).row.full-width
           q-input(
-            v-if="['ASSOCIATIVE'].includes(this.link.type)"
+            v-if="link.type === 'ESSENCE'"
             v-model="link.name"
-            borderless dark type="textarea" autogrow
-            placeholder="How are they connected?"
+            borderless dark type="textarea" autogrow autofocus
+            placeholder="Как они связаны?"
             :input-style=`{
               fontSize: '18px',
               fontWeight: 'bold',
               textAlign: 'center',
             }`).full-width
-      .row.full-width.justify-center
+      .row.full-width.justify-center.q-pa-md
         transition( appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
-          q-btn(
-            @click="publish()"
-            v-if="link && link.items.length === 2"
-            color="green" no-caps
-            :loading="publishing").q-px-sm
-            span.text-white.text-bold Связать
+          div(
+            v-if="link && link.items.length > 0"
+            :style=`{
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px', overflow: 'hidden'
+            }`
+            ).row
+            q-btn(
+              @click="publish()"
+              color="green" no-caps size="lg" icon="link"
+              :loading="publishing").full-width.q-px-sm
+              span.text-white.text-bold.q-ml-md Связать
+            div(:style=`{order: -1}`).row.full-width.q-pa-xs
+              .col
+                q-btn(
+                  @click="link.type === 'ESSENCE' ? link.type = 'ASSOCIATIVE' : link.type = 'ESSENCE'"
+                  :color="link.type === 'ESSENCE' ? 'green': 'grey-8'"
+                  :class=`{
+                    'b-60': link.type === 'ESSENCE'
+                  }`
+                  flat dense no-caps dark).full-width Указать суть
+              .col
+                q-btn(
+                  @click="['ESSENCE', 'ASSOCIATIVE'].includes(link.type) ? link.type = 'PROBLEM_SOLUTION' : link.type = 'ASSOCIATIVE'"
+                  :color="!['ESSENCE', 'ASSOCIATIVE'].includes(link.type) ? 'green' : 'grey-8'"
+                  :class=`{
+                    'b-60': !['ESSENCE', 'ASSOCIATIVE'].includes(link.type)
+                  }`
+                  flat dense no-caps dark).full-width Указать тип
     //- view add wrapper
     .row.full-width.justify-center.q-mt-md
       div(
@@ -129,6 +152,7 @@ export default {
       link: null,
       linkNew: {
         name: '',
+        type: 'ASSOCIATIVE',
         items: [],
         wsItemType: 'WS_JOINT',
       },
@@ -323,7 +347,7 @@ export default {
         // then submit...
         // delete this link draft...
         this.publishing = false
-        this.$router.push('/link/' + joint.oid).catch(e => e)
+        this.$router.replace('/link/' + joint.oid).catch(e => e)
         this.$rxdb.remove(this.link.id)
       }
       catch (e) {

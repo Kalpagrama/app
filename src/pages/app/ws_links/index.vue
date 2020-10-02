@@ -61,14 +61,17 @@
               ).row.full-width.link-item.b-40
               //- items wrapper
               .row.full-width
-                .col-6.br
-                  div(v-if="link.items[0]").row.full-width.justify-center.q-pa-xs
-                    small.text-white {{link.items[0].name}}
-                .col-6.br
-                  div(v-if="link.items[1]").row.full-width.justify-center.q-pa-xs
-                    small.text-white {{link.items[1].name}}
+                div(v-for="(i,ii) in link.items" :key="ii").col-6
+                  .row.full-width.justify-center.q-pa-xs
+                    img(
+                      v-if="i.item.thumbUrl"
+                      draggable="false"
+                      :src="i.item.thumbUrl"
+                      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+                    .row.full-width.justify-center.q-pa-xs
+                      small.text-white {{ i.item.name.slice(0, 40) }}
               .row.full-width.justify-center.q-pa-sm
-                small.text-white {{ link.name }}
+                span.text-bold.text-white {{ link.name }}
             slot(name="tint" :item="link" :itemKey="link.id")
             //- selected
             div(
