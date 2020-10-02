@@ -60,10 +60,12 @@ export default {
     },
     async next (i, done) {
       this.$log('next')
-      if (!this.items) {
+      if (!this.items || !this.items.next) {
+        this.$log('next2')
         this.query.populateObjects = true // ?????? ВСЕГДА запрашиваем полные сушности???
         this.items = await this.$rxdb.find(this.query, false)
       }
+      this.$log('next3')
       let hasMore = await this.items.next(this.limit)
       if (hasMore) done()
       else done(true)

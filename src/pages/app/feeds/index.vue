@@ -91,8 +91,8 @@ export default {
     feedsLoaded (feeds) {
       this.$log('feedsLoaded')
       this.feeds = feeds
-      if (!this.$route.params.id && this.feeds[0]) {
-        this.$router.replace({params: {id: this.feeds[0].id}})
+      if (!this.$route.params.id) {
+        this.$router.replace({params: {id: ''} })
       }
     }
   }
