@@ -30,12 +30,13 @@ export default {
       async handler (to, from) {
         this.$log('id TO', to)
         if (to) {
-          let {items: [item]} = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-              id: to
-            }
-          })
+          let item = await this.$rxdb.get(RxCollectionEnum.WS_CONTENT, to)
+          // let [item] = await this.$rxdb.find({
+          //   selector: {
+          //     rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          //     id: to
+          //   }
+          // })
           this.contentWorkspace = item
           this.$log('contentWorkspace', this.contentWorkspace)
           this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, item.contentOid)

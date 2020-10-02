@@ -197,7 +197,7 @@ export default {
       return await Promise.all(
         spheres.map(async (s) => {
           // for every sphere try to find this sphere in ws
-          let {items: [sphere]} = await this.$rxdb.find({
+          let [sphere] = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
             }

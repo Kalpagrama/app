@@ -34,7 +34,7 @@ export default {
       if (newName && newName.length > 0 && newName !== this.sphere.name) {
         this.sphere.name = newName
         // let sphere = await ObjectsApi.getSphere(newName)
-        let {items: [sphere]} = await this.$rxdb.find({
+        let [sphere] = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
             name: newName,

@@ -82,7 +82,8 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('id TO', to)
-        let {items: [item]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, id: to}})
+        let item = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
+        // let [item] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, id: to}})
         if (item) {
           this.item = item
           this.editor.setContent(this.item.name)

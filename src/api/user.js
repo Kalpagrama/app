@@ -64,7 +64,7 @@ class UserApi {
     logD(f, 'start', oid)
     const t1 = performance.now()
     let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
-    let { items } = await rxdb.find({
+    let items = await rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,
         oidSphere: oid

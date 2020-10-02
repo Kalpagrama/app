@@ -81,7 +81,6 @@ class Cache {
                if (this.lruResetInProgress) return
                assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
                let rxDoc = await this.db.cache.findOne(id).exec()
-               // let reactiveItem = await rxdb.get(null, null, {id})
                if (rxDoc) {
                   if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
                      setTimeout(() => {

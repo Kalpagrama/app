@@ -99,7 +99,8 @@ export default {
         let spheres = []
         await Promise.all(
           nodeInput.spheres.map(async (sphereId) => {
-            let {items: [sphere]} = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, id: sphereId } })
+            let sphere = await this.$rxdb.get(RxCollectionEnum.WS_SPHERE, sphereId)
+            // let [sphere] = await this.$rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_SPHERE, id: sphereId } })
             if (sphere) {
               spheres.push({name: sphere.name})
             }

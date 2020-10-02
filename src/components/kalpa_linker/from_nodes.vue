@@ -116,8 +116,8 @@ export default {
   },
   async created () {
     this.$log('created')
-    const { items, count, totalCount, nextPageToken } = await this.$rxdb.find(this.queryNodes)
-    this.$log(items, count, totalCount, nextPageToken)
+    const items = await this.$rxdb.find(this.queryNodes)
+    this.$log(items)
   },
   methods: {
     nodeClick (node) {
@@ -126,7 +126,7 @@ export default {
     async nodeUnpublish (node) {
       this.$log('nodeUnpublish', node)
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-      await NodeApi.nodeDelete(node.oid)
+      await NodeApi.unPublish(node.oid)
       // await node.updateExtended('stage', 'draft', false) // без debounce
       // await node.updateExtended('oid', node.oid, false) // без debounce
       this.$log('nodeUnPublish complete')
@@ -135,7 +135,7 @@ export default {
       return await Promise.all(
         spheres.map(async (s) => {
           // for every sphere try to find this sphere in ws
-          let {items: [sphere]} = await this.$rxdb.find({
+          let [sphere] = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
             }
