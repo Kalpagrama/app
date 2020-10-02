@@ -79,7 +79,7 @@ div(
               @click="nodeCreate()"
               round push color="green" dense icon="add"
               :style=`{borderRadius: '50%'}`)
-  //- div(
+  div(
     v-if="player && player.isFullscreen"
     :style=`{
       position: 'fixed', zIndex: 9999, right: '0px', top: '70px',
@@ -219,7 +219,7 @@ export default {
         name: '',
         spheres: [],
         category: 'FUN',
-        layout: 'PIP',
+        layout: 'SLIDER',
         wsItemType: 'WS_NODE',
         thumbUrl: this.contentKalpa.thumbUrl,
         items: [
@@ -231,6 +231,7 @@ export default {
               {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
             ],
             operation: { items: null, operations: null, type: 'CONCAT'},
+            meta: {cover: false, loop: true}
           }
         ]
       }

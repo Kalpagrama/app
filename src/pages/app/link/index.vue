@@ -11,17 +11,31 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="link" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ title }}
-          kalpa-follow(v-if="node" :oid="$route.params.oid")
+          kalpa-follow(v-if="link" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        div(v-if="link").row.full-width
-          .row.full-width.br
-            .col-6
-              small.text-white {{ link.leftItem }}
-            .col-6
-              .row.fit
-                small.text-white {{ link.rightItem }}
+        link-feed(v-if="link" :link="link")
+        .row.full-width.justify-center.q-pt-xl
+          //- .row.full-width.justify-center
+            span.text-white Something similar... links from items...
+          .row.full-width.q-pr-sm
+            masonry(
+              :cols="5"
+              :gutter="{default: 10}").full-width.q-pr-sm
+              div(
+                v-for="n in 10" :key="n"
+                :style=`{
+                  position: 'relative',
+                  height: 0, paddingBottom: '150%',
+                }`).row.full-width.q-pa-xs.q-mb-md
+                div(
+                  :style=`{
+                    position: 'absolute',
+                    borderRadius: '10px', overflow: 'hidden',
+                  }`
+                  ).row.fit.items-center.content-center.justify-center.b-40
+                  small.text-white link {{ n }}
 </template>
 
 <script>

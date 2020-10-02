@@ -95,6 +95,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('nodeLite', () => import('components/node_lite/index.vue'))
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     Vue.component('nodeMini', () => import('components/node_mini/index.vue'))
+    Vue.component('linkFeed', () => import('components/link_feed/index.vue'))
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listSlider', () => import('components/list_slider/index.vue'))
