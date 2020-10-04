@@ -302,7 +302,7 @@ class Workspace {
          if (wsOperationEnum === WsOperationEnum.UPSERT) {
             await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
          } else {
-            if (item.rev){ // если нет rev - то элемент еще не создавался на сервере
+            if (item.rev) { // если нет rev - то элемент еще не создавался на сервере
                await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
             }
          }
@@ -431,19 +431,33 @@ class Workspace {
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::set')
-         logD(f, 'locked')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === 'WS_NODE') {
+         if (itemCopy.wsItemType === 'WS_BOOKMARK') {
+            assert(itemCopy.oid)
+            const found = await rxdb.find({
+               selector: {
+                  rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+                  oid: itemCopy.oid
+               }
+            }, true)
+            assert(!found.length, 'уже есть такой букмарк!!!!!!')
+         } else if (itemCopy.wsItemType === 'WS_SPHERE') {
+            assert(itemCopy.oid)
+            const found = await rxdb.find({
+               selector: {
+                  rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+                  name: itemCopy.name
+               }
+            }, true)
+            assert(!found.length, 'уже есть такая же сфера!!!!!')
+         } else if (itemCopy.wsItemType === 'WS_NODE') {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
                val.layers.map(l => {
                   acc.push(l.contentOid)
                })
                return acc
             }, [])
-            // if (itemCopy.stage === 'draft') {
-            //   itemCopy.thumbUrl
-            // }
          }
          assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
          itemCopy.updatedAt = Date.now()

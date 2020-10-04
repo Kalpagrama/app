@@ -15,6 +15,16 @@ const FindCollectionEnum = Object.freeze({
 })
 
 function makeEventDescription(event){
+   // switch(event.type){
+   //    case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   //    // case 'OBJECT_CREATED': break
+   // }
    return JSON.stringify(event)
 }
 
