@@ -410,8 +410,8 @@ class Workspace {
    async find (mangoQuery) {
       const f = this.find
       try {
-         await this.lock('rxdb::ws::find')
-         // logD(f, 'locked')
+         // await this.lock('rxdb::ws::find')
+         // logD(f, 'locked') см set
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -420,7 +420,7 @@ class Workspace {
          let rxQuery = this.db.ws_items.find(mangoQuery)
          return rxQuery
       } finally {
-         this.release()
+         // this.release()
          // logD(f, 'unlocked')
       }
    }
@@ -443,13 +443,14 @@ class Workspace {
             }, true)
             assert(!found.length, 'уже есть такой букмарк!!!!!!')
          } else if (itemCopy.wsItemType === 'WS_SPHERE') {
-            assert(itemCopy.oid)
+            assert(itemCopy.name)
             const found = await rxdb.find({
                selector: {
                   rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
                   name: itemCopy.name
                }
             }, true)
+            // logD('found=', found)
             assert(!found.length, 'уже есть такая же сфера!!!!!')
          } else if (itemCopy.wsItemType === 'WS_NODE') {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
