@@ -16,6 +16,7 @@ import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
+import { setSyncEventStorageValue } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -104,36 +105,34 @@ class RxDBWrapper {
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
-      this.processStoreEvent = async (event) => {
+      this.processStoreEvent = async (eventKey) => {
          // одна из вкладок создала rxdb либо выполнила rxdb.deInitGlobal(пересрздала rxdb). Надо обновить коллекции
-         if (event.key && event.key.in('k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) {
-            if (this.created && event.newValue) {
-               const f = this.processStoreEvent
-               f.nameExtra = 'processStoreEvent'
-               logD(f, 'start', event.key, event)
-               const t1 = performance.now()
-               try {
-                  switch (event.key) {
-                     case 'k_rxdb_create_date':
-                        await this.updateCollections('create')
-                        break
-                     case 'k_rxdb_init_global_date':
-                        await this.init()
-                        break
-                     case 'k_rxdb_deinit_global_date':
-                        await this.updateCollections('create')
-                        await this.deInit()
-                        break
-                     default:
-                        throw new Error('bad event' + event.key)
-                  }
-               } catch (err) {
-                  logE('cant process rxdb event!', err)
-                  alert('error on processStoreEvent: ' + JSON.stringify(err))
-                  await window.location.reload()
-               } finally {
-                  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+         if (this.created) {
+            const f = this.processStoreEvent
+            f.nameExtra = 'processStoreEvent'
+            logD(f, 'start', eventKey)
+            const t1 = performance.now()
+            try {
+               switch (eventKey) {
+                  case 'k_rxdb_create_date':
+                     await this.updateCollections('create')
+                     break
+                  case 'k_rxdb_init_global_date':
+                     await this.init()
+                     break
+                  case 'k_rxdb_deinit_global_date':
+                     await this.updateCollections('create')
+                     await this.deInit()
+                     break
+                  default:
+                     throw new Error('bad event' + eventKey)
                }
+            } catch (err) {
+               logE('cant process rxdb event!', err)
+               alert('error on processStoreEvent: ' + JSON.stringify(err))
+               await window.location.reload()
+            } finally {
+               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
             }
          }
       }
@@ -229,7 +228,7 @@ class RxDBWrapper {
       }
       if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate'))) { // эта вкладка первой инициализироваля rxdb
          await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', valueString: Date.now().toString() })
-         localStorage.setItem('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
+         setSyncEventStorageValue('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
@@ -322,7 +321,7 @@ class RxDBWrapper {
 
    // запускается единожды после регистрации
    async initGlobal ({ userOid, dummyUser }) {
-      const f = this.init
+      const f = this.initGlobal
       logD(f, 'start')
       const t1 = performance.now()
       assert(this.created, '!created') // нужна коллекция META
@@ -332,7 +331,7 @@ class RxDBWrapper {
          await mutexGlobal.lock('rxdb::initGlobal')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
-         localStorage.setItem('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
+         setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } finally {
          mutexGlobal.release('rxdb::initGlobal')
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
@@ -347,7 +346,7 @@ class RxDBWrapper {
       try {
          await mutexGlobal.lock('rxdb::deinitGlobal')
          await this.deInit(true) // деинициализируем текущую вкладку
-         localStorage.setItem('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
+         setSyncEventStorageValue('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } catch (err) {
          logE(f, 'err on deInitGlobal! remove db!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит

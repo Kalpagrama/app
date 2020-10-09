@@ -1,4 +1,4 @@
-import {mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
+import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { AppVisibility, Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
@@ -20,6 +20,7 @@ const logME = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
 const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
+
 async function initServices (store) {
    const f = initServices
    logD(f, 'start', Platform.is, process.env.MODE)
@@ -38,22 +39,49 @@ async function initServices (store) {
    const hasPerm = await askForWebPushPerm(store)
    let storageEventMutex = new MutexLocal('storageEventMutex')
    // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
+   // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
    window.addEventListener('storage', async function (event) {
       try {
+         if (!event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) return
          await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
-         // одна из вкладок выполнила либо вход либо выход
-         if (event.key && event.key.in('k_login_date', 'k_logout_date') && event.newValue) {
-            logD(`localStorage auth event: ${event.key}`, event)
-            if (event.key === 'k_login_date') await router.replace('/home')
-            else await router.replace('/auth')
+         if (event.newValue) {
+            logD('storage sync event:', event)
+            const getSyncEventStorageValue = (strValue) => { // В сафари событие срабатывает и на вкладке, которая инициировала изменения
+               let res = JSON.parse(strValue)
+               assert(res.value && res.instanceId, '!res.value && res.instanceId')
+               if (res.instanceId !== mutexGlobal.getInstanceId()) return res.value // не реагируем сами на себя
+            }
+            switch (event.key) {
+               case 'k_login_date':
+                  logD(`localStorage auth event: ${event.key}`, event)
+                  if (getSyncEventStorageValue(event.newValue)) await router.replace('/home')
+                  break
+               case 'k_logout_date':
+                  logD(`localStorage auth event: ${event.key}`, event)
+                  if (getSyncEventStorageValue(event.newValue)) await router.replace('/auth')
+                  break
+               case 'k_rxdb_create_date':
+               case 'k_rxdb_init_global_date':
+               case 'k_rxdb_deinit_global_date':
+                  if (getSyncEventStorageValue(event.newValue)) await rxdb.processStoreEvent(event.key)
+                  break
+            }
          }
-         await rxdb.processStoreEvent(event)
       } finally {
          storageEventMutex.release()
       }
    })
    initialized = true
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
+}
+
+// В сафари событие срабатывает и на вкладке, которая инициировала изменения (храним id вкладки в событии)
+function setSyncEventStorageValue (key, value) {
+   const f = setSyncEventStorageValue
+   logD(f, key, value, mutexGlobal.getInstanceId())
+   assert(key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date'), 'bad key: ' + key)
+   assert(key && value && mutexGlobal.getInstanceId(), '!key && value' + key + value)
+   localStorage.setItem(key, JSON.stringify({ value, instanceId: mutexGlobal.getInstanceId() })) // сообщаем другим вкладкам
 }
 
 async function shareWith (object) {
@@ -113,7 +141,13 @@ function initOfflineEvents (store) {
 
 async function initSessionStorage () {
    if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
-   if (!sessionStorage.getItem('k_log_format')) sessionStorage.setItem('k_log_format', JSON.stringify({time: false, moduleName: true, funcName: true}))
+   if (!sessionStorage.getItem('k_log_format')) {
+      sessionStorage.setItem('k_log_format', JSON.stringify({
+         time: false,
+         moduleName: true,
+         funcName: true
+      }))
+   }
    if (!sessionStorage.getItem('k_log_level')) {
       if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
       else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
@@ -149,15 +183,15 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          logW('too often systemReset!')
          let hardReset = confirm('Too often system reset. \n Make app hard reset?')
          if (hardReset) {
-           await systemHardReset()
-           window.location.reload()
+            await systemHardReset()
+            window.location.reload()
          }
       }
       if (clearRxdb) await rxdb.deInitGlobal() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (process.env.MODE === 'pwa') await pwaReset()
       if (clearAuthData) {
-         localStorage.setItem('k_logout_date', Date.now().toString())
+         setSyncEventStorageValue('k_logout_date', Date.now().toString())
       } // сообщаем другим вкладкам
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
@@ -205,12 +239,12 @@ async function systemInit () {
             await router.replace(sessionStorage.getItem('k_originalUrl'))
             sessionStorage.removeItem('k_originalUrl')
          }
-         localStorage.setItem('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
+         setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
       } else { // не удалось залогиниться
          logD(f, 'GO LOGIN')
          await resetLocalStorage()
          await router.replace('/auth')
-         localStorage.setItem('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
+         setSyncEventStorageValue('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
       }
    } catch (err) {
       logE('error on systemInit!', err)
@@ -250,6 +284,7 @@ async function systemHardReset () {
 
 export {
    initServices,
+   setSyncEventStorageValue,
    systemReset,
    shareWith,
    initSessionStorage,
