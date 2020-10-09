@@ -131,7 +131,7 @@ async function resetLocalStorage () {
          if (key.startsWith('k_')) localStorage.removeItem(key)
       }
    } finally {
-      mutexGlobal.release()
+      mutexGlobal.release('system::resetLocalStorage')
    }
 }
 
@@ -169,7 +169,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    } finally {
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
-      mutexGlobal.release()
+      mutexGlobal.release('system::systemReset')
       if (reload) window.location.reload()
    }
 }
@@ -217,7 +217,7 @@ async function systemInit () {
       await systemReset(true, true, true)
       throw err
    } finally {
-      mutexGlobal.release()
+      mutexGlobal.release('system::systemInit')
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }

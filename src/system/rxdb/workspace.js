@@ -3,7 +3,7 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import assert from 'assert'
 import { wsSchemaLocalChanges, wsSchemaItem, schemaKeyValue } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { MutexLocal, mutexGlobal } from 'src/system/rxdb/mutex'
+import { MutexLocal, mutexGlobal, Locker } from 'src/system/rxdb/mutex'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
@@ -84,22 +84,6 @@ class Workspace {
       try {
          await this.lock('ws::updateCollections')
          this.ignoreWsChanges = true
-         // добавлет дефолтный вариант для пропущенных стратегий
-         const migrationProxy = (migrationStrategies) => {
-            return new Proxy(migrationStrategies, {
-               get (target, prop) {
-                  if (prop in target) {
-                     let value = target[prop]
-                     return (typeof value === 'function') ? value.bind(target) : value // иначе - внутри this - будет указывать на Proxy
-                  } else {
-                     return (oldDoc) => {
-                        let newDoc = oldDoc
-                        return newDoc
-                     }
-                  }
-               }
-            })
-         }
          if (operation.in('delete', 'recreate')) {
             if (this.db.ws_items) await this.db.ws_items.remove()
             if (this.db.ws_changes) await this.db.ws_changes.remove()
@@ -112,7 +96,11 @@ class Workspace {
             await this.db.collection({
                name: 'ws_items',
                schema: wsSchemaItem,
-               migrationStrategies: migrationProxy({})
+               migrationStrategies: {
+                  // 1: oldDoc => oldDoc,
+                  // 2: oldDoc => oldDoc,
+                  // ..., - см wsSchemaItem.version (из schema.js)
+               }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
             assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
@@ -187,7 +175,7 @@ class Workspace {
                   } finally {
                      this.release()
                      rxdb.release()
-                     mutexGlobal.release()
+                     mutexGlobal.release('ws::synchroLoop')
                      // logD(f, 'unlocked')
                      logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }

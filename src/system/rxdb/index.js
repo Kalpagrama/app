@@ -205,7 +205,7 @@ class RxDBWrapper {
          else await removeRxDatabase('rxdb', 'idb')
          throw err
       } finally {
-         mutexGlobal.release()
+         mutexGlobal.release('rxdb::create')
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
       }
    }
@@ -334,7 +334,7 @@ class RxDBWrapper {
          await this.init() // инициализируем текущую вкладку
          localStorage.setItem('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
       } finally {
-         mutexGlobal.release()
+         mutexGlobal.release('rxdb::initGlobal')
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
       }
    }
@@ -354,7 +354,7 @@ class RxDBWrapper {
          else await removeRxDatabase('rxdb', 'idb')
          throw err
       } finally {
-         mutexGlobal.release()
+         mutexGlobal.release('rxdb::deinitGlobal')
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
@@ -386,7 +386,7 @@ class RxDBWrapper {
          await this.event.processEvent(event, this.store)
       } finally {
          this.release()
-         mutexGlobal.release()
+         mutexGlobal.release('rxdb::processEvent')
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }

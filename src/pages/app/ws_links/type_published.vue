@@ -52,6 +52,7 @@ kalpa-loader(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ObjectsApi } from 'src/api/objects'
 
 export default {
   name: 'wsLinks_typePublished',
@@ -77,8 +78,10 @@ export default {
     },
   },
   methods: {
-    linkDelete (link) {
+    async linkDelete (link) {
+      if (!confirm(this.$t('confirm_Really delete?', 'Удалить?'))) return
       this.$log('linkDelete')
+      await ObjectsApi.unPublish(link.oid)
     },
     linkEdit (link) {
       this.$log('linkEdit')

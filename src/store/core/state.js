@@ -32,7 +32,7 @@ export default {
       // LogSystemModulesEnum.RXDB_GQL,
       // LogSystemModulesEnum.RXDB_LST,
       LogSystemModulesEnum.RXDB_EVENT,
-      LogSystemModulesEnum.MUTEX,
+      // LogSystemModulesEnum.MUTEX,
       LogSystemModulesEnum.BOOT,
       LogSystemModulesEnum.CP,
    ],

@@ -87,6 +87,25 @@ class ObjectsApi {
     return objectChange
   }
 
+  static async unPublish (oid) {
+    const f = this.unPublish
+    const t1 = performance.now()
+    logD(f, 'start')
+    assert.ok(oid)
+    let { data: { unPublish } } = await apollo.clients.api.mutate({
+      mutation: gql`
+        mutation unPublish($oid: OID!) {
+          unPublish (oid: $oid)
+        }
+      `,
+      variables: {
+        oid: oid
+      }
+    })
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+    return unPublish
+  }
+
   // static async getSphere (name) {
   //   logD('getSphere start')
   //   let {data: {sphere}} = await apollo.clients.api.query({
