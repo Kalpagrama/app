@@ -246,13 +246,13 @@ async function systemInit () {
          await router.replace('/auth')
          setSyncEventStorageValue('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
       }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)
       await systemReset(true, true, true)
       throw err
    } finally {
       mutexGlobal.release('system::systemInit')
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }
 

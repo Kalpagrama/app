@@ -270,8 +270,9 @@ module.exports = function (ctx) {
 
     },
     capacitor: {
-      // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
-      // backButtonExit: false // Quasar handles app exit on mobile phone back button
+      hideSplashscreen: false, // disables auto-hiding the Splashscreen by Quasar CLI
+      iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
+      backButtonExit: false // Quasar handles app exit on mobile phone back button
     },
     // vendor: {
     //   remove: ['vue', 'rxdb', 'rxjs', 'quasar', 'axios', 'mediaelement', 'lodash']

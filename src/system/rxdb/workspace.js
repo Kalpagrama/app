@@ -169,6 +169,7 @@ class Workspace {
                      await this.lock('ws::synchroLoop')
                      // logD(f, 'locked')
                      if (mutexGlobal.isLeader()) await this.synchronize()
+                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
@@ -177,7 +178,6 @@ class Workspace {
                      rxdb.release()
                      mutexGlobal.release('ws::synchroLoop')
                      // logD(f, 'unlocked')
-                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }
                }
                await this.synchroLoopWaitObj.wait()
@@ -185,8 +185,8 @@ class Workspace {
          }
          if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          this.created = true
-      } finally {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
+      } finally {
       }
    }
 
@@ -391,7 +391,7 @@ class Workspace {
       } finally {
          this.ignoreWsChanges = false
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 
@@ -465,7 +465,7 @@ class Workspace {
          return rxDoc
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 

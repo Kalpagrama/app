@@ -131,8 +131,8 @@ class RxDBWrapper {
                logE('cant process rxdb event!', err)
                alert('error on processStoreEvent: ' + JSON.stringify(err))
                await window.location.reload()
-            } finally {
                logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+            } finally {
             }
          }
       }
@@ -198,6 +198,7 @@ class RxDBWrapper {
          await this.workspace.create()
          await this.cache.create()
          this.created = true
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
       } catch (err) {
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
@@ -205,7 +206,6 @@ class RxDBWrapper {
          throw err
       } finally {
          mutexGlobal.release('rxdb::create')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
       }
    }
 
@@ -294,9 +294,9 @@ class RxDBWrapper {
             return currentUser
          }
          this.initialized = true
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
 
@@ -313,9 +313,9 @@ class RxDBWrapper {
          this.reactiveItemDbMemCache.reset()
          if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
 
@@ -332,9 +332,9 @@ class RxDBWrapper {
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
       } finally {
          mutexGlobal.release('rxdb::initGlobal')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
       }
    }
 
@@ -347,6 +347,7 @@ class RxDBWrapper {
          await mutexGlobal.lock('rxdb::deinitGlobal')
          await this.deInit(true) // деинициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'err on deInitGlobal! remove db!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
@@ -354,7 +355,6 @@ class RxDBWrapper {
          throw err
       } finally {
          mutexGlobal.release('rxdb::deinitGlobal')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
 
@@ -383,10 +383,10 @@ class RxDBWrapper {
          await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
          assert(this.store, '!this.store')
          await this.event.processEvent(event, this.store)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
          mutexGlobal.release('rxdb::processEvent')
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
    }
 
@@ -539,9 +539,9 @@ class RxDBWrapper {
          this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult, '!result')
          return findResult
+         // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       } finally {
          this.release()
-         // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       }
    }
 
