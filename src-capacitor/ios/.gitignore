@@ -8,6 +8,14 @@ App/public
 App/Podfile.lock
 xcuserdata
 
+App/Gemfile.lock
+App/*.ipa
+App/*.zip
+App/*.mobileprovision
+App/*.certSigningRequest
+App/*.p12
+App/*.cer
+
 # Cordova plugins for Capacitor
 capacitor-cordova-ios-plugins
 
