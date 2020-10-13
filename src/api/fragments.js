@@ -257,6 +257,10 @@ fragment jointFragment on Joint {
   rate
   weight
   rateUser
+  countVotes
+  countViews
+  countShares
+  countBookmarks
 }
 `
 

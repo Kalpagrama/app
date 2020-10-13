@@ -21,6 +21,11 @@ or alternatively using `brew install fastlane`
 fastlane ios testflight_lane
 ```
 Builds, achieves and uploads ipa to TestFlight
+### ios deploy
+```
+fastlane ios deploy
+```
+Builds, achieves and uploads ipa to apstore
 
 ----
 
