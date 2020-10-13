@@ -227,7 +227,7 @@ class QueueUpdate {
 
 function makeObjectCacheId(item){
   assert(item && item.oid, '!oid' + JSON.stringify(item))
-  return RxCollectionEnum.OBJ + '::' + item.oid
+  return RxCollectionEnum.OBJ + '::' + item.oid + '::{}'
 }
 
 function getOidFromId(id){

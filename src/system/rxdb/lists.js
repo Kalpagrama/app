@@ -23,7 +23,7 @@ function makeListCacheId (mangoQuery) {
   assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 3' + JSON.stringify(mangoQuery))
   let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
   assert(rxCollectionEnum in LstCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
-  return rxCollectionEnum + '::' + JSON.stringify(mangoQuery)
+  return rxCollectionEnum + '::' + JSON.stringify(mangoQuery) + '::{}'
 }
 
 function getMangoQueryFromId (id) {
