@@ -13,7 +13,9 @@ q-layout(view="hHh Lpr lff")
             }`).row.full-width.items-center.content-center.q-px-sm.b-40
             q-btn(round flat color="white" icon="keyboard_arrow_left")
             q-icon(name="school" size="30px" color="white").q-mr-md
-            span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
+            .col
+              span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
+            q-btn(round flat color="white" icon="more_vert")
           .row.full-width.q-pa-sm
             router-link(
               :to="p.path"

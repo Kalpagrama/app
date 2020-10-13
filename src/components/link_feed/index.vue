@@ -1,57 +1,78 @@
 <template lang="pug">
 .row.full-width
   div(
+    @click.self="linkClick()"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       //- background: 'rgb(35,35,35)',
     }`
     ).row.full-width.q-pa-sm.b-40
-    .row.full-width.items-end.content-end.q-pa-sm
-      .col-6.q-pr-xs
+    //- authors
+    .row.full-width.items-center.content-center
+      div(:style=`{overflow: 'hidden'}`).col
+        div(v-if="stats").row.items-center.content-center.justify-start.no-wrap.q-py-xs
+          q-btn(
+            v-for="(voter, voteri) in stats.votes" :key="voter.oid"
+            :to="'/user/'+voter.oid"
+            flat dense no-caps
+            :style=`{minWidth: '80px',background: 'rgb(45,45,45)'}`
+            ).row.q-mr-xs
+            user-avatar(:url="voter.thumbUrl" :width="24" :height="24")
+            span.text-grey-4.q-ml-sm {{ voter.name }}
+          q-btn(
+            v-if="stats.votes.length > 3"
+            flat dense color="grey-8" icon="more_vert"
+            ).q-mr-xs
+      q-icon(name="visibility" color="grey-8")
+      small.text-grey-8.q-mr-xs 1234
+      q-btn(round flat dense color="grey-8" icon="more_vert")
+    //- items
+    div(
+      @click.self="linkClick()"
+      :style=`{padding: '11px'}`).row.full-width.items-end.content-end
+      div(
+        v-for="(item,ii) in [link.leftItem, link.rightItem]" :key="ii"
+        ).col-6
+        //- div(:style=`{position: 'relative', height: 0, paddingBottom: '100%'}`).row.full-width
         link-item(
           :link="link"
-          :item="link.leftItem"
+          :item="item"
           :style=`{
-            transform: 'perspective(600px) rotateY(10deg)'
+            //- position: 'absolute', zIndex: 100, top: 0,
+            transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
           template(v-slot:footer)
             div(
               v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(link.jointType)"
               :style=`{height: '40px'}`).row.full-width.items-center.content-center.justify-end
               span.text-white.text-bold {{ getItemTypeName(0, link.jointType) }}
-      .col-6.q-pl-xs
-        link-item(
-          :link="link"
-          :item="link.rightItem"
-          :style=`{
-            transform: 'perspective(600px) rotateY(-10deg)'
-          }`)
-          template(v-slot:footer)
-            div(
-              v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(link.jointType)"
-              :style=`{height: '40px'}`).row.full-width.items-center.content-center.justify-start
-              span.text-white.text-bold {{ getItemTypeName(1, link.jointType) }}
     //- type
     //- .row.full-width.justify-center
       small.text-white {{ link.jointType }}
     //- name
     div(
+      @click="linkClick()"
       ).row.full-width.justify-center.q-pa-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ link.name }}
   //- actions
+  link-actions(:link="link")
   //- .row.full-width.justify-center
     span.text-white actions
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'linkFeed',
   props: ['link'],
   components: {
     linkItem: () => import('./link_item.vue'),
+    linkActions: () => import('components/link/link_actions.vue')
   },
   data () {
     return {
+      stats: null
     }
   },
   computed: {
@@ -81,6 +102,10 @@ export default {
     }
   },
   methods: {
+    linkClick () {
+      this.$log('linkClick')
+      this.$router.push(`/link/${this.link.oid}`).catch(e => e)
+    },
     getItemTypeName (index, val) {
       this.$log('getItemTypeName', index, val)
       if (['ESSENCE', 'ASSOCIATIVE'].includes(val)) return ''
@@ -90,6 +115,10 @@ export default {
         return t.names[index]
       }
     }
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.stats = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.link.oid}})
   }
 }
 </script>

@@ -9,6 +9,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
       //- center
+      //- TODO: desktop only framesDragging
       div(
         @click="framesClick"
         v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? framesDrag : false"

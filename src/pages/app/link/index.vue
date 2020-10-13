@@ -16,15 +16,15 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         link-feed(v-if="link" :link="link")
-        .row.full-width.q-px-md
+        .row.full-width.q-px-md.q-mt-xl
           q-tabs(
             v-model="viewId"
             dense active-color="green"
-            no-caps switch-indicator
+            no-caps :switch-indicator="false"
             ).full-width.text-grey-6
             q-tab(name="gallery" label="Gallery")
             q-tab(name="graph" label="Graph")
-        .row.full-width.justify-center.q-pt-xl
+        .row.full-width.justify-center
           link-links(v-if="link" :link="link")
 </template>
 
