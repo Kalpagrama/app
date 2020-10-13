@@ -37,7 +37,7 @@
                   flat dense color="grey-6" no-caps)
                   span.text-white.text-bold {{ itemTypes.find(i => i.id === link.type.split('_')[0]).name }}
                   q-menu(dark)
-                    div(:style=`{width: '100px'}`).row
+                    div(:style=`{width: '110px'}`).row
                       q-btn(
                         @click="itemTypeSet(0, t.id)"
                         v-for="(t,ti) in itemTypes" :key="t.id" v-close-popup
@@ -64,7 +64,7 @@
                   flat dense color="grey-6" no-caps)
                   span.text-white.text-bold {{ itemTypes.find(i => i.id === link.type.split('_')[1]).name }}
                   q-menu(dark)
-                    div(:style=`{width: '100px'}`).row
+                    div(:style=`{width: '110px'}`).row
                       q-btn(
                         @click="itemTypeSet(1, t.id)"
                         v-for="(t,ti) in itemTypes" :key="t.id" v-close-popup
@@ -78,7 +78,7 @@
             v-if="link.type === 'ESSENCE'"
             v-model="link.name"
             borderless dark type="textarea" autogrow autofocus
-            placeholder="Как они связаны?"
+            placeholder="Что их связывает?"
             :input-style=`{
               fontSize: '18px',
               fontWeight: 'bold',
@@ -160,10 +160,10 @@ export default {
         {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE', origin: 'CAUSE_EFFECT'},
         {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION', origin: 'PROBLEM_SOLUTION'},
         {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM', origin: 'PROBLEM_SOLUTION'},
-        {id: 'TRUE', name: 'Правда', pair: 'FALSE', origin: 'FALSE_TRUE'},
-        {id: 'FALSE', name: 'Ложь', pair: 'TRUE', origin: 'FALSE_TRUE'},
-        {id: 'FROM', name: 'Первое', pair: 'TO', origin: 'FROM_TO'},
-        {id: 'TO', name: 'Второе', pair: 'FROM', origin: 'FROM_TO'},
+        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE', origin: 'FALSE_TRUE'},
+        {id: 'FALSE', name: 'Фэйк', pair: 'TRUE', origin: 'FALSE_TRUE'},
+        {id: 'FROM', name: 'До', pair: 'TO', origin: 'FROM_TO'},
+        {id: 'TO', name: 'После', pair: 'FROM', origin: 'FROM_TO'},
       ]
     },
     itemsTypesShow () {

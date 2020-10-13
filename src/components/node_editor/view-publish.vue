@@ -7,7 +7,7 @@
         flat dense color="grey-2" no-caps icon="keyboard_arrow_left"
         :style=`{
         }`).q-pr-sm.q-py-sm вернуться к образам
-    .row.full-width.q-px-sm
+    //- .row.full-width.q-px-sm
       edit-description(
         :value="node.description" @input="node.description = $event"
         :style=`{

@@ -39,19 +39,9 @@ q-layout(view="lHh lpR lFf")
     @before-hide="$store.commit('ui/stateSet', ['showMobileNavigation', true]), $store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading && $route.name !== 'welcome'"
-      :inDrawer="true"
+      :mini="false"
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40
-  //- auth
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="$store.state.ui.showAuth"
-      :style=`{
-        position: 'fixed', zIndex: 4000, top: 0, left: 0, bottom: 0, right: 0,
-        background: 'rgba(0,0,0,0.5)',
-      }`
-      ).row.fit
-      auth-layout(container :style=`{width: '400px', height: '500px',}`)
   //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -62,11 +52,35 @@ q-layout(view="lHh lpR lFf")
       }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
         v-if="!loading && $route.name !== 'welcome'"
-        :inDrawer="false"
+        :mini="false"
         :style=`{
           borderRadius: '10px',
           maxWidth: $q.screen.width < 1020+400 ? '60px' : '240px',
         }`).b-40
+  //- right menu
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="true && $q.screen.width > 1020+200"
+      :style=`{
+        position: 'fixed', zIndex: 3000, right: '0px', top: '0px',
+        width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',
+      }`).row.full-height.items-start.content-start.justify-start.q-pa-sm
+      div(:style=`{borderRadius: '10px',}`).column.fit.b-40
+        div(:style=`{height: '60px'}`).row.full-width.br
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start.q-pa-sm
+            div(
+              v-for="n in 100" :key="n"
+              :style=`{}`
+              ).row.full-width.br
+              span.text-white item
+      //- kalpa-menu(
+      //-   v-if="!loading && $route.name !== 'welcome'"
+      //-   :inDrawer="false"
+      //-   :style=`{
+      //-     borderRadius: '10px',
+      //-     maxWidth: $q.screen.width < 1020+400 ? '60px' : '240px',
+      //-   }`).b-40
   //- mobile navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width < 960")

@@ -10,7 +10,7 @@
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
     .row.full-width.items-start.content-start.q-pt-sm
       kalpa-loader(
-        :immediate="true"
+        :immediate="true" @items="nodesLoaded"
         :query="queryNodes" :limit="1000" v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           q-infinite-scroll(ref="qis" @load="next" :offset="500")
@@ -147,6 +147,44 @@ export default {
     nodeLaunch (node) {
       this.$log('nodeLaunch', node)
       this.$router.push(`/node/${node.oid}`).catch(e => e)
+    },
+    async nodesLoaded (nodes) {
+      this.$log('nodesLoaded', nodes)
+      await Promise.all(
+        nodes.map(async (n) => {
+          let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: n.oid}})
+          if (!nodeBookmark) {
+            let nodeBookmarkInput = {
+              oid: n.oid,
+              name: n.name,
+              thumbUrl: n.items[0].thumbUrl,
+              type: 'NODE',
+              wsItemType: 'WS_BOOKMARK',
+              spheres: []
+            }
+            nodeBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, nodeBookmarkInput)
+          }
+          let spheres = []
+          this.$log('nodeBookmark', nodeBookmark)
+          // upsert spheres by names from all the nodes published...
+          console.log('n.spheres.length', n.spheres.length)
+          await Promise.all(
+            n.spheres.map(async (s) => {
+              let [sphere] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name}})
+              if (!sphere) {
+                let sphereInput = {
+                  wsItemType: 'WS_SPHERE',
+                  name: s.name,
+                  spheres: [],
+                }
+                sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+              }
+              spheres.push(sphere.id)
+            })
+          )
+          nodeBookmark.spheres = spheres
+        })
+      )
     }
   }
 }

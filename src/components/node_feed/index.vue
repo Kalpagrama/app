@@ -1,7 +1,12 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(
+  :style=`{
+    position: 'relative',
+  }`
+  ).row.full-width.items-start.content-start
   div(
     :style=`{
+      position: 'relative',
       background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
@@ -60,10 +65,29 @@
           ).q-px-sm
           small.text-white.text-bold {{ node.items.length }} внутри
     //- essence
-    router-link(
-      :to="'/node/'+node.oid"
-      ).row.full-width.justify-center.cursor-pointer.q-pa-md
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+    div(:style=`{position: 'relative',}`).row.full-width
+      router-link(
+        :to="'/node/'+node.oid"
+        :style=`{
+          position: 'relative',
+        }`
+        ).row.full-width.justify-center.cursor-pointer.q-pa-md
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+      q-btn(
+        @click="showMore = !showMore"
+        round flat color="white"
+        :icon="showMore ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+        :style=`{
+          position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px',
+        }`)
+    div(
+      v-if="showMore"
+      :style=`{
+        position: 'relative',
+        height: $q.screen.width > 600 ? '600px' : $q.screen.width+'px',
+        opacity: 0.5,
+      }`
+      ).row.full-width
   //- footer
   node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
@@ -79,6 +103,7 @@ export default {
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
+      showMore: false,
     }
   },
   computed: {

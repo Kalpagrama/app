@@ -85,7 +85,7 @@ q-layout(view="hHh Lpr lff")
                       :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
                       :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
               //- node spheres
-              div(
+              //- div(
                 v-if="node"
                 :style=`{
                   maxWidth: $store.state.ui.pageMaxWidth+'px',
@@ -113,6 +113,28 @@ q-layout(view="hHh Lpr lff")
               //- node description
               .row.full-width
                 span.text-white {{ node.description }}
+        div(
+                v-if="node"
+                :style=`{
+                  maxWidth: $store.state.ui.pageMaxWidth+'px',
+                  position: 'relative',
+                }`
+                ).row.full-width.items-center.content-center.q-pt-sm.q-px-sm
+                //- node category goes as first sphere
+                router-link(
+                  v-if="category"
+                  :to="'/sphere/'+category.sphere.oid"
+                  :style=`{height: '40px',borderRadius: '10px'}`
+                  ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-sm.q-mb-sm.shaking
+                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+                  span.text-white.q-mr-md {{ category.alias }}
+                //- node spheres
+                router-link(
+                  v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+                  :style=`{height: '40px',borderRadius: '10px'}`
+                  ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-sm.q-mb-sm
+                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+                  span.text-white.q-mr-md {{ s.name }}
         node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
         //- node is creating, wait...
         .row.full-width.justify-center

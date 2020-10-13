@@ -65,6 +65,7 @@
                 :style=`{height: '40px'}`
                 ).row.full-width.items-center.content-center.q-px-sm
                 q-icon(name="blur_on" color="white" size="20px").q-mr-sm
+                span.text-red {{ s.items.length }}
                 span.text-white {{ s.name }}
               //- items
               div(v-if="s.items.length > 0").row.full-width.q-pa-sm
@@ -107,7 +108,8 @@ export default {
     querySpheres () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_SPHERE
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+          deletedAt: {$exists: false}
         }
       }
       if (this.searchString.length > 0) {

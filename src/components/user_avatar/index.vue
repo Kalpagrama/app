@@ -4,7 +4,7 @@ div(
     position: 'relative', height: height+'px', width: width+'px',
     margin: 0, padding: 0,
   }`
-  ).row.items-start.content-start.justify-start
+  ).row.items-center.content-center.justify-center
   img(
     v-show="!error"
     @load="loaded" @error="errored" draggable="false"

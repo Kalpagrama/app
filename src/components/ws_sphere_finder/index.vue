@@ -20,7 +20,9 @@ div(
         @keyup.enter="sphereCreate()").full-width.b-50
   //- body
   .col.full-width.scroll
-    kalpa-loader(:query="spheresQuery" :limit="1000")
+    kalpa-loader(
+      :immediate="true"
+      :query="spheresQuery" :limit="1000")
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-pa-sm
           div(
@@ -92,12 +94,25 @@ export default {
       return new Promise(async (resolve, reject) => {
         this.$log('sphereCreate')
         if (this.searchStringLocal.length > 0) {
-          let sphereInput = {
-            wsItemType: 'WS_SPHERE',
-            name: this.searchStringLocal,
-            spheres: [],
+          // check duplicates
+          let [sphere] = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: this.searchStringLocal,
+            }
+          })
+          this.$log('sphere', sphere)
+          if (sphere) {
+            this.$log('*** sphere DUPLICATE ***', sphere.name)
           }
-          let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          else {
+            this.$log('sphere CREATE !', this.searchStringLocal)
+            let sphereInput = {
+              wsItemType: 'WS_SPHERE',
+              name: this.searchStringLocal,
+              spheres: [],
+            }
+            sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          }
           this.$emit('sphere', sphere)
           resolve(sphere)
         }

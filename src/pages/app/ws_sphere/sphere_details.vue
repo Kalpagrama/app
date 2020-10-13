@@ -9,8 +9,10 @@
     ).row.full-width.items-between.content-between.q-px-md.b-40
     .row.full-width.q-py-md
       ws-sphere-editor(:item="sphere" :hiddenIds="[sphere.id]")
+    .row.full-width
+      span.text-white {{sphere}}
     .row.full-widthq.q-py-xl
-      q-btn(flat color="red" no-caps @click="deletStart()") Удалить
+      q-btn(flat color="red" no-caps @click="deleteStart()") Удалить
 </template>
 
 <script>
@@ -46,8 +48,12 @@ export default {
         }
       }
     },
-    deleteStart () {
+    async deleteStart () {
       this.$log('deleteStart')
+      // if we got 0 items on this sphere...
+      // await this.$rxdb.remove(this.node.id)
+      // this.sphere.deletedAt = Date.now()
+      this.$set(this.sphere, 'deletedAt', Date.now())
     },
   }
 }

@@ -226,6 +226,11 @@ const routes = [
                   name: 'workspace.sphere',
                   path: 'sphere/:id',
                   component: () => import('pages/app/ws_sphere/index.vue'),
+               },
+               {
+                  name: 'workspace.trash',
+                  path: 'trash',
+                  component: () => import('pages/app/ws_trash/index.vue')
                }
             ],
             meta: { roleMinimal: 'MEMBER' }

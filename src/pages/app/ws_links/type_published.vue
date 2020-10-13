@@ -22,9 +22,9 @@ kalpa-loader(
         }`
         ).row.full-width.link-item.b-40
         //- items wrapper
-        .row.full-width
+        .row.full-width.items-end.content-end
           div(v-for="(i,ii) in [link.leftItem, link.rightItem]" :key="ii").col-6
-            .row.full-width.justify-center.q-pa-xs
+            .row.full-width.items-end.content-end.justify-center.q-pa-xs
               img(
                 draggable="false"
                 :src="i.thumbUrl"
@@ -48,6 +48,7 @@ kalpa-loader(
         q-btn(round flat dense color="green-8" icon="delete_outline" @click="linkDelete(link,li)")
         .col
         q-btn(round flat dense color="white" icon="edit" @click="linkEdit(link,li)")
+        q-btn(round flat dense color="white" icon="launch" @click="linkLaunch(link)")
 </template>
 
 <script>
@@ -88,6 +89,7 @@ export default {
     },
     linkLaunch (link) {
       this.$log('linkLaunch')
+      this.$router.push('/link/' + link.oid).catch(e => e)
     }
   }
 }

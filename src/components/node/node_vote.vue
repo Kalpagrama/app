@@ -163,12 +163,19 @@ export default {
     },
     voteStart () {
       this.$log('voteStart')
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      // if its me
+      let currentUser = this.$store.getters.currentUser()
+      if (currentUser.profile.role === 'GUEST') {
         this.$router.push('/auth/sign-in')
       }
       else {
-        this.showVotes = true
-        // this.showVotearea = true
+        if (currentUser.oid === this.node.author.oid) {
+          this.$q.notify({type: 'negative', position: 'top', message: 'Cant vote for your node!'})
+        }
+        else {
+          this.showVotes = true
+          // this.showVotearea = true
+        }
       }
     },
     async vote (val) {

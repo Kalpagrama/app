@@ -15,7 +15,7 @@ export default {
     limit: {
       type: Number,
       default () {
-        return 10
+        return 15
       }
     },
     immediate: {
