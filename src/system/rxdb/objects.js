@@ -233,7 +233,7 @@ function makeObjectCacheId(item){
 function getOidFromId(id){
   assert(id, '!id')
   let parts = id.split('::')
-  assert(parts.length === 2, 'bad id' + id)
+  assert(parts.length === 3, 'bad id' + id)
   let oid = parts[1]
   assert(oid, '!oid')
   return oid
