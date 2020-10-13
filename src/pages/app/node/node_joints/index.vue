@@ -1,7 +1,7 @@
 <template lang="pug">
 kalpa-loader(
   :immediate="true"
-  :query="queryBySphere" :limit="3" v-slot=`{items, next}`
+  :query="queryBySphere" :limit="15" v-slot=`{items, next}`
   @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
   masonry(
     :cols="2"

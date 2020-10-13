@@ -16,15 +16,15 @@
       borderRadius: '10px',
     }`
     ).column.fit.b-50
-    //- node-mini(:node="item" :isActive="true" :isVisible="true")
     .col.full-width
-      img(
+      node-mini(:node="item" :isActive="isActive" :isVisible="isVisible")
+      //- img(
         :src="item.items[0].thumbUrl"
         :style=`{
           borderRadius: '10px', overflow: 'hidden',
           objectFit: 'contain',
         }`).fit
-    .row.full-width.items-center.content-center.justify-center.q-pa-sm
+    //- .row.full-width.items-center.content-center.justify-center.q-pa-sm
       span.text-white {{ item.name }}
     .row.full-width
       slot(name="footer")
@@ -33,7 +33,7 @@
 <script>
 export default {
   name: 'linkFeed_linkItem',
-  props: ['link', 'item'],
+  props: ['link', 'item', 'isActive', 'isVisible'],
   data () {
     return {
     }

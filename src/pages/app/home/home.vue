@@ -13,7 +13,7 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
           kalpa-loader(
-            v-if="sphereOid" :query="query" :limit="3" v-slot=`{items, next}`
+            v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
             @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
               q-infinite-scroll(ref="qis" @load="next" :offset="500")

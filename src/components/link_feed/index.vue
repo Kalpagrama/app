@@ -37,6 +37,7 @@
         link-item(
           :link="link"
           :item="item"
+          :isActive="isActive" :isVisible="isVisible"
           :style=`{
             //- position: 'absolute', zIndex: 100, top: 0,
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
@@ -52,7 +53,7 @@
     //- name
     div(
       @click="linkClick()"
-      ).row.full-width.justify-center.q-pa-sm
+      ).row.full-width.justify-center.q-pa-sm.cursor-pointer
       span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ link.name }}
   //- actions
   link-actions(:link="link")
@@ -65,7 +66,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'linkFeed',
-  props: ['link'],
+  props: ['link', 'isActive', 'isVisible'],
   components: {
     linkItem: () => import('./link_item.vue'),
     linkActions: () => import('components/link/link_actions.vue')
