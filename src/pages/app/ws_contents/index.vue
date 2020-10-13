@@ -79,8 +79,8 @@ export default {
         this.$router.push(`/content/${contentKalpa.oid}`).catch(e => e)
       }
       // add content bookmark async
-      let bookmarkFound = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, contentKalpa.oid)
-      // let [bookmarkFound] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      // let bookmarkFound = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, contentKalpa.oid)
+      let [bookmarkFound] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       this.$log('bookmarkFound', bookmarkFound)
       if (!bookmarkFound) {
         let bookmarkInput = {

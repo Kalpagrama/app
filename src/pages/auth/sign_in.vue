@@ -135,7 +135,7 @@ export default {
         let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.email)
         // let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = {
         //   userExist: false,
-        //   userId: 'ivanq3w@gmail.com',
+        //   userId: '4321ip@mail.ru',
         //   needInvite: true,
         //   needConfirm: true,
         //   loginType: 'EMAIL',

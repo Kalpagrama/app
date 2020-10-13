@@ -3,7 +3,7 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import assert from 'assert'
 import { wsSchemaLocalChanges, wsSchemaItem, schemaKeyValue } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { MutexLocal, mutexGlobal } from 'src/system/rxdb/mutex'
+import { MutexLocal, mutexGlobal, Locker } from 'src/system/rxdb/mutex'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
@@ -84,22 +84,6 @@ class Workspace {
       try {
          await this.lock('ws::updateCollections')
          this.ignoreWsChanges = true
-         // добавлет дефолтный вариант для пропущенных стратегий
-         const migrationProxy = (migrationStrategies) => {
-            return new Proxy(migrationStrategies, {
-               get (target, prop) {
-                  if (prop in target) {
-                     let value = target[prop]
-                     return (typeof value === 'function') ? value.bind(target) : value // иначе - внутри this - будет указывать на Proxy
-                  } else {
-                     return (oldDoc) => {
-                        let newDoc = oldDoc
-                        return newDoc
-                     }
-                  }
-               }
-            })
-         }
          if (operation.in('delete', 'recreate')) {
             if (this.db.ws_items) await this.db.ws_items.remove()
             if (this.db.ws_changes) await this.db.ws_changes.remove()
@@ -112,7 +96,11 @@ class Workspace {
             await this.db.collection({
                name: 'ws_items',
                schema: wsSchemaItem,
-               migrationStrategies: migrationProxy({})
+               migrationStrategies: {
+                  // 1: oldDoc => oldDoc,
+                  // 2: oldDoc => oldDoc,
+                  // ..., - см wsSchemaItem.version (из schema.js)
+               }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
             assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
@@ -181,15 +169,15 @@ class Workspace {
                      await this.lock('ws::synchroLoop')
                      // logD(f, 'locked')
                      if (mutexGlobal.isLeader()) await this.synchronize()
+                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                   } finally {
                      this.release()
                      rxdb.release()
-                     mutexGlobal.release()
+                     mutexGlobal.release('ws::synchroLoop')
                      // logD(f, 'unlocked')
-                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   }
                }
                await this.synchroLoopWaitObj.wait()
@@ -197,8 +185,8 @@ class Workspace {
          }
          if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          this.created = true
-      } finally {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
+      } finally {
       }
    }
 
@@ -302,7 +290,9 @@ class Workspace {
          if (wsOperationEnum === WsOperationEnum.UPSERT) {
             await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
          } else {
-            await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
+            if (item.rev) { // если нет rev - то элемент еще не создавался на сервере
+               await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
+            }
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
@@ -401,15 +391,15 @@ class Workspace {
       } finally {
          this.ignoreWsChanges = false
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 
    async find (mangoQuery) {
       const f = this.find
       try {
-         await this.lock('rxdb::ws::find')
-         // logD(f, 'locked')
+         // await this.lock('rxdb::ws::find')
+         // logD(f, 'locked') см set
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -418,7 +408,7 @@ class Workspace {
          let rxQuery = this.db.ws_items.find(mangoQuery)
          return rxQuery
       } finally {
-         this.release()
+         // this.release()
          // logD(f, 'unlocked')
       }
    }
@@ -429,19 +419,34 @@ class Workspace {
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::set')
-         logD(f, 'locked')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === 'WS_NODE') {
+         if (itemCopy.wsItemType === 'WS_BOOKMARK') {
+            assert(itemCopy.oid)
+            const found = await rxdb.find({
+               selector: {
+                  rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+                  oid: itemCopy.oid
+               }
+            }, true)
+            assert(!found.length, 'уже есть такой букмарк!!!!!!')
+         } else if (itemCopy.wsItemType === 'WS_SPHERE') {
+            assert(itemCopy.name)
+            const found = await rxdb.find({
+               selector: {
+                  rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+                  name: itemCopy.name
+               }
+            }, true)
+            // logD('found=', found)
+            assert(!found.length, 'уже есть такая же сфера!!!!!')
+         } else if (itemCopy.wsItemType === 'WS_NODE') {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
                val.layers.map(l => {
                   acc.push(l.contentOid)
                })
                return acc
             }, [])
-            // if (itemCopy.stage === 'draft') {
-            //   itemCopy.thumbUrl
-            // }
          }
          assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
          itemCopy.updatedAt = Date.now()
@@ -460,7 +465,7 @@ class Workspace {
          return rxDoc
       } finally {
          this.release()
-         logD(f, 'unlocked')
+         // logD(f, 'unlocked')
       }
    }
 

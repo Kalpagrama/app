@@ -209,22 +209,22 @@ class NodeApi {
       return rate
    }
 
-   static async unPublish (oid) {
-      logD('nodeDelete start')
-      assert.ok(oid)
-      let { data: { unPublish } } = await apollo.clients.api.mutate({
-         mutation: gql`
-             mutation unPublish($oid: OID!) {
-                 unPublish (oid: $oid)
-             }
-         `,
-         variables: {
-            oid: oid
-         }
-      })
-      logD('nodeDelete dones')
-      return unPublish
-   }
+   // static async unPublish (oid) {
+   //    logD('nodeDelete start')
+   //    assert.ok(oid)
+   //    let { data: { unPublish } } = await apollo.clients.api.mutate({
+   //       mutation: gql`
+   //           mutation unPublish($oid: OID!) {
+   //               unPublish (oid: $oid)
+   //           }
+   //       `,
+   //       variables: {
+   //          oid: oid
+   //       }
+   //    })
+   //    logD('nodeDelete dones')
+   //    return unPublish
+   // }
 
    static async nodeCreate (node) {
       const f = this.nodeCreate

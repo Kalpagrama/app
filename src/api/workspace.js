@@ -52,7 +52,7 @@ class WorkspaceApi {
 
    static async wsItemDelete (item, wsRevision, wsVersion) {
       const f = this.wsItemDelete
-      logD(f, 'start')
+      logD(f, 'start', item)
       const t1 = performance.now()
       let { data: { wsItem, wsRevision: wsRevisionServer } } = await apollo.clients.api.mutate({
          mutation: gql`

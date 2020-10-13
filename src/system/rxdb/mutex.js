@@ -3,6 +3,8 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { wait } from 'src/system/utils'
 import { AppVisibility } from 'quasar'
 import Vue from 'vue'
+import { router } from 'src/boot/main'
+import { rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
@@ -20,12 +22,12 @@ class MutexLocal {
       this.timerErrId = null
    }
 
-   tryLock (lockOwner) {
-      assert(lockOwner, '!lockOwner')
-      if (!this.locked) {
-         return true
-      } else return false
-   }
+   // tryLock (lockOwner) {
+   //    assert(lockOwner, '!lockOwner')
+   //    if (!this.locked) {
+   //       return true
+   //    } else return false
+   // }
 
    async lock (lockOwner) {
       assert(lockOwner, '!lockOwner')
@@ -67,16 +69,14 @@ class MutexLocal {
    }
 }
 
-const maxLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
+const maxGlobalLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
+
 // глобальный (несколько вкладок) мьютекс без очереди захвата (кто успел - того и тапки)
+// синглтон (один экземпляр на приложение)
 class MutexGlobal {
    constructor () {
       this.queue = []
-      this.locked = false
-      this.lockOwner = null
-      this.name = 'MutexGlobal'
-      this.timerWarnId = null
-      this.timerErrId = null
+      this.lockCnt = 0 //  мьютекс по умолчанию рекурсивен
       this.instanceId = sessionStorage.getItem('k_instance_id') ? sessionStorage.getItem('k_instance_id') : (Math.ceil(Math.random() * Date.now())).toString()
       sessionStorage.removeItem('k_instance_id') // контроль дублирования (при удблированиии вкладок дублируется sessionStorage) https://stackoverflow.com/questions/11896160/any-way-to-identify-browser-tab-in-javascript
       this.unloadingInProgress = false
@@ -112,6 +112,12 @@ class MutexGlobal {
             }
          })
       }
+      window.addEventListener('storage', async function (event) {
+         if (this.lockCnt && event.key && event.key.in('k_global_lock')) { // Мы владели мьютексом, но какая-то вкладка сбросила нас (см maxGlobalLockTimeFuse)
+            logW('другая вкладка сбросила наш мьютекс тк посчитала это дедлоком')
+            window.location.reload()
+         }
+      })
    }
 
    setLeader () {
@@ -133,11 +139,9 @@ class MutexGlobal {
    }
 
    async lock (lockOwner) {
-      return
-      // eslint-disable-next-line no-unreachable
       assert(lockOwner, '!lockOwner')
       const f = this.lock
-      // logD(f, 'start', getInstanceId())
+      // logD(f, 'start', lockOwner, this.getInstanceId())
       if (this.unloadingInProgress) {
          logW('cant globalLock (unloadingInProgress)')
          await wait(10 * 1000)
@@ -149,10 +153,10 @@ class MutexGlobal {
          lockOwner: ''
       }))
       if (this.instanceId !== current.instanceId) {
-         while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxLockTimeFuse) {
+         while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxGlobalLockTimeFuse) {
             assert('dt' in current && 'instanceId' in current, 'bad current!')
-            await wait(200)
-            if (Date.now() % 5 === 0) logW(f, `${this.instanceId}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
+            await wait(500)
+            if (Date.now() % 4 === 0) logW(f, `${this.instanceId}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
             current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
                dt: 0,
                instanceId: '',
@@ -160,7 +164,7 @@ class MutexGlobal {
             }))
          }
          if (current.dt) {
-            logW(`${this.instanceId}:${lockOwner} break globalLock by timeout(maxLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
+            logW(`${this.instanceId}:${lockOwner} break globalLock by timeout(maxGlobalLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
             localStorage.removeItem('k_global_lock')
          }
       }
@@ -169,41 +173,29 @@ class MutexGlobal {
          instanceId: this.instanceId,
          lockOwner: lockOwner
       }))
+      this.lockCnt++
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   release () {
+   release (lockOwner) {
       const f = this.release
-      let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-      assert('dt' in current && 'instanceId' in current)
-      if (current.instanceId === this.instanceId) {
-         logD(f, 'release globalLock', this.instanceId, current)
-         localStorage.removeItem('k_global_lock')
-      } else if (current.instanceId) logW(f, `release foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`) // такое возможно из-за maxLockTimeFuse
+      assert(lockOwner, '!lockOwner')
+      // logD(f, 'start', lockOwner, this.getInstanceId())
+      assert(this.lockCnt, '!this.lockCnt')
+      this.lockCnt-- // нужно ставить до изменения k_global_lock (см window.addEventListener('storage.k_global_lock')
+      if (!this.lockCnt) {
+         let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
+         assert('dt' in current && 'instanceId' in current)
+         if (current.instanceId === this.instanceId) { // если это мы захватывали
+            logD(f, 'release globalLock', this.instanceId, current)
+            localStorage.removeItem('k_global_lock')
+         } else if (current.instanceId) { // кто-то перехватил наш mutex по тамауту maxGlobalLockTimeFuse. мы теперь не владеем этим мьютексом
+            logW(f, `release foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`)
+         } // такое возможно из-за maxGlobalLockTimeFuse
+      }
    }
 }
 
 const mutexGlobal = new MutexGlobal()
-
-//
-// class Locker{
-//    constructor (mutexArray) {
-//       let mutexes = []
-//       for (let mutexName of mutexArray){
-//          assert(mutexName.in('rxdb', '1global', 'rxdb_cache'))
-//          let mutex = mutexes[mutexName]
-//
-//       }
-//       mutexArray = mutexArray.sort()
-//    }
-//
-//    async lock (){
-//
-//    }
-//
-//    release(){
-//
-//    }
-// }
 
 export { MutexLocal, mutexGlobal }

@@ -48,8 +48,8 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          let nodeBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.node.oid)
-          // let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid}})
+          // let nodeBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.node.oid)
+          let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid}})
           if (nodeBookmark) this.nodeBookmark = nodeBookmark
         }
         else {

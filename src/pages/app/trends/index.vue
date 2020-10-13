@@ -61,6 +61,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           oidSphere: this.sphereOid
         },
+        populateObjects: true,
       }
     }
   },

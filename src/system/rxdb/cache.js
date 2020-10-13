@@ -123,8 +123,8 @@ class Cache {
             }
          }
          this.created = true
-      } finally {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
+      } finally {
       }
    }
 
