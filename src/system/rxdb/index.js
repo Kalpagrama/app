@@ -73,7 +73,7 @@ class ReactiveItemDbMemCache {
 function getRxCollectionEnumFromId (id) {
    assert(id, '!id')
    let parts = id.split('::')
-   assert(parts.length === 3, 'bad id!' + id)
+   assert(parts.length >= 2, 'bad id!' + id)
    let rxCollection = parts[0]
    assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
    return rxCollection
@@ -82,7 +82,7 @@ function getRxCollectionEnumFromId (id) {
 function getRawIdFromId (id) {
    assert(id, '!id')
    let parts = id.split('::')
-   assert(parts.length === 3, 'bad id!' + id)
+   assert(parts.length >= 2, 'bad id!' + id)
    let rawId = parts[1]
    assert(rawId, 'bad id' + id)
    return rawId

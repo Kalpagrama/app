@@ -452,7 +452,7 @@ class Workspace {
          assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
          itemCopy.updatedAt = Date.now()
          if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
-         if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}` // генерируем id для нового элемента
+         if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
          let rxDoc = await this.db.ws_items.atomicUpsert(itemCopy)
          assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
