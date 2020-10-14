@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-pa-sm
   .row.full-width.items-center.content-center.q-pa-sm
-    span.text-white.text-bold Отдали голос
+    span.text-white.text-bold Проголосовали
     .col
     q-btn(round flat dense color="grey-6" icon="clear" @click="$emit('close')")
   div(

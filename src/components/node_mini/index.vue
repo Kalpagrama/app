@@ -50,6 +50,7 @@
           :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
     //- essence
     router-link(
+      v-if="showName"
       :to="'/node/'+node.oid"
       ).row.full-width.justify-center.cursor-pointer.q-pa-md
       span(:style=`{fontSize: '1rem'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
@@ -65,7 +66,13 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     // nodeActions: () => import('components/node/node_actions.vue')
   },
-  props: ['node', 'isActive', 'isVisible'],
+  // props: ['node', 'isActive', 'isVisible'],
+  props: {
+    node: {type: Object},
+    isActive: {type: Boolean, default: false},
+    isVisible: {type: Boolean, default: false},
+    showName: {type: Boolean, default: true}
+  },
   data () {
     return {
     }

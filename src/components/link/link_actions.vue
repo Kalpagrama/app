@@ -13,7 +13,7 @@
       .row.full-width.justify-center
         small.text-grey-8 {{ link.countBookmarks > 100 ? '99+' : link.countShares }}
     //- remake
-    .row.full-height.justify-center
+    //- .row.full-height.justify-center
       link-remake(:link="link").shaking
       .row.full-width.justify-center
         small.text-grey-8 {{ link.countBookmarks > 100 ? '99+' : link.countRemakes }}

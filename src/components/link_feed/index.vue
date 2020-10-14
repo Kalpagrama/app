@@ -8,7 +8,9 @@
     }`
     ).row.full-width.q-pa-sm.b-40
     //- authors
-    .row.full-width.items-center.content-center
+    div(
+      v-if="showHeader"
+      ).row.full-width.items-center.content-center
       div(:style=`{overflow: 'hidden'}`).col
         div(v-if="stats").row.items-center.content-center.justify-start.no-wrap.q-py-xs
           q-btn(
@@ -38,6 +40,7 @@
           :link="link"
           :item="item"
           :isActive="isActive" :isVisible="isVisible"
+          :mini="mini"
           :style=`{
             //- position: 'absolute', zIndex: 100, top: 0,
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
@@ -45,8 +48,13 @@
           template(v-slot:footer)
             div(
               v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(link.jointType)"
-              :style=`{height: '40px'}`).row.full-width.items-center.content-center.justify-end
-              span.text-white.text-bold {{ getItemTypeName(0, link.jointType) }}
+              :class=`{
+                'justify-end': ii === 0
+              }`
+              :style=`{
+                height: '40px',
+              }`).row.full-width.items-center.content-center.q-px-md
+              span.text-white.text-bold {{ getItemTypeName(ii, link.jointType) }}
     //- type
     //- .row.full-width.justify-center
       small.text-white {{ link.jointType }}
@@ -56,9 +64,9 @@
       ).row.full-width.justify-center.q-pa-sm.cursor-pointer
       span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ link.name }}
   //- actions
-  link-actions(:link="link")
-  //- .row.full-width.justify-center
-    span.text-white actions
+  link-actions(
+    v-if="showFooter"
+    :link="link" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -66,7 +74,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'linkFeed',
-  props: ['link', 'isActive', 'isVisible'],
+  props: {
+    link: {type: Object},
+    isActive: {type: Boolean, default: false},
+    isVisible: {type: Boolean, default: false},
+    showHeader: {type: Boolean, default: true},
+    showFooter: {type: Boolean, default: true},
+    mini: {type: Boolean, default: false}
+  },
   components: {
     linkItem: () => import('./link_item.vue'),
     linkActions: () => import('components/link/link_actions.vue')

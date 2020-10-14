@@ -4,7 +4,7 @@ kalpa-loader(
   :query="query" :limit="1000"
   v-slot=`{items,next}`)
   masonry(
-    :cols="$q.screen.width < 800 ? 1 : 3"
+    :cols="$q.screen.width < 800 ? 1 : 2"
     :gutter="{default: 6}").full-width.q-pr-sm
     div(
       v-for="(link, li) in items" :key="link.oid"
@@ -21,8 +21,11 @@ kalpa-loader(
           borderRadius: '10px', overflow: 'hidden'
         }`
         ).row.full-width.link-item.b-40
+        link-feed(
+          :link="link" :isActive="false" :isVisible="false"
+          :showHeader="false" :showFooter="false" :mini="true")
         //- items wrapper
-        .row.full-width.items-end.content-end
+        //- .row.full-width.items-end.content-end
           div(v-for="(i,ii) in [link.leftItem, link.rightItem]" :key="ii").col-6
             .row.full-width.items-end.content-end.justify-center.q-pa-xs
               img(
@@ -32,8 +35,9 @@ kalpa-loader(
                   transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
                   borderRadius: '10px', overflow: 'hidden'
                 }`).full-width
+              .row.full-width.br
         //- name
-        .row.full-width.justify-center.q-pa-sm
+        //- .row.full-width.justify-center.q-pa-sm
           span.text-bold.text-white {{ link.name }}
       slot(name="tint" :item="link" :itemKey="link.oid")
       //- selected

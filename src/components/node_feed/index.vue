@@ -70,6 +70,7 @@ div(
         :to="'/node/'+node.oid"
         :style=`{
           position: 'relative',
+          textAlign: 'center',
         }`
         ).row.full-width.justify-center.cursor-pointer.q-pa-md
         span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}

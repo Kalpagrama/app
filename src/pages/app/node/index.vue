@@ -15,19 +15,20 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
-          ).row.full-width.items-center.content-center.b-40.q-px-sm
+          ).row.full-width.items-center.content-center.b-40.q-pa-sm
           q-btn(
+            v-if="$q.screen.width > $store.state.ui.pageMaxWidth+140"
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm.q-my-xs
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
-            //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ $t('Node', 'Ядро') }}
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
           kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
-    q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`)
+    q-page(:style=`{paddingTop: '8px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
-        div(v-if="node").row.full-width
+        //- node items
+        div(v-if="node").row.full-width.items-start.content-start
           //- SLIDER
           //- div(
             v-if="node.layout === 'SLIDER'"
@@ -53,89 +54,82 @@ q-layout(view="hHh Lpr lff")
           div(
             v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
             ).row.full-width.items-start.content-start.justify-center
-            //- node author
-            .row.full-width.justify-center
-              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
-                q-btn(
-                  :to="'/user/'+node.author.oid"
-                  flat color="white" dense no-caps
-                  )
-                  user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
-                  span.text-grey-4.q-ml-sm {{ node.author.name }}
-                .col
-                small.text-grey-8.q-mr-xs {{ node.countViews }}
-                q-icon(name="visibility" color="grey-8").q-mr-md
-                small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
             div(
               :style=`{
                 maxWidth: $store.state.ui.pageMaxWidth+'px',
-                borderRadius: '10px', overflow: 'hidden',}`
-              ).row.full-width.b-40.q-px-sm
-              list-middle(
-                rootMargin="-30% 0px"
-                :items="node.items" :itemStyles=`{marginTop: '16px',}`)
-                template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-                  div(
-                    :style=`{
-                      position: 'relative',
-                      borderRadius: '10px', overflow: 'hidden',
-                    }`
-                    ).row.full-width
-                    composition-player(
-                      :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
-                      :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
-              //- node spheres
-              //- div(
-                v-if="node"
+                borderRadius: '10px',
+                background: 'rgb(35,35,35)'
+              }`
+              ).row.full-width
+              //- node author
+              .row.full-width.justify-center
+                div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
+                  q-btn(
+                    :to="'/user/'+node.author.oid"
+                    flat color="white" dense no-caps
+                    )
+                    user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
+                    span.text-grey-4.q-ml-sm {{ node.author.name }}
+                  .col
+                  small.text-grey-8.q-mr-xs {{ node.countViews }}
+                  q-icon(name="visibility" color="grey-8").q-mr-md
+                  small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+              //- node body
+              div(
                 :style=`{
                   maxWidth: $store.state.ui.pageMaxWidth+'px',
-                  position: 'relative',
-                }`
-                ).row.full-width.items-center.content-center.q-pt-sm
-                //- node category goes as first sphere
-                router-link(
-                  v-if="category"
-                  :to="'/sphere/'+category.sphere.oid"
-                  :style=`{height: '40px',borderRadius: '10px'}`
-                  ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-sm.q-mb-sm.shaking
-                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-                  span.text-white.q-mr-md {{ category.alias }}
-                //- node spheres
-                router-link(
-                  v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
-                  :style=`{height: '40px',borderRadius: '10px'}`
-                  ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-sm.q-mb-sm
-                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-                  span.text-white.q-mr-md {{ s.name }}
-              //- node name
-              .row.full-width.items-start.content-start.justify-center.q-py-md
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-              //- node description
-              .row.full-width
-                span.text-white {{ node.description }}
-        div(
-                v-if="node"
-                :style=`{
-                  maxWidth: $store.state.ui.pageMaxWidth+'px',
-                  position: 'relative',
-                }`
-                ).row.full-width.items-center.content-center.q-pt-sm.q-px-sm
-                //- node category goes as first sphere
-                router-link(
-                  v-if="category"
-                  :to="'/sphere/'+category.sphere.oid"
-                  :style=`{height: '40px',borderRadius: '10px'}`
-                  ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-sm.q-mb-sm.shaking
-                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-                  span.text-white.q-mr-md {{ category.alias }}
-                //- node spheres
-                router-link(
-                  v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
-                  :style=`{height: '40px',borderRadius: '10px'}`
-                  ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-sm.q-mb-sm
-                  q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-                  span.text-white.q-mr-md {{ s.name }}
+                  borderRadius: '10px', overflow: 'hidden',}`
+                ).row.full-width.b-40
+                list-middle(
+                  rootMargin="-30% 0px"
+                  :items="node.items" :itemStyles=`{marginTop: '0px',}`)
+                  template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
+                    div(
+                      :style=`{
+                        position: 'relative',
+                        borderRadius: '10px', overflow: 'hidden',
+                      }`
+                      ).row.full-width
+                      composition-player(
+                        :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
+                        :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
+                //- node name
+                div(
+                  :style=`{
+                    textAlign: 'center',
+                  }`
+                  ).row.full-width.items-start.content-start.justify-center.q-pa-md
+                  span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+                //- node description
+                .row.full-width
+                  span.text-white {{ node.description }}
+        //- node actions
         node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
+        //- node spheres
+        div(
+          v-if="node"
+          :style=`{
+            maxWidth: $store.state.ui.pageMaxWidth+'px',
+            position: 'relative',
+          }`
+          ).row.full-width.items-center.content-center.q-py-md.q-px-sm
+          //- node category goes as first sphere
+          router-link(
+            v-if="category"
+            :to="'/sphere/'+category.sphere.oid"
+            :style=`{height: '40px',borderRadius: '10px'}`
+            ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-sm.q-mb-sm.shaking
+            q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+            span.text-white.q-mr-md {{ category.alias }}
+          //- node spheres
+          router-link(
+            v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+            :style=`{height: '40px',borderRadius: '10px'}`
+            ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-sm.q-mb-sm
+            q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+            span.text-white.q-mr-md {{ s.name }}
+        //- //- node actions
+        //- node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
         //- node is creating, wait...
         .row.full-width.justify-center
           node-mockup(

@@ -20,6 +20,14 @@ div(
         maxWidth: $q.screen.width  > 800 ? '400px' : $q.screen.width+'px',
       }`
       ).row.full-width.b-40
+      //- header
+      div(
+        :style=`{
+          fontSize: '18px',
+          textAlign: 'center',
+        }`
+        ).row.full-width.justify-center.q-px-md.q-py-xl
+        span.text-white.text-bold {{ node.name }}
       q-btn(
         @click="vote(a.value)"
         v-for="(a,ai) in actions" :key="ai"
