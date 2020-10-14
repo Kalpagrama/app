@@ -109,6 +109,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaMenu', () => import('components/kalpa_menu/index.vue'))
+    Vue.component('kalpaMenuMobile', () => import('components/kalpa_menu_mobile/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('kalpaFollow', () => import('components/kalpa_follow/index.vue'))
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
