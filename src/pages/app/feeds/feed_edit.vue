@@ -15,6 +15,7 @@
             v-model="feed.name"
             placeholder="Enter feed name"
             borderless dark
+            :autofocus="feed.name.length === 0"
             :input-style=`{
               fontSize: '18px',
               fontWeight: 'bold',
@@ -86,8 +87,8 @@ export default {
         name: '',
         spheres: [],
         items: [],
-        wsItemType: 'WS_BOOKMARK',
-        type: 'feed',
+        wsItemType: 'WS_FEED',
+        // type: 'feed',
         thumbUrl: '',
         // oid: null,
       }
@@ -122,7 +123,7 @@ export default {
                 // create node...
                 if (unwatch) unwatch()
                 let feedInput = JSON.parse(JSON.stringify(this.feed))
-                let feed = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, feedInput)
+                let feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
                 this.$router.replace(`/feeds/edit/${feed.id}`)
               },
               {
@@ -131,7 +132,7 @@ export default {
             )
           }
           else {
-            let feed = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
+            let feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
             this.$log('FOUND feed', feed)
             this.feed = feed
           }

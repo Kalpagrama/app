@@ -10,7 +10,10 @@ q-layout(view="hHh Lpr lff")
           ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
           q-icon(name="notifications_none" color="white" size="30px").q-mx-sm
           .col
-            span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
+            span(
+              :style=`{fontSize: '18px', userSelect: 'none'}`
+              ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
+          q-btn(round flat color="grey-8" icon="settings")
   q-page-container
     router-view
 </template>
