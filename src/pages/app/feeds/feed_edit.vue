@@ -24,16 +24,17 @@
   div(
     v-if="feed"
     ).row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-py-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
       //- small.text-white {{ feed }}
       div().row.full-width
         div(
+          @click="subscriptionClick({oid: i})"
           v-for="(i,ii) in feed.items" :key="i"
           v-if="subscriptions[i]"
           :style=`{
             borderRadius: '10px'
           }`
-          ).row.items-center.content-center.b-40.q-pa-sm
+          ).row.items-center.content-center.b-40.q-pa-sm.q-mr-sm.q-mb-sm
           img(
             draggable="false"
             :src="subscriptions[i].thumbUrl"
@@ -44,14 +45,24 @@
             }`).q-mr-sm
           span.text-white {{ subscriptions[i].name }}
   //- user subscriptions
-  .row.full-width.justify-center.q-px-sm
+  div(
+    v-if="feed"
+    ).row.full-width.justify-center.q-px-sm
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      .row.full-width.q-pa-sm
-        span.text-white Subsriptions
-      .row.full-width.items-start.content-start
+      .row.full-width.q-px-sm
+        span.text-grey-6 Мои подписки
+      .row.full-width
+        div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100,}`).row.full-width
+          q-input(
+            v-model="searchString"
+            filled dark dense color="grey-6"
+            placeholder="Поиск"
+            ).full-width
+      .row.full-width.items-start.content-start.q-pt-sm
         div(
           @click="subscriptionClick(s)"
           v-for="(s,skey) in subscriptions" :key="s.oid"
+          v-if="!feed.items.includes(s.oid)"
           :style=`{
             borderRadius: '10px',
           }`
@@ -69,6 +80,7 @@ export default {
   props: ['feeds', 'subscriptions'],
   data () {
     return {
+      searchString: '',
       feed: null,
       feedNew: {
         name: '',

@@ -35,6 +35,7 @@
         span.text-white.text-bold Опубликовать
     .row.full-width.q-py-md
       q-btn(
+        v-if="node.id"
         @click="nodeDelete()"
         flat dense color="red" no-caps).q-px-sm Удалить
 </template>

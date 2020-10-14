@@ -60,7 +60,7 @@
             .row.full-height.items-start.content-start.q-pa-xs
               q-btn(
                 @click="$router.push(`/feeds/edit/${f.id}`)"
-                round flat dense color="grey-7" icon="more_vert")
+                round flat dense color="grey-9" icon="settings")
 </template>
 
 <script>

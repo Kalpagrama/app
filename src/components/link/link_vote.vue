@@ -68,10 +68,10 @@ export default {
     },
     async vote (val) {
       try {
-        this.$log('vote start', this.node.oid, val)
+        this.$log('vote start', this.link.oid, val)
         this.voting = val
         await this.$wait(500)
-        let res = await NodeApi.nodeVote(this.node.oid, val)
+        let res = await NodeApi.nodeVote(this.link.oid, val)
         this.$log('vote done', res)
         this.voting = false
         this.votingAgain = false

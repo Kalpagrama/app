@@ -39,7 +39,7 @@ q-layout(view="lHh lpR lFf")
     kalpa-menu(
       :mini="false"
       :style=`{borderRadius: '0 10px 10px 0'}`
-      ).full-height.b-40
+      ).full-height.b-40.q-pt-md
   //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
