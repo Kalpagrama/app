@@ -34,10 +34,9 @@ q-layout(view="lHh lpR lFf")
     side="left"
     :value="$store.state.ui.appShowMenu"
     behavior="mobile" no-swipe-open
-    :width="$q.screen.width - 60"
+    :width="$q.screen.width - 70"
     @before-hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
-      v-if="!loading && $route.name !== 'welcome'"
       :mini="false"
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40
@@ -50,7 +49,6 @@ q-layout(view="lHh lpR lFf")
         width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',
       }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
-        v-if="!loading && $route.name !== 'welcome'"
         :mini="$q.screen.width < $store.state.ui.pageMaxWidth+500"
         :style=`{
           borderRadius: '10px',
@@ -61,9 +59,8 @@ q-layout(view="lHh lpR lFf")
     q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width <= $store.state.ui.pageMaxWidth+140")
       kalpa-menu-mobile
   q-page-container
-    router-view(v-if="!loading")
-    div(
-      v-if="loading"
+    router-view
+    //- div(
       :style=`{height: $q.screen.height-50+'px'}`
       ).row.full-width.items-center.content-center.justify-center
       q-spinner(color="green" size="100px" :thickness="4")
@@ -80,22 +77,22 @@ export default {
   components: {authLayout},
   data () {
     return {
-      loading: true,
+      // loading: true,
     }
   },
   watch: {
-    '$q.appVisible': {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('appVisible TO', to)
-      }
-    }
+    // '$q.appVisible': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     // this.$log('appVisible TO', to)
+    //   }
+    // }
   },
   async created () {
     // this.$log('created')
-    this.loading = true
+    // this.loading = true
     this.$q.addressbarColor.set('#424242')
-    this.loading = false
+    // this.loading = false
   }
 }
 </script>

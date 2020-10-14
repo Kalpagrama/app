@@ -1,15 +1,15 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+//- q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-px-sm
         div(:style=`{height: '60px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
-          q-icon(name="view_week" color="white" size="30px").q-mr-sm
+          ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
+          q-icon(name="view_week" color="white" size="30px").q-mx-sm
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_MyFeeds_title', 'Мои ленты')}}
           .col
           q-btn(
-            @click="$router.push('/settings/feeds')"
+            @click="$router.push('/feeds-settings')"
             round flat color="white" icon="settings")
         //- feeds tabs
         div(:style=`{paddingLeft: '16px', paddingRight: '16px',}`).row.full-width
@@ -22,30 +22,29 @@ q-layout(view="hHh Lpr lff")
               active-color="white" no-caps dense aling="left" switch-indicator
               ).full-width.text-grey-5
               q-tab(v-for="(f,fi) in items" :key="f.id" :name="f.id" :label="f.name")
-  q-page-container
+  //- q-page-container
     q-page(:style=`{paddingBottom: '0px',}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width
-        kalpa-loader(
-          v-if="$route.params.id && subscriptions.length > 0"
-          :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
-          list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-            q-infinite-scroll(@load="next" :offset="250")
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-              feed-item(:item="item" :isActive="isActive" :isVisible="isVisible")
+.row.full-width.items-start.content-start
+  kalpa-loader(
+    :immediate="true"
+    :query="querySubscriptions" :limit="1000" v-slot=`{items,next}` @items="subscriptionsLoaded")
+  kalpa-loader(
+    :immediate="true"
+    :query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feeds = $event")
+  router-view(:subscriptions="subscriptions" :feeds="feeds")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import feedItem from './feed_item.vue'
-// import('https://tenor.com/embed.js')
 
 export default {
-  name: 'pageApp__feeds',
-  components: {feedItem},
+  name: 'pageApp_feeds',
   data () {
     return {
-      feedId: null,
-      feeds: []
+      feeds: [],
+      subscriptions: {}
     }
   },
   computed: {
@@ -58,41 +57,24 @@ export default {
       }
       return res
     },
-    subscriptions () {
-      if (this.$route.params.id) {
-        return this.feeds.reduce((acc, val) => {
-          if (this.$route.params.id === val.id) {
-            val.items.map(i => {
-              acc.push(i.oid)
-            })
-          }
-          return acc
-        }, [])
-      }
-      else {
-        return []
-      }
-    },
-    queryFeedItems () {
-      return {
+    querySubscriptions () {
+      let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_FEED,
+          rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
           oidSphere: this.$store.getters.currentUser().oid,
-          // subscription: {$in: this.subscriptions}
         },
-        populateObjects: true,
+        populateObjects: false,
       }
-    }
-  },
-  watch: {
+      return res
+    },
   },
   methods: {
-    feedsLoaded (feeds) {
-      this.$log('feedsLoaded')
-      this.feeds = feeds
-      if (!this.$route.params.id) {
-        this.$router.replace({params: {id: ''} })
-      }
+    subscriptionsLoaded (subs) {
+      this.$log('subscriptionsLoaded', subs)
+      this.subscriptions = subs.reduce((acc, val) => {
+        acc[val.oid] = val
+        return acc
+      }, {})
     }
   }
 }

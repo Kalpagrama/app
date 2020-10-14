@@ -9,7 +9,7 @@ export default function (/* { store, ssrContext } */) {
   const router = new VueRouter({
     scrollBehavior (to, from, savedPosition) {
       // debug('sb', to, from)
-      console.log('scrollBehavior', to, from)
+      // console.log('scrollBehavior', to, from)
       if (savedPosition) {
         console.log('### savedPosition', savedPosition)
         // alert('### savedPosition' + savedPosition.toString())

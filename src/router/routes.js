@@ -39,10 +39,14 @@ const routes = [
       component: () => import('layouts/main_layout'),
       children: [
          {
-            name: 'home',
-            path: 'home/:id?',
+            path: 'feeds',
             component: () => import('pages/app/feeds/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'MEMBER' },
+            children: [
+               { path: '', name: 'feeds', component: () => import('pages/app/feeds/feeds.vue') },
+               { path: 'edit/:id?', name: 'feeds.edit', component: () => import('pages/app/feeds/feed_edit.vue') },
+               { path: ':id', name: 'feeds.feed', component: () => import('pages/app/feeds/feed.vue') }
+            ]
          },
          {
             name: 'welcome',
@@ -236,7 +240,7 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            name: 'notifications',
+            // name: 'notifications',
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
             // component: () => import('components/node_editor/index.vue'),

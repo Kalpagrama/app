@@ -1,8 +1,8 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
+    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")

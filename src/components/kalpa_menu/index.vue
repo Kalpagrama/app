@@ -9,6 +9,7 @@ div(
   :style=`{
     maxWidth: mini ? '60px' : '100%',
   }`).column.full-width
+  //- $q.platform.is.capacitor paddingTop 20px ?
   //- header
   div(
     :style=`{borderRadius: '10px',}`
@@ -140,8 +141,7 @@ export default {
   data () {
     return {
       pages: [
-        // {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
-        // {id: 'home', name: this.$t('pageApp_Home_title', 'Домашняя'), icon: 'home'},
+        {id: 'feeds', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},

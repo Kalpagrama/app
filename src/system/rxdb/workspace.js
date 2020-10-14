@@ -422,14 +422,14 @@ class Workspace {
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
          if (itemCopy.wsItemType === 'WS_BOOKMARK') {
-            assert(itemCopy.oid)
-            const found = await rxdb.find({
-               selector: {
-                  rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-                  oid: itemCopy.oid
-               }
-            }, true)
-            assert(!found.length, 'уже есть такой букмарк!!!!!!')
+            // assert(itemCopy.oid)
+            // const found = await rxdb.find({
+            //    selector: {
+            //       rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+            //       oid: itemCopy.oid
+            //    }
+            // }, true)
+            // assert(!found.length, 'уже есть такой букмарк!!!!!!')
          } else if (itemCopy.wsItemType === 'WS_SPHERE') {
             assert(itemCopy.name)
             const found = await rxdb.find({
