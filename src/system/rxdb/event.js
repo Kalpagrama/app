@@ -14,6 +14,53 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_EVENT)
 
+function makeEventCard (event) {
+   let resultCard = { icon: '', description: '', items: [] }
+   const cropObj = (obj) => {
+      assert(obj.oid && obj.name != null && obj.thumbUrl, 'bad obj')
+      return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl }
+   }
+   switch (event.type) {
+      case 'USER_SUBSCRIBED':
+         assert(event.matter, '!event.matter')
+         if (event.matter.reason === 'SUBSCRIBE') {
+            resultCard.items = ['пользователь', cropObj(event.subject), 'подписался на', cropObj(event.object)]
+         } else if (event.matter.reason === 'AUTHOR') {
+            resultCard.items = ['вы подписались на', cropObj(event.object)]
+         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         break
+      case 'USER_UNSUBSCRIBED':
+         assert(event.matter, '!event.matter')
+         if (event.matter.reason === 'SUBSCRIBE') {
+            resultCard.items = ['пользователь', cropObj(event.subject), 'отписался от', cropObj(event.object)]
+         } else if (event.matter.reason === 'AUTHOR') {
+            resultCard.items = ['вы отписались от', cropObj(event.object)]
+         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         break
+      case 'VOTED':
+         assert(event.matter, '!event.matter')
+         if (event.matter.reason === 'SUBSCRIBE') {
+            resultCard.items = ['пользователь', cropObj(event.subject), 'проголосовал за', cropObj(event.object)]
+         } else if (event.matter.reason === 'AUTHOR') {
+            resultCard.items = ['вы проголосовали за', cropObj(event.object)]
+         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         break
+      case 'OBJECT_CREATED':
+         assert(event.matter, '!event.matter')
+         if (event.matter.reason === 'SUBSCRIBE') {
+            resultCard.items = ['пользователь', cropObj(event.subject), 'создал', cropObj(event.object)]
+         } else if (event.matter.reason === 'AUTHOR') {
+            resultCard.items = ['вы создали', cropObj(event.object)]
+         } else if (event.matter.reason === 'JOIN') {
+            resultCard.items = ['пользователь', cropObj(event.subject), 'использовал ваше ядро для создания', cropObj(event.object)]
+         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         break
+   }
+   // span.text-white {{ n.subject.name }} =>
+   // span.text-white {{ n.matter.reason }} =>
+   return resultCard
+}
+
 class Event {
    constructor (workspace, objects, lists, cache) {
       this.workspace = workspace
@@ -96,6 +143,7 @@ class Event {
             await this.objects.processEvent(event)
             break
          case 'OBJECT_CREATED':
+            event.card = makeEventCard(event)
             if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
                logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
                await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true }) // обновит ядро в rxdb (изначально у нас был фейковый вариант)
@@ -110,6 +158,7 @@ class Event {
             await this.lists.processEvent(event) // удалить объект из всех лент
             break
          case 'VOTED':
+            event.card = makeEventCard(event)
             if (event.subject.oid === rxdb.getCurrentUser().oid) {
                this.notifyUserActionComplete(event.type, event.object)
             }
@@ -118,6 +167,7 @@ class Event {
             break
          case 'USER_SUBSCRIBED':
          case 'USER_UNSUBSCRIBED':
+            event.card = makeEventCard(event)
             this.notifyUserActionComplete(event.type, event.object)
             await this.lists.processEvent(event)
             break
@@ -197,4 +247,4 @@ class Event {
    }
 }
 
-export { Event }
+export { Event, makeEventCard }

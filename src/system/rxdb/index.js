@@ -73,7 +73,7 @@ class ReactiveItemDbMemCache {
 function getRxCollectionEnumFromId (id) {
    assert(id, '!id')
    let parts = id.split('::')
-   assert(parts.length === 2, 'bad id!' + id)
+   assert(parts.length === 3, 'bad id!' + id)
    let rxCollection = parts[0]
    assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
    return rxCollection
@@ -82,17 +82,18 @@ function getRxCollectionEnumFromId (id) {
 function getRawIdFromId (id) {
    assert(id, '!id')
    let parts = id.split('::')
-   assert(parts.length === 2, 'bad id!' + id)
+   assert(parts.length === 3, 'bad id!' + id)
    let rawId = parts[1]
    assert(rawId, 'bad id' + id)
    return rawId
 }
 
-function makeId (rxCollectionEnum, rawId) {
+function makeId (rxCollectionEnum, rawId, params) {
    assert(rawId, '!rawId')
    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
    assert(!rawId.includes('::'), 'bad rawId' + rawId)
-   return rxCollectionEnum + '::' + rawId
+   params = params || {}
+   return rxCollectionEnum + '::' + rawId + '::' + JSON.stringify(params)
 }
 
 class RxDBWrapper {
@@ -582,7 +583,7 @@ class RxDBWrapper {
             id = idOrRawId
          } else {
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-            id = makeId(rxCollectionEnum, idOrRawId)
+            id = makeId(rxCollectionEnum, idOrRawId, params)
          }
       }
       assert(id, 'bad id: ' + id)
