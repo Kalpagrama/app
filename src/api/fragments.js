@@ -238,6 +238,12 @@ const jointFragment = gql` ${objectFragment} ${videoFragment} ${imageFragment} $
 fragment jointFragment on Joint {
   ...objectFragment
   jointType
+  author {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 50)
+  }
   leftItem {
     ...on Video {...videoFragment}
     ...on Image {...imageFragment}
