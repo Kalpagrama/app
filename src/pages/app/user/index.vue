@@ -19,7 +19,7 @@ q-layout(view="hHh Lpr lff")
             q-route-tab(
               v-for="t in pages" :key="t.id"
               inline-label
-              :to="t.id" :name="t.id" :label="$q.screen.width > 600 ? t.name : null" :icon="t.icon").q-px-sm
+              :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
   q-page-container
     router-view(:oid="$route.params.oid")
 </template>

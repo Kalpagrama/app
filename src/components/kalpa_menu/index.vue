@@ -21,7 +21,7 @@ div(
         :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
         ).row.items-center.content-center.justify-center.cursor-pointer
         kalpa-logo(:width="40" :height="40" :style=`{pointEvents: 'none'}`)
-      div(v-if="mini").col
+      div(v-if="!mini").col
         div(
           @click="$router.push($store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/').catch(e => e)"
           ).row.fit.items-center.content-center.cursor-pointer
@@ -39,7 +39,7 @@ div(
       ).row.full-width.items-center.content-center.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
-      div(v-if="mini").col.full-height
+      div(v-if="!mini").col.full-height
         .row.fit.items-center.content-center
           span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
           small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
@@ -65,7 +65,7 @@ div(
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="22px" :name="p.icon" :color="p.color || 'white'")
           span(
-            v-if="mini"
+            v-if="!mini"
             :style=`{fontSize: '16px'}`).text-white {{ p.name }}
         //- refresh
         div(
@@ -74,7 +74,7 @@ div(
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
           span(
-            v-if="mini"
+            v-if="!mini"
             :style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
         //- logout
         div(
@@ -84,7 +84,7 @@ div(
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
           span(
-            v-if="mini"
+            v-if="!mini"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
         //- login
         div(
@@ -94,7 +94,7 @@ div(
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power" color="white" :loading="loginLoading")
           span(
-            v-if="mini"
+            v-if="!mini"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
         //- create link
         div(
@@ -105,7 +105,7 @@ div(
             flat color="green" no-caps align="left" icon="link" size="md"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width
             span(
-              v-if="mini"
+              v-if="!mini"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create link', 'Создать связь')}}
         //- create node
         div(
@@ -116,10 +116,10 @@ div(
             flat color="green" no-caps align="left" icon="add" size="md"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width
             span(
-              v-if="mini"
+              v-if="!mini"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать ядро')}}
         //- version
-        div(v-if="mini").row.full-width.items-center.q-pa-md
+        div(v-if="!mini").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
@@ -129,7 +129,6 @@ import {systemReset, shareWith} from 'src/system/services'
 
 export default {
   name: 'kalpaMenu',
-  // props: ['inDrawer', 'mini'],
   props: {
     mini: {
       type: Boolean,
@@ -155,10 +154,6 @@ export default {
     }
   },
   computed: {
-    // mini () {
-    //   if (this.inDrawer) return true
-    //   else return this.$q.screen.width > 1020 + 400
-    // }
   },
   methods: {
     async refresh () {
