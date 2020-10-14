@@ -3,6 +3,7 @@ import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { makeEventCard } from 'src/system/rxdb/event'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -13,20 +14,6 @@ const FindCollectionEnum = Object.freeze({
    OBJECTS: 'OBJECTS',
    EVENTS: 'EVENTS'
 })
-
-function makeEventDescription(event){
-   // switch(event.type){
-   //    case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   //    // case 'OBJECT_CREATED': break
-   // }
-   return JSON.stringify(event)
-}
 
 class ListsApi {
    // sphereItems query
@@ -67,8 +54,8 @@ class ListsApi {
       switch (rxCollectionEnum) {
          case RxCollectionEnum.LST_FEED:
             res = await ListsApi.find(FindCollectionEnum.EVENTS, mangoQuery)
-            for (let event of res.items){
-               event.description = makeEventDescription(event)
+            for (let event of res.items) {
+               event.card = makeEventCard(event)
             }
             break
          case RxCollectionEnum.LST_SPHERE_NODES:
@@ -264,7 +251,7 @@ class ListsApi {
    static async objSubscribers (oid, pagination) {
       const f = ListsApi.objSubscribers
       logD(f, 'start')
-      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, {clientFirst: false}) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
+      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, { clientFirst: false }) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
       assert(obj, '!obj')
       let subscribers = obj.subscribers || [] // внимание ! не реактивно!!!!
       assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')

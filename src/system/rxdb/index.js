@@ -92,8 +92,8 @@ function makeId (rxCollectionEnum, rawId, params) {
    assert(rawId, '!rawId')
    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
    assert(!rawId.includes('::'), 'bad rawId' + rawId)
-   let p = JSON.stringify(params || {})
-   return rxCollectionEnum + '::' + rawId + '::' + p
+   params = params || {}
+   return rxCollectionEnum + '::' + rawId + '::' + JSON.stringify(params)
 }
 
 class RxDBWrapper {
