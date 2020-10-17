@@ -29,6 +29,10 @@ platform :android do
     # sh "your_script.sh"
     # You can also use other beta testing services here
     # собираем билд
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
 
         path = '../app/build.gradle'
         re = /versionCode\s+(\d+)/
@@ -56,11 +60,5 @@ platform :android do
           skip_upload_images: true,
           skip_upload_screenshots: true,
           skip_upload_apk: false)
-  end
-
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
   end
 end
