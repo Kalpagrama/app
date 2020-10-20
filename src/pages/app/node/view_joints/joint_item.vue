@@ -20,10 +20,14 @@ div(
       ).row.full-width.q-pa-sm.b-40
       span.text-white.q-ml-sm {{ item.name }}
     //- footer
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-      small.text-white {{ joint.jointType }}
+    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
       .col
-      span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ joint.rate*100 }}
+      q-btn(
+        flat color="white" no-caps)
+        span.text-white {{ itemType }}
+      q-btn(
+        flat color="white" no-caps round)
+        span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ joint.rate*100 }}
   //- right padding for real
   div(:style=`{width: '60px',}`).row.full-height.justify-center
   //- right side for line and voting for the joint...
@@ -64,7 +68,17 @@ export default {
     item () {
       if (this.joint.leftItem.oid === this.node.oid) return this.joint.rightItem
       else return this.joint.leftItem
-    }
+    },
+    itemType () {
+      // left item is ok
+      if (this.joint.leftItem.oid === this.node.oid) {
+        return this.joint.jointType.split('_')[0]
+      }
+      // need swap
+      else {
+        return this.joint.jointType.split('_')[1]
+      }
+    },
   },
   methods: {
     async vote () {

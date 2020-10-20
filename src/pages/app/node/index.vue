@@ -6,12 +6,40 @@
 
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
+  //- position="bottom"
   q-dialog(
-    v-model="nodeLinkerOpened" position="bottom"
+    v-model="nodeLinkerOpened"
+    position="bottom"
+    transition-show="fade"
+    transition-hide="fade"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    .row.full-width.items-start.content-start.b-30
-      kalpa-connect(v-if="node" :oid="node.oid" @close="nodeLinkerOpened = false")
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
+        borderRadius: '10px 10px 0 0',
+      }`
+      ).row.full-width.items-start.content-start.b-30
+      kalpa-connect(
+        v-if="node"
+        :oid="node.oid"
+        @close="nodeLinkerOpened = false")
+        div(
+          :style=`{
+            borderRadius: '10px'
+          }`
+          ).row.full-width.b-40
+          img(
+            draggable="false"
+            :src="node.thumbUrl"
+            :style=`{
+              height: '80px',
+              borderRadius: '10px', overflow: 'hidden',
+            }`)
+          .col
+            .row.fit.items-start.content-start.q-pa-md
+              span.text-white.text-bold {{ node.name }}
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -26,7 +54,7 @@ q-layout(view="hHh Lpr lff")
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
           kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
-    q-page(:style=`{paddingTop: '8px', paddingBottom: '400px'}`)
+    q-page(:style=`{paddingTop: '8px', paddingBottom: '0px'}`)
       .row.full-width.items-start.content-start.justify-center
         //- node items
         div(v-if="node").row.full-width.items-start.content-start
@@ -96,14 +124,14 @@ q-layout(view="hHh Lpr lff")
             router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
-        position="bottom" :offset="[0, 60]"
+        position="bottom right" :offset="[0, 70]"
         :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           //- @click="$router.push('/workspace/link/new?oid='+node.oid)"
           q-btn(
             v-if="true"
             @click="nodeLinkerOpened = true"
-            no-caps color="green" icon="insert_link" size="md")
+            no-caps color="green" icon="insert_link" size="md").shaking
             span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
 </template>
 

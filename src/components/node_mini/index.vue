@@ -52,6 +52,9 @@
     router-link(
       v-if="showName"
       :to="'/node/'+node.oid"
+      :style=`{
+        textAlign: 'center',
+      }`
       ).row.full-width.justify-center.cursor-pointer.q-pa-md
       span(:style=`{fontSize: '1rem'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
   //- footer

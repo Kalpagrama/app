@@ -42,7 +42,7 @@ div(
       userSelect: 'none',
       height: options.height,
       objectFit: options.objectFit,
-      opacity: duration === 0 ? 1 : 0,
+      //- opacity: duration === 0 ? 1 : 0,
     }`
     ).full-width
   //- video wrapper
