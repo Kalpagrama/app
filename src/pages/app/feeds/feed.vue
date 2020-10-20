@@ -1,5 +1,6 @@
 <template lang="pug">
 .row.full-width
+  //- header
   .row.full-width.justify-center.q-pt-sm.q-px-sm
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       div(
@@ -12,9 +13,9 @@
         .col
           span(v-if="feed" :style=`{fontSize: '18px'}`).text-white.text-bold {{ feed.name }}
         q-btn(v-if="feed" round flat color="grey-7" icon="settings" @click="$router.push('/feeds/edit/'+feed.id)")
+  //- items
   .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      //- small.text-white {{ feed }}
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
       kalpa-loader(
         v-if="feed && feed.items.length > 0"
         :immediate="true"

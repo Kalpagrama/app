@@ -163,6 +163,7 @@ export default {
         {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
         {id: 'nodes-mine', name: this.$t('wsContentExplorer_video_viewNodesMine_title', 'Мои ядра')},
         {id: 'nodes-all', name: this.$t('wsContentExplorer_video_viewNodesAll_title', 'Все ядра')},
+        {id: 'joints', name: 'Связи'}
       ]
     }
   },

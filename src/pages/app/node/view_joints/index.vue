@@ -5,7 +5,7 @@ kalpa-loader(
   @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
   masonry(
     :cols="2"
-    :gutter="{default: 10}").full-width.q-pr-sm
+    :gutter="{default: 10}").full-width.q-pr-sm.q-pt-sm
     //- list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
     //- q-infinite-scroll(ref="qis" @load="next" :offset="500")
       //- template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)

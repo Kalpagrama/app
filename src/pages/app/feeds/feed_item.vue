@@ -1,3 +1,10 @@
+<style lang="sass" scoped>
+.feed-item
+  cursor: pointer
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 .row.full-width
   div(
@@ -6,8 +13,7 @@
       borderRadius: '10px', overflow: 'hidden'
     }`
     ).row.full-width
-    //- event reason and subject
-    //- div(:styl)
+    //- TYPE, Reason, Subject
     div(
       :style=`{
         background: 'rgb(35,35,35)',
@@ -21,21 +27,38 @@
         ).q-mr-sm
         user-avatar(:url="item.subject.thumbUrl" :width="24" :height="24")
         span.text-grey-4.q-ml-sm {{ item.subject.name }}
-      small.text-grey-6.q-mr-sm what: {{ item.type }}
+      small.text-grey-6.q-mr-sm {{ item.type }}
       //- small.text-grey-6.q-mr-sm subject: {{ item.subject.name }}
-      small.text-grey-6.q-mr-sm why: {{ item.matter.reason }}
+      //- small.text-grey-6.q-mr-sm why: {{ item.matter.reason }}
       //- small.text-grey-6 to: {{ item.object.name }}
-    //- event object : node wrapper
+    //- OBJECT object
     div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width
+      //- VIDEO
+      router-link(
+        v-if="['VIDEO', 'IMAGE'].includes(item.object.type)"
+        :to="'/content/'+item.object.oid"
+        ).row.full-width.b-40.feed-item
+        img(
+          draggable="false"
+          :src="item.object.thumbUrl"
+          :style=`{
+            height: '100px', borderRadius: '10px', overflow: 'hidden'
+          }`)
+        .col
+          .row.fit.items-center.content-center.q-pa-md
+            span.text-white {{ item.object.name }}
+      //- NODE
       node-feed(
-        v-if="item.object.type === 'NODE'"
+        v-else-if="item.object.type === 'NODE'"
         :node="item.object" :isActive="isActive" :isVisible="isVisible"
         :marginBottom="0")
+      //- WORD
       div(
         v-else-if="item.object.type === 'WORD'"
         ).row.full-width.items-center.content-center.q-pa-md
         q-icon(name="blur_on" color="white" size="30px").q-mr-sm
         span.text-bold.text-white {{ item.object.name }}
+      //- JOINT
       div(
         v-else-if="item.object.type === 'JOINT'"
         ).row.full-width
@@ -131,10 +154,9 @@
         //- node-content
         div(v-else).row.full-width
           small.text-white {{item.object}}
-      div(v-else).row.full-width
-        //- small.text-white {{item.object}}
-        h1.text-white {{item.object.type}}
-      //- small(v-if="item.object.type === 'NODE'").text-white {{item.object}}
+      //- ELSE
+      div(v-else).row.full-width.bg-blue
+        small.text-white {{ item.object }}
 </template>
 
 <script>

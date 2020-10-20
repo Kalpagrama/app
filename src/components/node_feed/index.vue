@@ -74,14 +74,14 @@ div(
         }`
         ).row.full-width.justify-center.cursor-pointer.q-pa-md
         span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-      q-btn(
+      //- q-btn(
         @click="showMore = !showMore"
         round flat color="white"
         :icon="showMore ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
         :style=`{
           position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px',
         }`)
-    div(
+    //- div(
       v-if="showMore"
       :style=`{
         position: 'relative',

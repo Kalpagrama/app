@@ -42,6 +42,7 @@ div(
       userSelect: 'none',
       height: options.height,
       objectFit: options.objectFit,
+      opacity: duration === 0 ? 1 : 0,
     }`
     ).full-width
   //- video wrapper
@@ -101,6 +102,15 @@ export default {
     }
   },
   watch: {
+    isVisible: {
+      handler (to, from) {
+        if (to) {
+        }
+        else {
+          this.duration = 0
+        }
+      }
+    },
     isActive: {
       handler (to, from) {
         // this.$log('isActive TO', to, composition.oid)
@@ -111,6 +121,7 @@ export default {
         }
         else {
           this.$refs.compositionVideoRef.pause()
+          this.duration = 0
         }
       }
     },
