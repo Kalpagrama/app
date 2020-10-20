@@ -9,8 +9,9 @@
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
     .row.full-width.items-start.content-start.q-pt-sm
+      //- @items="nodesLoaded"
       kalpa-loader(
-        :immediate="true" @items="nodesLoaded"
+        :immediate="true"
         :query="queryNodes" :limit="1000" v-slot=`{items, next}`)
         .row.full-width.items-start.content-start
           q-infinite-scroll(ref="qis" @load="next" :offset="500")

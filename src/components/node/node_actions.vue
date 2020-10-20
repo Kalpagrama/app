@@ -6,40 +6,42 @@
       :node="node" :isActive="isActive" :isVisible="isVisible"
       @close="showStats = false")
   //- actions wrapper
-  div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
+  div(:style=`{maxWidth: '700px'}`).row.full-width.items-center.content-center.q-mb-xs
     //- share
-    .row.full-height.justify-center
+    div(:style=`{position: 'relative',}`).row.full-height.justify-center
       node-share(:node="node").shaking
-      .row.full-width.justify-center
-        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countShares }}
+      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
+        small.text-grey-8 {{ node.countShares > 100 ? '99+' : node.countShares }}
     //- remake
-    .row.full-height.justify-center
+    div(:style=`{position: 'relative',}`).row.full-height.justify-center
       node-remake(:node="node").shaking
-      .row.full-width.justify-center
-        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countRemakes }}
+      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
+        small.text-grey-8 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
     //- bookmark
-    .row.full-height.justify-center
+    div(:style=`{position: 'relative',}`).row.full-height.justify-center
       node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
-      .row.full-width.justify-center
+      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
         small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
     //- link
-    .row.full-height.justify-center
+    div(:style=`{position: 'relative',}`).row.full-height.justify-center
       q-btn(
         @click="$router.push('/workspace/link/new?oid='+node.oid)"
         round flat color="green").shaking
-        q-icon(name="link" size="30px" color="green")
-      .row.full-width.justify-center
-        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countJoints }}
+        q-icon(name="link" size="30px" color="grey-9")
+      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
+        small.text-grey-8 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
     //- vote
     .col
-      .row.full-width.items-start.content-start.justify-end
-        q-btn(
+    div(:style=`{width: '60px'}`).row.justify-center
+      node-vote(:node="node")
+      //- div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start.justify-end
+        //- q-btn(
           @click="showStats = true"
           flat dense no-caps color="grey-2").q-mt-sm
           span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
         .row.full-height.justify-center
           node-vote(:node="node")
-          .row.full-width.justify-center
+          //- div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
             small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countVotes }}
 </template>
 

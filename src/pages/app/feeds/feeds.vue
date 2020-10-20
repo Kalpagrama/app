@@ -45,7 +45,7 @@
               .row.full-width
                 div(
                   v-for="(i,ii) in f.items" :key="i"
-                  v-if="ii < 6 && subscriptions[i]"
+                  v-if="ii < 6 && subscriptions[i] && !['WORD'].includes(subscriptions[i].type)"
                   :style=`{width: '50px', height: '50px'}`
                   ).row.items-center.content-center.justify-center
                   img(

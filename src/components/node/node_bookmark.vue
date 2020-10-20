@@ -2,7 +2,7 @@
 q-btn(
   @click="start()"
   round flat
-  :color="nodeBookmark ? 'green' : 'grey-8'"
+  :color="nodeBookmark ? 'green' : 'grey-9'"
   :icon="nodeBookmark ? 'bookmark' : 'bookmark_outline'"
   :loading="loading")
   //- q-menu(

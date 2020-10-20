@@ -6,11 +6,40 @@
 
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
+  //- position="bottom"
   q-dialog(
-    v-model="nodeLinkerOpened" position="bottom"
+    v-model="nodeLinkerOpened"
+    position="bottom"
+    transition-show="fade"
+    transition-hide="fade"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    node-linker(v-if="node" :node="node" @close="nodeLinkerOpened = false")
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
+        borderRadius: '10px 10px 0 0',
+      }`
+      ).row.full-width.items-start.content-start.b-30
+      kalpa-connect(
+        v-if="node"
+        :oid="node.oid"
+        @close="nodeLinkerOpened = false")
+        div(
+          :style=`{
+            borderRadius: '10px'
+          }`
+          ).row.full-width.b-40
+          img(
+            draggable="false"
+            :src="node.thumbUrl"
+            :style=`{
+              height: '80px',
+              borderRadius: '10px', overflow: 'hidden',
+            }`)
+          .col
+            .row.fit.items-start.content-start.q-pa-md
+              span.text-white.text-bold {{ node.name }}
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -25,32 +54,10 @@ q-layout(view="hHh Lpr lff")
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
           kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
-    q-page(:style=`{paddingTop: '8px', paddingBottom: '400px'}`)
+    q-page(:style=`{paddingTop: '8px', paddingBottom: '0px'}`)
       .row.full-width.items-start.content-start.justify-center
         //- node items
         div(v-if="node").row.full-width.items-start.content-start
-          //- SLIDER
-          //- div(
-            v-if="node.layout === 'SLIDER'"
-            :style=`{
-              position: 'relative',
-              borderRadius: '10px', overflow: 'hidden',
-            }`).row.full-width.items-start.content-start
-            list-slider(:items="node.items")
-              template(v-slot:item=`{item, isActive: itemActive}`)
-                div(
-                  :style=`{
-                    position: 'relative',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.fit.b-40.shadow-5
-                  composition-player(
-                    :composition="item" :isVisible="true" :isActive="nodeActive && itemActive"
-                    :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-            .row.full-width.justify-center
-              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-center.cursor-pointer.q-pa-md
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-          //- PIP, VERTICAL
           div(
             v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
             ).row.full-width.items-start.content-start.justify-center
@@ -103,33 +110,9 @@ q-layout(view="hHh Lpr lff")
                 //- node description
                 .row.full-width
                   span.text-white {{ node.description }}
-        //- node actions
-        node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
-        //- node spheres
-        div(
-          v-if="node"
-          :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px',
-            position: 'relative',
-          }`
-          ).row.full-width.items-center.content-center.q-py-md.q-px-sm
-          //- node category goes as first sphere
-          router-link(
-            v-if="category"
-            :to="'/sphere/'+category.sphere.oid"
-            :style=`{height: '33px',borderRadius: '10px'}`
-            ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-xs.q-mb-xs.shaking
-            q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-            span.text-white.q-mr-md {{ category.alias }}
-          //- node spheres
-          router-link(
-            v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
-            :style=`{height: '33px',borderRadius: '10px'}`
-            ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-xs.q-mb-xs.shaking
-            q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-            span.text-white.q-mr-md {{ s.name }}
-        //- //- node actions
-        //- node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
+              //- node actions
+              view-spheres(:node="node")
+            node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
         //- node is creating, wait...
         .row.full-width.justify-center
           node-mockup(
@@ -141,13 +124,14 @@ q-layout(view="hHh Lpr lff")
             router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
       q-page-sticky(
         v-if="node"
-        position="bottom" :offset="[0, 60]"
+        position="bottom right" :offset="[0, 70]"
         :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          //- @click="$router.push('/workspace/link/new?oid='+node.oid)"
           q-btn(
             v-if="true"
-            @click="$router.push('/workspace/link/new?oid='+node.oid)"
-            no-caps color="green" icon="insert_link" size="md")
+            @click="nodeLinkerOpened = true"
+            no-caps color="green" icon="insert_link" size="md").shaking
             span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
 </template>
 
@@ -165,7 +149,10 @@ export default {
     nodeMockup,
     nodeLinker,
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
-    nodeActions: () => import('components/node/node_actions.vue')
+    nodeActions: () => import('components/node/node_actions.vue'),
+    viewSpheres: () => import('./view_spheres/index.vue'),
+    viewJoints: () => import('./view_joints/index.vue'),
+    viewConnect: () => import('./view_connect/index.vue'),
   },
   data () {
     return {
@@ -178,27 +165,11 @@ export default {
     }
   },
   computed: {
-    views () {
-      return [
-        {id: 'nodes', name: this.$t('pageApp_node_viewNodes_title', 'Ядра')},
-        {id: 'chains', name: this.$t('pageApp_node_viewChains_title', 'Связи')}
-      ]
-    },
     createdAt () {
       if (this.node) {
         return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')
       }
       return ''
-    },
-    category () {
-      if (!this.node) return null
-      return this.nodeCategories.find(c => c.type === this.node.category)
-    },
-    categoryName () {
-      return this.category?.alias
-    },
-    categoryOid () {
-      return this.category?.sphere.oid
     },
   },
   watch: {
@@ -221,10 +192,6 @@ export default {
     },
   },
   methods: {
-    headerClick () {
-      this.$log('headerClick')
-      window.scrollTo(0, 0)
-    },
     nodeVisibilityCallback (isVisible, entry) {
       // this.$log('nodeVisibilityCallback', isVisible, entry)
       if (isVisible) {
@@ -265,7 +232,7 @@ export default {
     async nodeLoad (oid) {
       this.$log('nodeLoad', oid)
       this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-      this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+      // this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     }
   },
   mounted () {

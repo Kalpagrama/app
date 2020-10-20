@@ -1,6 +1,7 @@
 <template lang="pug">
 ws-nodes(
   :mode="'pick'"
+  :type="'published'"
   :query="{}")
   template(v-slot:tint=`{item, itemKey}`)
     slot(name="tint" :item="item" :itemKey="itemKey")
@@ -26,19 +27,19 @@ export default {
     }
   },
   methods: {
-    // async nodeClick (node) {
-    //   this.$log('nodeClick', node)
-    //   // need node by oid
-    //   if (node.wsItemType === 'WS_BOOKMARK') {
-    //     node = await this.$rxdb.get(RxCollectionEnum.OBJ, node.oid)
-    //     this.$log('node', node)
-    //   }
-    //   if (node.items && node.items.length > 0) {
-    //     node.items.map(i => {
-    //       this.$emit('item', i)
-    //     })
-    //   }
-    // }
+    async nodeClick (node) {
+      this.$log('nodeClick', node)
+      // need node by oid
+      if (node.wsItemType === 'WS_BOOKMARK') {
+        node = await this.$rxdb.get(RxCollectionEnum.OBJ, node.oid)
+        this.$log('node', node)
+      }
+      if (node.items && node.items.length > 0) {
+        node.items.map(i => {
+          this.$emit('item', i)
+        })
+      }
+    }
   }
 }
 </script>

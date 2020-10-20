@@ -136,7 +136,7 @@ const routes = [
                {
                   name: 'node.joints',
                   path: 'joints',
-                  component: () => import('pages/app/node/node_joints/index.vue'),
+                  component: () => import('pages/app/node/view_joints/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
             ],
