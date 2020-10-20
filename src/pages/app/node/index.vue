@@ -141,13 +141,13 @@ import { date } from 'quasar'
 import { shareWith } from 'src/system/services'
 
 import nodeMockup from './node_mockup/index.vue'
-import nodeLinker from './node_linker/index.vue'
+// import nodeLinker from './node_linker/index.vue'
 
 export default {
   name: 'pageApp__node',
   components: {
     nodeMockup,
-    nodeLinker,
+    // nodeLinker,
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue'),
     viewSpheres: () => import('./view_spheres/index.vue'),
