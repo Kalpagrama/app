@@ -31,12 +31,9 @@ const time = (sec) => {
   return result
 }
 
-var router
-
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
     if (!window.stores) window.stores = {}
-    router = VueRouter
     Vue.use(VueMasonry)
     // Vue.use(VueYandexMetrika, {
     //   id: 60818698,
@@ -128,4 +125,4 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   }
 }
 
-export { time, router }
+export { time }

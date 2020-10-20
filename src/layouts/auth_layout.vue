@@ -29,7 +29,8 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to) {
-          this.$log('$route.query.token TO', to)
+          // alert('$route.query.token')
+          this.$log('$route.query.token TO$route.query.token TO', to)
           let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = await AuthApi.userIdentifyByRoute(this.$route)
           // let { userId, loginType, userExist, needInvite, needConfirm, token, expires } = {
           //   loginType: 'EMAIL',

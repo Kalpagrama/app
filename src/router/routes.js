@@ -22,6 +22,7 @@ const routes = [
          { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') }
       ],
       beforeEnter: (to, from, next) => {
+         // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
          if (localStorage.getItem('k_user_oid')) {
            logD('user is Auth! goto /root')
@@ -267,6 +268,7 @@ const routes = [
             sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
          }
          logD('router :: try systemInit...')
+         // alert(' /root router :: try systemInit... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
         //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
          if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {

@@ -19,12 +19,13 @@
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app"
-    ]
+    ],
+    "url": "http://192.168.88.36:8484"
   },
   "android": {
-    "overrideUserAgent": "custom"
+    "overrideUserAgent": "capacitor android kalpa.app"
   },
   "ios": {
-    "overrideUserAgent": "custom"
+    "overrideUserAgent": "capacitor ios kalpa.app"
   }
 }

@@ -139,9 +139,12 @@ export const wsSchemaLocalChanges = {
     },
     operation: {
       type: 'string'
+    },
+    rev: {
+      type: 'integer'
     }
   },
-  required: ['id', 'operation']
+  required: ['id', 'operation', 'rev']
 }
 
 export const cacheSchema = {

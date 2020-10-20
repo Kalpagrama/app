@@ -14,14 +14,14 @@ import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
 import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
 import { NavigationRoute } from 'workbox-routing/NavigationRoute'
 import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute'
+import {makeEventCard, makeRoutePath} from 'public/scripts/common_func'
 
 // отключаем дебаговый вывод workbox
 self.__WB_DISABLE_DEV_LOGS = true
 // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
 precacheAndRoute(self.__WB_MANIFEST)
 
-
-const swVer = 3
+const swVer = 1
 const useCache = true
 let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
@@ -89,12 +89,12 @@ function sendMsg (type, msgData) {
                logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
                // Customize notification here
-               const event = JSON.parse(payload.data.event)
-               // const notificationTitle = `#${++i} ${event.type} event received!`
-               const notificationTitle = `${event.type}`
+               //todo use payload.notification.title & payload.notification.body
+               const dbEvent = JSON.parse(payload.data.event)
+               const notificationTitle = payload.data.title
                const notificationOptions = {
-                  body: `${event.object.name}`,
-                  data: event,
+                  body: payload.data.body,
+                  data: dbEvent,
                   icon: '/icons/icon-192x192.png',
                   badge: '/icons/badge3.png',
                   vibrate: [500, 100, 500],
@@ -102,7 +102,7 @@ function sendMsg (type, msgData) {
                   actions: [
                      {
                         action: 'goto',
-                        title: 'go to node',
+                        title: 'перейти к объекту',
                         icon: '/icons/icon-192x192.png'
                      }
                   ]
@@ -228,12 +228,7 @@ function sendMsg (type, msgData) {
          const dbEvent = event.notification.data
          logDebug('notificationclick dbEvent', dbEvent)
 
-         let route = '/'
-         if (event.action === 'goto') {
-            route = '/node/' + dbEvent.object.oid
-         } else {
-            route = '/node/' + dbEvent.object.oid
-         }
+         let route = makeRoutePath(dbEvent.object) || '/'
          event.waitUntil(
             // Получаем список клиентов SW.
             self.clients.matchAll({ type: 'window' }).then(function (clientList) {

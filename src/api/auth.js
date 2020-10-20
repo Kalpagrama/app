@@ -1,6 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { router } from 'src/boot/main'
+import { router } from 'src/boot/system'
 import { resetLocalStorage, systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
@@ -165,8 +165,6 @@ class AuthApi {
       }
       localStorage.setItem('k_token', token)
       localStorage.setItem('k_token_expires', expires)
-      // setWebPushToken мог быть вызван до userIdentify
-      if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return { userId, loginType, userExist, needInvite, needConfirm, hasPermanentPassword, dummyUser, token, expires }
    }
@@ -191,8 +189,6 @@ class AuthApi {
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
       }
-      // setWebPushToken мог быть вызван до userIdentify
-      if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return { userId, loginType, userExist, needInvite, needConfirm, token, expires }
    }
@@ -218,6 +214,8 @@ class AuthApi {
       })
       if (oid) localStorage.setItem('k_user_oid', oid)
       if (result) await systemInit()
+      // setWebPushToken мог быть вызван до userIdentify
+      if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, {
          result,
          role,
@@ -298,10 +296,15 @@ class AuthApi {
       const t1 = performance.now()
       assert(token)
       currentWebPushToken = token
-      if (!localStorage.getItem('k_token')) return
-      if (AuthApi.isGuest()) return
-      if (localStorage.getItem('k_web_push_token') === currentWebPushToken) return // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
-
+      if (!localStorage.getItem('k_token')) {
+         return
+      }
+      if (AuthApi.isGuest()) {
+         return
+      }
+      if (localStorage.getItem('k_web_push_token') === currentWebPushToken) { // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
+         return
+      }
       let { data: { setWebPushToken } } = await apollo.clients.auth.query({
          query: gql`query ($token: String!) {
              setWebPushToken (token: $token)

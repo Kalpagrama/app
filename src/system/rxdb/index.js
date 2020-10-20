@@ -346,7 +346,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       try {
          await mutexGlobal.lock('rxdb::deinitGlobal')
-         await this.deInit(true) // деинициализируем текущую вкладку
+         if (this.created) await this.deInit(true) // деинициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
@@ -516,7 +516,7 @@ class RxDBWrapper {
                   } else {
                      // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
                      populatedItems = await Promise.all(itemsForPopulate.map(objShort => {
-                        logD('objShort=', objShort)
+                        // logD('objShort=', objShort)
                         return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
                      }))
                      if (itemsForPrefetch) {

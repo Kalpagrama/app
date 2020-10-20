@@ -9,7 +9,7 @@ import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
 import store from 'src/store/index'
 import { wait } from 'src/system/utils'
-import { router } from 'src/boot/main'
+import { router } from 'src/boot/system'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
@@ -216,15 +216,19 @@ async function systemInit () {
    const t1 = performance.now()
    if (await rxdb.isInitializedGlobal() && localStorage.getItem('k_token')) { // k_token нужен для gql-запросов
       logD(f, 'skip systemInit')
+      // alert('skip systemInit')
       return
    } // уже войдено!
    try {
       await mutexGlobal.lock('system::systemInit')
       let userOid = localStorage.getItem('k_user_oid')
       if (userOid) { // пользователь зарегистрирован
+         // alert(' systemInit 1 ')
          await rxdb.initGlobal({ userOid })
       } else { // пытаемся войти без регистрации
+         // alert(' systemInit 2 ')
          if (!localStorage.getItem('k_token')) {
+            // alert(' systemInit 3 ')
             const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
             logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
             if (needConfirm === false && dummyUser) {
@@ -232,7 +236,9 @@ async function systemInit () {
             }
          }
       }
+      // alert(' systemInit 4 ')
       if (await rxdb.isInitializedGlobal()) {
+         // alert(' systemInit 5 ')
          await i18next.changeLanguage(rxdb.getCurrentUser().profile.lang)
          if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
             logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
@@ -241,11 +247,13 @@ async function systemInit () {
          }
          setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
       } else { // не удалось залогиниться
+         // alert(' systemInit 6 ')
          logD(f, 'GO LOGIN')
          await resetLocalStorage()
          await router.replace('/auth')
          setSyncEventStorageValue('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
       }
+      // alert(' systemInit 7 ')
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)
@@ -257,18 +265,23 @@ async function systemInit () {
 }
 
 async function systemHardReset () {
-   await wait(2000)
+   await wait(1000)
    if (window.indexedDB) {
       if (window.indexedDB.databases) {
          let dbs = await window.indexedDB.databases()
+         alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
+         alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
          for (let db of dbs) {
+            alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
             logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
             window.indexedDB.deleteDatabase(db.name)
          }
       } else {
+         alert('systemHardReset 2')
          for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i)
-            if (key.startsWith('_pouch_rxdb')) {
+            if (key.includes('rxdb')) {
+               alert('indexedDB.deleteDatabase(databaseName): ' + key)
                logD('indexedDB.deleteDatabase(databaseName): ' + key)
                window.indexedDB.deleteDatabase(key)
             }
@@ -277,8 +290,10 @@ async function systemHardReset () {
    } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
    if (process.env.MODE === 'pwa') await pwaReset()
    localStorage.clear()
+   sessionStorage.clear()
    logD('systemHardReset complete')
    await wait(2000)
+   alert('reload after systemHardReset...')
    window.location.reload()
 }
 
