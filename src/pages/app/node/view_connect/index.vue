@@ -1,9 +1,9 @@
 <template lang="pug">
-.row.full-width.justify-center
+.row.full-width.justify-center.q-px-sm
   kalpa-connect(
     :oid="node.oid"
     :style=`{
-      maxWidth: '500px',
+      maxWidth: '600px',
     }`
     )
 </template>

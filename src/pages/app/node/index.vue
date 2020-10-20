@@ -10,7 +10,8 @@ q-layout(view="hHh Lpr lff")
     v-model="nodeLinkerOpened" position="bottom"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    node-linker(v-if="node" :node="node" @close="nodeLinkerOpened = false")
+    .row.full-width.items-start.content-start.b-30
+      kalpa-connect(v-if="node" :oid="node.oid" @close="nodeLinkerOpened = false")
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -29,28 +30,6 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.items-start.content-start.justify-center
         //- node items
         div(v-if="node").row.full-width.items-start.content-start
-          //- SLIDER
-          //- div(
-            v-if="node.layout === 'SLIDER'"
-            :style=`{
-              position: 'relative',
-              borderRadius: '10px', overflow: 'hidden',
-            }`).row.full-width.items-start.content-start
-            list-slider(:items="node.items")
-              template(v-slot:item=`{item, isActive: itemActive}`)
-                div(
-                  :style=`{
-                    position: 'relative',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.fit.b-40.shadow-5
-                  composition-player(
-                    :composition="item" :isVisible="true" :isActive="nodeActive && itemActive"
-                    :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-            .row.full-width.justify-center
-              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-center.cursor-pointer.q-pa-md
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-          //- PIP, VERTICAL
           div(
             v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
             ).row.full-width.items-start.content-start.justify-center
@@ -104,53 +83,26 @@ q-layout(view="hHh Lpr lff")
                 .row.full-width
                   span.text-white {{ node.description }}
               //- node actions
-              node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
-        //- node views
-        div(
-          v-if="node"
-          ).row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: $store.state.ui.pageMaxWidth+'px',
-            }`
-            ).row.full-width
-            .row.full-width.q-px-md
-              q-tabs(
-                v-model="viewId"
-                dense active-color="green" no-caps :switch-indicator="false"
-                ).full-width.text-grey-6
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
-            div(
-              :style=`{
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.full-width
-              //- node-actions(v-if="viewId === 'actions'" :node="node" :isActive="true" :isVisible="true")
-              component(
-                :is="`view-${viewId}`"
-                :node="node"
-                )
-        //- node spheres
-        //- //- node actions
-        //- node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true")
+              view-spheres(:node="node")
+            node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
         //- node is creating, wait...
         .row.full-width.justify-center
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
             :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
-        //- .row.full-width.justify-center.q-pt-xl
+        .row.full-width.justify-center.q-pt-xl
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
             router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
-      //- q-page-sticky(
+      q-page-sticky(
         v-if="node"
         position="bottom" :offset="[0, 60]"
         :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          //- @click="$router.push('/workspace/link/new?oid='+node.oid)"
           q-btn(
             v-if="true"
-            @click="$router.push('/workspace/link/new?oid='+node.oid)"
+            @click="nodeLinkerOpened = true"
             no-caps color="green" icon="insert_link" size="md")
             span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
 </template>
@@ -182,17 +134,9 @@ export default {
       nodeCategories: [],
       nodeLinkerOpened: false,
       nodesLoaded: false,
-      viewId: 'spheres',
     }
   },
   computed: {
-    views () {
-      return [
-        {id: 'spheres', name: 'Сферы'},
-        {id: 'joints', name: 'Связи'},
-        {id: 'connect', name: 'Связать'},
-      ]
-    },
     createdAt () {
       if (this.node) {
         return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')

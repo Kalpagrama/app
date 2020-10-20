@@ -7,7 +7,7 @@
       maxWidth: $store.state.ui.pageMaxWidth+'px',
       position: 'relative',
     }`
-    ).row.full-width.items-center.content-center.q-py-md.q-px-sm
+    ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm.q-pb-xs
     //- node category goes as first sphere
     router-link(
       v-if="category"
