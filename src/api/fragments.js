@@ -26,6 +26,8 @@ const objectFragment = gql`${objectShortFragment}
     oid
     name
     thumbUrl(preferWidth: 600)
+    thumbWidth
+    thumbHeight
     createdAt
     deletedAt
     subscriberCnt
