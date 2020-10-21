@@ -14,7 +14,7 @@
         :query="query" :limit="1000"
         :immediate="true" @reset="$refs.kl.next(0, () => {})")
         masonry(
-          :cols="$q.screen.width < 800 ? Math.round($q.screen.width/400) : 2"
+          :cols="$q.screen.width > 800 ? 3 : 1"
           :gutter="{default: 10}").full-width
           div(
             v-for="(i,ii) in items" :key="i.id"
@@ -38,7 +38,7 @@
                 }`
                 ).full-width
               .row.full-width.q-pa-sm
-                span.text-white {{ i.name }}
+                small.text-white {{ i.name }}
             //- tint to intercept
             slot(name="tint" :item="i" :itemKey="i.id")
             //- selected for standalone mode...

@@ -10,7 +10,7 @@
     //- authors
     div(
       v-if="showHeader"
-      ).row.full-width.items-center.content-center
+      ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+joint.author.oid"
         flat color="white" dense no-caps
@@ -21,26 +21,6 @@
       small.text-grey-8.q-mr-xs {{ joint.countViews }}
       q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
-      //- div(:style=`{overflow: 'hidden'}`).col
-        div(v-if="stats").row.items-center.content-center.justify-start.no-wrap.q-py-xs
-          q-btn(
-            v-for="(voter, voteri) in stats.votes" :key="voter.oid"
-            :to="'/user/'+voter.oid"
-            flat dense no-caps
-            :style=`{
-              minWidth: '80px',
-              //- background: 'rgb(45,45,45)'
-            }`
-            ).row.q-mr-xs
-            user-avatar(:url="voter.thumbUrl" :width="24" :height="24")
-            span.text-grey-6.q-ml-sm {{ voter.name }}
-          q-btn(
-            v-if="stats.votes.length > 3"
-            flat dense color="grey-8" icon="more_vert"
-            ).q-mr-xs
-      //- q-icon(name="visibility" color="grey-8")
-      //- small.text-grey-8.q-mr-xs 1234
-      //- q-btn(round flat dense color="grey-8" icon="more_vert")
     //- items top/bottom
     //- div().row.full-width.items-start.content-start
       //- left item
@@ -79,14 +59,12 @@
       div(
         v-for="(item,ii) in [joint.leftItem, joint.rightItem]" :key="ii"
         ).col-6
-        //- div(:style=`{position: 'relative', height: 0, paddingBottom: '100%'}`).row.full-width
         joint-item(
           :joint="joint"
           :item="item"
           :isActive="isActive" :isVisible="isVisible"
           :mini="mini"
           :style=`{
-            //- position: 'absolute', zIndex: 100, top: 0,
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
           template(v-slot:footer)
@@ -99,9 +77,6 @@
                 height: '40px',
               }`).row.full-width.items-center.content-center.q-px-md
               span.text-white.text-bold {{ getItemTypeName(ii, joint.jointType) }}
-    //- type
-    //- .row.full-width.justify-center
-      small.text-white {{ joint.jointType }}
     //- name
     div(
       v-if="joint.name.length > 0"
@@ -128,7 +103,7 @@ export default {
     mini: {type: Boolean, default: false}
   },
   components: {
-    jointItem: () => import('./joint_item.vue'),
+    jointItem: () => import('components/joint/joint_item.vue'),
     jointActions: () => import('components/joint/joint_actions.vue')
   },
   data () {

@@ -22,21 +22,8 @@ div(
         small.text-grey-8.q-mr-xs {{ joint.countViews }}
         q-icon(name="visibility" color="grey-8").q-mr-md
         small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
-      //- item
-      node-mini(
-        v-if="item && item.type === 'NODE'"
-        :isActive="isActive" :isVisible="isVisible"
-        :node="item"
-        :marginBottom="80")
-      div(
-        v-if="item && item.type === 'WORD'"
-        :style=`{
-          borderRadius: '10px', overflow: 'hidden',
-          marginTop: '50px',
-          marginBottom: '30px',
-        }`
-        ).row.full-width.q-pa-sm.b-40
-        span.text-white.q-ml-sm {{ item.name }}
+      .row.full-width
+      joint-item(:item="item" :isActive="isActive" :isVisible="isVisible")
     //- footer
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
       joint-share(:joint="joint" :isActive="isActive" :isVisible="isVisible")
@@ -45,7 +32,8 @@ div(
       q-btn(
         @click="$router.push('/joint/'+joint.oid)"
         flat color="white" no-caps)
-        span.text-white {{ itemType }}
+        span(v-if="jointType !== 'ESSENCE'").text-white {{ itemType }}
+        span(v-else).text-white {{ joint.name }}
       q-btn(
         @click="showVotes = true"
         flat color="white" no-caps round)
@@ -84,7 +72,8 @@ export default {
     jointVote: () => import('components/joint/joint_vote.vue'),
     jointActions: () => import('components/joint/joint_actions.vue'),
     jointBookmark: () => import('components/joint/joint_bookmark.vue'),
-    jointShare: () => import('components/joint/joint_share.vue')
+    jointShare: () => import('components/joint/joint_share.vue'),
+    jointItem: () => import('components/joint/joint_item.vue')
   },
   data () {
     return {

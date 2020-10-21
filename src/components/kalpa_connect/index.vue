@@ -19,17 +19,21 @@
   //- body
   .col.full-width.scroll
     div(
-      v-if="!item"
+      v-if="!itemFinderOpened && !item"
       ).row.full-width.items-start.content-start.justify-center
-      //- view-find(@item="itemFound" @close="itemFinderOpened = false")
       q-btn(
+        @click="itemFinderOpened = true"
         flat color="green" icon="add" size="lg"
         :style=`{
           height: '200px',
           maxWidth: '600px',
         }`
         ).full-width.b-40
+    view-find(
+      v-if="itemFinderOpened"
+      @item="itemFound" @close="itemFinderOpened = false")
     div(
+      v-if="!itemFinderOpened"
       ).row.full-width.justify-center.q-pa-sm
       //- item
       .row.full-width.justify-center
@@ -145,14 +149,14 @@ export default {
       return [
         // {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE', origin: 'ESSENCE'},
         // {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE', origin: 'ASSOCIATIVE'},
-        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT', origin: 'CAUSE_EFFECT', swap: false},
-        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE', origin: 'CAUSE_EFFECT', swap: true},
-        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION', origin: 'PROBLEM_SOLUTION', swap: false},
-        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM', origin: 'PROBLEM_SOLUTION', swap: true},
-        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE', origin: 'FALSE_TRUE', swap: false},
-        {id: 'FALSE', name: 'Фэйк', pair: 'TRUE', origin: 'FALSE_TRUE', swap: true},
-        {id: 'FROM', name: 'До', pair: 'TO', origin: 'FROM_TO', swap: false},
-        {id: 'TO', name: 'После', pair: 'FROM', origin: 'FROM_TO', swap: true},
+        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT', origin: 'CAUSE_EFFECT', swap: true},
+        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE', origin: 'CAUSE_EFFECT', swap: false},
+        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION', origin: 'PROBLEM_SOLUTION', swap: true},
+        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM', origin: 'PROBLEM_SOLUTION', swap: false},
+        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE', origin: 'FALSE_TRUE', swap: true},
+        {id: 'FALSE', name: 'Фэйк', pair: 'TRUE', origin: 'FALSE_TRUE', swap: false},
+        {id: 'FROM', name: 'До', pair: 'TO', origin: 'FROM_TO', swap: true},
+        {id: 'TO', name: 'После', pair: 'FROM', origin: 'FROM_TO', swap: false},
       ]
     }
   },
@@ -189,9 +193,10 @@ export default {
           }
         }
         this.$log('jointInput', jointInput)
-        // let joint = await NodeApi.jointCreate(jointInput)
+        let joint = await NodeApi.jointCreate(jointInput)
         this.$log('connect done')
         this.loading = false
+        this.$emit('close')
       }
       catch (e) {
         this.$log('connect error', e)
