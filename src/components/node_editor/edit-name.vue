@@ -26,7 +26,7 @@ div(
 
 <script>
 export default {
-  name: 'pageApp_link_editName',
+  name: 'pageApp_nodeEditor_editName',
   props: ['value'],
   data () {
     return {
@@ -34,9 +34,6 @@ export default {
     }
   },
   computed: {
-    showBlink () {
-      return this.value.length === 0 && !this.isFocused
-    },
     fontSize () {
       // TODO: progressive fornSize...
       if (this.value.length < 50) return '30px'

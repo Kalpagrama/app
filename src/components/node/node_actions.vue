@@ -8,24 +8,24 @@
   //- actions wrapper
   div(:style=`{maxWidth: '700px'}`).row.full-width.items-center.content-center.q-mb-xs
     //- share
-    div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      node-share(:node="node").shaking
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
+    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
+    node-share(:node="node").shaking
+    //- div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
         small.text-grey-8 {{ node.countShares > 100 ? '99+' : node.countShares }}
     //- remake
-    div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      node-remake(:node="node").shaking
+    node-remake(:node="node").shaking
+    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
         small.text-grey-8 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
     //- bookmark
-    div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+    node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
         small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
-    //- link
+    //- joint
     div(:style=`{position: 'relative',}`).row.full-height.justify-center
       q-btn(
-        @click="$router.push('/workspace/link/new?oid='+node.oid)"
+        @click="$router.push('/workspace/joint/new?oid='+node.oid)"
         round flat color="green").shaking
         q-icon(name="link" size="30px" color="grey-9")
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center

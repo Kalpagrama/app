@@ -21,11 +21,15 @@ div(
       span.text-white.q-ml-sm {{ item.name }}
     //- footer
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+      joint-share(:joint="joint")
+      joint-bookmark(:joint="joint")
       .col
       q-btn(
+        @click="$router.push('/joint/'+joint.oid)"
         flat color="white" no-caps)
         span.text-white {{ itemType }}
       q-btn(
+        @click="showVotes = true"
         flat color="white" no-caps round)
         span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ joint.rate*100 }}
   //- right padding for real
@@ -45,13 +49,11 @@ div(
         marginBottom: '60px'
       }`
       ).row.full-width.justify-center
-      q-btn(
-        @click="vote()"
-        round flat dense color="green"
-        :style=`{height: '60px'}`
-        ).full-width.b-30
-        q-icon(name="adjust" color="green" size="30px")
-        //- .row.full-width.justify-center.q-mb-sm
+      joint-vote(
+        :joint="joint"
+        :style=`{
+          height: '60px',
+        }`).full-width.justify-center.b-30
 </template>
 
 <script>
@@ -60,8 +62,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'jointItem',
   props: ['node', 'joint', 'isActive', 'isVisible'],
+  components: {
+    jointVote: () => import('components/joint/joint_vote.vue'),
+    jointActions: () => import('components/joint/joint_actions.vue'),
+    jointShare: () => import('components/joint/joint_share.vue')
+  },
   data () {
     return {
+      showVotes: false,
     }
   },
   computed: {

@@ -238,6 +238,7 @@ const jointFragment = gql` ${objectFragment} ${videoFragment} ${imageFragment} $
 fragment jointFragment on Joint {
   ...objectFragment
   jointType
+  swap
   author {
     oid
     type

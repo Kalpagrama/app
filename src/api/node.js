@@ -11,10 +11,6 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
-const LinkTypeEnum = Object.freeze({
-   CAUSE_EFFECT: 'CAUSE_EFFECT',
-   ESSENCE: 'ESSENCE'
-})
 const StatKeyEnum = Object.freeze({
    VIEWED_TIME: 'VIEWED_TIME',
    BOOKMARKED: 'BOOKMARKED',
@@ -254,12 +250,13 @@ class NodeApi {
 
    static makeJointInput (joint) {
       let chainInput = {}
-      assert(joint.leftItem.oid || joint.leftItem.node, '!link.leftItem.oid')
-      assert(joint.rightItem.oid || joint.rightItem.node, '!link.rightItem.oid')
-      assert(joint.jointType, '!link.type')
+      assert(joint.leftItem.oid || joint.leftItem.node, '!joint.leftItem.oid')
+      assert(joint.rightItem.oid || joint.rightItem.node, '!joint.rightItem.oid')
+      assert(joint.jointType, '!joint.jointType')
       if (joint.leftItem.node) joint.leftItem.node = NodeApi.makeNodeInput(joint.leftItem.node)
       if (joint.rightItem.node) joint.rightItem.node = NodeApi.makeNodeInput(joint.rightItem.node)
       return {
+         swap: joint.swap,
          jointType: joint.jointType,
          leftItem: joint.leftItem,
          rightItem: joint.rightItem,
@@ -317,44 +314,6 @@ class NodeApi {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return updateStat
    }
-
-   // static async makeLink ({ oidLeft, nodeInputLeft }, { oidRight, nodeInputRight }, linkType, name = '', spheres = []) {
-   //    switch (linkType) {
-   //       case LinkTypeEnum.CAUSE_EFFECT: {
-   //          let chain = {
-   //             links: [
-   //                { leftItem: { oid: oidLeft }, rightItem: { oid: oidRight }, type: linkType }
-   //             ]
-   //          }
-   //          await NodeApi.chainCreate(chain)
-   //          break
-   //       }
-   //       case LinkTypeEnum.ESSENCE: {
-   //          let multiNodeInput = {
-   //             layout: 'PIP',
-   //             name,
-   //             category: 'FUN',
-   //             spheres,
-   //             items: [{ oid: oidLeft, nodeInput: nodeInputLeft }, { oid: oidRight, nodeInput: nodeInputRight }]
-   //                .map(({ oid, nodeInput }) => {
-   //                   assert(oid || nodeInput)
-   //                   if (oid) return { oid }
-   //                   else return NodeApi.makeNodeInput(nodeInput)
-   //                })
-   //          }
-   //          await NodeApi.nodeCreate(multiNodeInput)
-   //          break
-   //          // временное решение: связываем через сферы
-   //          // assert(oidLeft && nodeInputRight, 'oidLeft && nodeInputRight')
-   //          // let leftNode = await rxdb.get(RxCollectionEnum.OBJ, oidLeft)
-   //          // assert(leftNode && leftNode.sphereFromName, 'leftNode && leftNode.sphereFromName')
-   //          // nodeInputRight.spheres.unshift(leftNode.sphereFromName)
-   //          // nodeInputRight.spheres.splice(10, nodeInputRight.spheres.length) // удаляем те, что не влезли
-   //          // await NodeApi.nodeCreate(nodeInputRight)
-   //          // break
-   //       }
-   //    }
-   // }
 }
 
-export { NodeApi, LinkTypeEnum }
+export { NodeApi }

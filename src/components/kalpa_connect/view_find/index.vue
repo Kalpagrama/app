@@ -81,7 +81,7 @@ export default {
       //     ],
       //     operation: { items: null, operations: null, type: 'CONCAT'},
       //   }
-      //   // do not create content in kalpa before the LINK...?
+      //   // do not create content in kalpa before the CONNECT...?
       //   // let content = await ContentApi.contentCreateFromUrl(url)
       //   // this.$log('content', content)
       //   // if ii === 0 make a switch of items?

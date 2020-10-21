@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'kalpaLinker_fromGifs',
+  name: 'fromGifs',
   data () {
     return {
       tenorSearch: '',

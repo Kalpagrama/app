@@ -64,7 +64,7 @@ export default class Iframe extends Node {
             <q-btn round flat color="green" icon="menu"/>
           </div>
           <div v-if="nodeLite" class="row full-width">
-            <node-lite v-if="nodeLite" :node="nodeLite" :isActive="true" :isVisible="true"></node-lite>
+            <node-feed v-if="nodeLite" :node="nodeLite" :isActive="true" :isVisible="true"></node-feed>
           </div>
         </div>
       `,

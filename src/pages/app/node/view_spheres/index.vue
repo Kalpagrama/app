@@ -22,7 +22,7 @@
       :style=`{height: '33px',borderRadius: '10px'}`
       ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-xs.q-mb-xs.shaking
       q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-      span.text-white.q-mr-md {{ s.name }}
+      span.text-white.q-mr-xs {{ s.name }}
 </template>
 
 <script>

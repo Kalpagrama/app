@@ -48,7 +48,7 @@
 
 <script>
 export default {
-  name: 'kalpaConnect_fromGifs',
+  name: 'fromGifs',
   data () {
     return {
       tenorSearch: '',

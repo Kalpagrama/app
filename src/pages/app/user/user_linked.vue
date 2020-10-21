@@ -4,22 +4,17 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.just
     kalpa-loader(
       v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
-      //- masonry(
-        :cols="$q.screen.width < 800 ? 2 : 4"
-        :gutter="{default: 10}").full-width
-        div(v-for="link in items" :key="link.oid").row.full-width.br.bg
-          small.text-white {{link}}
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
         q-infinite-scroll(ref="qis" @load="next" :offset="500")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-          link-feed(:link="item" :isActive="isActive" :isVisible="isVisible")
+          joint-feed(:joint="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'userExplorer_userLinked',
+  name: 'userExplorer_userJoints',
   components: {},
   data () {
     return {
