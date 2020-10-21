@@ -24,7 +24,6 @@
         :value="typeId" @input="typeIdChanged" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        //- q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name" :icon="t.icon ? t.icon : null").q-px-xs.br
         q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
         q-tab(name="drafts" label="Черновики").q-px-xs
         q-tab(name="published" label="Опубликованные").q-px-xs
@@ -72,7 +71,6 @@ export default {
   },
   computed: {
     types () {
-      // name: this.$t('pageApp_wsNodes_saved', 'Сохраненные'),
       return [
         {id: 'saved', icon: 'bookmark'},
         {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики'), icon: null},

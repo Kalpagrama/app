@@ -80,6 +80,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          deletedAt: {$exists: false},
           type: 'JOINT',
         },
         sort: [{updatedAt: 'desc'}]
@@ -95,9 +96,10 @@ export default {
   methods: {
     async jointDelete (jointBookmark) {
       this.$log('jointDelete', jointBookmark)
-      if (!confirm('Delete joint?')) return
+      // if (!confirm('Delete joint?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(jointBookmark.id)
+      // await this.$rxdb.remove(jointBookmark.id)
+      jointBookmark.deletedAt = Date.now()
     },
     async jointLaunch (jointBookmark) {
       this.$log('itemLaunch', jointBookmark)

@@ -52,6 +52,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
+          deletedAt: {$exists: false}
         },
         sort: [{updatedAt: 'desc'}]
       }
@@ -66,9 +67,11 @@ export default {
   methods: {
     async itemDelete (item) {
       this.$log('itemDelete', item)
-      if (!confirm('Delete node?')) return
+      // if (!confirm('Delete node?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(item.id)
+      // await this.$rxdb.remove(item.id)
+      // this.$set()
+      item.deletedAt = Date.now()
     },
     itemEdit (item) {
       this.$log('itemEdit', item)
