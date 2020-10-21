@@ -32,15 +32,16 @@
       .row.full-width.justify-center
         small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countJoints }}
     //- vote
-    .col.br
+    .col
       div().row.full-width.items-center.content-center.justify-end
         q-btn(
           @click="showStats = true"
           flat dense no-caps color="grey-2")
-          span.text-white.text-bold {{ $nodeRateTitle(joint.rate) }}
+          span.text-white.text-bold.q-mx-sm 82
+          //- span.text-white.text-bold {{ $nodeRateTitle(joint.rate) }}
         div(v-if="!noVote").row.full-height.justify-center
           joint-vote(:joint="joint")
-          .row.full-width.justify-center
+          //- .row.full-width.justify-center
             small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countVotes }}
 </template>
 

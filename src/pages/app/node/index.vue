@@ -9,16 +9,15 @@ q-layout(view="hHh Lpr lff")
   //- position="bottom"
   q-dialog(
     v-model="nodeConnectOpened"
-    position="bottom"
-    transition-show="fade"
-    transition-hide="fade"
+    transition-show="none"
+    transition-hide="none"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
     div(
       :style=`{
         maxWidth: $store.state.ui.pageMaxWidth+'px',
         minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
-        borderRadius: '10px 10px 0 0',
+        borderRadius: '10px',
       }`
       ).row.full-width.items-start.content-start.b-30
       kalpa-connect(

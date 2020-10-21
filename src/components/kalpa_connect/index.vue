@@ -20,16 +20,23 @@
   .col.full-width.scroll
     div(
       v-if="!item"
-      ).row.fit
-      view-find(@item="itemFound" @close="itemFinderOpened = false")
+      ).row.full-width.items-start.content-start.justify-center
+      //- view-find(@item="itemFound" @close="itemFinderOpened = false")
+      q-btn(
+        flat color="green" icon="add" size="lg"
+        :style=`{
+          height: '200px',
+          maxWidth: '600px',
+        }`
+        ).full-width.b-40
     div(
-      v-if="item"
       ).row.full-width.justify-center.q-pa-sm
       //- item
       .row.full-width.justify-center
         //- .row.full-width.q-pa-sm
           span(:style=`{fontSize: '18px',}`).text-white.text-bold с ядром
         item-player(
+          v-if="item"
           :item="item"
           :style=`{
             maxWidth: '600px',

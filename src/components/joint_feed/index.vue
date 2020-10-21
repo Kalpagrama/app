@@ -11,7 +11,17 @@
     div(
       v-if="showHeader"
       ).row.full-width.items-center.content-center
-      div(:style=`{overflow: 'hidden'}`).col
+      q-btn(
+        :to="'/user/'+joint.author.oid"
+        flat color="white" dense no-caps
+        )
+        user-avatar(:url="joint.author.thumbUrl" :width="24" :height="24")
+        span.text-grey-4.q-ml-sm {{ joint.author.name }}
+      .col
+      small.text-grey-8.q-mr-xs {{ joint.countViews }}
+      q-icon(name="visibility" color="grey-8").q-mr-md
+      small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
+      //- div(:style=`{overflow: 'hidden'}`).col
         div(v-if="stats").row.items-center.content-center.justify-start.no-wrap.q-py-xs
           q-btn(
             v-for="(voter, voteri) in stats.votes" :key="voter.oid"
@@ -28,9 +38,9 @@
             v-if="stats.votes.length > 3"
             flat dense color="grey-8" icon="more_vert"
             ).q-mr-xs
-      q-icon(name="visibility" color="grey-8")
-      small.text-grey-8.q-mr-xs 1234
-      q-btn(round flat dense color="grey-8" icon="more_vert")
+      //- q-icon(name="visibility" color="grey-8")
+      //- small.text-grey-8.q-mr-xs 1234
+      //- q-btn(round flat dense color="grey-8" icon="more_vert")
     //- items top/bottom
     //- div().row.full-width.items-start.content-start
       //- left item
@@ -169,7 +179,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.stats = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.joint.oid}})
+    // this.stats = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.joint.oid}})
   }
 }
 </script>

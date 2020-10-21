@@ -11,11 +11,11 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="link" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ title }}
-          kalpa-follow(v-if="link" :oid="$route.params.oid")
+          kalpa-follow(v-if="joint" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        link-feed(v-if="link" :link="link")
+        joint-feed(v-if="joint" :joint="joint")
         .row.full-width.q-px-md.q-mt-xl
           q-tabs(
             v-model="viewId"
@@ -25,7 +25,7 @@ q-layout(view="hHh Lpr lff")
             q-tab(name="gallery" label="Gallery")
             q-tab(name="graph" label="Graph")
         .row.full-width.justify-center
-          link-links(v-if="link" :link="link")
+          joint-joints(v-if="joint" :joint="joint")
 </template>
 
 <script>
@@ -44,9 +44,9 @@ export default {
   },
   computed: {
     title () {
-      if (this.link) {
-        if (this.link.jointType === 'ASSOCIATIVE') return ''
-        else return this.link.name
+      if (this.joint) {
+        if (this.joint.jointType === 'ASSOCIATIVE') return ''
+        else return this.joint.name
       }
       else return ''
     }
@@ -58,7 +58,7 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.oid TO', to)
         if (to) {
-          this.link = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+          this.joint = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
         }
       }
     },

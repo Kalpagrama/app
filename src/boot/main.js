@@ -99,7 +99,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       },
     })
     Vue.component('kalpaConnect', () => import('components/kalpa_connect/index.vue'))
-    Vue.component('nodeLite', () => import('components/node_lite/index.vue'))
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     Vue.component('nodeMini', () => import('components/node_mini/index.vue'))
     Vue.component('jointFeed', () => import('components/joint_feed/index.vue'))

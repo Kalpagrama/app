@@ -11,7 +11,7 @@ div(
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
     //- header: author, createdAt
-    .row.full-width.items-center.content-center.q-pa-sm
+    .row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
         flat color="white" dense no-caps
@@ -24,25 +24,6 @@ div(
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
     //- items wrapper
     .row.full-width
-      //- SLIDER
-      //- div(
-        v-if="node.layout === 'SLIDER'"
-        :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden',
-        }`).row.full-width.items-start.content-start
-        list-slider(:items="node.items")
-          template(v-slot:item=`{item, isActive: itemActive}`)
-            div(
-              :style=`{
-                position: 'relative',
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.fit.b-40.shadow-5
-              composition-player(
-                :composition="item" :isVisible="isVisible" :isActive="isActive && itemActive"
-                :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-      //- PIP, VERTICAL
       div(
         v-if="['SLIDER', 'PIP', 'VERTICAL', 'HORIZONTAL'].includes(node.layout)"
         :style=`{
@@ -74,21 +55,6 @@ div(
         }`
         ).row.full-width.justify-center.cursor-pointer.q-pa-md
         span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-      //- q-btn(
-        @click="showMore = !showMore"
-        round flat color="white"
-        :icon="showMore ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-        :style=`{
-          position: 'absolute', zIndex: 1000, right: '8px', bottom: '8px',
-        }`)
-    //- div(
-      v-if="showMore"
-      :style=`{
-        position: 'relative',
-        height: $q.screen.width > 600 ? '600px' : $q.screen.width+'px',
-        opacity: 0.5,
-      }`
-      ).row.full-width
   //- footer
   node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>

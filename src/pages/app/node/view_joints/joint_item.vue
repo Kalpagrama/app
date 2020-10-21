@@ -4,25 +4,43 @@ div(
   ).row.full-width.items-between.fit
   //- left side with content: node, sphere, content, user
   .col.full-height
-    //- item
-    node-mini(
-      v-if="item && item.type === 'NODE'"
-      :isActive="isActive" :isVisible="isVisible"
-      :node="item"
-      :marginBottom="80")
+    //- body
     div(
-      v-if="item && item.type === 'WORD'"
       :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        marginTop: '50px',
-        marginBottom: '30px',
-      }`
-      ).row.full-width.q-pa-sm.b-40
-      span.text-white.q-ml-sm {{ item.name }}
+        background: 'rgb(35,35,35)',
+        borderRadius: '10px',
+      }`).row.full-width
+      //- author
+      .row.full-width.items-center.content-center.q-pa-xs
+        q-btn(
+          :to="'/user/'+joint.author.oid"
+          flat color="white" dense no-caps
+          )
+          user-avatar(:url="joint.author.thumbUrl" :width="24" :height="24")
+          span.text-grey-4.q-ml-sm {{ joint.author.name }}
+        .col
+        small.text-grey-8.q-mr-xs {{ joint.countViews }}
+        q-icon(name="visibility" color="grey-8").q-mr-md
+        small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
+      //- item
+      node-mini(
+        v-if="item && item.type === 'NODE'"
+        :isActive="isActive" :isVisible="isVisible"
+        :node="item"
+        :marginBottom="80")
+      div(
+        v-if="item && item.type === 'WORD'"
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+          marginTop: '50px',
+          marginBottom: '30px',
+        }`
+        ).row.full-width.q-pa-sm.b-40
+        span.text-white.q-ml-sm {{ item.name }}
     //- footer
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-      joint-share(:joint="joint")
-      joint-bookmark(:joint="joint")
+      joint-share(:joint="joint" :isActive="isActive" :isVisible="isVisible")
+      joint-bookmark(:joint="joint" :isActive="isActive" :isVisible="isVisible")
       .col
       q-btn(
         @click="$router.push('/joint/'+joint.oid)"
@@ -65,6 +83,7 @@ export default {
   components: {
     jointVote: () => import('components/joint/joint_vote.vue'),
     jointActions: () => import('components/joint/joint_actions.vue'),
+    jointBookmark: () => import('components/joint/joint_bookmark.vue'),
     jointShare: () => import('components/joint/joint_share.vue')
   },
   data () {
