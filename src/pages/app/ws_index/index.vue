@@ -44,7 +44,7 @@ export default {
       return [
         {id: 'workspace.contents', path: '/workspace/contents/video', name: this.$t('pageWs_content', 'Контент')},
         {id: 'workspace.nodes', path: '/workspace/nodes/drafts', name: this.$t('pageWs_nodes', 'Ядра')},
-        {id: 'workspace.links', path: '/workspace/links', name: this.$t('pageWs_links', 'Связи')},
+        {id: 'workspace.joints', path: '/workspace/joints', name: this.$t('pageWs_joints', 'Связи')},
         {id: 'workspace.spheres', path: '/workspace/spheres', name: this.$t('pageWs_spheres', 'Сферы')},
       ]
     },

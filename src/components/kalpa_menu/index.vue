@@ -97,17 +97,17 @@ div(
           span(
             v-if="!mini"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
-        //- create link
+        //- create joint
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           ).row.full-width.items-center.content-center
           q-btn(
-            :to="'/workspace/link/new'"
+            :to="'/workspace/joint/new'"
             flat color="green" no-caps align="left" icon="link" size="md"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width
             span(
               v-if="!mini"
-              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create link', 'Создать связь')}}
+              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create joint', 'Создать связь')}}
         //- create node
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"

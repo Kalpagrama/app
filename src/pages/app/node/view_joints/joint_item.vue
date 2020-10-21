@@ -4,28 +4,38 @@ div(
   ).row.full-width.items-between.fit
   //- left side with content: node, sphere, content, user
   .col.full-height
-    //- item
-    node-mini(
-      v-if="item && item.type === 'NODE'"
-      :isActive="isActive" :isVisible="isVisible"
-      :node="item"
-      :marginBottom="80")
+    //- body
     div(
-      v-if="item && item.type === 'WORD'"
       :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        marginTop: '50px',
-        marginBottom: '30px',
-      }`
-      ).row.full-width.q-pa-sm.b-40
-      span.text-white.q-ml-sm {{ item.name }}
+        background: 'rgb(35,35,35)',
+        borderRadius: '10px',
+      }`).row.full-width
+      //- author
+      .row.full-width.items-center.content-center.q-pa-xs
+        q-btn(
+          :to="'/user/'+joint.author.oid"
+          flat color="white" dense no-caps
+          )
+          user-avatar(:url="joint.author.thumbUrl" :width="24" :height="24")
+          span.text-grey-4.q-ml-sm {{ joint.author.name }}
+        .col
+        small.text-grey-8.q-mr-xs {{ joint.countViews }}
+        q-icon(name="visibility" color="grey-8").q-mr-md
+        small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
+      .row.full-width
+      joint-item(:item="item" :isActive="isActive" :isVisible="isVisible")
     //- footer
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+      joint-share(:joint="joint" :isActive="isActive" :isVisible="isVisible")
+      joint-bookmark(:joint="joint" :isActive="isActive" :isVisible="isVisible")
       .col
       q-btn(
+        @click="$router.push('/joint/'+joint.oid)"
         flat color="white" no-caps)
-        span.text-white {{ itemType }}
+        span(v-if="jointType !== 'ESSENCE'").text-white {{ itemType }}
+        span(v-else).text-white {{ joint.name }}
       q-btn(
+        @click="showVotes = true"
         flat color="white" no-caps round)
         span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ joint.rate*100 }}
   //- right padding for real
@@ -45,13 +55,11 @@ div(
         marginBottom: '60px'
       }`
       ).row.full-width.justify-center
-      q-btn(
-        @click="vote()"
-        round flat dense color="green"
-        :style=`{height: '60px'}`
-        ).full-width.b-30
-        q-icon(name="adjust" color="green" size="30px")
-        //- .row.full-width.justify-center.q-mb-sm
+      joint-vote(
+        :joint="joint"
+        :style=`{
+          height: '60px',
+        }`).full-width.justify-center.b-30
 </template>
 
 <script>
@@ -60,8 +68,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'jointItem',
   props: ['node', 'joint', 'isActive', 'isVisible'],
+  components: {
+    jointVote: () => import('components/joint/joint_vote.vue'),
+    jointActions: () => import('components/joint/joint_actions.vue'),
+    jointBookmark: () => import('components/joint/joint_bookmark.vue'),
+    jointShare: () => import('components/joint/joint_share.vue'),
+    jointItem: () => import('components/joint/joint_item.vue')
+  },
   data () {
     return {
+      showVotes: false,
     }
   },
   computed: {

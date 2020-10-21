@@ -47,7 +47,7 @@ export default {
     pages () {
       return [
         {id: 'created', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
-        {id: 'linked', name: this.$t('Links', 'Связи'), icon: 'link'},
+        {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'voted', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
         {id: 'following', name: this.$t('Subscriptions', 'Подписки'), icon: 'rss_feed'},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},

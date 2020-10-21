@@ -23,22 +23,6 @@ q-page(
                 }`
                 ).row.full-width.items-start.content-start.b-40
                 node-mini(:node="item" :isActive="false" :isVisible="false")
-                //- node-lite(
-                  :node="item"
-                  :showEssence="false"
-                  :showAuthor="false"
-                  :marginBottom="0"
-                  :style=`{
-                    pointerEvents: 'none',
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`)
-                //- mini essence
-                //- div(
-                  :style=`{
-                    position: 'relative', zIndex: 100,
-                    borderRadius: '10px', overflow: 'hidden',
-                  }`).row.full-width.q-pa-sm.b-40
-                  small.text-white {{ item.name }}
               //- node selected
               div(
                 v-if="nodeSelectedOid === item.oid"
@@ -86,17 +70,6 @@ export default {
     },
     nodesChanged (nodes) {
       this.$log('nodesChanged', nodes)
-      // let fragments = nodes.reduce((acc, node) => {
-      //   let fragmentInput = {
-      //     name: node.name,
-      //     items: [node.items[0]],
-      //     spheres: []
-      //   }
-      //   acc.push(fragmentInput)
-      //   return acc
-      // }, [])
-      // this.$log('fragments', fragments)
-      // this.$store.commit('ui/stateSet', ['contentNodes', JSON.parse(JSON.stringify(fragments))])
     }
   }
 }

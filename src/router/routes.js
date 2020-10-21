@@ -101,9 +101,9 @@ const routes = [
                   meta: { roleMinimal: 'GUEST' }
                },
                {
-                  name: 'user.linked',
-                  path: 'linked',
-                  component: () => import('pages/app/user/user_linked.vue'),
+                  name: 'user.joints',
+                  path: 'joints',
+                  component: () => import('pages/app/user/user_joints.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {
@@ -143,14 +143,9 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'link',
-            path: 'link/:oid',
-            component: () => import('pages/app/link/index.vue')
-         },
-         {
-            name: 'link-create',
-            path: 'link-create',
-            component: () => import('pages/app/link_create/index.vue'),
+            name: 'joint',
+            path: 'joint/:oid',
+            component: () => import('pages/app/joint/index.vue')
          },
          {
             name: 'sphere',
@@ -206,16 +201,16 @@ const routes = [
                   component: () => import('pages/app/ws_nodes/index.vue'),
                },
                {
-                  name: 'workspace.links',
-                  path: 'links',
+                  name: 'workspace.joints',
+                  path: 'joints',
                   // redirect: 'nodes/drafts',
                   // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
-                  component: () => import('pages/app/ws_links/index.vue'),
+                  component: () => import('pages/app/ws_joints/index.vue'),
                },
                {
-                  name: 'workspace.link',
-                  path: 'link/:id/:item?',
-                  component: () => import('pages/app/ws_link/index.vue')
+                  name: 'workspace.joint',
+                  path: 'joint/:id/:item?',
+                  component: () => import('pages/app/ws_joint/index.vue')
                },
                {
                   name: 'workspace.node',

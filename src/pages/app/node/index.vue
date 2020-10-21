@@ -8,23 +8,22 @@
 q-layout(view="hHh Lpr lff")
   //- position="bottom"
   q-dialog(
-    v-model="nodeLinkerOpened"
-    position="bottom"
-    transition-show="fade"
-    transition-hide="fade"
+    v-model="nodeConnectOpened"
+    transition-show="none"
+    transition-hide="none"
     @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
     div(
       :style=`{
         maxWidth: $store.state.ui.pageMaxWidth+'px',
         minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
-        borderRadius: '10px 10px 0 0',
+        borderRadius: '10px',
       }`
       ).row.full-width.items-start.content-start.b-30
       kalpa-connect(
         v-if="node"
         :oid="node.oid"
-        @close="nodeLinkerOpened = false")
+        @close="nodeConnectOpened = false")
         div(
           :style=`{
             borderRadius: '10px'
@@ -127,12 +126,11 @@ q-layout(view="hHh Lpr lff")
         position="bottom right" :offset="[0, 70]"
         :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          //- @click="$router.push('/workspace/link/new?oid='+node.oid)"
           q-btn(
             v-if="true"
-            @click="nodeLinkerOpened = true"
-            no-caps color="green" icon="insert_link" size="md").shaking
-            span.text-white.text-bold.q-ml-sm {{ $t('Link node', 'Связать ядро') }}
+            @click="nodeConnectOpened = true"
+            no-caps color="green" icon="link" size="md")
+            span.text-white.text-bold.q-ml-sm {{ $t('Connect node', 'Связать ядро') }}
 </template>
 
 <script>
@@ -141,13 +139,11 @@ import { date } from 'quasar'
 import { shareWith } from 'src/system/services'
 
 import nodeMockup from './node_mockup/index.vue'
-// import nodeLinker from './node_linker/index.vue'
 
 export default {
   name: 'pageApp__node',
   components: {
     nodeMockup,
-    // nodeLinker,
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue'),
     viewSpheres: () => import('./view_spheres/index.vue'),
@@ -160,7 +156,7 @@ export default {
       nodeActive: true,
       nodeVisible: true,
       nodeCategories: [],
-      nodeLinkerOpened: false,
+      nodeConnectOpened: false,
       nodesLoaded: false,
     }
   },
