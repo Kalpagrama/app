@@ -1,8 +1,8 @@
 <template lang="pug">
 q-page(
   :style=`{paddingTop: '8px'}`
-  ).row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm
+  ).row.full-width.items-start.content-start.justify-center.br
+  div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm.br
     span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ contentKalpa.name }}
     .row.full-width.q-py-md
       .row.full-width

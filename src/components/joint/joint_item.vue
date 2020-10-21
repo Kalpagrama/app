@@ -27,7 +27,7 @@
     ).row.full-width.items-start.content-start.cursor-pointer
     img(
       draggable="false"
-      :src="item.thumbUrl"
+      :src="itemThumburl"
       :style=`{
         borderRadius: '10px',
       }`
@@ -40,7 +40,9 @@
       div(:style=`{width: '60px',}`).row.full-height.items-center.content-center.justify-center
         q-icon(name="select_all" color="white" size="20px")
       .col
-        .row.fit.items-center.content-center
+        div(
+          v-if="showName"
+          ).row.fit.items-center.content-center
           span.text-white {{ item.name }}
   //- content,ws, bookmarkws
   .row.full-width
@@ -51,5 +53,23 @@
 export default {
   name: 'jointItem',
   props: ['item', 'isActive', 'isVisible'],
+  computed: {
+    itemThumburl () {
+      if (this.item.type === 'IMAGE') {
+        return this.item.urlOriginal
+      }
+      else {
+        return this.item.thumbUrl
+      }
+    },
+    showName () {
+      if (this.item.type === 'IMAGE') {
+        return false
+      }
+      else {
+        return true
+      }
+    }
+  }
 }
 </script>

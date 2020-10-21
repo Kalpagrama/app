@@ -19,25 +19,6 @@
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
     //- items wrapper
     .row.full-width
-      //- SLIDER
-      //- div(
-        v-if="node.layout === 'SLIDER'"
-        :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden',
-        }`).row.full-width.items-start.content-start
-        list-slider(:items="node.items")
-          template(v-slot:item=`{item, isActive: itemActive}`)
-            div(
-              :style=`{
-                position: 'relative',
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.fit.b-40.shadow-5
-              composition-player(
-                :composition="item" :isVisible="isVisible" :isActive="isActive && itemActive"
-                :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-      //- PIP, VERTICAL
       div(
         v-if="['SLIDER', 'HORIZONTAL', 'PIP', 'VERTICAL'].includes(node.layout)"
         :style=`{

@@ -124,6 +124,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ContentApi } from 'src/api/content'
 import { NodeApi } from 'src/api/node'
 
 export default {
@@ -171,6 +172,9 @@ export default {
         this.$log('connect start')
         this.loading = true
         await this.$wait(500)
+        if (this.item && this.item.oid === null) {
+          this.item = await await ContentApi.contentCreateFromUrl(this.item.thumbUrl)
+        }
         if (!this.item.oid) throw new Error('No item.oid!')
         let jointInput = {
           swap: false,
