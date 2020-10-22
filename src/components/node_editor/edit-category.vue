@@ -6,7 +6,9 @@ div(:style=`{position: 'relative'}`).row.full-width
     icon-right="keyboard_arrow_down"
     :style=`{position: 'relative', height: '40px'}`
     ).full-width.q-px-sm.b-50 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
-    q-menu(fit dark)
+    q-popup-proxy(
+      fit dark
+      position="bottom")
       div(
         :style=`{
           maxWidth: width+'px',

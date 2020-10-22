@@ -3,8 +3,9 @@ div.row
   q-btn(
     v-if="subscribed === false"
     @click="follow()"
-    round flat color="white" no-caps icon="rss_feed"
+    round flat color="white" no-caps
     :loading="loading")
+    q-icon(name="playlist_add" size="30px").rotate-90
   q-btn(
     v-if="subscribed === true"
     round flat color="green" no-caps icon="rss_feed"

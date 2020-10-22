@@ -9,7 +9,7 @@ div(
   img(
     :src="item.thumbUrl"
     draggable="false"
-    :style=`{objectFit: item.meta.cover ? 'cover' : 'contain'}`
+    :style=`{objectFit: 'contain'}`
     ).fit
   item-player(
     v-if="item.outputType === 'VIDEO'"
@@ -33,7 +33,7 @@ div(
         right: '0px',
         background: 'rgba(0,0,0,0.2)'
       }`)
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
       v-if="isActive"
       flat dense color="white" icon="more_vert"
@@ -44,7 +44,7 @@ div(
         background: 'rgba(0,0,0,0.2)'
       }`
       )
-      q-menu(dark anchor="center left" self="center right")
+      //- q-menu(dark anchor="center left" self="center right")
         div(:style=`{width: '120px'}`).row
           q-btn(
             @click="$emit(akey)"

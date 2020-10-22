@@ -207,6 +207,11 @@ const routes = [
                   component: () => import('pages/app/ws_joints/index.vue'),
                },
                {
+                  name: 'workspace.feeds',
+                  path: 'feeds',
+                  component: () => import('pages/app/ws_feeds/index.vue')
+               },
+               {
                   name: 'workspace.joint',
                   path: 'joint/:id/:item?',
                   component: () => import('pages/app/ws_joint/index.vue')

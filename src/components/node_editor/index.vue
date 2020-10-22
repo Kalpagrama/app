@@ -43,7 +43,7 @@
       :style=`{
         maxWidth: '800px', zIndex: 100,
         borderRadius: '10px', overflow: 'hidden'
-      }`).row.full-width.q-pa-sm.b-40
+      }`).row.full-width.b-40
       div(
         :style=`{
           position: 'relative',

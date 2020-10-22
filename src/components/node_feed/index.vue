@@ -67,13 +67,21 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  props: ['node', 'isActive', 'isVisible'],
+  props: ['node', 'isActive', 'isVisible', 'width'],
   data () {
     return {
       showMore: false,
     }
   },
   computed: {
+    height () {
+      if (this.width) {
+        // if ()
+        // return (this.node.thumbHeight * this.width) / this.node.thumbWidth
+        return null
+      }
+      else return null
+    }
   },
   methods: {
   }

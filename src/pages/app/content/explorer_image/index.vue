@@ -11,7 +11,7 @@ q-layout(view="hHh Lpr lff")
               height: '60px',
               borderRadius: '10px', overflow: 'hidden',
             }`).row.full-width.items-center.content-center.b-40.q-px-sm
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$rotuer.back()")
+            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
             q-icon(name="select_all" color="white" size="30px").q-mr-sm
             .col
               span(:style=`{fontSize: '1rem', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}

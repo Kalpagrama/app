@@ -46,6 +46,7 @@ export default {
       return [
         {id: 'video', name: this.$t('Video', 'Видео')},
         {id: 'image', name: this.$t('Images', 'Картинки')},
+        {id: 'post', name: this.$t('Post', 'Статьи')},
         {id: 'audio', name: this.$t('Audio', 'Аудио')},
         {id: 'books', name: this.$t('Books', 'Книги')},
       ]

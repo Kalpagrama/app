@@ -1,5 +1,19 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  q-dialog(
+    :position="$q.screen.width < 800 ? 'bottom' : 'standard'"
+    :maximized="$q.screen.width < 800 ? true : false"
+    transition-show="none"
+    transition-hide="none"
+    v-model="sphereAddingDialog")
+    ws-sphere-finder(
+      :useSearch="true"
+      :selectedIds="item.spheres"
+      @sphere="sphereAdd"
+      @close="sphereAddingDialog = false"
+      :style=`{
+        height: $q.screen.height < 800 ? $q.screen.height+'px' : '600px',
+      }`).full-width.b-30
   //- prepend default slot
   slot
   //- spheres list
@@ -13,6 +27,7 @@
         v-if="sphereEditing === sphereId"
         @click="sphereDelete(sphereId)"
         round flat dense color="red" icon="delete_outline")
+  //- append
   slot(name="append")
   //- input row
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden',}`).row
@@ -38,7 +53,10 @@
         :searchString="sphereSearchString"
         :selectedIds="item.spheres"
         :hiddenIds="hiddenIds || []"
-        @sphere="sphereAdd")
+        @sphere="sphereAdd"
+        :style=`{
+          width: '300px', height: '300px',
+        }`)
   //- stop sphereAdding
   q-btn(
     v-if="sphereAdding"
@@ -48,9 +66,9 @@
   //- start sphereAdding
   q-btn(
     v-if="!sphereAdding"
-    @click="sphereAdding = true"
+    @click="sphereAddingDialog = true"
     flat color="grey-6" icon="add" no-caps dense
-    :style=`{height: '40px'}`) {{ $t('wsNodeEditor_sphereAddFirst', 'Добавь сферу') }}
+    :style=`{height: '40px'}`) Добавить сферу
 </template>
 
 <script>
@@ -73,6 +91,7 @@ export default {
     return {
       sphereSearchString: '',
       sphereAdding: false,
+      sphereAddingDialog: false,
       sphereEditing: null,
     }
   },
