@@ -70,9 +70,6 @@ export default {
       // if (!confirm('Delete node?')) return
       // TODO what to do if we got items on this sphere ???
       // await this.$rxdb.remove(item.id)
-      // this.$set()
-      // item.deletedAt = Date.now()
-      this.$set(item, 'deletedAt', Date.now())
       await item.updateExtended('deletedAt', Date.now(), false)
     },
     itemEdit (item) {

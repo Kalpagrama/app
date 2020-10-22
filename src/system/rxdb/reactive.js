@@ -7,7 +7,8 @@ import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import merge from 'lodash/merge'
-import set from 'lodash/set'
+import * as lodashSet from 'lodash/set'
+import * as lodashHas from 'lodash/has'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex'
 
@@ -44,6 +45,7 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
    logD(f, 'start')
    const t1 = performance.now()
    // logD(f, 'start2', rxDocOrId, path, value)
+   assert(rxDocOrId && path, '!(rxDocOrId && path)')
    if (!rxDocOrId) return
    let rxDoc
    if (isRxDocument(rxDocOrId)) {
@@ -57,7 +59,15 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
       try {
          reactiveItemHolder.setDebouncedSave(debouncedSave)
          // logD(f, 'start2', reactiveItemHolder.reactiveItem, path, value)
-         set(reactiveItemHolder.reactiveItem, path, value)
+         assert(reactiveItemHolder.reactiveItem, '!reactiveItemHolder.reactiveItem')
+         if (!lodashHas(reactiveItemHolder.reactiveItem, path)) {
+            let rootPath = path.split('.')[0]
+            let tmpObj = {}
+            lodashSet(tmpObj, path, value)
+            Vue.set(reactiveItemHolder.reactiveItem, rootPath, tmpObj[rootPath]) // если проперти не было, то реактивности тоже нет
+         } else {
+            lodashSet(reactiveItemHolder.reactiveItem, path, value)
+         }
          // logD(f, 'complete', reactiveItemHolder.reactiveItem)
       } finally {
          wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов itemSubscribe

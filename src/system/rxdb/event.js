@@ -2,64 +2,18 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
-import { router } from 'src/boot/main'
+import { router } from 'src/boot/system'
 import { EventApi } from 'src/api/event'
 import { getReactive, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
 import { mutexGlobal } from 'src/system/rxdb/mutex'
+import { makeEventCard } from 'public/scripts/common_func'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_EVENT)
-
-function makeEventCard (event) {
-   let resultCard = { icon: '', description: '', items: [] }
-   const cropObj = (obj) => {
-      assert(obj.oid && obj.name != null && obj.thumbUrl, 'bad obj')
-      return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl }
-   }
-   switch (event.type) {
-      case 'USER_SUBSCRIBED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'подписался на', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы подписались на', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
-         break
-      case 'USER_UNSUBSCRIBED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'отписался от', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы отписались от', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
-         break
-      case 'VOTED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'проголосовал за', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы проголосовали за', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
-         break
-      case 'OBJECT_CREATED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'создал', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы создали', cropObj(event.object)]
-         } else if (event.matter.reason === 'JOIN') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'использовал ваше ядро для создания', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
-         break
-   }
-   // span.text-white {{ n.subject.name }} =>
-   // span.text-white {{ n.matter.reason }} =>
-   return resultCard
-}
 
 class Event {
    constructor (workspace, objects, lists, cache) {
@@ -247,4 +201,4 @@ class Event {
    }
 }
 
-export { Event, makeEventCard }
+export { Event }

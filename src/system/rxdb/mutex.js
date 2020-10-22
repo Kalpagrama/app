@@ -1,10 +1,8 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { wait } from 'src/system/utils'
-import { AppVisibility } from 'quasar'
+import { AppVisibility, Platform } from 'quasar'
 import Vue from 'vue'
-import { router } from 'src/boot/main'
-import { rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
@@ -126,6 +124,7 @@ class MutexGlobal {
    }
 
    isLeader () {
+      if (Platform.is.capacitor) return true
       let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
       if (!currentLeaderInstanceId) {
          this.setLeader()
@@ -139,6 +138,7 @@ class MutexGlobal {
    }
 
    async lock (lockOwner) {
+      if (Platform.is.capacitor) return
       assert(lockOwner, '!lockOwner')
       const f = this.lock
       // logD(f, 'start', lockOwner, this.getInstanceId())
@@ -178,6 +178,7 @@ class MutexGlobal {
    }
 
    release (lockOwner) {
+      if (Platform.is.capacitor) return
       const f = this.release
       assert(lockOwner, '!lockOwner')
       // logD(f, 'start', lockOwner, this.getInstanceId())

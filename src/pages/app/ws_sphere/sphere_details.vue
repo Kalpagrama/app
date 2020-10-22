@@ -52,8 +52,6 @@ export default {
       this.$log('deleteStart')
       // if we got 0 items on this sphere...
       // await this.$rxdb.remove(this.node.id)
-      // this.sphere.deletedAt = Date.now()
-      this.$set(this.sphere, 'deletedAt', Date.now())
       await this.sphere.updateExtended('deletedAt', Date.now(), false)
       this.$router.back()
     }

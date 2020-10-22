@@ -12,8 +12,12 @@ function t (str) {
   return str
 }
 
-export default async ({ app, store, Vue }) => {
+let router
+
+export default async ({ app, store, Vue, router: VueRouter }) => {
   try {
+    // alert('SYSTEM router init')
+    router = VueRouter
     await initServices(store)
   } catch (err) {
     logC(err)
@@ -21,4 +25,4 @@ export default async ({ app, store, Vue }) => {
   }
 }
 
-export { t }
+export { t, router }

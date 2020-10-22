@@ -50,10 +50,9 @@ export default {
       let location
       // eslint-disable-next-line no-constant-condition
       if (Platform.is.capacitor) {
-        location = 'app.kalpa://redirect_to_app/path' // custom_url_scheme for android & ios
+        location = 'app.kalpa://auth' // custom_url_scheme for android & ios
       } else {
-        location = window.location
-        location = location.toString().replace('#', '_octothorp_') // vk режет все после символа #
+        location = window.location.origin + '/auth'
       }
       this.$log('location', location)
       let to = `${url}&state={"origin":"${location}"}` // сообщаем серверу куда делать редирект после успешной аутентификации

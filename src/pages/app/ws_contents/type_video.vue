@@ -93,8 +93,6 @@ export default {
       // if (!confirm('Delete content?')) return
       // TODO what to do if we got items on this sphere ???
       // await this.$rxdb.remove(item.id)
-      // item.deletedAt = Date.now()
-      this.$set(item, 'deletedAt', Date.now())
       await item.updateExtended('deletedAt', Date.now(), false)
     },
     itemLaunch (contentBookmark) {

@@ -106,11 +106,11 @@ class Workspace {
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
             assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
-            let onWsChangedByUser = async (id, operation) => {
+            let onWsChangedByUser = async (id, operation, rev) => {
                const f = onWsChangedByUser
                if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
-               await this.db.ws_changes.atomicUpsert({ id, operation })
+               await this.db.ws_changes.atomicUpsert({ id, operation, rev })
                // logD(f, `complete. ${id}`)
             }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
@@ -131,14 +131,14 @@ class Workspace {
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
                // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
                if (!plainData.ignoreChanges) {
-                  await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+                  await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData.rev)
                }
             }, false)
             this.db.ws_items.postInsert(async (plainData) => {
-               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData.rev)
             }, false)
             this.db.ws_items.postRemove(async (plainData) => {
-               await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData.rev)
                rxdb.onRxDocDelete(plainData.id)
             }, false)
          }
@@ -303,10 +303,10 @@ class Workspace {
       let unsavedItems = await this.db.ws_changes.find().exec()
       let wsRevision = this.reactiveUser.wsRevision
       for (let rxDocUnsavedItem of unsavedItems) {
-         let { id, operation, updatedAt } = rxDocUnsavedItem
+         let { id, operation, rev } = rxDocUnsavedItem
          let plainDoc
          if (operation === WsOperationEnum.DELETE) {
-            plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id) }
+            plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
          } else {
             let rxDoc = await this.db.ws_items.findOne(id).exec()
             if (!rxDoc) { // в мастерской нет такого элемента!

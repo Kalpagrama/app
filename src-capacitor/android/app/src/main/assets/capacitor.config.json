@@ -22,9 +22,9 @@
     ]
   },
   "android": {
-    "overrideUserAgent": "custom"
+    "overrideUserAgent": "capacitor android kalpa.app"
   },
   "ios": {
-    "overrideUserAgent": "custom"
+    "overrideUserAgent": "capacitor ios kalpa.app"
   }
 }
