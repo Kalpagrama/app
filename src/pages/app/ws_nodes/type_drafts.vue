@@ -71,7 +71,9 @@ export default {
       // TODO what to do if we got items on this sphere ???
       // await this.$rxdb.remove(item.id)
       // this.$set()
-      item.deletedAt = Date.now()
+      // item.deletedAt = Date.now()
+      this.$set(item, 'deletedAt', Date.now())
+      await item.updateExtended('deletedAt', Date.now(), false)
     },
     itemEdit (item) {
       this.$log('itemEdit', item)

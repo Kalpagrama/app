@@ -1,5 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-start
+  .row.full-width.q-pa-sm
+    q-btn(icon="sort" color="grey-8" round flat)
   q-resize-observer(@resize="e => width = e.width")
   div(
     :style=`{
@@ -54,7 +56,9 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
           oidSphere: this.oid,
-          jointItemType: {$in: ['NODE', 'WORD']}
+          jointItemType: {$in: ['NODE', 'WORD']},
+          // sortStrategy: 'AGE',
+          // sortOrder: 'ASC' // DESC
         },
         populateObjects: true,
       }

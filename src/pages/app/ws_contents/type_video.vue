@@ -95,6 +95,7 @@ export default {
       // await this.$rxdb.remove(item.id)
       // item.deletedAt = Date.now()
       this.$set(item, 'deletedAt', Date.now())
+      await item.updateExtended('deletedAt', Date.now(), false)
     },
     itemLaunch (contentBookmark) {
       this.$log('itemLaunch', contentBookmark)
