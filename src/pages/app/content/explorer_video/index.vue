@@ -114,7 +114,6 @@ div(
       v-model="viewId"
       no-caps dense active-color="green" switch-indicator).full-width.text-grey-8
       q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
-  //- div(:style=`{position: 'relative'}`).col.full-width.scroll
   .row.full-width
     component(
       v-if="player"
@@ -142,11 +141,12 @@ import viewDetails from './view_details/index.vue'
 import viewNode from './view_node/index.vue'
 import viewNodesMine from './view_nodes_mine/index.vue'
 import viewNodesAll from './view_nodes_all/index.vue'
+import viewJoints from './view_joints/index.vue'
 import viewFullscreen from './view_fullscreen/index.vue'
 
 export default {
   name: 'contentExplorerVideo',
-  components: {contentPlayer, viewDetails, viewNode, viewNodesAll, viewNodesMine, viewFullscreen},
+  components: {contentPlayer, viewDetails, viewNode, viewNodesAll, viewNodesMine, viewJoints, viewFullscreen},
   props: ['contentKalpa', 'query'],
   data () {
     return {
@@ -160,10 +160,10 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'details', name: this.$t('wsContentExplorer_video_viewDetails_title', 'Детали')},
-        {id: 'nodes-mine', name: this.$t('wsContentExplorer_video_viewNodesMine_title', 'Мои ядра')},
-        {id: 'nodes-all', name: this.$t('wsContentExplorer_video_viewNodesAll_title', 'Все ядра')},
-        {id: 'joints', name: 'Связи'}
+        {id: 'details', name: this.$t('contentExplorerVideo_viewDetails_title', 'Детали')},
+        {id: 'nodes-mine', name: this.$t('contentExplorerVoieo_viewNodesMine_title', 'Мои ядра')},
+        {id: 'nodes-all', name: this.$t('contentExplorerVideo_viewNodesAll_title', 'Все ядра')},
+        {id: 'joints', name: this.$t('contentExplorerVideo_viewJoints_title', 'Связи')}
       ]
     }
   },

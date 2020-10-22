@@ -70,6 +70,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          deletedAt: {$exists: false},
           contentType: 'VIDEO',
           type: 'CONTENT',
         },
@@ -89,9 +90,11 @@ export default {
     },
     async itemDelete (item) {
       this.$log('itemDelete', item)
-      if (!confirm('Delete content?')) return
+      // if (!confirm('Delete content?')) return
       // TODO what to do if we got items on this sphere ???
-      await this.$rxdb.remove(item.id)
+      // await this.$rxdb.remove(item.id)
+      // item.deletedAt = Date.now()
+      this.$set(item, 'deletedAt', Date.now())
     },
     itemLaunch (contentBookmark) {
       this.$log('itemLaunch', contentBookmark)

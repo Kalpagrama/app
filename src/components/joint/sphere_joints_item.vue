@@ -32,7 +32,7 @@ div(
       q-btn(
         @click="$router.push('/joint/'+joint.oid)"
         flat color="white" no-caps)
-        span(v-if="jointType !== 'ESSENCE'").text-white {{ itemType }}
+        span(v-if="joint.jointType !== 'ESSENCE'").text-white {{ itemType }}
         span(v-else).text-white {{ joint.name }}
       q-btn(
         @click="showVotes = true"
@@ -66,8 +66,8 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'jointItem',
-  props: ['node', 'joint', 'isActive', 'isVisible'],
+  name: 'sphereJoints_item',
+  props: ['oid', 'joint', 'isActive', 'isVisible'],
   components: {
     jointVote: () => import('components/joint/joint_vote.vue'),
     jointActions: () => import('components/joint/joint_actions.vue'),
@@ -82,12 +82,12 @@ export default {
   },
   computed: {
     item () {
-      if (this.joint.leftItem.oid === this.node.oid) return this.joint.rightItem
+      if (this.joint.leftItem.oid === this.oid) return this.joint.rightItem
       else return this.joint.leftItem
     },
     itemType () {
       // left item is ok
-      if (this.joint.leftItem.oid === this.node.oid) {
+      if (this.joint.leftItem.oid === this.oid) {
         return this.joint.jointType.split('_')[0]
       }
       // need swap

@@ -18,7 +18,7 @@ q-layout(view="hHh Lpr lff")
             q-icon(name="school" size="30px" color="white").q-mr-md.q-ml-sm
             .col
               span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
-            q-btn(round flat color="grey-6" icon="more_vert")
+            //- q-btn(round flat color="grey-6" icon="more_vert")
           .row.full-width.q-px-sm.q-pt-sm
             router-link(
               :to="p.path"

@@ -1,15 +1,15 @@
 <template lang="pug">
 sphere-joints(
-  :oid="node.oid"
-  )
+  :oid="contentKalpa.oid"
+  ).q-mt-lg
 </template>
 
 <script>
 export default {
-  name: 'pageApp-node-nodeJoints',
+  name: 'contentExplorerVideo_viewJoints',
+  props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
   components: {
     sphereJoints: () => import('components/joint/sphere_joints.vue')
-  },
-  props: ['node'],
+  }
 }
 </script>

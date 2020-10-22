@@ -74,6 +74,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_JOINT,
+          deletedAt: {$exists: false},
         },
         sort: [{updatedAt: 'desc'}]
       }
@@ -88,19 +89,20 @@ export default {
   methods: {
     async jointDelete (joint) {
       this.$log('jointDelete', joint)
-      this.$q.dialog({
-        dark: true,
-        title: 'Удалить ?!',
-        // message: 'Это нельзя отменить',
-        persistent: true,
-        'content-style': { borderRadius: '10px', overflow: 'hidden' },
-        ok: { flat: false, color: 'green', label: 'Удалить', 'no-caps': true },
-        cancel: { flat: true, color: 'green', label: 'Отмена', 'no-caps': true },
-      }).onOk(async () => {
-        await this.$rxdb.remove(joint.id)
-      }).onCancel(() => {
-      }).onDismiss(() => {
-      })
+      // this.$q.dialog({
+      //   dark: true,
+      //   title: 'Удалить ?!',
+      //   // message: 'Это нельзя отменить',
+      //   persistent: true,
+      //   'content-style': { borderRadius: '10px', overflow: 'hidden' },
+      //   ok: { flat: false, color: 'green', label: 'Удалить', 'no-caps': true },
+      //   cancel: { flat: true, color: 'green', label: 'Отмена', 'no-caps': true },
+      // }).onOk(async () => {
+      //   await this.$rxdb.remove(joint.id)
+      // }).onCancel(() => {
+      // }).onDismiss(() => {
+      // })
+      joint.deletedAt = Date.now()
     },
     jointEdit (joint) {
       this.$log('jointEdit', joint)

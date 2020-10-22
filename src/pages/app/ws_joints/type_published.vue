@@ -59,6 +59,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          deletedAt: {$exists: false},
           // oidAuthor: {$ne: this.sphereOid},
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
@@ -70,8 +71,9 @@ export default {
   methods: {
     async jointDelete (joint) {
       if (!confirm(this.$t('confirm_Really delete?', 'Удалить?'))) return
-      this.$log('jointDelete')
+      this.$log('jointDelete', joint)
       await ObjectsApi.unPublish(joint.oid)
+      // joint.deletedAt = Date.now()
     },
     jointEdit (joint) {
       this.$log('jointEdit')
