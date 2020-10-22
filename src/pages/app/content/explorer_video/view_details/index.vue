@@ -1,26 +1,35 @@
 <template lang="pug">
 q-page(
   :style=`{paddingTop: '8px'}`
-  ).row.full-width.items-start.content-start.justify-center.br
-  div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm.br
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ contentKalpa.name }}
-    .row.full-width.q-py-md
-      .row.full-width
-        q-btn(
-          v-if="contentKalpa.contentSource !== 'KALPA'"
-          @click="gotToOriginal"
-          icon="fab fa-youtube"
-          color="green" outline no-caps dense).full-width.q-px-sm
-          span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
-      //- .row.full-width.q-py-md
-        kalpa-follow(
-          v-if="contentKalpa"
-          :oid="contentKalpa.oid").full-width
-    //- spheres
-    .row.full-width.q-py-sm
+  ).row.full-width.items-start.content-start.justify-center
+  div(
+    :style=`{
+      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      background: 'rgb(35,35,35)',
+      borderRadius: '10px',
+    }`).row.full-width.justify-center.q-pt-md.q-pb-xl
+    div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ contentKalpa.name }}
       .row.full-width.q-py-md
-        span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
-      ws-sphere-editor(v-if="contentBookmark" :item="contentBookmark")
+        .row.full-width
+          q-btn(
+            v-if="contentKalpa.contentSource !== 'KALPA'"
+            @click="gotToOriginal"
+            icon="fab fa-youtube" align="left"
+            color="green" outline no-caps
+            :style=`{
+              //- maxWidth: '300px',
+            }`).q-px-sm
+            span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+        //- .row.full-width.q-py-md
+          kalpa-follow(
+            v-if="contentKalpa"
+            :oid="contentKalpa.oid").full-width
+      //- spheres
+      .row.full-width.q-py-sm
+        .row.full-width.q-py-md
+          span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
+        ws-sphere-editor(v-if="contentBookmark" :item="contentBookmark")
 </template>
 
 <script>

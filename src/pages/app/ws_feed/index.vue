@@ -40,6 +40,32 @@
             }`
             :style=`{}`).full-width
       q-btn(round flat color="white" icon="launch" @click="$router.push('/feeds/'+feed.id)")
+  //- search
+  .row.full-width.justify-center.q-py-sm.q-px-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
+      div(:style=`{maxWidth: '700px',}`).row.full-width
+        .col
+          div(
+            :style=`{
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.fit
+            q-input(
+              v-model="searchString"
+              borderless dense dark color="green"
+              placeholder="Поиск"
+              :input-style=`{
+                paddingLeft: '10px',
+              }`
+              ).full-width
+              template(v-slot:append)
+                q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
+        q-btn(
+          @click="itemFinderOpened = true"
+          round flat color="grey-4" icon="add")
+        q-btn(
+          round flat color="grey-4" icon="tune")
   //- body: items
   .row.full-width.justify-center.q-py-sm
     div(
@@ -87,7 +113,7 @@
             .col
             q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
   //- footer
-  div(
+  //- div(
     :style=`{
       position: 'fixed', zIndex: 200, bottom: 0,
     }`
@@ -117,6 +143,7 @@ export default {
       },
       itemFinderOpened: false,
       itemSelected: null,
+      searchString: ''
     }
   },
   computed: {

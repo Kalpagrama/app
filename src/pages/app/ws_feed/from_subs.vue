@@ -1,7 +1,32 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  .row.full-width.justify-center.q-px-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
+      div(:style=`{maxWidth: '700px',}`).row.full-width
+        .col
+          div(
+            :style=`{
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.fit
+            q-input(
+              v-model="name"
+              borderless dense dark color="green"
+              placeholder="Поиск"
+              :input-style=`{
+                paddingLeft: '10px',
+              }`
+              ).full-width
+              template(v-slot:append)
+                q-icon(v-if="name.length > 0" name="clear" color="grey-4" @click="name = ''").q-mr-sm
+        //- q-btn(
+          @click="itemFinderOpened = true"
+          round flat color="grey-4" icon="add")
+        q-btn(
+          round flat color="grey-4" icon="tune")
   //- search
-  .row.full-width.q-px-sm
+  //- .row.full-width.q-px-sm
     div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
       q-input(
         v-model="name"
@@ -36,6 +61,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'fromSubs',
+  data () {
+    return {
+      name: '',
+    }
+  },
   computed: {
     querySubscriptions () {
       let res = {
