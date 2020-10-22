@@ -9,7 +9,7 @@ div(
       height: '60px',
     }`
     ).row.full-width.justify-start.items-center.q-mb-lg
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold Create collection
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold Создать коллекцию
     q-btn(
       @click="$emit('close')"
       round flat color="white" icon="clear"
@@ -22,7 +22,7 @@ div(
       q-input(
         v-model="name"
         filled dark color="green"
-        placeholder="Type collection name"
+        placeholder="Введите название"
         :autofocus="nameInputAutofocus"
         @keyup.enter="create()").full-width
     //- edit spheres...
@@ -34,7 +34,7 @@ div(
         :disabled="!createCan"
         :color="!createCan ? 'grey-8' : 'green'"
         :loading="creating").q-px-md
-        span.text-bold Create
+        span.text-bold Создать
 </template>
 
 <script>

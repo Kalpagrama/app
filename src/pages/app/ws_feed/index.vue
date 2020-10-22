@@ -61,7 +61,7 @@
               position: 'relative', zIndex: 10,
               borderRadius: '10px',
             }`
-            ).row.full-width.b-40
+            ).row.full-width.items-start.content-start.b-40.cursor-pointer
             img(
               draggable="false"
               :src="item.thumbUrl"
@@ -73,7 +73,7 @@
               .row.full-height.q-pa-xs
                 q-icon(:name="itemIcon(item)" color="grey-4" size="20px")
               .col
-                small.text-white {{ item.name }}
+                small.text-white {{ item.name.slice(0,30) }}
           //- selected...
           div(
             v-if="itemSelected === item.oid"
@@ -83,7 +83,7 @@
               borderRadius: '10px',
             }`
             ).row.full-width.bg-green
-            q-btn(round flat dense color="white" icon="delete_outline" @click="itemDelete(item)")
+            q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(item)")
             .col
             q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
   //- footer
@@ -178,8 +178,15 @@ export default {
     },
     itemLaunch (item) {
       this.$log('itemLaunch', item)
-      // let itemLaunchMap = {}
-      // this.$router.push()
+      let itemLaunchMap = {
+        NODE: '/node/',
+        CONTENT: '/content/',
+      }
+      let p = itemLaunchMap[item.type]
+      this.$log('p', p)
+      if (p) {
+        this.$router.push(p + item.oid)
+      }
     },
     itemDelete (item) {
       this.$log('itemDelete', item)

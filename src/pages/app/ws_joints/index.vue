@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.q-px-sm
+    //- .row.full-width.q-px-sm
       div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width.b-40
         .col
           div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
@@ -18,6 +18,30 @@
           @click="$router.push('/workspace/joint/new')"
           round flat dense color="green" icon="add"
           :style=`{width: '40px'}`)
+    .row.full-width.justify-start.q-px-sm
+      div(:style=`{maxWidth: '700px',}`).row.full-width
+        .col
+          div(
+            :style=`{
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.fit
+            q-input(
+              v-model="searchString"
+              borderless dense dark color="green"
+              placeholder="Поиск"
+              :input-style=`{
+                paddingLeft: '10px',
+              }`
+              ).full-width
+              template(v-slot:append)
+                q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
+        q-btn(
+          @click="$router.push('/workspace/joint/new')"
+          round flat color="grey-4" icon="add")
+        q-btn(
+          round flat color="grey-4" icon="tune")
     //- types
     div(:style=`{paddingRight: '50px',}`).row.full-width.q-pl-md
       q-tabs(

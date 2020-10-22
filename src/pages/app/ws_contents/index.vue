@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.items-start.q-px-sm
+    .row.full-width.items-start
       content-search(
         @contentKalpa="contentKalpaFound"
         @searchString="searchString = $event"

@@ -1,3 +1,9 @@
+<style lang="sass">
+.feed-item
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 .row.full-width.justify-center
   q-dialog(
@@ -9,17 +15,47 @@
       @close="feedCreatorOpened = false"
     )
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-    .row.full-width.q-pa-sm
-      q-btn(
-        @click="feedCreatorOpened = true"
-        round flat color="white" icon="add")
-      .col
-      q-btn(
-        round flat color="grey-7" icon="tune")
+    .row.full-width.justify-start.q-px-sm
+      div(:style=`{maxWidth: '700px',}`).row.full-width
+        .col
+          div(
+            :style=`{
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.fit
+            q-input(
+              v-model="searchString"
+              borderless dense dark color="green"
+              placeholder="Поиск"
+              :input-style=`{
+                paddingLeft: '10px',
+              }`
+              ).full-width
+              template(v-slot:append)
+                q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
+        q-btn(
+          @click="feedCreatorOpened = true"
+          round flat color="grey-4" icon="add")
+        q-btn(
+          round flat color="grey-4" icon="tune")
     kalpa-loader(
       :immediate="true"
       :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
       .row.full-width.items-start.content-start
+        //- create feed from searchString... if items.length === 0
+        //- div(
+          v-if="items && items.length === 0"
+          :style=`{
+            maxWidth: '600px',
+          }`
+          ).row.full-width.q-pa-sm
+          q-btn(
+            @click="feedCreate"
+            color="green" no-caps
+            )
+            span.text-bold.text-white Создать "{{ searchString }}"
+        //- items...
         div(
           v-for="(feed,ii) in items" :key="feed.id"
           :style=`{
@@ -42,7 +78,7 @@
                 :style=`{
                   borderRadius: '10px', overflow: 'hidden'
                 }`
-                ).column.fit.b-40.cursor-pointer
+                ).column.fit.b-40.cursor-pointer.feed-item
                 //- items previews, first 3 items...
                 div(
                   :style=`{
@@ -94,6 +130,7 @@ export default {
   },
   data () {
     return {
+      searchString: '',
       feedCreatorOpened: false,
     }
   },
@@ -108,6 +145,11 @@ export default {
           rxCollectionEnum: RxCollectionEnum.WS_FEED,
         }
       }
+      // add name filter
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
       return res
     }
   },
@@ -116,6 +158,9 @@ export default {
       this.$log('feedClick', feed)
       this.$router.push(`/workspace/feed/${feed.id}`).catch(e => e)
       // await this.$rxdb.remove(feed.id)
+    },
+    feedCreate () {
+      this.$log('feedCreate')
     }
   }
 }

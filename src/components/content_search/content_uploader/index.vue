@@ -2,7 +2,7 @@
 .row.items-center.content-center.justify-center
   q-btn(
     @click.native="start()"
-    round flat dense color="green" icon="add"
+    round flat dense color="white" icon="add"
     :style=`{
       width: '40px',
     }`).full-height
