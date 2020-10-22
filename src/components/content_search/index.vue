@@ -17,7 +17,7 @@ div(
     q-input(
       v-model="searchStringRaw"
       ref="searchStringInput"
-      borderless dense dark color="white"
+      borderless dense dark color="green"
       :placeholder="$t('Enter URL or search', 'Введите URL или поиск')"
       :loading="searchStringLoading"
       @focus="searchStringFocused"

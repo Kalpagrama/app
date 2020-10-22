@@ -46,21 +46,34 @@
                 //- items previews, first 3 items...
                 div(
                   :style=`{
-                    borderRadius: '10px', overflow: 'hidden'
+                    borderRadius: '10px', overflow: 'hidden',
+                    background: 'rgb(45,45,45)',
                   }`
                   ).col.full-width
-                  .row.fit.br
-                    .col-8.bg-red
-                      //- first item.thumbUrl...
-                      //- img(
-                        :src=""
+                  .row.fit
+                    div(:style=`{borderRight: '1px solid rgb(70,70,70)'}`).col-8
+                      img(
+                        v-if="feed.items[0]"
+                        :src="feed.items[0].thumbUrl"
                         :style=`{
                           objectFit: 'cover',
-                        }`)
-                    .col.bg
+                        }`).fit
+                    .col
                       .column.fit
-                        .col.full-width.br
-                        .col.full-width.bg
+                        div(:style=`{borderBottom: '1px solid rgb(70,70,70)'}`).col.full-width
+                          img(
+                            v-if="feed.items[1]"
+                            :src="feed.items[1].thumbUrl"
+                            :style=`{
+                              objectFit: 'cover',
+                            }`).fit
+                        .col.full-width
+                          img(
+                            v-if="feed.items[2]"
+                            :src="feed.items[2].thumbUrl"
+                            :style=`{
+                              objectFit: 'cover',
+                            }`).fit
                 //- footer: feed.name
                 div(
                   :style=`{
@@ -68,7 +81,7 @@
                   }`).row.full-width.items-center.content-center.q-px-sm
                   span.text-bold.text-white {{ feed.name }}
                   .row.full-width
-                    small.text-grey-6 внутри {{ feed.items.length }}
+                    small.text-grey-6 {{ feed.items.length }} внутри
 </template>
 
 <script>
@@ -101,7 +114,8 @@ export default {
   methods: {
     async feedClick (feed) {
       this.$log('feedClick', feed)
-      await this.$rxdb.remove(feed.id)
+      this.$router.push(`/workspace/feed/${feed.id}`).catch(e => e)
+      // await this.$rxdb.remove(feed.id)
     }
   }
 }

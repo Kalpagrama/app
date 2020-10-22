@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- header
-  .row.full-width.justify-center.q-pt-sm.q-px-sm
+  //- .row.full-width.justify-center.q-pt-sm.q-px-sm
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       div(
         :style=`{
@@ -32,17 +32,22 @@ import feedItem from './feed_item.vue'
 
 export default {
   name: 'pageApp_feeds_feed',
-  props: ['feeds', 'subscriptions'],
+  props: ['feed', 'feeds', 'subscriptions'],
   components: {feedItem},
   data () {
     return {
-      feed: null,
+      // feed: null,
     }
   },
   computed: {
     feedSubscriptions () {
       if (this.feed) {
-        return this.feed.items
+        return this.feed.items.reduce((acc, val) => {
+          if (val.oid) {
+            acc.push(val.oid)
+          }
+          return acc
+        }, [])
       }
       else {
         return []
@@ -60,17 +65,17 @@ export default {
     }
   },
   watch: {
-    '$route.params.id': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route.params.id TO', to)
-        if (to) {
-          let feed = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
-          this.$log('feed', feed)
-          this.feed = feed
-        }
-      }
-    }
+    // '$route.params.id': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('$route.params.id TO', to)
+    //     if (to) {
+    //       let feed = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
+    //       this.$log('feed', feed)
+    //       this.feed = feed
+    //     }
+    //   }
+    // }
   }
 }
 </script>

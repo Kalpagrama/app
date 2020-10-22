@@ -100,6 +100,7 @@ export default {
           spheres: [],
         }
         bookmarkFound = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        // subscribe to oid...
         this.$log('bookmarkFound')
       }
       if (this.mode === 'pick') {
