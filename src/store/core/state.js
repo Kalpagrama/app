@@ -25,7 +25,7 @@ export default {
       LogSystemModulesEnum.VUEX_CORE,
       LogSystemModulesEnum.VUEX_DBG,
       // LogSystemModulesEnum.RXDB,
-      LogSystemModulesEnum.RXDB_REACTIVE,
+      // LogSystemModulesEnum.RXDB_REACTIVE,
       // LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
       // LogSystemModulesEnum.RXDB_OBJ,
