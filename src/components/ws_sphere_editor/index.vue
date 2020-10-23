@@ -39,7 +39,7 @@ div(
     :style=`{
       position: 'absolute', zIndex: 500,
     }`
-    ).row.fit.br
+    ).row.fit
   spheres(
     :spheres="item.spheres"
     :sphereAdd="sphereAdd"
