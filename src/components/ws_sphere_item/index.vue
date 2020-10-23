@@ -11,7 +11,7 @@ div(
       position: 'relative',
       borderRadius: '10px', overflow: 'hidden'
     }`
-  ).row.items-center.content-center.q-pr-sm
+  ).row.items-center.content-center
   slot(name="prepend")
   .col.sphere-item
     div(
@@ -21,8 +21,8 @@ div(
         borderRadius: '10px', overflow: 'hidden',
         height: '24px',
       }`
-      ).row.full-width.items-center.content-center.q-pa-sm.cursor-pointer
-      q-icon(name="blur_on" color="white" size="16px").q-mr-xs
+      ).row.full-width.items-center.content-center.q-pr-sm.cursor-pointer
+      q-icon(name="blur_on" color="white" size="20px").q-mx-xs
       span(:style=`{fontSize: '14px'}`).text-white {{ sphere.name }}
   slot(name="append")
 </template>

@@ -74,6 +74,16 @@
       masonry(
         :cols="$q.screen.width < 800 ? 2 : 4"
         :gutter="{default: 10}").full-width
+        //- div(
+          :style=`{
+            width: '100%',
+            height: '100px',
+          }`
+          ).row.full-width
+          //- blockquote(class="twitter-tweet" data-theme="dark").twitter-tweet
+            p(lang="en" dir="ltr") {{ 'What happens when you prioritize consistency over clarity.' }}
+              a(href="https://t.co/BfaPvSAJQW") {{'pic.twitter.com/BfaPvSAJQW  &mdash; JD Vogt 🇺🇸 (@jdvogt)'}}
+              a(href="https://twitter.com/jdvogt/status/1319065447346573313?ref_src=twsrc%5Etfw") {{ 'October 21, 2020' }}
         div(
           v-for="(item,ii) in feed.items"
           :style=`{

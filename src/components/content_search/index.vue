@@ -40,7 +40,7 @@
     //- q-btn(
       @click="feedCreatorOpened = true"
       round flat color="grey-4" icon="add")
-    content-uploader(@file="contentFile = $event, contentImporterShow = true").q-ml-xs
+    content-uploader(@file="contentFile = $event, contentImporterShow = true")
     q-btn(
       round flat color="grey-4" icon="tune")
 </template>

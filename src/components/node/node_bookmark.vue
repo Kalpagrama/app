@@ -5,16 +5,6 @@ q-btn(
   :color="nodeBookmark ? 'green' : 'grey-9'"
   :icon="nodeBookmark ? 'bookmark' : 'bookmark_outline'"
   :loading="loading")
-  //- q-menu(
-    ref="sphereSelectorMenu"
-    dark cover anchor="top right")
-    ws-sphere-finder(
-      v-if="nodeBookmark"
-      ref="wsSphereFinder"
-      :useSearch="true"
-      :selectedIds="nodeBookmark.spheres"
-      :hiddenIds="[]"
-      @sphere="sphereAdd")
 </template>
 
 <script>

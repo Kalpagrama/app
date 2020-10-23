@@ -1,84 +1,65 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(
+  :style=`{
+    position: 'relative',
+  }`
+  ).row.full-width.items-start.content-start
+  //- mobile dialog
   q-dialog(
-    :position="$q.screen.width < 800 ? 'bottom' : 'standard'"
-    :maximized="$q.screen.width < 800 ? true : false"
+    v-model="sphereDialogShow"
+    maximized
     transition-show="none"
     transition-hide="none"
-    v-model="sphereAddingDialog")
-    ws-sphere-finder(
-      :useSearch="true"
-      :selectedIds="item.spheres"
-      @sphere="sphereAdd"
-      @close="sphereAddingDialog = false"
+    )
+    sphere-autocomplete(
+      :searchString="searchString" :selected="item.spheres"
       :style=`{
-        height: $q.screen.height < 800 ? $q.screen.height+'px' : '600px',
-      }`).full-width.b-30
-  //- prepend default slot
-  slot
-  //- spheres list
-  ws-sphere-item(
-    v-for="(sphereId, sphereIdIndex) in item.spheres" :key="sphereId"
-    :id="sphereId"
-    @clicked="sphereEditing = sphereId"
-    ).q-mr-sm.q-mb-sm
-    template(v-slot:append)
-      q-btn(
-        v-if="sphereEditing === sphereId"
-        @click="sphereDelete(sphereId)"
-        round flat dense color="red" icon="delete_outline")
-  //- append
-  slot(name="append")
-  //- input row
-  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden',}`).row
-    //- :autofocus="$q.screen.width > 1200"
-    q-input(
-      v-if="sphereAdding"
-      v-model="sphereSearchString"
-      ref="sphereEditorInput"
-      autofocus
-      placeholder="Найти сферу"
-      filled dark dense color="grey-6"
-      @keyup.enter="$refs.wsSphereFinder.sphereCreate().then(sphereAdd)"
-      @focus="$refs.sphereEditorMenu.show()")
-      //- template(v-slot:append)
-        span.text-white {{sphereAdding}}
-    //- :target="$refs.sphereEditorInput"
-    q-menu(
-      ref="sphereEditorMenu"
-      dark fit anchor="bottom left" self="top left" no-focus)
-      ws-sphere-finder(
-        ref="wsSphereFinder"
-        :useSearch="false"
-        :searchString="sphereSearchString"
-        :selectedIds="item.spheres"
-        :hiddenIds="hiddenIds || []"
-        @sphere="sphereAdd"
-        :style=`{
-          width: '300px', height: '300px',
-        }`)
-  //- stop sphereAdding
-  q-btn(
-    v-if="sphereAdding"
-    @click="sphereAdding = false"
-    round flat color="grey-6" icon="clear"
-    :style=`{height: '40px',}`)
-  //- start sphereAdding
-  q-btn(
-    v-if="!sphereAdding"
-    @click="sphereAddingDialog = true"
-    flat color="grey-6" icon="add" no-caps dense
-    :style=`{height: '40px'}`) Добавить сферу
+        minWidth: $q.screen.width+'px', maxWidth: $q.screen.width+'px',
+        minHeight: $q.screen.height+'px', maxHeight: $q.screen.height+'px',
+      }`
+      @sphere="sphereAdd").b-30
+      template(v-slot:header)
+        .row.full-width.items-start.content-start
+          //- header
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-ml-md Добавить сферу
+            .col
+            q-btn(round flat color="white" icon="clear" @click="sphereDialogShow = false").q-mr-sm
+          .row.full-width.items-start.content-start.q-px-sm
+            spheres(
+              :spheres="item.spheres"
+              :sphereAdd="sphereAdd"
+              :sphereDelete="sphereDelete"
+              :sphereCreate="sphereCreate"
+              @searchString="searchString = $event")
+  //- tint-interceptor for mobile
+  div(
+    v-if="$q.screen.width < 800"
+    @click="sphereDialogShow = true"
+    :style=`{
+      position: 'absolute', zIndex: 500,
+    }`
+    ).row.fit.br
+  spheres(
+    :spheres="item.spheres"
+    :sphereAdd="sphereAdd"
+    :sphereDelete="sphereDelete"
+    :sphereCreate="sphereCreate"
+    @searchString="searchString = $event")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+import spheres from './spheres.vue'
+import sphereAutocomplete from './sphere_autocomplete.vue'
+
 export default {
   name: 'wsSphereEditor',
-  components: {},
+  components: {spheres, sphereAutocomplete},
   props: {
     item: {
       type: Object,
-      required: true
+      required: true,
     },
     hiddenIds: {
       type: Array,
@@ -89,30 +70,45 @@ export default {
   },
   data () {
     return {
-      sphereSearchString: '',
-      sphereAdding: false,
-      sphereAddingDialog: false,
-      sphereEditing: null,
+      searchString: '',
+      sphereDialogShow: false,
     }
   },
   methods: {
-    sphereDelete (sphereId) {
-      this.$log('sphereDelete')
-      this.item.spheres = this.item.spheres.filter(id => id !== sphereId)
-      this.sphereAdding = false
-      this.sphereEditing = null
-      this.sphereSearchString = ''
-    },
     sphereAdd (sphere) {
       this.$log('sphereAdd', sphere)
-      let sphereFind = this.item.spheres.find(id => id === sphere.id)
-      if (!sphereFind) {
+      let sphereFind = this.item.spheres.findIndex(i => i === sphere.id)
+      if (sphereFind >= 0) {
+        this.$log('*** sphere DUPLICATE ***', sphere.name)
+      }
+      else {
         this.item.spheres.push(sphere.id)
       }
-      this.sphereAdding = false
-      this.sphereEditing = null
-      this.sphereSearchString = ''
-      this.$refs.sphereEditorMenu.hide()
+    },
+    sphereDelete (id) {
+      this.$log('sphereDelete', id)
+      this.item.spheres = this.item.spheres.filter(i => i !== id)
+    },
+    async sphereCreate (name) {
+      this.$log('sphereCreate', name)
+      let [sphere] = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: name,
+        }
+      })
+      if (sphere) {
+        this.$log('*** sphere DUPLICATE ***', name)
+      }
+      else {
+        this.$log('sphere CREATE !', name)
+        let sphereInput = {
+          wsItemType: 'WS_SPHERE',
+          spheres: [],
+          name: name,
+        }
+        sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+      }
+      return sphere
     }
   }
 }
