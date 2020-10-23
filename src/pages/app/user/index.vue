@@ -8,11 +8,8 @@ q-layout(view="hHh Lpr lff")
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col
             span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
-          //- kalpa-follow(
-              v-if="user && user.oid && !itsMe"
-              :oid="user.oid")
           kalpa-bookmark(
-            v-if="user"
+            v-if="user && !itsMe"
             :oid="user.oid"
             type="USER"
             :name="user.name"

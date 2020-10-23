@@ -5,7 +5,7 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px', minHeight: '100vh'}`)
       v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-        q-infinite-scroll(ref="qis" @load="next" :offset="500")
+        q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
           node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>

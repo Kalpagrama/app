@@ -172,6 +172,8 @@ export default {
           // this.$log('viewId', viewId)
           // if (viewId) this.viewId = viewId
         }
+        let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        if (bookmark) this.contentBookmark = bookmark
       }
     }
   },

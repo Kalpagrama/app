@@ -1,8 +1,8 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-px-sm
+    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-xs.b-40
           q-icon(name="whatshot" color="white" size="30px").q-mx-sm
@@ -25,7 +25,7 @@ q-layout(view="hHh Lpr lff")
             v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
             @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-              q-infinite-scroll(ref="qis" @load="next" :offset="500")
+              q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
               template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
                 node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
       q-page-sticky(

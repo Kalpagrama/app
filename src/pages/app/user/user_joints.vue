@@ -5,7 +5,7 @@ q-page(:style=`{paddingTop: '8px', paddingBottom: '200px'}`).row.full-width.just
       v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-        q-infinite-scroll(ref="qis" @load="next" :offset="500")
+        q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
           joint-feed(:joint="item" :isActive="isActive" :isVisible="isVisible")
 </template>

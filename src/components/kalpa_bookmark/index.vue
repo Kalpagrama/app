@@ -61,7 +61,7 @@ export default {
             oid: this.oid,
             type: this.type,
             name: this.name,
-            thumbUrl: this.node.thumbUrl,
+            thumbUrl: this.thumbUrl,
             wsItemType: 'WS_BOOKMARK',
             spheres: []
           }

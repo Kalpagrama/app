@@ -27,7 +27,7 @@
     @items="items = $event"
     @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
-      q-infinite-scroll(@load="next" :offset="250")
+      q-infinite-scroll(@load="next" :offset="$q.screen.height")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         .row.full-width
           item(

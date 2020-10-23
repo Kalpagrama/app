@@ -21,7 +21,7 @@
         :immediate="true"
         :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
         list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-          q-infinite-scroll(@load="next" :offset="250")
+          q-infinite-scroll(@load="next" :offset="$q.screen.height")
           template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
             feed-item(:item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>

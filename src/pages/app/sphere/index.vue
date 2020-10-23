@@ -38,7 +38,7 @@ q-layout(view="hHh Lpr lff")
             v-if="sphere" :query="query" :limit="15" v-slot=`{items, next}`
             @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-              q-infinite-scroll(ref="qis" @load="next" :offset="500")
+              q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
               template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
                 node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>

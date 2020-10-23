@@ -22,10 +22,12 @@ q-page(
             }`).q-px-sm
             span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
       //- spheres
-      .row.full-width.q-py-sm
+      div(
+        v-if="contentBookmark"
+        ).row.full-width.q-py-sm
         .row.full-width.q-py-md
           span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
-        ws-sphere-editor(v-if="contentBookmark" :item="contentBookmark")
+        ws-sphere-editor(:item="contentBookmark")
 </template>
 
 <script>

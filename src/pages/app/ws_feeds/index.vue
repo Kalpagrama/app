@@ -55,7 +55,9 @@
             color="green" no-caps
             )
             span.text-bold.text-white Создать "{{ searchString }}"
-        //- items...
+        feed-all(
+          :maxWidth="maxWidth")
+        //- feeds...
         div(
           v-for="(feed,ii) in items" :key="feed.id"
           :style=`{
@@ -117,15 +119,21 @@
                   }`).row.full-width.items-center.content-center.q-px-sm
                   span.text-bold.text-white {{ feed.name }}
                   .row.full-width
-                    small.text-grey-6 {{ feed.items.length }} внутри
+                    small(
+                      :style=`{
+                        opacity: feed.items.length > 0 ? 1 : 0,
+                      }`
+                      ).text-grey-6 {{ feed.items.length }} внутри
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import feedAll from './feed_all.vue'
 
 export default {
   name: 'pageApp_wsFeeds',
   components: {
+    feedAll,
     feedCreator: () => import('./feed_creator.vue')
   },
   data () {
