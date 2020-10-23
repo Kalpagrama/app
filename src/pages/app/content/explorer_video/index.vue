@@ -15,23 +15,13 @@ div(
           q-icon(name="select_all" color="white" size="30px").q-mr-sm
           div(:style=`{overflowX: 'auto'}`).col.q-mr-md
             span(:style=`{fontSize: '1rem', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-            //- span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Контент
-          //- q-btn(
-            @click="viewId = 'details'"
-            round flat color="white" icon="info")
-          kalpa-follow(
+          kalpa-bookmark(
             v-if="contentKalpa"
-            :oid="contentKalpa.oid")
-          q-btn(
-            @click="contentBookmarkCreate()"
-            round flat
-            :color="contentBookmark ? 'green' : 'white'"
-            :icon="contentBookmark ? 'bookmark' : 'bookmark_outline'")
-      //- div(:style=`{paddingLeft: '16px', paddingRight: '16px',}`).row.full-width.justify-start
-        q-tabs(
-          v-model="viewId"
-          no-caps dense active-color="green" switch-indicator).full-width.text-grey-8
-          q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+            :oid="contentKalpa.oid"
+            type="CONTENT"
+            :name="contentKalpa.name"
+            :thumbUrl="contentKalpa.thumbUrl"
+            :isActive="true")
   div(
     :style=`{
       ...playerStyles(),
@@ -182,34 +172,10 @@ export default {
           // this.$log('viewId', viewId)
           // if (viewId) this.viewId = viewId
         }
-        // find bookmark
-        // let contentBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.contentKalpa.oid)
-        let [contentBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
-        this.$log('contentBookmark', contentBookmark)
-        if (contentBookmark) this.contentBookmark = contentBookmark
       }
     }
   },
   methods: {
-    async contentBookmarkCreate () {
-      this.$log('contentBookmarkCreate')
-      // let contentBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.contentKalpa.oid)
-      let [contentBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
-      if (!contentBookmark) {
-        let contentBookmarkInput = {
-          oid: this.contentKalpa.oid,
-          name: this.contentKalpa.name,
-          thumbUrl: this.contentKalpa.thumbUrl,
-          type: 'CONTENT',
-          contentType: this.contentKalpa.type,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: []
-        }
-        contentBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, contentBookmarkInput)
-      }
-      this.$log('contentBookmark', contentBookmark)
-      this.contentBookmark = contentBookmark
-    },
     async nodeCreate () {
       this.$log('nodeCreate')
       this.player.fullscreenToggle(false)

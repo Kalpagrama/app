@@ -3,11 +3,12 @@ div.row
   q-btn(
     v-if="subscribed === false"
     @click="follow()"
-    round flat color="white" no-caps icon="rss_feed"
+    round flat color="white" no-caps
     :loading="loading")
+    q-icon(name="bookmark_outline" size="30px")
   q-btn(
     v-if="subscribed === true"
-    round flat color="green" no-caps icon="rss_feed"
+    round flat color="green" no-caps icon="bookmark"
     :loading="loading")
     q-menu(
       ref="userUnfollowMenu"

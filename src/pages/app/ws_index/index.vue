@@ -19,17 +19,18 @@ q-layout(view="hHh Lpr lff")
             .col
               span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
             //- q-btn(round flat color="grey-6" icon="more_vert")
-          .row.full-width.q-px-sm.q-pt-sm
-            router-link(
+          .row.full-width.q-pt-xs
+            q-btn(
               :to="p.path"
               v-for="p in pages" :key="p.id"
-              :class=`{
-                'text-grey-8': $route.name !== p.id,
-                'text-green': $route.name === p.id,
-              }`
-              :style=`{
-                fontSize: '1.1rem'
-              }`).text-bold.q-mr-md {{ p.name }}
+              flat no-caps
+              :color="$route.name === p.id ? 'green' : 'grey-7'")
+              q-icon(:name="p.icon" size="22px").q-mr-xs
+              span(
+                :style=`{
+                  fontSize: '16px'
+                }`
+                ).text-bold {{ p.name }}
       router-view
 </template>
 
@@ -42,10 +43,11 @@ export default {
     },
     pages () {
       return [
-        {id: 'workspace.contents', path: '/workspace/contents/video', name: this.$t('pageWs_content', 'Контент')},
-        {id: 'workspace.nodes', path: '/workspace/nodes/drafts', name: this.$t('pageWs_nodes', 'Ядра')},
-        {id: 'workspace.joints', path: '/workspace/joints', name: this.$t('pageWs_joints', 'Связи')},
-        {id: 'workspace.spheres', path: '/workspace/spheres', name: this.$t('pageWs_spheres', 'Сферы')},
+        {id: 'workspace.feeds', path: '/workspace/feeds', name: 'Коллекции', icon: 'view_week'},
+        {id: 'workspace.contents', path: '/workspace/contents/video', name: this.$t('pageWs_content', 'Контент'), icon: 'select_all'},
+        {id: 'workspace.nodes', path: '/workspace/nodes/drafts', name: this.$t('pageWs_nodes', 'Ядра'), icon: 'filter_tilt_shift'},
+        {id: 'workspace.joints', path: '/workspace/joints', name: this.$t('pageWs_joints', 'Связи'), icon: 'link'},
+        {id: 'workspace.spheres', path: '/workspace/spheres', name: this.$t('pageWs_spheres', 'Сферы'), icon: 'blur_on'},
       ]
     },
   }

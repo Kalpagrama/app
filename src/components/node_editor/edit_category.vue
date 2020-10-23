@@ -6,12 +6,24 @@ div(:style=`{position: 'relative'}`).row.full-width
     icon-right="keyboard_arrow_down"
     :style=`{position: 'relative', height: '40px'}`
     ).full-width.q-px-sm.b-50 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
-    q-menu(fit dark)
+    q-popup-proxy(
+      fit dark
+      position="bottom")
       div(
         :style=`{
-          maxWidth: width+'px',
+          maxWidth: $q.screen.width < 800 ? $q.screen.width+'px' : width+'px',
           borderRadius: '10px',overflow: 'hidden',}`
-        ).row.full-width.items-start.content-start.b-50
+        ).row.full-width.items-start.content-start.b-40
+        //- header
+        div(
+          v-if="$q.screen.width < 800"
+          :style=`{
+            height: '60px',
+          }`
+          ).row.full-width.items-center
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите категорию
+          .col
+          q-btn(round flat color="white" icon="clear" @click="$emit('close')").q-mr-sm
         q-btn(
           v-for="n in categories" :key="n.value" v-close-popup
           @click="node.category = n.value"

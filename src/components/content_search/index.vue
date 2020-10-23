@@ -1,9 +1,5 @@
 <template lang="pug">
-div(
-  :style=`{
-    borderRadius: '10px', overflow: 'hidden'
-  }`
-  ).row.full-width.b-40
+.row.full-width.justify-start.q-px-sm
   q-dialog(
     v-model="contentImporterShow"
     :maximized="$q.screen.width < 800"
@@ -13,30 +9,40 @@ div(
       :contentFile="contentFile"
       @contentKalpa="$emit('contentKalpa', $event), contentImporterShow = false"
       @close="contentImporterShow = false")
-  div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).col
-    q-input(
-      v-model="searchStringRaw"
-      ref="searchStringInput"
-      borderless dense dark color="white"
-      :placeholder="$t('Enter URL or search', 'Введите URL или поиск')"
-      :loading="searchStringLoading"
-      @focus="searchStringFocused"
-      @blur="searchStringBlurred"
-      :input-style=`{
-        paddingLeft: '10px',
-      }`
-      :style=`{
-        margin: 0,
-      }`
-      ).full-width
-      template(v-slot:append)
-        q-btn(
-          v-if="searchStringRaw.length > 0"
-          @click="searchStringRaw = ''"
-          flat dense color="white" icon="clear")
-        //- q-btn(
-          flat dense color="white" icon="tune")
-  content-uploader(@file="contentFile = $event, contentImporterShow = true").q-ml-xs
+  div(:style=`{maxWidth: '700px',}`).row.full-width
+    .col
+      div(
+        :style=`{
+          background: 'rgb(35,35,35)',
+          borderRadius: '10px', overflow: 'hidden',
+        }`
+        ).row.fit
+        q-input(
+          v-model="searchStringRaw"
+          ref="searchStringInput"
+          borderless dense dark color="green"
+          :placeholder="$t('Enter URL or search', 'Введите URL или поиск')"
+          :loading="searchStringLoading"
+          @focus="searchStringFocused"
+          @blur="searchStringBlurred"
+          :input-style=`{
+            paddingLeft: '10px',
+          }`
+          :style=`{
+            margin: 0,
+          }`
+          ).full-width
+          template(v-slot:append)
+            q-btn(
+              v-if="searchStringRaw.length > 0"
+              @click="searchStringRaw = ''"
+              flat dense color="white" icon="clear")
+    //- q-btn(
+      @click="feedCreatorOpened = true"
+      round flat color="grey-4" icon="add")
+    content-uploader(@file="contentFile = $event, contentImporterShow = true")
+    q-btn(
+      round flat color="grey-4" icon="tune")
 </template>
 
 <script>

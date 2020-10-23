@@ -7,7 +7,7 @@
 
 <template lang="pug">
 .row.full-width.items-start.content-start
-  .row.full-width.justify-center.b-30
+  //- .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         .row.full-width.q-px-sm
           div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
@@ -32,6 +32,32 @@
               @click="sphereAdd()"
               round flat dense color="green" icon="add"
               :style=`{width: '40px',}`)
+  .row.full-width.justify-center.b-30
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      .row.full-width.justify-start.q-px-sm
+        div(:style=`{maxWidth: '700px',}`).row.full-width
+          .col
+            div(
+              :style=`{
+                background: 'rgb(35,35,35)',
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).row.fit
+              q-input(
+                v-model="searchString"
+                borderless dense dark color="green"
+                placeholder="Поиск"
+                :input-style=`{
+                  paddingLeft: '10px',
+                }`
+                ).full-width
+                template(v-slot:append)
+                  q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
+          q-btn(
+            @click="sphereAdd()"
+            round flat color="grey-4" icon="add")
+          q-btn(
+            round flat color="grey-4" icon="tune")
   .row.full-width.items-start.content-start
     div(:style=`{paddingTop: '16px', paddingBottom: '200px',}`).row.full-width.justify-center
       div(

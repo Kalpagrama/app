@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.items-start.q-px-sm
+    .row.full-width.items-start
       content-search(
         @contentKalpa="contentKalpaFound"
         @searchString="searchString = $event"
@@ -46,6 +46,7 @@ export default {
       return [
         {id: 'video', name: this.$t('Video', 'Видео')},
         {id: 'image', name: this.$t('Images', 'Картинки')},
+        {id: 'post', name: this.$t('Post', 'Статьи')},
         {id: 'audio', name: this.$t('Audio', 'Аудио')},
         {id: 'books', name: this.$t('Books', 'Книги')},
       ]
@@ -99,6 +100,7 @@ export default {
           spheres: [],
         }
         bookmarkFound = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        // subscribe to oid...
         this.$log('bookmarkFound')
       }
       if (this.mode === 'pick') {

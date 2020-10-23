@@ -14,8 +14,13 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="blur_on" color="white" size="30px").q-mx-sm
           .col
             span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
-            //- .col
-          kalpa-follow(:oid="$route.params.oid")
+          kalpa-bookmark(
+            v-if="sphere"
+            :oid="sphere.oid"
+            type="SPHERE"
+            :name="sphere.name"
+            :thumbUrl="''"
+            :isActive="true")
   q-page-container
     q-page(
       :style=`{
@@ -34,8 +39,8 @@ q-layout(view="hHh Lpr lff")
             @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
               q-infinite-scroll(ref="qis" @load="next" :offset="500")
-              template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
+              template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>
 
 <script>

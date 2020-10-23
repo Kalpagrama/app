@@ -50,7 +50,7 @@
       //- NODE
       node-feed(
         v-else-if="item.object.type === 'NODE'"
-        :node="item.object" :isActive="isActive" :isVisible="isVisible"
+        :node="item.object" :isActive="isActive" :isVisible="isVisible" :width="width"
         :marginBottom="0")
       //- WORD
       div(
@@ -162,7 +162,7 @@
 <script>
 export default {
   name: 'feedItem',
-  props: ['item', 'isActive', 'isVisible'],
+  props: ['item', 'isActive', 'isVisible', 'width'],
   components: {
     insertEmoji: () => import('components/kalpa_icons/insert_emoji.vue')
   },

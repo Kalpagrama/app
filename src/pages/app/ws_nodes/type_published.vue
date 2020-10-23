@@ -75,8 +75,7 @@ export default {
       this.$log('nodeUnpublish', node)
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
       await ObjectsApi.unPublish(node.oid)
-      // await node.updateExtended('stage', 'draft', false) // без debounce
-      // await node.updateExtended('oid', node.oid, false) // без debounce
+      await this.nodeEdit(node)
       this.$log('nodeUnPublish complete')
     },
     async getSpheres (spheres) {

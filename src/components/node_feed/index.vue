@@ -29,6 +29,7 @@ div(
         :style=`{
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden',
+          minHeight: height ? height+'px' : 'auto',
         }`
         ).row.full-width.items-start.content-start
         composition-player(
@@ -67,13 +68,24 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  props: ['node', 'isActive', 'isVisible'],
+  props: ['node', 'isActive', 'isVisible', 'width'],
   data () {
     return {
       showMore: false,
     }
   },
   computed: {
+    height () {
+      if (this.width) {
+        if (this.node.items[0].thumbHeight && this.node.items[0].thumbWidth) {
+          return (this.node.items[0].thumbHeight * this.width) / this.node.items[0].thumbWidth
+        }
+        else {
+          return null
+        }
+      }
+      else return null
+    }
   },
   methods: {
   }

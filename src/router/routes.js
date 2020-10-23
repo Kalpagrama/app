@@ -39,15 +39,21 @@ const routes = [
       path: '/',
       component: () => import('layouts/main_layout'),
       children: [
+         // {
+         //    path: 'feeds',
+         //    component: () => import('pages/app/feeds/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' },
+         //    children: [
+         //       { path: '', name: 'feeds', component: () => import('pages/app/feeds/feeds.vue') },
+         //       { path: 'edit/:id?', name: 'feeds.edit', component: () => import('pages/app/feeds/feed_edit.vue') },
+         //       { path: ':id', name: 'feeds.feed', component: () => import('pages/app/feeds/feed.vue') }
+         //    ]
+         // },
          {
-            path: 'feeds',
-            component: () => import('pages/app/feeds/index.vue'),
-            meta: { roleMinimal: 'MEMBER' },
-            children: [
-               { path: '', name: 'feeds', component: () => import('pages/app/feeds/feeds.vue') },
-               { path: 'edit/:id?', name: 'feeds.edit', component: () => import('pages/app/feeds/feed_edit.vue') },
-               { path: ':id', name: 'feeds.feed', component: () => import('pages/app/feeds/feed.vue') }
-            ]
+            name: 'feeds',
+            path: 'feeds/:id?',
+            component: () => import('pages/app/feeds/feeds.vue'),
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'welcome',
@@ -206,6 +212,16 @@ const routes = [
                   // redirect: 'nodes/drafts',
                   // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
                   component: () => import('pages/app/ws_joints/index.vue'),
+               },
+               {
+                  name: 'workspace.feeds',
+                  path: 'feeds',
+                  component: () => import('pages/app/ws_feeds/index.vue')
+               },
+               {
+                  name: 'workspace.feed',
+                  path: 'feed/:id',
+                  component: () => import('pages/app/ws_feed/index.vue')
                },
                {
                   name: 'workspace.joint',

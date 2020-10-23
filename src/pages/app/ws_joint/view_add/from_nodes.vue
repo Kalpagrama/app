@@ -1,6 +1,7 @@
 <template lang="pug">
 ws-nodes(
   :mode="'pick'"
+  type="published"
   :query="{}")
   template(v-slot:tint=`{item, itemKey}`)
     slot(name="tint" :item="item" :itemKey="itemKey")

@@ -5,42 +5,22 @@ q-btn(
   :color="nodeBookmark ? 'green' : 'grey-9'"
   :icon="nodeBookmark ? 'bookmark' : 'bookmark_outline'"
   :loading="loading")
-  //- q-menu(
-    ref="sphereSelectorMenu"
-    dark cover anchor="top right")
-    ws-sphere-finder(
-      v-if="nodeBookmark"
-      ref="wsSphereFinder"
-      :useSearch="true"
-      :selectedIds="nodeBookmark.spheres"
-      :hiddenIds="[]"
-      @sphere="sphereAdd")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import wsSphereFinder from 'components/ws_sphere_finder/index.vue'
+import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'nodeLite__nodeBookmark',
-  components: {wsSphereFinder},
+  name: 'nodeBookmark',
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
       loading: false,
       nodeBookmark: null,
-      searchString: '',
     }
   },
   computed: {
-    spheresQuery () {
-      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE}}
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
-      }
-      return res
-    }
   },
   watch: {
     isActive: {
@@ -48,14 +28,8 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          // let nodeBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.node.oid)
           let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid}})
           if (nodeBookmark) this.nodeBookmark = nodeBookmark
-        }
-        else {
-          this.loading = false
-          this.spheresAdding = false
-          if (this.$refs.sphereSelectorMenu) this.$refs.sphereSelectorMenu.hide()
         }
       }
     }
@@ -64,7 +38,6 @@ export default {
     async start () {
       this.$log('start')
       this.loading = true
-      // let nodeBookmark = await this.$rxdb.get(RxCollectionEnum.WS_BOOKMARK, this.node.oid)
       let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.node.oid}})
       if (!nodeBookmark) {
         let nodeBookmarkInput = {
@@ -76,24 +49,13 @@ export default {
           spheres: []
         }
         nodeBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, nodeBookmarkInput)
+        // TODO: subscribe to node...
+        await UserApi.subscribe(this.node.oid)
       }
       this.$log('nodeBookmark', nodeBookmark)
       this.nodeBookmark = nodeBookmark
-      this.spheresAdding = true
       this.loading = false
-      this.$emit('done')
-    },
-    sphereAdd (sphere) {
-      this.$log('sphereAdd', sphere)
-      let sphereFind = this.nodeBookmark.spheres.find(id => id === sphere.id)
-      if (sphereFind) {
-        this.nodeBookmark.spheres = this.nodeBookmark.spheres.filter(id => id !== sphere.id)
-      }
-      else {
-        this.nodeBookmark.spheres.push(sphere.id)
-      }
-      this.$refs.sphereSelectorMenu.hide()
-    },
+    }
   },
 }
 </script>

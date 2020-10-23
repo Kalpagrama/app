@@ -5,7 +5,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
         v-for="(i,ii) in 16" :key="ii"
         :style=`{
         }`
-        ).col-4.q-px-xs.q-mb-sm
+        ).col-xs-6.col-md-2.q-px-xs.q-mb-sm
         div(
           :style=`{
             position: 'relative', zIndex: 100,
@@ -13,7 +13,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px'}`).row.full-width.jus
             borderRadius: '10px', overflow: 'hidden',
           }`
           ).row.b-40.q-pa-md
-          div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50.q-mt-xl
+          div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50.q-mt-lg
           .row.full-width.q-pa-md
             div(:style=`{height: '10px', borderRadius: '5px',}`).row.full-width.b-50
 </template>

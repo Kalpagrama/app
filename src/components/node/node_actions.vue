@@ -7,54 +7,34 @@
       @close="showStats = false")
   //- actions wrapper
   div(:style=`{maxWidth: '700px'}`).row.full-width.items-center.content-center.q-mb-xs
-    //- share
-    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
     node-share(:node="node").shaking
-    //- div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-        small.text-grey-8 {{ node.countShares > 100 ? '99+' : node.countShares }}
-    //- remake
     node-remake(:node="node").shaking
-    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-        small.text-grey-8 {{ node.countRemakes > 100 ? '99+' : node.countRemakes }}
-    //- bookmark
-    node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
-    //- div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-        small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countBookmarks }}
-    //- joint
-    div(:style=`{position: 'relative',}`).row.full-height.justify-center
-      q-btn(
-        @click="$router.push('/workspace/joint/new?oid='+node.oid)"
-        round flat color="green").shaking
-        q-icon(name="link" size="30px" color="grey-9")
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-        small.text-grey-8 {{ node.countJoints > 100 ? '99+' : node.countJoints }}
+    kalpa-bookmark(:oid="node.oid" type="NODE" :name="node.name" :thumbUrl="node.items[0].thumbUrl" :isActive="isActive").shaking
+    node-connect(:node="node" :isActive="isActive" :isVisible="isVisible")
     //- vote
     .col
+      .row.fit.items-center.content-center.justify-end
+        q-btn(
+          @click="showStats = true"
+          flat dense no-caps color="grey-2")
+          span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
     div(:style=`{width: '60px'}`).row.justify-center
       node-vote(:node="node")
-      //- div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start.justify-end
-        //- q-btn(
-          @click="showStats = true"
-          flat dense no-caps color="grey-2").q-mt-sm
-          span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
-        .row.full-height.justify-center
-          node-vote(:node="node")
-          //- div(:style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-            small.text-grey-8 {{ node.countBookmarks > 100 ? '99+' : node.countVotes }}
 </template>
 
 <script>
+import nodeRemake from 'components/node/node_remake.vue'
+import nodeBookmark from 'components/node/node_bookmark.vue'
+import nodeShare from 'components/node/node_share.vue'
+import nodeStats from 'components/node/node_stats/index.vue'
+import nodeConnect from 'components/node/node_connect.vue'
+import nodeVote from 'components/node/node_vote.vue'
+
 export default {
   name: 'nodeActions',
   props: ['node', 'isActive', 'isVisible'],
   components: {
-    nodeRemake: () => import('components/node/node_remake.vue'),
-    nodeBookmark: () => import('components/node/node_bookmark.vue'),
-    nodeShare: () => import('components/node/node_share.vue'),
-    nodeStats: () => import('components/node/node_stats/index.vue'),
-    nodeVote: () => import('components/node/node_vote.vue')
+    nodeRemake, nodeBookmark, nodeShare, nodeStats, nodeVote, nodeConnect,
   },
   data () {
     return {

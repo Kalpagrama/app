@@ -54,7 +54,7 @@ export default {
       // await this.$rxdb.remove(this.node.id)
       await this.sphere.updateExtended('deletedAt', Date.now(), false)
       this.$router.back()
-    },
+    }
   }
 }
 </script>

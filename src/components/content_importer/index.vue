@@ -5,30 +5,34 @@ div(:style=`{borderRadius: '10px',}`).row.full-width.items-start.content-start.b
     v-if="contentKalpa && contentKalpa.type === 'VIDEO' && contentKalpa.contentSource === 'YOUTUBE'"
     ).row.full-width.items-start.content-start
     //- header
-    div().row.full-width.items-center.content-center.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Add video to workspace
+    div().row.full-width.items-center.content-center.q-py-sm.q-px-md
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Добавить видео
+      .col
+      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
     //- body
     img(
       :src="contentKalpa.thumbUrl" draggable="false"
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
-        minHeight: '300px',
+        //- minHeight: '300px',
       }`
       ).full-width.b-40
     //- footer edit youtube video name?
-    .row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="fab fa-youtube" color="white" size="40px").q-mr-sm
-      span.text-bold.text-white {{ contentKalpa.name }}
+    .row.full-width.items-center.content-center.q-py-sm
+      //- .row.full-height.items-start.content-start.q-px-sm
+        q-icon(name="fab fa-youtube" color="white" size="40px")
+      .col.q-pa-md
+        span.text-bold.text-white {{ contentKalpa.name }}
     //- footer: actions
-    .row.full-width.q-pa-sm
-      q-checkbox(v-model="allowAutoUpload_youtube" dark filled color="green").text-white Autoupload from YouTube
+    .row.full-width.q-pa-sm.q-mt-md
+      //- q-checkbox(v-model="allowAutoUpload_youtube" dark filled color="green").text-white Autoupload from YouTube
       .col
       q-btn(
         @click="$emit('contentKalpa', contentKalpa)"
         color="green" no-caps
         :loading="loading"
-        ).q-px-md Add
+        ).q-px-md
+        span.text-bold.text-white Добавить
   //- image from url?
   div(
     v-if="contentKalpa && contentKalpa.type === 'IMAGE' && contentKalpa.contentSource === 'KALPA'"

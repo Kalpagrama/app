@@ -11,7 +11,13 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="link" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ title }}
-          kalpa-follow(v-if="joint" :oid="$route.params.oid")
+          kalpa-bookmark(
+            v-if="joint"
+            :oid="joint.oid"
+            type="JOINT"
+            :name="joint.name"
+            :thumbUrl="joint.thumbUrl"
+            :isActive="true")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width

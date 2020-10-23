@@ -1,8 +1,8 @@
 <style lang="sass" scoped>
-.sphere-item
-  cursor: pointer
-  &:hover
-    background: rgb(60,60,60)
+// .sphere-item
+//   cursor: pointer
+//   &:hover
+//     background: rgb(60,60,60)
 </style>
 
 <template lang="pug">
@@ -11,7 +11,7 @@ div(
       position: 'relative',
       borderRadius: '10px', overflow: 'hidden'
     }`
-  ).row.b-40
+  ).row.items-center.content-center
   slot(name="prepend")
   .col.sphere-item
     div(
@@ -19,11 +19,11 @@ div(
       @click="$emit('clicked', sphere)"
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
-        height: '40px',
+        height: '24px',
       }`
-      ).row.full-widthitems-center.content-center.q-pa-sm.cursor-pointer
-      q-icon(name="blur_on" color="white" size="20px").q-mr-xs
-      span.text-white {{ sphere.name }}
+      ).row.full-width.items-center.content-center.q-pr-sm.cursor-pointer
+      q-icon(name="blur_on" color="white" size="20px").q-mx-xs
+      span(:style=`{fontSize: '14px'}`).text-white {{ sphere.name }}
   slot(name="append")
 </template>
 

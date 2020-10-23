@@ -43,7 +43,7 @@
       :style=`{
         maxWidth: '800px', zIndex: 100,
         borderRadius: '10px', overflow: 'hidden'
-      }`).row.full-width.q-pa-sm.b-40
+      }`).row.full-width.b-40
       div(
         :style=`{
           position: 'relative',
@@ -129,12 +129,11 @@
 export default {
   name: 'nodeEditor',
   components: {
-    editName: () => import('./edit-name.vue'),
-    editDescription: () => import('./edit-description.vue'),
-    editItem: () => import('./edit-item/index.vue'),
-    viewAdd: () => import('./view-add/index.vue'),
-    viewSpheres: () => import('./view-spheres.vue'),
-    viewPublish: () => import('./view-publish.vue')
+    editName: () => import('./edit_name.vue'),
+    editDescription: () => import('./edit_description.vue'),
+    editItem: () => import('./edit_item/index.vue'),
+    viewAdd: () => import('./view_add/index.vue'),
+    viewPublish: () => import('./view_publish/index.vue')
   },
   props: {
     node: {type: Object}

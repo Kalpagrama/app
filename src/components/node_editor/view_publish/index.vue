@@ -28,7 +28,7 @@
       q-btn(
         @click="publish()"
         color="green" size="xl" no-caps
-        push align="center"
+        align="center"
         :loading="publishing"
         :style=`{maxWidth: '100%'}`
         ).full-width
@@ -48,8 +48,8 @@ export default {
   name: 'viewPublish',
   props: ['node'],
   components: {
-    editDescription: () => import('./edit-description.vue'),
-    editCategory: () => import('./edit-category.vue')
+    editDescription: () => import('../edit_description.vue'),
+    editCategory: () => import('../edit_category.vue')
   },
   data () {
     return {
