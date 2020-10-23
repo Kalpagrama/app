@@ -104,6 +104,7 @@ class Event {
                logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
                this.notifyUserActionComplete(event.type, event.object)
             }
+            await this.objects.processEvent(event) // обновить  статистику на ядре
             await this.lists.processEvent(event) // поместить объект во все ленты
             break
          case 'OBJECT_DELETED':
@@ -116,7 +117,7 @@ class Event {
             if (event.subject.oid === rxdb.getCurrentUser().oid) {
                this.notifyUserActionComplete(event.type, event.object)
             }
-            await this.objects.processEvent(event) // обновить ядро
+            await this.objects.processEvent(event) // обновить ядро + статистику голосования на ядре
             await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
             break
          case 'USER_SUBSCRIBED':

@@ -475,7 +475,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       // logD(f, 'start', mangoQuery)
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-      assert(!mangoQuery.pageToken && !mangoQuery.limit)
+      assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
          assert(this.initialized, '! this.initialized !')
          await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)

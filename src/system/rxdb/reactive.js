@@ -40,11 +40,11 @@ function mergeReactiveItem (reactiveItem, change) {
 let id = 0
 // все измененеия - только через эту ф-ю. Иначе - возможны гонки (из-за debounce)
 // либо - менять непосредственно reactiveItem (либо через updateExtended)
-async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
+async function updateRxDoc (rxDocOrId, path, valueOrFunc, debouncedSave = true) {
    const f = updateRxDoc
    logD(f, 'start')
    const t1 = performance.now()
-   // logD(f, 'start2', rxDocOrId, path, value)
+   // logD(f, 'start2', rxDocOrId, path, valueOrFunc)
    assert(rxDocOrId && path, '!(rxDocOrId && path)')
    if (!rxDocOrId) return
    let rxDoc
@@ -57,8 +57,13 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
    if (rxDoc) {
       let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
       try {
+         let value
+         if (typeof valueOrFunc === 'function'){
+            value = valueOrFunc(rxDoc)
+            assert(value)
+         } else value = valueOrFunc
          reactiveItemHolder.setDebouncedSave(debouncedSave)
-         // logD(f, 'start2', reactiveItemHolder.reactiveItem, path, value)
+         // logD(f, 'start2', reactiveItemHolder.reactiveItem, path, valueOrFunc)
          assert(reactiveItemHolder.reactiveItem, '!reactiveItemHolder.reactiveItem')
          if (!lodashHas(reactiveItemHolder.reactiveItem, path)) {
             let rootPath = path.split('.')[0]

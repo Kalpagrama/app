@@ -256,7 +256,7 @@ class NodeApi {
       if (joint.leftItem.node) joint.leftItem.node = NodeApi.makeNodeInput(joint.leftItem.node)
       if (joint.rightItem.node) joint.rightItem.node = NodeApi.makeNodeInput(joint.rightItem.node)
       return {
-         swap: joint.swap,
+         swap: joint.swap || false,
          jointType: joint.jointType,
          leftItem: joint.leftItem,
          rightItem: joint.rightItem,
