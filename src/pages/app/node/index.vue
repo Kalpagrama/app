@@ -6,39 +6,6 @@
 
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- position="bottom"
-  q-dialog(
-    v-model="nodeConnectOpened"
-    transition-show="none"
-    transition-hide="none"
-    @before-show="nodeActive = false, $store.commit('ui/stateSet', ['showMobileNavigation', false])"
-    @before-hide="nodeActive = true, $store.commit('ui/stateSet', ['showMobileNavigation', true])")
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
-        minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
-        borderRadius: '10px',
-      }`
-      ).row.full-width.items-start.content-start.b-30
-      kalpa-connect(
-        v-if="node"
-        :oid="node.oid"
-        @close="nodeConnectOpened = false")
-        div(
-          :style=`{
-            borderRadius: '10px'
-          }`
-          ).row.full-width.b-40
-          img(
-            draggable="false"
-            :src="node.thumbUrl"
-            :style=`{
-              height: '80px',
-              borderRadius: '10px', overflow: 'hidden',
-            }`)
-          .col
-            .row.fit.items-start.content-start.q-pa-md
-              span.text-white.text-bold {{ node.name }}
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -51,7 +18,7 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
-          kalpa-follow(v-if="node" :oid="$route.params.oid")
+          //- kalpa-follow(v-if="node" :oid="$route.params.oid")
   q-page-container
     q-page(:style=`{paddingTop: '8px', paddingBottom: '0px'}`)
       .row.full-width.items-start.content-start.justify-center
@@ -120,17 +87,18 @@ q-layout(view="hHh Lpr lff")
             :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
         .row.full-width.justify-center
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-            router-view(v-if="node" :node="node" @nodesLoaded="nodesLoaded = true")
+            router-view(v-if="node" :node="node")
       q-page-sticky(
         v-if="node"
         position="bottom right" :offset="[0, 70]"
         :style=`{zIndex: 5555}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          q-btn(
-            v-if="true"
-            @click="nodeConnectOpened = true"
-            no-caps color="green" icon="link" size="md")
-            span.text-white.text-bold.q-ml-sm {{ $t('Connect node', 'Связать ядро') }}
+          node-connect(:node="node" :isActive="isActive" :isVisible="isVisible")
+            template(v-slot:action=`{start}`)
+              q-btn(
+                @click="start()"
+                no-caps color="green" icon="link" size="md")
+                span.text-white.text-bold.q-ml-sm {{ $t('Connect node', 'Связать ядро') }}
 </template>
 
 <script>
@@ -139,6 +107,7 @@ import { date } from 'quasar'
 import { shareWith } from 'src/system/services'
 
 import nodeMockup from './node_mockup/index.vue'
+import nodeConnect from 'components/node/node_connect.vue'
 
 export default {
   name: 'pageApp__node',
@@ -148,16 +117,15 @@ export default {
     nodeActions: () => import('components/node/node_actions.vue'),
     viewSpheres: () => import('./view_spheres/index.vue'),
     viewJoints: () => import('./view_joints/index.vue'),
-    viewConnect: () => import('./view_connect/index.vue'),
+    // viewConnect: () => import('./view_connect/index.vue'),
+    nodeConnect,
   },
   data () {
     return {
       node: null,
       nodeActive: true,
       nodeVisible: true,
-      nodeCategories: [],
       nodeConnectOpened: false,
-      nodesLoaded: false,
     }
   },
   computed: {
@@ -228,7 +196,6 @@ export default {
     async nodeLoad (oid) {
       this.$log('nodeLoad', oid)
       this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-      // this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     }
   },
   mounted () {

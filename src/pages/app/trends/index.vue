@@ -26,8 +26,8 @@ q-layout(view="hHh Lpr lff")
             @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
               q-infinite-scroll(ref="qis" @load="next" :offset="500")
-              template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
+              template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
       q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30

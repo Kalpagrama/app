@@ -111,12 +111,11 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     // content
     Vue.component('contentSearch', () => import('components/content_search/index.vue'))
-    // Vue.component('wsNodeEditor', () => import('components/ws_node_editor/index.vue'))
+    // workspace
     Vue.component('wsNodeItem', () => import('components/ws_node_item/index.vue'))
     Vue.component('wsContentItem', () => import('components/ws_content_item/index.vue'))
     // spheres
     Vue.component('wsSphereItem', () => import('components/ws_sphere_item/index.vue'))
-    Vue.component('wsSphereFinder', () => import('components/ws_sphere_finder/index.vue'))
     Vue.component('wsSphereEditor', () => import('components/ws_sphere_editor/index.vue'))
   } catch (err) {
     logC(err)

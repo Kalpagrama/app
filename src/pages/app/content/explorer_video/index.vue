@@ -22,7 +22,7 @@ div(
           kalpa-follow(
             v-if="contentKalpa"
             :oid="contentKalpa.oid")
-          q-btn(
+          //- q-btn(
             @click="contentBookmarkCreate()"
             round flat
             :color="contentBookmark ? 'green' : 'white'"

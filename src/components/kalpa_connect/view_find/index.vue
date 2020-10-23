@@ -96,6 +96,7 @@ export default {
         else {
           if (item.oid && item.type === 'NODE') {
             itemInput = item
+            itemInput.thumbUrl = item.items[0].thumbUrl
           }
         }
       }

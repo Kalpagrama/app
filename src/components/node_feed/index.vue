@@ -29,6 +29,7 @@ div(
         :style=`{
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden',
+          minHeight: height ? height+'px' : 'auto',
         }`
         ).row.full-width.items-start.content-start
         composition-player(
@@ -76,9 +77,12 @@ export default {
   computed: {
     height () {
       if (this.width) {
-        // if ()
-        // return (this.node.thumbHeight * this.width) / this.node.thumbWidth
-        return null
+        if (this.node.items[0].thumbHeight && this.node.items[0].thumbWidth) {
+          return (this.node.items[0].thumbHeight * this.width) / this.node.items[0].thumbWidth
+        }
+        else {
+          return null
+        }
       }
       else return null
     }

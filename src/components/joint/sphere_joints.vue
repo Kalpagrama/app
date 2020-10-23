@@ -1,14 +1,19 @@
 <template lang="pug">
 .row.full-width.justify-start
-  .row.full-width.q-pa-sm
+  div(
+    v-if="items.length > 0"
+    ).row.full-width.q-pa-sm
     q-btn(icon="sort" color="grey-8" round flat)
   q-resize-observer(@resize="e => width = e.width")
+  //- top line wrapper
   div(
+    v-if="items.length > 0"
     :style=`{
       position: 'relative',
       maxWidth: maxWidth+'px',
     }`
     ).row.full-width
+    //- top line
     div(
       :style=`{
         position: 'absolute', zIndex: 1000, top: '-60px', right: 0,
@@ -19,6 +24,7 @@
   kalpa-loader(
     :immediate="true"
     :query="queryBySphere" :limit="15" v-slot=`{items, next}`
+    @items="items = $event"
     @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
       q-infinite-scroll(@load="next" :offset="250")
@@ -44,6 +50,7 @@ export default {
   data () {
     return {
       width: 0,
+      items: []
     }
   },
   computed: {
