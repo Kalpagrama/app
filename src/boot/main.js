@@ -95,7 +95,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         document.body.removeEventListener('click', el.clickOutsideEvent)
       },
     })
-    Vue.component('kalpaConnect', () => import('components/kalpa_connect/index.vue'))
+    // global components
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     Vue.component('nodeMini', () => import('components/node_mini/index.vue'))
     Vue.component('jointFeed', () => import('components/joint_feed/index.vue'))
@@ -103,12 +103,16 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listSlider', () => import('components/list_slider/index.vue'))
     Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
+    // user
+    Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
+    // kalpa
+    Vue.component('kalpaBookmark', () => import('components/kalpa_bookmark/index.vue'))
+    Vue.component('kalpaConnect', () => import('components/kalpa_connect/index.vue'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaMenu', () => import('components/kalpa_menu/index.vue'))
     Vue.component('kalpaMenuMobile', () => import('components/kalpa_menu_mobile/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('kalpaFollow', () => import('components/kalpa_follow/index.vue'))
-    Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     // content
     Vue.component('contentSearch', () => import('components/content_search/index.vue'))
     // workspace

@@ -21,10 +21,6 @@ q-page(
               //- maxWidth: '300px',
             }`).q-px-sm
             span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
-        //- .row.full-width.q-py-md
-          kalpa-follow(
-            v-if="contentKalpa"
-            :oid="contentKalpa.oid").full-width
       //- spheres
       .row.full-width.q-py-sm
         .row.full-width.q-py-md

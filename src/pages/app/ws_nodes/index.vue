@@ -2,22 +2,6 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    //- .row.full-width.q-px-sm
-      div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width.b-40
-        .col
-          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="searchString"
-              borderless dark dense color="white"
-              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-              :input-style=`{
-                paddingLeft: '10px',
-              }`
-              ).full-width
-        q-btn(
-          @click="$router.push('/workspace/node/new')"
-          round flat dense color="green" icon="add"
-          :style=`{width: '40px'}`)
     .row.full-width.justify-start.q-px-sm
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col

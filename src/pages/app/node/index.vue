@@ -18,7 +18,13 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
-          //- kalpa-follow(v-if="node" :oid="$route.params.oid")
+          kalpa-bookmark(
+            v-if="node"
+            :oid="node.oid"
+            type="NODE"
+            :name="node.name"
+            :thumbUrl="node.items[0].thumbUrl"
+            :isActive="true")
   q-page-container
     q-page(:style=`{paddingTop: '8px', paddingBottom: '0px'}`)
       .row.full-width.items-start.content-start.justify-center

@@ -9,7 +9,7 @@
   div(:style=`{maxWidth: '700px'}`).row.full-width.items-center.content-center.q-mb-xs
     node-share(:node="node").shaking
     node-remake(:node="node").shaking
-    node-bookmark(:node="node" :isActive="isActive" :isVisible="isVisible").shaking
+    kalpa-bookmark(:oid="node.oid" type="NODE" :name="node.name" :thumbUrl="node.items[0].thumbUrl" :isActive="isActive").shaking
     node-connect(:node="node" :isActive="isActive" :isVisible="isVisible")
     //- vote
     .col

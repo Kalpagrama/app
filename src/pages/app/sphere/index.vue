@@ -14,8 +14,13 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="blur_on" color="white" size="30px").q-mx-sm
           .col
             span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
-            //- .col
-          kalpa-follow(:oid="$route.params.oid")
+          kalpa-bookmark(
+            v-if="sphere"
+            :oid="sphere.oid"
+            type="SPHERE"
+            :name="sphere.name"
+            :thumbUrl="''"
+            :isActive="true")
   q-page-container
     q-page(
       :style=`{

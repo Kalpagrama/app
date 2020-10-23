@@ -4,13 +4,20 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
+          ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col
             span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
-          kalpa-follow(
+          //- kalpa-follow(
               v-if="user && user.oid && !itsMe"
               :oid="user.oid")
+          kalpa-bookmark(
+            v-if="user"
+            :oid="user.oid"
+            type="USER"
+            :name="user.name"
+            :thumbUrl="user.thumbUrl"
+            :isActive="true")
         .row.full-width.q-px-md
           q-tabs(
             no-caps active-color="green" align="left"
