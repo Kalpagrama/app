@@ -46,7 +46,7 @@ class Event {
                'props.rxCollectionEnum': RxCollectionEnum.LST_FEED
             }
          })
-         logD(f, 'finded LST_FEED: ', rxDocsFeed)
+         logD(f, 'found LST_FEED: ', rxDocsFeed)
          for (let rxDoc of rxDocsFeed) {
             let reactiveItem = getReactive(rxDoc).getData()
             assert(reactiveItem.items, '!reactiveItem.items')
