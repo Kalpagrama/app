@@ -348,7 +348,7 @@ const findResultFragment = gql`
     nextPageToken
     prevPageToken
     ... on EventFindResult { events {...eventFragment} }
-    ... on ObjectsFindResult { objects{oid} }
+    ... on ObjectsFindResult { objects{oid type name thumbUrl(preferWidth: 600)} }
     ... on WSFindResult { items }
   }
 `
