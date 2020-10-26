@@ -34,7 +34,7 @@ q-layout(view="hHh Lpr lff")
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md
             q-tabs(
               :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
-              dense no-caps active-color="white" switch-indicator
+              dense no-caps active-color="green" switch-indicator
               ).full-width.text-grey-8
               q-tab(v-for="c in nodeCategories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias" dense)
 </template>

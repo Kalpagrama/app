@@ -28,6 +28,7 @@
           small.text-grey-6 {{ item.subject.name }}
     small(v-if="item.type === 'OBJECT_CREATED'").text-grey-6.q-mr-sm создал
     small(v-else-if="item.type === 'USER_SUBSCRIBED'").text-grey-6.q-mr-sm подписался на
+    small(v-else-if="item.type === 'VOTED'").text-grey-6.q-mr-sm проголосовал за
     small(v-else).text-grey-6.bg-blue {{ item.type }}
     small(v-if="item.object.type === 'NODE'").text-grey-6.q-mr-sm ядро
     small(v-else-if="item.object.type === 'JOINT'").text-grey-6.q-mr-sm связь
