@@ -3,6 +3,7 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+        //- header
         div(
           :style=`{
             height: '60px', borderRadius: '10px',
@@ -13,8 +14,8 @@ q-layout(view="hHh Lpr lff")
             span(
               :style=`{fontSize: '18px', userSelect: 'none'}`
               ).text-bold.text-white {{$t('pageApp_search_title', 'Поиск')}}
-        //- header
-        .row.full-width.justify-start.q-py-sm
+        //- search
+        .row.full-width.justify-start.q-pt-sm
           div(:style=`{maxWidth: '700px',}`).row.full-width
             .col
               div(
@@ -36,6 +37,17 @@ q-layout(view="hHh Lpr lff")
                     q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
             q-btn(
               round flat color="grey-4" icon="tune")
+        //- types
+        .row.full-width.q-py-xs
+          q-btn(
+            @click="typeClick(type)"
+            v-for="(type,ii) in types" :key="type.id"
+            flat no-caps dense
+            :color="typeSelected(type) ? 'green' : 'grey-7'"
+            :class=`{
+              'b-40': typeSelected(type)
+            }`
+            :style=`{}`).q-mr-xs.q-mb-xs.q-px-xs {{ type.name }}
   q-page-container
     q-page.row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -49,13 +61,36 @@ q-layout(view="hHh Lpr lff")
                 borderRadius: '10px',
               }`
               ).row.full-width.q-mb-sm.b-40
-              //- node, joint
+              //- node
+              router-link(
+                v-if="item.type === 'NODE'"
+                :to="'/node/'+item.oid"
+                :style=`{}`
+                ).row.full-width.items-center.content-center
+                img(
+                  draggable="false"
+                  :src="item.thumbUrl"
+                  :style=`{height: '100px', borderRadius: '10px',}`)
+                .col.q-px-sm
+                  span.text-white {{ item.name }}
+              //- joint
+              router-link(
+                v-else-if="item.type === 'JOINT'"
+                :to="'/joint/'+item.oid"
+                :style=`{}`
+                ).row.full-width.items-center.content-center
+                img(
+                  draggable="false"
+                  :src="item.thumbUrl"
+                  :style=`{height: '100px', borderRadius: '10px',}`)
+                .col.q-px-sm
+                  span.text-white {{ item.name }}
               //- content
               router-link(
-                v-if="['VIDEO', 'IMAGE'].includes(item.type)"
+                v-else-if="['VIDEO', 'IMAGE'].includes(item.type)"
                 :to="'/content/'+item.oid"
                 :style=`{}`
-                ).row.items-center.content-center.q-pa-sm
+                ).row.full-width.items-center.content-center.q-pa-sm
                 img(
                   draggable="false"
                   :src="item.thumbUrl"
@@ -87,7 +122,7 @@ q-layout(view="hHh Lpr lff")
                   span.text-white {{ item.name }}
               //- sphere
               router-link(
-                v-else-if="item.type === 'WORD'"
+                v-else-if="['WORD', 'SENTENCE'].includes(item.type)"
                 :to="'/sphere/'+item.oid"
                 ).row.full-width.items-center.content-center.q-pa-sm
                 q-icon(name="blur_on" color="white" size="30px")
@@ -102,24 +137,66 @@ q-layout(view="hHh Lpr lff")
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+// TODO: save last searchString in $router.query object...
+// so we can return to it, and refresh the page...
+
 export default {
   name: 'pageApp_search',
   data () {
     return {
-      searchString: ''
+      searchString: '',
+      typesSelected: []
     }
   },
   computed: {
     query () {
-      return {
+      let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
           querySearch: this.searchString,
-          objectTypeEnum: {$in: ['NODE', 'VIDEO', 'USER', 'WORD', 'SPHERE']}
+          // objectTypeEnum: {$in: ['NODE', 'VIDEO', 'USER', 'WORD', 'SENTENCE']}
         },
-        populateObjects: true,
+        // populateObjects: true,
         limit: 100
       }
+      if (this.typesSelected.length === 0) {
+        res.selector.objectTypeEnum = {$in: ['NODE', 'VIDEO', 'USER', 'WORD', 'SENTENCE']}
+      }
+      else {
+        res.selector.objectTypeEnum = {$in: this.typesQuery}
+      }
+      return res
+    },
+    types () {
+      return [
+        {id: 'NODE', name: 'Ядра', types: ['NODE']},
+        {id: 'CONTENT', name: 'Контент', types: ['VIDEO', 'IMAGE']},
+        {id: 'JOINT', name: 'Связи', types: ['JOINT']},
+        {id: 'USER', name: 'Пользователи', types: ['USER']},
+        {id: 'SPHERE', name: 'Сферы', types: ['WORD', 'SENTENCE']}
+      ]
+    },
+    typesQuery () {
+      return this.typesSelected.reduce((acc, val) => {
+        val.types.map(t => {
+          acc.push(t)
+        })
+        return acc
+      }, [])
+    }
+  },
+  methods: {
+    typeClick (type) {
+      this.$log('typeClick', type)
+      if (this.typeSelected(type)) {
+        this.typesSelected = this.typesSelected.filter(t => t.id !== type.id)
+      }
+      else {
+        this.typesSelected.push(type)
+      }
+    },
+    typeSelected (type) {
+      return this.typesSelected.findIndex(t => t.id === type.id) >= 0
     }
   },
   mounted () {
