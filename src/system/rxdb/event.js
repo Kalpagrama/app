@@ -39,21 +39,23 @@ class Event {
       const t1 = performance.now()
       assert(mutexGlobal.isLeader(), '!Leader')
 
-      // добавляем эвент на ленту
-      let rxDocsFeed = await this.cache.find({
-         selector: {
-            'props.rxCollectionEnum': RxCollectionEnum.LST_FEED
+      // добавляем эвент на ленту (кроме собственных событий  (я созда/ я проголосовал итд))
+      if (event.subject && event.subject.oid !== rxdb.getCurrentUser().oid) {
+         let rxDocsFeed = await this.cache.find({
+            selector: {
+               'props.rxCollectionEnum': RxCollectionEnum.LST_FEED
+            }
+         })
+         logD(f, 'finded LST_FEED: ', rxDocsFeed)
+         for (let rxDoc of rxDocsFeed) {
+            let reactiveItem = getReactive(rxDoc).getData()
+            assert(reactiveItem.items, '!reactiveItem.items')
+            // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
+            reactiveItem.items.splice(0, 0, event)
+            reactiveItem.count++
+            reactiveItem.totalCount++
+            // logD(f, `reactive LST_FEED changed (${reactiveItem.items.length})`, reactiveItem)
          }
-      })
-      logD(f, 'finded LST_FEED: ', rxDocsFeed)
-      for (let rxDoc of rxDocsFeed) {
-         let reactiveItem = getReactive(rxDoc).getData()
-         assert(reactiveItem.items, '!reactiveItem.items')
-         // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
-         reactiveItem.items.splice(0, 0, event)
-         reactiveItem.count++
-         reactiveItem.totalCount++
-         // logD(f, `reactive LST_FEED changed (${reactiveItem.items.length})`, reactiveItem)
       }
 
       switch (event.type) {

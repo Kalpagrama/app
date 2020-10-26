@@ -57,7 +57,7 @@ class ListsApi {
             for (let event of res.items) {
                event.card = makeEventCard(event)
             }
-            res.items = res.items.filter(ev => !ev.type.in('WS_ITEM_CREATED', 'WS_ITEM_UPDATED', 'WS_ITEM_DELETED', 'PROGRESS'))
+            // res.items = res.items.filter(ev => !ev.type.in('WS_ITEM_CREATED', 'WS_ITEM_UPDATED', 'WS_ITEM_DELETED', 'PROGRESS'))
             break
          case RxCollectionEnum.LST_SPHERE_NODES:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')

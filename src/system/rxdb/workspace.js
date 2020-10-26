@@ -177,7 +177,7 @@ class Workspace {
                   } finally {
                      this.release()
                      rxdb.release()
-                     mutexGlobal.release('ws::synchroLoop')
+                     await mutexGlobal.release('ws::synchroLoop')
                      // logD(f, 'unlocked')
                   }
                }

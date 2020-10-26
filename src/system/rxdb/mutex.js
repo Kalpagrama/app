@@ -20,13 +20,6 @@ class MutexLocal {
       this.timerErrId = null
    }
 
-   // tryLock (lockOwner) {
-   //    assert(lockOwner, '!lockOwner')
-   //    if (!this.locked) {
-   //       return true
-   //    } else return false
-   // }
-
    async lock (lockOwner) {
       assert(lockOwner, '!lockOwner')
       return await new Promise((resolve, reject) => {
@@ -35,14 +28,14 @@ class MutexLocal {
             this.queue.push({ resolve, reject, lockOwner })
             logD(`${lockOwner} ${this.name} lock queued!  queue = ${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
          } else {
-            this.timerWarnId = setTimeout(() => logW(`${lockOwner} ${this.name} possible deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
-            this.timerErrId = setTimeout(() => {
-               logE(`${lockOwner} ${this.name} deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
-               reject(new Error('deadlock detected! reject all locks')) // current
-               for (let { reject } of this.queue) reject(new Error('deadlock detected! reject all locks')) // queued
-               this.locked = false
-               this.queue = []
-            }, 60 * 1000)
+            this.timerWarnId = setInterval(() => logW(`${lockOwner} ${this.name} possible deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
+            // this.timerErrId = setTimeout(() => {
+            //    logE(`${lockOwner} ${this.name} deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
+            //    reject(new Error('deadlock detected! reject all locks')) // current
+            //    for (let { reject } of this.queue) reject(new Error('deadlock detected! reject all locks')) // queued
+            //    this.locked = false
+            //    this.queue = []
+            // }, 60 * 1000)
             this.locked = true
             this.lockOwner = lockOwner
             logD(`${lockOwner} ${this.name} lock complete`)
@@ -58,8 +51,8 @@ class MutexLocal {
          this.lockOwner = lockOwner
          resolve()
       } else {
-         clearTimeout(this.timerWarnId)
-         clearTimeout(this.timerErrId)
+         if (this.timerWarnId) clearInterval(this.timerWarnId)
+         if (this.timerErrId) clearTimeout(this.timerErrId)
          this.locked = false
          this.lockOwner = null
       }
@@ -69,7 +62,7 @@ class MutexLocal {
 
 const maxGlobalLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
 
-// глобальный (несколько вкладок) мьютекс без очереди захвата (кто успел - того и тапки)
+// глобальный (несколько вкладок) мьютекс
 // синглтон (один экземпляр на приложение)
 class MutexGlobal {
    constructor () {
@@ -110,10 +103,21 @@ class MutexGlobal {
             }
          })
       }
+      // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
+      // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
       window.addEventListener('storage', async function (event) {
          if (this.lockCnt && event.key && event.key.in('k_global_lock')) { // Мы владели мьютексом, но какая-то вкладка сбросила нас (см maxGlobalLockTimeFuse)
-            logW('другая вкладка сбросила наш мьютекс тк посчитала это дедлоком')
-            window.location.reload()
+            if (event.newValue) {
+               let current = JSON.parse(event.newValue)
+               assert(current.instanceId, '!current.instanceId')
+               if (current.instanceId !== mutexGlobal.getInstanceId()) {
+                  logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком')
+                  window.location.reload()
+               }
+            } else {
+               logW('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это - пожтому делаем reload)')
+               window.location.reload()
+            }
          }
       })
    }
@@ -141,43 +145,66 @@ class MutexGlobal {
       if (Platform.is.capacitor) return
       assert(lockOwner, '!lockOwner')
       const f = this.lock
-      // logD(f, 'start', lockOwner, this.getInstanceId())
-      if (this.unloadingInProgress) {
-         logW('cant globalLock (unloadingInProgress)')
-         await wait(10 * 1000)
-      }
+      logD(f, 'start', lockOwner, this.getInstanceId())
+      if (this.unloadingInProgress) throw new Error('cant globalLock (unloadingInProgress)')
       const t1 = performance.now()
-      let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
-         dt: 0,
-         instanceId: '',
-         lockOwner: ''
-      }))
-      if (this.instanceId !== current.instanceId) {
-         while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxGlobalLockTimeFuse) {
-            assert('dt' in current && 'instanceId' in current, 'bad current!')
-            await wait(500)
-            if (Date.now() % 4 === 0) logW(f, `${this.instanceId}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
-            current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
-               dt: 0,
-               instanceId: '',
-               lockOwner: ''
-            }))
+      let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
+      while (current && current.locked && this.instanceId !== current.instanceId) { // мьютекс захвачен не нами. ждем пока освободится
+         // если вкладка, создавшая мьютекс не обновляет его (вкладки уже нет, либо она неактивна)
+         if (Date.now() - current.dtActual > 8888) {
+            logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!')
+            break
          }
-         if (current.dt) {
-            logW(`${this.instanceId}:${lockOwner} break globalLock by timeout(maxGlobalLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
-            localStorage.removeItem('k_global_lock')
-         }
+         await wait(500) // ждем пока мьютекс освободится
+         current = JSON.parse(localStorage.getItem('k_global_lock') || null)
       }
-      localStorage.setItem('k_global_lock', JSON.stringify({
-         dt: Date.now(),
-         instanceId: this.instanceId,
-         lockOwner: lockOwner
-      }))
+      // let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
+      //    dt: 0,
+      //    instanceId: '',
+      //    lockOwner: ''
+      // }))
+      // if (this.instanceId !== current.instanceId) {
+      //    while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxGlobalLockTimeFuse) {
+      //       assert('dt' in current && 'instanceId' in current, 'bad current!')
+      //       await wait(500)
+      //       if (Date.now() % 4 === 0) logW(f, `${this.instanceId}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
+      //       current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
+      //          dt: 0,
+      //          instanceId: '',
+      //          lockOwner: ''
+      //       }))
+      //    }
+      //    if (current.dt) {
+      //       logW(`${this.instanceId}:${lockOwner} break globalLock by timeout(maxGlobalLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
+      //       localStorage.removeItem('k_global_lock')
+      //    }
+      // }
+      if (!this.lockCnt) {
+         localStorage.setItem('k_global_lock', JSON.stringify({
+            dt: Date.now(),
+            dtActual: Date.now(),
+            locked: true,
+            instanceId: this.instanceId,
+            lockOwner: lockOwner
+         }))
+         // 2 раза в секунду обновляем актуальность блокировки (типа мы еще живы)
+         this.timerActualityId = setInterval(() => {
+            // todo
+            let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
+            if (!current || current.instanceId !== mutexGlobal.getInstanceId()) {
+               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком')
+               window.location.reload()
+            } else { // обновляем актуальность блокировки
+               current.dtActual = Date.now()
+               localStorage.setItem('k_global_lock', JSON.stringify(current))
+            }
+         }, 500)
+      }
       this.lockCnt++
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   release (lockOwner) {
+   async release (lockOwner) {
       if (Platform.is.capacitor) return
       const f = this.release
       assert(lockOwner, '!lockOwner')
@@ -185,13 +212,15 @@ class MutexGlobal {
       assert(this.lockCnt, '!this.lockCnt')
       this.lockCnt-- // нужно ставить до изменения k_global_lock (см window.addEventListener('storage.k_global_lock')
       if (!this.lockCnt) {
-         let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({ dt: 0, instanceId: '' }))
-         assert('dt' in current && 'instanceId' in current)
-         if (current.instanceId === this.instanceId) { // если это мы захватывали
+         if (this.timerActualityId) clearInterval(this.timerActualityId)
+         let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
+         assert('instanceId' in current)
+         if (current.instanceId === this.instanceId) { // (мог кто-то перехватить)
             logD(f, 'release globalLock', this.instanceId, current)
-            localStorage.removeItem('k_global_lock')
-         } else if (current.instanceId) { // кто-то перехватил наш mutex по тамауту maxGlobalLockTimeFuse. мы теперь не владеем этим мьютексом
-            logW(f, `release foreign(external) globalLock  (${current.instanceId}) lock while work is not complete. maybe work is too heavy`)
+            current.locked = false
+            localStorage.setItem('k_global_lock', JSON.stringify(current)) // нельзя удалять k_global_lock (см window.addEventListener('storage'... )!
+         } else if (current.instanceId) { // кто-то перехватил наш mutex. мы теперь не владеем этим мьютексом
+            logW(f, `кто то перехватил наш мьютекс: ${JSON.stringify(current)}`)
          } // такое возможно из-за maxGlobalLockTimeFuse
       }
    }
