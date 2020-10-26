@@ -2,10 +2,10 @@
 div(
   :style=`{minHeight: $q.screen.height+'px',}`
   ).row.full-width.items-start.content-start
-  .row.full-width.justify-center.b-30
-    div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm.q-pb-sm
+  .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm.q-mb-sm
+    div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       slot(name="header")
-      div(v-if="!$slots.header" :style=`{height: '60px'}`).row.full-width.items-between.content-between.q-px-sm
+      div(v-if="!$slots.header" :style=`{height: '60px'}`).row.full-width.items-between.content-between
         div(
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
           ).row.fit.items-center.content-center.b-40.q-pa-sm
@@ -21,7 +21,8 @@ div(
             type="CONTENT"
             :name="contentKalpa.name"
             :thumbUrl="contentKalpa.thumbUrl"
-            :isActive="true")
+            :isActive="true"
+            :fields=`{contentType: contentKalpa.type}`)
   div(
     :style=`{
       ...playerStyles(),
@@ -29,7 +30,7 @@ div(
     ).row.full-width.items-start.content-start.justify-center
     div(
       :style=`{
-        maxWidth: (player && player.isFullscreen) ? '100%' : '886px',
+        maxWidth: (player && player.isFullscreen) ? '100%' : $store.state.ui.pageMaxWidth+'px',
         height: (player && player.isFullscreen) ? '100%' : 'auto',
       }`).row.full-width
       div(

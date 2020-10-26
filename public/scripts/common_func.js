@@ -6,7 +6,7 @@ function makeEventCard (event) {
    let resultCard = { icon: '', title: 'Новое событие', description: '', items: [] }
    const cropObj = (obj) => {
       assert(obj.oid && obj.name != null && obj.thumbUrl, 'bad obj: ' + JSON.stringify(obj))
-      return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl }
+      return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl, type: obj.type }
    }
    switch (event.type) {
       case 'USER_SUBSCRIBED':

@@ -174,6 +174,11 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'search',
+            path: 'search',
+            component: () => import('pages/app/search/index.vue')
+         },
+         {
             name: 'trends',
             path: 'trends/:oid?',
             component: () => import('pages/app/trends/index.vue'),
@@ -252,15 +257,13 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            // name: 'notifications',
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
-            // component: () => import('components/node_editor/index.vue'),
             children: [
                {
                   name: 'notifications',
                   path: '',
-                  component: () => import('pages/app/notifications/view_home.vue'),
+                  component: () => import('pages/app/notifications/view_index.vue'),
                   meta: { roleMinimal: 'MEMBER' }
                }
             ],

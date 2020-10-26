@@ -1,7 +1,9 @@
 <template lang="pug">
-sphere-joints(
-  :oid="contentKalpa.oid"
-  ).q-mt-lg
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
+    sphere-joints(
+      :oid="contentKalpa.oid"
+      )
 </template>
 
 <script>

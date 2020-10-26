@@ -15,15 +15,19 @@
         q-btn(v-if="feed" round flat color="grey-7" icon="settings" @click="$router.push('/feeds/edit/'+feed.id)")
   //- items
   .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
       kalpa-loader(
         v-if="feed && feed.items.length > 0"
         :immediate="true"
         :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
-        list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
+        list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`).items-start
           q-infinite-scroll(@load="next" :offset="$q.screen.height")
           template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-            feed-item(:item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+            //- .row.full-width.bg-blue.q-mb-sm
+              small.text-white {{ item }}
+            feed-item(
+              v-if="item.subject"
+              :item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>
 
 <script>
@@ -60,7 +64,7 @@ export default {
           oidSphere: this.$store.getters.currentUser().oid,
           subscription: {$in: this.feedSubscriptions}
         },
-        populateObjects: true,
+        // populateObjects: true,
       }
     }
   },

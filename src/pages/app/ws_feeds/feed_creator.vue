@@ -30,6 +30,7 @@ div(
     //- footer: create
     .row.full-width.justify-end.q-mt-lg
       q-btn(
+        @click="create()"
         no-caps size="lg"
         :disabled="!createCan"
         :color="!createCan ? 'grey-8' : 'green'"

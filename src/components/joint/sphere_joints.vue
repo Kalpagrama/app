@@ -1,10 +1,11 @@
 <template lang="pug">
 .row.full-width.justify-start
+  q-resize-observer(@resize="e => width = e.width")
+  //- header with actions
   div(
     v-if="items.length > 0"
-    ).row.full-width.q-pa-sm
+    ).row.full-width.q-py-sm
     q-btn(icon="sort" color="grey-8" round flat)
-  q-resize-observer(@resize="e => width = e.width")
   //- top line wrapper
   div(
     v-if="items.length > 0"

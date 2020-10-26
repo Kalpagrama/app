@@ -144,6 +144,7 @@ export default {
         {id: 'feeds', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
+        {id: 'search', name: this.$t('pageSearch_title', 'Поиск'), icon: 'search'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],

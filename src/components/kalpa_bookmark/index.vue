@@ -23,7 +23,7 @@ import { UserApi } from 'src/api/user'
 
 export default {
   name: 'kalpaBookmark',
-  props: ['oid', 'type', 'name', 'thumbUrl', 'isActive'],
+  props: ['oid', 'type', 'name', 'thumbUrl', 'isActive', 'fields'],
   components: {
     feeds: () => import('./feeds.vue')
   },
@@ -52,6 +52,7 @@ export default {
         this.$log('start')
         this.loading = true
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
+        // await UserApi.subscribe(this.oid)
         if (bookmark) {
           // this.bookmark = bookmark
         }
@@ -63,10 +64,12 @@ export default {
             name: this.name,
             thumbUrl: this.thumbUrl,
             wsItemType: 'WS_BOOKMARK',
-            spheres: []
+            spheres: [],
+            ...this.fields || {},
           }
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-          // await UserApi.subscribe(this.oid)
+          // subscribe to this oid...
+          if (!await UserApi.isSubscribed(this.oid)) await UserApi.subscribe(this.oid)
         }
         this.$log('start done')
         this.bookmark = bookmark
