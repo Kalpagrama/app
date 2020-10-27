@@ -5,7 +5,7 @@
     kalpa-loader(
       :immediate="true"
       :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
-      list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`).items-start
+      list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`).items-start
         q-infinite-scroll(@load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
           //- .row.full-width.bg-blue.q-mb-sm

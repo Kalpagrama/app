@@ -1,5 +1,6 @@
 <template lang="pug">
 div(
+  @click="$router.push('/workspace/feed/all')"
   :style=`{
     height: '200px',
     maxWidth: maxWidth+'px',
@@ -15,7 +16,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 100,
       }`
-      ).row.fit.q-pa-sm
+      ).row.fit.q-px-sm
       div(
         :style=`{
           borderRadius: '10px', overflow: 'hidden'
@@ -55,13 +56,10 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.bookmarks = await this.$rxdb.find({
-      // limit: 10,
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-        // oid: this.contentKalpa.oid
       },
     })
-    this.$log('bookmarks', this.bookmarks)
   }
 }
 </script>

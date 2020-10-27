@@ -67,6 +67,7 @@ export default {
           name: this.name,
           items: [],
           spheres: [],
+          feeds: [],
           wsItemType: 'WS_FEED',
           thumbUrl: '',
         }

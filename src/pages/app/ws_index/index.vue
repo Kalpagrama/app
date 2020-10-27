@@ -23,7 +23,7 @@ q-layout(view="hHh Lpr lff")
             q-btn(
               :to="p.path"
               v-for="p in pages" :key="p.id"
-              flat no-caps
+              flat no-caps dense
               :color="$route.name === p.id ? 'green' : 'grey-7'")
               q-icon(:name="p.icon" size="22px").q-mr-xs
               span(

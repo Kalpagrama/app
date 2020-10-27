@@ -81,6 +81,12 @@ export const wsSchemaItem = {
         type: ['object', 'string']
       }
     },
+    feeds: {
+      type: 'array',
+      items: {
+        type: ['string', 'object']
+      }
+    },
     category: {
       type: 'string'
     },

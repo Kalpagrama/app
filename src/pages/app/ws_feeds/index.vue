@@ -42,88 +42,15 @@
     kalpa-loader(
       :immediate="true"
       :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
-      .row.full-width.items-start.content-start
-        //- create feed from searchString... if items.length === 0
-        //- div(
-          v-if="items && items.length === 0"
-          :style=`{
-            maxWidth: '600px',
-          }`
-          ).row.full-width.q-pa-sm
-          q-btn(
-            @click="feedCreate"
-            color="green" no-caps
-            )
-            span.text-bold.text-white Создать "{{ searchString }}"
+      .row.full-width.items-start.content-start.q-pt-sm
         feed-all(
+          v-if="searchString.length === 0"
           :maxWidth="maxWidth")
-        //- feeds...
-        div(
+        feed-item(
           v-for="(feed,ii) in items" :key="feed.id"
-          :style=`{
-            maxWidth: maxWidth+'px',
-          }`
-          ).row.full-width.items-start.content-start
-          div(
-            :style=`{
-              position: 'relative',
-              height: 0, paddingBottom: '100%',
-            }`
-            ).row.full-width
-            div(
-              :style=`{
-                position: 'absolute', zIndex: 100,
-              }`
-              ).row.fit.q-pa-sm
-              div(
-                @click="feedClick(feed)"
-                :style=`{
-                  borderRadius: '10px', overflow: 'hidden'
-                }`
-                ).column.fit.b-40.cursor-pointer.feed-item
-                //- items previews, first 3 items...
-                div(
-                  :style=`{
-                    borderRadius: '10px', overflow: 'hidden',
-                    background: 'rgb(45,45,45)',
-                  }`
-                  ).col.full-width
-                  .row.fit
-                    div(:style=`{borderRight: '1px solid rgb(70,70,70)'}`).col-8
-                      img(
-                        v-if="feed.items[0]"
-                        :src="feed.items[0].thumbUrl"
-                        :style=`{
-                          objectFit: 'cover',
-                        }`).fit
-                    .col
-                      .column.fit
-                        div(:style=`{borderBottom: '1px solid rgb(70,70,70)'}`).col.full-width
-                          img(
-                            v-if="feed.items[1]"
-                            :src="feed.items[1].thumbUrl"
-                            :style=`{
-                              objectFit: 'cover',
-                            }`).fit
-                        .col.full-width
-                          img(
-                            v-if="feed.items[2]"
-                            :src="feed.items[2].thumbUrl"
-                            :style=`{
-                              objectFit: 'cover',
-                            }`).fit
-                //- footer: feed.name
-                div(
-                  :style=`{
-                    height: '60px',
-                  }`).row.full-width.items-center.content-center.q-px-sm
-                  span.text-bold.text-white {{ feed.name }}
-                  .row.full-width
-                    small(
-                      :style=`{
-                        opacity: feed.items.length > 0 ? 1 : 0,
-                      }`
-                      ).text-grey-6 {{ feed.items.length }} внутри
+          @click.native="feedClick(feed)"
+          :maxWidth="maxWidth"
+          :feed="feed")
 </template>
 
 <script>
@@ -134,7 +61,8 @@ export default {
   name: 'pageApp_wsFeeds',
   components: {
     feedAll,
-    feedCreator: () => import('./feed_creator.vue')
+    feedCreator: () => import('./feed_creator.vue'),
+    feedItem: () => import('./feed_item.vue')
   },
   data () {
     return {
@@ -169,6 +97,9 @@ export default {
     },
     feedCreate () {
       this.$log('feedCreate')
+    },
+    feedDelete () {
+      this.$log('feedDelete')
     }
   }
 }

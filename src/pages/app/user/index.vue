@@ -50,6 +50,7 @@ export default {
   computed: {
     pages () {
       return [
+        {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
         {id: 'created', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'voted', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
