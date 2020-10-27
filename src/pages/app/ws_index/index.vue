@@ -44,10 +44,11 @@ export default {
     pages () {
       return [
         {id: 'workspace.feeds', path: '/workspace/feeds', name: 'Коллекции', icon: 'view_week'},
-        {id: 'workspace.contents', path: '/workspace/contents/video', name: this.$t('pageWs_content', 'Контент'), icon: 'select_all'},
+        // {id: 'workspace.contents', path: '/workspace/contents/video', name: this.$t('pageWs_content', 'Контент'), icon: 'select_all'},
         {id: 'workspace.nodes', path: '/workspace/nodes/drafts', name: this.$t('pageWs_nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'workspace.joints', path: '/workspace/joints', name: this.$t('pageWs_joints', 'Связи'), icon: 'link'},
         // {id: 'workspace.spheres', path: '/workspace/spheres', name: this.$t('pageWs_spheres', 'Сферы'), icon: 'blur_on'},
+        // {id: 'workspace.trash', path: '/workspace/trash', name: '', icon: 'delete_outline'}
       ]
     },
   }

@@ -48,7 +48,7 @@
         :value="typeId" @input="typeId = $event" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        q-tab(name="bookmarked" icon="bookmark" label="Закладки").q-px-xs
+        //- q-tab(name="bookmarked" icon="bookmark" label="Закладки").q-px-xs
         q-tab(name="drafts" label="Черновики").q-px-xs
         q-tab(name="published" label="Опубликованные").q-px-xs
     //- types wrapper

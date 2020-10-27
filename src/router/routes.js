@@ -52,7 +52,7 @@ const routes = [
          {
             name: 'feeds',
             path: 'feeds/:id?',
-            component: () => import('pages/app/feeds/feeds.vue'),
+            component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -194,7 +194,7 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace',
-            redirect: 'workspace/contents/video',
+            redirect: 'workspace/feeds',
             component: () => import('pages/app/ws_index/index.vue'),
             children: [
                {

@@ -1,33 +1,18 @@
 <template lang="pug">
-.row.full-width
-  //- header
-  //- .row.full-width.justify-center.q-pt-sm.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(
-        :style=`{
-          height: '60px', borderRadius: '10px',
-        }`
-        ).row.full-width.items-center.content-center.q-pa-sm.b-40
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-        //- q-icon(name="view_week" color="white" size="30px").q-mr-sm
-        .col
-          span(v-if="feed" :style=`{fontSize: '18px'}`).text-white.text-bold {{ feed.name }}
-        q-btn(v-if="feed" round flat color="grey-7" icon="settings" @click="$router.push('/feeds/edit/'+feed.id)")
-  //- items
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
-      kalpa-loader(
-        v-if="feed && feed.items.length > 0"
-        :immediate="true"
-        :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
-        list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`).items-start
-          q-infinite-scroll(@load="next" :offset="$q.screen.height")
-          template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-            //- .row.full-width.bg-blue.q-mb-sm
-              small.text-white {{ item }}
-            feed-item(
-              v-if="item.subject"
-              :item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+.row.full-width.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
+    //- v-if="feed && feed.items.length > 0"
+    kalpa-loader(
+      :immediate="true"
+      :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
+      list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`).items-start
+        q-infinite-scroll(@load="next" :offset="$q.screen.height")
+        template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+          //- .row.full-width.bg-blue.q-mb-sm
+            small.text-white {{ item }}
+          feed-item(
+            v-if="item.subject"
+            :item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>
 
 <script>
@@ -58,14 +43,18 @@ export default {
       }
     },
     queryFeedItems () {
-      return {
+      let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.$store.getters.currentUser().oid,
-          subscription: {$in: this.feedSubscriptions}
-        },
-        // populateObjects: true,
+          // subscription: {$in: this.feedSubscriptions}
+        }
       }
+      // add subscription array if not empty
+      if (this.feedSubscriptions.length > 0) {
+        res.selector.subscription = {$in: this.feedSubscriptions}
+      }
+      return res
     }
   },
   watch: {

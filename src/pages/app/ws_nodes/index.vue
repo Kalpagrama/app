@@ -32,7 +32,7 @@
         :value="typeId" @input="typeIdChanged" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
+        //- q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
         q-tab(name="drafts" label="Черновики").q-px-xs
         q-tab(name="published" label="Опубликованные").q-px-xs
   .row.full-width

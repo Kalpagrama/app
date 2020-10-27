@@ -70,6 +70,9 @@
         //-         img(:src="node.items[3].thumbUrl" draggable="false" :style=`{objectFit: 'cover'}`).fit
     //- essense
     div(
+      :style=`{
+        textAlign: 'center',
+      }`
       ).row.full-width.justify-center.q-py-sm
       small(
         v-if="node.name.length > 0"
