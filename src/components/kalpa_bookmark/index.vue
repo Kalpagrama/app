@@ -4,12 +4,13 @@
   q-dialog(
     v-model="showDialog"
     position="bottom"
-    maximized)
+    :maximized="$q.screen.width < 800")
     feeds-selector(
       :oid="oid"
       :bookmark="bookmark"
       :style=`{
-        height: $q.screen.height-60+'px',
+        height: $q.screen.width < 800 ? $q.screen.height-60+'px' : '600px',
+        maxWidth: $q.screen.width < 800 ? '100%' : '500px',
       }`
       @close="showDialog = false")
   slot(name="action" :start="start" :bookmark="bookmark")

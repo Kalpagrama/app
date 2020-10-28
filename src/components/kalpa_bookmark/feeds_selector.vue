@@ -9,19 +9,20 @@ q-layout(
   view="hHh Lpr lff" container
   :style=`{
     borderRadius: '10px',
-  }`).b-30
-  q-header(reveal)
+  }`)
+  q-header(reveal).b-30
     //- header
     div(
       :style=`{
         height: '60px',
+        borderRadius: '10px 10px 0 0',
       }`
-      ).row.full-width.items-center
+      ).row.full-width.items-center.b-30
       span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите коллекцию
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')").q-mr-sm
     //- search or create...
-    .row.full-width.justify-start.q-px-sm.q-py-sm
+    .row.full-width.justify-start.q-px-sm.q-py-sm.b-30
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(
@@ -49,7 +50,7 @@ q-layout(
       kalpa-loader(
         :immediate="true"
         :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
-        .row.full-width.items-start.content-start.q-pa-sm
+        .row.full-width.items-start.content-start.q-pa-sm.b-30
           div(
             v-for="(feed, ii) in items" :key="feed.id"
             :style=`{

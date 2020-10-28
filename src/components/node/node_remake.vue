@@ -1,7 +1,17 @@
 <template lang="pug">
-q-btn(
-  @click="remake()"
-  round flat color="grey-9" icon="cached").shaking
+div(
+  :style=`{
+    position: 'relative',
+    height: '60px',}`).row.justify-center.items-center.content-center
+  //- remake action
+  q-btn(
+    @click="remake()"
+    round flat color="grey-9" icon="cached").shaking
+  //- remake count
+  div(
+    v-if="node.countRemakes > 0"
+    :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
+    small.text-grey-9 {{ node.countRemakes }}
 </template>
 
 <script>

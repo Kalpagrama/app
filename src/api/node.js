@@ -288,16 +288,15 @@ class NodeApi {
       return reactiveJoint
    }
 
-   static async updateStat(oid, key, value){
+   static async updateStat(oid, key, value) {
       const f = this.updateStat
       logD(f, 'start')
       const t1 = performance.now()
       assert(oid, '!oid')
       assert(key in StatKeyEnum, '!key in StatKeyEnum')
-
+      // ${fragments.objectFullFragment}
       let { data: { updateStat } } = await apollo.clients.api.mutate({
          mutation: gql`
-             ${fragments.objectFullFragment}
              mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
                  updateStat (oid: $oid, statData: $statData)
              }

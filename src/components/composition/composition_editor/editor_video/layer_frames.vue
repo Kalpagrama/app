@@ -331,6 +331,16 @@ export default {
         await this.$wait(300)
         this.framesLayerCenter()
         this.pointDraggingError = false
+        // final action of pointDragging, the same layerForward...
+        if (index === 0) {
+          this.player.play()
+        }
+        else {
+          let tBeforeTheEnd = t - 3 > this.layerStart ? t - 3 : this.layerStart
+          this.$log('tBeforeTheEnd', tBeforeTheEnd)
+          this.player.setCurrentTime(tBeforeTheEnd)
+          this.player.play()
+        }
       }
     },
     framesClick (e) {

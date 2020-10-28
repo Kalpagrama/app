@@ -1,8 +1,10 @@
 <template lang="pug">
-q-btn(
-  @click="shareStart()"
-  round flat icon="share"
-  :color="shareDialogOpened ? 'grey-9' : 'grey-9'")
+div(
+  :style=`{
+    position: 'relative',
+    height: '60px',
+  }`).row.justify-center.items-center.content-center
+  //- share dialog
   q-dialog(v-model="shareDialogOpened")
     div(
       :style=`{
@@ -59,9 +61,20 @@ q-btn(
             template(v-slot:append)
               q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
                 span.text-bold {{$t('Copy', 'Скопировать')}}
+  //- share start btn
+  q-btn(
+    @click="shareStart()"
+    round flat icon="share"
+    :color="shareDialogOpened ? 'grey-9' : 'grey-9'")
+  //- share count
+  div(
+    v-if="node.countShares > 0"
+    :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
+    small.text-grey-9 {{ node.countShares }}
 </template>
 
 <script>
+import { NodeApi } from 'src/api/node'
 import { Platform, openURL } from 'quasar'
 import { shareWith } from 'src/system/services'
 
@@ -81,8 +94,10 @@ export default {
     }
   },
   methods: {
-    shareStart () {
+    async shareStart () {
       this.$log('shareStart')
+      let stat = await NodeApi.updateStat(this.node.oid, 'SHARED', null)
+      this.$log('shareStart stat', stat)
       if (Platform.is.desktop) {
         this.shareLink = location.origin + '/node/' + this.node.oid
         this.shareDialogOpened = true
