@@ -74,6 +74,7 @@ async function initCapacitor (store) {
       store.commit('workspace/stateSet', ['shareItem', shareItem], { root: true })
       await router.push({ path: '/workspace/contentNotes', query: { share: true } })
    })
+   await capacitorOrientationLock('portrait')
 }
 
 async function initCapacitorPushPlugin (store) {
@@ -130,4 +131,10 @@ async function capacitorShowShareDialog () {
    })
 }
 
-export { initCapacitor, initCapacitorPushPlugin }
+async function capacitorOrientationLock (mode) {
+   assert(mode.in('portrait', 'landscape', 'default'))
+   if (mode === 'default') await window.screen.orientation.unlock();
+   else await window.screen.orientation.lock(mode);
+}
+
+export { initCapacitor, initCapacitorPushPlugin, capacitorOrientationLock }

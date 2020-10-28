@@ -58,7 +58,7 @@ async function updateRxDoc (rxDocOrId, path, valueOrFunc, debouncedSave = true) 
       let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
       try {
          let value
-         if (typeof valueOrFunc === 'function'){
+         if (typeof valueOrFunc === 'function') {
             value = valueOrFunc(rxDoc)
             assert(value)
          } else value = valueOrFunc
@@ -214,122 +214,122 @@ class ReactiveItemHolder {
    }
 }
 
-class ReactiveListHolder {
-   async create (rxQuery) {
-      logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
-      assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
-      try {
-         if (rxQuery.reactiveListHolderMaster) {
-            await rxQuery.reactiveListHolderMaster.mutex.lock('ReactiveListHolder::create')
-            this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
-            assert(this.reactiveList, '!this.reactiveList!')
-         } else {
-            this.mutex = new MutexLocal('ReactiveListHolder::constructor')
-            await this.mutex.lock('ReactiveListHolder::create')
-            rxQuery.reactiveListHolderMaster = this
-            this.rxQuery = rxQuery
-            let docs = await rxQuery.exec()
-            assert(Array.isArray(docs), 'Array.isArray(docs)')
-            this.vm = new Vue({
-               data: {
-                  reactiveList: docs.map(rxDoc => getReactive(rxDoc).getData())
-               }
-            })
-            this.reactiveList = this.vm.reactiveList
-            assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
-            this.rxQuerySubscribe()
-            this.listSubscribe()
-         }
-      } finally {
-         if (rxQuery.reactiveListHolderMaster) {
-            rxQuery.reactiveListHolderMaster.mutex.release()
-         } else {
-            this.mutex.release()
-         }
-      }
-      assert(this.reactiveList, '!this.reactiveList!2')
-      return this.reactiveList
-   }
-
-   rxQuerySubscribe () {
-      const f = this.rxQuerySubscribe
-      if (this.rxQuerySubscription) return
-      // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-      this.rxQuerySubscription = this.rxQuery.$.pipe(skip(1)).subscribe(async results => {
-         try {
-            await this.mutex.lock('rxQuerySubscribe')
-            this.listUnsubscribe()
-            // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
-            // logD(f, 'rxQuery changed 1', results)
-            if (this.vm.reactiveList.length === results.length) {
-               let arrayChanged = false
-               for (let i = 0; i < results.length; i++) {
-                  if (results[i].id !== this.vm.reactiveList[i].id) {
-                     arrayChanged = true
-                     break
-                  }
-               }
-               if (!arrayChanged) return // если список не изменился - просто выходим
-            }
-            // logD(f, 'rxQuery changed 2', results)
-            let items = results.map(rxDoc => {
-               let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-               return reactiveItemHolder.reactiveItem
-            })
-            this.vm.reactiveList.splice(0, this.vm.reactiveList.length, ...items)
-         } finally {
-            this.listSubscribe()
-            this.mutex.release()
-         }
-      })
-   }
-
-   rxQueryUnsubscribe () {
-      if (this.rxQuerySubscription) this.rxQuerySubscription.unsubscribe()
-      delete this.rxQuerySubscription
-   }
-
-   listSubscribe () {
-      const f = this.listSubscribe
-      if (this.listUnsubscribeFunc) return
-      this.listUnsubscribeFunc = this.vm.$watch('reactiveList', async (newVal, oldVal) => {
-         // assert(false, 'изменения списка из UI запрещены')
-         // // reactiveList изменился (из UI)
-         // if (!this.debouncedListSave) {
-         //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
-         //     const f = this.debouncedListSave
-         //     try {
-         //       await this.mutex.lock('listUnsubscribeFunc')
-         //       await rxdb.lock('listUnsubscribeFunc') // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
-         //       this.rxQueryUnsubscribe()
-         //       logD(f, 'reactiveList changed from UI', newVal)
-         //       let insertedItems = difference(newVal, oldVal, (left, right) => left.id === right.id) // что добавилось в массив
-         //       let deletedItems = difference(oldVal, newVal, (left, right) => left.id === right.id) // что удалено из массива
-         //
-         //       for (let insertedItem of insertedItems) {
-         //         assert(!insertedItem.id)
-         //         await rxdb.upsertItem(insertedItem) // сохраним в БД
-         //       }
-         //       for (let deletedItem of deletedItems) {
-         //         assert(deletedItem.id)
-         //         await rxdb.delete(deletedItem.id) // сохраним в БД
-         //       }
-         //     } finally {
-         //       this.rxQuerySubscribe()
-         //       this.rxdb.release()
-         //       this.mutex.release()
-         //     }
-         //   }, debounceIntervalList)
-         // }
-         // this.debouncedListSave(newVal, oldVal)
-      }, { deep: false, immediate: false })
-   }
-
-   listUnsubscribe () {
-      if (this.listUnsubscribeFunc) this.listUnsubscribeFunc()
-      delete this.listUnsubscribeFunc
-   }
-}
+// class ReactiveListHolder {
+//    async create (rxQuery) {
+//       logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
+//       assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
+//       try {
+//          if (rxQuery.reactiveListHolderMaster) {
+//             await rxQuery.reactiveListHolderMaster.mutex.lock('ReactiveListHolder::create')
+//             this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
+//             assert(this.reactiveList, '!this.reactiveList!')
+//          } else {
+//             this.mutex = new MutexLocal('ReactiveListHolder::constructor')
+//             await this.mutex.lock('ReactiveListHolder::create')
+//             rxQuery.reactiveListHolderMaster = this
+//             this.rxQuery = rxQuery
+//             let docs = await rxQuery.exec()
+//             assert(Array.isArray(docs), 'Array.isArray(docs)')
+//             this.vm = new Vue({
+//                data: {
+//                   reactiveList: docs.map(rxDoc => getReactive(rxDoc).getData())
+//                }
+//             })
+//             this.reactiveList = this.vm.reactiveList
+//             assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
+//             this.rxQuerySubscribe()
+//             this.listSubscribe()
+//          }
+//       } finally {
+//          if (rxQuery.reactiveListHolderMaster) {
+//             rxQuery.reactiveListHolderMaster.mutex.release()
+//          } else {
+//             this.mutex.release()
+//          }
+//       }
+//       assert(this.reactiveList, '!this.reactiveList!2')
+//       return this.reactiveList
+//    }
+//
+//    rxQuerySubscribe () {
+//       const f = this.rxQuerySubscribe
+//       if (this.rxQuerySubscription) return
+//       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
+//       this.rxQuerySubscription = this.rxQuery.$.pipe(skip(1)).subscribe(async results => {
+//          try {
+//             await this.mutex.lock('rxQuerySubscribe')
+//             this.listUnsubscribe()
+//             // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
+//             // logD(f, 'rxQuery changed 1', results)
+//             if (this.vm.reactiveList.length === results.length) {
+//                let arrayChanged = false
+//                for (let i = 0; i < results.length; i++) {
+//                   if (results[i].id !== this.vm.reactiveList[i].id) {
+//                      arrayChanged = true
+//                      break
+//                   }
+//                }
+//                if (!arrayChanged) return // если список не изменился - просто выходим
+//             }
+//             // logD(f, 'rxQuery changed 2', results)
+//             let items = results.map(rxDoc => {
+//                let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+//                return reactiveItemHolder.reactiveItem
+//             })
+//             this.vm.reactiveList.splice(0, this.vm.reactiveList.length, ...items)
+//          } finally {
+//             this.listSubscribe()
+//             this.mutex.release()
+//          }
+//       })
+//    }
+//
+//    rxQueryUnsubscribe () {
+//       if (this.rxQuerySubscription) this.rxQuerySubscription.unsubscribe()
+//       delete this.rxQuerySubscription
+//    }
+//
+//    listSubscribe () {
+//       const f = this.listSubscribe
+//       if (this.listUnsubscribeFunc) return
+//       this.listUnsubscribeFunc = this.vm.$watch('reactiveList', async (newVal, oldVal) => {
+//          // assert(false, 'изменения списка из UI запрещены')
+//          // // reactiveList изменился (из UI)
+//          // if (!this.debouncedListSave) {
+//          //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
+//          //     const f = this.debouncedListSave
+//          //     try {
+//          //       await this.mutex.lock('listUnsubscribeFunc')
+//          //       await rxdb.lock('listUnsubscribeFunc') // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
+//          //       this.rxQueryUnsubscribe()
+//          //       logD(f, 'reactiveList changed from UI', newVal)
+//          //       let insertedItems = difference(newVal, oldVal, (left, right) => left.id === right.id) // что добавилось в массив
+//          //       let deletedItems = difference(oldVal, newVal, (left, right) => left.id === right.id) // что удалено из массива
+//          //
+//          //       for (let insertedItem of insertedItems) {
+//          //         assert(!insertedItem.id)
+//          //         await rxdb.upsertItem(insertedItem) // сохраним в БД
+//          //       }
+//          //       for (let deletedItem of deletedItems) {
+//          //         assert(deletedItem.id)
+//          //         await rxdb.delete(deletedItem.id) // сохраним в БД
+//          //       }
+//          //     } finally {
+//          //       this.rxQuerySubscribe()
+//          //       this.rxdb.release()
+//          //       this.mutex.release()
+//          //     }
+//          //   }, debounceIntervalList)
+//          // }
+//          // this.debouncedListSave(newVal, oldVal)
+//       }, { deep: false, immediate: false })
+//    }
+//
+//    listUnsubscribe () {
+//       if (this.listUnsubscribeFunc) this.listUnsubscribeFunc()
+//       delete this.listUnsubscribeFunc
+//    }
+// }
 
 class ReactiveListHolderWithPagination {
    async create (rxQueryOrRxDoc, populateFunc) {
@@ -340,6 +340,8 @@ class ReactiveListHolderWithPagination {
             this.reactiveListFull = rxQueryOrRxDoc.reactiveListHolderMaster.reactiveListFull
             this.reactiveListPagination = rxQueryOrRxDoc.reactiveListHolderMaster.reactiveListPagination
             this.next = rxQueryOrRxDoc.reactiveListHolderMaster.next
+            this.getProperty = rxQueryOrRxDoc.reactiveListHolderMaster.getProperty
+            this.setProperty = rxQueryOrRxDoc.reactiveListHolderMaster.setProperty
             assert(this.reactiveListFull && this.reactiveListPagination, '!this.reactiveListFull!')
          } else {
             this.mutex = new MutexLocal('ReactiveListHolder::constructor')
@@ -377,13 +379,21 @@ class ReactiveListHolderWithPagination {
             this.listSubscribe()
 
             this.nextIndex = 0 // первая незаполненная позиция
+            this.nextPageIndex = 0 // позиция, с которой начинается след страница
+            this.props = {}
             this.populateFunc = populateFunc
+            // setProperty / getProperty - хранение метаинформации на списке (currentIndex, итд)
+            this.reactiveListPagination.setProperty = (name, value) => {
+               this.props[name] = value
+            }
+            this.reactiveListPagination.getProperty = (name) => this.props[name]
             this.reactiveListPagination.next = async (count) => {
                if (!count && this.nextIndex === 0) { // autoNext
                   if (this.populateFunc) count = 8
                   else count = this.reactiveListFull.length
                }
-               if (this.nextIndex >= this.reactiveListFull.length) return false
+               this.nextPageIndex = this.nextIndex + count
+               if (this.nextIndex >= this.reactiveListFull.length) return false // дошли до конца списка
                let fromIndex = this.nextIndex
                this.nextIndex = this.nextIndex + count
                let nextItems = this.reactiveListFull.slice(fromIndex, this.nextIndex)
@@ -443,7 +453,7 @@ class ReactiveListHolderWithPagination {
                logD(f, 'List::rxDoc changed. try to change reactiveListFull')
                assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
                this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...change.cached.data.items)
-               let nextItems = this.reactiveListFull.slice(0, this.nextIndex)
+               let nextItems = this.reactiveListFull.slice(0, this.nextPageIndex)
                if (this.populateFunc) nextItems = await this.populateFunc(nextItems) // запрашиваем полные сущности
                this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...nextItems)
             } finally {
@@ -463,6 +473,7 @@ class ReactiveListHolderWithPagination {
       const f = this.listSubscribe
       if (this.listUnsubscribeFunc) return
       this.listUnsubscribeFunc = this.vm.$watch('reactiveListFull', async (newVal, oldVal) => {
+         logD('изменения списка из UI!')
          // assert(false, 'изменения списка из UI запрещены')
       }, { deep: false, immediate: false })
    }

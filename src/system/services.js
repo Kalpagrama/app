@@ -7,7 +7,6 @@ import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/syste
 import assert from 'assert';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
-import store from 'src/store/index'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
 
@@ -119,6 +118,14 @@ async function askForWebPushPerm (store) {
    } else if (process.env.MODE === 'pwa') {
       return await askForPwaWebPushPerm(store)
    }
+}
+
+function orientationLockEnabled (mode) {
+   return !!Platform.is.capacitor
+}
+async function orientationLock (mode) {
+   const { capacitorOrientationLock } = await import('src/system/capacitor.js')
+   if (Platform.is.capacitor) await capacitorOrientationLock(mode)
 }
 
 function initOfflineEvents (store) {
@@ -353,6 +360,8 @@ async function systemHardReset () {
 export {
    initServices,
    setSyncEventStorageValue,
+   orientationLockEnabled,
+   orientationLock,
    systemReset,
    shareWith,
    initSessionStorage,
