@@ -98,9 +98,23 @@ class Workspace {
                name: 'ws_items',
                schema: wsSchemaItem,
                migrationStrategies: {
-                  // 1: oldDoc => oldDoc,
-                  // 2: oldDoc => oldDoc,
                   // ..., - см wsSchemaItem.version (из schema.js)
+                  1: oldDoc => {
+                     if (oldDoc.wsItemType === 'WS_BOOKMARK') {
+                        if (!oldDoc.feeds) oldDoc.feeds = []
+                        if (!oldDoc.spheres) oldDoc.spheres = []
+                        if (oldDoc.contentType) {
+                           oldDoc.type = oldDoc.contentType
+                           delete oldDoc.contentType
+                        }
+                     }
+                     if (oldDoc.wsItemType === 'WS_FEED') {
+                        oldDoc.feeds = []
+                        oldDoc.spheres = []
+                     }
+                     return oldDoc
+                  }
+                  // 2: oldDoc => oldDoc,
                }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
