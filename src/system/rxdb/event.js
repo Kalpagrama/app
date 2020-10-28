@@ -23,12 +23,12 @@ class Event {
       this.cache = cache
    }
 
-   init () {
-      EventApi.init()
+   async init () {
+      await EventApi.init()
    }
 
-   deInit () {
-      EventApi.deInit()
+   async deInit () {
+      await EventApi.deInit()
    }
 
    // от сервера прилетел эвент (поправим данные в кэше)

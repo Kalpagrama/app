@@ -28,7 +28,7 @@ class MutexLocal {
             this.queue.push({ resolve, reject, lockOwner })
             logD(`${lockOwner} ${this.name} lock queued!  queue = ${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
          } else {
-            this.timerWarnId = setInterval(() => logW(`${lockOwner} ${this.name} possible deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
+            this.timerWarnId = setInterval(() => logW(`${this.name} possible deadlock! locked by:${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
             // this.timerErrId = setTimeout(() => {
             //    logE(`${lockOwner} ${this.name} deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
             //    reject(new Error('deadlock detected! reject all locks')) // current

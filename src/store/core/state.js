@@ -14,11 +14,11 @@ export default {
    logDbgFilter: 'any', // gui | system | any
    logFormat: {time: false, moduleName: true, funcName: true},
    logDbgModulesBlackList: [
-      LogSystemModulesEnum.SYSTEM,
+      // LogSystemModulesEnum.SYSTEM,
       LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,
-      LogSystemModulesEnum.AUTH,
-      LogSystemModulesEnum.GQL,
+      // LogSystemModulesEnum.AUTH,
+      // LogSystemModulesEnum.GQL,
       LogSystemModulesEnum.ROUTER,
       LogSystemModulesEnum.VUEX,
       LogSystemModulesEnum.VUEX_CACHE,
@@ -27,7 +27,7 @@ export default {
       // LogSystemModulesEnum.RXDB,
       // LogSystemModulesEnum.RXDB_REACTIVE,
       // LogSystemModulesEnum.RXDB_WS,
-      LogSystemModulesEnum.RXDB_CACHE,
+      // LogSystemModulesEnum.RXDB_CACHE,
       // LogSystemModulesEnum.RXDB_OBJ,
       // LogSystemModulesEnum.RXDB_GQL,
       // LogSystemModulesEnum.RXDB_LST,

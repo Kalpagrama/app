@@ -1,23 +1,16 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { router } from 'src/boot/system'
-import { resetLocalStorage, systemInit, systemReset } from 'src/system/services'
+import { systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { MutexLocal } from 'src/system/rxdb/mutex'
+import { rxdb } from 'src/system/rxdb'
+import { apiCall } from 'src/api'
 import { fragments } from 'src/api/fragments'
-import i18next from 'i18next'
-import store from 'src/store/index'
-import { UserApi } from 'src/api/user'
-import { WsCollectionEnum } from 'src/system/rxdb/workspace'
-import { LstCollectionEnum } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
-const authApiMutex = new MutexLocal('authApiMutex')
 
 const ActionEnum = Object.freeze({
    VOTE: 'VOTE'
@@ -101,11 +94,10 @@ class AuthApi {
 
    // если токен не указан - выйдет из всех сессий
    static async logout (token) {
-      const f = this.logout
+      const f = AuthApi.logout
       logD(f, 'start')
       const t1 = performance.now()
-      try {
-         await authApiMutex.lock('AuthApi::logout')
+      const cb = async () => {
          if (token) {
             let { data: { logout } } = await apollo.clients.auth.query({
                query: gql`
@@ -118,65 +110,77 @@ class AuthApi {
                }
             })
          }
-      } catch (err) {
-         logE('error on logout! err=', err)
-      } finally {
-         try {
-            if (!token || token === localStorage.getItem('k_token')) {
-               await systemReset(true, true, false)
-            }
-         } finally {
-            authApiMutex.release()
-         }
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      try {
+         return await apiCall(f, cb)
+      } finally {
+         if (!token || token === localStorage.getItem('k_token')) {
+            await systemReset(true, true, false) // вне cb (иначе дедлок)
+         }
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      }
    }
 
    static async userIdentify (userId_) {
-      const f = this.userIdentify
+      const f = AuthApi.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      await systemReset(true, true, false)
-      let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, hasPermanentPassword = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
-         query: gql`
-             ${fragments.dummyUserFragment}
-             query  ($userId: String){
-                 userIdentify(userId: $userId){
-                     userId
-                     loginType
-                     userExist
-                     needInvite
-                     needConfirm
-                     hasPermanentPassword
-                     dummyUser {
-                         ...dummyUserFragment
-                     }
-                     token
-                     expires
-                 }
-             }
-         `,
-         variables: {
-            userId: userId_
+      await systemReset(true, true, false) // вне cb (иначе дедлок)
+      const cb = async () => {
+         let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, hasPermanentPassword = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
+            query: gql`
+                ${fragments.dummyUserFragment}
+                query  ($userId: String){
+                    userIdentify(userId: $userId){
+                        userId
+                        loginType
+                        userExist
+                        needInvite
+                        needConfirm
+                        hasPermanentPassword
+                        dummyUser {
+                            ...dummyUserFragment
+                        }
+                        token
+                        expires
+                    }
+                }
+            `,
+            variables: {
+               userId: userId_
+            }
+         })
+         if (!token) { // сервер отверг userIdentify
+            alert('cant login!') // TODO
          }
-      })
-      if (!token){ // сервер отверг userIdentify
-         alert('cant login!') // TODO
+         localStorage.setItem('k_token', token)
+         localStorage.setItem('k_token_expires', expires)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return {
+            userId,
+            loginType,
+            userExist,
+            needInvite,
+            needConfirm,
+            hasPermanentPassword,
+            dummyUser,
+            token,
+            expires
+         }
       }
-      localStorage.setItem('k_token', token)
-      localStorage.setItem('k_token_expires', expires)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return { userId, loginType, userExist, needInvite, needConfirm, hasPermanentPassword, dummyUser, token, expires }
+      return await apiCall(f, cb)
    }
 
    // oauth вход
    static async userIdentifyByRoute (route) {
       assert(route, '!route')
-      const f = this.userIdentifyByRoute
+      const f = AuthApi.userIdentifyByRoute
       logD(f, 'start. route=', route)
       const t1 = performance.now()
-      let token, expires, userId, loginType, needInvite, needConfirm, userExist
-      if (route && route.query && route.query.token) {
+      assert(route && route.query && route.query.token, '!route && route.query && route.query.token')
+      await systemReset(true, true, false) // вне cb (иначе дедлок)
+      const cb = async () => {
+         let token, expires, userId, loginType, needInvite, needConfirm, userExist
          // take token from redirect url
          token = route.query.token
          expires = route.query.expires
@@ -188,131 +192,94 @@ class AuthApi {
          await systemReset(true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return { userId, loginType, userExist, needInvite, needConfirm, token, expires }
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return { userId, loginType, userExist, needInvite, needConfirm, token, expires }
+      return await apiCall(f, cb)
    }
 
    static async userAuthenticate (password, inviteCode) {
-      const f = this.userAuthenticate
+      const f = AuthApi.userAuthenticate
       logD(f, 'start')
       const t1 = performance.now()
-      let { data: { userAuthenticate: { result, role, oid, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.query({
-         query: gql`
-             query ($password: String!, $inviteCode: String) {
-                 userAuthenticate(password: $password, inviteCode: $inviteCode){
-                     result
-                     role
-                     oid
-                     nextAttemptDate
-                     attempts
-                     failReason
-                 }
-             }
-         `,
-         variables: { password: password || '', inviteCode }
-      })
-      if (oid) localStorage.setItem('k_user_oid', oid)
-      if (result) await systemInit()
-      // setWebPushToken мог быть вызван до userIdentify
-      if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, {
-         result,
-         role,
-         oid,
-         nextAttemptDate,
-         attempts,
-         failReason
-      })
-      return { result, role, nextAttemptDate, attempts, failReason }
+      const cb = async () => {
+         let { data: { userAuthenticate: { result, role, oid, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.query({
+            query: gql`
+                query ($password: String!, $inviteCode: String) {
+                    userAuthenticate(password: $password, inviteCode: $inviteCode){
+                        result
+                        role
+                        oid
+                        nextAttemptDate
+                        attempts
+                        failReason
+                    }
+                }
+            `,
+            variables: { password: password || '', inviteCode }
+         })
+         if (oid) localStorage.setItem('k_user_oid', oid)
+         return { result, role, nextAttemptDate, attempts, failReason }
+      }
+      let res = await apiCall(f, cb)
+      if (res.result) {
+         await systemInit() // вне cb (иначе дедлок)
+         // setWebPushToken мог быть вызван до userIdentify
+         if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken) // вне cb (иначе дедлок)
+      }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
+      return res
    }
 
    static async setPermanentPassword (oldPassword, newPassword) {
-      const f = this.setPermanentPassword
+      const f = AuthApi.setPermanentPassword
       logD(f, 'start')
       const t1 = performance.now()
-      let { data: { setPermanentPassword } } = await apollo.clients.auth.query({
-         query: gql`
-             query setPermanentPassword($oldPassword: String, $newPassword: String!) {
-                 setPermanentPassword(oldPassword: $oldPassword, newPassword: $newPassword)
-             }
-         `,
-         variables: { oldPassword, newPassword }
-      })
-      let currentUser = rxdb.getCurrentUser()
-      assert(currentUser && currentUser.settings, '!currentUser && currentUser.settings')
-      currentUser.settings.hasPermanentPassword = true
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, setPermanentPassword)
-      return setPermanentPassword
-   }
-
-   static async inviteEmail (email) {
-      logD('@invite start')
-      let { data: { inviteEmail } } = await apollo.clients.auth.query({
-         query: gql`
-             query ($email: String!){
-                 inviteEmail(email: $email)
-             }
-         `,
-         variables: {
-            email: email
-         }
-      })
-      logD('@invite done')
-      return inviteEmail
-   }
-
-   static async inviteUrl () {
-      logD('@invite start')
-      let { data: { inviteUrl } } = await apollo.clients.auth.query({
-         query: gql`
-             query {
-                 inviteUrl
-             }
-         `
-      })
-      logD('@invite done')
-      return inviteUrl
-   }
-
-   static async checkUserIdFree (userId) {
-      let { data: { checkUserIdFree } } = await apollo.clients.auth.query({
-         query: gql`
-             query ($userId: String!){
-                 checkUserIdFree(userId: $userId)
-             }
-         `,
-         variables: {
-            userId
-         }
-      })
-      return checkUserIdFree
+      const cb = async () => {
+         let { data: { setPermanentPassword } } = await apollo.clients.auth.query({
+            query: gql`
+                query setPermanentPassword($oldPassword: String, $newPassword: String!) {
+                    setPermanentPassword(oldPassword: $oldPassword, newPassword: $newPassword)
+                }
+            `,
+            variables: { oldPassword, newPassword }
+         })
+         let currentUser = rxdb.getCurrentUser()
+         assert(currentUser && currentUser.settings, '!currentUser && currentUser.settings')
+         currentUser.settings.hasPermanentPassword = true
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, setPermanentPassword)
+         return setPermanentPassword
+      }
+      return await apiCall(f, cb)
    }
 
    // сообщит токен на сервер (при условии что тот еще не был сообщен)
    static async setWebPushToken (token) {
-      const f = this.setWebPushToken
+      const f = AuthApi.setWebPushToken
       logD(f, 'start', token)
       const t1 = performance.now()
-      assert(token)
-      currentWebPushToken = token
-      if (!localStorage.getItem('k_token')) {
-         return
+      const cb = async () => {
+         assert(token)
+         currentWebPushToken = token
+         if (!localStorage.getItem('k_token')) {
+            return
+         }
+         if (AuthApi.isGuest()) {
+            return
+         }
+         if (localStorage.getItem('k_web_push_token') === currentWebPushToken) { // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
+            return
+         }
+         let { data: { setWebPushToken } } = await apollo.clients.auth.query({
+            query: gql`query ($token: String!) {
+                setWebPushToken (token: $token)
+            }`,
+            variables: { token }
+         })
+         localStorage.setItem('k_web_push_token', token)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
-      if (AuthApi.isGuest()) {
-         return
-      }
-      if (localStorage.getItem('k_web_push_token') === currentWebPushToken) { // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
-         return
-      }
-      let { data: { setWebPushToken } } = await apollo.clients.auth.query({
-         query: gql`query ($token: String!) {
-             setWebPushToken (token: $token)
-         }`,
-         variables: { token }
-      })
-      localStorage.setItem('k_web_push_token', token)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return await apiCall(f, cb)
    }
 }
 

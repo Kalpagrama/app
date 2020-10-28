@@ -4,6 +4,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { makeEventCard } from 'public/scripts/common_func'
+import { apiCall } from 'src/api/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -18,7 +19,7 @@ const FindCollectionEnum = Object.freeze({
 class ListsApi {
    // sphereItems query
    static checkMangoQuery (mangoQuery) {
-      const f = this.checkMangoQuery
+      const f = ListsApi.checkMangoQuery
       logD(f, 'start', mangoQuery)
       const t1 = performance.now()
       let ex = {
@@ -46,6 +47,9 @@ class ListsApi {
    }
 
    static async getList (mangoQuery) {
+      const f = ListsApi.getList
+      logD(f, 'start')
+      const t1 = performance.now()
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 4' + JSON.stringify(mangoQuery))
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -136,105 +140,27 @@ class ListsApi {
 
    static async find (collection, mangoQuery, search = false) {
       ListsApi.checkMangoQuery(mangoQuery)
-      const f = this.find
+      const f = ListsApi.find
       logD(f, 'start')
       const t1 = performance.now()
-      let { data: { find: { items, events, objects, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-         query: gql`
-             ${search ? fragments.findResultFragmentForSearch : fragments.findResultFragment}
-             query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON!){
-                 find (collection: $collection, mangoQuery: $mangoQuery) {
-                     ...findResultFragment
-                 }
-             }
-         `,
-         variables: { collection, mangoQuery }
-      })
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      assert(count >= 0, 'count >= 0')
-      return { items: items || events || objects, count, totalCount, nextPageToken }
+      const cb = async () => {
+         let { data: { find: { items, events, objects, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+            query: gql`
+                ${search ? fragments.findResultFragmentForSearch : fragments.findResultFragment}
+                query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON!){
+                    find (collection: $collection, mangoQuery: $mangoQuery) {
+                        ...findResultFragment
+                    }
+                }
+            `,
+            variables: { collection, mangoQuery }
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         assert(count >= 0, 'count >= 0')
+         return { items: items || events || objects, count, totalCount, nextPageToken }
+      }
+      return await apiCall(f, cb)
    }
-
-   // static async sphereSpheres (oid, pagination, filter, sortStrategy) {
-   //   const f = this.sphereSpheres
-   //   logD(f, 'start')
-   //   let { data: { sphereSpheres: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-   //     query: gql`
-   //       query sphereSpheres ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
-   //         sphereSpheres (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-   //           items {
-   //             oid
-   //             name
-   //           }
-   //         }
-   //       }
-   //     `,
-   //     variables: { oid, pagination, filter, sortStrategy }
-   //   })
-   //   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   //   return { items, count, totalCount, nextPageToken }
-   // }
-
-   // static async sphereNodes (oid, pagination, filter, sortStrategy) {
-   //   const f = this.sphereNodes
-   //   logD(f, 'start')
-   //   let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
-   //     query: gql`
-   //       ${fragments.objectShortFragment}
-   //       query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-   //         sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-   //           count
-   //           totalCount
-   //           nextPageToken
-   //           items {... objectShortFragment}
-   //         }
-   //       }
-   //     `,
-   //     variables: { oid, pagination, filter, sortStrategy }
-   //   })
-   //   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   //   return { items, count, totalCount, nextPageToken, prevPageToken }
-   // }
-
-   // static async feed (pagination) {
-   //   const f = this.feed
-   //   // logD(f, 'start')
-   //   // const t1 = performance.now()
-   //   let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-   //     query: gql`
-   //       ${fragments.objectShortFragment}
-   //       query feed ($pagination: PaginationInput!) {
-   //         feed (pagination: $pagination) {
-   //           count
-   //           totalCount
-   //           nextPageToken
-   //           items {... objectShortFragment}
-   //         }
-   //       }
-   //     `,
-   //     variables: { pagination }
-   //   })
-   //   // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   //   return { items, count, totalCount, nextPageToken }
-   // }
-
-   // static async events (pagination) {
-   //   let { data: { events: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-   //     query: gql`
-   //       ${fragments.eventFragment}
-   //       query events ( $pagination: PaginationInput!){
-   //         events (pagination: $pagination) {
-   //           totalCount
-   //           count
-   //           nextPageToken
-   //           items {...eventFragment}
-   //         }
-   //       }
-   //     `,
-   //     variables: { pagination }
-   //   })
-   //   return { items, count, totalCount, nextPageToken }
-   // }
 
    static async userSubscriptions (oid, pagination) {
       let user = await rxdb.get(RxCollectionEnum.OBJ, oid)

@@ -250,11 +250,12 @@ class Objects {
    // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
    // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 16 штук. Последние запрошенные - в первую очередь
    // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-   async get (id, priority, clientFirst, force, onFetchFunc = null) {
+   async get (id, notEvict, priority, clientFirst, force, onFetchFunc = null) {
       const fetchFunc = async () => {
          logD('objects::get::fetchFunc start')
          let promise = this.queryAccumulator.push(getOidFromId(id), priority)
          let result = await promise
+         result.notEvict = notEvict
          logD('objects::get::fetchFunc complete')
          return result
       }

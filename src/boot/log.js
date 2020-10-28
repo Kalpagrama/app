@@ -279,14 +279,6 @@ export default async ({Vue, store, app}) => {
         } else {
           logE('window.onerror', message, source, line, column, error)
         }
-        // let hardReset = confirm('critical error: ' + JSON.stringify(error) + '\n\nMake hardReset?')
-        // if (hardReset) {
-        //   const { systemHardReset } = require('src/system/services')
-        //   systemHardReset()
-        //   // const { systemReset } = require('src/system/services')
-        //   // systemReset(true) // todo нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
-        //   // window.location.reload()
-        // }
       } catch (e) {
         console.error(e)
       }

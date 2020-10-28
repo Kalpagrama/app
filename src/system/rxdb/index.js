@@ -247,7 +247,7 @@ class RxDBWrapper {
       }
       try {
          await this.lock('rxdb::init')
-         this.event.init()
+         await this.event.init()
          let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
          assert(authUser, 'authUser')
          let { userOid, dummyUser } = authUser
@@ -255,15 +255,8 @@ class RxDBWrapper {
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
          let currentUser
          if (userOid) {
-            let fetchCurrentUserFunc = async () => {
-               return {
-                  notEvict: true, // живет вечно
-                  item: await ObjectsApi.objectFull(userOid),
-                  actualAge: 'day'
-               }
-            }
             currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-               fetchFunc: fetchCurrentUserFunc,
+               notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
@@ -296,6 +289,8 @@ class RxDBWrapper {
          }
          this.initialized = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      } catch (err) {
+         logE('cant init rxdb. err = ', err)
       } finally {
          this.release()
       }
@@ -308,7 +303,7 @@ class RxDBWrapper {
          logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
          await this.lock('rxdb::deInit')
-         if (fromDeinitGlobal) this.event.deInit() // подписку отменяем только 1 раз
+         if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
          this.reactiveItemDbMemCache.reset()
@@ -546,7 +541,7 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.getRxDoc
       const t1 = performance.now()
       // logD(f, 'start')
@@ -558,7 +553,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum in LstCollectionEnum) {
          rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-         rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
+         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
@@ -573,7 +568,7 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
       // logW(f, 'start', rxCollectionEnum, idOrRawId)
@@ -600,6 +595,7 @@ class RxDBWrapper {
       if (!reactiveItem) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
+            notEvict,
             clientFirst,
             priority,
             force,
