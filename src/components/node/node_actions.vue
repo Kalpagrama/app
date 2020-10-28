@@ -8,17 +8,18 @@
   //- actions wrapper
   div(:style=`{maxWidth: '700px'}`).row.full-width.items-center.content-center.q-mb-xs
     node-share(:node="node").shaking
+    kalpa-bookmark(:oid="node.oid" type="NODE" :name="node.name" :thumbUrl="node.items[0].thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
     node-remake(:node="node").shaking
-    kalpa-bookmark(:oid="node.oid" type="NODE" :name="node.name" :thumbUrl="node.items[0].thumbUrl" :isActive="isActive").shaking
     node-connect(:node="node" :isActive="isActive" :isVisible="isVisible")
     //- vote
-    .col
+    .col.br
       .row.fit.items-center.content-center.justify-end
         q-btn(
           @click="showStats = true"
           flat dense no-caps color="grey-2")
-          span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
-    div(:style=`{width: '60px'}`).row.justify-center
+          //- span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
+          span.text-white.text-bold {{ node.rate }}
+    div(:style=`{width: '60px'}`).row.justify-center.br
       node-vote(:node="node")
 </template>
 

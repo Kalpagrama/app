@@ -7,42 +7,19 @@
       @close="showStats = false")
   //- actions wrapper
   div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-    //- share
     joint-share(:joint="joint")
-    //- .row.full-height.justify-center
-      joint-share(:joint="joint").shaking
-      //- .row.full-width.justify-center
-        small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countShares }}
-    //- remake
-    //- .row.full-height.justify-center
-      joint-remake(:joint="joint").shaking
-      .row.full-width.justify-center
-        small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countRemakes }}
-    //- bookmark
-    //- .row.full-height.justify-center
-    joint-bookmark(:joint="joint" :isActive="isActive" :isVisible="isVisible").shaking
-      //- .row.full-width.justify-center
-      //-   small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countBookmarks }}
-    //- v
-    //- .row.full-height.justify-center
-      q-btn(
-        @click="$router.push('/workspace/joint/new?oid='+joint.oid)"
-        round flat color="green").shaking
-        q-icon(name="link" size="30px" color="green")
-      .row.full-width.justify-center
-        small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countJoints }}
+    kalpa-bookmark(:oid="joint.oid" type="JOINT" :name="joint.name" :thumbUrl="joint.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
     //- vote
-    .col
-      div().row.full-width.items-center.content-center.justify-end
+    .col.br
+      .row.fit.items-center.content-center.justify-end
         q-btn(
           @click="showStats = true"
           flat dense no-caps color="grey-2")
-          span.text-white.text-bold.q-mx-sm 82
-          //- span.text-white.text-bold {{ $nodeRateTitle(joint.rate) }}
-        div(v-if="!noVote").row.full-height.justify-center
-          joint-vote(:joint="joint")
-          //- .row.full-width.justify-center
-            small.text-grey-8 {{ joint.countBookmarks > 100 ? '99+' : joint.countVotes }}
+          //- span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
+          span.text-white.text-bold {{ joint.rate }}
+    //- vote btn
+    div(:style=`{width: '60px'}`).row.justify-center.br
+      joint-vote(:joint="joint")
 </template>
 
 <script>

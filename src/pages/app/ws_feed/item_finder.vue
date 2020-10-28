@@ -17,7 +17,7 @@ q-layout(
       template(v-slot:tint=`{item}`)
         div(
           :style=`{
-            position: 'absolute', zIndex: 100,
+            position: 'absolute', zIndex: 200,
           }`
           ).row.fit
           div(

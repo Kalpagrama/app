@@ -60,6 +60,8 @@ q-layout(view="lHh lpR lFf")
       kalpa-menu-mobile
   q-page-container
     router-view
+    //- keep-alive
+      router-view(:key="$route.fullPath")
     //- div(
       :style=`{height: $q.screen.height-50+'px'}`
       ).row.full-width.items-center.content-center.justify-center

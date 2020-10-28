@@ -27,7 +27,24 @@ div(
             borderRadius: '10px', overflow: 'hidden',
             background: 'rgb(45,45,45)',
           }`
-        ).col.full-width
+          ).col.full-width
+          .row.fit
+            div(
+              v-for="(i,ii) in 3" :key="ii"
+              :style=`{
+                position: 'relative',
+              }`
+              ).col-4.full-height
+              img(
+                v-if="bookmarks[ii]"
+                draggable="false"
+                :src="bookmarks[ii].thumbUrl"
+                :style=`{
+                  borderRadius: '10px 0 0 10px', overflow: 'hidden',
+                  objectFit: 'cover',
+                  marginLeft: ii > 0 ? '-10px' : '0px',
+                  minWidth: ii > 0 ? 'calc(100% + 10px)' : '100%',
+                }`).fit.b-40
         div(
           :style=`{
             height: '60px'
@@ -59,6 +76,7 @@ export default {
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
       },
+      sort: [{updatedAt: 'desc'}]
     })
   }
 }

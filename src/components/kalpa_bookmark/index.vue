@@ -1,17 +1,23 @@
 <template lang="pug">
 .row
+  //- transition-show="none" transition-hide="none"
   q-dialog(
     v-model="showDialog"
-    )
-    feeds(
-      :oid="oid" :bookmark="bookmark"
+    position="bottom"
+    maximized)
+    feeds-selector(
+      :oid="oid"
+      :bookmark="bookmark"
+      :style=`{
+        height: $q.screen.height-60+'px',
+      }`
       @close="showDialog = false")
   slot(name="action" :start="start" :bookmark="bookmark")
   q-btn(
     v-if="!$scopedSlots.action"
     @click="start()"
     round flat no-caps
-    :color="bookmark ? 'green' : 'white'"
+    :color="bookmark ? activeColor : inactiveColor"
     :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
     :loading="loading"
     )
@@ -23,9 +29,19 @@ import { UserApi } from 'src/api/user'
 
 export default {
   name: 'kalpaBookmark',
-  props: ['oid', 'type', 'name', 'thumbUrl', 'isActive', 'fields'],
+  // props: ['oid', 'type', 'name', 'thumbUrl', 'isActive', 'fields'],
+  props: {
+    oid: {type: String},
+    type: {type: String},
+    name: {type: String},
+    thumbUrl: {type: String},
+    isActive: {type: Boolean},
+    fields: {type: Object},
+    inactiveColor: {type: String, default: 'white'},
+    activeColor: {type: String, default: 'green'},
+  },
   components: {
-    feeds: () => import('./feeds.vue')
+    feedsSelector: () => import('./feeds_selector.vue')
   },
   data () {
     return {
@@ -55,6 +71,7 @@ export default {
         // await UserApi.subscribe(this.oid)
         if (bookmark) {
           // this.bookmark = bookmark
+          this.showDialog = true
         }
         else {
           // TODO: where to handle bookmarkInput create?
@@ -65,6 +82,7 @@ export default {
             thumbUrl: this.thumbUrl,
             wsItemType: 'WS_BOOKMARK',
             spheres: [],
+            feeds: [],
             ...this.fields || {},
           }
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
@@ -74,7 +92,7 @@ export default {
         this.$log('start done')
         this.bookmark = bookmark
         this.loading = false
-        this.showDialog = true
+        // this.showDialog = true
       }
       catch (e) {
         this.$log('start error', e)
