@@ -8,7 +8,14 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- header
-  .row.full-width.items-center.content-center.q-py-xs.q-px-xs
+  div(
+    :style=`{
+      borderRadius: '10px 10px 0 0',
+      background: 'rgb(32,32,32)',
+      marginBottom: '-20px',
+      paddingBottom: '20px',
+    }`
+    ).row.full-width.items-center.content-center.q-pt-xs.q-px-xs
     router-link(
       v-if="item.subject.type === 'USER'"
       :to="'/user/'+item.subject.oid"
@@ -21,6 +28,7 @@
         draggable="false"
         :src="item.subject.thumbUrl"
         :style=`{
+          marginLeft: '2px',
           width: '20px', height: '20px',
           borderRadius: '50%'}`)
       .col.full-height

@@ -84,9 +84,12 @@
       ).row.full-width.justify-center.q-pa-sm.cursor-pointer
       span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ joint.name }}
   //- actions
-  joint-actions(
+  node-actions(
     v-if="showFooter"
-    :joint="joint" :isActive="isActive" :isVisible="isVisible")
+    :node="joint"
+    :useConnect="false"
+    :useRemake="false"
+    :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -104,7 +107,7 @@ export default {
   },
   components: {
     jointItem: () => import('components/joint/joint_item.vue'),
-    jointActions: () => import('components/joint/joint_actions.vue')
+    nodeActions: () => import('components/node/node_actions.vue')
   },
   data () {
     return {

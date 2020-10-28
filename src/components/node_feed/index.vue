@@ -22,6 +22,7 @@ div(
       small.text-grey-8.q-mr-xs {{ node.countViews }}
       q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      q-btn(round flat dense icon="more_vert" color="grey-9")
     //- items wrapper
     .row.full-width
       div(
