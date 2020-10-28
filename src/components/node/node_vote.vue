@@ -11,15 +11,17 @@ div(
         borderRadius: '10px 10px 0 0', overflow: 'hidden',
         maxWidth: $q.screen.width  > 800 ? '400px' : $q.screen.width+'px',
       }`
-      ).row.full-width.b-40
+      ).row.full-width.b-40.q-pa-sm
       //- header
       div(
         :style=`{
           fontSize: '18px',
           textAlign: 'center',
         }`
-        ).row.full-width.justify-center.q-px-md.q-py-xl
-        span.text-white.text-bold {{ node.name }}
+        ).row.full-width.justify-center.q-px-md.q-py-lg
+        .row.full-width.justify-center
+          span.text-white.text-bold Проголосовать за
+        span.text-white "{{ node.name }}"
       q-btn(
         @click="vote(a.value)"
         v-for="(a,ai) in actions" :key="ai"
@@ -28,8 +30,10 @@ div(
         :style=`{
           color: a.color,
         }`
-        ).full-width
+        ).row.full-width.b-50.q-mb-xs
         span.text-white.text-bold.q-ml-sm {{ a.label }}
+        .col
+        span.text-white.text-bold {{ a.value / 10 }}
   //- vote action start
   q-btn(
     @click="voteStart()"
@@ -77,12 +81,13 @@ export default {
         this.$router.push('/auth/sign-in')
       }
       else {
-        if (currentUser.oid === this.node.author.oid) {
-          this.$q.notify({type: 'negative', position: 'top', message: 'Cant vote for your node!'})
-        }
-        else {
-          this.showVotes = true
-        }
+        this.showVotes = true
+        // if (currentUser.oid === this.node.author.oid) {
+        //   this.$q.notify({type: 'negative', position: 'top', message: 'Cant vote for your node!'})
+        // }
+        // else {
+        //   this.showVotes = true
+        // }
       }
     },
     async vote (val) {
@@ -96,6 +101,7 @@ export default {
         this.votingAgain = false
         this.showVotes = false
         this.showVotearea = false
+        this.$emit('done')
       }
       catch (e) {
         this.$log('vote error', e)

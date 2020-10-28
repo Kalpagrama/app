@@ -30,7 +30,6 @@ import { UserApi } from 'src/api/user'
 
 export default {
   name: 'kalpaBookmark',
-  // props: ['oid', 'type', 'name', 'thumbUrl', 'isActive', 'fields'],
   props: {
     oid: {type: String},
     type: {type: String},

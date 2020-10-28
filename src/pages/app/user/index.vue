@@ -18,16 +18,19 @@ q-layout(view="hHh Lpr lff")
             :name="user.name"
             :thumbUrl="user.thumbUrl"
             :isActive="true")
-        .row.full-width.q-px-md
-          q-tabs(
-            no-caps active-color="green" align="left"
-            stretch :breakpoint="100" inline-label
-            :switch-indicator="true").full-width.text-grey-8
-            q-route-tab(
-              v-for="t in pages" :key="t.id"
-              inline-label
-              :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
   q-page-container
+    q-page-sticky(
+      expand position="top"
+      :style=`{zIndex: 1000}`).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md.b-30
+        q-tabs(
+          no-caps active-color="green" align="left"
+          stretch :breakpoint="100" inline-label
+          :switch-indicator="true").full-width.text-grey-8
+          q-route-tab(
+            v-for="t in pages" :key="t.id"
+            inline-label
+            :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
     router-view(:oid="$route.params.oid")
 </template>
 
@@ -53,11 +56,11 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
+        {id: 'feeds', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
         {id: 'created', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'voted', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
-        {id: 'following', name: this.$t('Subscriptions', 'Подписки'), icon: 'rss_feed'},
+        // {id: 'following', name: this.$t('Subscriptions', 'Подписки'), icon: 'rss_feed'},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},
       ]
     },

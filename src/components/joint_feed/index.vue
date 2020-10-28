@@ -89,6 +89,7 @@
     :node="joint"
     :useConnect="false"
     :useRemake="false"
+    :useBookmarkType="'JOINT'"
     :isActive="isActive" :isVisible="isVisible")
 </template>
 

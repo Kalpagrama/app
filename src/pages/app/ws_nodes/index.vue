@@ -2,7 +2,8 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.justify-start.q-px-sm
+    .row.full-width.justify-start.q-px-sm.q-pt-sm
+      slot(name="header")
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(

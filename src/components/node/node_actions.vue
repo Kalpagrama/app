@@ -14,7 +14,7 @@
         position: 'relative',
         height: '60px'}`
       ).row.items-center.content-center.justify-center
-      kalpa-bookmark(:oid="node.oid" type="NODE" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
+      kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
       //- bookmark count
       div(
         v-if="node.countBookmarks > 0"
@@ -58,6 +58,7 @@ export default {
     isVisible: {type: Boolean},
     useShare: {type: Boolean, default: true},
     useBookmark: {type: Boolean, default: true},
+    useBookmarkType: {type: String, default: 'NODE'},
     useRemake: {type: Boolean, default: true},
     useConnect: {type: Boolean, default: true},
     useVote: {type: Boolean, default: true}

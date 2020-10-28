@@ -101,6 +101,12 @@ const routes = [
             component: () => import('pages/app/user/index.vue'),
             children: [
                {
+                  name: 'user.feeds',
+                  path: 'feeds',
+                  component: () => import('pages/app/user/user_feeds.vue'),
+                  meta: { roleMinimal: 'GUEST' }
+               },
+               {
                   name: 'user.created',
                   path: 'created',
                   component: () => import('pages/app/user/user_created.vue'),

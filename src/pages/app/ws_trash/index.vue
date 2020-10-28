@@ -6,21 +6,22 @@
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Trash
   //- items
-  .row.full-width.items-start.content-start.q-py-sm
-    kalpa-loader(
-      :immediate="true"
-      :query="queryItems" :limit="10000"
-      v-slot=`{items,next}`)
-      div().row.full-width.items-start.content-start.q-px-sm
-        div(
-          v-for="(i,ii) in items" :key="ii"
-          :style=`{
-            borderRadius: '10px', overflow: 'hidden',
-          }`
-          ).row.full-width.q-py-sm.q-px-md.q-mb-sm.b-40
-          span.text-white {{ i.name }}
-          .row.full-width
-            small.text-grey-6 {{ i.wsItemType }}
+  .row.full-width.justify-center.q-px-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-py-sm
+      kalpa-loader(
+        :immediate="true"
+        :query="queryItems" :limit="10000"
+        v-slot=`{items,next}`)
+        div().row.full-width.items-start.content-start
+          div(
+            v-for="(i,ii) in items" :key="ii"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.full-width.q-py-sm.q-px-md.q-mb-sm.b-40
+            span.text-white {{ i.name }}
+            .row.full-width
+              small.text-grey-6 {{ i.wsItemType }}
 </template>
 
 <script>
