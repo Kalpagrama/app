@@ -59,6 +59,7 @@ div(
       @play="videoPlay"
       @pause="videoPause"
       @ended="videoEnded"
+      @error="videoError"
       ref="compositionVideoRef"
       :src="composition.url"
       :muted="muted"
@@ -122,6 +123,10 @@ export default {
         else {
           this.$refs.compositionVideoRef.pause()
           this.duration = 0
+          if (this.$refs.compositionVideoRef) {
+            this.$refs.compositionVideoRef.src = ''
+            this.$refs.compositionVideoRef.removeAttribute('src')
+          }
         }
       }
     },
@@ -184,10 +189,15 @@ export default {
         e.target.play()
       }
     },
+    videoError (e) {
+      this.$log('videoError', e)
+    }
   },
   mounted () {
     this.mutedCheck()
     // this.$log('mounted')
-  }
+  },
+  // beforeDestroy () {
+  // }
 }
 </script>

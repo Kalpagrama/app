@@ -1,24 +1,8 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-    //- header
-    //- .row.full-width.q-px-sm
-      div(:style=`{borderRadius: '10px',overflow: 'hidden'}`).row.full-width.b-40
-        .col
-          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="searchString"
-              borderless dark dense color="white"
-              :placeholder="$t('Find a joint', 'Найти связь')"
-              :input-style=`{
-                paddingLeft: '10px',
-              }`
-              ).full-width
-        q-btn(
-          @click="$router.push('/workspace/joint/new')"
-          round flat dense color="green" icon="add"
-          :style=`{width: '40px'}`)
-    .row.full-width.justify-start.q-px-sm
+    .row.full-width.justify-start.q-px-sm.q-pt-sm
+      slot(name="header")
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(
@@ -48,7 +32,7 @@
         :value="typeId" @input="typeId = $event" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        q-tab(name="bookmarked" icon="bookmark" label="Закладки").q-px-xs
+        //- q-tab(name="bookmarked" icon="bookmark" label="Закладки").q-px-xs
         q-tab(name="drafts" label="Черновики").q-px-xs
         q-tab(name="published" label="Опубликованные").q-px-xs
     //- types wrapper

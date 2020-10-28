@@ -52,7 +52,7 @@ const routes = [
          {
             name: 'feeds',
             path: 'feeds/:id?',
-            component: () => import('pages/app/feeds/feeds.vue'),
+            component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -100,6 +100,12 @@ const routes = [
             redirect: 'user/:oid/created',
             component: () => import('pages/app/user/index.vue'),
             children: [
+               {
+                  name: 'user.feeds',
+                  path: 'feeds',
+                  component: () => import('pages/app/user/user_feeds.vue'),
+                  meta: { roleMinimal: 'GUEST' }
+               },
                {
                   name: 'user.created',
                   path: 'created',
@@ -194,7 +200,7 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace',
-            redirect: 'workspace/contents/video',
+            redirect: 'workspace/feeds',
             component: () => import('pages/app/ws_index/index.vue'),
             children: [
                {

@@ -2,7 +2,8 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.justify-start.q-px-sm
+    .row.full-width.justify-start.q-px-sm.q-pt-sm
+      slot(name="header")
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(
@@ -32,7 +33,7 @@
         :value="typeId" @input="typeIdChanged" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
-        q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
+        //- q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
         q-tab(name="drafts" label="Черновики").q-px-xs
         q-tab(name="published" label="Опубликованные").q-px-xs
   .row.full-width

@@ -94,8 +94,8 @@ export default {
           oid: contentKalpa.oid,
           name: contentKalpa.name,
           thumbUrl: contentKalpa.thumbUrl,
-          type: 'CONTENT',
-          contentType: contentKalpa.type,
+          type: contentKalpa.type,
+          // contentType: contentKalpa.type,
           wsItemType: 'WS_BOOKMARK',
           spheres: [],
         }

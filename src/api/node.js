@@ -6,7 +6,6 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
 import { ActionEnum, AuthApi } from 'src/api/auth'
-import { apiCall } from 'src/api/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -21,53 +20,47 @@ const StatKeyEnum = Object.freeze({
 
 class NodeApi {
    static async nodeCategories () {
-      const f = NodeApi.nodeCategories
+      const f = this.nodeCategories
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         let { data: { nodeCategories } } = await apollo.clients.auth.query({
-            query: gql`
-                query nodeCategories{
-                    nodeCategories{
-                        alias
-                        icon
-                        name
-                        sphere{
-                            oid
-                            type
-                            name
-                        }
-                        type
-                    }
-                }
-            `
-         })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return nodeCategories
-      }
-      return await apiCall(f, cb)
+      let { data: { nodeCategories } } = await apollo.clients.auth.query({
+         query: gql`
+             query nodeCategories{
+                 nodeCategories{
+                     alias
+                     icon
+                     name
+                     sphere{
+                         oid
+                         type
+                         name
+                     }
+                     type
+                 }
+             }
+         `
+      })
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return nodeCategories
    }
 
    static async emojiSpheres () {
-      const f = NodeApi.emojiSpheres
+      const f = this.emojiSpheres
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         let { data: { emojiSpheres } } = await apollo.clients.auth.query({
-            query: gql`
-                query emojiSpheres{
-                    emojiSpheres{
-                        oid
-                        type
-                        name
-                    }
-                }
-            `
-         })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return emojiSpheres
-      }
-      return await apiCall(f, cb)
+      let { data: { emojiSpheres } } = await apollo.clients.auth.query({
+         query: gql`
+             query emojiSpheres{
+                 emojiSpheres{
+                     oid
+                     type
+                     name
+                 }
+             }
+         `
+      })
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return emojiSpheres
    }
 
    static makeCompositionInput (composition) {
@@ -157,65 +150,59 @@ class NodeApi {
    }
 
    static async nodeUnrate (oid) {
-      const f = NodeApi.nodeUnrate
+      const f = this.nodeUnrate
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         if (!oid) return
-         let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation nodeUnrate ($oid: OID!) {
-                    unrate (oid: $oid){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               oid: oid
-            }
-         })
-         // todo update node in apollo cache
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return nodeUnrate
-      }
-      return await apiCall(f, cb)
+      if (!oid) return
+      let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             ${fragments.objectFullFragment}
+             mutation nodeUnrate ($oid: OID!) {
+                 unrate (oid: $oid){
+                     ...objectFullFragment
+                 }
+             }
+         `,
+         variables: {
+            oid: oid
+         }
+      })
+      // todo update node in apollo cache
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return nodeUnrate
    }
 
    // общая оценка ядра придет с эвентом
    static async nodeVote (oid, rate) {
-      const f = NodeApi.nodeVote
+      const f = this.nodeVote
       logD(f, 'start', rate)
       const t1 = performance.now()
-      const cb = async () => {
-         assert(oid, 'oid && rate')
-         if (rate > 1) rate = rate / 100
-         assert(AuthApi.hasPermitionForAction(ActionEnum.VOTE))
-         let { data: { nodeRate } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation rate ($oid: OID!, $rate: Float!) {
-                    rate (oid: $oid, rate: $rate){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               oid: oid,
-               rate: rate
-            }
-         })
-         // надо запомнить сейчас, тк эвентом придет только общая оценка
-         let node = await rxdb.get(RxCollectionEnum.OBJ, oid)
-         if (node) {
-            // logD(f, `try change rateUser for ${node.id}`, node)
-            node.rateUser = rate // node реактивен!
-            logD(f, `done rateUser=${node.rateUser}`)
+      assert(oid, 'oid && rate')
+      if (rate > 1) rate = rate / 100
+      assert(AuthApi.hasPermitionForAction(ActionEnum.VOTE))
+      let { data: { nodeRate } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             ${fragments.objectFullFragment}
+             mutation rate ($oid: OID!, $rate: Float!) {
+                 rate (oid: $oid, rate: $rate){
+                     ...objectFullFragment
+                 }
+             }
+         `,
+         variables: {
+            oid: oid,
+            rate: rate
          }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return rate
+      })
+      // надо запомнить сейчас, тк эвентом придет только общая оценка
+      let node = await rxdb.get(RxCollectionEnum.OBJ, oid)
+      if (node) {
+         // logD(f, `try change rateUser for ${node.id}`, node)
+         node.rateUser = rate // node реактивен!
+         logD(f, `done rateUser=${node.rateUser}`)
       }
-      return await apiCall(f, cb)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return rate
    }
 
    // static async unPublish (oid) {
@@ -236,32 +223,29 @@ class NodeApi {
    // }
 
    static async nodeCreate (node) {
-      const f = NodeApi.nodeCreate
+      const f = this.nodeCreate
       logD(f, 'start', node)
       const t1 = performance.now()
-      const cb = async () => {
-         let nodeInput = NodeApi.makeNodeInput(node)
-         let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation nodeCreate($node: NodeInput!) {
-                    nodeCreate (node: $node){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               node: nodeInput
-            }
-         })
-         let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveNode.oid, progress: 1 }
-         assert(store, '!store')
-         store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
-         return reactiveNode
-      }
-      return await apiCall(f, cb)
+      let nodeInput = NodeApi.makeNodeInput(node)
+      let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             ${fragments.objectFullFragment}
+             mutation nodeCreate($node: NodeInput!) {
+                 nodeCreate (node: $node){
+                     ...objectFullFragment
+                 }
+             }
+         `,
+         variables: {
+            node: nodeInput
+         }
+      })
+      let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveNode.oid, progress: 1 }
+      assert(store, '!store')
+      store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
+      return reactiveNode
    }
 
    static makeJointInput (joint) {
@@ -281,60 +265,53 @@ class NodeApi {
    }
 
    static async jointCreate (joint) {
-      const f = NodeApi.jointCreate
+      const f = this.jointCreate
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         let jointInput = NodeApi.makeJointInput(joint)
-         logD('jointCreate jointInput', jointInput)
-         let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation jointCreate($joint: JointInput!) {
-                    jointCreate (joint: $joint){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               joint: jointInput
-            }
-         })
-         let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return reactiveJoint
-      }
-      return await apiCall(f, cb)
+      let jointInput = NodeApi.makeJointInput(joint)
+      logD('jointCreate jointInput', jointInput)
+      let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             ${fragments.objectFullFragment}
+             mutation jointCreate($joint: JointInput!) {
+                 jointCreate (joint: $joint){
+                     ...objectFullFragment
+                 }
+             }
+         `,
+         variables: {
+            joint: jointInput
+         }
+      })
+      let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return reactiveJoint
    }
 
-   static async updateStat (oid, key, value) {
-      const f = NodeApi.updateStat
+   static async updateStat(oid, key, value){
+      const f = this.updateStat
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         assert(oid, '!oid')
-         assert(key in StatKeyEnum, '!key in StatKeyEnum')
+      assert(oid, '!oid')
+      assert(key in StatKeyEnum, '!key in StatKeyEnum')
 
-         let { data: { updateStat } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
-                    updateStat (oid: $oid, statData: $statData)
-                }
-            `,
-            variables: {
-               oid: oid,
-               statData: {
-                  key,
-                  valueInt: value
-               }
+      let { data: { updateStat } } = await apollo.clients.api.mutate({
+         mutation: gql`
+             mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
+                 updateStat (oid: $oid, statData: $statData)
+             }
+         `,
+         variables: {
+            oid: oid,
+            statData: {
+               key,
+               valueInt: value
             }
-         })
-         // todo update stat in cache
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return updateStat
-      }
-      return await apiCall(f, cb)
+         }
+      })
+      // todo update stat in cache
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return updateStat
    }
 }
 

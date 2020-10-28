@@ -35,9 +35,10 @@
       :to="'/node/'+node.oid"
       :style=`{
         textAlign: 'center',
+        height: '60px',
       }`
-      ).row.full-width.justify-center.cursor-pointer.q-pa-md
-      span(:style=`{fontSize: '1rem'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+      ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-px-md
+      small(:style=`{}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
   //- footer
   //- node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>

@@ -22,6 +22,7 @@ div(
       small.text-grey-8.q-mr-xs {{ node.countViews }}
       q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      q-btn(round flat dense icon="more_vert" color="grey-9")
     //- items wrapper
     .row.full-width
       div(
@@ -55,7 +56,11 @@ div(
           textAlign: 'center',
         }`
         ).row.full-width.justify-center.cursor-pointer.q-pa-md
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+        //- <50 18 100 18
+        span(
+          :style=`{
+            fontSize: nodeNameSize+'px',
+          }`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
   //- footer
   node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
@@ -85,6 +90,14 @@ export default {
         }
       }
       else return null
+    },
+    // TODO: impl better way
+    nodeNameSize () {
+      let l = this.node.name.length
+      if (l < 50) return 18
+      else if (l >= 50 && l < 100) return 14
+      else if (l >= 100) return 12
+      else return 10
     }
   },
   methods: {

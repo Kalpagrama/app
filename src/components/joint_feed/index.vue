@@ -74,8 +74,8 @@
                 'justify-end': ii === 0
               }`
               :style=`{
-                height: '40px',
-              }`).row.full-width.items-center.content-center.q-px-md
+                height: '24px',
+              }`).row.full-width.items-center.content-center.q-px-sm
               span.text-white.text-bold {{ getItemTypeName(ii, joint.jointType) }}
     //- name
     div(
@@ -84,9 +84,13 @@
       ).row.full-width.justify-center.q-pa-sm.cursor-pointer
       span(:style=`{fontSize: '20px'}`).text-white.text-bold.shaking.cursor-pointer {{ joint.name }}
   //- actions
-  joint-actions(
+  node-actions(
     v-if="showFooter"
-    :joint="joint" :isActive="isActive" :isVisible="isVisible")
+    :node="joint"
+    :useConnect="false"
+    :useRemake="false"
+    :useBookmarkType="'JOINT'"
+    :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -104,7 +108,7 @@ export default {
   },
   components: {
     jointItem: () => import('components/joint/joint_item.vue'),
-    jointActions: () => import('components/joint/joint_actions.vue')
+    nodeActions: () => import('components/node/node_actions.vue')
   },
   data () {
     return {
@@ -143,17 +147,17 @@ export default {
       this.$router.push(`/joint/${this.joint.oid}`).catch(e => e)
     },
     getItemTypeName (index, val) {
-      this.$log('getItemTypeName', index, val)
+      // this.$log('getItemTypeName', index, val)
       if (['ESSENCE', 'ASSOCIATIVE'].includes(val)) return ''
       else {
         let t = this.types.find(t => t.id === val)
-        this.$log('t', t)
+        // this.$log('t', t)
         return t.names[index]
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     // this.stats = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.joint.oid}})
   }
 }

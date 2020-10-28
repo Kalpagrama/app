@@ -17,7 +17,7 @@ export const schemaKeyValue = {
 
 export const wsSchemaItem = {
   title: 'wsSchemaItem',
-  version: 0,
+  version: 1,
   description: 'wsSchemaItem',
   type: 'object',
   properties: {
@@ -79,6 +79,12 @@ export const wsSchemaItem = {
       uniqueItems: false,
       items: {
         type: ['object', 'string']
+      }
+    },
+    feeds: {
+      type: 'array',
+      items: {
+        type: ['string', 'object']
       }
     },
     category: {

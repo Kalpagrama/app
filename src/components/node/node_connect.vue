@@ -1,5 +1,8 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-height.justify-center
+div(
+  :style=`{
+    position: 'relative',
+    height: '60px',}`).row.full-height.items-center.content-center.justify-center
   //- position="bottom"
   q-dialog(
     v-model="nodeConnectOpened"
@@ -40,11 +43,11 @@ div(:style=`{position: 'relative',}`).row.full-height.justify-center
     @click="connectStart()"
     round flat color="green").shaking
     q-icon(name="link" size="30px" color="grey-9")
-  //- count
+  //- joints count
   div(
-    v-if="node.countJoints > 0"
-    :style=`{position: 'absolute', zIndex: 100, bottom: '-4px',}`).row.full-width.justify-center
-    small.text-grey-8 {{ node.countJoints }}
+    v-if="true || node.countJoints > 0"
+    :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
+    small.text-grey-9 {{ node.countJoints }}
 </template>
 
 <script>

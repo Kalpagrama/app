@@ -16,10 +16,10 @@
         )
         user-avatar(:url="v.thumbUrl" :width="24" :height="24")
         span.text-grey-4.q-ml-sm {{ v.name }}
+      small.text-grey-8.q-mt-xs.q-mx-xs {{ $date(v.createdAt, 'DD.MM.YYYY') }}
       .col
-      small.text-grey-8.q-mr-xs {{ v.rate }}
-      q-icon(name="adjust" color="grey-8").q-mr-md
-      small.text-grey-8.q-mr-sm {{ $date(v.createdAt, 'DD.MM.YYYY') }}
+      small(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-sm {{ v.rate * 10 }}
+      //- q-icon(name="adjust" color="grey-8").q-mx-sm
 </template>
 
 <script>

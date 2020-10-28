@@ -137,6 +137,19 @@ q-page(
               }`)
             .col.q-px-sm
               span.text-white {{ n.object.name.slice(0, 50) }}
+        //- object WORD, SENTENCE
+        router-link(
+          v-else-if="['WORD', 'SENTENCE'].includes(n.object.type)"
+          :to="'/sphere/'+n.object.oid"
+          ).row.items-center.content-center.q-pa-xs
+          span.text-white.q-mr-sm сферу
+          div(
+            :style=`{
+              borderRadius: '10px',
+            }`
+            ).row.items-center.content-center.q-pa-xs.b-50
+            q-icon(name="blur_on" color="white" size="30px")
+            span.text-white.q-mx-sm {{ n.object.name }}
         //- object fallback
         div(
           v-else

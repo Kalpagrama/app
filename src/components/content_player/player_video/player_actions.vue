@@ -22,7 +22,9 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
     q-btn(
       flat dense :color="color")
       small.text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
+    //- TODO: impl fullscreen player on mobile devices
     q-btn(
+      v-if="$q.screen.width > 800"
       @click="player.fullscreenToggle()"
       round flat dense :color="color"
       :icon="player.isFullscreen ? 'fullscreen_exit' : 'fullscreen'")
