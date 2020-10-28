@@ -54,45 +54,6 @@ export default {
     }
   },
   methods: {
-    async itemClick (item) {
-      this.$log('itemClick', item)
-      // // store item raw or not ?
-      // let itemInput
-      // if (this.viewId === 'from-subs') {
-      //   // this.$emit('item', item)
-      //   itemInput = {
-      //     id: item.id,
-      //     oid: item.oid,
-      //     name: item.name,
-      //     thumbUrl: item.thumbUrl,
-      //     type: item.type,
-      //     wsItemType: item.wsItemType,
-      //   }
-      // }
-      // else if (this.viewId === 'ws-contents') {
-      //   itemInput = {
-      //     id: item.id,
-      //     oid: item.oid,
-      //     name: item.name,
-      //     thumbUrl: item.thumbUrl,
-      //     type: item.contentType,
-      //     wsItemType: item.wsItemType,
-      //   }
-      // }
-      // else if (this.viewId === 'ws-nodes') {
-      //   itemInput = {
-      //     id: item.id,
-      //     oid: item.oid,
-      //     name: item.name,
-      //     thumbUrl: item.items[0] ? item.items[0].thumbUrl : '',
-      //     type: item.type,
-      //     wsItemType: item.wsItemType,
-      //   }
-      // }
-      // else if (this.viewId === 'ws-joints') {
-      // }
-      // this.$emit('item', itemInput)
-    }
   }
 }
 </script>
