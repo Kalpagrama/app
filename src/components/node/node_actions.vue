@@ -51,7 +51,7 @@ export default {
   name: 'nodeActions',
   props: ['node', 'isActive', 'isVisible'],
   components: {
-    nodeRemake, nodeShare, nodeStats, nodeVote, nodeConnect,
+    nodeShare, nodeRemake, nodeStats, nodeVote, nodeConnect,
   },
   data () {
     return {

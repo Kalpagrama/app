@@ -8,6 +8,9 @@ q-layout(view="hHh Lpr lff")
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col
             span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
+          kalpa-share(
+            v-if="user"
+            type="user" :item="user")
           kalpa-bookmark(
             v-if="user && !itsMe"
             :oid="user.oid"

@@ -107,12 +107,12 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     // kalpa
     Vue.component('kalpaBookmark', () => import('components/kalpa_bookmark/index.vue'))
+    Vue.component('kalpaShare', () => import('components/kalpa_share/index.vue'))
     Vue.component('kalpaConnect', () => import('components/kalpa_connect/index.vue'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaMenu', () => import('components/kalpa_menu/index.vue'))
     Vue.component('kalpaMenuMobile', () => import('components/kalpa_menu_mobile/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
-    Vue.component('kalpaFollow', () => import('components/kalpa_follow/index.vue'))
     // content
     Vue.component('contentSearch', () => import('components/content_search/index.vue'))
     // workspace

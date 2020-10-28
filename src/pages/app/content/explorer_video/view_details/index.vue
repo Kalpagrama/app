@@ -17,10 +17,10 @@ q-page(
             @click="gotToOriginal"
             icon="fab fa-youtube" align="left"
             color="green" outline no-caps
-            :style=`{
-              //- maxWidth: '300px',
-            }`).q-px-sm
+            ).col.q-px-sm
             span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+          kalpa-share(
+            type="content" :item="contentKalpa")
       //- spheres
       div(
         v-if="contentBookmark"

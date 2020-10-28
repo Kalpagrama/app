@@ -1,38 +1,139 @@
 <template lang="pug">
-.row
+.row.justify-center.items-center.content-center
   q-dialog(
-    v-model="showDialog"
+    v-model="shareDialogOpened"
     position="bottom"
     :maximized="$q.screen.width < 800")
-    //- feeds-selector(
-      :oid="oid"
-      :bookmark="bookmark"
+    div(
       :style=`{
-        height: $q.screen.width < 800 ? $q.screen.height-60+'px' : '600px',
+        height: $q.screen.width < 800 ? $q.screen.height-60+'px' : '400px',
         maxWidth: $q.screen.width < 800 ? '100%' : '500px',
-      }`
-      @close="showDialog = false")
+        borderRadius: '10px', overflow: 'hidden',
+      }`).row.full-width.items-start.content-start.b-30
+      //- header
+      .row.full-width.items-center.content-center.q-pa-md
+        .col
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Share', 'Поделиться')}}
+        q-btn(
+          @click="shareDialogOpened = false"
+          round flat color="grey-8" icon="clear")
+      //- copy link
+      .row.full-width.q-pa-md
+        div(
+          :style=`{
+            position: 'relative', zIndex: 100,
+            borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+          ).row.full-width
+          q-input(
+            v-model="shareLink"
+            filled dark color="grey-8"
+            ).full-width
+            template(v-slot:append)
+              q-btn(color="green" flat no-caps @click="shareLinkCopy()")
+                span.text-bold {{$t('Copy', 'Скопировать')}}
+      //- links
+      div(
+        v-if="!shareTarget").row.full-width.q-px-md
+        q-btn(
+          @click="shareEmbed"
+          round icon="code" color="grey-5" size="lg"
+          :style=`{borderRadius: '50%'}`).q-mr-md
+        //- q-btn(
+          @click="shareWithTwitter"
+          round icon="fab fa-twitter" color="blue-6" size="lg"
+          :style=`{borderRadius: '50%'}`).q-mr-md
+        //- q-btn(
+          round icon="fab fa-vk" color="blue-8" size="lg"
+          :style=`{borderRadius: '50%'}`).q-mr-md
+      //- embed
+      div(
+        v-if="shareTarget === 'embed'"
+        ).row.full-width.q-pa-md
+        div(
+          :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+          q-input(
+            :value="shareEmbedText"
+            filled dark dense color="grey-6"
+            type="textarea" autogrow
+            :input-style=`{minHeight: '100px',}`).full-width
+            template(v-slot:append)
+              q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
+                span.text-bold {{$t('Copy', 'Скопировать')}}
+  //- share start btn
   q-btn(
-    @click="start()"
+    @click="shareStart()"
     round flat no-caps
-    color="grey-9"
+    :color="color"
     icon="share"
     :loading="loading")
+  slot(name="footer")
 </template>
 
 <script>
+import { Platform, openURL } from 'quasar'
+import { shareWith } from 'src/system/services'
+
 export default {
   name: 'kalpaShare',
-  props: ['item'],
+  props: {
+    type: {type: String, required: true},
+    item: {type: Object, required: true},
+    color: {type: String, default: 'grey-9'}
+  },
   data () {
     return {
-      showDialog: false,
       loading: false,
+      shareLink: '',
+      shareDialogOpened: false,
+      shareTarget: null,
+    }
+  },
+  computed: {
+    shareEmbedText () {
+      return `<iframe width="100%" height="315" src="${location.origin}/${this.type}/${this.item.oid}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
     }
   },
   methods: {
-    start () {
-      this.$log('start')
+    async shareStart () {
+      this.$log('shareStart')
+      if (Platform.is.desktop) {
+        this.shareLink = location.origin + '/' + this.type + '/' + this.item.oid
+        this.shareDialogOpened = true
+      }
+      else {
+        shareWith(this.item)
+      }
+      this.$emit('done')
+    },
+    async shareLinkCopy () {
+      this.$log('shareLinkCopy')
+      this.clipboardWrite(this.shareLink, 'Link copied to clipboard!')
+      await this.$wait(500)
+      this.shareDialogOpened = false
+    },
+    shareEmbed () {
+      this.$log('shareEmbed')
+      this.shareTarget = 'embed'
+    },
+    async shareEmbedCopy () {
+      this.$log('shareEmbedCopy')
+      this.clipboardWrite(this.shareEmbedText, 'Copied to clipboard!')
+      await this.$wait(500)
+      this.shareDialogOpened = false
+    },
+    clipboardWrite (val, message) {
+      this.$log('clipboardWrite', val)
+      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          await navigator.clipboard.writeText(val)
+          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
+        }
+      })
+    },
+    shareWithTwitter () {
+      this.$log('shareWithTwitter')
+      let url = `https://twitter.com/intent/tweet?url=${this.shareLink}&via=Kalpagrama&text=${this.node.name}`
+      openURL(url)
     }
   }
 }
