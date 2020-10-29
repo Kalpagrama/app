@@ -45,7 +45,7 @@ div(
     q-icon(name="link" size="30px" color="grey-9")
   //- joints count
   div(
-    v-if="true || node.countJoints > 0"
+    v-if="node.countJoints > 0"
     :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
     small.text-grey-9 {{ node.countJoints }}
 </template>

@@ -74,13 +74,13 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

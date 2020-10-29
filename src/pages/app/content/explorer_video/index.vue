@@ -18,7 +18,7 @@ div(
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
-            type="CONTENT"
+            :type="contentKalpa.type"
             :name="contentKalpa.name"
             :thumbUrl="contentKalpa.thumbUrl"
             :isActive="true"

@@ -26,21 +26,14 @@ q-page(
       :style=`{
         height: '120px',
       }`
-      ).row.full-width.b-30
+      ).row.full-width.items-start.content-start.b-30
       //- search
-      .row.full-width.justify-center.q-py-sm.q-px-sm
+      .row.full-width.justify-center.q-pt-sm.q-pb-xs.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
           div(:style=`{maxWidth: '700px',}`).row.full-width
-            .col
-              div(
-                :style=`{
-                  background: 'rgb(35,35,35)',
-                  borderRadius: '10px', overflow: 'hidden',
-                }`
-                ).row.fit
-                feed-search(
-                  @content="contentFound"
-                  @searchString="searchString = $event")
+            slot(name="search-prepend")
+            div(:style=`{maxWidth: '700px',}`).col
+              ws-search()
             q-btn(
               v-if="id !== 'all'"
               @click="itemFinderOpened = true"
@@ -49,7 +42,11 @@ q-page(
               round flat color="grey-4" icon="tune")
       //- types
       .row.full-width.justify-center.q-px-sm
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+        div(
+          :style=`{
+            maxWidth: $store.state.ui.pageMaxWidth+'px'
+            //- maxWidth: '700px',
+          }`
           ).row.full-width.items-start.content-start.scroll
           .row.items-center.content-center.no-wrap
             q-btn(
@@ -68,28 +65,30 @@ q-page(
     :query="itemsQuery" :limit="1000" v-slot=`{items,next}`)
     div(
       :style=`{
-        maxWidth: $store.state.ui.pageMaxWidth+'px'
+        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        //- maxWidth: '700px',
       }`
       ).row.full-width.items-start.content-start
-      feed-item(
-        v-for="(item, ii) in items" :key="item.id"
-        @select="itemSelectedId = item.id"
-        :item="item"
-        ).q-mb-sm
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
-        template(v-slot:default=`{item}`)
-          div(
-            v-if="itemSelectedId === item.id"
-            :style=`{
-              marginTop: '-20px',
-              paddingTop: '20px',
-              borderRadius: '10px',
-            }`
-            ).row.full-width.bg-green.q-px-xs.q-pb-xs
-            q-btn(round flat dense color="white" icon="delete_outline" @click="itemDelete(item)")
-            .col
-            q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
+      div(:style=`{maxWidth: '700px'}`).row.full-width
+        feed-item(
+          v-for="(item, ii) in items" :key="item.id"
+          @select="itemSelectedId = item.id"
+          :item="item"
+          ).q-mb-sm
+          template(v-slot:tint=`{item}`)
+            slot(name="tint" :item="item")
+          template(v-slot:default=`{item}`)
+            div(
+              v-if="itemSelectedId === item.id"
+              :style=`{
+                marginTop: '-20px',
+                paddingTop: '20px',
+                borderRadius: '10px',
+              }`
+              ).row.full-width.bg-green.q-px-xs.q-pb-xs
+              q-btn(round flat dense color="white" icon="delete_outline" @click="itemDelete(item)")
+              .col
+              q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
 </template>
 
 <script>
@@ -120,7 +119,7 @@ export default {
         {id: 'IMAGE', name: 'Картинки', types: ['IMAGE']},
         {id: 'NODE', name: 'Ядра', types: ['NODE']},
         {id: 'JOINT', name: 'Связи', types: ['JOINT']},
-        {id: 'USER', name: 'Пользователи', types: ['USER']},
+        {id: 'USER', name: 'Люди', types: ['USER']},
         {id: 'SPHERE', name: 'Сферы', types: ['WORD', 'SENTENCE']}
       ]
     },

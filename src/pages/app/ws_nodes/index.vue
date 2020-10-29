@@ -1,10 +1,73 @@
 <template lang="pug">
-.row.full-width.justify-center
+q-layout(
+  view="hHh Lpr lff")
+  q-header(reveal)
+    .row.full-width.q-pt-sm.q-px-sm.b-30
+      //- .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+          ).row.full-width.items-center
+          q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
+          span.text-grey-6 Мастерская / Ядра
+      .row.full-width.justify-center
+        div(
+          :style=`{
+            position: 'relative',
+            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
+            borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-center.b-40.q-px-sm
+          q-icon(name="filter_tilt_shift" size="30px" color="white").q-mr-md.q-ml-sm
+          .col
+            span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Ядра
+          q-btn(round flat color="white" icon="more_vert")
+      .row.full-width.justify-center
+        div(
+          :style=`{
+            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
+            borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-start.q-pt-sm
+          div(:style=`{maxWidth: '700px',}`).col
+            ws-search(
+              @searchString="searchString = $event"
+              )
+          q-btn(
+            @click="$router.push('/workspace/node/new')"
+            round flat color="grey-4" icon="add").full-height
+          q-btn(
+            round flat color="grey-4" icon="tune").full-height
+      //- types
+      .row.full-width.justify-center.q-pt-xs
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+          q-btn(
+            v-for="(type,ii) in types" :key="type.id"
+            @click="typeId = type.id"
+            flat no-caps dense
+            :color="typeId === type.id ? 'green' : 'grey-7'"
+            :class=`{
+              'b-40': typeId === type.id
+            }`
+            :style=`{}`).q-mr-xs.q-mb-xs.q-px-xs {{ type.name }}
+  q-page-container
+    q-page.row.full-width.justify-center.q-pt-md
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.br
+        component(:is="`type-${typeId}`" :searchString="searchString")
+          template(v-slot:tint=`{item, itemKey}`)
+            slot(name="tint" :item="item" :itemKey="itemKey")
+//- .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
     //- header
-    .row.full-width.justify-start.q-px-sm.q-pt-sm
+    div(v-if="showHeader").row.full-width.justify-start.q-px-sm.q-pt-sm
       slot(name="header")
-      div(:style=`{maxWidth: '700px',}`).row.full-width
+      .row.full-width
+        .col.br
+          ws-search(
+            :style=`{maxWidth: '700px',}`
+            )
+        q-btn(
+          @click="$router.push('/workspace/node/new')"
+          round flat color="grey-4" icon="add")
+        q-btn(
+          round flat color="grey-4" icon="tune")
+      //- div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(
             :style=`{
@@ -29,13 +92,24 @@
           round flat color="grey-4" icon="tune")
     //- types
     div(:style=`{}`).row.full-width.q-px-md
-      q-tabs(
+      //- q-tabs(
         :value="typeId" @input="typeIdChanged" inline-label
         dense no-caps active-color="green" align="left" switch-indicator
         ).full-width.text-grey-8
         //- q-tab(name="saved" icon="bookmark" label="Закладки").q-px-xs
-        q-tab(name="drafts" label="Черновики").q-px-xs
-        q-tab(name="published" label="Опубликованные").q-px-xs
+        q-tab(name="drafts" label="Черновики" inline-label).q-px-xs
+        q-tab(name="published" label="Опубликованные" inline-label).q-px-xs
+      q-tabs(
+        :value="typeId" @input="typeIdChanged" inline-label
+        no-caps active-color="green" align="left"
+        stretch :breakpoint="600" dense
+        :switch-indicator="true").full-width.text-grey-8
+        q-tab(name="drafts" label="Черновики" inline-label).q-px-xs
+        q-tab(name="published" label="Опубликованные" inline-label).q-px-xs
+        //- q-tab(
+          v-for="v in views" :key="v.id"
+          inline-label
+          :name="v.id" :label="v.name" :icon="v.icon").q-px-xs
   .row.full-width
     component(:is="`type-${typeId}`" :searchString="searchString")
       template(v-slot:tint=`{item, itemKey}`)
@@ -51,7 +125,9 @@ export default {
   props: {
     mode: {type: String, default () { return 'standalone' }},
     type: {type: String, default () { return 'drafts' }},
-    query: {type: Object, default () { return {} }}
+    query: {type: Object, default () { return {} }},
+    showHeader: {type: Boolean, default: true},
+    searchStringInput: {type: String}
   },
   components: {
     typeDrafts: () => import('./type_drafts.vue'),
@@ -76,14 +152,18 @@ export default {
         this.$log('type TO', to)
         this.typeId = to
       }
+    },
+    searchStringInput: {
+      handler (to, from) {
+        if (to) this.searchString = to
+      }
     }
   },
   computed: {
     types () {
       return [
-        {id: 'saved', icon: 'bookmark'},
-        {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики'), icon: null},
-        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные'), icon: null},
+        {id: 'drafts', name: this.$t('pageApp_wsNodes_drafts', 'Черновики')},
+        {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
       ]
     },
   },

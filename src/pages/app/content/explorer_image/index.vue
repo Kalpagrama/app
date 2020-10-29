@@ -33,7 +33,8 @@ q-layout(view="hHh Lpr lff")
             img(
               :src="contentKalpa.url" draggable="false"
               :style=`{
-                objectFit: 'contain'
+                objectFit: 'contain',
+                maxHeight: $q.screen.heigth*0.8+'px',
               }`).fit
           .row.full-width
             .row.full-width.justify-start.q-px-md

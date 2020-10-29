@@ -1,8 +1,15 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- item finder
-  q-dialog(v-model="itemFinderOpened" position="bottom" maximized)
-    div(
+  q-dialog(
+    v-model="itemFinderOpened"
+    position="bottom"
+    maximized)
+    item-finder(
+      @sphere="sphereFound"
+      @close="itemFinderOpened = false"
+      )
+    //- div(
       @click.self="itemFinderOpened = false"
       :style=`{height: $q.screen.height+'px',}`).row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center
@@ -51,8 +58,10 @@
           borderRadius: '10px', overflow: 'hidden',
         }`
         ).row.full-width
-        div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
-          q-btn(round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true")
+        //- div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
+        q-btn(
+          round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true"
+          :style=`{position: 'absolute', zIndex: 10}`).fit.b-50
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
     //- slider
@@ -133,7 +142,8 @@ export default {
     editDescription: () => import('./edit_description.vue'),
     editItem: () => import('./edit_item/index.vue'),
     viewAdd: () => import('./view_add/index.vue'),
-    viewPublish: () => import('./view_publish/index.vue')
+    viewPublish: () => import('./view_publish/index.vue'),
+    itemFinder: () => import('./item_finder.vue')
   },
   props: {
     node: {type: Object}
@@ -165,6 +175,16 @@ export default {
     }
   },
   methods: {
+    sphereFound (sphere) {
+      this.$log('sphereFound', sphere)
+      let i = this.node.spheres.findIndex(id => id === sphere.id)
+      if (i >= 0) {
+        alert('Duplicate sphere!')
+      }
+      else {
+        this.node.spheres.push(sphere.id)
+      }
+    },
     itemFound (item) {
       this.$log('itemFound', item)
       item.meta = {cover: true, timeout: 3000}
