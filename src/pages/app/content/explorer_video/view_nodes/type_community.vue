@@ -32,7 +32,8 @@ kalpa-loader(
         div(v-if="!$scopedSlots.nodeActionAll").row.full-width
           q-btn(round flat dense color="white" icon="edit")
           .col
-          q-btn(round flat dense color="white" icon="launch" @click="$router.push(`/node/${item.oid}`)")
+          q-btn(v-if="pick" flat color="red" no-caps @click="pick(item)") Выбрать ядро
+          q-btn(v-if="!pick" round flat dense color="white" icon="launch" @click="$router.push(`/node/${item.oid}`)")
 </template>
 
 <script>
@@ -41,6 +42,7 @@ import nodeItem from './type_community_item.vue'
 
 export default {
   name: 'typeCommunity',
+  inject: ['pick'],
   props: ['node', 'player', 'contentKalpa', 'contentBookmark', 'onlyMine'],
   components: {
     nodeItem

@@ -1,7 +1,6 @@
 <template lang="pug">
 div(
   :style=`{
-    //- position: 'relative',
     borderRadius: '10px',
   }`
   ).row.full-width.items-start.content-start.bg-black
@@ -12,53 +11,24 @@ div(
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
         maxHeight: $q.screen.height/2+'px',
-      }`).full-width.br
+      }`).full-width
     component(
       :is="playerComponent[source]"
       :url="url"
       @player="player = $event, $emit('player', $event)"
       :style=`{
-        position: 'absolute', zIndex: 100, top: 0,
+        position: 'absolute', zIndex: 1000, top: 0,
       }`).fit.bg-black
-  div(
-    :style=`{
-      //- height: '40px',
-      position: 'relative',
-    }`
-    ).row.full-width.justify-center
-    player-actions(
-      v-if="player" :player="player"
-      :style=`{
-        position: 'absolute', zIndex: 400, top: '-34px',
-        maxWidth: '770px',
-      }`)
-      template(v-slot)
-        slot(name="actions")
-    player-bar(v-if="player" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
-  //- .col.full-width
-  //- .row.full-width.bg-red.q-pa-md
-  //- component(
-    :is="playerComponent[source]"
-    :url="url"
-    @player="player = $event, $emit('player', $event)").br
-    div(
-      v-if="player"
-      :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '6px',
-      }`
-      ).row.full-width.justify-center.q-px-lg.bg
-      //- actions wrapper
-      div(
-        v-if="options.showActions"
-        ).row.full-width.justify-center
-        player-actions(v-if="player" :player="player" :style=`{maxWidth: '600px'}`)
-          template(v-slot)
-            slot(name="actions")
-      //- bar wrapper
-      div(
-        v-if="options.showBar"
-        ).row.full-width.justify-center
-        player-bar(v-if="player" :player="player" :options="options" :style=`{maxWidth: '600px'}`)
+    //- actions slots...
+    div(:style=`{position: 'absolute', zIndex: 1100, left: '0px', bottom: '0px'}`).row
+      slot(name="left-bottom")
+    div(:style=`{position: 'absolute', zIndex: 1100, right: '0px', top: '50%'}`).row
+      slot(name="right")
+    //- actions player
+  div(:style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
+    div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-sm
+      player-actions(v-if="player" :player="player" :style=`{maxWidth: '770px',}`)
+      player-bar(v-if="player" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
 </template>
 
 <script>
@@ -73,7 +43,6 @@ export default {
     playerActions,
     playerBar,
   },
-  // props: ['source', 'url', 'options'],
   props: {
     source: {type: String, required: true},
     url: {type: String, required: true},

@@ -60,6 +60,12 @@ export default {
           if (bookmark) this.bookmark = bookmark
         }
       }
+    },
+    bookmark: {
+      handler (to, from) {
+        this.$log('bookmark TO', to)
+        if (to) this.$emit('bookmark', to)
+      }
     }
   },
   methods: {

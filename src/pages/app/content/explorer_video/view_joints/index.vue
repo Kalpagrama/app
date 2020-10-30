@@ -10,8 +10,8 @@ q-page(
       zIndex: 1000
     }`).b-30
     //- types
-    //- .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-py-xs
+    .row.full-width.justify-center.b-30
+      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm
         q-btn(
           v-for="(type,ii) in types" :key="type.id"
           @click="typeId = type.id"
@@ -30,6 +30,7 @@ q-page(
   component(
     :is="`type-${typeId}`"
     v-bind="$props"
+    :onlyMine="typeId === 'mine'"
     :style=`{
       maxWidth: 770+'px',
     }`)
@@ -42,7 +43,7 @@ export default {
   components: {
     typeCommunity: () => import('./type_community.vue'),
     typeDrafts: () => import('./type_drafts.vue'),
-    typeMine: () => import('./type_mine.vue')
+    typeMine: () => import('./type_community.vue')
   },
   data () {
     return {
@@ -52,9 +53,9 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'drafts', name: 'Drafts'},
-        {id: 'mine', name: 'Mine'},
-        {id: 'community', name: 'Community'}
+        // {id: 'drafts', name: 'Drafts'},
+        {id: 'mine', name: 'Мои связи'},
+        {id: 'community', name: 'Все связи'}
       ]
     }
   }

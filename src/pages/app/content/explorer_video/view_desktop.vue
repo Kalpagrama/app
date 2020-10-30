@@ -16,18 +16,10 @@ q-layout(
               q-icon(name="select_all" color="white" size="20px").q-mr-xs
               div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '1rem', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-              kalpa-bookmark(
-                v-if="contentKalpa"
-                :oid="contentKalpa.oid"
-                :type="contentKalpa.type"
-                :name="contentKalpa.name"
-                :thumbUrl="contentKalpa.thumbUrl"
-                :isActive="true"
-                :fields=`{contentType: contentKalpa.type}`)
         div(:style=`{width: '500px',}`).row.items-end.content-end.q-pl-sm
           div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pl-sm
             q-tabs(
-              v-model="viewId"
+              :value="viewId" @input="$event => $router.replace({query: {...$route.query, viewid: $event}})"
               align="justify"
               no-caps dense active-color="green").full-width.text-grey-8
               q-tab(
@@ -42,30 +34,32 @@ q-layout(
       }`).row.full-width
       .row.full-width.justify-start.items-start.content-start
         div(:style=`{position: 'relative'}`).col
-          content-player(
-            :contentKalpa="contentKalpa"
-            @player="playerLoaded"
-            @error="playerErrorHandle"
-            :style=`{
-            }`).full-width
-            template(v-slot:actions)
-              q-btn(
-                v-if="true || viewId !== 'node'"
-                @click="nodeCreate()"
-                round dense color="green" icon="add"
-                :style=`{borderRadius: '50%'}`)
+          div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
+            content-player(
+              :contentKalpa="contentKalpa"
+              @player="playerLoaded"
+              @error="playerErrorHandle"
+              :style=`{
+              }`).full-width
+              template(v-slot:right)
+                q-btn(
+                  v-if="!node"
+                  @click="createStart()"
+                  round dense color="green" icon="add"
+                  :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
           view-details(
-            v-if="viewId !== 'node'"
+            v-if="!node"
             :node="node"
             :player="player"
             :contentKalpa="contentKalpa"
             :contentBookmark="contentBookmark")
           view-node(
-            v-if="viewId === 'node'"
+            v-if="node"
             :node="node"
             :player="player"
             :contentKalpa="contentKalpa"
-            :contentBookmark="contentBookmark")
+            :contentBookmark="contentBookmark"
+            @close="node = null")
         div(:style=`{width: '500px'}`).row.items-start.content-start
           q-layout(
             view="hHh Lpr lff"
@@ -78,22 +72,17 @@ q-layout(
               component(
                 v-if="player"
                 :is="`view-${viewId}`"
-                :ref="`view-${viewId}`"
-                :node="node"
                 :player="player"
                 :contentKalpa="contentKalpa"
                 :contentBookmark="contentBookmark"
+                :nodeEditingId="node ? node.id : null"
                 :style=`{
                   paddingTop: '40px',
                 }`
-                @node="viewId = 'node', node = $event"
-                @close="viewId = 'nodes-mine', node = null")
-                //- template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
-                //-   slot(name="nodeAction" :node="node")
-                //- template(v-if="$scopedSlots.nodeActionMine" v-slot:nodeActionMine=`{node}`)
-                //-   slot(name="nodeActionMine" :node="node")
-                //- template(v-if="$scopedSlots.nodeActionAll" v-slot:nodeActionAll=`{node}`)
-                //-   slot(name="nodeActionAll" :node="node")
+                @bookmark="contentBookmark = $event"
+                @nodeCreate="nodeCreate"
+                @nodeEdit="nodeEdit"
+                @close="node = null")
 </template>
 
 <script>
@@ -104,8 +93,6 @@ import viewDetails from './view_details/index.vue'
 import viewNode from './view_node/index.vue'
 import viewNodes from './view_nodes/index.vue'
 import viewJoints from './view_joints/index.vue'
-// TODO: impl
-// import viewFullscreen from './view_fullscreen/index.vue'
 
 export default {
   name: 'contentExplorerVideo',
@@ -113,7 +100,6 @@ export default {
   props: ['contentKalpa', 'query'],
   data () {
     return {
-      viewId: 'nodes',
       player: null,
       playerIsVisible: false,
       contentBookmark: null,
@@ -130,6 +116,14 @@ export default {
     },
     paddingLeft () {
       return this.$q.screen.gt.md ? 250 : 76
+    },
+    viewId () {
+      if (this.query && this.query.viewid) return this.query.viewid
+      else return null
+    },
+    mode () {
+      if (this.query && this.query.mode) return this.query.mode
+      else return null
     }
   },
   watch: {
@@ -137,25 +131,29 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('query TO', to)
-        // set viewId force, from feed or from workspace
-        if (to && to.viewid) {
-          this.viewId = to.viewid
+        if (to) {
+          if (to.viewid) {
+          }
+          else {
+            this.$router.replace({query: {viewid: 'nodes', ...to}})
+          }
         }
-        // catch lastViewId
-        else {
-          // let viewId = localStorage.getItem('k_contentExplorer_viewid')
-          // this.$log('viewId', viewId)
-          // if (viewId) this.viewId = viewId
-        }
+        // get bookmark
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
         if (bookmark) this.contentBookmark = bookmark
       }
     }
   },
   methods: {
+    async createStart () {
+      this.$log('createStart')
+      // create something link or node... or always node...
+      let node = await this.nodeCreate()
+      this.nodeEdit(node)
+    },
     async nodeCreate () {
       this.$log('nodeCreate')
-      this.player.fullscreenToggle(false)
+      // this.player.fullscreenToggle(false)
       // start/end
       let start = this.player.currentTime
       let end = start + 10 > this.player.duration ? this.player.duration : start + 10
@@ -181,8 +179,13 @@ export default {
       }
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeCreate node', node)
+      return node
+    },
+    async nodeEdit (node) {
+      this.$log('nodeEdit', node)
+      this.node = null
+      await this.$wait(300)
       this.node = node
-      this.viewId = 'node'
     },
     playerStyles () {
       if (this.player && this.player.isFullscreen) {
@@ -269,7 +272,6 @@ export default {
     window.removeEventListener('keydown', this.keydownHandle)
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)
-    localStorage.setItem('k_contentExplorer_viewid', this.viewId)
     this.$store.commit('ui/stateSet', ['contentNodes', null])
   }
 }

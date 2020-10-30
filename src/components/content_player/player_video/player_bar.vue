@@ -7,7 +7,7 @@ div(
   v-touch-pan.left.right.prevent.mouse="barPan"
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
-  }`).row.full-width.b-40
+  }`).row.full-width.b-50
   //- contentNodes, we need nodes with first item of this content!
   //- with t, content type video
   div(

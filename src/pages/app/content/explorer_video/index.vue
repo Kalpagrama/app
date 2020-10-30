@@ -1,8 +1,7 @@
 <template lang="pug">
 component(
   :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
-  v-bind="$props"
-  )
+  v-bind="$props")
 </template>
 
 <script>

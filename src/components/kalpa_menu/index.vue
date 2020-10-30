@@ -101,11 +101,12 @@ div(
         //- create joint
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-          ).row.full-width.items-center.content-center
+          ).row.full-width.items-center.content-center.justify-center
           q-btn(
             :to="'/workspace/joint/new'"
-            flat color="green" no-caps align="left" icon="link" size="md"
-            :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
+            flat color="green" no-caps icon="link" size="md"
+            :align="mini ? 'center' : 'left'"
+            :style=`{height: '60px', paddingLeft: '0px'}`).full-width.menu-item
             span(
               v-if="!mini"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create joint', 'Создать связь')}}
@@ -115,7 +116,8 @@ div(
           ).row.full-width.items-center.content-center
           q-btn(
             :to="'/workspace/node/new'"
-            flat color="green" no-caps align="left" icon="add" size="md"
+            flat color="green" no-caps icon="add" size="md"
+            :align="mini ? 'center' : 'left'"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
             span(
               v-if="!mini"

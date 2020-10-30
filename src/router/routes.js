@@ -39,16 +39,6 @@ const routes = [
       path: '/',
       component: () => import('layouts/main_layout'),
       children: [
-         // {
-         //    path: 'feeds',
-         //    component: () => import('pages/app/feeds/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' },
-         //    children: [
-         //       { path: '', name: 'feeds', component: () => import('pages/app/feeds/feeds.vue') },
-         //       { path: 'edit/:id?', name: 'feeds.edit', component: () => import('pages/app/feeds/feed_edit.vue') },
-         //       { path: ':id', name: 'feeds.feed', component: () => import('pages/app/feeds/feed.vue') }
-         //    ]
-         // },
          {
             name: 'feeds',
             path: 'feeds/:id?',
@@ -97,7 +87,7 @@ const routes = [
          {
             name: 'user',
             path: 'user/:oid',
-            redirect: 'user/:oid/created',
+            redirect: 'user/:oid/nodes',
             component: () => import('pages/app/user/index.vue'),
             children: [
                {
@@ -107,9 +97,9 @@ const routes = [
                   meta: { roleMinimal: 'GUEST' }
                },
                {
-                  name: 'user.created',
-                  path: 'created',
-                  component: () => import('pages/app/user/user_created.vue'),
+                  name: 'user.nodes',
+                  path: 'nodes',
+                  component: () => import('pages/app/user/user_nodes.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {
@@ -119,15 +109,9 @@ const routes = [
                   meta: { roleMinimal: 'GUEST' }
                },
                {
-                  name: 'user.voted',
-                  path: 'voted',
-                  component: () => import('pages/app/user/user_voted.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
-                  name: 'user.following',
-                  path: 'following',
-                  component: () => import('pages/app/user/user_following.vue'),
+                  name: 'user.votes',
+                  path: 'votes',
+                  component: () => import('pages/app/user/user_votes.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {

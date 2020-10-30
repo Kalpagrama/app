@@ -7,12 +7,11 @@ q-page(
     expand
     :position="$q.screen.gt.sm ? 'top' : 'bottom'"
     :style=`{
-      zIndex: 1000
+      zIndex: 4000
     }`).b-30
     //- types
     .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-py-xs
-        //- q-btn(round flat dense color="white" icon="menu")
+      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-pb-xs
         q-btn(
           v-for="(type,ii) in types" :key="type.id"
           @click="typeId = type.id"
@@ -34,13 +33,15 @@ q-page(
     :onlyMine="typeId === 'mine'"
     :style=`{
       maxWidth: 770+'px',
-    }`)
+    }`
+    @nodeEdit="$event => $emit('nodeEdit', $event)"
+    @nodeCreate="$emit('nodeCreate')")
 </template>
 
 <script>
 export default {
   name: 'viewNodes',
-  props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
+  props: ['player', 'contentKalpa', 'contentBookmark', 'nodeEditingId'],
   components: {
     typeCommunity: () => import('./type_community.vue'),
     typeMine: () => import('./type_community.vue'),

@@ -1,5 +1,4 @@
 <template lang="pug">
-//- .row.full-width.items-start.content-start
 sphere-joints(
   :oid="contentKalpa.oid"
   :style=`{zIndex: 0}`

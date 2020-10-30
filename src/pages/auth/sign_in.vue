@@ -120,7 +120,8 @@ export default {
       password: '',
       passwordShow: false,
       inviteCodeShow: false,
-      inviteCode: ''
+      inviteCode: '',
+      loading: false,
     }
   },
   watch: {

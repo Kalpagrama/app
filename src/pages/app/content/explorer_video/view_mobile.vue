@@ -31,12 +31,12 @@ q-layout(
               @error="playerErrorHandle"
               :style=`{
               }`).fit
-              template(v-slot:actions)
+              template(v-slot:left-bottom)
                 q-btn(
-                  v-if="viewId !== 'node'"
-                  @click="nodeCreate()"
-                  round push color="green" dense icon="add"
-                  :style=`{borderRadius: '50%'}`)
+                  v-if="!node"
+                  @click="createStart()"
+                  round color="green" dense icon="add"
+                  :style=`{borderRadius: '50%', marginBottom: '36px',}`).q-ml-sm
   q-page-container
     component(
       v-if="player"
@@ -48,20 +48,17 @@ q-layout(
       :contentBookmark="contentBookmark"
       :style=`{
         paddingTop: '8px',
+        paddingBottom: '100px',
       }`
-      @node="viewId = 'node', node = $event"
-      @close="viewId = 'nodes-mine', node = null")
-      //- template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
-      //-   slot(name="nodeAction" :node="node")
-      //- template(v-if="$scopedSlots.nodeActionMine" v-slot:nodeActionMine=`{node}`)
-      //-   slot(name="nodeActionMine" :node="node")
-      //- template(v-if="$scopedSlots.nodeActionAll" v-slot:nodeActionAll=`{node}`)
-      //-   slot(name="nodeActionAll" :node="node")
+      @bookmark="contentBookmark = $event"
+      @nodeCreate="nodeCreate"
+      @nodeEdit="nodeEdit"
+      @close="viewId = 'nodes', node = null")
       template(v-slot:bottom)
         div(
           :style=`{}`).row.full-width.justify-center
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm Back
+            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-md Назад
             .col
               q-tabs(
                 v-model="viewId"
@@ -97,14 +94,10 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'details', icon: 'info', name: 'About'},
-        {id: 'nodes', icon: 'filter_tilt_shift', name: 'Nodes'},
-        {id: 'joints', icon: 'link', name: 'Links'}
+        {id: 'details', icon: 'info', name: 'Детали'},
+        {id: 'nodes', icon: 'filter_tilt_shift', name: 'Ядра'},
+        {id: 'joints', icon: 'link', name: 'Связи'}
       ]
-    },
-    paddingLeft () {
-      // return (this.$q.screen.width - this.$store.state.ui.pageMaxWidth) / 2
-      return 260
     }
   },
   watch: {
@@ -123,11 +116,19 @@ export default {
           // if (viewId) this.viewId = viewId
         }
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        this.$log('boookmarkkkkk', bookmark)
         if (bookmark) this.contentBookmark = bookmark
       }
     }
   },
   methods: {
+    async createStart () {
+      this.$log('createStart')
+      // create something link or node... or always node...
+      let node = await this.nodeCreate()
+      this.nodeEdit(node)
+      // this.viewId = 'node'
+    },
     async nodeCreate () {
       this.$log('nodeCreate')
       this.player.fullscreenToggle(false)
@@ -156,6 +157,14 @@ export default {
       }
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeCreate node', node)
+      return node
+      // this.node = node
+      // this.viewId = 'node'
+    },
+    async nodeEdit (node) {
+      this.$log('nodeEdit', node)
+      this.node = null
+      await this.$wait(300)
       this.node = node
       this.viewId = 'node'
     },
@@ -244,7 +253,7 @@ export default {
     window.removeEventListener('keydown', this.keydownHandle)
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)
-    localStorage.setItem('k_contentExplorer_viewid', this.viewId)
+    // localStorage.setItem('k_contentExplorer_viewid', this.viewId)
     this.$store.commit('ui/stateSet', ['contentNodes', null])
   }
 }

@@ -25,4 +25,5 @@ export default {
   showAuth: false,
   isTyping: false,
   contentNodes: null,
+  editorItem: null
 }

@@ -34,6 +34,7 @@ div(
 <script>
 export default {
   name: 'viewNodes_typeComminityItem',
+  inject: ['pick'],
   props: ['contentKalpa', 'player', 'node', 'isSelected'],
   data () {
     return {

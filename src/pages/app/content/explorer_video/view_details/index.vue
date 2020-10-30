@@ -43,7 +43,8 @@
             :thumbUrl="contentKalpa.thumbUrl"
             :isActive="true"
             inactiveColor="grey-8"
-            :fields=`{contentType: contentKalpa.type}`)
+            :fields=`{contentType: contentKalpa.type}`
+            @bookmark="$event => $emit('bookmark', $event)")
           kalpa-share(
             type="content" :item="contentKalpa")
       //- spheres
@@ -54,7 +55,8 @@
           span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
         ws-sphere-editor(
           :item="contentBookmark"
-          :style=`{borderRadius: '10px',}`).b-40
+          :style=`{borderRadius: '10px',}`
+          ).b-40
 </template>
 
 <script>

@@ -66,9 +66,8 @@ q-layout(
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="viewId = 'feeds', feedId = null")
       template(v-slot:tint=`{item}`)
         div(
-          @click="itemClick(item)"
-          :style=`{position: 'absolute', zIndex: 200,}`).row.fit
-          //- small.text-white {{item}}
+          @click="$emit('item', item)"
+          :style=`{position: 'absolute', zIndex: 500}`).row.fit.cursor-pointer
     //- nodes
     ws-nodes(
       v-if="viewId === 'nodes'"
@@ -83,6 +82,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeEditor_itemFinder',
+  props: ['node'],
   components: {
     feedAll: () => import('pages/app/ws_feeds/feed_all.vue'),
     feedCreator: () => import('pages/app/ws_feeds/feed_creator.vue'),
@@ -132,48 +132,6 @@ export default {
       this.$log('feedClick', feed)
       this.viewId = 'feed'
       this.feedId = feed.id
-    },
-    async itemClick (item) {
-      this.$log('itemClick', item)
-      if (item.wsItemType === 'WS_BOOKMARK') {
-        // extract everything from node
-        if (item.type === 'NODE') {
-          // take everything from node
-        }
-        // use video content
-        if (item.type === 'VIDEO') {
-          // use as sphere...
-          // open content node extractor...
-        }
-        // use image content, extract nodes from the content
-        if (item.type === 'IMAGE') {
-          // create compositionInput
-        }
-        // use user, sphere, word, sentence...
-        if (['USER', 'SPHERE'].includes(item.type)) {
-          this.$q.notify({type: 'negative', position: 'top', message: 'You cant add sphere/user for now :('})
-          // // find sphere with item.name in workspace...
-          // let [sphere] = await this.$rxdb.find({
-          //   selector: {
-          //     rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: item.name,
-          //   }
-          // })
-          // // do nothing?
-          // if (sphere) {
-          // }
-          // // create sphere in workspace...
-          // else {
-          //   let sphereInput = {
-          //     wsItemType: 'WS_SPHERE',
-          //     spheres: [],
-          //     name: item.name,
-          //   }
-          //   sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
-          // }
-          // // emit sphere event to nodeEditor
-          // this.$emit('sphere', {id: sphere.id, name: sphere.name, oid: item.oid})
-        }
-      }
     }
   }
 }

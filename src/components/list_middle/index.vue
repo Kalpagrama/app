@@ -22,6 +22,7 @@
       :isActive="indexMiddle === ii"
       :isVisible="ii === indexMiddle || ii === indexMiddle-1 || ii === indexMiddle+1"
       :width="width")
+  slot(name="append")
 </template>
 
 <script>
