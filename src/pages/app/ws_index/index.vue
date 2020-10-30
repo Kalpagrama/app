@@ -65,7 +65,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('pageWs_podborki', 'Подборки'), icon: 'view_week'},
+        {id: 'feeds', name: this.$t('pageWs_podborki', 'Подборки'), icon: 'collections_bookmark'},
         {id: 'nodes', name: this.$t('pageWs_nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('pageWs_joints', 'Связи'), icon: 'link'}
       ]

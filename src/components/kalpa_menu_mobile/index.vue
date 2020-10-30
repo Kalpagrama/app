@@ -12,10 +12,10 @@
     router-link(:to="{name: 'feeds'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
-          round flat dense icon="view_week"
+          round flat dense icon="explore"
           :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
-          small.text-grey-6 Ленты
+          small.text-grey-6 Новое
     router-link(:to="'/workspace/node/new'").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(

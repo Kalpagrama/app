@@ -48,7 +48,7 @@ q-layout(
             :style=`{}`).q-mr-xs.q-mb-xs.q-px-xs {{ type.name }}
   q-page-container
     q-page.row.full-width.justify-center.q-pt-md
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.br
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         component(:is="`type-${typeId}`" :searchString="searchString")
           template(v-slot:tint=`{item, itemKey}`)
             slot(name="tint" :item="item" :itemKey="itemKey")

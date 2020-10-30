@@ -11,7 +11,7 @@ q-layout(
               :style=`{borderRadius: '10px', overflow: 'hidden'}`
               ).row.fit.items-center.content-center.q-pa-sm.b-40
               q-btn(
-                @click="$emit('out', ['back'])"
+                @click="$router.back()"
                 round flat color="white" icon="keyboard_arrow_left")
               q-icon(name="select_all" color="white" size="20px").q-mr-xs
               div(:style=`{overflowX: 'auto'}`).col

@@ -144,7 +144,7 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'feeds', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
+        {id: 'feeds', name: 'Новое', icon: 'explore'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'search', name: this.$t('pageSearch_title', 'Поиск'), icon: 'search'},

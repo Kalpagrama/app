@@ -70,10 +70,12 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    if (this.query && this.query.pick && this.query.id) this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

@@ -31,12 +31,12 @@ q-layout(
               @error="playerErrorHandle"
               :style=`{
               }`).fit
-              template(v-slot:left-bottom)
+              template(v-slot:right)
                 q-btn(
                   v-if="!node"
                   @click="createStart()"
                   round color="green" dense icon="add"
-                  :style=`{borderRadius: '50%', marginBottom: '36px',}`).q-ml-sm
+                  :style=`{borderRadius: '50%', marginBottom: '36px',}`).q-ml-sm.q-mr-sm
   q-page-container
     component(
       v-if="player"

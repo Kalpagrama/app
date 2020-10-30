@@ -41,6 +41,7 @@ q-page(
 <script>
 export default {
   name: 'viewNodes',
+  inject: ['pick'],
   props: ['player', 'contentKalpa', 'contentBookmark', 'nodeEditingId'],
   components: {
     typeCommunity: () => import('./type_community.vue'),
@@ -64,6 +65,9 @@ export default {
       if (this.$q.screen.width < 770) return this.$q.screen.width - 70
       else return 770
     }
+  },
+  created () {
+    if (this.pick) this.typeId = 'drafts'
   }
 }
 </script>
