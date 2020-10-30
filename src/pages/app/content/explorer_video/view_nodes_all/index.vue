@@ -1,11 +1,40 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
-    kalpa-loader(
-      :immediate="true" @reset="$refs.kl1.next(0, () => {})"
-      :query="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`
-      )
-      masonry(
+.row.full-width.items-start.content-start.justify-center.q-px-sm
+  //- items
+  //- from community
+  kalpa-loader(
+    v-if="typeId === 'community'"
+    :immediate="true" @reset="$refs.kl1.next(0, () => {})"
+    :query="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`)
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
+      div(
+        v-for="item in items" :key="item.oid"
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+        }`
+        ).row.full-width.q-mb-xs
+        node-item(
+          :node="item" :player="player" :contentKalpa="contentKalpa"
+          @toggleSelect="nodeSelectedOid === item.oid ? nodeSelectedOid = null : nodeSelectedOid = item.oid"
+          :style=`{
+            position: 'relative', zIndex: 10,
+            borderRadius: '10px', overflow: 'hidden',
+          }`
+          ).b-40
+        //- node selected
+        div(
+          v-if="nodeSelectedOid === item.oid"
+          :style=`{
+            marginTop: '-10px', paddingTop: '14px',
+            borderRadius: '0 0 10px 10px',
+          }`
+          ).row.full-width.bg-green.q-py-xs.q-px-xs
+          slot(name="nodeActionAll" :node="item")
+          div(v-if="!$scopedSlots.nodeActionAll").row.full-width
+            q-btn(round flat dense color="white" icon="edit")
+            .col
+            q-btn(round flat dense color="white" icon="launch" @click="$router.push(`/node/${item.oid}`)")
+      //- masonry(
         :cols="$q.screen.width < 600 ? 2 : 4"
         :gutter="{default: 10}").full-width.q-pt-sm.q-pr-sm
         div(
@@ -34,7 +63,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeItem from './node-item.vue'
+import nodeItem from './node_item.vue'
 
 export default {
   name: 'wsContentExplorer_viewNodes',
@@ -42,7 +71,8 @@ export default {
   props: ['contentKalpa', 'contentBookmark', 'player'],
   data () {
     return {
-      nodeSelectedOid: null
+      nodeSelectedOid: null,
+      typeId: 'community'
     }
   },
   computed: {
@@ -55,7 +85,7 @@ export default {
         },
         populateObjects: true,
       }
-    }
+    },
   },
   methods: {
     nodeClick (node) {

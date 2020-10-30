@@ -5,6 +5,7 @@ component(
   :contentKalpa="contentKalpa"
   :source="contentKalpa.contentSource"
   :url="contentKalpa.url"
+  :thumbUrl="contentKalpa.thumbUrl"
   :options="options"
   @player="$emit('player', $event)")
   template(v-slot:actions)

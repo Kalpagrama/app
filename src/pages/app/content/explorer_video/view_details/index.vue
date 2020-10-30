@@ -1,15 +1,31 @@
 <template lang="pug">
-q-page(
-  :style=`{paddingTop: '8px'}`
-  ).row.full-width.items-start.content-start.justify-center
+.row.full-width.items-start.content-start.justify-center.q-pt-sm
+  //- slot for top-left, top-right shit
+  q-page-sticky(
+    expand position="top"
+    :style=`{}`
+    ).row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(
+        :style=`{
+          width: '60px',
+        }`).row
+        slot(name="top-left")
+  q-page-sticky(
+    expand position="bottom"
+    :style=`{
+      zIndex: 1000
+    }`).b-30
+    .row.full-width
+      slot(name="bottom")
   div(
     :style=`{
-      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      maxWidth: 770+'px',
       background: 'rgb(35,35,35)',
       borderRadius: '10px',
     }`).row.full-width.justify-center.q-pt-md.q-pb-xl
-    div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ contentKalpa.name }}
+    div(:style=`{maxWidth: '600px',}`).row.full-width.items-start.content-start.q-px-md
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm {{ contentKalpa.name }}
       .row.full-width.q-py-md
         .row.full-width
           q-btn(
@@ -17,17 +33,28 @@ q-page(
             @click="gotToOriginal"
             icon="fab fa-youtube" align="left"
             color="green" outline no-caps
-            ).col.q-px-sm
-            span.q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+            ).col
+            span(:style=`{fontSize: '15px'}`).q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+          kalpa-bookmark(
+            v-if="contentKalpa"
+            :oid="contentKalpa.oid"
+            :type="contentKalpa.type"
+            :name="contentKalpa.name"
+            :thumbUrl="contentKalpa.thumbUrl"
+            :isActive="true"
+            inactiveColor="grey-8"
+            :fields=`{contentType: contentKalpa.type}`)
           kalpa-share(
             type="content" :item="contentKalpa")
       //- spheres
       div(
         v-if="contentBookmark"
         ).row.full-width.q-py-sm
-        .row.full-width.q-py-md
+        .row.full-width.q-pa-sm
           span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
-        ws-sphere-editor(:item="contentBookmark")
+        ws-sphere-editor(
+          :item="contentBookmark"
+          :style=`{borderRadius: '10px',}`).b-40
 </template>
 
 <script>

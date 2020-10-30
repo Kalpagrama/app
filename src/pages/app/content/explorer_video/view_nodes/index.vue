@@ -10,8 +10,9 @@ q-page(
       zIndex: 1000
     }`).b-30
     //- types
-    //- .row.full-width.justify-center.b-30
+    .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-py-xs
+        //- q-btn(round flat dense color="white" icon="menu")
         q-btn(
           v-for="(type,ii) in types" :key="type.id"
           @click="typeId = type.id"
@@ -30,6 +31,7 @@ q-page(
   component(
     :is="`type-${typeId}`"
     v-bind="$props"
+    :onlyMine="typeId === 'mine'"
     :style=`{
       maxWidth: 770+'px',
     }`)
@@ -37,12 +39,12 @@ q-page(
 
 <script>
 export default {
-  name: 'viewJoints',
+  name: 'viewNodes',
   props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
   components: {
     typeCommunity: () => import('./type_community.vue'),
+    typeMine: () => import('./type_community.vue'),
     typeDrafts: () => import('./type_drafts.vue'),
-    typeMine: () => import('./type_mine.vue')
   },
   data () {
     return {
@@ -52,10 +54,14 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'drafts', name: 'Drafts'},
-        {id: 'mine', name: 'Mine'},
-        {id: 'community', name: 'Community'}
+        {id: 'drafts', name: 'Черновики'},
+        {id: 'mine', name: 'Мои ядра'},
+        {id: 'community', name: 'Все ядра'}
       ]
+    },
+    maxWidth () {
+      if (this.$q.screen.width < 770) return this.$q.screen.width - 70
+      else return 770
     }
   }
 }

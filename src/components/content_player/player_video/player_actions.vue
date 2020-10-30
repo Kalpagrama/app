@@ -1,5 +1,23 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.justify-between.q-pa-xs
+.row.full-width.items-end.content-end.q-px-sm
+  .col
+    .row.full-width.items-center.content-center
+      q-btn(
+        @click="player.playing ? player.pause() : player.play()"
+        round flat dense size="sm"
+        :color="player.playing ? color : color"
+        :icon="player.playing ? 'pause' : 'play_arrow'"
+        :style=`{background: 'rgba(0,0,0,0.2)'}`)
+      q-btn(round flat dense size="sm" :color="color" icon="fast_rewind" @click="backward()")
+      small.text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
+      q-btn(round flat dense size="sm" :color="color" icon="fast_forward" @click="forward()")
+      q-btn(round flat dense :color="color" size="sm")
+        q-icon(
+          :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
+          :color="player.mutedLocal ? 'red' : color"
+          size="20px" @click="player.volumeToggle()")
+  slot
+//- div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.justify-between.q-pa-xs
   //- play/pause
   q-btn(
     @click="player.playing ? player.pause() : player.play()"

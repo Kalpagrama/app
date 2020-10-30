@@ -33,7 +33,9 @@ q-page(
           div(:style=`{maxWidth: '700px',}`).row.full-width
             slot(name="search-prepend")
             div(:style=`{maxWidth: '700px',}`).col
-              ws-search()
+              ws-search(
+                :feedId="id !== 'all' ? id : undefined"
+              )
             q-btn(
               v-if="id !== 'all'"
               @click="itemFinderOpened = true"
@@ -214,41 +216,23 @@ export default {
     },
     itemDelete (item) {
       this.$log('itemDelete', item)
-      let i = item.feeds.findIndex(id => id === this.feed.id)
-      this.$log('i', i)
-      if (i >= 0) {
-        this.$delete(item.feeds, i)
-        this.feed.items = this.feed.items.filter(id => id !== item.id)
-      }
-    },
-    async contentFound (content) {
-      this.$log('contentFound', content)
-      // create/find bookmark
-      let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: content.oid}})
-      this.$log('bookmark', bookmark)
-      if (bookmark) {
-        if (bookmark.deletedAt > 0) {
-          alert('content was deleted!, restoring...')
-          this.$delete(bookmark, 'deletedAt')
+      if (this.id === 'all') {
+        // remove it all to trash ?
+        // from other feeds ?
+        // soft or hard delete ?
+        // delete from feeds
+        if (item.feeds.length > 0) {
+          // get feed and delete item from feed.items [id] ?
+          // soft delete ?
         }
       }
       else {
-        let bookmarkInput = {
-          oid: content.oid,
-          name: content.name,
-          thumbUrl: content.thumbUrl,
-          type: content.type,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: [],
-          feeds: []
+        let i = item.feeds.findIndex(id => id === this.feed.id)
+        this.$log('i', i)
+        if (i >= 0) {
+          this.$delete(item.feeds, i)
+          this.feed.items = this.feed.items.filter(id => id !== item.id)
         }
-        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-      }
-      // subsribe to bookmark...
-      if (!await UserApi.isSubscribed(bookmark.oid)) await UserApi.subscribe(bookmark.oid)
-      // add bookmark to this feed if not "all"
-      if (this.id !== 'all') {
-        this.itemAdd(bookmark)
       }
     }
   }

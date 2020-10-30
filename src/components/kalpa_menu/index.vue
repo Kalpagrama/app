@@ -1,7 +1,7 @@
 <style lang="sass">
 .menu-item
   &:hover
-    background: rgb(50,50,50)
+    background: rgb(40,40,40)
 </style>
 
 <template lang="pug">
@@ -13,10 +13,11 @@ div(
   //- header
   div(
     :style=`{borderRadius: '10px',}`
-    ).row.full-width.items-center.content-center.b-40
+    ).row.full-width.items-center.content-center
     //- home
     router-link(
       :to="$store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/'"
+      :style=`{borderRadius: '10px',}`
       ).row.full-width
       div(
         :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
@@ -34,7 +35,7 @@ div(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
       :to="'/user/'+$store.getters.currentUser().oid"
       :class=`{
-        'b-60': $route.path.split('/')[1] === 'user'
+        //- 'b-60': $route.path.split('/')[1] === 'user'
       }`
       :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.items-center.content-center.menu-item
@@ -56,7 +57,7 @@ div(
           v-if="p.id === 'trends' ? true : $store.getters.currentUser().profile.role !== 'GUEST'"
           :to="{name: p.id}"
           :class=`{
-            'b-60': $route.path.split('/')[1] === p.id
+            'b-40': $route.path.split('/')[1] === p.id
           }`
           :style=`{
             height: $q.screen.width > 600 ? '55px' : '55px',
@@ -104,7 +105,7 @@ div(
           q-btn(
             :to="'/workspace/joint/new'"
             flat color="green" no-caps align="left" icon="link" size="md"
-            :style=`{height: '60px', paddingLeft: '2px'}`).full-width
+            :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
             span(
               v-if="!mini"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create joint', 'Создать связь')}}
@@ -115,13 +116,13 @@ div(
           q-btn(
             :to="'/workspace/node/new'"
             flat color="green" no-caps align="left" icon="add" size="md"
-            :style=`{height: '60px', paddingLeft: '2px'}`).full-width
+            :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
             span(
               v-if="!mini"
               :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать ядро')}}
         //- version
         div(v-if="!mini").row.full-width.items-center.q-pa-md
-          small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+          small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-8 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

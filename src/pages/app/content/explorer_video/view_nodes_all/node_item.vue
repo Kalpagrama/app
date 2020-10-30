@@ -9,6 +9,24 @@
 div(
   @click="onClick"
   :style=`{
+    height: '50px',
+  }`
+  ).row.full-width.items-center.content-center
+  img(
+    draggable="false"
+    :src="item.thumbUrl"
+    :style=`{
+      height: '50px',
+      //- width: '50px',
+      borderRadius: '10px',
+      objectFit: 'contain',
+    }`
+    )
+  .col.q-px-sm
+    span.text-white {{ node.name }}
+//- div(
+  @click="onClick"
+  :style=`{
     position: 'relative',
     zIndex: 100,
     borderRadius: '10px', overflow: 'hidden',

@@ -18,7 +18,7 @@ q-layout(
         borderRadius: '10px 10px 0 0',
       }`
       ).row.full-width.items-center.b-30
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите коллекцию
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите подборку
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')").q-mr-sm
     //- search or create...

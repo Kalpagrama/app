@@ -2,8 +2,8 @@
 q-layout(
   view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.q-pt-sm.q-px-sm
-      .row.full-width.justify-center
+    .row.full-width.q-pt-sm.b-30
+      .row.full-width.justify-center.q-px-sm
         div(
           :style=`{
             maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
@@ -13,7 +13,7 @@ q-layout(
           .col
             span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
           q-btn(round flat color="white" icon="more_vert")
-      .row.full-width.justify-center
+      .row.full-width.justify-center.q-px-sm
         div(
           :style=`{
             maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
@@ -39,7 +39,7 @@ q-layout(
             :style=`{
               position: 'relative',
               height: 0,
-              paddingBottom: $q.screen.width < 800 ? '50%' : '100%',
+              paddingBottom: $q.screen.lt.md ? '30%' : '100%',
             }`
             ).row
             div(

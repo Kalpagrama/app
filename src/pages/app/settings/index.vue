@@ -11,7 +11,7 @@ q-layout(view="hHh Lpr lff")
         .row.full-width.q-px-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
-            no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
+            no-caps dense active-color="green" align="left" switch-indicator).text-grey-8
             q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
     router-view

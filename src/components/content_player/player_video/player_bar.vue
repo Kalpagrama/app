@@ -7,7 +7,7 @@ div(
   v-touch-pan.left.right.prevent.mouse="barPan"
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
-  }`).row.full-width.b-50
+  }`).row.full-width.b-40
   //- contentNodes, we need nodes with first item of this content!
   //- with t, content type video
   div(
@@ -22,14 +22,15 @@ div(
       v-if="f.items[0].layers[0].figuresAbsolute[0].t && f.items[0].layers[0].figuresAbsolute[1].t"
       :style=`{
         position: 'absolute', zIndex: 9999,
-        top: '-2px',
+        top: '0px',
         left: f.items[0].layers[0].figuresAbsolute[0].t/player.duration*100+'%',
-        width: ((f.items[0].layers[0].figuresAbsolute[1].t-f.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
-        height: 'calc(100% + 4px)',
-        border: '2px solid #4caf50',
+        //- width: ((f.items[0].layers[0].figuresAbsolute[1].t-f.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
+        width: '2px',
+        height: 'calc(100% + 0px)',
+        //- border: '2px solid #4caf50',
         borderRadius: '4px',
         pointerEvents: 'none',
-        background: 'rgba(255,255,255,0.3)',
+        background: 'rgba(255,255,255,0.7)',
       }`
       ).row
       //- TODO: add hover effect on contentNodes...
@@ -43,7 +44,7 @@ div(
       pointerEvents: 'none',
       borderRadius: '10px 0 0 10px',
     }`
-    ).row.full-height.b-110
+    ).row.full-height.b-80
     div(
       :style=`{
         position: 'absolute', zIndex: 200, right: '-2px', top: '-4px',

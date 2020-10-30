@@ -46,10 +46,15 @@
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
+import { UserApi } from 'src/api/user'
 
 export default {
   name: 'wsSearch',
+  props: {
+    feedId: {type: String},
+  },
   components: {
     contentImporter: () => import('./content_importer.vue')
   },
@@ -67,13 +72,44 @@ export default {
       async handler (to, from) {
         if (this.isURL(to)) {
           this.loading = true
-          // this.searchString = ''
           this.contentKalpa = await ContentApi.contentCreateFromUrl(to)
           this.$log('contentKalpa', this.contentKalpa)
-          // this.showContentDialog = true
-          // this.$emit('content', this.contentKalpa)
+          // add bookmark...
+          let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+          if (bookmark) {
+            // resurrect from the dead
+            if (bookmark.deletedAt > 0) {
+              alert('bookmark was deleted!, restoring...')
+              this.$delete(bookmark, 'deletedAt')
+            }
+            // add feedId ...
+            if (this.feedId) {
+              if (bookmark.feeds.includes(this.feedId)) {
+                // do nothing...
+              }
+              else {
+                bookmark.feeds.push(this.feedId)
+              }
+            }
+          }
+          else {
+            // TODO: where to handle bookmarkInput create?
+            let bookmarkInput = {
+              oid: this.contentKalpa.oid,
+              type: this.contentKalpa.type,
+              name: this.contentKalpa.name,
+              thumbUrl: this.contentKalpa.thumbUrl,
+              wsItemType: 'WS_BOOKMARK',
+              spheres: [],
+              feeds: [],
+            }
+            if (this.feedId) bookmarkInput.feeds.push(this.feedId)
+            bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+            // subscribe to this oid...
+            if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
+          }
+          this.loading = false
           this.$router.push(`/content/${this.contentKalpa.oid}`)
-          // add to workspace as bookmark...
         }
         else {
           this.$emit('searchString', to)

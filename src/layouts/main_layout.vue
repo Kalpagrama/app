@@ -41,7 +41,7 @@ q-layout(view="lHh lpR lFf")
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40.q-pt-md
   //- left menu
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$store.state.ui.showDesktopNavigation && $q.screen.width > $store.state.ui.pageMaxWidth+140"
       :style=`{
@@ -54,18 +54,28 @@ q-layout(view="lHh lpR lFf")
           borderRadius: '10px',
           maxWidth: $q.screen.width < $store.state.ui.pageMaxWidth+500 ? '60px' : '240px',
         }`).b-40
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="$q.screen.gt.sm && $store.state.ui.showDesktopNavigation"
+      :style=`{
+        position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
+        //- width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',
+        width: '250px',
+        minHeight: $q.screen.height+'px',
+      }`).row.full-height.items-start.content-start.justify-start.q-pt-sm.q-px-sm
+      kalpa-menu(
+        :mini="$q.screen.lt.lg"
+        :style=`{
+          borderRadius: '10px',
+          maxWidth: $q.screen.lt.lg ? '60px' : '240px',
+          //- background: 'rgb(35,35,35)',
+        }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width <= $store.state.ui.pageMaxWidth+140")
+    q-footer(v-if="$q.screen.lt.md && $store.state.ui.showMobileNavigation")
       kalpa-menu-mobile
   q-page-container
     router-view
-    //- keep-alive
-      router-view(:key="$route.fullPath")
-    //- div(
-      :style=`{height: $q.screen.height-50+'px'}`
-      ).row.full-width.items-center.content-center.justify-center
-      q-spinner(color="green" size="100px" :thickness="4")
 </template>
 
 <script>
