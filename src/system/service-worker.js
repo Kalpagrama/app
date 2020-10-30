@@ -58,6 +58,8 @@ function sendMsg (type, msgData) {
    logD('__WB_MANIFEST_TMP', __WB_MANIFEST_TMP)
    // precacheAndRoute(__WB_MANIFEST_TMP) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
    {
+      // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
+      // https://github.com/GoogleChrome/workbox/issues/155
       let delayedPrecachename = cacheNames.precache + '-delayed';
       const delayedPrecacheController = new PrecacheController(delayedPrecachename);
       // const precacheController = new PrecacheController();

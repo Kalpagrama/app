@@ -3,7 +3,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { AppVisibility, Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { askForPwaWebPushPerm, initPWA, precacheAndRoute, pwaReset, pwaShareWith } from 'src/system/pwa'
+import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
 import assert from 'assert';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
@@ -249,9 +249,6 @@ async function systemInit () {
       }
       // alert(' systemInit 4 ')
       if (await rxdb.isInitializedGlobal()) {
-         // if (process.env.MODE === 'pwa') {
-         //    await precacheAndRoute()
-         // }
          await i18next.changeLanguage(rxdb.getCurrentUser().profile.lang)
          if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
             logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))

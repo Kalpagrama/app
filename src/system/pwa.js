@@ -309,4 +309,4 @@ async function showNotification (title, body, dbEvent) {
    }
 }
 
-export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith, precacheAndRoute }
+export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith }
