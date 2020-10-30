@@ -116,6 +116,7 @@ async function initPWA (store) {
             if (registration.active) {
                registration.active.postMessage({ type: 'sendVersion' }) // просим сообщить swVer
                registration.active.postMessage({ type: 'sendWebPushToken' }) // просим сообщить webPushToken
+               // registration.active.postMessage({ type: 'precacheAndRoute' })
             }
          }
       }
@@ -308,4 +309,4 @@ async function showNotification (title, body, dbEvent) {
    }
 }
 
-export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith }
+export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith, precacheAndRoute }

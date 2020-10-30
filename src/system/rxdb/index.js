@@ -8,6 +8,7 @@ import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
+import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, ReactiveListHolderWithPagination } from 'src/system/rxdb/reactive'
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
@@ -105,6 +106,7 @@ class RxDBWrapper {
       addRxPlugin(require('pouchdb-adapter-idb'))
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
+      addRxPlugin(RxDBMigrationPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок создала rxdb либо выполнила rxdb.deInitGlobal(пересрздала rxdb). Надо обновить коллекции

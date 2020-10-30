@@ -121,7 +121,7 @@ class AuthApi {
       }
    }
 
-   static async userIdentify (userId_) {
+   static async userIdentify (userId_, forceSendConfirmation = false) {
       const f = AuthApi.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
@@ -130,8 +130,8 @@ class AuthApi {
          let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, hasPermanentPassword = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
             query: gql`
                 ${fragments.dummyUserFragment}
-                query  ($userId: String){
-                    userIdentify(userId: $userId){
+                query  ($userId: String, $forceSendConfirmation: Boolean){
+                    userIdentify(userId: $userId, forceSendConfirmation: $forceSendConfirmation){
                         userId
                         loginType
                         userExist
@@ -147,7 +147,8 @@ class AuthApi {
                 }
             `,
             variables: {
-               userId: userId_
+               userId: userId_,
+               forceSendConfirmation
             }
          })
          if (!token) { // сервер отверг userIdentify
@@ -189,7 +190,6 @@ class AuthApi {
          needInvite = route.query.needInvite === 'true'
          needConfirm = route.query.needConfirm === 'true'
          userExist = route.query.userExist === 'true'
-         await systemReset(true, true, false)
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

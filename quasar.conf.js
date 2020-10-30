@@ -121,9 +121,9 @@ module.exports = function (ctx) {
             new webpack.IgnorePlugin(/@capacitor\/core/)
           )
         }
-        if (ctx.mode.spa) {
+        if (ctx.dev) {
           cfg.plugins.push(
-            new BundleAnalyzerPlugin()
+            new BundleAnalyzerPlugin({analyzerPort: ctx.mode.pwa ? 8888 : 9999})
           )
         }
         // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
@@ -146,6 +146,28 @@ module.exports = function (ctx) {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),
           public: path.resolve(__dirname, './public')
+        }
+        cfg.optimization = {
+          runtimeChunk: 'single',
+          splitChunks: {
+            chunks: 'all',
+            maxInitialRequests: Infinity,
+            // minSize: 0,
+            cacheGroups: {
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                name(module) {
+                  // получает имя, то есть node_modules/packageName/not/this/part.js
+                  // или node_modules/packageName
+                  const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+                  // имена npm-пакетов можно, не опасаясь проблем, использовать
+                  // в URL, но некоторые серверы не любят символы наподобие @
+                  return `npm.${packageName.replace('@', '')}`;
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -184,13 +206,13 @@ module.exports = function (ctx) {
     },
     pwa: {
       workboxPluginMode: 'InjectManifest', // 'GenerateSW', //
-      workboxOptions: {
-        // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
-        // importWorkboxFrom: 'local'
-        swSrc: 'src/system/service-worker.js',
-        swDest: 'service-worker.js',
-        maximumFileSizeToCacheInBytes: 1024 * 1024 * 20,
-      },
+      // workboxOptions: {
+      //   // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
+      //   // importWorkboxFrom: 'local'
+      //   swSrc: 'src/system/service-worker.js',
+      //   swDest: 'service-worker.js',
+      //   maximumFileSizeToCacheInBytes: 1024 * 1024 * 20,
+      // },
       manifest: {
         name: 'Kalpagrama',
         short_name: 'Kalpagrama',
@@ -273,16 +295,6 @@ module.exports = function (ctx) {
       hideSplashscreen: false, // disables auto-hiding the Splashscreen by Quasar CLI
       iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
       backButtonExit: false // Quasar handles app exit on mobile phone back button
-    },
-    // vendor: {
-    //   remove: ['vue', 'rxdb', 'rxjs', 'quasar', 'axios', 'mediaelement', 'lodash']
-    // }
-    // chainWebpack (chain) {
-    //   chain.optimization.get('splitChunks').cacheGroups.vendors.name = (_module, chunks) => {
-    //     const allChunksNames = chunks.map((item) => item.name).join('~')
-    //     if (allChunksNames) return 'vendor'
-    //     else return !ctx.prod
-    //   }
-    // }
+    }
   }
 }

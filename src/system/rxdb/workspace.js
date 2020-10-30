@@ -47,10 +47,9 @@ class WaitBreakable {
 }
 
 const WsItemTypeEnum = Object.freeze({
-   WS_ANY: 'WS_ANY',
+   WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
    WS_NODE: 'WS_NODE',
    WS_CONTENT: 'WS_CONTENT',
-   WS_CHAIN: 'WS_CHAIN',
    WS_SPHERE: 'WS_SPHERE',
    WS_BOOKMARK: 'WS_BOOKMARK',
    WS_JOINT: 'WS_JOINT',
@@ -127,7 +126,21 @@ class Workspace {
                await this.db.ws_changes.atomicUpsert({ id, operation, rev })
                // logD(f, `complete. ${id}`)
             }
+            const checkUnique = async (plainData) => {
+               assert(plainData.wsItemType in WsItemTypeEnum, '!plainData.wsItemType in WsItemTypeEnum')
+               if (plainData.wsItemType === WsItemTypeEnum.WS_SPHERE) {
+                  assert(plainData.name)
+                  const found = await rxdb.find({
+                     selector: {
+                        rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+                        name: plainData.name
+                     }
+                  }, true)
+                  if (found.length) throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+               }
+            }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
+               await checkUnique(plainData)
                plainData.ignoreChanges = false
                let plainDataCopy = cloneDeep(plainData) // newVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
@@ -142,6 +155,9 @@ class Workspace {
                   plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
                }
             }, false)
+            this.db.ws_items.preInsert(async (plainData) => {
+               await checkUnique(plainData)
+            }, false);
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
                // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
                if (!plainData.ignoreChanges) {
@@ -180,19 +196,15 @@ class Workspace {
                   try {
                      logD(f, 'next loop start...', mutexGlobal.isLeader(), this.synchroLoopWaitObj.getTimeOut())
                      await mutexGlobal.lock('ws::synchroLoop')
-                     await rxdb.lock('ws::synchroLoop')// (чтобы дождалась пока отработает rxdb.deInit и др)
                      await this.lock('ws::synchroLoop')
-                     // logD(f, 'locked')
-                     if (mutexGlobal.isLeader()) await this.synchronize()
+                     if (rxdb.initialized && mutexGlobal.isLeader()) await this.synchronize()
                      logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                   } finally {
                      this.release()
-                     rxdb.release()
                      await mutexGlobal.release('ws::synchroLoop')
-                     // logD(f, 'unlocked')
                   }
                }
                await this.synchroLoopWaitObj.wait()
@@ -436,26 +448,7 @@ class Workspace {
          await this.lock('rxdb::ws::set')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === 'WS_BOOKMARK') {
-            // assert(itemCopy.oid)
-            // const found = await rxdb.find({
-            //    selector: {
-            //       rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-            //       oid: itemCopy.oid
-            //    }
-            // }, true)
-            // assert(!found.length, 'уже есть такой букмарк!!!!!!')
-         } else if (itemCopy.wsItemType === 'WS_SPHERE') {
-            assert(itemCopy.name)
-            const found = await rxdb.find({
-               selector: {
-                  rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-                  name: itemCopy.name
-               }
-            }, true)
-            // logD('found=', found)
-            assert(!found.length, 'уже есть такая же сфера!!!!!')
-         } else if (itemCopy.wsItemType === 'WS_NODE') {
+         if (itemCopy.wsItemType === 'WS_NODE') {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
                val.layers.map(l => {
                   acc.push(l.contentOid)

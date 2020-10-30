@@ -451,6 +451,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "SHARED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -1086,7 +1092,7 @@
             "description": "например, время просмотра",
             "type": {
               "kind": "SCALAR",
-              "name": "Int",
+              "name": "BigInt",
               "ofType": null
             },
             "defaultValue": null
@@ -1181,7 +1187,7 @@
           },
           {
             "name": "userIdentify",
-            "description": "userId - email/phone/username либо null (для входа без регистрации)",
+            "description": "userId - email/phone/username либо null (для входа без регистрации)\nforceSendConfirmation - слать код даже если установлен постоянный пароль",
             "args": [
               {
                 "name": "userId",
@@ -1189,6 +1195,16 @@
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "forceSendConfirmation",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 },
                 "defaultValue": null
@@ -1369,6 +1385,26 @@
                     "name": "String",
                     "ofType": null
                   }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "title",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "body",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 },
                 "defaultValue": null
               }
@@ -2116,7 +2152,7 @@
           },
           {
             "name": "rate",
-            "description": "проголосовать за ядро",
+            "description": "\"проголосовать за ядро\"",
             "args": [
               {
                 "name": "oid",
