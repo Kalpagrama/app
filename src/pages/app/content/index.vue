@@ -3,8 +3,7 @@ component(
   v-if="contentKalpa"
   :is="explorerComponent[contentKalpa.type]"
   :contentKalpa="contentKalpa"
-  :query="query"
-  @out="outHandle")
+  :query="query")
   template(v-slot:header)
     slot(name="header")
   template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
@@ -27,6 +26,24 @@ export default {
   name: 'contentExplorer',
   components: {explorerVideo, explorerImage},
   props: ['oid', 'query'],
+  provide () {
+    if (this.query && this.query.pick && this.query.id) {
+      return {
+        pick: (item) => {
+          this.$log('pick !!!', this.query.pick, this.query.id)
+          // save to vuex item.value
+          this.$store.commit('ui/stateSet', ['editorItem', JSON.parse(JSON.stringify(item))])
+          // go to the node...
+          this.$router.replace(`/workspace/${this.query.pick}/${this.query.id}`)
+        }
+      }
+    }
+    else {
+      return {
+        pick: null
+      }
+    }
+  },
   data () {
     return {
       contentKalpa: null,
@@ -50,30 +67,15 @@ export default {
       }
     },
   },
-  methods: {
-    outHandle ([type, val]) {
-      this.$log('outHandle', type, val)
-      if (type === 'back') {
-        this.$router.back()
-      }
-      else if (type === 'push') {
-        this.$router.push(val)
-      }
-      else if (type === 'replace') {
-        this.$router.replace(val)
-      }
-      else if (type === 'emit') {
-        this.$emit('value', val)
-      }
-    }
-  },
   mounted () {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+    if (this.query && this.query.pick && this.query.id) this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

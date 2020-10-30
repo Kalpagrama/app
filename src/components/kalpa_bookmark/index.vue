@@ -9,7 +9,7 @@
       :oid="oid"
       :bookmark="bookmark"
       :style=`{
-        height: $q.screen.width < 800 ? $q.screen.height-60+'px' : '600px',
+        height: $q.screen.width < 800 ? $q.screen.height+'px' : '600px',
         maxWidth: $q.screen.width < 800 ? '100%' : '500px',
       }`
       @close="showDialog = false")
@@ -59,6 +59,12 @@ export default {
           let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
           if (bookmark) this.bookmark = bookmark
         }
+      }
+    },
+    bookmark: {
+      handler (to, from) {
+        this.$log('bookmark TO', to)
+        if (to) this.$emit('bookmark', to)
       }
     }
   },

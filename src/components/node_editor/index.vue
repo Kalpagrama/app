@@ -1,15 +1,16 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- item finder
-  q-dialog(v-model="itemFinderOpened" position="bottom" maximized)
-    div(
-      @click.self="itemFinderOpened = false"
-      :style=`{height: $q.screen.height+'px',}`).row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center
-        .row.full-width.items-center.content-center.q-pa-sm
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
-          span(:style=`{fontSize: '1rem'}`).text-white.text-bold Find item
-        view-add(@item="itemFound" @close="itemFinderOpened = false")
+  q-dialog(
+    v-model="itemFinderOpened"
+    position="bottom"
+    maximized)
+    item-finder(
+      :node="node"
+      @item="itemFound"
+      @sphere="sphereFound"
+      @close="itemFinderOpened = false"
+      )
   //- header
   .row.full-width.justify-center
     div(
@@ -23,20 +24,38 @@
         :style=`{fontSize: '1rem'}`).text-grey-6.text-bold Редактор ядра
       .col
       q-btn(round flat color='grey-6' icon="more_vert")
-      //- q-btn(
-        v-if="node.items.length > 0"
-        flat no-caps color="white" icon-right="keyboard_arrow_down")
-        span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ layoutName }}
-        q-menu(dark)
-          div(:style=`{width: '110px'}`).row
-            q-btn(
-              @click="node.layout = l.id"
-              v-for="l in layouts" :key="l.id"
-              v-if="l.id !== node.layout"
-              flat color="white" no-caps align="left"
-              ).full-width
-              span(:style=`{fontSize: '0.8rem'}`).text-white.text-bold {{ l.name }}
-      //- q-btn(round flat dense color="grey-8" icon="more_vert")
+        q-popup-proxy(
+          anchor="bottom right" self="top right"
+          position="bottom"
+          maximized dark
+          )
+          div(
+            :class=`{
+              'b-30': $q.screen.lt.md
+            }`
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden',
+              minWidth: '300px',
+            }`).row.full-width.items-start.content-start
+            //- header
+            //- div(
+              v-if="$q.screen.lt.md"
+              :style=`{
+                textAlign: 'center'
+              }`).row.full-width.justify-center.q-py-md
+              span.text-white {{ node.name }}
+            //- actions
+            .row.full-width.items-start.content-start
+              q-btn(
+                v-for="(a,akey) in actions" :key="akey"
+                @click="a.cb()"
+                flat no-caps
+                :color="a.color || 'white'"
+                :style=`{
+                  height: '50px',
+                  ...a.styles,
+                }`
+                ).row.full-width {{ a.name }}
   //- items mockup
   div(v-if="node.items.length === 0").row.full-width.items-start.content-start.justify-center
     div(
@@ -51,41 +70,12 @@
           borderRadius: '10px', overflow: 'hidden',
         }`
         ).row.full-width
-        div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
-          q-btn(round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true")
+        //- div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
+        q-btn(
+          round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true"
+          :style=`{position: 'absolute', zIndex: 10}`).fit.b-50
   //- items slider
   div(v-if="node.items.length > 0").row.full-width.items-start.content-start
-    //- slider
-    //- list-slider(
-      v-if="node.layout === 'SLIDER'" :items="node.items")
-      template(v-slot:item=`{item,isActive,meta}`)
-        edit-item(
-          :item="item" :isActive="isActive"
-          @next="itemNext(item)"
-          @prev="itemPrev(item)"
-          @duplicate="itemDuplicate(item)"
-          @remove="itemRemove(item)")
-    //- horizontal
-    //- div(
-      v-if="node.layout === 'HORIZONTAL'"
-      ).row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
-        list-horizontal(
-          :items="node.items"
-          :style=`{height: '500px'}`)
-          template(v-slot:item="{item, isActive}")
-            div(
-              :style=`{
-                height: '500px',
-                borderRadius: '10px', overflow: 'hidden',
-              }`
-              ).row.full-width.items-start.content-start.b-40
-              edit-item(
-                :item="item" :isActive="isActive"
-                @next="itemNext(item)"
-                @prev="itemPrev(item)"
-                @duplicate="itemDuplicate(item)"
-                @remove="itemRemove(item)")
     //- vertical
     div(
       v-if="['SLIDER', 'VERTICAL', 'PIP', 'HORIZONTAL'].includes(node.layout)"
@@ -133,7 +123,8 @@ export default {
     editDescription: () => import('./edit_description.vue'),
     editItem: () => import('./edit_item/index.vue'),
     viewAdd: () => import('./view_add/index.vue'),
-    viewPublish: () => import('./view_publish/index.vue')
+    viewPublish: () => import('./view_publish/index.vue'),
+    itemFinder: () => import('./item_finder.vue')
   },
   props: {
     node: {type: Object}
@@ -162,14 +153,130 @@ export default {
         {id: 'HORIZONTAL', name: this.$t('Compare', 'Сравнение')},
         {id: 'VERTICAL', name: this.$t('Vertical', 'Портянка')}
       ]
+    },
+    actions () {
+      return {
+        favorite: {
+          name: 'Make favorite',
+          color: 'green',
+          styles: {
+            fontWeight: 'bold'
+          },
+          cb: async () => {
+            this.$log('nodeFavorite')
+          }
+        },
+        delete: {
+          name: 'Delete',
+          color: 'red',
+          styles: {},
+          cb: async () => {
+            this.$log('nodeDelete')
+            this.$router.push('/workspace/nodes')
+            await this.node.updateExtended('deletedAt', Date.now(), false)
+          }
+        }
+      }
     }
   },
   methods: {
-    itemFound (item) {
-      this.$log('itemFound', item)
-      item.meta = {cover: true, timeout: 3000}
-      this.node.items.push(item)
+    sphereFound (sphere) {
+      this.$log('sphereFound', sphere)
+      let i = this.node.spheres.findIndex(id => id === sphere.id)
+      if (i >= 0) {
+        alert('Duplicate sphere!')
+      }
+      else {
+        this.node.spheres.push(sphere.id)
+      }
+    },
+    // itemFound (item) {
+    //   this.$log('itemFound', item)
+    //   item.meta = {cover: true, timeout: 3000}
+    //   this.node.items.push(item)
+    //   this.itemFinderOpened = false
+    // },
+    async itemFound (item) {
+      this.$log('itemClick', item)
       this.itemFinderOpened = false
+      if (item.wsItemType === 'WS_BOOKMARK') {
+        // extract everything from node
+        if (item.type === 'NODE') {
+          alert('GOT NODE')
+          // take everything from node
+          // take items
+          // take spheres
+          // take name
+          // take description
+        }
+        // use video content
+        // use as sphere...
+        // open content node extractor...
+        if (item.type === 'VIDEO') {
+          this.$set(this.node, 'updatedAt', Date.now())
+          await this.$wait(300)
+          if (this.$route.params.id) {
+            // alert('FOUND NODE go to content')
+            this.$router.push(`/content/${item.oid}/?viewid=nodes&pick=node&id=${this.$route.params.id}`)
+          }
+          else {
+            // alert('NO NODE no CONTENT')
+          }
+        }
+        // use image content, extract nodes from the content
+        if (item.type === 'IMAGE') {
+          // create compositionInput
+          // this.$router.push(`/content/${item.oid}/?viewid=nodes&mode=pick`)
+        }
+        // use user, sphere, word, sentence...
+        if (['USER', 'SPHERE'].includes(item.type)) {
+          this.$q.notify({type: 'negative', position: 'top', message: 'You cant add sphere/user for now :('})
+          // // find sphere with item.name in workspace...
+          // let [sphere] = await this.$rxdb.find({
+          //   selector: {
+          //     rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: item.name,
+          //   }
+          // })
+          // // do nothing?
+          // if (sphere) {
+          // }
+          // // create sphere in workspace...
+          // else {
+          //   let sphereInput = {
+          //     wsItemType: 'WS_SPHERE',
+          //     spheres: [],
+          //     name: item.name,
+          //   }
+          //   sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+          // }
+          // // emit sphere event to nodeEditor
+          // this.$emit('sphere', {id: sphere.id, name: sphere.name, oid: item.oid})
+        }
+      }
+      // node WORKSPACE
+      if (item.wsItemType === 'WS_NODE') {
+        // add.name
+        // if (this.node.name.length === 0) this.node.name = item.name
+        this.node.name += item.name
+        // add.description
+        // if (this.node.description.length === 0) this.node.description
+        this.node.description += item.description
+        // add.spheres
+        item.spheres.map(s => {
+          if (!this.node.spheres.includes(s)) this.node.spheres.push(s)
+        })
+        // add items
+        item.items.map(i => {
+          this.node.items.push(i)
+        })
+      }
+      // node PUBLISHED
+      if (item.type === 'NODE' && item.rate && item.oid) {
+        // convert node...
+        let nodeConverted = this.nodePublishedToWorkspace(item)
+        this.$log('nodeConverted', nodeConverted)
+        this.itemFound(nodeConverted)
+      }
     },
     itemNext (item) {
       this.$log('itemNext', item)
@@ -213,10 +320,44 @@ export default {
       if (itemIndex >= 0) {
         this.$delete(this.node.items, itemIndex)
       }
+    },
+    nodePublishedToWorkspace (node) {
+      let nodeInput = {
+        name: node.name,
+        category: 'FUN',
+        layout: node.layout,
+        wsItemType: 'WS_NODE',
+        thumbUrl: node.thumbUrl,
+        spheres: [],
+        items: [
+          {
+            id: `${Date.now().toString()}-0`,
+            thumbUrl: node.items[0].thumbUrl,
+            contentOid: node.items[0].contentOid,
+            outputType: node.items[0].outputType,
+            operation: node.items[0].operation,
+            layers: node.items[0].layers.map((layer, layerIndex) => {
+              return {
+                id: `${Date.now().toString()}-0-layer`,
+                contentOid: layer.contentOid,
+                figuresAbsolute: layer.figuresAbsolute,
+                points: layer.points || []
+              }
+            })
+          }
+        ]
+      }
+      return nodeInput
     }
   },
   mounted () {
     this.$log('mounted')
+    let editorItem = this.$store.state.ui.editorItem
+    this.$log('editorItem', editorItem)
+    if (editorItem) {
+      this.itemFound(JSON.parse(JSON.stringify(editorItem)))
+      this.$store.commit('ui/stateSet', ['editorItem', null])
+    }
     // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {

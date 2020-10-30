@@ -8,7 +8,7 @@ q-layout(view="hHh Lpr lff")
             height: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-btn(
+          //- q-btn(
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="blur_on" color="white" size="30px").q-mx-sm

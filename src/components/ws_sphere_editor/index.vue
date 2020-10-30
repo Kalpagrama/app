@@ -3,7 +3,7 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-center.content-center.q-px-sm
   //- mobile dialog
   q-dialog(
     v-model="sphereDialogShow"

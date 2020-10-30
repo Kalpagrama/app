@@ -7,11 +7,11 @@ q-page(
     expand
     :position="$q.screen.gt.sm ? 'top' : 'bottom'"
     :style=`{
-      zIndex: 1000
+      zIndex: 4000
     }`).b-30
     //- types
     .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm
+      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-pb-xs
         q-btn(
           v-for="(type,ii) in types" :key="type.id"
           @click="typeId = type.id"
@@ -33,17 +33,20 @@ q-page(
     :onlyMine="typeId === 'mine'"
     :style=`{
       maxWidth: 770+'px',
-    }`)
+    }`
+    @nodeEdit="$event => $emit('nodeEdit', $event)"
+    @nodeCreate="$emit('nodeCreate')")
 </template>
 
 <script>
 export default {
-  name: 'viewJoints',
-  props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
+  name: 'viewNodes',
+  inject: ['pick'],
+  props: ['player', 'contentKalpa', 'contentBookmark', 'nodeEditingId'],
   components: {
     typeCommunity: () => import('./type_community.vue'),
+    typeMine: () => import('./type_community.vue'),
     typeDrafts: () => import('./type_drafts.vue'),
-    typeMine: () => import('./type_community.vue')
   },
   data () {
     return {
@@ -53,11 +56,18 @@ export default {
   computed: {
     types () {
       return [
-        // {id: 'drafts', name: 'Drafts'},
-        {id: 'mine', name: 'Мои связи'},
-        {id: 'community', name: 'Все связи'}
+        {id: 'drafts', name: 'Черновики'},
+        {id: 'mine', name: 'Мои ядра'},
+        {id: 'community', name: 'Все ядра'}
       ]
+    },
+    maxWidth () {
+      if (this.$q.screen.width < 770) return this.$q.screen.width - 70
+      else return 770
     }
+  },
+  created () {
+    if (this.pick) this.typeId = 'drafts'
   }
 }
 </script>

@@ -116,6 +116,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // content
     Vue.component('contentSearch', () => import('components/content_search/index.vue'))
     // workspace
+    Vue.component('wsSearch', () => import('components/ws_search/index.vue'))
     Vue.component('wsNodeItem', () => import('components/ws_node_item/index.vue'))
     Vue.component('wsContentItem', () => import('components/ws_content_item/index.vue'))
     // spheres

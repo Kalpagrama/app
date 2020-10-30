@@ -15,6 +15,7 @@ q-layout(view="hHh Lpr lff")
             v-if="user && !itsMe"
             :oid="user.oid"
             type="USER"
+            inactiveColor="grey-8"
             :name="user.name"
             :thumbUrl="user.thumbUrl"
             :isActive="true")
@@ -38,14 +39,14 @@ q-layout(view="hHh Lpr lff")
 import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import userFollowers from './user_followers'
-import userFollowing from './user_following'
-import userCreated from './user_created'
-import userVoted from './user_voted'
+// import userFollowers from './user_followers'
+// import userFollowing from './user_following'
+// import userCreated from './user_created'
+// import userVoted from './user_voted'
 
 export default {
   name: 'pageApp__user',
-  components: {userCreated, userVoted, userFollowing, userFollowers},
+  // components: {userCreated, userVoted, userFollowing, userFollowers},
   data () {
     return {
       user: null,
@@ -57,10 +58,9 @@ export default {
     pages () {
       return [
         {id: 'feeds', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
-        {id: 'created', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
+        {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
-        {id: 'voted', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
-        // {id: 'following', name: this.$t('Subscriptions', 'Подписки'), icon: 'rss_feed'},
+        {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},
       ]
     },

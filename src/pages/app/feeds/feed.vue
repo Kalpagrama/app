@@ -1,18 +1,17 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
-    //- v-if="feed && feed.items.length > 0"
     kalpa-loader(
-      :immediate="true"
-      :query="queryFeedItems" :limit="20" v-slot=`{items,next}`)
-      list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`).items-start
+      v-if="true" :query="queryFeedItems" :limit="20" v-slot=`{items, next, nexting}`)
+      list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
         q-infinite-scroll(@load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-          //- .row.full-width.bg-blue.q-mb-sm
-            small.text-white {{ item }}
           feed-item(
             v-if="item.subject"
             :item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+        template(v-slot:append)
+          div(:style=`{height: '50px'}`).row.full-width.justify-center
+            q-spinner-dots(v-show="nexting" color="green" size="50px")
 </template>
 
 <script>

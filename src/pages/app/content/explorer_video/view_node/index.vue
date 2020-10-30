@@ -40,8 +40,15 @@ div(
       div(:style=`{maxWidth: '620px',}`).row.full-width.q-py-sm
         q-btn(flat color="white" no-caps @click="$emit('close')").b-40 {{$t('close', 'Закрыть')}}
         .col
-        slot(name="nodeAction" :node="node")
-        q-btn(v-if="!$scopedSlots.nodeAction" color="green" no-caps @click="publish()") Опубликовать
+        //- slot(name="nodeAction" :node="node")
+        q-btn(v-if="!pick" color="green" no-caps @click="publish()") Опубликовать
+        q-btn(
+          v-if="pick"
+          @click="pick(node)"
+          color="red" dense no-caps
+          :style=`{
+          }`).q-px-sm
+          span.text-bold Выбрать ядро
 </template>
 
 <script>
@@ -50,6 +57,7 @@ import compositionEditor from 'components/composition/composition_editor/index.v
 export default {
   name: 'contentExplorerVideo_viewNode',
   components: {compositionEditor},
+  inject: ['pick'],
   props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
   data () {
     return {
@@ -74,6 +82,7 @@ export default {
   methods: {
     publish () {
       this.$log('publish')
+      // make a copy...
       this.$router.push('/workspace/node/' + this.node.id)
     }
   },

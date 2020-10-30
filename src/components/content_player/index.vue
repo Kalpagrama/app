@@ -5,10 +5,13 @@ component(
   :contentKalpa="contentKalpa"
   :source="contentKalpa.contentSource"
   :url="contentKalpa.url"
+  :thumbUrl="contentKalpa.thumbUrl"
   :options="options"
   @player="$emit('player', $event)")
-  template(v-slot:actions)
-    slot(name="actions")
+  template(v-slot:left-bottom)
+    slot(name="left-bottom")
+  template(v-slot:right)
+    slot(name="right")
 </template>
 
 <script>

@@ -54,6 +54,8 @@ q-page(:style=`{paddingBottom: '200px',}`)
                 ).full-width.b-50
               .row.full-width.justify-center.q-py-xs
                 span.text-bold.text-grey-6 Введите код с почты
+              .row.full-width
+                span.text-grey-6 Отправить код заново
             //- invite code
             div(v-if="inviteCodeShow").row.full-width
               input(
@@ -118,7 +120,8 @@ export default {
       password: '',
       passwordShow: false,
       inviteCodeShow: false,
-      inviteCode: ''
+      inviteCode: '',
+      loading: false,
     }
   },
   watch: {

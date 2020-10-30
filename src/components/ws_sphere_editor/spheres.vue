@@ -3,7 +3,7 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-center.content-center
   //- get width for sphere autocomplete menu maxWidth...
   q-resize-observer(@resize="e => width = e.width")
   //- sphere autocomplete dialog...
@@ -20,7 +20,9 @@ div(
       }`
       @sphere="sphereAdd")
   //- preview spheres...
-  div(v-for="(sphere,si) in spheres"  :key="sphere").row.items-start.content-start.q-mr-xs.q-mb-xs
+  div(
+    v-for="(sphere,si) in spheres"  :key="sphere"
+    :style=`{height: '42px'}`).row.items-center.content-center.q-mr-xs
     ws-sphere-item(:id="sphere").b-60
       template(v-slot:append)
         q-icon(
@@ -34,9 +36,10 @@ div(
     placeholder="Введите сферу"
     :input-style=`{
       paddingLeft: '8px',
+      paddingTop: '4px',
     }`
     :style=`{
-      maxHeight: '24px',
+      //- maxHeight: '24px',
       minWidth: '80px',
     }`
     @keyup.enter="sphereInputEntered"

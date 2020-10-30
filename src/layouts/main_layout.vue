@@ -30,10 +30,12 @@
 
 <template lang="pug">
 q-layout(view="lHh lpR lFf")
+  //- no-swipe-open
   q-drawer(
+    v-if="$q.screen.lt.md"
     side="left"
     :value="$store.state.ui.appShowMenu"
-    behavior="mobile" no-swipe-open
+    behavior="mobile"
     :width="$q.screen.width - 70"
     @before-hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
@@ -43,29 +45,24 @@ q-layout(view="lHh lpR lFf")
   //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$store.state.ui.showDesktopNavigation && $q.screen.width > $store.state.ui.pageMaxWidth+140"
+      v-if="$q.screen.gt.sm && $store.state.ui.showDesktopNavigation"
       :style=`{
         position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
-        width: ($q.screen.width-$store.state.ui.pageMaxWidth)/2+'px',
-      }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
+        maxWidth: $q.screen.lt.lg ? '70px' : '250px',
+        minHeight: $q.screen.height+'px',
+      }`).row.fit.items-start.content-start.justify-start.q-pt-sm.q-px-sm
       kalpa-menu(
-        :mini="$q.screen.width < $store.state.ui.pageMaxWidth+500"
+        :mini="$q.screen.lt.lg"
         :style=`{
           borderRadius: '10px',
-          maxWidth: $q.screen.width < $store.state.ui.pageMaxWidth+500 ? '60px' : '240px',
-        }`).b-40
+          maxWidth: $q.screen.lt.lg ? '60px' : '240px',
+        }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width <= $store.state.ui.pageMaxWidth+140")
+    q-footer(v-if="$q.screen.lt.md && $store.state.ui.showMobileNavigation")
       kalpa-menu-mobile
   q-page-container
     router-view
-    //- keep-alive
-      router-view(:key="$route.fullPath")
-    //- div(
-      :style=`{height: $q.screen.height-50+'px'}`
-      ).row.full-width.items-center.content-center.justify-center
-      q-spinner(color="green" size="100px" :thickness="4")
 </template>
 
 <script>

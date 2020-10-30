@@ -1,6 +1,5 @@
 <template lang="pug">
 div(
-  @click="$router.push('/workspace/feed/all')"
   :style=`{
     height: '200px',
     maxWidth: maxWidth+'px',
@@ -33,6 +32,7 @@ div(
               v-for="(i,ii) in 3" :key="ii"
               :style=`{
                 position: 'relative',
+                //- borderLeft: '1px solid red'
               }`
               ).col-4.full-height
               img(
@@ -40,6 +40,8 @@ div(
                 draggable="false"
                 :src="bookmarks[ii].thumbUrl"
                 :style=`{
+                  borderLeft: ii > 0 ? '2px solid rgb(90,90,90)' : 'none',
+                  //- borderBottom: ii > 0 ? '2px solid rgb(90,90,90)' : 'none',
                   borderRadius: '10px 0 0 10px', overflow: 'hidden',
                   objectFit: 'cover',
                   marginLeft: ii > 0 ? '-10px' : '0px',

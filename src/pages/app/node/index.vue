@@ -92,7 +92,7 @@ q-layout(view="hHh Lpr lff")
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
             :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
         .row.full-width.justify-center
-          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingTop: '48px',}`).row.full-width
             router-view(v-if="node" :node="node")
       q-page-sticky(
         v-if="node"

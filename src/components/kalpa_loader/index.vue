@@ -3,7 +3,8 @@ export default {
   render () {
     return this.$scopedSlots.default({
       items: this.items,
-      next: this.next
+      next: this.next,
+      nexting: this.nexting
     })
   },
   name: 'kalpaLoader',
@@ -30,7 +31,8 @@ export default {
       items: null,
       itemsPage: 0,
       itemsPageToken: null,
-      itemsTotal: 0
+      itemsTotal: 0,
+      nexting: false
     }
   },
   watch: {
@@ -60,15 +62,21 @@ export default {
     },
     async next (i, done) {
       this.$log('next')
+      this.nexting = true
       if (!this.items || !this.items.next) {
         // this.$log('next2')
         // this.query.populateObjects = true // ?????? ВСЕГДА запрашиваем полные сушности???
         this.items = await this.$rxdb.find(this.query, false)
       }
       // this.$log('next3')
+      await this.$wait(500)
+      // alert('next: ' + this.items.length + ' limit: ' + this.limit)
       let hasMore = await this.items.next(this.limit)
       if (hasMore) done()
       else done(true)
+      // alert('next: ' + this.items.length + ' limit: ' + this.limit)
+      // await this.$wait(1000)
+      this.nexting = false
       // this.$log('next', i, this.items.length < this.itemsTotal)
       // if (this.itemsPage === 0 || this.items.length < this.itemsTotal) {
       //   this.$log('itemsGet LOADING MORE ITEMS...')

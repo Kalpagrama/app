@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page(:style=`{paddingTop: '50px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
+q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
     kalpa-loader(
       v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
@@ -14,13 +14,10 @@ q-page(:style=`{paddingTop: '50px', paddingBottom: '200px', minHeight: '100vh'}`
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_user_userCreated',
-  props: {
-  },
+  name: 'userExplorer_userVotes',
+  components: {},
   data () {
     return {
-      indexMiddle: 0,
-      items: []
     }
   },
   computed: {
@@ -31,8 +28,8 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidAuthor: {$ne: this.sphereOid},
           oidSphere: this.sphereOid,
-          oidAuthor: {$eq: this.sphereOid},
           sortStrategy: 'AGE',
         },
         populateObjects: true,
@@ -40,6 +37,12 @@ export default {
     }
   },
   methods: {
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
