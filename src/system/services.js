@@ -163,7 +163,7 @@ async function initSessionStorage () {
       if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
       else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
    }
-   if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'any')
+   if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'gui')
 }
 
 async function resetLocalStorage () {

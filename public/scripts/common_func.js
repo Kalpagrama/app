@@ -1,5 +1,7 @@
-import assert from "assert"
 import 'src/system/utils' // string.in func
+function assert(cond, strError){
+   if(!cond) throw new Error('dummy assert: ' + strError)
+}
 
 function makeEventCard (event) {
    // alert('makeEventCard')
