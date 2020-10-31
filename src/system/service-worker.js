@@ -21,7 +21,7 @@ const { ExpirationPlugin } = workbox.expiration
 // import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
 import { makeRoutePath } from 'public/scripts/common_func'
 
-let logD, logW, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
+let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
    cacheVideo, messaging
 
@@ -47,6 +47,10 @@ function sendMsg (type, msgData) {
 
    logW = (...msg) => {
       if (logLevel <= 2) console.log('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
+   }
+
+   logE = (...msg) => {
+      if (logLevel <= 3) console.log('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
    }
 
    logC = (...msg) => {
