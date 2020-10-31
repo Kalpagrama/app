@@ -44,7 +44,7 @@ async function initServices () {
    // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
    window.addEventListener('storage', async function (event) {
       try {
-         if (!event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) return
+         if (!event.key || !event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) return
          await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
          if (event.newValue) {
             logD('storage sync event:', event)

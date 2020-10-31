@@ -19,7 +19,7 @@ const { ExpirationPlugin } = workbox.expiration
 // import { CacheFirst } from 'workbox-strategies/CacheFirst'
 // import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
 // import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath, wait } from 'public/scripts/common_func'
 
 let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
@@ -46,11 +46,11 @@ function sendMsg (type, msgData) {
    }
 
    logW = (...msg) => {
-      if (logLevel <= 2) console.log('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
+      if (logLevel <= 2) console.warn('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
    }
 
    logE = (...msg) => {
-      if (logLevel <= 3) console.log('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
+      if (logLevel <= 3) console.error('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
    }
 
    logC = (...msg) => {
@@ -71,11 +71,13 @@ function sendMsg (type, msgData) {
       self.addEventListener('install', (event) => {
          const checkPrecache = async () => {
             // const cache = await caches.open(staticCacheName)
-            if(!delayedPrecacheController.getCacheKeyForURL('/app.js')) {
-               logE('/app.js not found in chunks:', delayedPrecacheController.getCachedURLs())
-               throw new Error('/app.js not found in chunks')
+            // logW('chunks:', delayedPrecacheController.getCachedURLs())
+            if(!delayedPrecacheController.getCacheKeyForURL('/manifest.json')) {
+               logE('/manifest.json not found in chunks:', delayedPrecacheController.getCachedURLs())
+               await wait(200)
+               throw new Error('/manifest.json not found in chunks')
             }
-            if(await delayedPrecacheController.matchPrecache('/app.js')) { // если в кэше уже что-то есть - не выходим из install, пока не загрузим новые данные
+            if(await delayedPrecacheController.matchPrecache('/manifest.json')) { // если в кэше уже что-то есть - не выходим из install, пока не загрузим новые данные
                logD('delayedPrecacheController.install...')
                await delayedPrecacheController.install()
             }
@@ -167,7 +169,7 @@ function sendMsg (type, msgData) {
 
       registerRoute(/\/share_target\/?$/,
          async ({ url, event, params }) => {
-            logD('share_target 1', url, getCacheKeyForURL('/index.html'))
+            // logD('share_target 1', url, getCacheKeyForURL('/index.html'))
             // if (event.request.method === 'POST') {
             //   logD('redirect to share_target = ')
             //   return Response.redirect('share_target', 303)
@@ -191,7 +193,7 @@ function sendMsg (type, msgData) {
                }
             }
             if (getCacheKeyForURL('/index.html')) {
-               logD('share_target returm from cache', url)
+               logD('share_target return from cache', url)
                return caches.match(getCacheKeyForURL('/index.html'))
             } else {
                logD('share_target returm from net', url)

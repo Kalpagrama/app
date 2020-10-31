@@ -2,6 +2,7 @@ import 'src/system/utils' // string.in func
 function assert(cond, strError){
    if(!cond) throw new Error('dummy assert: ' + strError)
 }
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function makeEventCard (event) {
    // alert('makeEventCard')
@@ -67,4 +68,4 @@ function makeRoutePath(object){
    return res
 }
 
-export { makeEventCard, makeRoutePath }
+export { makeEventCard, makeRoutePath, wait }
