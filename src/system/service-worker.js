@@ -67,7 +67,10 @@ function sendMsg (type, msgData) {
       self.addEventListener('install', (event) => {
          const checkPrecache = async () => {
             // const cache = await caches.open(staticCacheName)
-            if(!delayedPrecacheController.getCacheKeyForURL('/app.js')) throw new Error('/app.js not found in chunks')
+            if(!delayedPrecacheController.getCacheKeyForURL('/app.js')) {
+               logE('/app.js not found in chunks:', delayedPrecacheController.getCachedURLs())
+               throw new Error('/app.js not found in chunks')
+            }
             if(await delayedPrecacheController.matchPrecache('/app.js')) { // если в кэше уже что-то есть - не выходим из install, пока не загрузим новые данные
                logD('delayedPrecacheController.install...')
                await delayedPrecacheController.install()
