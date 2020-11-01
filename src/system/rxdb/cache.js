@@ -104,7 +104,7 @@ class Cache {
          }
          this.debouncedDumpLru = debounce(async () => {
             const f = this.debouncedDumpLru
-            if (!mutexGlobal.isLeader()) return
+            if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
             logD(f, 'start', 'debouncedDumpLru')
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()

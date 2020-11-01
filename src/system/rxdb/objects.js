@@ -269,11 +269,9 @@ class Objects {
 
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event) {
-      assert(mutexGlobal.isLeader(), 'isLeader()')
       const f = this.processEvent
-      logD(f, 'start', mutexGlobal.isLeader())
+      logD(f, 'start')
       const t1 = performance.now()
-      if (!mutexGlobal.isLeader()) return
       switch (event.type) {
          case 'OBJECT_CHANGED': {
             await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)

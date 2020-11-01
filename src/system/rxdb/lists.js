@@ -82,7 +82,6 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    assert(mutexGlobal.isLeader(), 'isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     const t1 = performance.now()

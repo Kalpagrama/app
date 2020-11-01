@@ -38,7 +38,7 @@ export default async ({ Vue, store, app }) => {
                logE('gql error', err)
                err.message = err.code + ':' + err.message
                if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
-                  alert('error on gql request: ' + JSON.stringify(err))
+                  // alert('error on gql request: ' + JSON.stringify(err))
                   AuthApi.logout(null)
                      .then(() => {
                         window.location.reload()
@@ -48,14 +48,14 @@ export default async ({ Vue, store, app }) => {
                         window.location.reload()
                      })
                } else if (err.code === 'BAD_DATA') {
-                  alert(err.message)
+                  // alert(err.message)
                }
             }
          }
          if (networkError) {
             logE('gql network error', networkError)
             if (networkError.message === 'bad auth token!') {
-               alert('error on gql request2: ' + JSON.stringify(networkError))
+               // alert('error on gql request2: ' + JSON.stringify(networkError))
                AuthApi.logout(null)
                   .then(() => {
                      window.location.reload()

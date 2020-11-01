@@ -35,10 +35,8 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start', mutexGlobal.isLeader())
+      logD(f, 'start')
       const t1 = performance.now()
-      assert(mutexGlobal.isLeader(), '!Leader')
-
       // добавляем эвент на ленту (кроме собственных событий  (я созда/ я проголосовал итд))
       if (event.subject && event.subject.oid !== rxdb.getCurrentUser().oid) {
          let rxDocsFeed = await this.cache.find({

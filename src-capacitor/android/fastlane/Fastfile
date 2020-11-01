@@ -32,7 +32,7 @@ platform :android do
   end
 
   desc "Deploy a new version to the Google Play"
-  lane :deploy do
+  lane :beta do
 
         path = '../app/build.gradle'
         re = /versionCode\s+(\d+)/
@@ -61,4 +61,33 @@ platform :android do
           skip_upload_screenshots: true,
           skip_upload_apk: false)
   end
+  lane :deploy do
+
+          path = '../app/build.gradle'
+          re = /versionCode\s+(\d+)/
+          s = File.read(path)
+          versionCode = s[re, 1].to_i
+          s[re, 1] = (versionCode + 1).to_s
+          f = File.new(path, 'w')
+          f.write(s)
+          f.close
+
+          gradle(
+            task: "clean assembleRelease",
+            properties: {
+              "android.injected.signing.store.file" => "/Users/user/dev/api/deploy/kalpa.keystore",
+              "android.injected.signing.store.password" => "$4f3cvbz",
+              "android.injected.signing.key.alias" => "kalpa",
+              "android.injected.signing.key.password" => "$4f3cvbz",
+            }
+          )
+
+          # публикуем в бета-канал (если закомментить (track: 'beta',) - то в продакшн)
+          upload_to_play_store(
+            # track: 'beta',
+            skip_upload_metadata: false,
+            skip_upload_images: true,
+            skip_upload_screenshots: true,
+            skip_upload_apk: false)
+    end
 end

@@ -121,7 +121,7 @@ class Workspace {
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
             let onWsChangedByUser = async (id, operation, rev) => {
                const f = onWsChangedByUser
-               if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return
+               if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return // postSave сработает на всех вкладках (независимо от того, какая изменила итем) только одна вкладка меняет ws_changes
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                await this.db.ws_changes.atomicUpsert({ id, operation, rev })
                // logD(f, `complete. ${id}`)
@@ -191,13 +191,13 @@ class Workspace {
             logD(f, 'start')
             this.synchroStarted = true // защита от двойного запуска
             while (true) {
-               if (this.reactiveUser && this.synchro) {
-                  const tLoop = performance.now()
+               if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
                   try {
-                     logD(f, 'next loop start...', mutexGlobal.isLeader(), this.synchroLoopWaitObj.getTimeOut())
                      await mutexGlobal.lock('ws::synchroLoop')
                      await this.lock('ws::synchroLoop')
-                     if (rxdb.initialized && mutexGlobal.isLeader()) await this.synchronize()
+                     const tLoop = performance.now()
+                     logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                     await this.synchronize()
                      logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
@@ -241,7 +241,6 @@ class Workspace {
       const f = this.synchronize
       logD(f, 'start')
       const t1 = performance.now()
-      assert(mutexGlobal.isLeader(), '!isLeader')
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
@@ -371,21 +370,17 @@ class Workspace {
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
-      assert(mutexGlobal.isLeader(), 'isLeader()')
       const f = this.processEvent
       logD(f, 'start')
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::processEvent')
-         logD(f, 'locked')
-         this.ignoreWsChanges = true
-         if (!mutexGlobal.isLeader()) return
-         logD(f, 'try apply event')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')
          assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
          assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
          assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
+         this.ignoreWsChanges = true
          let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
          this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать мастерскую (synchronizeWsWhole)

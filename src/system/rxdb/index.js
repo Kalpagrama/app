@@ -134,7 +134,7 @@ class RxDBWrapper {
                logE('cant process rxdb event!', err)
                alert('error on processStoreEvent: ' + JSON.stringify(err))
                await window.location.reload()
-               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
             } finally {
             }
          }
@@ -201,7 +201,7 @@ class RxDBWrapper {
          await this.workspace.create()
          await this.cache.create()
          this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
@@ -302,9 +302,9 @@ class RxDBWrapper {
       const f = this.deInit
       const t1 = performance.now()
       try {
+         await this.lock('rxdb::deInit')
          logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
-         await this.lock('rxdb::deInit')
          if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
@@ -330,7 +330,7 @@ class RxDBWrapper {
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          await mutexGlobal.release('rxdb::initGlobal')
       }
@@ -339,7 +339,7 @@ class RxDBWrapper {
    // удалит данные в rxdb (сообщит об этом другим вкладкам)
    async deInitGlobal () {
       const f = this.deInitGlobal
-      logD(f, 'start', this.created, mutexGlobal.isLeader())
+      logD(f, 'start')
       const t1 = performance.now()
       try {
          await mutexGlobal.lock('rxdb::deinitGlobal')
@@ -374,15 +374,23 @@ class RxDBWrapper {
       const f = this.processEvent
       const t1 = performance.now()
       logD(f, 'start', event)
+      let processedEvents
       try {
-         assert(this.initialized, '! this.initialized !')
-         if (!mutexGlobal.isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
          await mutexGlobal.lock('rxdb::processEvent')
          await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
+         assert(this.initialized, '! this.initialized !')
+         assert(event.id, '!event.id')
          assert(this.store, '!this.store')
+         processedEvents = JSON.parse(await this.get(RxCollectionEnum.META, 'processedEvents') || '[]')
+         if (processedEvents.includes(event.id)) return // эвент уже обработан (только одна вкладка меняет rxdb по эвентам сервера)
          await this.event.processEvent(event, this.store)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
+         if (processedEvents){
+            processedEvents.unshift(event.id) // добавляем в начало
+            processedEvents.splice(888, processedEvents.length()) // обрезаем старые (чтобы массив не рос бесконечно)
+            await this.set(RxCollectionEnum.META, { id: 'processedEvents', valueString: JSON.stringify(processedEvents) })
+         }
          this.release()
          await mutexGlobal.release('rxdb::processEvent')
       }
@@ -474,8 +482,8 @@ class RxDBWrapper {
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
-         assert(this.initialized, '! this.initialized !')
          await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
+         assert(this.initialized, '! this.initialized !')
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
          let findResult
