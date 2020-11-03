@@ -359,7 +359,7 @@ class RxDBWrapper {
    async isInitializedGlobal () {
       assert(this.created, '!created')
       let authUser = await this.get(RxCollectionEnum.META, 'authUser') // данные запоминаются после первого успешного init на одной из вкладок
-      return !!authUser
+      return !!authUser && localStorage.getItem('k_token') // k_token нужен для gql-запросов
    }
 
    async lock (lockOwner) {
@@ -388,7 +388,7 @@ class RxDBWrapper {
       } finally {
          if (processedEvents){
             processedEvents.unshift(event.id) // добавляем в начало
-            processedEvents.splice(888, processedEvents.length()) // обрезаем старые (чтобы массив не рос бесконечно)
+            processedEvents.splice(888, processedEvents.length) // обрезаем старые (чтобы массив не рос бесконечно)
             await this.set(RxCollectionEnum.META, { id: 'processedEvents', valueString: JSON.stringify(processedEvents) })
          }
          this.release()
@@ -542,7 +542,7 @@ class RxDBWrapper {
             this.reactiveItemDbMemCache.set(queryId, findResult)
          }
          if (autoNext) await findResult.next()
-         this.store.commit('debug/addFindResult', { queryId, findResult })
+         // this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult, '!result')
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
@@ -616,10 +616,9 @@ class RxDBWrapper {
          reactiveItem = getReactive(rxDoc)
          this.reactiveItemDbMemCache.set(id, reactiveItem)
       }
-      this.store.commit('debug/addReactiveItem', { id, reactiveItem })
-      assert(reactiveItem.getData, '!reactiveItem.getData' + JSON.stringify(reactiveItem))
+      // this.store.commit('debug/addReactiveItem', { id, reactiveItem })
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return reactiveItem.getData()
+      return reactiveItem
    }
 
    // actualAge - актуально только для кэша
@@ -636,14 +635,14 @@ class RxDBWrapper {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data)) // valueString не должен быть null! (cм getReactive(rxDoc).getData())
+         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
          rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }
       if (!rxDoc) return null
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return getReactive(rxDoc).getData()
+      return getReactive(rxDoc)
    }
 
    async remove (id) {

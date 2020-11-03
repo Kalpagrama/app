@@ -332,24 +332,16 @@ class NodeApi {
          })
          switch (key) {
             case StatKeyEnum.REMADE:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'cached.data.countRemakes', (rxDoc) => {
-                  return rxDoc.cached.data.countRemakes + 1
-               }, false)
+               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
                break
             case StatKeyEnum.SHARED:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'cached.data.countShares', (rxDoc) => {
-                  return rxDoc.cached.data.countShares + 1
-               }, false)
+               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
                break
             case StatKeyEnum.VIEWED_TIME:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'cached.data.countViews', (rxDoc) => {
-                  return rxDoc.cached.data.countViews + 1
-               }, false)
+               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
                break
             case StatKeyEnum.BOOKMARKED:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'cached.data.countBookmarks', (rxDoc) => {
-                  return rxDoc.cached.data.countBookmarks + 1
-               }, false)
+               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
                break
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

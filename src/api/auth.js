@@ -84,7 +84,7 @@ class AuthApi {
                  oAuthUrlYandex
                  oAuthUrlVk
                  oAuthUrlGoogle
-                 oAuthUrlGithub
+                 oAuthUrlApple
                  oAuthUrlFacebook
              }
          }`

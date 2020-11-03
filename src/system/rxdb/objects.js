@@ -3,10 +3,8 @@ import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
 import { updateRxDoc } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
-import set from 'lodash/set'
+import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
-import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -250,6 +248,7 @@ class Objects {
    // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
    // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 16 штук. Последние запрошенные - в первую очередь
    // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
+   // priority -1 - если есть - вернет из кэша (с сервера запрашивать не будет)
    async get (id, notEvict, priority, clientFirst, force, onFetchFunc = null) {
       const fetchFunc = async () => {
          logD('objects::get::fetchFunc start')
@@ -261,7 +260,7 @@ class Objects {
       }
       const f = this.get
       // logD(f, 'start')
-      let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
+      let rxDoc = await this.cache.get(id, priority >= 0 ? fetchFunc : null, clientFirst, force, onFetchFunc)
       if (!rxDoc) return null // см "queued item was evicted legally"
       assert(rxDoc.cached, '!rxDoc.cached')
       return rxDoc
@@ -274,7 +273,7 @@ class Objects {
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)
+            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
             break
          }
          case 'OBJECT_CREATED':
@@ -282,34 +281,24 @@ class Objects {
             assert(event.object.type, '!event.object.type')
             if (event.object.type === 'JOINT') { // создан новый джойнт. обновляем статистику джойнтов на ядре
                for (let oid of event.sphereOids) {
-                  let rxDoc = await rxdb.cache.get(makeId(RxCollectionEnum.OBJ, oid)) // берем только те что есть в кэше ( с сервера не запрашиваем)
-                  if (rxDoc && rxDoc.cached.data.type === 'NODE') { // обновляем статистику джойнтов на ядре
-                     await updateRxDoc(rxDoc.id, 'cached.data.countJoints', (rxDoc) => {
-                        return rxDoc.cached.data.countJoints + 1
-                     }, false)
-                  }
+                  let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
+                  if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints++ // обновляем статистику джойнтов на ядре
                }
             }
             break
          case 'VOTED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data.rate', event.rate, false)
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data.countVotes', (rxDoc) => {
-               return rxDoc.cached.data.countVotes + 1
-            }, false)
+            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, false)
+            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, false)
             break
          }
          case 'OBJECT_DELETED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data.deletedAt', new Date(), false)
+            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'deletedAt', new Date(), false)
             assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.object.type === 'JOINT') { // удален джойнт. обновляем статистику джойнтов на ядре
                for (let oid of event.sphereOids) {
-                  let rxDoc = await rxdb.cache.get(makeId(RxCollectionEnum.OBJ, oid)) // берем только те что есть в кэше ( с сервера не запрашиваем)
-                  if (rxDoc && rxDoc.cached.data.type === 'NODE') { // обновляем статистику джойнтов на ядре
-                     await updateRxDoc(rxDoc.id, 'cached.data.countJoints', (rxDoc) => {
-                        return rxDoc.cached.data.countJoints ? rxDoc.cached.data.countJoints - 1 : 0
-                     }, false)
-                  }
+                  let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
+                  if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints = reactiveItem.countJoints ? reactiveItem.countJoints - 1 : 0 // обновляем статистику джойнтов на ядре
                }
             }
             break

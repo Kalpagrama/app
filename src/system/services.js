@@ -225,7 +225,7 @@ async function systemInit () {
    const f = systemInit
    logD(f, 'start')
    const t1 = performance.now()
-   if (await rxdb.isInitializedGlobal() && localStorage.getItem('k_token')) { // k_token нужен для gql-запросов
+   if (await rxdb.isInitializedGlobal()) {
       logD(f, 'skip systemInit')
       // alert('skip systemInit')
       return

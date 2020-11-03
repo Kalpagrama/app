@@ -103,7 +103,7 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          let reactiveItem = getReactive(rxDoc).getData()
+          let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           logD(f, 'add subscriber to list')
           reactiveItem.items.push(event.subject)
@@ -111,7 +111,7 @@ class Lists {
           reactiveItem.totalCount++
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          let reactiveItem = getReactive(rxDoc).getData()
+          let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           logD(f, 'add subscription to list')
           reactiveItem.items.push(event.object)
@@ -137,7 +137,7 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          let reactiveItem = getReactive(rxDoc).getData()
+          let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
           if (indx >= 0) {
@@ -148,7 +148,7 @@ class Lists {
           }
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          let reactiveItem = getReactive(rxDoc).getData()
+          let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
           if (indx >= 0) {
@@ -184,7 +184,7 @@ class Lists {
         }
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
-          let reactiveItem = getReactive(rxDoc).getData()
+          let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')
           let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
@@ -219,7 +219,7 @@ class Lists {
           })
           logD(f, 'find voted nodes complete', rxDocs)
           for (let rxDoc of rxDocs) {
-            let reactiveItem = getReactive(rxDoc).getData()
+            let reactiveItem = getReactive(rxDoc)
             assert(reactiveItem.items, '!reactiveItem.items')
             assert(event.object, '!event.object')
             let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)

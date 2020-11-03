@@ -46,7 +46,7 @@ class Event {
          })
          logD(f, 'found LST_FEED: ', rxDocsFeed)
          for (let rxDoc of rxDocsFeed) {
-            let reactiveItem = getReactive(rxDoc).getData()
+            let reactiveItem = getReactive(rxDoc)
             assert(reactiveItem.items, '!reactiveItem.items')
             // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
             reactiveItem.items.splice(0, 0, event)

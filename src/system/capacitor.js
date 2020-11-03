@@ -21,6 +21,7 @@ async function initCapacitor (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
    App.addListener('appUrlOpen', async (openData) => {
       // alert('appUrlOpen: ' + JSON.stringify(openData))
+      logD('appUrlOpen. openData=', openData)
       let url = new URL(openData.url)
       let data = url.searchParams.get('data')
       let text = url.searchParams.get('contentText')
