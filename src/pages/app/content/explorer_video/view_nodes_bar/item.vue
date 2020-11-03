@@ -25,7 +25,7 @@ div(
       opacity: 0.4,
       left: (item.layers[0].figuresAbsolute[1].t-item.layers[0].figuresAbsolute[1].t) / contentKalpa.duration * 100 + '%',
     }`
-    ).row.bg-white.br
+    ).row.bg-white
   //- preview
   img(
     :src="item.thumbUrl"

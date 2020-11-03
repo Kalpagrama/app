@@ -25,7 +25,7 @@ q-page(
     :style=`{zIndex: 1000}`
     ).b-30
     .row.full-width.items-start.content-start.b-30.q-px-sm
-      slot(name="top")
+      slot(name="top" :feed="feed")
       //- search
       .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start

@@ -47,7 +47,7 @@ q-layout(
                   @click="createStart()"
                   round dense color="green" icon="add"
                   :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
-          //- view-nodes-bar(
+          view-nodes-bar(
             v-if="!node"
             :player="player"
             :contentKalpa="contentKalpa"

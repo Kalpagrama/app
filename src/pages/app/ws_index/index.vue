@@ -72,6 +72,14 @@ export default {
     itemClick (item) {
       this.$log('itemClick', item)
     }
+  },
+  watch: {
+    '$route.params.viewId': {
+      immediate: true,
+      handler (to, from) {
+        if (!to) this.$router.replace({params: {viewId: 'nodes'}})
+      }
+    }
   }
 }
 </script>
