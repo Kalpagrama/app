@@ -1,4 +1,5 @@
 import 'src/system/utils' // string.in func
+import {rxdb} from 'src/system/rxdb'
 function assert(cond, strError){
    if(!cond) throw new Error('dummy assert: ' + strError)
 }
@@ -8,48 +9,64 @@ function makeEventCard (event) {
    // alert('makeEventCard')
    let resultCard = { icon: '', title: 'Новое событие', description: '', items: [] }
    const cropObj = (obj) => {
-      assert(obj.oid && obj.name != null && obj.thumbUrl, 'bad obj: ' + JSON.stringify(obj))
-      return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl, type: obj.type }
+      assert(obj.oid && obj.type && obj.name != null && obj.thumbUrl, 'bad obj: ' + JSON.stringify(obj))
+      return { oid: obj.oid , name: obj.name, thumbUrl: obj.thumbUrl, type: obj.type }
    }
+   const verbalizeObject = (obj) => {
+      assert(obj.oid && obj.type && obj.name != null && obj.thumbUrl, 'bad obj: ' + JSON.stringify(obj))
+      return `${verbalizeObjectType(obj)}${obj.name ? ' ' + obj.name: ''}`
+   }
+   const verbalizeObjectType = (obj)=>{
+      assert(obj.type && obj.name != null, 'bad obj: ' + JSON.stringify(obj))
+      switch (obj.type){
+         case 'NODE': return 'ядро'
+         case 'JOINT': return 'связь'
+         case 'USER': return 'пользователь'
+         case 'SPHERE':
+         case 'CHAR':
+         case 'WORD':
+         case 'SENTENCE': return 'сфера'
+         case 'AUDIO':
+         case 'IMAGE':
+         case 'VIDEO':
+         case 'BOOK': return 'контент'
+      }
+   }
+   const myOid = rxdb.getCurrentUser().oid
    switch (event.type) {
       case 'USER_SUBSCRIBED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'подписался на', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы подписались на', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         if (event.subject.oid === myOid) {
+            resultCard.items = [`вы подписались на ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         } else {
+            resultCard.items = ['пользователь', cropObj(event.subject), `подписался на ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         }
          break
       case 'USER_UNSUBSCRIBED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'отписался от', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы отписались от', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         if (event.subject.oid === myOid) {
+            resultCard.items = [`вы отписались от ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         } else {
+            resultCard.items = ['пользователь', cropObj(event.subject), `отписался от ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         }
          break
       case 'VOTED':
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'проголосовал за', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы проголосовали за', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         if (event.subject.oid === myOid) {
+            resultCard.items = [`вы проголосовали за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         } else {
+            resultCard.items = ['пользователь', cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         }
          break
       case 'OBJECT_CREATED':
          resultCard.title = 'Создан новый объект'
-         assert(event.matter, '!event.matter')
-         if (event.matter.reason === 'SUBSCRIBE') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'создал', cropObj(event.object)]
-         } else if (event.matter.reason === 'AUTHOR') {
-            resultCard.items = ['вы создали', cropObj(event.object)]
-         } else if (event.matter.reason === 'JOIN') {
+         if (event.matter.reason === 'JOIN') {
             resultCard.items = ['пользователь', cropObj(event.subject), 'использовал ваше ядро для создания', cropObj(event.object)]
-         } else throw new Error('bad matter:' + JSON.stringify(event.matter))
+         }
+         else if (event.subject.oid === myOid) {
+            resultCard.items = [`вы создали ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         } else {
+            resultCard.items = ['пользователь', cropObj(event.subject), `создал ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+         }
          break
    }
-   // span.text-white {{ n.subject.name }} =>
-   // span.text-white {{ n.matter.reason }} =>
    resultCard.description = resultCard.items.reduce((acc, item) => {
       acc += ` ${typeof item === 'string' ? item : `"${item.name}"`}`
       return acc
