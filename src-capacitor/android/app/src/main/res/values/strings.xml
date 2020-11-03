@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">KALPAGRAMA</string>
-    <string name="title_activity_main">KALPAGRAMA</string>
+    <string name="app_name">Kalpagrama</string>
+    <string name="title_activity_main">Kalpagrama</string>
     <string name="package_name">app.kalpa</string>
     <string name="custom_url_scheme">app.kalpa</string>
 </resources>

@@ -8,6 +8,7 @@ import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
+import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, ReactiveListHolderWithPagination } from 'src/system/rxdb/reactive'
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
@@ -105,6 +106,7 @@ class RxDBWrapper {
       addRxPlugin(require('pouchdb-adapter-idb'))
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
+      addRxPlugin(RxDBMigrationPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок создала rxdb либо выполнила rxdb.deInitGlobal(пересрздала rxdb). Надо обновить коллекции
@@ -132,7 +134,7 @@ class RxDBWrapper {
                logE('cant process rxdb event!', err)
                alert('error on processStoreEvent: ' + JSON.stringify(err))
                await window.location.reload()
-               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
             } finally {
             }
          }
@@ -199,7 +201,7 @@ class RxDBWrapper {
          await this.workspace.create()
          await this.cache.create()
          this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`, this.created)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
@@ -247,7 +249,7 @@ class RxDBWrapper {
       }
       try {
          await this.lock('rxdb::init')
-         this.event.init()
+         await this.event.init()
          let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
          assert(authUser, 'authUser')
          let { userOid, dummyUser } = authUser
@@ -255,15 +257,8 @@ class RxDBWrapper {
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
          let currentUser
          if (userOid) {
-            let fetchCurrentUserFunc = async () => {
-               return {
-                  notEvict: true, // живет вечно
-                  item: await ObjectsApi.objectFull(userOid),
-                  actualAge: 'day'
-               }
-            }
             currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-               fetchFunc: fetchCurrentUserFunc,
+               notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
@@ -296,6 +291,8 @@ class RxDBWrapper {
          }
          this.initialized = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      } catch (err) {
+         logE('cant init rxdb. err = ', err)
       } finally {
          this.release()
       }
@@ -305,10 +302,10 @@ class RxDBWrapper {
       const f = this.deInit
       const t1 = performance.now()
       try {
+         await this.lock('rxdb::deInit')
          logD(f, 'start', fromDeinitGlobal)
          assert(this.created, '!created')
-         await this.lock('rxdb::deInit')
-         if (fromDeinitGlobal) this.event.deInit() // подписку отменяем только 1 раз
+         if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
          this.reactiveItemDbMemCache.reset()
@@ -333,7 +330,7 @@ class RxDBWrapper {
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, `isLeader = ${mutexGlobal.isLeader()}`)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          await mutexGlobal.release('rxdb::initGlobal')
       }
@@ -342,7 +339,7 @@ class RxDBWrapper {
    // удалит данные в rxdb (сообщит об этом другим вкладкам)
    async deInitGlobal () {
       const f = this.deInitGlobal
-      logD(f, 'start', this.created, mutexGlobal.isLeader())
+      logD(f, 'start')
       const t1 = performance.now()
       try {
          await mutexGlobal.lock('rxdb::deinitGlobal')
@@ -362,7 +359,7 @@ class RxDBWrapper {
    async isInitializedGlobal () {
       assert(this.created, '!created')
       let authUser = await this.get(RxCollectionEnum.META, 'authUser') // данные запоминаются после первого успешного init на одной из вкладок
-      return !!authUser
+      return !!authUser && localStorage.getItem('k_token') // k_token нужен для gql-запросов
    }
 
    async lock (lockOwner) {
@@ -377,15 +374,23 @@ class RxDBWrapper {
       const f = this.processEvent
       const t1 = performance.now()
       logD(f, 'start', event)
+      let processedEvents
       try {
-         assert(this.initialized, '! this.initialized !')
-         if (!mutexGlobal.isLeader()) return // только одна вкладка меняет rxdb по эвентам сервера
          await mutexGlobal.lock('rxdb::processEvent')
          await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
+         assert(this.initialized, '! this.initialized !')
+         assert(event.id, '!event.id')
          assert(this.store, '!this.store')
+         processedEvents = JSON.parse(await this.get(RxCollectionEnum.META, 'processedEvents') || '[]')
+         if (processedEvents.includes(event.id)) return // эвент уже обработан (только одна вкладка меняет rxdb по эвентам сервера)
          await this.event.processEvent(event, this.store)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
+         if (processedEvents){
+            processedEvents.unshift(event.id) // добавляем в начало
+            processedEvents.splice(888, processedEvents.length) // обрезаем старые (чтобы массив не рос бесконечно)
+            await this.set(RxCollectionEnum.META, { id: 'processedEvents', valueString: JSON.stringify(processedEvents) })
+         }
          this.release()
          await mutexGlobal.release('rxdb::processEvent')
       }
@@ -477,8 +482,8 @@ class RxDBWrapper {
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
-         assert(this.initialized, '! this.initialized !')
          await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
+         assert(this.initialized, '! this.initialized !')
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
          let findResult
@@ -537,7 +542,7 @@ class RxDBWrapper {
             this.reactiveItemDbMemCache.set(queryId, findResult)
          }
          if (autoNext) await findResult.next()
-         this.store.commit('debug/addFindResult', { queryId, findResult })
+         // this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult, '!result')
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
@@ -546,7 +551,7 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.getRxDoc
       const t1 = performance.now()
       // logD(f, 'start')
@@ -558,7 +563,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum in LstCollectionEnum) {
          rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-         rxDoc = await this.objects.get(id, priority, clientFirst, force, onFetchFunc)
+         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
@@ -573,7 +578,7 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
       const f = this.get
       const t1 = performance.now()
       // logW(f, 'start', rxCollectionEnum, idOrRawId)
@@ -600,6 +605,7 @@ class RxDBWrapper {
       if (!reactiveItem) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
+            notEvict,
             clientFirst,
             priority,
             force,
@@ -610,10 +616,9 @@ class RxDBWrapper {
          reactiveItem = getReactive(rxDoc)
          this.reactiveItemDbMemCache.set(id, reactiveItem)
       }
-      this.store.commit('debug/addReactiveItem', { id, reactiveItem })
-      assert(reactiveItem.getData, '!reactiveItem.getData' + JSON.stringify(reactiveItem))
+      // this.store.commit('debug/addReactiveItem', { id, reactiveItem })
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return reactiveItem.getData()
+      return reactiveItem
    }
 
    // actualAge - актуально только для кэша
@@ -630,14 +635,14 @@ class RxDBWrapper {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data)) // valueString не должен быть null! (cм getReactive(rxDoc).getData())
+         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
          rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }
       if (!rxDoc) return null
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return getReactive(rxDoc).getData()
+      return getReactive(rxDoc)
    }
 
    async remove (id) {

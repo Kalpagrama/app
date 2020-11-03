@@ -128,6 +128,14 @@ export default {
     login (newVal) {
       this.$set(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
     },
+    '$route.query.email': {
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          this.email = to
+        }
+      }
+    }
   },
   methods: {
     async identify () {
@@ -151,7 +159,11 @@ export default {
           this.passwordShow = true
         }
         if (needInvite) {
-          this.inviteCodeShow = true
+          if (this.$route.query.invite){ // вход по ссылке-приглашению
+            this.inviteCodeShow = false
+            this.inviteCode = this.$route.query.invite
+            // alert('TADA!!!!' + this.inviteCode)
+          } else this.inviteCodeShow = true
         }
         if (needConfirm) {
           this.emailCodeShow = true

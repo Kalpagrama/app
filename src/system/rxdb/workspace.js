@@ -47,10 +47,9 @@ class WaitBreakable {
 }
 
 const WsItemTypeEnum = Object.freeze({
-   WS_ANY: 'WS_ANY',
+   WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
    WS_NODE: 'WS_NODE',
    WS_CONTENT: 'WS_CONTENT',
-   WS_CHAIN: 'WS_CHAIN',
    WS_SPHERE: 'WS_SPHERE',
    WS_BOOKMARK: 'WS_BOOKMARK',
    WS_JOINT: 'WS_JOINT',
@@ -122,12 +121,26 @@ class Workspace {
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
             let onWsChangedByUser = async (id, operation, rev) => {
                const f = onWsChangedByUser
-               if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return
+               if (this.ignoreWsChanges || !mutexGlobal.isLeader()) return // postSave сработает на всех вкладках (независимо от того, какая изменила итем) только одна вкладка меняет ws_changes
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                await this.db.ws_changes.atomicUpsert({ id, operation, rev })
                // logD(f, `complete. ${id}`)
             }
+            const checkUnique = async (plainData) => {
+               assert(plainData.wsItemType in WsItemTypeEnum, '!plainData.wsItemType in WsItemTypeEnum')
+               if (plainData.wsItemType === WsItemTypeEnum.WS_SPHERE) {
+                  assert(plainData.name)
+                  const found = await rxdb.find({
+                     selector: {
+                        rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+                        name: plainData.name
+                     }
+                  }, true)
+                  if (found.length) throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+               }
+            }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
+               await checkUnique(plainData)
                plainData.ignoreChanges = false
                let plainDataCopy = cloneDeep(plainData) // newVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
@@ -142,6 +155,9 @@ class Workspace {
                   plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
                }
             }, false)
+            this.db.ws_items.preInsert(async (plainData) => {
+               await checkUnique(plainData)
+            }, false);
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
                // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
                if (!plainData.ignoreChanges) {
@@ -175,24 +191,20 @@ class Workspace {
             logD(f, 'start')
             this.synchroStarted = true // защита от двойного запуска
             while (true) {
-               if (this.reactiveUser && this.synchro) {
-                  const tLoop = performance.now()
+               if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
                   try {
-                     logD(f, 'next loop start...', mutexGlobal.isLeader(), this.synchroLoopWaitObj.getTimeOut())
                      await mutexGlobal.lock('ws::synchroLoop')
-                     await rxdb.lock('ws::synchroLoop')// (чтобы дождалась пока отработает rxdb.deInit и др)
                      await this.lock('ws::synchroLoop')
-                     // logD(f, 'locked')
-                     if (mutexGlobal.isLeader()) await this.synchronize()
+                     const tLoop = performance.now()
+                     logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                     await this.synchronize()
                      logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                   } finally {
                      this.release()
-                     rxdb.release()
                      await mutexGlobal.release('ws::synchroLoop')
-                     // logD(f, 'unlocked')
                   }
                }
                await this.synchroLoopWaitObj.wait()
@@ -229,7 +241,6 @@ class Workspace {
       const f = this.synchronize
       logD(f, 'start')
       const t1 = performance.now()
-      assert(mutexGlobal.isLeader(), '!isLeader')
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
@@ -359,21 +370,17 @@ class Workspace {
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
-      assert(mutexGlobal.isLeader(), 'isLeader()')
       const f = this.processEvent
       logD(f, 'start')
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::processEvent')
-         logD(f, 'locked')
-         this.ignoreWsChanges = true
-         if (!mutexGlobal.isLeader()) return
-         logD(f, 'try apply event')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')
          assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
          assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
          assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
+         this.ignoreWsChanges = true
          let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
          this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать мастерскую (synchronizeWsWhole)
@@ -436,26 +443,7 @@ class Workspace {
          await this.lock('rxdb::ws::set')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === 'WS_BOOKMARK') {
-            // assert(itemCopy.oid)
-            // const found = await rxdb.find({
-            //    selector: {
-            //       rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-            //       oid: itemCopy.oid
-            //    }
-            // }, true)
-            // assert(!found.length, 'уже есть такой букмарк!!!!!!')
-         } else if (itemCopy.wsItemType === 'WS_SPHERE') {
-            assert(itemCopy.name)
-            const found = await rxdb.find({
-               selector: {
-                  rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-                  name: itemCopy.name
-               }
-            }, true)
-            // logD('found=', found)
-            assert(!found.length, 'уже есть такая же сфера!!!!!')
-         } else if (itemCopy.wsItemType === 'WS_NODE') {
+         if (itemCopy.wsItemType === 'WS_NODE') {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
                val.layers.map(l => {
                   acc.push(l.contentOid)

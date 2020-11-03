@@ -104,11 +104,10 @@ class Cache {
          }
          this.debouncedDumpLru = debounce(async () => {
             const f = this.debouncedDumpLru
-            if (!mutexGlobal.isLeader()) return
+            if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
             logD(f, 'start', 'debouncedDumpLru')
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()
-            // await rxdb.set(RxCollectionEnum.META, {id: 'lruDump', valueString: JSON.stringify(lruDump)})
             await this.db.meta.atomicUpsert({ id: 'lruDump', valueString: JSON.stringify(lruDump) })
             logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }, debounceIntervalDumpLru)
@@ -226,7 +225,7 @@ class Cache {
    }
 
    // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
-   async get (id, fetchFunc, clientFirst = true, force = false, onFetchFunc = null) {
+   async get (id, fetchFunc = null, clientFirst = true, force = false, onFetchFunc = null) {
       try {
          // await this.lock('rxdb::get') ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
          assert(this.created, '!this.created')
@@ -281,7 +280,7 @@ class Cache {
          if (force || !this.isActual(id, cachedInfo)) { // данные отсутствуют в кэше, либо устарели
             await fetch()
          }
-         let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
+         let rxDoc = await this.db.cache.findOne(id).exec() // выполняем строго после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
          if (cachedInfo && !rxDoc) { // наблюдается баг (в cacheLru запись есть, а в rxdb - нет) Не разобрался до конца как это происходит... Возможно это связано с ручной очисткой storage
             logW(f, 'record has in cacheLru but not in rxdb!', cachedInfo)
             clientFirst = false // ждем отвера сервера

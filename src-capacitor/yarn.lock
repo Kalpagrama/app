@@ -116,6 +116,16 @@ compare-versions@^3.1.0:
   resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
   integrity sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
 
+cordova-plugin-screen-orientation@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-screen-orientation/-/cordova-plugin-screen-orientation-3.0.2.tgz#81290a933cfe84d35482cfcb251c931cc7b71931"
+  integrity sha512-2w6CMC+HGvbhogJetalwGurL2Fx8DQCCPy3wlSZHN1/W7WoQ5n9ujVozcoKrY4VaagK6bxrPFih+ElkO8Uqfzg==
+
+es6-promise-plugin@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/es6-promise-plugin/-/es6-promise-plugin-4.2.2.tgz#cfa0cc1383d91f999a62a2bbf4bd97bec305e0ac"
+  integrity sha512-uoA4aVplXI9oqUYJFBAVRwAqIN9/n9JgrTAUGX3qPbnSZVE5yY1+6/MsoN5f4xsaPO62WjPHOdtts6okMN6tNA==
+
 escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"

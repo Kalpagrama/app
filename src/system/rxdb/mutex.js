@@ -28,7 +28,7 @@ class MutexLocal {
             this.queue.push({ resolve, reject, lockOwner })
             logD(`${lockOwner} ${this.name} lock queued!  queue = ${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
          } else {
-            this.timerWarnId = setInterval(() => logW(`${lockOwner} ${this.name} possible deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
+            this.timerWarnId = setInterval(() => logW(`${this.name} possible deadlock! locked by:${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`), 10 * 1000)
             // this.timerErrId = setTimeout(() => {
             //    logE(`${lockOwner} ${this.name} deadlock detected! this.lockOwner=${this.lockOwner} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
             //    reject(new Error('deadlock detected! reject all locks')) // current
@@ -45,6 +45,7 @@ class MutexLocal {
    }
 
    release () {
+      assert(this.lockOwner, '!this.lockOwner')
       let lockOwnerOld = this.lockOwner
       if (this.queue.length > 0) {
          const { resolve, reject, lockOwner } = this.queue.shift()
@@ -56,7 +57,7 @@ class MutexLocal {
          this.locked = false
          this.lockOwner = null
       }
-      logD(`${lockOwnerOld} ${this.name}. release lock complete. this.lockOwner=${this.lockOwner} queue = ${JSON.stringify(this.queue.map(item => item.lockOwner))} ${this.locked}`)
+      logD(`${lockOwnerOld} ${this.name}. release lock complete. this.lockOwner=${this.lockOwner} lockOwnerOld=${lockOwnerOld} queue = ${JSON.stringify(this.queue.map(item => item.lockOwner))} ${this.locked}`)
    }
 }
 
@@ -204,10 +205,10 @@ class MutexGlobal {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async release (lockOwner) {
+   async release (unlockOwner) {
       if (Platform.is.capacitor) return
       const f = this.release
-      assert(lockOwner, '!lockOwner')
+      assert(unlockOwner, '!unlockOwner')
       // logD(f, 'start', lockOwner, this.getInstanceId())
       assert(this.lockCnt, '!this.lockCnt')
       this.lockCnt-- // нужно ставить до изменения k_global_lock (см window.addEventListener('storage.k_global_lock')

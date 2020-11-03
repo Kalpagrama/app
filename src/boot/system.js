@@ -18,7 +18,7 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
   try {
     // alert('SYSTEM router init')
     router = VueRouter
-    await initServices(store)
+    await initServices()
   } catch (err) {
     logC(err)
     throw err // без initServices работать не можем!

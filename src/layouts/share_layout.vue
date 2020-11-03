@@ -22,7 +22,7 @@ export default {
     this.$logD('mounted')
     const swShareStore = new Store('sw-share', 'request-formData')
     let shareData = await get('shareData', swShareStore)
-    alert('share to KALPAGRAMA! shareData (see store.core.state.shareData)=\n' + JSON.stringify(shareData))
+    alert('share to Kalpagrama! shareData (see store.core.state.shareData)=\n' + JSON.stringify(shareData))
     this.$logD('formData=', shareData)
     this.$store.commit('core/stateSet', ['shareData', shareData])
     // if (shareData.image) this.$logD('file image =', await toBase64(shareData.image))

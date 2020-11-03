@@ -54,6 +54,14 @@ export default {
       items: []
     }
   },
+  watch: {
+    items: {
+      deep: true,
+      handler (to, from) {
+        this.$log('items changed TO', to, from)
+      }
+    }
+  },
   computed: {
     maxWidth () {
       if (this.$q.screen.width > 700) return 700 + ((this.width - 700) / 2)

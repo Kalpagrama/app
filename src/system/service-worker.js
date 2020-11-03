@@ -1,29 +1,27 @@
 /* eslint-disable */
-
+const swVer = 2
+const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
 // https://gist.github.com/jeffposnick/fc761c06856fa10dbf93e62ce7c4bd57
-import { setCacheNameDetails, skipWaiting, clientsClaim } from 'workbox-core'
-import { registerRoute, setDefaultHandler, setCatchHandler } from 'workbox-routing'
-import { getCacheKeyForURL } from 'workbox-precaching'
-import { matchPrecache } from 'workbox-precaching'
-import { createHandlerBoundToURL } from 'workbox-precaching'
-import { CacheableResponsePlugin } from 'workbox-cacheable-response/CacheableResponsePlugin'
-import { CacheFirst } from 'workbox-strategies/CacheFirst'
-import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
-import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
-import { NavigationRoute } from 'workbox-routing/NavigationRoute'
-import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute'
-import {makeEventCard, makeRoutePath} from 'public/scripts/common_func'
 
-// отключаем дебаговый вывод workbox
-self.__WB_DISABLE_DEV_LOGS = true
-// precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-precacheAndRoute(self.__WB_MANIFEST)
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+const {cacheNames, setCacheNameDetails} = workbox.core
+const {registerRoute, setCatchHandler} = workbox.routing
+const {addRoute, getCacheKeyForURL, matchPrecache, PrecacheController} = workbox.precaching
+const { CacheFirst } = workbox.strategies
+const { StaleWhileRevalidate } = workbox.strategies
+const { ExpirationPlugin } = workbox.expiration
 
-const swVer = 1
-const useCache = true
-let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
+// import { cacheNames, setCacheNameDetails } from 'workbox-core'
+// import { registerRoute, setCatchHandler } from 'workbox-routing'
+// import { addRoute, getCacheKeyForURL, matchPrecache, PrecacheController } from 'workbox-precaching'
+// import { CacheFirst } from 'workbox-strategies/CacheFirst'
+// import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
+// import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
+import { makeRoutePath, wait } from 'public/scripts/common_func'
+
+let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
    cacheVideo, messaging
 
@@ -33,6 +31,7 @@ function sendMsg (type, msgData) {
 
 // log
 {
+   self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
    logDbgFilter = 'gui'
    logLevel = 0
    logLevelSentry = 3
@@ -41,33 +40,75 @@ function sendMsg (type, msgData) {
    /* global Sentry */
    // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
 
-   logDebug = (...msg) => {
+   logD = (...msg) => {
       if (logDbgFilter === 'gui') return
-      if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
-      // if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+      if (logLevel === 0) console.log('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
    }
 
-   logCritical = (...msg) => {
-      if (logLevel <= 4) console.error(...msg)
+   logW = (...msg) => {
+      if (logLevel <= 2) console.warn('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
+   }
+
+   logE = (...msg) => {
+      if (logLevel <= 3) console.error('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
+   }
+
+   logC = (...msg) => {
+      if (logLevel <= 4) console.error('SW: ', swVer, (new Date()).toLocaleTimeString(), ...msg)
       // if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
    }
 }
 // common init sw
 {
-   logDebug('common init sw', swVer)
-   /* global idbKeyval, MD5 */
+   logD('common init sw', swVer)
+   { // precache
+      // precacheAndRoute(__WB_MANIFEST_TMP) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке
+      // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
+      // https://github.com/GoogleChrome/workbox/issues/155
+
+      const delayedPrecacheController = new PrecacheController(cacheNames.precache)
+      delayedPrecacheController.addToCacheList(self.__WB_MANIFEST);
+      self.addEventListener('install', (event) => {
+         const checkPrecache = async () => {
+            // const cache = await caches.open(staticCacheName)
+            // logW('chunks:', delayedPrecacheController.getCachedURLs())
+            if(!delayedPrecacheController.getCacheKeyForURL('/manifest.json')) {
+               logE('/manifest.json not found in chunks:', delayedPrecacheController.getCachedURLs())
+               await wait(200)
+               throw new Error('/manifest.json not found in chunks')
+            }
+            if(await delayedPrecacheController.matchPrecache('/manifest.json')) { // если в кэше уже что-то есть - не выходим из install, пока не загрузим новые данные
+               logD('delayedPrecacheController.install...')
+               await delayedPrecacheController.install()
+            }
+         }
+         event.waitUntil(checkPrecache())
+      });
+      self.addEventListener('activate', (event) => {
+         setTimeout(function () {
+            logD('delayedPrecacheController.install by timeout.')
+            delayedPrecacheController.install().then(function () {
+               logD('delayedPrecacheController.activate.')
+               delayedPrecacheController.activate()
+            });
+         }, 15000);
+         event.waitUntil(Promise.resolve(0));
+      });
+      addRoute({})
+   }
+   // /* global idbKeyval, MD5 */
    importScripts('/scripts/idb-keyval/idb-keyval-iife.min.js')
    importScripts('/scripts/md5.js')
    importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js')
    importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-messaging.js')
-   logDebug('swVer=', swVer)
-   logDebug('init idb')
+   logD('swVer=', swVer)
+   logD('init idb')
    swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
    videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
-   logDebug('init idb ok')
+   logD('init idb ok')
 
    function initWebPush () {
-      logDebug('try init web push with firebase...')
+      logD('try init web push with firebase...')
       /* global firebase */
       firebase.initializeApp({
          apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
@@ -79,14 +120,14 @@ function sendMsg (type, msgData) {
          appId: '1:1082935232322:web:a4f0203aa4015e8f86eadb',
          measurementId: 'G-D8QZ67XLM5'
       })
-      logDebug('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
+      logD('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
       let i = 0
       if (firebase.messaging.isSupported()) {
          try {
             messaging = firebase.messaging()
             // messaging.useServiceWorker(self.registration)
             messaging.setBackgroundMessageHandler(function (payload) {
-               logDebug('[firebase-messaging-sw.js] Received background message ', payload)
+               logD('[firebase-messaging-sw.js] Received background message ', payload)
 
                // Customize notification here
                //todo use payload.notification.title & payload.notification.body
@@ -110,7 +151,7 @@ function sendMsg (type, msgData) {
                return self.registration.showNotification(notificationTitle, notificationOptions)
             })
          } catch (err) {
-            logCritical('firebase init error!', err)
+            logC('firebase init error!', err)
          }
       }
    }
@@ -128,13 +169,13 @@ function sendMsg (type, msgData) {
 
       registerRoute(/\/share_target\/?$/,
          async ({ url, event, params }) => {
-            logDebug('share_target 1', url, getCacheKeyForURL('/index.html'))
+            // logD('share_target 1', url, getCacheKeyForURL('/index.html'))
             // if (event.request.method === 'POST') {
-            //   logDebug('redirect to share_target = ')
+            //   logD('redirect to share_target = ')
             //   return Response.redirect('share_target', 303)
             // }
             if (url.pathname.includes('share_target')) {
-               logDebug('share_target 6 ')
+               logD('share_target 6 ')
                try {
                   let formData = await event.request.formData()
                   // for (let [name, value] of formData) {
@@ -145,17 +186,17 @@ function sendMsg (type, msgData) {
                   let url = formData.get('url')
                   let images = formData.getAll('image')
                   let videos = formData.getAll('video')
-                  logDebug(' formData fields  = ', { title, text, url, images, videos })
+                  logD(' formData fields  = ', { title, text, url, images, videos })
                   await idbKeyval.set('shareData', { title, text, url, images, videos }, swShareStore)
                } catch (err) {
-                  logCritical('share_target err', err)
+                  logC('share_target err', err)
                }
             }
             if (getCacheKeyForURL('/index.html')) {
-               logDebug('share_target returm from cache', url)
+               logD('share_target return from cache', url)
                return caches.match(getCacheKeyForURL('/index.html'))
             } else {
-               logDebug('share_target returm from net', url)
+               logD('share_target returm from net', url)
                return fetch('/index.html')
             }
          },
@@ -165,33 +206,33 @@ function sendMsg (type, msgData) {
    // listeners
    {
       self.addEventListener('install', event => {
-         logDebug('installed!', swVer)
+         logD('installed!', swVer)
          // event.registerForeignFetch({
          //   scopes: ['/'],
          //   origins: ['*'] // or ['https://example.com']
          // })
       })
       self.addEventListener('activate', event => {
-         logDebug('activated!', swVer)
+         logD('activated!', swVer)
          // if (messaging) {
          //   messaging.getToken().then(token => {
-         //     logDebug('messaging.getToken() = ', token)
+         //     logD('messaging.getToken() = ', token)
          //     webPushToken = token
-         //   }).catch(err => logCritical('error on messaging.getToken(): ', err))
+         //   }).catch(err => logC('error on messaging.getToken(): ', err))
          // }
       })
       self.addEventListener('fetch', async event => {
-         // logDebug('ready to handle fetches! request=', event.request)
+         // logD('ready to handle fetches! request=', event.request)
       })
       self.addEventListener('updatefound', event => {
-         logDebug('ready to update!', swVer)
+         logD('ready to update!', swVer)
          self.registration.showNotification('new version available')
       })
       self.addEventListener('error', function (e) {
-         logCritical(e)
+         logC(e)
       })
       self.addEventListener('message', function handler (event) {
-         logDebug('message!', event.data)
+         logD('message!', event.data)
          if (event.data) {
             switch (event.data.type) {
                case 'logInit':
@@ -199,6 +240,14 @@ function sendMsg (type, msgData) {
                   logLevel = event.data.logLevel
                   logLevelSentry = event.data.logLevelSentry
                   break
+               // case 'precacheAndRoute':
+               //    if(!self.precacheAndRouteExecuted){
+               //       // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+               //       logD('precacheAndRoute', __WB_MANIFEST_TMP)
+               //       precacheAndRoute(__WB_MANIFEST_TMP)
+               //       self.precacheAndRouteExecuted = true
+               //    }
+               //    break
                case 'skipWaiting':
                   self.skipWaiting()
                   break
@@ -208,25 +257,25 @@ function sendMsg (type, msgData) {
                case 'sendWebPushToken':
                   if (messaging) {
                      messaging.getToken().then(token => {
-                        logDebug('messaging.getToken() = ', token)
+                        logD('messaging.getToken() = ', token)
                         sendMsg('webPushToken', token)
-                     }).catch(err => logCritical('error on messaging.getToken(): ', err))
+                     }).catch(err => logC('error on messaging.getToken(): ', err))
                   }
                   // sendMsg('webPushToken', webPushToken)
                   break
                default:
-                  logCritical('bad event.data.type', event.data.type)
+                  logC('bad event.data.type', event.data.type)
             }
          } else {
-            logCritical('event.data is null')
+            logC('event.data is null')
          }
       })
       self.addEventListener('notificationclick', function (event) {
-         logDebug('notificationclick', event)
-         logDebug('notificationclick', event.notification.data)
+         logD('notificationclick', event)
+         logD('notificationclick', event.notification.data)
          event.notification.close()
          const dbEvent = event.notification.data
-         logDebug('notificationclick dbEvent', dbEvent)
+         logD('notificationclick dbEvent', dbEvent)
 
          let route = makeRoutePath(dbEvent.object) || '/'
          event.waitUntil(
@@ -246,7 +295,7 @@ function sendMsg (type, msgData) {
          )
       }, false)
       self.addEventListener('push', function (event) {
-         logDebug('push event recieved = ', event)
+         logD('push event recieved = ', event)
          let payload = event.data ? event.data.text() : 'Alohomora'
 
          event.waitUntil(
@@ -286,7 +335,7 @@ if (useCache) {
    {
       cacheVideo = async function (event) {
          // let requestCopy = event.request.clone()
-         // logDebug('video cacheVideo', requestCopy.url, requestCopy)
+         // logD('video cacheVideo', requestCopy.url, requestCopy)
          return await cacheFirst(event, videoStore)
       }
       const cacheOnly = async (event, store) => {
@@ -299,7 +348,7 @@ if (useCache) {
          })
       }
       const StaleWhileRevalidate = async (event, store) => {
-         logDebug('gql StaleWhileRevalidate')
+         logD('gql StaleWhileRevalidate')
          let cachedResponse = await cacheOnly(event, store)
          let fetchPromise = fetch(event.request.clone())
             .then(async (response) => {
@@ -307,45 +356,45 @@ if (useCache) {
                return response
             })
             .catch((err) => {
-               logCritical('cant fetch gql query with StaleWhileRevalidate', err)
+               logC('cant fetch gql query with StaleWhileRevalidate', err)
             })
          return cachedResponse ? cachedResponse : await fetchPromise
       }
       // Если по истечении timeout ответ не получен - ответить из кэша
       const networkFirst = async (event, store, timeout) => {
-         logDebug('gql networkFirst')
+         logD('gql networkFirst')
          let cachedResponse = await cacheOnly(event, store)
          return await new Promise((resolve, reject) => {
             let timeoutId
             if (cachedResponse && timeout) {
                timeoutId = setTimeout(() => {
-                  logDebug('gql networkFirst. time expired. resolve from cache ok!')
+                  logD('gql networkFirst. time expired. resolve from cache ok!')
                   resolve(cachedResponse)
                }, timeout)
             }
             networkOnly(event).then(async (networkResponse) => {
-               logDebug('gql networkFirst. resolve from network ok!', networkResponse)
+               logD('gql networkFirst. resolve from network ok!', networkResponse)
                if (timeoutId) clearTimeout(timeoutId)
                if (networkResponse && networkResponse.ok) {
-                  logDebug('gql networkFirst. save to cache...')
+                  logD('gql networkFirst. save to cache...')
                   await setCache(event.request, networkResponse, store)
                }
                resolve(networkResponse)
             }).catch(err => {
                if (cachedResponse) {
-                  logDebug('gql networkFirst. fails. resolve from cache ok!', err)
+                  logD('gql networkFirst. fails. resolve from cache ok!', err)
                   resolve(cachedResponse)
                }
-               logDebug('gql networkFirst. fails.', err)
+               logD('gql networkFirst. fails.', err)
                reject(err)
             })
          })
       }
       const cacheFirst = async (event, store) => {
-         logDebug('gql cacheFirst')
+         logD('gql cacheFirst')
          let cachedResponse = await cacheOnly(event, store)
          if (cachedResponse) {
-            logDebug('gql cacheFirst. resolve from cache ok!', cachedResponse)
+            logD('gql cacheFirst. resolve from cache ok!', cachedResponse)
             return cachedResponse
          }
          return await networkFirst(event, store)
@@ -386,9 +435,9 @@ if (useCache) {
          return res
       }
       const setCache = async (request, response, store) => {
-         logDebug('save to cache...')
+         logD('save to cache...')
          if (!store) {
-            logCritical('bad store!!!')
+            logC('bad store!!!')
             throw new Error('bad store!!!')
          }
          let reqPrepared = await prepareRequest(request)
@@ -400,11 +449,11 @@ if (useCache) {
          let id = MD5(JSON.stringify(reqPrepared)).toString()
 
          await idbKeyval.set(id, entry, store)
-         logDebug('save to cache ok!')
+         logD('save to cache ok!')
       }
       const getCache = async (request, store) => {
          if (!store) {
-            logCritical('bad store!!!')
+            logC('bad store!!!')
             throw new Error('bad store!!!')
          }
          let reqPrepared = await prepareRequest(request)
@@ -413,20 +462,20 @@ if (useCache) {
             let id = MD5(JSON.stringify(reqPrepared)).toString()
             entry = await idbKeyval.get(id, store)
             if (!entry) {
-               logDebug('Load response not found in cache.')
+               logD('Load response not found in cache.')
                return null
             }
             // // Check cache max age.
             // let cacheControl = requestCopy.headers.get('Cache-Control')
             // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
             // if (Date.now() - data.timestamp > maxAge * 1000) {
-            //   logDebug('Cache expired. Load from API endpoint.')
+            //   logD('Cache expired. Load from API endpoint.')
             //   return null
             // }
-            logDebug('Load response from cache.', entry)
+            logD('Load response from cache.', entry)
             return new Response(entry.response.body, entry.response)
          } catch (err) {
-            logCritical('cant getCache', err)
+            logC('cant getCache', err)
             return null
          }
       }
@@ -443,10 +492,10 @@ if (useCache) {
       }))
       // vue router ( /menu /create etc looks at index.html)
       registerRoute(/\/(?!graphql)\w+\/?$/, async ({ url, event, params }) => {
-         logDebug('vue router 1', url, getCacheKeyForURL('/index.html'))
-         // logDebug('ask url=', url)
+         logD('vue router 1', url, getCacheKeyForURL('/index.html'))
+         // logD('ask url=', url)
          // let xxx = await createHandlerBoundToURL('/index.html', true)
-         // logDebug('ask url, createHandlerBoundToURL = ', xxx)
+         // logD('ask url, createHandlerBoundToURL = ', xxx)
          // return xxx
          if (getCacheKeyForURL('/index.html')) {
             return caches.match(getCacheKeyForURL('/index.html'))
@@ -480,7 +529,7 @@ if (useCache) {
       //    //    `A ${params.type} to ${params.name}`
       //    // );
       //    // decide for yourself which values you provide to mode and credentials
-      //    logDebug('decide for yourself which values you provide to mode and credentials')
+      //    logD('decide for yourself which values you provide to mode and credentials')
       //    const newRequest = new Request(event.request, {
       //       mode: 'cors',
       //       credentials: 'omit',
@@ -495,7 +544,7 @@ if (useCache) {
       // registerRoute( // content video
       //   /^http.*(kalpa\.store).+\.mp4$/,
       //   ({ url, event, params }) => {
-      //     logDebug('registerRoute video', event)
+      //     logD('registerRoute video', event)
       //     return cacheVideo(event)
       //   }
       // )
@@ -511,17 +560,18 @@ if (useCache) {
          // Use event, request, and url to figure out how to respond.
          // One approach would be to use request.destination, see
          // https://medium.com/dev-channel/service-worker-caching-strategies-based-on-request-types-57411dd7652c
-         logDebug('setCatchHandler', event)
+         logD('setCatchHandler', event)
          switch (event.request.destination) {
             case 'image': {
-               logDebug('fallback image', event.request.url, 'to', getCacheKeyForURL('/icons/icon-512x512.png'))
+               logD('fallback image', event.request.url, 'to', getCacheKeyForURL('/icons/icon-512x512.png'))
                return matchPrecache('/icons/icon-512x512.png')
             }
             default:
-               logDebug('fallback default', event.request)
+               logD('fallback default', event.request)
                // If we don't have a fallback, just return an error response.
                return Response.error()
          }
       })
    }
 }
+

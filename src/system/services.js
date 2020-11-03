@@ -7,9 +7,9 @@ import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/syste
 import assert from 'assert';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
-import store from 'src/store/index'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
+import store from 'src/store/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
@@ -21,10 +21,12 @@ const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
 
-async function initServices (store) {
+async function initServices () {
    const f = initServices
    logD(f, 'start', Platform.is, process.env.MODE)
    const t1 = performance.now()
+   initOfflineEvents(store)
+
    if (process.env.MODE === 'pwa') {
       await initPWA(store)
    } else if (Platform.is.capacitor) {
@@ -34,16 +36,16 @@ async function initServices (store) {
       const { initCordova } = await import('src/system/cordova.js')
       await initCordova(store)
    }
-   initOfflineEvents(store)
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
+
    let storageEventMutex = new MutexLocal('storageEventMutex')
    // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
    // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
    window.addEventListener('storage', async function (event) {
       try {
-         if (!event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) return
          await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
+         if (!event.key || !event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_create_date', 'k_rxdb_init_global_date', 'k_rxdb_deinit_global_date')) return
          if (event.newValue) {
             logD('storage sync event:', event)
             const getSyncEventStorageValue = (strValue) => { // В сафари событие срабатывает и на вкладке, которая инициировала изменения
@@ -72,7 +74,7 @@ async function initServices (store) {
       }
    })
    initialized = true
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, hasPerm)
+   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 // В сафари событие срабатывает и на вкладке, которая инициировала изменения (храним id вкладки в событии)
@@ -119,6 +121,15 @@ async function askForWebPushPerm (store) {
    } else if (process.env.MODE === 'pwa') {
       return await askForPwaWebPushPerm(store)
    }
+}
+
+function orientationLockEnabled (mode) {
+   return !!Platform.is.capacitor
+}
+
+async function orientationLock (mode) {
+   const { capacitorOrientationLock } = await import('src/system/capacitor.js')
+   if (Platform.is.capacitor) await capacitorOrientationLock(mode)
 }
 
 function initOfflineEvents (store) {
@@ -214,7 +225,7 @@ async function systemInit () {
    const f = systemInit
    logD(f, 'start')
    const t1 = performance.now()
-   if (await rxdb.isInitializedGlobal() && localStorage.getItem('k_token')) { // k_token нужен для gql-запросов
+   if (await rxdb.isInitializedGlobal()) {
       logD(f, 'skip systemInit')
       // alert('skip systemInit')
       return
@@ -238,7 +249,6 @@ async function systemInit () {
       }
       // alert(' systemInit 4 ')
       if (await rxdb.isInitializedGlobal()) {
-         // alert(' systemInit 5 ')
          await i18next.changeLanguage(rxdb.getCurrentUser().profile.lang)
          if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
             logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
@@ -269,19 +279,19 @@ async function systemHardReset () {
    if (window.indexedDB) {
       if (window.indexedDB.databases) {
          let dbs = await window.indexedDB.databases()
-         alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
-         alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
+         // alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
+         // alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
          for (let db of dbs) {
-            alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
+            // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
             logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
             window.indexedDB.deleteDatabase(db.name)
          }
       } else {
-         alert('systemHardReset 2')
+         // alert('systemHardReset 2')
          for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i)
             if (key.includes('rxdb')) {
-               alert('indexedDB.deleteDatabase(databaseName): ' + key)
+               // alert('indexedDB.deleteDatabase(databaseName): ' + key)
                logD('indexedDB.deleteDatabase(databaseName): ' + key)
                window.indexedDB.deleteDatabase(key)
             }
@@ -353,6 +363,8 @@ async function systemHardReset () {
 export {
    initServices,
    setSyncEventStorageValue,
+   orientationLockEnabled,
+   orientationLock,
    systemReset,
    shareWith,
    initSessionStorage,

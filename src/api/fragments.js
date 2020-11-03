@@ -348,7 +348,19 @@ const findResultFragment = gql`
     nextPageToken
     prevPageToken
     ... on EventFindResult { events {...eventFragment} }
-    ... on ObjectsFindResult { objects{oid type name thumbUrl(preferWidth: 600)} }
+    ... on ObjectsFindResult { objects{ oid } }
+    ... on WSFindResult { items }
+  }
+`
+const findResultFragmentForSearch = gql`
+  ${eventFragment}
+  fragment findResultFragment on FindResult {
+    count
+    totalCount
+    nextPageToken
+    prevPageToken
+    ... on EventFindResult { events {...eventFragment} }
+    ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }
     ... on WSFindResult { items }
   }
 `
@@ -362,7 +374,8 @@ const fragments = {
   objectShortStatFragment,
   nodeFragment,
   sphereFragment,
-  findResultFragment
+  findResultFragment,
+  findResultFragmentForSearch
 }
 
 export {

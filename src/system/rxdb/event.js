@@ -23,22 +23,20 @@ class Event {
       this.cache = cache
    }
 
-   init () {
-      EventApi.init()
+   async init () {
+      await EventApi.init()
    }
 
-   deInit () {
-      EventApi.deInit()
+   async deInit () {
+      await EventApi.deInit()
    }
 
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start', mutexGlobal.isLeader())
+      logD(f, 'start')
       const t1 = performance.now()
-      assert(mutexGlobal.isLeader(), '!Leader')
-
       // добавляем эвент на ленту (кроме собственных событий  (я созда/ я проголосовал итд))
       if (event.subject && event.subject.oid !== rxdb.getCurrentUser().oid) {
          let rxDocsFeed = await this.cache.find({
@@ -46,9 +44,9 @@ class Event {
                'props.rxCollectionEnum': RxCollectionEnum.LST_FEED
             }
          })
-         logD(f, 'finded LST_FEED: ', rxDocsFeed)
+         logD(f, 'found LST_FEED: ', rxDocsFeed)
          for (let rxDoc of rxDocsFeed) {
-            let reactiveItem = getReactive(rxDoc).getData()
+            let reactiveItem = getReactive(rxDoc)
             assert(reactiveItem.items, '!reactiveItem.items')
             // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
             reactiveItem.items.splice(0, 0, event)
