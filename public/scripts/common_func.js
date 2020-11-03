@@ -38,32 +38,32 @@ function makeEventCard (event) {
          if (event.subject.oid === myOid) {
             resultCard.items = [`вы подписались на ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          } else {
-            resultCard.items = ['пользователь', cropObj(event.subject), `подписался на ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+            resultCard.items = [cropObj(event.subject), `подписался на ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          }
          break
       case 'USER_UNSUBSCRIBED':
          if (event.subject.oid === myOid) {
             resultCard.items = [`вы отписались от ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          } else {
-            resultCard.items = ['пользователь', cropObj(event.subject), `отписался от ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+            resultCard.items = [cropObj(event.subject), `отписался от ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          }
          break
       case 'VOTED':
          if (event.subject.oid === myOid) {
             resultCard.items = [`вы проголосовали за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          } else {
-            resultCard.items = ['пользователь', cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+            resultCard.items = [cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          }
          break
       case 'OBJECT_CREATED':
          resultCard.title = 'Создан новый объект'
          if (event.matter.reason === 'JOIN') {
-            resultCard.items = ['пользователь', cropObj(event.subject), 'использовал ваше ядро для создания', cropObj(event.object)]
+            resultCard.items = [cropObj(event.subject), 'использовал ваше ядро для создания', cropObj(event.object)]
          }
          else if (event.subject.oid === myOid) {
             resultCard.items = [`вы создали ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          } else {
-            resultCard.items = ['пользователь', cropObj(event.subject), `создал ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+            resultCard.items = [cropObj(event.subject), `создал ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
          }
          break
    }
