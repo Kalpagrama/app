@@ -1,80 +1,38 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  container
-  :style=`{
-    width: '800px',
-    height: height+'px',
-    //- borderRadius: '10px 10px 0 0',
-    //- overflow: 'hidden',
-  }`)
+  container).b-30
   q-header(reveal)
     div(:style=`{borderRadius: '10px 10px 0 0',}`).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
-      //- header
       div(
         :style=`{
           height: '60px',
           borderRadius: '10px',
-        }`).row.full-width.items-center.content-center.b-40.q-px-sm
+        }`).row.full-width.items-center.content-center.q-px-sm
         span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-ml-sm Добавить элемент
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      //- types
-      div(
-        v-if="!feedId"
-        ).row.full-width.justify-center.q-px-sm
-        q-tabs(
-          :value="viewId" @input="viewId = $event, feedId = null"
-          no-caps active-color="green" align="left"
-          stretch :breakpoint="100" inline-label dense
-          :switch-indicator="true").full-width.text-grey-8
-          q-tab(
-            v-for="v in views" :key="v.id"
-            inline-label
-            :name="v.id" :label="v.name" :icon="v.icon").q-px-xs
-      //- search
-      div(
-        v-if="!feedId"
-        ).row.full-width.justify-start
-        div(:style=`{maxWith: '700px'}`).col
-          ws-search(
-            @searchString="searchString = $event"
-            :style=`{}`
-          )
   q-page-container
-    //- feeds page
-    q-page(v-if="viewId === 'feeds'").row.full-width.justify-center
-      kalpa-loader(
-        v-if="viewId === 'feeds' && !feedId"
-        :immediate="true"
-        :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start.justify-start.q-pt-sm.b-30
-          feed-all(
-            v-if="searchString.length === 0"
-            @click.native="feedClick({id: 'all'})"
-            :maxWidth="maxWidth")
-          feed-item(
-            v-for="(feed,ii) in items" :key="feed.id"
-            @click.native="feedClick(feed)"
-            :maxWidth="maxWidth"
-            :feed="feed")
-    //- feed page
-    ws-feed(
-      v-if="viewId === 'feed' && feedId"
-      :id="feedId").b-30
-      template(v-slot:search-prepend)
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="viewId = 'feeds', feedId = null")
+    component(:is="viewId" :id="feedId" :paddingTop="40")
+      template(v-slot:top)
+        .row.full-width.items-center.content-center.justify-center.q-px-sm
+          q-tabs(
+            :value="viewId" @input="viewIdChanged"
+            no-caps active-color="green" align="left"
+            stretch :breakpoint="100" inline-label dense
+            :switch-indicator="false").full-width.text-grey-8
+            q-tab(
+              v-for="v in views" :key="v.id"
+              inline-label
+              :name="v.id" :label="v.name").q-px-sm
       template(v-slot:tint=`{item}`)
         div(
-          @click="$emit('item', item)"
-          :style=`{position: 'absolute', zIndex: 500}`).row.fit.cursor-pointer
-    //- nodes
-    ws-nodes(
-      v-if="viewId === 'nodes'"
-      mode="pick"
-      :showHeader="false"
-      :searchStringInput="searchString").b-30
-    //- joints
+          @click="itemClick(item)"
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            opacity: 0.5,
+          }`
+          ).row.fit.bg-red
 </template>
 
 <script>
@@ -84,17 +42,15 @@ export default {
   name: 'nodeEditor_itemFinder',
   props: ['node'],
   components: {
-    feedAll: () => import('pages/app/ws_feeds/feed_all.vue'),
-    feedCreator: () => import('pages/app/ws_feeds/feed_creator.vue'),
-    feedItem: () => import('pages/app/ws_feeds/feed_item.vue'),
-    wsFeed: () => import('pages/app/ws_feed/feed.vue'),
-    wsNodes: () => import('pages/app/ws_nodes/index.vue')
+    wsFeedPage: () => import('pages/app/ws_feed/page.vue'),
+    wsFeedsPage: () => import('pages/app/ws_feeds/page.vue'),
+    wsNodesPage: () => import('pages/app/ws_nodes/page.vue')
   },
   data () {
     return {
       searchString: '',
-      viewId: 'feeds',
-      feedId: null,
+      viewId: 'ws-nodes-page',
+      feedId: 'all',
     }
   },
   computed: {
@@ -121,17 +77,33 @@ export default {
     },
     views () {
       return [
-        {id: 'feeds', name: 'Подборки', icon: 'view_week'},
-        {id: 'nodes', name: 'Ядра', icon: 'filter_tilt_shift'},
-        // {id: 'joints', name: 'Связи', icon: 'link'}
+        {id: 'ws-feed-page', name: 'по Типу', icon: 'title'},
+        {id: 'ws-feeds-page', name: 'по Коллекции', icon: 'view_week'},
+        {id: 'ws-nodes-page', name: 'мои Ядра', icon: 'filter_tilt_shift'},
       ]
     },
   },
   methods: {
-    feedClick (feed) {
-      this.$log('feedClick', feed)
-      this.viewId = 'feed'
-      this.feedId = feed.id
+    viewIdChanged (viewId) {
+      if (viewId === 'ws-feed-page') {
+        this.feedId = 'all'
+      }
+      else if (viewId === 'ws-feeds-page') {
+        this.feedId = null
+      }
+      else if (viewId === 'ws-nodes-page') {
+        this.feedId = null
+      }
+      this.viewId = viewId
+    },
+    itemClick (item) {
+      if (this.viewId === 'ws-feeds-page') {
+        this.feedId = item.id
+        this.viewId = 'ws-feed-page'
+      }
+      else {
+        this.$emit('item', item)
+      }
     }
   }
 }

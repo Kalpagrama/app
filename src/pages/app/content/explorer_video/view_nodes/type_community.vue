@@ -1,5 +1,4 @@
 <template lang="pug">
-//- @reset="$refs.kl1.next(0, () => {})"
 kalpa-loader(
   :immediate="true"
   :query="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`)

@@ -47,6 +47,11 @@ q-layout(
                   @click="createStart()"
                   round dense color="green" icon="add"
                   :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
+          //- view-nodes-bar(
+            v-if="!node"
+            :player="player"
+            :contentKalpa="contentKalpa"
+            :contentBookmark="contentBookmark")
           view-details(
             v-if="!node"
             :node="node"
@@ -94,9 +99,11 @@ import viewNode from './view_node/index.vue'
 import viewNodes from './view_nodes/index.vue'
 import viewJoints from './view_joints/index.vue'
 
+import viewNodesBar from './view_nodes_bar/index.vue'
+
 export default {
   name: 'contentExplorerVideo',
-  components: {contentPlayer, viewDetails, viewNode, viewNodes, viewJoints},
+  components: {contentPlayer, viewDetails, viewNode, viewNodes, viewJoints, viewNodesBar},
   props: ['contentKalpa', 'query'],
   data () {
     return {
@@ -111,7 +118,8 @@ export default {
       return [
         {id: 'details', icon: 'info', name: 'Детали'},
         {id: 'nodes', icon: 'filter_tilt_shift', name: 'Ядра'},
-        {id: 'joints', icon: 'link', name: 'Связи'}
+        {id: 'joints', icon: 'link', name: 'Связи'},
+        {id: 'similar', icon: '', name: 'Похожее'}
       ]
     },
     paddingLeft () {

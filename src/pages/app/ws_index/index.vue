@@ -11,65 +11,67 @@ q-layout(
           ).row.full-width.items-center.content-center.justify-center.b-40.q-px-sm
           q-icon(name="school" size="30px" color="white").q-mr-md.q-ml-sm
           .col
-            span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Мастерская
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
           q-btn(round flat color="white" icon="more_vert")
-      .row.full-width.justify-center.q-px-sm
-        div(
-          :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
-            borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-start.q-pt-sm
-          ws-search(
-            @searchString="searchString = $event"
-            :style=`{
-              maxWidth: '700px',
-            }`
-            )
   q-page-container
-    q-page(v-if="searchString.length === 0").row.full-width.justify-center.q-pt-md.q-px-sm
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageMaxWidth+'px'
-        }`).row.full-width.items-start.content-start
+    component(:is="$route.params.viewId" :id="feedId" :paddingTop="40")
+      template(v-slot:top)
+        .row.full-width.justify-center
+          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.justify-center.q-px-sm
+            q-tabs(
+              :value="$route.params.viewId" @input="viewIdChanged"
+              no-caps active-color="green" align="left"
+              stretch :breakpoint="100" inline-label dense
+              :switch-indicator="false").full-width.text-grey-8
+              q-tab(
+                v-for="v in views" :key="v.id"
+                inline-label
+                :name="v.id" :label="v.name").q-px-sm
+      //- template(v-slot:tint=`{item}`)
         div(
-          v-for="(page,ii) in pages" :key="page.id"
+          @click="itemClick(item)"
           :style=`{
-          }`).col-xs-12.col-md-4.q-pa-xs
-          div(
-            :style=`{
-              position: 'relative',
-              height: 0,
-              paddingBottom: $q.screen.lt.md ? '30%' : '100%',
-            }`
-            ).row
-            div(
-              @click="$router.push('/workspace/'+page.id)"
-              :style=`{
-                position: 'absolute', zIndex: 10,
-                borderRadius: '10px', overflow: 'hidden',
-              }`).column.fit.items-center.content-center.b-40.cursor-pointer
-              .col.full-width
-              div(:style=`{height: '60px',}`).row.full-width.items-center.content-center.q-px-md
-                q-icon(:name="page.icon" color="white" size="30px").q-mr-sm
-                span(:style=`{fontSize: '18px',}`).text-white.text-bold {{page.name}}
+            position: 'absolute', zIndex: 100,
+            opacity: 0.5,
+          }`
+          ).row.fit.bg-red
 </template>
 
 <script>
 export default {
   name: 'pageApp_wsIndex',
+  components: {
+    feed: () => import('pages/app/ws_feed/page.vue'),
+    feeds: () => import('pages/app/ws_feeds/page.vue'),
+    nodes: () => import('pages/app/ws_nodes/page.vue'),
+    trash: () => import('pages/app/ws_trash/index.vue')
+  },
   data () {
     return {
-      searchString: ''
+      searchString: '',
+      viewId: 'feed',
+      feedId: 'all',
     }
   },
   computed: {
-    pages () {
+    views () {
       return [
-        {id: 'feeds', name: this.$t('pageWs_podborki', 'Подборки'), icon: 'collections_bookmark'},
-        {id: 'nodes', name: this.$t('pageWs_nodes', 'Ядра'), icon: 'filter_tilt_shift'},
-        {id: 'joints', name: this.$t('pageWs_joints', 'Связи'), icon: 'link'}
+        {id: 'feed', name: 'по Типу', icon: 'title'},
+        {id: 'feeds', name: 'по Коллекции', icon: 'view_week'},
+        {id: 'nodes', name: 'мои Ядра', icon: 'filter_tilt_shift'},
+        {id: 'trash', name: 'Корзина', icon: 'delete_outline'}
       ]
     },
+  },
+  methods: {
+    viewIdChanged (viewId) {
+      this.$log('viewIdChanged', viewId)
+      this.$router.push({params: {viewId: viewId}})
+      // this.viewId = viewId
+    },
+    itemClick (item) {
+      this.$log('itemClick', item)
+    }
   }
 }
 </script>

@@ -8,9 +8,10 @@
 div(
   :style=`{
     borderRadius: '12px',
-    border: nodeEditing ? '2px solid rgb(76,175,79)' : '2px solid rgb(40,40,40)',
+    border: nodeEditing ? '2px solid rgb(76,175,79)' : '2px solid rgba(40,40,40,0)',
+    background: 'rgb(35,35,35)',
   }`
-  ).row.full-width.items-start.content-start.b-40
+  ).row.full-width.items-start.content-start
   //- actions...
   div(:style=`{height: '60px', position: 'relative'}`).row.full-width.items-end.content-end
     //- pick
@@ -106,7 +107,10 @@ div(
     ws-sphere-editor(
       v-if="node"
       :item="node"
-      :style=`{borderRadius: '10px',}`).b-40
+      :style=`{
+        borderRadius: '10px',
+        background: 'rgb(35,35,35)',
+      }`)
 </template>
 
 <script>

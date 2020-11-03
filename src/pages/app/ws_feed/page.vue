@@ -1,6 +1,8 @@
 <template lang="pug">
 q-page(
-  :style=`{paddingTop: '120px',}`
+  :style=`{
+    paddingTop: 94+paddingTop+'px',
+  }`
   ).row.full-width.justify-center.items-start.content-start.q-px-sm
   q-dialog(
     v-model="itemFinderOpened"
@@ -21,14 +23,11 @@ q-page(
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000}`
-    ).row.full-width.b-30
-    div(
-      :style=`{
-        height: '120px',
-      }`
-      ).row.full-width.items-start.content-start.b-30
+    ).b-30
+    .row.full-width.items-start.content-start.b-30.q-px-sm
+      slot(name="top")
       //- search
-      .row.full-width.justify-center.q-pt-sm.q-pb-xs.q-px-sm
+      .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
           div(:style=`{maxWidth: '700px',}`).row.full-width
             slot(name="search-prepend")
@@ -43,13 +42,13 @@ q-page(
             q-btn(
               round flat color="grey-4" icon="tune")
       //- types
-      .row.full-width.justify-center.q-px-sm
+      .row.full-width.justify-center
         div(
           :style=`{
             maxWidth: $store.state.ui.pageMaxWidth+'px'
             //- maxWidth: '700px',
           }`
-          ).row.full-width.items-start.content-start.scroll
+          ).row.full-width.items-start.content-start.scroll.q-pt-xs
           .row.items-center.content-center.no-wrap
             q-btn(
               @click="typeClick(type)"
@@ -98,8 +97,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'wsFeed_feed',
-  props: ['id'],
+  name: 'wsFeed_page',
+  props: {
+    id: {type: String},
+    paddingTop: {
+      type: Number,
+      default: 0
+    }
+  },
   components: {
     feedSearch: () => import('./feed_search.vue'),
     feedItem: () => import('./feed_item.vue'),

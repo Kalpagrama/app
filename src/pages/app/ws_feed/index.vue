@@ -1,9 +1,9 @@
 <template lang="pug">
-//- container
 q-layout(
   view="hHh Lpr lff"
   :style=`{
-  }`).b-30
+  }`
+  ).b-30
   q-header(reveal).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
     div(
       v-if="feed"
@@ -29,17 +29,16 @@ q-layout(
             :style=`{}`).full-width
       q-btn(round flat color="white" icon="launch" @click="$router.push('/feeds/'+feed.id)")
   q-page-container
-    feed(:id="$route.params.id")
+    page(:id="$route.params.id")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import feed from './feed.vue'
 
 export default {
   name: 'pageApp_wsFeed',
   components: {
-    feed,
+    page: () => import('./page.vue')
   },
   data () {
     return {
