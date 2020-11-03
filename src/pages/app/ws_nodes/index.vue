@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff")
-  q-header(reveal)
+  view="hHh Lpr lff").b-30
+  q-header(reveal).b-30
     .row.full-width.q-pt-sm.q-px-sm.b-30
       //- .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`
@@ -19,35 +19,11 @@ q-layout(
           .col
             span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Ядра
           q-btn(round flat color="white" icon="more_vert")
-      .row.full-width.justify-center
-        div(
-          :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
-            borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-start.q-pt-sm
-          div(:style=`{maxWidth: '700px',}`).col
-            ws-search(
-              @searchString="searchString = $event"
-              )
-          q-btn(
-            @click="$router.push('/workspace/node/new')"
-            round flat color="grey-4" icon="add").full-height
-          q-btn(
-            round flat color="grey-4" icon="tune").full-height
-      //- types
-      .row.full-width.justify-center.q-pt-xs
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-          q-btn(
-            v-for="(type,ii) in types" :key="type.id"
-            @click="typeId = type.id"
-            flat no-caps dense
-            :color="typeId === type.id ? 'green' : 'grey-7'"
-            :class=`{
-              'b-40': typeId === type.id
-            }`
-            :style=`{}`).q-mr-xs.q-mb-xs.q-px-xs {{ type.name }}
   q-page-container
-    q-page.row.full-width.justify-center.q-pt-md
+    page()
+      template(v-slot:tint=`{item, itemKey}`)
+        slot(name="tint" :item="item" :itemKey="itemKey")
+    //- q-page.row.full-width.justify-center.q-pt-md
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         component(:is="`type-${typeId}`" :searchString="searchString")
           template(v-slot:tint=`{item, itemKey}`)
@@ -121,7 +97,7 @@ import assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp__wsNodes',
+  name: 'wsNodes',
   props: {
     mode: {type: String, default () { return 'standalone' }},
     type: {type: String, default () { return 'drafts' }},
@@ -130,6 +106,7 @@ export default {
     searchStringInput: {type: String}
   },
   components: {
+    page: () => import('./page.vue'),
     typeDrafts: () => import('./type_drafts.vue'),
     typePublished: () => import('./type_published.vue'),
     typeSaved: () => import('./type_saved.vue'),

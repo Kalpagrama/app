@@ -17,9 +17,11 @@ div(
       ).row.fit.q-px-sm
       div(
         :style=`{
+          position: 'relative',
           borderRadius: '10px', overflow: 'hidden'
         }`
         ).column.fit.b-40.cursor-pointer.feed-item
+        slot(name="tint" :item="feed")
         //- items previews, first 3 items...
         div(
           :style=`{

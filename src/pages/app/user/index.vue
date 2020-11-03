@@ -3,7 +3,27 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        div(:style=`{height: '60px', borderRadius: '10px',}`
+        //- div(:style=`{position: 'relative', height: '150px',}`).row.full-width
+          img(
+            v-if="user"
+            draggable="false"
+            :src="user.profile.photoUrl"
+            :style=`{objectFit: 'cover',borderRadius: '10px',}`
+            ).fit
+          div(
+            :style=`{position: 'absolute', zIndex: 100, bottom: '20px',}`
+            ).row.full-width.q-px-md
+            q-tabs(
+              :value="'profile'" no-caps active-color="green" align="left").full-width
+              q-tab(name="profile" label="Profile")
+              q-tab(name="workspace" label="Workspace")
+          div(
+            :style=`{
+              position: 'absolute', bottom: '20px', zIndex: 90, transform: 'translate3d(0,0,0)', height: '70%',
+              background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(10,10,10,1) 0%, rgba(0,0,0,0) 100%)',
+              borderRadius: '10px 10px 0 0', overflow: 'hidden', pointerEvents: 'none',
+            }`).row.full-width
+        div(:style=`{position: 'relative', zIndex: 60, height: '60px', borderRadius: '10px',marginTop: '-20px',paddingTop: '0px',}`
           ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col

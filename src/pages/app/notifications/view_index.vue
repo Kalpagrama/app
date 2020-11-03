@@ -11,155 +11,40 @@ q-page(
       div(
         v-for="(n,ni) in items" :key="n.id"
         v-if="n.subject && n.object"
-        :style=`{minHeight: '60px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.b-40.q-pa-sm.q-mb-sm
-        //- subject WHO
-        //- subject USER
-        router-link(
-          v-if="n.subject.type === 'USER'"
-          :to="'/user/'+n.subject.oid"
-          :style=`{
-            borderRadius: '10px',
-          }`
-          ).row.items-center.content-center.q-pa-xs.b-50
-          img(
-            draggable="false"
-            :src="n.subject.thumbUrl"
-            :style=`{
-              width: '30px', height: '30px',
-              borderRadius: '50%'}`
-            )
-          .col.q-px-sm
-            small.text-white {{ n.subject.name }}
-        //- subject fallback
+        :style=`{
+          position: 'relative',
+          minHeight: '60px', borderRadius: '10px', overflow: 'hidden',
+          background: 'rgb(35,35,35)',
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.q-mb-sm
+        //- timestamp
+        div(:style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 100,}`).row
+          //- .col
+          small.text-grey-8 {{ $date(n.createdAt) }}
         div(
-          v-else
-          ).row.bg-blue
-          small.text-white {{ n.subject }}
-        //- type (n.type) VOTED
-        //- type VOTED
-        div(
-          v-if="n.type === 'VOTED'"
-          ).row.q-px-sm
-          span.text-white проголосовал за
-        div(
-          v-else-if="n.type === 'USER_SUBSCRIBED'"
-          ).row.q-px-sm
-          span.text-white подписался на
-        div(
-          v-else-if="n.type === 'OBJECT_CREATED'"
-          ).row.q-px-sm
-          span.text-white создал
-        div(
-          v-else-if="n.type === 'OBJECT_DELETED'"
-          ).row.q-px-sm
-          span.text-white удалил
-        //- type fallback
-        div(
-          v-else
-          ).row.bg-blue
-          small.text-white {{ n.type }}
-        //- what (n.object) NODE, JOINT
-        //- object NODE
-        router-link(
-          v-if="n.object.type === 'NODE'"
-          :to="'/node/'+n.object.oid"
-          ).row.items-center.content-center
-          .col.q-pr-sm
-            span.text-white ядро
+          v-for="(i,ii) in n.card.items" :key="ii"
+          ).row.full-width
           div(
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).row.full-height.items-center.content-center.b-50
-            img(
-              draggable="false"
-              :src="n.object.thumbUrl"
-              :style=`{
-                height: '40px', borderRadius: '10px',
-              }`)
-            .col.q-px-sm
-              span.text-white {{ n.object.name.slice(0, 50) }}
-        //- object JOINT
-        router-link(
-          v-else-if="n.object.type === 'JOINT'"
-          :to="'/joint/'+n.object.oid"
-          ).row.items-center.content-center
-          .col.q-pr-sm
-            span.text-white связь
+            v-if="typeof i === 'object'"
+            ).row.full-width
+            router-link(
+              :to="objectLink(i)"
+              :style=`{borderRadius: '10px',}`).row.items-center.content-center.b-40
+              img(
+                draggable="false"
+                :src="i.thumbUrl"
+                :style=`{
+                  height: '40px',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                  //- width: '40px',
+                }`)
+              .col.q-px-sm
+                span.text-white {{ i.name }}
           div(
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).row.full-height.items-center.content-center.b-50
-            img(
-              draggable="false"
-              :src="n.object.thumbUrl"
-              :style=`{
-                height: '40px', borderRadius: '10px',
-              }`)
-            .col.q-px-sm
-              span.text-white {{ n.object.name.slice(0, 50) }}
-        //- object USER
-        router-link(
-          v-else-if="n.object.type === 'USER'"
-          :to="'/user/'+n.object.oid"
-          :style=`{
-            borderRadius: '10px',
-          }`
-          ).row.items-center.content-center.q-pa-xs.b-50
-          img(
-            draggable="false"
-            :src="n.object.thumbUrl"
-            :style=`{
-              width: '30px', height: '30px',
-              borderRadius: '50%'}`
-            )
-          .col.q-px-sm
-            small.text-white {{ n.object.name }}
-        //- object VIDEO, IMAGE... content
-        router-link(
-          v-else-if="['VIDEO', 'IMAGE'].includes(n.object.type)"
-          :to="'/content/'+n.object.oid"
-          ).row.items-center.content-center
-          .col.q-pr-sm
-            span.text-white контент
-          div(
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).row.full-height.items-center.content-center.b-50
-            img(
-              draggable="false"
-              :src="n.object.thumbUrl"
-              :style=`{
-                height: '40px', borderRadius: '10px',
-              }`)
-            .col.q-px-sm
-              span.text-white {{ n.object.name.slice(0, 50) }}
-        //- object WORD, SENTENCE
-        router-link(
-          v-else-if="['WORD', 'SENTENCE'].includes(n.object.type)"
-          :to="'/sphere/'+n.object.oid"
-          ).row.items-center.content-center.q-pa-xs
-          span.text-white.q-mr-sm сферу
-          div(
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).row.items-center.content-center.q-pa-xs.b-50
-            q-icon(name="blur_on" color="white" size="30px")
-            span.text-white.q-mx-sm {{ n.object.name }}
-        //- object fallback
-        div(
-          v-else
-          ).row.bg-blue
-          small.text-white {{ n.object }}
-        //- why (n.matter)
-        //- div(
-          :style=`{}`
-          ).row.bg-blue
-          small.text-white {{ n.matter }}
+            v-if="typeof i === 'string'"
+            ).row.q-pa-sm
+            span.text-white {{ i }}
 </template>
 
 <script>
@@ -186,18 +71,15 @@ export default {
     }
   },
   methods: {
-    getTitle (n) {
-      let typeMap = {
-        VOTED: 'Вы проголосовали за',
+    objectLink (i) {
+      let m = {
+        NODE: '/node/',
+        USER: '/user/',
+        WORD: '/sphere/',
+        SENTENCE: '/sphere/',
+        JOINT: '/joint/'
       }
-      // let
-      return `${n.subject.name} voted ${n.object.name}`
-    },
-    getObject (object) {
-      let objectMap = {
-        NODE: 'node'
-      }
-      return null
+      return m[i.type] + i.oid
     }
   }
 }

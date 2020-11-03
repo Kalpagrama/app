@@ -30,10 +30,9 @@
 
 <template lang="pug">
 q-layout(view="lHh lpR lFf")
-  //- no-swipe-open
   q-drawer(
     v-if="$q.screen.lt.md"
-    side="left"
+    side="left" no-swipe-open
     :value="$store.state.ui.appShowMenu"
     behavior="mobile"
     :width="$q.screen.width - 70"
@@ -69,29 +68,16 @@ q-layout(view="lHh lpR lFf")
 import { systemInit } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 
-import authLayout from 'layouts/auth_layout.vue'
-
 export default {
   name: 'mainLayout',
-  components: {authLayout},
   data () {
     return {
-      // loading: true,
     }
   },
   watch: {
-    // '$q.appVisible': {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     // this.$log('appVisible TO', to)
-    //   }
-    // }
   },
   async created () {
-    // this.$log('created')
-    // this.loading = true
     this.$q.addressbarColor.set('#424242')
-    // this.loading = false
   }
 }
 </script>

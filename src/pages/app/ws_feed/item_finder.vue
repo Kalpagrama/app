@@ -13,7 +13,7 @@ q-layout(
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   q-page-container
-    feed(id="all")
+    page(id="all")
       template(v-slot:tint=`{item}`)
         div(
           :style=`{
@@ -43,12 +43,12 @@ q-layout(
 </template>
 
 <script>
-import feed from 'pages/app/ws_feed/feed.vue'
-
 export default {
   name: 'wsFeed_itemFinder',
   props: ['items'],
-  components: {feed},
+  components: {
+    page: () => import('./page.vue')
+  },
   data () {
     return {
     }

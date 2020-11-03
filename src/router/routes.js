@@ -183,41 +183,42 @@ const routes = [
          },
          {
             name: 'workspace',
-            path: 'workspace',
+            path: 'workspace/:viewId?',
+            // redirect: 'workspace/nodes',
             component: () => import('pages/app/ws_index/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
-         {
-            name: 'workspace.feeds',
-            // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
-            path: 'workspace/feeds',
-            component: () => import('pages/app/ws_feeds/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'workspace.feeds',
+         //    // props: (route) => ({mode: 'standalone', type: route.params.type, query: route.query}),
+         //    path: 'workspace/feeds',
+         //    component: () => import('pages/app/ws_feeds/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'workspace.feed',
             path: 'workspace/feed/:id',
             component: () => import('pages/app/ws_feed/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
-         {
-            name: 'workspace.nodes',
-            path: 'workspace/nodes',
-            component: () => import('pages/app/ws_nodes/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'workspace.nodes',
+         //    path: 'workspace/nodes',
+         //    component: () => import('pages/app/ws_nodes/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'workspace.node',
             path: 'workspace/node/:id',
             component: () => import('pages/app/ws_node/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
-         {
-            name: 'workspace.joints',
-            path: 'workspace/joints',
-            component: () => import('pages/app/ws_joints/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'workspace.joints',
+         //    path: 'workspace/joints',
+         //    component: () => import('pages/app/ws_joints/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'workspace.joint',
             path: 'workspace/joint/:id',

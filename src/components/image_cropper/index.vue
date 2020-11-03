@@ -1,44 +1,45 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.b-30
+.row.full-width.items-start.content-start.b-40
   //- image wrapper
   div(
     :style=`{
       position: 'relative',
       borderRadius: '10px', overflow: 'hidden',
-    }`).row.full-width.items-start.content-start
+    }`).row.full-width.items-start.content-start.b-50
     img(
       ref="imageRef"
       :src="src"
       :style=`{
-        maxHeight: '500px',
+        maxHeight: $q.screen.height/2+'px',
         objectFit: 'contain',
       }`
       ).full-width
   //- footer with actions
   //- TODO: add flip?
-  .row.full-width.q-pa-sm
-    q-btn(
-      @click="cropper.setDragMode('move'), cropping = false"
-      icon="open_with"
-      round flat
-      :color="cropping ? 'white' : 'green'")
-    q-btn(
-      @click="cropper.setDragMode('crop'), cropping = true"
-      icon="crop"
-      round flat
-      :color="cropping ? 'green' : 'white'")
-    .col
-    small(v-if="cropper").text-white {{cropper.mode}}
-    q-btn(
-      @click="cropper.reset()"
-      round flat color="white" icon="autorenew")
-    .col
-    q-btn(
-      @click="cropper.rotate(90)"
-      round flat color="white" icon="rotate_left")
-    q-btn(
-      @click="cropper.rotate(-90)"
-      round flat color="white" icon="rotate_right")
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pa-sm
+      q-btn(
+        @click="cropper.setDragMode('move'), cropping = false"
+        icon="open_with"
+        round flat
+        :color="cropping ? 'white' : 'green'")
+      q-btn(
+        @click="cropper.setDragMode('crop'), cropping = true"
+        icon="crop"
+        round flat
+        :color="cropping ? 'green' : 'white'")
+      .col
+      small(v-if="cropper").text-white {{cropper.mode}}
+      q-btn(
+        @click="cropper.reset()"
+        round flat color="white" icon="autorenew")
+      .col
+      q-btn(
+        @click="cropper.rotate(90)"
+        round flat color="white" icon="rotate_left")
+      q-btn(
+        @click="cropper.rotate(-90)"
+        round flat color="white" icon="rotate_right")
 </template>
 
 <script>

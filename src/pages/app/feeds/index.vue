@@ -5,8 +5,8 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-sm.b-40
-          q-icon(name="explore" color="white" size="30px").q-mx-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Новое
+          q-icon(name="view_week" color="white" size="30px").q-mx-sm
+          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Ленты
           .col
           q-btn(round flat color="white" icon="launch" @click="feedLaunch()")
   q-page-container

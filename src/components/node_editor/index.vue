@@ -7,10 +7,13 @@
     maximized)
     item-finder(
       :node="node"
+      :style=`{
+        height: $q.screen.height+'px',
+        maxWidth: $store.state.ui.pageMaxWidth+'px',
+      }`
       @item="itemFound"
       @sphere="sphereFound"
-      @close="itemFinderOpened = false"
-      )
+      @close="itemFinderOpened = false")
   //- header
   .row.full-width.justify-center
     div(
@@ -200,6 +203,11 @@ export default {
       this.$log('itemClick', item)
       this.itemFinderOpened = false
       if (item.wsItemType === 'WS_BOOKMARK') {
+        // migration...
+        if (item.contentType) {
+          item.type = item.contentType
+          delete item.contentType
+        }
         // extract everything from node
         if (item.type === 'NODE') {
           alert('GOT NODE')
@@ -276,6 +284,18 @@ export default {
         let nodeConverted = this.nodePublishedToWorkspace(item)
         this.$log('nodeConverted', nodeConverted)
         this.itemFound(nodeConverted)
+      }
+      // contentKalpa Image
+      if (item.__typename === 'Image' && item.type === 'IMAGE') {
+        // use image as is...
+      }
+      // contentKalpa Video
+      if (item.__typename === 'Video' && item.type === 'VIDEO') {
+        this.$set(this.node, 'updatedAt', Date.now())
+        await this.$wait(300)
+        if (this.$route.params.id) {
+          this.$router.push(`/content/${item.oid}/?viewid=nodes&pick=node&id=${this.$route.params.id}`)
+        }
       }
     },
     itemNext (item) {
