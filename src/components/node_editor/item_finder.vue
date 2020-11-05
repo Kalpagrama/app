@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff"
   container).b-30
-  q-header(reveal)
+  q-header(reveal).b-30
     div(:style=`{borderRadius: '10px 10px 0 0',}`).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
       div(
         :style=`{
@@ -13,18 +13,29 @@ q-layout(
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   q-page-container
-    component(:is="viewId" :id="feedId" :paddingTop="40")
-      template(v-slot:top)
-        .row.full-width.items-center.content-center.justify-center.q-px-sm
-          q-tabs(
-            :value="viewId" @input="viewIdChanged"
-            no-caps active-color="green" align="left"
-            stretch :breakpoint="100" inline-label dense
-            :switch-indicator="false").full-width.text-grey-8
-            q-tab(
-              v-for="v in views" :key="v.id"
-              inline-label
-              :name="v.id" :label="v.name").q-px-sm
+    component(
+      :is="viewId" :id="feedId || 'all'" :paddingTop="40" :useViews="false")
+      template(v-slot:top=`{feed}`)
+        .row.full-width
+          div(
+            v-if="feedId"
+            :style=`{}`).row.full-width.items-center.content-center
+            q-btn(
+              round flat dense color="white" icon="keyboard_arrow_left"
+              @click="viewId = 'ws-feeds-page', feedId = null")
+            span(v-if="feed").text-white из Коллекции "{{ feed.name }}"
+          div(
+            v-if="!feedId"
+            ).row.full-width.items-center.content-center.justify-center.q-px-sm
+            q-tabs(
+              :value="viewId" @input="viewId = $event, feedId = null"
+              no-caps active-color="green" align="left"
+              stretch :breakpoint="100" inline-label dense
+              :switch-indicator="false").full-width.text-grey-8
+              q-tab(
+                v-for="v in views" :key="v.id"
+                inline-label
+                :name="v.id" :label="v.name").q-px-sm
       template(v-slot:tint=`{item}`)
         div(
           @click="itemClick(item)"
@@ -32,7 +43,7 @@ q-layout(
             position: 'absolute', zIndex: 100,
             opacity: 0.5,
           }`
-          ).row.fit.bg-red
+          ).row.fit
 </template>
 
 <script>
@@ -49,8 +60,8 @@ export default {
   data () {
     return {
       searchString: '',
-      viewId: 'ws-nodes-page',
-      feedId: 'all',
+      viewId: 'ws-feed-page',
+      feedId: null,
     }
   },
   computed: {
@@ -84,18 +95,6 @@ export default {
     },
   },
   methods: {
-    viewIdChanged (viewId) {
-      if (viewId === 'ws-feed-page') {
-        this.feedId = 'all'
-      }
-      else if (viewId === 'ws-feeds-page') {
-        this.feedId = null
-      }
-      else if (viewId === 'ws-nodes-page') {
-        this.feedId = null
-      }
-      this.viewId = viewId
-    },
     itemClick (item) {
       if (this.viewId === 'ws-feeds-page') {
         this.feedId = item.id

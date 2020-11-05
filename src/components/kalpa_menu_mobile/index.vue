@@ -37,21 +37,20 @@
           :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
           small.text-grey-6 Уведомления
-    router-link(:to="'/user/'+$store.getters.currentUser().oid").col
-      .row.full-height.items-center.content-center.justify-center
-        user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="30" :height="30")
-        //- q-btn(
-          round flat dense icon="psychology"
-          :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-4'")
+    //- profile/menu
+    .col
+      router-link(
+        :to="'/user/'+$store.getters.currentUser().oid"
+        ).row.full-height.items-center.content-center.justify-center
+        user-avatar(
+          @click.native="profileClick"
+          :url="$store.getters.currentUser().profile.photoUrl" :width="30" :height="30"
+          :style=`{
+            borderRadius: '50%',
+            border: ($route.name.split('.')[0] === 'user' && $route.params.oid === $store.getters.currentUser().oid) ? '2px solid rgb(76,175,79)' : '2px solid rgba(0,0,0,0)'
+          }`)
         .row.full-width.justify-center.q-mt-xs
           small.text-grey-6 Профиль
-    //- div(@click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round flat dense icon="menu"
-          :color="$store.state.ui.appShowMenu ? 'green' : 'white'")
-        .row.full-width.justify-center
-          small.text-grey-6 Меню
 </template>
 
 <script>
@@ -59,6 +58,14 @@ export default {
   name: 'kalpaMenuMobile',
   data () {
     return {
+    }
+  },
+  methods: {
+    profileClick () {
+      this.$log('profileClick')
+      if (this.$route.name.split('.')[0] === 'user' && this.$route.params.oid === this.$store.getters.currentUser().oid) {
+        this.$store.commit('ui/stateSet', ['appShowMenu', !this.$store.state.ui.appShowMenu])
+      }
     }
   }
 }

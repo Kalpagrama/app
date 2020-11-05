@@ -1,14 +1,7 @@
 <template lang="pug">
-.row.full-width
-  node-editor(
-    v-if="node && $route.params.item === undefined"
-    :node="node"
-    :title="title"
-    @out="outHandle")
-  item-editor(
-    v-if="node && $route.params.item !== undefined"
-    :item="node.items[parseInt($route.params.item)]"
-    @close="$router.back()")
+node-editor(
+  v-if="node"
+  :node="node")
 </template>
 
 <script>
@@ -16,10 +9,9 @@ import { NodeApi } from 'src/api/node'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_wsNode',
+  name: 'wsNode',
   components: {
     nodeEditor: () => import('components/node_editor/index.vue'),
-    itemEditor: () => import('components/node_editor/item_editor.vue')
   },
   data () {
     return {
@@ -71,12 +63,6 @@ export default {
     },
   },
   methods: {
-    outHandle ([type, val]) {
-      this.$log('outHandle', type, val)
-      if (type === 'back') {
-        this.$router.back()
-      }
-    }
   },
   mounted () {
     this.$log('mounted')

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width
+div(:style=`{position: 'relative',}`).row.full-width
   //- one layer composition ONLY, for now...
   div(
     v-if="composition.layers.length === 1"
@@ -16,7 +16,10 @@
           :isActive="panning"
           :player="player" :composition="composition" :contentKalpa="contentKalpa"
           actionsPosition="bottom"
-          :style=`{position: 'absolute', top: '0px', zIndex: 99999}`)
+          :style=`{position: 'absolute', top: '0px', zIndex: 99999}`
+          :barStyles=`{
+            height: '100%',
+          }`).fit
 </template>
 
 <script>

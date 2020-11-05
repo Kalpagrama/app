@@ -3,7 +3,7 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        //- div(:style=`{position: 'relative', height: '150px',}`).row.full-width
+        div(:style=`{position: 'relative', height: '150px',}`).row.full-width
           img(
             v-if="user"
             draggable="false"
@@ -15,8 +15,8 @@ q-layout(view="hHh Lpr lff")
             ).row.full-width.q-px-md
             q-tabs(
               :value="'profile'" no-caps active-color="green" align="left").full-width
-              q-tab(name="profile" label="Profile")
-              q-tab(name="workspace" label="Workspace")
+              q-tab(name="profile" label="Профиль")
+              q-tab(name="workspace" label="Мастерская")
           div(
             :style=`{
               position: 'absolute', bottom: '20px', zIndex: 90, transform: 'translate3d(0,0,0)', height: '70%',
@@ -42,7 +42,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page-sticky(
       expand position="top"
-      :style=`{zIndex: 1000}`).row.full-width.justify-center
+      :style=`{zIndex: 2000}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md.b-30
         q-tabs(
           no-caps active-color="green" align="left"

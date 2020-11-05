@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff"
   container).b-30
-  q-header(reveal)
+  q-header(reveal).b-30
     .row.full-width.q-pt-sm.q-px-sm
       div(
         :style=`{

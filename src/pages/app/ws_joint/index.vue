@@ -1,6 +1,6 @@
 <template lang="pug">
-h1.text-red wsJOint
-//- .row.full-width
+//- h1.text-red wsJOint
+.row.full-width
   div(v-if="$route.params.item === undefined").row.full-width.items-start.content-start
     //- header
     .row.full-width.justify-center.q-pt-sm.q-mb-sm

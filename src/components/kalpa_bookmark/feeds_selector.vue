@@ -9,7 +9,7 @@ q-layout(
   view="hHh Lpr lff" container
   :style=`{
     borderRadius: '10px',
-  }`)
+  }`).b-30
   q-header(reveal).b-30
     //- header
     div(
@@ -18,7 +18,7 @@ q-layout(
         borderRadius: '10px 10px 0 0',
       }`
       ).row.full-width.items-center.b-30
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите подборку
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Добавить в коллекцию
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')").q-mr-sm
     //- search or create...
@@ -35,6 +35,7 @@ q-layout(
               v-model="searchString"
               borderless dense dark color="green"
               placeholder="Поиск"
+              :debounce="200"
               :input-style=`{
                 paddingLeft: '10px',
               }`
@@ -42,6 +43,7 @@ q-layout(
               template(v-slot:append)
                 q-icon(v-if="searchString.length > 0" name="clear" color="grey-4" @click="searchString = ''").q-mr-sm
         q-btn(
+          @click="feedCreateStart()"
           round flat color="grey-4" icon="add")
         //- q-btn(
         //-   round flat color="grey-4" icon="tune")
@@ -49,8 +51,16 @@ q-layout(
     q-page
       kalpa-loader(
         :immediate="true"
-        :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
+        :query="queryFeeds" :limit="1000" v-slot=`{items,next,nexting}`)
         .row.full-width.items-start.content-start.q-pa-sm.b-30
+          div(
+            v-if="!nexting && items && items.length === 0"
+            ).row.full-width.q-py-sm
+            q-btn(
+              @click="feedCreateStart()"
+              color="green" no-caps
+              )
+              span.text-white.text-bold Создать "{{ searchString }}"
           div(
             v-for="(feed, ii) in items" :key="feed.id"
             :style=`{
@@ -150,17 +160,37 @@ export default {
   methods: {
     feedAdd (feed) {
       this.$log('feedAdd')
-      feed.items.push(this.bookmark.id)
-      this.bookmark.feeds.push(feed.id)
+      if (!feed.items.includes(this.bookmark.id)) feed.items.push(this.bookmark.id)
+      if (!this.bookmark.feeds.includes(feed.id)) this.bookmark.feeds.push(feed.id)
     },
     feedDelete (feed) {
       this.$log('feedDelete', feed)
       feed.items = feed.items.filter(id => id !== this.bookmark.id)
       this.bookmark.feeds = this.bookmark.feeds.filter(id => id !== feed.id)
     },
-  },
-  mounted () {
-    this.$log('mounted')
+    async feedCreateStart () {
+      this.$log('feedCreateStart')
+      if (this.searchString.length === 0) return
+      // if there is no such feed...
+      let [feed] = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: this.searchString,
+        }
+      })
+      if (!feed) {
+        let feedInput = {
+          name: this.searchString,
+          items: [],
+          spheres: [],
+          feeds: [],
+          wsItemType: 'WS_FEED',
+          thumbUrl: '',
+        }
+        feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+      }
+      this.feedAdd(feed)
+      this.searchString = ''
+    },
   }
 }
 </script>

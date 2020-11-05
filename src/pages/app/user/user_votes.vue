@@ -8,6 +8,7 @@ q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`).row.full-width.jus
         q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
           node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+          //- .row.full-width.bg-red.text-white {{ item.type }}
 </template>
 
 <script>

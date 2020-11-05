@@ -25,7 +25,7 @@ div(
       opacity: 0.4,
       left: (item.layers[0].figuresAbsolute[1].t-item.layers[0].figuresAbsolute[1].t) / contentKalpa.duration * 100 + '%',
     }`
-    ).row.bg-white.br
+    ).row.bg-white
   //- preview
   img(
     :src="item.thumbUrl"
@@ -33,11 +33,15 @@ div(
       zIndex: 2,
       borderRadius: '10px',
       height: nodeClosest ? '60px' : '40px',
+      userSelect: 'none',
       borderRadius: '10px',
     }`
   )
   div(
     v-if="nodeClosest"
+    :style=`{
+      userSelect: 'none',
+    }`
     ).row.full-width.q-px-xs
     small.text-white.text-bold.q-mr-xs {{ Math.round((node.rate * 10) * 10) / 10  }}
     small.text-white {{ node.name }}

@@ -12,7 +12,15 @@ div(
         borderRadius: '10px', overflow: 'hidden',
         maxHeight: $q.screen.height/2+'px',
       }`).full-width
+    q-btn(
+      v-if="!isActiveLocal"
+      @click="isActiveLocal = true"
+      flat color="white"
+      :style=`{position: 'absolute', zIndex: 1000, top: 0, borderRadius: '10px',}`
+      ).fit
+      q-icon(color="white" size="100px" name="play_arrow")
     component(
+      v-if="isActiveLocal"
       :is="playerComponent[source]"
       :url="url"
       @player="player = $event, $emit('player', $event)"
@@ -25,10 +33,11 @@ div(
     div(:style=`{position: 'absolute', zIndex: 1100, right: '0px', top: '50%'}`).row
       slot(name="right")
     //- actions player
-  div(:style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
+  div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
     div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-sm
       player-actions(v-if="player" :player="player" :style=`{maxWidth: '770px',}`)
       player-bar(v-if="player" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
+  slot(name="footer")
 </template>
 
 <script>
@@ -44,6 +53,8 @@ export default {
     playerBar,
   },
   props: {
+    isActive: {type: Boolean, default: true},
+    isVisible: {type: Boolean, default: true},
     source: {type: String, required: true},
     url: {type: String, required: true},
     thumbUrl: {type: String, required: true},
@@ -64,6 +75,16 @@ export default {
         YOUTUBE: 'player-youtube',
         KALPA: 'player-kalpa',
       },
+      isActiveLocal: false,
+    }
+  },
+  watch: {
+    isActive: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('isActive TO', to)
+        this.isActiveLocal = to
+      }
     }
   }
 }

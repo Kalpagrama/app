@@ -12,7 +12,7 @@
     :style=`{
       maxWidth: '770px',
       position: 'relative',
-      height: '120px',
+      height: nodes.length > 0 ? '90px' : '0px',
     }`
     ).row.full-width.items-start.content-start.q-py-sm
     item(
@@ -22,10 +22,7 @@
       v-bind="$props"
       :style=`{
         pointerEvents: 'none',
-      }`
-      )
-  //- .row.full-width.bg-green
-    small.text-white {{ mousePercent }}
+      }`)
 </template>
 
 <script>
@@ -40,7 +37,6 @@ export default {
   },
   data () {
     return {
-      // mousePercent: null,
       mouseOver: false,
       nodeClosest: null,
       nodes: []
@@ -68,7 +64,7 @@ export default {
         if (this.mouseOver) return
         let percent = to / this.contentKalpa.duration
         if (percent >= 0 && percent <= 1) {
-          this.nodeClosest = this.nodes.reduce((prev, curr) => Math.abs(curr.percent - percent) < Math.abs(prev.percent - percent) ? curr : prev)
+          if (this.nodes.length > 0) this.nodeClosest = this.nodes.reduce((prev, curr) => Math.abs(curr.percent - percent) < Math.abs(prev.percent - percent) ? curr : prev)
         }
       }
     }
@@ -97,7 +93,7 @@ export default {
       let percent = (e.clientX - left) / width
       // this.$log('percent', percent)
       if (percent >= 0 && percent <= 1) {
-        this.nodeClosest = this.nodes.reduce((prev, curr) => Math.abs(curr.percent - percent) < Math.abs(prev.percent - percent) ? curr : prev)
+        if (this.nodes.length > 0) this.nodeClosest = this.nodes.reduce((prev, curr) => Math.abs(curr.percent - percent) < Math.abs(prev.percent - percent) ? curr : prev)
       }
     },
     nodesLoaded (nodes) {

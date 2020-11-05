@@ -2,16 +2,15 @@
 q-layout(
   view="hHh Lpr lff" container
   :style=`{
-    height: $q.screen.height+'px',
-    borderRadius: '10px',
   }`).b-30
   q-header(reveal).b-30
-    div(
-      :style=`{height: '68px',}`
-      ).row.full-width.items-center.content-center.q-px-sm.b-30
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm Добавить элементы
-      .col
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    .row.full-width.justify-center.q-pt-sm
+      div(
+        :style=`{height: '60px',}`
+        ).row.full-width.items-center.content-center.q-px-sm.b-30
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm Добавить элементы
+        .col
+        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   q-page-container
     page(id="all")
       template(v-slot:tint=`{item}`)

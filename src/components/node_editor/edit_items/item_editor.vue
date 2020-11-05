@@ -1,10 +1,10 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff").b-30
-  q-header(reveal)
+  q-header(reveal).b-30
     .row.full-width.justify-center
       div(:style=`{maxWidth: 800+'px', height: '50px'}`).row.full-width.items-center.content-center
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="close()").q-mr-sm
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold Item editor
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор элемента
   q-page-container
     q-page(:style=`{paddingTop: '0px'}`)
       .row.full-width.justify-center.items-start.content-start.q-px-sm
@@ -45,7 +45,7 @@ q-layout(view="hHh Lpr lff").b-30
           //- footer
           .row.full-width.justify-center
             div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center.q-pa-md
-              q-btn(flat no-caps color="white" @click="close()") Close
+              q-btn(flat no-caps color="white" @click="close()") Закрыть
               .col
                 //- small.text-white itemCopyChanged: {{itemCopyChanged}}
               q-btn(
@@ -53,7 +53,7 @@ q-layout(view="hHh Lpr lff").b-30
                 no-caps
                 :disable="!itemCopyChanged"
                 :color="itemCopyChanged ? 'green' : 'grey-9'"
-                ).q-px-md Save
+                ).q-px-md Сохранить
 </template>
 
 <script>

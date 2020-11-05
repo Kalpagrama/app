@@ -184,7 +184,6 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace/:viewId?',
-            // redirect: 'workspace/nodes',
             component: () => import('pages/app/ws_index/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },

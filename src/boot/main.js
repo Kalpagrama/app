@@ -11,6 +11,7 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
+import html2canvas from 'html2canvas'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -44,6 +45,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // Vue.use(Viewer)
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
+    Vue.prototype.$h2c = html2canvas
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
     // quasar stuff
