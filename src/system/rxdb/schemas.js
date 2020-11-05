@@ -127,11 +127,11 @@ export const wsSchemaItem = {
     ignoreChanges: {
       type: 'boolean',
       default: false
+    },
+    synchronized: { // изменения применены на сервере (отправлять изменения этого элемента на надо)
+      type: 'boolean',
+      default: true
     }
-    // changesApplied: { // изменения применены на сервере (отправлять изменения этого элемента на надо)
-    //   type: 'boolean',
-    //   default: true
-    // }
   },
   required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']

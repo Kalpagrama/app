@@ -98,7 +98,7 @@ class MutexGlobal {
                   async handler (to, from) {
                      assert(to, '!to!')
                      // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-                     if (to && to.appVisible && !thiz.isLeader()) thiz.setLeader()
+                     if (to && to.appVisible) thiz.setLeader()
                   }
                }
             }
@@ -120,11 +120,18 @@ class MutexGlobal {
                window.location.reload()
             }
          }
+         if (event.key && event.key.in('k_leader_instance_id')){
+            if (!mutexGlobal.isLeader()){
+               document.title = document.title.replaceAll('✨', '')
+            }
+         }
       })
    }
 
    setLeader () {
       logD('change leader to ', this.instanceId)
+      document.title = document.title.replaceAll('✨', '')
+      document.title = document.title + '✨'
       localStorage.setItem('k_leader_instance_id', this.instanceId)
    }
 

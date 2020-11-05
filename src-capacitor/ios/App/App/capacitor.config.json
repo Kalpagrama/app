@@ -20,11 +20,5 @@
       "kalpa.app",
       "*.kalpa.app"
     ]
-  },
-  "android": {
-    "overrideUserAgent": "capacitor android kalpa.app"
-  },
-  "ios": {
-    "overrideUserAgent": "capacitor ios kalpa.app"
   }
 }
