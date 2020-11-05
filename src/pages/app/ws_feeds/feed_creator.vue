@@ -68,10 +68,10 @@ export default {
           items: [],
           spheres: [],
           feeds: [],
-          wsItemType: 'WS_FEED',
+          wsItemType: 'WS_COLLECTION',
           thumbUrl: '',
         }
-        let feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+        let feed = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, feedInput)
         this.$log('create done', feed)
         this.creating = false
         this.$emit('close')

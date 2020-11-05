@@ -87,7 +87,7 @@ export default {
         name: '',
         spheres: [],
         items: [],
-        wsItemType: 'WS_FEED',
+        wsItemType: 'WS_COLLECTION',
         // type: 'feed',
         thumbUrl: '',
         // oid: null,
@@ -123,7 +123,7 @@ export default {
                 // create node...
                 if (unwatch) unwatch()
                 let feedInput = JSON.parse(JSON.stringify(this.feed))
-                let feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+                let feed = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, feedInput)
                 this.$router.replace(`/feeds/edit/${feed.id}`)
               },
               {
@@ -132,7 +132,7 @@ export default {
             )
           }
           else {
-            let feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
+            let feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
             this.$log('FOUND feed', feed)
             this.feed = feed
           }

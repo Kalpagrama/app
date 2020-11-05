@@ -8191,7 +8191,7 @@
             "deprecationReason": null
           },
           {
-            "name": "WS_FEED",
+            "name": "WS_COLLECTION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

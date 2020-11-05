@@ -38,6 +38,9 @@ export const wsSchemaItem = {
       type: 'string',
       default: '!_unnamed_!'
     },
+    thumbUrl: {
+      type: 'string'
+    },
     description: {
       type: 'string',
       default: ''
@@ -81,25 +84,19 @@ export const wsSchemaItem = {
         type: ['object', 'string']
       }
     },
-    feeds: {
-      type: 'array',
-      items: {
-        type: ['string', 'object']
-      }
-    },
+    // feeds: {
+    //   type: 'array',
+    //   items: {
+    //     type: ['string', 'object']
+    //   }
+    // },
     category: {
       type: 'string'
     },
     layout: {
       type: 'string'
     },
-    // stage: {
-    //   type: 'string'
-    // },
     // ---- content ----
-    thumbUrl: {
-      type: 'string'
-    },
     layers: {
       type: 'array',
       maxItems: 888,
@@ -117,11 +114,22 @@ export const wsSchemaItem = {
     operation: {
       type: 'object'
     },
-    // ---- chain ----
-    // todo
-    // ---- sphere ----
+    // ---- collection ----
     color: {
       type: 'string'
+    },
+    bookmarks: { // список id букмарков в этой коллекции
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    // ---- bookmark ----
+    collections: { // список id коллекций в которые попал букмарк
+      type: 'array',
+      items: {
+        type: 'string'
+      }
     },
     // ------ system -----
     ignoreChanges: {

@@ -11,6 +11,7 @@ import * as lodashSet from 'lodash/set'
 import * as lodashHas from 'lodash/has'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex'
+import { WsItemTypeEnum } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -149,6 +150,9 @@ class ReactiveItemHolder {
             if (reactiveItem && typeof reactiveItem === 'object') {
                reactiveItem.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDoc(this.rxDoc, path, value, debouncedSave, synchro)
+               }
+               if (reactiveItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
+                  rxdb.workspace.populateReactiveItem(reactiveItem)
                }
             }
             Vue.set(this.vm.reactiveData, 'reactiveItem', reactiveItem)

@@ -53,7 +53,7 @@ const WsItemTypeEnum = Object.freeze({
    WS_SPHERE: 'WS_SPHERE',
    WS_BOOKMARK: 'WS_BOOKMARK',
    WS_JOINT: 'WS_JOINT',
-   WS_FEED: 'WS_FEED'
+   WS_COLLECTION: 'WS_COLLECTION'
 })
 const WsCollectionEnum = Object.freeze({
    ...WsItemTypeEnum,
@@ -103,7 +103,7 @@ class Workspace {
                            delete oldDoc.contentType
                         }
                      }
-                     if (oldDoc.wsItemType === 'WS_FEED') {
+                     if (oldDoc.wsItemType === 'WS_COLLECTION') {
                         oldDoc.feeds = []
                         oldDoc.spheres = []
                      }
@@ -492,7 +492,26 @@ class Workspace {
          await this.lock('rxdb::ws::remove')
          // logD(f, 'locked')
          assert(this.created, '!this.created')
-         await this.db.ws_items.find({ selector: { id: id } }).remove()
+
+         let removedItem = await this.db.ws_items.findOne(id).exec()
+         assert(removedItem, '!removedItem')
+         if (removedItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
+            // удалить себя из всех bookmarks
+            assert(removedItem.bookmarks, '!removedItem.bookmarks')
+            // let bookmarks = await rxdb.find({
+            //    selector: {
+            //       rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+            //       oid: objectShortOrWsBookmark.oid
+            //    }
+            // })
+
+
+         } else if (removedItem.wsItemType === WsItemTypeEnum.WS_BOOKMARK) {
+            // удалить себя из всех коллекций
+            assert(removedItem.collections, '!removedItem.collections')
+         }
+         await removedItem.remove()
+         // await this.db.ws_items.find({ selector: { id: id } }).remove()
       } finally {
          this.release()
          // logD(f, 'unlocked')
@@ -508,8 +527,45 @@ class Workspace {
    }
 
    // добавить методы для работы с итемом
-   populateReactiveItem(reactiveItem){
-      if (reactiveItem.wsItemType === WsItemTypeEnum.WS_FEED)
+   populateReactiveItem (reactiveItem) {
+      if (reactiveItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
+         // добавиить в коллекцию объект с ленты или букмарк
+         const reactiveCollection = reactiveItem
+         reactiveCollection.addItemToCollection = async (objectShortOrWsBookmark) => {
+            let bm
+            if (objectShortOrWsBookmark.wsItemType) { // добавить букмарк в коллекцию
+               assert(objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
+               bm = objectShortOrWsBookmark
+            } else { // найти / создать букмарк из objectShort и добавить его в коллекцию
+               assert(objectShortOrWsBookmark.oid && objectShortOrWsBookmark.type && objectShortOrWsBookmark.thumbUrl, '!objectShortOrWsBookmark.oid')
+               let [found] = await rxdb.find({
+                  selector: {
+                     rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+                     oid: objectShortOrWsBookmark.oid
+                  }
+               })
+               if (found) bm = found
+               else {
+                  let objBookmarkInput = {
+                     oid: objectShortOrWsBookmark.oid,
+                     name: objectShortOrWsBookmark.name,
+                     thumbUrl: objectShortOrWsBookmark.thumbUrl,
+                     type: objectShortOrWsBookmark.type,
+                     wsItemType: 'WS_BOOKMARK',
+                     collections: []
+                  }
+                  bm = await rxdb.set(RxCollectionEnum.WS_BOOKMARK, objBookmarkInput)
+               }
+            }
+            if (!bm.collections.includes(reactiveCollection.id)) bm.collections.push(reactiveCollection.id)
+            if (!reactiveCollection.bookmarks.includes(bm.id)) reactiveCollection.bookmarks.push(bm.id)
+         }
+         reactiveCollection.removeItemFromCollection = async (wsBookmark) => {
+            assert(wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
+            wsBookmark.collections = wsBookmark.collections.filter(id => id !== reactiveCollection.id)
+            reactiveCollection.bookmarks = reactiveCollection.bookmarks.filter(id => id !== wsBookmark.id)
+         }
+      }
    }
 }
 

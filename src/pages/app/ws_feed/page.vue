@@ -175,7 +175,7 @@ export default {
             }
           }
           else {
-            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
+            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
           }
         }
       }

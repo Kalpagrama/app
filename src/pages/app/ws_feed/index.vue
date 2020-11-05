@@ -47,7 +47,7 @@ export default {
         name: '',
         spheres: [],
         items: [],
-        wsItemType: 'WS_FEED',
+        wsItemType: 'WS_COLLECTION',
         thumbUrl: '',
       },
       itemSelected: null,
@@ -65,7 +65,7 @@ export default {
             this.feed = {id: 'all', name: 'Все закладки'}
           }
           else {
-            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
+            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
           }
         }
       }
