@@ -1,6 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
-  //- item finder
+q-layout(view="hHh Lpr lff").b-30
   q-dialog(
     v-model="itemFinderOpened"
     position="bottom"
@@ -9,123 +8,94 @@
       :node="node"
       :style=`{
         height: $q.screen.height+'px',
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        maxWidth: 800+'px',
       }`
       @item="itemFound"
-      @sphere="sphereFound"
       @close="itemFinderOpened = false")
-  //- header
-  .row.full-width.justify-center
-    div(
-      :style=`{
-        height: '70px',
-        maxWidth: 800+'px',
-      }`).row.full-width.items-center.content-center
-      q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
-      .col
-      span(
-        :style=`{fontSize: '1rem'}`).text-grey-6.text-bold Редактор ядра
-      .col
-      q-btn(round flat color='grey-6' icon="more_vert")
-        q-popup-proxy(
-          anchor="bottom right" self="top right"
-          position="bottom"
-          maximized dark
-          )
-          div(
-            :class=`{
-              'b-30': $q.screen.lt.md
-            }`
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden',
-              minWidth: '300px',
-            }`).row.full-width.items-start.content-start
-            //- header
-            //- div(
-              v-if="$q.screen.lt.md"
+  q-header(reveal).b-30
+    .row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
+      div(:style=`{maxWidth: 800+'px', height: '60px',}`
+        ).row.full-width.items-center.content-center
+        q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
+        .col
+        span(
+          :style=`{fontSize: '1rem'}`).text-grey-6.text-bold Редактор ядра
+        .col
+        q-btn(round flat color='grey-6' icon="more_vert")
+          q-popup-proxy(
+            anchor="bottom right" self="top right"
+            position="bottom"
+            maximized dark)
+            div(
+              :class=`{
+                'b-30': $q.screen.lt.md
+              }`
               :style=`{
-                textAlign: 'center'
-              }`).row.full-width.justify-center.q-py-md
-              span.text-white {{ node.name }}
-            //- actions
-            .row.full-width.items-start.content-start
-              q-btn(
-                v-for="(a,akey) in actions" :key="akey"
-                @click="a.cb()"
-                flat no-caps
-                :color="a.color || 'white'"
-                :style=`{
-                  height: '50px',
-                  ...a.styles,
-                }`
-                ).row.full-width {{ a.name }}
-  //- items mockup
-  div(v-if="node.items.length === 0").row.full-width.items-start.content-start.justify-center
-    div(
-      :style=`{
-        maxWidth: '800px', zIndex: 100,
-        borderRadius: '10px', overflow: 'hidden'
-      }`).row.full-width.b-40
-      div(
-        :style=`{
-          position: 'relative',
-          height: 0, paddingBottom: '60%',
-          borderRadius: '10px', overflow: 'hidden',
-        }`
-        ).row.full-width
-        //- div(:style=`{position: 'absolute'}`).row.fit.items-center.content-center.justify-center.b-50.shadow-5
-        q-btn(
-          round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true"
-          :style=`{position: 'absolute', zIndex: 10}`).fit.b-50
-  //- items slider
-  div(v-if="node.items.length > 0").row.full-width.items-start.content-start
-    //- vertical
-    div(
-      v-if="['SLIDER', 'VERTICAL', 'PIP', 'HORIZONTAL'].includes(node.layout)"
-      ).row.full-width.items-start.content-start.justify-center
-      div(
-        :style=`{
-          maxWidth: '800px', zIndex: 100,
-          borderRadius: '10px', overflow: 'hidden',
-        }`).row.full-width.items-start.content-start.b-40
+                borderRadius: '10px', overflow: 'hidden',
+                minWidth: '300px',
+              }`).row.full-width.items-start.content-start
+              //- actions
+              .row.full-width.items-start.content-start
+                q-btn(
+                  v-for="(a,akey) in actions" :key="akey"
+                  @click="a.cb()"
+                  flat no-caps
+                  :color="a.color || 'white'"
+                  :style=`{
+                    height: '50px',
+                    ...a.styles,
+                  }`
+                  ).row.full-width {{ a.name }}
+  q-page-container
+    q-page.row.full-width.justify-center
+      div(:style=`{maxWidth: 800+'px'}`).row.full-width.justify-center
+        //- node mockup
         div(
-          v-for="(item,ii) in node.items" :key="item.id"
-          :class=`{
-            'q-mb-md': ii !== node.items.length-1,
-          }`
+          v-if="node.items.length === 0"
           :style=`{
-            borderRadius: '10px', overflow: 'hidden',
+            position: 'relative',
+            height: 0, paddingBottom: $q.screen.width > 660 ? '100%' : '180%',
           }`
-          ).row.full-width.b-40.shadow-10
-          edit-item(
-            :item="item" :isActive="true"
-            @next="itemNext(item)"
-            @prev="itemPrev(item)"
-            @duplicate="itemDuplicate(item)"
-            @remove="itemRemove(item)"
-            @edit="$router.push({params: {item: ii}})")
-        .row.full-width.items-center.content-center.justify-center.q-py-xs
-          q-btn(flat color="green" icon="add" no-caps @click="itemFinderOpened = true").full-width Add item
-  .row.full-width.justify-center.q-mb-xl
-    div(
-      :style=`{
-        maxWidth: '800px',
-        marginTop: '-20px',
-        paddingTop: '20px',
-        borderRadius: '0 0 10px 10px', overflow: 'hidden',
-      }`).row.full-width.b-40
-      edit-name(:value="node.name" @input="node.name = $event").q-mb-xl
-      view-publish(:node="node")
+          ).row.full-width
+          div(
+            :style=`{
+              position: 'absolute', zIndex: 10, top: 0,
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px',
+            }`
+            ).column.fit
+            //- items mockup btn
+            .col.full-width
+              q-btn(
+                round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true"
+                :style=`{}`).fit.b-40
+            //- footer
+            .row.full-width.justify-center.q-pb-lg
+              view-publish(
+                :node="node"
+                :style=`{maxWidth: '600px',}`)
+        //- node with items
+        div(
+          v-else
+          :style=`{
+            background: 'rgb(35,35,35)',
+            borderRadius: '10px',
+          }`
+          ).row.full-width.items-start.content-start.justify-center.q-mb-xl
+          edit-items(
+            v-if="node && node.items.length > 0"
+            :node="node"
+            @itemAdd="itemAddAfter = $event, itemFinderOpened = true")
+          view-publish(
+            :node="node"
+            :style=`{maxWidth: '600px',}`).q-pb-lg
 </template>
 
 <script>
 export default {
   name: 'nodeEditor',
   components: {
-    editName: () => import('./edit_name.vue'),
-    editDescription: () => import('./edit_description.vue'),
-    editItem: () => import('./edit_item/index.vue'),
-    viewAdd: () => import('./view_add/index.vue'),
+    editItems: () => import('./edit_items/index.vue'),
     viewPublish: () => import('./view_publish/index.vue'),
     itemFinder: () => import('./item_finder.vue')
   },
@@ -134,43 +104,25 @@ export default {
   },
   data () {
     return {
-      viewId: '',
-      itemFinderOpened: false
+      itemFinderOpened: false,
+      itemAddAfter: 0
     }
   },
   computed: {
-    views () {
-      return [
-        {id: 'add', name: 'Образы', icon: 'add'},
-        {id: 'publish', name: 'Publish', icon: 'check'}
-      ]
-    },
-    layoutName () {
-      let layout = this.layouts.find(l => l.id === this.node.layout)
-      if (layout) return layout.name
-      else return ''
-    },
-    layouts () {
-      return [
-        {id: 'SLIDER', name: this.$t('Slider', 'Слайдер')},
-        {id: 'HORIZONTAL', name: this.$t('Compare', 'Сравнение')},
-        {id: 'VERTICAL', name: this.$t('Vertical', 'Портянка')}
-      ]
-    },
     actions () {
       return {
-        favorite: {
-          name: 'Make favorite',
-          color: 'green',
-          styles: {
-            fontWeight: 'bold'
-          },
-          cb: async () => {
-            this.$log('nodeFavorite')
-          }
-        },
+        // favorite: {
+        //   name: 'Make favorite',
+        //   color: 'green',
+        //   styles: {
+        //     fontWeight: 'bold'
+        //   },
+        //   cb: async () => {
+        //     this.$log('nodeFavorite')
+        //   }
+        // },
         delete: {
-          name: 'Delete',
+          name: 'Удалить ядро',
           color: 'red',
           styles: {},
           cb: async () => {
@@ -183,25 +135,10 @@ export default {
     }
   },
   methods: {
-    sphereFound (sphere) {
-      this.$log('sphereFound', sphere)
-      let i = this.node.spheres.findIndex(id => id === sphere.id)
-      if (i >= 0) {
-        alert('Duplicate sphere!')
-      }
-      else {
-        this.node.spheres.push(sphere.id)
-      }
-    },
-    // itemFound (item) {
-    //   this.$log('itemFound', item)
-    //   item.meta = {cover: true, timeout: 3000}
-    //   this.node.items.push(item)
-    //   this.itemFinderOpened = false
-    // },
     async itemFound (item) {
       this.$log('itemClick', item)
       this.itemFinderOpened = false
+      // WS_BOOKMARK
       if (item.wsItemType === 'WS_BOOKMARK') {
         // migration...
         if (item.contentType) {
@@ -298,49 +235,6 @@ export default {
         }
       }
     },
-    itemNext (item) {
-      this.$log('itemNext', item)
-      let itemIndex = this.node.items.findIndex(i => i.id === item.id)
-      this.$log('itemNext itemIndex', itemIndex)
-      if (itemIndex >= 0) {
-        if (this.node.items[itemIndex + 1]) {
-          let t = JSON.parse(JSON.stringify(this.node.items[itemIndex]))
-          this.$set(this.node.items, itemIndex, this.node.items[itemIndex + 1])
-          this.$set(this.node.items, itemIndex + 1, t)
-        }
-        else {
-          alert('Nowhere to go!')
-        }
-      }
-    },
-    itemPrev (item) {
-      this.$log('itemPrev', item)
-      let itemIndex = this.node.items.findIndex(i => i.id === item.id)
-      this.$log('itemPrev itemIndex', itemIndex)
-      if (itemIndex >= 0) {
-        if (this.node.items[itemIndex - 1]) {
-          let t = JSON.parse(JSON.stringify(this.node.items[itemIndex]))
-          this.$set(this.node.items, itemIndex, this.node.items[itemIndex - 1])
-          this.$set(this.node.items, itemIndex - 1, t)
-        }
-        else {
-          alert('Nowhere to go!')
-        }
-      }
-    },
-    itemDuplicate (item) {
-      this.$log('itemDuplicate', item)
-      let itemInput = JSON.parse(JSON.stringify(item))
-      itemInput.id = Date.now().toString()
-      this.node.items.push(itemInput)
-    },
-    itemRemove (item) {
-      this.$log('itemRemove', item)
-      let itemIndex = this.node.items.findIndex(i => i.id === item.id)
-      if (itemIndex >= 0) {
-        this.$delete(this.node.items, itemIndex)
-      }
-    },
     nodePublishedToWorkspace (node) {
       let nodeInput = {
         name: node.name,
@@ -378,11 +272,9 @@ export default {
       this.itemFound(JSON.parse(JSON.stringify(editorItem)))
       this.$store.commit('ui/stateSet', ['editorItem', null])
     }
-    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
   }
 }
 </script>

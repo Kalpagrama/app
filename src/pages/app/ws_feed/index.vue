@@ -11,7 +11,7 @@ q-layout(
         height: '60px',
         maxWidth: $store.state.ui.pageMaxWidth+'px',
         borderRadius: '10px',
-      }`).row.full-width.items-center.content-center.q-px-sm.b-40
+      }`).row.full-width.items-center.content-center.q-px-sm.b-30.q-mb-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       .col
         .row.fit.items-center.content-center
@@ -30,6 +30,7 @@ q-layout(
       q-btn(round flat color="white" icon="launch" @click="$router.push('/feeds/'+feed.id)")
   q-page-container
     page(:id="$route.params.id")
+    //- view-items(:id="$route.params.id")
 </template>
 
 <script>
@@ -38,7 +39,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageApp_wsFeed',
   components: {
-    page: () => import('./page.vue')
+    page: () => import('./page.vue'),
+    // viewItems: () => import('./view_items.vue')
   },
   data () {
     return {

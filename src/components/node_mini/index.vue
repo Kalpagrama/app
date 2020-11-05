@@ -38,7 +38,7 @@
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-px-md
-      small(:style=`{}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+      span(:style=`{}`).text-white.text-bold.cursor-pointer {{ node.name }}
   //- footer
   //- node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>

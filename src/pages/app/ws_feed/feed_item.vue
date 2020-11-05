@@ -11,6 +11,43 @@ div(
   }`
   ).row.full-width.items-start.content-start
   slot(name="tint" :item="item")
+  //- action
+  q-btn(
+    round flat dense color="white" icon="more_vert"
+    :style=`{position: 'absolute', top: '0px', right: '0px', zIndex: 100}`)
+    q-popup-proxy(
+      v-model="actionOpened"
+      anchor="top right" self="top right"
+      position="bottom"
+      maximized dark
+      @hide="actionOpened = false")
+      div(
+        :class=`{
+          'b-30': $q.screen.lt.md
+        }`
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+          minWidth: '300px',
+        }`).row.full-width.items-start.content-start
+        //- header
+        div(
+          v-if="$q.screen.lt.md"
+          :style=`{
+            textAlign: 'center'
+          }`).row.full-width.justify-center.q-py-md
+          span.text-white {{ item.name }}
+        //- actions
+        .row.full-width.items-start.content-start
+          q-btn(
+            v-for="(a,akey) in actions" :key="akey"
+            @click="a.cb()"
+            flat no-caps
+            :color="a.color || 'white'"
+            :style=`{
+              height: '50px',
+              ...a.styles,
+            }`
+            ).row.full-width {{ a.name }}
   //- default
   div(
     v-if="item"
@@ -68,6 +105,36 @@ export default {
   props: ['item'],
   data () {
     return {
+      ready: false,
+      actionOpened: false,
+    }
+  },
+  computed: {
+    actions () {
+      return {
+        // publish: {
+        //   name: 'Опубликовать',
+        //   color: 'green',
+        //   styles: {
+        //     fontWeight: 'bold'
+        //   },
+        //   cb: async () => {
+        //     this.$log('nodePublish', this.node)
+        //     this.$router.push('/workspace/node/' + this.node.id)
+        //   }
+        // },
+        delete: {
+          name: 'Удалить',
+          color: 'red',
+          styles: {},
+          cb: async () => {
+            this.$log('actionDelete', this.item)
+            this.$emit('delete')
+            // await this.node.updateExtended('deletedAt', Date.now(), false)
+            // delete from feed? or from everything...
+          }
+        }
+      }
     }
   },
   methods: {
@@ -84,6 +151,19 @@ export default {
         return itemIconMap[item.type]
       }
     },
+    onHold (e) {
+      this.$log('onHold', e)
+      // ready ? null : actionOpened = true
+      if (this.ready) {}
+      else {
+        this.actionOpened = true
+      }
+    }
+  },
+  async mounted () {
+    this.$log('mounted')
+    await this.$wait(5000)
+    this.ready = true
   }
 }
 </script>

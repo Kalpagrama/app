@@ -35,6 +35,7 @@ q-layout(view="hHh Lpr lff")
               :style=`{
                 objectFit: 'contain',
                 maxHeight: $q.screen.heigth*0.8+'px',
+                borderRadius: '10px',
               }`).fit
           .row.full-width
             .row.full-width.justify-start.q-px-md

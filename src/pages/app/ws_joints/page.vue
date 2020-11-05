@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: 90+paddingTop+'px',
+    paddingTop: 92+paddingTop+'px',
   }`
   ).row.full-width.justify-center
   q-page-sticky(
@@ -20,9 +20,9 @@ q-page(
           div(:style=`{maxWidth: '700px',}`).col
             ws-search(
               @searchString="searchString = $event"
-              )
+              @contentKalpa="contentKalpaFound")
           q-btn(
-            @click="$router.push('/workspace/node/new')"
+            @click="$router.push('/workspace/joint/new')"
             round flat color="grey-4" icon="add").full-height
           q-btn(
             round flat color="grey-4" icon="tune").full-height
@@ -47,7 +47,7 @@ q-page(
 
 <script>
 export default {
-  name: 'wsNodes_page',
+  name: 'wsJoints_page',
   props: {
     paddingTop: {
       type: Number,
@@ -61,7 +61,7 @@ export default {
   data () {
     return {
       searchString: '',
-      typeId: 'drafts'
+      typeId: 'drafts',
     }
   },
   computed: {
@@ -71,6 +71,11 @@ export default {
         {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
       ]
     },
+  },
+  methods: {
+    contentKalpaFound (contentKalpa) {
+      this.$log('contentKalpaFound', contentKalpa)
+    }
   }
 }
 </script>

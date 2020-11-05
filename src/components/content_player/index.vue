@@ -6,12 +6,16 @@ component(
   :source="contentKalpa.contentSource"
   :url="contentKalpa.url"
   :thumbUrl="contentKalpa.thumbUrl"
+  :isActive="isActive"
+  :isVisible="isVisible"
   :options="options"
   @player="$emit('player', $event)")
   template(v-slot:left-bottom)
     slot(name="left-bottom")
   template(v-slot:right)
     slot(name="right")
+  template(v-slot:footer)
+    slot(name="footer")
 </template>
 
 <script>
@@ -23,6 +27,8 @@ export default {
     playerBook: () => import('./player_book/index.vue'),
   },
   props: {
+    isActive: {type: Boolean, default: true},
+    isVisible: {type: Boolean, default: true},
     contentKalpa: {type: Object, required: true},
     options: {type: Object},
   },

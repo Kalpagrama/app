@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-    .row.full-width.justify-center.q-px-sm.q-pt-sm
+  q-header(reveal).b-30
+    .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-px-sm

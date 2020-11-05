@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff"
   container).b-30
-  q-header(reveal)
+  q-header(reveal).b-30
     div(:style=`{borderRadius: '10px 10px 0 0',}`).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
       div(
         :style=`{
@@ -14,14 +14,14 @@ q-layout(
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   q-page-container
     component(
-      :is="viewId" :id="feedId || 'all'" :paddingTop="40")
+      :is="viewId" :id="feedId || 'all'" :paddingTop="40" :useViews="false")
       template(v-slot:top=`{feed}`)
         .row.full-width
           div(
             v-if="feedId"
             :style=`{}`).row.full-width.items-center.content-center
             q-btn(
-              round flat color="white" icon="keyboard_arrow_left"
+              round flat dense color="white" icon="keyboard_arrow_left"
               @click="viewId = 'ws-feeds-page', feedId = null")
             span(v-if="feed").text-white из Коллекции "{{ feed.name }}"
           div(
@@ -43,7 +43,7 @@ q-layout(
             position: 'absolute', zIndex: 100,
             opacity: 0.5,
           }`
-          ).row.fit.bg-red
+          ).row.fit
 </template>
 
 <script>
@@ -60,8 +60,8 @@ export default {
   data () {
     return {
       searchString: '',
-      viewId: 'ws-nodes-page',
-      feedId: null
+      viewId: 'ws-feed-page',
+      feedId: null,
     }
   },
   computed: {

@@ -14,12 +14,12 @@ q-layout(
             span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
           q-btn(round flat color="white" icon="more_vert")
   q-page-container
-    component(:is="$route.params.viewId" :id="feedId" :paddingTop="40")
+    component(:is="viewId" :id="feedId" :paddingTop="40" :useViews="feedId !== 'all'")
       template(v-slot:top)
         .row.full-width.justify-center
           div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.justify-center.q-px-sm
             q-tabs(
-              :value="$route.params.viewId" @input="viewIdChanged"
+              :value="viewId" @input="$router.push({params: {viewId: $event}})"
               no-caps active-color="green" align="left"
               stretch :breakpoint="100" inline-label dense
               :switch-indicator="false").full-width.text-grey-8
@@ -27,14 +27,16 @@ q-layout(
                 v-for="v in views" :key="v.id"
                 inline-label
                 :name="v.id" :label="v.name").q-px-sm
-      //- template(v-slot:tint=`{item}`)
+      template(
+        v-if="viewId === 'feeds'"
+        v-slot:tint=`{item}`)
         div(
           @click="itemClick(item)"
           :style=`{
             position: 'absolute', zIndex: 100,
-            opacity: 0.5,
+            //- opacity: 0.5,
           }`
-          ).row.fit.bg-red
+          ).row.fit
 </template>
 
 <script>
@@ -44,33 +46,39 @@ export default {
     feed: () => import('pages/app/ws_feed/page.vue'),
     feeds: () => import('pages/app/ws_feeds/page.vue'),
     nodes: () => import('pages/app/ws_nodes/page.vue'),
+    joints: () => import('pages/app/ws_joints/page.vue'),
+    // groups: () => import('./groups/index.vue'),
     trash: () => import('pages/app/ws_trash/index.vue')
   },
   data () {
     return {
-      searchString: '',
-      viewId: 'feed',
       feedId: 'all',
     }
   },
   computed: {
+    viewId () {
+      return this.$route.params.viewId
+    },
     views () {
       return [
-        {id: 'feed', name: 'по Типу', icon: 'title'},
-        {id: 'feeds', name: 'по Коллекции', icon: 'view_week'},
-        {id: 'nodes', name: 'мои Ядра', icon: 'filter_tilt_shift'},
+        {id: 'feed', name: 'Все подряд', icon: 'title'},
+        {id: 'feeds', name: 'Коллекции', icon: 'view_week'},
+        {id: 'nodes', name: 'Ядра', icon: 'filter_tilt_shift'},
+        {id: 'joints', name: 'Связи', icon: 'link'},
+        // {id: 'groups', name: 'Groups', icon: 'gesture'},
         {id: 'trash', name: 'Корзина', icon: 'delete_outline'}
       ]
     },
   },
   methods: {
-    viewIdChanged (viewId) {
-      this.$log('viewIdChanged', viewId)
-      this.$router.push({params: {viewId: viewId}})
-      // this.viewId = viewId
-    },
     itemClick (item) {
       this.$log('itemClick', item)
+      if (this.viewId === 'feeds') {
+        // go to feed
+        this.$router.push('/workspace/feed/' + item.id)
+      }
+      else {
+      }
     }
   },
   watch: {

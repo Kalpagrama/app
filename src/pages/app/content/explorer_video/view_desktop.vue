@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff")
-  q-header()
+  q-header().b-30
     div(:style=`{paddingLeft: paddingLeft+'px'}`).row.full-width.q-pt-sm.q-px-sm
       div(:style=`{borderRadius: '10px'}`).row.full-width.b-40
         .col
@@ -47,6 +47,14 @@ q-layout(
                   @click="createStart()"
                   round dense color="green" icon="add"
                   :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
+          //- .row.full-width.q-pa-sm.bg-red
+            q-btn(round flat dense color="white" icon="menu" @click="getScreenshot")
+            img(
+              v-if="screenshotUrl"
+              :src="screenshotUrl"
+              :style=`{
+                width: '100px', height: '100px',
+              }`)
           view-nodes-bar(
             v-if="!node"
             :player="player"
@@ -111,6 +119,7 @@ export default {
       playerIsVisible: false,
       contentBookmark: null,
       node: null,
+      screenshotUrl: null,
     }
   },
   computed: {
@@ -153,6 +162,29 @@ export default {
     }
   },
   methods: {
+    getScreenshot () {
+      this.$log('getScreenshot')
+      // iframe[id$="_youtube_iframe"]
+      let iframes = document.querySelectorAll('iframe[id$="_youtube_iframe"]')
+      this.$log('iframes', iframes)
+      this.$h2c(document.querySelector('#q-app')).then(canvas => {
+        document.body.appendChild(canvas)
+      })
+      if (iframes[0]) {
+        // this.$log('iframe', iframes[0])
+        // iframes[0]
+        this.$h2c(document.querySelector('#q-app')).then(canvas => {
+          document.body.appendChild(canvas)
+        })
+        // iframes[0].reload()
+        // let browser = document.querySelector('iframe')
+        // let request = iframes[0].getScreenshot(100, 100)
+        // request.onsuccess = function() {
+        //   var blob = request.result
+        //   this.screenshotUrl = URL.createObjectURL(blob)
+        // }
+      }
+    },
     async createStart () {
       this.$log('createStart')
       // create something link or node... or always node...
@@ -244,7 +276,7 @@ export default {
       // left/right keys for fast navigations
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         if (!this.player) return
-        if (!this.playerIsVisible) return
+        // if (!this.playerIsVisible) return
         let t = this.player.currentTime
         if (e.key === 'ArrowLeft') t -= 5
         else if (e.key === 'ArrowRight') t += 5
@@ -254,7 +286,7 @@ export default {
       if (e.code === 'Space') {
         e.preventDefault()
         if (!this.player) return
-        if (!this.playerIsVisible) return
+        // if (!this.playerIsVisible) return
         if (this.player.playing) this.player.pause()
         else this.player.play()
       }

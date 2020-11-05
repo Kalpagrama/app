@@ -1,31 +1,16 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-mb-xl
-    //- .row.full-width.q-px-sm
-      edit-description(
-        :node="node"
-        :style=`{
-          maxWidth: '600px',
-        }`)
-    .row.full-width.q-px-sm.q-py-sm
-      edit-category(:node="node")
-    .row.full-width.q-px-sm
-      ws-sphere-editor(:item="node")
-    .row.full-width.q-py-md.q-px-sm.q-mt-md
-      q-btn(
-        @click="publish()"
-        color="green" size="xl" no-caps
-        align="center"
-        :loading="publishing"
-        :style=`{maxWidth: '100%'}`
-        ).full-width
-        span.text-white.text-bold Опубликовать
-    .row.full-width.q-px-sm
-      edit-description(
-        :node="node"
-        :style=`{
-          maxWidth: '600px',
-        }`)
+.row.full-width.items-start.content-start
+  edit-name(:node="node").q-mb-md
+  ws-sphere-editor(:item="node")
+  edit-category(:node="node")
+  q-btn(
+    @click="publish()"
+    color="green" size="xl" no-caps
+    align="center"
+    :loading="publishing"
+    ).full-width.q-my-sm
+    span.text-white.text-bold Опубликовать
+  edit-description(:node="node")
 </template>
 
 <script>
@@ -36,16 +21,13 @@ export default {
   name: 'viewPublish',
   props: ['node'],
   components: {
-    editDescription: () => import('../edit_description.vue'),
-    editCategory: () => import('../edit_category.vue')
+    editName: () => import('./edit_name.vue'),
+    editDescription: () => import('./edit_description.vue'),
+    editCategory: () => import('./edit_category.vue')
   },
   data () {
     return {
       publishing: false,
-      meta: {
-        isPrivate: false,
-        isMature: false
-      }
     }
   },
   methods: {

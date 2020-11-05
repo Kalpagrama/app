@@ -48,8 +48,7 @@ div(
       q-popup-proxy(
         anchor="bottom right" self="top right"
         position="bottom"
-        maximized dark
-        )
+        maximized dark)
         div(
           :class=`{
             'b-30': $q.screen.lt.md
@@ -153,7 +152,7 @@ export default {
           }
         },
         delete: {
-          name: 'Удалить черновик',
+          name: 'Удалить',
           color: 'red',
           styles: {},
           cb: async () => {

@@ -42,7 +42,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page-sticky(
       expand position="top"
-      :style=`{zIndex: 1000}`).row.full-width.justify-center
+      :style=`{zIndex: 2000}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md.b-30
         q-tabs(
           no-caps active-color="green" align="left"

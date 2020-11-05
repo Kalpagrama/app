@@ -3,11 +3,12 @@ div(
   :style=`{position: 'relative'}`
   ).row.full-width.justify-center
   q-input(
-    :value="value" @input="$emit('input', $event)"
-    borderless autofocus dark
+    v-model="node.name"
+    borderless  dark
     type="textarea" autogrow
     placeholder="В чем суть?"
     spellcheck="false"
+    :autofocus="isAutofocus"
     :style=`{
       maxWidth: '600px',
     }`
@@ -16,8 +17,7 @@ div(
       fontWeight: 'bold',
       textAlign: 'center',
       lineHeight: '1.1',
-      caretColor: 'rgb(76,175,80)',
-      //- color: 'white'
+      caretColor: 'rgb(76,175,80)'
     }`
     @focus="onFocus"
     @blur="onBlur"
@@ -27,7 +27,7 @@ div(
 <script>
 export default {
   name: 'pageApp_nodeEditor_editName',
-  props: ['value'],
+  props: ['node'],
   data () {
     return {
       isFocused: false
@@ -36,8 +36,11 @@ export default {
   computed: {
     fontSize () {
       // TODO: progressive fornSize...
-      if (this.value.length < 50) return '30px'
+      if (this.node.name.length < 50) return '30px'
       else return '20px'
+    },
+    isAutofocus () {
+      return this.$q.screen.gt.sm
     }
   },
   methods: {

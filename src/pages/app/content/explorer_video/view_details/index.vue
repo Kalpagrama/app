@@ -48,7 +48,7 @@
           kalpa-share(
             type="content" :item="contentKalpa")
       //- spheres
-      div(
+      //- div(
         v-if="contentBookmark"
         ).row.full-width.q-py-sm
         .row.full-width.q-pa-sm

@@ -16,7 +16,7 @@ q-page(
           minHeight: '60px', borderRadius: '10px', overflow: 'hidden',
           background: 'rgb(35,35,35)',
         }`
-        ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.q-mb-sm
+        ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.q-pt-sm.q-mb-sm
         //- timestamp
         div(:style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 100,}`).row
           //- .col

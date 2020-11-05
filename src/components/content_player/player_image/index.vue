@@ -5,6 +5,7 @@
     :src="contentKalpa.url"
     :style=`{
       maxHeight: $q.screen.height*0.8+'px',
+      borderRadius: '10px',
       objectFit: 'contain',
     }`
     ).full-width.b-40

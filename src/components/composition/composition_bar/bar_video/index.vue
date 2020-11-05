@@ -1,13 +1,13 @@
 <template lang="pug">
-.row.full-width.fit
+.row.full-width.items-start.content-start
   //- bar
   div(
     @click="barClick"
     :style=`{
       position: 'relative',
-      height: '100%',
       borderRadius: '10px',
       //- border: '2px solid #4caf50',
+      height: '20px',
       ...barStyles,
     }`
     ).row.full-width

@@ -16,7 +16,7 @@
         height: $q.screen.height+'px',
         maxWidth: $store.state.ui.pageMaxWidth+'px',
       }`
-      @contentKalpa="contentKalpaFound"
+      @contentKalpa="contentKalpaFound, searchString = ''"
       @close="contentImporterShow = false")
   .col
     q-input(
