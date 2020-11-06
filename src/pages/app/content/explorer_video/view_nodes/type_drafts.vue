@@ -46,8 +46,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
-          deletedAt: {$exists: false},
+          contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}}
         },
         sort: [{updatedAt: 'asc'}],
       }

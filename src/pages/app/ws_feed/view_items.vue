@@ -23,13 +23,13 @@ export default {
             this.feed = {
               id: 'all',
               name: 'All bookmarks',
-              feeds: [],
-              items: [],
-              spheres: []
+              // feeds: [],
+              bookmarks: [],
+              // spheres: []
             }
           }
           else {
-            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
+            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
           }
         }
       }

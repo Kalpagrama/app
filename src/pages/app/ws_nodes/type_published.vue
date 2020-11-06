@@ -91,10 +91,8 @@ export default {
           if (!sphere) {
             this.$log('sphere NOT FOUND, creating...')
             let sphereInput = {
-              wsItemType: 'WS_SPHERE',
               name: s.name,
-              oid: s.oid,
-              spheres: []
+              oid: s.oid
             }
             sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
           }
@@ -111,7 +109,6 @@ export default {
       this.$log('node', node)
       // create nodeInput
       let nodeInput = {
-        wsItemType: 'WS_NODE',
         // stage: 'draft',
         name: node.name,
         layout: node.layout,
@@ -155,12 +152,10 @@ export default {
           let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: n.oid}})
           if (!nodeBookmark) {
             let nodeBookmarkInput = {
+              type: 'NODE',
               oid: n.oid,
               name: n.name,
               thumbUrl: n.items[0].thumbUrl,
-              type: 'NODE',
-              wsItemType: 'WS_BOOKMARK',
-              spheres: []
             }
             nodeBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, nodeBookmarkInput)
           }
@@ -173,9 +168,7 @@ export default {
               let [sphere] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name}})
               if (!sphere) {
                 let sphereInput = {
-                  wsItemType: 'WS_SPHERE',
                   name: s.name,
-                  spheres: [],
                 }
                 sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
               }

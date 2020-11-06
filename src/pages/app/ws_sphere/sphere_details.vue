@@ -52,7 +52,7 @@ export default {
       this.$log('deleteStart')
       // if we got 0 items on this sphere...
       // await this.$rxdb.remove(this.node.id)
-      await this.sphere.updateExtended('deletedAt', Date.now(), false)
+      await this.sphere.remove()
       this.$router.back()
     }
   }

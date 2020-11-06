@@ -175,7 +175,7 @@ export default {
     async feedDelete () {
       this.$log('feedDelete')
       if (!confirm('Delete feed?')) return
-      await this.$rxdb.remove(this.feed.id)
+      await this.feed.remove()
       this.$router.back()
     }
   },

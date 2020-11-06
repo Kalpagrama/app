@@ -151,8 +151,16 @@ class ReactiveItemHolder {
                reactiveItem.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDoc(this.rxDoc, path, value, debouncedSave, synchro)
                }
-               if (reactiveItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
-                  rxdb.workspace.populateReactiveItem(reactiveItem)
+               if (reactiveItem.wsItemType) {
+                  reactiveItem.remove = async (permanent = false) => {
+                     if (reactiveItem.beforeRemove) await reactiveItem.beforeRemove(permanent)
+                     if (permanent) await this.rxDoc.remove()
+                     else await updateRxDoc(this.rxDoc, 'deletedAt', Date.now(), false)
+                  }
+                  reactiveItem.restoreFromTrash = async () => {
+                     await updateRxDoc(this.rxDoc, 'deletedAt', 0, false)
+                  }
+                  rxdb.workspace.populateReactiveWsItem(reactiveItem)
                }
             }
             Vue.set(this.vm.reactiveData, 'reactiveItem', reactiveItem)
@@ -222,7 +230,7 @@ class ReactiveItemHolder {
             this.itemSaveFunc = async (synchro = true) => {
                // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!
                const f = this.itemSaveFunc
-               if (this.rxDoc.deleted) return // на всякий случай
+               if (this.rxDoc.deleted) return // из-за дебаунса такое возможно
                try {
                   await this.mutex.lock('itemSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
@@ -234,7 +242,7 @@ class ReactiveItemHolder {
                         case 'wsItem':
                            newData = item // wsSchemaItem
                            newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
-                           if (synchro) newData.synchronized = false // итем изменился локально. надо отправить изменеия на сервер
+                           if (synchro) newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                            break
                         case 'object':
                            newData.cached.data = item // cacheSchema

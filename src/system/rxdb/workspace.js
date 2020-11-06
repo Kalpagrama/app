@@ -94,30 +94,17 @@ class Workspace {
                schema: wsSchemaItem,
                migrationStrategies: {
                   // ..., - см wsSchemaItem.version (из schema.js)
-                  1: oldDoc => {
-                     if (oldDoc.wsItemType === 'WS_BOOKMARK') {
-                        if (!oldDoc.feeds) oldDoc.feeds = []
-                        if (!oldDoc.spheres) oldDoc.spheres = []
-                        if (oldDoc.contentType) {
-                           oldDoc.type = oldDoc.contentType
-                           delete oldDoc.contentType
-                        }
-                     }
-                     if (oldDoc.wsItemType === 'WS_COLLECTION') {
-                        oldDoc.feeds = []
-                        oldDoc.spheres = []
-                     }
-                     return oldDoc
-                  }
+                  1: oldDoc => oldDoc
                   // 2: oldDoc => oldDoc,
                }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
             assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
-            let onWsChangedByUser = async (id, operation, rev) => {
+            let onWsChangedByUser = async (id, operation, plainData) => {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
-               await this.db.ws_changes.atomicUpsert({ id, operation, rev })
+               assert('hasChanges' in plainData, '! hasChanges in plainData')
+               if (plainData.hasChanges) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
             }
             const checkUnique = async (plainData) => {
                assert(plainData.wsItemType in WsItemTypeEnum, '!plainData.wsItemType in WsItemTypeEnum')
@@ -132,45 +119,48 @@ class Workspace {
                   if (found.length) throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
                }
             }
+            const initWsItem = (plainData) => {
+               assert(plainData.wsItemType, '!plainData.wsItemType')
+               plainData.rev = plainData.rev || 0
+               switch (plainData.wsItemType) {
+                  case WsItemTypeEnum.WS_COLLECTION:
+                     plainData.bookmarks = plainData.bookmarks || []
+                     break
+                  case WsItemTypeEnum.WS_BOOKMARK:
+                     plainData.collections = plainData.collections || []
+                     break
+               }
+            }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
+               initWsItem(plainData)
                await checkUnique(plainData)
-               plainData.ignoreChanges = false
                let plainDataCopy = cloneDeep(plainData) // newVal
-               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
                let rxDocCopy = rxDoc.toJSON() // oldVal
-               // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
-               delete plainDataCopy.rev
+               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+               delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
                delete rxDocCopy.rev
-               // logD(f, 'preSave', rxDocCopy, plainDataCopy, isEqual(plainDataCopy, rxDocCopy))
+               delete plainDataCopy.hasChanges
+               delete rxDocCopy.hasChanges
                if (isEqual(plainDataCopy, rxDocCopy)) {
-                  // изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
-                  logD(f, ' ignoreChanges', rxDocCopy, plainDataCopy)
-                  plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
+                  // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+                  plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
                }
             }, false)
             this.db.ws_items.preInsert(async (plainData) => {
+               initWsItem(plainData)
                await checkUnique(plainData)
             }, false);
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
-               // сработает на всех вкладках (независимо от того, какая изменила итем) для этого - mutexGlobal.isLeader()
-               // plainData.synchronized === false - если данные изменились по событию от сервера ( см processEvent)
-               if (mutexGlobal.isLeader() && !plainData.synchronized) {
-                  await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData.rev)
-               }
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
             }, false)
             this.db.ws_items.postInsert(async (plainData) => {
-               // сработает на всех вкладках (независимо от того, какая изменила итем) для этого - mutexGlobal.isLeader()
-               // plainData.synchronized === false - если данные изменились по событию от сервера ( см processEvent)
-               if (mutexGlobal.isLeader() && !plainData.synchronized) {
-                  await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData.rev)
-               }
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
             }, false)
             this.db.ws_items.postRemove(async (plainData) => {
-               // сработает на всех вкладках (независимо от того, какая изменила итем) для этого - mutexGlobal.isLeader()
-               // plainData.synchronized === false - если данные изменились по событию от сервера ( см processEvent)
-               if (mutexGlobal.isLeader() && !plainData.synchronized) {
-                  await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData.rev)
-               }
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
                rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
             }, false)
          }
@@ -261,7 +251,7 @@ class Workspace {
             for (let wsItemTypeEnum in WsItemTypeEnum) {
                if (wsServer[wsItemTypeEnum]) itemsServer.push(...wsServer[wsItemTypeEnum])
             }
-            for (let itemServer of itemsServer) itemServer.synchronized = true
+            for (let itemServer of itemsServer) itemServer.hasChanges = false
             let newItems = []
             let outdatedItems = []
             let extraItems = []
@@ -303,7 +293,7 @@ class Workspace {
          assert(item && item.id, '!item')
          assert(wsRevision, '!wsRevision')
          assert(this.created, '!this.created')
-         assert(!('synchronized' in item), '!!(synchronized in item)')
+         assert(!('hasChanges' in item), '!!(hasChanges in item)')
          const f = saveToServer
          logD(f, `start ${item.id} rev:${item.rev}`)
          const t1 = performance.now()
@@ -334,7 +324,7 @@ class Workspace {
                continue
             }
             plainDoc = rxDoc.toJSON()
-            delete plainDoc.synchronized
+            delete plainDoc.hasChanges // это системное поле (не надо отправлять на сервер)
          }
          try {
             // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
@@ -376,7 +366,7 @@ class Workspace {
          assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
          assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
          assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
-         itemServer.synchronized = true
+         itemServer.hasChanges = false
          let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
          await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
@@ -392,12 +382,12 @@ class Workspace {
             logD(f, 'Берем изменения с сервера', type)
             if (reactiveItem && type === 'WS_ITEM_DELETED') {
                // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
-               await reactiveItem.updateExtended('synchronized', true, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
+               await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
                await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
             } else {
                // logD(f, 'try update ws item')
-               assert(itemServer.synchronized, '!itemServer.synchronized')
-               await this.db.ws_items.atomicUpsert(itemServer) // itemServer.synchronized === true (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
+               assert(!itemServer.hasChanges, 'itemServer.hasChanges')
+               await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
             }
             await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
          } else {
@@ -423,6 +413,7 @@ class Workspace {
          let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
          assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
          delete mangoQuery.selector.rxCollectionEnum
+         if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
          if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
          let rxQuery = this.db.ws_items.find(mangoQuery)
          return rxQuery
@@ -433,6 +424,7 @@ class Workspace {
    }
 
    async set (item) {
+      assert(item.wsItemType in WsItemTypeEnum, '!itemCopy.wsItemType in WsItemTypeEnum')
       const f = this.set
       logD(f, 'start')
       const t1 = performance.now()
@@ -440,7 +432,7 @@ class Workspace {
          await this.lock('rxdb::ws::set')
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === 'WS_NODE') {
+         if (itemCopy.wsItemType === WsItemTypeEnum.WS_NODE) {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
                val.layers.map(l => {
                   acc.push(l.contentOid)
@@ -448,7 +440,6 @@ class Workspace {
                return acc
             }, [])
          }
-         assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
          itemCopy.updatedAt = Date.now()
          if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
          if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
@@ -485,32 +476,16 @@ class Workspace {
       }
    }
 
-   async remove (id) {
+   async remove (id, permanent = false) {
       const f = this.remove
       logD(f, 'start', id)
       try {
          await this.lock('rxdb::ws::remove')
          // logD(f, 'locked')
          assert(this.created, '!this.created')
-
-         let removedItem = await this.db.ws_items.findOne(id).exec()
+         let removedItem = await rxdb.get(null, null, { id })
          assert(removedItem, '!removedItem')
-         if (removedItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
-            // удалить себя из всех bookmarks
-            assert(removedItem.bookmarks, '!removedItem.bookmarks')
-            // let bookmarks = await rxdb.find({
-            //    selector: {
-            //       rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-            //       oid: objectShortOrWsBookmark.oid
-            //    }
-            // })
-
-
-         } else if (removedItem.wsItemType === WsItemTypeEnum.WS_BOOKMARK) {
-            // удалить себя из всех коллекций
-            assert(removedItem.collections, '!removedItem.collections')
-         }
-         await removedItem.remove()
+         await removedItem.remove(permanent)
          // await this.db.ws_items.find({ selector: { id: id } }).remove()
       } finally {
          this.release()
@@ -527,11 +502,11 @@ class Workspace {
    }
 
    // добавить методы для работы с итемом
-   populateReactiveItem (reactiveItem) {
+   populateReactiveWsItem (reactiveItem) {
       if (reactiveItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
          // добавиить в коллекцию объект с ленты или букмарк
          const reactiveCollection = reactiveItem
-         reactiveCollection.addItemToCollection = async (objectShortOrWsBookmark) => {
+         reactiveCollection.addBookmarkToCollection = async (objectShortOrWsBookmark) => {
             let bm
             if (objectShortOrWsBookmark.wsItemType) { // добавить букмарк в коллекцию
                assert(objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
@@ -560,10 +535,32 @@ class Workspace {
             if (!bm.collections.includes(reactiveCollection.id)) bm.collections.push(reactiveCollection.id)
             if (!reactiveCollection.bookmarks.includes(bm.id)) reactiveCollection.bookmarks.push(bm.id)
          }
-         reactiveCollection.removeItemFromCollection = async (wsBookmark) => {
+         reactiveCollection.removeBookmarkFromCollection = async (wsBookmark) => {
             assert(wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
             wsBookmark.collections = wsBookmark.collections.filter(id => id !== reactiveCollection.id)
             reactiveCollection.bookmarks = reactiveCollection.bookmarks.filter(id => id !== wsBookmark.id)
+         }
+         reactiveCollection.beforeRemove = async (permanent = false) => {
+            // удалить себя(коллекцию) из всех bookmarks
+            assert(reactiveCollection.bookmarks, '!reactiveCollection.bookmarks')
+            if (permanent) {
+               let bookmarks = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
+               for (let bm of bookmarks) {
+                  bm.collections = bm.collections.filter(id => id !== reactiveCollection.id)
+               }
+            }
+         }
+      } else if (reactiveItem.wsItemType === WsItemTypeEnum.WS_BOOKMARK) {
+         const reactiveBookmark = reactiveItem
+         reactiveBookmark.beforeRemove = async (permanent = false) => {
+            // удалить себя(букмарк) из всех коллекций
+            assert(reactiveBookmark.collections, '!removedItem.collections')
+            if (permanent){
+               let collections = await rxdb.find({ selector: { id: { $in: reactiveBookmark.collections } } })
+               for (let c of collections) {
+                  c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)
+               }
+            }
          }
       }
    }

@@ -69,7 +69,6 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-          deletedAt: {$exists: false},
           contentType: 'IMAGE',
           type: 'CONTENT',
         },
@@ -87,9 +86,7 @@ export default {
     async itemDelete (contentBookmark) {
       this.$log('itemDelete', contentBookmark)
       // if (!confirm('Delete content?')) return
-      // TODO what to do if we got items on this sphere ???
-      // await this.$rxdb.remove(contentBookmark.id)
-      contentBookmark.deletedAt = Date.now()
+      await contentBookmark.remove()
     },
     itemEdit (contentBookmark) {
       this.$log('itemEdit', contentBookmark)

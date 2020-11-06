@@ -21,7 +21,6 @@ export default {
       // take items, spheres, name, and create ws_node...
       let nodeInput = {
         name: this.joint.name,
-        wsItemType: 'WS_NODE',
         thumbUrl: '',
         layout: 'VERTICAL',
         category: 'FUN',

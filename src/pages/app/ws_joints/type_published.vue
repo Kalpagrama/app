@@ -120,7 +120,7 @@ export default {
       if (!confirm(this.$t('confirm_Really delete?', 'Удалить?'))) return
       this.$log('jointDelete', joint)
       await ObjectsApi.unPublish(joint.oid)
-      // joint.deletedAt = Date.now()
+      // await joint.remove()
     },
     jointEdit (joint) {
       this.$log('jointEdit')

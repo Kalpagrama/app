@@ -30,7 +30,7 @@ export default {
   computed: {
     feedSubscriptions () {
       if (this.feed) {
-        return this.feed.items.reduce((acc, val) => {
+        return this.feed.bookmarks.reduce((acc, val) => {
           if (val.oid) {
             acc.push(val.oid)
           }

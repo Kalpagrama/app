@@ -58,7 +58,8 @@ export const wsSchemaItem = {
       default: 0
     },
     deletedAt: {
-      type: 'integer'
+      type: 'integer',
+      default: 0
     },
     // ---- node ----
     contentOids: {
@@ -84,12 +85,6 @@ export const wsSchemaItem = {
         type: ['object', 'string']
       }
     },
-    // feeds: {
-    //   type: 'array',
-    //   items: {
-    //     type: ['string', 'object']
-    //   }
-    // },
     category: {
       type: 'string'
     },
@@ -120,6 +115,7 @@ export const wsSchemaItem = {
     },
     bookmarks: { // список id букмарков в этой коллекции
       type: 'array',
+      uniqueItems: true,
       items: {
         type: 'string'
       }
@@ -127,22 +123,19 @@ export const wsSchemaItem = {
     // ---- bookmark ----
     collections: { // список id коллекций в которые попал букмарк
       type: 'array',
+      uniqueItems: true,
       items: {
         type: 'string'
       }
     },
     // ------ system -----
-    ignoreChanges: {
+    hasChanges: { // hasChanges === false - либо нет изменений, либо изменения учтены в ws_changes
       type: 'boolean',
       default: false
-    },
-    synchronized: { // изменения применены на сервере (отправлять изменения этого элемента на надо)
-      type: 'boolean',
-      default: true
     }
   },
-  required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']
+  required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt', 'deletedAt'],
+  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'deletedAt']
 }
 
 export const wsSchemaLocalChanges = {

@@ -130,8 +130,6 @@ export default {
           cb: async () => {
             this.$log('actionDelete', this.item)
             this.$emit('delete')
-            // await this.node.updateExtended('deletedAt', Date.now(), false)
-            // delete from feed? or from everything...
           }
         }
       }

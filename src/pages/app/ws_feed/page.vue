@@ -12,7 +12,7 @@ q-page(
     transition-hide="none")
     item-finder(
       v-if="feed && id !== 'all'"
-      :items="feed.items"
+      :items="feed.bookmarks"
       :style=`{
         height: $q.screen.height+'px',
         minWidth: itemFinderWidth+'px',
@@ -164,14 +164,13 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-          deletedAt: {$exists: false},
         },
         sort: [{updatedAt: 'desc'}]
       }
       // add feeds filter
       if (this.id !== 'all') {
         // res.selector.feeds = {$elemMatch: {$eq: this.feed.id}}
-        res.selector.id = {$in: this.feed.items}
+        res.selector.id = {$in: this.feed.bookmarks}
       }
       // add types filter
       if (this.typesSelected.length > 0) {
@@ -201,12 +200,11 @@ export default {
             this.feed = {
               id: 'all',
               name: 'All bookmarks',
-              feeds: [],
-              items: [],
-              spheres: []
+              // feeds: [],
+              bookmarks: []
+              // spheres: []
             }
-          }
-          else {
+          } else {
             this.feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
           }
         }
@@ -223,15 +221,9 @@ export default {
         this.typesSelected.push(type.id)
       }
     },
-    itemAdd (item) {
-      this.$log('itemAdd', item)
-      if (item.feeds.includes(this.feed.id)) {
-        alert('Duplicate!')
-      }
-      else {
-        item.feeds.push(this.feed.id)
-        this.feed.items.push(item.id)
-      }
+    async itemAdd (bookmark) {
+      this.$log('itemAdd', bookmark)
+      await this.feed.addBookmarkToCollection(bookmark)
     },
     itemLaunch (item) {
       this.$log('itemLaunch', item)
@@ -251,58 +243,27 @@ export default {
         this.$router.push(p + item.oid)
       }
     },
-    async itemDelete (item) {
-      this.$log('itemDelete', item)
-      if (this.id === 'all') {
-        // remove it all to trash ?
-        // from other feeds ?
-        // soft or hard delete ?
-        // delete from feeds
-        if (item.feeds.length > 0) {
-          // get feed and delete item from feed.items [id] ?
-          // soft delete ?
-          this.$q.notify({type: 'negative', position: 'top', message: 'Cant delete item.feeds.length > 0'})
-        }
-        else {
-          await item.updateExtended('deletedAt', Date.now(), false)
-        }
-      }
-      else {
-        let i = item.feeds.findIndex(id => id === this.feed.id)
-        this.$log('i', i)
-        if (i >= 0) {
-          this.$delete(item.feeds, i)
-          this.feed.items = this.feed.items.filter(id => id !== item.id)
-        }
-      }
+    async itemDelete (bookmark) {
+      this.$log('itemDelete', bookmark)
+      await bookmark.remove() // удалит себя из всех коллекций и переместится в корзину
     },
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // try to find bookmark with this content
       let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) {
-        // resurrect from the dead
-        if (bookmark.deletedAt > 0) {
-          this.$delete(bookmark, 'deletedAt')
-          this.$log('bookmark resurrected')
-        }
-      }
-      else {
+        await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
+      } else {
         let bookmarkInput = {
-          oid: contentKalpa.oid,
           type: contentKalpa.type,
+          oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: [],
-          feeds: [],
+          thumbUrl: contentKalpa.thumbUrl
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }
       if (this.id !== 'all') {
-        // connect bookmark and feed
-        if (!bookmark.feeds.includes(this.feed.id)) bookmark.feeds.push(this.feed.id)
-        if (!this.feed.items.includes(bookmark.id)) this.feed.items.push(bookmark.id)
+         await this.feed.addBookmarkToCollection(bookmark) // добавим в эту коллекцию
       }
       // bookmark subscribe
       if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)

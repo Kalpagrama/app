@@ -79,23 +79,6 @@ export default {
           this.loading = true
           this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to))
           this.loading = false
-          // else {
-          //   // TODO: where to handle bookmarkInput create?
-          //   let bookmarkInput = {
-          //     oid: this.contentKalpa.oid,
-          //     type: this.contentKalpa.type,
-          //     name: this.contentKalpa.name,
-          //     thumbUrl: this.contentKalpa.thumbUrl,
-          //     wsItemType: 'WS_BOOKMARK',
-          //     spheres: [],
-          //     feeds: [],
-          //   }
-          //   if (this.feedId) bookmarkInput.feeds.push(this.feedId)
-          //   bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-          //   // subscribe to this oid...
-          //   if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
-          // }
-          // this.contentKalpaFound(this.contentKalpa)
         }
         else {
           this.$emit('searchString', to)
@@ -113,22 +96,7 @@ export default {
       this.$log('contentKalpaFound', contentKalpa)
       // check bookmark...
       let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
-      if (bookmark) {
-        // resurrect from the dead
-        if (bookmark.deletedAt > 0) {
-          // alert('bookmark was deleted!, restoring...')
-          this.$delete(bookmark, 'deletedAt')
-        }
-        // // add feedId ...
-        // if (this.feedId) {
-        //   if (bookmark.feeds.includes(this.feedId)) {
-        //     // do nothing...
-        //   }
-        //   else {
-        //     bookmark.feeds.push(this.feedId)
-        //   }
-        // }
-      }
+      if (bookmark) await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
       this.$emit('contentKalpa', contentKalpa)
       // this.$router.push(`/content/${this.contentKalpa.oid}`)
       // this.$router.push(`/content/${item.oid}/?viewid=nodes&pick=node&id=${this.$route.params.id}`)

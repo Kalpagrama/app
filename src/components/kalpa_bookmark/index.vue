@@ -82,13 +82,10 @@ export default {
         else {
           // TODO: where to handle bookmarkInput create?
           let bookmarkInput = {
-            oid: this.oid,
             type: this.type,
+            oid: this.oid,
             name: this.name,
             thumbUrl: this.thumbUrl,
-            wsItemType: 'WS_BOOKMARK',
-            spheres: [],
-            feeds: [],
             ...this.fields || {},
           }
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)

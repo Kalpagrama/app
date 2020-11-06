@@ -90,29 +90,17 @@ export default {
       // try to find bookmark with this content
       let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) {
-        // resurrect from the dead
-        if (bookmark.deletedAt > 0) {
-          this.$delete(bookmark, 'deletedAt')
-          this.$log('bookmark resurrected')
-        }
+        await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
       }
       else {
         let bookmarkInput = {
-          oid: contentKalpa.oid,
           type: contentKalpa.type,
+          oid: contentKalpa.oid,
           name: contentKalpa.name,
           thumbUrl: contentKalpa.thumbUrl,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: [],
-          feeds: [],
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }
-      // if (this.id !== 'all') {
-      //   // connect bookmark and feed
-      //   if (!bookmark.feeds.includes(this.feed.id)) bookmark.feeds.push(this.feed.id)
-      //   if (!this.feed.items.includes(bookmark.id)) this.feed.items.push(bookmark.id)
-      // }
       // bookmark subscribe
       if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       // open content ?

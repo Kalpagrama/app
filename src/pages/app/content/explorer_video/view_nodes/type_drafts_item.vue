@@ -157,7 +157,7 @@ export default {
           styles: {},
           cb: async () => {
             this.$log('nodeDelete', this.node)
-            await this.node.updateExtended('deletedAt', Date.now(), false)
+            await this.node.remove()
           }
         }
       }

@@ -62,9 +62,9 @@ div(
           .row.full-width
             small(
               :style=`{
-                opacity: feed.items.length > 0 ? 1 : 0,
+                opacity: feed.bookmarks.length > 0 ? 1 : 0,
               }`
-              ).text-grey-6 {{ feed.items.length }} внутри
+              ).text-grey-6 {{ feed.bookmarks.length }} внутри
 </template>
 
 <script>
@@ -82,7 +82,7 @@ export default {
     this.items = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-        feeds: {$elemMatch: {$eq: this.feed.id}}
+        id: {$in: this.feed.bookmarks}
       },
       sort: [{updatedAt: 'desc'}],
       limit: 3

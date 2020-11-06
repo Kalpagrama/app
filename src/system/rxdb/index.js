@@ -626,6 +626,8 @@ class RxDBWrapper {
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       let rxDoc
       if (rxCollectionEnum in WsCollectionEnum) {
+         data.wsItemType = data.wsItemType || rxCollectionEnum
+         assert(data.wsItemType === rxCollectionEnum, '!data.wsItemType === rxCollectionEnum')
          rxDoc = await this.workspace.set(data)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          let id = makeId(rxCollectionEnum, data.oid)

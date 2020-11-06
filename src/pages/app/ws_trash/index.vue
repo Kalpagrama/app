@@ -46,7 +46,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_ANY,
-          deletedAt: {$exists: true}
+          deletedAt: {$gt: 0}
         }
       }
       return res

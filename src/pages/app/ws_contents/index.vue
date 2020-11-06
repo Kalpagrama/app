@@ -84,20 +84,14 @@ export default {
       let [bookmarkFound] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       this.$log('bookmarkFound', bookmarkFound)
       if (bookmarkFound) {
-        if (bookmarkFound.deletedAt > 0) {
-          alert('content was deleted!, restoring...')
-          this.$delete(bookmarkFound, 'deletedAt')
-        }
-      }
-      else {
+        await bookmarkFound.restoreFromTrash() // на тот случай если он сейчас в корзине
+      } else {
         let bookmarkInput = {
+          type: contentKalpa.type,
           oid: contentKalpa.oid,
           name: contentKalpa.name,
           thumbUrl: contentKalpa.thumbUrl,
-          type: contentKalpa.type,
           // contentType: contentKalpa.type,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: [],
         }
         bookmarkFound = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         // subscribe to oid...
