@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff")
   q-header().b-30
-    div(:style=`{paddingLeft: paddingLeft+'px'}`).row.full-width.q-pt-sm.q-px-sm
+    div(:style=`{paddingLeft: 70+'px'}`).row.full-width.q-pt-sm.q-px-sm
       div(:style=`{borderRadius: '10px'}`).row.full-width.b-40
         .col
           div(
@@ -29,7 +29,7 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
-        paddingLeft: paddingLeft+'px',
+        paddingLeft: 70+'px',
         paddingTop: '8px',
       }`).row.full-width
       .row.full-width.justify-start.items-start.content-start
@@ -47,14 +47,6 @@ q-layout(
                   @click="createStart()"
                   round dense color="green" icon="add"
                   :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
-          //- .row.full-width.q-pa-sm.bg-red
-            q-btn(round flat dense color="white" icon="menu" @click="getScreenshot")
-            img(
-              v-if="screenshotUrl"
-              :src="screenshotUrl"
-              :style=`{
-                width: '100px', height: '100px',
-              }`)
           view-nodes-bar(
             v-if="!node"
             :player="player"

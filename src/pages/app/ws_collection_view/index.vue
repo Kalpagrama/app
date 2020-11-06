@@ -5,7 +5,7 @@ q-layout(
   q-header(reveal).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
     .row.full-width.justify-center
       div(
-        v-if="collection"
+        v-if="collection && view"
         :style=`{
           minHeight: '60px',
           maxWidth: $store.state.ui.pageWidth+'px',
@@ -15,7 +15,7 @@ q-layout(
         .col
           .row.fit.items-center.content-center
             q-input(
-              v-model="collection.name"
+              v-model="view.name"
               placeholder="Enter feed name"
               borderless dark color="green"
               :autofocus="collection.name.length === 0"
@@ -23,11 +23,11 @@ q-layout(
                 fontSize: '18px',
                 fontWeight: 'bold',
               }`
-              :label="'Collection'"
+              :label="`${collection.name} collection view`"
               :style=`{}`).full-width
         q-btn(round flat color="white" icon="view_week" @click="$router.push('/feeds/'+collection.id)")
     //- views
-    .row.full-width.justify-center
+    //- .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
         q-tabs(
           v-model="viewId"
@@ -37,7 +37,7 @@ q-layout(
             v-for="(view, ii) in views" :key="view.id"
             :name="view.id" :label="view.name")
   q-page-container
-    component(
+    //- component(
       v-if="collection"
       :is="`view-${viewId}`" :collection="collection")
 </template>
@@ -46,27 +46,11 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'wsCollection',
-  components: {
-    viewDetails: () => import('./view_details.vue'),
-    viewItems: () => import('./view_items.vue'),
-    viewSubscriptions: () => import('./view_subscriptions.vue'),
-    viewViews: () => import('./view_views.vue')
-  },
+  name: 'wsCollectionView',
   data () {
     return {
-      viewId: 'items',
       collection: null,
-    }
-  },
-  computed: {
-    views () {
-      return [
-        {id: 'details', name: 'Details'},
-        {id: 'items', name: 'Items'},
-        {id: 'subscriptions', name: 'Subscriptions'},
-        {id: 'views', name: 'Views'},
-      ]
+      view: null,
     }
   },
   watch: {
@@ -76,19 +60,18 @@ export default {
         this.$log('id TO', to)
         if (to) {
           let collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
-          if (collection) this.collection = collection
+          if (collection) {
+            this.collection = collection
+            let view = this.collection.items.find(i => i.id === this.$route.params.viewid)
+            if (view) {
+              this.view = view
+            }
+            else this.$router.replace('/workspace/collections')
+          }
           else this.$router.replace('/workspace/collections')
         }
       }
     },
   },
-  mounted () {
-    this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-  }
 }
 </script>

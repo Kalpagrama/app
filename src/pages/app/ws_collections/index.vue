@@ -31,7 +31,7 @@ q-layout(
       template(v-slot:tint=`{item}`)
         div(
           @click="feedClick(item)"
-          :style=`{position: 'absolute', zIndex: 100,}`).row.fit.br
+          :style=`{position: 'absolute', zIndex: 100,}`).row.fit
 </template>
 
 <script>

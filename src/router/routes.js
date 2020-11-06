@@ -227,6 +227,12 @@ const routes = [
             component: () => import('pages/app/ws_collection/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
+         {
+            name: 'workspace.collection-view',
+            path: 'workspace/collection-view/:id/:viewid',
+            component: () => import('pages/app/ws_collection_view/index.vue'),
+            meta: { roleMinimal: 'MEMBER' },
+         },
          // {
          //    name: 'workspace.nodes',
          //    path: 'workspace/nodes',

@@ -30,8 +30,7 @@ q-layout(
             q-checkbox(
               v-if="item"
               color="green"
-              :value="true"
-              )
+              :value="true")
           div(
             v-else
             @click="$emit('itemAdd', item)"

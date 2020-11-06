@@ -1,18 +1,18 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: (useViews ? 134 : 98)+paddingTop+'px',
+    paddingTop: 98+paddingTop+'px',
   }`
   ).row.full-width.justify-center.items-start.content-start.q-px-sm
-  q-dialog(
+  //- q-dialog(
     v-model="itemFinderOpened"
     position="bottom"
     maximized
     transition-show="none"
     transition-hide="none")
     item-finder(
-      v-if="feed && id !== 'all'"
-      :items="feed.bookmarks"
+      v-if="collection"
+      :items="collection.bookmarks"
       :style=`{
         height: $q.screen.height+'px',
         minWidth: itemFinderWidth+'px',
@@ -26,25 +26,14 @@ q-page(
     :style=`{zIndex: 1000}`
     ).b-30
     .row.full-width.items-start.content-start.b-30.q-px-sm
-      slot(name="top" :feed="feed")
-      //- views
-      //- div(v-if="useViews").row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
-          q-tabs(
-            v-model="viewId"
-            no-caps align="left" active-color="green" dense
-            ).full-width.text-grey-7
-            q-tab(
-              v-for="(view, ii) in views" :key="view.id"
-              :name="view.id" :label="view.name")
+      slot(name="top" :collection="collection")
       //- search
-      div(v-if="viewId === 'items'").row.full-width.justify-center
+      .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-start
           div(:style=`{maxWidth: '700px',}`).row.full-width
             slot(name="search-prepend")
             div(:style=`{maxWidth: '700px',}`).col
               ws-search(
-                :feedId="id !== 'all' ? id : undefined"
                 @searchString="searchString = $event"
                 @contentKalpa="contentKalpaFound")
             q-btn(
@@ -54,11 +43,10 @@ q-page(
             q-btn(
               round flat color="grey-4" icon="tune")
       //- types
-      div(v-if="viewId === 'items'").row.full-width.justify-center
+      .row.full-width.justify-center
         div(
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px'
-            //- maxWidth: '700px',
           }`
           ).row.full-width.items-start.content-start.scroll.q-pt-xs
           .row.items-center.content-center.no-wrap
@@ -72,29 +60,16 @@ q-page(
               }`
               :style=`{}`).q-mr-xs.q-px-xs {{ type.name }}
   //- items wrapper
-  div(
-    v-if="viewId === 'details'"
-    ).row.full-width.q-pa-xl.bg-red
-  div(
-    v-if="viewId === 'subscriptions'"
-    ).row.full-width.q-pa-xl.bg-blue
-  view-views(
-    v-if="viewId === 'views'"
-    )
   kalpa-loader(
-    v-if="viewId === 'items' && feed"
     :immediate="true"
     :query="itemsQuery" :limit="1000" v-slot=`{items,next,nexting}`)
     div(
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
-        //- maxWidth: '700px',
       }`
       ).row.full-width.items-start.content-start
-      //- div(v-show="nexting" :style=`{height: '50px'}`).row.full-width.justify-center
-        q-spinner-dots(v-show="nexting" color="green" size="50px")
-      div(:style=`{maxWidth: '700px'}`).row.full-width
-        feed-item(
+      small.text-white {{collection}}
+        //- feed-item(
           v-for="(item, ii) in items" :key="item.id"
           @select="itemLaunch(item)"
           @delete="itemDelete(item)"
@@ -124,6 +99,7 @@ export default {
   name: 'wsCollection_viewItems',
   props: {
     id: {type: String},
+    collection: {type: Object},
     paddingTop: {
       type: Number,
       default: 0
@@ -131,15 +107,14 @@ export default {
     useViews: {type: Boolean, default: true}
   },
   components: {
-    feedSearch: () => import('./feed_search.vue'),
-    feedItem: () => import('./feed_item.vue'),
+    // feedSearch: () => import('./feed_search.vue'),
+    // feedItem: () => import('./feed_item.vue'),
     itemFinder: () => import('./item_finder.vue'),
     viewViews: () => import('./view_views.vue')
   },
   data () {
     return {
       viewId: 'items',
-      feed: null,
       typesSelected: [],
       searchString: '',
       itemFinderOpened: false,
@@ -175,7 +150,7 @@ export default {
       // add feeds filter
       if (this.id !== 'all') {
         // res.selector.feeds = {$elemMatch: {$eq: this.feed.id}}
-        res.selector.id = {$in: this.feed.bookmarks}
+        res.selector.id = {$in: this.collection.bookmarks}
       }
       // add types filter
       if (this.typesSelected.length > 0) {
@@ -197,24 +172,24 @@ export default {
     },
   },
   watch: {
-    id: {
-      immediate: true,
-      async handler (to, from) {
-        if (to) {
-          if (to === 'all') {
-            this.feed = {
-              id: 'all',
-              name: 'All bookmarks',
-              // feeds: [],
-              bookmarks: []
-              // spheres: []
-            }
-          } else {
-            this.feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
-          }
-        }
-      }
-    }
+    // id: {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     if (to) {
+    //       if (to === 'all') {
+    //         this.collection = {
+    //           id: 'all',
+    //           name: 'All bookmarks',
+    //           // feeds: [],
+    //           bookmarks: []
+    //           // spheres: []
+    //         }
+    //       } else {
+    //         this.collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
+    //       }
+    //     }
+    //   }
+    // }
   },
   methods: {
     typeClick (type) {
@@ -268,7 +243,7 @@ export default {
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }
       if (this.id !== 'all') {
-         await this.feed.addBookmarkToCollection(bookmark) // добавим в эту коллекцию
+         await this.collection.addBookmarkToCollection(bookmark) // добавим в эту коллекцию
       }
       // bookmark subscribe
       if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
