@@ -30,7 +30,7 @@
       div().row.full-width
         div(
           @click="subscriptionClick({oid: i})"
-          v-for="(i,ii) in feed.items" :key="i"
+          v-for="(i,ii) in feed.bookmarks" :key="i"
           v-if="subscriptions[i]"
           :style=`{
             borderRadius: '10px'
@@ -63,7 +63,7 @@
         div(
           @click="subscriptionClick(s)"
           v-for="(s,skey) in subscriptions" :key="s.oid"
-          v-if="!feed.items.includes(s.oid)"
+          v-if="!feed.bookmarks.includes(s.oid)"
           :style=`{
             borderRadius: '10px',
           }`
@@ -84,28 +84,23 @@ export default {
       searchString: '',
       feed: null,
       feedNew: {
-        name: '',
-        spheres: [],
-        items: [],
-        wsItemType: 'WS_FEED',
-        // type: 'feed',
-        thumbUrl: '',
-        // oid: null,
+        name: ''
       }
     }
   },
   methods: {
-    subscriptionClick (s) {
+    async subscriptionClick (s) {
       this.$log('subscriptionClick', s)
-      let sFind = this.feed.items.findIndex(i => i === s.oid)
-      // remove this sub
-      if (sFind >= 0) {
-        this.feed.items = this.feed.items.filter(i => i !== s.oid)
-      }
-      // add this sub
-      else {
-        this.feed.items.push(s.oid)
-      }
+      await this.feed.addBookmarkToCollection(s)
+      // let sFind = this.feed.items.findIndex(i => i === s.oid)
+      // // remove this sub
+      // if (sFind >= 0) {
+      //   this.feed.bookmarks = this.feed.bookmarks.filter(i => i !== s.oid)
+      // }
+      // // add this sub
+      // else {
+      //   this.feed.bookmarks.push(s.oid)
+      // }
     },
   },
   watch: {
@@ -122,8 +117,8 @@ export default {
                 this.$log('feed _TO', to)
                 // create node...
                 if (unwatch) unwatch()
-                let feedInput = JSON.parse(JSON.stringify(this.feed))
-                let feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+                let collectionInput = JSON.parse(JSON.stringify(this.feed))
+                let feed = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
                 this.$router.replace(`/feeds/edit/${feed.id}`)
               },
               {
@@ -132,7 +127,7 @@ export default {
             )
           }
           else {
-            let feed = await this.$rxdb.get(RxCollectionEnum.WS_FEED, to)
+            let feed = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
             this.$log('FOUND feed', feed)
             this.feed = feed
           }

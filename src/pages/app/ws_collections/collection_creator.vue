@@ -42,7 +42,7 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'feedCreator',
+  name: 'collectionCreator',
   data () {
     return {
       name: '',
@@ -63,15 +63,10 @@ export default {
       try {
         this.$log('create start', this.name)
         this.creating = true
-        let feedInput = {
-          name: this.name,
-          items: [],
-          spheres: [],
-          feeds: [],
-          wsItemType: 'WS_FEED',
-          thumbUrl: '',
+        let collectionInput = {
+          name: this.name
         }
-        let feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+        let feed = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
         this.$log('create done', feed)
         this.creating = false
         this.$emit('close')

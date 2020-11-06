@@ -69,8 +69,7 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          deletedAt: {$exists: false}
+          rxCollectionEnum: RxCollectionEnum.WS_NODE
         },
         sort: [{updatedAt: 'desc'}]
       }
@@ -111,7 +110,7 @@ export default {
           name: 'В корзину',
           color: 'red',
           cb: async (node) => {
-            await node.updateExtended('deletedAt', Date.now(), false)
+            await node.remove()
           }
         }
       }

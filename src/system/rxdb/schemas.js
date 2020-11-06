@@ -38,6 +38,9 @@ export const wsSchemaItem = {
       type: 'string',
       default: '!_unnamed_!'
     },
+    thumbUrl: {
+      type: 'string'
+    },
     description: {
       type: 'string',
       default: ''
@@ -55,7 +58,8 @@ export const wsSchemaItem = {
       default: 0
     },
     deletedAt: {
-      type: 'integer'
+      type: 'integer',
+      default: 0
     },
     // ---- node ----
     contentOids: {
@@ -81,25 +85,13 @@ export const wsSchemaItem = {
         type: ['object', 'string']
       }
     },
-    feeds: {
-      type: 'array',
-      items: {
-        type: ['string', 'object']
-      }
-    },
     category: {
       type: 'string'
     },
     layout: {
       type: 'string'
     },
-    // stage: {
-    //   type: 'string'
-    // },
     // ---- content ----
-    thumbUrl: {
-      type: 'string'
-    },
     layers: {
       type: 'array',
       maxItems: 888,
@@ -117,24 +109,33 @@ export const wsSchemaItem = {
     operation: {
       type: 'object'
     },
-    // ---- chain ----
-    // todo
-    // ---- sphere ----
+    // ---- collection ----
     color: {
       type: 'string'
     },
+    bookmarks: { // список id букмарков в этой коллекции
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string'
+      }
+    },
+    // ---- bookmark ----
+    collections: { // список id коллекций в которые попал букмарк
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string'
+      }
+    },
     // ------ system -----
-    ignoreChanges: {
+    hasChanges: { // hasChanges === false - либо нет изменений, либо изменения учтены в ws_changes
       type: 'boolean',
       default: false
     }
-    // changesApplied: { // изменения применены на сервере (отправлять изменения этого элемента на надо)
-    //   type: 'boolean',
-    //   default: true
-    // }
   },
-  required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']
+  required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt', 'deletedAt'],
+  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'deletedAt']
 }
 
 export const wsSchemaLocalChanges = {

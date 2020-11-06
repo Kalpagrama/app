@@ -57,7 +57,7 @@ export default {
     queryFeeds () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_FEED,
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
         }
       }
       return res

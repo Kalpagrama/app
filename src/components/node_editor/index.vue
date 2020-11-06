@@ -147,7 +147,7 @@ export default {
           cb: async () => {
             this.$log('nodeDelete')
             this.$router.push('/workspace/nodes')
-            await this.node.updateExtended('deletedAt', Date.now(), false)
+            await this.node.remove()
           }
         }
       }
@@ -222,8 +222,6 @@ export default {
           // // create sphere in workspace...
           // else {
           //   let sphereInput = {
-          //     wsItemType: 'WS_SPHERE',
-          //     spheres: [],
           //     name: item.name,
           //   }
           //   sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)

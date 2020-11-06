@@ -1,0 +1,9 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [{
+            "appID": "RWC96M839A.app.kalpa",
+            "paths": ["*"]
+        }]
+    }
+}

@@ -8,6 +8,7 @@ import {
    PushNotificationActionPerformed
 } from '@capacitor/core'
 import { AuthApi } from 'src/api/auth'
+import { Platform } from 'quasar'
 
 const { PushNotifications, Share, App } = Plugins
 
@@ -19,6 +20,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 async function initCapacitor (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
+   alert(JSON.stringify(Platform.is))
    App.addListener('appUrlOpen', async (openData) => {
       // alert('appUrlOpen: ' + JSON.stringify(openData))
       logD('appUrlOpen. openData=', openData)

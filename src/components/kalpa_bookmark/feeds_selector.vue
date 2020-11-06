@@ -74,8 +74,8 @@ q-layout(
               }`
               ).row.fit
               div(
-                v-if="bookmark.feeds.includes(feed.id)"
-                @click="feedDelete(feed)"
+                v-if="bookmark.collections.includes(feed.id)"
+                @click="removeBookMarkFromCollection(feed)"
                 :style=`{
                   background: 'rgba(0,0,0,0.3)',
                   borderRadius: '10px',
@@ -89,7 +89,7 @@ q-layout(
                   }`)
               div(
                 v-else
-                @click="feedAdd(feed)"
+                @click="addBookmarkToCollection(feed)"
                 :style=`{
                   borderRadius: '10px',
                 }`
@@ -110,9 +110,9 @@ q-layout(
                 }`
                 ).row
                 img(
-                  v-if="feed.items[0]"
+                  v-if="feed.bookmarks[0]"
                   draggable="false"
-                  :src="feed.items[0].thumbUrl"
+                  :src="feed.bookmarks[0].thumbUrl"
                   :style=`{
                     width: '50px',
                     height: '50px',
@@ -133,6 +133,7 @@ q-layout(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { WsItemTypeEnum } from 'src/system/rxdb/workspace'
 
 export default {
   name: 'kalpaBookmark_feedsSelector',
@@ -146,7 +147,7 @@ export default {
     queryFeeds () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_FEED,
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
         }
       }
       // add name filter
@@ -158,37 +159,30 @@ export default {
     }
   },
   methods: {
-    feedAdd (feed) {
-      this.$log('feedAdd')
-      if (!feed.items.includes(this.bookmark.id)) feed.items.push(this.bookmark.id)
-      if (!this.bookmark.feeds.includes(feed.id)) this.bookmark.feeds.push(feed.id)
+    async addBookmarkToCollection (collection) {
+      this.$log('addBookmarkToCollection')
+      await collection.addBookmarkToCollection(this.bookmark)
     },
-    feedDelete (feed) {
-      this.$log('feedDelete', feed)
-      feed.items = feed.items.filter(id => id !== this.bookmark.id)
-      this.bookmark.feeds = this.bookmark.feeds.filter(id => id !== feed.id)
+    async removeBookMarkFromCollection (collection) {
+      this.$log('removeBookMarkFromCollection', collection)
+      await collection.removeBookMarkFromCollection(this.bookmark)
     },
     async feedCreateStart () {
       this.$log('feedCreateStart')
       if (this.searchString.length === 0) return
-      // if there is no such feed...
-      let [feed] = await this.$rxdb.find({
+      // if there is no such collection...
+      let [collection] = await this.$rxdb.find({
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: this.searchString,
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION, name: this.searchString,
         }
       })
-      if (!feed) {
-        let feedInput = {
-          name: this.searchString,
-          items: [],
-          spheres: [],
-          feeds: [],
-          wsItemType: 'WS_FEED',
-          thumbUrl: '',
+      if (!collection) {
+        let collectionInput = {
+          name: this.searchString
         }
-        feed = await this.$rxdb.set(RxCollectionEnum.WS_FEED, feedInput)
+        collection = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
       }
-      this.feedAdd(feed)
+      await this.addBookmarkToCollection(collection)
       this.searchString = ''
     },
   }

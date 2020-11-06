@@ -53,7 +53,6 @@ export default {
         spheres: [],
         category: 'FUN',
         layout: 'PIP',
-        wsItemType: 'WS_NODE',
         thumbUrl: '',
         stage: 'page',
       },

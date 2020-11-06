@@ -61,17 +61,16 @@ export default {
       let name = prompt('Feed name')
       if (name && name.length > 0) {
         this.$log('feedCreateStart name', name)
-        let feedInput = {
+        let bookmarkInput = {
           name: name,
           spheres: [],
-          wsItemType: 'WS_BOOKMARK',
           type: 'feed',
           items: [],
           thumbUrl: '',
         }
-        let feed = await this.$rxdb.set(RxCollectionEnum.WS_NODE, feedInput)
-        this.$log('feedCreateStart feed', feed)
-        this.$router.push(`/settings/feed/${feed.id}`).catch(e => e)
+        let bmFeed = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        this.$log('feedCreateStart feed', bmFeed)
+        this.$router.push(`/settings/feed/${bmFeed.id}`).catch(e => e)
       }
     }
   }

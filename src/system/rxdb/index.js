@@ -12,7 +12,6 @@ import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, ReactiveListHolderWithPagination } from 'src/system/rxdb/reactive'
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
-import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
@@ -374,25 +373,22 @@ class RxDBWrapper {
       const f = this.processEvent
       const t1 = performance.now()
       logD(f, 'start', event)
-      let processedEvents
-      try {
-         await mutexGlobal.lock('rxdb::processEvent')
-         await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
-         assert(this.initialized, '! this.initialized !')
-         assert(event.id, '!event.id')
-         assert(this.store, '!this.store')
-         processedEvents = JSON.parse(await this.get(RxCollectionEnum.META, 'processedEvents') || '[]')
-         if (processedEvents.includes(event.id)) return // эвент уже обработан (только одна вкладка меняет rxdb по эвентам сервера)
-         await this.event.processEvent(event, this.store)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } finally {
-         if (processedEvents){
-            processedEvents.unshift(event.id) // добавляем в начало
-            processedEvents.splice(888, processedEvents.length) // обрезаем старые (чтобы массив не рос бесконечно)
-            await this.set(RxCollectionEnum.META, { id: 'processedEvents', valueString: JSON.stringify(processedEvents) })
+      if (mutexGlobal.isLeader() || event.type === 'PROGRESS') {
+         logD(f, 'try to process event...')
+         try {
+            await mutexGlobal.lock('rxdb::processEvent')
+            await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
+            assert(this.initialized, '! this.initialized !')
+            assert(event.id, '!event.id')
+            assert(this.store, '!this.store')
+            await this.event.processEvent(event, this.store)
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         } finally {
+            this.release()
+            await mutexGlobal.release('rxdb::processEvent')
          }
-         this.release()
-         await mutexGlobal.release('rxdb::processEvent')
+      } else {
+         logD(f, 'event ignored', event)
       }
    }
 
@@ -630,6 +626,8 @@ class RxDBWrapper {
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       let rxDoc
       if (rxCollectionEnum in WsCollectionEnum) {
+         data.wsItemType = data.wsItemType || rxCollectionEnum
+         assert(data.wsItemType === rxCollectionEnum, '!data.wsItemType === rxCollectionEnum')
          rxDoc = await this.workspace.set(data)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          let id = makeId(rxCollectionEnum, data.oid)

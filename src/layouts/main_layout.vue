@@ -49,10 +49,10 @@ q-layout(view="lHh lpR lFf")
         maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
       }`).row.fit.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
-        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 300"
+        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 220"
         :style=`{
           borderRadius: '10px',
-          maxWidth: '300px',
+          maxWidth: '220px',
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")

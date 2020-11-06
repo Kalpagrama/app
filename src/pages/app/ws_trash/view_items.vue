@@ -24,6 +24,7 @@ q-page(
         span.text-white {{ i.name }}
         .row.full-width
           small.text-grey-6 {{ i.wsItemType }}
+          small.text-red {{ i.deletedAt }}
 </template>
 
 <script>
@@ -46,7 +47,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_ANY,
-          deletedAt: {$exists: true}
+          deletedAt: {$gt: 0}
         }
       }
       return res

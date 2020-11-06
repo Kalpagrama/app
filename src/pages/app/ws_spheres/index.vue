@@ -134,8 +134,7 @@ export default {
     querySpheres () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-          deletedAt: {$exists: false}
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE
         }
       }
       if (this.searchString.length > 0) {
@@ -201,9 +200,7 @@ export default {
       let name = prompt('Sphere name', this.searchString)
       if (name) {
         let sphereInput = {
-          wsItemType: 'WS_SPHERE',
-          name: name,
-          items: []
+          name: name
         }
         let sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
         this.$router.push(`/workspace/sphere/${sphere.id}`)

@@ -12,7 +12,7 @@ q-layout(
     transition-show="none"
     transition-hide="none"
     :maximized="$q.screen.width < 800")
-    feed-creator(
+    collection-creator(
       @close="feedCreatorOpened = false")
   q-header(reveal)
     .row.full-width.q-pt-sm.q-px-sm.b-30
@@ -27,8 +27,7 @@ q-layout(
             span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Подборки
           q-btn(round flat color="white" icon="more_vert")
   q-page-container
-    //- view_items()
-    //- page()
+    view_items()
       template(v-slot:tint=`{item}`)
         div(
           @click="feedClick(item)"
@@ -41,8 +40,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'wsCollections',
   components: {
-    // page: () => import('./page.vue'),
-    // collectionCreator: () => import('./collection_creator.vue'),
+    collectionCreator: () => import('./collection_creator.vue'),
   },
   data () {
     return {
@@ -53,7 +51,7 @@ export default {
   methods: {
     async feedClick (feed) {
       this.$log('feedClick', feed)
-      this.$router.push(`/workspace/feed/${feed.id}`).catch(e => e)
+      this.$router.push(`/workspace/collection/${feed.id}`).catch(e => e)
       // await this.$rxdb.remove(feed.id)
     },
     feedCreate () {

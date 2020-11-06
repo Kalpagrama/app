@@ -4,6 +4,13 @@ q-page(
     paddingTop: 58+paddingTop+'px',
   }`
   ).row.full-width.justify-center
+  q-dialog(
+    v-model="collectionCreatorOpened"
+    transition-show="none"
+    transition-hide="none"
+    :maximized="$q.screen.width < 800")
+    collection-creator(
+      @close="collectionCreatorOpened = false")
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000,}`).b-30
@@ -21,7 +28,7 @@ q-page(
               @contentKalpa="contentKalpaFound"
               )
           q-btn(
-            @click="feedCreatorOpened = true"
+            @click="collectionCreatorOpened = true"
             round flat color="grey-4" icon="add").full-height
           q-btn(
             round flat color="grey-4" icon="tune").full-height
@@ -30,14 +37,11 @@ q-page(
     :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
     div(
       :style=`{
-        //- position: 'relative',
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
       ).row.full-width.items-start.content-start
       div(
         :style=`{
-          //- marginLeft: '-10px',
-          //- minWidth: 'calc(100% + 8px)',
         }`
         ).row.full-width
         //- feed-all(
@@ -46,9 +50,10 @@ q-page(
           template(v-slot:tint=`{item}`)
             slot(name="tint" :item="item")
         collection-item(
-          v-for="(feed,ii) in items" :key="feed.id"
+          v-for="(collection,ii) in items" :key="collection.id"
+          @click.native="$router.push('/workspace/collection/'+collection.id)"
           :maxWidth="maxWidth"
-          :feed="feed")
+          :collection="collection")
           template(v-slot:tint=`{item}`)
             slot(name="tint" :item="item")
 </template>
@@ -67,18 +72,20 @@ export default {
   },
   components: {
     feedAll: () => import('./feed_all.vue'),
-    collectionItem: () => import('./collection_item.vue')
+    collectionItem: () => import('./collection_item.vue'),
+    collectionCreator: () => import('./collection_creator.vue')
   },
   data () {
     return {
-      searchString: ''
+      searchString: '',
+      collectionCreatorOpened: false,
     }
   },
   computed: {
     queryFeeds () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_FEED,
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
         }
       }
       // add name filter
@@ -117,11 +124,6 @@ export default {
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }
-      // if (this.id !== 'all') {
-      //   // connect bookmark and feed
-      //   if (!bookmark.feeds.includes(this.feed.id)) bookmark.feeds.push(this.feed.id)
-      //   if (!this.feed.items.includes(bookmark.id)) this.feed.items.push(bookmark.id)
-      // }
       // bookmark subscribe
       if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       // open content ?

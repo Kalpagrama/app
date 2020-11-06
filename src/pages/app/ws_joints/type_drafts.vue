@@ -76,7 +76,6 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_JOINT,
-          deletedAt: {$exists: false},
         },
         sort: [{updatedAt: 'desc'}]
       }
@@ -104,7 +103,7 @@ export default {
       // }).onCancel(() => {
       // }).onDismiss(() => {
       // })
-      joint.deletedAt = Date.now()
+      await joint.remove()
     },
     jointEdit (joint) {
       this.$log('jointEdit', joint)

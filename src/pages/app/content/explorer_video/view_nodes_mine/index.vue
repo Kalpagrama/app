@@ -151,7 +151,6 @@ export default {
           name: node.name,
           category: 'FUN',
           layout: node.layout,
-          wsItemType: 'WS_NODE',
           thumbUrl: this.contentKalpa.thumbUrl,
           spheres: [],
           items: [
@@ -199,7 +198,6 @@ export default {
         name: '',
         category: 'FUN',
         layout: 'PIP',
-        wsItemType: 'WS_NODE',
         thumbUrl: '',
         spheres: [],
         items: []
@@ -218,9 +216,7 @@ export default {
               // create sphere if there is no one
               if (!sphere) {
                 let sphereInput = {
-                  wsItemType: 'WS_SPHERE',
-                  name: node.name,
-                  spheres: []
+                  name: node.name
                 }
                 sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
               }

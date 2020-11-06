@@ -3,8 +3,8 @@ div(
   ).row.full-width.justify-center.q-pt-xs
   div(
     :style=`{
-      maxWidth: 700+'px',
-    }`).row.full-width.q-px-sm
+      //- maxWidth: 700+'px',
+    }`).row.full-width
     //- editor wrapper
     div(
       :style=`{

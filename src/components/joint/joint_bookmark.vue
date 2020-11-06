@@ -38,12 +38,10 @@ export default {
       let [jointBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.joint.oid}})
       if (!jointBookmark) {
         let jointBookmarkInput = {
+          type: 'JOINT',
           oid: this.joint.oid,
           name: this.joint.name,
-          thumbUrl: '',
-          type: 'JOINT',
-          wsItemType: 'WS_BOOKMARK',
-          spheres: []
+          thumbUrl: ''
         }
         jointBookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, jointBookmarkInput)
       }

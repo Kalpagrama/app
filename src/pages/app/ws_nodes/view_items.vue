@@ -20,6 +20,7 @@ q-page(
           div(:style=`{maxWidth: '700px',}`).col
             ws-search(
               @searchString="searchString = $event"
+              @contentKalpa="contentKalpaFound"
               )
           q-btn(
             @click="$router.push('/workspace/node/new')"
@@ -46,6 +47,9 @@ q-page(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { UserApi } from 'src/api/user'
+
 export default {
   name: 'wsNodes_viewItems',
   props: {
@@ -71,6 +75,29 @@ export default {
         {id: 'published', name: this.$t('pageApp_wsNodes_published', 'Опубликованные')},
       ]
     },
+  },
+  methods: {
+    async contentKalpaFound (contentKalpa) {
+      this.$log('contentKalpaFound', contentKalpa)
+      // try to find bookmark with this content
+      let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      if (bookmark) {
+        await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
+      } else {
+        let bookmarkInput = {
+          type: contentKalpa.type,
+          oid: contentKalpa.oid,
+          name: contentKalpa.name,
+          thumbUrl: contentKalpa.thumbUrl
+        }
+        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+      }
+      // bookmark subscribe
+      if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
+      // open content ?
+      await this.$wait(500)
+      this.$router.push('/content/' + contentKalpa.oid)
+    }
   }
 }
 </script>

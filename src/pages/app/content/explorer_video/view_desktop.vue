@@ -202,7 +202,6 @@ export default {
         spheres: [],
         category: 'FUN',
         layout: 'VERTICAL',
-        wsItemType: 'WS_NODE',
         thumbUrl: this.contentKalpa.thumbUrl,
         items: [
           {

@@ -147,7 +147,6 @@ export default {
         name: '',
         type: 'ASSOCIATIVE',
         items: [],
-        wsItemType: 'WS_JOINT',
       },
       publishing: false,
     }

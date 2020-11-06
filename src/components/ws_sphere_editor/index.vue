@@ -102,8 +102,6 @@ export default {
       else {
         this.$log('sphere CREATE !', name)
         let sphereInput = {
-          wsItemType: 'WS_SPHERE',
-          spheres: [],
           name: name,
         }
         sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)

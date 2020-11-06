@@ -26,8 +26,8 @@ div(
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden'
         }`
-        ).column.fit.b-40.cursor-pointer.feed-item
-        slot(name="tint" :item="feed")
+        ).column.fit.b-40.cursor-pointer.collection-item
+        slot(name="tint" :item="collection")
         //- items previews, first 3 items...
         div(
           :style=`{
@@ -59,18 +59,18 @@ div(
                     :style=`{
                       objectFit: 'cover',
                     }`).fit
-        //- footer: feed.name
+        //- footer: collection.name
         div(
           :style=`{
             height: '60px',
           }`).row.full-width.items-center.content-center.q-px-sm
-          span.text-bold.text-white {{ feed.name }}
+          span.text-bold.text-white {{ collection.name }}
           .row.full-width
             small(
               :style=`{
-                opacity: feed.items.length > 0 ? 1 : 0,
+                opacity: collection.bookmarks.length > 0 ? 1 : 0,
               }`
-              ).text-grey-6 {{ feed.items.length }} внутри
+              ).text-grey-6 {{ collection.bookmarks.length }} внутри
 </template>
 
 <script>
@@ -78,7 +78,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'collectionItem',
-  props: ['feed', 'maxWidth'],
+  props: ['collection', 'maxWidth'],
   data () {
     return {
       items: []
@@ -88,7 +88,7 @@ export default {
     this.items = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-        feeds: {$elemMatch: {$eq: this.feed.id}}
+        id: {$in: this.collection.bookmarks}
       },
       sort: [{updatedAt: 'desc'}],
       limit: 3
