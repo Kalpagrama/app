@@ -22,11 +22,12 @@ class WorkspaceApi {
                 }
             `
          })
-         await systemReset(false, true, true)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return wsClear
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      await systemReset(false, true, true)
+      return res
    }
 
    static async getWs () {
