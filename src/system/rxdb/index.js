@@ -614,7 +614,10 @@ class RxDBWrapper {
       }
       // this.store.commit('debug/addReactiveItem', { id, reactiveItem })
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return reactiveItem
+      if (rxCollectionEnum === RxCollectionEnum.META){
+         if (reactiveItem) return reactiveItem.valueString
+         else return null
+      } else return reactiveItem
    }
 
    // actualAge - актуально только для кэша

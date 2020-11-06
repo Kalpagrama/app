@@ -367,10 +367,10 @@ class Workspace {
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start')
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::processEvent')
+         logD(f, 'start')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')
          assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
@@ -406,8 +406,11 @@ class Workspace {
             await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
          }
          // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
+         logD('set wsRevision to', wsRevision.toString())
          await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         let xxx = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
+         logD('new val =', xxx)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, 'wsRevisionLocal=', parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')))
       } finally {
          this.release()
          // logD(f, 'unlocked')

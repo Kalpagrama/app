@@ -113,7 +113,7 @@ class ReactiveItemHolder {
             case 'object':
                return plainData.cached.data // cacheSchema
             case 'meta':
-               return plainData.valueString // schemaKeyValue
+               return plainData // plainData.valueString // schemaKeyValue
             default:
                throw new Error('bad itemType: ' + this.itemType)
          }
@@ -147,6 +147,7 @@ class ReactiveItemHolder {
             return this.vm.reactiveData.reactiveItem
          }
          this.setReactiveItem = (reactiveItem) => {
+            assert(typeof reactiveItem === 'object', '!typeof reactiveItem === object') // сейчас reactiveItem - всегда объект (даже для META)
             if (reactiveItem && typeof reactiveItem === 'object') {
                reactiveItem.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDoc(this.rxDoc, path, value, debouncedSave, synchro)
@@ -248,7 +249,8 @@ class ReactiveItemHolder {
                            newData.cached.data = item // cacheSchema
                            break
                         case 'meta':
-                           newData.valueString = item // schemaKeyValue
+                           newData = item // newData.valueString = item // schemaKeyValue
+                           newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
                            break
                         default:
                            throw new Error('bad itemType: ' + this.itemType)
