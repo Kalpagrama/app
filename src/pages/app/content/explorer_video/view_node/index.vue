@@ -3,7 +3,7 @@ div(
   ).row.full-width.justify-center.q-pt-xs
   div(
     :style=`{
-      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      maxWidth: 700+'px',
     }`).row.full-width.q-px-sm
     //- editor wrapper
     div(

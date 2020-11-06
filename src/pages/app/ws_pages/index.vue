@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-page-container
     q-page.row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.justify-center
         slot(name="header")
         .row.full-width.items-start.content-start
           .row.full-width.q-pa-xs

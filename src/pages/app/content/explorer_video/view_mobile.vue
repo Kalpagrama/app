@@ -11,8 +11,8 @@ q-layout(
         ).row.full-width.items-start.content-start.justify-center
         div(
           :style=`{
-            maxWidth: (player && player.isFullscreen) ? '100%' : $store.state.ui.pageMaxWidth+'px',
-            height: (player && player.isFullscreen) ? '100%' : 'auto',
+            maxWidth: '100%',
+            //- height: (player && player.isFullscreen) ? '100%' : 'auto',
           }`).row.full-width
           div(
             v-observe-visibility=`{
@@ -57,7 +57,7 @@ q-layout(
       template(v-slot:bottom)
         div(
           :style=`{}`).row.full-width.justify-center
-          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
             q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-md Назад
             .col
               q-tabs(
@@ -237,24 +237,18 @@ export default {
       }
       // create Fragment with N or F
       if (e.keyCode === 78 || e.keyCode === 70) {
-        this.nodeCreateStart()
+        this.createStart()
       }
     }
   },
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
-    // prevent text,textarea events...
-    window.addEventListener('focusin', this.handleFocusin)
-    window.addEventListener('focusout', this.handleFocusout)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
-    window.removeEventListener('focusin', this.handleFocusin)
-    window.removeEventListener('focusout', this.handleFocusout)
-    // localStorage.setItem('k_contentExplorer_viewid', this.viewId)
-    this.$store.commit('ui/stateSet', ['contentNodes', null])
+    this.$store.commit('ui/stateSet', ['contentFigures', null])
   }
 }
 </script>

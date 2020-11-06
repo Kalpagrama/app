@@ -16,7 +16,7 @@
       .row.full-width.justify-center.q-pa-sm
         span.text-white {{ item.item.name }}
   div(v-if="item.item.wsItemType === 'WS_NODE'").row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-end.content-end
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-end.content-end
       img(
         :src="item.item.items[0].thumbUrl"
         :style=`{
@@ -27,7 +27,7 @@
         span.text-white {{item.name}}
   //- ws_bookmark
   div(v-if="item.item.wsItemType === 'WS_BOOKMARK'").row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-end.content-end
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-end.content-end
       img(
         :src="item.item.thumbUrl"
         :style=`{
@@ -36,7 +36,7 @@
         ).full-width
   //- image, gif, meme, content image
   div(v-if="item.item.type === 'IMAGE'").row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-end.content-end
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-end.content-end
       img(
         :src="item.item.thumbUrl"
         :style=`{

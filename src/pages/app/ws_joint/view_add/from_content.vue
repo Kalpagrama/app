@@ -8,7 +8,7 @@
       :style=`{maxWidth: width+'px',}`
       @item="$emit('item', $event), contentExtractorOpened = false"
       @close="contentExtractorOpened = false")
-  ws-contents(
+  //- ws-contents(
     :mode="'pick'"
     :query="{}"
     @content="contentBookmarkClick")
@@ -27,7 +27,7 @@
 export default {
   name: 'nodeEditor_viewAdd_fromContent',
   components: {
-    wsContents: () => import('pages/app/ws_contents/index.vue'),
+    // wsContents: () => import('pages/app/ws_contents/index.vue'),
     // fromContentExtract: () => import('./from-content-extract.vue')
   },
   data () {

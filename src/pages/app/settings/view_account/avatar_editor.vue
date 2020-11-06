@@ -2,7 +2,7 @@
 q-layout(view="lHh lpR lFf").b-30
   q-page-container
     q-page().row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
         //- header
         div().row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")

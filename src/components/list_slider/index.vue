@@ -5,7 +5,7 @@ div(
   //- debug
   //- stats
   //- .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.br
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.br
       span.text-white scroll: {{scrollLeft}}/{{scrollWidth}}
       .row.full-width
         span.text-white itemActive: {{ itemActive }}

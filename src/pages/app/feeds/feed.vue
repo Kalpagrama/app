@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
     kalpa-loader(
       v-if="true" :query="queryFeedItems" :limit="20" v-slot=`{items, next, nexting}`)
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)

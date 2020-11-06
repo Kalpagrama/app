@@ -6,7 +6,7 @@ q-layout(
     .row.full-width.q-pt-sm.q-px-sm
       div(
         :style=`{
-          maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
+          maxWidth: $store.state.ui.pageWidth+'px', height: '60px',
           borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-px-sm

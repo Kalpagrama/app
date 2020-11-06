@@ -3,7 +3,7 @@
   div(
     :style=`{
       position: 'relative', minHeight: '500px',
-      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px', overflow: 'hidden',
     }`
     ).row.full-width.items-between.content-between.q-px-md.b-40

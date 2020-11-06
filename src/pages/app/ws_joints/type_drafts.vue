@@ -6,7 +6,7 @@
 
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', minHeight: '100vh'}`).row.full-width
 //- kalpa-loader(
   :immediate="true"
   :query="query" :limit="1000"

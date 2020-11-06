@@ -6,7 +6,7 @@ q-layout(
       .row.full-width.justify-center.q-px-sm
         div(
           :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
+            maxWidth: $store.state.ui.pageWidth+'px', height: '60px',
             borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-center.b-40.q-px-sm
           q-icon(name="school" size="30px" color="white").q-mr-md.q-ml-sm
@@ -17,7 +17,7 @@ q-layout(
     component(:is="viewId" :id="feedId" :paddingTop="40" :useViews="feedId !== 'all'")
       template(v-slot:top)
         .row.full-width.justify-center
-          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.justify-center.q-px-sm
+          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.justify-center.q-px-sm
             q-tabs(
               :value="viewId" @input="$router.push({params: {viewId: $event}})"
               no-caps active-color="green" align="left"
@@ -43,12 +43,11 @@ q-layout(
 export default {
   name: 'pageApp_wsIndex',
   components: {
-    feed: () => import('pages/app/ws_feed/page.vue'),
-    feeds: () => import('pages/app/ws_feeds/page.vue'),
-    nodes: () => import('pages/app/ws_nodes/page.vue'),
-    joints: () => import('pages/app/ws_joints/page.vue'),
-    // groups: () => import('./groups/index.vue'),
-    trash: () => import('pages/app/ws_trash/index.vue')
+    collection: () => import('pages/app/ws_collection/view_items.vue'),
+    collections: () => import('pages/app/ws_collections/view_items.vue'),
+    nodes: () => import('pages/app/ws_nodes/view_items.vue'),
+    joints: () => import('pages/app/ws_joints/view_items.vue'),
+    trash: () => import('pages/app/ws_trash/view_items.vue')
   },
   data () {
     return {
@@ -61,11 +60,10 @@ export default {
     },
     views () {
       return [
-        {id: 'feed', name: 'Все подряд', icon: 'title'},
-        {id: 'feeds', name: 'Коллекции', icon: 'view_week'},
+        {id: 'collection', name: 'Все', icon: 'title'},
+        {id: 'collections', name: 'Коллекции', icon: 'view_week'},
         {id: 'nodes', name: 'Ядра', icon: 'filter_tilt_shift'},
         {id: 'joints', name: 'Связи', icon: 'link'},
-        // {id: 'groups', name: 'Groups', icon: 'gesture'},
         {id: 'trash', name: 'Корзина', icon: 'delete_outline'}
       ]
     },

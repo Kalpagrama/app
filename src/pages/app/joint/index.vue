@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal).b-30
     .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-px-sm
           q-btn(
@@ -20,7 +20,7 @@ q-layout(view="hHh Lpr lff")
             :isActive="true")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         joint-feed(v-if="joint" :joint="joint")
         .row.full-width.q-px-md.q-mt-xl
           q-tabs(

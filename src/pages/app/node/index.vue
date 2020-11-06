@@ -8,11 +8,11 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal).b-30
     .row.full-width.justify-center.q-px-sm.q-pt-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-sm
           q-btn(
-            v-if="$q.screen.width > $store.state.ui.pageMaxWidth+140"
+            v-if="$q.screen.width > $store.state.ui.pageWidth+140"
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
@@ -35,14 +35,14 @@ q-layout(view="hHh Lpr lff")
             ).row.full-width.items-start.content-start.justify-center
             div(
               :style=`{
-                maxWidth: $store.state.ui.pageMaxWidth+'px',
+                maxWidth: $store.state.ui.pageWidth+'px',
                 borderRadius: '10px',
                 background: 'rgb(35,35,35)'
               }`
               ).row.full-width
               //- node author
               .row.full-width.justify-center
-                div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
+                div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
                   q-btn(
                     :to="'/user/'+node.author.oid"
                     flat color="white" dense no-caps
@@ -56,7 +56,7 @@ q-layout(view="hHh Lpr lff")
               //- node body
               div(
                 :style=`{
-                  maxWidth: $store.state.ui.pageMaxWidth+'px',
+                  maxWidth: $store.state.ui.pageWidth+'px',
                   borderRadius: '10px', overflow: 'hidden',}`
                 ).row.full-width.b-40
                 list-middle(
@@ -90,9 +90,9 @@ q-layout(view="hHh Lpr lff")
           node-mockup(
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-            :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
         .row.full-width.justify-center
-          div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingTop: '48px',}`).row.full-width
+          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingTop: '48px',}`).row.full-width
             router-view(v-if="node" :node="node")
       q-page-sticky(
         v-if="node"

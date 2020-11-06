@@ -29,7 +29,7 @@ q-page(
       slot(name="top" :feed="feed")
       //- views
       div(v-if="useViews").row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
           q-tabs(
             v-model="viewId"
             no-caps align="left" active-color="green" dense
@@ -39,7 +39,7 @@ q-page(
               :name="view.id" :label="view.name")
       //- search
       div(v-if="viewId === 'items'").row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-start
           div(:style=`{maxWidth: '700px',}`).row.full-width
             slot(name="search-prepend")
             div(:style=`{maxWidth: '700px',}`).col
@@ -57,7 +57,7 @@ q-page(
       div(v-if="viewId === 'items'").row.full-width.justify-center
         div(
           :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px'
+            maxWidth: $store.state.ui.pageWidth+'px'
             //- maxWidth: '700px',
           }`
           ).row.full-width.items-start.content-start.scroll.q-pt-xs
@@ -78,13 +78,16 @@ q-page(
   div(
     v-if="viewId === 'subscriptions'"
     ).row.full-width.q-pa-xl.bg-blue
+  view-views(
+    v-if="viewId === 'views'"
+    )
   kalpa-loader(
     v-if="viewId === 'items' && feed"
     :immediate="true"
     :query="itemsQuery" :limit="1000" v-slot=`{items,next,nexting}`)
     div(
       :style=`{
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        maxWidth: $store.state.ui.pageWidth+'px',
         //- maxWidth: '700px',
       }`
       ).row.full-width.items-start.content-start
@@ -118,7 +121,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'wsFeed_page',
+  name: 'wsCollection_viewItems',
   props: {
     id: {type: String},
     paddingTop: {
@@ -130,7 +133,8 @@ export default {
   components: {
     feedSearch: () => import('./feed_search.vue'),
     feedItem: () => import('./feed_item.vue'),
-    itemFinder: () => import('./item_finder.vue')
+    itemFinder: () => import('./item_finder.vue'),
+    viewViews: () => import('./view_views.vue')
   },
   data () {
     return {
@@ -148,6 +152,7 @@ export default {
         {id: 'details', name: 'Детали'},
         {id: 'items', name: 'Закладки'},
         {id: 'subscriptions', name: 'Подписки'},
+        {id: 'views', name: 'Views'},
       ]
     },
     types () {
@@ -185,8 +190,8 @@ export default {
       return res
     },
     itemFinderWidth () {
-      if (this.$q.screen.width < this.$store.state.ui.pageMaxWidth) return this.$q.screen.width
-      else return this.$store.state.ui.pageMaxWidth
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return this.$q.screen.width
+      else return this.$store.state.ui.pageWidth
     },
     itemFinderHeight () {
       return this.$q.screen.height - 76

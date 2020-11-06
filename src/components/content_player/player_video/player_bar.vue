@@ -10,7 +10,7 @@ div(
   }`).row.full-width.b-50
   //- contentNodes, we need nodes with first item of this content!
   //- with t, content type video
-  div(
+  //- div(
     v-if="$store.state.ui.contentNodes"
     :style=`{
       position: 'absolute', zIndex: 9999,

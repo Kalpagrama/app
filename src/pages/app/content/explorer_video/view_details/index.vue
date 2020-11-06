@@ -5,7 +5,7 @@
     expand position="top"
     :style=`{}`
     ).row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       div(
         :style=`{
           width: '60px',
@@ -34,7 +34,7 @@
             icon="fab fa-youtube" align="left"
             color="green" outline no-caps
             ).col
-            span(:style=`{fontSize: '15px'}`).q-mx-sm {{$t('View original', 'Перейти на оригинал')}}
+            span(:style=`{fontSize: '15px'}`).q-mx-sm в источник
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
@@ -47,6 +47,23 @@
             @bookmark="$event => $emit('bookmark', $event)")
           kalpa-share(
             type="content" :item="contentKalpa")
+          q-btn(
+            round flat color="grey-8" icon="more_vert")
+            q-popup-proxy(
+              maximized position="bottom" dark
+              cover anchor="top right" self="top right").b-40
+              div(
+                :style=`{
+                  borderRadius: '10px',
+                }`
+                ).row.full-width.items-start.content-start.b-40
+                q-btn(
+                  @click="a.cb()"
+                  v-for="(a,akey) in actions" :key="akey"
+                  flat no-caps
+                  :color="a.color || 'white'"
+                  :style=`{height: '50px',}`).full-width
+                  span.text-bold {{ a.name }}
       //- spheres
       //- div(
         v-if="contentBookmark"
@@ -71,6 +88,32 @@ export default {
       sphere: '',
       sphereAdding: false,
       sphereEditing: false,
+    }
+  },
+  computed: {
+    actions () {
+      return {
+        share: {
+          name: 'Поделиться',
+          cb: () => {
+            this.$log('share...')
+          }
+        },
+        report: {
+          name: 'Пожаловаться',
+          color: 'red',
+          cb: () => {
+            this.$log('report...')
+          }
+        },
+        // delete: {
+        //   name: 'Удалить',
+        //   color: 'red',
+        //   cb: () => {
+        //     this.$log('delete...')
+        //   }
+        // }
+      }
     }
   },
   methods: {

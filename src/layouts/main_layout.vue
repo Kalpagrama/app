@@ -33,32 +33,30 @@ q-layout(view="lHh lpR lFf")
   q-drawer(
     v-if="$q.screen.lt.md"
     side="left" no-swipe-open
-    :value="$store.state.ui.appShowMenu"
+    :value="$store.state.ui.mobileMenuShow"
     behavior="mobile"
     :width="$q.screen.width - 70"
-    @before-hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
+    @before-hide="$store.commit('ui/stateSet', ['mobileMenuShow', false])")
     kalpa-menu(
       :mini="false"
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40.q-pt-md
-  //- left menu
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$q.screen.gt.sm && $store.state.ui.showDesktopNavigation"
+      v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
       :style=`{
         position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
-        maxWidth: $q.screen.lt.lg ? '70px' : '250px',
-        minHeight: $q.screen.height+'px',
-      }`).row.fit.items-start.content-start.justify-start.q-pt-sm.q-px-sm
+        maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
+      }`).row.fit.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
-        :mini="$q.screen.lt.lg"
+        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 300"
         :style=`{
           borderRadius: '10px',
-          maxWidth: $q.screen.lt.lg ? '60px' : '240px',
+          maxWidth: '300px',
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-footer(v-if="$q.screen.lt.md && $store.state.ui.showMobileNavigation")
+    q-footer(v-if="$q.screen.lt.md && $store.state.ui.desktopNavigationShow")
       kalpa-menu-mobile
   q-page-container
     router-view

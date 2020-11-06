@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '50px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     .row.full-width.justify-center.q-py-xl
       span.text-white Nothing found :(
     //- kalpa-loader(

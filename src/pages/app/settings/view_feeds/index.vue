@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '8px',}`).row.full-width.justify-center
-  div(:style=`{height: $q.screen.height-105+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
+  div(:style=`{height: $q.screen.height-105+'px', maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
     .row.full-width.q-py-md
       .col.q-pl-sm
         div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width

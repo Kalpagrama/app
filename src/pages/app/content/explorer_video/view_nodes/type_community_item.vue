@@ -9,7 +9,7 @@
 div(
   @click="onClick"
   :style=`{
-    height: '50px',
+    minHeight: '50px',
   }`
   ).row.full-width.items-center.content-center.node-item
   img(
@@ -23,7 +23,7 @@ div(
     }`
     )
   .col.q-px-sm
-    span(:style=`{userSelect: 'none'}`).text-white {{ node.name.slice(0, 50) }}
+    span(:style=`{userSelect: 'none'}`).text-white {{ node.name.slice(0, 48) }}
   div(
     :style=`{
       height: '50px', width: '50px',

@@ -1,14 +1,8 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(
-    :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px 10px 0 0'}`
+    :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
     ).row.full-width.items-center.content-center.justify-between.q-pt-sm.b-40.q-pb-xs
-    //- div(@click="$router.back()").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round flat dense color="white" icon="keyboard_arrow_left")
-        .row.full-width.justify-center
-          small.text-grey-6 Назад
     router-link(:to="{name: 'feeds'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
@@ -64,7 +58,7 @@ export default {
     profileClick () {
       this.$log('profileClick')
       if (this.$route.name.split('.')[0] === 'user' && this.$route.params.oid === this.$store.getters.currentUser().oid) {
-        this.$store.commit('ui/stateSet', ['appShowMenu', !this.$store.state.ui.appShowMenu])
+        this.$store.commit('ui/stateSet', ['mobileMenuShow', !this.$store.state.ui.mobileMenuShow])
       }
     }
   }

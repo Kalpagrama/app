@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.b-30
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.b-30
         div(
           v-if="true"
           :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
@@ -10,7 +10,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(style="padding-top: 0px")
       .row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start.q-px-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start.q-px-sm
           div(
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-start.content-start.b-50

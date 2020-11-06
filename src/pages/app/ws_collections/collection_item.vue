@@ -1,9 +1,15 @@
+<style lang="sass">
+.collection-item
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 div(
   :style=`{
     maxWidth: maxWidth+'px',
   }`
-  ).row.full-width.items-start.content-start.q-mb-md
+  ).row.full-width.items-start.content-start.q-mb-sm
   div(
     :style=`{
       position: 'relative',
@@ -14,7 +20,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 100,
       }`
-      ).row.fit.q-px-sm
+      ).row.fit.q-pr-sm
       div(
         :style=`{
           position: 'relative',
@@ -71,7 +77,7 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'feedItem',
+  name: 'collectionItem',
   props: ['feed', 'maxWidth'],
   data () {
     return {

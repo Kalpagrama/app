@@ -14,9 +14,9 @@
       :contentFile="contentFile"
       :style=`{
         height: $q.screen.height+'px',
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        maxWidth: $store.state.ui.pageWidth+'px',
       }`
-      @contentKalpa="contentKalpaFound, searchString = ''"
+      @contentKalpa="contentKalpaFound"
       @close="contentImporterShow = false")
   .col
     q-input(

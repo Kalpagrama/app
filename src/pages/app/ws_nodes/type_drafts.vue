@@ -1,37 +1,55 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.items-start.content-start
-    //- items
-    .row.full-width.q-pt-sm.q-pr-sm
-      kalpa-loader(
-        :immediate="true"
-        :query="query" :limit="1000")
-        template(v-slot=`{items,next}`)
-          masonry(
-            :cols="$q.screen.width < 800 ? 2 : 4"
-            :gutter="{default: 10}").full-width
-            div(
-              v-for="(item, ii) in items" :key="item.id"
-              :style=`{position: 'relative'}`
-              ).row.full-width
-              ws-node-item(
-                :node="item"
-                :style=`{position: 'relative'}`
-                @clicked="itemSelected = item.id").q-mb-sm
-                template(v-slot:footer)
-                  //- selected
+  kalpa-loader(
+    :immediate="true"
+    :query="query" :limit="1000")
+    template(v-slot=`{items,next,nexting}`)
+      masonry(
+        :cols="$q.screen.width < $store.state.ui.pageWidth ? 2 : 4"
+        :gutter="{default: 0}"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+        ).full-width.items-start.content-start.justify-start
+        div(
+          v-for="(node, ii) in items" :key="node.id"
+          @mouseenter="nodeOver = node.id"
+          @mouseleave="nodeOver = null"
+          :style=`{position: 'relative'}`
+          ).row.full-width.q-pr-sm.q-mb-sm
+          slot(name="tint" :item="node" :itemKey="node.id")
+          ws-node-item(
+            @click.native="$router.push('/workspace/node/'+node.id)"
+            :node="node"
+            :style=`{position: 'relative'}`)
+          div(:style=`{position: 'absolute', zIndex: 300, top: 0, right: '8px',}`)
+            q-btn(
+              v-show="$q.screen.width < $store.state.ui.pageWidth ? true : nodeOver == node.id"
+              round flat dense icon="more_vert" color="white"
+              :style=`{
+              }`)
+              q-popup-proxy(
+                maximized position="bottom" dark
+                anchor="top right" self="top right"
+                :max-width="$q.screen.width < $store.state.ui.pageWidth ? '100%' : '200px'"
+                ).b-40
+                div(
+                  :style=`{
+                    borderRadius: '10px',
+                  }`
+                  ).row.full-width.items-start.content-start.b-40
+                  //- header
                   div(
-                    v-if="itemSelected === item.id"
-                    :style=`{
-                      position: 'relative',
-                      marginTop: '-10px', paddingTop: '14px',
-                      borderRadius: '0 0 10px 10px', overflow: 'hidden',
-                    }`
-                    ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="itemDelete(item,ii)")
-                    .col
-                    q-btn(round flat dense color="white" icon="edit" @click="itemEdit(item,ii)")
-              slot(name="tint" :item="item" :itemKey="item.id")
+                    v-if="$q.screen.width < $store.state.ui.pageWidth"
+                    ).row.full-width.items-center.content-center.justify-center.q-pa-md
+                    q-icon(name="filter_tilt_shift" color="white" size="20px").q-mr-sm
+                    span.text-white.text-bold "{{ node.name }}"
+                  //- actions
+                  q-btn(
+                    @click="a.cb(node)"
+                    v-for="(a,akey) in actions" :key="akey"
+                    flat no-caps
+                    :color="a.color || 'white'"
+                    :style=`{height: '50px',}`).full-width
+                    span {{ a.name }}
 </template>
 
 <script>
@@ -44,7 +62,7 @@ export default {
   },
   data () {
     return {
-      itemSelected: null,
+      nodeOver: null,
     }
   },
   computed: {
@@ -62,20 +80,44 @@ export default {
         res.selector.name = {$regex: nameRegExp}
       }
       return res
+    },
+    actions () {
+      return {
+        edit: {
+          name: 'Редактировать',
+          cb: (node) => {
+            this.$log('edit')
+            this.$router.push('/workspace/node/' + node.id)
+          }
+        },
+        goToContext: {
+          name: 'Перейти на контент',
+          cb: async (node) => {
+            this.$log('goToContext')
+            if (node.items[0]) {
+              this.$router.push('/content/' + node.items[0].layers[0].contentOid)
+            }
+          }
+        },
+        moveToCollection: {
+          name: 'Добавить в коллекцию',
+          cb: (node) => {
+            this.$log('moveToCollection...')
+            // move to collection
+            // go to collection items
+          }
+        },
+        delete: {
+          name: 'В корзину',
+          color: 'red',
+          cb: async (node) => {
+            await node.updateExtended('deletedAt', Date.now(), false)
+          }
+        }
+      }
     }
   },
   methods: {
-    async itemDelete (item) {
-      this.$log('itemDelete', item)
-      // if (!confirm('Delete node?')) return
-      // TODO what to do if we got items on this sphere ???
-      // await this.$rxdb.remove(item.id)
-      await item.updateExtended('deletedAt', Date.now(), false)
-    },
-    itemEdit (item) {
-      this.$log('itemEdit', item)
-      this.$router.push(`/workspace/node/${item.id}`).catch(e => e)
-    },
   }
 }
 </script>

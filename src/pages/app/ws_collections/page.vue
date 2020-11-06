@@ -12,7 +12,7 @@ q-page(
       .row.full-width.justify-center
         div(
           :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px',
+            maxWidth: $store.state.ui.pageWidth+'px',
             borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-start
           div(:style=`{maxWidth: '700px',}`).col
@@ -29,7 +29,7 @@ q-page(
     :immediate="true"
     :query="queryFeeds" :limit="1000" v-slot=`{items,next}`)
     div(
-      :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+      :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
       ).row.full-width.items-start.content-start.q-pt-sm
       feed-all(
         v-if="searchString.length === 0"
@@ -80,8 +80,8 @@ export default {
       return res
     },
     maxWidth () {
-      if (this.$q.screen.width < this.$store.state.ui.pageMaxWidth) return this.$q.screen.width / 2
-      else return this.$store.state.ui.pageMaxWidth / 4
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return this.$q.screen.width / 2
+      else return this.$store.state.ui.pageWidth / 4
     },
   },
   methods: {

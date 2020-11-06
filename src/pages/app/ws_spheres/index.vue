@@ -8,7 +8,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         .row.full-width.q-px-sm
           div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
             .col
@@ -33,7 +33,7 @@
               round flat dense color="green" icon="add"
               :style=`{width: '40px',}`)
   .row.full-width.justify-center.b-30
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       .row.full-width.justify-start.q-px-sm
         div(:style=`{maxWidth: '700px',}`).row.full-width
           .col
@@ -63,7 +63,7 @@
       div(
         :class=`{
         }`
-        :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pr-sm
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.q-pr-sm
         kalpa-loader(
           :immediate="true"
           :query="querySpheres" :limit="1000" @items="spheresLoaded")

@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   .row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.justify-start
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-start
       div(:style=`{maxWidth: '700px',}`).row.full-width
         .col
           div(

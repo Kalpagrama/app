@@ -69,13 +69,15 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
-    if (this.query && this.query.pick && this.query.id) this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
+    this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    if (this.query && this.query.pick && this.query.id) this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
+    this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

@@ -2,7 +2,7 @@
 .row.full-width
   //- header
   .row.full-width.justify-center.q-pt-sm.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       div(
         :style=`{
           height: '60px', borderRadius: '10px',
@@ -25,7 +25,7 @@
   div(
     v-if="feed"
     ).row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pt-sm
       //- small.text-white {{ feed }}
       div().row.full-width
         div(
@@ -49,7 +49,7 @@
   div(
     v-if="feed"
     ).row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       .row.full-width.q-px-sm
         span.text-grey-6 Мои подписки
       .row.full-width

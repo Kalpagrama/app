@@ -108,7 +108,7 @@ export default {
     'node'
   ],
   components: {
-    fromWorkspace: () => import('pages/app/ws_feed/page.vue'),
+    fromWorkspace: () => import('pages/app/ws_collection/view_items.vue'),
   },
   data () {
     return {

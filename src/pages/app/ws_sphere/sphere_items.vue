@@ -7,7 +7,7 @@
 
 <template lang="pug">
 .row.full-width.justify-center.items-start.content-start
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     .row.full-width.q-px-sm
       div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
         q-input(

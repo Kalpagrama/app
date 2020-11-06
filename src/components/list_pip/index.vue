@@ -31,7 +31,7 @@ div(
       left: '0px', top: '60px',
       width: '15%',
       height: 'calc(100% - 120px)',
-      borderRadius: $store.state.ui.borderRadius+'px',
+      borderRadius: '10px',
       overflow: 'hidden',
       background: 'rgba(255,255,255,0)',
     }`)

@@ -91,7 +91,7 @@ export default {
           this.$log('imageSave blob size=', blob.size)
           blob.name = this.name
           let contentKalpa = await ContentApi.contentCreateFromFile(blob)
-          await this.$wait(1000)
+          await this.$wait(300)
           this.$log('imageSave contentKalpa', contentKalpa)
           this.loading = false
           this.$emit('contentKalpa', contentKalpa)

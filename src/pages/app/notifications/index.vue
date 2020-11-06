@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
           :style=`{
             height: '60px', borderRadius: '10px',

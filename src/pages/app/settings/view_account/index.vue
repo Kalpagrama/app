@@ -8,7 +8,7 @@ q-page.row.full-width.justify-center
       :oid="currentUser.oid"
       :avatarUrl="avatarUrl"
       @close="avatarEditorOpened = false")
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
     .row.full-width.items-start.content-start
       //- avatar
       .col-xs-12.col-sm-4.q-pa-sm
@@ -55,7 +55,7 @@ q-page.row.full-width.justify-center
             option-label="label"
             :options="langs"
             :style=`{
-              borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
+              borderRadius: '10px', overflow: 'hidden',
               minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
         //- password

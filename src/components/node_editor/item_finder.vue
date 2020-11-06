@@ -53,9 +53,9 @@ export default {
   name: 'nodeEditor_itemFinder',
   props: ['node'],
   components: {
-    wsFeedPage: () => import('pages/app/ws_feed/page.vue'),
-    wsFeedsPage: () => import('pages/app/ws_feeds/page.vue'),
-    wsNodesPage: () => import('pages/app/ws_nodes/page.vue')
+    wsFeedPage: () => import('pages/app/ws_collection/view_items.vue'),
+    wsFeedsPage: () => import('pages/app/ws_collection/view_items.vue'),
+    wsNodesPage: () => import('pages/app/ws_nodes/view_items.vue')
   },
   data () {
     return {
@@ -66,12 +66,12 @@ export default {
   },
   computed: {
     height () {
-      if (this.$q.screen.width < this.$store.state.ui.pageMaxWidth) return this.$q.screen.height
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return this.$q.screen.height
       else return this.$q.screen.height * 0.8
     },
     maxWidth () {
-      if (this.$q.screen.width < this.$store.state.ui.pageMaxWidth) return this.$q.screen.width / 2
-      else return this.$store.state.ui.pageMaxWidth / 4
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return this.$q.screen.width / 2
+      else return this.$store.state.ui.pageWidth / 4
     },
     queryFeeds () {
       let res = {

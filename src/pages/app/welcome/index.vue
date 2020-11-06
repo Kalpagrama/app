@@ -9,7 +9,7 @@ div(
     div(
       :style=`{
         height: '100px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
+        maxWidth: $store.state.ui.pageWidth+'px',
         borderRadius: '10px', overflow: 'hidden',
       }`).row.full-width.items-center.content-center.q-px-md.b-50
       span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('welcome_to_kalpagrama', 'Добро пожаловать!')}}
@@ -18,8 +18,8 @@ div(
     .row.fit.justify-center
       div(
         :style=`{
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-          borderRadius: $store.state.ui.borderRadius+'px'
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: $store.state.ui.pageWidth+'px'
         }`
         ).row.fit.b-50
         edit-categories(v-if="pageId === 'categories'" @next="pageId = 'profile'")

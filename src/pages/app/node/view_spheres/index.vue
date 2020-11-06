@@ -4,7 +4,7 @@
   div(
     v-if="node"
     :style=`{
-      maxWidth: $store.state.ui.pageMaxWidth+'px',
+      maxWidth: $store.state.ui.pageWidth+'px',
       position: 'relative',
     }`
     ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm.q-pb-xs

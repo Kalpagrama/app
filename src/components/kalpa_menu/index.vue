@@ -7,7 +7,7 @@
 <template lang="pug">
 div(
   :style=`{
-    maxWidth: mini ? '60px' : '100%',
+    //- maxWidth: mini ? '60px' : '100%',
   }`).column.full-width
   //- $q.platform.is.capacitor paddingTop 20px ?
   //- header
@@ -61,7 +61,7 @@ div(
           }`
           :style=`{
             height: $q.screen.width > 600 ? '55px' : '55px',
-            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
+            borderRadius: '10px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
@@ -71,7 +71,7 @@ div(
             :style=`{fontSize: '16px'}`).text-white {{ p.name }}
         //- refresh
         div(
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="refresh()"
+          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="refresh()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
@@ -81,7 +81,7 @@ div(
         //- logout
         div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
+          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
@@ -91,7 +91,7 @@ div(
         //- login
         div(
           v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="login()"
+          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="login()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power" color="white" :loading="loginLoading")
@@ -144,11 +144,12 @@ export default {
   data () {
     return {
       pages: [
+        // {id: 'search', name: this.$t('pageSearch_title', 'Поиск'), icon: 'search'},
         {id: 'feeds', name: 'Новое', icon: 'explore'},
         {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
-        {id: 'search', name: this.$t('pageSearch_title', 'Поиск'), icon: 'search'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
+        {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
         {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,

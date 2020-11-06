@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{position: 'relative', height: '150px',}`).row.full-width
           img(
             v-if="user"
@@ -39,11 +39,28 @@ q-layout(view="hHh Lpr lff")
             :name="user.name"
             :thumbUrl="user.thumbUrl"
             :isActive="true")
+          q-btn(
+            round flat color="grey-8" icon="more_vert")
+            q-popup-proxy(
+              maximized position="bottom" dark
+              cover anchor="top right" self="top right").b-40
+              div(
+                :style=`{
+                  borderRadius: '10px',
+                }`
+                ).row.full-width.items-start.content-start.b-40
+                q-btn(
+                  @click="a.cb()"
+                  v-for="(a,akey) in actions" :key="akey"
+                  flat no-caps
+                  :color="a.color || 'white'"
+                  :style=`{height: '50px',}`).full-width
+                  span.text-bold {{ a.name }}
   q-page-container
     q-page-sticky(
       expand position="top"
       :style=`{zIndex: 2000}`).row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-md.b-30
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md.b-30
         q-tabs(
           no-caps active-color="green" align="left"
           stretch :breakpoint="100" inline-label
@@ -59,14 +76,8 @@ q-layout(view="hHh Lpr lff")
 import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-// import userFollowers from './user_followers'
-// import userFollowing from './user_following'
-// import userCreated from './user_created'
-// import userVoted from './user_voted'
-
 export default {
   name: 'pageApp__user',
-  // components: {userCreated, userVoted, userFollowing, userFollowers},
   data () {
     return {
       user: null,
@@ -86,6 +97,23 @@ export default {
     },
     itsMe () {
       return this.$store.getters.currentUser().oid === this.$route.params.oid
+    },
+    actions () {
+      return {
+        share: {
+          name: 'Поделиться',
+          cb: () => {
+            this.$log('share...')
+          }
+        },
+        report: {
+          name: 'Пожаловаться',
+          color: 'red',
+          cb: () => {
+            this.$log('report...')
+          }
+        }
+      }
     }
   },
   watch: {

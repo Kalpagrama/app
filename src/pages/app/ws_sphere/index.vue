@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-page-container
     .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
         .col
           q-input(

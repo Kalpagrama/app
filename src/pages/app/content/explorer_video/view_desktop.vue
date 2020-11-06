@@ -258,20 +258,8 @@ export default {
         this.player.setCurrentTime(startat)
       }
     },
-    handleFocusin (e) {
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
-        // this.$log('handleFocusin', e)
-        this.$store.commit('ui/stateSet', ['isTyping', true])
-      }
-    },
-    handleFocusout (e) {
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
-        // this.$log('handleFocusout', e)
-        this.$store.commit('ui/stateSet', ['isTyping', false])
-      }
-    },
     keydownHandle (e) {
-      if (this.$store.state.ui.isTyping) return
+      if (this.$store.state.ui.userTyping) return
       this.$log('keydownHandle', e)
       // left/right keys for fast navigations
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -296,23 +284,18 @@ export default {
       }
       // create Fragment with N or F
       if (e.keyCode === 78 || e.keyCode === 70) {
-        this.nodeCreateStart()
+        this.createStart()
       }
     }
   },
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.keydownHandle)
-    // prevent text,textarea events...
-    window.addEventListener('focusin', this.handleFocusin)
-    window.addEventListener('focusout', this.handleFocusout)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
-    window.removeEventListener('focusin', this.handleFocusin)
-    window.removeEventListener('focusout', this.handleFocusout)
-    this.$store.commit('ui/stateSet', ['contentNodes', null])
+    this.$store.commit('ui/stateSet', ['contentFigures', null])
   }
 }
 </script>

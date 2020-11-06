@@ -1,46 +1,52 @@
-<style lang="sass" scoped>
-.item
-  cursor: pointer
-  &:hover
-    background: rgb(50,50,50) !important
-</style>
-
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', minHeight: '100vh'}`).row.full-width.q-pr-sm
-    .row.full-width.items-start.content-start.q-pt-sm
-      //- @items="nodesLoaded"
-      kalpa-loader(
-        :immediate="true"
-        :query="queryNodes" :limit="1000" v-slot=`{items, next}`)
-        .row.full-width.items-start.content-start
-          q-infinite-scroll(ref="qis" @load="next" :offset="500")
-          masonry(
-            :cols="$q.screen.width < 800 ? 2 : 4"
-            :gutter="{default: 10}").full-width.justify-start
-            div(
-              v-for="(node, ii) in items" :key="node.oid"
-              :style=`{position: 'relative'}`
-              ).row.full-width.q-mb-sm
-              slot(name="tint" :item="node" :itemKey="node.oid")
-              ws-node-item(
-                :node="node"
-                :style=`{position: 'relative'}`
-                @clicked="nodeSelectedOid = node.oid").q-mb-sm
-                template(v-slot:footer)
-                  //- selected
-                  div(
-                    v-if="nodeSelectedOid === node.oid"
-                    :style=`{
-                      position: 'relative',
-                      marginTop: '-10px', paddingTop: '14px',
-                      borderRadius: '0 0 10px 10px', overflow: 'hidden',
-                    }`
-                    ).row.full-width.items-center.content-center.bg-green.q-px-xs.q-pb-xs
-                    q-btn(round flat dense color="green-8" icon="delete_outline" @click="nodeUnpublish(node)")
-                    .col
-                    q-btn(round flat dense color="white" icon="edit" @click="nodeEdit(node)").q-mr-sm
-                    q-btn(round flat dense color="white" icon="launch" @click="nodeLaunch(node)")
+  kalpa-loader(
+    :immediate="true"
+    :query="queryNodes" :limit="1000" v-slot=`{items,next,nexting}`)
+      masonry(
+        :cols="$q.screen.width < $store.state.ui.pageWidth ? 2 : 4"
+        :gutter="{default: 0}"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+        ).full-width.items-start.content-start.justify-start
+        div(
+          v-for="(node, ii) in items" :key="node.oid"
+          @mouseenter="nodeOver = node.oid"
+          @mouseleave="nodeOver = null"
+          :style=`{position: 'relative'}`
+          ).row.full-width.q-pr-sm.q-mb-sm
+          slot(name="tint" :item="node" :itemKey="node.oid")
+          ws-node-item(
+            @click.native="$router.push('/node/'+node.oid)"
+            :node="node"
+            :style=`{position: 'relative'}`)
+          q-btn(
+            v-show="$q.screen.width < $store.state.ui.pageWidth ? true : nodeOver == node.oid"
+            round flat dense icon="more_vert" color="white"
+            :style=`{
+              position: 'absolute', zIndex: 200, top: 0, right: '8px',
+            }`)
+            q-popup-proxy(
+              maximized position="bottom" dark
+              anchor="top right" self="top right").b-40
+              div(
+                :style=`{
+                  borderRadius: '10px',
+                }`
+                ).row.full-width.items-start.content-start.b-40
+                //- header
+                div(
+                  v-if="$q.screen.width < $store.state.ui.pageWidth"
+                  ).row.full-width.items-center.content-center.justify-center.q-pa-md
+                  q-icon(name="filter_tilt_shift" color="white" size="20px").q-mr-sm
+                  span.text-white.text-bold "{{ node.name }}"
+                //- actions
+                q-btn(
+                  @click="a.cb(node)"
+                  v-for="(a,akey) in actions" :key="akey"
+                  flat no-caps
+                  :color="a.color || 'white'"
+                  :style=`{height: '50px',}`).full-width
+                  span {{ a.name }}
 </template>
 
 <script>
@@ -54,7 +60,7 @@ export default {
   },
   data () {
     return {
-      nodeSelectedOid: null,
+      nodeOver: null,
     }
   },
   computed: {
@@ -67,6 +73,40 @@ export default {
           sortStrategy: 'AGE',
         },
         populateObjects: true,
+      }
+    },
+    actions () {
+      return {
+        share: {
+          name: 'Поделиться',
+          cb: (node) => {
+            this.$log('share...')
+            // TODO: impl
+          }
+        },
+        edit: {
+          name: 'Редактировать',
+          cb: (node) => {
+            this.$log('edit')
+          }
+        },
+        moveToCollection: {
+          name: 'Добавить в коллекцию',
+          cb: (node) => {
+            this.$log('moveToCollection...')
+            // move to collection
+            // go to collection items
+          }
+        },
+        unpublish: {
+          name: 'Снять с публикации',
+          color: 'red',
+          cb: async (node) => {
+            if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
+            await ObjectsApi.unPublish(node.oid)
+            // await this.nodeEdit(node)
+          }
+        }
       }
     }
   },

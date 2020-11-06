@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff").b-30
   q-page-container
-    page()
+    view-items()
       template(v-slot:tint=`{item, itemKey}`)
         slot(name="tint" :item="item" :itemKey="itemKey")
 </template>
@@ -16,7 +16,7 @@ export default {
   props: {
   },
   components: {
-    page: () => import('./page.vue'),
+    viewItems: () => import('./view_items.vue'),
   },
   data () {
     return {

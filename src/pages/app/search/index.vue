@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         //- header
         div(
           :style=`{
@@ -50,7 +50,7 @@ q-layout(view="hHh Lpr lff")
             :style=`{}`).q-mr-xs.q-mb-xs.q-px-xs {{ type.name }}
   q-page-container
     q-page.row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         kalpa-loader(
           v-if="searchString.length >= 3"
           :immediate="true" :query="query" :limit="100" v-slot=`{items,next}`)

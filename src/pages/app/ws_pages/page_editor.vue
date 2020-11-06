@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.items-start.content-start.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.content-center.q-py-sm
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-py-sm
         q-btn(
           flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
           :style=`{width: '40px', height: '56px'}`).q-mr-xs
@@ -30,7 +30,7 @@ q-layout(view="hHh Lpr lff")
       div(
         v-if="page"
         :style=`{
-          maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px',
+          maxWidth: $store.state.ui.pageWidth+'px', borderRadius: '10px',
           //- background: 'rgb(35,35,35)',
         }`).row.full-width.items-start.content-start.q-py-md
         //- items

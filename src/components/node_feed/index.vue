@@ -14,8 +14,7 @@ div(
     .row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        flat color="white" dense no-caps
-        )
+        flat color="white" dense no-caps)
         user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
         span.text-grey-4.q-ml-sm {{ node.author.name }}
       .col
@@ -23,6 +22,21 @@ div(
       q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
       q-btn(round flat dense icon="more_vert" color="grey-9")
+        q-popup-proxy(
+          maximized position="bottom" dark
+          cover anchor="top right" self="top right").b-40
+          div(
+            :style=`{
+              borderRadius: '10px',
+            }`
+            ).row.full-width.items-start.content-start.b-40
+            q-btn(
+              @click="a.cb()"
+              v-for="(a,akey) in actions" :key="akey"
+              flat no-caps
+              :color="a.color || 'white'"
+              :style=`{height: '50px',}`).full-width
+              span.text-bold {{ a.name }}
     //- items wrapper
     .row.full-width
       div(
@@ -60,7 +74,7 @@ div(
         span(
           :style=`{
             fontSize: nodeNameSize+'px',
-          }`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+          }`).text-white.text-bold.cursor-pointer {{ node.name }}
   //- footer
   node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
@@ -98,6 +112,30 @@ export default {
       else if (l >= 50 && l < 100) return 14
       else if (l >= 100) return 12
       else return 10
+    },
+    actions () {
+      return {
+        share: {
+          name: 'Поделиться',
+          cb: () => {
+            this.$log('share...')
+          }
+        },
+        report: {
+          name: 'Пожаловаться',
+          color: 'red',
+          cb: () => {
+            this.$log('report...')
+          }
+        },
+        delete: {
+          name: 'Удалить',
+          color: 'red',
+          cb: () => {
+            this.$log('delete...')
+          }
+        }
+      }
     }
   },
   methods: {

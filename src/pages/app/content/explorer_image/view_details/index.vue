@@ -2,7 +2,7 @@
 q-page(
   :style=`{paddingTop: '8px'}`
   ).row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start.q-px-sm
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start.q-px-sm
     //- small.text-white {{ contentBookmark }}
     span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentBookmark.name }}
     .row.full-width.q-py-md

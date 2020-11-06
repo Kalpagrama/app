@@ -12,7 +12,7 @@ q-layout(
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   q-page-container
-    page(id="all")
+    view-items(id="all")
       template(v-slot:tint=`{item}`)
         div(
           :style=`{
@@ -46,7 +46,7 @@ export default {
   name: 'wsFeed_itemFinder',
   props: ['items'],
   components: {
-    page: () => import('./page.vue')
+    viewItems: () => import('./view_items.vue')
   },
   data () {
     return {

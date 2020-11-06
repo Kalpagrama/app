@@ -163,11 +163,11 @@ const routes = [
             ],
             meta: { roleMinimal: 'GUEST' }
          },
-         {
-            name: 'search',
-            path: 'search',
-            component: () => import('pages/app/search/index.vue')
-         },
+         // {
+         //    name: 'search',
+         //    path: 'search',
+         //    component: () => import('pages/app/search/index.vue')
+         // },
          {
             name: 'trends',
             path: 'trends/:oid?',
@@ -179,6 +179,33 @@ const routes = [
             path: 'content/:oid',
             props: (route) => ({oid: route.params.oid, query: route.query}),
             component: () => import('pages/app/content/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
+         },
+         {
+            path: 'notifications',
+            component: () => import('pages/app/notifications/index.vue'),
+            children: [
+               {
+                  name: 'notifications',
+                  path: '',
+                  component: () => import('pages/app/notifications/view_index.vue'),
+                  meta: { roleMinimal: 'MEMBER' }
+               }
+            ],
+            meta: { roleMinimal: 'MEMBER' }
+         },
+         {
+            name: 'messages',
+            path: 'messages',
+            component: () => import('pages/app/messages/index.vue'),
+            // children: [
+            //    {
+            //       name: 'notifications',
+            //       path: '',
+            //       component: () => import('pages/app/notifications/view_index.vue'),
+            //       meta: { roleMinimal: 'MEMBER' }
+            //    }
+            // ],
             meta: { roleMinimal: 'MEMBER' }
          },
          {
@@ -195,9 +222,9 @@ const routes = [
          //    meta: { roleMinimal: 'MEMBER' }
          // },
          {
-            name: 'workspace.feed',
-            path: 'workspace/feed/:id',
-            component: () => import('pages/app/ws_feed/index.vue'),
+            name: 'workspace.collection',
+            path: 'workspace/collection/:id',
+            component: () => import('pages/app/ws_collection/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          // {
@@ -228,19 +255,6 @@ const routes = [
             name: 'workspace.trash',
             path: 'workspace/trash',
             component: () => import('pages/app/ws_joint/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            path: 'notifications',
-            component: () => import('pages/app/notifications/index.vue'),
-            children: [
-               {
-                  name: 'notifications',
-                  path: '',
-                  component: () => import('pages/app/notifications/view_index.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               }
-            ],
             meta: { roleMinimal: 'MEMBER' }
          },
          {

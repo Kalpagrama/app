@@ -19,7 +19,7 @@ q-layout(
       .row.full-width.justify-center
         div(
           :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px', height: '60px',
+            maxWidth: $store.state.ui.pageWidth+'px', height: '60px',
             borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-center.b-40.q-px-sm
           q-icon(name="view_week" size="30px" color="white").q-mr-md.q-ml-sm
@@ -27,7 +27,8 @@ q-layout(
             span(:style=`{fontSize: '1.1rem'}`).text-white.text-bold Подборки
           q-btn(round flat color="white" icon="more_vert")
   q-page-container
-    page()
+    //- view_items()
+    //- page()
       template(v-slot:tint=`{item}`)
         div(
           @click="feedClick(item)"
@@ -38,10 +39,10 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_wsFeeds',
+  name: 'wsCollections',
   components: {
-    page: () => import('./page.vue'),
-    feedCreator: () => import('./feed_creator.vue'),
+    // page: () => import('./page.vue'),
+    // collectionCreator: () => import('./collection_creator.vue'),
   },
   data () {
     return {

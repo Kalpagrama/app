@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-px-sm.q-pt-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
           :style=`{
             height: '60px',
@@ -31,7 +31,7 @@ q-layout(view="hHh Lpr lff")
           :class=`{
           }`
           :style=`{
-            maxWidth: $store.state.ui.pageMaxWidth+'px',
+            maxWidth: $store.state.ui.pageWidth+'px',
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(

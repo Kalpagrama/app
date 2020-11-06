@@ -8,13 +8,13 @@ q-layout(view="hHh Lpr lff").b-30
       :node="node"
       :style=`{
         height: $q.screen.height+'px',
-        maxWidth: 800+'px',
+        maxWidth: 700+'px',
       }`
       @item="itemFound"
       @close="itemFinderOpened = false")
   q-header(reveal).b-30
     .row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
-      div(:style=`{maxWidth: 800+'px', height: '60px',}`
+      div(:style=`{maxWidth: 700+'px', height: '60px',}`
         ).row.full-width.items-center.content-center
         q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$router.back()").q-mr-xs
         .col
@@ -48,9 +48,28 @@ q-layout(view="hHh Lpr lff").b-30
                   ).row.full-width {{ a.name }}
   q-page-container
     q-page.row.full-width.justify-center
-      div(:style=`{maxWidth: 800+'px'}`).row.full-width.justify-center
-        //- node mockup
+      div(:style=`{maxWidth: 700+'px'}`).row.full-width.items-start.content-start.justify-center
         div(
+          :style=`{
+            background: 'rgb(35,35,35)',
+            borderRadius: '10px',
+          }`
+          ).row.full-width.items-start.content-start.justify-center
+          q-btn(
+            v-if="node.items.length === 0"
+            round flat color="green" icon="add" size="xl" @click="itemFinderOpened = true"
+            :style=`{
+              height: $q.screen.width > 700 ? 400+'px' : $q.screen.width+'px'
+            }`).full-width.b-40
+          edit-items(
+            v-else
+            :node="node"
+            @itemAdd="itemAddAfter = $event, itemFinderOpened = true")
+          view-publish(
+            :node="node"
+            :style=`{maxWidth: 600+'px',}`).q-pb-xl
+        //- node mockup
+        //- div(
           v-if="node.items.length === 0"
           :style=`{
             position: 'relative',
@@ -75,7 +94,7 @@ q-layout(view="hHh Lpr lff").b-30
                 :node="node"
                 :style=`{maxWidth: '600px',}`)
         //- node with items
-        div(
+        //- div(
           v-else
           :style=`{
             background: 'rgb(35,35,35)',
@@ -172,6 +191,21 @@ export default {
         if (item.type === 'IMAGE') {
           // create compositionInput
           // this.$router.push(`/content/${item.oid}/?viewid=nodes&mode=pick`)
+          let itemInput = {
+            id: `${Date.now().toString()}-0`,
+            outputType: 'IMAGE',
+            thumbUrl: item.thumbUrl,
+            operation: { items: null, operations: null, type: 'CONCAT'},
+            meta: {cover: true, loop: true},
+            layers: [
+              {
+                id: `${Date.now().toString()}-0`,
+                contentOid: item.oid,
+                figuresAbsolute: [{t: null, points: []}, {t: null, points: []}]
+              }
+            ]
+          }
+          this.node.items.push(itemInput)
         }
         // use user, sphere, word, sentence...
         if (['USER', 'SPHERE'].includes(item.type)) {
@@ -266,10 +300,10 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    let editorItem = this.$store.state.ui.editorItem
-    this.$log('editorItem', editorItem)
-    if (editorItem) {
-      this.itemFound(JSON.parse(JSON.stringify(editorItem)))
+    let item = this.$store.state.ui.nodeEditorItem
+    this.$log('item', item)
+    if (item) {
+      this.itemFound(JSON.parse(JSON.stringify(item)))
       this.$store.commit('ui/stateSet', ['editorItem', null])
     }
   },

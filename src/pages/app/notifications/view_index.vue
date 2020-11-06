@@ -6,7 +6,7 @@ q-page(
     v-if="sphereOid"
     :immediate="true" :query="query" :limit="100" v-slot=`{items,next}`)
     div(
-      :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+      :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
       ).row.full-width.items-start.content-start
       div(
         v-for="(n,ni) in items" :key="n.id"

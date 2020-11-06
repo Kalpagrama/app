@@ -2,7 +2,7 @@
 kalpa-loader(
   :immediate="true"
   :query="nodesQuery" @items="nodesLoaded" v-slot=`{items, next}`)
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px',}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
     div(
       v-for="item in items" :key="item.oid"
       :style=`{

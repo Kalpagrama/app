@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     kalpa-loader(
       v-if="sphereOid" :query="query" :limit="15" v-slot=`{items, next}`
       @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")

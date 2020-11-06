@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
-  edit-name(:node="node").q-mb-md
+.row.full-width.items-start.content-start.q-px-sm
+  edit-name(:node="node").q-mb-xl
   ws-sphere-editor(:item="node")
   edit-category(:node="node")
   q-btn(
@@ -8,9 +8,9 @@
     color="green" size="xl" no-caps
     align="center"
     :loading="publishing"
-    ).full-width.q-my-sm
+    ).full-width.q-mt-sm
     span.text-white.text-bold Опубликовать
-  edit-description(:node="node")
+  //- edit-description(:node="node")
 </template>
 
 <script>

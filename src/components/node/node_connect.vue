@@ -13,7 +13,7 @@ div(
     //- TODO: width, height of this dialog...
     div(
       :style=`{
-        maxWidth: $store.state.ui.pageMaxWidth+'px',
+        maxWidth: $store.state.ui.pageWidth+'px',
         minHeight: $q.screen.gt.sm ? $q.screen.height/2+'px' : $q.screen.height+'px',
         borderRadius: '10px',
       }`

@@ -17,7 +17,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
         :style=`{
           position: 'relative',
           height: '50px',
-          borderRadius: $store.state.ui.borderRadius+'px',
+          borderRadius: '10px',
         }`).row.no-wrap.items-center.content-center.justify-start.b-220
         //- frames
         div(:style=`{minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).row

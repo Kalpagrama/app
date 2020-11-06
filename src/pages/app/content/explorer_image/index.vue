@@ -4,7 +4,7 @@ q-layout(view="hHh Lpr lff")
     q-page
       //- header
       .row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pt-sm
           div(
             v-if="contentKalpa"
             :style=`{
@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
               :isActive="true")
       //- body
       .row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pt-sm
           div(
             :style=`{
               position: 'relative',

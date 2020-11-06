@@ -56,7 +56,8 @@ export default {
           else {
             let item = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
             this.$log('FOUND node', item)
-            this.node = item
+            if (item) this.node = item
+            else this.$router.push('/workspace/nodes')
           }
         }
       }
@@ -66,13 +67,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-    this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
   }
 }
 </script>

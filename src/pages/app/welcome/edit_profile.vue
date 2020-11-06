@@ -41,7 +41,7 @@
             option-label="label"
             :options="langs"
             :style=`{
-              borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
+              borderRadius: '10px', overflow: 'hidden',
               minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
   //- footer

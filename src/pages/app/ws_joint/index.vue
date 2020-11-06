@@ -7,7 +7,7 @@
       div(
         :style=`{
           height: '60px',
-          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '10px',overflow: 'hidden'
         }`
         ).row.full-width.items-center.content-center.q-px-sm
@@ -21,7 +21,7 @@
       div(
         v-if="joint"
         :style=`{
-          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '10px',
         }`).row.full-width.q-px-md.q-pt-md
         //- left item
@@ -120,7 +120,7 @@
     .row.full-width.justify-center.q-mt-md
       div(
         :style=`{
-          maxWidth: $store.state.ui.pageMaxWidth+'px',
+          maxWidth: $store.state.ui.pageWidth+'px',
           background: 'rgb(35,35,35)',
           borderRadius: '10px', overflow: 'hidden',
           minHeight: '500px',
