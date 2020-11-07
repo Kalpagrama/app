@@ -41,9 +41,9 @@ export default {
   name: 'viewJoints',
   props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
   components: {
-    typeCommunity: () => import('./type_community.vue'),
     typeDrafts: () => import('./type_drafts.vue'),
-    typeMine: () => import('./type_community.vue')
+    typeMine: () => import('./type_community.vue'),
+    typeCommunity: () => import('./type_community.vue'),
   },
   data () {
     return {

@@ -35,8 +35,14 @@ div(
     //- actions player
   div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
     div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-sm
-      player-actions(v-if="player" :player="player" :style=`{maxWidth: '770px',}`)
+      player-actions(
+        v-if="player && !player.playing"
+        :player="player" :style=`{maxWidth: '770px',}`)
       player-bar(v-if="player" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
+        template(v-slot:bar)
+          slot(name="bar")
+        template(v-slot:bar-current-time="data")
+          slot(name="bar-current-time" v-bind="data")
   slot(name="footer")
 </template>
 

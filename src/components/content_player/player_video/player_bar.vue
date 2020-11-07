@@ -5,37 +5,12 @@ div(
   @mouseleave="barMouseleave"
   @mouseenter="barMouseenter"
   v-touch-pan.left.right.prevent.mouse="barPan"
+  accessKey="bar-body"
   :style=`{
     position: 'relative', height: '20px', borderRadius: '10px',
   }`).row.full-width.b-50
-  //- contentNodes, we need nodes with first item of this content!
-  //- with t, content type video
-  //- div(
-    v-if="$store.state.ui.contentNodes"
-    :style=`{
-      position: 'absolute', zIndex: 9999,
-      pointerEvents: 'none',
-    }`
-    ).row.fit
-    div(
-      v-for="(f,fi) in $store.state.ui.contentNodes" :key="fi"
-      v-if="f.items[0].layers[0].figuresAbsolute[0].t && f.items[0].layers[0].figuresAbsolute[1].t"
-      :style=`{
-        position: 'absolute', zIndex: 9999,
-        top: '0px',
-        left: f.items[0].layers[0].figuresAbsolute[0].t/player.duration*100+'%',
-        //- width: ((f.items[0].layers[0].figuresAbsolute[1].t-f.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
-        width: '2px',
-        height: 'calc(100% + 0px)',
-        //- border: '2px solid #4caf50',
-        borderRadius: '4px',
-        pointerEvents: 'none',
-        background: 'rgba(255,255,255,0.7)',
-      }`
-      ).row
-      //- TODO: add hover effect on contentNodes...
-      //- q-tooltip
-        small.text-white.text-bold {{ f.name }}
+  slot(name="bar")
+  slot(name="bar-current-time" :panning="panning")
   //- currentTime width/line
   div(
     :style=`{
@@ -45,15 +20,25 @@ div(
       borderRadius: '10px 0 0 10px',
     }`
     ).row.full-height.b-80
-    div(
+    //- div(
       :style=`{
-        position: 'absolute', zIndex: 200, right: '-2px', top: '-4px',
+        position: 'absolute', zIndex: 2200, right: '-2px', top: '-4px',
         height: 'calc(100% + 8px)',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
       }`
       ).row.bg-red
-  //- currentTimeMove line
+  //- currentTime line
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 2100, left: '0px', top: '-4px',
+      left: 'calc('+(player.currentTime/player.duration)*100+'% - 2px)',
+      width: '4px', borderRadius: '2px', overflow: 'hidden',
+      height: 'calc(100% + 8px)',
+      pointerEvents: 'none',
+    }`
+    ).row.bg-red
+  //- onMoving over line currentTime
   div(
     v-if="currentTimeMove"
     :style=`{
@@ -65,7 +50,7 @@ div(
       opacity: 0.9,
     }`
     ).row.bg-red
-  //- label currentTime moving
+  //- onMoving over rect label
   div(
     v-if="currentTimeMove"
     :style=`{
@@ -76,7 +61,7 @@ div(
       opacity: 0.9,
     }`
     ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimeMove) }}
-  //- currentTimePecent panning line
+  //- onPanning line currentTime
   div(
     v-if="panning"
     :style=`{
@@ -88,7 +73,7 @@ div(
       opacity: 0.9,
     }`
     ).row.bg-red
-  //- label panning time
+  //- onPanning rect label
   div(
     v-if="panning"
     :style=`{
@@ -96,6 +81,7 @@ div(
       left: 'calc('+currentTimePercent+'% - 2px)',
       borderRadius: '10px 10px 10px 0', overflow: 'hidden',
       pointerEvents: 'none',
+      userSelect: 'none',
       opacity: 0.9,
     }`
     ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
@@ -116,6 +102,8 @@ export default {
   methods: {
     barClick (e) {
       // this.$log('barClick', e)
+      this.$log('barClick accessKey', e.target.accessKey)
+      if (e.target.accessKey !== 'bar-body') return
       let left = e.layerX
       let width = e.target.clientWidth
       if (left > width) return
@@ -137,6 +125,8 @@ export default {
     },
     barMousemove (e) {
       // this.$log('barMousemove', e)
+      this.$log('barMousemove accessKey', e.target.accessKey)
+      if (e.target.accessKey !== 'bar-body') return
       let left = e.layerX
       let width = e.target.clientWidth
       // this.$log('left/width', left, width)
@@ -144,7 +134,7 @@ export default {
       this.currentTimeMove = t
     },
     barPan (e) {
-      // this.$log('barPan', e)
+      this.$log('barPan', e)
       if (e.isFirst) {
         this.panning = true
         // this.player.pause()

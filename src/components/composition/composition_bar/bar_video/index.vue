@@ -1,3 +1,13 @@
+<style lang="sass">
+@-webkit-keyframes rotating
+  from
+    -webkit-transform: rotate(0deg)
+  to
+    -webkit-transform: rotate(-360deg)
+.rotating
+  -webkit-animation: rotating 2s linear infinite
+</style>
+
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- bar
@@ -84,7 +94,7 @@
         :class=`{
           'rotating': compositionLooping,
         }`
-        :color="compositionLooping ? 'green' : 'white'")
+        :color="compositionLooping ? 'white' : 'white'")
     //- .col
     q-btn(
       v-if="compositionPlaying"
@@ -223,7 +233,7 @@ export default {
         // this.$log('composition TO', to)
         let _composition = JSON.parse(JSON.stringify(to))
         let fragments = [{name: '', items: [_composition]}]
-        this.$store.commit('ui/stateSet', ['contentNodes', fragments])
+        // this.$store.commit('ui/stateSet', ['contentNodes', fragments])
       }
     }
   },
@@ -315,7 +325,6 @@ export default {
     this.compositionPlay()
   },
   beforeDestroy () {
-    this.$store.commit('ui/stateSet', ['contentNodes', null])
     this.player.events.off('bar-click', this.playerBarClickHandle)
     this.player.events.off('edit-start', this.playerEditStartHandle)
     this.player.events.off('edit-end', this.playerEditEndHandle)

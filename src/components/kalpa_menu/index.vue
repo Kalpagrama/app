@@ -144,9 +144,8 @@ export default {
   data () {
     return {
       pages: [
-        // {id: 'search', name: this.$t('pageSearch_title', 'Поиск'), icon: 'search'},
-        {id: 'feeds', name: 'Новое', icon: 'explore'},
-        {id: 'trends', name: this.$t('pageCategories_title', 'Категории'), icon: 'whatshot'},
+        {id: 'feeds', name: 'Ленты', icon: 'view_week'},
+        {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},

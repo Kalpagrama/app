@@ -31,12 +31,46 @@ q-layout(
               @error="playerErrorHandle"
               :style=`{
               }`).fit
-              template(v-slot:right)
-                q-btn(
-                  v-if="!node"
-                  @click="createStart()"
-                  round color="green" dense icon="add"
-                  :style=`{borderRadius: '50%', marginBottom: '36px',}`).q-ml-sm.q-mr-sm
+              template(v-slot:bar)
+                div(
+                  v-if="player && figures.length > 0"
+                  :style=`{position: 'absolute', zIndex: 2050, pointerEvents: 'none'}`
+                  ).row.fit
+                  template(v-for="(f,fi) in figures")
+                    div(
+                      v-if="f.length === 1"
+                      :key="fi"
+                      :style=`{
+                        position: 'absolute', zIndex: 2050, top: '0px',
+                        left: f[0].t/player.duration*100+'%',
+                        width: '2px',
+                        background: 'rgba(255,255,255, 0.5)',
+                      }`
+                      ).row.full-height
+                    div(
+                      v-if="f.length === 2"
+                      :key="fi"
+                      :style=`{
+                        position: 'absolute', zIndex: 2050, top: '-2px',
+                        left: f[0].t/player.duration*100+'%',
+                        width: (f[1].t-f[0].t)/player.duration*100+'%',
+                        height: 'calc(100% + 4px)',
+                        border: '2px solid rgb(76,175,80)',
+                        borderRadius: '4px',
+                        background: 'rgba(255,255,255,0.2)',
+                        pointerEvents: 'none',
+                      }`
+                      ).row
+              template(v-slot:bar-current-time=`{panning}`)
+                transition(enter-active-class="animated fadeIn" leave-active-class="none")
+                  q-btn(
+                    v-if="player && !panning && !node && viewId !== 'node'"
+                    @click="nodeCreateStart()"
+                    round color="green" icon="add" dense
+                    :style=`{
+                      position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
+                      left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
+                    }`)
   q-page-container
     component(
       v-if="player"
@@ -53,11 +87,12 @@ q-layout(
       @bookmark="contentBookmark = $event"
       @nodeCreate="nodeCreate"
       @nodeEdit="nodeEdit"
-      @close="viewId = 'nodes', node = null")
+      @close="viewId = 'nodes', node = null"
+      @figures="figures = $event")
       template(v-slot:bottom)
         div(
           :style=`{}`).row.full-width.justify-center
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          div(:style=`{maxWidth: 700+'px'}`).row.full-width
             q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-md Назад
             .col
               q-tabs(
@@ -89,6 +124,7 @@ export default {
       playerIsVisible: false,
       contentBookmark: null,
       node: null,
+      figures: [],
     }
   },
   computed: {
@@ -122,16 +158,15 @@ export default {
     }
   },
   methods: {
-    async createStart () {
-      this.$log('createStart')
+    async nodeCreateStart () {
+      this.$log('nodeCreateStart')
       // create something link or node... or always node...
       let node = await this.nodeCreate()
       this.nodeEdit(node)
-      // this.viewId = 'node'
     },
     async nodeCreate () {
       this.$log('nodeCreate')
-      this.player.fullscreenToggle(false)
+      // this.player.fullscreenToggle(false)
       // start/end
       let start = this.player.currentTime
       let end = start + 10 > this.player.duration ? this.player.duration : start + 10
@@ -157,14 +192,17 @@ export default {
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeCreate node', node)
       return node
-      // this.node = node
-      // this.viewId = 'node'
     },
     async nodeEdit (node) {
       this.$log('nodeEdit', node)
-      this.node = null
-      await this.$wait(300)
-      this.node = node
+      if (this.node === null) {
+        this.node = node
+      }
+      else {
+        this.node = null
+        await this.$wait(300)
+        this.node = node
+      }
       this.viewId = 'node'
     },
     playerStyles () {
@@ -198,20 +236,8 @@ export default {
         this.player.setCurrentTime(startat)
       }
     },
-    handleFocusin (e) {
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
-        // this.$log('handleFocusin', e)
-        this.$store.commit('ui/stateSet', ['isTyping', true])
-      }
-    },
-    handleFocusout (e) {
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
-        // this.$log('handleFocusout', e)
-        this.$store.commit('ui/stateSet', ['isTyping', false])
-      }
-    },
     keydownHandle (e) {
-      if (this.$store.state.ui.isTyping) return
+      if (this.$store.state.ui.userTyping) return
       this.$log('keydownHandle', e)
       // left/right keys for fast navigations
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -247,7 +273,6 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.keydownHandle)
-    this.$store.commit('ui/stateSet', ['contentFigures', null])
   }
 }
 </script>

@@ -124,7 +124,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
       left: '0px', width: '100%',
     }`
     ).row.items-center.content-center.justify-center
-    div(:style=`{maxWidth: '70%'}`).row.full-width.items-center.content-center.no-wrap
+    div(:style=`{maxWidth: '300px'}`).row.full-width.items-center.content-center.no-wrap
       q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
         div(:style=`{
           position: 'absolute', zIndex: 100,

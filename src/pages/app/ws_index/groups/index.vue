@@ -57,7 +57,7 @@ export default {
           id: '1',
           name: 'g 1',
           items: [
-            {id: '7', type: 'TEXT', links: [], order: 5, item: {text: 'lorem ipsum dolor sit amet lorem ipsum'}, style: {border: '1px solid red'}, class: 'q-pa-xl'},
+            {id: '7', type: 'TEXT', links: [], order: 5, item: {text: 'lorem ipsum dolor sit amet lorem ipsum'}, style: {}, class: ''},
             {id: '8', type: 'TEXT', links: [], order: 6, item: {text: 'Hello world'}}
           ],
           links: [

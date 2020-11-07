@@ -1,90 +1,35 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
+  q-header(
+    v-if="viewId !== 'search'"
+    reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
-          q-icon(name="whatshot" color="white" size="30px").q-mx-sm
+          q-icon(name="explore" color="white" size="30px").q-mx-sm
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Новое
           .col
-          q-btn(round flat color="white" icon="search")
+          q-btn(
+            @click="viewId = 'search'"
+            round flat color="white" icon="search")
   q-page-container
-    q-page(
-      :style=`{
-        paddingTop: '50px', paddingBottom: '200px',
-      }`)
-      .row.full-width.items-start.content-start.justify-center
-        div(
-          :class=`{
-          }`
-          :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-          }`
-          ).row.full-width.items-start.content-start
-          kalpa-loader(
-            v-if="sphereOid" :query="query" :limit="20" v-slot=`{items, next, nexting}`)
-            list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-              q-infinite-scroll(@load="next" :offset="$q.screen.height")
-              template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
-              template(v-slot:append)
-                div(:style=`{height: '50px'}`).row.full-width.justify-center
-                  q-spinner-dots(v-show="nexting" color="green" size="50px")
-      q-page-sticky(
-        expand position="top" :style=`{zIndex: 1000}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md
-            q-tabs(
-              :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
-              dense no-caps active-color="green" switch-indicator
-              ).full-width.text-grey-8
-              q-tab(v-for="c in nodeCategories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias" dense)
+    component(:is="`view-${viewId}`" :oid="$route.params.oid" @close="viewId = 'trends'")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp__trends',
-  components: {},
+  name: 'pageApp_trends',
+  components: {
+    viewTrends: () => import('./view_trends.vue'),
+    viewSearch: () => import('./view_search.vue'),
+  },
   data () {
     return {
-      nodeCategories: [],
-      category: null,
+      viewId: 'trends',
     }
-  },
-  computed: {
-    sphereOid () {
-      return this.category?.sphere.oid
-    },
-    query () {
-      return {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          oidSphere: this.sphereOid,
-          sortStrategy: 'AGE',
-        },
-        populateObjects: true,
-      }
-    }
-  },
-  watch: {
-    '$route.params.oid': {
-      deep: true,
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route CHANGED', to)
-        if (this.nodeCategories.length === 0) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
-        if (to) {
-          this.category = this.nodeCategories.find(c => c.sphere.oid === to)
-        }
-        // go to the first category: ALL
-        else {
-          this.$router.replace({params: {oid: this.nodeCategories[0].sphere.oid}})
-        }
-      }
-    }
-  },
+  }
 }
 </script>

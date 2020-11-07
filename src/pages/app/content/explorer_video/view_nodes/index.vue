@@ -34,8 +34,9 @@ q-page(
     :style=`{
       maxWidth: 770+'px',
     }`
-    @nodeEdit="$event => $emit('nodeEdit', $event)"
-    @nodeCreate="$emit('nodeCreate')")
+    @nodeEdit="$emit('nodeEdit', $event)"
+    @nodeCreate="$emit('nodeCreate')"
+    @figures="$emit('figures', $event)")
 </template>
 
 <script>
@@ -57,8 +58,8 @@ export default {
     types () {
       return [
         {id: 'drafts', name: 'Черновики'},
-        {id: 'mine', name: 'Мои ядра'},
-        {id: 'community', name: 'Все ядра'}
+        {id: 'mine', name: 'Мои'},
+        {id: 'community', name: 'Все'}
       ]
     },
     maxWidth () {

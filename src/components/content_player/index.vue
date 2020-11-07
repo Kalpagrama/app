@@ -10,12 +10,10 @@ component(
   :isVisible="isVisible"
   :options="options"
   @player="$emit('player', $event)")
-  template(v-slot:left-bottom)
-    slot(name="left-bottom")
-  template(v-slot:right)
-    slot(name="right")
-  template(v-slot:footer)
-    slot(name="footer")
+  template(v-for="(index, name) in $slots" v-slot:[name])
+    slot(:name="name")
+  template(v-for="(index, name) in $scopedSlots" v-slot:[name]="data")
+    slot(:name="name" v-bind="data")
 </template>
 
 <script>

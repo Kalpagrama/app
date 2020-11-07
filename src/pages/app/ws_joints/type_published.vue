@@ -11,7 +11,7 @@
           :to="'/joint/'+joint.oid"
           :style=`{
             position: 'relative',
-            background: 'rgb(35,35,35)',
+            //- background: 'rgb(35,35,35)',
             borderRadius: '10px',
           }`
           ).row.full-width.q-mb-md.cursor-pointer
@@ -41,7 +41,7 @@
                 span.text-white {{ item.name }}
           div(
             :style=`{order: 1}`
-            ).row.full-width.q-pa-md
+            ).row.full-width.q-px-md
             div(v-if="joint.jointType === 'ESSENCE'").row.full-width
               q-icon(name="link" flat dense color="grey-6" size="20px").q-ml-lg
               span.text-white.text-bold.q-ml-sm {{ joint.name }}

@@ -17,7 +17,8 @@ div(
       fontWeight: 'bold',
       textAlign: 'center',
       lineHeight: '1.1',
-      caretColor: 'rgb(76,175,80)'
+      caretColor: 'rgb(76,175,80)',
+      paddingTop: '10px',
     }`
     @focus="onFocus"
     @blur="onBlur"

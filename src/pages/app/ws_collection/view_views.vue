@@ -1,3 +1,9 @@
+<style lang="sass">
+.view-item
+  &:hover
+    background: rgb(45,45,45)
+</style>
+
 <template lang="pug">
 q-page(
   :style=`{
@@ -34,8 +40,8 @@ q-page(
         background: 'rgb(35,35,35)',
         borderRadius: '10px',
       }`
-      ).row.full-width.items-center.content-center.q-pa-sm.q-mb-xs
-      span.text-white.text-bold {{ view }}
+      ).row.full-width.items-center.content-center.q-pa-sm.q-mb-xs.cursor-pointer.view-item
+      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ view.name }}
 </template>
 
 <script>

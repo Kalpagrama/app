@@ -16,18 +16,18 @@ q-layout(
           .row.fit.items-center.content-center
             q-input(
               v-model="view.name"
-              placeholder="Enter feed name"
+              placeholder="Enter collection view name"
               borderless dark color="green"
               :autofocus="collection.name.length === 0"
               :input-style=`{
                 fontSize: '18px',
                 fontWeight: 'bold',
               }`
-              :label="`${collection.name} collection view`"
+              :label="`\"${collection.name}\" collection view`"
               :style=`{}`).full-width
-        q-btn(round flat color="white" icon="view_week" @click="$router.push('/feeds/'+collection.id)")
+        //- q-btn(round flat color="white" icon="view_week" @click="$router.push('/feeds/'+collection.id)")
     //- views
-    //- .row.full-width.justify-center
+    .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
         q-tabs(
           v-model="viewId"
@@ -37,9 +37,9 @@ q-layout(
             v-for="(view, ii) in views" :key="view.id"
             :name="view.id" :label="view.name")
   q-page-container
-    //- component(
-      v-if="collection"
-      :is="`view-${viewId}`" :collection="collection")
+    component(
+      v-if="collection && view"
+      :is="`view-${viewId}`" :collection="collection" :view="view")
 </template>
 
 <script>
@@ -47,10 +47,22 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsCollectionView',
+  components: {
+    viewBook: () => import('./view_book.vue'),
+  },
   data () {
     return {
       collection: null,
       view: null,
+      viewId: 'book',
+    }
+  },
+  computed: {
+    views () {
+      return [
+        {id: 'book', name: 'Book'},
+        {id: 'graph', name: 'Graph'},
+      ]
     }
   },
   watch: {

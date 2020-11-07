@@ -13,7 +13,7 @@
     router-link(:to="{name: 'trends'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
-          round flat dense icon="whatshot"
+          round flat dense icon="explore"
           :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
           small.text-grey-6 Новое

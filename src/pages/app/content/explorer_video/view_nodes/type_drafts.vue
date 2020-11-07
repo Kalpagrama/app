@@ -1,9 +1,10 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   kalpa-loader(
+    @items="nodesLoaded"
     :query="query"
     :immediate="true"
-    :limit="1000" @items="itemsLoaded" v-slot=`{items, next}`)
+    :limit="1000" v-slot=`{items, next}`)
     .row.full-width.items-start.content-start
       node-item(
         v-for="(node,ii) in items" :key="node.id"
@@ -33,7 +34,7 @@ import { NodeApi } from 'src/api/node'
 import nodeItem from './type_drafts_item.vue'
 
 export default {
-  name: 'typeDrafts',
+  name: 'viewNodes_typeDrafts',
   props: ['player', 'contentKalpa', 'contentBookmark', 'nodeEditingId'],
   components: {nodeItem},
   data () {
@@ -54,8 +55,19 @@ export default {
     },
   },
   methods: {
-    itemsLoaded (items) {
-      this.$log('itemsLoaded', items)
+    nodesLoaded (nodes) {
+      this.$log('nodesLoaded', nodes.length)
+      // get figures
+      let figures = nodes.reduce((acc, node) => {
+        node.items.map(i => {
+          if (i.layers[0].contentOid === this.contentKalpa.oid) {
+            let figureInput = i.layers[0].figuresAbsolute[0]
+            acc.push([figureInput])
+          }
+        })
+        return acc
+      }, [])
+      this.$emit('figures', figures)
     }
   }
 }

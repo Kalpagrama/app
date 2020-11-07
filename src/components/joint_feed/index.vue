@@ -55,7 +55,7 @@
     //- items left/right
     div(
       @click.self="jointClick()"
-      :style=`{padding: '11px'}`).row.full-width.items-end.content-end
+      :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
       div(
         v-for="(item,ii) in [joint.leftItem, joint.rightItem]" :key="ii"
         ).col-6
@@ -77,6 +77,9 @@
                 height: '24px',
               }`).row.full-width.items-center.content-center.q-px-sm
               span.text-white.text-bold {{ getItemTypeName(ii, joint.jointType) }}
+      q-btn(
+        round flat color="green" icon="link"
+        :style=`{position: 'absolute', zIndex: 10000, bottom: '20px', left: 'calc(50% - 20px)',}`)
     //- name
     div(
       v-if="joint.name.length > 0"

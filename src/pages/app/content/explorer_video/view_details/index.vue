@@ -129,7 +129,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.$store.commit('ui/stateSet', ['contentNodes', null])
+    this.$emit('figures', [])
   }
 }
 </script>

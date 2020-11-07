@@ -8,7 +8,7 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="view_week" color="white" size="30px").q-mx-sm
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Ленты
           .col
-          q-btn(round flat color="white" icon="launch" @click="feedLaunch()")
+          q-btn(round flat color="white" icon="launch" @click="feedCollection()")
   q-page-container
     q-page(
       :style=`{
@@ -27,7 +27,7 @@ q-layout(view="hHh Lpr lff")
               :value="$route.params.id" @input="$router.push({params: {id: $event}}).catch(e => e)"
               dense no-caps active-color="green" switch-indicator
               ).full-width.text-grey-8
-              q-tab(name="all" label="Все закладки")
+              q-tab(name="all" label="Все")
               q-tab(v-for="(feed,ii) in feeds" :key="feed.id" :name="feed.id" :label="feed.name" dense)
 </template>
 
@@ -79,9 +79,9 @@ export default {
     }
   },
   methods: {
-    feedLaunch () {
+    feedCollection () {
       this.$log('feedLaunch')
-      this.$router.push('/workspace/feed/' + this.$route.params.id)
+      this.$router.push('/workspace/collection/' + this.$route.params.id)
     }
   }
 }

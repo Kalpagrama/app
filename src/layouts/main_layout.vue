@@ -19,13 +19,6 @@
   40%, 60%
     transform: translate3d(2px, 0, 0)
     color: #4caf50 !important
-@-webkit-keyframes rotating
-  from
-    -webkit-transform: rotate(0deg)
-  to
-    -webkit-transform: rotate(-360deg)
-.rotating
-  -webkit-animation: rotating 2s linear infinite
 </style>
 
 <template lang="pug">

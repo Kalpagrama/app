@@ -7,7 +7,6 @@
 
 <template lang="pug">
 div(
-  @click="onClick"
   :style=`{
     minHeight: '50px',
   }`
@@ -34,7 +33,7 @@ div(
 <script>
 export default {
   name: 'viewNodes_typeComminityItem',
-  inject: ['pick'],
+  // inject: ['pick'],
   props: ['contentKalpa', 'player', 'node', 'isSelected'],
   data () {
     return {
@@ -49,13 +48,6 @@ export default {
     }
   },
   methods: {
-    onClick () {
-      this.$log('onClick')
-      this.$emit('toggleSelect')
-      let t = this.item.layers[0].figuresAbsolute[0].t
-      this.player.setCurrentTime(t)
-      this.player.play()
-    }
   }
 }
 </script>
