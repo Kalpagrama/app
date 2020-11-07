@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 10 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {

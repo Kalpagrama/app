@@ -49,7 +49,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
          } else value = valueOrFunc
          reactiveDoc.updatePayloadByPath(path, value)
       } finally {
-         wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов itemSubscribe
+         wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов reactiveDocSubscribe
             reactiveDocFactory.setDebouncedSave(true)
             reactiveDocFactory.setSynchro(true)
          })
@@ -73,8 +73,8 @@ class ReactiveDocFactory {
       if (rxDoc.reactiveItemHolderMaster) {
          this.getReactiveDoc = rxDoc.reactiveItemHolderMaster.getReactiveDoc
          this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
-         this.itemSubscribe = rxDoc.reactiveItemHolderMaster.itemSubscribe
-         this.itemUnsubscribe = rxDoc.reactiveItemHolderMaster.itemUnsubscribe
+         this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
+         this.reactiveDocUnsubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocUnsubscribe
          this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe
          this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
          this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
@@ -143,12 +143,12 @@ class ReactiveDocFactory {
                      throw new Error('bad itemType: ' + this.itemType)
                }
                // ws: subscriber.name
-               let propPathParent = payloadPath.split('.').slice(0, -1).join('.')
-               let changedPropName = payloadPath.split('.').slice(-1).join('.')
+               let propPathParent = fullPath.split('.').slice(0, -1).join('.')
+               let changedPropName = fullPath.split('.').slice(-1).join('.')
                let valueParent = propPathParent ? lodashGet(reactiveDoc, propPathParent) : reactiveDoc // родитель измененного свойства
                if (valueParent) {
                   ReactiveDocFactory.mergeReactive(valueParent, { [changedPropName]: value })
-               } else logE(`cant find prop ${payloadPath} in object`, reactiveDoc)
+               } else logE(`cant find prop ${fullPath} in object`, reactiveDoc)
             }
 
             if (typeof payload === 'object') {
@@ -190,7 +190,7 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc(rxDoc.toJSON())
          this.rxDocSubscribe()
-         this.itemSubscribe()
+         this.reactiveDocSubscribe()
          rxDoc.reactiveItemHolderMaster = this
       }
    }
@@ -217,15 +217,15 @@ class ReactiveDocFactory {
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
             // logD(f, 'reactiveDoc changed start', changePlainDoc)
-            await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см itemSubscribe)
+            await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см reactiveDocSubscribe)
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
-            if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.itemSubscribe())
-            this.itemUnsubscribe()
+            if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveDocSubscribe())
+            this.reactiveDocUnsubscribe()
             ReactiveDocFactory.mergeReactive(this.getReactiveDoc(), changePlainDoc)
             this.setRev(changePlainDoc._rev)
             // logD(f, 'reactiveDoc changed stop')
          } finally {
-            this.itemSubscribe()
+            this.reactiveDocSubscribe()
             this.mutex.release()
          }
       })
@@ -238,8 +238,8 @@ class ReactiveDocFactory {
       delete this.rxDocSubscription
    }
 
-   itemSubscribe () {
-      const f = this.itemSubscribe
+   reactiveDocSubscribe () {
+      const f = this.reactiveDocSubscribe
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
@@ -250,14 +250,11 @@ class ReactiveDocFactory {
                const f = this.itemSaveFunc
                if (this.rxDoc.deleted) return // из-за дебаунса такое возможно
                try {
-                  await this.mutex.lock('itemSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
+                  await this.mutex.lock('reactiveDocSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
                   // logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
                      let newData = JSON.parse(JSON.stringify(this.getReactiveDoc())) // убираем реактивную хрень
-                     if (newData.cached && newData.wsRevision){
-                        logD('!!!!!!!!!!!!!!!!!', newData)
-                     }
                      newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
                      if (synchro && this.itemType === 'wsItem') newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                      return newData
@@ -281,8 +278,8 @@ class ReactiveDocFactory {
       }, { deep: true, immediate: false })
    }
 
-   itemUnsubscribe () {
-      const f = this.itemUnsubscribe
+   reactiveDocUnsubscribe () {
+      const f = this.reactiveDocUnsubscribe
       if (this.itemUnsubscribeFunc) this.itemUnsubscribeFunc()
       delete this.itemUnsubscribeFunc
    }
@@ -405,7 +402,7 @@ class ReactiveListWithPaginationFactory {
       } else if (this.rxDoc) {
          this.rxSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
             try {
-               await this.mutex.lock('List::rxDocSubscribe') // обязательно сначала блокируем !!! (см itemSubscribe)
+               await this.mutex.lock('List::rxDocSubscribe') // обязательно сначала блокируем !!! (см querySubscribe)
                this.listUnsubscribe()
                logD(f, 'List::rxDoc changed. try to change reactiveListFull')
                assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
