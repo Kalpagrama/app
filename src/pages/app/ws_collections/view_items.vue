@@ -105,22 +105,16 @@ export default {
       this.$log('contentKalpaFound', contentKalpa)
       // try to find bookmark with this content
       let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
-      if (bookmark) {
-        // resurrect from the dead
-        if (bookmark.deletedAt > 0) {
-          this.$delete(bookmark, 'deletedAt')
-          this.$log('bookmark resurrected')
-        }
-      }
+      if (bookmark) await bookmark.restoreFromTrash()
       else {
         let bookmarkInput = {
           oid: contentKalpa.oid,
           type: contentKalpa.type,
           name: contentKalpa.name,
           thumbUrl: contentKalpa.thumbUrl,
-          wsItemType: 'WS_BOOKMARK',
-          spheres: [],
-          feeds: [],
+          // wsItemType: 'WS_BOOKMARK',
+          // spheres: [],
+          // feeds: [],
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }

@@ -55,7 +55,8 @@ export default {
         this.$log('publish done')
         this.publishing = false
         this.$router.replace(`/node/${createdNode.oid}?creating=true`).catch(e => e)
-        this.$rxdb.remove(this.node.id)
+        await this.node.remove()
+        // this.$rxdb.remove(this.node.id)
       }
       catch (e) {
         this.$log('publish error', e)

@@ -336,7 +336,8 @@ export default {
         this.$log('publish done')
         this.publishing = false
         this.$router.replace('/joint/' + joint.oid).catch(e => e)
-        this.$rxdb.remove(this.joint.id)
+        // this.$rxdb.remove(this.joint.id)
+        await this.joint.remove()
       }
       catch (e) {
         this.$log('publish error', e)
