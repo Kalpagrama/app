@@ -68,8 +68,8 @@ q-page(
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
       ).row.full-width.items-start.content-start
-      small.text-white {{collection}}
-        //- feed-item(
+      //- small.text-white {{collection}}
+      feed-item(
           v-for="(item, ii) in items" :key="item.id"
           @select="itemLaunch(item)"
           @delete="itemDelete(item)"
@@ -108,7 +108,7 @@ export default {
   },
   components: {
     // feedSearch: () => import('./feed_search.vue'),
-    // feedItem: () => import('./feed_item.vue'),
+    feedItem: () => import('./feed_item.vue'),
     itemFinder: () => import('./item_finder.vue'),
     viewViews: () => import('./view_views.vue')
   },
