@@ -218,7 +218,7 @@ class ReactiveDocFactory {
          try {
             // logD(f, 'reactiveDoc changed start', changePlainDoc)
             await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см itemSubscribe)
-            assert(this.getReactiveDoc()._rev && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
+            assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.itemSubscribe())
             this.itemUnsubscribe()
             ReactiveDocFactory.mergeReactive(this.getReactiveDoc(), changePlainDoc)
