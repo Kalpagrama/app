@@ -116,7 +116,9 @@ class Workspace {
                         name: plainData.name
                      }
                   }, true)
-                  if (found.length) throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+                  if (found.filter(item => item.id !== plainData.id).length) {
+                     throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+                  }
                }
             }
             const initWsItem = (plainData) => {
@@ -367,10 +369,10 @@ class Workspace {
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start')
       const t1 = performance.now()
       try {
          await this.lock('rxdb::ws::processEvent')
+         logD(f, 'start')
          let { type, wsItem: itemServer, wsRevision } = event
          assert(this.created, '!this.created')
          assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
@@ -381,7 +383,8 @@ class Workspace {
          await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
             logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
-            // здесь нельзя явно вызывать synchronizeWsWhole !!! в следующем цикле будет проведена синхронизация (см this.synchroLoop)
+            // здесь нельзя явно вызывать synchronizeWsWhole
+            this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
             return
          }
          // ищем изменившейся item

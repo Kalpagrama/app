@@ -7,49 +7,46 @@ import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import mergeWith from 'lodash/mergeWith'
-import * as lodashSet from 'lodash/set'
-import * as lodashHas from 'lodash/has'
+import * as lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex'
-import { WsItemTypeEnum } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
-function getReactive (rxDoc) {
-   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-   return reactiveItemHolder.getReactiveItem()
+function getReactiveDoc (rxDoc) {
+   let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
+   return reactiveDocFactory.getReactiveDoc()
 }
 
-function mergeReactiveItem (reactiveItem, change) {
-   if (reactiveItem && typeof reactiveItem === 'object') {
-      assert(typeof change === 'object', 'typeof change !== object')
-      return mergeWith(reactiveItem, change, (objValue, srcValue, key, object, source, stack) => {
-         if (Array.isArray(objValue) && Array.isArray(srcValue)) {
-            objValue.splice(0, objValue.length, ...srcValue)
-            return objValue
-         } else if (typeof objValue === 'object' && typeof srcValue === 'object') {
-            for (let key in objValue) {
-               if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
-            }
-            return undefined // default behavior
-         } else {
-            return undefined // default behavior
+function applyChangesToReactiveDoc (reactiveDoc, changedDoc) {
+   assert(reactiveDoc && typeof reactiveDoc === 'object', '!reactiveDoc && typeof reactiveDoc === object')
+   assert(typeof changedDoc === 'object', 'typeof changedDoc !== object')
+   mergeWith(reactiveDoc, changedDoc, (objValue, srcValue, key, object, source, stack) => {
+      if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+         objValue.splice(0, objValue.length, ...srcValue)
+         return objValue
+      } else if (typeof objValue === 'object' && typeof srcValue === 'object') {
+         for (let key in objValue) {
+            if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
          }
-      })
-   } else return change
+         return undefined // default behavior
+      } else {
+         return undefined // default behavior
+      }
+   })
 }
 
 // все изменения rxDoc - только через эту ф-ю!!! Иначе - возможны гонки (из-за debounce)
-// либо - менять непосредственно reactiveItem(reactiveItem.prop = ...) (либо через reactiveItem.updateExtended)
+// либо - менять непосредственно reactiveDoc.payload(payload.prop = ...) (либо через reactiveItem.updateExtended)
 // synchro - синхронить эти изменения на сервер
-async function updateRxDoc (rxDocOrId, path, valueOrFunc, debouncedSave = true, synchro = true) {
-   const f = updateRxDoc
+async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave = true, synchro = true) {
+   const f = updateRxDocPayload
    logD(f, 'start')
    const t1 = performance.now()
    // logD(f, 'start2', rxDocOrId, path, valueOrFunc)
-   assert(rxDocOrId && path, '!(rxDocOrId && path)')
+   assert(rxDocOrId, '!(rxDocOrId)')
    if (!rxDocOrId) return
    let rxDoc
    if (isRxDocument(rxDocOrId)) {
@@ -59,35 +56,21 @@ async function updateRxDoc (rxDocOrId, path, valueOrFunc, debouncedSave = true, 
       rxDoc = await rxdb.cache.get(rxDocOrId) // берем только те что есть в кэше ( с сервера не запрашиваем)
    }
    if (rxDoc) {
-      let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-      let reactiveItem = reactiveItemHolder.getReactiveItem()
-      assert(reactiveItem || reactiveItem === '', '!reactiveItem')
+      let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
+      let reactiveDoc = reactiveDocFactory.getReactiveDoc()
       try {
-         reactiveItemHolder.setDebouncedSave(debouncedSave)
-         reactiveItemHolder.setSynchro(synchro)
+         reactiveDocFactory.setDebouncedSave(debouncedSave)
+         reactiveDocFactory.setSynchro(synchro)
          let value
          if (typeof valueOrFunc === 'function') {
-            value = valueOrFunc(JSON.parse(JSON.stringify(reactiveItem)))
-            assert(value)
+            value = valueOrFunc(JSON.parse(JSON.stringify(reactiveDoc.getPayload() || null)))
+            assert(value, '!value')
          } else value = valueOrFunc
-         if (reactiveItem && typeof reactiveItem === 'object') {
-            if (!lodashHas(reactiveItem, path)) { // если проперти не было, то реактивности тоже нет (работаем через Vue.set)
-               let rootPath = path.split('.')[0]
-               let tmpObj = {}
-               lodashSet(tmpObj, path, value)
-               Vue.set(reactiveItem, rootPath, tmpObj[rootPath]) // меняем целиком объект
-            } else {
-               lodashSet(reactiveItem, path, value)
-            }
-         } else {
-            assert(!path, '!!path')
-            reactiveItemHolder.setReactiveItem(value)
-         }
-         // logD(f, 'complete', reactiveItemHolder.reactiveItem)
+         reactiveDoc.updatePayloadByPath(path, value)
       } finally {
          wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов itemSubscribe
-            reactiveItemHolder.setDebouncedSave(true)
-            reactiveItemHolder.setSynchro(true)
+            reactiveDocFactory.setDebouncedSave(true)
+            reactiveDocFactory.setSynchro(true)
          })
       }
    }
@@ -97,31 +80,18 @@ async function updateRxDoc (rxDocOrId, path, valueOrFunc, debouncedSave = true, 
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 // класс-обертка над rxDoc для реактивности
-class ReactiveItemHolder {
+class ReactiveDocFactory {
    constructor (rxDoc) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
-      logD('ReactiveItemHolder::constructor', rxDoc.id)
+      logD('ReactiveDocFactory::constructor', rxDoc.id)
       if (rxDoc.wsItemType) this.itemType = 'wsItem'
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      this.getDataForReactiveItem = (plainData) => {
-         switch (this.itemType) {
-            case 'wsItem':
-               return plainData // wsSchemaItem
-            case 'object':
-               return plainData.cached.data // cacheSchema
-            case 'meta':
-               return plainData.valueString // schemaKeyValue
-            default:
-               throw new Error('bad itemType: ' + this.itemType)
-         }
-      }
-
       if (rxDoc.reactiveItemHolderMaster) {
-         this.getReactiveItem = rxDoc.reactiveItemHolderMaster.getReactiveItem
-         this.setReactiveItem = rxDoc.reactiveItemHolderMaster.setReactiveItem
+         this.getReactiveDoc = rxDoc.reactiveItemHolderMaster.getReactiveDoc
+         this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
          this.itemSubscribe = rxDoc.reactiveItemHolderMaster.itemSubscribe
          this.itemUnsubscribe = rxDoc.reactiveItemHolderMaster.itemUnsubscribe
          this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe
@@ -134,7 +104,7 @@ class ReactiveItemHolder {
          this.setRev = rxDoc.reactiveItemHolderMaster.setRev
       } else {
          this.rxDoc = rxDoc
-         this.mutex = new MutexLocal('ReactiveItemHolder::constructor')
+         this.mutex = new MutexLocal('ReactiveDocFactory::constructor')
          this.vm = new Vue({
             data: {
                reactiveData: {},
@@ -143,27 +113,57 @@ class ReactiveItemHolder {
          })
          this.debouncedSave = true
          this.synchro = true
-         this.getReactiveItem = () => {
-            return this.vm.reactiveData.reactiveItem
+         this.getReactiveDoc = () => {
+            assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
+            return this.vm.reactiveData.doc
          }
-         this.setReactiveItem = (reactiveItem) => {
-            if (reactiveItem && typeof reactiveItem === 'object') {
-               reactiveItem.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
-                  await updateRxDoc(this.rxDoc, path, value, debouncedSave, synchro)
-               }
-               if (reactiveItem.wsItemType) {
-                  reactiveItem.remove = async (permanent = false) => {
-                     if (reactiveItem.beforeRemove) await reactiveItem.beforeRemove(permanent)
-                     if (permanent) await this.rxDoc.remove()
-                     else await updateRxDoc(this.rxDoc, 'deletedAt', Date.now(), false)
-                  }
-                  reactiveItem.restoreFromTrash = async () => {
-                     await updateRxDoc(this.rxDoc, 'deletedAt', 0, false)
-                  }
-                  rxdb.workspace.populateReactiveWsItem(reactiveItem)
+         this.setReactiveDoc = (plainData) => {
+            assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
+            Vue.set(this.vm.reactiveData, 'doc', plainData)
+            const reactiveDoc = this.vm.reactiveData.doc
+            reactiveDoc.getPayload = () => {
+               switch (this.itemType) {
+                  case 'wsItem':
+                     return reactiveDoc // wsSchemaItem
+                  case 'object':
+                     return reactiveDoc.cached.data // cacheSchema
+                  case 'meta':
+                     return reactiveDoc.valueString // schemaKeyValue
+                  default:
+                     throw new Error('bad itemType: ' + this.itemType)
                }
             }
-            Vue.set(this.vm.reactiveData, 'reactiveItem', reactiveItem)
+            const payload = reactiveDoc.getPayload()
+            reactiveDoc.updatePayloadByPath = (payloadPath, value) => {
+               if (this.itemType.in('wsItem', 'object')) {
+                  assert(payloadPath, '!payloadPath')
+                  let propPathParent = payloadPath.split('.').slice(0, -1).join('.')
+                  let changedPropName = payloadPath.split('.').slice(-1).join('.')
+                  let valueParent = propPathParent === '' ? payload : lodashGet(payload, payloadPath.split('.').slice(0, -1).join('.')) // родитель измененного свойства
+                  if (valueParent) {
+                     Vue.set(valueParent, changedPropName, value)
+                  } else logE(`cant find prop ${payloadPath} in object`, payload)
+               } else if (this.itemType.in('meta')) {
+                  assert(payloadPath === '', '!payloadPath === emptyStr')
+                  Vue.set(reactiveDoc, 'valueString', value)
+               } else throw new Error('bad itemType: ' + this.itemType)
+            }
+            if (typeof payload === 'object') {
+               payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
+                  await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
+               }
+               if (payload.wsItemType) {
+                  payload.remove = async (permanent = false) => {
+                     if (payload.beforeRemove) await payload.beforeRemove(permanent)
+                     if (permanent) await this.rxDoc.remove()
+                     else await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false)
+                  }
+                  payload.restoreFromTrash = async () => {
+                     await updateRxDocPayload(this.rxDoc, 'deletedAt', 0, false)
+                  }
+                  rxdb.workspace.populateReactiveWsItem(payload)
+               }
+            }
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -184,7 +184,7 @@ class ReactiveItemHolder {
             assert(rev, '!_rev')
             this.vm.rev = rev
          }
-         this.setReactiveItem(this.getDataForReactiveItem(rxDoc.toJSON()))
+         this.setReactiveDoc(rxDoc.toJSON())
          this.rxDocSubscribe()
          this.itemSubscribe()
          rxDoc.reactiveItemHolderMaster = this
@@ -196,16 +196,16 @@ class ReactiveItemHolder {
       // logD(f, `rxDoc subscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
       if (this.rxDocSubscription) return
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-      this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
+      this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
             await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см itemSubscribe)
-            assert(this.getRev() && change._rev, '!this.getRev() && change._rev')
-            if (this.getRev() === change._rev) return // изменения уже применены к reactiveItem (см this.itemSubscribe())
+            assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
+            if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.itemSubscribe())
             this.itemUnsubscribe()
-            // logD(f, `rxDoc changed. try to change reactiveItem (${this.id}). ${change.id}`)
-            this.setReactiveItem(mergeReactiveItem(this.getReactiveItem(), this.getDataForReactiveItem(change)))
-            this.setRev(change._rev)
-            // logD(f, `reactiveItem changed`)
+            // this.setReactiveDoc(applyChangesToReactiveDoc(this.getReactiveDoc(), changePlainDoc))
+            applyChangesToReactiveDoc(this.getReactiveDoc(), changePlainDoc)
+            this.setRev(changePlainDoc._rev)
+            // logD(f, `reactiveDoc changed`)
          } finally {
             this.itemSubscribe()
             this.mutex.release()
@@ -237,22 +237,10 @@ class ReactiveItemHolder {
                   // logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
                      let newData = oldData
-                     let item = JSON.parse(JSON.stringify(this.getReactiveItem())) // убираем реактивную хрень
-                     switch (this.itemType) {
-                        case 'wsItem':
-                           newData = item // wsSchemaItem
-                           newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
-                           if (synchro) newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
-                           break
-                        case 'object':
-                           newData.cached.data = item // cacheSchema
-                           break
-                        case 'meta':
-                           newData.valueString = item // schemaKeyValue
-                           break
-                        default:
-                           throw new Error('bad itemType: ' + this.itemType)
-                     }
+                     let item = JSON.parse(JSON.stringify(this.getReactiveDoc())) // убираем реактивную хрень
+                     newData = item
+                     newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
+                     if (synchro && this.itemType === 'wsItem') newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                      return newData
                   })
                   this.setRev(updatedRxDoc._rev)
@@ -299,7 +287,7 @@ class ReactiveItemHolder {
 //             assert(Array.isArray(docs), 'Array.isArray(docs)')
 //             this.vm = new Vue({
 //                data: {
-//                   reactiveList: docs.map(rxDoc => getReactive(rxDoc))
+//                   reactiveList: docs.map(rxDoc => getReactiveDoc(rxDoc))
 //                }
 //             })
 //             this.reactiveList = this.vm.reactiveList
@@ -340,8 +328,8 @@ class ReactiveItemHolder {
 //             }
 //             // logD(f, 'rxQuery changed 2', results)
 //             let items = results.map(rxDoc => {
-//                let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-//                return reactiveItemHolder.reactiveItem
+//                let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
+//                return reactiveDocFactory.reactiveItem
 //             })
 //             this.vm.reactiveList.splice(0, this.vm.reactiveList.length, ...items)
 //          } finally {
@@ -398,7 +386,7 @@ class ReactiveItemHolder {
 //    }
 // }
 
-class ReactiveListHolderWithPagination {
+class ReactiveListWithPaginationFactory {
    async create (rxQueryOrRxDoc, populateFunc) {
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
       try {
@@ -428,7 +416,7 @@ class ReactiveListHolderWithPagination {
                assert(this.rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
                let rxDocs = await this.rxQuery.exec()
                assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-               listItems = rxDocs.map(rxDoc => getReactive(rxDoc))
+               listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
             } else if (this.rxDoc) { // лента полученная с сервера {items, count, totalCount}
                listItems = this.rxDoc.toJSON().cached.data.items
             } else throw new Error('bad collection' + this.rxQuery.collection.name)
@@ -503,7 +491,7 @@ class ReactiveListHolderWithPagination {
                   if (!arrayChanged) return // если список не изменился - просто выходим
                }
                // logD(f, 'rxQuery changed 2', results)
-               let listItems = results.map(rxDoc => getReactive(rxDoc))
+               let listItems = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
                this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...listItems)
                this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...this.vm.reactiveListFull.slice(0, this.nextIndex))
                this.vm.reactiveListPagination.next(3) // если nextIndex === 0, то никто не узнает что можно вызывать next()
@@ -551,4 +539,4 @@ class ReactiveListHolderWithPagination {
    }
 }
 
-export { ReactiveItemHolder, ReactiveListHolderWithPagination, getReactive, updateRxDoc }
+export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactiveDoc, updateRxDocPayload }

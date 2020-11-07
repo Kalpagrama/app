@@ -1,7 +1,7 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
-import { updateRxDoc } from 'src/system/rxdb/reactive'
+import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
@@ -273,7 +273,7 @@ class Objects {
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
             break
          }
          case 'OBJECT_CREATED':
@@ -287,12 +287,12 @@ class Objects {
             }
             break
          case 'VOTED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, false)
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, false)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, false)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, false)
             break
          }
          case 'OBJECT_DELETED': {
-            await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'deletedAt', new Date(), false)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'deletedAt', new Date(), false)
             assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.object.type === 'JOINT') { // удален джойнт. обновляем статистику джойнтов на ядре
