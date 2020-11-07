@@ -10,7 +10,7 @@ import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
-import { getReactive, ReactiveListHolderWithPagination } from 'src/system/rxdb/reactive'
+import { getReactiveDoc, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
@@ -40,7 +40,7 @@ const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 
 if (defaultCacheSize < 10 * 1024 * 1024) logW('TODO увеличить rxDbMemCache до 10 МБ после тестирования')
 
 // кээширование объектов перед rxDb (rxDb  очень медленная)
-class ReactiveItemDbMemCache {
+class ReactiveDocDbMemCache {
    constructor () {
       this.cacheLru = new LruCache({
          max: defaultCacheSize,
@@ -101,7 +101,7 @@ class RxDBWrapper {
       this.created = false
       this.mutex = new MutexLocal('rxdb')
       this.store = null // vuex
-      this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
+      this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
@@ -143,7 +143,7 @@ class RxDBWrapper {
    onRxDocDelete (id) {
       assert(id)
       assert(this.store)
-      this.reactiveItemDbMemCache.del(id)
+      this.reactiveDocDbMemCache.del(id)
    }
 
    // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
@@ -189,7 +189,7 @@ class RxDBWrapper {
          logD('after createRxDatabase')
          await this.purgeDb() // очистит бд от старых данных
 
-         this.reactiveItemDbMemCache.reset()
+         this.reactiveDocDbMemCache.reset()
          this.workspace = new Workspace(this.db)
          this.cache = new Cache(this.db)
          this.objects = new Objects(this.cache)
@@ -307,7 +307,7 @@ class RxDBWrapper {
          if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
          delete this.getCurrentUser
-         this.reactiveItemDbMemCache.reset()
+         this.reactiveDocDbMemCache.reset()
          if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -423,7 +423,7 @@ class RxDBWrapper {
    //          id: result.items[result.items.length - 1].id
    //       } : null
    //
-   //       const result = await (new ReactiveListHolderWithPagination()).create(rxQuery)
+   //       const result = await (new ReactiveListWithPaginationFactory()).create(rxQuery)
    //
    //    } else if (rxCollectionEnum in LstCollectionEnum) {
    //       let objectShortList = await this.findInternal(mangoQuery)
@@ -478,12 +478,12 @@ class RxDBWrapper {
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
-         await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveItemDbMemCache)
+         await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
          assert(this.initialized, '! this.initialized !')
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
          let findResult
-         let cachedReactiveList = this.reactiveItemDbMemCache.get(queryId)
+         let cachedReactiveList = this.reactiveDocDbMemCache.get(queryId)
          // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
@@ -493,7 +493,7 @@ class RxDBWrapper {
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
-               findResult = await (new ReactiveListHolderWithPagination()).create(rxQuery)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery)
                assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
                let populateObjects = mangoQuery.populateObjects
@@ -530,15 +530,16 @@ class RxDBWrapper {
                   assert(populatedItems && Array.isArray(populatedItems))
                   return populatedItems.filter(obj => !!obj)
                }
-               findResult = await (new ReactiveListHolderWithPagination()).create(rxDoc, populateObjects ? populateFunc : null)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc, populateObjects ? populateFunc : null)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
             assert(findResult, '!findResult' + JSON.stringify(findResult))
-            this.reactiveItemDbMemCache.set(queryId, findResult)
+            this.reactiveDocDbMemCache.set(queryId, findResult)
          }
          if (autoNext) await findResult.next()
          // this.store.commit('debug/addFindResult', { queryId, findResult })
+         this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult, '!result')
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
@@ -589,16 +590,16 @@ class RxDBWrapper {
       }
       assert(id, 'bad id: ' + id)
       rxCollectionEnum = getRxCollectionEnumFromId(id) // иногда вызывается без rxCollectionEnum (когда известен только id)
-      let reactiveItem
+      let reactiveDoc
       if (!force) { // вернем из быстрого кэша реактивных элементов
-         let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
+         let cachedReactiveItem = this.reactiveDocDbMemCache.get(id)
          if (cachedReactiveItem) {
             if ([RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY].includes(rxCollectionEnum)) {
-               if (this.cache.isActual(id)) reactiveItem = cachedReactiveItem // элемент из RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY может устареть (тогда надо запросить заново)
-            } else reactiveItem = cachedReactiveItem // остальные элементы не устаревают
+               if (this.cache.isActual(id)) reactiveDoc = cachedReactiveItem // элемент из RxCollectionEnum.OBJ, RxCollectionEnum.GQL_QUERY может устареть (тогда надо запросить заново)
+            } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveItem) {
+      if (!reactiveDoc) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -609,15 +610,11 @@ class RxDBWrapper {
             params
          })
          if (!rxDoc) return null
-         reactiveItem = getReactive(rxDoc)
-         this.reactiveItemDbMemCache.set(id, reactiveItem)
+         reactiveDoc = getReactiveDoc(rxDoc)
+         this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
-      // this.store.commit('debug/addReactiveItem', { id, reactiveItem })
-      // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      if (rxCollectionEnum === RxCollectionEnum.META){
-         if (reactiveItem) return reactiveItem.valueString
-         else return null
-      } else return reactiveItem
+      this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
+      return reactiveDoc.getPayload()
    }
 
    // actualAge - актуально только для кэша
@@ -643,7 +640,7 @@ class RxDBWrapper {
       }
       if (!rxDoc) return null
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return getReactive(rxDoc)
+      return getReactiveDoc(rxDoc).getPayload()
    }
 
    async remove (id) {
@@ -685,6 +682,6 @@ export {
    RxCollectionEnum,
    getRxCollectionEnumFromId,
    getRawIdFromId,
-   getReactive,
+   getReactiveDoc,
    makeId
 }

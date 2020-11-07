@@ -4,7 +4,7 @@ import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { router } from 'src/boot/system'
 import { EventApi } from 'src/api/event'
-import { getReactive, rxdb } from 'src/system/rxdb'
+import { getReactiveDoc, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
 import { mutexGlobal } from 'src/system/rxdb/mutex'
@@ -46,7 +46,7 @@ class Event {
          })
          logD(f, 'found LST_FEED: ', rxDocsFeed)
          for (let rxDoc of rxDocsFeed) {
-            let reactiveItem = getReactive(rxDoc)
+            let reactiveItem = getReactiveDoc(rxDoc).getPayload()
             assert(reactiveItem.items, '!reactiveItem.items')
             // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
             reactiveItem.items.splice(0, 0, event)

@@ -7,7 +7,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
 import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
-import { updateRxDoc } from 'src/system/rxdb/reactive'
+import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
@@ -332,16 +332,16 @@ class NodeApi {
          })
          switch (key) {
             case StatKeyEnum.REMADE:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
                break
             case StatKeyEnum.SHARED:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
                break
             case StatKeyEnum.VIEWED_TIME:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
                break
             case StatKeyEnum.BOOKMARKED:
-               await updateRxDoc(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
                break
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

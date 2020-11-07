@@ -116,7 +116,9 @@ class Workspace {
                         name: plainData.name
                      }
                   }, true)
-                  if (found.length) throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+                  if (found.filter(item => item.id !== plainData.id).length) {
+                     throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+                  }
                }
             }
             const initWsItem = (plainData) => {
@@ -381,7 +383,8 @@ class Workspace {
          await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
             logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
-            // здесь нельзя явно вызывать synchronizeWsWhole !!! в следующем цикле будет проведена синхронизация (см this.synchroLoop)
+            // здесь нельзя явно вызывать synchronizeWsWhole
+            this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
             return
          }
          // ищем изменившейся item
@@ -406,11 +409,8 @@ class Workspace {
             await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
          }
          // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-         logD('set wsRevision to', wsRevision.toString())
          await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
-         let xxx = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
-         logD('new val =', xxx)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, 'wsRevisionLocal=', parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')))
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
          // logD(f, 'unlocked')

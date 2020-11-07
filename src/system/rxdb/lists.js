@@ -2,7 +2,7 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
-import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
+import { getReactiveDoc, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
@@ -103,7 +103,7 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          let reactiveItem = getReactive(rxDoc)
+          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           logD(f, 'add subscriber to list')
           reactiveItem.items.push(event.subject)
@@ -111,7 +111,7 @@ class Lists {
           reactiveItem.totalCount++
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          let reactiveItem = getReactive(rxDoc)
+          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           logD(f, 'add subscription to list')
           reactiveItem.items.push(event.object)
@@ -137,7 +137,7 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          let reactiveItem = getReactive(rxDoc)
+          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
           if (indx >= 0) {
@@ -148,7 +148,7 @@ class Lists {
           }
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          let reactiveItem = getReactive(rxDoc)
+          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
           if (indx >= 0) {
@@ -184,7 +184,7 @@ class Lists {
         }
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
-          let reactiveItem = getReactive(rxDoc)
+          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')
           let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
@@ -219,7 +219,7 @@ class Lists {
           })
           logD(f, 'find voted nodes complete', rxDocs)
           for (let rxDoc of rxDocs) {
-            let reactiveItem = getReactive(rxDoc)
+            let reactiveItem = getReactiveDoc(rxDoc).getPayload()
             assert(reactiveItem.items, '!reactiveItem.items')
             assert(event.object, '!event.object')
             let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
