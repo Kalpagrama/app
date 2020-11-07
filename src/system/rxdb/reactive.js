@@ -10,6 +10,7 @@ import mergeWith from 'lodash/mergeWith'
 import * as lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -18,24 +19,6 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE
 function getReactiveDoc (rxDoc) {
    let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
    return reactiveDocFactory.getReactiveDoc()
-}
-
-function applyChangesToReactiveDoc (reactiveDoc, changedDoc) {
-   assert(reactiveDoc && typeof reactiveDoc === 'object', '!reactiveDoc && typeof reactiveDoc === object')
-   assert(typeof changedDoc === 'object', 'typeof changedDoc !== object')
-   mergeWith(reactiveDoc, changedDoc, (objValue, srcValue, key, object, source, stack) => {
-      if (Array.isArray(objValue) && Array.isArray(srcValue)) {
-         objValue.splice(0, objValue.length, ...srcValue)
-         return objValue
-      } else if (typeof objValue === 'object' && typeof srcValue === 'object') {
-         for (let key in objValue) {
-            if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
-         }
-         return undefined // default behavior
-      } else {
-         return undefined // default behavior
-      }
-   })
 }
 
 // все изменения rxDoc - только через эту ф-ю!!! Иначе - возможны гонки (из-за debounce)
@@ -84,7 +67,7 @@ class ReactiveDocFactory {
    constructor (rxDoc) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
-      logD('ReactiveDocFactory::constructor', rxDoc.id)
+      // logD('ReactiveDocFactory::constructor', rxDoc.id)
       if (rxDoc.wsItemType) this.itemType = 'wsItem'
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
@@ -119,8 +102,7 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc = (plainData) => {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
-            Vue.set(this.vm.reactiveData, 'doc', plainData)
-            const reactiveDoc = this.vm.reactiveData.doc
+            const reactiveDoc = plainData
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
                   case 'wsItem':
@@ -164,6 +146,53 @@ class ReactiveDocFactory {
                   rxdb.workspace.populateReactiveWsItem(payload)
                }
             }
+            Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+            // assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
+            // Vue.set(this.vm.reactiveData, 'doc', plainData)
+            // const reactiveDoc = this.vm.reactiveData.doc
+            // reactiveDoc.getPayload = () => {
+            //    switch (this.itemType) {
+            //       case 'wsItem':
+            //          return reactiveDoc // wsSchemaItem
+            //       case 'object':
+            //          return reactiveDoc.cached.data // cacheSchema
+            //       case 'meta':
+            //          return reactiveDoc.valueString // schemaKeyValue
+            //       default:
+            //          throw new Error('bad itemType: ' + this.itemType)
+            //    }
+            // }
+            // const payload = reactiveDoc.getPayload()
+            // reactiveDoc.updatePayloadByPath = (payloadPath, value) => {
+            //    if (this.itemType.in('wsItem', 'object')) {
+            //       assert(payloadPath, '!payloadPath')
+            //       let propPathParent = payloadPath.split('.').slice(0, -1).join('.')
+            //       let changedPropName = payloadPath.split('.').slice(-1).join('.')
+            //       let valueParent = propPathParent === '' ? payload : lodashGet(payload, payloadPath.split('.').slice(0, -1).join('.')) // родитель измененного свойства
+            //       if (valueParent) {
+            //          Vue.set(valueParent, changedPropName, value)
+            //       } else logE(`cant find prop ${payloadPath} in object`, payload)
+            //    } else if (this.itemType.in('meta')) {
+            //       assert(payloadPath === '', '!payloadPath === emptyStr')
+            //       Vue.set(reactiveDoc, 'valueString', value)
+            //    } else throw new Error('bad itemType: ' + this.itemType)
+            // }
+            // if (typeof payload === 'object') {
+            //    payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
+            //       await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
+            //    }
+            //    if (payload.wsItemType) {
+            //       payload.remove = async (permanent = false) => {
+            //          if (payload.beforeRemove) await payload.beforeRemove(permanent)
+            //          if (permanent) await this.rxDoc.remove()
+            //          else await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false)
+            //       }
+            //       payload.restoreFromTrash = async () => {
+            //          await updateRxDocPayload(this.rxDoc, 'deletedAt', 0, false)
+            //       }
+            //       rxdb.workspace.populateReactiveWsItem(payload)
+            //    }
+            // }
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -195,6 +224,25 @@ class ReactiveDocFactory {
       const f = this.rxDocSubscribe
       // logD(f, `rxDoc subscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
       if (this.rxDocSubscription) return
+      // const applyChangesToReactiveDoc = (reactiveDoc, changedDoc) => {
+      //    assert(reactiveDoc && typeof reactiveDoc === 'object', '!reactiveDoc && typeof reactiveDoc === object')
+      //    assert(typeof changedDoc === 'object', 'typeof changedDoc !== object')
+      //    let payload = reactiveDoc.getPayload()
+      //
+      //    mergeWith(reactiveDoc, changedDoc, (objValue, srcValue, key, object, source, stack) => {
+      //       if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+      //          objValue.splice(0, objValue.length, ...srcValue)
+      //          return objValue
+      //       } else if (typeof objValue === 'object' && typeof srcValue === 'object') {
+      //          for (let key in objValue) {
+      //             if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
+      //          }
+      //          return undefined // default behavior
+      //       } else {
+      //          return undefined // default behavior
+      //       }
+      //    })
+      // }
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
@@ -203,9 +251,10 @@ class ReactiveDocFactory {
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.itemSubscribe())
             this.itemUnsubscribe()
             // this.setReactiveDoc(applyChangesToReactiveDoc(this.getReactiveDoc(), changePlainDoc))
-            applyChangesToReactiveDoc(this.getReactiveDoc(), changePlainDoc)
+            // applyChangesToReactiveDoc(this.getReactiveDoc(), changePlainDoc)
+            this.setReactiveDoc(cloneDeep(changePlainDoc)) // changePlainDoc нельзя менять (setReactiveDoc добавит геттеры и сеттеры)
             this.setRev(changePlainDoc._rev)
-            // logD(f, `reactiveDoc changed`)
+            // logD(f, 'reactiveDoc changed')
          } finally {
             this.itemSubscribe()
             this.mutex.release()
