@@ -97,7 +97,7 @@ class Event {
             await this.objects.processEvent(event)
             break
          case 'OBJECT_CREATED':
-            event.card = makeEventCard(event)
+            event.card = EventApi.makeEventCard(event)
             if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
                logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
                await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true }) // обновит ядро в rxdb (изначально у нас был фейковый вариант)
@@ -113,7 +113,7 @@ class Event {
             await this.lists.processEvent(event) // удалить объект из всех лент
             break
          case 'VOTED':
-            event.card = makeEventCard(event)
+            event.card = EventApi.makeEventCard(event)
             if (event.subject.oid === rxdb.getCurrentUser().oid) {
                this.notifyUserActionComplete(event.type, event.object)
             }
@@ -122,7 +122,7 @@ class Event {
             break
          case 'USER_SUBSCRIBED':
          case 'USER_UNSUBSCRIBED':
-            event.card = makeEventCard(event)
+            event.card = EventApi.makeEventCard(event)
             this.notifyUserActionComplete(event.type, event.object)
             await this.lists.processEvent(event)
             break
