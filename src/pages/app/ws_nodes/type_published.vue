@@ -51,7 +51,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'wsNodes_typePublished',
@@ -103,7 +103,7 @@ export default {
           color: 'red',
           cb: async (node) => {
             if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-            await ObjectsApi.unPublish(node.oid)
+            await ObjectApi.unPublish(node.oid)
             // await this.nodeEdit(node)
           }
         }
@@ -114,7 +114,7 @@ export default {
     async nodeUnpublish (node) {
       this.$log('nodeUnpublish', node)
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-      await ObjectsApi.unPublish(node.oid)
+      await ObjectApi.unPublish(node.oid)
       await this.nodeEdit(node)
       this.$log('nodeUnPublish complete')
     },

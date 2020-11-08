@@ -39,7 +39,7 @@ div(
 </template>
 
 <script>
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 
 import editCategories from './edit_categories'
 import editProfile from './edit_profile'
@@ -58,7 +58,7 @@ export default {
       this.$log('welcomeDone')
       this.$q.loading.show({spinnerColor: 'green', message: 'Aligning sattelites...'})
       let currentUser = this.$store.getters.currentUser()
-      await ObjectsApi.update(currentUser.oid, 'profile.tutorial', false)
+      await ObjectApi.update(currentUser.oid, 'profile.tutorial', false)
       currentUser.profile.tutorial = false // currentUser реактивен
       // done
       await this.$wait(1000)

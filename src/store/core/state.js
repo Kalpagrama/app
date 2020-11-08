@@ -18,7 +18,7 @@ export default {
       LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
-      LogSystemModulesEnum.GQL,
+      LogSystemModulesEnum.API,
       LogSystemModulesEnum.ROUTER,
       LogSystemModulesEnum.VUEX,
       LogSystemModulesEnum.VUEX_CACHE,

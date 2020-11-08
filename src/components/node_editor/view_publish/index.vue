@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
+import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -50,7 +50,7 @@ export default {
         )
         nodeInput.spheres = spheres
         // create node
-        let createdNode = await NodeApi.nodeCreate(nodeInput)
+        let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         this.$log('publish done')
         this.publishing = false

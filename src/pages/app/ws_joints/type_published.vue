@@ -91,7 +91,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'wsJoints_typePublished',
@@ -119,7 +119,7 @@ export default {
     async jointDelete (joint) {
       if (!confirm(this.$t('confirm_Really delete?', 'Удалить?'))) return
       this.$log('jointDelete', joint)
-      await ObjectsApi.unPublish(joint.oid)
+      await ObjectApi.unPublish(joint.oid)
       // await joint.remove()
     },
     jointEdit (joint) {

@@ -132,7 +132,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'pageApp_wsJoint',
@@ -331,7 +331,7 @@ export default {
         }
         // another types...
         this.$log('*** JOINT TYPE *** ', jointInput.jointType)
-        let joint = await NodeApi.jointCreate(jointInput)
+        let joint = await ObjectCreateApi.jointCreate(jointInput)
         this.$log('joint done joint', joint)
         this.$log('publish done')
         this.publishing = false

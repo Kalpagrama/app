@@ -24,7 +24,7 @@ q-layout(view="lHh lpR lFf").b-30
 </template>
 
 <script>
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 
 import imageCropper from 'components/image_cropper/index.vue'
 
@@ -40,7 +40,7 @@ export default {
           this.$log('save blob', blob)
           let file = new File([blob], 'user_avatar_' + Date.now().toString())
           this.$log('save file', file)
-          await ObjectsApi.update(this.oid, 'profile.photo', file)
+          await ObjectApi.update(this.oid, 'profile.photo', file)
           this.$emit('close')
         })
     }

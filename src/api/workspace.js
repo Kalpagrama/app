@@ -4,9 +4,9 @@ import { systemReset } from 'src/system/services'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { apiCall } from 'src/api/index'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class WorkspaceApi {
    // очистить мастерскую на сервере

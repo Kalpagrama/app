@@ -5,9 +5,9 @@ import { fragments } from 'src/api/fragments'
 import { rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class EventApi {
    static makeEventCard (event) {

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
+import { ObjectApi } from 'src/api/object'
 
 import nodeShare from 'components/node/node_share.vue'
 import nodeRemake from 'components/node/node_remake.vue'
@@ -81,7 +81,7 @@ export default {
         else {
           let statValue = Date.now() - this.isActiveStart
           this.$log('statValue', statValue)
-          let stat = await NodeApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
+          let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
           this.$log('shareStart stat', stat)
           this.isActiveStart = 0
         }

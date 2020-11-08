@@ -125,7 +125,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
-import { NodeApi } from 'src/api/node'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'kalpaConnect',
@@ -197,7 +197,7 @@ export default {
           }
         }
         this.$log('jointInput', jointInput)
-        let joint = await NodeApi.jointCreate(jointInput)
+        let joint = await ObjectCreateApi.jointCreate(jointInput)
         this.$log('connect done')
         this.loading = false
         this.$emit('close')

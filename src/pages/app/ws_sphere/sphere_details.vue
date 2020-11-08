@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { ObjectsApi } from 'src/api/objects'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -33,7 +32,6 @@ export default {
       let newName = prompt('New sphere name', this.sphere.name)
       if (newName && newName.length > 0 && newName !== this.sphere.name) {
         this.sphere.name = newName
-        // let sphere = await ObjectsApi.getSphere(newName)
         let [sphere] = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
