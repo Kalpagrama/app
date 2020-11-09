@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 10 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
@@ -162,7 +162,8 @@ class Workspace {
             }, false)
             this.db.ws_items.postRemove(async (plainData) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
+               // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+               if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
                rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
             }, false)
          }
@@ -291,77 +292,129 @@ class Workspace {
          await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', valueString: (new Date()).toISOString() })
       }
       // отправить изменения на сервер
-      const saveToServer = async (wsOperationEnum, item, wsRevision, wsVersion) => {
-         assert(item && item.id, '!item')
-         assert(wsRevision, '!wsRevision')
-         assert(this.created, '!this.created')
-         assert(!('hasChanges' in item), '!!(hasChanges in item)')
-         const f = saveToServer
-         logD(f, `start ${item.id} rev:${item.rev}`)
-         const t1 = performance.now()
-         assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
-         if (wsOperationEnum === WsOperationEnum.UPSERT) {
-            await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
-         } else {
-            if (item.rev) { // если нет rev - то элемент еще не создавался на сервере
-               await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
-            }
-         }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      }
+      // const saveToServer = async (wsOperationEnum, item, wsRevision, wsVersion) => {
+      //    assert(item && item.id, '!item')
+      //    assert(wsRevision, '!wsRevision')
+      //    assert(this.created, '!this.created')
+      //    assert(!('hasChanges' in item), '!!(hasChanges in item)')
+      //    const f = saveToServer
+      //    logD(f, `start ${item.id} rev:${item.rev}`)
+      //    const t1 = performance.now()
+      //    assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
+      //    if (wsOperationEnum === WsOperationEnum.UPSERT) {
+      //       await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
+      //    } else {
+      //       if (item.rev) { // если нет rev - то элемент еще не создавался на сервере
+      //          await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
+      //       }
+      //    }
+      //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      // }
 
       const clearTrash = async () => {
          await this.db.ws_items.find({
-            selector: {deletedAt: { $gt: 0 }},
+            selector: { deletedAt: { $gt: 0 } },
             sort: [{ deletedAt: 'desc' }] // в начале списка те, что удалены недавно)
          }).skip(1000).remove() // оставляем максимум 1000 последних
-         await this.db.ws_items.find({ selector: {deletedAt: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 30 }} }).remove() // удаляем, те что старше месяца
+         await this.db.ws_items.find({
+            selector: {
+               $and: [
+                  { deletedAt: { $gt: 0 } },
+                  { deletedAt: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 30 } }
+               ]
+            }
+         }).remove() // удаляем, те что старше месяца
       }
-      // await clearTrash()
+      await clearTrash()
 
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()
-      let unsavedItems = await this.db.ws_changes.find().exec()
-      let wsRevision = this.reactiveUser.wsRevision
-      for (let rxDocUnsavedItem of unsavedItems) {
-         let { id, operation, rev } = rxDocUnsavedItem
-         let plainDoc
+      let unsavedItems = (await this.db.ws_changes.find().exec()).map(rxDoc => rxDoc.toJSON()) // убираем реактивность
+      let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
+      let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
+      let operations = []
+      // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
+      await this.db.ws_changes.find().remove() // удаляем информацию из очереди на отправку
+      for (let unsavedItem of unsavedItems) {
+         let { id, operation, rev } = unsavedItem
+         let wsItemInput
          if (operation === WsOperationEnum.DELETE) {
-            plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
+            wsItemInput = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
          } else {
             let rxDoc = await this.db.ws_items.findOne(id).exec()
             if (!rxDoc) { // в мастерской нет такого элемента!
                await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
                continue
             }
-            plainDoc = rxDoc.toJSON()
-            delete plainDoc.hasChanges // это системное поле (не надо отправлять на сервер)
+            wsItemInput = rxDoc.toJSON()
+            delete wsItemInput.hasChanges // это системное поле (не надо отправлять на сервер)
          }
-         try {
-            // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
-            await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
-            await saveToServer(operation, plainDoc, wsRevision++, this.reactiveUser.wsVersion)
-            this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
-         } catch (err) {
-            if (err.networkError) { // если ошибка не сетевая - увеличить интервал
-               logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
-               this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-               await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
-            } else {
-               try {
-                  logE(f, 'критическая ошибка при отправке! пробуем слиться с сервером', err)
-                  await synchronizeWsWhole(true)
-                  this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
-               } catch (err) {
-                  logE(f, 'неудачная синхронизация  с сервером', err)
-                  if (err.networkError) {
-                     this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-                     await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
-                  }
+         operations.push({ operation, wsItemInput })
+      }
+      try {
+         if (operations.length){
+            await WorkspaceApi.wsBatchOperation(operations, wsRevisionLocal, wsVersionLocal)
+         }
+         this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
+      } catch (err) {
+         if (err.networkError) { // если ошибка не сетевая - увеличить интервал
+            logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
+            this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+            await this.db.ws_changes.bulkInsert(unsavedItems)// вставляем обратно
+         } else {
+            try {
+               logE(f, 'критическая ошибка при отправке! пробуем слиться с сервером', err)
+               await synchronizeWsWhole(true)
+               this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
+            } catch (err) {
+               logE(f, 'неудачная синхронизация  с сервером', err)
+               if (err.networkError) {
+                  this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+                  await this.db.ws_changes.bulkInsert(unsavedItems)// вставляем обратно
                }
             }
          }
       }
+
+      // for (let rxDocUnsavedItem of unsavedItems) {
+      //    let { id, operation, rev } = rxDocUnsavedItem
+      //    let plainDoc
+      //    if (operation === WsOperationEnum.DELETE) {
+      //       plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
+      //    } else {
+      //       let rxDoc = await this.db.ws_items.findOne(id).exec()
+      //       if (!rxDoc) { // в мастерской нет такого элемента!
+      //          await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
+      //          continue
+      //       }
+      //       plainDoc = rxDoc.toJSON()
+      //       delete plainDoc.hasChanges // это системное поле (не надо отправлять на сервер)
+      //    }
+      //    try {
+      //       // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
+      //       await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
+      //       await saveToServer(operation, plainDoc, wsRevision++, this.reactiveUser.wsVersion)
+      //       this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
+      //    } catch (err) {
+      //       if (err.networkError) { // если ошибка не сетевая - увеличить интервал
+      //          logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
+      //          this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+      //          await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
+      //       } else {
+      //          try {
+      //             logE(f, 'критическая ошибка при отправке! пробуем слиться с сервером', err)
+      //             await synchronizeWsWhole(true)
+      //             this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
+      //          } catch (err) {
+      //             logE(f, 'неудачная синхронизация  с сервером', err)
+      //             if (err.networkError) {
+      //                this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+      //                await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
+      //             }
+      //          }
+      //       }
+      //    }
+      // }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
@@ -369,18 +422,18 @@ class Workspace {
    async processEvent (event) {
       const f = this.processEvent
       const t1 = performance.now()
+      logD(f, 'start')
+      let { type, wsItem: itemServer, wsRevision } = event
+      assert(this.created, '!this.created')
+      assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
+      assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
+      assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
       try {
          await this.lock('rxdb::ws::processEvent')
-         logD(f, 'start')
-         let { type, wsItem: itemServer, wsRevision } = event
-         assert(this.created, '!this.created')
-         assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
-         assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
-         assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
          itemServer.hasChanges = false
          let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
          await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
-         if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
+         if (wsRevisionLocal !== wsRevision && wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
             logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
             // здесь нельзя явно вызывать synchronizeWsWhole
             this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
@@ -415,6 +468,56 @@ class Workspace {
          // logD(f, 'unlocked')
       }
    }
+
+   // async processEvent_old (event) {
+   //    const f = this.processEvent
+   //    const t1 = performance.now()
+   //    try {
+   //       await this.lock('rxdb::ws::processEvent')
+   //       logD(f, 'start')
+   //       let { type, wsItem: itemServer, wsRevision } = event
+   //       assert(this.created, '!this.created')
+   //       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
+   //       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
+   //       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
+   //       itemServer.hasChanges = false
+   //       let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
+   //       await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
+   //       if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
+   //          logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
+   //          // здесь нельзя явно вызывать synchronizeWsWhole
+   //          this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
+   //          return
+   //       }
+   //       // ищем изменившейся item
+   //       assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
+   //       let reactiveItem = await rxdb.get(null, null, { id: itemServer.id })
+   //       // применим изменения
+   //       if (!reactiveItem || type === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
+   //          logD(f, 'Берем изменения с сервера', type)
+   //          if (reactiveItem && type === 'WS_ITEM_DELETED') {
+   //             // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
+   //             await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
+   //             await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
+   //          } else {
+   //             // logD(f, 'try update ws item')
+   //             assert(!itemServer.hasChanges, 'itemServer.hasChanges')
+   //             await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
+   //          }
+   //          await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
+   //       } else {
+   //          logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
+   //          // просто возьмем ревизию с сервера (нальзя полностью менять данные тк у нас могут быть данные свежее, чем на сервере)
+   //          await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
+   //       }
+   //       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
+   //       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
+   //       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   //    } finally {
+   //       this.release()
+   //       // logD(f, 'unlocked')
+   //    }
+   // }
 
    async find (mangoQuery) {
       const f = this.find
@@ -567,7 +670,7 @@ class Workspace {
          reactiveBookmark.beforeRemove = async (permanent = false) => {
             // удалить себя(букмарк) из всех коллекций
             assert(reactiveBookmark.collections, '!removedItem.collections')
-            if (permanent){
+            if (permanent) {
                let collections = await rxdb.find({ selector: { id: { $in: reactiveBookmark.collections } } })
                for (let c of collections) {
                   c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)
