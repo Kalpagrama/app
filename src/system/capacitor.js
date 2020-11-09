@@ -18,7 +18,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
-let isStatusBarLight = true
 async function initCapacitor (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
    // alert(JSON.stringify(Platform.is))
@@ -81,17 +80,13 @@ async function initCapacitor (store) {
    await capacitorOrientationLock('portrait')
    // Events (iOS only)
    window.addEventListener('statusTap', function () {
-      alert('statusbar tapped')
-      StatusBar.setStyle({
-         style: isStatusBarLight ? StatusBarStyle.Dark : StatusBarStyle.Light,
-         overlays: true
-      })
-      isStatusBarLight = !isStatusBarLight
-      // Display content under transparent status bar (Android only)
-      StatusBar.setOverlaysWebView({
-         overlay: false
-      });
+      // alert('statusbar tapped')
    })
+   await StatusBar.setStyle({
+      style: StatusBarStyle.Dark,
+      overlays: true
+   })
+   // await StatusBar.hide()
 }
 
 async function initCapacitorPushPlugin (store) {

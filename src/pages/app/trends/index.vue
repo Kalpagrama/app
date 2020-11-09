@@ -2,7 +2,7 @@
 q-layout(view="hHh Lpr lff")
   q-header(
     v-if="viewId !== 'search'"
-    reveal
+    reveal @reveal="headerRevealed = $event"
     :style=`{
       paddingTop: 'env(safe-area-inset-top)',
     }`).b-30
@@ -17,7 +17,7 @@ q-layout(view="hHh Lpr lff")
             @click="viewId = 'search'"
             round flat color="white" icon="search")
   q-page-container
-    component(:is="`view-${viewId}`" :oid="$route.params.oid" @close="viewId = 'trends'")
+    component(:is="`view-${viewId}`" :oid="$route.params.oid" @close="viewId = 'trends'" :headerRevealed="headerRevealed")
 </template>
 
 <script>
@@ -32,6 +32,7 @@ export default {
   data () {
     return {
       viewId: 'trends',
+      headerRevealed: false
     }
   }
 }
