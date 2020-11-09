@@ -6,6 +6,7 @@ import assert from 'assert'
 import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
+import throttle from 'lodash/throttle'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -17,6 +18,52 @@ const StatKeyEnum = Object.freeze({
    SHARED: 'SHARED',
    REMADE: 'REMADE'
 })
+
+let statAccumulator = []
+
+const updateStatThrottled = throttle(async () => {
+   const f = updateStatThrottled
+   f.nameExtra = 'updateStatThrottled'
+   const t1 = performance.now()
+   logD(f, 'start updateStatThrottled')
+   try {
+      if (!statAccumulator.length) return
+      const cb = async () => {
+         let { data: { updateStat2 } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                mutation updateStat2 ($stats: [StatDataInput2!]!) {
+                    updateStat2 (stats: $stats)
+                }
+            `,
+            variables: {
+               stats: statAccumulator
+            }
+         })
+         for (let {oid, key, valueInt} of statAccumulator){
+            switch (key) {
+               case StatKeyEnum.REMADE:
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
+                  break
+               case StatKeyEnum.SHARED:
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
+                  break
+               case StatKeyEnum.VIEWED_TIME:
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
+                  break
+               case StatKeyEnum.BOOKMARKED:
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
+                  break
+            }
+         }
+         return updateStat2
+      }
+      return await apiCall(f, cb)
+   }
+   finally {
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec ${statAccumulator.length}`)
+      statAccumulator = []
+   }
+}, 1000 * 30, {leading: false}) // шлем не чаще чем раз в 30 сек
 
 class ObjectApi {
    static fileToDataUrl (file) {
@@ -222,46 +269,13 @@ class ObjectApi {
       return await apiCall(f, cb)
    }
 
-   static async updateStat (oid, key, value) {
-      const f = ObjectApi.updateStat
-      logD(f, 'start')
-      const t1 = performance.now()
-      const cb = async () => {
-         assert(oid, '!oid')
-         assert(key in StatKeyEnum, '!key in StatKeyEnum')
-
-         let { data: { updateStat } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
-                    updateStat (oid: $oid, statData: $statData)
-                }
-            `,
-            variables: {
-               oid: oid,
-               statData: {
-                  key,
-                  valueInt: value
-               }
-            }
-         })
-         switch (key) {
-            case StatKeyEnum.REMADE:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
-               break
-            case StatKeyEnum.SHARED:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
-               break
-            case StatKeyEnum.VIEWED_TIME:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
-               break
-            case StatKeyEnum.BOOKMARKED:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
-               break
-         }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return updateStat
-      }
-      return await apiCall(f, cb)
+   static async updateStat (oid, key, valueInt) {
+      assert(oid, '!oid')
+      assert(key in StatKeyEnum, '!key in StatKeyEnum')
+      assert(typeof valueInt === 'number')
+      statAccumulator.push({oid, key, valueInt})
+      updateStatThrottled()
+      return true
    }
 }
 

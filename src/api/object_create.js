@@ -5,9 +5,7 @@ import { fragments } from 'src/api/fragments'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
-import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
-import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
