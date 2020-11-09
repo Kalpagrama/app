@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- q-header(reveal)
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{position: 'relative', height: '150px',}`).row.full-width
@@ -58,7 +58,7 @@ q-layout(view="hHh Lpr lff")
                   :style=`{height: '50px',}`).full-width
                   span.text-bold {{ a.name }}
   q-page-container
-    //- q-page-sticky(
+    q-page-sticky(
       expand position="top"
       :style=`{zIndex: 2000}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md.b-30

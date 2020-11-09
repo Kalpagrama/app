@@ -126,7 +126,7 @@ module.exports = function (ctx) {
         }
         if (ctx.dev) {
           cfg.plugins.push(
-            new BundleAnalyzerPlugin({analyzerPort: ctx.mode.pwa ? 8888 : 9999})
+            new BundleAnalyzerPlugin({analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999})
           )
         }
         // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
