@@ -93,9 +93,9 @@ class EventApi {
          const observerEvent = apollo.clients.ws.subscribe({
             client: 'wsApollo',
             query: gql`
-                ${fragments.eventFragment}
+                ${fragments.eventFragmentWithBatch}
                 subscription event {
-                    event {...eventFragment}
+                    event {...eventFragmentWithBatch}
                 }
             `
          })

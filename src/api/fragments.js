@@ -1,23 +1,23 @@
 import gql from 'graphql-tag'
 
 const objectShortFragment = gql`
-  fragment objectShortFragment on ObjectShort {
-    type
-    oid
-    name
-    thumbUrl(preferWidth: 600)
-    createdAt
-  }
+    fragment objectShortFragment on ObjectShort {
+        type
+        oid
+        name
+        thumbUrl(preferWidth: 600)
+        createdAt
+    }
 `
 
 const objectShortStatFragment = gql`  ${objectShortFragment}
-  fragment objectShortStatFragment on ObjectShortStat {
+fragment objectShortStatFragment on ObjectShortStat {
     ...objectShortFragment
     rate
     weight
     date
-    
-  }
+
+}
 `
 
 const objectFragment = gql`${objectShortFragment}
@@ -37,70 +37,70 @@ const objectFragment = gql`${objectShortFragment}
 `
 
 const userFragment = gql`
-  ${objectShortFragment} ${objectFragment}
-  fragment userFragment on User {
-    ...objectFragment
-    username
-    weightVal
-    settings
-    wsRevision
-    wsVersion
-    subscriptions{...objectShortFragment}
-    profile{
-      tutorial
-      about
-      status
-      photoUrl
-      coverUrl
-      city
-      country
-      dateBirth
-      gender
-      lang
-      nameFirst
-      nameFull
-      nameSecond
-      role
-      email
-      phone
-      password
+    ${objectShortFragment} ${objectFragment}
+    fragment userFragment on User {
+        ...objectFragment
+        username
+        weightVal
+        settings
+        wsRevision
+        wsVersion
+        subscriptions{...objectShortFragment}
+        profile{
+            tutorial
+            about
+            status
+            photoUrl
+            coverUrl
+            city
+            country
+            dateBirth
+            gender
+            lang
+            nameFirst
+            nameFull
+            nameSecond
+            role
+            email
+            phone
+            password
+        }
+        sessions{
+            token
+            ip
+            userAgent
+        }
     }
-    sessions{
-      token
-      ip
-      userAgent
-    }
-  }
 `
 const dummyUserFragment = gql`
-  ${objectShortFragment}
-  fragment dummyUserFragment on DummyUser {
-    type
-    thumbUrl(preferWidth: 600)
-    name
-    username
-    settings
-    subscriptions{...objectShortFragment}
-    profile{
-      tutorial
-      about
-      status
-      photoUrl
-      coverUrl
-      city
-      country
-      dateBirth
-      gender
-      lang
-      nameFirst
-      nameFull
-      nameSecond
-      role
-      email
-      phone
-      password
+    ${objectShortFragment}
+    fragment dummyUserFragment on DummyUser {
+        type
+        thumbUrl(preferWidth: 600)
+        name
+        username
+        settings
+        subscriptions{...objectShortFragment}
+        profile{
+            tutorial
+            about
+            status
+            photoUrl
+            coverUrl
+            city
+            country
+            dateBirth
+            gender
+            lang
+            nameFirst
+            nameFull
+            nameSecond
+            role
+            email
+            phone
+            password
+        }
     }
-  }
 `
 const sphereFragment = gql`${objectFragment}
   fragment sphereFragment on Object {
@@ -238,146 +238,158 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 const jointFragment = gql` ${objectFragment} ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
 fragment jointFragment on Joint {
-  ...objectFragment
-  jointType
-  swap
-  author {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 50)
-  }
-  leftItem {
-    ...on Video {...videoFragment}
-    ...on Image {...imageFragment}
-    ...on Node {... nodeFragment}
-    ...on Sphere {... sphereFragment}
-    ...on User {... userFragment}
-    ...on Composition {...compositionFragment}
-  }
-  rightItem {
-    ...on Video {...videoFragment}
-    ...on Image {...imageFragment}
-    ...on Node {... nodeFragment}
-    ...on Sphere {... sphereFragment}
-    ...on User {... userFragment}
-    ...on Composition {...compositionFragment}
-  }
-  rate
-  weight
-  rateUser
-  countVotes
-  countViews
-  countShares
-  countBookmarks
+    ...objectFragment
+    jointType
+    swap
+    author {
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 50)
+    }
+    leftItem {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+    }
+    rightItem {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+    }
+    rate
+    weight
+    rateUser
+    countVotes
+    countViews
+    countShares
+    countBookmarks
 }
 `
 
 const eventFragment = gql`
-  ${objectShortFragment}
-  fragment eventFragment on Event {
-    id
-    createdAt
-    type
-    ... on EventError{
-      operation
-      code
-      message
-      subject{... objectShortFragment}
-      object{... objectShortFragment}
+    ${objectShortFragment}
+    fragment eventFragment on Event {
+        id
+        createdAt
+        type
+        ... on EventError{
+            operation
+            code
+            message
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+        }
+        ... on EventProgress{
+            oid
+            action
+            progress
+        }
+        ... on EventNotice{
+            typeNotice
+            message
+        }
+        ... on EventWS{
+            wsRevision
+            wsItem
+        }
+        ... on EventObjectUpdate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            path
+            value
+            matter {reason subscription}
+        }
+        ... on EventGeneral{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            matter {reason subscription}
+        }
+        ... on EventObjectCreateDelete{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            sphereOids
+            matter {reason subscription}
+        }
+        ... on EventObjectRate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            rate
+            matter {reason subscription}
+        }
     }
-    ... on EventProgress{
-      oid
-      action
-      progress
-    }
-    ... on EventNotice{
-      typeNotice
-      message
-    }
-    ... on EventWS{
-      wsRevision
-      wsItem
-    }
-    ... on EventObjectUpdate{
-      subject{... objectShortFragment}
-      object{... objectShortFragment}
-      path
-      value
-      matter {reason subscription}
-    }
-    ... on EventGeneral{
-      subject{... objectShortFragment}
-      object{... objectShortFragment}
-      matter {reason subscription}
-    }
-    ... on EventObjectCreateDelete{
-      subject{... objectShortFragment}
-      object{... objectShortFragment}
-      sphereOids
-      matter {reason subscription}
-    }
-    ... on EventObjectRate{
-      subject{... objectShortFragment}
-      object{... objectShortFragment}
-      rate
-      matter {reason subscription}
-    }
-  }
 `
+
+const eventFragmentWithBatch = gql`
+    ${eventFragment}
+    fragment eventFragmentWithBatch on Event {
+        ...eventFragment
+        ... on EventBatch {
+            events {...eventFragment}
+        }
+    }
+`
+
 const objectFullFragment = gql`
-  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
-  ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
-  fragment objectFullFragment on Object {
-    ...objectFragment
-    ...on Video {...videoFragment}
-    ...on Image {...imageFragment}
-    ...on Node {... nodeFragment}
-    ...on Sphere {... sphereFragment}
-    ...on User {... userFragment}
-    ...on Composition {...compositionFragment}
-    ...on Joint {...jointFragment}
-  }
+    ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
+    ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
+    fragment objectFullFragment on Object {
+        ...objectFragment
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+        ...on Joint {...jointFragment}
+    }
 `
 
 const findResultFragment = gql`
-  ${eventFragment}
-  fragment findResultFragment on FindResult {
-    count
-    totalCount
-    nextPageToken
-    prevPageToken
-    ... on EventFindResult { events {...eventFragment} }
-    ... on ObjectsFindResult { objects{ oid } }
-    ... on WSFindResult { items }
-  }
+    ${eventFragment}
+    fragment findResultFragment on FindResult {
+        count
+        totalCount
+        nextPageToken
+        prevPageToken
+        ... on EventFindResult { events {...eventFragment} }
+        ... on ObjectsFindResult { objects{ oid } }
+        ... on WSFindResult { items }
+    }
 `
 const findResultFragmentForSearch = gql`
-  ${eventFragment}
-  fragment findResultFragment on FindResult {
-    count
-    totalCount
-    nextPageToken
-    prevPageToken
-    ... on EventFindResult { events {...eventFragment} }
-    ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }
-    ... on WSFindResult { items }
-  }
+    ${eventFragment}
+    fragment findResultFragment on FindResult {
+        count
+        totalCount
+        nextPageToken
+        prevPageToken
+        ... on EventFindResult { events {...eventFragment} }
+        ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }
+        ... on WSFindResult { items }
+    }
 `
 
 const fragments = {
-  eventFragment,
-  objectFullFragment,
-  userFragment,
-  dummyUserFragment,
-  objectShortFragment,
-  objectShortStatFragment,
-  nodeFragment,
-  sphereFragment,
-  findResultFragment,
-  findResultFragmentForSearch
+   eventFragment,
+   eventFragmentWithBatch,
+   objectFullFragment,
+   userFragment,
+   dummyUserFragment,
+   objectShortFragment,
+   objectShortStatFragment,
+   nodeFragment,
+   sphereFragment,
+   findResultFragment,
+   findResultFragmentForSearch
 }
 
 export {
-  fragments
+   fragments
 }

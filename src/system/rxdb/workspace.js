@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 10 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
@@ -317,7 +317,7 @@ class Workspace {
          }).skip(1000).remove() // оставляем максимум 1000 последних
          await this.db.ws_items.find({ selector: {deletedAt: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 30 }} }).remove() // удаляем, те что старше месяца
       }
-      await clearTrash()
+      // await clearTrash()
 
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()
