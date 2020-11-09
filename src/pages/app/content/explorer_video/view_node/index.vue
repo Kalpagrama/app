@@ -35,7 +35,7 @@ div(
         @click="extended = !extended"
         round flat dense
         :color="extended ? 'white' : 'green'"
-        :icon="extended ? 'clear' : 'add'")
+        :icon="extended ? 'clear' : 'link'")
       .col
         //- q-btn(
           v-if="!extended"
