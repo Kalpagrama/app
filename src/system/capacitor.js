@@ -3,6 +3,7 @@ import assert from 'assert'
 import { router } from 'src/boot/system'
 import {
    Plugins,
+   StatusBarStyle,
    PushNotification,
    PushNotificationToken,
    PushNotificationActionPerformed
@@ -10,14 +11,14 @@ import {
 import { AuthApi } from 'src/api/auth'
 import { Platform } from 'quasar'
 
-const { PushNotifications, Share, App } = Plugins
+const { PushNotifications, Share, App, StatusBar } = Plugins
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
-
+let isStatusBarLight = true
 async function initCapacitor (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
    // alert(JSON.stringify(Platform.is))
@@ -78,6 +79,19 @@ async function initCapacitor (store) {
       await router.push({ path: '/workspace/contentNotes', query: { share: true } })
    })
    await capacitorOrientationLock('portrait')
+   // Events (iOS only)
+   window.addEventListener('statusTap', function () {
+      alert('statusbar tapped')
+      StatusBar.setStyle({
+         style: isStatusBarLight ? StatusBarStyle.Dark : StatusBarStyle.Light,
+         overlays: true
+      })
+      isStatusBarLight = !isStatusBarLight
+      // Display content under transparent status bar (Android only)
+      StatusBar.setOverlaysWebView({
+         overlay: false
+      });
+   })
 }
 
 async function initCapacitorPushPlugin (store) {
