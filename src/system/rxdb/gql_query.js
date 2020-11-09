@@ -3,8 +3,8 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb, makeId, getRawIdFromId } from 'src/system/rxdb/index'
 import { AuthApi } from 'src/api/auth'
-import { NodeApi } from 'src/api/node'
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectCreateApi } from 'src/api/object_create'
+import { ObjectApi } from 'src/api/object'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_GQL)
@@ -37,7 +37,7 @@ class GqlQueries {
             fetchFunc = async () => {
                return {
                   notEvict: true, // живет в кэше вечно
-                  item: await NodeApi.nodeCategories(),
+                  item: await ObjectCreateApi.nodeCategories(),
                   actualAge: 'day' // обновляется раз в день
                }
             }
@@ -46,7 +46,7 @@ class GqlQueries {
             fetchFunc = async () => {
                return {
                   notEvict: true, // живет в кэше вечно
-                  item: await NodeApi.emojiSpheres(),
+                  item: await ObjectCreateApi.emojiSpheres(),
                   actualAge: 'day' // обновляется раз в день
                }
             }
@@ -55,7 +55,7 @@ class GqlQueries {
             assert(params.oid, '!params.oid')
             fetchFunc = async () => {
                return {
-                  item: await ObjectsApi.stat(params.oid),
+                  item: await ObjectApi.stat(params.oid),
                   actualAge: 'hour'
                }
             }

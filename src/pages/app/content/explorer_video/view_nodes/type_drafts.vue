@@ -29,8 +29,6 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
-
 import nodeItem from './type_drafts_item.vue'
 
 export default {

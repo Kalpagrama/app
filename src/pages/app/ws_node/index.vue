@@ -5,7 +5,6 @@ node-editor(
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {

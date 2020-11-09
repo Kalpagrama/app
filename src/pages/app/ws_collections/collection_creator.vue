@@ -65,7 +65,7 @@ export default {
         this.creating = true
         let collectionInput = {
           name: this.name,
-          items: [],
+          // items: [],
         }
         let feed = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
         this.$log('create done', feed)

@@ -3,12 +3,12 @@ import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { makeEventCard } from 'public/scripts/common_func'
 import { apiCall } from 'src/api/index'
+import { EventApi } from 'src/api/event'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 const FindCollectionEnum = Object.freeze({
    WS: 'WS',
@@ -59,7 +59,7 @@ class ListsApi {
          case RxCollectionEnum.LST_FEED:
             res = await ListsApi.find(FindCollectionEnum.EVENTS, mangoQuery)
             for (let event of res.items) {
-               event.card = makeEventCard(event)
+               event.card = EventApi.makeEventCard(event)
             }
             // res.items = res.items.filter(ev => !ev.type.in('WS_ITEM_CREATED', 'WS_ITEM_UPDATED', 'WS_ITEM_DELETED', 'PROGRESS'))
             break

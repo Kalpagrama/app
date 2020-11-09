@@ -623,6 +623,7 @@ class RxDBWrapper {
       // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
       assert(data, '!data')
+      // assert(!data.wsItemType, '!!data.wsItemType') // передается отдельно от item
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       let rxDoc
       if (rxCollectionEnum in WsCollectionEnum) {

@@ -29,7 +29,7 @@ div(
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'nodeVote',
@@ -71,7 +71,7 @@ export default {
         this.$log('vote start', this.joint.oid, val)
         this.voting = val
         await this.$wait(500)
-        let res = await NodeApi.nodeVote(this.joint.oid, val)
+        let res = await ObjectApi.vote(this.joint.oid, val)
         this.$log('vote done', res)
         this.voting = false
         this.votingAgain = false

@@ -1,6 +1,6 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
@@ -108,7 +108,7 @@ class QueryAccumulator {
       }
       if (oidsForQuery.length === 0) return
       this.queryInProgress = true // Не более одного запроса в единицу времени
-      ObjectsApi.objectList(oidsForQuery).then(objectList => {
+      ObjectApi.objectList(oidsForQuery).then(objectList => {
          this.queryInProgress = false
          for (let oid of oidsForQuery) {
             let object = objectList.find(obj => obj.oid === oid)

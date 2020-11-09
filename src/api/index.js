@@ -2,9 +2,9 @@ import { MutexLocal } from 'src/system/rxdb/mutex'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 const apiMutex = new MutexLocal('apiMutex')
 

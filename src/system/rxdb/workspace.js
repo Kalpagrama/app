@@ -311,14 +311,13 @@ class Workspace {
       }
 
       const clearTrash = async () => {
-         let deletedElements = await rxdb.find({
-            selector: {
-               rxCollectionEnum: RxCollectionEnum.WS_ANY,
-               deletedAt: {$gt: 0}
-            },
-            sort: [{deletedAt: 'desc'}]
-         })
+         await this.db.ws_items.find({
+            selector: {deletedAt: { $gt: 0 }},
+            sort: [{ deletedAt: 'desc' }] // в начале списка те, что удалены недавно)
+         }).skip(1000).remove() // оставляем максимум 1000 последних
+         await this.db.ws_items.find({ selector: {deletedAt: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 30 }} }).remove() // удаляем, те что старше месяца
       }
+      // await clearTrash()
 
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()

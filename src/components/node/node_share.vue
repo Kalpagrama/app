@@ -13,7 +13,7 @@ div(
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'nodeShare',
@@ -25,7 +25,7 @@ export default {
   methods: {
     async shared () {
       this.$log('shared')
-      let stat = await NodeApi.updateStat(this.node.oid, 'SHARED', null)
+      let stat = await ObjectApi.updateStat(this.node.oid, 'SHARED', null)
       this.$log('shareStart stat', stat)
     }
   },

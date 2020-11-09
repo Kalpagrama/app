@@ -5,24 +5,15 @@ import { fragments } from 'src/api/fragments'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
-import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
-import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
-const StatKeyEnum = Object.freeze({
-   VIEWED_TIME: 'VIEWED_TIME',
-   BOOKMARKED: 'BOOKMARKED',
-   SHARED: 'SHARED',
-   REMADE: 'REMADE'
-})
-
-class NodeApi {
+class ObjectCreateApi {
    static async nodeCategories () {
-      const f = NodeApi.nodeCategories
+      const f = ObjectCreateApi.nodeCategories
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
@@ -50,7 +41,7 @@ class NodeApi {
    }
 
    static async emojiSpheres () {
-      const f = NodeApi.emojiSpheres
+      const f = ObjectCreateApi.emojiSpheres
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
@@ -131,7 +122,7 @@ class NodeApi {
    }
 
    static makeNodeInput (node) {
-      const f = NodeApi.makeNodeInput
+      const f = ObjectCreateApi.makeNodeInput
       node = cloneDeep(node) // makeNodeInput меняет node
       {
          // checks
@@ -151,97 +142,18 @@ class NodeApi {
       })
       nodeInput.items = node.items.map(i => {
          return {
-            composition: NodeApi.makeCompositionInput(i)
+            composition: ObjectCreateApi.makeCompositionInput(i)
          }
       })
       return nodeInput
    }
 
-   static async nodeUnrate (oid) {
-      const f = NodeApi.nodeUnrate
-      logD(f, 'start')
-      const t1 = performance.now()
-      const cb = async () => {
-         if (!oid) return
-         let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation nodeUnrate ($oid: OID!) {
-                    unrate (oid: $oid){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               oid: oid
-            }
-         })
-         // todo update node in apollo cache
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return nodeUnrate
-      }
-      return await apiCall(f, cb)
-   }
-
-   // общая оценка ядра придет с эвентом
-   static async nodeVote (oid, rate) {
-      const f = NodeApi.nodeVote
-      logD(f, 'start', rate)
-      const t1 = performance.now()
-      const cb = async () => {
-         assert(oid, 'oid && rate')
-         if (rate > 1) rate = rate / 100
-         assert(AuthApi.hasPermitionForAction(ActionEnum.VOTE))
-         let { data: { nodeRate } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation rate ($oid: OID!, $rate: Float!) {
-                    rate (oid: $oid, rate: $rate){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               oid: oid,
-               rate: rate
-            }
-         })
-         // надо запомнить сейчас, тк эвентом придет только общая оценка
-         let node = await rxdb.get(RxCollectionEnum.OBJ, oid)
-         if (node) {
-            // logD(f, `try change rateUser for ${node.id}`, node)
-            node.rateUser = rate // node реактивен!
-            logD(f, `done rateUser=${node.rateUser}`)
-         }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return rate
-      }
-      return await apiCall(f, cb)
-   }
-
-   // static async unPublish (oid) {
-   //    logD('nodeDelete start')
-   //    assert.ok(oid)
-   //    let { data: { unPublish } } = await apollo.clients.api.mutate({
-   //       mutation: gql`
-   //           mutation unPublish($oid: OID!) {
-   //               unPublish (oid: $oid)
-   //           }
-   //       `,
-   //       variables: {
-   //          oid: oid
-   //       }
-   //    })
-   //    logD('nodeDelete dones')
-   //    return unPublish
-   // }
-
    static async nodeCreate (node) {
-      const f = NodeApi.nodeCreate
+      const f = ObjectCreateApi.nodeCreate
       logD(f, 'start', node)
       const t1 = performance.now()
       const cb = async () => {
-         let nodeInput = NodeApi.makeNodeInput(node)
+         let nodeInput = ObjectCreateApi.makeNodeInput(node)
          let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
@@ -270,8 +182,8 @@ class NodeApi {
       assert(joint.leftItem.oid || joint.leftItem.node, '!joint.leftItem.oid')
       assert(joint.rightItem.oid || joint.rightItem.node, '!joint.rightItem.oid')
       assert(joint.jointType, '!joint.jointType')
-      if (joint.leftItem.node) joint.leftItem.node = NodeApi.makeNodeInput(joint.leftItem.node)
-      if (joint.rightItem.node) joint.rightItem.node = NodeApi.makeNodeInput(joint.rightItem.node)
+      if (joint.leftItem.node) joint.leftItem.node = ObjectCreateApi.makeNodeInput(joint.leftItem.node)
+      if (joint.rightItem.node) joint.rightItem.node = ObjectCreateApi.makeNodeInput(joint.rightItem.node)
       return {
          swap: joint.swap || false,
          jointType: joint.jointType,
@@ -282,11 +194,11 @@ class NodeApi {
    }
 
    static async jointCreate (joint) {
-      const f = NodeApi.jointCreate
+      const f = ObjectCreateApi.jointCreate
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
-         let jointInput = NodeApi.makeJointInput(joint)
+         let jointInput = ObjectCreateApi.makeJointInput(joint)
          logD('jointCreate jointInput', jointInput)
          let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
             mutation: gql`
@@ -307,48 +219,6 @@ class NodeApi {
       }
       return await apiCall(f, cb)
    }
-
-   static async updateStat (oid, key, value) {
-      const f = NodeApi.updateStat
-      logD(f, 'start')
-      const t1 = performance.now()
-      const cb = async () => {
-         assert(oid, '!oid')
-         assert(key in StatKeyEnum, '!key in StatKeyEnum')
-
-         let { data: { updateStat } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                mutation updateStat ($oid: OID!, $statData: StatDataInput!) {
-                    updateStat (oid: $oid, statData: $statData)
-                }
-            `,
-            variables: {
-               oid: oid,
-               statData: {
-                  key,
-                  valueInt: value
-               }
-            }
-         })
-         switch (key) {
-            case StatKeyEnum.REMADE:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
-               break
-            case StatKeyEnum.SHARED:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
-               break
-            case StatKeyEnum.VIEWED_TIME:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
-               break
-            case StatKeyEnum.BOOKMARKED:
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
-               break
-         }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return updateStat
-      }
-      return await apiCall(f, cb)
-   }
 }
 
-export { NodeApi }
+export { ObjectCreateApi }

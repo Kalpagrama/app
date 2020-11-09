@@ -73,7 +73,7 @@ q-page.row.full-width.justify-center
 </template>
 
 <script>
-import { ObjectsApi } from 'src/api/objects'
+import { ObjectApi } from 'src/api/object'
 import { rxdb } from 'src/system/rxdb'
 
 export default {
@@ -110,7 +110,7 @@ export default {
       this.avatarFile = e.target.files[0]
       this.avatarUrl = URL.createObjectURL(this.avatarFile)
       this.avatarEditorOpened = true
-      // this.avatarDataUrl = await ObjectsApi.fileToDataUrl(this.avatarFile)
+      // this.avatarDataUrl = await ObjectApi.fileToDataUrl(this.avatarFile)
       // this.$log('avatarFile=', this.avatarFile)
       // this.$log('this.avatarFile instanceof File=', this.avatarFile instanceof File)
     },
@@ -130,13 +130,13 @@ export default {
         await this.$wait(1000)
         let oid = this.$rxdb.getCurrentUser().oid
         // set avatar,name,lang
-        // if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
+        // if (this.avatarFile) await ObjectApi.update(oid, 'profile.photo', this.avatarFile)
         if (this.lang.value && this.lang.value !== this.currentUser.profile.lang) {
           this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang.value)
           this.$i18n.i18next.changeLanguage(this.lang.value).catch(err => this.$logE(err))
-          await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
+          await ObjectApi.update(oid, 'profile.lang', this.lang.value)
         }
-        if (this.name.length > 0 && this.name !== this.currentUser.name) await ObjectsApi.update(oid, 'profile.name', this.name)
+        if (this.name.length > 0 && this.name !== this.currentUser.name) await ObjectApi.update(oid, 'profile.name', this.name)
         // done
         this.loading = false
         this.$emit('next')

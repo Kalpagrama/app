@@ -6,7 +6,7 @@ import { i18n } from 'src/boot/i18n'
 import { Store, get, clear } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
-import { makeEventCard, makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath } from 'public/scripts/common_func'
 import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)

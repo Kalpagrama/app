@@ -16,7 +16,7 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'nodeRemake',
@@ -61,7 +61,7 @@ export default {
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('remake node', node)
       this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
-      NodeApi.updateStat(this.node.oid, 'REMADE')
+      await ObjectApi.updateStat(this.node.oid, 'REMADE')
     }
   }
 }

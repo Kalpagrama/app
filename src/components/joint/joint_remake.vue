@@ -6,7 +6,7 @@ q-btn(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { NodeApi } from 'src/api/node'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'nodeRemake',
@@ -51,7 +51,7 @@ export default {
       let joint = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('remake joint', joint)
       this.$router.push(`/workspace/joint/${joint.id}`).catch(e => e)
-      NodeApi.updateStat(this.joint.oid, 'REMADE')
+      await ObjectApi.updateStat(this.joint.oid, 'REMADE')
     }
   }
 }
