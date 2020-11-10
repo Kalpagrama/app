@@ -25,7 +25,7 @@ div(
       v-model="sphereSearching"
       borderless dark dense
       placeholder="Введите сферу"
-      :autofocus="true"
+      :autofocus="false"
       :input-style=`{
         paddingLeft: '8px',
         paddingTop: '4px',

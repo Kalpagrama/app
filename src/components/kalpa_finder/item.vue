@@ -50,6 +50,7 @@ div(
             ).row.full-width {{ a.name }}
   //- default
   div(
+    @click="$emit('clicked')"
     :style=`{
       height: '80px',
       borderRadius: '10px',
@@ -149,7 +150,7 @@ export default {
       else {
         return iconMap[item.type]
       }
-    }
+    },
   }
 }
 </script>

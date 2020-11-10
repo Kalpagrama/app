@@ -27,7 +27,7 @@
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-px-md
-      span(:style=`{}`).text-white.text-bold.cursor-pointer {{ node.name.slice(0, 20) }}
+      span(:style=`{}`).text-white.text-bold.cursor-pointer {{ node.name.slice(0, 80) }}
 </template>
 
 <script>

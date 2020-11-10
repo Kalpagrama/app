@@ -4,10 +4,10 @@ div(
   ).row.full-width.justify-center
   q-input(
     v-model="node.name"
-    borderless  dark
+    borderless dark
     type="textarea" autogrow
-    placeholder="В чем суть?"
     spellcheck="false"
+    :placeholder="placeholder"
     :autofocus="isAutofocus"
     :style=`{
       maxWidth: '600px',
@@ -28,7 +28,11 @@ div(
 <script>
 export default {
   name: 'pageApp_nodeEditor_editName',
-  props: ['node'],
+  // props: ['node'],
+  props: {
+    node: {type: Object},
+    placeholder: {type: String, default: 'В чем суть?'}
+  },
   data () {
     return {
       isFocused: false

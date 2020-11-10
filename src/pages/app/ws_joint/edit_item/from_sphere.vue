@@ -14,7 +14,7 @@ div(
     }`
     ).row.full-width.justify-center.q-pt-sm
     q-icon(name="blur_on" color="white" size="100px")
-  div(:style=`{height: '40px', textAlign: 'center'}`).row.full-width.items-center.content-center.justify-center
+  div(:style=`{height: '60px', textAlign: 'center'}`).row.full-width.items-center.content-center.justify-center
     span(v-if="isOpened").text-white.text-bold {{ sphere.name }}
     q-icon(v-else name="blur_on" color="white" size="24px")
 </template>

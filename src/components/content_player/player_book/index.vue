@@ -3,7 +3,7 @@
 
 <script>
 export default {
-  name: 'wsContentPlayer__playerBook',
+  name: 'contentPlayer_book',
   data () {
     return {
       currentPage: 0

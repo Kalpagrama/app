@@ -20,7 +20,7 @@
         v-if="node.countBookmarks > 0"
         :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
         small.text-grey-9 {{ node.countBookmarks }}
-    node-remake(v-if="useRemake" :node="node")
+    //- node-remake(v-if="useRemake" :node="node")
     node-connect(v-if="useConnect" :node="node" :isActive="isActive" :isVisible="isVisible")
     //- vote
     div(

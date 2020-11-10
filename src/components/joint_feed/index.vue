@@ -53,7 +53,7 @@
             //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
     //- items left/right
-    div(
+    //- div(
       @click.self="jointClick()"
       :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
       div(
@@ -80,8 +80,21 @@
       q-btn(
         round flat color="green" icon="link"
         :style=`{position: 'absolute', zIndex: 10000, bottom: '20px', left: 'calc(50% - 20px)',}`)
+    //- items left/right mini/maxi
+    div().row.full-width.items-end.content-end
+      div(
+        v-for="(item,ii) in [joint.leftItem, joint.rightItem]"
+        :style=`{maxWidth: itemOpened === ii ? '100%' : '60px',}`).col.br
+        joint-item(
+          :joint="joint"
+          :item="item"
+          :isActive="isActive" :isVisible="isVisible"
+          :mini="mini"
+          :style=`{
+            //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
+          }`)
     //- name
-    div(
+    //- div(
       v-if="joint.name.length > 0"
       @click="jointClick()"
       ).row.full-width.justify-center.q-pa-sm.cursor-pointer
@@ -115,7 +128,8 @@ export default {
   },
   data () {
     return {
-      stats: null
+      stats: null,
+      itemOpened: 0,
     }
   },
   computed: {

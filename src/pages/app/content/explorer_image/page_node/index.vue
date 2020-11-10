@@ -11,7 +11,7 @@ div(
       }`
     ).row.full-width.items-start.content-start.b-40
     //- composition.editor
-    div(
+    //- div(
       v-show="compositionEditorShow"
       :style=`{
         paddingTop: '20px',
@@ -26,7 +26,7 @@ div(
     //- edit appendix
     div(
       :style=`{
-        paddingTop: compositionEditorShow ? '0px' : '20px',
+        paddingTop: compositionEditorShow ? '20px' : '20px',
       }`
       ).row.full-width.items-start.content-start.justify-center
       div(
@@ -105,7 +105,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
 export default {
-  name: 'contentExplorerVideo_viewNode',
+  name: 'contentExplorerImage_pageNode',
   components: {
     compositionEditor,
     editName: () => import('components/node_editor/view_publish/edit_name.vue'),
