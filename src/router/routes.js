@@ -85,41 +85,56 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            name: 'user',
+            // name: 'user',
             path: 'user/:oid',
-            redirect: 'user/:oid/nodes',
+            redirect: 'user/:oid',
             component: () => import('pages/app/user/index.vue'),
             children: [
                {
-                  name: 'user.feeds',
-                  path: 'feeds',
-                  component: () => import('pages/app/user/user_feeds.vue'),
-                  meta: { roleMinimal: 'GUEST' }
+                  path: ':tab?',
+                  name: 'user',
+                  component: () => import('pages/app/user/page_profile/index.vue')
                },
                {
-                  name: 'user.nodes',
-                  path: 'nodes',
-                  component: () => import('pages/app/user/user_nodes.vue'),
-                  meta: { roleMinimal: 'GUEST' }
+                  path: 'workspace/:tab?',
+                  name: 'user.workspace',
+                  component: () => import('pages/app/user/page_workspace/index.vue')
                },
                {
-                  name: 'user.joints',
-                  path: 'joints',
-                  component: () => import('pages/app/user/user_joints.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
-                  name: 'user.votes',
-                  path: 'votes',
-                  component: () => import('pages/app/user/user_votes.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
-                  name: 'user.followers',
-                  path: 'followers',
-                  component: () => import('pages/app/user/user_followers.vue'),
-                  meta: { roleMinimal: 'GUEST' }
+                  path: 'settings/:tab?',
+                  name: 'user.settings',
+                  component: () => import('pages/app/user/page_settings/index.vue')
                }
+               // {
+               //    name: 'user.feeds',
+               //    path: 'feeds',
+               //    component: () => import('pages/app/user/user_feeds.vue'),
+               //    meta: { roleMinimal: 'GUEST' }
+               // },
+               // {
+               //    name: 'user.nodes',
+               //    path: 'nodes',
+               //    component: () => import('pages/app/user/user_nodes.vue'),
+               //    meta: { roleMinimal: 'GUEST' }
+               // },
+               // {
+               //    name: 'user.joints',
+               //    path: 'joints',
+               //    component: () => import('pages/app/user/user_joints.vue'),
+               //    meta: { roleMinimal: 'GUEST' }
+               // },
+               // {
+               //    name: 'user.votes',
+               //    path: 'votes',
+               //    component: () => import('pages/app/user/user_votes.vue'),
+               //    meta: { roleMinimal: 'GUEST' }
+               // },
+               // {
+               //    name: 'user.followers',
+               //    path: 'followers',
+               //    component: () => import('pages/app/user/user_followers.vue'),
+               //    meta: { roleMinimal: 'GUEST' }
+               // }
             ],
             meta: { roleMinimal: 'GUEST' }
          },
