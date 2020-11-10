@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 5 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
@@ -182,7 +182,7 @@ class Workspace {
          this.synchroLoop = async () => {
             const f = this.synchroLoop
             f.nameExtra = 'synchroLoop'
-            logD(f, 'start')
+            // logD(f, 'start')
             this.synchroStarted = true // защита от двойного запуска
             while (true) {
                if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
@@ -190,9 +190,9 @@ class Workspace {
                      await mutexGlobal.lock('ws::synchroLoop')
                      await this.lock('ws::synchroLoop')
                      const tLoop = performance.now()
-                     logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                     // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
                      await this.synchronize()
-                     logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
+                     // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
                   } catch (err) {
                      logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
                      this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
@@ -233,12 +233,12 @@ class Workspace {
    // работает в фоне и запускается по мере необходимости см ( switchOnSynchro )
    async synchronize () {
       const f = this.synchronize
-      logD(f, 'start')
+      // logD(f, 'start')
       const t1 = performance.now()
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
-         logD(f, 'start')
+         // logD(f, 'start')
          const t1 = performance.now()
          assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
          let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
@@ -248,7 +248,7 @@ class Workspace {
          //  reactiveUser.wsVersion - версия мастерской (меняется сервером после пересоздания мастерской)
          if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate || wsVersionLocal !== this.reactiveUser.wsVersion) {
             let wsServer = await WorkspaceApi.getWs()
-            logD(f, 'try merge ws...', wsServer)
+            logD(f, 'try merge local ws with server...', wsServer)
             // console.time('tm merge ws')
             let itemsServer = []
             for (let wsItemTypeEnum in WsItemTypeEnum) {
@@ -287,7 +287,7 @@ class Workspace {
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
             this.reactiveUser.wsRevision = wsServer.rev // ревизия по мнению сервера
             this.reactiveUser.wsVersion = wsServer.ver // версия мастерской по мнению сервера
-            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, newItems, outdatedItems, extraItems)
          }
          await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', valueString: (new Date()).toISOString() })
       }

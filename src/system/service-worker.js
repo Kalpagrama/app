@@ -131,7 +131,7 @@ function sendMsg (type, msgData) {
 
                // Customize notification here
                //todo use payload.notification.title & payload.notification.body
-               const dbEvent = JSON.parse(payload.data.event)
+               const dbEvent = JSON.parse(payload.data.event || '{}')
                const notificationTitle = payload.data.title
                const notificationOptions = {
                   body: payload.data.body,

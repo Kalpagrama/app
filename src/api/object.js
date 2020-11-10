@@ -31,8 +31,8 @@ const updateStatThrottled = throttle(async () => {
       const cb = async () => {
          let { data: { updateStat2 } } = await apollo.clients.api.mutate({
             mutation: gql`
-                mutation updateStat2 ($stats: [StatDataInput2!]!) {
-                    updateStat2 (stats: $stats)
+                mutation updateStat ($stats: [StatDataInput!]!) {
+                    updateStat (stats: $stats)
                 }
             `,
             variables: {
