@@ -17,7 +17,7 @@
           :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
           small.text-grey-6 Новое
-    router-link(:to="'/workspace/node/new'").col
+    router-link(:to="'/workspace/create'").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
           round dense color="green" icon="add" size="lg"

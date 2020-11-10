@@ -53,7 +53,7 @@
             //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
     //- items left/right
-    //- div(
+    div(
       @click.self="jointClick()"
       :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
       div(
@@ -62,7 +62,7 @@
         joint-item(
           :joint="joint"
           :item="item"
-          :isActive="isActive" :isVisible="isVisible"
+          :isActive="false" :isVisible="false"
           :mini="mini"
           :style=`{
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
@@ -79,12 +79,12 @@
               span.text-white.text-bold {{ getItemTypeName(ii, joint.jointType) }}
       q-btn(
         round flat color="green" icon="link"
-        :style=`{position: 'absolute', zIndex: 10000, bottom: '20px', left: 'calc(50% - 20px)',}`)
+        :style=`{position: 'absolute', zIndex: 100, bottom: '20px', left: 'calc(50% - 20px)',}`)
     //- items left/right mini/maxi
-    div().row.full-width.items-end.content-end
+    //- div().row.full-width.items-end.content-end
       div(
         v-for="(item,ii) in [joint.leftItem, joint.rightItem]"
-        :style=`{maxWidth: itemOpened === ii ? '100%' : '60px',}`).col.br
+        :style=`{maxWidth: itemOpened === ii ? '100%' : '50%',}`).col
         joint-item(
           :joint="joint"
           :item="item"

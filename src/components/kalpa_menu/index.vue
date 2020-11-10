@@ -115,7 +115,7 @@ div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           ).row.full-width.items-center.content-center
           q-btn(
-            :to="'/workspace/node/new'"
+            :to="'/workspace/create'"
             flat color="green" no-caps icon="add" size="md"
             :align="mini ? 'center' : 'left'"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item

@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: '0px',
+    paddingTop: '40px',
     paddingBottom: '0px',
   }`
   ).row.full-width.justify-center
@@ -17,18 +17,26 @@ q-page(
           v-for="t in tabs" :key="t.id"
           inline-label
           :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
-  div().row.full-width
-    small.text-white {{$route.params.tab}}
+  component(
+    :is="`tab-${$route.params.tab}`"
+    :user="user")
 </template>
 
 <script>
 export default {
   name: 'user_pageProfile',
+  components: {
+    tabCollections: () => import('./tab_collections.vue'),
+    tabNodes: () => import('./tab_nodes.vue'),
+    tabJoints: () => import('./tab_joints.vue'),
+    tabVotes: () => import('./tab_votes.vue'),
+    tabFollowers: () => import('./tab_followers.vue'),
+  },
   props: ['user'],
   computed: {
     tabs () {
       return [
-        {id: 'feeds', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
+        {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
         {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
