@@ -54,8 +54,8 @@ export default {
     types () {
       return [
         // {id: 'drafts', name: 'Drafts'},
-        {id: 'mine', name: 'Мои связи'},
-        {id: 'community', name: 'Все связи'}
+        {id: 'mine', name: 'Мои'},
+        {id: 'community', name: 'Все'}
       ]
     }
   }

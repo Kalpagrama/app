@@ -16,7 +16,9 @@ q-layout(
               q-icon(name="select_all" color="white" size="20px").q-mr-xs
               div(:style=`{overflowX: 'auto'}`).col
                 span(:style=`{fontSize: '1rem', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentKalpa.name }}
-        div(:style=`{width: '500px',}`).row.items-end.content-end.q-pl-sm
+        //- header right side
+        div(
+          :style=`{width: '500px',}`).row.items-end.content-end.q-pl-sm
           div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pl-sm
             q-tabs(
               :value="viewId" @input="$event => $router.replace({query: {...$route.query, viewid: $event}})"
@@ -33,7 +35,7 @@ q-layout(
         paddingTop: '8px',
       }`).row.full-width
       .row.full-width.justify-start.items-start.content-start
-        div(:style=`{position: 'relative'}`).col
+        div(:style=`{position: 'relative'}`).col.q-pr-sm
           div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
             content-player(
               :contentKalpa="contentKalpa"
@@ -41,12 +43,46 @@ q-layout(
               @error="playerErrorHandle"
               :style=`{
               }`).full-width
-              template(v-slot:right)
-                q-btn(
-                  v-if="!node"
-                  @click="createStart()"
-                  round dense color="green" icon="add"
-                  :style=`{borderRadius: '50%'}`).q-mb-sm.q-mr-sm
+              template(v-slot:bar)
+                div(
+                  v-if="player && figures.length > 0"
+                  :style=`{position: 'absolute', zIndex: 2050, pointerEvents: 'none'}`
+                  ).row.fit
+                  template(v-for="(f,fi) in figures")
+                    div(
+                      v-if="f.length === 1"
+                      :key="fi"
+                      :style=`{
+                        position: 'absolute', zIndex: 2050, top: '0px',
+                        left: f[0].t/player.duration*100+'%',
+                        width: '2px',
+                        background: 'rgba(255,255,255, 0.5)',
+                      }`
+                      ).row.full-height
+                    div(
+                      v-if="f.length === 2"
+                      :key="fi"
+                      :style=`{
+                        position: 'absolute', zIndex: 2050, top: '-2px',
+                        left: f[0].t/player.duration*100+'%',
+                        width: (f[1].t-f[0].t)/player.duration*100+'%',
+                        height: 'calc(100% + 4px)',
+                        border: '2px solid rgb(76,175,80)',
+                        borderRadius: '4px',
+                        background: 'rgba(255,255,255,0.2)',
+                        pointerEvents: 'none',
+                      }`
+                      ).row
+              template(v-slot:bar-current-time=`{panning}`)
+                transition(enter-active-class="animated fadeIn" leave-active-class="none")
+                  q-btn(
+                    v-if="player && !panning && !node && viewId !== 'node'"
+                    @click="nodeCreateStart()"
+                    round color="green" icon="add" dense
+                    :style=`{
+                      position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
+                      left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
+                    }`)
           view-nodes-bar(
             v-if="!node"
             :player="player"
@@ -64,8 +100,11 @@ q-layout(
             :player="player"
             :contentKalpa="contentKalpa"
             :contentBookmark="contentBookmark"
+            @linked="linked = $event"
             @close="node = null")
-        div(:style=`{width: '500px'}`).row.items-start.content-start
+        //- body right side
+        div(
+          :style=`{width: '500px'}`).row.items-start.content-start
           q-layout(
             view="hHh Lpr lff"
             container
@@ -87,6 +126,7 @@ q-layout(
                 @bookmark="contentBookmark = $event"
                 @nodeCreate="nodeCreate"
                 @nodeEdit="nodeEdit"
+                @figures="figures = $event"
                 @close="node = null")
 </template>
 
@@ -112,6 +152,7 @@ export default {
       contentBookmark: null,
       node: null,
       screenshotUrl: null,
+      figures: [],
     }
   },
   computed: {
@@ -154,31 +195,8 @@ export default {
     }
   },
   methods: {
-    getScreenshot () {
-      this.$log('getScreenshot')
-      // iframe[id$="_youtube_iframe"]
-      let iframes = document.querySelectorAll('iframe[id$="_youtube_iframe"]')
-      this.$log('iframes', iframes)
-      this.$h2c(document.querySelector('#q-app')).then(canvas => {
-        document.body.appendChild(canvas)
-      })
-      if (iframes[0]) {
-        // this.$log('iframe', iframes[0])
-        // iframes[0]
-        this.$h2c(document.querySelector('#q-app')).then(canvas => {
-          document.body.appendChild(canvas)
-        })
-        // iframes[0].reload()
-        // let browser = document.querySelector('iframe')
-        // let request = iframes[0].getScreenshot(100, 100)
-        // request.onsuccess = function() {
-        //   var blob = request.result
-        //   this.screenshotUrl = URL.createObjectURL(blob)
-        // }
-      }
-    },
-    async createStart () {
-      this.$log('createStart')
+    async nodeCreateStart () {
+      this.$log('nodeCreateStart')
       // create something link or node... or always node...
       let node = await this.nodeCreate()
       this.nodeEdit(node)

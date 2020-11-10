@@ -302,7 +302,7 @@ export default {
     this.$log('item', item)
     if (item) {
       this.itemFound(JSON.parse(JSON.stringify(item)))
-      this.$store.commit('ui/stateSet', ['editorItem', null])
+      this.$store.commit('ui/stateSet', ['nodeEditorItem', null])
     }
   },
   beforeDestroy () {

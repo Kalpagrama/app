@@ -3,8 +3,8 @@ div(
   :style=`{position: 'relative',}`
   ).row.full-width.items-start.content-start
   //- close
-  div(
-    v-if="contentKalpa && !isOpened"
+  //- div(
+    v-if="contentKalpa"
     :style=`{borderRadius: '10px',}`).row.full-width.b-50
     img(
       draggable="false"
@@ -18,7 +18,7 @@ div(
         span.text-white {{ contentKalpa.name }}
   //- opened
   content-player(
-    v-if="contentKalpa && isOpened"
+    v-if="contentKalpa"
     :contentKalpa="contentKalpa"
     @player="player = $event"
     :options=`{
@@ -30,6 +30,7 @@ div(
     template(v-slot:footer)
       composition-bar(
         v-if="player && !isEditing"
+        v-show="isOpened"
         :isActive="true"
         :player="player"
         :contentKalpa="contentKalpa"
@@ -43,6 +44,7 @@ div(
         }`)
       composition-editor(
         v-if="player && isEditing"
+        v-show="isOpened"
         :contentKalpa="contentKalpa"
         :composition="item"
         :player="player")

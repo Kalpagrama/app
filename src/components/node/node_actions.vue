@@ -6,13 +6,13 @@
       :node="node" :isActive="isActive" :isVisible="isVisible"
       @close="showStats = false")
   //- actions wrapper
-  div(:style=`{maxWidth: '700px', height: '60px',}`).row.full-width.items-center.content-center
-    node-share(v-if="useShare" :node="node").shaking
+  div(:style=`{maxWidth: '700px', height: '50px',}`).row.full-width.items-center.content-center
+    node-share(v-if="useShare" :node="node")
     div(
       v-if="useBookmark"
       :style=`{
         position: 'relative',
-        height: '60px'}`
+        height: '50px'}`
       ).row.items-center.content-center.justify-center
       kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
       //- bookmark count
@@ -20,7 +20,7 @@
         v-if="node.countBookmarks > 0"
         :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
         small.text-grey-9 {{ node.countBookmarks }}
-    node-remake(v-if="useRemake" :node="node").shaking
+    node-remake(v-if="useRemake" :node="node")
     node-connect(v-if="useConnect" :node="node" :isActive="isActive" :isVisible="isVisible")
     //- vote
     div(

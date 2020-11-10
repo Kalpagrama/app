@@ -34,6 +34,7 @@ export default {
   desktopNavigationShow: true,
   desktopNavigationStyles: {},
   contentFigures: {},
+  userTyping: false,
   nodeEditorItem: null,
-  userTyping: false
+  jointEditorItem: null,
 }

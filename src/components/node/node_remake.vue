@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: '60px',}`).row.justify-center.items-center.content-center
+    height: '50px',}`).row.justify-center.items-center.content-center
   //- remake action
   q-btn(
     @click="remake()"

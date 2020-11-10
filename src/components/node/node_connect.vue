@@ -4,7 +4,7 @@ div(
     position: 'relative',
     height: '60px',}`).row.full-height.items-center.content-center.justify-center
   //- position="bottom"
-  q-dialog(
+  //- q-dialog(
     v-model="nodeConnectOpened"
     transition-show="none"
     transition-hide="none"
@@ -37,10 +37,10 @@ div(
           .col
             .row.fit.items-start.content-start.q-pa-md
               span.text-white.text-bold {{ node.name }}
-  slot(name="action" :start="connectStart")
+  //- slot(name="action" :start="connectStart")
   q-btn(
     v-if="!$scopedSlots.action"
-    @click="connectStart()"
+    @click="$router.push('/workspace/joint/new?oid='+node.oid)"
     round flat color="green").shaking
     q-icon(name="link" size="30px" color="grey-9")
   //- joints count

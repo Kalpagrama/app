@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: '60px',
+    height: '50px',
   }`).row.justify-center.items-center.content-center
   kalpa-share(type="node" :item="node" @done="shared")
   //- share count

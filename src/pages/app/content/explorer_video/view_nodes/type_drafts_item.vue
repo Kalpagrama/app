@@ -63,7 +63,7 @@ div(
             :style=`{
               textAlign: 'center'
             }`).row.full-width.justify-center.q-py-md
-            span.text-white {{ node.name }}
+            span.text-white "{{ node.name }}"
           //- actions
           .row.full-width.items-start.content-start
             q-btn(
@@ -102,7 +102,7 @@ div(
       }`
       ).full-width
   //- spheres editor
-  .row.full-width
+  //- .row.full-width
     ws-sphere-editor(
       v-if="node"
       :item="node"
@@ -149,6 +149,15 @@ export default {
           cb: async () => {
             this.$log('nodePublish', this.node)
             this.$router.push('/workspace/node/' + this.node.id)
+          }
+        },
+        join: {
+          name: 'Связать',
+          color: 'white',
+          styles: {},
+          cb: () => {
+            this.$log('nodeJoin', this.node)
+            this.$router.push(`/workspace/joint/new?id=${this.node.id}`)
           }
         },
         delete: {

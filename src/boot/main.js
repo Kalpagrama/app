@@ -108,6 +108,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // user
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     // kalpa
+    Vue.component('kalpaFinder', () => import('components/kalpa_finder/index.vue'))
     Vue.component('kalpaBookmark', () => import('components/kalpa_bookmark/index.vue'))
     Vue.component('kalpaShare', () => import('components/kalpa_share/index.vue'))
     Vue.component('kalpaConnect', () => import('components/kalpa_connect/index.vue'))

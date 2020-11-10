@@ -25,13 +25,13 @@ div(
         :player="player" :composition="item"
         :contentKalpa="contentKalpa")
     //- node.name/node.sphers editors wrapper
-    div(
+    //- div(
       :style=`{
         paddingTop: compositionEditorShow ? '0px' : '20px',
       }`
       ).row.full-width.items-start.content-start.q-px-sm
       //- q-btn(round flat color="grey-8" icon="delete_outline" @click="nodeDelete()")
-      q-btn(
+      //- q-btn(
         @click="extended = !extended"
         round flat dense
         :color="extended ? 'white' : 'green'"
@@ -64,7 +64,7 @@ div(
           )
     div(
       :style=`{
-        paddingTop: compositionEditorShow ? '0px' : '0px',
+        paddingTop: compositionEditorShow ? '0px' : '20px',
       }`
       ).row.full-width.items-start.content-start.justify-center
       div(
@@ -91,20 +91,58 @@ div(
             :icon="compositionEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
             ).q-mt-sm
         //- ws-sphere-editor(:item="node").q-py-sm
-        div(:style=`{position: 'relative'}`).row.full-width.justify-center.q-py-sm.q-mb-md
+        div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-between.q-py-sm.q-mb-md
           q-btn(
-            no-caps flat icon="add" color="white"
-            :style=`{minWidth: '280px',}`).b-50 Добавить сферу
+            @click="nodeJoin()"
+            round flat dense
+            :color="linked ? 'grey-4' : 'green'"
+            :icon="linked ? 'link_off' : 'link'")
+          .col
+            q-btn(
+              no-caps flat icon="add" color="white"
+              :style=`{}`).full-width.b-50 Добавить сферу
+          q-btn(
+            @click="compositionEditorShow = !compositionEditorShow"
+            round flat dense color="white"
+            :icon="compositionEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
   //- .row.full-width.q-pa-sm
     q-btn(flat color="green" icon="add"
       :style=`{height: '200px'}`).full-width.b-40
+  //- link
+  //- div(
+    v-if="linked && $q.screen.lt.lg").row.full-width.items-start.content-start.q-px-sm
+    .row.full-width.items-center.content-center.justify-center
+      //- q-btn(round flat dense color="grey-4" icon="link_off" @click="linked = false")
+      q-btn(flat dense color="white" no-caps icon-right="keyboard_arrow_down")
+        span.text-grey-4 Следствие
+      //- q-btn(round flat dense color="green" icon="link")
+    div(
+      :style=`{
+        borderRadius: '10px',
+      }`
+      ).row.full-width.b-40
+      img(
+        v-if="true"
+        @click="extended = false"
+        :src="contentKalpa.thumbUrl"
+        :style=`{borderRadius: '10px',}`).full-width
+      div(
+        v-if="true"
+        ).row.full-width.items-center.content-center.justify-center.q-pa-sm
+        small.text-white Суть соедененного ядра
   //- footer: actions close, createNode
   .row.full-width.justify-center.q-px-sm
     div(:style=`{maxWidth: '620px',}`).row.full-width.q-py-sm
       //- q-btn(round flat color="grey-8" icon="delete_outline" @click="nodeDelete()")
+      //- .col
+      q-btn(flat color="grey-4" no-caps @click="$emit('close')").b-40.q-mr-sm Закрыть
       .col
-      q-btn(flat color="white" no-caps @click="$emit('close')").b-40.q-mr-sm Готово
-      q-btn(v-if="!pick" color="green" no-caps @click="publish()") Опубликовать
+      //- q-btn(v-if="!linked" round flat color="green" icon="link" @click="linked = true").q-mr-xs
+      q-btn(
+        v-if="!pick"
+        @click="publish()"
+        color="green" no-caps
+        :loading="publishing") Опубликовать
       q-btn(
         v-if="pick"
         @click="pick(node)"
@@ -115,6 +153,7 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
 export default {
@@ -129,6 +168,8 @@ export default {
     return {
       compositionEditorShow: true,
       extended: false,
+      linked: false,
+      publishing: false,
     }
   },
   computed: {
@@ -150,14 +191,24 @@ export default {
     }
   },
   methods: {
+    nodeJoin () {
+      this.$log('nodeJoin')
+      this.$store.commit('ui/stateSet', ['jointEditorItem', JSON.parse(JSON.stringify(this.node))])
+      this.$router.push('/workspace/joint/new')
+    },
     nodeDelete () {
       this.$log('nodeDelete')
     },
-    publish () {
-      this.$log('publish')
-      // make a copy...
-      this.$router.push('/workspace/node/' + this.node.id)
-      // publish right here... ?
+    async publish () {
+      try {
+        this.$log('publish start')
+        await this.$wait(1000)
+        this.$log('publish done')
+      }
+      catch (e) {
+        this.$log('publish error', e)
+        this.publishing = false
+      }
     },
     figuresUpdate (node) {
       // this.$log('figuresUpdate')

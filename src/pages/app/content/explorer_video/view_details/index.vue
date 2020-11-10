@@ -1,18 +1,9 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center.q-pt-sm
-  //- slot for top-left, top-right shit
+  //- top/bottom slot
   q-page-sticky(
-    expand position="top"
-    :style=`{}`
-    ).row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-      div(
-        :style=`{
-          width: '60px',
-        }`).row
-        slot(name="top-left")
-  q-page-sticky(
-    expand position="bottom"
+    expand
+    :position="$q.screen.gt.sm ? 'top' : 'bottom'"
     :style=`{
       zIndex: 1000
     }`).b-30
@@ -29,12 +20,9 @@
       .row.full-width.q-py-md
         .row.full-width
           q-btn(
-            v-if="contentKalpa.contentSource !== 'KALPA'"
             @click="gotToOriginal"
-            icon="fab fa-youtube" align="left"
-            color="green" outline no-caps
-            ).col
-            span(:style=`{fontSize: '15px'}`).q-mx-sm в источник
+            flat round color="grey-8" icon="launch")
+          .col
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
@@ -64,16 +52,6 @@
                   :color="a.color || 'white'"
                   :style=`{height: '50px',}`).full-width
                   span.text-bold {{ a.name }}
-      //- spheres
-      //- div(
-        v-if="contentBookmark"
-        ).row.full-width.q-py-sm
-        .row.full-width.q-pa-sm
-          span.text-white.text-bold {{$t('Spheres', 'Сферы')}}
-        ws-sphere-editor(
-          :item="contentBookmark"
-          :style=`{borderRadius: '10px',}`
-          ).b-40
 </template>
 
 <script>
@@ -85,9 +63,6 @@ export default {
   props: ['contentKalpa', 'contentBookmark'],
   data () {
     return {
-      sphere: '',
-      sphereAdding: false,
-      sphereEditing: false,
     }
   },
   computed: {
@@ -119,6 +94,7 @@ export default {
   methods: {
     gotToOriginal () {
       this.$log('gotToOriginal')
+      // TODO: urlOriginal...
       if (this.contentKalpa.contentSource === 'YOUTUBE') {
         let arr = this.contentKalpa.url.split('/')
         let isEmbed = arr[arr.length - 2] === 'embed'

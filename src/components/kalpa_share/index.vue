@@ -78,7 +78,7 @@ export default {
   props: {
     type: {type: String, required: true},
     item: {type: Object, required: true},
-    color: {type: String, default: 'grey-9'}
+    color: {type: String, default: 'grey-8'}
   },
   data () {
     return {

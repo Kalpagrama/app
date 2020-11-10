@@ -14,12 +14,12 @@
       item-player(
         :item="item"
         :isActive="node.items.length > 1 ? itemActive === ii : true"
-        :isOpened="node.items.length > 1 ? itemOpened === ii : true"
+        :isOpened="itemOpened === ii"
         :isEditing="node.items.length > 1 ? itemEditing === ii : true")
       div(
         v-if="node.items.length > 1 ? itemEditing !== ii : true"
         ).row.full-width.items-center.content-center.q-pa-xs
-        div(
+        //- div(
           v-if="node.items.length > 1"
           ).row.full-height.items-center.content-center
           //- q-btn(
@@ -29,18 +29,23 @@
             ).full-height {{ ii === 0 ? 'Главное' : 'Наверх' }}
           q-btn(flat round color="grey-7" icon="keyboard_arrow_up" dense @click="itemPrev(item)")
           q-btn(flat round color="grey-7" icon="keyboard_arrow_down" dense @click="itemNext(item)")
-        .col
+        //- .col
         //- q-btn(
           v-if="node.items.length > 1"
           flat dense color="grey-7" icon-right="visibility" no-caps)
           span.text-grey-7.q-mr-sm Show
-        q-btn(
+        //- q-btn(
           v-if="node.items.length > 1"
           round flat dense color="grey-7" icon="edit" @click="itemEditing = ii, itemOpened = ii").q-ml-md
         q-btn(
           v-if="node.items.length === 1"
           round flat dense color="grey-7" icon="delete_outline" @click="itemDelete(item, ii)")
-        q-btn(flat color="green" no-caps icon-right="add" dense @click="$emit('itemAdd', ii)").full-height.q-ml-md Добавить
+        .col
+        q-btn(
+          @click="itemOpened === ii ? itemOpened = null : itemOpened = ii"
+          round flat dense color="grey-7"
+          :icon="itemOpened === ii ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
+        //- q-btn(flat color="green" no-caps icon-right="add" dense @click="$emit('itemAdd', ii)").full-height.q-ml-md Добавить
       div(
         v-if="itemEditing === ii"
         ).row.full-width.items-center.content-center.q-pa-xs
@@ -130,7 +135,7 @@ export default {
     this.$log('mounted')
     if (this.node.items.length > 0) {
       this.itemActive = this.node.items.length - 1
-      this.itemOpened = this.node.items.length - 1
+      // this.itemOpened = this.node.items.length - 1
     }
   }
 }

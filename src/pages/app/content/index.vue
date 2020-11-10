@@ -32,7 +32,7 @@ export default {
         pick: (item) => {
           this.$log('pick !!!', this.query.pick, this.query.id)
           // save to vuex item.value
-          this.$store.commit('ui/stateSet', ['editorItem', JSON.parse(JSON.stringify(item))])
+          this.$store.commit('ui/stateSet', ['nodeEditorItem', JSON.parse(JSON.stringify(item))])
           // go to the node...
           this.$router.replace(`/workspace/${this.query.pick}/${this.query.id}`)
         }
@@ -76,7 +76,7 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }

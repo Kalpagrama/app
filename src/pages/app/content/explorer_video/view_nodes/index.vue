@@ -3,6 +3,7 @@ q-page(
   :style=`{
   }`
   ).row.full-width.items-start.content-start.justify-center.q-px-sm
+  //- top/bottom slot
   q-page-sticky(
     expand
     :position="$q.screen.gt.sm ? 'top' : 'bottom'"
@@ -11,7 +12,7 @@ q-page(
     }`).b-30
     //- types
     .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm.q-pb-xs
+      div(:style=`{maxWidth: 770+'px'}`).row.full-width.q-px-sm
         q-btn(
           v-for="(type,ii) in types" :key="type.id"
           @click="typeId = type.id"
