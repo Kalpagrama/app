@@ -2,7 +2,8 @@
 q-layout(
   view="hHh Lpr lff"
   ).b-30
-  q-header(reveal).row.full-width.justify-center.q-pt-sm.q-px-sm.b-30
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
+    //.row.full-width.justify-center.q-pt-sm.q-px-sm.b-30.br
     .row.full-width.justify-center
       div(
         v-if="collection"

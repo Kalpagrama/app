@@ -49,7 +49,11 @@ q-layout(view="lHh lpR lFf")
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
+    q-footer(
+      v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow"
+      :style=`{
+         paddingBottom: 'env(safe-area-inset-bottom)'
+      }`).b-30
       kalpa-menu-mobile
   q-page-container
     router-view

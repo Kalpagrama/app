@@ -1,23 +1,17 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { router } from 'src/boot/system'
-import {
-   Plugins,
-   PushNotification,
-   PushNotificationToken,
-   PushNotificationActionPerformed
-} from '@capacitor/core'
+import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AuthApi } from 'src/api/auth'
-import { Platform } from 'quasar'
+import { makeRoutePath } from 'public/scripts/common_func'
 
-const { PushNotifications, Share, App } = Plugins
+const { PushNotifications, Share, App, StatusBar } = Plugins
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
-
 async function initCapacitor (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
    // alert(JSON.stringify(Platform.is))
@@ -78,6 +72,23 @@ async function initCapacitor (store) {
       await router.push({ path: '/workspace/contentNotes', query: { share: true } })
    })
    await capacitorOrientationLock('portrait')
+   // Events (iOS only)
+   window.addEventListener('statusTap', function () {
+      // alert('statusbar tapped')
+   })
+   await StatusBar.setStyle({
+      style: StatusBarStyle.Dark,
+      overlays: true
+   })
+   // await StatusBar.hide()
+}
+
+async function capacitorShowStatusBar () {
+   await StatusBar.show()
+}
+
+async function capacitorHideStatusBar () {
+   await StatusBar.hide()
 }
 
 async function initCapacitorPushPlugin (store) {
@@ -110,16 +121,26 @@ async function initCapacitorPushPlugin (store) {
    )
 
    // Show us the notification payload if the app is open on our device
-   PushNotifications.addListener('pushNotificationReceived', (notification) => {
-         alert('Push received (app is opened):' + JSON.stringify(notification))
+   PushNotifications.addListener('pushNotificationReceived', async (notification) => {
          logD('Push received (app is opened): ', notification)
+         alert('Push dbEvent received (app is opened):' + JSON.stringify(notification))
+         let dbEvent = JSON.parse(notification.notification.data.event || '{}')
+         alert('Push dbEvent received (app is opened):' + JSON.stringify(dbEvent))
+         let route = (makeRoutePath(dbEvent.object) || '/').replaceAll('//', '/')
+         alert('route = ' + route)
+         await router.push(route)
       }
    )
 
    // Method called when tapping on a notification
-   PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-         alert('Push action performed:' + JSON.stringify(notification))
+   PushNotifications.addListener('pushNotificationActionPerformed', async (notification) => {
          logD('Push action performed: ', notification)
+         alert('Push action performed:' + JSON.stringify(notification))
+         let dbEvent = JSON.parse(notification.notification.data.event || '{}')
+         alert('Push action performed:' + JSON.stringify(dbEvent))
+         let route = (makeRoutePath(dbEvent.object) || '/').replaceAll('//', '/')
+         alert('route = ' + route)
+         await router.push(route)
       }
    )
 }
@@ -140,4 +161,10 @@ async function capacitorOrientationLock (mode) {
    else await window.screen.orientation.lock(mode);
 }
 
-export { initCapacitor, initCapacitorPushPlugin, capacitorOrientationLock }
+export {
+   initCapacitor,
+   initCapacitorPushPlugin,
+   capacitorOrientationLock,
+   capacitorShowStatusBar,
+   capacitorHideStatusBar
+}

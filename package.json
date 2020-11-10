@@ -1,6 +1,6 @@
 {
   "name": "kalpagrama",
-  "version": "3.2.26",
+  "version": "3.2.28",
   "description": "Kalpagrama application",
   "productName": "Kalpagrama",
   "cordovaId": "app.kalpa",
@@ -114,7 +114,8 @@
   },
   "engines": {
     "node": ">= 10.0.0",
-    "npm": ">= 5.6.0"
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.21.1"
   },
   "browserslist": [
     "last 10 Chrome versions",

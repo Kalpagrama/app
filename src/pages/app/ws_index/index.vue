@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff")
-  q-header(reveal)
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.q-pt-sm.b-30
       .row.full-width.justify-center.q-px-sm
         div(

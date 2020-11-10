@@ -78,6 +78,24 @@ class WorkspaceApi {
       }
       return await apiCall(f, cb)
    }
+
+   static async wsBatchOperation (operations, wsRevision, wsVersion) {
+      const f = WorkspaceApi.wsBatchOperation
+      logD(f, 'start', operations)
+      const t1 = performance.now()
+      const cb = async () => {
+         let { data: { wsBatchOperation } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                mutation wsBatchOperation($operations: [RawJSON!]!, $wsRevision: Int!, $wsVersion: String!) {
+                    wsBatchOperation (operations: $operations, wsRevision: $wsRevision, wsVersion: $wsVersion)
+                }`,
+            variables: { operations, wsRevision, wsVersion }
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return wsBatchOperation
+      }
+      return await apiCall(f, cb)
+   }
 }
 
 export { WorkspaceApi }

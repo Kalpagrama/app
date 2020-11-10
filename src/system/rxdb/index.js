@@ -6,6 +6,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 // import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
+import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
@@ -103,6 +104,7 @@ class RxDBWrapper {
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
+      addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)

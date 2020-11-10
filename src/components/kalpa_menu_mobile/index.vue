@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(
     :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
-    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.b-40.q-pb-xs
+    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs
     router-link(:to="{name: 'feeds'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(

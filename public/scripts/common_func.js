@@ -5,6 +5,7 @@ function assert(cond, strError){
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function makeRoutePath(object){
+   if (!object) return '/'
    assert(object.type, '!object.type')
    assert(object.oid, '!object.oid')
    let res
