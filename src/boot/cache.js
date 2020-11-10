@@ -144,8 +144,7 @@ class Cache {
   constructor (store) {
     this.queue = new QueueUpdate(store)
     this.defaultActualAge = 1000 * 60 * 60 // 1 hour by default
-    // TODO увеличить до 50 МБ после тестирования
-    this.defaultCacheSize = 1 * 1024 * 1024 // 1Mb
+    this.defaultCacheSize = 50 * 1024 * 1024 // 1Mb
     this.store = store
     this.cachePersist = new CachePersist()
     // используется для контроля места

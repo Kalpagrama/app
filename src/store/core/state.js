@@ -15,8 +15,8 @@ export default {
    logFormat: {time: false, moduleName: true, funcName: true},
    logDbgModulesBlackList: [
       LogSystemModulesEnum.SYSTEM,
-      LogSystemModulesEnum.SW,
-      LogSystemModulesEnum.PWA,
+      // LogSystemModulesEnum.SW,
+      // LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
       LogSystemModulesEnum.API,
       LogSystemModulesEnum.ROUTER,

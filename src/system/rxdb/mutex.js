@@ -122,7 +122,8 @@ class MutexGlobal {
          }
          if (event.key && event.key.in('k_leader_instance_id')){
             if (!mutexGlobal.isLeader()){
-               document.title = document.title.replaceAll('✨', '')
+               // logW('document.title=', document.title)
+               if (document.title && typeof document.title === 'string') document.title = document.title.replace('✨', '')
             }
          }
       })
@@ -130,8 +131,11 @@ class MutexGlobal {
 
    setLeader () {
       logD('change leader to ', this.instanceId)
-      document.title = document.title.replaceAll('✨', '')
-      document.title = document.title + '✨'
+      // logW('document.title=', document.title)
+      if (document.title && typeof document.title === 'string') {
+         document.title = document.title.replace('✨', '')
+         document.title = document.title + '✨'
+      }
       localStorage.setItem('k_leader_instance_id', this.instanceId)
    }
 

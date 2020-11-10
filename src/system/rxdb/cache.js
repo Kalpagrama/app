@@ -15,8 +15,8 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_CACHE)
 
 const debounceIntervalDumpLru = 1000 * 8 // сохраняем весь LRU в idb с дебаунсом 8 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию час)
-const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 50 МБ после тестирования
-if (defaultCacheSize < 20 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
+const defaultCacheSize = 50 * 1024 * 1024 // кэш в rxdb
+if (defaultCacheSize < 50 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
 
 const DEBUG_IGNORE_CACHE = false // если === true - брать из сети (игнорить кэш)
 
@@ -68,7 +68,7 @@ class Cache {
       assert(!this.created, 'this.created')
       try {
          this.mutex = new MutexLocal('rxdb::cache')
-         // используется для контроля места
+         // используется для контроля места (при переполнении - объект удалится из rxdb)
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
             length: function (n, id) {
