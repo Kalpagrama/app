@@ -117,7 +117,9 @@ class Workspace {
                      }
                   }, true)
                   if (found.filter(item => item.id !== plainData.id).length) {
+                     // logE(`уже есть такая же сфера (${plainData.name})!!!!!`)
                      throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
+                     // plainData.name = plainData.name + performance.now()
                   }
                }
             }
@@ -150,7 +152,7 @@ class Workspace {
             }, false)
             this.db.ws_items.preInsert(async (plainData) => {
                initWsItem(plainData)
-               await checkUnique(plainData)
+               if (!plainData.rev) await checkUnique(plainData) // для вновь созданных объектов (объекты с сервере не проверяем)
             }, false);
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
@@ -415,7 +417,7 @@ class Workspace {
       //       }
       //    }
       // }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
