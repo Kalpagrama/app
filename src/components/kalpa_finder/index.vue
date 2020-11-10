@@ -128,6 +128,14 @@ export default {
       if (this.typesSelected.length > 0) {
         res.selector.type = {$in: this.typesSelected}
       }
+      else {
+        res.selector.type = {
+          $in: this.types.reduce((acc, val) => {
+            acc.push(val.id)
+            return acc
+          }, [])
+        }
+      }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')

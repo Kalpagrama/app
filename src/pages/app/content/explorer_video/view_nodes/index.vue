@@ -1,6 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
+    paddingBottom: $q.screen.height/2+'px',
   }`
   ).row.full-width.items-start.content-start.justify-center.q-px-sm
   //- top/bottom slot

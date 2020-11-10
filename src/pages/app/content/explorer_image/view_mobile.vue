@@ -108,7 +108,7 @@ export default {
             thumbUrl: this.contentKalpa.thumbUrl,
             outputType: 'IMAGE',
             layers: [
-              {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: null, points: []}, {t: null, points: []}]},
+              {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: []},
             ],
             operation: { items: null, operations: null, type: 'CONCAT'},
             meta: {cover: false, loop: true}

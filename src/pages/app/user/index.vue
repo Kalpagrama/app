@@ -3,7 +3,7 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        div(:style=`{position: 'relative', height: '150px',}`).row.full-width
+        div(:style=`{position: 'relative', height: '140px',}`).row.full-width
           img(
             v-if="user"
             draggable="false"
@@ -13,11 +13,17 @@ q-layout(view="hHh Lpr lff")
           div(
             v-if="itsMe"
             :style=`{position: 'absolute', zIndex: 100, bottom: '20px',}`
-            ).row.full-width.q-px-md
-            q-tabs(
-              :value="'profile'" no-caps active-color="green" align="left").full-width
-              q-tab(name="profile" label="Профиль")
-              q-tab(name="workspace" label="Мастерская")
+            ).row.full-width.items-center.content-center
+            .col.q-pl-md
+              q-tabs(
+                :value="$route.name" @input="$router.push({name: $event})"
+                no-caps active-color="green" align="left").full-width
+                q-tab(
+                  v-for="p in pagesMine" :key="p.id" :name="p.id" :label="p.name")
+            q-btn(
+              @click="$router.push({name: 'user.settings'})"
+              round flat icon="settings"
+              :color="$route.name === 'user.settings' ? 'green' : 'white'").q-mx-sm
           div(
             :style=`{
               position: 'absolute', bottom: '0px', zIndex: 90, transform: 'translate3d(0,0,0)', height: '70%',
@@ -58,7 +64,11 @@ q-layout(view="hHh Lpr lff")
                   :style=`{height: '50px',}`).full-width
                   span.text-bold {{ a.name }}
   q-page-container
-    q-page-sticky(
+    router-view(v-if="user" :user="user")
+    //- component(
+      :is="`page-${pageId}`"
+      :user="user")
+    //- q-page-sticky(
       expand position="top"
       :style=`{zIndex: 2000}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md.b-30
@@ -70,7 +80,7 @@ q-layout(view="hHh Lpr lff")
             v-for="t in pages" :key="t.id"
             inline-label
             :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
-    router-view(:oid="$route.params.oid")
+    //- router-view(:oid="$route.params.oid")
 </template>
 
 <script>
@@ -79,14 +89,26 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp__user',
+  components: {
+    pageProfile: () => import('./page_profile/index.vue'),
+    pageSettings: () => import('./page_settings/index.vue'),
+    pageWorkspace: () => import('./page_workspace/index.vue'),
+  },
   data () {
     return {
       user: null,
       userSubscribed: null,
-      pageId: 'created',
+      pageId: 'profile',
     }
   },
   computed: {
+    pagesMine () {
+      return [
+        {id: 'user', name: 'Профиль'},
+        {id: 'user.workspace', name: 'Мастерская'},
+        // {id: 'user.settings', name: 'Настройки'},
+      ]
+    },
     pages () {
       return [
         {id: 'feeds', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
