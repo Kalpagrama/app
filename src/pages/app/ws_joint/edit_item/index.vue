@@ -19,6 +19,25 @@ div(
     from-sphere(
       v-if="!item.wsItemType && ['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
       :sphere="item" :isOpened="isOpened")
+    from-user(
+      v-if="!item.wsItemType && item.type === 'USER'"
+      :user="item" :isOpened="isOpened")
+    div(
+      v-if="item.wsItemType && item.wsItemType === 'WS_BOOKMARK' && item.type === 'IMAGE'"
+      :style=`{
+        borderRadius: '10px',
+        background: 'rgb(35,35,35)',
+      }`
+      ).column.fit
+      .col.full-width
+        img(
+          :src="item.thumbUrl"
+          :style=`{
+            borderRadius: '10px',
+            objectFit: 'contain',
+          }`
+          ).fit.bg-black
+      div(:style=`{height: '60px'}`).row.full-width
     //- from sphere
     //- from user
     //- from content
@@ -45,7 +64,8 @@ export default {
   components: {
     fromNode: () => import('./from_node.vue'),
     fromWsNode: () => import('./from_ws_node.vue'),
-    fromSphere: () => import('./from_sphere.vue')
+    fromSphere: () => import('./from_sphere.vue'),
+    fromUser: () => import('./from_user.vue')
   },
   props: ['item', 'isOpened'],
   methods: {

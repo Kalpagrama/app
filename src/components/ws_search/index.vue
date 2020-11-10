@@ -42,7 +42,7 @@
           v-if="searchString.length > 0 && !loading"
           round flat dense color="grey-8" icon="clear" @click="searchString = ''")
   content-uploader(
-    v-if="searchString.length === 0 && !loading"
+    v-if="true"
     @file="contentFile = $event, contentImporterShow = true")
 </template>
 

@@ -8,26 +8,27 @@ div(
     :contentKalpa="contentKalpa"
     @player="player = $event"
     :options=`{
-      showBar: false,
-      showActions: false,
+      showBar: isEditing,
+      showActions: isEditing,
     }`
     :style=`{
     }`)
     template(v-slot:footer)
-      composition-bar(
-        v-if="player && !isEditing"
-        v-show="isOpened"
-        :isActive="true"
-        :player="player"
-        :contentKalpa="contentKalpa"
-        :composition="item"
-        actionsPosition="top"
-        :barStyles=`{
-          background: 'rgba(45,45,45)',
-        }`
-        :style=`{
-          height: '53px',
-        }`)
+      div(v-if="player && !isEditing").row.full-width.q-px-sm
+        //- '53px',
+        composition-bar(
+          v-show="isOpened"
+          :isActive="true"
+          :player="player"
+          :contentKalpa="contentKalpa"
+          :composition="item"
+          actionsPosition="top"
+          :barStyles=`{
+            background: 'rgba(45,45,45)',
+          }`
+          :style=`{
+            height: '53px',
+          }`)
       composition-editor(
         v-if="player && isEditing"
         v-show="isOpened"

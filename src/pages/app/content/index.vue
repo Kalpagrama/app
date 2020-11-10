@@ -4,46 +4,18 @@ component(
   :is="explorerComponent[contentKalpa.type]"
   :contentKalpa="contentKalpa"
   :query="query")
-  template(v-slot:header)
-    slot(name="header")
-  template(v-if="$scopedSlots.nodeAction" v-slot:nodeAction=`{node}`)
-    slot(name="nodeAction" :node="node")
-  template(v-if="$scopedSlots.nodeActionMine" v-slot:nodeActionMine=`{node}`)
-    slot(name="nodeActionMine" :node="node")
-  template(v-if="$scopedSlots.nodeActionAll" v-slot:nodeActionAll=`{node}`)
-    slot(name="nodeActionAll" :node="node")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import explorerVideo from './explorer_video/index.vue'
 import explorerImage from './explorer_image/index.vue'
-// import explorerBook from './explorer_book/index.vue'
-// import explorerWeb from './explorer_web/index.vue'
+import explorerVideo from './explorer_video/index.vue'
 
 export default {
   name: 'contentExplorer',
   components: {explorerVideo, explorerImage},
   props: ['oid', 'query'],
-  provide () {
-    if (this.query && this.query.pick && this.query.id) {
-      return {
-        pick: (item) => {
-          this.$log('pick !!!', this.query.pick, this.query.id)
-          // save to vuex item.value
-          this.$store.commit('ui/stateSet', ['nodeEditorItem', JSON.parse(JSON.stringify(item))])
-          // go to the node...
-          this.$router.replace(`/workspace/${this.query.pick}/${this.query.id}`)
-        }
-      }
-    }
-    else {
-      return {
-        pick: null
-      }
-    }
-  },
   data () {
     return {
       contentKalpa: null,
@@ -71,13 +43,13 @@ export default {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    if (this.query && this.query.pick && this.query.id) this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

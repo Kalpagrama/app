@@ -9,6 +9,7 @@ component(
   :isActive="isActive"
   :isVisible="isVisible"
   :options="options"
+  :styles="styles"
   @player="$emit('player', $event)")
   template(v-for="(index, name) in $slots" v-slot:[name])
     slot(:name="name")
@@ -18,7 +19,7 @@ component(
 
 <script>
 export default {
-  name: 'wsContentPlayer',
+  name: 'contentPlayerIndex',
   components: {
     playerVideo: () => import('./player_video/index.vue'),
     playerImage: () => import('./player_image/index.vue'),
@@ -29,6 +30,7 @@ export default {
     isVisible: {type: Boolean, default: true},
     contentKalpa: {type: Object, required: true},
     options: {type: Object},
+    styles: {type: Object},
   },
   data () {
     return {

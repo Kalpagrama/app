@@ -20,9 +20,9 @@
     router-link(:to="'/workspace/node/new'").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
-          round dense color="green" icon="add"
-          :style=`{borderRadius: '50%'}`)
-        .row.full-width.justify-center
+          round dense color="green" icon="add" size="lg"
+          :style=`{borderRadius: '50%'}`).q-mb-xs
+        //- .row.full-width.justify-center
           small.text-grey-6 Создать
     router-link(:to="{name: 'notifications'}").col
       .row.full-height.items-center.content-center.justify-center

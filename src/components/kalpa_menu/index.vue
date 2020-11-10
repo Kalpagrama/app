@@ -99,7 +99,7 @@ div(
             v-if="!mini"
             :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
         //- create joint
-        div(
+        //- div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           ).row.full-width.items-center.content-center.justify-center
           q-btn(
@@ -121,7 +121,7 @@ div(
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
             span(
               v-if="!mini"
-              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать ядро')}}
+              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать')}}
         //- version
         div(v-if="!mini").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-8 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
