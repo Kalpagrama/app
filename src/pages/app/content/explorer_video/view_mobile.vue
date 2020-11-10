@@ -34,7 +34,10 @@ q-layout(
               template(v-slot:bar)
                 div(
                   v-if="player && figures.length > 0"
-                  :style=`{position: 'absolute', zIndex: 2050, pointerEvents: 'none'}`
+                  :style=`{
+                    position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+                    //- borderRadius: '10px', overflow: 'hidden',
+                  }`
                   ).row.fit
                   template(v-for="(f,fi) in figures")
                     div(

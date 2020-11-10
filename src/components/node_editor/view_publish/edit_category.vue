@@ -23,7 +23,7 @@ div(:style=`{position: 'relative'}`).row.full-width
           ).row.full-width.items-center
           span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите категорию
           .col
-          q-btn(round flat color="white" icon="clear" @click="$emit('close')").q-mr-sm
+          q-btn(round flat color="white" icon="clear" v-close-popup).q-mr-sm
         q-btn(
           v-for="n in categories" :key="n.value" v-close-popup
           @click="node.category = n.value"

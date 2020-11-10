@@ -16,14 +16,14 @@ div(
       v-if="isActive"
       :style=`{
         position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-        bottom: '8px', left: '8px',
+        bottom: '0px', left: '0px',
       }`)
       q-btn(
         @click="muted ? mutedOff() : mutedOn()"
         round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
         q-spinner-audio(
           v-if="!muted"
-          size="25px" color="white").q-mx-sm
+          size="18px" color="white").q-mx-xs
         //- q-icon(
           v-if="!muted && !playing"
           name="play_arrow" size="25px" color="white"
@@ -31,7 +31,7 @@ div(
         q-icon(
           v-if="muted"
           size="25px" color="red" name="volume_off").q-mx-sm
-        span.text-white.text-bold.q-mr-sm {{ $time(duration-currentTime) }}
+        span.text-white.text-bold.q-mr-sm.q-mt-sm {{ $time(duration-currentTime) }}
   //- preview
   img(
     @click="$emit('previewClick')"

@@ -4,7 +4,7 @@ div(
     position: 'relative',
     height: '50px',
   }`).row.justify-center.items-center.content-center
-  kalpa-share(type="node" :item="node" @done="shared")
+  kalpa-share(type="node" :item="node" color="grey-9" @done="shared")
   //- share count
   div(
     v-if="node.countShares > 0"

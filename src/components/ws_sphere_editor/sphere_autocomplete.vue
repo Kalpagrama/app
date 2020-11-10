@@ -8,7 +8,7 @@
 .column.full-width.b-30
   .row.full-width
     slot(name="header")
-    .row.full-width.q-pa-md
+    //- .row.full-width.q-pa-md
       span.text-grey-8 Выберите сферу
   .col.full-width.scroll
     kalpa-loader(
@@ -35,7 +35,38 @@
               flat color="white" dense no-caps align="left"
               ).fit.q-pl-md
               span.text-white {{ sphere.name }}
-          q-btn(round flat dense color="grey-8" icon="more_horiz")
+          q-btn(round flat dense color="grey-8" icon="more_vert")
+            q-popup-proxy(
+              anchor="bottom right" self="top right"
+              position="bottom"
+              maximized dark)
+              div(
+                :class=`{
+                  'b-30': $q.screen.lt.md
+                }`
+                :style=`{
+                  borderRadius: '10px', overflow: 'hidden',
+                  minWidth: '300px',
+                }`).row.full-width.items-start.content-start
+                //- header
+                //- div(
+                  v-if="$q.screen.lt.md"
+                  :style=`{
+                    textAlign: 'center'
+                  }`).row.full-width.justify-center.q-py-md
+                  span.text-white "{{ node.name }}"
+                //- actions
+                .row.full-width.items-start.content-start
+                  q-btn(
+                    v-for="(a,akey) in actions" :key="akey"
+                    v-close-popup
+                    @click="a.cb(sphere)"
+                    flat no-caps
+                    :color="a.color || 'white'"
+                    :style=`{
+                      height: '50px',
+                    }`
+                    ).row.full-width {{ a.name }}
   .row.full-width
     slot(name="footer")
 </template>
@@ -70,6 +101,24 @@ export default {
         res.selector.name = {$regex: nameRegExp}
       }
       return res
+    },
+    actions () {
+      return {
+        rename: {
+          name: 'Rename',
+          cb: (sphere) => {
+            this.$log('sphereRename', sphere)
+          }
+        },
+        delete: {
+          name: 'Delete',
+          cb: async (sphere) => {
+            this.$log('sphereDelete', sphere)
+            await sphere.remove(true)
+            // await this.$rxdb.remove(sphere.id)
+          }
+        }
+      }
     }
   },
   methods: {

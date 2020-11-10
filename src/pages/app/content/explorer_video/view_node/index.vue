@@ -8,7 +8,6 @@ div(
   div(
     :style=`{
       borderRadius: '10px',
-      //- paddingTop: '20px',
       }`
     ).row.full-width.items-start.content-start.b-40
     //- composition.editor
@@ -24,44 +23,7 @@ div(
       composition-editor(
         :player="player" :composition="item"
         :contentKalpa="contentKalpa")
-    //- node.name/node.sphers editors wrapper
-    //- div(
-      :style=`{
-        paddingTop: compositionEditorShow ? '0px' : '20px',
-      }`
-      ).row.full-width.items-start.content-start.q-px-sm
-      //- q-btn(round flat color="grey-8" icon="delete_outline" @click="nodeDelete()")
-      //- q-btn(
-        @click="extended = !extended"
-        round flat dense
-        :color="extended ? 'white' : 'green'"
-        :icon="extended ? 'clear' : 'link'")
-      .col
-        //- q-btn(
-          v-if="!extended"
-          @click="extended = true"
-          flat color="green" icon="add" no-caps
-          :style=`{height: '40px'}`).full-width.b-50
-          small(:style=`{fontSize: '18px',}`) Добавить элемент
-        div(
-          :style=`{
-            borderRadius: '10px',
-          }`
-          ).row.full-width.b-50
-          img(
-            v-if="extended"
-            @click="extended = false"
-            :src="contentKalpa.thumbUrl"
-            :style=`{borderRadius: '10px',}`).full-width
-          div(
-            v-if="extended"
-            ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-            small.text-white Суть соедененного ядра
-      q-btn(
-          @click="compositionEditorShow = !compositionEditorShow"
-          round flat dense color="white"
-          :icon="compositionEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-          )
+    //- edit name
     div(
       :style=`{
         paddingTop: compositionEditorShow ? '0px' : '20px',
@@ -71,79 +33,40 @@ div(
         :style=`{
           maxWidth: '620px',
         }`).row.full-width.items-start.content-start
-        //- node.name editor
-        //- div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100,}`).row.full-width
-          q-input(
-            v-model="node.name"
-            filled dark dense color="grey-6"
-            autogrow type="textarea"
-            placeholder="В чем суть?"
-            :input-style=`{
-              minHeight: '60px',
-            }`).full-width
-        //- name editor 2
-        //- q-btn(round flat dense color="white" icon="bookmark_outline").q-mt-sm
-        //- .col
         edit-name(:node="node")
-        //- q-btn(
-            @click="compositionEditorShow = !compositionEditorShow"
-            round flat dense color="white"
-            :icon="compositionEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            ).q-mt-sm
-        //- ws-sphere-editor(:item="node").q-py-sm
-        div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-between.q-py-sm.q-mb-md
+        //- join, spheres, compositionEditor show
+        div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-between.q-py-sm
           q-btn(
             @click="nodeJoin()"
             round flat dense
             :color="linked ? 'grey-4' : 'green'"
             :icon="linked ? 'link_off' : 'link'")
           .col
-            q-btn(
+            //- q-btn(
+              v-if="node.spheres.length === 0"
+              @click="sphereAddStart()"
               no-caps flat icon="add" color="white"
               :style=`{}`).full-width.b-50 Добавить сферу
+            ws-sphere-editor(
+              :item="node")
           q-btn(
             @click="compositionEditorShow = !compositionEditorShow"
             round flat dense color="white"
             :icon="compositionEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-  //- .row.full-width.q-pa-sm
-    q-btn(flat color="green" icon="add"
-      :style=`{height: '200px'}`).full-width.b-40
-  //- link
-  //- div(
-    v-if="linked && $q.screen.lt.lg").row.full-width.items-start.content-start.q-px-sm
-    .row.full-width.items-center.content-center.justify-center
-      //- q-btn(round flat dense color="grey-4" icon="link_off" @click="linked = false")
-      q-btn(flat dense color="white" no-caps icon-right="keyboard_arrow_down")
-        span.text-grey-4 Следствие
-      //- q-btn(round flat dense color="green" icon="link")
-    div(
-      :style=`{
-        borderRadius: '10px',
-      }`
-      ).row.full-width.b-40
-      img(
-        v-if="true"
-        @click="extended = false"
-        :src="contentKalpa.thumbUrl"
-        :style=`{borderRadius: '10px',}`).full-width
-      div(
-        v-if="true"
-        ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-        small.text-white Суть соедененного ядра
+        //- category
+        div(:style=`{paddingLeft: '40px', paddingRight: '40px', paddingBottom: '40px',}`).row.full-width
+          edit-category(:node="node")
   //- footer: actions close, createNode
-  .row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: '620px',}`).row.full-width.q-py-sm
-      //- q-btn(round flat color="grey-8" icon="delete_outline" @click="nodeDelete()")
-      //- .col
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: '620px',paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.q-py-sm
       q-btn(flat color="grey-4" no-caps @click="$emit('close')").b-40.q-mr-sm Закрыть
-      .col
-      //- q-btn(v-if="!linked" round flat color="green" icon="link" @click="linked = true").q-mr-xs
+      //- .col
       q-btn(
         v-if="!pick"
         @click="publish()"
         color="green" no-caps
-        :loading="publishing") Опубликовать
-      q-btn(
+        :loading="publishing").col Опубликовать
+      //- q-btn(
         v-if="pick"
         @click="pick(node)"
         color="red" dense no-caps
@@ -153,6 +76,7 @@ div(
 </template>
 
 <script>
+import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
@@ -160,15 +84,15 @@ export default {
   name: 'contentExplorerVideo_viewNode',
   components: {
     compositionEditor,
-    editName: () => import('components/node_editor/view_publish/edit_name.vue')
+    editName: () => import('components/node_editor/view_publish/edit_name.vue'),
+    editCategory: () => import('components/node_editor/view_publish/edit_category.vue')
   },
   inject: ['pick'],
   props: ['node', 'player', 'contentKalpa', 'contentBookmark'],
   data () {
     return {
       compositionEditorShow: true,
-      extended: false,
-      linked: false,
+      sphereDialogShow: false,
       publishing: false,
     }
   },
@@ -191,6 +115,12 @@ export default {
     }
   },
   methods: {
+    sphereAddStart () {
+      this.$log('sphereAddStart')
+      this.player.pause()
+      // TODO: check spheres
+      this.sphereDialogShow = true
+    },
     nodeJoin () {
       this.$log('nodeJoin')
       this.$store.commit('ui/stateSet', ['jointEditorItem', JSON.parse(JSON.stringify(this.node))])
@@ -202,8 +132,25 @@ export default {
     async publish () {
       try {
         this.$log('publish start')
-        await this.$wait(1000)
+        this.publishing = true
+        // await this.$wait(1000)
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        // get spheres from workspace
+        let spheres = []
+        await Promise.all(
+          nodeInput.spheres.map(async (sphereId) => {
+            let sphere = await this.$rxdb.get(RxCollectionEnum.WS_SPHERE, sphereId)
+            if (sphere) spheres.push({name: sphere.name})
+          })
+        )
+        nodeInput.spheres = spheres
+        // create node
+        let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
+        this.$log('publish createdNode', createdNode)
+        this.publishing = false
+        this.$router.push(`/node/${createdNode.oid}?creating=true`).catch(e => e)
         this.$log('publish done')
+        this.publishing = false
       }
       catch (e) {
         this.$log('publish error', e)

@@ -2,20 +2,6 @@
 div(
   :style=`{position: 'relative',}`
   ).row.full-width.items-start.content-start
-  //- close
-  //- div(
-    v-if="contentKalpa"
-    :style=`{borderRadius: '10px',}`).row.full-width.b-50
-    img(
-      draggable="false"
-      :src="contentKalpa.thumbUrl"
-      :style=`{
-        height: '80px',
-        borderRadius: '10px',
-      }`)
-    .col.q-px-sm
-      .row.fit.items-center.content-center
-        span.text-white {{ contentKalpa.name }}
   //- opened
   content-player(
     v-if="contentKalpa"

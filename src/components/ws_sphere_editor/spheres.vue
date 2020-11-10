@@ -19,21 +19,44 @@ div(
         minHeight: '500px', maxHeight: '500px',
       }`
       @sphere="sphereAdd")
+  .row.full-width
+    q-input(
+      ref="sphereInput"
+      v-model="sphereSearching"
+      borderless dark dense
+      placeholder="Введите сферу"
+      :autofocus="true"
+      :input-style=`{
+        paddingLeft: '8px',
+        paddingTop: '4px',
+      }`
+      :style=`{
+        //- maxHeight: '24px',
+        minWidth: '80px',
+      }`
+      @keyup.enter="sphereInputEntered"
+      @keyup.backspace="sphereInputBackspaced"
+      @input.native="sphereInputEvented"
+      @focus="sphereInputFocused"
+      @blur="sphereInputBlurred"
+      ).full-width
   //- preview spheres...
-  div(
-    v-for="(sphere,si) in spheres"  :key="sphere"
-    :style=`{height: '42px'}`).row.items-center.content-center.q-mr-xs
-    ws-sphere-item(:id="sphere").b-60
-      template(v-slot:append)
-        q-icon(
-          @click="sphereDelete(sphere)"
-          name="clear" color="white" size="14px").q-mr-sm.q-mt-xs.cursor-pointer
+  .row.full-width.q-pb-sm
+    div(
+      v-for="(sphere,si) in spheres"  :key="sphere"
+      :style=`{}`).row.items-center.content-center.q-mr-xs.q-mb-xs
+      ws-sphere-item(:id="sphere").b-60
+        template(v-slot:append)
+          q-icon(
+            @click="sphereDelete(sphere)"
+            name="clear" color="white" size="14px").q-mr-sm.q-mt-xs.cursor-pointer
   //- sphere input for search and autocomplete...
-  q-input(
+  //- q-input(
     ref="sphereInput"
     v-model="sphereSearching"
     borderless dark dense
     placeholder="Введите сферу"
+    :autofocus="true"
     :input-style=`{
       paddingLeft: '8px',
       paddingTop: '4px',
