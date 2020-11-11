@@ -2,6 +2,7 @@
 .row.full-width.justify-center
   kalpa-finder(
     @contentKalpa="contentKalpaFound"
+    :pagesFilter="['workspace', 'kalpa']"
     :workspaceTypes="['IMAGE', 'VIDEO']"
     :kalpaTypes="['IMAGE', 'VIDEO']"
     :style=`{
