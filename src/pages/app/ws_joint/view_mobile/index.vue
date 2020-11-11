@@ -185,6 +185,7 @@ export default {
   },
   data () {
     return {
+      publishing: false,
       itemFinderOpened: false,
       itemOpened: 0,
       itemFinding: null,
@@ -268,6 +269,7 @@ export default {
     async publish () {
       try {
         this.$log('publish start')
+        this.publishing = true
         let jointInput = { leftItem: {oid: null}, rightItem: {oid: null} }
         await this.$wait(500)
         // check 0 item
