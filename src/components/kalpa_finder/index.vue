@@ -22,7 +22,7 @@ q-layout(
           @searchString="searchString = $event"
           @contentKalpa="contentKalpaFound")
       //- types
-      //- .row.full-width.justify-center
+      .row.full-width.justify-center
         div(
           :style=`{
           }`
