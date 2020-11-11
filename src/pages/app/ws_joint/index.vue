@@ -19,7 +19,7 @@ export default {
     return {
       jointNew: {
         name: '',
-        type: 'ASSOCIATIVE',
+        type: 'PROBLEM_SOLUTION',
         items: [],
       },
       joint: null,

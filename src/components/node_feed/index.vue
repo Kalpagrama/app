@@ -38,13 +38,13 @@ div(
               :style=`{height: '50px',}`).full-width
               span.text-bold {{ a.name }}
     //- items wrapper
-    .row.full-width
+    .row.full-width.items-start.content-start
       div(
         v-if="['SLIDER', 'PIP', 'VERTICAL', 'HORIZONTAL'].includes(node.layout)"
         :style=`{
           position: 'relative',
           borderRadius: '10px', overflow: 'hidden',
-          minHeight: height ? height+'px' : 'auto',
+          //- minHeight: height ? height+'px' : 'auto',
         }`
         ).row.full-width.items-start.content-start
         composition-player(

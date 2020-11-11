@@ -25,72 +25,72 @@ q-layout(view="hHh Lpr lff")
             :name="node.name"
             :thumbUrl="node.items[0].thumbUrl"
             :isActive="true")
-      //- node items
-      div(v-if="node").row.full-width.items-start.content-start
-        div(
-          v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
-          ).row.full-width.items-start.content-start.justify-center
+  q-page-container
+    q-page(:style=`{paddingTop: '0px', paddingBottom: '0px'}`).row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingTop: '0px',}`).row.full-width.items-start.content-start
+        //- node items
+        div(v-if="node").row.full-width.items-start.content-start
           div(
-            :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-              borderRadius: '10px',
-              background: 'rgb(35,35,35)'
-            }`
-            ).row.full-width
-            //- node author
-            .row.full-width.justify-center
-              div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
-                q-btn(
-                  :to="'/user/'+node.author.oid"
-                  flat color="white" dense no-caps
-                  )
-                  user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
-                  span.text-grey-4.q-ml-sm {{ node.author.name }}
-                .col
-                small.text-grey-8.q-mr-xs {{ node.countViews }}
-                q-icon(name="visibility" color="grey-8").q-mr-md
-                small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-            //- node body
+            v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
+            ).row.full-width.items-start.content-start.justify-center
             div(
               :style=`{
                 maxWidth: $store.state.ui.pageWidth+'px',
-                borderRadius: '10px', overflow: 'hidden',}`
-              ).row.full-width.b-40
-              list-middle(
-                rootMargin="-30% 0px"
-                :items="node.items" :itemStyles=`{marginTop: '0px',}`)
-                template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-                  div(
-                    :style=`{
-                      position: 'relative',
-                      borderRadius: '10px', overflow: 'hidden',
-                    }`
-                    ).row.full-width
-                    composition-player(
-                      :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
-                      :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
-              //- node name
+                borderRadius: '10px',
+                background: 'rgb(35,35,35)'
+              }`
+              ).row.full-width
+              //- node author
+              .row.full-width.justify-center
+                div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
+                  q-btn(
+                    :to="'/user/'+node.author.oid"
+                    flat color="white" dense no-caps
+                    )
+                    user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
+                    span.text-grey-4.q-ml-sm {{ node.author.name }}
+                  .col
+                  small.text-grey-8.q-mr-xs {{ node.countViews }}
+                  q-icon(name="visibility" color="grey-8").q-mr-md
+                  small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+              //- node body
               div(
                 :style=`{
-                  textAlign: 'center',
-                }`
-                ).row.full-width.items-start.content-start.justify-center.q-pa-md
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
-              //- node description
-              .row.full-width
-                span.text-white {{ node.description }}
-            //- node actions
-            view-spheres(:node="node")
-          node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
-      //- node is creating, wait...
-      .row.full-width.justify-center
-        node-mockup(
-          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-  q-page-container
-    q-page(:style=`{paddingTop: '16px', paddingBottom: '0px'}`).row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingTop: '48px',}`).row.full-width
+                  maxWidth: $store.state.ui.pageWidth+'px',
+                  borderRadius: '10px', overflow: 'hidden',}`
+                ).row.full-width.b-40
+                list-middle(
+                  rootMargin="-30% 0px"
+                  :items="node.items" :itemStyles=`{marginTop: '0px',}`)
+                  template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
+                    div(
+                      :style=`{
+                        position: 'relative',
+                        borderRadius: '10px', overflow: 'hidden',
+                      }`
+                      ).row.full-width
+                      composition-player(
+                        :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
+                        :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
+                //- node name
+                div(
+                  :style=`{
+                    textAlign: 'center',
+                  }`
+                  ).row.full-width.items-start.content-start.justify-center.q-pa-md
+                  span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+                //- node description
+                .row.full-width
+                  span.text-white {{ node.description }}
+              //- node actions
+              view-spheres(:node="node")
+            node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
+        //- node is creating, wait...
+        .row.full-width.justify-center
+          node-mockup(
+            v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
+            :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
+            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
         router-view(v-if="node" :node="node")
       //- q-page-sticky(
         v-if="node"

@@ -9,8 +9,10 @@ q-layout(view="hHh Lpr lff").b-30
     transition-hide="none")
     kalpa-finder(
       @contentKalpa="itemFound"
+      :pageId_="'kalpa'"
+      :pagesShow="false"
       :workspaceTypes="['IMAGE', 'VIDEO', 'NODE']"
-      :kalpaTypes="['IMAGE', 'VIDEO', 'NODE', 'USER', 'SPHERE']"
+      :kalpaTypes="['NODE', 'USER', 'SPHERE']"
       :style=`{
         height: $q.screen.height+'px',
         maxWidth: $store.state.ui.pageWidth+'px',
@@ -76,12 +78,58 @@ q-layout(view="hHh Lpr lff").b-30
               .col
               q-btn(
                 v-if="itemOpened !== 1" flat dense no-caps color="grey-5" icon-right="keyboard_arrow_down"
-                :style=`{position: 'relative'}`) Проблема
+                :style=`{position: 'relative'}`) {{ typeGet(0).name }}
+                q-popup-proxy(
+                  fit dark
+                  position="bottom")
+                  div(
+                    :style=`{
+                      maxWidth: $q.screen.width < 800 ? $q.screen.width+'px' : 300+'px',
+                      borderRadius: '10px',overflow: 'hidden',}`
+                    ).row.full-width.items-start.content-start.b-40
+                    //- header
+                    div(
+                      v-if="$q.screen.width < 800"
+                      :style=`{
+                        height: '60px',
+                      }`
+                      ).row.full-width.items-center
+                      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите тип связи
+                      .col
+                      q-btn(round flat color="white" icon="clear" v-close-popup).q-mr-sm
+                    q-btn(
+                      v-for="t in types" :key="t.id" v-close-popup
+                      @click="typeClick(0, t)"
+                      flat color="grey-5" no-caps
+                      ).full-width {{ t.name }}
             //- item right footer
             div(v-if="ii === 1" :style=`{height: '40px', position: 'relative',}`).row.full-width
               q-btn(
                 v-if="itemOpened !== 0" flat dense no-caps color="grey-5" icon="keyboard_arrow_down"
-                :style=`{position: 'relative'}`) Решение
+                :style=`{position: 'relative'}`) {{ typeGet(1).name }}
+                q-popup-proxy(
+                  fit dark
+                  position="bottom")
+                  div(
+                    :style=`{
+                      maxWidth: $q.screen.width < 800 ? $q.screen.width+'px' : 300+'px',
+                      borderRadius: '10px',overflow: 'hidden',}`
+                    ).row.full-width.items-start.content-start.b-40
+                    //- header
+                    div(
+                      v-if="$q.screen.width < 800"
+                      :style=`{
+                        height: '60px',
+                      }`
+                      ).row.full-width.items-center
+                      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выберите тип связи
+                      .col
+                      q-btn(round flat color="white" icon="clear" v-close-popup).q-mr-sm
+                    q-btn(
+                      v-for="t in types" :key="t.id" v-close-popup
+                      @click="typeClick(1, t)"
+                      flat color="grey-5" no-caps
+                      ).full-width {{ t.name }}
               .col
               q-btn(round flat dense color="grey-9" icon="delete_outline" @click="itemDelete(1)")
           //- no item
@@ -99,14 +147,19 @@ q-layout(view="hHh Lpr lff").b-30
               @click="itemOpened === ii ? itemOpened = null : itemOpened = ii"
               :style=`{height: '60px'}`
               ).row.full-width
+      //- debug
+      //- .row.full-width.justify-center
+        div(:style=`{maxWidth: 600+'px'}`).row.full-width.bg-green
+          small.text-white {{ joint.type }}
       .row.full-width.justify-center
         div(:style=`{maxWidth: 600+'px'}`).row.full-width.q-mt-md
           edit-name(v-if="joint" :node="joint" placeholder="В чем связь?")
           div(:style=`{paddingLeft: '68px', paddingRight: '68px',}`).row.full-width.q-pt-xl
             q-btn(
-              @click="join()"
+              @click="publish()"
               color="green" no-caps
               icon="link"
+              :loading="publishing"
               :style=`{
                 height: '50px',
               }`).full-width
@@ -121,6 +174,7 @@ q-layout(view="hHh Lpr lff").b-30
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'wsJoint_viewMobile',
@@ -134,10 +188,33 @@ export default {
       itemFinderOpened: false,
       itemOpened: 0,
       itemFinding: null,
-      itemMaxHeight: 0
+      itemMaxHeight: 0,
+    }
+  },
+  computed: {
+    types () {
+      return [
+        {id: 'CAUSE', name: 'Причина', 0: 'CAUSE_EFFECT', 1: 'EFFECT_CAUSE'},
+        {id: 'EFFECT', name: 'Следствие', 0: 'EFFECT_CAUSE', 1: 'CAUSE_EFFECT'},
+        {id: 'PROBLEM', name: 'Проблема', 0: 'PROBLEM_SOLUTION', 1: 'SOLUTION_PROBLEM'},
+        {id: 'SOLUTION', name: 'Решение', 0: 'SOLUTION_PROBLEM', 1: 'PROBLEM_SOLUTION'},
+        {id: 'TRUE', name: 'Правда', 0: 'TRUE_FALSE', 1: 'FALSE_TRUE'},
+        {id: 'FALSE', name: 'Ложь', 0: 'FALSE_TRUE', 1: 'TRUE_FALSE'},
+        {id: 'FROM', name: 'Первое', 0: 'FROM_TO', 1: 'TO_FROM'},
+        {id: 'TO', name: 'Второе', 0: 'TO_FROM', 1: 'FROM_TO'},
+      ]
     }
   },
   methods: {
+    typeGet (index) {
+      return this.types.find(t => {
+        return t.id === this.joint.type.split('_')[index]
+      })
+    },
+    typeClick (index, type) {
+      this.$log('typeClick', index, type)
+      this.joint.type = type[index]
+    },
     async itemFound (item) {
       this.$log('itemFound', item)
       if (item.wsItemType) {
@@ -182,8 +259,89 @@ export default {
       this.$set(this.joint.items, itemIndex, null)
       this.itemOpened = itemIndex === 0 ? 1 : 0
     },
-    async join () {
-      this.$log('join')
+    async publish () {
+      try {
+        this.$log('publish start')
+        let jointInput = { leftItem: {oid: null}, rightItem: {oid: null} }
+        await this.$wait(500)
+        // check 0 item
+        if (this.joint.items[0]) {
+          if (this.joint.items[0].oid) {
+            jointInput.leftItem.oid = this.joint.items[0].oid
+          }
+          // else if (this.joint.items[0].oidUrl) {
+          //   // get content by url...
+          //   throw new Error('Need to upload content!')
+          // }
+          // else if (this.joint.items[0].wsItemType === 'WS_NODE') {
+          //   // pre publish node
+          //   throw new Error('Need to publish node!')
+          // }
+          else {
+            throw new Error('Wrong first item!')
+          }
+        }
+        // check 1 item
+        if (this.joint.items[1]) {
+          if (this.joint.items[1].oid) {
+            jointInput.rightItem.oid = this.joint.items[1].oid
+          }
+          // else if (this.joint.items[1].oidUrl) {
+          //   // get content by url...
+          //   throw new Error('Need to upload content!')
+          // }
+          // else if (this.joint.items[1].wsItemType === 'WS_NODE') {
+          //   // pre publish node...
+          //   throw new Error('Need to publish node!')
+          // }
+          else {
+            throw new Error('Wrong second item!')
+          }
+        }
+        // essence
+        if (this.joint.type === 'ESSENCE') {
+          if (this.joint.name.length === 0) {
+            jointInput.jointType = 'ASSOCIATIVE'
+          }
+          else {
+            jointInput.jointType = 'ESSENCE'
+            jointInput.name = this.joint.name
+          }
+        }
+        else if (this.joint.type === 'ASSOCIATIVE') {
+          jointInput.jointType = this.joint.type
+        }
+        else {
+          this.$log('*** joint TYPE *** ', this.joint.type)
+          let switchMap = {
+            EFFECT_CAUSE: 'CAUSE_EFFECT',
+            SOLUTION_PROBLEM: 'PROBLEM_SOLUTION',
+            TRUE_FALSE: 'FALSE_TRUE',
+            TO_FROM: 'FROM_TO'
+          }
+          // switch items and set another...
+          if (switchMap[this.joint.type]) {
+            this.$log('*** SWITCH ***', this.joint.type)
+            let t = jointInput.rightItem
+            jointInput.rightItem = jointInput.leftItem
+            jointInput.leftItem = t
+            jointInput.jointType = switchMap[this.joint.type]
+          }
+          else {
+            jointInput.jointType = this.joint.type
+          }
+        }
+        let joint = await ObjectCreateApi.jointCreate(jointInput)
+        this.$log('joint done joint', joint)
+        this.$log('publish done')
+        this.publishing = false
+        this.$router.push('/user/' + this.$store.getters.currentUser().oid + '/joints')
+      }
+      catch (e) {
+        this.$log('publish error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.publishing = false
+      }
     }
   }
 }
