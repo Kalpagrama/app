@@ -91,7 +91,7 @@ q-layout(view="hHh Lpr lff")
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-        router-view(v-if="node" :node="node")
+        router-view(v-if="node" :node="node" :style=`{paddingTop: '46px',}`)
       //- q-page-sticky(
         v-if="node"
         position="bottom right" :offset="[0, 70]"
