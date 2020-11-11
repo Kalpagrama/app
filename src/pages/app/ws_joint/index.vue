@@ -2,7 +2,7 @@
 component(
   v-if="joint"
   v-bind="$props"
-  :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
+  :is="$q.screen.gt.sm ? 'view-mobile' : 'view-mobile'"
   :joint="joint")
 </template>
 

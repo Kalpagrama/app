@@ -7,12 +7,13 @@ div(
     draggable="false"
     :src="contentKalpa.url"
     :style=`{
-      //- maxHeight: $q.screen.height*0.8+'px',
+      maxHeight: $q.screen.height*0.5+'px',
       borderRadius: '10px',
       objectFit: 'contain',
+      background: 'rgb(35,35,35)',
       ...styles
     }`
-    ).full-width.b-40
+    ).full-width
 </template>
 
 <script>

@@ -44,53 +44,14 @@ q-layout(
               :style=`{
               }`).full-width
               template(v-slot:bar)
-                div(
-                  v-if="player && figures.length > 0"
+                q-btn(
+                  v-if="!node && viewId !== 'node'"
+                  @click="nodeCreateStart()"
+                  round color="green" icon="add"
                   :style=`{
-                    position: 'absolute', zIndex: 2050, pointerEvents: 'none',
-                    //- borderRadius: '10px', overflow: 'hidden',
-                  }`
-                  ).row.fit
-                  template(v-for="(f,fi) in figures")
-                    div(
-                      v-if="f.length === 1"
-                      :key="fi"
-                      :style=`{
-                        position: 'absolute', zIndex: 2050, top: '0px',
-                        left: f[0].t/player.duration*100+'%',
-                        width: '2px',
-                        background: 'rgba(255,255,255, 0.5)',
-                      }`
-                      ).row.full-height
-                    div(
-                      v-if="f.length === 2"
-                      :key="fi"
-                      :style=`{
-                        position: 'absolute', zIndex: 2050, top: '-2px',
-                        left: f[0].t/player.duration*100+'%',
-                        width: (f[1].t-f[0].t)/player.duration*100+'%',
-                        height: 'calc(100% + 4px)',
-                        border: '2px solid rgb(76,175,80)',
-                        borderRadius: '4px',
-                        background: 'rgba(255,255,255,0.2)',
-                        pointerEvents: 'none',
-                      }`
-                      ).row
-              template(v-slot:bar-current-time=`{panning}`)
-                transition(enter-active-class="animated fadeIn" leave-active-class="none")
-                  q-btn(
-                    v-if="player && !panning && !node && viewId !== 'node'"
-                    @click="nodeCreateStart()"
-                    round color="green" icon="add" dense
-                    :style=`{
-                      position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
-                      left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
-                    }`)
-          //- view-nodes-bar(
-            v-if="!node"
-            :player="player"
-            :contentKalpa="contentKalpa"
-            :contentBookmark="contentBookmark")
+                    position: 'absolute', zIndex: 1000, bottom: '4px', borderRadius: '50%',
+                    left: 'calc(50% - 20px)'
+                  }`)
           page-details(
             v-if="!node"
             :node="node"

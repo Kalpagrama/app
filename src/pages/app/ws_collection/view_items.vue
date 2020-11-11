@@ -11,6 +11,7 @@ q-page(
     transition-show="none"
     transition-hide="none")
     kalpa-finder(
+      @contentKalpa="contentKalpaFound"
       :style=`{
         height: $q.screen.height+'px',
         maxWidth: $store.state.ui.pageWidth+'px',
