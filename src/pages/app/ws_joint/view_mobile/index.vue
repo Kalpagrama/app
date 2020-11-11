@@ -63,9 +63,13 @@ q-layout(view="hHh Lpr lff").b-30
             div(v-if="ii === 0" :style=`{height: '40px', position: 'relative',}`).row.full-width
               q-btn(round flat dense color="grey-9" icon="delete_outline" @click="itemDelete(0)")
               .col
-              q-btn(v-if="itemOpened !== 1" flat dense no-caps color="grey-5" icon-right="keyboard_arrow_down") Причина
+              q-btn(
+                v-if="itemOpened !== 1" flat dense no-caps color="grey-5" icon-right="keyboard_arrow_down"
+                :style=`{position: 'relative'}`) Проблема
             div(v-if="ii === 1" :style=`{height: '40px', position: 'relative',}`).row.full-width
-              q-btn(v-if="itemOpened !== 0" flat dense no-caps color="grey-5" icon="keyboard_arrow_down") Причина
+              q-btn(
+                v-if="itemOpened !== 0" flat dense no-caps color="grey-5" icon="keyboard_arrow_down"
+                :style=`{position: 'relative'}`) Решение
               .col
               q-btn(round flat dense color="grey-9" icon="delete_outline" @click="itemDelete(1)")
           div(

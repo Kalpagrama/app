@@ -40,7 +40,7 @@ q-layout(
               :style=`{}`).q-mr-xs.q-px-xs {{ type.name }}
   q-page-container
     q-page
-      kalpa-loader(
+      //- kalpa-loader(
         v-if="viewId === 'kalpa' ? searchString.length > 3 : true"
         :immediate="true"
         :query="viewId === 'workspace' ? queryWorkspace : queryKalpa" :limit="1000" v-slot=`{items,next,nexting}`)
