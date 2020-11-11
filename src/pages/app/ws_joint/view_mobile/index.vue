@@ -9,9 +9,9 @@ q-layout(view="hHh Lpr lff").b-30
     transition-hide="none")
     kalpa-finder(
       @contentKalpa="itemFound"
-      :pageId_="'kalpa'"
-      :pagesShow="false"
-      :workspaceTypes="['IMAGE', 'VIDEO', 'NODE']"
+      :pageId_="'nodes-mine'"
+      :pagesFilter="['nodes-mine', 'nodes-bookmark', 'kalpa']"
+      :workspaceTypes="['NODE_BOOKMARK']"
       :kalpaTypes="['NODE', 'USER', 'SPHERE']"
       :style=`{
         height: $q.screen.height+'px',
@@ -223,6 +223,12 @@ export default {
           }
           if (item.type === 'IMAGE') {
           }
+          if (item.type === 'NODE') {
+            item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+            this.$log('itemFound item get', item)
+            this.$set(this.joint.items, this.itemFinding, JSON.parse(JSON.stringify(item)))
+            this.itemOpened = this.itemFinding
+          }
         }
       }
       else {
@@ -299,14 +305,9 @@ export default {
           }
         }
         // essence
-        if (this.joint.type === 'ESSENCE') {
-          if (this.joint.name.length === 0) {
-            jointInput.jointType = 'ASSOCIATIVE'
-          }
-          else {
-            jointInput.jointType = 'ESSENCE'
-            jointInput.name = this.joint.name
-          }
+        if (this.joint.name.length > 0) {
+          jointInput.jointType = 'ESSENCE'
+          jointInput.name = this.joint.name
         }
         else if (this.joint.type === 'ASSOCIATIVE') {
           jointInput.jointType = this.joint.type

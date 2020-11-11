@@ -54,7 +54,8 @@ export default {
       return [
         {id: 'VIDEO', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
         {id: 'IMAGE', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
-        {id: 'NODE', name: 'Ядра', selector: {wsItemType: 'WS_NODE'}},
+        {id: 'NODE_WS', name: 'Ядра черновики', selector: {wsItemType: 'WS_NODE'}},
+        {id: 'NODE_BOOKMARK', name: 'Ядра сохраненные', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
         {id: 'JOINT', name: 'Связи', selector: {wsItemType: 'WS_JOINT'}},
         {id: 'USER', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
         {id: 'SPHERE', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}}

@@ -94,7 +94,7 @@
             //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
     //- name
-    //- div(
+    div(
       v-if="joint.name.length > 0"
       @click="jointClick()"
       ).row.full-width.justify-center.q-pa-sm.cursor-pointer

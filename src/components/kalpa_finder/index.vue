@@ -22,6 +22,7 @@ q-layout(
           @searchString="searchString = $event"
           @contentKalpa="contentKalpaFound")
   q-page-container
+    //- slot(:name="`page-${pageId}`" :searchString="searchString")
     component(
       v-bind="$props"
       :is="`page-${pageId}`"
@@ -39,22 +40,35 @@ export default {
   name: 'kalpaFinder',
   props: {
     pageId_: {type: String, default: 'workspace'},
+    pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
     workspaceTypes: {type: Array},
     kalpaTypes: {type: Array},
   },
   components: {
     pageWorkspace: () => import('./page_workspace.vue'),
-    pageKalpa: () => import('./page_kalpa.vue')
+    pageKalpa: () => import('./page_kalpa.vue'),
+    pageNodesMine: () => import('./page_nodes_mine.vue'),
+    pageNodesBookmark: () => import('./page_nodes_bookmark.vue'),
+    // pageQuery: () => import('./page_query.vue')
   },
   data () {
     return {
       pageId: 'workspace',
-      pages: [
-        {id: 'workspace', name: 'Мастерская'},
-        {id: 'kalpa', name: 'Кальпаграма'},
-      ],
       searchString: ''
+    }
+  },
+  computed: {
+    pages () {
+      return [
+        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
+        {id: 'kalpa', name: 'Кальпаграма', component: 'page-kalpa'},
+        {id: 'nodes-mine', name: 'Мои ядра', component: 'page-nodes-mine'},
+        {id: 'nodes-bookmark', name: 'Ядра из закладок', component: 'page-nodes-bookmark'}
+      ].filter(p => {
+        if (this.pagesFilter) return this.pagesFilter.includes(p.id)
+        else return true
+      })
     }
   },
   watch: {
