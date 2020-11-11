@@ -138,7 +138,7 @@ export default {
   data () {
     return {
       itemFinderOpened: false,
-      itemOpened: null,
+      itemOpened: 0,
       itemFinding: null,
       itemMaxHeight: 0
     }

@@ -40,8 +40,7 @@ q-layout(
   q-page-container
     //- component(
       :is="`page-${pageId}`"
-      :style=`{}`
-      )
+      :style=`{}`)
     q-page
       kalpa-loader(
         v-if="pageId === 'kalpa' ? searchString.length > 3 : true"
@@ -164,7 +163,7 @@ export default {
   methods: {
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
-      this.$router.replace('/content/' + contentKalpa.oid)
+      // this.$router.replace('/content/' + contentKalpa.oid)
       let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) {
         await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
@@ -179,6 +178,7 @@ export default {
       }
       // bookmark subscribe
       if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
+      this.$emit('contentKalpa', contentKalpa)
     },
     typeClick (type) {
       this.$log('typeClick', type)
