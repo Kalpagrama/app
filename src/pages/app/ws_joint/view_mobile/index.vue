@@ -1,18 +1,37 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(view="hHh Lpr lff").b-30
+  q-dialog(
+    v-model="itemFinderOpened"
+    @hide="itemFinding = null"
+    position="bottom"
+    maximized
+    transition-show="none"
+    transition-hide="none")
+    kalpa-finder(
+      :workspaceFilter="['WS_NODE', 'WS_BOOKMARK']"
+      :typesFilter="['NODE', 'USER', 'SPHERE', 'VIDEO', 'IMAGE']"
+      :style=`{
+        height: $q.screen.height+'px',
+        maxWidth: $store.state.ui.pageWidth+'px',
+      }`)
+      template(v-slot:header)
+        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
+          .col
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать элемент
+      template(v-slot:tint=`{item}`)
+        div(
+          @click="itemFound(item)"
+          :class=`{
+            //- 'bg-red': collection.bookmarks.includes(item.id)
+          }`
+          :style=`{
+            position: 'absolute', zIndex: 1000,
+            opacity: 0.5,
+          }`
+          ).row.fit
   q-header().b-30
     .row.full-width.items-start.content-start.justify-center.q-pt-xs
-      //- header
-      //- .row.full-width.items-center.content-center.q-pa-sm
-        q-btn(flat round color="grey-8" icon="keyboard_arrow_left" no-caps @click="$router.back()")
-        .col
-          .row.full-width.justify-center
-            q-btn(no-caps color="green").q-px-md
-              span.text-white Связать
-            //- span(:style=`{fontSize: '18px'}`).text-white.text-bold Joint creator
-            //- edit-name(v-if="joint" :node="joint")
-        //- q-btn(round flat color="grey-8" icon="delete_outline" @click="$router.back()")
-        q-btn(round flat color="grey-8" icon="more_vert")
       //- items
       div(
         :style=`{
@@ -20,14 +39,14 @@ q-layout(view="hHh Lpr lff")
           minHeight: $q.screen.height/2+'px',
           //- height: $q.screen.height/2+'px',
         }`
-        ).row.full-width.items-end.content-end.q-gutter-xs.q-pr-xs
+        ).row.full-width.items-end.content-end.q-px-sm
         //- q-resize-observer(@resize="$event => itemMaxHeight = Math.max(itemMaxHeight, $event.height)")
         q-btn(
           @click="itemOpened = null"
           round flat color="green" icon="link" size="lg"
           :style=`{
-            position: 'absolute', zIndex: 2000, bottom: '0px',
-            left: 'calc(50% - 35px)'
+            position: 'absolute', zIndex: 2000, bottom: '40px',
+            left: itemOpened === null ? 'calc(50% - 30px)' : itemOpened === 0 ? 'calc(100% - 60px - 42px)' : 'calc(60px - 20px)',
           }`)
         div(
           v-for="(i,ii) in 2" :key="ii"
@@ -36,29 +55,33 @@ q-layout(view="hHh Lpr lff")
             maxWidth: itemOpened === null ? '50%' : itemOpened === ii ? '100%' : '60px',
             transform: ii === 0 ? 'perspective(1000px) rotateY(10deg)' : 'perspective(1000px) rotateY(-10deg)'
           }`
-          ).col.full-height
+          ).col
           edit-item(
             v-if="joint.items[ii]"
             :item="joint.items[ii]" :isOpened="itemOpened === ii"
             @open="itemOpened = ii")
-            //- div(
-              v-if="itemFinding === null"
-              :style=`{
-                height: '40px',
-              }`
-              ).row.full-width
-              div(v-if="itemOpened === ii").row.full-width
-                q-btn(round flat dense icon="delete_outline" @click="itemDelete(ii)")
-          q-btn(
+            div(v-if="ii === 0" :style=`{height: '40px', position: 'relative',}`).row.full-width
+              q-btn(round flat dense color="grey-9" icon="delete_outline" @click="itemDelete(0)")
+              .col
+              q-btn(v-if="itemOpened !== 1" flat dense no-caps color="grey-5" icon-right="keyboard_arrow_down") Причина
+            div(v-if="ii === 1" :style=`{height: '40px', position: 'relative',}`).row.full-width
+              q-btn(v-if="itemOpened !== 0" flat dense no-caps color="grey-5" icon="keyboard_arrow_down") Причина
+              .col
+              q-btn(round flat dense color="grey-9" icon="delete_outline" @click="itemDelete(1)")
+          div(
             v-else
-            @click="itemFinding === ii ? itemFinding = null : itemFinding = ii"
-            flat color="green"
-            :icon="itemFinding === ii ? 'clear' : 'add'"
-            :style=`{
-              //- height: '60px',
-              background: 'rgb(35,35,35)',
-              //- marginBottom: itemFinding === ii ? '0px' : '0px',
-            }`).fit
+            :style=`{background: 'rgb(35,35,35)', borderRadius: '10px', marginBottom: '42px',}`).row.full-width
+            q-btn(
+              @click="itemFinderOpened = true, itemFinding = ii"
+              flat color="green" size="lg"
+              :icon="itemFinding === ii ? 'clear' : 'add'"
+              :style=`{
+                height: '100px',
+              }`).full-width.b-40
+            div(
+              @click="itemOpened === ii ? itemOpened = null : itemOpened = ii"
+              :style=`{height: '60px'}`
+              ).row.full-width
       //- debug
       //- .row.full-width.bg-green
         small.text-white itemMaxHeight: {{itemMaxHeight}}
@@ -99,6 +122,8 @@ q-layout(view="hHh Lpr lff")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'wsJoint_viewMobile',
   props: ['joint'],
@@ -108,17 +133,46 @@ export default {
   },
   data () {
     return {
+      itemFinderOpened: false,
       itemOpened: null,
       itemFinding: null,
       itemMaxHeight: 0
     }
   },
   methods: {
-    itemFound (item) {
+    async itemFound (item) {
       this.$log('itemFound', item)
-      this.joint.items[this.itemFinding] = item
-      this.itemOpened = this.itemFinding
+      if (item.wsItemType) {
+        if (item.wsItemType === 'WS_BOOKMARK') {
+          if (item.type === 'VIDEO') {
+          }
+          if (item.type === 'IMAGE') {
+          }
+        }
+      }
+      else {
+        item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+        this.$log('itemFound item get', item)
+        // use node as is...
+        if (item.oid && item.type === 'NODE') {
+          this.$log('using node as is...')
+          this.$set(this.joint.items, this.itemFinding, JSON.parse(JSON.stringify(item)))
+          this.itemOpened = this.itemFinding
+        }
+        if (item.oid && item.type === 'VIDEO') {
+          // use as video...
+        }
+        if (item.oid && item.type === 'IMAGE') {
+          // use as image node...
+        }
+        if (item.oid && item.type === 'USER') {
+          this.$log('using user as is...')
+          this.$set(this.joint.items, this.itemFinding, JSON.parse(JSON.stringify(item)))
+          this.itemOpened = this.itemFinding
+        }
+      }
       this.itemFinding = null
+      this.itemFinderOpened = false
     },
     itemDelete (itemIndex) {
       this.$log('itemDelete', itemIndex)

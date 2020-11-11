@@ -3,7 +3,7 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.fit.items-end.content-end
+  ).row.full-width.items-end.content-end
   div(
     v-if="!isOpened"
     @click="$emit('open')"
