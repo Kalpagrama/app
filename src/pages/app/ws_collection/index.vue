@@ -3,7 +3,6 @@ q-layout(
   view="hHh Lpr lff"
   ).b-30
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
-    //.row.full-width.justify-center.q-pt-sm.q-px-sm.b-30.br
     .row.full-width.justify-center
       div(
         v-if="collection"
@@ -17,14 +16,14 @@ q-layout(
           .row.fit.items-center.content-center
             q-input(
               v-model="collection.name"
-              placeholder="Enter feed name"
+              placeholder="Введите название"
               borderless dark color="green"
               :autofocus="collection.name.length === 0"
               :input-style=`{
                 fontSize: '18px',
                 fontWeight: 'bold',
               }`
-              :label="'Collection'"
+              :label="'Коллекция'"
               :style=`{}`).full-width
         q-btn(round flat color="white" icon="view_week" @click="$router.push('/feeds/'+collection.id)")
     //- views
@@ -63,10 +62,10 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'details', name: 'Details'},
-        {id: 'items', name: 'Items'},
-        {id: 'subscriptions', name: 'Subscriptions'},
-        {id: 'views', name: 'Views'},
+        {id: 'details', name: 'Детали'},
+        {id: 'items', name: 'Элементы'},
+        {id: 'subscriptions', name: 'Подписки'},
+        // {id: 'views', name: 'Views'},
       ]
     }
   },

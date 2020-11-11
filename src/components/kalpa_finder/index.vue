@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  container)
+  container).b-30
   q-header.b-30
     .row.full-width.justify-center.q-px-sm
       slot(name="header")
@@ -14,9 +14,8 @@ q-layout(
           dense active-color="green"
           ).text-grey-6
           q-tab(
-            v-for="v in views" :key="v.id"
-            :name="v.id" :label="v.name"
-            )
+            v-for="p in pages" :key="p.id"
+            :name="p.id" :label="p.name")
       //- search
       .row.full-width
         ws-search(
@@ -39,6 +38,10 @@ q-layout(
               }`
               :style=`{}`).q-mr-xs.q-px-xs {{ type.name }}
   q-page-container
+    //- component(
+      :is="`page-${pageId}`"
+      :style=`{}`
+      )
     q-page
       kalpa-loader(
         v-if="viewId === 'kalpa' ? searchString.length > 3 : true"
@@ -52,6 +55,8 @@ q-layout(
             :style=`{
             }`
             ).q-mb-sm
+            template(v-slot:tint=`{item}`)
+              slot(name="tint" :item="item")
 </template>
 
 <script>
@@ -71,8 +76,8 @@ export default {
   },
   data () {
     return {
-      viewId: 'workspace',
-      views: [
+      pageId: 'workspace',
+      pages: [
         {id: 'workspace', name: 'Мастерская'},
         {id: 'kalpa', name: 'Кальпаграма'},
       ],
@@ -125,17 +130,17 @@ export default {
         sort: [{updatedAt: 'desc'}]
       }
       // add types filter
-      if (this.typesSelected.length > 0) {
-        res.selector.type = {$in: this.typesSelected}
-      }
-      else {
-        res.selector.type = {
-          $in: this.types.reduce((acc, val) => {
-            acc.push(val.id)
-            return acc
-          }, [])
-        }
-      }
+      // if (this.typesSelected.length > 0) {
+      //   res.selector.type = {$in: this.typesSelected}
+      // }
+      // else {
+      //   res.selector.type = {
+      //     $in: this.types.reduce((acc, val) => {
+      //       acc.push(val.id)
+      //       return acc
+      //     }, [])
+      //   }
+      // }
       // add name filter
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')

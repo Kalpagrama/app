@@ -35,8 +35,9 @@ div(
   //- preview
   img(
     @click="$emit('previewClick')"
-    :src="composition.thumbUrl"
     draggable="false"
+    loading="lazy"
+    :src="composition.thumbUrl"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',

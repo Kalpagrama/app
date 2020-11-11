@@ -30,7 +30,7 @@ q-page(
           q-btn(
             @click="collectionCreatorOpened = true"
             round flat color="grey-4" icon="add").full-height
-          q-btn(
+          //- q-btn(
             round flat color="grey-4" icon="tune").full-height
   kalpa-loader(
     :immediate="true"

@@ -12,7 +12,7 @@ q-layout(
           q-icon(name="school" size="30px" color="white").q-mr-md.q-ml-sm
           .col
             span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
-          q-btn(round flat color="white" icon="more_vert")
+          //- q-btn(round flat color="white" icon="more_vert")
   q-page-container
     component(:is="viewId" :id="feedId" :paddingTop="40" :useViews="feedId !== 'all'")
       template(v-slot:top)

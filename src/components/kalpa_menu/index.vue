@@ -115,7 +115,7 @@ div(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           ).row.full-width.items-center.content-center
           q-btn(
-            :to="'/workspace/node/new'"
+            :to="'/workspace/create'"
             flat color="green" no-caps icon="add" size="md"
             :align="mini ? 'center' : 'left'"
             :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
@@ -148,7 +148,7 @@ export default {
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
+        // {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
         {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,

@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width.q-pa-md
-  .row.full-width
+.row.full-width.q-py-md.q-px-sm
+  .row.full-width.q-px-sm
     span.text-bold.text-white {{ $t('Password', 'Пароль') }}
   //- set password
   div(v-if="!$store.getters.currentUser().settings.hasPermanentPassword").row.full-width

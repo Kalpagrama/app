@@ -62,7 +62,7 @@ q-page.row.full-width.justify-center
         email-editor()
         password-editor()
         //- save
-        .row.full-width.justify-start.q-pa-md
+        .row.full-width.justify-start.q-py-md.q-px-sm
           //- .col
           q-btn(
             @click="save()"

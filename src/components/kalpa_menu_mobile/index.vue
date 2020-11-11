@@ -17,7 +17,7 @@
           :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
           small.text-grey-6 Новое
-    router-link(:to="'/workspace/node/new'").col
+    router-link(:to="'/workspace/create'").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
           round dense color="green" icon="add" size="lg"
@@ -33,11 +33,11 @@
           small.text-grey-6 Уведомления
     //- profile/menu
     .col
-      router-link(
-        :to="'/user/'+$store.getters.currentUser().oid"
+      div(
+        @click="profileClick()"
         ).row.full-height.items-center.content-center.justify-center
+        //- @click.native="profileClick"
         user-avatar(
-          @click.native="profileClick"
           :url="$store.getters.currentUser().profile.photoUrl" :width="30" :height="30"
           :style=`{
             borderRadius: '50%',
@@ -57,8 +57,12 @@ export default {
   methods: {
     profileClick () {
       this.$log('profileClick')
+      // :to="'/user/'+$store.getters.currentUser().oid"
       if (this.$route.name.split('.')[0] === 'user' && this.$route.params.oid === this.$store.getters.currentUser().oid) {
         this.$store.commit('ui/stateSet', ['mobileMenuShow', !this.$store.state.ui.mobileMenuShow])
+      }
+      else {
+        this.$router.push('/user/' + this.$store.getters.currentUser().oid)
       }
     }
   }

@@ -7,18 +7,18 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header().b-30
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        //- div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
+    .row.full-width.justify-center.q-pt-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-mb-sm
+        div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-sm
           q-btn(
             v-if="$q.screen.width > $store.state.ui.pageWidth+140"
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mx-sm.q-my-xs
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
             span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
-          kalpa-bookmark(
+          //- kalpa-bookmark(
             v-if="node"
             :oid="node.oid"
             type="NODE"
@@ -89,7 +89,7 @@ q-layout(view="hHh Lpr lff")
           :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
   q-page-container
-    q-page(:style=`{paddingTop: '8px', paddingBottom: '0px'}`).row.full-width.justify-center
+    q-page(:style=`{paddingTop: '16px', paddingBottom: '0px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingTop: '48px',}`).row.full-width
         router-view(v-if="node" :node="node")
       //- q-page-sticky(
