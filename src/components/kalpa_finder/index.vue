@@ -5,12 +5,12 @@ q-layout(
   q-header.b-30
     .row.full-width.justify-center.q-px-sm
       slot(name="header")
-      //- views
+      //- pages
       div(
         v-if="viewsShow"
         :style=`{marginBottom: '-2px'}`).row.full-width.q-px-sm
         q-tabs(
-          v-model="viewId" no-caps
+          v-model="pageId" no-caps
           dense active-color="green"
           ).text-grey-6
           q-tab(
@@ -44,9 +44,9 @@ q-layout(
       )
     q-page
       kalpa-loader(
-        v-if="viewId === 'kalpa' ? searchString.length > 3 : true"
+        v-if="pageId === 'kalpa' ? searchString.length > 3 : true"
         :immediate="true"
-        :query="viewId === 'workspace' ? queryWorkspace : queryKalpa" :limit="1000" v-slot=`{items,next,nexting}`)
+        :query="pageId === 'workspace' ? queryWorkspace : queryKalpa" :limit="1000" v-slot=`{items,next,nexting}`)
         .row.full-width.items-start.content-start.q-pa-sm
           item(
             v-for="(item,ii) in items" :key="ii"
