@@ -7,7 +7,7 @@ q-layout(
       slot(name="header")
       //- pages
       div(
-        v-if="viewsShow"
+        v-if="pagesShow"
         :style=`{marginBottom: '-2px'}`).row.full-width.q-px-sm
         q-tabs(
           v-model="pageId" no-caps
@@ -38,8 +38,8 @@ import { UserApi } from 'src/api/user'
 export default {
   name: 'kalpaFinder',
   props: {
-    viewId_: {type: String, default: 'workspace'},
-    viewsShow: {type: Boolean, default: true},
+    pageId_: {type: String, default: 'workspace'},
+    pagesShow: {type: Boolean, default: true},
     workspaceTypes: {type: Array},
     kalpaTypes: {type: Array},
   },
@@ -55,6 +55,17 @@ export default {
         {id: 'kalpa', name: 'Кальпаграма'},
       ],
       searchString: ''
+    }
+  },
+  watch: {
+    pageId_: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('pageId_ TO', to)
+        if (to) {
+          this.pageId = to
+        }
+      }
     }
   },
   methods: {
