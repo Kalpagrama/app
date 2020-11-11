@@ -14,16 +14,15 @@ q-layout(
           dense active-color="green"
           ).text-grey-6
           q-tab(
-            v-for="v in views" :key="v.id"
-            :name="v.id" :label="v.name"
-            )
+            v-for="p in pages" :key="p.id"
+            :name="p.id" :label="p.name")
       //- search
       .row.full-width
         ws-search(
           @searchString="searchString = $event"
           @contentKalpa="contentKalpaFound")
       //- types
-      .row.full-width.justify-center
+      //- .row.full-width.justify-center
         div(
           :style=`{
           }`
@@ -39,8 +38,12 @@ q-layout(
               }`
               :style=`{}`).q-mr-xs.q-px-xs {{ type.name }}
   q-page-container
+    //- component(
+      :is="`page-${pageId}`"
+      :style=`{}`
+      )
     q-page
-      //- kalpa-loader(
+      kalpa-loader(
         v-if="viewId === 'kalpa' ? searchString.length > 3 : true"
         :immediate="true"
         :query="viewId === 'workspace' ? queryWorkspace : queryKalpa" :limit="1000" v-slot=`{items,next,nexting}`)
@@ -73,8 +76,8 @@ export default {
   },
   data () {
     return {
-      viewId: 'workspace',
-      views: [
+      pageId: 'workspace',
+      pages: [
         {id: 'workspace', name: 'Мастерская'},
         {id: 'kalpa', name: 'Кальпаграма'},
       ],
