@@ -2,6 +2,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
 import assert from 'assert'
+import { vueRoutesRegexp } from 'public/scripts/common_func'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
@@ -25,10 +26,9 @@ const routes = [
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
          if (localStorage.getItem('k_user_oid')) {
-           logD('user is Auth! goto /root')
-           return next('/')
-         }
-         else return next()
+            logD('user is Auth! goto /root')
+            return next('/')
+         } else return next()
       }
    },
    {
@@ -107,7 +107,7 @@ const routes = [
                   path: 'joints',
                   component: () => import('pages/app/node/view_joints/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
-               },
+               }
             ],
             meta: { roleMinimal: 'GUEST' }
          },
@@ -145,7 +145,7 @@ const routes = [
          {
             name: 'content',
             path: 'content/:oid',
-            props: (route) => ({oid: route.params.oid, query: route.query}),
+            props: (route) => ({ oid: route.params.oid, query: route.query }),
             component: () => import('pages/app/content/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
@@ -190,7 +190,7 @@ const routes = [
             name: 'workspace.collection-view',
             path: 'workspace/collection-view/:id/:viewid',
             component: () => import('pages/app/ws_collection_view/index.vue'),
-            meta: { roleMinimal: 'MEMBER' },
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'workspace.node',
@@ -225,7 +225,7 @@ const routes = [
          logD('router :: try systemInit...')
          // alert(' /root router :: try systemInit... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
-        //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
+         //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
          if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
             logD('router::need more privileges')
             return next('/auth') // если маршрут требует повышения - переходим на форму входа
@@ -242,5 +242,14 @@ routes.push({
    path: '*',
    redirect: '/auth'
 })
+
+// на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
+for (let r of routes[2].children) {
+   assert(r.path, '!r.path' + JSON.stringify(r))
+   let path = r.path.split('/')[0]
+   assert(path, '!path')
+   if (path === '*') continue
+   assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
+}
 
 export default routes

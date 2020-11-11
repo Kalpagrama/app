@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 5 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
@@ -137,7 +137,7 @@ class Workspace {
             }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
                initWsItem(plainData)
-               await checkUnique(plainData)
+               if (plainData.hasChanges) await checkUnique(plainData) // проверяем на уникальность только те что изменены локально (с сервера берем не глядя иначе будет ошибка при синхронизации - await this.db.ws_items.atomicUpsert(outdated))
                let plainDataCopy = cloneDeep(plainData) // newVal
                let rxDocCopy = rxDoc.toJSON() // oldVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
@@ -523,21 +523,14 @@ class Workspace {
 
    async find (mangoQuery) {
       const f = this.find
-      try {
-         // await this.lock('rxdb::ws::find')
-         // logD(f, 'locked') см set
-         assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
-         let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-         assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-         delete mangoQuery.selector.rxCollectionEnum
-         if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
-         if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
-         let rxQuery = this.db.ws_items.find(mangoQuery)
-         return rxQuery
-      } finally {
-         // this.release()
-         // logD(f, 'unlocked')
-      }
+      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
+      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+      assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      delete mangoQuery.selector.rxCollectionEnum
+      if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
+      if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
+      let rxQuery = this.db.ws_items.find(mangoQuery)
+      return rxQuery
    }
 
    async set (item) {
@@ -546,7 +539,7 @@ class Workspace {
       logD(f, 'start')
       const t1 = performance.now()
       try {
-         await this.lock('rxdb::ws::set')
+         await this.lock('rxdb::ws::set') // нельзя чтобы метод сработал во время synchronize
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
          if (itemCopy.wsItemType === WsItemTypeEnum.WS_NODE) {
@@ -561,7 +554,6 @@ class Workspace {
          if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
          if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
          let rxDoc = await this.db.ws_items.atomicUpsert(itemCopy)
-         assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
             let wsSynchroDateStr = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate')
             let wsSynchroDate = wsSynchroDateStr ? new Date(wsSynchroDateStr) : new Date(0)
@@ -581,23 +573,16 @@ class Workspace {
       const f = this.get
       logD(f, 'start', id)
       const t1 = performance.now()
-      try {
-         // await this.lock('rxdb::ws::get') вызывается внутри processEvent
-         // logD(f, 'locked')
-         let rxDoc = await this.db.ws_items.findOne(id).exec()
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return rxDoc
-      } finally {
-         // this.release()
-         // logD(f, 'unlocked')
-      }
+      let rxDoc = await this.db.ws_items.findOne(id).exec()
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return rxDoc
    }
 
    async remove (id, permanent = false) {
       const f = this.remove
       logD(f, 'start', id)
       try {
-         await this.lock('rxdb::ws::remove')
+         await this.lock('rxdb::ws::remove') // нельзя чтобы метод сработал во время synchronize
          // logD(f, 'locked')
          assert(this.created, '!this.created')
          let removedItem = await rxdb.get(null, null, { id })

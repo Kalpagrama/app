@@ -4,6 +4,8 @@ function assert(cond, strError){
 }
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+const vueRoutesRegexp = /.+\/(auth|feeds|welcome|settings|user|node|joint|sphere|trends|content|notifications|messages|workspace.*)(\/|\?|$).*/
+
 function makeRoutePath(object){
    if (!object) return '/'
    assert(object.type, '!object.type')
@@ -16,4 +18,4 @@ function makeRoutePath(object){
    return res
 }
 
-export { makeRoutePath, wait }
+export { makeRoutePath, wait, vueRoutesRegexp }

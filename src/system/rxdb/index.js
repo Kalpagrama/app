@@ -37,7 +37,7 @@ const RxModuleEnum = Object.freeze({
 })
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 
-const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 10 МБ после тестирования
+const defaultCacheSize = 10 * 1024 * 1024 // кэш реактивных объектов
 if (defaultCacheSize < 10 * 1024 * 1024) logW('TODO увеличить rxDbMemCache до 10 МБ после тестирования')
 
 // кээширование объектов перед rxDb (rxDb  очень медленная)
@@ -101,6 +101,8 @@ class RxDBWrapper {
    constructor () {
       this.created = false
       this.mutex = new MutexLocal('rxdb')
+      this.findMutex = new MutexLocal('rxdb-find')
+      this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
       addRxPlugin(require('pouchdb-adapter-idb'))
@@ -230,8 +232,8 @@ class RxDBWrapper {
       for (let collection of collections) {
          if (this[collection]) await this[collection].updateCollections(operation)
       }
-      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate'))) { // эта вкладка первой инициализироваля rxdb
-         await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', valueString: Date.now().toString() })
+      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', {beforeCreate: true}))) { // эта вкладка первой инициализироваля rxdb
+         await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', valueString: Date.now().toString() }, {beforeCreate: true})
          setSyncEventStorageValue('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -372,6 +374,7 @@ class RxDBWrapper {
    }
 
    async processEvent (event) {
+      assert(this.created, 'cant processEvent! !this.created')
       const f = this.processEvent
       const t1 = performance.now()
       logD(f, 'start', event)
@@ -474,13 +477,14 @@ class RxDBWrapper {
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
    async find (mangoQuery, autoNext = true) {
+      assert(this.created, 'cant find! !this.created')
       const f = this.find
       const t1 = performance.now()
       // logD(f, 'start', mangoQuery)
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
-         await this.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
+         await this.findMutex.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
          assert(this.initialized, '! this.initialized !')
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
@@ -546,11 +550,12 @@ class RxDBWrapper {
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       } finally {
-         this.release()
+         this.findMutex.release()
       }
    }
 
-   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+      assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
       const t1 = performance.now()
       // logD(f, 'start')
@@ -577,7 +582,8 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null } = {}) {
+   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+      assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
       // logW(f, 'start', rxCollectionEnum, idOrRawId)
@@ -609,7 +615,8 @@ class RxDBWrapper {
             priority,
             force,
             onFetchFunc,
-            params
+            params,
+            beforeCreate
          })
          if (!rxDoc) return null
          reactiveDoc = getReactiveDoc(rxDoc)
@@ -620,7 +627,9 @@ class RxDBWrapper {
    }
 
    // actualAge - актуально только для кэша
-   async set (rxCollectionEnum, data, { actualAge, notEvict = false } = {}) {
+   async set (rxCollectionEnum, data, { actualAge, notEvict = false, beforeCreate = false } = {}) {
+      // notice! блокировать нельзя тк возможен дедлок! вызывается ws.set, а он ждет synchro, а она ждет rxdb.set
+      assert(beforeCreate || this.created, 'cant set! !this.created')
       const f = this.set
       // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
@@ -647,16 +656,22 @@ class RxDBWrapper {
    }
 
    async remove (id) {
+      assert(this.created, 'cant remove! !this.created')
       const f = this.remove
       const t1 = performance.now()
-      logD(f, 'start')
-      let collection = getRxCollectionEnumFromId(id)
-      if (collection in WsCollectionEnum) {
-         await this.workspace.remove(id)
-      } else {
-         throw new Error('bad id!!' + id)
+      try {
+         await this.removeMutex.lock()
+         logD(f, 'start')
+         let collection = getRxCollectionEnumFromId(id)
+         if (collection in WsCollectionEnum) {
+            await this.workspace.remove(id)
+         } else {
+            throw new Error('bad id!!' + id)
+         }
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      } finally {
+         this.removeMutex.release()
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 }
 
