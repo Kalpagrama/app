@@ -1,13 +1,13 @@
 /* eslint-disable */
-const swVer = 4
+const swVer = 2
 const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
 // https://gist.github.com/jeffposnick/fc761c06856fa10dbf93e62ce7c4bd57
 
-// self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
-workbox.setConfig({ debug: true });
+// self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
+// workbox.setConfig({ debug: true });
 const { cacheNames, setCacheNameDetails } = workbox.core
 const { registerRoute, setCatchHandler } = workbox.routing
 const { addRoute, getCacheKeyForURL, matchPrecache, PrecacheController, precacheAndRoute } = workbox.precaching
@@ -21,7 +21,7 @@ const { ExpirationPlugin } = workbox.expiration
 // import { CacheFirst } from 'workbox-strategies/CacheFirst'
 // import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
 // import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
-import { makeRoutePath, wait } from 'public/scripts/common_func'
+import { makeRoutePath, vueRoutesRegexp, wait } from 'public/scripts/common_func'
 
 let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
@@ -68,7 +68,6 @@ function sendMsg (type, msgData) {
 
       // грузим сразу(пока не загрузит весь сайт - будет висеть)
       precacheAndRoute(self.__WB_MANIFEST) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке
-
 
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
@@ -491,15 +490,6 @@ if (useCache) {
    {
       registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({ cacheName: 'google' }))
       registerRoute(/\/(icons|other|scripts)\/.*$/, new CacheFirst({ cacheName: 'static' }))
-      // vue router ( /menu /create etc looks at index.html)
-      registerRoute(/^((?!\/graphql\/?).)*$/, async ({ url, event, params }) => {
-         // logD('vue router 1', url, getCacheKeyForURL('/index.html'))
-         if (getCacheKeyForURL('/index.html')) {
-            return caches.match(getCacheKeyForURL('/index.html'))
-         } else {
-            return fetch('/index.html')
-         }
-      })
       // content images
       registerRoute(/^http.*(kalpa\.store).+\.jpg$/,
          new CacheFirst({
@@ -520,26 +510,9 @@ if (useCache) {
          })
       )
       registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'origin images' }))
-
-
-
-      // registerRoute(/^http.*(kalpa\.store).+\.jpg$/, async ({ url, event, params }) => {
-      //    // Response will be "A guide to Workbox"
-      //    // return new Response(
-      //    //    `A ${params.type} to ${params.name}`
-      //    // );
-      //    // decide for yourself which values you provide to mode and credentials
-      //    logD('decide for yourself which values you provide to mode and credentials')
-      //    const newRequest = new Request(event.request, {
-      //       mode: 'cors',
-      //       credentials: 'omit',
-      //       headers: {
-      //          'x-my-custom-header': 'The Most Amazing Header Ever'
-      //       }
-      //    })
-      //    event.respondWith(fetch(newRequest))
-      // })
-
+      registerRoute(/^http.*(kalpa\.store).+\.mp4$/, async ({ url, event, params }) => {
+         return fetch(event.request)
+      })
       // // почему-то закэшитрованное видео не играет...
       // registerRoute( // content video
       //   /^http.*(kalpa\.store).+\.mp4$/,
@@ -548,6 +521,16 @@ if (useCache) {
       //     return cacheVideo(event)
       //   }
       // )
+
+      // vue router ( /menu /create etc look at index.html)
+      registerRoute(vueRoutesRegexp, async ({ url, event, params }) => {
+         logD('vue router 1', url, getCacheKeyForURL('/index.html'))
+         if (getCacheKeyForURL('/index.html')) {
+            return caches.match(getCacheKeyForURL('/index.html'))
+         } else {
+            return fetch('/index.html')
+         }
+      })
 
       // This "catch" handler is triggered when any of the other routes fail to
       // generate a response.

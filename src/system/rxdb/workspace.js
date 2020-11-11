@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 5 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000')
 class WaitBreakable {
@@ -137,7 +137,7 @@ class Workspace {
             }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
                initWsItem(plainData)
-               await checkUnique(plainData)
+               if (plainData.hasChanges) await checkUnique(plainData) // проверяем на уникальность только те что изменены локально (с сервера берем не глядя иначе будет ошибка при синхронизации - await this.db.ws_items.atomicUpsert(outdated))
                let plainDataCopy = cloneDeep(plainData) // newVal
                let rxDocCopy = rxDoc.toJSON() // oldVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)

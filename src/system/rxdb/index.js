@@ -102,7 +102,6 @@ class RxDBWrapper {
       this.created = false
       this.mutex = new MutexLocal('rxdb')
       this.findMutex = new MutexLocal('rxdb-find')
-      this.setMutex = new MutexLocal('rxdb-set')
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
@@ -629,6 +628,7 @@ class RxDBWrapper {
 
    // actualAge - актуально только для кэша
    async set (rxCollectionEnum, data, { actualAge, notEvict = false, beforeCreate = false } = {}) {
+      // notice! блокировать нельзя тк возможен дедлок! вызывается ws.set, а он ждет synchro, а она ждет rxdb.set
       assert(beforeCreate || this.created, 'cant set! !this.created')
       const f = this.set
       // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
@@ -636,28 +636,23 @@ class RxDBWrapper {
       assert(data, '!data')
       // assert(!data.wsItemType, '!!data.wsItemType') // передается отдельно от item
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-      try {
-         await this.setMutex.lock('rxdb::set collection=' + rxCollectionEnum)
-         let rxDoc
-         if (rxCollectionEnum in WsCollectionEnum) {
-            data.wsItemType = data.wsItemType || rxCollectionEnum
-            assert(data.wsItemType === rxCollectionEnum, '!data.wsItemType === rxCollectionEnum')
-            rxDoc = await this.workspace.set(data)
-         } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-            let id = makeId(rxCollectionEnum, data.oid)
-            rxDoc = await this.cache.set(id, data, actualAge, notEvict)
-         } else if (rxCollectionEnum === RxCollectionEnum.META) {
-            assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
-            rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
-         } else {
-            throw new Error('bad collection' + rxCollectionEnum)
-         }
-         if (!rxDoc) return null
-         // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return getReactiveDoc(rxDoc).getPayload()
-      } finally {
-         this.setMutex.release()
+      let rxDoc
+      if (rxCollectionEnum in WsCollectionEnum) {
+         data.wsItemType = data.wsItemType || rxCollectionEnum
+         assert(data.wsItemType === rxCollectionEnum, '!data.wsItemType === rxCollectionEnum')
+         rxDoc = await this.workspace.set(data)
+      } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
+         let id = makeId(rxCollectionEnum, data.oid)
+         rxDoc = await this.cache.set(id, data, actualAge, notEvict)
+      } else if (rxCollectionEnum === RxCollectionEnum.META) {
+         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
+         rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
+      } else {
+         throw new Error('bad collection' + rxCollectionEnum)
       }
+      if (!rxDoc) return null
+      // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return getReactiveDoc(rxDoc).getPayload()
    }
 
    async remove (id) {

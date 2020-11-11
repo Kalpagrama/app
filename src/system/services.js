@@ -182,7 +182,7 @@ async function resetLocalStorage () {
 
 // очистить кэши и БД
 // todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
-async function systemReset (clearAuthData = false, clearRxdb = true, reload = true) {
+async function systemReset (clearAuthData = false, clearRxdb = true, reload = true, pwaResetFlag = true) {
    const f = systemReset
    const t1 = performance.now()
    logD(f, 'start')
@@ -200,7 +200,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
       }
       if (clearRxdb) await rxdb.deInitGlobal() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
-      if (process.env.MODE === 'pwa') await pwaReset()
+      if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
       if (clearAuthData) {
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
       } // сообщаем другим вкладкам
@@ -267,7 +267,7 @@ async function systemInit () {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)
-      await systemReset(true, true, true)
+      await systemReset(true, true, true, true)
       throw err
    } finally {
       await mutexGlobal.release('system::systemInit')
