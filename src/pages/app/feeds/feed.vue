@@ -19,18 +19,18 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import feedItem from './feed_item.vue'
 
 export default {
-  name: 'pageApp_feeds_feed',
-  props: ['feed', 'feeds', 'subscriptions'],
+  name: 'feeds_feed',
+  props: ['feed'],
   components: {feedItem},
   data () {
     return {
-      // feed: null,
+      bookmarks: [],
     }
   },
   computed: {
     feedSubscriptions () {
-      if (this.feed) {
-        return this.feed.bookmarks.reduce((acc, val) => {
+      if (this.bookmarks.length > 0) {
+        return this.bookmarks.reduce((acc, val) => {
           if (val.oid) {
             acc.push(val.oid)
           }
@@ -57,17 +57,22 @@ export default {
     }
   },
   watch: {
-    // '$route.params.id': {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     this.$log('$route.params.id TO', to)
-    //     if (to) {
-    //       let feed = await this.$rxdb.get(RxCollectionEnum.WS_NODE, to)
-    //       this.$log('feed', feed)
-    //       this.feed = feed
-    //     }
-    //   }
-    // }
+    feed: {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        this.$log('feed TO', to)
+        if (to && to.bookmarks) {
+          this.bookmarks = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+              id: {$in: to.bookmarks}
+            },
+            sort: [{updatedAt: 'desc'}]
+          })
+        }
+      }
+    }
   }
 }
 </script>

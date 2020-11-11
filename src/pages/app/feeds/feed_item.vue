@@ -74,8 +74,8 @@
       .col.q-px-sm
         span.text-white {{ item.object.name }}
     //- object fallback
-    div(v-else).row.full-width.bg-blue
-      small.text-white {{ item.object }}
+    div(v-else).row.full-width
+      //- small.text-white {{ item.object }}
 </template>
 
 <script>

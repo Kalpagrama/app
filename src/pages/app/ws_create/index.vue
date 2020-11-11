@@ -7,12 +7,12 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       height: $q.screen.height+'px',
-    }`)
+    }`).b-30
     template(v-slot:header)
       div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+        q-btn(round flat color="white" icon="keyboard_arrow_back" @click="$router.back()")
         .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-md Выбрать контент
-        q-btn(round flat color="white" icon="clear" @click="$router.back()").q-mr-sm
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать контент
 </template>
 
 <script>

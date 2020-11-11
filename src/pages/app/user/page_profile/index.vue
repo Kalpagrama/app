@@ -4,7 +4,7 @@ q-page(
     paddingTop: '40px',
     paddingBottom: '0px',
   }`
-  ).row.full-width.justify-center
+  ).row.full-width.items-start.content-start.justify-center
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 2000}`).row.full-width.justify-center.b-30
@@ -19,14 +19,17 @@ q-page(
           :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
   component(
     :is="`tab-${$route.params.tab}`"
-    :user="user")
+    :user="user"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+    }`)
 </template>
 
 <script>
 export default {
   name: 'user_pageProfile',
   components: {
-    tabCollections: () => import('./tab_collections.vue'),
+    // tabCollections: () => import('./tab_collections.vue'),
     tabNodes: () => import('./tab_nodes.vue'),
     tabJoints: () => import('./tab_joints.vue'),
     tabVotes: () => import('./tab_votes.vue'),
@@ -36,7 +39,7 @@ export default {
   computed: {
     tabs () {
       return [
-        {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
+        // {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
         {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
         {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},

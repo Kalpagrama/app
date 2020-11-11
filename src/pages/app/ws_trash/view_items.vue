@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: 0+paddingTop+'px',
+    paddingTop: -2+paddingTop+'px',
   }`
   ).row.full-width.justify-center.q-px-sm
   q-page-sticky(
@@ -24,7 +24,7 @@ q-page(
         span.text-white {{ i.name }}
         .row.full-width
           small.text-grey-6 {{ i.wsItemType }}
-          small.text-red {{ i.deletedAt }}
+          //- small.text-red {{ i.deletedAt }}
 </template>
 
 <script>

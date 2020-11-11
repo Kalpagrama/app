@@ -21,7 +21,11 @@ q-page(
             div(:style=`{height: '50px'}`).row.full-width.justify-center
               q-spinner-dots(v-show="nexting" color="green" size="50px")
   q-page-sticky(
-    expand position="top" :style=`{zIndex: 1000, paddingTop: headerRevealed ? '0px' : 'env(safe-area-inset-top)'}`).b-30
+    expand position="top"
+    :style=`{
+      zIndex: 1000,
+      //- paddingTop: headerRevealed ? '0px' : 'env(safe-area-inset-top)'
+    }`).b-30
     .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md
         q-tabs(

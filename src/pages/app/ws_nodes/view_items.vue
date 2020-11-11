@@ -22,10 +22,10 @@ q-page(
               @searchString="searchString = $event"
               @contentKalpa="contentKalpaFound"
               )
-          q-btn(
+          //- q-btn(
             @click="$router.push('/workspace/node/new')"
             round flat color="grey-4" icon="add").full-height
-          q-btn(
+          //- q-btn(
             round flat color="grey-4" icon="tune").full-height
       //- types
       .row.full-width.justify-center.q-pt-xs

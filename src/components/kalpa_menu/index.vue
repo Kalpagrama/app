@@ -148,7 +148,7 @@ export default {
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
+        // {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
         {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,

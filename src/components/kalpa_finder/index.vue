@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  container)
+  container).b-30
   q-header.b-30
     .row.full-width.justify-center.q-px-sm
       slot(name="header")
@@ -52,6 +52,8 @@ q-layout(
             :style=`{
             }`
             ).q-mb-sm
+            template(v-slot:tint=`{item}`)
+              slot(name="tint" :item="item")
 </template>
 
 <script>

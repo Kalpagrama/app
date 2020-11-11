@@ -27,7 +27,6 @@ q-layout(view="lHh lpR lFf")
     v-if="$q.screen.lt.md"
     side="left" no-swipe-open
     :value="$store.state.ui.mobileMenuShow"
-    persistent
     behavior="mobile"
     :width="$q.screen.width - 70"
     @before-hide="$store.commit('ui/stateSet', ['mobileMenuShow', false])")

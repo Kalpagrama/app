@@ -45,12 +45,12 @@ const routes = [
             component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
-         {
-            name: 'welcome',
-            path: 'welcome',
-            component: () => import('pages/app/welcome/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'welcome',
+         //    path: 'welcome',
+         //    component: () => import('pages/app/welcome/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'settings',
             path: 'settings',
@@ -64,18 +64,6 @@ const routes = [
                   meta: { roleMinimal: 'GUEST' }
                },
                {
-                  name: 'settings.feeds',
-                  path: 'feeds',
-                  component: () => import('pages/app/settings/view_feeds/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
-                  name: 'settings.feed',
-                  path: 'feed/:id',
-                  component: () => import('pages/app/settings/view_feeds/feed_editor.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
                   name: 'settings.workspace',
                   path: 'workspace',
                   component: () => import('pages/app/settings/view_workspace/index.vue'),
@@ -85,9 +73,7 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            // name: 'user',
             path: 'user/:oid',
-            redirect: 'user/:oid',
             component: () => import('pages/app/user/index.vue'),
             children: [
                {
@@ -98,43 +84,15 @@ const routes = [
                {
                   path: 'workspace/:tab?',
                   name: 'user.workspace',
-                  component: () => import('pages/app/user/page_workspace/index.vue')
+                  redirect: '/workspace',
+                  // component: () => import('pages/app/user/page_workspace/index.vue')
                },
                {
                   path: 'settings/:tab?',
                   name: 'user.settings',
-                  component: () => import('pages/app/user/page_settings/index.vue')
+                  redirect: '/settings'
+                  // component: () => import('pages/app/user/page_settings/index.vue')
                }
-               // {
-               //    name: 'user.feeds',
-               //    path: 'feeds',
-               //    component: () => import('pages/app/user/user_feeds.vue'),
-               //    meta: { roleMinimal: 'GUEST' }
-               // },
-               // {
-               //    name: 'user.nodes',
-               //    path: 'nodes',
-               //    component: () => import('pages/app/user/user_nodes.vue'),
-               //    meta: { roleMinimal: 'GUEST' }
-               // },
-               // {
-               //    name: 'user.joints',
-               //    path: 'joints',
-               //    component: () => import('pages/app/user/user_joints.vue'),
-               //    meta: { roleMinimal: 'GUEST' }
-               // },
-               // {
-               //    name: 'user.votes',
-               //    path: 'votes',
-               //    component: () => import('pages/app/user/user_votes.vue'),
-               //    meta: { roleMinimal: 'GUEST' }
-               // },
-               // {
-               //    name: 'user.followers',
-               //    path: 'followers',
-               //    component: () => import('pages/app/user/user_followers.vue'),
-               //    meta: { roleMinimal: 'GUEST' }
-               // }
             ],
             meta: { roleMinimal: 'GUEST' }
          },
@@ -178,11 +136,6 @@ const routes = [
             ],
             meta: { roleMinimal: 'GUEST' }
          },
-         // {
-         //    name: 'search',
-         //    path: 'search',
-         //    component: () => import('pages/app/search/index.vue')
-         // },
          {
             name: 'trends',
             path: 'trends/:oid?',

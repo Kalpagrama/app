@@ -4,23 +4,33 @@ q-page(
     paddingTop: 98+paddingTop+'px',
   }`
   ).row.full-width.justify-center.items-start.content-start.q-px-sm
-  //- q-dialog(
+  q-dialog(
     v-model="itemFinderOpened"
     position="bottom"
     maximized
     transition-show="none"
     transition-hide="none")
-    item-finder(
-      v-if="collection"
-      :items="collection.bookmarks"
+    kalpa-finder(
       :style=`{
         height: $q.screen.height+'px',
-        minWidth: itemFinderWidth+'px',
-        maxWidth: itemFinderWidth+'px',
-      }`
-      @itemAdd="itemAdd"
-      @itemDelete="itemDelete"
-      @close="itemFinderOpened = false")
+        maxWidth: $store.state.ui.pageWidth+'px',
+      }`)
+      template(v-slot:header)
+        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
+          .col
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать элемент
+      template(v-slot:tint=`{item}`)
+        div(
+          @click="itemFound(item)"
+          :class=`{
+            'bg-red': collection.bookmarks.includes(item.id)
+          }`
+          :style=`{
+            position: 'absolute', zIndex: 1000,
+            opacity: 0.5,
+          }`
+          ).row.fit
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000}`
@@ -40,7 +50,7 @@ q-page(
               v-if="id !== 'all'"
               @click="itemFinderOpened = true"
               round flat color="grey-4" icon="add")
-            q-btn(
+            //- q-btn(
               round flat color="grey-4" icon="tune")
       //- types
       .row.full-width.justify-center
@@ -68,27 +78,26 @@ q-page(
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
       ).row.full-width.items-start.content-start
-      //- small.text-white {{collection}}
       feed-item(
-          v-for="(item, ii) in items" :key="item.id"
-          @select="itemLaunch(item)"
-          @delete="itemDelete(item)"
-          :item="item"
-          ).q-mb-sm
-          template(v-slot:tint=`{item}`)
-            slot(name="tint" :item="item")
-          template(v-slot:default=`{item}`)
-            div(
-              v-if="itemSelectedId === item.id"
-              :style=`{
-                marginTop: '-20px',
-                paddingTop: '20px',
-                borderRadius: '10px',
-              }`
-              ).row.full-width.bg-green.q-px-xs.q-pb-xs
-              q-btn(round flat dense color="white" icon="delete_outline" @click="itemDelete(item)")
-              .col
-              q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
+        v-for="(item, ii) in items" :key="item.id"
+        @select="itemLaunch(item)"
+        @delete="itemDelete(item)"
+        :item="item"
+        ).q-mb-sm
+        template(v-slot:tint=`{item}`)
+          slot(name="tint" :item="item")
+        template(v-slot:default=`{item}`)
+          div(
+            v-if="itemSelectedId === item.id"
+            :style=`{
+              marginTop: '-20px',
+              paddingTop: '20px',
+              borderRadius: '10px',
+            }`
+            ).row.full-width.bg-green.q-px-xs.q-pb-xs
+            q-btn(round flat dense color="white" icon="delete_outline" @click="itemDelete(item)")
+            .col
+            q-btn(round flat dense color="white" icon="launch" @click="itemLaunch(item)")
 </template>
 
 <script>
@@ -107,7 +116,6 @@ export default {
     useViews: {type: Boolean, default: true}
   },
   components: {
-    // feedSearch: () => import('./feed_search.vue'),
     feedItem: () => import('./feed_item.vue'),
     itemFinder: () => import('./item_finder.vue'),
     viewViews: () => import('./view_views.vue')
@@ -172,24 +180,6 @@ export default {
     },
   },
   watch: {
-    // id: {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     if (to) {
-    //       if (to === 'all') {
-    //         this.collection = {
-    //           id: 'all',
-    //           name: 'All bookmarks',
-    //           // feeds: [],
-    //           bookmarks: []
-    //           // spheres: []
-    //         }
-    //       } else {
-    //         this.collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, to)
-    //       }
-    //     }
-    //   }
-    // }
   },
   methods: {
     typeClick (type) {
@@ -201,9 +191,19 @@ export default {
         this.typesSelected.push(type.id)
       }
     },
-    async itemAdd (bookmark) {
-      this.$log('itemAdd', bookmark)
-      await this.feed.addBookmarkToCollection(bookmark)
+    async itemFound (item) {
+      this.$log('itemFound', item)
+      if (item.wsItemType) {
+        if (this.collection.bookmarks.includes(item.id)) {
+          await this.collection.removeBookmarkFromCollection(item)
+        }
+        else {
+          await this.collection.addBookmarkToCollection(item)
+        }
+      }
+      else {
+        confirm('Add bookmark ?')
+      }
     },
     itemLaunch (item) {
       this.$log('itemLaunch', item)
