@@ -5,11 +5,14 @@ div(
   }`
   ).row.full-width.items-end.content-end
   div(
-    v-if="!isOpened"
-    @click="$emit('open')"
-    :style=`{position: 'absolute', zIndex: 100,}`).row.fit
-  div(
-    v-if="item").row.fit.items-end.content-end
+    v-if="item"
+    :style=`{
+      position: 'relative',
+    }`).row.fit.items-end.content-end
+    div(
+      v-if="!isOpened"
+      @click="$emit('open')"
+      :style=`{position: 'absolute', zIndex: 100,}`).row.fit
     from-node(
       v-if="!item.wsItemType && item.type === 'NODE'"
       :node="item" :isOpened="isOpened")
@@ -43,19 +46,9 @@ div(
     //- from content
     //- from gif, video, image...
     //- from joint...
+  //- footer slot
   .row.full-width
     slot
-  //- kalpa-finder(
-    v-else
-    @item="itemFound")
-  //- div(
-    v-if="!item"
-    :style=`{
-      minHeight: '500px',
-    }`).row.full-width.items-start.content-start
-    span.text-white Find item
-    .row.full-width
-      span.text-white world workspace
 </template>
 
 <script>

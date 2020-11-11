@@ -28,7 +28,7 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'compositionPlayer_video_contentExplorer',
+  name: 'compositionPlayer_contentExplorer',
   props: ['composition'],
   data () {
     return {
@@ -53,9 +53,14 @@ export default {
     async start () {
       this.$log('start')
       let contentOid = this.composition.layers[0].contentOid
-      let start = this.composition.layers[0].figuresAbsolute[0].t
-      this.$log('contentOid/start', contentOid, start)
-      this.$router.push(`/content/${contentOid}?viewid=nodes&startat=${start}`)
+      if (this.composition.outputType === 'IMAGE') {
+        this.$router.push(`/content/${contentOid}?page=nodes`)
+      }
+      else if (this.composition.outputType === 'VIDEO') {
+        let start = this.composition.layers[0].figuresAbsolute[0].t
+        this.$log('contentOid/start', contentOid, start)
+        this.$router.push(`/content/${contentOid}?page=nodes&startat=${start}`)
+      }
     },
   },
   async created () {

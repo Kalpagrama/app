@@ -67,7 +67,7 @@ div(
       }`
       ).row.items-center.content-center.justify-center
       img(
-        v-if="item.type !== 'SPHERE'"
+        v-if="!['SPHERE', 'WORD', 'SENTENCE'].includes(item.type)"
         draggable="false"
         :src="item.thumbUrl"
         :style=`{
@@ -145,6 +145,7 @@ export default {
       if (item.wsItemType) {
         if (item.wsItemType === 'WS_BOOKMARK') return iconMap[item.type]
         else if (item.wsItemType === 'WS_NODE') return 'filter_tilt_shift'
+        else if (item.wsItemType === 'WS_JOINT') return 'link'
         else return 'blur_on'
       }
       else {

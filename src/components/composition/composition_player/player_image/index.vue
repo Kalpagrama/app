@@ -16,6 +16,8 @@ div(
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
+      maxHeight: $q.screen.height/2+'px',
+      background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: options.height,
