@@ -1,18 +1,20 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { router } from 'src/boot/system'
-import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
+// import { Screenshot } from 'com.darktalker.cordova.screenshot'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
+import { wait } from 'src/system/utils'
 
-const { PushNotifications, Share, App, StatusBar } = Plugins
+const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
-async function initCapacitor (store) {
+async function init (store) {
    // share для ios (не разобрался как из ios послать эвент в js без плагина)
    // alert(JSON.stringify(Platform.is))
    App.addListener('appUrlOpen', async (openData) => {
@@ -71,7 +73,7 @@ async function initCapacitor (store) {
       store.commit('workspace/stateSet', ['shareItem', shareItem], { root: true })
       await router.push({ path: '/workspace/contentNotes', query: { share: true } })
    })
-   await capacitorOrientationLock('portrait')
+   await orientationLock('portrait')
    // Events (iOS only)
    window.addEventListener('statusTap', function () {
       // alert('statusbar tapped')
@@ -83,15 +85,25 @@ async function initCapacitor (store) {
    // await StatusBar.hide()
 }
 
-async function capacitorShowStatusBar () {
-   await StatusBar.show()
+async function statusBarSetVisible (visible) {
+   if (visible) await StatusBar.show()
+   else await StatusBar.hide()
 }
 
-async function capacitorHideStatusBar () {
-   await StatusBar.hide()
+async function vibrate () {
+   // assert(pattern && Array.isArray(pattern), 'pattern && Array.isArray(pattern)')
+   Haptics.vibrate()
 }
 
-async function initCapacitorPushPlugin (store) {
+async function hapticsImpact (style) {
+   assert(style.in('medium', 'heavy', 'light'), '!style.in(medium, heavy, light)')
+   if (style === 'medium') style = HapticsImpactStyle.Medium
+   else if (style === 'heavy') style = HapticsImpactStyle.Heavy
+   else if (style === 'light') style = HapticsImpactStyle.Light
+   Haptics.impact({ style });
+}
+
+async function initPushPlugin (store) {
    assert(PushNotifications)
    // Request permission to use push notifications
    // iOS will prompt user and return if they granted permission or not
@@ -145,7 +157,7 @@ async function initCapacitorPushPlugin (store) {
    )
 }
 
-async function capacitorShowShareDialog () {
+async function showShareDialog () {
    assert(Share)
    let shareRet = await Share.share({
       title: 'title kalpagrama share data',
@@ -155,16 +167,53 @@ async function capacitorShowShareDialog () {
    })
 }
 
-async function capacitorOrientationLock (mode) {
+async function orientationLock (mode) {
    assert(mode.in('portrait', 'landscape', 'default'))
    if (mode === 'default') await window.screen.orientation.unlock();
    else await window.screen.orientation.lock(mode);
 }
 
+Browser.addListener('browserFinished', (info) => {
+   alert('browserFinished' + JSON.stringify(info))
+})
+Browser.addListener('browserPageLoaded', async (info) => {
+   alert('browserPageLoaded' + JSON.stringify(info))
+})
+async function openUrl (urlStr) {
+   Browser.open({ url: urlStr, presentationStyle: 'fullscreen' }).catch(err => logE('qweqweqew', err))
+   await wait(3000)
+   await screenshot()
+}
+
+async function screenshot () {
+   alert('screenshot')
+   navigator.screenshot.URI(function (error, res) {
+      if (error) {
+         alert(JSON.stringify(error))
+         console.error(error);
+      } else {
+         console.error('ОК!', res.URI)
+         alert('OK:' + JSON.stringify(res))
+      }
+   }, 50);
+
+   navigator.screenshot.save(function (error, res) {
+      if (error) {
+         console.error(error);
+      } else {
+         alert('ok' + res.filePath); // should be path/to/myScreenshot.jpg
+      }
+   }, 'jpg', 50, 'myScreenShot');
+}
+
 export {
-   initCapacitor,
-   initCapacitorPushPlugin,
-   capacitorOrientationLock,
-   capacitorShowStatusBar,
-   capacitorHideStatusBar
+   init,
+   initPushPlugin,
+   showShareDialog,
+   orientationLock,
+   statusBarSetVisible,
+   vibrate,
+   hapticsImpact,
+   openUrl,
+   screenshot
 }

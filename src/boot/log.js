@@ -1,5 +1,5 @@
 import assert from 'assert'
-import 'src/system/utils' // Object.assign...
+import 'src/system/utils'
 
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
@@ -62,6 +62,15 @@ class Logger {
     this.store = store
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+    this.init()
+    window.addEventListener('storage', async (event) => {
+      if (event.key && event.key.in('k_log_level', 'k_log_format', 'k_log_filter')) {
+        this.init()
+      }
+    })
+  }
+
+  init() {
     let logLevel = sessionStorage.getItem('k_log_level')
     let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))
     let logDbgFilter = sessionStorage.getItem('k_log_filter')

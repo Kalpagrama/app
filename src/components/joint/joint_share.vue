@@ -81,14 +81,14 @@ export default {
     }
   },
   methods: {
-    shareStart () {
+    async shareStart () {
       this.$log('shareStart')
       if (Platform.is.desktop) {
         this.shareLink = location.origin + '/joint/' + this.joint.oid
         this.shareDialogOpened = true
       }
       else {
-        shareWith(this.link)
+        await this.$systemUtils.shareWith(this.link)
       }
     },
     async shareLinkCopy () {

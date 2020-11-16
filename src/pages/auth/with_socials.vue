@@ -60,7 +60,8 @@ export default {
       const urlObj = new URL(url)
       urlObj.searchParams.set('state', `{"origin":"${location}"}`); // сообщаем серверу куда делать редирект после успешной аутентификации
       this.$log('urlObj', urlObj.toString())
-      window.location = urlObj.toString()
+      // window.location = urlObj.toString()
+      await this.$systemUtils.openUrl(urlObj.toString(), true)
     }
   }
 }

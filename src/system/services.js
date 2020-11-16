@@ -21,8 +21,49 @@ const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
 
-async function initServices () {
-   const f = initServices
+let capacitor
+
+class SystemUtils {
+   async vibrate (patternOrDuration = 100) {
+      if (Platform.is.capacitor) await capacitor.vibrate()
+      else if (navigator.vibrate) navigator.vibrate(patternOrDuration)
+   }
+
+   async hapticsImpact (style = 'medium') {
+      if (Platform.is.capacitor) await capacitor.hapticsImpact(style)
+   }
+
+   async shareWith (object) {
+      await shareWith(object)
+   }
+
+   async reset () {
+      await systemReset()
+   }
+
+   async statusBarSetVisible (visible) {
+      if (Platform.is.capacitor) await capacitor.statusBarSetVisible(visible)
+   }
+
+   orientationLockEnabled (mode) {
+      return !!Platform.is.capacitor
+   }
+
+   async orientationLock (mode) {
+      if (Platform.is.capacitor) await capacitor.orientationLock(mode)
+   }
+
+   async openUrl (urlStr, inAppBrowser = false) {
+      if (Platform.is.capacitor && inAppBrowser) await capacitor.openUrl(urlStr)
+      else window.location = urlStr
+   }
+
+   async screenshot() {
+      if (Platform.is.capacitor) await capacitor.screenshot()
+   }
+}
+async function initApplication () {
+   const f = initApplication
    logD(f, 'start', Platform.is, process.env.MODE)
    const t1 = performance.now()
    initOfflineEvents(store)
@@ -30,11 +71,8 @@ async function initServices () {
    if (process.env.MODE === 'pwa') {
       await initPWA(store)
    } else if (Platform.is.capacitor) {
-      const { initCapacitor } = await import('src/system/capacitor.js')
-      await initCapacitor(store)
-   } else if (Platform.is.cordova) {
-      const { initCordova } = await import('src/system/cordova.js')
-      await initCordova(store)
+      capacitor = await import('src/system/capacitor.js')
+      await capacitor.init(store)
    }
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
@@ -75,6 +113,7 @@ async function initServices () {
    })
    initialized = true
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   return new SystemUtils()
 }
 
 // В сафари событие срабатывает и на вкладке, которая инициировала изменения (храним id вкладки в событии)
@@ -111,25 +150,11 @@ async function shareWith (object) {
 
 async function askForWebPushPerm (store) {
    if (Platform.is.capacitor) {
-      const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
-      await initCapacitorPushPlugin(store)
-      return true
-   } else if (Platform.is.cordova) {
-      const { initCordovaPushPlugin } = await import('src/system/cordova.js')
-      await initCordovaPushPlugin(store)
+      await capacitor.initPushPlugin(store)
       return true
    } else if (process.env.MODE === 'pwa') {
       return await askForPwaWebPushPerm(store)
    }
-}
-
-function orientationLockEnabled (mode) {
-   return !!Platform.is.capacitor
-}
-
-async function orientationLock (mode) {
-   const { capacitorOrientationLock } = await import('src/system/capacitor.js')
-   if (Platform.is.capacitor) await capacitorOrientationLock(mode)
 }
 
 function initOfflineEvents (store) {
@@ -361,10 +386,8 @@ async function systemHardReset () {
 }
 
 export {
-   initServices,
+   initApplication,
    setSyncEventStorageValue,
-   orientationLockEnabled,
-   orientationLock,
    systemReset,
    shareWith,
    initSessionStorage,

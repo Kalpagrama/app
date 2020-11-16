@@ -101,7 +101,7 @@ export default {
         this.shareDialogOpened = true
       }
       else {
-        shareWith(this.item)
+        await this.$systemUtils.shareWith(this.item)
       }
       this.$emit('done')
     },
