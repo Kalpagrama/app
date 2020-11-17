@@ -1,0 +1,16 @@
+.git
+.idea
+.quasar
+.thumbs.db
+dist
+node_modules
+src-bex
+src-capacitor
+src-capacitor_old
+src-capacitor_dummy
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
