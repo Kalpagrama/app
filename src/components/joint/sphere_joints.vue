@@ -25,8 +25,7 @@
   kalpa-loader(
     :immediate="true"
     :query="queryBySphere" :limit="15" v-slot=`{items, next}`
-    @items="items = $event"
-    @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
+    @items="items = $event")
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
       q-infinite-scroll(@load="next" :offset="$q.screen.height")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)

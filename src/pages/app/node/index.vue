@@ -6,8 +6,8 @@
 
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header().b-30
-    .row.full-width.justify-center.q-pt-sm
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
+    .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-mb-sm
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-sm
@@ -17,7 +17,10 @@ q-layout(view="hHh Lpr lff")
             round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col
-            span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
+            .row.full-width.items-center.content-center.q-px-sm.q-pt-xs
+              span(:style=`{fontSize: '18px', lineHeight: 0.8, whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
+              .row.full-width
+                small.text-white Ядро
           //- kalpa-bookmark(
             v-if="node"
             :oid="node.oid"
@@ -73,17 +76,18 @@ q-layout(view="hHh Lpr lff")
                         :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
                         :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
                 //- node name
-                div(
+                router-link(
+                  :to="'/sphere/'+node.sphereFromName.oid"
                   :style=`{
                     textAlign: 'center',
                   }`
-                  ).row.full-width.items-start.content-start.justify-center.q-pa-md
-                  span(:style=`{fontSize: '18px'}`).text-white.text-bold.shaking.cursor-pointer {{ node.name }}
+                  ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+                  span(:style=`{fontSize: '18px'}`).text-white.text-bold.cursor-pointer {{ node.name }}
                 //- node description
-                .row.full-width
+                //- .row.full-width
                   span.text-white {{ node.description }}
               //- node actions
-              view-spheres(:node="node")
+              //- view-spheres(:node="node")
             node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
         //- node is creating, wait...
         .row.full-width.justify-center
@@ -91,7 +95,8 @@ q-layout(view="hHh Lpr lff")
             v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
             :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-        router-view(v-if="node" :node="node" :style=`{paddingTop: '46px',}`)
+        //- router-view(v-if="node" :node="node" :style=`{paddingTop: '46px',}`)
+        //- view-inside()
       //- q-page-sticky(
         v-if="node"
         position="bottom right" :offset="[0, 70]"
@@ -121,6 +126,7 @@ export default {
     nodeActions: () => import('components/node/node_actions.vue'),
     viewSpheres: () => import('./view_spheres/index.vue'),
     viewJoints: () => import('./view_joints/index.vue'),
+    viewInside: () => import('./view_inside/index.vue'),
     // viewConnect: () => import('./view_connect/index.vue'),
     nodeConnect,
   },

@@ -26,6 +26,7 @@ export default {
   // isTyping: false,
   // contentNodes: null,
   // editorItem: null
+  pageHeight: 0,
   pageWidth: 700,
   pageWidthDefault: 700,
   mobileNavigationShow: true,

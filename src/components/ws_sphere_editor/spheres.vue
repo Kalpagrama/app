@@ -18,13 +18,14 @@ div(
         height: '500px',
         minHeight: '500px', maxHeight: '500px',
       }`
-      @sphere="sphereAdd")
+      @sphere="sphereFound")
   .row.full-width
     q-input(
       ref="sphereInput"
       v-model="sphereSearching"
       borderless dark dense
       placeholder="Введите сферу"
+      :debounce="500"
       :autofocus="false"
       :input-style=`{
         paddingLeft: '8px',
@@ -95,9 +96,22 @@ export default {
         this.$log('sphereSearching TO', to)
         this.$emit('searchString', to)
       }
+    },
+    spheres: {
+      deep: true,
+      handler (to, from) {
+        this.$log('spheres TO', to)
+        // use to refresh sphereSearching...
+        this.sphereSearching = ''
+      }
     }
   },
   methods: {
+    sphereFound (sphere) {
+      this.$log('sphereFound', sphere)
+      this.sphereAdd(sphere)
+      this.sphereSearching = ''
+    },
     async sphereInputEntered () {
       this.$log('sphereInputEntered')
       if (this.sphereSearching.length === 0) return
@@ -106,7 +120,7 @@ export default {
       this.sphereSearching = ''
     },
     sphereInputBackspaced (e) {
-      this.$log('sphereInputBackspaced', e)
+      // this.$log('sphereInputBackspaced', e)
       // if (e.target.value.length === 0) {
       //   if (this.spheres.length > 0) {
       //     this.sphereInputBackspaced += 1
@@ -117,7 +131,7 @@ export default {
       // }
     },
     async sphereInputEvented (e) {
-      this.$log('sphereInputEvented', e)
+      // this.$log('sphereInputEvented', e)
       // if ()
       // let start = e.target.selectionStart
       // let lastChar = String.fromCharCode(e.target.value.charCodeAt(start - 1))

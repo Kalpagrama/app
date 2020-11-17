@@ -1,14 +1,14 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
-    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+    .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{position: 'relative', height: '140px',}`).row.full-width
           img(
             v-if="user"
             draggable="false"
             :src="user.profile.photoUrl"
-            :style=`{objectFit: 'cover', borderRadius: '10px',}`
+            :style=`{objectFit: 'cover', borderRadius: '0 0 10px 10px',}`
             ).fit
           div(
             v-if="itsMe"

@@ -61,16 +61,22 @@ const routes = [
                   name: 'settings.account',
                   path: 'account',
                   component: () => import('pages/app/settings/view_account/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
+                  meta: { roleMinimal: 'MEMBER' }
                },
                {
                   name: 'settings.workspace',
                   path: 'workspace',
                   component: () => import('pages/app/settings/view_workspace/index.vue'),
+                  meta: { roleMinimal: 'MEMBER' }
+               },
+               {
+                  name: 'settings.docs',
+                  path: 'docs',
+                  component: () => import('pages/app/settings/view_docs/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                }
             ],
-            meta: { roleMinimal: 'MEMBER' }
+            // meta: { roleMinimal: 'MEMBER' }
          },
          {
             path: 'user/:oid',

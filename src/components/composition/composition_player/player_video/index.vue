@@ -31,7 +31,7 @@ div(
         q-icon(
           v-if="muted"
           size="25px" color="red" name="volume_off").q-mx-sm
-        span.text-white.text-bold.q-mr-sm.q-mt-sm {{ $time(duration-currentTime) }}
+        span(v-if="duration  > 0").text-white.text-bold.q-mr-sm.q-mt-sm {{ $time(duration-currentTime) }}
   //- preview
   img(
     @click="$emit('previewClick')"
@@ -42,15 +42,16 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: options.height,
-      objectFit: options.objectFit,
-      //- opacity: duration === 0 ? 1 : 0,
+      //- objectFit: options.objectFit,
+      opacity: duration > 0 ? 0 : 1,
     }`
     ).full-width
   //- video wrapper
   div(
     v-if="isActive && isVisible"
     :style=`{
-      position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
+      position: 'absolute', zIndex: 200,
+      //- transform: 'translate3d(0,0,0)',
     }`
     ).row.fit
     video(
@@ -68,7 +69,9 @@ div(
       playsinline
       :style=`{
         objectFit: options.objectFit,
-        borderRadius: '10px', overflow: 'hidden',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        //- opacity: 0.5
       }`
       ).fit
 </template>
@@ -184,7 +187,7 @@ export default {
       this.currentTime = e.target.currentTime
     },
     videoLoadedmetadata (e) {
-      // this.$log('videoLoadedmetadata', e)
+      this.$log('videoLoadedmetadata', e)
       this.duration = e.target.duration
       if (this.isActive) {
         e.target.play()

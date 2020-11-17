@@ -17,7 +17,7 @@
   q-btn(
     v-if="!$scopedSlots.action"
     @click="start()"
-    round flat no-caps
+    round flat no-caps dense
     :color="bookmark ? activeColor : inactiveColor"
     :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
     :loading="loading"

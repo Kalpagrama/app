@@ -6,39 +6,18 @@
       :node="node" :isActive="isActive" :isVisible="isVisible"
       @close="showStats = false")
   //- actions wrapper
-  div(:style=`{maxWidth: '700px', height: '50px',}`).row.full-width.items-center.content-center
-    node-share(v-if="useShare" :node="node")
+  div(:style=`{maxWidth: '500px', height: '50px',}`).row.full-width.items-start.content-start
     div(
       v-if="useBookmark"
       :style=`{
         position: 'relative',
-        height: '50px'}`
-      ).row.items-center.content-center.justify-center
+        paddingTop: '2px',
+      }`
+      ).row.items-start.content-start.justify-center.q-px-xs
       kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
-      //- bookmark count
-      div(
-        v-if="node.countBookmarks > 0"
-        :style=`{position: 'absolute', zIndex: 10, bottom: '0px',}`).row.full-width.justify-center
-        small.text-grey-9 {{ node.countBookmarks }}
-    //- node-remake(v-if="useRemake" :node="node")
-    node-connect(v-if="useConnect" :node="node" :isActive="isActive" :isVisible="isVisible")
-    //- vote
-    div(
-      v-if="useVote"
-      @click="showStats = true"
-      ).col.full-height.cursor-pointer
-      .row.fit.items-center.content-center.justify-end
-        q-btn(
-          @click="showStats = true"
-          flat dense no-caps color="grey-2").q-px-xs.q-py-xs
-          //- span.text-white.text-bold {{ $nodeRateTitle(node.rate) }}
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ Math.round((node.rate * 10) * 10) / 10  }}
-    node-vote(
-      v-if="useVote"
-      :node="node"
-      :style=`{
-        width: '60px', height: '60px',
-      }`).items-center.content-center.justify-center
+    .col.full-height
+      node-vote-bar(:node="node")
+    node-connect(v-if="useConnect || true" :node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -48,6 +27,7 @@ import nodeShare from 'components/node/node_share.vue'
 import nodeRemake from 'components/node/node_remake.vue'
 import nodeConnect from 'components/node/node_connect.vue'
 import nodeVote from 'components/node/node_vote.vue'
+import nodeVoteBar from 'components/node/node_vote_bar.vue'
 import nodeStats from 'components/node/node_stats/index.vue'
 
 export default {
@@ -61,15 +41,16 @@ export default {
     useBookmarkType: {type: String, default: 'NODE'},
     useRemake: {type: Boolean, default: true},
     useConnect: {type: Boolean, default: true},
-    useVote: {type: Boolean, default: true}
+    useVote: {type: Boolean, default: true},
   },
   components: {
-    nodeShare, nodeRemake, nodeStats, nodeVote, nodeConnect,
+    nodeShare, nodeRemake, nodeStats, nodeVote, nodeVoteBar, nodeConnect,
   },
   data () {
     return {
       showStats: false,
       isActiveStart: 0,
+      votesShow: false,
     }
   },
   watch: {
@@ -80,9 +61,9 @@ export default {
         }
         else {
           let statValue = Date.now() - this.isActiveStart
-          this.$log('statValue', statValue)
+          // this.$log('statValue', statValue)
           let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
-          this.$log('shareStart stat', stat)
+          // this.$log('statValue stat', stat)
           this.isActiveStart = 0
         }
       }

@@ -32,7 +32,8 @@ export default {
     views () {
       return [
         {id: 'settings.account', name: this.$t('pageSettings_account_title', 'Профиль')},
-        {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')}
+        {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')},
+        {id: 'settings.docs', name: this.$t('pageSettings_docs_title', 'Документы')}
       ]
     }
   },

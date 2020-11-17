@@ -9,7 +9,7 @@
   input(
     ref="inputFile" type="file"
     @input="fileChanged"
-    accept="image/*, video/*"
+    :accept="accept"
     :style=`{display: 'none'}`)
 </template>
 
@@ -19,6 +19,11 @@ export default {
   data () {
     return {
     }
+  },
+  computed: {
+    accept () {
+      return 'image/*, video/*'
+    },
   },
   methods: {
     start (e) {
