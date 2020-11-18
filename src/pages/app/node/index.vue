@@ -15,7 +15,7 @@ q-layout(view="hHh Lpr lff").b-30
           template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
             node-feed(
               :node="item" :isActive="true" :isVisible="itemVisible"
-              :showHeader="nodeOpened" :showActions="nodeOpened")
+              :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
               template(v-slot:name-left)
                 q-btn(
                   @click="nodeOpened = !nodeOpened"

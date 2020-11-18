@@ -72,6 +72,19 @@ div(
               :style=`{
                 fontSize: nodeNameSize+'px',
               }`).text-white.text-bold.cursor-pointer {{ node.name }}
+          div(
+            v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll
+            .row.full-width.justify-start.no-wrap.q-px-sm
+              q-btn(
+                v-for="(s,si) in node.spheres" :key="s.oid"
+                flat color="white" dense no-caps
+                :to="'/sphere/'+s.oid"
+                :style=`{
+                  whiteSpace: 'nowrap',
+                  borderRadius: '10px',
+                  //- maxHeight: '40px',
+                }`
+                ).b-40.q-px-sm.q-mr-sm.q-mb-sm {{ s.name }}
           slot(name="name-bottom")
         slot(name="name-right")
     .row.full-width
@@ -93,7 +106,8 @@ export default {
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
     showHeader: {type: Boolean, default: true},
-    showActions: {type: Boolean, default: true}
+    showActions: {type: Boolean, default: true},
+    showSpheres: {type: Boolean, default: true}
   },
   data () {
     return {
