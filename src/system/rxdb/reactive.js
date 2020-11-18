@@ -44,7 +44,8 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
          reactiveDocFactory.setSynchro(synchro)
          let value
          if (typeof valueOrFunc === 'function') {
-            value = valueOrFunc(JSON.parse(JSON.stringify(reactiveDoc.getPayload() || null)))
+            let changedData = lodashGet(JSON.parse(JSON.stringify(reactiveDoc.getPayload() || null)), path, null)
+            value = valueOrFunc(changedData)
             assert(value, '!value')
          } else value = valueOrFunc
          reactiveDoc.updatePayloadByPath(path, value)
