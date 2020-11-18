@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center.q-pt-sm
+.row.full-width.items-start.content-start.justify-center.q-px-sm.q-pt-sm
   //- top/bottom slot
   q-page-sticky(
     expand

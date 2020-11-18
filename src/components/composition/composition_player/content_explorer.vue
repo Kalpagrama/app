@@ -4,18 +4,18 @@ div(
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
     top: '0px', left: '0px',
-    height: '44px',
+    height: '44px', width: '44px',
     background: 'rgba(0,0,0,0.15)',
     borderRadius: '10px', overflow: 'hidden',
     maxWidth: 'calc(100% - 8px)',
   }`
   v-ripple=`{color: 'white'}`
-  ).row.items-center.content-center.cursor-pointer
+  ).row.items-center.content-center.justify-center.cursor-pointer
   q-btn(
     @mouseenter="mouseOver = true"
     @mouseleave="mouseOver = false"
     round flat color="grey-2" icon="select_all" no-caps)
-  transition(enter-active-class="animated fadeIn" leave-active-class="none")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="none")
     div(
       v-if="showContentName"
       :style=`{overflow: 'hidden', pointerEvents: 'none'}`).col.full-height

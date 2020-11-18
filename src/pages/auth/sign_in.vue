@@ -101,6 +101,14 @@ q-page(:style=`{paddingBottom: '200px',}`)
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
       .row.full-width.q-px-sm
         with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
+      .row.full-width.justify-center.text-grey-8
+        small.text-grey-8.q-mr-sm Продолжая, вы соглашаетесь с
+        router-link(:to="'/settings/docs'").q-px-sm
+          small.text-grey-8 Пользовательским соглашением,
+        router-link(:to="'/settings/docs'").q-px-sm
+          small.text-grey-8 Политикой конфиденциальности,
+        router-link(:to="'/settings/docs'").q-px-sm
+          small.text-grey-8 DMCA
 </template>
 
 <script>

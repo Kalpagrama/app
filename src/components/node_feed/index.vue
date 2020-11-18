@@ -11,7 +11,9 @@ div(
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
     //- header: author, createdAt
-    .row.full-width.items-center.content-center.q-pa-xs
+    div(
+      v-if="showHeader"
+      ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
         flat color="white" dense no-caps)
@@ -19,9 +21,9 @@ div(
         span.text-grey-4.q-ml-sm {{ node.author.name }}
       .col
       small.text-grey-8.q-mr-xs {{ node.countViews }}
-      q-icon(name="visibility" color="grey-8").q-mr-md
-      small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-      q-btn(round flat dense icon="more_vert" color="grey-9")
+      q-icon(name="visibility" color="grey-8").q-mr-xs
+      small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      q-btn(round flat dense icon="more_horiz" color="grey-9")
         q-popup-proxy(
           maximized position="bottom" dark
           cover anchor="top right" self="top right").b-40
@@ -38,29 +40,18 @@ div(
               :style=`{height: '50px',}`).full-width
               span.text-bold {{ a.name }}
     //- items wrapper
-    .row.full-width.items-start.content-start
-      div(
-        v-if="['SLIDER', 'PIP', 'VERTICAL', 'HORIZONTAL'].includes(node.layout)"
+    div(
+      :style=`{
+        position: 'relative',
+        paddingBottom: Math.min(Math.round(ratio*100), 100)+'%',
+      }`
+      ).row.full-width
+      composition-player(
+        :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
+        :options=`{height: '100%', objectFit: 'contain', loop: true}`
         :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden',
-          //- minHeight: height ? height+'px' : 'auto',
-        }`
-        ).row.full-width.items-start.content-start
-        composition-player(
-          :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-          :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
-        q-btn(
-          v-if="isActive && isVisible && node.items.length > 1"
-          :to="'/node/'+node.oid"
-          flat dense color="grey-2" no-caps
-          :style=`{
-            position: 'absolute', zIndex: 3000, bottom: '8px',
-            left: 'calc(50% - 20px)',
-            background: 'rgba(0,0,0,0.2)',
-          }`
-          ).q-px-sm
-          small.text-white.text-bold {{ node.items.length }} внутри
+          position: 'absolute', zIndex: 100, top: 0,
+        }`)
     //- essence
     div(:style=`{position: 'relative',}`).row.full-width
       router-link(
@@ -69,14 +60,24 @@ div(
           position: 'relative',
           textAlign: 'center',
         }`
-        ).row.full-width.justify-center.cursor-pointer.q-pa-md
-        //- <50 18 100 18
-        span(
-          :style=`{
-            fontSize: nodeNameSize+'px',
-          }`).text-white.text-bold.cursor-pointer {{ node.name }}
+        ).row.full-width.items-start.content-start.justify-center.cursor-pointer
+        slot(name="name-left")
+        .col
+          div(
+            :style=`{
+              minHeight: '44px',
+              textAlign: 'center',
+            }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
+            span(
+              :style=`{
+                fontSize: nodeNameSize+'px',
+              }`).text-white.text-bold.cursor-pointer {{ node.name }}
+          slot(name="name-bottom")
+        slot(name="name-right")
+    .row.full-width
+      slot(name="footer")
   //- footer
-  node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
+  node-actions(v-if="showActions" :node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -87,23 +88,22 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  props: ['node', 'isActive', 'isVisible', 'width'],
+  props: {
+    node: {type: Object},
+    isActive: {type: Boolean},
+    isVisible: {type: Boolean},
+    showHeader: {type: Boolean, default: true},
+    showActions: {type: Boolean, default: true}
+  },
   data () {
     return {
       showMore: false,
     }
   },
   computed: {
-    height () {
-      if (this.width) {
-        if (this.node.items[0].thumbHeight && this.node.items[0].thumbWidth) {
-          return (this.node.items[0].thumbHeight * this.width) / this.node.items[0].thumbWidth
-        }
-        else {
-          return null
-        }
-      }
-      else return null
+    ratio () {
+      let height = this.node.items[0].thumbHeight
+      return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
     },
     // TODO: impl better way
     nodeNameSize () {

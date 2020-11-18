@@ -200,7 +200,7 @@ export default {
         let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         this.publishing = false
-        this.$router.push(`/node/${createdNode.oid}?creating=true`).catch(e => e)
+        this.$router.push(`/node/${createdNode.oid}`).catch(e => e)
         this.$log('publish done')
         this.publishing = false
       }

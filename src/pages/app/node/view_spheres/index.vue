@@ -6,6 +6,7 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       position: 'relative',
+      paddingLeft: '40px', paddingRight: '40px',
     }`
     ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm.q-pb-xs
     //- node category goes as first sphere
@@ -13,14 +14,14 @@
       v-if="category"
       :to="'/sphere/'+category.sphere.oid"
       :style=`{height: '33px',borderRadius: '10px'}`
-      ).row.items-center.content-center.q-px-sm.bg-blue.q-mr-xs.q-mb-xs.shaking
+      ).row.full-width.items-center.content-center.q-px-sm.bg-blue.q-mr-xs.q-mb-xs.shaking
       q-icon(name="blur_on" color="white" size="20px").q-mr-xs
       span.text-white.q-mr-md {{ category.alias }}
     //- node spheres
     router-link(
       v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
       :style=`{height: '33px',borderRadius: '10px'}`
-      ).row.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-xs.q-mb-xs.shaking
+      ).row.full-width.items-center.content-center.q-px-sm.b-50.sphere-item.q-mr-xs.q-mb-xs.shaking
       q-icon(name="blur_on" color="white" size="20px").q-mr-xs
       span.text-white.q-mr-xs {{ s.name }}
 </template>

@@ -58,6 +58,9 @@
       :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
       div(
         v-for="(item,ii) in [joint.leftItem, joint.rightItem]" :key="ii"
+        :style=`{
+          //- maxWidth: ii === 0 ? '100%' : '60px'
+        }`
         ).col-6
         joint-item(
           :joint="joint"

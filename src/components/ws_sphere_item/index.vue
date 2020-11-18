@@ -19,11 +19,13 @@ div(
       @click="$emit('clicked', sphere)"
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
-        height: '24px',
+        minHeight: '24px',
       }`
       ).row.full-width.items-center.content-center.q-pr-sm.cursor-pointer
-      q-icon(name="blur_on" color="white" size="20px").q-mx-xs
-      span(:style=`{fontSize: '14px'}`).text-white {{ sphere.name }}
+      .row.full-height.items-start.content-start.q-px-xs
+        q-icon(name="blur_on" color="white" size="20px").q-mx-xs
+      .col
+        span(:style=`{fontSize: '14px', lineHeight: 1}`).text-white {{ sphere.name }}
   slot(name="append")
 </template>
 

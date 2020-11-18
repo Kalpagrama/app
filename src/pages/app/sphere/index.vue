@@ -8,11 +8,11 @@ q-layout(view="hHh Lpr lff")
             height: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          //- q-btn(
+          q-btn(
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="blur_on" color="white" size="30px").q-mx-sm
-          .col
+          q-icon(name="blur_on" color="white" size="30px")
+          .col.q-px-md
             span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
           kalpa-bookmark(
             v-if="sphere"
@@ -35,10 +35,9 @@ q-layout(view="hHh Lpr lff")
           }`
           ).row.full-width.items-start.content-start
           kalpa-loader(
-            v-if="sphere" :query="query" :limit="15" v-slot=`{items, next}`
-            @reset="$refs.qis.reset(), $refs.qis.resume(), $refs.qis.poll()")
+            v-if="sphere" :query="query" :limit="15" v-slot=`{items, next}`)
             list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-              q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
+              q-infinite-scroll(@load="next" :offset="$q.screen.height")
               template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
                 node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>

@@ -20,18 +20,18 @@ div(
       }`)
       q-btn(
         @click="muted ? mutedOff() : mutedOn()"
-        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
-        q-spinner-audio(
+        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`).q-pr-sm
+        //- q-spinner-audio(
           v-if="!muted"
-          size="18px" color="white").q-mx-xs
+          size="16px" color="grey-6").q-mx-xs
         //- q-icon(
           v-if="!muted && !playing"
           name="play_arrow" size="25px" color="white"
           ).q-mx-sm
         q-icon(
-          v-if="muted"
-          size="25px" color="red" name="volume_off").q-mx-sm
-        span.text-white.text-bold.q-mr-sm.q-mt-sm {{ $time(duration-currentTime) }}
+          size="24px" color="grey-6" :name="muted ? 'volume_off' : 'volume_up'"
+          :style=`{marginLeft: '10px'}`).q-mr-sm
+        span(v-if="duration  > 0").text-grey-6 {{ $time(duration-currentTime) }}
   //- preview
   img(
     @click="$emit('previewClick')"
@@ -42,15 +42,16 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: options.height,
-      objectFit: options.objectFit,
-      //- opacity: duration === 0 ? 1 : 0,
+      //- objectFit: options.objectFit,
+      opacity: duration > 0 ? 0 : 1,
     }`
     ).full-width
   //- video wrapper
   div(
     v-if="isActive && isVisible"
     :style=`{
-      position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
+      position: 'absolute', zIndex: 200,
+      //- transform: 'translate3d(0,0,0)',
     }`
     ).row.fit
     video(
@@ -68,7 +69,9 @@ div(
       playsinline
       :style=`{
         objectFit: options.objectFit,
-        borderRadius: '10px', overflow: 'hidden',
+        //- borderRadius: '10px',
+        overflow: 'hidden',
+        //- opacity: 0.5
       }`
       ).fit
 </template>
@@ -184,7 +187,7 @@ export default {
       this.currentTime = e.target.currentTime
     },
     videoLoadedmetadata (e) {
-      // this.$log('videoLoadedmetadata', e)
+      this.$log('videoLoadedmetadata', e)
       this.duration = e.target.duration
       if (this.isActive) {
         e.target.play()

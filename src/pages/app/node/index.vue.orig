@@ -71,6 +71,11 @@ q-layout(view="hHh Lpr lff").b-30
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+<<<<<<< HEAD
+import { date } from 'quasar'
+
+=======
+>>>>>>> 0e3ccda2754c6cf1747fd2c2291c3bce13533209
 import nodeMockup from './node_mockup/index.vue'
 
 export default {

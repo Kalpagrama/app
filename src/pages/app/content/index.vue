@@ -34,7 +34,9 @@ export default {
       async handler (to, from) {
         this.$log('oid TO', to)
         if (to) {
-          this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+          this.contentKalpa = null
+          await this.$wait(250)
+          this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
         }
       }
     },
