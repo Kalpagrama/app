@@ -292,7 +292,6 @@ class Objects {
             await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateStat', event.rateStat, true)
             await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', countVotes => countVotes + 1, true)
             // добавим голос пользователя в статистику
-            // let sss = await rxdb.find({selector: {id: makeId(RxCollectionEnum.GQL_QUERY, 'objectStat', { params: { oid: event.object.oid } })}})
             await updateRxDocPayload(makeId(RxCollectionEnum.GQL_QUERY, 'objectStat', { oid: event.object.oid }), 'votes', votes => {
                logD('updateRxDocPayload objectStat TODO! обновить статистику голосованния', votes)
                assert(votes && Array.isArray(votes), '!stat.votes')
@@ -304,7 +303,10 @@ class Objects {
                if (indx >= 0) votes.splice(indx, 1)
                votes.push(userVote)
                return votes
-            }, false)
+            }, true)
+            if (event.subject.oid === rxdb.getCurrentUser().oid){
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
+            }
             break
          }
          case 'OBJECT_DELETED': {
