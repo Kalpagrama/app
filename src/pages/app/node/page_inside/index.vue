@@ -1,7 +1,8 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: '30px',
+    paddingTop: '8px',
+    paddingBottom: pageHeight+'px'
   }`
   )
   q-page-sticky(
@@ -17,41 +18,77 @@ q-page(
     :style=`{
       zIndex: 4000
     }`).b-30
-    //- .row.full-width.q-px-md.q-py-sm
-      small.text-white 1933 comments
+    .row.full-width.q-pl-sm.q-py-xs.q-pr-xs
+      q-btn(flat color="green" no-caps dense).q-px-xs.b-50 от Автора
+      q-btn(flat color="grey-8" no-caps dense).q-px-xs Все
+      .col
+      q-btn(round flat color="green" icon="add" dense)
+      //- creator()
+      //- small.text-white 1933 comments
     slot(name="bottom")
   .row.full-width.items-start.content-start.q-pa-sm
     slot(name="body")
     div(
       v-for="(i,ii) in 100" :key="ii"
       :style=`{
-        //- minHeight: '40px',
         borderRadius: '10px',
         overflow: 'hidden',
+        paddingRight: '0px',
       }`
-      ).row.full-width.items-start.content-start.b-40.q-mb-sm.q-pa-xs
-        .row.full-width.items-center.content-center
-          img(:src="node.thumbUrl" :style=`{width: '28px', height: '28px', borderRadius: '50%',}`).q-ml-xs
-          .col.q-px-sm
-            .row.full-width.items-center.content-center
-              small.text-white Author Name
-              .row.full-width
+      ).row.full-width.items-start.content-start.q-mb-md
+        div(
+          :style=`{
+            background: 'rgb(35,35,35)',
+            borderRadius: '10px',
+            overflow: 'hidden',
+          }`
+          ).row.full-width
+          .row.full-width.items-center.content-center.q-pa-xs
+            img(:src="node.thumbUrl" :style=`{width: '28px', height: '28px', borderRadius: '50%',}`).q-ml-xs
+            .col.q-px-sm
+              .row.full-width.items-center.content-center
+                .col
+                  small.text-white Author Name
                 small.text-grey-8 17.11.2020
-          q-btn(round flat dense color="grey-9" icon="link")
-        .row.full-width.items-start.content-start.q-px-sm.q-py-sm
-          span.text-white lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
-          img(
-            v-if="ii % 3 === 0"
-            :src="node.thumbUrl"
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).full-width
+          .row.full-width.items-start.content-start
+            .row.full-width.items-start.content-start.q-px-sm
+              img(
+                v-if="true"
+                :src="node.thumbUrl"
+                :style=`{
+                  borderRadius: '10px',
+                  height: '60px',
+                }`)
+              .col
+                .row.full-width.q-px-sm
+                  span.text-white lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+            .row.full-width.justify-start.q-pt-sm.q-px-sm
+              q-btn(
+                v-for="s in 3" :key="s"
+                round flat dense color="grey-2" no-caps).q-px-sm.b-40.q-mr-sm.q-mb-sm sphere {{s}}
+        div(:style=`{height: '50px',}`).row.full-width.items-start.content-start
+          q-btn(round flat color="grey-9" icon="bookmark_outline")
+          .col
+            div(
+              v-if="true"
+              :style=`{
+                opacity: 0.5,
+                position: 'relative',
+                height: '5px',
+                marginTop: '18px',
+                borderRadius: '10px', overflow: 'hidden',
+                background: 'rgb(2,0,36)',
+                background: 'linear-gradient(90deg, rgba(255,26,5,1) 0%, rgba(255,221,2,0.7) 25%, rgba(75,172,79,0.7) 50%, rgba(44,85,179,0.7) 75%, rgba(113,49,164,1) 100%)'
+              }`).row.full-width
+          q-btn(round flat color="grey-9" icon="link")
 </template>
 
 <script>
 export default {
   name: 'node_pageInside',
-  props: ['node', 'pageHeight', 'pageWidth']
+  props: ['node', 'pageHeight', 'pageWidth'],
+  components: {
+    creator: () => import('./create.vue'),
+  }
 }
 </script>

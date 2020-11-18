@@ -51,19 +51,25 @@ div(
   //- svg(width="400px" height="100px" xmlns="http://www.w3.org/2000/svg").bg
     path(d="m 0 50, h 100, v -50, h100, v50, h100, v50, h-100, v-10, h-100, v-10, h-100 z" stroke="red" fill="black")
   div(
-    v-if="!node.rateUser"
+    v-if="!node.rateUser || node.rateStat.length === 0"
     @click="voteStart"
     :style=`{
       position: 'relative',
       height: '5px',
+      marginTop: '13px',
       borderRadius: '10px', overflow: 'hidden',
       background: 'rgb(2,0,36)',
       background: 'linear-gradient(90deg, rgba(255,26,5,1) 0%, rgba(255,221,2,0.7) 25%, rgba(75,172,79,0.7) 50%, rgba(44,85,179,0.7) 75%, rgba(113,49,164,1) 100%)'
     }`).row.full-width
+  div(v-if="!node.rateUser || node.rateStat.length === 0").row.full-width.justify-center
+    small.text-grey-6 Проголосовать
   div(
-    v-if="node.rateUser && voteStats"
+    v-if="node.rateUser && node.rateStat && node.rateStat.length > 0"
     @click="voteStatsShow = true"
-    ).row.full-width.justify-center.q-pt-md
+    :style=`{
+      marginTop: '13px',
+    }`
+    ).row.full-width.justify-center
     div(
       :style=`{
         position: 'relative',
@@ -73,11 +79,11 @@ div(
       }`
       ).row.full-width
       div(
-        v-for="(s,skey) in voteStats" :key="skey"
-        v-if="s.w > 0"
+        v-for="(s,si) in node.rateStat" :key="si"
+        v-if="s.percent > 0"
         :style=`{
-          width: s.w+'%',
-          background: s.color,
+          width: s.percent+'%',
+          background: voteStats[si].color,
         }`).full-height
     div().row.full-width.justify-center
       small.text-grey-6 {{ votesCount }}
@@ -108,7 +114,7 @@ export default {
   },
   computed: {
     votesCountRaw () {
-      return this.voteStats.reduce((acc, val) => {
+      return this.node.rateStat.reduce((acc, val) => {
         acc += val.count
         return acc
       }, 0)

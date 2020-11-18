@@ -1,5 +1,7 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff").b-30
+q-layout(
+  view="hHh Lpr lff"
+  @scroll="onScroll").b-30
   q-header(
    ).b-30
     .row.full-width.justify-center
@@ -16,15 +18,21 @@ q-layout(view="hHh Lpr lff").b-30
             node-feed(
               :node="item" :isActive="true" :isVisible="itemVisible"
               :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
-              template(v-slot:name-left)
+              template(v-slot:name)
+                div(
+                  @click="nodeOpened = !nodeOpened"
+                  :style=`{
+                    position: 'absolute', zIndex: 100,
+                  }`).row.fit
+              //- template(v-slot:name-left)
                 q-btn(
                   @click="nodeOpened = !nodeOpened"
                   round flat color="grey-6"
                   :icon="nodeOpened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-              template(v-slot:name-right)
+              //- template(v-slot:name-right)
                 q-btn(round flat color="grey-6" icon="add")
               template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
-                .row.full-width
+                div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width
                   router-link(
                     v-for="(s,si) in node.spheres" :key="si"
                     v-if="si < 3"
@@ -92,7 +100,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'inside', name: 'Ядро'},
+        {id: 'inside', name: 'Ядра'},
         {id: 'outside', name: 'Связи'}
       ]
     }
@@ -128,6 +136,10 @@ export default {
       this.$log('onResize', e)
       this.headerHeight = e.height
       this.headerWidth = e.width
+    },
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (this.nodeOpened) this.nodeOpened = false
     },
     nodeWatch (oid) {
       this.$log('nodeWatch', oid)

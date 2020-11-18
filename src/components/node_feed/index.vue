@@ -65,9 +65,11 @@ div(
         .col
           div(
             :style=`{
+              position: 'relative',
               minHeight: '44px',
               textAlign: 'center',
             }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
+            slot(name="name")
             span(
               :style=`{
                 fontSize: nodeNameSize+'px',
