@@ -546,7 +546,7 @@ class RxDBWrapper {
          if (autoNext) await findResult.next()
          // this.store.commit('debug/addFindResult', { queryId, findResult })
          this.store.commit('debug/addFindResult', { queryId, findResult })
-         assert(findResult, '!result')
+         assert(findResult && findResult.next, '!findResult.next')
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
       } finally {

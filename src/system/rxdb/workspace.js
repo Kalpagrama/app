@@ -106,23 +106,6 @@ class Workspace {
                assert('hasChanges' in plainData, '! hasChanges in plainData')
                if (plainData.hasChanges) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
             }
-            const checkUnique = async (plainData) => {
-               assert(plainData.wsItemType in WsItemTypeEnum, '!plainData.wsItemType in WsItemTypeEnum')
-               if (plainData.wsItemType === WsItemTypeEnum.WS_SPHERE) {
-                  assert(plainData.name)
-                  const found = await rxdb.find({
-                     selector: {
-                        rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-                        name: plainData.name
-                     }
-                  }, true)
-                  if (found.filter(item => item.id !== plainData.id).length) {
-                     // logE(`уже есть такая же сфера (${plainData.name})!!!!!`)
-                     throw new Error(`уже есть такая же сфера (${plainData.name})!!!!!`)
-                     // plainData.name = plainData.name + performance.now()
-                  }
-               }
-            }
             const initWsItem = (plainData) => {
                assert(plainData.wsItemType, '!plainData.wsItemType')
                plainData.rev = plainData.rev || 0
@@ -137,7 +120,6 @@ class Workspace {
             }
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
                initWsItem(plainData)
-               if (plainData.hasChanges) await checkUnique(plainData) // проверяем на уникальность только те что изменены локально (с сервера берем не глядя иначе будет ошибка при синхронизации - await this.db.ws_items.atomicUpsert(outdated))
                let plainDataCopy = cloneDeep(plainData) // newVal
                let rxDocCopy = rxDoc.toJSON() // oldVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
@@ -152,7 +134,6 @@ class Workspace {
             }, false)
             this.db.ws_items.preInsert(async (plainData) => {
                initWsItem(plainData)
-               if (!plainData.rev) await checkUnique(plainData) // для вновь созданных объектов (объекты с сервере не проверяем)
             }, false);
             this.db.ws_items.postSave(async (plainData, rxDoc) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
@@ -335,7 +316,8 @@ class Workspace {
       let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
       let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
       let operations = []
-      // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
+      // todo - по идее это избыточно (processEvent не завязан на этот список) - убрать после презентации
+      // сначала удаляем из очереди, а потом шлем на отправку (processEvent может сработать в другой вкладке до того как  закончится saveToServer)
       await this.db.ws_changes.find().remove() // удаляем информацию из очереди на отправку
       for (let unsavedItem of unsavedItems) {
          let { id, operation, rev } = unsavedItem
@@ -549,6 +531,22 @@ class Workspace {
                })
                return acc
             }, [])
+         } else if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE){
+            const foundOtherDocs = await this.db.ws_items.find({
+               selector: {
+                  wsItemType: RxCollectionEnum.WS_SPHERE,
+                  name: itemCopy.name,
+                  id: {$ne: itemCopy.id || 0}
+               }
+            }).exec()
+            // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
+            if (foundOtherDocs.length) {
+               if (!itemCopy.id){ // создание нового элемента
+                  return foundOtherDocs[0] // вернем существующий
+               } else { // изменение существующего элемента
+                  throw new Error(`same sphere found! ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
+               }
+            }
          }
          itemCopy.updatedAt = Date.now()
          if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()

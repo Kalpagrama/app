@@ -131,7 +131,6 @@ div(
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import {systemReset, shareWith} from 'src/system/services'
 
 export default {
   name: 'kalpaMenu',
@@ -165,8 +164,12 @@ export default {
     async refresh () {
       this.$log('refresh')
       this.refreshLoading = true
-      await this.$wait(300)
-      await systemReset()
+      // await this.$wait(300)
+      await this.$systemUtils.vibrate(200)
+      await this.$systemUtils.reset()
+      // await this.$systemUtils.openUrl()
+      // await this.$systemUtils.openUrl('https://kalpagrama.com/', true)
+      // await this.$systemUtils.hapticsImpact()
       this.refreshLoading = false
     },
     async logout () {

@@ -210,6 +210,8 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     ...objectFragment
     sphereFromName{...objectShortFragment}
     rate
+    weight
+    rateStat {percent, weight, count}
     rateUser
     countVotes
     countViews
@@ -265,6 +267,7 @@ fragment jointFragment on Joint {
     }
     rate
     weight
+    rateStat {percent, weight, count}
     rateUser
     countVotes
     countViews

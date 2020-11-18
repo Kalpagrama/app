@@ -1,6 +1,6 @@
 import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { AppVisibility, Notify, Platform } from 'quasar'
+import { AppVisibility, Notify, Platform, Loading } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
@@ -10,6 +10,8 @@ import { AuthApi } from 'src/api/auth'
 import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
 import store from 'src/store/index'
+import { ContentApi } from 'src/api/content'
+import { makeRoutePath } from 'public/scripts/common_func'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
@@ -21,8 +23,55 @@ const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
 let initialized = false
 
-async function initServices () {
-   const f = initServices
+let capacitor
+
+class SystemUtils {
+   async vibrate (patternOrDuration = 100) {
+      if (Platform.is.capacitor) await capacitor.vibrate()
+      else if (navigator.vibrate) navigator.vibrate(patternOrDuration)
+   }
+
+   async hapticsImpact (style = 'medium') {
+      if (Platform.is.capacitor) await capacitor.hapticsImpact(style)
+      else if (navigator.vibrate) navigator.vibrate(50)
+   }
+
+   async shareOut (object) {
+      await shareOut(object)
+   }
+
+   async reset () {
+      await systemReset()
+   }
+
+   async statusBarSetVisible (visible) {
+      if (Platform.is.capacitor) await capacitor.statusBarSetVisible(visible)
+   }
+
+   async statusBarSetStyle (style) {
+      if (Platform.is.capacitor) await capacitor.statusBarSetStyle(style)
+   }
+
+   orientationLockEnabled (mode) {
+      return !!Platform.is.capacitor
+   }
+
+   async orientationLock (mode) {
+      if (Platform.is.capacitor) await capacitor.orientationLock(mode)
+   }
+
+   async openUrl (urlStr, inAppBrowser = false) {
+      if (Platform.is.capacitor && inAppBrowser) await capacitor.openUrl(urlStr)
+      else window.location = urlStr
+   }
+
+   async screenshot () {
+      if (Platform.is.capacitor) await capacitor.screenshot()
+   }
+}
+
+async function initApplication () {
+   const f = initApplication
    logD(f, 'start', Platform.is, process.env.MODE)
    const t1 = performance.now()
    initOfflineEvents(store)
@@ -30,11 +79,8 @@ async function initServices () {
    if (process.env.MODE === 'pwa') {
       await initPWA(store)
    } else if (Platform.is.capacitor) {
-      const { initCapacitor } = await import('src/system/capacitor.js')
-      await initCapacitor(store)
-   } else if (Platform.is.cordova) {
-      const { initCordova } = await import('src/system/cordova.js')
-      await initCordova(store)
+      capacitor = await import('src/system/capacitor.js')
+      await capacitor.init(store)
    }
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
    const hasPerm = await askForWebPushPerm(store)
@@ -75,6 +121,7 @@ async function initServices () {
    })
    initialized = true
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   return new SystemUtils()
 }
 
 // В сафари событие срабатывает и на вкладке, которая инициировала изменения (храним id вкладки в событии)
@@ -86,50 +133,70 @@ function setSyncEventStorageValue (key, value) {
    localStorage.setItem(key, JSON.stringify({ value, instanceId: mutexGlobal.getInstanceId() })) // сообщаем другим вкладкам
 }
 
-async function shareWith (object) {
-   const f = shareWith
-   logD(f, 'start', Platform.is, process.env.MODE)
+// поделиться в кальпаграма
+async function shareIn ({ contentUrl } = {}) {
+   const f = shareIn
+   if (contentUrl) {
+      try {
+         // alert('shareIn1')
+         Loading.show({
+            message: `Content upload is in progress <b>${contentUrl}</b> <br/><span class="text-light">Hang on...</span>`
+         })
+         // alert('shareIn2')
+         let content = await ContentApi.contentCreateFromUrl(contentUrl)
+         let bookmarkInput = {
+            type: content.type,
+            oid: content.oid,
+            name: content.name,
+            thumbUrl: content.thumbUrl
+         }
+         await rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+         // alert('shareIn3')
+         let route = makeRoutePath(content)
+         // alert('shareIn4')
+         logD(f, 'go to route', route)
+         // alert('route = ' + route)
+         await router.push(route)
+         // alert('shareIn5')
+      } finally {
+         Loading.hide()
+      }
+   }
+}
+
+// поделиться из кальпаграма
+async function shareOut (object) {
+   const f = shareOut
+   // alert('shareOut:' + JSON.stringify(object))
+   logD(f, 'start', Platform.is, process.env.MODE, object)
    const t1 = performance.now()
    let title, text, url
    assert(object && object.oid && object.type)
-   switch (object.type) {
-      case 'NODE':
-         title = object.name
-         text = object.name
-         url = location.origin + '/node/' + object.oid
-         break
-      case 'USER':
-         title = object.name
-         text = object.name
-         url = location.origin + '/user/' + object.oid
+   url = makeRoutePath(object, true)
+   logD(f, 'url=', url)
+   if (object) {
+      title = object.name
+      text = object.name
    }
+   // alert('shareOut url =' + url)
+   // alert('shareOut text =' + text)
+   // alert('shareOut title =' + title)
    if (process.env.MODE === 'pwa' || process.env.MODE === 'spa') {
-      if (url) await pwaShareWith(title, text, url)
+      await pwaShareWith(title || '', text || '', url)
+   } else if (Platform.is.capacitor) {
+      await capacitor.shareOut(title || '', text || '', url)
    }
+   // alert('shareOut end ')
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 async function askForWebPushPerm (store) {
    if (Platform.is.capacitor) {
-      const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
-      await initCapacitorPushPlugin(store)
-      return true
-   } else if (Platform.is.cordova) {
-      const { initCordovaPushPlugin } = await import('src/system/cordova.js')
-      await initCordovaPushPlugin(store)
+      await capacitor.initPushPlugin(store)
       return true
    } else if (process.env.MODE === 'pwa') {
       return await askForPwaWebPushPerm(store)
    }
-}
-
-function orientationLockEnabled (mode) {
-   return !!Platform.is.capacitor
-}
-
-async function orientationLock (mode) {
-   const { capacitorOrientationLock } = await import('src/system/capacitor.js')
-   if (Platform.is.capacitor) await capacitorOrientationLock(mode)
 }
 
 function initOfflineEvents (store) {
@@ -361,12 +428,10 @@ async function systemHardReset () {
 }
 
 export {
-   initServices,
+   initApplication,
    setSyncEventStorageValue,
-   orientationLockEnabled,
-   orientationLock,
    systemReset,
-   shareWith,
+   shareIn,
    initSessionStorage,
    systemInit
 }

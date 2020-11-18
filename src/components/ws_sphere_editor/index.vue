@@ -91,22 +91,11 @@ export default {
     },
     async sphereCreate (name) {
       this.$log('sphereCreate', name)
-      let [sphere] = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: name,
-        }
-      })
-      if (sphere) {
-        this.$log('*** sphere DUPLICATE ***', name)
+      this.$log('sphere CREATE !', name)
+      let sphereInput = {
+        name: name,
       }
-      else {
-        this.$log('sphere CREATE !', name)
-        let sphereInput = {
-          name: name,
-        }
-        sphere = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
-      }
-      return sphere
+      return await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
     }
   }
 }

@@ -63,7 +63,7 @@ q-btn(
 
 <script>
 import { Platform, openURL } from 'quasar'
-import { shareWith } from 'src/system/services'
+import { makeRoutePath } from 'public/scripts/common_func'
 
 export default {
   name: 'nodeShare',
@@ -77,18 +77,18 @@ export default {
   },
   computed: {
     shareEmbedText () {
-      return `<iframe width="100%" height="315" src="${location.origin}/joint/${this.joint.oid}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+      return `<iframe width="100%" height="315" src="${makeRoutePath(this.joint, true)}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
     }
   },
   methods: {
-    shareStart () {
+    async shareStart () {
       this.$log('shareStart')
       if (Platform.is.desktop) {
-        this.shareLink = location.origin + '/joint/' + this.joint.oid
+        this.shareLink = makeRoutePath(this.joint, true)
         this.shareDialogOpened = true
       }
       else {
-        shareWith(this.link)
+        await this.$systemUtils.shareOut(this.link)
       }
     },
     async shareLinkCopy () {

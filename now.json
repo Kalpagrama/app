@@ -14,6 +14,7 @@
     { "src": "^/fonts/(.*)", "dest": "/fonts/$1" },
     { "src": "^/scripts/(.*)", "dest": "/scripts/$1" },
     { "src": "^/icons/(.*)", "dest": "/icons/$1" },
+    { "src": "^/.well-known/(.*)", "dest": "/.well-known/$1" },
     { "src": "^/other/(.*)", "dest": "/other/$1" },
     { "src": "^/(.*).js", "dest": "/$1.js" },
     { "src": "^/(.*).json", "dest": "/$1.json" },

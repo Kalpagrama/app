@@ -4,7 +4,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 // import VueYandexMetrika from 'vue-yandex-metrika'
 
-import { LoadingBar, Screen, date } from 'quasar'
+import { Screen, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
@@ -50,11 +50,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.prototype.$axios = axios
     // quasar stuff
     // Screen.setSizes({ xs: 600, sm: 900, md: 1260, lg: 1600, xl: 1900 })
-    LoadingBar.setDefaults({
-      color: 'green',
-      size: '4px',
-      position: 'top'
-    })
+
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {

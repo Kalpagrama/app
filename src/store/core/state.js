@@ -6,7 +6,6 @@ export default {
    version: process.env.BUILD_VERSION,
    buildDate: process.env.BUILD_DATE,
    online: true, // если сеть недоступна - присваивается false
-   shareData: null, // данные от меню "поделиться в приложение"
    newVersionAvailable: false,
    installPrompt: null, // ф-я вызова диалога "установить приложение"
    logLevel: LogLevelEnum.DEBUG,
@@ -18,7 +17,7 @@ export default {
       // LogSystemModulesEnum.SW,
       // LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
-      LogSystemModulesEnum.API,
+      // LogSystemModulesEnum.API,
       LogSystemModulesEnum.ROUTER,
       LogSystemModulesEnum.VUEX,
       LogSystemModulesEnum.VUEX_CACHE,

@@ -1,6 +1,6 @@
 {
   "name": "kalpagrama",
-  "version": "3.2.28",
+  "version": "3.2.68",
   "description": "Kalpagrama application",
   "author": "kalpagrama <info@kalpagramma.ru>",
   "private": true,
@@ -9,6 +9,7 @@
     "@capacitor/cli": "^2.0.0",
     "@capacitor/core": "^2.0.0",
     "@capacitor/ios": "2.4.2",
+    "briebug-cordova-screenshot": "^0.1.7",
     "cordova-plugin-screen-orientation": "^3.0.2",
     "es6-promise-plugin": "^4.2.2"
   }
