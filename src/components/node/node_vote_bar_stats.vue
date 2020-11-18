@@ -24,10 +24,11 @@ div(
       }`
       ).row.full-width.items-center.content-center
       div(
-        v-for="(s,si) in voteStats" :key="si"
+        v-for="(s,si) in rateStat" :key="si"
+        v-if="s.percent > 0"
         @click="voteSelected = si"
         :style=`{
-          background: s.color,
+          background: rateMeta[si].color,
           maxHeight: si === voteSelected ? '40px' : '20px',
           //- borderRadius: si === 0 ? '10px 0 0 10px' : si === 4 ? '0 10px 10px 0' : '0px',
           borderRadius: voteBorderRadius(si),
@@ -61,7 +62,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeVoteBarStats',
-  props: ['node', 'voteStats'],
+  props: ['node', 'rateStat', 'rateMeta'],
   data () {
     return {
       stats: null,

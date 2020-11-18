@@ -79,17 +79,14 @@ div(
               }`).text-white.text-bold.cursor-pointer {{ node.name }}
           div(
             v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll
-            .row.full-width.justify-start.no-wrap.q-px-sm
-              q-btn(
+            .row.full-width.justify-start.no-wrap.q-pl-sm
+              div(
                 v-for="(s,si) in node.spheres" :key="s.oid"
-                flat color="white" dense no-caps
-                :to="'/sphere/'+s.oid"
-                :style=`{
-                  whiteSpace: 'nowrap',
-                  borderRadius: '10px',
-                  //- maxHeight: '40px',
-                }`
-                ).b-40.q-px-sm.q-mr-sm.q-mb-sm {{ s.name }}
+                ).row.items-start.content-start.justify-start.q-pr-sm.q-pb-sm
+                q-btn(
+                  flat color="white" dense no-caps
+                  :to="'/sphere/'+s.oid"
+                  :style=`{borderRadius: '10px', whiteSpace: 'nowrap',}`).row.b-40.q-px-sm.text-grey-4 {{ s.name }}
           slot(name="name-bottom")
         slot(name="name-right")
     .row.full-width
