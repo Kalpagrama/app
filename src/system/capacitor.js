@@ -6,6 +6,7 @@ import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { wait } from 'src/system/utils'
+import { shareIn } from 'src/system/services'
 
 const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
 
@@ -15,14 +16,13 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
 async function init (store) {
-   // share для ios (не разобрался как из ios послать эвент в js без плагина)
-   // alert(JSON.stringify(Platform.is))
    App.addListener('appUrlOpen', async (openData) => {
       // alert('appUrlOpen: ' + JSON.stringify(openData))
       logD('appUrlOpen. openData=', openData)
       let url = new URL(openData.url)
       let data = url.searchParams.get('data')
-      let text = url.searchParams.get('contentText')
+      let contentUrl = url.searchParams.get('contentUrl')
+      let contentText = url.searchParams.get('contentText')
 
       let userId = url.searchParams.get('userId')
       let loginType = url.searchParams.get('loginType')
@@ -31,17 +31,10 @@ async function init (store) {
       let needConfirm = url.searchParams.get('needConfirm')
       let token = url.searchParams.get('token')
       let expires = url.searchParams.get('expires')
-      if (data || text) {
-         // alert('appUrlOpen. data = ' + data)
-         // alert('appUrlOpen. text = ' + text)
-         let shareItem = {
-            type: 'VIDEO',
-            url: text,
-            file: null
-         }
-         // alert('shareItem = ' + JSON.stringify(shareItem))
-         store.commit('workspace/stateSet', ['shareItem', shareItem], { root: true })
-         await router.push({ path: '/workspace/contentNotes', query: { share: true } })
+      if (contentUrl || contentText) { // поделиться в приложение (вариант для ios и android)
+         // alert('appUrlOpen. contentUrl = ' + contentUrl)
+         // alert('appUrlOpen. contentText = ' + contentText)
+         await shareIn({ contentUrl })
       } else if (userId) {
          // alert('appUrlOpen... /auth/sign-in auth.userId = ' + userId)
          await router.push({
@@ -49,45 +42,35 @@ async function init (store) {
             query: { userId, loginType, userExist, needInvite, needConfirm, token, expires }
          })
       } else { // deep linking
+         // alert(`appUrlOpen deep linking... data.url1= ${url}`)
          // Example url: https://dev.kalpa.app/content/23874628346781637
-         // slug = /content/23874628346781637
-         const slug = data.url.split('.app').pop()
-         // We only push to the route if there is a slug present
-         if (slug) {
-            router.push({
-               path: slug
-            })
+         // path = /content/23874628346781637
+         const path = url.toString().split('.app').pop()
+         // alert('appUrlOpen deep linking... path= ' + path)
+         // We only push to the route if there is a path present
+         if (path) {
+            router.push({ path })
          }
       }
    })
-   // share для android
-   window.addEventListener('shareEventKalpa', async (e) => {
-      // Prevent the mini-info bar from appearing.
-      alert('shareEventKalpa !' + JSON.stringify(e))
-      let shareItem = {
-         type: 'VIDEO',
-         url: e.dataKey,
-         file: null
-      }
-      alert('shareItem = ' + JSON.stringify(shareItem))
-      store.commit('workspace/stateSet', ['shareItem', shareItem], { root: true })
-      await router.push({ path: '/workspace/contentNotes', query: { share: true } })
-   })
    await orientationLock('portrait')
+   await statusBarSetStyle('dark')
    // Events (iOS only)
-   window.addEventListener('statusTap', function () {
-      // alert('statusbar tapped')
-   })
-   await StatusBar.setStyle({
-      style: StatusBarStyle.Dark,
-      overlays: true
-   })
-   // await StatusBar.hide()
+   // window.addEventListener('statusTap', function () {
+   //    // alert('statusbar tapped')
+   // })
 }
 
 async function statusBarSetVisible (visible) {
    if (visible) await StatusBar.show()
    else await StatusBar.hide()
+}
+
+async function statusBarSetStyle (style) {
+   assert(style.in('dark', 'light'), 'bad style')
+   if (style === 'dark') style = StatusBarStyle.Dark
+   else style = StatusBarStyle.Light
+   await StatusBar.setStyle({ style })
 }
 
 async function vibrate () {
@@ -135,11 +118,11 @@ async function initPushPlugin (store) {
    // Show us the notification payload if the app is open on our device
    PushNotifications.addListener('pushNotificationReceived', async (notification) => {
          logD('Push received (app is opened): ', notification)
-         alert('Push dbEvent received (app is opened):' + JSON.stringify(notification))
+         // alert('Push dbEvent received (app is opened):' + JSON.stringify(notification))
          let dbEvent = JSON.parse(notification.notification.data.event || '{}')
-         alert('Push dbEvent received (app is opened):' + JSON.stringify(dbEvent))
+         // alert('Push dbEvent received (app is opened):' + JSON.stringify(dbEvent))
          let route = (makeRoutePath(dbEvent.object) || '/').replaceAll('//', '/')
-         alert('route = ' + route)
+         // alert('route = ' + route)
          await router.push(route)
       }
    )
@@ -147,24 +130,19 @@ async function initPushPlugin (store) {
    // Method called when tapping on a notification
    PushNotifications.addListener('pushNotificationActionPerformed', async (notification) => {
          logD('Push action performed: ', notification)
-         alert('Push action performed:' + JSON.stringify(notification))
+         // alert('Push action performed:' + JSON.stringify(notification))
          let dbEvent = JSON.parse(notification.notification.data.event || '{}')
-         alert('Push action performed:' + JSON.stringify(dbEvent))
+         // alert('Push action performed:' + JSON.stringify(dbEvent))
          let route = (makeRoutePath(dbEvent.object) || '/').replaceAll('//', '/')
-         alert('route = ' + route)
+         // alert('route = ' + route)
          await router.push(route)
       }
    )
 }
 
-async function showShareDialog () {
+async function shareOut (title, text, url) {
    assert(Share)
-   let shareRet = await Share.share({
-      title: 'title kalpagrama share data',
-      text: 'text kalpagrama share data',
-      url: 'https://kalpa.app/#OID',
-      dialogTitle: 'dialogTitle kalpagrama share' // Android only
-   })
+   let shareRet = await Share.share({ title, text, url, dialogTitle: 'kalpagrama share' })
 }
 
 async function orientationLock (mode) {
@@ -174,15 +152,14 @@ async function orientationLock (mode) {
 }
 
 Browser.addListener('browserFinished', (info) => {
-   alert('browserFinished' + JSON.stringify(info))
+   // alert('browserFinished' + JSON.stringify(info))
 })
 Browser.addListener('browserPageLoaded', async (info) => {
-   alert('browserPageLoaded' + JSON.stringify(info))
+   // alert('browserPageLoaded' + JSON.stringify(info))
 })
+
 async function openUrl (urlStr) {
-   Browser.open({ url: urlStr, presentationStyle: 'fullscreen' }).catch(err => logE('qweqweqew', err))
-   await wait(3000)
-   await screenshot()
+   await Browser.open({ url: urlStr, presentationStyle: 'fullscreen' })
 }
 
 async function screenshot () {
@@ -209,9 +186,10 @@ async function screenshot () {
 export {
    init,
    initPushPlugin,
-   showShareDialog,
+   shareOut,
    orientationLock,
    statusBarSetVisible,
+   statusBarSetStyle,
    vibrate,
    hapticsImpact,
    openUrl,

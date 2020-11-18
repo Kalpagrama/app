@@ -8,6 +8,7 @@ import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
 import assert from 'assert'
+import { shareIn } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)
@@ -125,6 +126,27 @@ async function initPWA (store) {
    } else {
       logW('serviceWorker disabled!')
    }
+
+   // share pwa
+   router.beforeEach(async (to, from, next) => {
+      if (to.path === '/share') {
+         // const toBase64 = file => new Promise((resolve, reject) => {
+         //   const reader = new FileReader()
+         //   reader.readAsDataURL(file)
+         //   reader.onload = () => resolve(reader.result)
+         //   reader.onerror = error => reject(error)
+         // })
+         logD('mounted')
+         const swShareStore = new Store('sw-share', 'request-formData')
+         let shareData = await get('shareData', swShareStore)
+         if (shareData) {
+            // alert('share to Kalpagrama! shareData (see store.core.state.shareData)=\n' + JSON.stringify(shareData))
+            await shareIn({ contentUrl: shareData.contentUrl })
+            this.$logD('shareData=', shareData)
+         } else next('/')
+      } else next()
+   })
+
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 

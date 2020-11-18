@@ -20,7 +20,6 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import {systemReset, shareWith} from 'src/system/services'
 
 export default {
   name: 'pageApp_settings',

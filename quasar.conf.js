@@ -92,13 +92,17 @@ module.exports = function (ctx) {
             'AppFullscreen',
             'AddressbarColor',
             'AppVisibility',
-            'Dialog'
+            'Dialog',
+            'LoadingBar',
+            'Loading'
          ]
       },
 
       // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
       build: {
          env: {
+            ORIGIN_URL: process.env.ORIGIN_URL,
+            ORIGIN_URL_DEBUG: process.env.ORIGIN_URL_DEBUG,
             SERVICES_URL: process.env.AUTH_URL || process.env.SERVICES_URL,
             SERVICES_URL_DEBUG: process.env.SERVICES_URL_DEBUG,
             BUILD_DATE: (new Date().toISOString()).split('T')[0],
@@ -274,7 +278,7 @@ module.exports = function (ctx) {
                }
             ],
             share_target: {
-               // action: '/share-target/',
+               // action: '/share/',
                // method: 'GET',
                // enctype: 'application/x-www-form-urlencoded',
                // params: {
@@ -282,7 +286,7 @@ module.exports = function (ctx) {
                //   text: 'body',
                //   url: 'url'
                // }
-               action: '/share_target',
+               action: '/share',
                method: 'POST',
                enctype: 'multipart/form-data',
                params: {

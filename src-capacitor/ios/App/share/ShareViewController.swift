@@ -56,7 +56,7 @@ class ShareViewController: SLComposeServiceViewController {
     func openApp(urlData: String){
         // let xxx = contentText
         var url = URL(string: "app.kalpa://share")!
-        url.appendQueryItem(name: "data", value: urlData)
+        url.appendQueryItem(name: "contentUrl", value: urlData)
         url.appendQueryItem(name: "contentText", value: contentText)
 //        guard let url = URL(string: "kalpa://share/?data=" + urlData) else { return }
         // Запуск Containing App через url-scheme
