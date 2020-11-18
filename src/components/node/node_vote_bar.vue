@@ -62,7 +62,7 @@ div(
       background: 'linear-gradient(90deg, rgba(255,26,5,1) 0%, rgba(255,221,2,0.7) 25%, rgba(75,172,79,0.7) 50%, rgba(44,85,179,0.7) 75%, rgba(113,49,164,1) 100%)'
     }`).row.full-width
   div(v-if="!node.rateUser || node.rateStat.length === 0").row.full-width.justify-center
-    small.text-grey-6 Проголосовать
+    small.text-grey-6 {{node.rateStat.length === 0 ? 'Ждем голосов' : 'Проголосовать'}}
   div(
     v-if="node.rateUser && node.rateStat && node.rateStat.length > 0"
     @click="voteStatsShow = true"

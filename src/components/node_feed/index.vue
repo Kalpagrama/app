@@ -52,6 +52,9 @@ div(
         :style=`{
           position: 'absolute', zIndex: 100, top: 0,
         }`)
+      //- content-player(
+        :contentKalpa=`{
+        }`)
     //- essence
     div(:style=`{position: 'relative',}`).row.full-width
       router-link(
@@ -100,6 +103,7 @@ div(
 export default {
   name: 'nodeFeed',
   components: {
+    contentPlayer: () => import('components/content_player/index.vue'),
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },

@@ -7,8 +7,11 @@ q-layout(
     .row.full-width.justify-center
       q-resize-observer(@resize="onResize")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
-        //- .row.full-width.items-center.content-center.q-pa-sm
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm
+        .row.full-width.items-center.content-center
+          q-btn(
+            @click="$router.back()"
+            round flat color="white" icon="keyboard_arrow_left")
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-md
           span.text-white Ядро
         list-middle(
           v-if="node"
@@ -65,7 +68,7 @@ q-layout(
     component(
       v-if="node"
       :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
-      template(v-slot:bottom)
+      //- template(v-slot:bottom)
         .row.full-width.justify-center
           div(:style=`{maxWidth: 770+'px'}`).row.full-width
             q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm.q-mr-lg Назад
@@ -85,8 +88,9 @@ export default {
   name: 'pageApp_node',
   components: {
     nodeMockup,
-    pageInside: () => import('./page_inside/index.vue'),
-    pageOutside: () => import('./page_outside/index.vue'),
+    pageInside: () => import('./view_joints/index.vue'),
+    // pageInside: () => import('./page_inside/index.vue'),
+    // pageOutside: () => import('./page_outside/index.vue'),
   },
   data () {
     return {
@@ -177,12 +181,12 @@ export default {
   mounted () {
     this.$log('mounted')
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }

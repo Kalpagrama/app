@@ -1,7 +1,15 @@
 <template lang="pug">
-sphere-joints(
-  :oid="node.oid"
-  )
+q-page(
+  :style=`{
+    paddingTop: '8px',
+  }`
+  ).row.full-width.justify-center
+  sphere-joints(
+    :oid="node.oid"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+    }`
+    )
 </template>
 
 <script>
