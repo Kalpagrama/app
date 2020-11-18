@@ -8,7 +8,7 @@ div(
   //- vote stats
   q-dialog(
     v-model="voteStatsShow" position="bottom")
-    node-vote-bar-stats(:node="node" :voteStats="voteStats")
+    node-vote-bar-stats(:node="node" :rateStat="node.rateStat" :rateMeta="rateMeta")
   //- vote actions
   q-dialog(
     v-model="voteActionsShow" position="bottom")
@@ -17,8 +17,9 @@ div(
         zIndex: 9999,
         borderRadius: '10px 10px 0 0', overflow: 'hidden',
         maxWidth: $q.screen.width  > 800 ? '400px' : $q.screen.width+'px',
+        background: 'rgba(40,40,40,0.95)'
       }`
-      ).row.full-width.b-40.q-py-sm.q-px-md
+      ).row.full-width.q-py-sm.q-px-xl
       //- header
       div(
         :style=`{
@@ -27,20 +28,30 @@ div(
         }`
         ).row.full-width.justify-center.q-px-md.q-py-lg
         .row.full-width.justify-center
-          span.text-white.text-bold Проголосовать за
-        span.text-white "{{ node.name }}"
+          span.text-white.text-bold Как близко ядро к сути?
+        //- span.text-white "{{ node.name }}"
+      //- icon="adjust"
       q-btn(
         @click="vote(a.value)"
-        v-for="(a,ai) in actions" :key="ai"
-        flat no-caps icon="adjust" align="left" size="lg"
+        v-for="(a,ai) in rateMeta" :key="a.value"
+        flat no-caps
+        align="left" size="lg"
         :loading="voteAction === a.value"
         :style=`{
-          color: a.color,
+          color: 'white',
+          background: a.colorBackground,
+          height: '60px',
         }`
-        ).row.full-width.b-50.q-mb-xs
-        span.text-white.text-bold.q-ml-sm {{ a.label }}
-        .col
-        //- span.text-white.text-bold {{ a.value / 10 }}
+        ).row.full-width.b-50.q-mb-sm
+        span.text-white.text-bold.q-ml-sm {{ a.name }}
+      div(
+        :style=`{
+          height: '100px',
+          textAlign: 'center',
+        }`
+        ).row.full-width.items-center.content-center.justify-center
+        span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ node.name }}
+  //- TODO: snake svg
   //- svg(width="400" height="22" viewBox="0 0 400 22" fill="none" xmlns="http://www.w3.org/2000/svg")
   //-   path(d=`
   //-     M165.989 9H2C0.895431 9 0 9.89543 0 11C0 12.1046 0.895435 13 2 13H165.989C171.909 13
@@ -62,7 +73,7 @@ div(
       background: 'linear-gradient(90deg, rgba(255,26,5,1) 0%, rgba(255,221,2,0.7) 25%, rgba(75,172,79,0.7) 50%, rgba(44,85,179,0.7) 75%, rgba(113,49,164,1) 100%)'
     }`).row.full-width
   div(v-if="!node.rateUser || node.rateStat.length === 0").row.full-width.justify-center
-    small.text-grey-6 {{node.rateStat.length === 0 ? 'Ждем голосов' : 'Проголосовать'}}
+    small.text-grey-6 {{node.rateStat.length === 0 ? 'Нет голосов' : 'Проголосовать'}}
   div(
     v-if="node.rateUser && node.rateStat && node.rateStat.length > 0"
     @click="voteStatsShow = true"
@@ -74,7 +85,7 @@ div(
       :style=`{
         position: 'relative',
         height: '5px',
-        borderRadius: '10px',
+        borderRadius: '5px',
         overflow: 'hidden'
       }`
       ).row.full-width
@@ -83,7 +94,7 @@ div(
         v-if="s.percent > 0"
         :style=`{
           width: s.percent+'%',
-          background: voteStats[si].color,
+          background: rateMeta[si].color,
         }`).full-height
     div().row.full-width.justify-center
       small.text-grey-6 {{ votesCount }}
@@ -103,13 +114,6 @@ export default {
       voteAction: false,
       voteActionsShow: false,
       voteStatsShow: false,
-      voteStats: [
-        {w: 10, count: 10, color: 'rgba(255,26,5,1)'},
-        {w: 20, count: 20, color: 'rgba(255,221,2,0.7)'},
-        {w: 0, count: 0, color: 'rgba(75,172,79,0.7)'},
-        {w: 0, count: 0, color: 'rgba(44,85,179,0.7)'},
-        {w: 70, count: 300, color: 'rgba(113,49,164,1)'}
-      ],
     }
   },
   computed: {
@@ -121,17 +125,17 @@ export default {
     },
     votesCount () {
       // TODO: impl kK 1,000,000
-      return this.votesCountRaw
+      return this.votesCountRaw + ' голосов'
     },
-    actions () {
+    rateMeta () {
       return [
-        {id: 1, label: this.$t('nodeVote100', 'Прямо в точку!'), value: 1, color: 'rgba(113,49,164,1)'},
-        {id: 0.7, label: this.$t('nodeVote70', 'Близко'), value: 0.75, color: 'rgba(44,85,179,0.7)'},
-        {id: 0.5, label: this.$t('nodeVote50', 'Где-то рядом'), value: 0.5, color: 'rgba(75,172,79,0.7)'},
-        {id: 0.3, label: this.$t('nodeVote30', 'Ну такое...'), value: 0.25, color: 'rgba(255,221,2,0.7)'},
-        {id: 0.1, label: this.$t('nodeVote0', 'Очень далеко'), value: 0, color: 'rgba(255,26,5,1)'},
+        {name: 'Очень далеко', value: 0, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)'},
+        {name: 'Далеко', value: 0.25, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)'},
+        {name: 'Где-то рядом', value: 0.5, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)'},
+        {name: 'Близко', value: 0.75, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)'},
+        {name: 'Прямо в точку!', value: 1, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)'}
       ]
-    },
+    }
   },
   methods: {
     voteStart () {
