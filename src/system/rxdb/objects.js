@@ -287,8 +287,10 @@ class Objects {
             }
             break
          case 'VOTED': {
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, false)
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, false)
+            assert(event.rate && event.rateStat, 'bad event!')
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, true)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateStat', event.rateStat, true)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, true)
             break
          }
          case 'OBJECT_DELETED': {

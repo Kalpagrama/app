@@ -324,6 +324,7 @@ const eventFragment = gql`
             subject{... objectShortFragment}
             object{... objectShortFragment}
             rate
+            rateStat {percent, weight, count}
             matter {reason subscription}
         }
     }

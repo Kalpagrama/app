@@ -14,15 +14,15 @@ class EventApi {
    static makeEventCard (event) {
       const myOid = rxdb.getCurrentUser().oid
       const cropObj = (obj) => {
-         assert(obj.oid && obj.type && obj.name != null, 'bad obj: ' + JSON.stringify(obj))
-         return { oid: obj.oid, name: obj.name, thumbUrl: obj.thumbUrl, type: obj.type }
+         assert(obj.oid && obj.type, 'bad obj: ' + JSON.stringify(obj))
+         return { oid: obj.oid, name: obj.name || '', thumbUrl: obj.thumbUrl, type: obj.type }
       }
       const verbalizeObject = (obj) => {
-         assert(obj.oid && obj.type && obj.name != null, 'bad obj: ' + JSON.stringify(obj))
+         assert(obj.oid && obj.type, 'bad obj: ' + JSON.stringify(obj))
          return `${verbalizeObjectType(obj)}${obj.name ? ' ' + obj.name : ''}`
       }
       const verbalizeObjectType = (obj) => {
-         assert(obj.type && obj.name != null, 'bad obj: ' + JSON.stringify(obj))
+         assert(obj.type, 'bad obj: ' + JSON.stringify(obj))
          switch (obj.type) {
             case 'NODE':
                return 'ядро'
