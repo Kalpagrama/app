@@ -22,7 +22,7 @@ q-page(
     slot(name="bottom")
   .row.full-width
     slot(name="body")
-    kalpa-loader(
+    //- kalpa-loader(
       :immediate="true"
       :query="query" :limit="15" v-slot=`{items,next,nexting}`)
       .row.full-width.items-start.content-start.justify-center
@@ -33,6 +33,16 @@ q-page(
           }`
           ).row.full-width
           joint(:joint="joint" :oid="node.oid")
+    //- create your joint
+    //- div().row.full-width.q-pa-sm
+      //- q-btn(
+        flat color="green" icon="add"
+        :style=`{height: '100px',}`
+        ).full-width.b-40
+      //- q-input(
+        v-model="name"
+        bordered
+        ).full-width
 </template>
 
 <script>
@@ -43,6 +53,11 @@ export default {
   props: ['node', 'pageHeight', 'pageWidth'],
   components: {
     joint: () => import('./joint.vue'),
+  },
+  data () {
+    return {
+      name: ''
+    }
   },
   computed: {
     query () {
