@@ -120,8 +120,8 @@ class MutexGlobal {
                window.location.reload()
             }
          }
-         if (event.key && event.key.in('k_leader_instance_id')){
-            if (!mutexGlobal.isLeader()){
+         if (event.key && event.key.in('k_leader_instance_id')) {
+            if (!mutexGlobal.isLeader()) {
                // logW('document.title=', document.title)
                if (document.title && typeof document.title === 'string') document.title = document.title.replace('✨', '')
             }
@@ -158,6 +158,7 @@ class MutexGlobal {
       assert(lockOwner, '!lockOwner')
       const f = this.lock
       logD(f, 'start', lockOwner, this.getInstanceId())
+      for (let i = 0; this.unloadingInProgress && i < 10; i++) await wait(200) // ждем 2 сек
       if (this.unloadingInProgress) throw new Error('cant globalLock (unloadingInProgress)')
       const t1 = performance.now()
       let current = JSON.parse(localStorage.getItem('k_global_lock') || null)

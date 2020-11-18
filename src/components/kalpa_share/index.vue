@@ -71,7 +71,7 @@
 
 <script>
 import { Platform, openURL } from 'quasar'
-import { shareWith } from 'src/system/services'
+import { makeRoutePath } from 'public/scripts/common_func'
 
 export default {
   name: 'kalpaShare',
@@ -90,18 +90,18 @@ export default {
   },
   computed: {
     shareEmbedText () {
-      return `<iframe width="100%" height="315" src="${location.origin}/${this.type}/${this.item.oid}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+      return `<iframe width="100%" height="315" src="${makeRoutePath(this.item, true)}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
     }
   },
   methods: {
     async shareStart () {
       this.$log('shareStart')
       if (Platform.is.desktop) {
-        this.shareLink = location.origin + '/' + this.type + '/' + this.item.oid
+        this.shareLink = makeRoutePath(this.item, true)
         this.shareDialogOpened = true
       }
       else {
-        await this.$systemUtils.shareWith(this.item)
+        await this.$systemUtils.shareOut(this.item)
       }
       this.$emit('done')
     },

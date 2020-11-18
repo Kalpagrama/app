@@ -6,15 +6,18 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const vueRoutesRegexp = /.+\/(auth|feeds|welcome|settings|user|node|joint|sphere|trends|content|notifications|messages|workspace.*)(\/|\?|$).*/
 
-function makeRoutePath(object){
-   if (!object) return '/'
-   assert(object.type, '!object.type')
-   assert(object.oid, '!object.oid')
-   let res
-   if (object.type === 'NODE') res = `/node/${object.oid}`
-   else if (object.type.in('VIDEO', 'IMAGE')) res = `/content/${object.oid}`
-   else if (object.type === 'USER') res = `/user/${object.oid}`
-   else if (object.type.in('WORD', 'SENTENCE', 'CHAR')) res = `/sphere/${object.oid}`
+function makeRoutePath(object, full = false){
+   let res = '/'
+   if (object) {
+      assert(object.type, '!object.type')
+      assert(object.oid, '!object.oid')
+      if (object.type === 'NODE') res = `/node/${object.oid}`
+      else if (object.type === 'JOINT') res = `/joint/${object.oid}`
+      else if (object.type.in('VIDEO', 'IMAGE')) res = `/content/${object.oid}`
+      else if (object.type === 'USER') res = `/user/${object.oid}`
+      else if (object.type.in('WORD', 'SENTENCE', 'CHAR')) res = `/sphere/${object.oid}`
+   }
+   if (full) res = (process.env.NODE_ENV === 'development' ? process.env.ORIGIN_URL_DEBUG : process.env.ORIGIN_URL) + res
    return res
 }
 

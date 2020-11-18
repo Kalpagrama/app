@@ -1,5 +1,8 @@
 package app.kalpa;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,32 +11,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.getcapacitor.BridgeActivity;
-import com.getcapacitor.Plugin;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ShareActivity extends BridgeActivity {
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    // Initializes the Bridge
-    this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
-      // Additional plugins you've installed go here
-      // Ex: add(TotallyAwesomePlugin.class);
-    }});
-  }
-  @Override
-  protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
+public class ShareActivity extends Activity
+{
+  public void onCreate(Bundle SavedInstanceState) {
+    super.onCreate(SavedInstanceState);
+    // Get the intent that started this activity
+    Intent intent = getIntent();
     String action = intent.getAction();
     String type = intent.getType();
-//    showDialog("MainActivity onNewIntent::" + action + "::" + type);
-    // showDialog(" bridge.getIntentUri() = " +  bridge.getIntentUri().toString());
-//    showDialog(" bridge.getLocalUrl() = " +  bridge.getLocalUrl());
 
     if (Intent.ACTION_SEND.equals(action) && type != null) {
       if (type.startsWith("text/")) {
@@ -56,6 +46,38 @@ public class ShareActivity extends BridgeActivity {
     } else {
       // Handle other intents, such as being started from the home screen
     }
+
+    setResult(Activity.RESULT_OK, new Intent());
+    finish();
+  }
+
+  private void handleSendText(Intent intent) throws JSONException {
+    String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+//    showDialog("handleSendText");
+    if (sharedText != null) {
+      Log.e("todo ",   sharedText);
+      // Update UI to reflect text being shared
+    //      showDialog(sharedText);
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      Uri.Builder builder = new Uri.Builder();
+      builder.scheme("app.kalpa")
+        .authority("share.ext")
+        .appendPath("share")
+        .appendQueryParameter("contentUrl", sharedText);
+      String shareUrl = builder.build().toString();
+
+      i.setData(Uri.parse(shareUrl));
+      startActivity(i);
+
+//      bridge.triggerJSEvent("myCustomEvent", "window", "{ 'dataKey': 'dataValue1' }");
+//      new Handler().postDelayed(new Runnable() {
+//        @Override
+//        public void run() {
+//          bridge.triggerJSEvent("myCustomEvent", "window", "{ 'dataKey': 'dataValue2' }");
+//        }
+//      }, 10000);
+
+    }
   }
 
   private void showDialog(String text){
@@ -72,40 +94,6 @@ public class ShareActivity extends BridgeActivity {
     // Create the AlertDialog object and return it
     builder.create();
     builder.show();
-  }
-
-  private void handleSendText(Intent intent) throws JSONException {
-    String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-//    showDialog("handleSendText");
-    if (sharedText != null) {
-      Log.e("todo ",   sharedText);
-      // Update UI to reflect text being shared
-//      showDialog(sharedText);
-      JSONObject data = new JSONObject();
-      data.put("dataKey", sharedText);
-
-      bridge.triggerJSEvent("myCustomEvent", "window", "{ 'dataKey': 'dataValue1' }");
-      new Handler().postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          bridge.triggerJSEvent("myCustomEvent", "window", "{ 'dataKey': 'dataValue2' }");
-        }
-      }, 10000);
-
-//      bridge.triggerWindowJSEvent("shareEventKalpa", data.toString());
-//      bridge.triggerJSEvent("shareEventKalpa", "window");
-//      bridge.triggerJSEvent("shareEventKalpa", "document");
-
-//      new Handler().postDelayed(new Runnable() {
-//        @Override
-//        public void run() {
-//          bridge.triggerWindowJSEvent("shareEventKalpa", "test");
-//          bridge.triggerJSEvent("shareEventKalpa", "window");
-//          bridge.triggerJSEvent("shareEventKalpa", "document");
-//        }
-//      }, 10000);
-
-    }
   }
 
   // todo сделать шаринг данных через capacitor Storage API

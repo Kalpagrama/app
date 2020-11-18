@@ -173,15 +173,15 @@ function sendMsg (type, msgData) {
       // skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
       // clientsClaim()
 
-      registerRoute(/\/share_target\/?$/,
+      registerRoute(/\/share\/?$/,
          async ({ url, event, params }) => {
-            // logD('share_target 1', url, getCacheKeyForURL('/index.html'))
+            // logD('share 1', url, getCacheKeyForURL('/index.html'))
             // if (event.request.method === 'POST') {
-            //   logD('redirect to share_target = ')
-            //   return Response.redirect('share_target', 303)
+            //   logD('redirect to share = ')
+            //   return Response.redirect('share', 303)
             // }
-            if (url.pathname.includes('share_target')) {
-               logD('share_target 6 ')
+            if (url.pathname.includes('share')) {
+               logD('share 6 ')
                try {
                   let formData = await event.request.formData()
                   // for (let [name, value] of formData) {
@@ -190,10 +190,11 @@ function sendMsg (type, msgData) {
                   let title = formData.get('title')
                   let text = formData.get('text')
                   let url = formData.get('url')
+                  let contentUrl = text || url
                   let images = formData.getAll('image')
                   let videos = formData.getAll('video')
                   logD(' formData fields  = ', { title, text, url, images, videos })
-                  await idbKeyval.set('shareData', { title, text, url, images, videos }, swShareStore)
+                  await idbKeyval.set('shareData', { title, text, url, contentUrl, images, videos }, swShareStore)
                } catch (err) {
                   logC('share_target err', err)
                }

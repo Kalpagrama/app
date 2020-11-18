@@ -108,7 +108,6 @@ q-layout(view="hHh Lpr lff")
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { date } from 'quasar'
-import { shareWith } from 'src/system/services'
 
 import nodeMockup from './node_mockup/index.vue'
 import nodeConnect from 'components/node/node_connect.vue'
