@@ -52,6 +52,9 @@ div(
         :style=`{
           position: 'absolute', zIndex: 100, top: 0,
         }`)
+      //- content-player(
+        :contentKalpa=`{
+        }`)
     //- essence
     div(:style=`{position: 'relative',}`).row.full-width
       router-link(
@@ -65,13 +68,28 @@ div(
         .col
           div(
             :style=`{
+              position: 'relative',
               minHeight: '44px',
               textAlign: 'center',
             }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
+            slot(name="name")
             span(
               :style=`{
                 fontSize: nodeNameSize+'px',
               }`).text-white.text-bold.cursor-pointer {{ node.name }}
+          div(
+            v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll
+            .row.full-width.justify-start.no-wrap.q-px-sm
+              q-btn(
+                v-for="(s,si) in node.spheres" :key="s.oid"
+                flat color="white" dense no-caps
+                :to="'/sphere/'+s.oid"
+                :style=`{
+                  whiteSpace: 'nowrap',
+                  borderRadius: '10px',
+                  //- maxHeight: '40px',
+                }`
+                ).b-40.q-px-sm.q-mr-sm.q-mb-sm {{ s.name }}
           slot(name="name-bottom")
         slot(name="name-right")
     .row.full-width
@@ -85,6 +103,7 @@ div(
 export default {
   name: 'nodeFeed',
   components: {
+    contentPlayer: () => import('components/content_player/index.vue'),
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
@@ -93,7 +112,8 @@ export default {
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
     showHeader: {type: Boolean, default: true},
-    showActions: {type: Boolean, default: true}
+    showActions: {type: Boolean, default: true},
+    showSpheres: {type: Boolean, default: true}
   },
   data () {
     return {

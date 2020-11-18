@@ -24,7 +24,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '16px', paddingBottom: '200px',
+        paddingTop: '8px', paddingBottom: '200px',
       }`)
       .row.full-width.items-start.content-start.justify-center
         div(

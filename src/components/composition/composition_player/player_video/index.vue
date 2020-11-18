@@ -69,9 +69,8 @@ div(
       playsinline
       :style=`{
         objectFit: options.objectFit,
-        //- borderRadius: '10px',
+        borderRadius: '10px',
         overflow: 'hidden',
-        //- opacity: 0.5
       }`
       ).fit
 </template>
