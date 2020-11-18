@@ -1,150 +1,101 @@
-<style lang="sass">
-.sphere-item
-  &:hover
-    background: rgb(60,60,60) !important
-</style>
-
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
+q-layout(view="hHh Lpr lff").b-30
+  q-header(
+   ).b-30
+    .row.full-width.justify-center
+      q-resize-observer(@resize="onResize")
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
+        //- .row.full-width.items-center.content-center.q-pa-sm
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm
+          span.text-white Ядро
+        list-middle(
+          v-if="node"
+          rootMargin="-30% 0px"
+          :items="[node]" :itemStyles=`{marginTop: '0px',}`)
+          template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
+            node-feed(
+              :node="item" :isActive="true" :isVisible="itemVisible"
+              :showHeader="nodeOpened" :showActions="nodeOpened")
+              template(v-slot:name-left)
+                q-btn(
+                  @click="nodeOpened = !nodeOpened"
+                  round flat color="grey-6"
+                  :icon="nodeOpened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
+              template(v-slot:name-right)
+                q-btn(round flat color="grey-6" icon="add")
+              template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
+                .row.full-width
+                  router-link(
+                    v-for="(s,si) in node.spheres" :key="si"
+                    v-if="si < 3"
+                    :to="'/sphere/'+s.oid"
+                    :style=`{
+                      textAlign: 'center',
+                      minHeight: '30px',
+                      borderRadius: '10px',
+                    }`
+                    ).row.full-width.items-center.content-center.justify-center.b-40.q-mb-xs
+                    span.text-white {{s.name}}
+        node-mockup(
+          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
+          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
+  //- q-header(
+    v-if="nodeOpened"
+    reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-mb-sm
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-pa-sm
           q-btn(
-            v-if="$q.screen.width > $store.state.ui.pageWidth+140"
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm.q-my-xs
-          div(:style=`{overflowX: 'auto'}`).col
-            .row.full-width.items-center.content-center.q-px-sm.q-pt-xs
-              span(:style=`{fontSize: '18px', lineHeight: 0.8, whiteSpace: 'nowrap'}`).text-white.text-bold {{ node ? node.name : '' }}
-              .row.full-width
-                small.text-white Ядро
-          //- kalpa-bookmark(
-            v-if="node"
-            :oid="node.oid"
-            type="NODE"
-            :name="node.name"
-            :thumbUrl="node.items[0].thumbUrl"
-            :isActive="true")
+          q-icon(name="filter_tilt_shift" color="white" size="30px").q-my-xs
+          div(:style=`{overflowX: 'auto'}`).col.q-px-md
+            span(:style=`{fontSize: '18px', lineHeight: 0.8, whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
   q-page-container
-    q-page(:style=`{paddingTop: '0px', paddingBottom: '0px'}`).row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', paddingTop: '0px',}`).row.full-width.items-start.content-start
-        //- node items
-        div(v-if="node").row.full-width.items-start.content-start
-          div(
-            v-if="['PIP', 'VERTICAL', 'SLIDER'].includes(node.layout)"
-            ).row.full-width.items-start.content-start.justify-center
-            div(
-              :style=`{
-                maxWidth: $store.state.ui.pageWidth+'px',
-                borderRadius: '10px',
-                background: 'rgb(35,35,35)'
-              }`
-              ).row.full-width
-              //- node author
-              .row.full-width.justify-center
-                div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-pa-sm
-                  q-btn(
-                    :to="'/user/'+node.author.oid"
-                    flat color="white" dense no-caps
-                    )
-                    user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
-                    span.text-grey-4.q-ml-sm {{ node.author.name }}
-                  .col
-                  small.text-grey-8.q-mr-xs {{ node.countViews }}
-                  q-icon(name="visibility" color="grey-8").q-mr-md
-                  small.text-grey-8.q-mr-sm {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-              //- node body
-              div(
-                :style=`{
-                  maxWidth: $store.state.ui.pageWidth+'px',
-                  borderRadius: '10px', overflow: 'hidden',}`
-                ).row.full-width.b-40
-                list-middle(
-                  rootMargin="-30% 0px"
-                  :items="node.items" :itemStyles=`{marginTop: '0px',}`)
-                  template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-                    div(
-                      :style=`{
-                        position: 'relative',
-                        borderRadius: '10px', overflow: 'hidden',
-                      }`
-                      ).row.full-width
-                      composition-player(
-                        :composition="item" :isVisible="itemVisible" :isActive="nodeActive && itemActive"
-                        :options=`{height: 'auto', objectFit: 'contain', loop: true}`)
-                //- node name
-                router-link(
-                  :to="'/sphere/'+node.sphereFromName.oid"
-                  :style=`{
-                    textAlign: 'center',
-                  }`
-                  ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-                  span(:style=`{fontSize: '18px'}`).text-white.text-bold.cursor-pointer {{ node.name }}
-                //- node description
-                //- .row.full-width
-                  span.text-white {{ node.description }}
-              //- node actions
-              //- view-spheres(:node="node")
-            node-actions(v-if="node" :node="node" :isActive="true" :isVisible="true").q-mb-xs
-        //- node is creating, wait...
+    component(
+      v-if="node"
+      :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
+      template(v-slot:bottom)
         .row.full-width.justify-center
-          node-mockup(
-            v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-            :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-        //- router-view(v-if="node" :node="node" :style=`{paddingTop: '46px',}`)
-        //- view-inside()
-      //- q-page-sticky(
-        v-if="node"
-        position="bottom right" :offset="[0, 70]"
-        :style=`{zIndex: 5555}`)
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-connect(:node="node" :isActive="isActive" :isVisible="isVisible")
-            template(v-slot:action=`{start}`)
-              q-btn(
-                @click="start()"
-                no-caps color="green" icon="link" size="md")
-                span.text-white.text-bold.q-ml-sm {{ $t('Connect node', 'Связать ядро') }}
+          div(:style=`{maxWidth: 770+'px'}`).row.full-width
+            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm.q-mr-lg Назад
+            .col
+              q-tabs(
+                v-model="pageId"
+                align="justify"
+                no-caps active-color="green").full-width.text-grey-8
+                q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { date } from 'quasar'
-import { shareWith } from 'src/system/services'
-
 import nodeMockup from './node_mockup/index.vue'
-import nodeConnect from 'components/node/node_connect.vue'
 
 export default {
-  name: 'pageApp__node',
+  name: 'pageApp_node',
   components: {
     nodeMockup,
-    compositionPlayer: () => import('components/composition/composition_player/index.vue'),
-    nodeActions: () => import('components/node/node_actions.vue'),
-    viewSpheres: () => import('./view_spheres/index.vue'),
-    viewJoints: () => import('./view_joints/index.vue'),
-    viewInside: () => import('./view_inside/index.vue'),
-    // viewConnect: () => import('./view_connect/index.vue'),
-    nodeConnect,
+    pageInside: () => import('./page_inside/index.vue'),
+    pageOutside: () => import('./page_outside/index.vue'),
   },
   data () {
     return {
       node: null,
-      nodeActive: true,
-      nodeVisible: true,
-      nodeConnectOpened: false,
+      nodeOpened: true,
+      pageId: 'inside',
+      headerHeight: 0,
+      headerWidth: 0,
     }
   },
   computed: {
-    createdAt () {
-      if (this.node) {
-        return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')
-      }
-      return ''
-    },
+    pages () {
+      return [
+        {id: 'inside', name: 'Ядро'},
+        {id: 'outside', name: 'Связи'}
+      ]
+    }
   },
   watch: {
     '$route.params.oid': {
@@ -164,16 +115,19 @@ export default {
         }
       }
     },
+    pageId: {
+      handler (to, from) {
+        if (to && to === 'outside') {
+          this.nodeOpened = false
+        }
+      }
+    }
   },
   methods: {
-    nodeVisibilityCallback (isVisible, entry) {
-      // this.$log('nodeVisibilityCallback', isVisible, entry)
-      if (isVisible) {
-        this.nodeActive = true
-      }
-      else {
-        this.nodeActive = false
-      }
+    onResize (e) {
+      this.$log('onResize', e)
+      this.headerHeight = e.height
+      this.headerWidth = e.width
     },
     nodeWatch (oid) {
       this.$log('nodeWatch', oid)
@@ -210,13 +164,15 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
-    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', false])
+    // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
-    // this.$store.commit('ui/stateSet', ['showDesktopNavigation', true])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

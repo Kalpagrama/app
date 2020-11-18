@@ -3,7 +3,7 @@ div(
   @click="start()"
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-    bottom: '0px', right: '0px',
+    top: '0px', left: '0px',
     height: '44px', width: '44px',
     background: 'rgba(0,0,0,0.15)',
     borderRadius: '10px', overflow: 'hidden',

@@ -50,7 +50,7 @@ div(
         template(v-slot:append)
           q-icon(
             @click="sphereDelete(sphere)"
-            name="clear" color="white" size="14px").q-mr-sm.q-mt-xs.cursor-pointer
+            name="clear" color="white" size="14px").q-mr-sm.cursor-pointer
   //- sphere input for search and autocomplete...
   //- q-input(
     ref="sphereInput"

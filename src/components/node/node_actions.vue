@@ -1,34 +1,18 @@
 <template lang="pug">
 .row.full-width.justify-center.items-center.content-center
-  q-dialog(
-    v-model="showStats" position="bottom")
-    node-stats(
-      :node="node" :isActive="isActive" :isVisible="isVisible"
-      @close="showStats = false")
-  //- actions wrapper
-  div(:style=`{maxWidth: '500px', height: '50px',}`).row.full-width.items-start.content-start
-    div(
-      v-if="useBookmark"
-      :style=`{
-        position: 'relative',
-        paddingTop: '2px',
-      }`
-      ).row.items-start.content-start.justify-center.q-px-xs
-      kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9").shaking
-    .col.full-height
+  div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
+    kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+    .col.full-height.q-px-xs
       node-vote-bar(:node="node")
-    node-connect(v-if="useConnect || true" :node="node" :isActive="isActive" :isVisible="isVisible")
+    q-btn(
+      @click="$router.push('/workspace/joint/new?oid='+node.oid)"
+      round flat color="green")
+      q-icon(name="link" size="30px" color="grey-9")
 </template>
 
 <script>
 import { ObjectApi } from 'src/api/object'
-
-import nodeShare from 'components/node/node_share.vue'
-import nodeRemake from 'components/node/node_remake.vue'
-import nodeConnect from 'components/node/node_connect.vue'
-import nodeVote from 'components/node/node_vote.vue'
 import nodeVoteBar from 'components/node/node_vote_bar.vue'
-import nodeStats from 'components/node/node_stats/index.vue'
 
 export default {
   name: 'nodeActions',
@@ -44,7 +28,7 @@ export default {
     useVote: {type: Boolean, default: true},
   },
   components: {
-    nodeShare, nodeRemake, nodeStats, nodeVote, nodeVoteBar, nodeConnect,
+    nodeVoteBar,
   },
   data () {
     return {

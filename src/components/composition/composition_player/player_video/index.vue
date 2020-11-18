@@ -20,18 +20,18 @@ div(
       }`)
       q-btn(
         @click="muted ? mutedOff() : mutedOn()"
-        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`)
-        q-spinner-audio(
+        round flat color="white" :style=`{background: 'rgba(0,0,0,0.15)',}`).q-pr-sm
+        //- q-spinner-audio(
           v-if="!muted"
-          size="18px" color="white").q-mx-xs
+          size="16px" color="grey-6").q-mx-xs
         //- q-icon(
           v-if="!muted && !playing"
           name="play_arrow" size="25px" color="white"
           ).q-mx-sm
         q-icon(
-          v-if="muted"
-          size="25px" color="red" name="volume_off").q-mx-sm
-        span(v-if="duration  > 0").text-white.text-bold.q-mr-sm.q-mt-sm {{ $time(duration-currentTime) }}
+          size="24px" color="grey-6" :name="muted ? 'volume_off' : 'volume_up'"
+          :style=`{marginLeft: '10px'}`).q-mr-sm
+        span(v-if="duration  > 0").text-grey-6 {{ $time(duration-currentTime) }}
   //- preview
   img(
     @click="$emit('previewClick')"
@@ -69,7 +69,7 @@ div(
       playsinline
       :style=`{
         objectFit: options.objectFit,
-        borderRadius: '10px',
+        //- borderRadius: '10px',
         overflow: 'hidden',
         //- opacity: 0.5
       }`

@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px',
+    //- borderRadius: '10px',
   }`
   ).row.full-width.items-start.content-start.bg-black
   div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start

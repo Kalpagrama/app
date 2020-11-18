@@ -11,7 +11,9 @@ div(
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
     //- header: author, createdAt
-    .row.full-width.items-center.content-center.q-pa-xs
+    div(
+      v-if="showHeader"
+      ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
         flat color="white" dense no-caps)
@@ -58,13 +60,24 @@ div(
           position: 'relative',
           textAlign: 'center',
         }`
-        ).row.full-width.justify-center.cursor-pointer.q-pa-md
-        span(
-          :style=`{
-            fontSize: nodeNameSize+'px',
-          }`).text-white.text-bold.cursor-pointer {{ node.name }}
+        ).row.full-width.items-start.content-start.justify-center.cursor-pointer
+        slot(name="name-left")
+        .col
+          div(
+            :style=`{
+              minHeight: '44px',
+              textAlign: 'center',
+            }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
+            span(
+              :style=`{
+                fontSize: nodeNameSize+'px',
+              }`).text-white.text-bold.cursor-pointer {{ node.name }}
+          slot(name="name-bottom")
+        slot(name="name-right")
+    .row.full-width
+      slot(name="footer")
   //- footer
-  node-actions(:node="node" :isActive="isActive" :isVisible="isVisible")
+  node-actions(v-if="showActions" :node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -75,7 +88,13 @@ export default {
     compositionPlayer: () => import('components/composition/composition_player/index.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
-  props: ['node', 'isActive', 'isVisible'],
+  props: {
+    node: {type: Object},
+    isActive: {type: Boolean},
+    isVisible: {type: Boolean},
+    showHeader: {type: Boolean, default: true},
+    showActions: {type: Boolean, default: true}
+  },
   data () {
     return {
       showMore: false,
