@@ -296,7 +296,7 @@ class Objects {
                logD('updateRxDocPayload objectStat TODO! обновить статистику голосованния', votes)
                assert(votes && Array.isArray(votes), '!stat.votes')
                let userVote = JSON.parse(JSON.stringify(event.subject))
-               userVote.rate = event.rate
+               userVote.rate = event.rateUser
                userVote.weight = rxdb.getCurrentUser().weightVal
                userVote.date = Date.now()
                let indx = votes.findIndex(v => v.oid === rxdb.getCurrentUser().oid)
@@ -304,10 +304,9 @@ class Objects {
                votes.push(userVote)
                return votes
             }, true)
-            // rateUser менять не надо! оно изменилось
-            // if (event.subject.oid === rxdb.getCurrentUser().oid){
-            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
-            // }
+            if (event.subject.oid === rxdb.getCurrentUser().oid){
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rateUser, true)
+            }
             break
          }
          case 'OBJECT_DELETED': {

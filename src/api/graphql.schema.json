@@ -4988,7 +4988,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "Float",
                 "ofType": null
               }
             },
@@ -10462,7 +10462,23 @@
           },
           {
             "name": "rate",
-            "description": null,
+            "description": "итоговая оценка ядра",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rateUser",
+            "description": "как проголосовал этот пользователь",
             "args": [],
             "type": {
               "kind": "NON_NULL",
