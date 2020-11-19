@@ -68,7 +68,7 @@ div(
           small.text-grey-8.q-mx-xs {{ $date(v.createdAt, 'DD.MM.YYYY') }}
   //- rate again
   div(
-    v-if="node.rateUser"
+    v-if="node.rateUser !== null"
     ).row.full-width.q-pa-md
     q-btn(
       @click="$emit('rateAgain')"
@@ -104,6 +104,22 @@ export default {
       })
     }
   },
+  watch: {
+    node: {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
+            if (val.percent > acc) acc = val.percent
+            return acc
+          }, 0)
+          this.voteSelected = this.rateStat.findIndex(r => r.percent === countMax)
+          this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}}))
+        }
+      }
+    }
+  },
   methods: {
     voteBorderRadius (index) {
       if (index === this.voteSelected) return '10px'
@@ -113,15 +129,6 @@ export default {
         else return '0px'
       }
     }
-  },
-  async mounted () {
-    this.$log('mounted')
-    let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
-      if (val.percent > acc) acc = val.percent
-      return acc
-    }, 0)
-    this.voteSelected = this.rateStat.findIndex(r => r.percent === countMax)
-    this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}}))
   }
 }
 </script>

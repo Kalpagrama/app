@@ -181,6 +181,21 @@ export default {
       }, [])
     },
   },
+  watch: {
+    node: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
+            if (val.percent > acc) acc = val.percent
+            return acc
+          }, 0)
+          this.rateMax = this.rateStat.findIndex(r => r.percent === countMax)
+        }
+      }
+    }
+  },
   methods: {
     rateBorderRadius (index) {
       // si === 0 ? '10px 0 0 10px' : si === rateStat.length-1 ? '0 10px 10px 0' : '0px',
@@ -222,11 +237,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
-      if (val.percent > acc) acc = val.percent
-      return acc
-    }, 0)
-    this.rateMax = this.rateStat.findIndex(r => r.percent === countMax)
   }
 }
 </script>
