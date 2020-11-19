@@ -304,9 +304,10 @@ class Objects {
                votes.push(userVote)
                return votes
             }, true)
-            if (event.subject.oid === rxdb.getCurrentUser().oid){
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
-            }
+            // rateUser менять не надо! оно изменилось
+            // if (event.subject.oid === rxdb.getCurrentUser().oid){
+            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
+            // }
             break
          }
          case 'OBJECT_DELETED': {

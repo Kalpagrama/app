@@ -94,8 +94,11 @@ export default {
     voters () {
       if (!this.stats) return []
       return this.stats.votes.filter(v => {
-        let rate = this.rateStat[this.voteSelected].value
-        return v.rate === rate
+        // let rate = this.rateStat[this.voteSelected].value
+        let rateMin = this.rateStat[this.voteSelected].valueMin
+        let rateMax = this.rateStat[this.voteSelected].valueMax
+        // return v.rate === rate
+        return v.rate > rateMin && v.rate <= rateMax
       })
     }
   },

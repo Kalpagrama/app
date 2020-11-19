@@ -146,11 +146,11 @@ export default {
     },
     rateMeta () {
       return [
-        {name: 'Очень далеко', value: 0, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
-        {name: 'Далеко', value: 0.25, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
-        {name: 'Где-то рядом', value: 0.5, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
-        {name: 'Близко', value: 0.75, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
-        {name: 'Прямо в точку!', value: 1, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
+        {name: 'Очень далеко', value: 0, valueMin: -1, valueMax: 0.2, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
+        {name: 'Далеко', value: 0.25, valueMin: 0.2, valueMax: 0.4, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
+        {name: 'Где-то рядом', value: 0.5, valueMin: 0.4, valueMax: 0.6, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
+        {name: 'Близко', value: 0.75, valueMin: 0.6, valueMax: 0.8, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
+        {name: 'Прямо в точку!', value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
       ]
     },
     rateStat () {
@@ -164,6 +164,8 @@ export default {
             color: this.rateMeta[ii].color,
             colorBackground: this.rateMeta[ii].colorBackground,
             value: this.rateMeta[ii].value,
+            valueMin: this.rateMeta[ii].valueMin,
+            valueMax: this.rateMeta[ii].valueMax,
             order: arr.length - ii,
           })
         }
