@@ -18,7 +18,7 @@ q-page(
     :style=`{
       zIndex: 4000
     }`).b-30
-    .row.full-width.q-pl-sm.q-py-xs.q-pr-xs
+    .row.full-width.items-center.content-center.q-pl-sm.q-py-xs.q-pr-xs
       q-btn(flat color="green" no-caps dense).q-px-xs.b-50 от Автора
       q-btn(flat color="grey-8" no-caps dense).q-px-xs Все
       .col
@@ -56,20 +56,36 @@ q-page(
                 small.text-grey-8 17.11.2020
           .row.full-width.items-start.content-start
             .row.full-width.items-start.content-start.q-px-sm
-              img(
-                v-if="true"
-                :src="node.thumbUrl"
+              div(:style=`{borderRadius: '10px',}`).row.full-width.items-start.content-start.b-40
+                img(
+                  v-if="true"
+                  :src="node.thumbUrl"
+                  :style=`{
+                    borderRadius: '10px',
+                    height: '40px',
+                  }`)
+                .col.full-height
+                  .row.fit.items-center.content-center.q-pa-sm
+                    small.text-white суть которую я увидел в ядре выше
+            .row.full-width.q-px-sm.q-pt-sm
+              div(
                 :style=`{
                   borderRadius: '10px',
-                  height: '60px',
-                }`)
-              .col
-                .row.full-width.q-px-sm
-                  span.text-white lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+                }`
+                ).row.full-width.items-start.content-start.b-40
+                img(
+                  v-if="true"
+                  :src="node.thumbUrl"
+                  :style=`{
+                    borderRadius: '10px',
+                  }`
+                  ).full-width
+                .row.full-width.items-center.content-center.q-pa-sm
+                  span.text-white суть ядра которое я прикрепил
             .row.full-width.justify-start.q-pt-sm.q-px-sm
               q-btn(
                 v-for="s in 3" :key="s"
-                round flat dense color="grey-2" no-caps).q-px-sm.b-40.q-mr-sm.q-mb-sm sphere {{s}}
+                round flat dense color="grey-2" no-caps).q-px-sm.b-40.q-mr-sm.q-mb-sm сфера {{s}}
         div(:style=`{height: '50px',}`).row.full-width.items-start.content-start
           q-btn(round flat color="grey-9" icon="bookmark_outline")
           .col

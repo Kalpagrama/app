@@ -63,9 +63,10 @@
         }`
         ).col-6
         joint-item(
+          @activated="itemActive = ii"
           :joint="joint"
           :item="item"
-          :isActive="false" :isVisible="false"
+          :isActive="isActive && itemActive === ii" :isVisible="true"
           :mini="mini"
           :style=`{
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
@@ -133,6 +134,7 @@ export default {
     return {
       stats: null,
       itemOpened: 0,
+      itemActive: 0,
     }
   },
   computed: {
@@ -144,10 +146,10 @@ export default {
         {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
         {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
         {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
-        {id: 'TRUE', name: 'Правда', pair: 'FALSE'},
-        {id: 'FALSE', name: 'Ложь', pair: 'TRUE'},
-        {id: 'FROM', name: 'Первое', pair: 'TO'},
-        {id: 'TO', name: 'Второе', pair: 'FROM'},
+        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE'},
+        {id: 'FALSE', name: 'Фэйк', pair: 'TRUE'},
+        {id: 'FROM', name: 'Факт', pair: 'TO'},
+        {id: 'TO', name: 'Подтверждение', pair: 'FROM'},
       ]
     },
     types () {
