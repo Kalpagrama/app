@@ -42,10 +42,10 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: options.height,
-      //- objectFit: options.objectFit,
+      objectFit: options.objectFit,
       //- opacity: duration > 0 ? 0 : 1,
     }`
-    ).full-width
+    ).full-width.b-40
   //- video wrapper
   div(
     v-if="isActive && isVisible"

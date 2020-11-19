@@ -68,7 +68,7 @@ div(
           small.text-grey-8.q-mx-xs {{ $date(v.createdAt, 'DD.MM.YYYY') }}
   //- rate again
   div(
-    v-if="node.rateUser !== null"
+    v-if="node.rateUser !== null && node.author.oid !== $store.getters.currentUser().oid"
     ).row.full-width.q-pa-md
     q-btn(
       @click="$emit('rateAgain')"
