@@ -30,7 +30,7 @@ q-page(
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
     }`
-    ).row.full-width.items-start.content-start.q-pa-sm
+    ).row.full-width.items-start.content-start.q-pa-sm.br
     slot(name="body")
     div(
       v-for="(i,ii) in 100" :key="ii"

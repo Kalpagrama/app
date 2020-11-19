@@ -10,7 +10,8 @@ export default {
   props: ['contentKalpa', 'query'],
   components: {
     viewDesktop: () => import('./view_desktop.vue'),
-    viewMobile: () => import('./view_mobile.vue')
+    // viewMobile: () => import('./view_mobile.vue'),
+    viewMobile: () => import('./view_mobile_new/index.vue')
   }
 }
 </script>
