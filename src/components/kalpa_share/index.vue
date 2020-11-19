@@ -59,16 +59,18 @@
             template(v-slot:append)
               q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
                 span.text-bold {{$t('Copy', 'Скопировать')}}
+  slot(name="btn" :start="shareStart")
   //- share start btn
   q-btn(
+    v-if="!$scopedSlots.btn"
     @click="shareStart()"
     round flat no-caps
     :color="'grey-9'"
     icon="share"
     :loading="loading")
-  slot(name="footer")
+  //- slot(name="footer")
 </template>
-s
+
 <script>
 import { Platform, openURL } from 'quasar'
 import { makeRoutePath } from 'public/scripts/common_func'

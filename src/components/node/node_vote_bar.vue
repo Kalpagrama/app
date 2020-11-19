@@ -214,7 +214,12 @@ export default {
         this.$router.push('/auth/sign-in')
       }
       else {
-        this.voteActionsShow = true
+        if (currentUser.oid === this.node.author.oid) {
+          // this.voteStatsShow = true
+        }
+        else {
+          this.voteActionsShow = true
+        }
       }
     },
     async vote (val) {
