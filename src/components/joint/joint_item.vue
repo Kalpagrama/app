@@ -1,8 +1,18 @@
 <template lang="pug">
-.row.full-width
+div(
+  :style=`{position: 'relative',}`
+  ).row.full-width
+  div(
+    v-if="!isActiveLocal"
+    @click="isActiveLocal = true, $emit('activated')"
+    :style=`{
+      position: 'absolute', zIndex: 100,
+      //- opacity: 0.5,
+    }`
+    ).row.fit
   node-mini(
     v-if="item.type === 'NODE'"
-    :isActive="isActive" :isVisible="isVisible"
+    :isActive="isActiveLocal" :isVisible="isVisible"
     :node="item"
     :marginBottom="80")
   //- user
@@ -53,6 +63,11 @@
 export default {
   name: 'jointItem',
   props: ['item', 'isActive', 'isVisible'],
+  data () {
+    return {
+      isActiveLocal: false
+    }
+  },
   computed: {
     itemThumburl () {
       if (this.item.type === 'IMAGE') {
@@ -68,6 +83,15 @@ export default {
       }
       else {
         return true
+      }
+    }
+  },
+  watch: {
+    isActive: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('isActive TO', to)
+        this.isActiveLocal = to
       }
     }
   }

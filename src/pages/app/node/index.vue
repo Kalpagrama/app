@@ -53,7 +53,7 @@ q-layout(
                   :icon="nodeOpened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
               //- template(v-slot:name-right)
                 q-btn(round flat color="grey-6" icon="add")
-              template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
+              //- template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
                 div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width
                   router-link(
                     v-for="(s,si) in node.spheres" :key="si"
@@ -204,12 +204,12 @@ export default {
     await this.$wait(2000)
     this.mounted = true
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }

@@ -25,9 +25,12 @@
       :style=`{
         textAlign: 'center',
         height: '60px',
+        //- overflow: 'hidden',
       }`
       ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-px-md
-      span(:style=`{}`).text-white.text-bold.cursor-pointer {{ node.name.slice(0, 80) }}
+      .row.full-width.scroll
+        div(:style=`{textAlign: 'center',}`).row.full-width.justify-center.no-wrap
+          span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold.cursor-pointer {{ node.name.slice(0, 80) }}
 </template>
 
 <script>

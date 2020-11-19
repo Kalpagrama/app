@@ -38,7 +38,7 @@ div(
         @click="vote(a.value)"
         v-for="(a,ai) in rateMeta" :key="a.value"
         flat no-caps
-        align="left" size="lg"
+        align="center" size="lg"
         :loading="voteAction === a.value"
         :style=`{
           order: a.order,
@@ -92,7 +92,12 @@ div(
       position: 'relative',
     }`
     ).row.fit.items-center.content-center
-    //- count
+    //- header: rateMax
+    div(
+      :style=`{position: 'absolute', zIndex: 100, top: '2px'}`
+      ).row.full-width.justify-center
+      small.text-grey-8 {{ rateStat[rateMax].name }}
+    //- footer: count
     div(
       :style=`{position: 'absolute', zIndex: 100, bottom: '2px'}`
       ).row.full-width.justify-center
@@ -102,11 +107,13 @@ div(
       v-for="(s,si) in rateStat" :key="si"
       :style=`{
         width: s.percent+'%',
-        paddingBottom: '16px',
+        //- paddingBottom: '16px',
       }`).row.full-height.items-center.content-center
       //- bar name
-      .row.full-width.justify-center
-        small.text-grey-8 {{ s.name }}
+      //- div(:style=`{height: '16px'}`).row.full-width.justify-center
+        small(
+          v-if="rateMax === si"
+          :style=`{whiteSpace: 'nowrap'}`).text-grey-8 {{ s.name }}
       //- bar
       div(
         :style=`{
@@ -131,6 +138,7 @@ export default {
       voteAction: false,
       voteActionsShow: false,
       voteStatsShow: false,
+      rateMax: 0,
     }
   },
   computed: {
@@ -211,6 +219,14 @@ export default {
         this.voteActionsShow = false
       }
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
+      if (val.percent > acc) acc = val.percent
+      return acc
+    }, 0)
+    this.rateMax = this.rateStat.findIndex(r => r.percent === countMax)
   }
 }
 </script>

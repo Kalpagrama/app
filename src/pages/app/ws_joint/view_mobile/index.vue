@@ -199,10 +199,10 @@ export default {
         {id: 'EFFECT', name: 'Следствие', 0: 'EFFECT_CAUSE', 1: 'CAUSE_EFFECT'},
         {id: 'PROBLEM', name: 'Проблема', 0: 'PROBLEM_SOLUTION', 1: 'SOLUTION_PROBLEM'},
         {id: 'SOLUTION', name: 'Решение', 0: 'SOLUTION_PROBLEM', 1: 'PROBLEM_SOLUTION'},
-        {id: 'TRUE', name: 'Правда', 0: 'TRUE_FALSE', 1: 'FALSE_TRUE'},
-        {id: 'FALSE', name: 'Ложь', 0: 'FALSE_TRUE', 1: 'TRUE_FALSE'},
-        {id: 'FROM', name: 'Первое', 0: 'FROM_TO', 1: 'TO_FROM'},
-        {id: 'TO', name: 'Второе', 0: 'TO_FROM', 1: 'FROM_TO'},
+        {id: 'TRUE', name: 'Опровержение', 0: 'TRUE_FALSE', 1: 'FALSE_TRUE'},
+        {id: 'FALSE', name: 'Фэйк', 0: 'FALSE_TRUE', 1: 'TRUE_FALSE'},
+        {id: 'FROM', name: 'Факт', 0: 'FROM_TO', 1: 'TO_FROM'},
+        {id: 'TO', name: 'Подтверждение', 0: 'TO_FROM', 1: 'FROM_TO'},
       ]
     }
   },
