@@ -112,7 +112,7 @@ div(
         :style=`{
           height: '5px',
           background: s.color,
-          borderRadius: si === 0 ? '10px 0 0 10px' : si === rateStat.length-1 ? '0 10px 10px 0' : '0px',
+          borderRadius: rateBorderRadius(si)
         }`
         ).row.full-width
 </template>
@@ -172,6 +172,15 @@ export default {
     },
   },
   methods: {
+    rateBorderRadius (index) {
+      // si === 0 ? '10px 0 0 10px' : si === rateStat.length-1 ? '0 10px 10px 0' : '0px',
+      if (this.rateStat.length === 1) return '10px'
+      else {
+        if (index === 0) return '10px 0 0 10px'
+        else if (index === this.rateStat.length - 1) return '0 10px 10px 0'
+        else return '0px'
+      }
+    },
     voteStart () {
       this.$log('voteStart')
       // if its me
