@@ -16,7 +16,7 @@
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Share', 'Поделиться')}}
         q-btn(
           @click="shareDialogOpened = false"
-          round flat color="grey-8" icon="clear")
+          round flat color="grey-9" icon="clear")
       //- copy link
       .row.full-width.q-pa-md
         div(
@@ -26,7 +26,7 @@
           ).row.full-width
           q-input(
             v-model="shareLink"
-            filled dark color="grey-8"
+            filled dark color="grey-9"
             ).full-width
             template(v-slot:append)
               q-btn(color="green" flat no-caps @click="shareLinkCopy()")
@@ -63,12 +63,12 @@
   q-btn(
     @click="shareStart()"
     round flat no-caps
-    :color="color"
+    :color="'grey-9'"
     icon="share"
     :loading="loading")
   slot(name="footer")
 </template>
-
+s
 <script>
 import { Platform, openURL } from 'quasar'
 import { makeRoutePath } from 'public/scripts/common_func'
@@ -78,7 +78,7 @@ export default {
   props: {
     type: {type: String, required: true},
     item: {type: Object, required: true},
-    color: {type: String, default: 'grey-8'}
+    color: {type: String, default: 'grey-9'}
   },
   data () {
     return {

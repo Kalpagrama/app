@@ -1,5 +1,9 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
+div(
+  :style=`{
+    position: 'relative',
+  }`
+  ).row.full-width.items-start.content-start.justify-center.br
   video(
     ref="videoRef"
     :src="url"
@@ -63,16 +67,17 @@ export default {
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
-      this.curerntTime = t
-      this.$refs.videoRef.setCurrentTime(t)
+      this.currentTime = t
+      if (this.$refs.videoRef) this.$refs.videoRef.setCurrentTime(t)
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
       this.duration = this.$refs.videoRef.duration
+      // TODO: create player ??? with methods...
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
-      this.currentTime = this.$refs.videoRef.currentTime
+      if (this.$refs.videoRef) this.currentTime = this.$refs.videoRef.currentTime
     },
     playHandle (e) {
       // this.$log('playHandle', e)

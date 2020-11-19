@@ -7,17 +7,36 @@ q-layout(
     .row.full-width.justify-center
       q-resize-observer(@resize="onResize")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
-        .row.full-width.items-center.content-center
+        //- .row.full-width.items-center.content-center
           q-btn(
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-md
+          q-btn(
+            round flat color="white" icon="filter_tilt_shift")
           span.text-white Ядро
+        //- div(
+          :style=`{paddingLeft: '42px',}`
+          ).row.full-width.items-center.content-center
+          q-btn(round flat color="white" icon="select_all")
+          .col
+            .row.full-width.items-center.content-center.q-pb-sm
+              .row.full-width
+                //- span.text-white В гостях у Дмитра Гордона
+              .row.full-width
+                small(:style=`{lineHeight: 0.6}`).text-grey-4 from YouTube video
         list-middle(
           v-if="node"
           rootMargin="-30% 0px"
           :items="[node]" :itemStyles=`{marginTop: '0px',}`)
           template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
+            //- content-player(
+              :contentKalpa=`{
+                name: '',
+                url: node.items[0].url,
+                thumbUrl: node.thumbUrl,
+                contentSource: 'KALPA',
+                type: 'VIDEO',
+              }`)
             node-feed(
               :node="item" :isActive="true" :isVisible="itemVisible"
               :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
@@ -91,6 +110,7 @@ export default {
     pageInside: () => import('./view_joints/index.vue'),
     // pageInside: () => import('./page_inside/index.vue'),
     // pageOutside: () => import('./page_outside/index.vue'),
+    // contentPlayer: () => import('components/content_player/index.vue')
   },
   data () {
     return {
@@ -99,6 +119,7 @@ export default {
       pageId: 'inside',
       headerHeight: 0,
       headerWidth: 0,
+      mounted: false,
     }
   },
   computed: {
@@ -143,7 +164,7 @@ export default {
     },
     onScroll (e) {
       // this.$log('onScroll', e)
-      if (this.nodeOpened) this.nodeOpened = false
+      if (this.nodeOpened && this.mounted) this.nodeOpened = false
     },
     nodeWatch (oid) {
       this.$log('nodeWatch', oid)
@@ -178,8 +199,10 @@ export default {
       this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    await this.$wait(2000)
+    this.mounted = true
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
     // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])

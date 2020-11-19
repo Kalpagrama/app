@@ -1,10 +1,15 @@
 <template lang="pug">
 .row.full-width.justify-center.items-center.content-center
   div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
-    kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-    .col.full-height.q-px-xs
-      node-vote-bar(:node="node")
+    slot(name="action-left")
+    kalpa-bookmark(
+      v-if="!$slots['action-left']"
+      :oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+    .col.full-height
+      node-vote-bar(v-if="node" :node="node")
+    slot(name="action-right")
     q-btn(
+      v-if="!$slots['action-right']"
       @click="$router.push('/workspace/joint/new?oid='+node.oid)"
       round flat color="green")
       q-icon(name="link" size="30px" color="grey-9")

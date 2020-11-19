@@ -106,10 +106,10 @@
   node-actions(
     v-if="showFooter"
     :node="joint"
-    :useConnect="false"
-    :useRemake="false"
-    :useBookmarkType="'JOINT'"
     :isActive="isActive" :isVisible="isVisible")
+    template(v-slot:action-right)
+      kalpa-share(
+        type="joint" :item="joint")
 </template>
 
 <script>
