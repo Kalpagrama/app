@@ -32,6 +32,16 @@ div(
               borderRadius: '10px',
             }`
             ).row.full-width.items-start.content-start.b-40
+            kalpa-share(type="node" :item="node").full-width
+              template(v-slot:btn=`{start}`)
+                q-btn(
+                  @click="start"
+                  flat color="white" no-caps
+                  :style=`{
+                    height: '50px',
+                  }`
+                  ).full-width
+                  span.text-bold Поделиться
             q-btn(
               @click="a.cb()"
               v-for="(a,akey) in actions" :key="akey"
@@ -135,12 +145,12 @@ export default {
     },
     actions () {
       return {
-        share: {
-          name: 'Поделиться',
-          cb: () => {
-            this.$log('share...')
-          }
-        },
+        // share: {
+        //   name: 'Поделиться',
+        //   cb: () => {
+        //     this.$log('share...')
+        //   }
+        // },
         report: {
           name: 'Пожаловаться',
           color: 'red',
@@ -148,13 +158,13 @@ export default {
             this.$log('report...')
           }
         },
-        delete: {
-          name: 'Удалить',
-          color: 'red',
-          cb: () => {
-            this.$log('delete...')
-          }
-        }
+        // delete: {
+        //   name: 'Удалить',
+        //   color: 'red',
+        //   cb: () => {
+        //     this.$log('delete...')
+        //   }
+        // }
       }
     }
   },
