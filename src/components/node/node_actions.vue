@@ -2,8 +2,8 @@
 .row.full-width.justify-center.items-center.content-center
   div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
     kalpa-bookmark(:oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-    .col.full-height.q-px-xs
-      node-vote-bar(:node="node")
+    .col.full-height
+      node-vote-bar(v-if="node" :node="node")
     q-btn(
       @click="$router.push('/workspace/joint/new?oid='+node.oid)"
       round flat color="green")

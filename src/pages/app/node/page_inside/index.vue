@@ -4,7 +4,7 @@ q-page(
     paddingTop: '8px',
     paddingBottom: pageHeight+'px'
   }`
-  )
+  ).row.full-width.justify-center
   q-page-sticky(
     expand
     position="top"
@@ -26,7 +26,11 @@ q-page(
       //- creator()
       //- small.text-white 1933 comments
     slot(name="bottom")
-  .row.full-width.items-start.content-start.q-pa-sm
+  div(
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+    }`
+    ).row.full-width.items-start.content-start.q-pa-sm
     slot(name="body")
     div(
       v-for="(i,ii) in 100" :key="ii"

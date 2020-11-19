@@ -69,7 +69,7 @@ div(
           div(
             :style=`{
               position: 'relative',
-              minHeight: '44px',
+              minHeight: '60px',
               textAlign: 'center',
             }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
             slot(name="name")

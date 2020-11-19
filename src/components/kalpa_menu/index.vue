@@ -27,11 +27,9 @@ div(
         div(
           @click="$router.push($store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/').catch(e => e)"
           ).row.fit.items-center.content-center.cursor-pointer
-          //- span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
-          span(:style=`{fontSize: '20px'}`).text-white.text-bold kalpa*
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpagrama', 'Кальпаграма')}}
           .row.full-width
-            //- small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
-            small.text-white Connect the dots
+            small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
     //- user
     router-link(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
