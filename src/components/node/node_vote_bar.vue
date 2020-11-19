@@ -67,7 +67,7 @@ div(
     path(d="m 0 50, h 100, v -50, h100, v50, h100, v50, h-100, v-10, h-100, v-10, h-100 z" stroke="red" fill="black")
   //- node unrated or yours
   div(
-    v-if="!node.rateUser || node.rateStat.length === 0"
+    v-if="node.rateUser === null || node.rateStat.length === 0"
     @click="voteStart"
     :style=`{
       paddingTop: '16px',
@@ -86,7 +86,7 @@ div(
       small.text-grey-6 {{node.author.oid === $store.getters.currentUser().oid ? 'Нет голосов' : 'Проголосовать'}}
   //- node rated, no gradient
   div(
-    v-if="node.rateUser && node.rateStat && node.rateStat.length > 0"
+    v-if="node.rateUser !== null && node.rateStat && node.rateStat.length > 0"
     @click="voteStatsShow = true"
     :style=`{
       position: 'relative',
