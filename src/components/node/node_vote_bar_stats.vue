@@ -39,25 +39,27 @@ div(
         }`
         ).col.full-height.cursor-pointer
         .row.fit.items-center.content-center.justify-center
-          //- small(v-if="s.count > 0").text-white {{ s.count }}
           small(
             :class=`{
               'text-white': si === voteSelected,
               'text-grey-4': si !== voteSelected,
               'text-bold': si === voteSelected,
             }`
-            ) {{ s.name }} - {{ s.count }}
+            ) {{ s.count }}
+  //- vote stat name
+  .row.full-width.justify-center
+    span.text-white {{ rateStat[voteSelected].name }}
   //- selected vote stat
   .col.full-width.scroll
     .row.fit.items-start.content-start.q-py-sm.q-px-md
-      div(
+      router-link(
         v-for="(v,vi) in voters" :key="v.oid+vi"
+        :to="'/user/'+v.oid"
         :style=`{
           borderRadius: '10px', overflow: 'hidden',
         }`
         ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm.b-40
           q-btn(
-            :to="'/user/'+v.oid"
             flat color="white" dense no-caps
             )
             user-avatar(:url="v.thumbUrl" :width="28" :height="28")
@@ -111,6 +113,11 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
+    let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
+      if (val.percent > acc) acc = val.percent
+      return acc
+    }, 0)
+    this.voteSelected = this.rateStat.findIndex(r => r.percent === countMax)
     this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}}))
   }
 }

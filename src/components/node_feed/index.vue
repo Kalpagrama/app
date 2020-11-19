@@ -77,16 +77,19 @@ div(
               :style=`{
                 fontSize: nodeNameSize+'px',
               }`).text-white.text-bold.cursor-pointer {{ node.name }}
-          div(
-            v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll
-            .row.full-width.justify-start.no-wrap.q-pl-sm
-              div(
-                v-for="(s,si) in node.spheres" :key="s.oid"
-                ).row.items-start.content-start.justify-start.q-pr-sm.q-pb-sm
-                q-btn(
-                  flat color="white" dense no-caps
-                  :to="'/sphere/'+s.oid"
-                  :style=`{borderRadius: '10px', whiteSpace: 'nowrap',}`).row.b-40.q-px-sm.text-grey-4 {{ s.name }}
+      div(
+        v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll.q-pb-sm
+        .row.no-wrap.q-pl-sm
+          router-link(
+            v-for="(s,si) in node.spheres" :key="s.oid"
+            :to="'/sphere/'+s.oid"
+            :style=`{
+              whiteSpace: 'nowrap',
+              borderRadius: '10px',
+            }`
+            ).text-grey-4.q-py-xs.q-px-sm.b-50.q-mr-sm
+            q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
+            span {{s.name}}
           slot(name="name-bottom")
         slot(name="name-right")
     .row.full-width
