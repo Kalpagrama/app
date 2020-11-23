@@ -46,16 +46,40 @@ q-layout(
         template(v-slot:bar-current-time=`{panning}`)
           transition(enter-active-class="animated fadeIn" leave-active-class="none")
             q-btn(
-              v-if="player && !panning && !node && viewId !== 'node'"
+              v-if="player && !panning && !node && pageId !== 'node'"
               @click="nodeCreateStart()"
               round color="green" icon="add" dense
               :style=`{
                 position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
                 left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
               }`)
+      //- .row.full-width.q-pa-md.bg-red
+        span.text-white.text-bold {{ contentKalpa.name }}
+  //- q-footer()
+    .row.full-width.bg-black.q-pa-md
+      span.text-white menu
   q-page-container
-    page-nodes(
+    q-page-sticky(
+      v-if="pageId !== 'node'"
+      expand position="bottom"
+      :style=`{zIndex: 1000, borderRadius: '10px 10px 0 0',}`
+      ).full-width.b-30
+      //- div(:style=`{height: '50px',}`).row.full-width.bg-blue.q-pa-md
+      div(
+        :style=`{height: '50px',}`).row.full-width.justify-center
+        div(:style=`{maxWidth: 700+'px'}`).row.full-width
+          q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-sm Назад
+          .col
+            q-tabs(
+              v-model="pageId"
+              align="justify"
+              no-caps active-color="green").full-width.text-grey-8
+              q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
+    component(
+      v-if="player && contentKalpa"
+      :is="`page-${pageId}`"
       :contentKalpa="contentKalpa" :node="node"
+      :player="player"
       :headerHeight="headerHeight")
     //- component(
       v-if="player"
@@ -98,15 +122,18 @@ import contentPlayer from 'components/content_player/index.vue'
 // TODO: impl
 // import viewFullscreen from './view_fullscreen/index.vue'
 import pageNodes from './page_nodes/index.vue'
+import pageDetails from './page_details/index'
+import pageNode from './page_node/index.vue'
+import pageJoints from './page_joints/index.vue'
 
 export default {
   name: 'contentExplorerVideo',
   // components: {contentPlayer, viewDetails, viewNode, viewNodes, viewJoints, viewFullscreen},
-  components: {contentPlayer, pageNodes},
+  components: {contentPlayer, pageNodes, pageDetails, pageNode, pageJoints},
   props: ['contentKalpa', 'query'],
   data () {
     return {
-      viewId: 'nodes',
+      pageId: 'nodes',
       player: null,
       playerIsVisible: false,
       contentBookmark: null,
@@ -116,11 +143,12 @@ export default {
     }
   },
   computed: {
-    views () {
+    pages () {
       return [
         {id: 'details', icon: 'info', name: 'Детали'},
         {id: 'nodes', icon: 'filter_tilt_shift', name: 'Ядра'},
-        {id: 'joints', icon: 'link', name: 'Связи'}
+        {id: 'joints', icon: 'link', name: 'Связи'},
+        {id: 'similar', icon: 'menu', name: 'Similar'}
       ]
     }
   },
@@ -161,7 +189,7 @@ export default {
       // this.player.fullscreenToggle(false)
       // start/end
       let start = this.player.currentTime
-      let end = start + 10 > this.player.duration ? this.player.duration : start + 10
+      let end = start + 30 > this.player.duration ? this.player.duration : start + 30
       let nodeInput = {
         name: '',
         spheres: [],
@@ -195,7 +223,7 @@ export default {
         await this.$wait(300)
         this.node = node
       }
-      this.viewId = 'node'
+      this.pageId = 'node'
     },
     playerStyles () {
       if (this.player && this.player.isFullscreen) {

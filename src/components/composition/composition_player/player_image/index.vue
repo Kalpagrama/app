@@ -16,12 +16,15 @@ div(
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
-      maxHeight: $q.screen.height/2+'px',
+      //- maxHeight: $q.screen.height/2+'px',
+      maxHeight: maxHeight+'px',
       background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      height: options.height,
-      objectFit: options.objectFit,
+      //- height: options.height,
+      //- height: '100%',
+      //- objectFit: options.objectFit,
+      objectFit: 'cover',
     }`
     ).full-width
 </template>
@@ -45,6 +48,14 @@ export default {
           objectFit: 'cover',
           loop: true,
         }
+      }
+    }
+  },
+  computed: {
+    maxHeight () {
+      if (this.$q.screen.width > this.$store.state.ui.pageWidth) return this.$store.state.ui.pageWidth
+      else {
+        return this.$q.screen.width
       }
     }
   }

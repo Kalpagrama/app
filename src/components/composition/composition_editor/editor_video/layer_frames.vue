@@ -1,10 +1,16 @@
 <template lang="pug">
 div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
   q-resize-observer(@resize="e => width = e.width")
+  q-btn(
+    @click="actionsShow = !actionsShow"
+    round flat color="grey-7" icon="tune" dense
+    :style=`{
+      position: 'absolute', zIndex: 1000, right: '4px', bottom: '0px',
+    }`)
   //- overflowY: 'hidden',
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '20px', paddingBottom: '70px'}`).row.full-width.scroll
+    :style=`{paddingTop: '20px', paddingBottom: '44px'}`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -35,8 +41,8 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           :style=`{
             position: 'absolute', zIndex: 200,
             left: 'calc('+(player.currentTime/player.duration)*100+'% - 0px)',
-            top: '-16px',
-            height: 'calc(100% + 32px)',
+            top: '-10px',
+            height: 'calc(100% + 20px)',
             width: '4px',
             borderRadius: '2px', overflow: 'hidden',
             pointerEvents: 'none'
@@ -57,17 +63,17 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 50px)',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 13px)',
             height: '50px',
-            width: '50px',
+            width: '20px',
             cursor: 'grabbing',
             borderRadius: '10px',
             //- opacity: 0.55,
-            background: 'rgba(76,175,79,0.55)'
+            background: 'rgba(76,175,79,0.5)'
           }`
           ).row.items-center.content-center.justify-center
           q-icon(
-            name="drag_indicator" color="white" size="24px"
+            name="more_vert" color="white" size="22px"
             :style=`{pointerEvents: 'none'}`)
         //- right tint
         //- div(
@@ -84,17 +90,17 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 8px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 2px)',
             height: '50px',
-            width: '50px',
+            width: '20px',
             cursor: 'grabbing',
             borderRadius: '10px',
-            //- opacity: 0.55,
-            background: 'rgba(76,175,79,0.55)'
+            //- opacity: 0.1,
+            background: 'rgba(76,175,79,0.5)'
           }`
           ).row.items-center.content-center.justify-center
           q-icon(
-            name="drag_indicator" color="white" size="24px"
+            name="more_vert" color="white" size="22px"
             :style=`{pointerEvents: 'none'}`)
         //- rect
         div(
@@ -119,6 +125,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
       div(:style=`{height: '50px', width: width/2+'px'}`)
   //- actions at the bottom
   div(
+    v-show="actionsShow"
     :style=`{
       position: 'absolute', zIndex: 300, bottom: '0px',
       left: '0px', width: '100%',
@@ -170,7 +177,8 @@ export default {
       pointDragging: false,
       pointDraggingIndex: null,
       pointDraggingError: false,
-      layerForwarding: null
+      layerForwarding: null,
+      actionsShow: false,
     }
   },
   computed: {
@@ -360,6 +368,10 @@ export default {
       else {
         this.$log('framesClick OUTside')
         this.player.events.emit('edit-start')
+        let index = 0
+        if (t > this.layerEnd) index = 1
+        this.layer.figuresAbsolute[index].t = t
+        this.player.setCurrentTime(t)
       }
     },
     framesDrag (e) {

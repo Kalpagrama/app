@@ -41,11 +41,13 @@ div(
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      height: options.height,
+      //- height: options.height,
+      maxHeight: maxHeight+'px',
+      objectFit: 'contain',
       //- objectFit: options.objectFit,
       //- opacity: duration > 0 ? 0 : 1,
     }`
-    ).full-width
+    ).full-width.fit
   //- video wrapper
   div(
     v-if="isActive && isVisible"
@@ -68,7 +70,9 @@ div(
       :loop="options.loop"
       playsinline
       :style=`{
-        objectFit: options.objectFit,
+        //- objectFit: options.objectFit,
+        maxHeight: maxHeight+'px',
+        objectFit: 'contain',
         borderRadius: '10px',
         overflow: 'hidden',
       }`
@@ -103,6 +107,14 @@ export default {
       playing: false,
       currentTime: 0,
       duration: 0
+    }
+  },
+  computed: {
+    maxHeight () {
+      if (this.$q.screen.width > this.$store.state.ui.pageWidth) return this.$store.state.ui.pageWidth
+      else {
+        return this.$q.screen.width
+      }
     }
   },
   watch: {

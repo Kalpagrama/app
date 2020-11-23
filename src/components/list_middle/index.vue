@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  q-resize-observer(@resize="e => width = e.width" :debounce="500")
+  //- q-resize-observer(@resize="e => width = e.width" :debounce="500")
   slot
   div(
     v-for="(i,ii) in items" :key="i[itemKey]" :accessKey="ii"

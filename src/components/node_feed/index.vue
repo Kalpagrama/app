@@ -120,7 +120,8 @@ export default {
   computed: {
     ratio () {
       let height = this.node.items[0].thumbHeight
-      return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
+      if (height) return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
+      else return 1
     },
     // TODO: impl better way
     nodeNameSize () {
