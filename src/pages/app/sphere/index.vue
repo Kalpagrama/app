@@ -57,7 +57,8 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.$route.params.oid
         },
         populateObjects: true,

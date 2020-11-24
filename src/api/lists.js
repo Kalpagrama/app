@@ -63,18 +63,6 @@ class ListsApi {
             }
             // res.items = res.items.filter(ev => !ev.type.in('WS_ITEM_CREATED', 'WS_ITEM_UPDATED', 'WS_ITEM_DELETED', 'PROGRESS'))
             break
-         case RxCollectionEnum.LST_SPHERE_NODES:
-            assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            mangoQuery.selector.objectTypeEnum = { $in: ['NODE'] }
-            // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
-            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
-            break
-         case RxCollectionEnum.LST_SPHERE_JOINTS:
-            assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            mangoQuery.selector.objectTypeEnum = { $in: ['JOINT'] }
-            // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
-            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
-            break
          case RxCollectionEnum.LST_SPHERE_ITEMS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
             if (!mangoQuery.selector.objectTypeEnum) mangoQuery.selector.objectTypeEnum = { $in: ['JOINT', 'NODE'] }

@@ -17,7 +17,8 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['JOINT'] },
           oidAuthor: this.user.oid,
           oidSphere: this.user.oid,
           sortStrategy: 'AGE',

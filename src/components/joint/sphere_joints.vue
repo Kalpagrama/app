@@ -69,7 +69,8 @@ export default {
     queryBySphere () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.oid,
           jointItemType: {$in: ['NODE', 'WORD']},
           // sortStrategy: 'AGE',
