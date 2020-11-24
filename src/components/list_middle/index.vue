@@ -10,6 +10,7 @@
     }`
     v-observe-visibility=`{
       callback: indexMiddleHandler,
+      throttle: 1000,
       intersection: {
         rootMargin: rootMargin
       }

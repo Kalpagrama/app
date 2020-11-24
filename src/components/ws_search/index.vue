@@ -26,6 +26,7 @@
       placeholder="Поиск или URL"
       :dark="focused"
       :loading="loading"
+      :debounce="500"
       :input-style=`{
         borderRadius: '10px',
         color: 'white'

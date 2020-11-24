@@ -50,7 +50,7 @@ export default {
         }
         else {
           let statValue = Date.now() - this.isActiveStart
-          // this.$log('statValue', statValue)
+          this.$log('statValue', statValue)
           let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
           // this.$log('statValue stat', stat)
           this.isActiveStart = 0
