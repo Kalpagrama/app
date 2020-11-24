@@ -287,8 +287,27 @@ class Objects {
             }
             break
          case 'VOTED': {
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, false)
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', item => item.countVotes + 1, false)
+            assert(event.rate && event.rateStat, 'bad event!')
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rate', event.rate, true)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateStat', event.rateStat, true)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', countVotes => countVotes + 1, true)
+            // добавим голос пользователя в статистику
+            await updateRxDocPayload(makeId(RxCollectionEnum.GQL_QUERY, 'objectStat', { oid: event.object.oid }), 'votes', votes => {
+               logD('updateRxDocPayload objectStat TODO! обновить статистику голосованния', votes)
+               assert(votes && Array.isArray(votes), '!stat.votes')
+               let userVote = JSON.parse(JSON.stringify(event.subject))
+               userVote.rate = event.rate
+               userVote.weight = rxdb.getCurrentUser().weightVal
+               userVote.date = Date.now()
+               let indx = votes.findIndex(v => v.oid === rxdb.getCurrentUser().oid)
+               if (indx >= 0) votes.splice(indx, 1)
+               votes.push(userVote)
+               return votes
+            }, true)
+            // rateUser менять не надо! оно изменилось
+            // if (event.subject.oid === rxdb.getCurrentUser().oid){
+            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
+            // }
             break
          }
          case 'OBJECT_DELETED': {

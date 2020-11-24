@@ -42,7 +42,7 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       //- height: options.height,
-      maxHeight: maxHeight+'px',
+      //- maxHeight: maxHeight+'px',
       objectFit: 'contain',
       //- objectFit: options.objectFit,
       //- opacity: duration > 0 ? 0 : 1,
@@ -71,7 +71,7 @@ div(
       playsinline
       :style=`{
         //- objectFit: options.objectFit,
-        maxHeight: maxHeight+'px',
+        //- maxHeight: maxHeight+'px',
         objectFit: 'contain',
         borderRadius: '10px',
         overflow: 'hidden',

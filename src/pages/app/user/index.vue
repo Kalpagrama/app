@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
-    .row.full-width.justify-center.b-30
+    div(v-if="user").row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{position: 'relative', height: '140px',}`).row.full-width
           img(
@@ -145,6 +145,8 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.oid TO', to)
         if (to) {
+          this.user = null
+          await this.$wait(300)
           this.user = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           this.userSubscribed = await UserApi.isSubscribed(this.user.oid)
         }

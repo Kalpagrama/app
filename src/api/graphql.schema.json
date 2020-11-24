@@ -10477,6 +10477,30 @@
             "deprecationReason": null
           },
           {
+            "name": "rateStat",
+            "description": "статистика голосования для полосы",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "RateStatItem",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "matter",
             "description": "Почему я получаю этот эвент? что, послужило триггером для этого уведомления",
             "args": [],

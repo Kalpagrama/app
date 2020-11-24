@@ -55,6 +55,7 @@ async function init (store) {
    })
    await orientationLock('portrait')
    await statusBarSetStyle('dark')
+   await statusBarSetVisible(false)
    // Events (iOS only)
    // window.addEventListener('statusTap', function () {
    //    // alert('statusbar tapped')

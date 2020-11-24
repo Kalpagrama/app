@@ -38,7 +38,7 @@ div(
         @click="vote(a.value)"
         v-for="(a,ai) in rateMeta" :key="a.value"
         flat no-caps
-        align="left" size="lg"
+        align="center" size="lg"
         :loading="voteAction === a.value"
         :style=`{
           order: a.order,
@@ -67,7 +67,7 @@ div(
     path(d="m 0 50, h 100, v -50, h100, v50, h100, v50, h-100, v-10, h-100, v-10, h-100 z" stroke="red" fill="black")
   //- node unrated or yours
   div(
-    v-if="!node.rateUser || node.rateStat.length === 0"
+    v-if="node.rateUser === null || node.rateStat.length === 0"
     @click="voteStart"
     :style=`{
       paddingTop: '16px',
@@ -86,13 +86,18 @@ div(
       small.text-grey-6 {{node.author.oid === $store.getters.currentUser().oid ? 'Нет голосов' : 'Проголосовать'}}
   //- node rated, no gradient
   div(
-    v-if="node.rateUser && node.rateStat && node.rateStat.length > 0"
+    v-if="node.rateUser !== null && node.rateStat && node.rateStat.length > 0"
     @click="voteStatsShow = true"
     :style=`{
       position: 'relative',
     }`
     ).row.fit.items-center.content-center
-    //- count
+    //- header: rateMax
+    div(
+      :style=`{position: 'absolute', zIndex: 100, top: '2px'}`
+      ).row.full-width.justify-center
+      small.text-grey-8 {{ rateStat[rateMax].name }}
+    //- footer: count
     div(
       :style=`{position: 'absolute', zIndex: 100, bottom: '2px'}`
       ).row.full-width.justify-center
@@ -102,11 +107,13 @@ div(
       v-for="(s,si) in rateStat" :key="si"
       :style=`{
         width: s.percent+'%',
-        paddingBottom: '16px',
+        //- paddingBottom: '16px',
       }`).row.full-height.items-center.content-center
       //- bar name
-      .row.full-width.justify-center
-        small.text-grey-8 {{ s.name }}
+      //- div(:style=`{height: '16px'}`).row.full-width.justify-center
+        small(
+          v-if="rateMax === si"
+          :style=`{whiteSpace: 'nowrap'}`).text-grey-8 {{ s.name }}
       //- bar
       div(
         :style=`{
@@ -131,6 +138,7 @@ export default {
       voteAction: false,
       voteActionsShow: false,
       voteStatsShow: false,
+      rateMax: 0,
     }
   },
   computed: {
@@ -146,11 +154,11 @@ export default {
     },
     rateMeta () {
       return [
-        {name: 'Очень далеко', value: 0, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
-        {name: 'Далеко', value: 0.25, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
-        {name: 'Где-то рядом', value: 0.5, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
-        {name: 'Близко', value: 0.75, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
-        {name: 'Прямо в точку!', value: 1, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
+        {name: 'Очень далеко', value: 0, valueMin: -1, valueMax: 0.2, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
+        {name: 'Далеко', value: 0.25, valueMin: 0.2, valueMax: 0.4, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
+        {name: 'Где-то рядом', value: 0.5, valueMin: 0.4, valueMax: 0.6, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
+        {name: 'Близко', value: 0.75, valueMin: 0.6, valueMax: 0.8, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
+        {name: 'Прямо в точку!', value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
       ]
     },
     rateStat () {
@@ -164,12 +172,29 @@ export default {
             color: this.rateMeta[ii].color,
             colorBackground: this.rateMeta[ii].colorBackground,
             value: this.rateMeta[ii].value,
+            valueMin: this.rateMeta[ii].valueMin,
+            valueMax: this.rateMeta[ii].valueMax,
             order: arr.length - ii,
           })
         }
         return acc
       }, [])
     },
+  },
+  watch: {
+    node: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          let countMax = this.rateStat.reduce((acc, val, ii, arr) => {
+            if (val.percent > acc) acc = val.percent
+            return acc
+          }, 0)
+          this.rateMax = this.rateStat.findIndex(r => r.percent === countMax)
+        }
+      }
+    }
   },
   methods: {
     rateBorderRadius (index) {
@@ -189,7 +214,12 @@ export default {
         this.$router.push('/auth/sign-in')
       }
       else {
-        this.voteActionsShow = true
+        if (currentUser.oid === this.node.author.oid) {
+          // this.voteStatsShow = true
+        }
+        else {
+          this.voteActionsShow = true
+        }
       }
     },
     async vote (val) {
@@ -209,6 +239,9 @@ export default {
         this.voteActionsShow = false
       }
     }
+  },
+  mounted () {
+    this.$log('mounted')
   }
 }
 </script>

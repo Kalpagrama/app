@@ -83,7 +83,7 @@ async function initApplication () {
       await capacitor.init(store)
    }
    // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
-   const hasPerm = await askForWebPushPerm(store)
+   askForWebPushPerm(store).catch(err => logE('cant get permissions', err))
 
    let storageEventMutex = new MutexLocal('storageEventMutex')
    // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)

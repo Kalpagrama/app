@@ -42,16 +42,16 @@ const updateStatThrottled = throttle(async () => {
          for (let {oid, key, valueInt} of statAccumulator){
             switch (key) {
                case StatKeyEnum.REMADE:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', item => item.countRemakes + 1, false)
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', countRemakes => countRemakes + 1, false)
                   break
                case StatKeyEnum.SHARED:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', item => item.countShares + 1, false)
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', countShares => countShares + 1, false)
                   break
                case StatKeyEnum.VIEWED_TIME:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', item => item.countViews + 1, false)
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', countViews => countViews + 1, false)
                   break
                case StatKeyEnum.BOOKMARKED:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', item => item.countBookmarks + 1, false)
+                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', countBookmarks => countBookmarks + 1, false)
                   break
             }
          }
