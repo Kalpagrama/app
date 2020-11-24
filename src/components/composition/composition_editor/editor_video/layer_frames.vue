@@ -351,7 +351,7 @@ export default {
         }
       }
     },
-    framesClick (e) {
+    async framesClick (e) {
       this.$log('framesClick', e.offsetX, e.target.accessKey)
       if (e.target.accessKey !== 'frames') return
       // this.player.events.emit('edit-event', {t: t})
@@ -372,12 +372,15 @@ export default {
         if (t > this.layerEnd) index = 1
         this.layer.figuresAbsolute[index].t = t
         this.player.setCurrentTime(t)
+        await this.$wait(240)
+        this.framesLayerCenter()
       }
     },
     framesDrag (e) {
       // this.$log('framesDrag', e)
       if (this.poingDragging) return
-      if (this.$q.screen.xs) return
+      // if (this.$q.screen.xs) return
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return
       this.$refs.layerItemFramesScrollArea.scrollLeft -= e.delta.x
       if (e.isFirst) this.framesDragging = true
       if (e.isFinal) this.framesDragging = false

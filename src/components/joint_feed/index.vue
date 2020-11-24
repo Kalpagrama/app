@@ -158,8 +158,8 @@ export default {
         // {id: 'ASSOCIATIVE'},
         {id: 'CAUSE_EFFECT', names: ['Причина', 'Следствие']},
         {id: 'PROBLEM_SOLUTION', names: ['Проблема', 'Решение']},
-        {id: 'FALSE_TRUE', names: ['Ложь', 'Правда']},
-        {id: 'FROM_TO', names: ['Первое', 'Второе']}
+        {id: 'FALSE_TRUE', names: ['Фэйк', 'Опровержение']},
+        {id: 'FROM_TO', names: ['Факт', 'Подтверждение']}
       ]
     }
   },

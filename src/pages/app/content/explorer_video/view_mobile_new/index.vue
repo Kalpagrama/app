@@ -9,6 +9,8 @@ q-layout(
         @player="playerLoaded"
         @error="playerErrorHandle"
         :style=`{
+          borderRadius: '10px',
+          //- overflow: 'hidden',
         }`).fit
         template(v-slot:bar)
           div(
@@ -46,7 +48,7 @@ q-layout(
         template(v-slot:bar-current-time=`{panning}`)
           transition(enter-active-class="animated fadeIn" leave-active-class="none")
             q-btn(
-              v-if="player && !panning && !node && pageId !== 'node'"
+              v-if="player && !panning && pageId !== 'node'"
               @click="nodeCreateStart()"
               round color="green" icon="add" dense
               :style=`{
@@ -80,7 +82,8 @@ q-layout(
       :is="`page-${pageId}`"
       :contentKalpa="contentKalpa" :node="node"
       :player="player"
-      :headerHeight="headerHeight")
+      :headerHeight="headerHeight"
+      @close="pageId = 'nodes'")
     //- component(
       v-if="player"
       :is="`view-${viewId}`"

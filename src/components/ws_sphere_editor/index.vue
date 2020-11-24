@@ -10,7 +10,7 @@
             @click="sphereDelete(sphere)"
             name="clear" color="white" size="14px").q-mr-sm.cursor-pointer
   q-btn(
-    flat color="green" no-caps icon="add"
+    flat color="green" no-caps
     ).full-width.b-40 Добавить сферу
 </template>
 

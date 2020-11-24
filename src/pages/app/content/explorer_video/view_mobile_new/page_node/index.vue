@@ -5,6 +5,28 @@ q-page(
     paddingBottom: '0px',
   }`
   ).row.full-width.items-start.content-start.justify-center
+  //- contentfinder
+  q-dialog(
+    v-model="contentFinderShow"
+    position="bottom" maximized)
+    kalpa-finder(
+      @contentKalpa="contentKalpaFound"
+      :pagesFilter="['workspace', 'kalpa']"
+      :workspaceTypes="['IMAGE', 'VIDEO']"
+      :kalpaTypes="['IMAGE', 'VIDEO']"
+      :style=`{
+        maxWidth: $store.state.ui.pageWidth+'px',
+        height: $q.screen.height+'px',
+      }`).b-30
+      template(v-slot:header)
+        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+          .col
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать контент
+      template(v-slot:tint=`{item}`)
+        div(
+          @click="itemFound(item)"
+          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
   //- editor wrapper
   div(
     :style=`{
@@ -15,12 +37,11 @@ q-page(
     ).row.full-width
     //- composition.editor
     div(
-      v-show="compositionEditorShow"
+      v-show="leftItemEditorShow"
       :style=`{
         paddingTop: '20px',
-        //- paddingBottom: '10px',
-        //- background: 'rgb(30,30,30)',
         borderRadius: '10px',
+        zIndex: 10,
       }`
       ).row.full-width.bg-black
       composition-editor(
@@ -28,10 +49,71 @@ q-page(
         :contentKalpa="contentKalpa")
     div(
       :style=`{
-        paddingTop: compositionEditorShow ? '0px' : '20px',
+        paddingTop: leftItemEditorShow ? '0px' : '20px',
       }`
       ).row.full-width.items-start.content-start.justify-center
+      //- name top
       div(
+        v-if="joining"
+        :style=`{
+          position: 'relative',
+          marginTop: '-20px',
+          paddingTop: '28px',
+          paddingBottom: '8px',
+          paddingLeft: '42px',
+          paddingRight: '42px',
+          borderRadius: '0 0 10px 10px'
+        }`
+        ).row.full-width.justify-center.q-px-sm.b-30
+        span.text-grey-6 В чем суть?
+        q-btn(
+          @click="leftItemEditorShow = !leftItemEditorShow"
+          round flat color="white" dense
+          :icon="leftItemEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+          :style=`{position: 'absolute', zIndex: 110, right: '4px', bottom: '0px',}`)
+      //- name
+      .row.full-width
+        edit-name(
+          :node="node"
+          :placeholder="joining ? 'В чем связь?' : 'В чем суть?'")
+      //- add
+      .row.full-width.q-mb-sm
+        //- join
+        div(
+          v-if="joining"
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-30
+          img(
+            v-if="rightItem"
+            @click="joining = false"
+            :src="rightItem.thumbUrl"
+            :style=`{
+              borderRadius: '10px',
+            }`
+            ).full-width
+          div(
+            :style=`{
+              position: 'relative',
+            }`
+            ).row.full-width.justify-center.q-pa-sm.b-30
+            span.text-grey-6 В чем суть?
+            q-btn(
+              round flat color="white" dense
+              :icon="leftItemEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+              :style=`{position: 'absolute', zIndex: 110, right: '4px', bottom: '0px',}`)
+        //- join toggle
+        div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
+          q-btn(
+            @click="joiningToggle()"
+            flat no-caps
+            :color="joining ? 'red' : 'green'"
+            :style=`{
+            }`).fit {{ joining ? 'Убрать связь' : 'Добавить связь' }}
+      //- spheres & category
+      div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
+        ws-sphere-editor(:item="node")
+        .row.full-width
+          edit-category(:node="node")
+      //- div(
         :style=`{
           maxWidth: '620px',
         }`).row.full-width.items-start.content-start
@@ -41,9 +123,9 @@ q-page(
             round flat
             :color="joining ? 'grey-4' : 'green'"
             :icon="joining ? 'link_off' : 'link'"
-            :style=`{marginTop: '8px'}`)
+            :style=`{marginTop: '8px', opacity: 0,}`)
           .col
-            div(
+            //- div(
               v-if="joining"
               :style=`{
                 borderRadius: '10px',
@@ -55,10 +137,24 @@ q-page(
                 :style=`{height: '120px'}`).full-width.b-50
               //- .row.full-width
             .row.full-width.q-pb-md
+              //- small.text-white {{node}}
               edit-name(:node="node")
-              ws-sphere-editor(:item="node")
-              .row.full-width
-                edit-category(:node="node")
+              q-btn(
+                v-if="joining === false"
+                @click="joining = true"
+                color="green" flat no-caps icon="add"
+                :style=`{
+                }`).full-width.b-40
+              img(
+                v-if="joining"
+                @click="joining = false"
+                :src="contentKalpa.thumbUrl"
+                :style=`{
+                  borderRadius: '10px',
+                }`
+                ).full-width
+              //- .row.full-width.justify-center.q-py-md
+                q-btn(color="green" round dense outline icon="add" :style=`{borderRadius: '50%',}`)
           //- div(v-show="joining").col
                 //- q-resize-observer(@resize="width = $event.width")
                 //- q-btn(
@@ -119,7 +215,10 @@ export default {
   },
   data () {
     return {
-      compositionEditorShow: true,
+      contentFinderShow: false,
+      leftItemEditorShow: true,
+      rightItemEditorShow: false,
+      rightItem: null,
       joining: false,
     }
   },
@@ -129,6 +228,27 @@ export default {
     },
   },
   methods: {
+    joiningToggle () {
+      this.$log('joiningToggle')
+      if (this.joining) {
+        // close joining shit
+        this.joining = false
+      }
+      else {
+        // open content finder...
+        this.player.pause()
+        this.contentFinderShow = true
+      }
+    },
+    contentKalpaFound (contentKalpa) {
+      this.$log('contentKalpaFound', contentKalpa)
+    },
+    itemFound (item) {
+      this.$log('itemFound', item)
+      this.rightItem = item // content => node?
+      this.contentFinderShow = false
+      this.joining = true
+    },
     publish () {
       console.log('publish')
     }

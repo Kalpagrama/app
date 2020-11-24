@@ -5,7 +5,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     no-caps flat color="grey-5" align="between"
     icon-right="keyboard_arrow_down"
     :style=`{position: 'relative', height: '40px'}`
-    ).full-width.q-px-sm.b-50 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
+    ).full-width.q-px-sm.b-40 {{ category(node.category) ? category(node.category).label : 'Выбери категорию' }}
     q-popup-proxy(
       fit dark
       position="bottom")
