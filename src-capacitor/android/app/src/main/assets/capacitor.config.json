@@ -19,6 +19,7 @@
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app"
-    ]
+    ],
+    "url": "http://192.168.88.20:8484"
   }
 }
