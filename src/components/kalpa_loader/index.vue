@@ -1,6 +1,6 @@
 <script>
 import debounce from 'lodash/debounce'
-// import { debounce } from 'quasar'
+import assert from 'assert'
 
 export default {
   render () {
@@ -19,7 +19,7 @@ export default {
     limit: {
       type: Number,
       default () {
-        return 20
+        return 12
       }
     },
     immediate: {
@@ -40,8 +40,8 @@ export default {
       deep: true,
       async handler (to, from) {
         this.$logW('query CHANGED', to, this.query)
-        this.items = []
-        this.nextDebounced(0, () => {})
+        // this.items = []
+        this.nextDebounced(0, () => {}, true)
       }
     },
     items: {
@@ -52,12 +52,13 @@ export default {
     }
   },
   methods: {
-    async next(i, done) {
+    async next(i, done, queryChanged = false) {
       this.$log('next')
       this.nexting = true
-      if (!this.items || !this.items.next) {
+      if (!this.items || queryChanged) {
         this.items = await this.$rxdb.find(this.query, false)
       }
+      assert(this.items.next, '!this.items.next')
       let hasMore = await this.items.next(this.limit)
       if (hasMore) done()
       else done(true)
@@ -66,7 +67,7 @@ export default {
     }
   },
   async mounted () {
-    this.nextDebounced = debounce(this.next, 700, {leading: false})
+    this.nextDebounced = debounce(this.next, 1000, {leading: true, maxWait: 1000}) // leading - срабатывает в начале
     this.$log('mounted')
     if (this.immediate) await this.next(0, () => {})
   }

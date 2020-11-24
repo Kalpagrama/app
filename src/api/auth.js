@@ -262,6 +262,7 @@ class AuthApi {
          assert(token)
          currentWebPushToken = token
          if (!localStorage.getItem('k_token')) {
+            // запомнили currentWebPushToken. вызовем setWebPushToken повторно в userAuthenticate
             return
          }
          if (AuthApi.isGuest()) {
@@ -274,9 +275,9 @@ class AuthApi {
             query: gql`query ($token: String!) {
                 setWebPushToken (token: $token)
             }`,
-            variables: { token }
+            variables: { token: currentWebPushToken }
          })
-         localStorage.setItem('k_web_push_token', token)
+         localStorage.setItem('k_web_push_token', currentWebPushToken)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
       return await apiCall(f, cb)

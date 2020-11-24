@@ -506,6 +506,10 @@ class RxDBWrapper {
                delete mangoQuery.populateObjects // мешает нормальному кэшированию
                let rxDoc = await this.lists.find(mangoQuery)
                let populateFunc = async (itemsForPopulate, itemsForPrefetch) => {
+                  const f = populateFunc
+                  f.nameExtra = 'populateFunc'
+                  logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
+                  const t1 = performance.now()
                   let populatedItems
                   if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
                      // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
@@ -534,6 +538,7 @@ class RxDBWrapper {
                      }
                   }
                   assert(populatedItems && Array.isArray(populatedItems))
+                  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
                   return populatedItems.filter(obj => !!obj)
                }
                findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc, populateObjects ? populateFunc : null)

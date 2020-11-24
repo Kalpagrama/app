@@ -267,7 +267,7 @@ class ReactiveDocFactory {
                   this.mutex.release()
                }
             }
-            this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem)
+            this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem, { maxWait: 8888 })
          }
          if (this.getDebouncedSave()) {
             // logD(f, `reactiveItem changed (rxDoc will change via debounce later)`)
@@ -337,8 +337,9 @@ class ReactiveListWithPaginationFactory {
          }
          this.reactiveListPagination.getProperty = (name) => this.props[name]
          this.reactiveListPagination.next = async (count) => {
+            if (this.populateFunc) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)
             if (!count && this.nextIndex === 0) { // autoNext
-               if (this.populateFunc) count = 8 // дорогая операция
+               if (this.populateFunc) count = 12 // дорогая операция
                else count = this.reactiveListFull.length // выдаем все элементы разом
             }
             this.nextPageIndex = this.nextIndex + count
@@ -346,7 +347,8 @@ class ReactiveListWithPaginationFactory {
             let fromIndex = this.nextIndex
             this.nextIndex = this.nextIndex + count
             let nextItems = this.reactiveListFull.slice(fromIndex, this.nextIndex)
-            let prefetchItems = this.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждпющее чтение
+            let prefetchItems = []
+            if (count < 12) prefetchItems = this.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждпющее чтение
             if (this.populateFunc) nextItems = await this.populateFunc(nextItems, prefetchItems) // запрашиваем полные сущности
             this.vm.reactiveListPagination.splice(this.vm.reactiveListPagination.length, 0, ...nextItems)
             return this.nextIndex < this.reactiveListFull.length

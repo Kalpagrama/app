@@ -75,6 +75,12 @@ class ListsApi {
             // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
             break
+         case RxCollectionEnum.LST_SPHERE_ITEMS:
+            assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+            if (!mangoQuery.selector.objectTypeEnum) mangoQuery.selector.objectTypeEnum = { $in: ['JOINT', 'NODE'] }
+            // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
+            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
+            break
          case RxCollectionEnum.LST_SUBSCRIBERS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
             res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere, pagination)

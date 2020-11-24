@@ -24,7 +24,7 @@
       div(:style=`{width: '2px',}`).row.full-height.bg-green
   kalpa-loader(
     :immediate="true"
-    :query="queryBySphere" :limit="15" v-slot=`{items, next}`
+    :query="queryBySphere" :limit="12" v-slot=`{items, next}`
     @items="items = $event")
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
       q-infinite-scroll(@load="next" :offset="$q.screen.height")

@@ -31,7 +31,7 @@ const updateStatThrottled = throttle(async () => {
       const cb = async () => {
          let { data: { updateStat2 } } = await apollo.clients.api.mutate({
             mutation: gql`
-                mutation updateStat ($stats: [StatDataInput!]!) {
+                mutation ($stats: [StatDataInput!]!) {
                     updateStat (stats: $stats)
                 }
             `,
@@ -39,25 +39,26 @@ const updateStatThrottled = throttle(async () => {
                stats: statAccumulator
             }
          })
-         for (let {oid, key, valueInt} of statAccumulator){
-            switch (key) {
-               case StatKeyEnum.REMADE:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', countRemakes => countRemakes + 1, false)
-                  break
-               case StatKeyEnum.SHARED:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', countShares => countShares + 1, false)
-                  break
-               case StatKeyEnum.VIEWED_TIME:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', countViews => countViews + 1, false)
-                  break
-               case StatKeyEnum.BOOKMARKED:
-                  await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', countBookmarks => countBookmarks + 1, false)
-                  break
-            }
-         }
          return updateStat2
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      for (let {oid, key, valueInt} of statAccumulator){
+         switch (key) {
+            case StatKeyEnum.REMADE:
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', countRemakes => countRemakes + 1, false)
+               break
+            case StatKeyEnum.SHARED:
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countShares', countShares => countShares + 1, false)
+               break
+            case StatKeyEnum.VIEWED_TIME:
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countViews', countViews => countViews + 1, false)
+               break
+            case StatKeyEnum.BOOKMARKED:
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countBookmarks', countBookmarks => countBookmarks + 1, false)
+               break
+         }
+      }
+      return res
    }
    finally {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec ${statAccumulator.length}`)
@@ -80,6 +81,7 @@ class ObjectApi {
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
+         const t2 = performance.now()
          let { data: { objectList } } = await apollo.clients.api.query({
             query: gql`
                 ${fragments.objectFullFragment}
@@ -91,8 +93,8 @@ class ObjectApi {
             `,
             variables: { oids }
          })
-         logD('objectList=', objectList)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         // logD('objectList=', objectList)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)}/${Math.floor(performance.now() - t2)} msec`, oids.length)
          return objectList
       }
       return await apiCall(f, cb)

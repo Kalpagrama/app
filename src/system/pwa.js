@@ -39,9 +39,10 @@ async function initPWA (store) {
          logD('try navigator.serviceWorker.register service-worker.js', Date.now())
          // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
          registration = await navigator.serviceWorker.register('/service-worker.js')
-         let sw = registration.installing || registration.active
+         // let sw = registration.installing || registration.active
          for (let sw of [registration.installing, registration.waiting, registration.active]) {
             if (sw) {
+               // установить фильтр логирования
                sw.postMessage({
                   type: 'logInit',
                   logDbgFilter: store.state.core.logDbgFilter,
@@ -98,12 +99,10 @@ async function initPWA (store) {
          { // получаем данные из sw
             navigator.serviceWorker.addEventListener('message', function handler (event) {
                let eventData = event.data
-               if (eventData.firebaseMessaging) {
-                  logD('web push message recieved!!!', eventData.firebaseMessaging.payload.data)
-                  const dbEvent = JSON.parse(eventData.firebaseMessaging.payload.data.event)
-                  const title = JSON.parse(eventData.firebaseMessaging.payload.data.title)
-                  const body = JSON.parse(eventData.firebaseMessaging.payload.data.body)
-                  showNotification(title, body, dbEvent)
+               if (event.data.isFirebaseMessaging) { // если окно открыто - уведомления приходят сюда - иначе - в сервисворкер
+                  let payload = event.data.data
+                  logD('web push message recieved!!!', payload)
+                  showNotification(payload.title, payload.body, payload.event)
                } else if (eventData.type === 'swVer') {
                   logD('sw version =', eventData.msgData)
                   store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
@@ -119,6 +118,9 @@ async function initPWA (store) {
                registration.active.postMessage({ type: 'sendWebPushToken' }) // просим сообщить webPushToken
                // registration.active.postMessage({ type: 'precacheAndRoute' })
             }
+            // setTimeout(async () => {
+            //
+            // }, 5000)
          }
       }
       logD('initSw complete')
@@ -127,7 +129,7 @@ async function initPWA (store) {
       logW('serviceWorker disabled!')
    }
 
-   // share pwa
+   // share into app (pwa)
    router.beforeEach(async (to, from, next) => {
       if (to.path === '/share') {
          // const toBase64 = file => new Promise((resolve, reject) => {
@@ -298,37 +300,53 @@ function checkSafariRemotePermission (permissionData, vuexContext) {
 }
 
 async function showNotification (title, body, dbEvent) {
-   if (registration) {
-      const notificationTitle = title // `${event.type}`
-      let options = {
-         body: body, // `${event.object.name}`,
-         data: dbEvent,
-         icon: '/icons/icon-192x192.png',
-         badge: '/icons/badge3.png',
-         vibrate: [500, 100, 500],
-         tag: 'tag: sample'
-      }
-      // let notification = new Notification('direct:' + title, options)
-      // logD('notification=', notifications)
-      if ('actions' in Notification.prototype) {
-         // Action buttons are supported.
-         options.actions = [
-            {
-               action: 'goto',
-               title: 'перейти',
-               icon: '/icons/favicon-32x32.png',
-               handler: async () => {
-                  logD('action = go 1')
-                  // alert('goto 1')
-                  await router.push(makeRoutePath(dbEvent.object))
-               }
+   // if (registration) {
+   //    dbEvent = JSON.stringify(dbEvent)
+   //    const notificationTitle = title // `${event.type}`
+   //    let options = {
+   //       body: body, // `${event.object.name}`,
+   //       data: dbEvent,
+   //       icon: '/icons/icon-192x192.png',
+   //       badge: '/icons/badge3.png',
+   //       vibrate: [500, 100, 500],
+   //       tag: 'tag: sample'
+   //    }
+   //    // let notification = new Notification('direct:' + title, options)
+   //    // logD('notification=', notifications)
+   //    if ('actions' in Notification.prototype) {
+   //       // Action buttons are supported.
+   //       options.actions = [
+   //          {
+   //             action: 'goto',
+   //             title: 'перейти',
+   //             icon: '/icons/favicon-32x32.png',
+   //             handler: async () => {
+   //                logD('action = go 1')
+   //                // alert('goto 1')
+   //                await router.push(makeRoutePath(dbEvent.object))
+   //             }
+   //          }
+   //       ]
+   //    } else {
+   //       // Action buttons are NOT supported.
+   //    }
+   //    registration.showNotification(notificationTitle, options)
+   // }
+
+   dbEvent = typeof dbEvent === 'string' ? JSON.parse(dbEvent) : dbEvent
+   Notify.create(
+      {
+         position: 'top',
+         message: title,
+         actions: [{
+            label: i18n.t('goto...', 'перейти...'),
+            noDismiss: true,
+            handler: async () => {
+               await router.push(makeRoutePath(dbEvent.object))
             }
-         ]
-      } else {
-         // Action buttons are NOT supported.
+         }]
       }
-      registration.showNotification(notificationTitle, options)
-   }
+   )
 }
 
 export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith }

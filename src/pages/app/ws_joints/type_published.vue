@@ -3,7 +3,7 @@
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', minHeight: '100vh'}`).row.full-width.justify-start
     kalpa-loader(
       :immediate="true"
-      :query="query" :limit="1000"
+      :query="query" :limit="12"
       v-slot=`{items,next,nexting}`)
       div(:style=`{maxWidth: 700+'px'}`).row.full-width
         router-link(
@@ -108,6 +108,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          oidAuthor: this.sphereOid,
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
         },

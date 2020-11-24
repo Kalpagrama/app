@@ -27,15 +27,17 @@ let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, 
    cacheGraphQl,
    cacheVideo, messaging
 
-function sendMsg (type, msgData) {
-   self.clients.matchAll().then(all => all.map(client => client.postMessage({ type, msgData })))
+async function sendMsg (type, msgData) {
+   const all = await self.clients.matchAll()
+   // logD('sendMsg::messaging.self.clients.matchAll() = ', all)
+   for (const client of all) {
+      client.postMessage({ type, msgData })
+   }
 }
 
 // log
 {
-
-
-   logDbgFilter = 'gui'
+   logDbgFilter = 'sys'
    logLevel = 0
    logLevelSentry = 3
    /* global importScripts */
@@ -105,8 +107,8 @@ function sendMsg (type, msgData) {
    // /* global idbKeyval, MD5 */
    importScripts('/scripts/idb-keyval/idb-keyval-iife.min.js')
    importScripts('/scripts/md5.js')
-   importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js')
-   importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-messaging.js')
+   importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js')
+   importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-messaging.js')
    logD('swVer=', swVer)
    logD('init idb')
    swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
@@ -115,6 +117,7 @@ function sendMsg (type, msgData) {
 
    function initWebPush () {
       logD('try init web push with firebase...')
+      // console.log('try init web push with firebase')
       /* global firebase */
       firebase.initializeApp({
          apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
@@ -127,35 +130,36 @@ function sendMsg (type, msgData) {
          measurementId: 'G-D8QZ67XLM5'
       })
       logD('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
+      // console.log('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
       let i = 0
       if (firebase.messaging.isSupported()) {
          try {
             messaging = firebase.messaging()
             // messaging.useServiceWorker(self.registration)
-            messaging.setBackgroundMessageHandler(function (payload) {
-               logD('[firebase-messaging-sw.js] Received background message ', payload)
-
-               // Customize notification here
-               //todo use payload.notification.title & payload.notification.body
-               const dbEvent = JSON.parse(payload.data.event || '{}')
-               const notificationTitle = payload.data.title
-               const notificationOptions = {
-                  body: payload.data.body,
-                  data: dbEvent,
-                  icon: '/icons/icon-192x192.png',
-                  badge: '/icons/badge3.png',
-                  vibrate: [500, 100, 500],
-                  tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
-                  actions: [
-                     {
-                        action: 'goto',
-                        title: 'перейти к объекту',
-                        icon: '/icons/icon-192x192.png'
-                     }
-                  ]
-               }
-               return self.registration.showNotification(notificationTitle, notificationOptions)
-            })
+            // messaging.setBackgroundMessageHandler(function (payload) {
+            //    logD('[firebase-messaging-sw.js] Received background message ')
+            //    console.log('[firebase-messaging-sw.js] Received background message ')
+            //    // Customize notification here
+            //    //todo use payload.notification.title & payload.notification.body
+            //    const dbEvent = JSON.parse(payload.data.event || '{}')
+            //    const notificationTitle = payload.data.title
+            //    const notificationOptions = {
+            //       body: payload.data.body,
+            //       data: dbEvent,
+            //       icon: '/icons/icon-192x192.png',
+            //       badge: '/icons/badge3.png',
+            //       vibrate: [500, 100, 500],
+            //       tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
+            //       actions: [
+            //          {
+            //             action: 'goto',
+            //             title: 'перейти к объекту',
+            //             icon: '/icons/icon-192x192.png'
+            //          }
+            //       ]
+            //    }
+            //    return self.registration.showNotification(notificationTitle, notificationOptions)
+            // })
          } catch (err) {
             logC('firebase init error!', err)
          }
@@ -221,12 +225,13 @@ function sendMsg (type, msgData) {
       })
       self.addEventListener('activate', event => {
          logD('activated!', swVer)
-         // if (messaging) {
-         //   messaging.getToken().then(token => {
-         //     logD('messaging.getToken() = ', token)
-         //     webPushToken = token
-         //   }).catch(err => logC('error on messaging.getToken(): ', err))
-         // }
+         const sendToken = async () => {
+            await clients.claim() // перевести всех клиентов на себя
+            let token = await messaging.getToken()
+            await sendMsg('webPushToken', token) // послать всем новый токен
+            await sendMsg('swVer', swVer)
+         }
+         event.waitUntil(sendToken()) // пришел новый сервис-воркер - отправить всем новый webPushToken
       })
       self.addEventListener('fetch', async event => {
          // logD('ready to handle fetches! request=', event.request)
@@ -240,51 +245,56 @@ function sendMsg (type, msgData) {
       })
       self.addEventListener('message', function handler (event) {
          logD('message!', event.data)
-         if (event.data) {
-            switch (event.data.type) {
-               case 'logInit':
-                  logDbgFilter = event.data.logDbgFilter
-                  logLevel = event.data.logLevel
-                  logLevelSentry = event.data.logLevelSentry
-                  break
-               // case 'precacheAndRoute':
-               //    if(!self.precacheAndRouteExecuted){
-               //       // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-               //       logD('precacheAndRoute', __WB_MANIFEST_TMP)
-               //       precacheAndRoute(__WB_MANIFEST_TMP)
-               //       self.precacheAndRouteExecuted = true
-               //    }
-               //    break
-               case 'skipWaiting':
-                  self.skipWaiting()
-                  break
-               case 'sendVersion':
-                  sendMsg('swVer', swVer)
-                  break
-               case 'sendWebPushToken':
-                  if (messaging) {
-                     messaging.getToken().then(token => {
-                        logD('messaging.getToken() = ', token)
-                        sendMsg('webPushToken', token)
-                     }).catch(err => logC('error on messaging.getToken(): ', err))
-                  }
-                  // sendMsg('webPushToken', webPushToken)
-                  break
-               default:
-                  logC('bad event.data.type', event.data.type)
+         const doFunc = async () => {
+            if (event.data) {
+               switch (event.data.type) {
+                  case 'logInit':
+                     logDbgFilter = event.data.logDbgFilter
+                     logLevel = event.data.logLevel
+                     logLevelSentry = event.data.logLevelSentry
+                     break
+                  // case 'precacheAndRoute':
+                  //    if(!self.precacheAndRouteExecuted){
+                  //       // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+                  //       logD('precacheAndRoute', __WB_MANIFEST_TMP)
+                  //       precacheAndRoute(__WB_MANIFEST_TMP)
+                  //       self.precacheAndRouteExecuted = true
+                  //    }
+                  //    break
+                  case 'skipWaiting':
+                     self.skipWaiting()
+                     break
+                  case 'sendVersion':
+                     await sendMsg('swVer', swVer)
+                     break
+                  case 'sendWebPushToken':
+                     logD('sendWebPushToken message!')
+                     if (messaging) {
+                        messaging.getToken().then(async token => {
+                           logD('messaging.getToken() = ', token)
+                           await sendMsg('webPushToken', token)
+                        }).catch(err => logC('error on messaging.getToken(): ', err))
+                     }
+                     // sendMsg('webPushToken', webPushToken)
+                     break
+                  default:
+                     logC('bad event.data.type', event.data.type)
+               }
+            } else {
+               logC('event.data is null')
             }
-         } else {
-            logC('event.data is null')
          }
+         event.waitUntil(doFunc())
+
       })
       self.addEventListener('notificationclick', function (event) {
          logD('notificationclick', event)
-         logD('notificationclick', event.notification.data)
-         event.notification.close()
-         const dbEvent = event.notification.data
-         logD('notificationclick dbEvent', dbEvent)
+         // console.log('push notificationclick = ', event)
 
-         let route = makeRoutePath(dbEvent.object) || '/'
+         event.notification.close()
+         const dbEvent = typeof event.notification.data === 'string' ? JSON.parse(event.notification.data) : event.notification.data
+         let route = makeRoutePath(dbEvent.object, true) || '/'
+         // console.log('notificationclick:', dbEvent, route)
          event.waitUntil(
             // Получаем список клиентов SW.
             self.clients.matchAll({ type: 'window' }).then(function (clientList) {
@@ -292,45 +302,56 @@ function sendMsg (type, msgData) {
                if (clientList.length > 0) {
                   if ('navigate' in clientList[0]) {
                      clientList[0].focus()
-                     clientList[0].navigate(route)
+                     clientList[0].navigate(makeRoutePath(dbEvent.object) || '/')
                      return
                   }
                }
                // В противном случае открываем новую страницу.
-               return self.clients.openWindow(route)
+               return self.clients.openWindow(makeRoutePath(dbEvent.object, true) || '/')
             })
          )
       }, false)
       self.addEventListener('push', function (event) {
          logD('push event recieved = ', event)
-         let payload = event.data ? event.data.text() : 'Alohomora'
+         // console.log('push event recieved = ', event)
+
+         let payload = JSON.parse(event.data ? event.data.text() : '{}');
+         // console.log('push message recieved = ', payload)
 
          event.waitUntil(
             // Получить список клиентов для SW
             self.clients.matchAll().then(function (clientList) {
                // Проверяем, есть ли хотя бы один сфокусированный клиент.
                var focused = clientList.some(function (client) {
-                  return client.focused
+                  return client.focused // есть клиент. Сообщение не показываем (надо отловить внутри клиента)
                })
 
                var notificationMessage
                if (focused) {
-                  notificationMessage = 'Imperio! You\'re still here, thanks!'
+                  // * 1, страница сфокусирована;
                } else if (clientList.length > 0) {
-                  notificationMessage = 'Imperio! You haven\'t closed the page, ' +
-                     'click here to focus it!'
+                  // * 2, страница по-прежнему открыта, но не сфокусирована;
                } else {
-                  notificationMessage = 'Imperio! You have closed the page, ' +
-                     'click here to re-open it!'
+                  // * 3, страница закрыта).
                }
-               // Показывать уведомление с заголовком «Unforgiveable Curses»
-               // и телом в зависимости от состоянию клиентов SW
-               // * 1, страница сфокусирована;
-               // * 2, страница по-прежнему открыта, но не сфокусирована;
-               // * 3, страница закрыта).
-               // return self.registration.showNotification('Unforgiveable Curses', {
-               //    body: notificationMessage
-               // })
+               const dbEvent = JSON.parse(payload.data.event || '{}')
+               const notificationTitle = payload.data.title
+               const notificationOptions = {
+                  body: payload.data.body,
+                  data: dbEvent,
+                  icon: '/icons/icon-192x192.png',
+                  badge: '/icons/badge3.png',
+                  vibrate: [500, 100, 500],
+                  tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
+                  actions: [
+                     {
+                        action: 'goto',
+                        title: 'перейти к объекту',
+                        icon: '/icons/icon-192x192.png'
+                     }
+                  ]
+               }
+               return self.registration.showNotification(notificationTitle, notificationOptions)
             })
          )
       })
@@ -492,7 +513,7 @@ if (useCache) {
       registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({ cacheName: 'google' }))
       registerRoute(/\/(icons|other|scripts)\/.*$/, new CacheFirst({ cacheName: 'static' }))
       // content images
-      registerRoute(/^http.*(kalpa\.store).+\.jpg$/,
+      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.jpg$/,
          new CacheFirst({
             cacheName: 'content_img',
             plugins: [
@@ -525,7 +546,7 @@ if (useCache) {
 
       // vue router ( /menu /create etc look at index.html)
       registerRoute(vueRoutesRegexp, async ({ url, event, params }) => {
-         logD('vue router 1', url, getCacheKeyForURL('/index.html'))
+         // logD('vue router 1', url, getCacheKeyForURL('/index.html'))
          if (getCacheKeyForURL('/index.html')) {
             return caches.match(getCacheKeyForURL('/index.html'))
          } else {
