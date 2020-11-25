@@ -32,59 +32,70 @@
         ).col-6
         div(
           :style=`{
-            //- height: '100px',
             position: 'relative',
-            paddingTop: '100%',
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
-          }`).row
-          div(
-            v-if="itemActive !== ii"
-            @click="itemActive = ii"
-            :style=`{
-              position: 'absolute', zIndex: 110, top: 0,
-            }`
-            ).row.fit
+          }`
+          ).row.full-width
           div(
             :style=`{
-              position: 'absolute', zIndex: 100, top: 0,
-            }`
-            ).row.fit
-            composition-player(
-              v-if="item.type === 'NODE'"
-              :composition="item.items[0]"
-              :isActive="isActive && itemActive === ii"
-              :isVisible="isVisible"
-              :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-            img(
-              v-else
-              :src="item.thumbUrl"
+              position: 'relative',
+              paddingTop: '100%',
+            }`).row.full-width
+            div(
+              v-if="itemActive !== ii"
+              @click="itemActive = ii"
               :style=`{
-                borderRadius: '10px',
-                objectFit: 'cover',
-                borderRadius: '10px',
+                position: 'absolute', zIndex: 110, top: 0,
               }`
-              ).fit.b-30
-            //- tint
+              ).row.fit
             div(
               :style=`{
-                position: 'absolute', bottom: '-0.8px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
-                //- background: 'rgb(0,0,0)',
-                background: 'linear-gradient(0deg, rgba(5,5,5,0.9) 30%, rgba(0,0,0,0) 100%)',
-                borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
-              }`).row.full-width
-            //- name
-            div(
-              :style=`{
-                position: 'absolute', zIndex: 2010, bottom: 0
+                position: 'absolute', zIndex: 100, top: 0,
               }`
-              ).row.full-width.q-pa-sm
-              .row.full-width.scroll
-                div(
-                  :style=`{
-                    maxHeight: '40px',
-                  }`
-                  ).row.no-wrap
-                  span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
+              ).row.fit
+              composition-player(
+                v-if="item.type === 'NODE'"
+                :composition="item.items[0]"
+                :isActive="isActive && itemActive === ii"
+                :isVisible="isVisible"
+                :options=`{height: '100%', objectFit: 'cover', loop: true}`)
+              img(
+                v-else
+                :src="item.thumbUrl"
+                :style=`{
+                  borderRadius: '10px',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                }`
+                ).fit.b-30
+              //- tint
+              div(
+                :style=`{
+                  position: 'absolute', bottom: '-0.8px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
+                  //- background: 'rgb(0,0,0)',
+                  background: 'linear-gradient(0deg, rgba(5,5,5,0.9) 30%, rgba(0,0,0,0) 100%)',
+                  borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
+                }`).row.full-width
+              //- name
+              div(
+                :style=`{
+                  position: 'absolute', zIndex: 2010, bottom: 0
+                }`
+                ).row.full-width.q-pa-sm
+                .row.full-width.scroll
+                  div(
+                    :style=`{
+                      maxHeight: '40px',
+                    }`
+                    ).row.no-wrap
+                    span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
+          //- item.type
+          //- joint.vertices[ii] !== 'ASSOCIATIVE'
+          div(
+            v-if="joint.vertices[ii] && joint.vertices[ii] !== 'ASSOCIATIVE'"
+            ).row.full-width.justify-center
+            span.text-white {{ itemType(ii).name }}
+      //- link btn
       q-btn(
         round flat color="green" icon="link" size="lg"
         :style=`{position: 'absolute', zIndex: 100, bottom: 'calc(50% - 30.5px)', left: 'calc(50% - 30.5px)',}`)
@@ -120,7 +131,6 @@ export default {
   },
   components: {
     compositionPlayer,
-    // jointItem: () => import('components/joint/joint_item.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
   data () {
@@ -140,7 +150,7 @@ export default {
         {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
         {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
         {id: 'TRUE', name: 'Опровержение', pair: 'FALSE'},
-        {id: 'FALSE', name: 'Фэйк', pair: 'TRUE'},
+        {id: 'FALSE', name: 'Факт', pair: 'TRUE'},
         {id: 'FROM', name: 'Факт', pair: 'TO'},
         {id: 'TO', name: 'Подтверждение', pair: 'FROM'},
       ]
@@ -157,18 +167,12 @@ export default {
     }
   },
   methods: {
+    itemType (index) {
+      return this.itemTypes.find(i => i.id === this.joint.vertices[index])
+    },
     jointClick () {
       this.$log('jointClick')
       this.$router.push(`/joint/${this.joint.oid}`).catch(e => e)
-    },
-    getItemTypeName (index, val) {
-      // this.$log('getItemTypeName', index, val)
-      if (['ESSENCE', 'ASSOCIATIVE'].includes(val)) return ''
-      else {
-        let t = this.types.find(t => t.id === val)
-        // this.$log('t', t)
-        return t.names[index]
-      }
     }
   },
   async mounted () {
