@@ -18,7 +18,7 @@ const ActionEnum = Object.freeze({
 
 class AuthApi {
    static getRole () {
-      return rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
+      return rxdb && rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
    }
 
    static isGuest () {

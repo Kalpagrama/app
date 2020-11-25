@@ -8,7 +8,6 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 
 function startPage () {
-   console.log('!!!!!!!!!!!!!!!!!!!startPage')
    let res = '/home'
    if (AuthApi.isGuest()) res = '/trends'
    return res

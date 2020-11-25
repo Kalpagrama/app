@@ -28,8 +28,19 @@ async function systemInit () {
    }
 }
 
+async function initSessionStorage () {
+   if (process.env.MODE === 'ssr') {
+      const {initSessionStorage} = await import('src/system/services_ssr')
+      await initSessionStorage()
+   } else {
+      const {initSessionStorage} = await import('src/system/services_browser')
+      await initSessionStorage()
+   }
+}
+
 export {
    initApplication,
    systemReset,
-   systemInit
+   systemInit,
+   initSessionStorage
 }

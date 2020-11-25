@@ -73,13 +73,15 @@ class Logger {
    }
 
    init () {
-      let logLevel = sessionStorage.getItem('k_log_level')
-      let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))
-      let logDbgFilter = sessionStorage.getItem('k_log_filter')
-      assert(logLevel && logFormat && logDbgFilter, '!this.logLevel && this.logFormat && this.logDbgFilter')
-      this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
-      this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
-      this.store.commit('core/stateSet', ['logFormat', logFormat])
+      if (sessionStorage) {
+         let logLevel = sessionStorage.getItem('k_log_level')
+         let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))
+         let logDbgFilter = sessionStorage.getItem('k_log_filter')
+         assert(logLevel && logFormat && logDbgFilter, '!this.logLevel && this.logFormat && this.logDbgFilter')
+         this.store.commit('core/stateSet', ['logLevel', parseInt(logLevel)])
+         this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
+         this.store.commit('core/stateSet', ['logFormat', logFormat])
+      }
    }
 
    randomInteger (min, max) {
@@ -228,9 +230,7 @@ function getLogFunc (level, module) {
 
 export default async ({ Vue, store, app }) => {
    try {
-      // import { initSessionStorage } from 'src/system/services'
-      await require('src/system/services_browser').initSessionStorage()
-      // await initSessionStorage()
+      await require('src/system/services').initSessionStorage()
       const detectModuleName = (thiz) => {
          if (thiz && thiz.logModuleName) {
             return thiz.logModuleName
