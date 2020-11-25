@@ -145,6 +145,7 @@ class ObjectCreateApi {
             composition: ObjectCreateApi.makeCompositionInput(i)
          }
       })
+      nodeInput.vertices = []
       return nodeInput
    }
 
@@ -179,11 +180,11 @@ class ObjectCreateApi {
 
    static makeJointInput (joint) {
       let chainInput = {}
-      assert(joint.leftItem.oid || joint.leftItem.node, '!joint.leftItem.oid')
-      assert(joint.rightItem.oid || joint.rightItem.node, '!joint.rightItem.oid')
+      assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
+      assert(joint.rightItem.oid || joint.rightItem.nodeInput, '!joint.rightItem.oid')
       assert(joint.jointType, '!joint.jointType')
-      if (joint.leftItem.node) joint.leftItem.node = ObjectCreateApi.makeNodeInput(joint.leftItem.node)
-      if (joint.rightItem.node) joint.rightItem.node = ObjectCreateApi.makeNodeInput(joint.rightItem.node)
+      if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeNodeInput(joint.leftItem.nodeInput)
+      if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeNodeInput(joint.rightItem.nodeInput)
       return {
          swap: joint.swap || false,
          jointType: joint.jointType,
