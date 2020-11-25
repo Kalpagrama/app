@@ -237,7 +237,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     vertices
   }
 `
-const jointFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
+const jointFragment = gql`${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
 fragment jointFragment on Joint {
     ...objectFragment
     sphereFromName{...objectShortFragment}
@@ -264,6 +264,11 @@ fragment jointFragment on Joint {
     category
     layout
     items {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
         ...on Composition {...compositionFragment}
     }
     vertices
