@@ -2,7 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
-import { LstCollectionEnum } from 'src/system/rxdb/lists'
+import { LstCollectionEnum } from 'src/system/rxdb/common'
 import { apiCall } from 'src/api/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)

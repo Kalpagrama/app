@@ -1,22 +1,14 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { rxdb } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum, LstCollectionEnum } from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactiveDoc, updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
-
-const LstCollectionEnum = Object.freeze({
-  LST_SPHERE_ITEMS: 'LST_SPHERE_ITEMS', // элементы на сфере
-  LST_FEED: 'LST_FEED',
-  LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
-  LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
-  LST_SEARCH: 'LST_SEARCH' // подписки пользователя
-})
 
 function makeListCacheId (mangoQuery) {
   assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 3' + JSON.stringify(mangoQuery))
@@ -300,4 +292,4 @@ class Lists {
   }
 }
 
-export { Lists, LstCollectionEnum }
+export { Lists }

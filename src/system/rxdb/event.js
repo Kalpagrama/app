@@ -3,8 +3,9 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
-import { getReactiveDoc, rxdb } from 'src/system/rxdb'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { rxdb } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
+import { getReactiveDoc } from 'src/system/rxdb/reactive'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)

@@ -1,7 +1,3 @@
-// import VueI18n from 'vue-i18n'
-// import messages from 'src/i18n'
-
-import { initApplication } from 'src/system/services'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
@@ -18,8 +14,11 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
   try {
     // alert('SYSTEM router init')
     router = VueRouter
-    Vue.prototype.$systemUtils = await initApplication()
-    // await initApplication()
+    if (process.env.MODE === 'ssr') {
+    } else {
+      const {initApplication} = await import('src/system/services')
+      Vue.prototype.$systemUtils = await initApplication()
+    }
   } catch (err) {
     logC(err)
     throw err // без initApplication работать не можем!

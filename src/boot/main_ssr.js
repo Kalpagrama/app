@@ -31,23 +31,13 @@ const time = (sec) => {
   return result
 }
 
-export default async ({ Vue, store: storeVue, router: VueRouter }) => {
+export default async ({ Vue, store: storeVue, router: VueRouter, ssrContext }) => {
   try {
-    if (!window.stores) window.stores = {}
     Vue.use(VueMasonry)
-    // Vue.use(VueYandexMetrika, {
-    //   id: 60818698,
-    //   router: router,
-    //   // env: process.env.NODE_ENV
-    //   // other options
-    // })
-    // Vue.use(Viewer)
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
-    // quasar stuff
-    // Screen.setSizes({ xs: 600, sm: 900, md: 1260, lg: 1600, xl: 1900 })
 
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {

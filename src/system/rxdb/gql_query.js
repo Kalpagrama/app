@@ -1,7 +1,8 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb, makeId, getRawIdFromId } from 'src/system/rxdb/index'
+import { getRawIdFromId } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { AuthApi } from 'src/api/auth'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ObjectApi } from 'src/api/object'
