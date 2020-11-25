@@ -57,12 +57,24 @@
       @click.self="jointClick()"
       :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
       div(
-        v-for="(item,ii) in [joint.leftItem, joint.rightItem]" :key="ii"
+        v-for="(item,ii) in joint.items" :key="ii"
         :style=`{
           //- maxWidth: ii === 0 ? '100%' : '60px'
         }`
         ).col-6
-        joint-item(
+        div(
+          :style=`{
+            height: '100px',
+            transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
+          }`).row
+          img(
+            :src="item.thumbUrl"
+            :style=`{
+              borderRadius: '10px',
+              objectFit: 'cover',
+            }`
+            ).fit
+        //- joint-item(
           @activated="itemActive = ii"
           :joint="joint"
           :item="item"
