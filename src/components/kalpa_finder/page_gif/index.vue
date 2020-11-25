@@ -41,7 +41,15 @@ q-page(
               borderRadius: '10px', overflow: 'hidden',
             }`
             ).row.full-width.items-start.content-start.q-mb-sm
-            slot(name="tint" :item="gif" :itemKey="gif.id")
+            slot(
+              name="tint"
+              :item=`{
+                oid: null,
+                type: 'GIF',
+                thumbUrl: gif.media[0]['tinygif']['url'],
+                url: gif.media[0]['gif']['url']
+              }`
+              :itemKey="gif.id")
             //- img
             img(
               :src="gif.media[0]['tinygif']['url']"

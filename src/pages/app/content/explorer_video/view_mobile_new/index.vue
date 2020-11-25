@@ -208,11 +208,11 @@ export default {
               {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
             ],
             operation: { items: null, operations: null, type: 'CONCAT'},
-            meta: {cover: false, loop: true}
           }
         ]
       }
-      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      // let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      let node = nodeInput
       this.$log('nodeCreate node', node)
       return node
     },

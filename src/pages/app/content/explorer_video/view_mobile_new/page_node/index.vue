@@ -60,7 +60,7 @@ q-page(
       ).row.full-width.items-start.content-start.justify-center
       //- name top
       div(
-        v-if="rightItem"
+        v-if="node.items[1]"
         :style=`{
           position: 'relative',
           marginTop: '-20px',
@@ -81,20 +81,21 @@ q-page(
       .row.full-width
         edit-name(
           :node="node"
-          :placeholder="rightItem ? 'В чем связь?' : 'В чем суть?'")
+          :placeholder="'В чем суть?'")
       //- add
       .row.full-width.q-mb-sm
         item-editor(
-          v-if="rightItem"
-          :item="rightItem")
+          v-if="node.items[1]"
+          @item="rightItemUpdated"
+          :item="node.items[1]")
         //- join toggle
         div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
           q-btn(
             @click="rightItemToggle()"
             flat no-caps
-            :color="rightItem ? 'red' : 'green'"
+            :color="node.items[1] ? 'red' : 'green'"
             :style=`{
-            }`).fit {{ rightItem ? 'Убрать связь' : 'Добавить связь' }}
+            }`).fit {{ node.items[1] ? 'Убрать связь' : 'Добавить связь' }}
       //- spheres & category
       div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
         ws-sphere-editor(:item="node")
@@ -104,7 +105,7 @@ q-page(
   .row.full-width.justify-center
     div(:style=`{maxWidth: '620px',paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.q-py-sm
       q-btn(
-        @click="$emit('close')"
+        @click="cancel()"
         flat color="grey-4" no-caps
         :style=`{background: 'rgb(35,35,35)',}`).q-mr-sm Закрыть
       q-btn(
@@ -115,6 +116,7 @@ q-page(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import itemEditor from './item_editor.vue'
 
@@ -132,8 +134,9 @@ export default {
       // contentFinderShow: false,
       leftItemEditorShow: true,
       rightItemFinderShow: false,
-      rightItem: null,
-      joining: false,
+      // rightItem: null,
+      // joining: false,
+      publishing: false,
     }
   },
   computed: {
@@ -142,11 +145,15 @@ export default {
     },
   },
   methods: {
+    rightItemUpdated (item) {
+      this.$log('rightItemUpdated', item)
+      this.$set(this.node.items, 1, item)
+    },
     rightItemToggle () {
       this.$log('rightItemToggle')
-      if (this.rightItem) {
+      if (this.node.items[1]) {
         // close joining shit
-        this.rightItem = null
+        this.node.items = [this.node.items[0]]
       }
       else {
         // open content finder...
@@ -158,39 +165,80 @@ export default {
       this.$log('contentKalpaFound', contentKalpa)
       this.rightItemFound(contentKalpa)
     },
-    rightItemFound (item) {
+    async rightItemFound (item) {
       this.$log('itemFound', item)
       this.rightItemFinderShow = false
       // from ws
       if (item.wsItemType) {
+        // WS_BOOKMARK
         if (item.wsItemType === 'WS_BOOKMARK') {
           if (item.type === 'VIDEO') {
-            alert('ws_bookmark.video')
-            // this.rightItem
-            // create node...
+            // alert('ws_bookmark.VIDEO')
+            item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+            this.$set(this.node.items, 1, JSON.parse(JSON.stringify(item)))
+            // this.node.items[1] = item
           }
           else if (item.type === 'IMAGE') {
-            alert('ws_bookmark.image')
-            // create node...
+            item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+            this.node.items[1] = item
+          }
+          else if (item.type === 'NODE') {
+            item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+            this.node.items[1] = item
           }
         }
+        // WS_NODE
         if (item.wsItemType === 'WS_NODE') {
-          alert('ws_node')
+          this.node.items[1] = item
         }
+        // WS_JOINT?
+        // WS_SPHERE?
       }
       // from kalpa, published
       else {
         if (item.type === 'VIDEO') {
-          this.rightItem = item
+          alert('VIDEO')
+          this.node.items[1] = item
         }
         else if (item.type === 'IMAGE') {
+          this.node.items[1] = item
+        }
+        else if (item.type === 'NODE') {
+          // ?
+        }
+        else if (item.type === 'USER') {
+          // ?
+        }
+        else if (['SPHERE', 'WORD', 'SENTENCE'].includes(item.type)) {
+          // ?
         }
         else if (item.type === 'GIF') {
+          alert('content.GIF')
+          this.node.items[1] = item
         }
       }
     },
-    publish () {
-      console.log('publish')
+    async publish () {
+      try {
+        this.$log('publish start')
+        this.publishing = true
+        await this.$wait(1000)
+        // rightItem ? joint : node...
+        // publish content... content&content
+        // publish node... node&content
+        // publish user... node
+        // here we have node&[content,user,sphere,node]
+        this.$log('publish done')
+        this.publishing = false
+      }
+      catch (e) {
+        this.$log('publish error', e)
+        this.publishing = false
+      }
+    },
+    cancel () {
+      this.$log('cancel')
+      // this.$emit('close')
     }
   }
 }

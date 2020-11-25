@@ -84,6 +84,50 @@
       q-btn(
         round flat color="green" icon="link"
         :style=`{position: 'absolute', zIndex: 100, bottom: '20px', left: 'calc(50% - 20px)',}`)
+    //- items left/right 80/20
+    //- div(
+      :style=`{
+        position: 'relative',
+        borderRadius: '10px',
+      }`).row.full-width.justify-start
+      div(
+        @click="rightItemOpened = false"
+        :style=`{
+          maxWidth: 'calc(100% - 60px)',
+          zIndex: rightItemOpened ? 100 : 200,
+          clipPath: rightItemOpened ? 'inset(0px calc(100% - 70px) 0px 0px)' : 'none',
+        }`).row.full-width.items-start.content-start
+        img(
+          :src="joint.leftItem.thumbUrl"
+          :style=`{
+            borderRadius: '10px',
+            maxHeight: $q.screen.width+'px',
+            objectFit: 'cover',
+            borderTop: '3px solid rgb(40,40,40)',
+            borderBottom: '3px solid rgb(40,40,40)',
+            borderRight: '3px solid rgb(40,40,40)',
+            opacity: rightItemOpened ? 0.6 : 1,
+          }`).full-width
+      div(
+        @click="rightItemOpened = true"
+        :style=`{
+          position: 'absolute',
+          zIndex: rightItemOpened ? 200 : 100,
+          top: 0,
+          right: 0,
+          maxWidth: 'calc(100% - 60px)',
+        }`
+        ).row.fit
+        img(
+          :src="joint.rightItem.thumbUrl"
+          :style=`{
+            objectFit: 'cover',
+            borderRadius: '10px',
+            borderTop: '3px solid rgb(40,40,40)',
+            borderBottom: '3px solid rgb(40,40,40)',
+            borderLeft: '3px solid rgb(40,40,40)',
+            opacity: rightItemOpened ? 1 : 0.6,
+          }`).fit
     //- items left/right mini/maxi
     //- div().row.full-width.items-end.content-end
       div(
@@ -93,7 +137,7 @@
           :joint="joint"
           :item="item"
           :isActive="isActive" :isVisible="isVisible"
-          :mini="mini"
+          :mini="mini"s
           :style=`{
             //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
           }`)
@@ -135,6 +179,7 @@ export default {
       stats: null,
       itemOpened: 0,
       itemActive: 0,
+      rightItemOpened: false,
     }
   },
   computed: {
