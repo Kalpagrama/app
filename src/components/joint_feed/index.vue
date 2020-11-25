@@ -4,10 +4,9 @@
     @click.self="jointClick()"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
-      //- background: 'rgb(35,35,35)',
     }`
     ).row.full-width.b-40
-    //- authors
+    //- author
     div(
       v-if="showHeader"
       ).row.full-width.items-center.content-center.q-pa-xs
@@ -21,38 +20,7 @@
       small.text-grey-8.q-mr-xs {{ joint.countViews }}
       q-icon(name="visibility" color="grey-8").q-mr-md
       small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
-    //- items top/bottom
-    //- div().row.full-width.items-start.content-start
-      //- left item
-      .row.full-width.q-px-sm
-        div(
-          :style=`{
-            borderRadius: '10px',
-            background: 'rgb(45,45,45)',
-          }`
-          ).row.full-width
-          img(
-            draggable="false"
-            :src="joint.leftItem.thumbUrl"
-            :style=`{
-              height: '80px',
-              borderRadius: '10px', overflow: 'hidden',
-            }`)
-          .col
-            .row.fit.items-start.content-start.q-pa-md
-              span.text-white.text-bold {{ joint.leftItem.name }}
-      //- right item
-      div(:style=`{}`).row.full-width.q-pt-md
-        joint-item(
-          :joint="joint"
-          :item="joint.rightItem"
-          :isActive="isActive" :isVisible="isVisible"
-          :mini="mini"
-          :style=`{
-            //- position: 'absolute', zIndex: 100, top: 0,
-            //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
-          }`)
-    //- items left/right
+    //- items
     div(
       @click.self="jointClick()"
       :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
@@ -64,51 +32,62 @@
         ).col-6
         div(
           :style=`{
-            height: '100px',
+            //- height: '100px',
+            position: 'relative',
+            paddingTop: '100%',
             transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
           }`).row
-          img(
-            :src="item.thumbUrl"
+          div(
+            v-if="itemActive !== ii"
+            @click="itemActive = ii"
             :style=`{
-              borderRadius: '10px',
-              objectFit: 'cover',
+              position: 'absolute', zIndex: 110, top: 0,
             }`
-            ).fit
-        //- joint-item(
-          @activated="itemActive = ii"
-          :joint="joint"
-          :item="item"
-          :isActive="isActive && itemActive === ii" :isVisible="true"
-          :mini="mini"
-          :style=`{
-            transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
-          }`)
-          template(v-slot:footer)
-            div(
-              v-if="!['ESSENCE', 'ASSOCIATIVE'].includes(joint.jointType)"
-              :class=`{
-                'justify-end': ii === 0
-              }`
+            ).row.fit
+          div(
+            :style=`{
+              position: 'absolute', zIndex: 100, top: 0,
+            }`
+            ).row.fit
+            composition-player(
+              v-if="item.type === 'NODE'"
+              :composition="item.items[0]"
+              :isActive="isActive && itemActive === ii"
+              :isVisible="isVisible"
+              :options=`{height: '100%', objectFit: 'cover', loop: true}`)
+            img(
+              v-else
+              :src="item.thumbUrl"
               :style=`{
-                height: '24px',
-              }`).row.full-width.items-center.content-center.q-px-sm
-              span.text-white.text-bold {{ getItemTypeName(ii, joint.jointType) }}
+                borderRadius: '10px',
+                objectFit: 'cover',
+                borderRadius: '10px',
+              }`
+              ).fit.b-30
+            //- tint
+            div(
+              :style=`{
+                position: 'absolute', bottom: '-0.8px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
+                //- background: 'rgb(0,0,0)',
+                background: 'linear-gradient(0deg, rgba(5,5,5,0.9) 30%, rgba(0,0,0,0) 100%)',
+                borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
+              }`).row.full-width
+            //- name
+            div(
+              :style=`{
+                position: 'absolute', zIndex: 2010, bottom: 0
+              }`
+              ).row.full-width.q-pa-sm
+              .row.full-width.scroll
+                div(
+                  :style=`{
+                    maxHeight: '40px',
+                  }`
+                  ).row.no-wrap
+                  span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
       q-btn(
-        round flat color="green" icon="link"
-        :style=`{position: 'absolute', zIndex: 100, bottom: '20px', left: 'calc(50% - 20px)',}`)
-    //- items left/right mini/maxi
-    //- div().row.full-width.items-end.content-end
-      div(
-        v-for="(item,ii) in [joint.leftItem, joint.rightItem]"
-        :style=`{maxWidth: itemOpened === ii ? '100%' : '50%',}`).col
-        joint-item(
-          :joint="joint"
-          :item="item"
-          :isActive="isActive" :isVisible="isVisible"
-          :mini="mini"
-          :style=`{
-            //- transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)'
-          }`)
+        round flat color="green" icon="link" size="lg"
+        :style=`{position: 'absolute', zIndex: 100, bottom: 'calc(50% - 30.5px)', left: 'calc(50% - 30.5px)',}`)
     //- name
     div(
       v-if="joint.name.length > 0"
@@ -127,6 +106,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
   name: 'jointFeed',
@@ -139,7 +119,8 @@ export default {
     mini: {type: Boolean, default: false}
   },
   components: {
-    jointItem: () => import('components/joint/joint_item.vue'),
+    compositionPlayer,
+    // jointItem: () => import('components/joint/joint_item.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
   data () {
