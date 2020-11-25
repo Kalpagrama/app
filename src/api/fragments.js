@@ -235,13 +235,38 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     ...on Composition {...compositionFragment}
     }
     vertices
-    #    jointsWithEmojis{...objectShortJointFragment}
-    #    jointsWithSpheres{...objectShortJointFragment}
   }
 `
-const jointFragment = gql` ${nodeFragment}
+const jointFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
 fragment jointFragment on Joint {
-    ...nodeFragment
+    ...objectFragment
+    sphereFromName{...objectShortFragment}
+    rate
+    weight
+    rateStat {percent, weight, count}
+    rateUser
+    countVotes
+    countViews
+    countJoints
+    countRemakes
+    countShares
+    countBookmarks
+    author {
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 50)
+    }
+    spheres {
+        oid
+        name
+    }
+    category
+    layout
+    items {
+        ...on Composition {...compositionFragment}
+    }
+    vertices
 }
 `
 
