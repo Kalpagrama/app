@@ -12,12 +12,13 @@ import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists } from 'src/system/rxdb/lists'
 import { getReactiveDoc, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
-import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
+import { mutexGlobal } from 'src/system/rxdb/mutex_global'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { setSyncEventStorageValue } from 'src/system/services'
+import { setSyncEventStorageValue } from 'src/system/services_browser'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)

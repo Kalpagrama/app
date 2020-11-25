@@ -8,7 +8,7 @@ import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
 import assert from 'assert'
-import { shareIn } from 'src/system/services'
+import { shareIn } from 'src/system/services_browser'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)

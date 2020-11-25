@@ -3,6 +3,7 @@ import {RxCollectionEnum} from 'src/system/rxdb/common'
 let rxdb
 
 async function initRxdb(store){
+   console.log('!!!!!!!!!!!!!!!!!!!initRxdb')
    if (process.env.MODE === 'ssr') {
       const {rxdbDummy} = await import('src/system/rxdb/index_ssr')
       rxdb = rxdbDummy

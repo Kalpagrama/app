@@ -16,7 +16,7 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
     router = VueRouter
     if (process.env.MODE === 'ssr') {
     } else {
-      const {initApplication} = await import('src/system/services')
+      const {initApplication} = await import('src/system/services_browser')
       Vue.prototype.$systemUtils = await initApplication()
     }
   } catch (err) {

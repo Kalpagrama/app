@@ -63,11 +63,13 @@ class Logger {
       this.loggerFuncs = {}
       // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
       this.init()
-      window.addEventListener('storage', async (event) => {
-         if (event.key && event.key.in('k_log_level', 'k_log_format', 'k_log_filter')) {
-            this.init()
-         }
-      })
+      if (window) {
+         window.addEventListener('storage', async (event) => {
+            if (event.key && event.key.in('k_log_level', 'k_log_format', 'k_log_filter')) {
+               this.init()
+            }
+         })
+      }
    }
 
    init () {
@@ -185,7 +187,7 @@ class Logger {
       try {
          if (showAlert) this.showAlert(msg)
          let reload = confirm('critical error: ' + JSON.stringify(...msg) + '\n\nReload page?')
-         if (reload) window.location.reload()
+         if (reload && window) window.location.reload()
          if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
             this.prepareParams(msg)
             console.error(...msg)
@@ -224,28 +226,10 @@ function getLogFunc (level, module) {
    }
 }
 
-class DummyWindow {
-   addEventListener () {
-
-   }
-}
-class DummyLocalStorage {
-   setItem(key, value){}
-   getItem(key){}
-   removeItem(key) {}
-   clear() {}
-   key(index) {}
-   length = 0
-}
-
-// let window = new DummyWindow() // для ssr
-// let sessionStorage = new DummyLocalStorage() // для ssr
-// let localStorage = new DummyLocalStorage() // для ssr
-
 export default async ({ Vue, store, app }) => {
    try {
       // import { initSessionStorage } from 'src/system/services'
-      await require('src/system/services').initSessionStorage()
+      await require('src/system/services_browser').initSessionStorage()
       // await initSessionStorage()
       const detectModuleName = (thiz) => {
          if (thiz && thiz.logModuleName) {
@@ -294,20 +278,22 @@ export default async ({ Vue, store, app }) => {
          // logW(`Vue.config.warnHandler: ${msg}\nTrace: ${trace}`)
       }
       // глобальный обработчик ошибок для всего. Сработает только если ОПРЕДЕЛЕНА Vue.config.errorHandler. Это странно...
-      window.onerror = function (message, source, line, column, error) {
-         console.log('window.onerror')
-         if (error) {
-            if (error.processed) return
-            error.processed = true
-         }
-         try {
-            if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.') {
-               logW('window.onerror', message, source, line, column, error)
-            } else {
-               logE('window.onerror', message, source, line, column, error)
+      if (window) {
+         window.onerror = function (message, source, line, column, error) {
+            console.log('window.onerror')
+            if (error) {
+               if (error.processed) return
+               error.processed = true
             }
-         } catch (e) {
-            console.error(e)
+            try {
+               if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.') {
+                  logW('window.onerror', message, source, line, column, error)
+               } else {
+                  logE('window.onerror', message, source, line, column, error)
+               }
+            } catch (e) {
+               console.error(e)
+            }
          }
       }
    } catch (err) {
