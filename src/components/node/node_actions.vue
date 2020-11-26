@@ -13,6 +13,10 @@
       @click="$router.push('/workspace/joint/new?oid='+node.oid)"
       round flat color="green")
       q-icon(name="link" size="30px" color="grey-9")
+  //- div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.text-white.justify-center.q-py-sm
+    span Казнить нельзя
+    span(:style=`{fontSize: '30px', lineHeight: 0.5}`).text-bold.q-mx-xs ,
+    span помиловать
 </template>
 
 <script>

@@ -50,6 +50,7 @@ div(
               :style=`{height: '50px',}`).full-width
               span.text-bold {{ a.name }}
     //- items wrapper
+    //- items.length === 1
     div(
       :style=`{
         position: 'relative',
