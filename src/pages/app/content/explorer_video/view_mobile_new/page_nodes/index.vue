@@ -16,6 +16,7 @@ q-page(
       ).row.full-width.items-start.content-start.q-pa-sm
       node-item(
         v-for="(node, nodei) in items" :key="node.oid"
+        v-if="node.items.length === 1"
         :node="node" :player="player" :contentKalpa="contentKalpa"
         :style=`{
           marginBottom: '40px',
@@ -65,7 +66,7 @@ export default {
         node.items.map(i => {
           if (i.layers[0].contentOid === this.contentKalpa.oid) {
             let figureInput = i.layers[0].figuresAbsolute[0]
-            acc.push([figureInput])
+            if (node.items.length === 1) acc.push([figureInput])
           }
         })
         return acc

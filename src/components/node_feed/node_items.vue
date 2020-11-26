@@ -30,6 +30,7 @@ div(
             position: 'absolute', zIndex: 100, top: 0,
           }`
           ).row.fit
+          //- NODE
           composition-player(
             v-if="item.type === 'NODE'"
             :composition="item.items[0]"
@@ -40,15 +41,18 @@ div(
               showContentExplorer: true,
               showContentMeta: false,
             }`)
-            //- template(v-slot:lefttop)
-              q-btn(
-                v-if="isActive && itemActive === ii"
-                @click="$router.push('/node/'+item.oid)"
-                round flat color="white" icon="filter_tilt_shift"
-                :style=`{
-                  position: 'absolute', left: 0, top: 0, zIndex: 1000,
-                  background: 'rgba(0,0,0,0.15)'
-                }`)
+          //- COMPOSITION
+          composition-player(
+            v-else-if="item.__typename === 'Composition'"
+            :composition="item"
+            :isActive="isActive && itemActive === ii"
+            :isVisible="isVisible"
+            :options=`{
+              height: '100%', objectFit: 'cover', loop: true,
+              showContentExplorer: true,
+              showContentMeta: false,
+            }`)
+          //- FALLBACK
           //- fallback image
           img(
             v-else
@@ -61,6 +65,7 @@ div(
             ).fit.b-30
           //- tint
           div(
+            v-if="item.type === 'NODE'"
             :style=`{
               position: 'absolute', bottom: '-2px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
               //- background: 'rgb(0,0,0)',
@@ -69,6 +74,7 @@ div(
             }`).row.full-width
           //- name
           div(
+            v-if="item.type === 'NODE'"
             @click="$router.push('/node/'+item.oid)"
             :style=`{
               position: 'absolute', zIndex: 2010, bottom: 0

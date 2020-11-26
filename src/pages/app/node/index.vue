@@ -7,82 +7,33 @@ q-layout(
     .row.full-width.justify-center
       //- q-resize-observer(@resize="onResize")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
-        //- .row.full-width.items-center.content-center
-          q-btn(
-            @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left")
-          q-btn(
-            round flat color="white" icon="filter_tilt_shift")
-          span.text-white Ядро
-        //- div(
-          :style=`{paddingLeft: '42px',}`
-          ).row.full-width.items-center.content-center
-          q-btn(round flat color="white" icon="select_all")
-          .col
-            .row.full-width.items-center.content-center.q-pb-sm
-              .row.full-width
-                //- span.text-white В гостях у Дмитра Гордона
-              .row.full-width
-                small(:style=`{lineHeight: 0.6}`).text-grey-4 from YouTube video
+        .row.full-width.q-pa-sm
+          div(
+            :style=`{
+              height: '60px',
+              borderRadius: '10px',
+            }`
+            ).row.full-width.items-center.content-center.q-pa-sm.b-40
+            q-btn(
+              @click="$router.back()"
+              round flat color="white" icon="keyboard_arrow_left")
+            q-btn(
+              round flat color="white" icon="filter_tilt_shift")
+            .col.q-px-sm
+              span.text-white.text-bold Ядро
+            kalpa-menu-actions(:actions="actions" icon="more_vert")
         list-middle(
           v-if="node"
           rootMargin="-30% 0px"
           :items="[node]" :itemStyles=`{marginTop: '0px',}`)
           template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-            content-player(
-              :contentKalpa=`{
-                name: '',
-                url: node.items[0].url,
-                thumbUrl: node.thumbUrl,
-                contentSource: 'KALPA',
-                type: 'VIDEO',
-              }`)
-            //- node-feed(
-              :node="item" :isActive="true" :isVisible="itemVisible"
-              :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
-              template(v-slot:name)
-                div(
-                  @click="nodeOpened = !nodeOpened"
-                  :style=`{
-                    position: 'absolute', zIndex: 100,
-                  }`).row.fit
-              //- template(v-slot:name-left)
-                q-btn(
-                  @click="nodeOpened = !nodeOpened"
-                  round flat color="grey-6"
-                  :icon="nodeOpened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-              //- template(v-slot:name-right)
-                q-btn(round flat color="grey-6" icon="add")
-              //- template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
-                div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width
-                  router-link(
-                    v-for="(s,si) in node.spheres" :key="si"
-                    v-if="si < 3"
-                    :to="'/sphere/'+s.oid"
-                    :style=`{
-                      textAlign: 'center',
-                      minHeight: '30px',
-                      borderRadius: '10px',
-                    }`
-                    ).row.full-width.items-center.content-center.justify-center.b-40.q-mb-xs
-                    span.text-white {{s.name}}
+            node-feed(
+              v-if="node"
+              :node="node" :isActive="itemActive" :isVisible="itemVisible")
         node-mockup(
           v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
           :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-  //- q-header(
-    v-if="nodeOpened"
-    reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
-    .row.full-width.justify-center.q-px-sm.q-pt-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-mb-sm
-        div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
-          ).row.full-width.items-center.content-center.b-40.q-pa-sm
-          q-btn(
-            @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-my-xs
-          div(:style=`{overflowX: 'auto'}`).col.q-px-md
-            span(:style=`{fontSize: '18px', lineHeight: 0.8, whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
   q-page-container
     component(
       v-if="node"
@@ -128,6 +79,16 @@ export default {
         {id: 'inside', name: 'Ядра'},
         {id: 'outside', name: 'Связи'}
       ]
+    },
+    actions () {
+      return {
+        report: {
+          name: 'Пожаловаться',
+          cb: () => {
+            this.$log('nodeReport...')
+          }
+        }
+      }
     }
   },
   watch: {
