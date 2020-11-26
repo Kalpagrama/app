@@ -1,6 +1,6 @@
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AppVisibility, Notify, Platform, Loading } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
@@ -218,7 +218,7 @@ function initOfflineEvents (store) {
    store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-async function initSessionStorage () {
+function initSessionStorage () {
    if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
    if (!sessionStorage.getItem('k_log_format')) {
       sessionStorage.setItem('k_log_format', JSON.stringify({
@@ -428,11 +428,12 @@ async function systemHardReset () {
    }
 }
 
+initSessionStorage()
+
 export {
    initApplication,
    setSyncEventStorageValue,
    systemReset,
    shareIn,
-   initSessionStorage,
    systemInit
 }

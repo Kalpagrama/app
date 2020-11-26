@@ -4,17 +4,13 @@ import { onError } from 'apollo-link-error'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from '../api/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
-// import VueApollo from 'vue-apollo'
-// import { persistCache } from 'apollo-cache-persist'
-// import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'public/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, sessionStorage, window } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
@@ -25,8 +21,7 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
-      let kDebug = sessionStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
-      assert(kDebug) // '0' | '1'
+      let kDebug = sessionStorage.getItem('k_debug') || '0'// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
@@ -142,7 +137,7 @@ export default async ({ Vue, store, app }) => {
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
          { clientFirst: true, force: true, onFetchFunc })
 
-      logD('services', services)
+      logD('services=', services)
       assert(services, '!services!!!')
       let linkAuth = services.authUrl
       let linkApi = services.apiUrl

@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { RxCollectionEnum, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/common'
 import { wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { WorkspaceApi } from 'src/api/workspace'

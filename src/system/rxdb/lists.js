@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { RxCollectionEnum, LstCollectionEnum } from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'

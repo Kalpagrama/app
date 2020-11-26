@@ -1,7 +1,7 @@
 import LruCache from 'lru-cache'
 import assert from 'assert'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'

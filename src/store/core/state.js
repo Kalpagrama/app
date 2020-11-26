@@ -1,4 +1,4 @@
-import { LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 export default {
    initialized: false,

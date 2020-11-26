@@ -1,5 +1,7 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { LstCollectionEnum, RxCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
+import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb/index_browser'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
@@ -15,9 +17,10 @@ class RxDBDummy {
 
    async create (store) {
       const f = this.create
-      logD(f, 'start')
+      logD(f, 'start???')
       const t1 = performance.now()
       assert(!this.created, 'this.created')
+      this.created = true
    }
 
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской) dummyUser - для входа без регистрации
@@ -56,6 +59,31 @@ class RxDBDummy {
       const f = this.get
       const t1 = performance.now()
       logW(f, 'start', rxCollectionEnum, idOrRawId)
+      if (!id) {
+         assert(idOrRawId)
+         if (idOrRawId.includes('::')) {
+            id = idOrRawId
+         } else {
+            assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+            id = makeId(rxCollectionEnum, idOrRawId, params)
+         }
+      }
+      assert(id, 'bad id: ' + id)
+      rxCollectionEnum = getRxCollectionEnumFromId(id) // иногда вызывается без rxCollectionEnum (когда известен только id)
+      let rawId = getRawIdFromId(id)
+      if (rxCollectionEnum in WsCollectionEnum) {
+         throw new Error('not impl!!!')
+      } else if (rxCollectionEnum in LstCollectionEnum) {
+         rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
+      } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
+         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc)
+      } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
+         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
+      } else if (rxCollectionEnum === RxCollectionEnum.META) {
+         rxDoc = await this.db.meta.findOne(rawId).exec()
+      } else {
+         throw new Error('bad collection' + rxCollectionEnum)
+      }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 

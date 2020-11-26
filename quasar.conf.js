@@ -24,13 +24,13 @@ module.exports = function (ctx) {
       boot: [
          'log',
          'rxdb',
-         { path: 'notify', server: false },
-         { path: 'i18n', server: false },
-         { path: 'apollo', server: false },
+         'notify',
+         'i18n',
+         // { path: 'apollo', server: false },
+         'apollo',
          'system',
-         { path: 'main', server: false },
-         { path: 'main_ssr', client: false },
-         { path: 'filters', server: false },
+         'main',
+         'filters'
       ],
 
       // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

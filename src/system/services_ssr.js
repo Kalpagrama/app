@@ -13,13 +13,8 @@ async function systemInit () {
 
 }
 
-async function initSessionStorage () {
-
-}
-
 export {
    initApplication,
    systemReset,
-   systemInit,
-   initSessionStorage
+   systemInit
 }

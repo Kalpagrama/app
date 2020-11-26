@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
@@ -33,7 +33,6 @@ const time = (sec) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
-    if (!window.stores) window.stores = {}
     Vue.use(VueMasonry)
     // Vue.use(VueYandexMetrika, {
     //   id: 60818698,

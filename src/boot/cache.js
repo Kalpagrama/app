@@ -8,7 +8,7 @@ import {
   set as idbSet,
   Store
 } from 'public/scripts/idb-keyval/idb-keyval.mjs'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CACHE)

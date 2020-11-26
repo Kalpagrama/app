@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import assert from 'assert'
 import { router } from 'src/boot/system'
 import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
