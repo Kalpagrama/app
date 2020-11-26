@@ -3,17 +3,20 @@ div(
   :style=`{
     position: 'relative',
     height: options.height,
+    //- border: $slots.lefttop ? '1px solid red' : 'none'
     }`
   ).row.full-width.items-start.content-start
   //- content explorer btn
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    content-explorer(
-      v-if="isActive"
-      :composition="composition")
+  slot(name="lefttop")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  content-explorer(
+    v-if="options.showContentExplorer && isActive"
+    :composition="composition")
   //- video spinner
+  slot(name="left-bottom")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="isActive"
+      v-if="options.showContentMeta && isActive"
       :style=`{
         position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
         bottom: '0px', left: '0px',
@@ -92,6 +95,8 @@ export default {
           height: 'auto',
           objectFit: 'cover',
           loop: true,
+          showContentExplorer: true,
+          showContentMeta: true
         }
       }
     }

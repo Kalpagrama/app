@@ -141,8 +141,15 @@ class ObjectCreateApi {
          return { name: s.name, oid: s.oid }
       })
       nodeInput.items = node.items.map(i => {
-         return {
-            composition: ObjectCreateApi.makeCompositionInput(i)
+         if (i.oid) {
+            return {
+               oid: i.oid
+            }
+         }
+         else {
+            return {
+               composition: ObjectCreateApi.makeCompositionInput(i)
+            }
          }
       })
       nodeInput.vertices = []

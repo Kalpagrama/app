@@ -32,7 +32,7 @@ q-page(
       template(v-slot:tint=`{item}`)
         div(
           @click="rightItemFound(item)"
-          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.br
+          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
   //- editor wrapper
   div(
     :style=`{
@@ -117,6 +117,8 @@ q-page(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ObjectCreateApi } from 'src/api/object_create'
+
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import itemEditor from './item_editor.vue'
 
@@ -126,6 +128,8 @@ export default {
   components: {
     itemEditor,
     compositionEditor,
+    kalpaFinder: () => import('components/kalpa_finder/index.vue'),
+    wsSphereEditor: () => import('components/ws_sphere_editor/index.vue'),
     editName: () => import('components/node_editor/view_publish/edit_name.vue'),
     editCategory: () => import('components/node_editor/view_publish/edit_category.vue')
   },
@@ -222,7 +226,14 @@ export default {
       try {
         this.$log('publish start')
         this.publishing = true
-        await this.$wait(1000)
+        await this.$wait(500)
+        if (this.node.items.length > 0) {
+          let nodeInput = JSON.parse(JSON.stringify(this.node))
+          this.$log('nodeInput', nodeInput)
+          let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
+          this.$log('publish createdNode', createdNode)
+          // this.$router.push(`/node/${createdNode.oid}`).catch(e => e)
+        }
         // rightItem ? joint : node...
         // publish content... content&content
         // publish node... node&content
@@ -238,7 +249,7 @@ export default {
     },
     cancel () {
       this.$log('cancel')
-      // this.$emit('close')
+      this.$emit('close')
     }
   }
 }

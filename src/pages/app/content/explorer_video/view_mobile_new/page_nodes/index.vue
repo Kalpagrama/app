@@ -51,8 +51,11 @@ export default {
     nodeClick (node) {
       this.$log('nodeClick', node)
       let start = node.items[0].layers[0].figuresAbsolute[0].t
+      let end = node.items[0].layers[0].figuresAbsolute[1].t
       this.player.setCurrentTime(start)
       this.player.play()
+      this.$emit('figures', [node.items[0].layers[0].figuresAbsolute])
+      this.$emit('frames', [node.items[0].layers[0].figuresAbsolute])
     },
     nodesLoaded (nodes) {
       this.$emit('figures')
@@ -69,6 +72,9 @@ export default {
       }, [])
       this.$emit('figures', figures)
     }
+  },
+  beforeDestroy () {
+    this.$emit('figures', [])
   }
 }
 </script>

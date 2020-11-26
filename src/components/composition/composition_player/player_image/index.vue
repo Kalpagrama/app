@@ -5,9 +5,10 @@ div(
     height: options.height,
     }`
   ).row.full-width.items-start.content-start
+  slot(name="left-top")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     content-explorer(
-      v-if="isActive"
+      v-if="!$slots['left-top'] && isActive"
       :composition="composition"
       :options="options")
   //- preview
@@ -17,13 +18,13 @@ div(
     draggable="false"
     :style=`{
       maxHeight: maxHeight+'px',
-      background: 'rgb(35,35,35)',
+      //- background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: options.height,
       objectFit: options.objectFit,
     }`
-    ).full-width
+    ).full-width.b-40
 </template>
 
 <script>

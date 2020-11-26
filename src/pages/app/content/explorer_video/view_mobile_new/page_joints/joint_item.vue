@@ -4,21 +4,38 @@ div(
     position: 'relative',
   }`).row.full-width
   //- left
-  div(
+  //- div(
     @click="$emit('prev')"
     :style=`{
       position: 'absolute', zIndex: 500, left: 0,
       width: '80px',
     }`
-    ).row.full-height.br
+    ).row.full-height
   //- right
-  div(
+  //- div(
     @click="$emit('next')"
     :style=`{
       position: 'absolute', zIndex: 500, right: 0,
       width: '80px',
     }`
-    ).row.full-height.br
+    ).row.full-height
+  //- COMPOSITION
+  div(
+    v-if="item && item.__typename === 'Composition'"
+    :style=`{
+      position: 'relative',
+    }`
+    ).row.fit.bg-black
+    composition-player(
+      :composition="item" :isVisible="true" :isActive="isActive"
+      :options=`{
+        height: '100%', objectFit: 'contain', loop: true,
+        showContentExplorer: true,
+        showContentMeta: true,
+      }`
+      :style=`{
+        position: 'absolute', zIndex: 100, top: 0,
+      }`).fit
   //- NODE
   div(
     v-if="item && item.type === 'NODE'"
@@ -28,7 +45,11 @@ div(
     ).row.fit.bg-black
     composition-player(
       :composition="item.items[0]" :isVisible="true" :isActive="isActive"
-      :options=`{height: '100%', objectFit: 'contain', loop: true}`
+      :options=`{
+        height: '100%', objectFit: 'contain', loop: true,
+        showContentExplorer: true,
+        showContentMeta: true,
+      }`
       :style=`{
         position: 'absolute', zIndex: 100, top: 0,
       }`).fit
@@ -96,6 +117,12 @@ export default {
       return this.joint.items.find(i => {
         if (i.type === 'NODE') {
           if (i.items[0].layers[0].contentOid !== this.contentKalpa.oid) {
+            return true
+          }
+          else return false
+        }
+        else if (i.__typename === 'Composition') {
+          if (i.layers[0].contentOid !== this.contentKalpa.oid) {
             return true
           }
           else return false

@@ -49,6 +49,7 @@ export default {
     pages: {type: Object},
   },
   components: {
+    wsSearch: () => import('components/ws_search/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
     pageKalpa: () => import('./page_kalpa.vue'),
     pageNodesMine: () => import('./page_nodes_mine.vue'),

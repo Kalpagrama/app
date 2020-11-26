@@ -9,7 +9,7 @@ q-layout(
         @player="playerLoaded"
         @error="playerErrorHandle"
         :style=`{
-          borderRadius: '10px',
+          borderRadius: '0 0 10px 10px',
           //- overflow: 'hidden',
         }`).fit
         template(v-slot:bar)
@@ -93,6 +93,7 @@ q-layout(
         'b-30': pageId !== 'joints',
         'bg-black': pageId === 'joints'
       }`
+      @frames="frames = $event"
       @figures="figures = $event"
       @close="pageId = 'nodes'")
 </template>
@@ -116,6 +117,7 @@ export default {
       player: null,
       node: null,
       figures: [],
+      frames: [],
       headerHeight: 0,
     }
   },
@@ -138,6 +140,20 @@ export default {
         // set viewId force, from feed or from workspace
         if (to && to.pageId) {
           this.pageId = to.pageId
+        }
+      }
+    },
+    // frames: {
+    //   handler (to, from) {
+    //     if (to && to.length === 2) {
+    //       this.$log('frames TO', to)
+    //     }
+    //   }
+    // }
+    'player.currentTime': {
+      handler (to, from) {
+        if (this.frames.length > 0) {
+          this.$log('frames...')
         }
       }
     }

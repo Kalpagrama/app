@@ -7,7 +7,11 @@ div(
   ).row.full-width
   composition-player(
     :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-    :options=`{height: '100%', objectFit: 'contain', loop: true}`
+    :options=`{
+      height: '100%', objectFit: 'contain', loop: true,
+      showContentExplorer: true,
+      showContentMeta: true,
+    }`
     :style=`{
       position: 'absolute', zIndex: 100, top: 0,
     }`)

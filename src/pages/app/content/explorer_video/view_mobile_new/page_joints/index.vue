@@ -1,9 +1,34 @@
 <template lang="pug">
 q-page(
+  v-touch-swipe.mouse.left.right="onSwipe"
   :style=`{
+    position: 'relative',
     //- height: $q.screen.height-headerHeight-30+'px',
   }`
   ).row.full-width.items-start.content-start.justify-center
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 1000, top: '4px',
+      paddingLeft: '22px', paddingRight: '22px',
+    }`
+    ).row.full-width
+    div(
+      v-for="(joint,ii) in joints" :key="ii"
+      v-if="joint.items.length === 2"
+      :style=`{
+        //- minWidth: jointActive === ii ? '50px' : 'none',
+      }`
+      ).col.q-px-xs
+      div(
+        :class=`{
+          'b-30': jointActive !== ii,
+          'b-120': jointActive === ii,
+        }`
+        :style=`{
+          height: '4px',
+          borderRadius: '2px',
+        }`
+        ).row.full-width
   q-resize-observer(@resize="onResize")
   kalpa-loader(
     :immediate="true"
@@ -17,6 +42,7 @@ q-page(
       div().row.no-wrap
         joint-item(
           v-for="(joint,ii) in items" :key="joint.oid"
+          v-if="joint.items.length === 2"
           :joint="joint" :ii="ii" :contentKalpa="contentKalpa" :player="player"
           :isActive="jointActive === ii"
           :style=`{
@@ -44,6 +70,7 @@ export default {
       jointMoving: false,
       jointsScrollOverflow: 'hidden',
       nodeOpened: false,
+      joints: []
     }
   },
   computed: {
@@ -83,6 +110,12 @@ export default {
     },
     jointsLoaded (joints) {
       this.$log('jointsLoaded', joints)
+      this.joints = joints
+    },
+    onSwipe (e) {
+      this.$log('onSwipe', e)
+      if (e.direction === 'left') this.jointMove(1)
+      else this.jointMove(0)
     },
     onResize (e) {
       this.$log('onResize', e.width)

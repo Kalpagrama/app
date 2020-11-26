@@ -35,10 +35,23 @@ div(
             :composition="item.items[0]"
             :isActive="isActive && itemActive === ii"
             :isVisible="isVisible"
-            :options=`{height: '100%', objectFit: 'cover', loop: true}`)
+            :options=`{
+              height: '100%', objectFit: 'cover', loop: true,
+              showContentExplorer: true,
+              showContentMeta: false,
+            }`)
+            //- template(v-slot:lefttop)
+              q-btn(
+                v-if="isActive && itemActive === ii"
+                @click="$router.push('/node/'+item.oid)"
+                round flat color="white" icon="filter_tilt_shift"
+                :style=`{
+                  position: 'absolute', left: 0, top: 0, zIndex: 1000,
+                  background: 'rgba(0,0,0,0.15)'
+                }`)
           //- fallback image
-          //- img(
-            v-if="false"
+          img(
+            v-else
             :src="item.thumbUrl"
             :style=`{
               borderRadius: '10px',
@@ -56,6 +69,7 @@ div(
             }`).row.full-width
           //- name
           div(
+            @click="$router.push('/node/'+item.oid)"
             :style=`{
               position: 'absolute', zIndex: 2010, bottom: 0
             }`

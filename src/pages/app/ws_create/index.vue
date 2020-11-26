@@ -26,6 +26,9 @@
 <script>
 export default {
   name: 'wsCreate',
+  components: {
+    kalpaFinder: () => import('components/kalpa_finder/index.vue')
+  },
   data () {
     return {
     }

@@ -30,7 +30,6 @@ const time = (sec) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
-    if (!window.stores) window.stores = {}
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
