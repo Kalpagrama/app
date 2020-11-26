@@ -67,7 +67,8 @@ export default {
     queryNodes () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.$store.getters.currentUser().oid,
           oidAuthor: {$eq: this.$store.getters.currentUser().oid},
           sortStrategy: 'AGE',

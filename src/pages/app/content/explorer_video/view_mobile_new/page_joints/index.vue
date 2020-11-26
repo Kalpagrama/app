@@ -4,7 +4,7 @@ q-page(
     //- height: $q.screen.height-headerHeight-50+'px',
   }`
   ).row.full-width.items-start.content-start.justify-center
-  q-resize-observer(@resize="onResize")
+  //- q-resize-observer(@resize="onResize")
   kalpa-loader(
     :immediate="true"
     :query="jointsQuery" @items="jointsLoaded" v-slot=`{items,next,nexting}`)

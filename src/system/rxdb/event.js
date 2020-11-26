@@ -80,15 +80,15 @@ class Event {
                      await wsNode.updateExtended('stage', 'draft', false)// без debounce
                      delete wsNode.oid
                   }
-                  await wait(3000)
-                  let createdWsNodes2 = await rxdb.find({
-                     selector: {
-                        rxCollectionEnum: RxCollectionEnum.WS_NODE,
-                        stage: 'published',
-                        oid: event.object.oid
-                     }
-                  })
-                  logD(f, 'createdWsNodes2=', createdWsNodes2)
+                  // await wait(3000)
+                  // let createdWsNodes2 = await rxdb.find({
+                  //    selector: {
+                  //       rxCollectionEnum: RxCollectionEnum.WS_NODE,
+                  //       stage: 'published',
+                  //       oid: event.object.oid
+                  //    }
+                  // })
+                  // logD(f, 'createdWsNodes2=', createdWsNodes2)
                }
                this.notifyError(event)
                break

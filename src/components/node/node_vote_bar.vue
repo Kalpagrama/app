@@ -106,22 +106,23 @@ div(
     div(
       v-for="(s,si) in rateStat" :key="si"
       :style=`{
-        width: s.percent+'%',
-        //- paddingBottom: '16px',
-      }`).row.full-height.items-center.content-center
-      //- bar name
-      //- div(:style=`{height: '16px'}`).row.full-width.justify-center
-        small(
-          v-if="rateMax === si"
-          :style=`{whiteSpace: 'nowrap'}`).text-grey-8 {{ s.name }}
-      //- bar
-      div(
-        :style=`{
-          height: '5px',
-          background: s.color,
-          borderRadius: rateBorderRadius(si)
-        }`
-        ).row.full-width
+        maxWidth: s.percent+'%',
+        minWidth: '30px',
+      }`).col
+      .row.full-height.items-center.content-center
+        //- bar name
+        //- div(:style=`{height: '16px'}`).row.full-width.justify-center
+          small(
+            v-if="rateMax === si"
+            :style=`{whiteSpace: 'nowrap'}`).text-grey-8 {{ s.name }}
+        //- bar
+        div(
+          :style=`{
+            height: '5px',
+            background: s.color,
+            borderRadius: rateBorderRadius(si)
+          }`
+          ).row.full-width
 </template>
 
 <script>

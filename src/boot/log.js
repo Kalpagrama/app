@@ -112,7 +112,7 @@ class Logger {
     let func = null
     if (this.store.state.core.logFormat.funcName && msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      msg.splice(0, 1, `[${func.name || func.nameExtra}]`)
+      msg.splice(0, 1, `[${func.nameExtra || func.name}]`)
     }
     assert(module, '!module')
     msg.splice(0, 0, `%c[${module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)

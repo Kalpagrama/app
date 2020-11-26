@@ -11,8 +11,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
 
 const LstCollectionEnum = Object.freeze({
-  LST_SPHERE_NODES: 'LST_SPHERE_NODES', // ядра на контенте например
-  LST_SPHERE_JOINTS: 'LST_SPHERE_JOINTS', // связи ядра с чем-либо
+  LST_SPHERE_ITEMS: 'LST_SPHERE_ITEMS', // элементы на сфере
   LST_FEED: 'LST_FEED',
   LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
   LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
@@ -164,13 +163,9 @@ class Lists {
       case 'OBJECT_DELETED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
-        let rxCollectionEnum
-        if (event.object.type === 'NODE') rxCollectionEnum = LstCollectionEnum.LST_SPHERE_NODES
-        else if (event.object.type === 'JOINT') rxCollectionEnum = LstCollectionEnum.LST_SPHERE_JOINTS
-        else throw new Error('bad event.object.type:' + event.object.type)
         let rxDocs = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': rxCollectionEnum,
+            'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
             'props.oid': { $in: event.sphereOids }
           }
         })
@@ -212,7 +207,7 @@ class Lists {
           logD(f, 'find voted nodes start')
           let rxDocs = await this.cache.find({
             selector: {
-              'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
+              'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
               'props.oid': rxdb.getCurrentUser().oid,
               'props.mangoQuery.selector.oidAuthor.$ne': rxdb.getCurrentUser().oid
             }

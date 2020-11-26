@@ -1,6 +1,6 @@
 <template lang="pug">
 kalpa-loader(
-  :query="query" :limit="20" v-slot=`{items, next, nexting}`)
+  :query="query" :limit="12" v-slot=`{items, next, nexting}`)
   list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
     q-infinite-scroll(@load="next" :offset="$q.screen.height")
     template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
@@ -24,7 +24,8 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.user.oid,
           oidAuthor: {$eq: this.user.oid},
           sortStrategy: 'AGE',

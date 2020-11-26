@@ -5,7 +5,7 @@ q-layout(
   q-header(
    ).b-30
     .row.full-width.justify-center
-      q-resize-observer(@resize="onResize")
+      //- q-resize-observer(@resize="onResize")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
         //- .row.full-width.items-center.content-center
           q-btn(

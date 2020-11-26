@@ -46,7 +46,8 @@ export default {
     nodesQuery () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.contentKalpa.oid
         },
         populateObjects: true,

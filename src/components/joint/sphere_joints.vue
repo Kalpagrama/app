@@ -1,13 +1,13 @@
 <template lang="pug">
 .row.full-width.justify-start
-  q-resize-observer(@resize="e => width = e.width")
+  //- q-resize-observer(@resize="e => width = e.width")
   //- header with actions
   //- div(
     v-if="items.length > 0"
     ).row.full-width.q-py-sm
     q-btn(icon="sort" color="grey-8" round flat)
   //- top line wrapper
-  div(
+  //- div(
     v-if="items.length > 0"
     :style=`{
       position: 'relative',
@@ -24,7 +24,7 @@
       div(:style=`{width: '2px',}`).row.full-height.bg-green
   kalpa-loader(
     :immediate="true"
-    :query="queryBySphere" :limit="15" v-slot=`{items, next}`
+    :query="queryBySphere" :limit="12" v-slot=`{items, next}`
     @items="items = $event")
     list-middle(:items="items" :itemStyles=`{marginBottom: '0px',}`)
       q-infinite-scroll(@load="next" :offset="$q.screen.height")
@@ -69,7 +69,8 @@ export default {
     queryBySphere () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.oid,
           jointItemType: {$in: ['NODE', 'WORD']},
           // sortStrategy: 'AGE',

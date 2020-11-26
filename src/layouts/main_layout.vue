@@ -63,8 +63,14 @@ q-layout(view="lHh lpR lFf")
 import { systemInit } from 'src/system/services'
 import { AuthApi } from 'src/api/auth'
 
+import kalpaMenu from 'components/kalpa_menu/index.vue'
+import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
+
 export default {
   name: 'mainLayout',
+  components: {
+    kalpaMenu, kalpaMenuMobile,
+  },
   data () {
     return {
     }

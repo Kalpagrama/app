@@ -290,14 +290,14 @@ class Cache {
           logW('Данные не получены! объект не найден на сервере', err)
           await this.set(key, { failReason: err }, 'year') // таких данных на сервере нет. Нечего больше их запрашивать
         } else if (err === 'fetchError') {
-          logD('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
+          logD('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще. err=', err)
           let item = this.store.state.cache.cachedItems[key] || { failReason: err }
           await this.set(key, item, 'minute')// ошибка при извлечении. Через минуту можно еще попробовать
         } else if (err === 'deleted') {
           logD('Данные не получены! Объект был удален!', err)
           await this.set(key, { failReason: err }, 'year')// данные удалены. Нечего больше запрашивать
         } else {
-          logE('Данные не получены! неизвестная ошибка. Через минуту  можно пробовать еще', err)
+          logE('Данные не получены! неизвестная ошибка. Через минуту  можно пробовать еще. err=', err)
           let item = this.store.state.cache.cachedItems[key] || { failReason: 'unknownError: ' + err.message }
           await this.set(key, item, 'minute')// ошибка при извлечении. Через минуту можно еще попробовать
         }

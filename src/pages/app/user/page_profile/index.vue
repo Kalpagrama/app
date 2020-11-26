@@ -8,7 +8,7 @@ q-page(
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 2000}`).row.full-width.justify-center.b-30
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md.b-30
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm.b-30
       q-tabs(
         no-caps active-color="green" align="left" dense
         stretch :breakpoint="100" inline-label
@@ -29,7 +29,7 @@ q-page(
 export default {
   name: 'user_pageProfile',
   components: {
-    // tabCollections: () => import('./tab_collections.vue'),
+    tabCollections: () => import('./tab_collections.vue'),
     tabNodes: () => import('./tab_nodes.vue'),
     tabJoints: () => import('./tab_joints.vue'),
     tabVotes: () => import('./tab_votes.vue'),
@@ -39,9 +39,9 @@ export default {
   computed: {
     tabs () {
       return [
-        // {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
+        {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
         {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
-        {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
+        // {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},
       ]

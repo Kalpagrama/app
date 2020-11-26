@@ -3,7 +3,7 @@
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', minHeight: '100vh'}`).row.full-width.justify-start
     kalpa-loader(
       :immediate="true"
-      :query="query" :limit="1000"
+      :query="query" :limit="12"
       v-slot=`{items,next,nexting}`)
       div(:style=`{maxWidth: 700+'px'}`).row.full-width
         router-link(
@@ -52,41 +52,6 @@
         //- loading spinner...
         div(:style=`{height: '50px'}`).row.full-width.justify-center
           q-spinner-dots(v-show="nexting" color="green" size="50px")
-      //- masonry(
-        :cols="$q.screen.width < 800 ? 1 : 2"
-        :gutter="{default: 6}").full-width.q-pr-sm
-        div(
-          v-for="(joint, li) in items" :key="joint.oid"
-          :style=`{
-            position: 'relative',
-            borderRadius: '10px', overflow: 'hidden',
-          }`
-          ).row.full-width.q-mb-md.b-40.cursor-pointer.joint-item
-          //- default
-          div(
-            @click="jointSelected === joint.oid ? jointSelected = null : jointSelected = joint.oid"
-            :style=`{
-              position: 'relative', zIndex: 10,
-              borderRadius: '10px', overflow: 'hidden'
-            }`
-            ).row.full-width.joint-item.b-40
-            joint-feed(
-              :joint="joint" :isActive="false" :isVisible="false"
-              :showHeader="false" :showFooter="false" :mini="true")
-          slot(name="tint" :item="joint" :itemKey="joint.oid")
-          //- selected
-          div(
-            v-if="joint.oid === jointSelected"
-            :style=`{
-              position: 'relative',
-              marginTop: '-10px', paddingTop: '14px',
-              borderRadius: '0 0 10px 10px', overflow: 'hidden',
-            }`
-            ).row.full-width.bg-green.q-px-xs.q-pb-xs
-            q-btn(round flat dense color="green-8" icon="delete_outline" @click="jointDelete(joint)")
-            .col
-            q-btn(round flat dense color="white" icon="edit" @click="jointEdit(joint)")
-            q-btn(round flat dense color="white" icon="launch" @click="jointLaunch(joint)")
 </template>
 
 <script>
@@ -107,7 +72,9 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_JOINTS,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['JOINT'] },
+          oidAuthor: this.sphereOid,
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
         },

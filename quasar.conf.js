@@ -102,7 +102,7 @@ module.exports = function (ctx) {
       build: {
          env: {
             ORIGIN_URL: process.env.ORIGIN_URL,
-            ORIGIN_URL_DEBUG: process.env.ORIGIN_URL_DEBUG,
+            ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
             SERVICES_URL: process.env.AUTH_URL || process.env.SERVICES_URL,
             SERVICES_URL_DEBUG: process.env.SERVICES_URL_DEBUG,
             BUILD_DATE: (new Date().toISOString()).split('T')[0],

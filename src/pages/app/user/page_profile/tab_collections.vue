@@ -1,6 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center.q-py-xl
-  span.text-white.q-mt-xl No collections
+  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+    span.text-white Скоро пользователи смогу делиться своими коллекциями
 </template>
 
 <script>
@@ -17,7 +18,8 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.user.oid,
           oidAuthor: {$eq: this.user.oid},
           sortStrategy: 'AGE',

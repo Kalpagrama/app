@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
     kalpa-loader(
-      v-if="true" :query="queryFeedItems" :limit="20" v-slot=`{items, next, nexting}`)
+      v-if="true" :query="queryFeedItems" :limit="12" v-slot=`{items, next, nexting}`)
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
         q-infinite-scroll(@load="next" :offset="$q.screen.height")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)

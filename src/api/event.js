@@ -76,7 +76,8 @@ class EventApi {
             }
             break
       }
-      resultCard.description = resultCard.items.reduce((acc, item) => {
+      resultCard.description = ''
+      resultCard.title = resultCard.items.reduce((acc, item) => {
          acc += ` ${typeof item === 'string' ? item : `"${item.name}"`}`
          return acc
       }, '')

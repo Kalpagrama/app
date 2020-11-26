@@ -10,7 +10,7 @@ div(
       background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width
-    //- header: author, createdAt
+    //- HEADER: author, createdAt
     div(
       v-if="showHeader"
       ).row.full-width.items-center.content-center.q-pa-xs
@@ -23,49 +23,11 @@ div(
       small.text-grey-8.q-mr-xs {{ node.countViews }}
       q-icon(name="visibility" color="grey-8").q-mr-xs
       small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-      q-btn(round flat dense icon="more_horiz" color="grey-9")
-        q-popup-proxy(
-          maximized position="bottom" dark
-          cover anchor="top right" self="top right").b-40
-          div(
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).row.full-width.items-start.content-start.b-40
-            kalpa-share(type="node" :item="node").full-width
-              template(v-slot:btn=`{start}`)
-                q-btn(
-                  @click="start"
-                  flat color="white" no-caps
-                  :style=`{
-                    height: '50px',
-                  }`
-                  ).full-width
-                  span.text-bold Поделиться
-            q-btn(
-              @click="a.cb()"
-              v-for="(a,akey) in actions" :key="akey"
-              flat no-caps
-              :color="a.color || 'white'"
-              :style=`{height: '50px',}`).full-width
-              span.text-bold {{ a.name }}
-    //- items wrapper
-    div(
-      :style=`{
-        position: 'relative',
-        paddingBottom: Math.min(Math.round(ratio*100), 100)+'%',
-      }`
-      ).row.full-width
-      composition-player(
-        :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-        :options=`{height: '100%', objectFit: 'contain', loop: true}`
-        :style=`{
-          position: 'absolute', zIndex: 100, top: 0,
-        }`)
-      //- content-player(
-        :contentKalpa=`{
-        }`)
-    //- essence
+      kalpa-menu-actions(:actions="actions")
+    //- ITEMS: one or two
+    node-item(v-if="node.items.length === 1" v-bind="$props")
+    node-items(v-if="node.items.length === 2" v-bind="$props")
+    //- ESSENCE:
     div(:style=`{position: 'relative',}`).row.full-width
       router-link(
         :to="'/node/'+node.oid"
@@ -87,6 +49,7 @@ div(
               :style=`{
                 fontSize: nodeNameSize+'px',
               }`).text-white.text-bold.cursor-pointer {{ node.name }}
+      //- SPHERES: category & spheres...
       div(
         v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll.q-pb-sm
         .row.no-wrap.q-pl-sm
@@ -104,7 +67,7 @@ div(
         slot(name="name-right")
     .row.full-width
       slot(name="footer")
-  //- footer
+  //- FOOTER: share, vote, link?
   node-actions(v-if="showActions" :node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
@@ -113,8 +76,8 @@ div(
 export default {
   name: 'nodeFeed',
   components: {
-    contentPlayer: () => import('components/content_player/index.vue'),
-    compositionPlayer: () => import('components/composition/composition_player/index.vue'),
+    nodeItem: () => import('./node_item.vue'),
+    nodeItems: () => import('./node_items.vue'),
     nodeActions: () => import('components/node/node_actions.vue')
   },
   props: {
@@ -127,15 +90,9 @@ export default {
   },
   data () {
     return {
-      showMore: false,
     }
   },
   computed: {
-    ratio () {
-      let height = this.node.items[0].thumbHeight
-      if (height) return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
-      else return 1
-    },
     // TODO: impl better way
     nodeNameSize () {
       let l = this.node.name.length
@@ -144,14 +101,11 @@ export default {
       else if (l >= 100) return 12
       else return 10
     },
+    nodeIsMine () {
+      return false
+    },
     actions () {
-      return {
-        // share: {
-        //   name: 'Поделиться',
-        //   cb: () => {
-        //     this.$log('share...')
-        //   }
-        // },
+      let res = {
         report: {
           name: 'Пожаловаться',
           color: 'red',
@@ -159,17 +113,18 @@ export default {
             this.$log('report...')
           }
         },
-        // delete: {
-        //   name: 'Удалить',
-        //   color: 'red',
-        //   cb: () => {
-        //     this.$log('delete...')
-        //   }
-        // }
       }
+      if (this.nodeIsMine) {
+        res.delete = {
+          name: 'Удалить',
+          color: 'red',
+          cb: () => {
+            this.$log('nodeDelete...')
+          }
+        }
+      }
+      return res
     }
-  },
-  methods: {
   }
 }
 </script>

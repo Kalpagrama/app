@@ -3,7 +3,7 @@ div(
   :style=`{
     position: 'relative', zIndex: 100,
   }`).row.full-width.items-start.content-start
-  q-resize-observer(@resize="width = $event.width")
+  //- q-resize-observer(@resize="width = $event.width")
   //- first item
   div(:style=`{position: 'relative'}`).row.fit
     slot(name="item" :item="items[0]" :isActive="first" :itemIndex="0" :itemNexting="true" :next="next" :prev="prev"

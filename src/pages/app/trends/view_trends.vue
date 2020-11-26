@@ -12,7 +12,7 @@ q-page(
       }`
       ).row.full-width.items-start.content-start
       kalpa-loader(
-        v-if="sphereOid" :query="query" :limit="20" v-slot=`{items, next, nexting}`)
+        v-if="sphereOid" :query="query" :limit="12" v-slot=`{items, next, nexting}`)
         list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
           q-infinite-scroll(@load="next" :offset="$q.screen.height")
           template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
@@ -54,7 +54,8 @@ export default {
     query () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
         },

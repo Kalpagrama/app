@@ -9,6 +9,7 @@
       ...itemStyles,
     }`
     v-observe-visibility=`{
+      throttle: 300,
       callback: indexMiddleHandler,
       throttle: 1000,
       intersection: {

@@ -5,6 +5,7 @@ import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { wait } from 'src/system/utils'
+import debounce from 'lodash/debounce'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -21,11 +22,19 @@ class QueryAccumulator {
          let set = new Set(queue.map(item => item.oid))
          return set.size
       }
+      this.nextDebounced = debounce((reject) => {
+         try {
+            this.next()
+         } catch (err) {
+            reject(err)
+         }
+      }, 300, { maxWait: 1000 })
    }
 
    // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
    push (oid, priority) {
       assert(oid && priority >= 0, 'oid && priority' + oid + priority)
+      // todo вместо wait(500) заюзать debounce(next)
       return new Promise((resolve, reject) => {
          let queue
          let queueMaxSz = 0
@@ -48,7 +57,8 @@ class QueryAccumulator {
             reject('queued item was evicted legally')
          }
          // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
-         wait(500).then(() => this.next()).catch(reject)
+         // wait(500).then(() => this.next()).catch(reject)
+         this.nextDebounced(reject)
       })
    }
 
@@ -296,7 +306,7 @@ class Objects {
                logD('updateRxDocPayload objectStat TODO! обновить статистику голосованния', votes)
                assert(votes && Array.isArray(votes), '!stat.votes')
                let userVote = JSON.parse(JSON.stringify(event.subject))
-               userVote.rate = event.rate
+               userVote.rate = event.rateUser
                userVote.weight = rxdb.getCurrentUser().weightVal
                userVote.date = Date.now()
                let indx = votes.findIndex(v => v.oid === rxdb.getCurrentUser().oid)
@@ -304,10 +314,9 @@ class Objects {
                votes.push(userVote)
                return votes
             }, true)
-            // rateUser менять не надо! оно изменилось
-            // if (event.subject.oid === rxdb.getCurrentUser().oid){
-            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rate, true)
-            // }
+            if (event.subject.oid === rxdb.getCurrentUser().oid) {
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'rateUser', event.rateUser, true)
+            }
             break
          }
          case 'OBJECT_DELETED': {
