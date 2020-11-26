@@ -143,17 +143,18 @@ export default {
         }
       }
     },
-    // frames: {
-    //   handler (to, from) {
-    //     if (to && to.length === 2) {
-    //       this.$log('frames TO', to)
-    //     }
-    //   }
-    // }
     'player.currentTime': {
       handler (to, from) {
         if (this.frames.length > 0) {
-          this.$log('frames...')
+          if (this.frames[0].length === 2) {
+            this.$log('framing...')
+            if (to < this.frames[0][0].t) {
+              this.player.setCurrentTime(this.frames[0][0].t)
+            }
+            if (to >= this.frames[0][1].t) {
+              this.player.setCurrentTime(this.frames[0][0].t)
+            }
+          }
         }
       }
     }

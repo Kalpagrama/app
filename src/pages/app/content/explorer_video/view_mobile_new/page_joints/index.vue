@@ -6,6 +6,7 @@ q-page(
     //- height: $q.screen.height-headerHeight-30+'px',
   }`
   ).row.full-width.items-start.content-start.justify-center
+  //- stories bar
   div(
     :style=`{
       position: 'absolute', zIndex: 1000, top: '4px',
@@ -49,8 +50,7 @@ q-page(
             height: $q.screen.height-headerHeight-50+'px',
             minWidth: '100%',
           }`
-          @prev="jointMove(0)"
-          @next="jointMove(1)")
+          )
 </template>
 
 <script>
@@ -91,9 +91,17 @@ export default {
       if (this.jointMoving) return
       this.jointMoving = true
       this.$log('jointMove', forward)
-      this.jointsScrollOverflow = 'auto'
+      // get index
       let index = this.jointActive + 1
       if (forward === 0) index -= 2
+      // check -1, last joint index...
+      if (!this.joints[index]) {
+        this.$q.notify({type: 'negative', position: 'top', message: '-1,last!'})
+        this.jointMoving = false
+        return
+      }
+      // start scrolling
+      this.jointsScrollOverflow = 'auto'
       this.$tween.to(
         this.$refs.jointsScroll,
         0.3,

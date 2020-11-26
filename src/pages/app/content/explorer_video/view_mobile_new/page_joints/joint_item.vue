@@ -36,9 +36,38 @@ div(
       :style=`{
         position: 'absolute', zIndex: 100, top: 0,
       }`).fit
+    //- FOOTER:
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 2000,
+        bottom: '0px',
+      }`
+      ).row.full-width.q-pa-sm
+      div(
+        @click="opened = !opened"
+        :class=`{
+          'b-30': !opened,
+          'b-50': opened,
+        }`
+        :style=`{
+          minHeight: '60px',
+          borderRadius: '10px',
+          textAlign: 'center',
+        }`
+        ).row.items-center.content-center.justify-center.full-width
+        span(
+          v-if="joint.name.length > 0"
+          :style=`{
+            fontSize: '18px',
+          }`).text-white.text-bold {{joint.name}}
+        span(
+          v-else
+          :style=`{
+            fontSize: '18px',
+          }`).text-white.text-bold {{ joint.vertices }}
   //- NODE
   div(
-    v-if="item && item.type === 'NODE'"
+    v-else-if="item && item.type === 'NODE'"
     :style=`{
       position: 'relative',
     }`
@@ -91,12 +120,20 @@ div(
               textAlign: 'center',
             }`
             ).row.items-center.content-center.justify-center.full-width
-            span(v-if="joint.name.length > 0").text-white {{joint}}
+            span(
+              v-if="joint.name.length > 0"
+              :style=`{
+                fontSize: '18px',
+              }`).text-white.text-bold {{joint.name}}
             span(
               v-else
               :style=`{
                 fontSize: '18px',
               }`).text-white.text-bold {{ joint.vertices }}
+  //- div(
+    v-else
+    ).row.fit
+    small.text-white {{joint}}
 </template>
 
 <script>

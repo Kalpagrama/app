@@ -17,7 +17,7 @@ div(
     round flat color="grey-2" icon="select_all" no-caps)
   //- transition(enter-active-class="animated fadeIn" leave-active-class="none")
     div(
-      v-if="showContentName"
+      v-if="true || showContentName"
       :style=`{overflow: 'hidden', pointerEvents: 'none'}`).col.full-height
       .row.fit.q-pr-sm
         div(:style=`{overflow: 'hidden'}`).row.fit.items-center.content-center
