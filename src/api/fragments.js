@@ -257,6 +257,25 @@ fragment jointFragment on Joint {
         name
         thumbUrl(preferWidth: 50)
     }
+    jointType
+    swap
+    leftItem {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+    }
+    rightItem {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {... nodeFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+    }
+    
     spheres {
         oid
         name
