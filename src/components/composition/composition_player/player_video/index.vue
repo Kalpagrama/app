@@ -41,13 +41,10 @@ div(
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      //- height: options.height,
-      //- maxHeight: maxHeight+'px',
-      objectFit: 'contain',
-      //- objectFit: options.objectFit,
-      //- opacity: duration > 0 ? 0 : 1,
+      height: options.height,
+      objectFit: options.objectFit,
     }`
-    ).full-width.fit
+    ).full-width
   //- video wrapper
   div(
     v-if="isActive && isVisible"
@@ -70,9 +67,7 @@ div(
       :loop="options.loop"
       playsinline
       :style=`{
-        //- objectFit: options.objectFit,
-        //- maxHeight: maxHeight+'px',
-        objectFit: 'contain',
+        objectFit: options.objectFit,
         borderRadius: '10px',
         overflow: 'hidden',
       }`

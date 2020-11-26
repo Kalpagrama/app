@@ -1,8 +1,8 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff")
-  q-header()
-    .row.full-width.b-30
+  q-header().bg-black
+    .row.full-width
       q-resize-observer(@resize="onResize")
       content-player(
         :contentKalpa="contentKalpa"
@@ -55,26 +55,32 @@ q-layout(
                 position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
                 left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
               }`)
-      //- .row.full-width.q-pa-md.bg-red
+      //- content.name like node.name
+      //- .row.full-width.justify-center.q-pa-xs.bg-red
         span.text-white.text-bold {{ contentKalpa.name }}
-  //- q-footer()
-    .row.full-width.bg-black.q-pa-md
-      span.text-white menu
   q-page-container
     q-page-sticky(
       v-if="pageId !== 'node'"
       expand position="bottom"
+      :class=`{
+        'b-30': pageId !== 'joints',
+        'bg-black': pageId === 'joints'
+      }`
       :style=`{zIndex: 1000, borderRadius: '10px 10px 0 0',}`
-      ).full-width.b-30
-      //- div(:style=`{height: '50px',}`).row.full-width.bg-blue.q-pa-md
+      ).full-width
       div(
-        :style=`{height: '50px',}`).row.full-width.justify-center
-        div(:style=`{maxWidth: 700+'px'}`).row.full-width
-          q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-sm Назад
+        :style=`{height: '40px',}`).row.full-width.justify-center
+        div(:style=`{maxWidth: 700+'px'}`).row.full-width.items-end.content-end
+          q-btn(
+            round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps
+            :style=`{
+              marginBottom: '1px',
+            }`
+            ).q-px-sm Назад
           .col
             q-tabs(
               v-model="pageId"
-              align="justify"
+              align="justify" dense
               no-caps active-color="green").full-width.text-grey-8
               q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
     component(
@@ -83,47 +89,18 @@ q-layout(
       :contentKalpa="contentKalpa" :node="node"
       :player="player"
       :headerHeight="headerHeight"
-      @close="pageId = 'nodes'")
-    //- component(
-      v-if="player"
-      :is="`view-${viewId}`"
-      :ref="`view-${viewId}`"
-      :node="node"
-      :player="player"
-      :contentKalpa="contentKalpa"
-      :contentBookmark="contentBookmark"
-      :style=`{
-        paddingTop: '8px',
-        paddingBottom: '100px',
+      :class=`{
+        'b-30': pageId !== 'joints',
+        'bg-black': pageId === 'joints'
       }`
-      @bookmark="contentBookmark = $event"
-      @nodeCreate="nodeCreate"
-      @nodeEdit="nodeEdit"
-      @close="viewId = 'nodes', node = null"
-      @figures="figures = $event")
-      template(v-slot:bottom)
-        div(
-          :style=`{}`).row.full-width.justify-center
-          div(:style=`{maxWidth: 700+'px'}`).row.full-width
-            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-mx-md Назад
-            .col
-              q-tabs(
-                v-model="viewId"
-                align="justify"
-                no-caps active-color="green").full-width.text-grey-8
-                q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
+      @figures="figures = $event"
+      @close="pageId = 'nodes'")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
-// import viewDetails from './view_details/index.vue'
-// import viewNode from './view_node/index.vue'
-// import viewNodes from './view_nodes/index.vue'
-// import viewJoints from './view_joints/index.vue'
-// TODO: impl
-// import viewFullscreen from './view_fullscreen/index.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageDetails from './page_details/index'
 import pageNode from './page_node/index.vue'
@@ -131,15 +108,12 @@ import pageJoints from './page_joints/index.vue'
 
 export default {
   name: 'contentExplorerVideo',
-  // components: {contentPlayer, viewDetails, viewNode, viewNodes, viewJoints, viewFullscreen},
   components: {contentPlayer, pageNodes, pageDetails, pageNode, pageJoints},
   props: ['contentKalpa', 'query'],
   data () {
     return {
       pageId: 'nodes',
       player: null,
-      playerIsVisible: false,
-      contentBookmark: null,
       node: null,
       figures: [],
       headerHeight: 0,
@@ -151,7 +125,7 @@ export default {
         {id: 'details', icon: 'info', name: 'Детали'},
         {id: 'nodes', icon: 'filter_tilt_shift', name: 'Ядра'},
         {id: 'joints', icon: 'link', name: 'Связи'},
-        {id: 'similar', icon: 'menu', name: 'Similar'}
+        // {id: 'similar', icon: 'menu', name: 'Similar'}
       ]
     }
   },
@@ -160,19 +134,11 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('query TO', to)
+        // if (to) {}
         // set viewId force, from feed or from workspace
-        if (to && to.viewid) {
-          this.viewId = to.viewid
+        if (to && to.pageId) {
+          this.pageId = to.pageId
         }
-        // catch lastViewId
-        else {
-          // let viewId = localStorage.getItem('k_contentExplorer_viewid')
-          // this.$log('viewId', viewId)
-          // if (viewId) this.viewId = viewId
-        }
-        let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
-        this.$log('boookmarkkkkk', bookmark)
-        if (bookmark) this.contentBookmark = bookmark
       }
     }
   },
@@ -185,7 +151,8 @@ export default {
       this.$log('nodeCreateStart')
       // create something link or node... or always node...
       let node = await this.nodeCreate()
-      this.nodeEdit(node)
+      this.node = node
+      this.pageId = 'node'
     },
     async nodeCreate () {
       this.$log('nodeCreate')
@@ -216,39 +183,9 @@ export default {
       this.$log('nodeCreate node', node)
       return node
     },
-    async nodeEdit (node) {
-      this.$log('nodeEdit', node)
-      if (this.node === null) {
-        this.node = node
-      }
-      else {
-        this.node = null
-        await this.$wait(300)
-        this.node = node
-      }
-      this.pageId = 'node'
-    },
-    playerStyles () {
-      if (this.player && this.player.isFullscreen) {
-        return {
-          position: 'fixed', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, transform: 'translate3d(0,0,0)'
-        }
-      }
-      else {
-        return {}
-      }
-    },
     playerErrorHandle () {
       this.$log('playerErrorHandle')
       confirm('Player error! Try on desktop!')
-    },
-    playerVisibilityCallback (isVisible, entry) {
-      // this.$log('playerVisibilityCallback', isVisible, entry)
-      this.playerIsVisible = isVisible
-      if (this.player && this.player.play) {
-        if (isVisible) this.player.play()
-        else this.player.pause()
-      }
     },
     playerLoaded (player) {
       this.$log('playerLoaded', player)
@@ -258,44 +195,7 @@ export default {
       if (startat) {
         this.player.setCurrentTime(startat)
       }
-    },
-    keydownHandle (e) {
-      if (this.$store.state.ui.userTyping) return
-      this.$log('keydownHandle', e)
-      // left/right keys for fast navigations
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        if (!this.player) return
-        if (!this.playerIsVisible) return
-        let t = this.player.currentTime
-        if (e.key === 'ArrowLeft') t -= 5
-        else if (e.key === 'ArrowRight') t += 5
-        this.player.setCurrentTime(t)
-      }
-      // space for play/pause
-      if (e.code === 'Space') {
-        e.preventDefault()
-        if (!this.player) return
-        if (!this.playerIsVisible) return
-        if (this.player.playing) this.player.pause()
-        else this.player.play()
-      }
-      // handle Escape when in isFullscreen player mode
-      if (e.key === 'Escape') {
-        if (this.player && this.player.isFullscreen) this.player.fullscreenToggle()
-      }
-      // create Fragment with N or F
-      if (e.keyCode === 78 || e.keyCode === 70) {
-        this.createStart()
-      }
     }
-  },
-  mounted () {
-    this.$log('mounted')
-    window.addEventListener('keydown', this.keydownHandle)
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
-    window.removeEventListener('keydown', this.keydownHandle)
   }
 }
 </script>

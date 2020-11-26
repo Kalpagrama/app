@@ -1,6 +1,7 @@
 <template lang="pug">
+//- :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
 component(
-  :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
+  is="view-mobile"
   v-bind="$props")
 </template>
 

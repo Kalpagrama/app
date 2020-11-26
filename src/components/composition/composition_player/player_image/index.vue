@@ -16,15 +16,12 @@ div(
     :src="composition.thumbUrl"
     draggable="false"
     :style=`{
-      //- maxHeight: $q.screen.height/2+'px',
       maxHeight: maxHeight+'px',
       background: 'rgb(35,35,35)',
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      //- height: options.height,
-      //- height: '100%',
-      //- objectFit: options.objectFit,
-      objectFit: 'cover',
+      height: options.height,
+      objectFit: options.objectFit,
     }`
     ).full-width
 </template>

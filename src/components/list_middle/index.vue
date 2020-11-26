@@ -1,6 +1,5 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  //- q-resize-observer(@resize="e => width = e.width" :debounce="500")
   slot
   div(
     v-for="(i,ii) in items" :key="i[itemKey]" :accessKey="ii"
@@ -9,9 +8,8 @@
       ...itemStyles,
     }`
     v-observe-visibility=`{
-      throttle: 300,
+      throttle: 200,
       callback: indexMiddleHandler,
-      throttle: 1000,
       intersection: {
         rootMargin: rootMargin
       }
@@ -23,7 +21,7 @@
       :itemIndex="ii"
       :isActive="indexMiddle === ii"
       :isVisible="ii === indexMiddle || ii === indexMiddle-1 || ii === indexMiddle+1"
-      :width="width")
+      )
   slot(name="append")
 </template>
 
@@ -45,7 +43,7 @@ export default {
   },
   data () {
     return {
-      width: 0,
+      // width: 0,
       indexMiddle: -1
     }
   },

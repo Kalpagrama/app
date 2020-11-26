@@ -30,14 +30,15 @@ div(
             position: 'absolute', zIndex: 100, top: 0,
           }`
           ).row.fit
-          //- composition-player(
+          composition-player(
             v-if="item.type === 'NODE'"
             :composition="item.items[0]"
             :isActive="isActive && itemActive === ii"
             :isVisible="isVisible"
             :options=`{height: '100%', objectFit: 'cover', loop: true}`)
-          //- v-else
-          img(
+          //- fallback image
+          //- img(
+            v-if="false"
             :src="item.thumbUrl"
             :style=`{
               borderRadius: '10px',

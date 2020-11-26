@@ -25,11 +25,13 @@ div(
       small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
       kalpa-menu-actions(:actions="actions")
     //- ITEMS: one or two
-    node-item(v-if="node.items.length === 1" v-bind="$props")
-    node-items(v-if="node.items.length === 2" v-bind="$props")
+    slot(name="items")
+    node-item(v-if="showItems && !$slots.items && node.items.length === 1" v-bind="$props")
+    node-items(v-if="showItems && !$slots.items && node.items.length === 2" v-bind="$props")
     //- ESSENCE:
+    slot(name="name")
     div(
-      v-if="node.name.length > 0"
+      v-if="showName && node.name.length > 0"
       :style=`{position: 'relative',}`).row.full-width
       router-link(
         :to="'/node/'+node.oid"
@@ -64,7 +66,7 @@ div(
             }`
             ).text-grey-4.q-py-xs.q-px-sm.b-50.q-mr-sm
             q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
-            span {{s.name}}
+            span {{ s.name }}
           slot(name="name-bottom")
         slot(name="name-right")
     .row.full-width
@@ -87,8 +89,10 @@ export default {
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
     showHeader: {type: Boolean, default: true},
+    showName: {type: Boolean, default: true},
     showActions: {type: Boolean, default: true},
-    showSpheres: {type: Boolean, default: true}
+    showSpheres: {type: Boolean, default: true},
+    showItems: {type: Boolean, default: true}
   },
   data () {
     return {
