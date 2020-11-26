@@ -48,23 +48,7 @@ q-layout(view="hHh Lpr lff")
             :name="user.name"
             :thumbUrl="user.thumbUrl"
             :isActive="true")
-          q-btn(
-            round flat color="grey-8" icon="more_vert")
-            q-popup-proxy(
-              maximized position="bottom" dark
-              cover anchor="top right" self="top right").b-40
-              div(
-                :style=`{
-                  borderRadius: '10px',
-                }`
-                ).row.full-width.items-start.content-start.b-40
-                q-btn(
-                  @click="a.cb()"
-                  v-for="(a,akey) in actions" :key="akey"
-                  flat no-caps
-                  :color="a.color || 'white'"
-                  :style=`{height: '50px',}`).full-width
-                  span.text-bold {{ a.name }}
+          kalpa-menu-actions(:actions="actions" icon="more_vert").q-mr-xs
   q-page-container(v-if="user")
     router-view(:user="user" :key="user.oid")
 </template>

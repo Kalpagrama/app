@@ -1,14 +1,20 @@
 <template lang="pug">
 .row.full-width.justify-center.items-center.content-center
-  div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
-    slot(name="action-left")
-    kalpa-bookmark(
-      v-if="!$slots['action-left']"
-      :oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-    .col.full-height
-      node-vote-bar(v-if="node" :node="node")
-    slot(name="action-right")
-    q-btn(
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
+      slot(name="action-left")
+      kalpa-bookmark(
+        v-if="!$slots['action-left']"
+        :oid="node.oid" :type="useBookmarkType" :name="node.name" :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+      .col.full-height
+        node-vote-bar(v-if="node" :node="node")
+      slot(name="action-right")
+      kalpa-share(type="node" :item="node")
+  //- extend/add/link ONE item node...
+  //- .row.full-width.justify-center
+    div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
+      q-btn(flat icon="link" color="green").full-width
+    //- q-btn(
       v-if="!$slots['action-right']"
       @click="$router.push('/workspace/joint/new?oid='+node.oid)"
       round flat color="green")

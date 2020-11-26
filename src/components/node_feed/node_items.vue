@@ -1,7 +1,7 @@
 <template lang="pug">
 //- items
 div(
-  :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end.br
+  :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
   div(
     v-for="(item, ii) in node.items" :key="ii"
     :style=`{
@@ -30,27 +30,27 @@ div(
             position: 'absolute', zIndex: 100, top: 0,
           }`
           ).row.fit
-          composition-player(
+          //- composition-player(
             v-if="item.type === 'NODE'"
             :composition="item.items[0]"
             :isActive="isActive && itemActive === ii"
             :isVisible="isVisible"
             :options=`{height: '100%', objectFit: 'cover', loop: true}`)
+          //- v-else
           img(
-            v-else
             :src="item.thumbUrl"
             :style=`{
               borderRadius: '10px',
-              objectFit: 'contain',
+              objectFit: 'cover',
               borderRadius: '10px',
             }`
             ).fit.b-30
           //- tint
           div(
             :style=`{
-              position: 'absolute', bottom: '-0.8px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
+              position: 'absolute', bottom: '-2px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
               //- background: 'rgb(0,0,0)',
-              background: 'linear-gradient(0deg, rgba(5,5,5,0.9) 30%, rgba(0,0,0,0) 100%)',
+              background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 30%, rgba(0,0,0,0) 100%)',
               borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
             }`).row.full-width
           //- name
@@ -69,8 +69,8 @@ div(
       //- item.type
       div(
         v-if="node.vertices[ii] && node.vertices[ii] !== 'ASSOCIATIVE'"
-        ).row.full-width.justify-center
-        span.text-white {{ itemType(ii).name }}
+        ).row.full-width.justify-center.q-pt-xs
+        small.text-white {{ itemType(ii).name }}
   //- link btn
   //- TODO: btn color
   q-btn(

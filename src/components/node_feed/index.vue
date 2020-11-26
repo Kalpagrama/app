@@ -28,7 +28,9 @@ div(
     node-item(v-if="node.items.length === 1" v-bind="$props")
     node-items(v-if="node.items.length === 2" v-bind="$props")
     //- ESSENCE:
-    div(:style=`{position: 'relative',}`).row.full-width
+    div(
+      v-if="node.name.length > 0"
+      :style=`{position: 'relative',}`).row.full-width
       router-link(
         :to="'/node/'+node.oid"
         :style=`{
@@ -102,7 +104,7 @@ export default {
       else return 10
     },
     nodeIsMine () {
-      return false
+      return this.node.author.oid === this.$store.getters.currentUser().oid
     },
     actions () {
       let res = {
