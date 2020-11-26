@@ -12,12 +12,26 @@ import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, sessionStorage, window } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
+import axios from 'axios'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 let apollo
+
+let fetchFunc
+if (process.env.MODE === 'ssr') {
+   fetchFunc = async (uri, options) => {
+      options.url = uri
+      if (options.body) options.data = options.body
+      let res = await axios(options)
+      if (res && res.data) res.body = res.data
+      return res
+   }
+} else {
+   fetchFunc = fetch
+}
 
 export default async ({ Vue, store, app }) => {
    try {
@@ -110,7 +124,7 @@ export default async ({ Vue, store, app }) => {
             uri: SERVICES_URL,
             fetch (uri, options) {
                if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-               return fetch(uri, options)
+               return fetchFunc(uri, options)
             }
          }),
          defaultOptions,
@@ -153,7 +167,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
                // useGETForQueries: true
             })
@@ -170,7 +184,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
                // useGETForQueries: true
             })
@@ -209,7 +223,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
             })
          ]),

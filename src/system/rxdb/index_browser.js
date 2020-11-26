@@ -19,6 +19,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services_browser'
+import { getRxCollectionEnumFromId, getRawIdFromId, makeId } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -57,32 +58,6 @@ class ReactiveDocDbMemCache {
    reset () {
       this.cacheLru.reset()
    }
-}
-
-function getRxCollectionEnumFromId (id) {
-   assert(id, '!id')
-   let parts = id.split('::')
-   assert(parts.length >= 2, 'bad id!' + id)
-   let rxCollection = parts[0]
-   assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
-   return rxCollection
-}
-
-function getRawIdFromId (id) {
-   assert(id, '!id')
-   let parts = id.split('::')
-   assert(parts.length >= 2, 'bad id!' + id)
-   let rawId = parts[1]
-   assert(rawId, 'bad id' + id)
-   return rawId
-}
-
-function makeId (rxCollectionEnum, rawId, params) {
-   assert(rawId, '!rawId')
-   assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
-   assert(!rawId.includes('::'), 'bad rawId' + rawId)
-   params = params || {}
-   return rxCollectionEnum + '::' + rawId + '::' + JSON.stringify(params)
 }
 
 class RxDBWrapper {
@@ -690,8 +665,5 @@ const rxdbWrapper = new RxDBWrapper()
 export {
    rxdbWrapper,
    rxdbWrapper as rxdb,
-   getRxCollectionEnumFromId,
-   getRawIdFromId,
    getReactiveDoc,
-   makeId
 }

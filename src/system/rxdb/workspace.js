@@ -9,7 +9,7 @@ import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
-import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb/index_browser'
+import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)

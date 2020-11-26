@@ -1,7 +1,9 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { LstCollectionEnum, RxCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
-import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb/index_browser'
+import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb'
+import { GqlQueries } from 'src/system/rxdb/gql_query'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
@@ -70,21 +72,25 @@ class RxDBDummy {
       }
       assert(id, 'bad id: ' + id)
       rxCollectionEnum = getRxCollectionEnumFromId(id) // иногда вызывается без rxCollectionEnum (когда известен только id)
+      let result
       let rawId = getRawIdFromId(id)
       if (rxCollectionEnum in WsCollectionEnum) {
          throw new Error('not impl!!!')
       } else if (rxCollectionEnum in LstCollectionEnum) {
-         rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
+         throw new Error('not impl!!!')
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc)
+         throw new Error('not impl!!!')
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
-         rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
+         let fetchFunc = GqlQueries.getFetchFunc(id, params)
+         let { item } = await fetchFunc()
+         result = item
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         rxDoc = await this.db.meta.findOne(rawId).exec()
+         throw new Error('not impl!!!')
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return result
    }
 
    // actualAge - актуально только для кэша
