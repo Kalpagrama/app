@@ -230,20 +230,23 @@ class Cache {
                let debouncedUpdateQueueCopy = this.debouncedUpdateQueue
                this.debouncedUpdateQueue = [] // пока debouncedBatchUpdate выполняется, - очередь может пополняться
                try {
-                  let uniquePlainDocs = {}
-                  for (let { plainDoc } of debouncedUpdateQueueCopy) uniquePlainDocs[plainDoc.id] = plainDoc
-                  // logW(f, `try update batch queue sz = ${debouncedUpdateQueueCopy.length} unique = ${Object.keys(uniquePlainDocs).length}`)
+                  let insertedPlainDocs = {}
+                  for (let { plainDoc } of debouncedUpdateQueueCopy) insertedPlainDocs[plainDoc.id] = plainDoc
                   // если такие уже есть - удалим
-                  await this.db.cache.find({ selector: { id: { $in: Object.keys(uniquePlainDocs) } } }).remove()
-                  // logD('before insert', Object.values(uniquePlainDocs), await this.db.cache.find({ selector: { id: { $in: Object.keys(uniquePlainDocs) } } }).exec())
-                  let { success, error } = await this.db.cache.bulkInsert(Object.values(uniquePlainDocs))
-                  // let inserted = await this.db.cache.find({ selector: { id: { $in: Object.keys(uniquePlainDocs) } } }).exec()
-                  // for (let doc of inserted)logW('after insert', doc.toJSON())
+                  let updatedRxDocs = await this.db.cache.find({ selector: { id: { $in: Object.keys(insertedPlainDocs) } } }).exec() // эти обновляем
+                  for (let updated of updatedRxDocs) {
+                     let inserted = insertedPlainDocs[updated.id]
+                     assert(inserted, '!updated')
+                     await this.db.cache.atomicUpsert(inserted)
+                     delete insertedPlainDocs[updated.id]
+                  }
+                  let { success, error } = await this.db.cache.bulkInsert(Object.values(insertedPlainDocs)) // оставшиеся вставляем
+                  success.push(...updatedRxDocs)
                   for (let { plainDoc, resolve, reject } of debouncedUpdateQueueCopy) {
                      let rxDocUpdated = success.find(rxDoc => rxDoc.id === plainDoc.id)
                      if (rxDocUpdated) resolve(rxDocUpdated)
                      else {
-                        reject('bulkInsert error! uniquePlainDocs=' + JSON.stringify({uniquePlainDocs, success, error}))
+                        reject('bulkInsert error! debouncedUpdateQueueCopy=' + JSON.stringify({debouncedUpdateQueueCopy, success, error}))
                      }
                   }
                } catch (err) {

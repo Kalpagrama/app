@@ -166,7 +166,8 @@ class Lists {
         let rxDocs = await this.cache.find({
           selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-            'props.oid': { $in: event.sphereOids }
+            'props.oid': { $in: event.sphereOids },
+            'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
           }
         })
         if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
@@ -179,6 +180,7 @@ class Lists {
         }
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
+          logD('apply event to rxdoc', rxDoc.toJSON())
           let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')

@@ -510,6 +510,7 @@ class RxDBWrapper {
                   f.nameExtra = 'populateFunc'
                   logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
                   const t1 = performance.now()
+                  assert(itemsForPopulate && itemsForPrefetch)
                   let populatedItems
                   if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
                      // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
