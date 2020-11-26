@@ -11,6 +11,7 @@ div(
       :style=`{
         position: 'relative',
         transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
+        borderRadius: '10px', overflow: 'hidden',
       }`
       ).row.full-width
       div(
@@ -51,6 +52,8 @@ div(
               height: '100%', objectFit: 'cover', loop: true,
               showContentExplorer: true,
               showContentMeta: false,
+              borderRadius: '10px',
+              overflow: 'hidden'
             }`)
           //- FALLBACK
           //- fallback image

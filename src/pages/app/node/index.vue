@@ -61,7 +61,7 @@ export default {
     // pageInside: () => import('./view_joints/index.vue'),
     pageInside: () => import('./page_inside/index.vue'),
     // pageOutside: () => import('./page_outside/index.vue'),
-    contentPlayer: () => import('components/content_player/index.vue')
+    // contentPlayer: () => import('components/content_player/index.vue')
   },
   data () {
     return {
@@ -165,12 +165,12 @@ export default {
     await this.$wait(2000)
     this.mounted = true
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
     // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }

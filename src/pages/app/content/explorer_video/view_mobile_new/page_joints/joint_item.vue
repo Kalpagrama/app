@@ -100,7 +100,7 @@ div(
         :node="joint"
         :isActive="opened" :isVisible="true"
         :showItems="false"
-        :showName="true"
+        :showName="false"
         :showActions="opened"
         :showSpheres="opened"
         :showHeader="opened"

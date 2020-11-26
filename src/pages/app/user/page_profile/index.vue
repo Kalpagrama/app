@@ -13,7 +13,7 @@ q-page(
     :style=`{
       position: 'sticky', top: '0px',
       maxWidth: $store.state.ui.pageWidth+'px',
-      zIndex: 10000,
+      zIndex: 2000,
     }`
     ).row.full-width.q-px-sm.b-30
     q-tabs(

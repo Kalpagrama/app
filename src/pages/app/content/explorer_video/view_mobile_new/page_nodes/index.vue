@@ -63,12 +63,14 @@ export default {
       this.$log('figuresUpdate', nodes.length)
       // get figures
       let figures = nodes.reduce((acc, node) => {
-        node.items.map(i => {
-          if (i.layers[0].contentOid === this.contentKalpa.oid) {
-            let figureInput = i.layers[0].figuresAbsolute[0]
-            if (node.items.length === 1) acc.push([figureInput])
-          }
-        })
+        if (node.items.length === 1 && node.items[0].layers) {
+          node.items.map(i => {
+            if (i.layers[0].contentOid === this.contentKalpa.oid) {
+              let figureInput = i.layers[0].figuresAbsolute[0]
+              if (node.items.length === 1) acc.push([figureInput])
+            }
+          })
+        }
         return acc
       }, [])
       this.$emit('figures', figures)
