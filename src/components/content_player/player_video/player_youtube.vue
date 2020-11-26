@@ -3,7 +3,7 @@ iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
   z-index: 100
-  border-radius: 10px
+  // border-radius: 10px
   overflow: hidden
   pointer-events: none
 // @media (min-width: 900px)

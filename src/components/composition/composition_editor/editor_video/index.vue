@@ -19,6 +19,7 @@ div(:style=`{position: 'relative',}`).row.full-width
           :style=`{position: 'absolute', top: '0px', zIndex: 99999}`
           :barStyles=`{
             height: '100%',
+            //- opacity: 0.1
           }`).fit
 </template>
 

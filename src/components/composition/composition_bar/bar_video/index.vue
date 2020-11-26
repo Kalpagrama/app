@@ -56,7 +56,7 @@
         }`
         ).row.bg-red
   //- actions
-  div(
+  //- div(
     :style=`{
       order: actionsPosition === 'bottom' ? 1 : -1,
     }`

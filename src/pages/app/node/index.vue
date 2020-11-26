@@ -5,7 +5,7 @@ q-layout(
   q-header(
    ).b-30
     .row.full-width.justify-center
-      q-resize-observer(@resize="onResize")
+      //- q-resize-observer(@resize="onResize")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
         //- .row.full-width.items-center.content-center
           q-btn(
@@ -29,7 +29,7 @@ q-layout(
           rootMargin="-30% 0px"
           :items="[node]" :itemStyles=`{marginTop: '0px',}`)
           template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-            //- content-player(
+            content-player(
               :contentKalpa=`{
                 name: '',
                 url: node.items[0].url,
@@ -37,7 +37,7 @@ q-layout(
                 contentSource: 'KALPA',
                 type: 'VIDEO',
               }`)
-            node-feed(
+            //- node-feed(
               :node="item" :isActive="true" :isVisible="itemVisible"
               :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
               template(v-slot:name)
@@ -87,7 +87,7 @@ q-layout(
     component(
       v-if="node"
       :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
-      //- template(v-slot:bottom)
+      template(v-slot:bottom)
         .row.full-width.justify-center
           div(:style=`{maxWidth: 770+'px'}`).row.full-width
             q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm.q-mr-lg Назад
@@ -108,10 +108,10 @@ export default {
   name: 'pageApp_node',
   components: {
     nodeMockup,
-    pageInside: () => import('./view_joints/index.vue'),
-    // pageInside: () => import('./page_inside/index.vue'),
+    // pageInside: () => import('./view_joints/index.vue'),
+    pageInside: () => import('./page_inside/index.vue'),
     // pageOutside: () => import('./page_outside/index.vue'),
-    // contentPlayer: () => import('components/content_player/index.vue')
+    contentPlayer: () => import('components/content_player/index.vue')
   },
   data () {
     return {

@@ -2,7 +2,7 @@
 div(
   @click="start()"
   :style=`{
-    position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
+    position: 'absolute', zIndex: 3000, transform: 'translate3d(0,0,0)',
     top: '0px', left: '0px',
     height: '44px', width: '44px',
     background: 'rgba(0,0,0,0.15)',

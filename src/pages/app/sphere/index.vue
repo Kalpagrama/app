@@ -1,19 +1,21 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-px-sm.q-pt-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
           :style=`{
-            height: '60px',
+            minHeight: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-btn(
+          //- q-btn(
             @click="$router.back()"
             round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="blur_on" color="white" size="30px")
-          .col.q-px-md
-            span(v-if="sphere" :style=`{fontSize: '18px'}`).text-white.text-bold {{ sphere.name }}
+          q-icon(name="blur_on" color="white" size="30px").q-ml-sm
+          .col.q-px-sm
+            span(
+              v-if="sphere" :style=`{fontSize: '18px'}`
+              ).text-white.text-bold {{ sphere.name }}
           kalpa-bookmark(
             v-if="sphere"
             :oid="sphere.oid"
@@ -58,7 +60,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.$route.params.oid
         },
         populateObjects: true,

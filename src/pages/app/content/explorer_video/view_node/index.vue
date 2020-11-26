@@ -56,7 +56,7 @@ div(
                 flat color="green" icon="add" size="lg"
                 :style=`{height: '100px'}`).full-width.b-60
               .row.full-width
-                q-resize-observer(@resize="width = $event.width")
+                //- q-resize-observer(@resize="width = $event.width")
                 q-btn(
                   flat color="white" icon-right="keyboard_arrow_down" no-caps
                   ).full-width {{ jointType }}

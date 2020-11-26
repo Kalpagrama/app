@@ -5,7 +5,7 @@ div(
   }`
   ).row.full-width.items-center.content-center
   //- get width for sphere autocomplete menu maxWidth...
-  q-resize-observer(@resize="e => width = e.width")
+  //- q-resize-observer(@resize="e => width = e.width")
   //- sphere autocomplete dialog...
   q-menu(
     v-model="sphereAutocompleteShow"

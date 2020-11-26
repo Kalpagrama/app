@@ -4,7 +4,7 @@ kalpa-loader(
   list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
     q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      joint-feed(:joint="item" :isActive="isActive" :isVisible="isVisible")
+      node-feed(:node="item" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>

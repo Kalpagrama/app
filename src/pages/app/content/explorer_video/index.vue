@@ -1,6 +1,7 @@
 <template lang="pug">
+//- :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
 component(
-  :is="$q.screen.gt.sm ? 'view-desktop' : 'view-mobile'"
+  is="view-mobile"
   v-bind="$props")
 </template>
 
@@ -10,7 +11,8 @@ export default {
   props: ['contentKalpa', 'query'],
   components: {
     viewDesktop: () => import('./view_desktop.vue'),
-    viewMobile: () => import('./view_mobile.vue')
+    // viewMobile: () => import('./view_mobile.vue'),
+    viewMobile: () => import('./view_mobile_new/index.vue')
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
+  q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
@@ -16,6 +16,12 @@ q-layout(view="hHh Lpr lff")
           //- q-btn(round flat color="grey-8" icon="settings")
   q-page-container
     router-view
+    //- iframe(
+      src="https://doc.clickup.com/p/h/2cve9-15/42d6a6e8f899a3b"
+      frameBorder="0"
+      :style=`{
+        width: '100%', height: 'calc(100vh - 0px)',
+      }`)
 </template>
 
 <script>

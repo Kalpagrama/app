@@ -7,7 +7,7 @@ node-editor(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'wsNode',
+  name: 'pageApp_wsNode',
   components: {
     nodeEditor: () => import('components/node_editor/index.vue'),
   },

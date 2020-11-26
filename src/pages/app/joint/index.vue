@@ -21,7 +21,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     q-page(:style=`{paddingTop: '20px', paddingBottom: '400px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        joint-feed(v-if="joint" :joint="joint")
+        node-feed(v-if="joint" :node="joint")
         .row.full-width.q-px-md.q-mt-xl
           q-tabs(
             v-model="viewId"

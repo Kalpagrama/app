@@ -4,7 +4,7 @@ kalpa-loader(
   list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
     q-infinite-scroll(@load="next" :offset="$q.screen.height")
     template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-      component(:is="components[item.type]" :joint="item" :node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+      node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>
 
 <script>
@@ -15,10 +15,6 @@ export default {
   props: ['user'],
   data () {
     return {
-      components: {
-        NODE: 'node-feed',
-        JOINT: 'joint-feed',
-      }
     }
   },
   computed: {
