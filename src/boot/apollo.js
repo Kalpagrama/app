@@ -10,7 +10,7 @@ import possibleTypes from 'public/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, sessionStorage, window } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, sessionStorage, window, localStorage } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import axios from 'axios'
 
@@ -25,9 +25,25 @@ if (process.env.MODE === 'ssr') {
    fetchFunc = async (uri, options) => {
       options.url = uri
       if (options.body) options.data = options.body
-      let res = await axios(options)
-      if (res && res.data) res.body = res.data
-      return res
+      let result = await axios(options)
+      // if (res && res.data) res.body = res.data
+      // res.body.text = () => {}
+
+      // Convert the Axios style response into a `fetch` style response
+      const responseBody = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
+
+      const { Response, Headers } = require('node-fetch')
+      const headers = new Headers();
+      Object.entries(result.headers).forEach(function ([key, value]) {
+         headers.append(key, value);
+      })
+      let response = new Response(responseBody, {
+         status: result.status,
+         statusText: result.statusText,
+         headers
+      });
+
+      return response
    }
 } else {
    fetchFunc = fetch
@@ -148,6 +164,7 @@ export default async ({ Vue, store, app }) => {
             window.location.reload() // новые данные будут подхвачены после перезагрузки
          }
       }
+
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
          { clientFirst: true, force: true, onFetchFunc })
 
@@ -193,27 +210,30 @@ export default async ({ Vue, store, app }) => {
          cache,
          connectToDevTools: true
       })
-      const wsApollo = new ApolloClient({
-         link: ApolloLink.from([
-            errLinkWs,
-            new WebSocketLink({
-               uri: linkWs,
-               options: {
-                  minTimeout: 6000,
-                  reconnect: true,
-                  lazy: true,
-                  connectionParams: () => {
-                     return {
-                        Authorization: localStorage.getItem('k_token'),
-                        'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+      let wsApollo = null
+      if (process.env.MODE !== 'ssr') {
+         wsApollo = new ApolloClient({
+            link: ApolloLink.from([
+               errLinkWs,
+               new WebSocketLink({
+                  uri: linkWs,
+                  options: {
+                     minTimeout: 6000,
+                     reconnect: true,
+                     lazy: true,
+                     connectionParams: () => {
+                        return {
+                           Authorization: localStorage.getItem('k_token'),
+                           'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+                        }
                      }
                   }
-               }
-            })
-         ]),
-         defaultOptions,
-         cache
-      })
+               })
+            ]),
+            defaultOptions,
+            cache
+         })
+      }
       const uploadApollo = new ApolloClient({
          link: ApolloLink.from([
             errLink,

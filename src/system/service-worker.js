@@ -234,7 +234,7 @@ async function sendMsg (type, msgData) {
          event.waitUntil(sendToken()) // пришел новый сервис-воркер - отправить всем новый webPushToken
       })
       self.addEventListener('fetch', async event => {
-         // logD('ready to handle fetches! request=', event.request)
+         logD('ready to handle fetches! request=', event.request)
       })
       self.addEventListener('updatefound', event => {
          logD('ready to update!', swVer)

@@ -103,7 +103,7 @@
     "eslint-plugin-vue": "^6.0.1",
     "fs": "^0.0.1-security",
     "i18next-scanner": "^2.10.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "now": "^20.1.1",
     "strip-ansi": "^6.0.0",
     "vue-template-compiler": "^2.6.10",

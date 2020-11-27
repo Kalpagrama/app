@@ -1,6 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'

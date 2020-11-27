@@ -1,12 +1,17 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { LstCollectionEnum, RxCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
-import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb'
+import { getRawIdFromId, getRxCollectionEnumFromId, makeId, rxdb } from 'src/system/rxdb'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
+import { AuthApi } from 'src/api/auth'
+import cloneDeep from 'lodash/cloneDeep'
+import { ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
+import { ListsApi as ListApi } from 'src/api/lists'
+import { ObjectApi } from 'src/api/object'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SSR)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SSR)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SSR)
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const defaultCacheSize = 10 * 1024 * 1024 // кэш реактивных объектов
@@ -21,17 +26,23 @@ class RxDBDummy {
       const f = this.create
       logD(f, 'start???')
       const t1 = performance.now()
-      assert(!this.created, 'this.created')
+      // assert(!this.created, 'this.created')
       this.created = true
    }
 
    // получит юзера, запустит обработку эвентов и синхронмзацию мастерской) dummyUser - для входа без регистрации
    async init () {
       assert(this.created, '!created')
-      assert(!this.initialized, 'this.initialized уже!')
       const f = this.init
       const t1 = performance.now()
       logD(f, 'start')
+      const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
+      // logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
+      assert(dummyUser, '!dummyUser')
+      this.getCurrentUser = () => {
+         return dummyUser
+      }
+      this.initialized = true
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
@@ -50,7 +61,77 @@ class RxDBDummy {
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start')
+      mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
+      assert(this.initialized, '! this.initialized !')
+      const queryId = JSON.stringify(mangoQuery)
+      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
+      let findResult
+      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+      assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      if (rxCollectionEnum in WsCollectionEnum) {
+         throw new Error('not impl')
+      } else if (rxCollectionEnum in LstCollectionEnum) {
+         let populateObjects = mangoQuery.populateObjects
+         delete mangoQuery.populateObjects // мешает нормальному кэшированию
+         let populateFunc = async (itemsForPopulate, itemsForPrefetch) => {
+            const f = populateFunc
+            f.nameExtra = 'populateFunc'
+            logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
+            const t1 = performance.now()
+            let populatedItems = cloneDeep(itemsForPopulate)
+            let oids = itemsForPopulate.map(item => {
+               if (rxCollectionEnum === RxCollectionEnum.LST_FEED) return item.object.oid
+               else return item.oid
+            })
+            let objectList = await ObjectApi.objectList(oids)
+
+            if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
+               for (let item of populatedItems) {
+                  let fullItem = objectList.find(obj => obj.oid === item.oid)
+                  assert(fullItem, '!fullItem')
+                  item.object = fullItem
+               }
+            } else {
+               for (let i = 0; i < populatedItems.length; i++) {
+                  let fullItem = objectList.find(obj => obj.oid === populatedItems[i].oid)
+                  assert(fullItem, '!fullItem')
+                  populatedItems[i] = fullItem
+               }
+            }
+            assert(populatedItems && Array.isArray(populatedItems))
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+            return populatedItems.filter(obj => !!obj)
+         }
+
+         let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
+         let totalItems = items
+         findResult = []
+         findResult.nextIndex = 0
+         findResult.nextPageIndex = 0
+         findResult.next = async (count) => {
+            if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)
+            if (!count && findResult.nextIndex === 0) { // autoNext
+               if (populateObjects) count = 12 // дорогая операция
+               else count = totalItems.length // выдаем все элементы разом
+            }
+            findResult.nextPageIndex = findResult.nextIndex + count
+            if (findResult.nextIndex >= totalItems.length) return false // дошли до конца списка
+            let fromIndex = findResult.nextIndex
+            findResult.nextIndex = findResult.nextIndex + count
+            let nextItems = totalItems.slice(fromIndex, findResult.nextIndex)
+            let prefetchItems = []
+            if (count < 12) prefetchItems = totalItems.slice(findResult.nextIndex, findResult.nextIndex + 4) // упреждпющее чтение
+            if (populateObjects) nextItems = await populateFunc(nextItems, prefetchItems) // запрашиваем полные сущности
+            findResult.splice(findResult.length, 0, ...nextItems)
+            return findResult.nextIndex < findResult.reactiveListFull.length
+         }
+      } else {
+         throw new Error('bad collection:' + rxCollectionEnum)
+      }
+      assert(findResult && findResult.next, '!findResult.next')
+      if (autoNext) await findResult.next()
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return findResult
    }
 
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
@@ -79,7 +160,8 @@ class RxDBDummy {
       } else if (rxCollectionEnum in LstCollectionEnum) {
          throw new Error('not impl!!!')
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-         throw new Error('not impl!!!')
+         let oid = getRawIdFromId(id)
+         result = await ObjectApi.objectFull(oid)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          let fetchFunc = GqlQueries.getFetchFunc(id, params)
          let { item } = await fetchFunc()

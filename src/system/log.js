@@ -33,6 +33,7 @@ const LogSystemModulesEnum = Object.freeze({
    SYSTEM: 'sys',
    SW: 'sw',
    PWA: 'pwa',
+   SSR: 'ssr',
    AUTH: 'auth',
    API: 'api',
    ROUTER: 'rtr',
@@ -79,27 +80,41 @@ function getLogFunc (level, module) {
 
 let performanceSSR = { now: () => Date.now() }
 let localStorageSSR, sessionStorageSSR
-localStorageSSR = sessionStorageSSR = {
-   setItem: (key, value) => {
-   },
-   getItem: (key) => {
-   },
-   removeItem: (key) => {
-   },
-   clear: () => {
-   },
-   key: (index) => {
-   },
-   length: 0
+
+class Storage {
+   constructor () {
+      this.storage = {}
+   }
+
+   setItem (key, value) {
+      this.storage[key] = value
+   }
+
+   getItem (key) {
+      return this.storage[key]
+   }
+
+   removeItem (key) {
+      delete this.storage[key]
+   }
+
+   clear () {
+      this.storage = {}
+   }
+
+   key (index) {
+      throw new Error('not impl')
+   }
 }
+
+localStorageSSR = sessionStorageSSR = new Storage()
 let windowSSR = {
    location: {
       reload: () => {
       }
    }
 }
-let documentSSR = {
-}
+let documentSSR = {}
 
 async function initLogger (store) {
    assert(store, '!store')
