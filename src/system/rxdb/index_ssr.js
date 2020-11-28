@@ -65,11 +65,16 @@ class RxDBDummy {
       assert(this.initialized, '! this.initialized !')
       const queryId = JSON.stringify(mangoQuery)
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
-      let findResult
+      let findResult = []
+      findResult.nextIndex = 0
+      findResult.nextPageIndex = 0
+      findResult.next = async (count) => {
+         return false
+      }
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       if (rxCollectionEnum in WsCollectionEnum) {
-         throw new Error('not impl')
+         // throw new Error('not impl')
       } else if (rxCollectionEnum in LstCollectionEnum) {
          let populateObjects = mangoQuery.populateObjects
          delete mangoQuery.populateObjects // мешает нормальному кэшированию
@@ -105,9 +110,6 @@ class RxDBDummy {
 
          let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
          let totalItems = items
-         findResult = []
-         findResult.nextIndex = 0
-         findResult.nextPageIndex = 0
          findResult.next = async (count) => {
             if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)
             if (!count && findResult.nextIndex === 0) { // autoNext
@@ -123,7 +125,7 @@ class RxDBDummy {
             if (count < 12) prefetchItems = totalItems.slice(findResult.nextIndex, findResult.nextIndex + 4) // упреждпющее чтение
             if (populateObjects) nextItems = await populateFunc(nextItems, prefetchItems) // запрашиваем полные сущности
             findResult.splice(findResult.length, 0, ...nextItems)
-            return findResult.nextIndex < findResult.reactiveListFull.length
+            return findResult.nextIndex < totalItems.length
          }
       } else {
          throw new Error('bad collection:' + rxCollectionEnum)

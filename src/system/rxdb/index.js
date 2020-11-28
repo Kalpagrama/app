@@ -1,5 +1,6 @@
 import {RxCollectionEnum} from 'src/system/rxdb/common'
 import assert from 'assert'
+import { isSsr } from 'src/system/log'
 
 let rxdb
 
@@ -31,7 +32,7 @@ function makeId (rxCollectionEnum, rawId, params) {
 
 async function initRxdb(store){
    console.log('!!!!!!!!!!!!!!!!!!!initRxdb')
-   if (process.env.MODE === 'ssr') {
+   if (isSsr) {
       const {rxdbDummy} = await import('src/system/rxdb/index_ssr')
       rxdb = rxdbDummy
    } else {

@@ -10,7 +10,15 @@ import possibleTypes from 'public/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, sessionStorage, window, localStorage } from 'src/system/log'
+import {
+   getLogFunc,
+   LogLevelEnum,
+   LogSystemModulesEnum,
+   sessionStorage,
+   window,
+   localStorage,
+   isSsr
+} from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import axios from 'axios'
 
@@ -20,37 +28,37 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 let apollo
 
-let fetchFunc
-if (process.env.MODE === 'ssr') {
-   fetchFunc = async (uri, options) => {
-      options.url = uri
-      if (options.body) options.data = options.body
-      let result = await axios(options)
-      // if (res && res.data) res.body = res.data
-      // res.body.text = () => {}
-
-      // Convert the Axios style response into a `fetch` style response
-      const responseBody = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
-
-      const { Response, Headers } = require('node-fetch')
-      const headers = new Headers();
-      Object.entries(result.headers).forEach(function ([key, value]) {
-         headers.append(key, value);
-      })
-      let response = new Response(responseBody, {
-         status: result.status,
-         statusText: result.statusText,
-         headers
-      });
-
-      return response
-   }
-} else {
-   fetchFunc = fetch
-}
-
 export default async ({ Vue, store, app }) => {
    try {
+      let fetchFunc
+      console.error('apollo::isSsr=', isSsr)
+      if (isSsr) {
+         fetchFunc = async (uri, options) => {
+            options.url = uri
+            if (options.body) options.data = options.body
+            let result = await axios(options)
+            // if (res && res.data) res.body = res.data
+            // res.body.text = () => {}
+
+            // Convert the Axios style response into a `fetch` style response
+            const responseBody = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
+
+            const { Response, Headers } = require('node-fetch')
+            const headers = new Headers();
+            Object.entries(result.headers).forEach(function ([key, value]) {
+               headers.append(key, value);
+            })
+            let response = new Response(responseBody, {
+               status: result.status,
+               statusText: result.statusText,
+               headers
+            });
+
+            return response
+         }
+      } else {
+         fetchFunc = fetch
+      }
       let kDebug = sessionStorage.getItem('k_debug') || '0'// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
@@ -211,7 +219,7 @@ export default async ({ Vue, store, app }) => {
          connectToDevTools: true
       })
       let wsApollo = null
-      if (process.env.MODE !== 'ssr') {
+      if (!isSsr) {
          wsApollo = new ApolloClient({
             link: ApolloLink.from([
                errLinkWs,

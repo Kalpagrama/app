@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, isSsr, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
@@ -14,7 +14,7 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
   try {
     // alert('SYSTEM router init')
     router = VueRouter
-    if (process.env.MODE === 'ssr') {
+    if (isSsr) {
     } else {
       const {initApplication} = await import('src/system/services_browser')
       Vue.prototype.$systemUtils = await initApplication()

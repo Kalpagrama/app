@@ -78,6 +78,7 @@ function getLogFunc (level, module) {
    }
 }
 
+let isSsr = process.env.MODE === 'ssr'
 let performanceSSR = { now: () => Date.now() }
 let localStorageSSR, sessionStorageSSR
 
@@ -116,13 +117,18 @@ let windowSSR = {
 }
 let documentSSR = {}
 
-async function initLogger (store) {
+async function initLogger (store, ssrContext) {
    assert(store, '!store')
+   let isSsrServerSide = !!ssrContext
+   isSsr = (process.env.MODE === 'ssr') // && isSsrServerSide
+   console.log('boot::log::isSsr=', isSsr)
+   console.log('boot::log::isSsrServerSide=', isSsrServerSide)
    let logger
-   if (process.env.MODE === 'ssr') {
+   if (isSsr) {
       const { init } = await import('src/system/log_ssr')
       logger = init(store)
    } else {
+      alert('isSsr=' + JSON.stringify(isSsr))
       performanceSSR = window.performance
       localStorageSSR = window.localStorage
       sessionStorageSSR = window.sessionStorage
@@ -166,6 +172,7 @@ export {
    getLogFunc,
    LogLevelEnum,
    LogSystemModulesEnum,
+   isSsr,
    performanceSSR as performance,
    localStorageSSR as localStorage,
    sessionStorageSSR as sessionStorage,

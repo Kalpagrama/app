@@ -1,5 +1,7 @@
+import { isSsr } from 'src/system/log'
+
 async function initApplication () {
-   if (process.env.MODE === 'ssr') {
+   if (isSsr) {
       const {initApplication} = await import('src/system/services_ssr')
       await initApplication()
    } else {
@@ -9,7 +11,7 @@ async function initApplication () {
 }
 
 async function systemReset (clearAuthData = false, clearRxdb = true, reload = true, pwaResetFlag = true) {
-   if (process.env.MODE === 'ssr') {
+   if (isSsr) {
       const {systemReset} = await import('src/system/services_ssr')
       await systemReset(clearAuthData, clearRxdb, reload, pwaResetFlag)
    } else {
@@ -19,7 +21,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
 }
 
 async function systemInit () {
-   if (process.env.MODE === 'ssr') {
+   if (isSsr) {
       const {systemInit} = await import('src/system/services_ssr')
       await systemInit()
    } else {

@@ -1,9 +1,9 @@
 import 'src/system/utils'
 import { initLogger } from 'src/system/log'
 
-export default async ({ Vue, store, app }) => {
+export default async ({ Vue, store, app, ssrContext }) => {
    try {
-      let { logD, logI, logW, logE, logC } = await initLogger(store)
+      let { logD, logI, logW, logE, logC } = await initLogger(store, ssrContext)
       Vue.prototype.$log = Vue.prototype.$logD = logD
       Vue.prototype.$logI = logI
       Vue.prototype.$logW = logW

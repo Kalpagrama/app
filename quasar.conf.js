@@ -22,11 +22,12 @@ module.exports = function (ctx) {
       // --> boot files are part of "main.js"
       // https://quasar.dev/quasar-cli/boot-files
       boot: [
+         // { path: 'log_ssr', client: false },
+         // { path: 'log', server: false },
          'log',
          'rxdb',
          'notify',
          'i18n',
-         // { path: 'apollo', server: false },
          'apollo',
          'system',
          'main',
@@ -232,7 +233,8 @@ module.exports = function (ctx) {
      //  animations: 'all', // animations: [],
 
       ssr: {
-         pwa: true, // should a PWA take over (default: false), or just a SPA?
+         pwa: false, // should a PWA take over (default: false), or just a SPA?
+         manualHydration: true,
          // manualHydration: true/false, // (@quasar/app v1.4.2+) Manually hydrate the store
          // componentCache: {...} // lru-cache package options,
 
