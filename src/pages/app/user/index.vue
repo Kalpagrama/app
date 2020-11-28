@@ -34,7 +34,9 @@ q-layout(view="hHh Lpr lff")
           ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
           user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
           .col
-            span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
+            span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
+            .row.full-width.q-px-sm
+              small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
           kalpa-share(
             v-if="user"
             type="user" :item="user")

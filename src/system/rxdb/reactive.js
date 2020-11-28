@@ -337,7 +337,11 @@ class ReactiveListWithPaginationFactory {
          }
          this.reactiveListPagination.getProperty = (name) => this.props[name]
          this.reactiveListPagination.next = async (count) => {
-            if (this.populateFunc) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)
+            if (this.populateFunc && count > 12) {
+               logW('next allow only 12 with populate')
+               // assert(count <= 12, 'count <= 12! value =' + count)
+               count = 12
+            } // сервер работает пачками по 16 (12 + побочные запросы)
             if (!count && this.nextIndex === 0) { // autoNext
                if (this.populateFunc) count = 12 // дорогая операция
                else count = this.reactiveListFull.length // выдаем все элементы разом
@@ -401,7 +405,7 @@ class ReactiveListWithPaginationFactory {
                assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
                this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...change.cached.data.items)
                let nextItems = this.reactiveListFull.slice(0, this.nextPageIndex)
-               if (this.populateFunc) nextItems = await this.populateFunc(nextItems) // запрашиваем полные сущности
+               if (this.populateFunc) nextItems = await this.populateFunc(nextItems, []) // запрашиваем полные сущности
                this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...nextItems)
             } finally {
                this.reactiveListSubscribe()
