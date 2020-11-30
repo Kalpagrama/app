@@ -25,7 +25,6 @@ q-page
 
 <script>
 import { WorkspaceApi } from 'src/api/workspace'
-import { systemReset } from 'src/system/services'
 
 export default {
   name: 'pageApp_settings_viewWorkspace',

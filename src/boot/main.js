@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
@@ -33,7 +33,6 @@ const time = (sec) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
-    if (!window.stores) window.stores = {}
     Vue.use(VueMasonry)
     // Vue.use(VueYandexMetrika, {
     //   id: 60818698,
@@ -76,21 +75,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       else if (val <= 0.8) return 'Близко'
       else return 'Прямо в точку!'
     }
-    Vue.directive('kalpa-click-outside', {
-      bind: function (el, binding, vnode) {
-        el.clickOutsideEvent = function (event) {
-          // here I check that click was outside the el and his childrens
-          if (!(el === event.target || el.contains(event.target))) {
-            // and if it did, call method provided in attribute value
-            vnode.context[binding.expression](event);
-          }
-        }
-        document.body.addEventListener('click', el.clickOutsideEvent)
-      },
-      unbind: function (el) {
-        document.body.removeEventListener('click', el.clickOutsideEvent)
-      },
-    })
     // global components
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     Vue.component('nodeMini', () => import('components/node_mini/index.vue'))

@@ -2,8 +2,9 @@
 import assert from 'assert'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { makeId, rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { wait } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 

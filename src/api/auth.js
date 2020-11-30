@@ -1,5 +1,5 @@
 import { apollo } from 'src/boot/apollo'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
@@ -18,7 +18,7 @@ const ActionEnum = Object.freeze({
 
 class AuthApi {
    static getRole () {
-      return rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
+      return rxdb && rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
    }
 
    static isGuest () {

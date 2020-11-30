@@ -5,10 +5,10 @@ import { isRxDocument, isRxQuery } from 'rxdb'
 import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
-import { MutexLocal } from 'src/system/rxdb/mutex'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)

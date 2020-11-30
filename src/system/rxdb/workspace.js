@@ -1,15 +1,15 @@
-import { isRxDocument } from 'rxdb'
-
 import assert from 'assert'
+import { RxCollectionEnum, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/common'
 import { wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { mutexGlobal } from 'src/system/rxdb/mutex_global'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
-import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
@@ -46,19 +46,6 @@ class WaitBreakable {
    }
 }
 
-const WsItemTypeEnum = Object.freeze({
-   WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
-   WS_NODE: 'WS_NODE',
-   WS_CONTENT: 'WS_CONTENT',
-   WS_SPHERE: 'WS_SPHERE',
-   WS_BOOKMARK: 'WS_BOOKMARK',
-   WS_JOINT: 'WS_JOINT',
-   WS_COLLECTION: 'WS_COLLECTION'
-})
-const WsCollectionEnum = Object.freeze({
-   ...WsItemTypeEnum,
-   WS_CHANGES: 'WS_CHANGES'
-})
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
