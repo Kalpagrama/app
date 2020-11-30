@@ -1,6 +1,6 @@
 import assert from 'assert'
 import 'src/system/utils'
-import { LogSystemModulesEnum, LogLevelEnum } from 'src/system/log'
+import { LogSystemModulesEnum, LogLevelEnum, sessionStorage } from 'src/system/log'
 
 let logSystemModulesValueSet = new Set(Object.values(LogSystemModulesEnum))
 
@@ -20,6 +20,21 @@ class Logger {
    }
 
    init () {
+      {
+         // init
+         if (!sessionStorage.getItem('k_log_format')) {
+            sessionStorage.setItem('k_log_format', JSON.stringify({
+               time: false,
+               moduleName: true,
+               funcName: true
+            }))
+         }
+         if (!sessionStorage.getItem('k_log_level')) {
+            if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
+            else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
+         }
+         if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'gui')
+      }
       let logLevel = sessionStorage.getItem('k_log_level')
       let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))
       let logDbgFilter = sessionStorage.getItem('k_log_filter')

@@ -121,14 +121,14 @@ async function initLogger (store, ssrContext) {
    assert(store, '!store')
    let isSsrServerSide = !!ssrContext
    isSsr = (process.env.MODE === 'ssr') // && isSsrServerSide
-   console.log('boot::log::isSsr=', isSsr)
-   console.log('boot::log::isSsrServerSide=', isSsrServerSide)
+   logD('boot::log::isSsr=', isSsr)
+   logD('boot::log::isSsrServerSide=', isSsrServerSide)
    let logger
    if (isSsr) {
       const { init } = await import('src/system/log_ssr')
       logger = init(store)
    } else {
-      alert('isSsr=' + JSON.stringify(isSsr))
+      // alert('isSsr=' + JSON.stringify(isSsr))
       performanceSSR = window.performance
       localStorageSSR = window.localStorage
       sessionStorageSSR = window.sessionStorage

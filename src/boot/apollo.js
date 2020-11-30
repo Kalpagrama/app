@@ -59,7 +59,8 @@ export default async ({ Vue, store, app }) => {
       } else {
          fetchFunc = fetch
       }
-      let kDebug = sessionStorage.getItem('k_debug') || '0'// запросы переренаправляются на машину разработчика
+      if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
+      let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)

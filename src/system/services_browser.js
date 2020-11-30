@@ -218,22 +218,6 @@ function initOfflineEvents (store) {
    store.commit('core/stateSet', ['online', navigator.onLine])
 }
 
-function initSessionStorage () {
-   if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
-   if (!sessionStorage.getItem('k_log_format')) {
-      sessionStorage.setItem('k_log_format', JSON.stringify({
-         time: false,
-         moduleName: true,
-         funcName: true
-      }))
-   }
-   if (!sessionStorage.getItem('k_log_level')) {
-      if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
-      else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
-   }
-   if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'gui')
-}
-
 async function resetLocalStorage () {
    const f = resetLocalStorage
    logD(f, 'start')
@@ -427,8 +411,6 @@ async function systemHardReset () {
       };
    }
 }
-
-initSessionStorage()
 
 export {
    initApplication,

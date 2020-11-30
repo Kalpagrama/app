@@ -235,19 +235,22 @@ class RxDBWrapper {
             this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
-            let fetchCurrentUserFunc = async () => {
-               return {
-                  notEvict: true, // живет вечно
-                  item: dummyUser,
-                  actualAge: 'century' // dummyUser не устаревает
-               }
-            }
-            assert(dummyUser.oid, 'dummyUser.oid')
-            currentUser = await this.get(RxCollectionEnum.OBJ, dummyUser.oid, {
-               fetchFunc: fetchCurrentUserFunc,
-               force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-               clientFirst: false // обязательно брать из fetchFunc
-            })
+            // assert(!dummyUser.oid)
+            // dummyUser.oid = 'dummyUser_oid_' + Date.now()
+            // let fetchCurrentUserFunc = async () => {
+            //    return {
+            //       notEvict: true, // живет вечно
+            //       item: dummyUser,
+            //       actualAge: 'century' // dummyUser не устаревает
+            //    }
+            // }
+            // assert(dummyUser.oid, 'dummyUser.oid')
+            // currentUser = await this.get(RxCollectionEnum.OBJ, dummyUser.oid, {
+            //    fetchFunc: fetchCurrentUserFunc,
+            //    force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+            //    clientFirst: false // обязательно брать из fetchFunc
+            // })
+            currentUser = dummyUser
             assert(currentUser, '!currentUser (dummyUser)!!') // должен быть в rxdb после init
          }
 
