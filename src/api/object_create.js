@@ -121,9 +121,9 @@ class ObjectCreateApi {
       }
    }
 
-   static makeNodeInput (node) {
-      const f = ObjectCreateApi.makeNodeInput
-      node = cloneDeep(node) // makeNodeInput меняет node
+   static makeEssenceInput (node) {
+      const f = ObjectCreateApi.makeEssenceInput
+      node = cloneDeep(node) // makeEssenceInput меняет node
       {
          // checks
          assert.ok(node.category, 'node.category')
@@ -149,31 +149,31 @@ class ObjectCreateApi {
       return nodeInput
    }
 
-   static async nodeCreate (node) {
+   static async nodeCreate (essence) {
       const f = ObjectCreateApi.nodeCreate
-      logD(f, 'start', node)
+      logD(f, 'start', essence)
       const t1 = performance.now()
       const cb = async () => {
-         let nodeInput = ObjectCreateApi.makeNodeInput(node)
-         let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
+         let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
+         let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
-                mutation nodeCreate($node: NodeInput!) {
-                    nodeCreate (node: $node){
+                mutation essenceCreate($essence: NodeInput!) {
+                    essenceCreate (essence: $essence){
                         ...objectFullFragment
                     }
                 }
             `,
             variables: {
-               node: nodeInput
+               essence: essenceInput
             }
          })
-         let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+         let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'zero' }) // поместим ядро/joint в кэш (на всяк случай)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveNode.oid, progress: 1 }
+         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
          assert(store, '!store')
          store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
-         return reactiveNode
+         return reactiveEssence
       }
       return await apiCall(f, cb)
    }
@@ -183,8 +183,8 @@ class ObjectCreateApi {
       assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
       assert(joint.rightItem.oid || joint.rightItem.nodeInput, '!joint.rightItem.oid')
       assert(joint.jointType, '!joint.jointType')
-      if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeNodeInput(joint.leftItem.nodeInput)
-      if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeNodeInput(joint.rightItem.nodeInput)
+      if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.leftItem.nodeInput)
+      if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.rightItem.nodeInput)
       return {
          swap: joint.swap || false,
          jointType: joint.jointType,
