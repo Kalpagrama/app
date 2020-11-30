@@ -50,7 +50,7 @@ export default {
         )
         nodeInput.spheres = spheres
         // create node
-        let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
+        let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$log('publish createdNode', createdNode)
         this.$log('publish done')
         this.publishing = false

@@ -205,8 +205,8 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     contentSource
   }
 `
-const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
-  fragment nodeFragment on Node {
+const essenceFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
+  fragment essenceFragment on Essence {
     ...objectFragment
     sphereFromName{...objectShortFragment}
     rate
@@ -236,62 +236,6 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     }
     vertices
   }
-`
-const jointFragment = gql`${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
-fragment jointFragment on Joint {
-    ...objectFragment
-    sphereFromName{...objectShortFragment}
-    rate
-    weight
-    rateStat {percent, weight, count}
-    rateUser
-    countVotes
-    countViews
-    countJoints
-    countRemakes
-    countShares
-    countBookmarks
-    author {
-        oid
-        type
-        name
-        thumbUrl(preferWidth: 50)
-    }
-    jointType
-    swap
-    leftItem {
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
-        ...on Sphere {... sphereFragment}
-        ...on User {... userFragment}
-        ...on Composition {...compositionFragment}
-    }
-    rightItem {
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
-        ...on Sphere {... sphereFragment}
-        ...on User {... userFragment}
-        ...on Composition {...compositionFragment}
-    }
-    
-    spheres {
-        oid
-        name
-    }
-    category
-    layout
-    items {
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
-        ...on Sphere {... sphereFragment}
-        ...on User {... userFragment}
-        ...on Composition {...compositionFragment}
-    }
-    vertices
-}
 `
 
 const eventFragment = gql`
@@ -360,17 +304,16 @@ const eventFragmentWithBatch = gql`
 `
 
 const objectFullFragment = gql`
-    ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
-    ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
+    ${compositionFragment} ${videoFragment} ${imageFragment} ${essenceFragment}
+    ${sphereFragment} ${userFragment} ${objectFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
         ...on Video {...videoFragment}
         ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
+        ...on Essence {... essenceFragment}
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
-        ...on Joint {...jointFragment}
     }
 `
 
@@ -407,7 +350,7 @@ const fragments = {
    dummyUserFragment,
    objectShortFragment,
    objectShortStatFragment,
-   nodeFragment,
+   essenceFragment,
    sphereFragment,
    findResultFragment,
    findResultFragmentForSearch

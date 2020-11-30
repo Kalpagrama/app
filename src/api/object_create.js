@@ -121,36 +121,39 @@ class ObjectCreateApi {
       }
    }
 
-   static makeEssenceInput (node) {
+   static makeEssenceInput (essence) {
       const f = ObjectCreateApi.makeEssenceInput
-      node = cloneDeep(node) // makeEssenceInput меняет node
+      essence = cloneDeep(essence) // makeEssenceInput меняет essence
       {
          // checks
-         assert.ok(node.category, 'node.category')
-         assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10, 'node spheres')
-         assert.ok(node.items.length > 0, 'node.items.length > 0')
-         assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout), 'node.layout')
+         assert.ok(essence.category, 'essence.category')
+         assert.ok(essence.spheres.length >= 0 && essence.spheres.length <= 10, 'essence spheres')
+         assert.ok(essence.items.length > 0 && essence.items.length <= 2, 'essence.items.length > 0')
+         assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essence.layout), 'essence.layout')
       }
       let nodeInput = {}
-      nodeInput.layout = node.layout
-      // logD(f, nodeInput, node.spheres, node.spheres.length)
-      nodeInput.name = node.name || (node.spheres.length ? node.spheres[0].name : null)
+      nodeInput.layout = essence.layout
+      // logD(f, nodeInput, essence.spheres, essence.spheres.length)
+      nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       assert(nodeInput.name, '!nodeInput.name')
-      nodeInput.category = node.category || 'FUN'
-      nodeInput.spheres = node.spheres.map(s => {
+      nodeInput.category = essence.category || 'FUN'
+      nodeInput.spheres = essence.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      nodeInput.items = node.items.map(i => {
+      nodeInput.items = essence.items.map(i => {
+         let itemInput
+         if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
+         else itemInput = ObjectCreateApi.makeEssenceInput(i)
          return {
-            composition: ObjectCreateApi.makeCompositionInput(i)
+            compositionInput: ObjectCreateApi.makeCompositionInput(i)
          }
       })
-      nodeInput.vertices = []
+      nodeInput.vertices = essence.vertices || []
       return nodeInput
    }
 
-   static async nodeCreate (essence) {
-      const f = ObjectCreateApi.nodeCreate
+   static async essenceCreate (essence) {
+      const f = ObjectCreateApi.essenceCreate
       logD(f, 'start', essence)
       const t1 = performance.now()
       const cb = async () => {
@@ -158,7 +161,7 @@ class ObjectCreateApi {
          let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
-                mutation essenceCreate($essence: NodeInput!) {
+                mutation essenceCreate($essence:  EssenceInput!) {
                     essenceCreate (essence: $essence){
                         ...objectFullFragment
                     }
@@ -197,28 +200,29 @@ class ObjectCreateApi {
    static async jointCreate (joint) {
       const f = ObjectCreateApi.jointCreate
       logD(f, 'start')
-      const t1 = performance.now()
-      const cb = async () => {
-         let jointInput = ObjectCreateApi.makeJointInput(joint)
-         logD('jointCreate jointInput', jointInput)
-         let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation jointCreate($joint: JointInput!) {
-                    jointCreate (joint: $joint){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               joint: jointInput
-            }
-         })
-         let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return reactiveJoint
-      }
-      return await apiCall(f, cb)
+      // const t1 = performance.now()
+      // const cb = async () => {
+      //    let jointInput = ObjectCreateApi.makeJointInput(joint)
+      //    logD('jointCreate jointInput', jointInput)
+      //    let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
+      //       mutation: gql`
+      //           ${fragments.objectFullFragment}
+      //           mutation jointCreate($joint: JointInput!) {
+      //               jointCreate (joint: $joint){
+      //                   ...objectFullFragment
+      //               }
+      //           }
+      //       `,
+      //       variables: {
+      //          joint: jointInput
+      //       }
+      //    })
+      //    let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+      //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      //    return reactiveJoint
+      // }
+      // return await apiCall(f, cb)
+      return await ObjectCreateApi.essenceCreate(joint)
    }
 }
 
