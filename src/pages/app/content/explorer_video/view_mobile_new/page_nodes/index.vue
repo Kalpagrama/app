@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: '16px',
+    paddingTop: '8px',
     paddingBottom: '100vh',
   }`
   ).row.full-width.justify-center
@@ -9,20 +9,23 @@ q-page(
     :immediate="true"
     @items="nodesLoaded"
     :query="nodesQuery" v-slot=`{items,next,nexting}`)
-    div(
+    //- div(
       :style=`{
         maxWidth: '100%',
       }`
       ).row.full-width.items-start.content-start.q-px-sm
-      node-item(
-        v-for="(node, nodei) in items" :key="node.oid"
-        v-if="true || node.items.length === 1"
-        :node="node" :player="player" :contentKalpa="contentKalpa"
-        :isFocused="nodeFocused ? nodeFocused.oid === node.oid : false"
-        @isFocused="$event => nodeFocusedHandle(node, $event)"
-        :style=`{
-          marginBottom: '40px',
-        }`)
+    list-middle(
+      :items="items" :itemStyles=`{marginBottom: '40px',}`
+      :style=`{maxWidth: '700px',}`).q-px-sm
+      template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+        node-item(
+          :node="item" :player="player" :contentKalpa="contentKalpa"
+          :isActive="isActive" :isVisible="isVisible"
+          :isFocused="nodeFocused ? nodeFocused.oid === item.oid : false"
+          @isFocused="$event => nodeFocusedHandle(item, $event[0], $event[1])"
+          :style=`{
+            marginBottom: '0px',
+          }`)
 </template>
 
 <script>
@@ -46,7 +49,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['JOINT'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
         },
@@ -69,17 +72,17 @@ export default {
     }
   },
   methods: {
-    nodeFocusedHandle (node, isFocused) {
-      this.$log('nodeFocusedHandle', node, isFocused)
+    nodeFocusedHandle (node, item, isFocused) {
+      this.$log('nodeFocusedHandle', node, item, isFocused)
       if (isFocused) {
         this.nodeFocused = node
-        let start = node.items[0].layers[0].figuresAbsolute[0].t
-        let end = node.items[0].layers[0].figuresAbsolute[1].t
+        let start = item.layers[0].figuresAbsolute[0].t
+        let end = item.layers[0].figuresAbsolute[1].t
         this.player.setCurrentTime(start)
         this.player.play()
         // TODO: set this.player.setFigures([[],[]], true)
         // this.player.setFigures([[],[]], false)
-        this.$emit('figures', [node.items[0].layers[0].figuresAbsolute])
+        this.$emit('figures', [item.layers[0].figuresAbsolute])
       }
       else {
         this.nodeFocused = null

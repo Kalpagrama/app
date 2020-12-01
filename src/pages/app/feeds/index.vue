@@ -5,21 +5,21 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-sm.b-40
-          q-icon(name="view_week" color="white" size="30px").q-mx-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Ленты
+          q-icon(name="home" color="white" size="30px").q-mx-sm
+          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Домашняя
           .col
-          q-btn(round flat color="white" icon="launch" @click="feedCollection()")
+          //- q-btn(round flat color="white" icon="launch" @click="feedCollection()")
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '50px', paddingBottom: '200px',
+        paddingTop: '8px', paddingBottom: '200px',
       }`)
-      kalpa-loader(
+      //- kalpa-loader(
         :immediate="true"
         :query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feeds = $event, feedsLoaded")
       //- feed...
       feed(:feed="feed")
-      q-page-sticky(
+      //- q-page-sticky(
         expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md

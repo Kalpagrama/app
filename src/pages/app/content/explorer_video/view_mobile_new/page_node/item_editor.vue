@@ -94,7 +94,7 @@
         :color="editing ? 'green' : 'white'"
         :icon="editing ? 'check' : 'edit'"
         :style=`{
-          position: 'absolute', zIndex: 2000, right: '4px', bottom: '0px',
+          position: 'absolute', zIndex: 2000, right: '4px', bottom: '10px',
           //- borderRadius: '50%',
         }`)
     composition-editor(

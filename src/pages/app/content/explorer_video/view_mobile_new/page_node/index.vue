@@ -30,133 +30,134 @@ q-page(
         div(
           @click="rightItemFound(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
-  q-btn(
-    @click="leftItemEditorShow = !leftItemEditorShow"
-    round flat dense
-    :color="leftItemEditorShow ? 'green' : 'white'"
-    :icon="leftItemEditorShow ? 'check' : 'edit'"
-    :style=`{
-      position: 'absolute', zIndex: 2000, right: '6px', top: '-28px',
-    }`)
-  //- editor wrapper
-  div(
-    :style=`{
-      marginTop: '-20px',
-      borderRadius: '0 0 10px 10px',
-      background: 'rgb(35,35,35)',
-    }`
-    ).row.full-width
-    //- composition.editor
-    div(
-      :class=`{
-        'q-pb-sm': !leftItemEditorShow,
-      }`
+  div(:style=`{position: 'relative', maxWidth: '700px'}`).row.full-width
+    q-btn(
+      @click="leftItemEditorShow = !leftItemEditorShow"
+      round flat dense
+      :color="leftItemEditorShow ? 'green' : 'white'"
+      :icon="leftItemEditorShow ? 'check' : 'edit'"
       :style=`{
-        paddingTop: '20px',
-        borderRadius: '10px',
-        zIndex: 10,
+        position: 'absolute', zIndex: 2000, right: '6px', top: '-38px',
+      }`)
+    //- editor wrapper
+    div(
+      :style=`{
+        marginTop: '-20px',
+        borderRadius: '0 0 10px 10px',
+        background: 'rgb(35,35,35)',
       }`
-      ).row.full-width.bg-black
-      composition-editor(
-        v-show="leftItemEditorShow"
-        :player="player" :composition="item"
-        :contentKalpa="contentKalpa")
-    .row.full-width.items-start.content-start.justify-center
-      //- name
+      ).row.full-width
+      //- composition.editor
       div(
+        :class=`{
+          'q-pb-sm': !leftItemEditorShow,
+        }`
         :style=`{
-          position: 'relative',
-          paddingLeft: '60px',
-          paddingRight: '60px',
-        }`).row.full-width
-        edit-name(
-          :node="node"
-          :placeholder="'В чем суть?'")
+          paddingTop: '20px',
+          borderRadius: '10px',
+          zIndex: 10,
+        }`
+        ).row.full-width.bg-black
+        composition-editor(
+          v-show="leftItemEditorShow"
+          :player="player" :composition="item"
+          :contentKalpa="contentKalpa")
+      .row.full-width.items-start.content-start.justify-center
+        //- name
         div(
           :style=`{
-            position: 'absolute', zIndex: 200, left: '0px',
-            width: '50px',
-          }`
-          ).row.full-height.items-center.content-center.justify-center
+            position: 'relative',
+            paddingLeft: '60px',
+            paddingRight: '60px',
+          }`).row.full-width
+          edit-name(
+            :node="node"
+            :placeholder="'В чем суть?'")
           div(
+            :style=`{
+              position: 'absolute', zIndex: 200, left: '0px',
+              width: '50px',
+            }`
+            ).row.full-height.items-center.content-center.justify-center
+            div(
+              v-if="node.items[1]"
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                //- right: '0px',
+                left: '10px',
+                width: '30px',
+                //- borderRadius: '10px 0 0 10px',
+                //- borderTop: '2px solid green',
+                //- borderLeft: '20px solid green',
+                //- borderBottom: '2px solid green',
+              }`
+              ).row.full-height.bg-green
+            q-btn(
+              @click="rightItemToggle()"
+              round flat color="white" icon="link" size="md" dense
+              :style=`{
+                zIndex: 110,
+                //- background: 'rgb(35,35,35)',
+              }`
+              ).rotate-90
+          div(
+            :style=`{
+              position: 'absolute', zIndex: 200, right: '0px',
+              width: '50px',
+            }`
+            ).row.full-height.items-center.content-center.justify-center
+            //- div(
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                //- right: '0px',
+                left: '10px',
+                width: '40px',
+                //- borderRadius: '10px 0 0 10px',
+                //- borderTop: '2px solid green',
+                //- borderLeft: '20px solid green',
+                //- borderBottom: '2px solid green',
+              }`
+              ).row.full-height.bg-green
+            q-btn(
+              v-if="node.items[1]"
+              @click="rightItemToggle()"
+              round flat color="white" icon="link_off" size="md" dense
+              :style=`{
+                zIndex: 110,
+                //- background: 'rgb(35,35,35)',
+              }`
+              ).rotate-90
+        //- add
+        .row.full-width.q-mb-sm
+          item-editor(
             v-if="node.items[1]"
-            :style=`{
-              position: 'absolute', zIndex: 100,
-              //- right: '0px',
-              left: '10px',
-              width: '30px',
-              //- borderRadius: '10px 0 0 10px',
-              //- borderTop: '2px solid green',
-              //- borderLeft: '20px solid green',
-              //- borderBottom: '2px solid green',
-            }`
-            ).row.full-height.bg-green
-          q-btn(
-            @click="rightItemToggle()"
-            round flat color="white" icon="link" size="md" dense
-            :style=`{
-              zIndex: 110,
-              //- background: 'rgb(35,35,35)',
-            }`
-            ).rotate-90
-        div(
-          :style=`{
-            position: 'absolute', zIndex: 200, right: '0px',
-            width: '50px',
-          }`
-          ).row.full-height.items-center.content-center.justify-center
-          //- div(
-            :style=`{
-              position: 'absolute', zIndex: 100,
-              //- right: '0px',
-              left: '10px',
-              width: '40px',
-              //- borderRadius: '10px 0 0 10px',
-              //- borderTop: '2px solid green',
-              //- borderLeft: '20px solid green',
-              //- borderBottom: '2px solid green',
-            }`
-            ).row.full-height.bg-green
-          q-btn(
-            v-if="node.items[1]"
-            @click="rightItemToggle()"
-            round flat color="white" icon="link_off" size="md" dense
-            :style=`{
-              zIndex: 110,
-              //- background: 'rgb(35,35,35)',
-            }`
-            ).rotate-90
-      //- add
-      .row.full-width.q-mb-sm
-        item-editor(
-          v-if="node.items[1]"
-          @item="rightItemUpdated"
-          :item="node.items[1]")
-        //- join toggle
-        //- div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
-          q-btn(
-            @click="rightItemToggle()"
-            flat no-caps
-            :color="node.items[1] ? 'red' : 'green'"
-            :style=`{
-            }`).fit {{ node.items[1] ? 'Убрать связь' : 'Добавить связь' }}
-      //- spheres & category
-      div(:style=`{}`).row.full-width
-        ws-sphere-editor(:item="node")
-        div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
-          edit-category(:node="node")
-  //- footer: close, publish
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: '620px',paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.q-py-sm
-      q-btn(
-        @click="cancel()"
-        flat color="grey-4" no-caps
-        :style=`{background: 'rgb(35,35,35)',}`).q-mr-sm Закрыть
-      q-btn(
-        v-if="!pick"
-        @click="publish()"
-        color="green" no-caps
-        :loading="publishing").col Опубликовать
+            @item="rightItemUpdated"
+            :item="node.items[1]")
+          //- join toggle
+          //- div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
+            q-btn(
+              @click="rightItemToggle()"
+              flat no-caps
+              :color="node.items[1] ? 'red' : 'green'"
+              :style=`{
+              }`).fit {{ node.items[1] ? 'Убрать связь' : 'Добавить связь' }}
+        //- spheres & category
+        div(:style=`{}`).row.full-width
+          ws-sphere-editor(:item="node")
+          div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
+            edit-category(:node="node")
+    //- footer: close, publish
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '620px',paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.q-py-sm
+        q-btn(
+          @click="cancel()"
+          flat color="grey-4" no-caps
+          :style=`{background: 'rgb(35,35,35)',}`).q-mr-sm Закрыть
+        q-btn(
+          v-if="!pick"
+          @click="publish()"
+          color="green" no-caps
+          :loading="publishing").col Опубликовать
 </template>
 
 <script>
@@ -301,6 +302,7 @@ export default {
         // here we have node&[content,user,sphere,node]
         this.$log('publish done')
         this.publishing = false
+        this.$emit('close')
       }
       catch (e) {
         this.$log('publish error', e)

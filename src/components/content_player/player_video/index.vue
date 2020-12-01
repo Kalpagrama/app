@@ -35,8 +35,8 @@ div(
       slot(name="right")
     //- actions player
   //- footer:
-  div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
-    div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-xl
+  div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '40px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
+    div(:style=`{position: 'absolute', zIndex: 1101, bottom: '10px'}`).row.full-width.justify-center.q-px-xl
       //- player-actions(
         v-if="player && !player.playing && options.showActions"
         :player="player" :style=`{maxWidth: '770px',}`)

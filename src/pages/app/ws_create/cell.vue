@@ -65,7 +65,7 @@ div(
       overflow: 'hidden',
     }`
     ).row.fit.items-start.content-start
-    //- img(
+    img(
       v-if="fileUrl"
       draggable="false"
       :src="fileUrl"
@@ -73,7 +73,7 @@ div(
         objectFit: 'cover',
       }`
       ).fit
-    image-cropper(
+    //- image-cropper(
       v-if="fileUrl"
       :src="fileUrl"
       @crop="onCrop"

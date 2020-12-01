@@ -95,6 +95,7 @@ div(
         v-if="node.vertices[ii] && node.vertices[ii] !== 'ASSOCIATIVE'"
         ).row.full-width.justify-center.q-pt-xs
         small.text-white {{ itemType(ii).name }}
+        //- small.text-white {{ node.vertices[ii] }}
   //- link btn
   //- TODO: btn color
   q-btn(
@@ -122,14 +123,24 @@ export default {
       return [
         {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
         {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
+        // cause/effect
         {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
         {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
+        // problem/solution
         {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
         {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
-        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE'},
-        {id: 'FALSE', name: 'Факт', pair: 'TRUE'},
-        {id: 'FROM', name: 'Факт', pair: 'TO'},
-        {id: 'TO', name: 'Подтверждение', pair: 'FROM'},
+        // from/to
+        {id: 'FROM', name: 'До', pair: 'TO'},
+        {id: 'TO', name: 'После', pair: 'FROM'},
+        // fake/disproof
+        {id: 'FAKE', name: 'Опровержение', pair: 'FALSE'},
+        {id: 'DISPROOF', name: 'Факт', pair: 'TRUE'},
+        // fact/proof
+        {id: 'FACT', name: 'Опровержение', pair: 'FALSE'},
+        {id: 'PROOF', name: 'Факт', pair: 'TRUE'},
+        // question/answer
+        {id: 'QUESTION', name: 'Опровержение', pair: 'ANSWER'},
+        {id: 'ANSWER', name: 'Факт', pair: 'QUESTION'},
       ]
     },
   },

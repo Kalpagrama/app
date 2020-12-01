@@ -50,9 +50,9 @@ export default {
         }
       }
       // add subscription array if not empty
-      if (this.feedSubscriptions.length > 0) {
-        res.selector.subscription = {$in: this.feedSubscriptions}
-      }
+      // if (this.feedSubscriptions.length > 0) {
+      //   res.selector.subscription = {$in: this.feedSubscriptions}
+      // }
       return res
     }
   },

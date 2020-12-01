@@ -1,8 +1,8 @@
 <template lang="pug">
 node-feed(
-  :node="node" :isActive="false" :isVisible="false"
-  :showName="false")
-  template(v-slot:items)
+  :node="node" :isActive="isActive" :isVisible="isVisible"
+  :showName="node.items.length === 2")
+  template(v-slot:items v-if="node.items.length === 1")
     .row.full-width.items-start.content-start.q-px-sm
       div(
         :style=`{
@@ -12,7 +12,7 @@ node-feed(
         //- tint inActive
         div(
           v-if="!isFocused"
-          @click="$emit('isFocused', true)"
+          @click="$emit('isFocused', [item, true])"
           :style=`{
             position: 'absolute', zIndex: 100,
           }`
@@ -37,7 +37,7 @@ node-feed(
         //- currentTime stop
         q-btn(
           v-if="isFocused"
-          @click="$emit('isFocused', false)"
+          @click="$emit('isFocused', [item, false])"
           round flat color="white" icon="clear" dense
           :style=`{
             position: 'absolute', zIndex: 220, top: '-38px',
@@ -50,8 +50,8 @@ node-feed(
         .col
           .row.full-width.items-start.content-start.justify-end
             img(
-              v-if="itemRight"
-              :src="itemRight.thumbUrl"
+              v-if="item"
+              :src="item.thumbUrl"
               :style=`{
                 height: '60px',
                 borderRadius: '10px',
@@ -61,7 +61,7 @@ node-feed(
 <script>
 export default {
   name: 'pageNodes_item',
-  props: ['node', 'player', 'contentKalpa', 'isFocused'],
+  props: ['node', 'player', 'contentKalpa', 'isFocused', 'isActive', 'isVisible'],
   components: {
   },
   data () {
