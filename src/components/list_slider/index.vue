@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`).row.full-width.justify-center
-  q-resize-observer(@resize="e => width = e.width")
+  //- q-resize-observer(@resize="e => width = e.width")
   //- debug
   //- stats
   //- .row.full-width.justify-center

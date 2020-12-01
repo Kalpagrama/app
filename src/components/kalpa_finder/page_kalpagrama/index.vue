@@ -24,7 +24,11 @@ q-page(
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     .row.full-width.items-start.content-start.q-pa-sm
-      item(
+      div(
+        v-for="(item,ii) in items" :key="ii"
+        ).row.full-width
+        small.text-white {{ item.name }}
+      //- item(
         v-for="(item,ii) in items" :key="ii"
         @click.native="$emit('item', item)"
         :item="item"
@@ -40,10 +44,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'kalpaFinder_pageWorkspace',
+  name: 'kalpaFinder_pageKalpagrama',
   props: ['searchString', 'kalpaTypes'],
   components: {
-    item: () => import('./item.vue')
+    // item: () => import('./item.vue')
   },
   data () {
     return {

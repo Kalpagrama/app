@@ -44,8 +44,7 @@
     small(v-else).text-grey-6.q-mr-sm {{ item.object.type }}
   //- object
   .row.full-width
-    node-feed(v-if="object && object.type === 'NODE'" :node="object" :isActive="isActive" :isVisible="isVisible" :width="width")
-    joint-feed(v-else-if="object && object.type === 'JOINT'" :joint="object" :isActive="isActive" :isVisible="isVisible" :width="width")
+    node-feed(v-if="object" :node="object" :isActive="isActive" :isVisible="isVisible" :width="width")
     //- VIDEO
     router-link(
       v-else-if="['VIDEO', 'IMAGE'].includes(item.object.type)"
@@ -85,7 +84,6 @@ export default {
   name: 'feedItem',
   props: ['item', 'isActive', 'isVisible', 'width'],
   components: {
-    insertEmoji: () => import('components/kalpa_icons/insert_emoji.vue')
   },
   data () {
     return {

@@ -1,13 +1,13 @@
 <template lang="pug">
 .row.full-width.justify-start
-  q-resize-observer(@resize="e => width = e.width")
+  //- q-resize-observer(@resize="e => width = e.width")
   //- header with actions
   //- div(
     v-if="items.length > 0"
     ).row.full-width.q-py-sm
     q-btn(icon="sort" color="grey-8" round flat)
   //- top line wrapper
-  div(
+  //- div(
     v-if="items.length > 0"
     :style=`{
       position: 'relative',

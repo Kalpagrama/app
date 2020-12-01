@@ -2,6 +2,7 @@
 component(
   v-if="contentKalpa"
   :is="explorerComponent[contentKalpa.type]"
+  :key="contentKalpa.oid"
   :contentKalpa="contentKalpa"
   :query="query")
 </template>
@@ -34,24 +35,20 @@ export default {
       async handler (to, from) {
         this.$log('oid TO', to)
         if (to) {
-          this.contentKalpa = null
-          await this.$wait(250)
+          // this.contentKalpa = null
+          // await this.$wait(250)
           this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
         }
       }
-    },
+    }
   },
   mounted () {
     this.$log('mounted')
-    this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

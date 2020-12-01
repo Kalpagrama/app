@@ -1,101 +1,78 @@
+<style lang="sass">
+.q-field--outlined .q-field__control
+  border-radius: 10px
+</style>
+
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-  }`
-  ).row.full-width.items-center.content-center.q-px-sm
-  //- mobile dialog
-  q-dialog(
+.row.full-width
+  //- q-dialog(
     v-model="sphereDialogShow"
-    maximized
-    transition-show="none"
-    transition-hide="none"
-    )
-    sphere-autocomplete(
-      :searchString="searchString" :selected="item.spheres"
-      :style=`{
-        minWidth: $q.screen.width+'px', maxWidth: $q.screen.width+'px',
-        minHeight: $q.screen.height+'px', maxHeight: $q.screen.height+'px',
-      }`
-      @sphere="sphereAdd").b-30
-      template(v-slot:header)
-        .row.full-width.items-start.content-start
-          //- header
-          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-ml-md Добавить сферу
-            .col
-            q-btn(round flat color="white" icon="clear" @click="sphereDialogShow = false").q-mr-sm
-          .row.full-width.items-start.content-start.q-px-sm
-            spheres(
-              :spheres="item.spheres"
-              :sphereAdd="sphereAdd"
-              :sphereDelete="sphereDelete"
-              :sphereCreate="sphereCreate"
-              @searchString="searchString = $event")
-  //- tint-interceptor for mobile
+    position="bottom")
+    .column.full-width
+  .row.full-width.q-pb-sm.q-px-xs
+    div(
+      v-for="(sphere, si) in item.spheres"  :key="sphere"
+      :style=`{}`).row.full-width.q-mb-xs
+      q-btn(
+        round flat dense icon="drag_indicator" color="grey-9")
+      .col.q-px-xs
+        q-input(
+          v-model="sphere.name"
+          :outlined="sphereFocused === si"
+          :borderless="sphereFocused !== si"
+          dense dark color="green"
+          autofocus
+          @focus="sphereFocused = si"
+          @blur="sphereFocused = null"
+          :input-style=`{
+            textAlign: 'center'
+          }`
+          :style=`{
+            borderRadius: '10px',
+          }`
+          ).full-width.b-40
+          //- template(v-slot:prepend)
+            q-icon(name="blur_on" color="grey-9")
+      q-btn(
+        @click="sphereDelete(si)"
+        round flat dense icon="delete_outline" color="grey-9")
+      //- ws-sphere-item(:id="sphere").b-60
+        template(v-slot:append)
+          q-icon(
+            @click="sphereDelete(sphere)"
+            name="clear" color="white" size="14px").q-mr-sm.cursor-pointer
+  //- ADD
   div(
-    v-if="$q.screen.width < 800"
-    @click="sphereDialogShow = true"
-    :style=`{
-      position: 'absolute', zIndex: 500,
-    }`
-    ).row.fit
-  spheres(
-    :spheres="item.spheres"
-    :sphereAdd="sphereAdd"
-    :sphereDelete="sphereDelete"
-    :sphereCreate="sphereCreate"
-    @searchString="searchString = $event")
+    v-if="item.spheres.length < 3"
+    :style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.q-pb-sm
+    q-btn(
+      @click="sphereAddStart"
+      flat color="green" no-caps
+      ).full-width.b-40 Добавить сферу
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
-import spheres from './spheres.vue'
-import sphereAutocomplete from './sphere_autocomplete.vue'
-
 export default {
   name: 'wsSphereEditor',
-  components: {spheres, sphereAutocomplete},
   props: {
     item: {
       type: Object,
       required: true,
     },
-    hiddenIds: {
-      type: Array,
-      default () {
-        return []
-      }
-    }
   },
   data () {
     return {
-      searchString: '',
       sphereDialogShow: false,
+      sphereFocused: null,
     }
   },
   methods: {
-    sphereAdd (sphere) {
-      this.$log('sphereAdd', sphere)
-      let sphereFind = this.item.spheres.findIndex(i => i === sphere.id)
-      if (sphereFind >= 0) {
-        this.$log('*** sphere DUPLICATE ***', sphere.name)
-      }
-      else {
-        this.item.spheres.push(sphere.id)
-      }
+    sphereDelete (sphereIndex) {
+      this.$delete(this.item.spheres, sphereIndex)
     },
-    sphereDelete (id) {
-      this.$log('sphereDelete', id)
-      this.item.spheres = this.item.spheres.filter(i => i !== id)
-    },
-    async sphereCreate (name) {
-      this.$log('sphereCreate', name)
-      this.$log('sphere CREATE !', name)
-      let sphereInput = {
-        name: name,
-      }
-      return await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+    sphereAddStart () {
+      this.$log('sphereAddStart')
+      this.item.spheres.push({name: ''})
     }
   }
 }

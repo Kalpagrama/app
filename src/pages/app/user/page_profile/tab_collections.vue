@@ -1,6 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center.q-py-xl
-  span.text-white.q-mt-xl No collections
+  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+    span.text-white Скоро пользователи смогу делиться своими коллекциями
 </template>
 
 <script>

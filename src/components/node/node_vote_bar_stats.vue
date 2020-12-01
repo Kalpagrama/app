@@ -34,6 +34,7 @@ div(
           background: s.color,
           maxHeight: si === voteSelected ? '40px' : '20px',
           maxWidth: s.percent+'%',
+          minWidth: '30px',
           borderRadius: voteBorderRadius(si),
           overflow: 'hidden',
         }`

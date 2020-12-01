@@ -14,8 +14,8 @@ q-layout(
             span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
           //- q-btn(round flat color="white" icon="more_vert")
   q-page-container
-    component(:is="viewId" :id="feedId" :paddingTop="40" :useViews="feedId !== 'all'")
-      template(v-slot:top)
+    //- component(:is="viewId" :id="feedId" :paddingTop="40" :useViews="feedId !== 'all'")
+      //- template(v-slot:top)
         .row.full-width.justify-center
           div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.justify-center.q-px-sm
             q-tabs(
@@ -27,7 +27,7 @@ q-layout(
                 v-for="v in views" :key="v.id"
                 inline-label
                 :name="v.id" :label="v.name").q-px-sm
-      template(
+      //- template(
         v-if="viewId === 'feeds'"
         v-slot:tint=`{item}`)
         div(
@@ -51,7 +51,7 @@ export default {
   },
   data () {
     return {
-      feedId: 'all',
+      feedId: 'bookmarks',
     }
   },
   computed: {
@@ -60,11 +60,13 @@ export default {
     },
     views () {
       return [
-        {id: 'collection', name: 'Все', icon: 'title'},
-        {id: 'collections', name: 'Коллекции', icon: 'view_week'},
-        {id: 'nodes', name: 'Ядра', icon: 'filter_tilt_shift'},
-        {id: 'joints', name: 'Связи', icon: 'link'},
-        {id: 'trash', name: 'Корзина', icon: 'delete_outline'}
+        {id: 'content', name: 'Контент'},
+        {id: 'bookmarks', name: 'Закладки'}
+        // {id: 'collection', name: 'Все', icon: 'title'},
+        // {id: 'collections', name: 'Коллекции', icon: 'view_week'},
+        // {id: 'nodes', name: 'Ядра', icon: 'filter_tilt_shift'},
+        // {id: 'joints', name: 'Связи', icon: 'link'},
+        // {id: 'trash', name: 'Корзина', icon: 'delete_outline'}
       ]
     },
   },
@@ -83,7 +85,7 @@ export default {
     '$route.params.viewId': {
       immediate: true,
       handler (to, from) {
-        if (!to) this.$router.replace({params: {viewId: 'nodes'}})
+        // if (!to) this.$router.replace({params: {viewId: 'nodes'}})
       }
     }
   }

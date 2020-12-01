@@ -42,10 +42,10 @@ q-layout(view="lHh lpR lFf")
         maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
       }`).row.fit.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
-        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 220"
+        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 190"
         :style=`{
           borderRadius: '10px',
-          maxWidth: '220px',
+          maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 190 ? '60px' : '190px',
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -61,8 +61,14 @@ q-layout(view="lHh lpR lFf")
 
 <script>
 
+import kalpaMenu from 'components/kalpa_menu/index.vue'
+import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
+
 export default {
   name: 'mainLayout',
+  components: {
+    kalpaMenu, kalpaMenuMobile,
+  },
   data () {
     return {
     }

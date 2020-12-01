@@ -7,6 +7,10 @@ component(
   :options="options"
   @previewClick="$emit('previewClick')"
   @ended="$emit('ended')")
+  template(v-for="(index, name) in $slots" v-slot:[name])
+    slot(:name="name")
+  template(v-for="(index, name) in $scopedSlots")
+    slot(:name="name" v-bind="data")
 </template>
 
 <script>

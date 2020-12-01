@@ -24,7 +24,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden', zIndex: 10}`).row.full-width.items-start.content-start.justify-center
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 10}`).row.full-width.items-start.content-start.justify-center
   video(
     ref="videoRef"
     :src="url"
