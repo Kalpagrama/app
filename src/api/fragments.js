@@ -208,7 +208,45 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     contentSource
   }
 `
-const essenceFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
+const essenceFragmentLeaf = gql`
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+  fragment essenceFragmentLeaf on Essence {
+    ...objectFragment
+    sphereFromName{...objectShortFragment}
+    rate
+    weight
+    rateStat {percent, weight, count}
+    rateUser
+    countVotes
+    countViews
+    countJoints
+    countRemakes
+    countShares
+    countBookmarks
+    author {
+      oid
+      type
+      name
+      thumbUrl(preferWidth: 50)
+    }
+    spheres {
+      oid
+      name
+    }
+    category
+    layout
+    items {
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
+    }
+    vertices
+  }
+`
+const essenceFragment = gql`
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragment on Essence {
     ...objectFragment
     sphereFromName{...objectShortFragment}
@@ -235,7 +273,12 @@ const essenceFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} 
     category
     layout
     items {
-    ...on Composition {...compositionFragment}
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Essence {...essenceFragmentLeaf}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
     }
     vertices
   }
