@@ -20,10 +20,15 @@ q-page(
             }`
             :style=`{}`).q-mr-xs.q-px-xs {{ t.name }}
   kalpa-loader(
+    v-if="searchString.length > 3"
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     .row.full-width.items-start.content-start.q-pa-sm
-      item(
+      div(
+        v-for="(item,ii) in items" :key="ii"
+        ).row.full-width
+        small.text-white {{ item.name }}
+      //- item(
         v-for="(item,ii) in items" :key="ii"
         @click.native="$emit('item', item)"
         :item="item"
@@ -39,10 +44,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'kalpaFinder_pageWorkspace',
-  props: ['searchString', 'workspaceTypes'],
+  name: 'kalpaFinder_pageKalpagrama',
+  props: ['searchString', 'kalpaTypes'],
   components: {
-    item: () => import('./item.vue')
+    // item: () => import('./item.vue')
   },
   data () {
     return {
@@ -52,45 +57,44 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'VIDEO', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
-        {id: 'IMAGE', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
-        {id: 'NODE_WS', name: 'Ядра черновики', selector: {wsItemType: 'WS_NODE'}},
-        {id: 'NODE_BOOKMARK', name: 'Ядра сохраненные', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
-        {id: 'JOINT', name: 'Связи', selector: {wsItemType: 'WS_JOINT'}},
-        {id: 'USER', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
-        {id: 'SPHERE', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}}
+        {id: 'VIDEO', name: 'Видео', selector: {types: ['VIDEO']}},
+        {id: 'IMAGE', name: 'Картинки', selector: {types: ['IMAGE']}},
+        {id: 'NODE', name: 'Ядра', selector: {types: ['NODE']}},
+        {id: 'JOINT', name: 'Связи', selector: {types: ['JOINT']}},
+        {id: 'USER', name: 'Люди', selector: {types: ['USER']}},
+        {id: 'SPHERE', name: 'Сферы', selector: {types: ['WORD', 'SENTENCE']}}
       ].filter(t => {
-        if (this.workspaceTypes) return this.workspaceTypes.includes(t.id)
+        if (this.kalpaTypes) return this.kalpaTypes.includes(t.id)
         else return t
       })
     },
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_ANY,
+          rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
+          querySearch: this.searchString,
         },
-        sort: [{updatedAt: 'desc'}]
+        // populateObjects: true,
+        limit: 100
       }
-      // add selector filter
       if (this.type) {
-        res.selector = {...res.selector, ...this.type.selector}
+        res.selector.objectTypeEnum = {$in: this.type.selector.types}
       }
       else {
-        // res.selector = {...res.selector, ...this.types}
+        res.selector.objectTypeEnum = {
+          $in: this.types.reduce((acc, val) => {
+            val.selector.types.map(type => {
+              acc.push(type)
+            })
+            return acc
+          }, [])
+        }
       }
-      // add name filter
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
-      }
+      // else {}
       return res
     },
   },
   methods: {
-    typeClick (type) {
-      this.$log('typeClick', type)
-      this.typesSelected = [type.id]
-    }
   },
   created () {
     this.$log('created')

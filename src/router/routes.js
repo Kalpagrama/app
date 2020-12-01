@@ -185,36 +185,36 @@ const routes = [
             component: () => import('pages/app/ws_index/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
-         {
-            name: 'workspace.collection',
-            path: 'workspace/collection/:id',
-            component: () => import('pages/app/ws_collection/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.collection-view',
-            path: 'workspace/collection-view/:id/:viewid',
-            component: () => import('pages/app/ws_collection_view/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.node',
-            path: 'workspace/node/:id',
-            component: () => import('pages/app/ws_node/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.joint',
-            path: 'workspace/joint/:id',
-            component: () => import('pages/app/ws_joint/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.trash',
-            path: 'workspace/trash',
-            component: () => import('pages/app/ws_joint/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'workspace.collection',
+         //    path: 'workspace/collection/:id',
+         //    component: () => import('pages/app/ws_collection/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace.collection-view',
+         //    path: 'workspace/collection-view/:id/:viewid',
+         //    component: () => import('pages/app/ws_collection_view/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace.node',
+         //    path: 'workspace/node/:id',
+         //    component: () => import('pages/app/ws_node/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace.joint',
+         //    path: 'workspace/joint/:id',
+         //    component: () => import('pages/app/ws_joint/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace.trash',
+         //    path: 'workspace/trash',
+         //    component: () => import('pages/app/ws_joint/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'fallback',
             path: '*',

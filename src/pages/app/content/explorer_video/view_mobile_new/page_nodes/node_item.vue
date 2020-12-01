@@ -5,14 +5,21 @@ node-feed(
   template(v-slot:items)
     .row.full-width.items-start.content-start.q-px-sm
       div(
-        @click="$emit('clicked')"
         :style=`{
           position: 'relative',
           borderRadius: '10px',
         }`).row.full-width.b-40.q-mb-sm
+        //- tint inActive
+        div(
+          v-if="!isFocused"
+          @click="$emit('isFocused', true)"
+          :style=`{
+            position: 'absolute', zIndex: 100,
+          }`
+          ).row.fit
         //- currentTime
         div(
-          v-if="player.currentTime >= start && player.currentTime <= end"
+          v-if="isFocused"
           :style=`{
             position: 'absolute', zIndex: 200,
             borderRadius: '10px',
@@ -27,6 +34,15 @@ node-feed(
               background: 'rgba(255,255,255,0.5)',
             }`
             ).row.full-height
+        //- currentTime stop
+        q-btn(
+          v-if="isFocused"
+          @click="$emit('isFocused', false)"
+          round flat color="white" icon="clear" dense
+          :style=`{
+            position: 'absolute', zIndex: 220, top: '-38px',
+            left: 'calc(50% - 20px)',
+          }`)
         //- name
         .col.q-pa-sm
           span.text-white.text-bold {{ node.name }}
@@ -44,7 +60,7 @@ node-feed(
 <script>
 export default {
   name: 'pageNodes_item',
-  props: ['node', 'player', 'contentKalpa'],
+  props: ['node', 'player', 'contentKalpa', 'isFocused'],
   components: {
   },
   data () {

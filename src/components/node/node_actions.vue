@@ -9,7 +9,11 @@
       .col.full-height
         node-vote-bar(v-if="node" :node="node")
       slot(name="action-right")
-      kalpa-share(type="node" :item="node")
+      //- kalpa-share(type="node" :item="node")
+      q-btn(
+        @click="$router.push('/node/'+node.oid)"
+        round flat color="grey-9")
+        q-icon(name="link").rotate-90
   //- extend/add/link ONE item node...
   //- .row.full-width.justify-center
     div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start

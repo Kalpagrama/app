@@ -36,8 +36,6 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
-// filters: {[page-id]: filter, [page-id]: filter, [page-id]: options}
-
 export default {
   name: 'kalpaFinder',
   props: {
@@ -51,16 +49,12 @@ export default {
   components: {
     wsSearch: () => import('components/ws_search/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
-    pageKalpa: () => import('./page_kalpa.vue'),
-    pageNodesMine: () => import('./page_nodes_mine.vue'),
-    pageNodesBookmark: () => import('./page_nodes_bookmark.vue'),
+    pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
     pageWeb: () => import('./page_web/index.vue'),
     pageGif: () => import('./page_gif/index.vue'),
-    // pageQuery: () => import('./page_query.vue')
   },
   data () {
     return {
-      // pageId: 'workspace',
       pageId: null,
       searchString: ''
     }
@@ -72,10 +66,8 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
+        {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Кальпаграма', component: 'page-kalpa'},
-        {id: 'nodes-mine', name: 'Мои ядра', component: 'page-nodes-mine'},
-        {id: 'nodes-bookmark', name: 'Ядра из закладок', component: 'page-nodes-bookmark'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
         {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {
@@ -85,8 +77,6 @@ export default {
         else {
           return true
         }
-        // if (this.pagesFilter) return this.pagesFilter.includes(p.id)
-        // else return true
       })
     }
   },

@@ -1,7 +1,7 @@
 <template lang="pug">
 .row
   //- transition-show="none" transition-hide="none"
-  q-dialog(
+  //- q-dialog(
     v-model="showDialog"
     position="bottom"
     :maximized="$q.screen.width < 800")
@@ -20,8 +20,7 @@
     round flat no-caps
     :color="bookmark ? activeColor : inactiveColor"
     :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
-    :loading="loading"
-    )
+    :loading="loading")
 </template>
 
 <script>
@@ -76,8 +75,9 @@ export default {
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
         // await UserApi.subscribe(this.oid)
         if (bookmark) {
+          // TODO: delete bookmark and unSubscribe...
           // this.bookmark = bookmark
-          this.showDialog = true
+          // this.showDialog = true
         }
         else {
           // TODO: where to handle bookmarkInput create?

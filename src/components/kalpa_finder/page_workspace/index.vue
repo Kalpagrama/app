@@ -8,7 +8,7 @@ q-page(
     :style=`{zIndex: 1000}`).b-30
     //- types
     .row.full-width.q-px-sm
-      .row.full-width.items-start.content-start.scroll.q-pt-xs
+      .row.full-width.items-start.content-start.scroll.q-py-xs
         .row.items-center.content-center.no-wrap
           q-btn(
             @click="viewId = v.id"
@@ -58,11 +58,9 @@ export default {
       return [
         {id: 'video', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
         {id: 'image', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
-        {id: 'drafts', name: 'Ядра черновики', selector: {wsItemType: 'WS_NODE'}},
-        // {id: 'NODE_BOOKMARK', name: 'Ядра сохраненные', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
-        // {id: 'JOINT', name: 'Связи', selector: {wsItemType: 'WS_JOINT'}},
-        // {id: 'USER', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
-        // {id: 'SPHERE', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}}
+        {id: 'node', name: 'Ядра', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
+        {id: 'sphere', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}},
+        {id: 'user', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
       ].filter(v => {
         if (this.page) return this.page.views.includes(v.id)
         else return true

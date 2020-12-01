@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: '8px',
+    paddingTop: '16px',
     paddingBottom: '100vh',
   }`
   ).row.full-width.justify-center
@@ -13,15 +13,16 @@ q-page(
       :style=`{
         maxWidth: '100%',
       }`
-      ).row.full-width.items-start.content-start.q-pa-sm
+      ).row.full-width.items-start.content-start.q-px-sm
       node-item(
         v-for="(node, nodei) in items" :key="node.oid"
         v-if="node.items.length === 1"
         :node="node" :player="player" :contentKalpa="contentKalpa"
+        :isFocused="nodeFocused ? nodeFocused.oid === node.oid : false"
+        @isFocused="$event => nodeFocusedHandle(node, $event)"
         :style=`{
           marginBottom: '40px',
-        }`
-        @clicked="nodeClick(node)")
+        }`)
 </template>
 
 <script>
@@ -33,6 +34,12 @@ export default {
   props: ['contentKalpa', 'player'],
   components: {
     nodeItem,
+  },
+  data () {
+    return {
+      nodeFocused: null,
+      figures: []
+    }
   },
   computed: {
     nodesQuery () {
@@ -48,18 +55,39 @@ export default {
       return res
     },
   },
+  watch: {
+    'player.currentTime': {
+      handler (to, from) {
+        if (this.nodeFocused) {
+          let start = this.nodeFocused.items[0].layers[0].figuresAbsolute[0].t
+          let end = this.nodeFocused.items[0].layers[0].figuresAbsolute[1].t
+          if (to < start || to > end) {
+            this.player.setCurrentTime(start)
+          }
+        }
+      }
+    }
+  },
   methods: {
-    nodeClick (node) {
-      this.$log('nodeClick', node)
-      let start = node.items[0].layers[0].figuresAbsolute[0].t
-      let end = node.items[0].layers[0].figuresAbsolute[1].t
-      this.player.setCurrentTime(start)
-      this.player.play()
-      this.$emit('figures', [node.items[0].layers[0].figuresAbsolute])
-      this.$emit('frames', [node.items[0].layers[0].figuresAbsolute])
+    nodeFocusedHandle (node, isFocused) {
+      this.$log('nodeFocusedHandle', node, isFocused)
+      if (isFocused) {
+        this.nodeFocused = node
+        let start = node.items[0].layers[0].figuresAbsolute[0].t
+        let end = node.items[0].layers[0].figuresAbsolute[1].t
+        this.player.setCurrentTime(start)
+        this.player.play()
+        // TODO: set this.player.setFigures([[],[]], true)
+        // this.player.setFigures([[],[]], false)
+        this.$emit('figures', [node.items[0].layers[0].figuresAbsolute])
+      }
+      else {
+        this.nodeFocused = null
+        this.$emit('figures', this.figures)
+      }
     },
     nodesLoaded (nodes) {
-      this.$emit('figures')
+      // this.$emit('figures')
       this.$log('figuresUpdate', nodes.length)
       // get figures
       let figures = nodes.reduce((acc, node) => {
@@ -73,11 +101,12 @@ export default {
         }
         return acc
       }, [])
+      this.figures = figures
       this.$emit('figures', figures)
     }
   },
-  beforeDestroy () {
-    this.$emit('figures', [])
-  }
+  // beforeDestroy () {
+  //   this.$emit('figures', [])
+  // }
 }
 </script>

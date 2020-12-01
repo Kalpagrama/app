@@ -8,6 +8,8 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
+import VueZoomer from 'vue-zoomer'
+// import PinchZoom from 'vue-pinch-zoom'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -32,6 +34,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
+    Vue.use(VueZoomer)
+    // Vue.component('pinch-zoom', PinchZoom)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
     // quasar stuff

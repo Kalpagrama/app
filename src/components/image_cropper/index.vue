@@ -1,22 +1,28 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.b-40
+div(
+  :style=`{
+  }`
+  ).row.fit.items-start.content-start
   //- image wrapper
   div(
     :style=`{
-      position: 'relative',
-      borderRadius: '10px', overflow: 'hidden',
-    }`).row.full-width.items-start.content-start.b-50
+      //- position: 'relative',
+      //- borderRadius: '10px', overflow: 'hidden',
+    }`).row.fit
     img(
-      ref="imageRef"
+      v-if="src"
+      ref="cropRef"
+      draggable="false"
       :src="src"
       :style=`{
-        maxHeight: $q.screen.height/2+'px',
-        objectFit: 'contain',
+        //- maxHeight: $q.screen.height/2+'px',
+        //- objectFit: 'contain',
       }`
-      ).full-width
+      ).fit
+    //- slot()
   //- footer with actions
   //- TODO: add flip?
-  .row.full-width.justify-center
+  //- .row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pa-sm
       q-btn(
         @click="cropper.setDragMode('move'), cropping = false"
@@ -57,15 +63,19 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.cropper = new Cropper(this.$refs.imageRef, {
-      ...this.options,
+    this.cropper = new Cropper(this.$refs.cropRef, {
+      // ...this.options,
       // aspectRatio: 16 / 9,
       // viewMode: 1,
       // initialAspectRatio: 10 / 10,
+      viewMode: 0,
+      dragMode: 'move',
+      background: false,
       crop: (event) => {
         this.$emit('crop', event)
       }
     })
+    // this.cropper.setDragMode('move')
   }
 }
 </script>

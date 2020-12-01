@@ -11,11 +11,8 @@ q-page(
     position="bottom" maximized)
     kalpa-finder(
       @contentKalpa="contentKalpaFound"
-      :pagesFilter="['workspace', 'kalpa', 'gif', 'web']"
-      :workspaceTypes="['IMAGE', 'VIDEO']"
-      :kalpaTypes="['IMAGE', 'VIDEO']"
       :pages=`{
-        workspace: {views: ['all', 'nodes', 'drafts', 'image', 'video']},
+        workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
         kalpagrama: {views: ['all', 'users', 'nodes']},
         gif: {views: ['all']},
         web: {views: ['all', 'image', 'video',]}
@@ -33,6 +30,14 @@ q-page(
         div(
           @click="rightItemFound(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
+  q-btn(
+    @click="leftItemEditorShow = !leftItemEditorShow"
+    round flat dense
+    :color="leftItemEditorShow ? 'green' : 'white'"
+    :icon="leftItemEditorShow ? 'check' : 'edit'"
+    :style=`{
+      position: 'absolute', zIndex: 2000, right: '6px', top: '-28px',
+    }`)
   //- editor wrapper
   div(
     :style=`{
@@ -43,7 +48,9 @@ q-page(
     ).row.full-width
     //- composition.editor
     div(
-      v-show="leftItemEditorShow"
+      :class=`{
+        'q-pb-sm': !leftItemEditorShow,
+      }`
       :style=`{
         paddingTop: '20px',
         borderRadius: '10px',
@@ -51,37 +58,74 @@ q-page(
       }`
       ).row.full-width.bg-black
       composition-editor(
+        v-show="leftItemEditorShow"
         :player="player" :composition="item"
         :contentKalpa="contentKalpa")
-    div(
-      :style=`{
-        paddingTop: leftItemEditorShow ? '0px' : '20px',
-      }`
-      ).row.full-width.items-start.content-start.justify-center
-      //- name top
+    .row.full-width.items-start.content-start.justify-center
+      //- name
       div(
-        v-if="node.items[1]"
         :style=`{
           position: 'relative',
-          marginTop: '-20px',
-          paddingTop: '28px',
-          paddingBottom: '8px',
-          paddingLeft: '42px',
-          paddingRight: '42px',
-          borderRadius: '0 0 10px 10px'
-        }`
-        ).row.full-width.justify-center.q-px-sm.b-30
-        span.text-grey-6 В чем суть?
-        q-btn(
-          @click="leftItemEditorShow = !leftItemEditorShow"
-          round flat color="white" dense
-          :icon="leftItemEditorShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-          :style=`{position: 'absolute', zIndex: 110, right: '4px', bottom: '0px',}`)
-      //- name
-      .row.full-width
+          paddingLeft: '60px',
+          paddingRight: '60px',
+        }`).row.full-width
         edit-name(
           :node="node"
           :placeholder="'В чем суть?'")
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 200, left: '0px',
+            width: '50px',
+          }`
+          ).row.full-height.items-center.content-center.justify-center
+          div(
+            v-if="node.items[1]"
+            :style=`{
+              position: 'absolute', zIndex: 100,
+              //- right: '0px',
+              left: '10px',
+              width: '30px',
+              //- borderRadius: '10px 0 0 10px',
+              //- borderTop: '2px solid green',
+              //- borderLeft: '20px solid green',
+              //- borderBottom: '2px solid green',
+            }`
+            ).row.full-height.bg-green
+          q-btn(
+            @click="rightItemToggle()"
+            round flat color="white" icon="link" size="md" dense
+            :style=`{
+              zIndex: 110,
+              //- background: 'rgb(35,35,35)',
+            }`
+            ).rotate-90
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 200, right: '0px',
+            width: '50px',
+          }`
+          ).row.full-height.items-center.content-center.justify-center
+          //- div(
+            :style=`{
+              position: 'absolute', zIndex: 100,
+              //- right: '0px',
+              left: '10px',
+              width: '40px',
+              //- borderRadius: '10px 0 0 10px',
+              //- borderTop: '2px solid green',
+              //- borderLeft: '20px solid green',
+              //- borderBottom: '2px solid green',
+            }`
+            ).row.full-height.bg-green
+          q-btn(
+            v-if="node.items[1]"
+            @click="rightItemToggle()"
+            round flat color="white" icon="link_off" size="md" dense
+            :style=`{
+              zIndex: 110,
+              //- background: 'rgb(35,35,35)',
+            }`
+            ).rotate-90
       //- add
       .row.full-width.q-mb-sm
         item-editor(
@@ -89,7 +133,7 @@ q-page(
           @item="rightItemUpdated"
           :item="node.items[1]")
         //- join toggle
-        div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
+        //- div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width.items-start.content-start
           q-btn(
             @click="rightItemToggle()"
             flat no-caps
@@ -97,9 +141,9 @@ q-page(
             :style=`{
             }`).fit {{ node.items[1] ? 'Убрать связь' : 'Добавить связь' }}
       //- spheres & category
-      div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
+      div(:style=`{}`).row.full-width
         ws-sphere-editor(:item="node")
-        .row.full-width
+        div(:style=`{paddingLeft: '42px', paddingRight: '42px', paddingBottom: '16px',}`).row.full-width
           edit-category(:node="node")
   //- footer: close, publish
   .row.full-width.justify-center
@@ -148,6 +192,18 @@ export default {
       return this.node.items[0]
     },
   },
+  watch: {
+    node: {
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          this.$log('node TO', to)
+          let figures = [to.items[0].layers[0].figuresAbsolute]
+          this.$emit('figures', figures)
+        }
+      }
+    }
+  },
   methods: {
     rightItemUpdated (item) {
       this.$log('rightItemUpdated', item)
@@ -162,6 +218,7 @@ export default {
       else {
         // open content finder...
         this.player.pause()
+        this.leftItemEditorShow = false
         this.rightItemFinderShow = true
       }
     },

@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   div(
-    :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-30
+    :style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-30
     //- NODE
     div(
       v-if="item.type === 'NODE'"
@@ -26,8 +26,15 @@
     //- CONTENT
     div(
       v-if="contentKalpa && (item.type === 'VIDEO' || item.outputType === 'VIDEO')"
-      :style=`{borderRadius: '10px',}`
-      ).row.full-width.items-start.content-start.bg-black
+      :style=`{
+        position: 'relative',
+        borderRadius: '10px',
+      }`
+      ).row.full-width.items-start.content-start.bg-black.q-pb-sm
+      //- composition-editor(
+        v-if="item.outputType === 'VIDEO' && editing"
+        :player="player" :composition="item"
+        :contentKalpa="contentKalpa")
       content-player(
         :contentKalpa="contentKalpa"
         @player="player = $event"
@@ -35,6 +42,39 @@
         :style=`{
           borderRadius: '10px',
         }`).fit
+        template(v-slot:bar)
+          div(
+            v-if="player && figures.length > 0"
+            :style=`{
+              position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+              //- borderRadius: '10px', overflow: 'hidden',
+            }`
+            ).row.fit
+            template(v-for="(f,fi) in figures")
+              div(
+                v-if="f.length === 1"
+                :key="fi"
+                :style=`{
+                  position: 'absolute', zIndex: 2050, top: '0px',
+                  left: f[0].t/player.duration*100+'%',
+                  width: '2px',
+                  background: 'rgba(255,255,255, 0.5)',
+                }`
+                ).row.full-height
+              div(
+                v-if="f.length === 2"
+                :key="fi"
+                :style=`{
+                  position: 'absolute', zIndex: 2050, top: '-2px',
+                  left: f[0].t/player.duration*100+'%',
+                  width: (f[1].t-f[0].t)/player.duration*100+'%',
+                  height: 'calc(100% + 4px)',
+                  border: '2px solid rgb(76,175,80)',
+                  borderRadius: '4px',
+                  background: 'rgba(255,255,255,0.2)',
+                  pointerEvents: 'none',
+                }`
+                ).row
         template(
           v-if="!item.outputType"
           v-slot:bar-current-time=`{panning}`)
@@ -47,21 +87,31 @@
                 position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
                 left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
               }`)
-      composition-editor(
-        v-if="item.outputType === 'VIDEO' && editing"
-        :player="player" :composition="item"
-        :contentKalpa="contentKalpa")
+      q-btn(
+        v-if="item.outputType === 'VIDEO'"
+        @click="editing = !editing"
+        round flat dense
+        :color="editing ? 'green' : 'white'"
+        :icon="editing ? 'check' : 'edit'"
+        :style=`{
+          position: 'absolute', zIndex: 2000, right: '4px', bottom: '0px',
+          //- borderRadius: '50%',
+        }`)
+    composition-editor(
+      v-if="item.outputType === 'VIDEO' && editing"
+      :player="player" :composition="item"
+      :contentKalpa="contentKalpa")
     //- USER
     //- SPHERE,WORD,SENTENCE
     //- footer
     //- NAME for everyone
-    div(
+    //- div(
       :style=`{
         position: 'relative',
         zIndex: 100,
       }`
-      ).row.full-width.justify-center.q-pa-sm.b-30
-      span.text-grey-6 В чем суть?
+      ).row.full-width.justify-center.q-pa-sm.b-40
+      span(:style=`{opacity: 0}`).text-grey-6 В чем суть?
       q-btn(
         @click="editing = !editing"
         round flat color="white" dense
@@ -88,6 +138,7 @@ export default {
       player: null,
       playerError: null,
       contentKalpa: null,
+      figures: [],
     }
   },
   watch: {
@@ -99,6 +150,7 @@ export default {
         if (to) {
           if (to.outputType === 'VIDEO') {
             this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
+            this.figures = [to.layers[0].figuresAbsolute]
           }
           if (to.oid && to.type === 'VIDEO') {
             this.contentKalpa = to

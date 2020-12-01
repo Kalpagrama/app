@@ -1,15 +1,27 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff")
-  q-header().bg-black
-    .row.full-width
-      q-resize-observer(@resize="onResize")
+  q-header(
+    :class=`{
+      'q-px-md': false
+    }`
+    ).b-30
+    //- .row.full-width.justify-center
+      span.text-green Связь
+    div(
+      :style=`{
+        borderRadius: '10px 10px 0 0',
+        //- borderTop: '2px solid #4caf4f',
+        //- borderLeft: '2px solid #4caf4f',
+        //- borderRight: '2px solid #4caf4f',
+      }`).row.full-width.bg-black
+      //- q-resize-observer(@resize="onResize")
       content-player(
         :contentKalpa="contentKalpa"
         @player="playerLoaded"
         @error="playerErrorHandle"
         :style=`{
-          borderRadius: '0 0 10px 10px',
+          borderRadius: '10px',
           //- overflow: 'hidden',
         }`).fit
         template(v-slot:bar)
@@ -45,7 +57,15 @@ q-layout(
                   pointerEvents: 'none',
                 }`
                 ).row
-        template(v-slot:bar-current-time=`{panning}`)
+      div(v-if="pageId !== 'node'").row.full-width.q-pb-sm.bg-black
+      q-btn(
+        v-if="player && pageId !== 'node'"
+        @click="nodeCreateStart()"
+        round flat color="green" icon="add" dense
+        :style=`{
+          position: 'absolute', zIndex: 2000, right: '8px', bottom: '2px',
+        }`)
+        //- template(v-slot:bar-current-time=`{panning}`)
           transition(enter-active-class="animated fadeIn" leave-active-class="none")
             q-btn(
               v-if="player && !panning && pageId !== 'node'"
@@ -69,18 +89,18 @@ q-layout(
       :style=`{zIndex: 1000, borderRadius: '10px 10px 0 0',}`
       ).full-width
       div(
-        :style=`{height: '40px',}`).row.full-width.justify-center
-        div(:style=`{maxWidth: 700+'px'}`).row.full-width.items-end.content-end
+        :style=`{}`).row.full-width.justify-center
+        div(:style=`{maxWidth: 700+'px'}`).row.full-width
           q-btn(
-            round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps
+            round flat color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps
             :style=`{
               marginBottom: '1px',
             }`
-            ).q-px-sm Назад
+            ).q-px-sm.q-mx-md Назад
           .col
             q-tabs(
               v-model="pageId"
-              align="justify" dense
+              align="justify"
               no-caps active-color="green").full-width.text-grey-8
               q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
     component(
@@ -126,7 +146,7 @@ export default {
       return [
         {id: 'details', icon: 'info', name: 'Детали'},
         {id: 'nodes', icon: 'filter_tilt_shift', name: 'Ядра'},
-        {id: 'joints', icon: 'link', name: 'Связи'},
+        // {id: 'joints', icon: 'link', name: 'Связи'},
         // {id: 'similar', icon: 'menu', name: 'Similar'}
       ]
     }
@@ -138,31 +158,17 @@ export default {
         this.$log('query TO', to)
         // if (to) {}
         // set viewId force, from feed or from workspace
-        if (to && to.pageId) {
-          this.pageId = to.pageId
-        }
-      }
-    },
-    'player.currentTime': {
-      handler (to, from) {
-        if (this.frames.length > 0) {
-          if (this.frames[0].length === 2) {
-            this.$log('framing...')
-            if (to < this.frames[0][0].t) {
-              this.player.setCurrentTime(this.frames[0][0].t)
-            }
-            if (to >= this.frames[0][1].t) {
-              this.player.setCurrentTime(this.frames[0][0].t)
-            }
-          }
-        }
+        // if (to && to.pageId) {
+        //   this.pageId = to.pageId
+        // }
+        // if (to.oid) {}
       }
     }
   },
   methods: {
     onResize (e) {
       this.$log('onResize', e)
-      this.headerHeight = e.height
+      // this.headerHeight = e.height
     },
     async nodeCreateStart () {
       this.$log('nodeCreateStart')

@@ -11,6 +11,23 @@ div(
   }`).row.full-width.b-50
   slot(name="bar")
   slot(name="bar-current-time" :panning="panning")
+  //- volume
+  q-btn(
+    round flat dense :color="color"
+    :style=`{
+      position: 'absolute', left: '-40px', top: '-8px', zIndex: 300,
+    }`)
+    q-icon(
+      :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
+      :color="player.mutedLocal ? 'red' : color"
+      size="20px" @click="player.volumeToggle()")
+  //- currentTime/duration
+  small(
+    :style=`{
+      position: 'absolute', zIndex: 300,
+      pointerEvents: 'none', left: '8px', top: '2px',
+    }`
+    ).text-grey-4 {{$time(player.currentTime)}} / {{$time(player.duration)}}
   //- currentTime width/line
   div(
     :style=`{
