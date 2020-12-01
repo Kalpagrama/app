@@ -45,12 +45,13 @@ node-feed(
           }`)
         //- name
         .col.q-pa-sm
-          span.text-white.text-bold {{ node.name }}
+          span.text-white.text-bold {{ node.name || node.vertices }}
         //- preview
         .col
           .row.full-width.items-start.content-start.justify-end
             img(
-              :src="node.thumbUrl"
+              v-if="itemRight"
+              :src="itemRight.thumbUrl"
               :style=`{
                 height: '60px',
                 borderRadius: '10px',
@@ -68,11 +69,31 @@ export default {
     }
   },
   computed: {
+    itemRight () {
+      return this.node.items.find(i => {
+        if (i.layers) {
+          return i.layers[0].contentOid !== this.contentKalpa.oid
+        }
+        else {
+          return true
+        }
+      })
+    },
+    item () {
+      return this.node.items.find(i => {
+        if (i.layers) {
+          return i.layers[0].contentOid === this.contentKalpa.oid
+        }
+        else {
+          return true
+        }
+      })
+    },
     start () {
-      return this.node.items[0].layers[0].figuresAbsolute[0].t
+      return this.item.layers[0].figuresAbsolute[0].t
     },
     end () {
-      return this.node.items[0].layers[0].figuresAbsolute[1].t
+      return this.item.layers[0].figuresAbsolute[1].t
     },
     duration () {
       return this.end - this.start

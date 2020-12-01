@@ -16,7 +16,7 @@ q-page(
       ).row.full-width.items-start.content-start.q-px-sm
       node-item(
         v-for="(node, nodei) in items" :key="node.oid"
-        v-if="node.items.length === 1"
+        v-if="true || node.items.length === 1"
         :node="node" :player="player" :contentKalpa="contentKalpa"
         :isFocused="nodeFocused ? nodeFocused.oid === node.oid : false"
         @isFocused="$event => nodeFocusedHandle(node, $event)"
@@ -46,7 +46,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
         },

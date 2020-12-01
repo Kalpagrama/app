@@ -55,13 +55,13 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
         },
         populateObjects: true,
       }
-    }
+    },
   },
   watch: {
     oid: {

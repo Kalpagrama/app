@@ -57,7 +57,7 @@ q-layout(
                   pointerEvents: 'none',
                 }`
                 ).row
-      div(v-if="pageId !== 'node'").row.full-width.q-pb-sm.bg-black
+      //- div(v-if="pageId !== 'node'").row.full-width.q-pb-sm.bg-black
       q-btn(
         v-if="player && pageId !== 'node'"
         @click="nodeCreateStart()"

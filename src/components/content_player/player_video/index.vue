@@ -4,6 +4,7 @@ div(
     //- borderRadius: '10px',
   }`
   ).row.full-width.items-start.content-start.bg-black
+  //- player wrapper:
   div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
     img(
       draggable="false"
@@ -33,6 +34,7 @@ div(
     div(:style=`{position: 'absolute', zIndex: 1100, right: '0px', top: '50%'}`).row
       slot(name="right")
     //- actions player
+  //- footer:
   div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
     div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-xl
       //- player-actions(
