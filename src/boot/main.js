@@ -57,16 +57,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
-<<<<<<< HEAD
-=======
-    Vue.prototype.$nodeRateTitle = (val) => {
-      if (val <= 0.2) return 'Очень далеко'
-      else if (val <= 0.4) return 'Ну такое'
-      else if (val <= 0.6) return 'Где-то рядом'
-      else if (val <= 0.8) return 'Близко'
-      else return 'Прямо в точку!'
-    }
->>>>>>> 325d15d1e2a54372d2bcbef744fc53244428b7a2
     // global components
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     // Vue.component('nodeMini', () => import('components/node_mini/index.vue'))

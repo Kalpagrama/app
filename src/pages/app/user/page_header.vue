@@ -15,7 +15,7 @@
         .col.q-pl-sm
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
-            no-caps active-color="green" align="left").full-width
+            no-caps active-color="green" align="left").full-width.text-white
             q-tab(
               v-for="p in pagesMine" :key="p.id" :name="p.id" :label="p.name")
         q-btn(

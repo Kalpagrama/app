@@ -286,8 +286,11 @@ export default {
         await this.$wait(500)
         if (this.node.items.length > 0) {
           let nodeInput = JSON.parse(JSON.stringify(this.node))
+          if (nodeInput.items.length === 2) {
+            nodeInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+          }
           this.$log('nodeInput', nodeInput)
-          let createdNode = await ObjectCreateApi.nodeCreate(nodeInput)
+          let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
           this.$log('publish createdNode', createdNode)
           // this.$router.push(`/node/${createdNode.oid}`).catch(e => e)
         }

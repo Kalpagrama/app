@@ -134,8 +134,9 @@ class ObjectCreateApi {
       let nodeInput = {}
       nodeInput.layout = essence.layout
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)
-      nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
-      assert(nodeInput.name, '!nodeInput.name')
+      // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
+      // assert(nodeInput.name, '!nodeInput.name')
+      nodeInput.name = essence.name
       nodeInput.category = essence.category || 'FUN'
       nodeInput.spheres = essence.spheres.map(s => {
          return { name: s.name, oid: s.oid }
