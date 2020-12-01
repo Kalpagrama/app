@@ -1,7 +1,7 @@
 import { LoadingBar } from 'quasar'
-import { MutexLocal } from 'src/system/rxdb/mutex'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)

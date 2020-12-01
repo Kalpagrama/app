@@ -1,4 +1,4 @@
-import { LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 export default {
    initialized: false,
@@ -27,9 +27,9 @@ export default {
       LogSystemModulesEnum.RXDB_REACTIVE,
       // LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
-      LogSystemModulesEnum.RXDB_OBJ,
+      // LogSystemModulesEnum.RXDB_OBJ,
       LogSystemModulesEnum.RXDB_GQL,
-      LogSystemModulesEnum.RXDB_LST,
+      // LogSystemModulesEnum.RXDB_LST,
       LogSystemModulesEnum.RXDB_EVENT,
       LogSystemModulesEnum.MUTEX,
       LogSystemModulesEnum.BOOT,

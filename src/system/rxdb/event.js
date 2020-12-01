@@ -1,10 +1,11 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
-import { getReactiveDoc, rxdb } from 'src/system/rxdb'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { rxdb } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
+import { getReactiveDoc } from 'src/system/rxdb/reactive'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
@@ -59,7 +60,8 @@ class Event {
                // logD(f, `reactive LST_FEED changed (${reactiveItem.items.length})`, reactiveItem)
             }
          }
-
+         event.card = EventApi.makeEventCard(event)
+         if (event.subject && event.subject.oid === rxdb.getCurrentUser().oid) this.notifyUserActionComplete(event.type, event.object)
          switch (event.type) {
             case 'ERROR':
                if (event.operation === 'OBJECT_CREATE') { // не удалось создать ядро!
@@ -101,33 +103,21 @@ class Event {
                await this.objects.processEvent(event)
                break
             case 'OBJECT_CREATED':
-               event.card = EventApi.makeEventCard(event)
-               if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
-                  logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
-                  await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true }) // обновит ядро в rxdb (изначально у нас был фейковый вариант)
-                  logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
-                  this.notifyUserActionComplete(event.type, event.object)
-               }
                await this.objects.processEvent(event) // обновить  статистику на ядре
                await this.lists.processEvent(event) // поместить объект во все ленты
                break
             case 'OBJECT_DELETED':
-               this.notifyUserActionComplete(event.type, event.object)
                await this.objects.processEvent(event) // обновить ядро
                await this.lists.processEvent(event) // удалить объект из всех лент
                break
             case 'VOTED':
                event.card = EventApi.makeEventCard(event)
-               if (event.subject.oid === rxdb.getCurrentUser().oid) {
-                  this.notifyUserActionComplete(event.type, event.object)
-               }
                await this.objects.processEvent(event) // обновить ядро + статистику голосования на ядре
                await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
                break
             case 'USER_SUBSCRIBED':
             case 'USER_UNSUBSCRIBED':
                event.card = EventApi.makeEventCard(event)
-               this.notifyUserActionComplete(event.type, event.object)
                await this.lists.processEvent(event)
                break
             case 'WS_ITEM_CREATED':

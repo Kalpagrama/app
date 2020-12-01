@@ -60,8 +60,6 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-import { systemInit } from 'src/system/services'
-import { AuthApi } from 'src/api/auth'
 
 import kalpaMenu from 'components/kalpa_menu/index.vue'
 import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'

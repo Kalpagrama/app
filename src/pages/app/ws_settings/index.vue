@@ -36,7 +36,6 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { WorkspaceApi } from 'src/api/workspace'
-import { systemReset } from 'src/system/services'
 
 export default {
   name: 'pageApp__wsSettings',

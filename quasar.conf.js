@@ -22,6 +22,8 @@ module.exports = function (ctx) {
       // --> boot files are part of "main.js"
       // https://quasar.dev/quasar-cli/boot-files
       boot: [
+         // { path: 'log_ssr', client: false },
+         // { path: 'log', server: false },
          'log',
          'rxdb',
          'notify',
@@ -141,7 +143,7 @@ module.exports = function (ctx) {
                   new webpack.IgnorePlugin(/@capacitor\/core/)
                )
             }
-            if (ctx.dev) {
+            if (ctx.dev && !ctx.mode.ssr) {
                cfg.plugins.push(
                   new BundleAnalyzerPlugin({ analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 })
                )
@@ -171,28 +173,28 @@ module.exports = function (ctx) {
                schema: path.resolve(__dirname, './src/api'),
                public: path.resolve(__dirname, './public')
             }
-            cfg.optimization = {
-               runtimeChunk: 'single',
-               splitChunks: {
-                  chunks: 'all',
-                  maxInitialRequests: Infinity,
-                  // minSize: 0,
-                  cacheGroups: {
-                     vendor: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name (module) {
-                           // получает имя, то есть node_modules/packageName/not/this/part.js
-                           // или node_modules/packageName
-                           const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-
-                           // имена npm-пакетов можно, не опасаясь проблем, использовать
-                           // в URL, но некоторые серверы не любят символы наподобие @
-                           return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
-                        }
-                     }
-                  }
-               }
-            }
+            // cfg.optimization = {
+            //    runtimeChunk: 'single',
+            //    splitChunks: {
+            //       chunks: 'all',
+            //       maxInitialRequests: Infinity,
+            //       // minSize: 0,
+            //       cacheGroups: {
+            //          vendor: {
+            //             test: /[\\/]node_modules[\\/]/,
+            //             name (module) {
+            //                // получает имя, то есть node_modules/packageName/not/this/part.js
+            //                // или node_modules/packageName
+            //                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            //
+            //                // имена npm-пакетов можно, не опасаясь проблем, использовать
+            //                // в URL, но некоторые серверы не любят символы наподобие @
+            //                return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
+            //             }
+            //          }
+            //       }
+            //    }
+            // }
          }
       },
 
@@ -216,7 +218,7 @@ module.exports = function (ctx) {
          //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
          // },
          // https: true,
-         port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+         port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
          host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
          // https: false,
          https: ctx.mode.capacitor || ctx.mode.spa ? false : {
@@ -231,8 +233,38 @@ module.exports = function (ctx) {
      //  animations: 'all', // animations: [],
 
       ssr: {
-         pwa: false
+         pwa: false, // should a PWA take over (default: false), or just a SPA?
+         manualHydration: true,
+         // manualHydration: true/false, // (@quasar/app v1.4.2+) Manually hydrate the store
+         // componentCache: {...} // lru-cache package options,
+
+         // -- @quasar/app v1.9.5+ --
+         // optional; add/remove/change properties
+         // of production generated package.json
+         // extendPackageJson (pkg) {
+         //    // directly change props of pkg;
+         //    // no need to return anything
+         // },
+
+         // -- @quasar/app v1.5+ --
+         // optional; webpack config Object for
+         // the Webserver part ONLY (/src-ssr/)
+         // which is invoked for production (NOT for dev)
+         // extendWebpack (cfg) {
+         //    // directly change props of cfg;
+         //    // no need to return anything
+         // },
+
+         // -- @quasar/app v1.5+ --
+         // optional; EQUIVALENT to extendWebpack() but uses webpack-chain;
+         // the Webserver part ONLY (/src-ssr/)
+         // which is invoked for production (NOT for dev)
+         // chainWebpack (chain) {
+         //    // chain is a webpack-chain instance
+         //    // of the Webpack configuration
+         // }
       },
+
       pwa: {
          workboxPluginMode: 'InjectManifest', // 'GenerateSW', //
          workboxOptions: {

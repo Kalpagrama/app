@@ -2,8 +2,9 @@
 import assert from 'assert'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { makeId, rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { wait } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 
@@ -289,6 +290,11 @@ class Objects {
          case 'OBJECT_CREATED':
             assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
             assert(event.object.type, '!event.object.type')
+            if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
+               logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
+               await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true, clientFirst: true }) // обновит ядро в rxdb (изначально у нас был фейковый вариант)
+               logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
+            }
             if (event.object.type === 'JOINT') { // создан новый джойнт. обновляем статистику джойнтов на ядре
                for (let oid of event.sphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)

@@ -1,22 +1,14 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { rxdb } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum, LstCollectionEnum } from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactiveDoc, updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { mutexGlobal } from 'src/system/rxdb/mutex'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
-
-const LstCollectionEnum = Object.freeze({
-  LST_SPHERE_ITEMS: 'LST_SPHERE_ITEMS', // элементы на сфере
-  LST_FEED: 'LST_FEED',
-  LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
-  LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
-  LST_SEARCH: 'LST_SEARCH' // подписки пользователя
-})
 
 function makeListCacheId (mangoQuery) {
   assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 3' + JSON.stringify(mangoQuery))
@@ -166,7 +158,8 @@ class Lists {
         let rxDocs = await this.cache.find({
           selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-            'props.oid': { $in: event.sphereOids }
+            'props.oid': { $in: event.sphereOids },
+            'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
           }
         })
         if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
@@ -179,6 +172,7 @@ class Lists {
         }
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
+          logD('apply event to rxdoc', rxDoc.toJSON())
           let reactiveItem = getReactiveDoc(rxDoc).getPayload()
           assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')
@@ -300,4 +294,4 @@ class Lists {
   }
 }
 
-export { Lists, LstCollectionEnum }
+export { Lists }

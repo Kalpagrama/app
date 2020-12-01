@@ -4,18 +4,23 @@ import { onError } from 'apollo-link-error'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from '../api/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
-// import VueApollo from 'vue-apollo'
-// import { persistCache } from 'apollo-cache-persist'
-// import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'public/scripts/possibleTypes.json'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import {
+   getLogFunc,
+   LogLevelEnum,
+   LogSystemModulesEnum,
+   sessionStorage,
+   window,
+   localStorage,
+   isSsr
+} from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
+import axios from 'axios'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
@@ -25,8 +30,37 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
-      let kDebug = sessionStorage.getItem('k_debug') // запросы переренаправляются на машину разработчика
-      assert(kDebug) // '0' | '1'
+      let fetchFunc
+      console.error('apollo::isSsr=', isSsr)
+      if (isSsr) {
+         fetchFunc = async (uri, options) => {
+            options.url = uri
+            if (options.body) options.data = options.body
+            let result = await axios(options)
+            // if (res && res.data) res.body = res.data
+            // res.body.text = () => {}
+
+            // Convert the Axios style response into a `fetch` style response
+            const responseBody = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
+
+            const { Response, Headers } = require('node-fetch')
+            const headers = new Headers();
+            Object.entries(result.headers).forEach(function ([key, value]) {
+               headers.append(key, value);
+            })
+            let response = new Response(responseBody, {
+               status: result.status,
+               statusText: result.statusText,
+               headers
+            });
+
+            return response
+         }
+      } else {
+         fetchFunc = fetch
+      }
+      if (!sessionStorage.getItem('k_debug')) sessionStorage.setItem('k_debug', '0')
+      let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
@@ -115,7 +149,7 @@ export default async ({ Vue, store, app }) => {
             uri: SERVICES_URL,
             fetch (uri, options) {
                if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-               return fetch(uri, options)
+               return fetchFunc(uri, options)
             }
          }),
          defaultOptions,
@@ -139,10 +173,11 @@ export default async ({ Vue, store, app }) => {
             window.location.reload() // новые данные будут подхвачены после перезагрузки
          }
       }
+
       let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
          { clientFirst: true, force: true, onFetchFunc })
 
-      logD('services', services)
+      logD('services=', services)
       assert(services, '!services!!!')
       let linkAuth = services.authUrl
       let linkApi = services.apiUrl
@@ -158,7 +193,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
                // useGETForQueries: true
             })
@@ -175,7 +210,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
                // useGETForQueries: true
             })
@@ -184,27 +219,30 @@ export default async ({ Vue, store, app }) => {
          cache,
          connectToDevTools: true
       })
-      const wsApollo = new ApolloClient({
-         link: ApolloLink.from([
-            errLinkWs,
-            new WebSocketLink({
-               uri: linkWs,
-               options: {
-                  minTimeout: 6000,
-                  reconnect: true,
-                  lazy: true,
-                  connectionParams: () => {
-                     return {
-                        Authorization: localStorage.getItem('k_token'),
-                        'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+      let wsApollo = null
+      if (!isSsr) {
+         wsApollo = new ApolloClient({
+            link: ApolloLink.from([
+               errLinkWs,
+               new WebSocketLink({
+                  uri: linkWs,
+                  options: {
+                     minTimeout: 6000,
+                     reconnect: true,
+                     lazy: true,
+                     connectionParams: () => {
+                        return {
+                           Authorization: localStorage.getItem('k_token'),
+                           'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+                        }
                      }
                   }
-               }
-            })
-         ]),
-         defaultOptions,
-         cache
-      })
+               })
+            ]),
+            defaultOptions,
+            cache
+         })
+      }
       const uploadApollo = new ApolloClient({
          link: ApolloLink.from([
             errLink,
@@ -214,7 +252,7 @@ export default async ({ Vue, store, app }) => {
                   const token = localStorage.getItem('k_token')
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
-                  return fetch(uri, options)
+                  return fetchFunc(uri, options)
                }
             })
          ]),

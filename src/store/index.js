@@ -6,7 +6,7 @@ import ui from './ui'
 import debug from './debug'
 import {rxdb} from 'src/system/rxdb'
 import assert from 'assert'
-import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
+import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/system/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)

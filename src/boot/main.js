@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
@@ -8,8 +8,6 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
-import VueZoomer from 'vue-zoomer'
-// import PinchZoom from 'vue-pinch-zoom'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -34,8 +32,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
-    Vue.use(VueZoomer)
-    // Vue.component('pinch-zoom', PinchZoom)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
     // quasar stuff
@@ -61,6 +57,16 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
+<<<<<<< HEAD
+=======
+    Vue.prototype.$nodeRateTitle = (val) => {
+      if (val <= 0.2) return 'Очень далеко'
+      else if (val <= 0.4) return 'Ну такое'
+      else if (val <= 0.6) return 'Где-то рядом'
+      else if (val <= 0.8) return 'Близко'
+      else return 'Прямо в точку!'
+    }
+>>>>>>> 325d15d1e2a54372d2bcbef744fc53244428b7a2
     // global components
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
     // Vue.component('nodeMini', () => import('components/node_mini/index.vue'))

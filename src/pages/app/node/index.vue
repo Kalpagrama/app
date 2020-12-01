@@ -53,6 +53,7 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeMockup from './node_mockup/index.vue'
+import debounce from 'lodash/debounce'
 
 export default {
   name: 'pageApp_node',
@@ -66,6 +67,7 @@ export default {
   data () {
     return {
       node: null,
+      node_tmp: null,
       nodeOpened: true,
       pageId: 'inside',
       headerHeight: 0,
@@ -115,6 +117,13 @@ export default {
           this.nodeOpened = false
         }
       }
+    },
+    node_tmp: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$logW('node_tmp changed', from, to)
+      }
     }
   },
   methods: {
@@ -157,7 +166,8 @@ export default {
     },
     async nodeLoad (oid) {
       this.$log('nodeLoad', oid)
-      this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+      this.node_tmp = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+      this.node = this.node_tmp
     }
   },
   async mounted () {
