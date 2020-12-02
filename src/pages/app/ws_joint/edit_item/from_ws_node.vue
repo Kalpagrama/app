@@ -25,7 +25,7 @@ div(
       marginTop: '-20px', paddingTop: '24px',
       borderRadius: '10px',
     }`
-    ).row.full-width.bg-black.q-px-xs.q-pb-xs
+    ).row.full-width.q-px-xs.q-pb-xs
     //- q-btn(round flat dense color="grey-6" icon="delete_outline")
     .col
     q-btn(

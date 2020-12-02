@@ -2,11 +2,9 @@
 .row.full-width.justify-center
   kalpa-finder(
     @contentKalpa="contentKalpaFound"
+    :pagesShow="false"
     :pages=`{
       workspace: {views: ['image', 'video', 'node', 'user', 'sphere']},
-      kalpagrama: {views: ['all', 'users', 'nodes']},
-      gif: {views: ['all']},
-      web: {views: ['all', 'image', 'video',]}
     }`
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',

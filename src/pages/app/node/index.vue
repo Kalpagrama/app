@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff"
   @scroll="onScroll").b-30
-  q-header(
+  //- q-header(
    ).b-30
     .row.full-width.justify-center
       //- q-resize-observer(@resize="onResize")
@@ -35,7 +35,23 @@ q-layout(
           :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
   q-page-container
-    component(
+    q-page(
+      :style=`{
+        paddingTop: '16px',
+      }`
+      ).row.full-width.justify-center
+      div(
+        v-if="node"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        .col-6
+          node-feed(
+            v-if="node"
+            :node="node" :isActive="true" :isVisible="true"
+            :style=`{
+              transform: 'perspective(600px) rotateY(10deg)',
+            }`)
+        .col-6.br
+    //- component(
       v-if="node"
       :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
       template(v-slot:bottom)

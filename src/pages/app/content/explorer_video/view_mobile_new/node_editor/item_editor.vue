@@ -43,14 +43,14 @@
       position: 'relative',
       ...styles,
     }`
-    ).row.full-width.items-start.content-start.br
+    ).row.full-width.items-start.content-start
     content-player(
       :contentKalpa="contentKalpa"
       @player="player = $event"
       @error="playerError = $event"
       :style=`{
-        //- borderRadius: '10px',
-        zIndex: 200,
+        borderRadius: '10px',
+        zIndex: 210,
       }`).fit.bg-black
     q-btn(
       v-if="!item.outputType"
@@ -59,7 +59,7 @@
       color="green"
       icon="crop"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: '1px'
+        position: 'absolute', zIndex: 2000, right: '8px', bottom: 8+1+'px'
       }`)
     q-btn(
       v-if="item.outputType"
@@ -68,14 +68,14 @@
       :color="editing ? 'green' : 'white'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: '1px'
+        position: 'absolute', zIndex: 2000, right: '8px', bottom: 8+1+'px'
       }`)
     div(
       v-if="item.outputType === 'VIDEO'"
       :style=`{
         position: 'absolute', zIndex: 200, bottom: '0px',
       }`).row.full-width
-      div(:style=`{position: 'absolute', zIndex: 200, top: '-8px',}`).row.full-width
+      div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
         composition-editor(
           v-if="editing"
           :player="player" :composition="item"
@@ -83,7 +83,7 @@
           :style=`{
             zIndex: 2000,
             borderRadius: '0 0 10px 10px',
-          }`).br
+          }`).bg-black
         .row.full-width
           slot(name="footer")
 </template>
@@ -95,7 +95,7 @@ import contentPlayer from 'components/content_player/index.vue'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
 export default {
-  name: 'pageNode_itemEditor',
+  name: 'itemEditor',
   props: ['item', 'styles', 'isActive'],
   components: {
     contentPlayer,
@@ -125,7 +125,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$log('item TO', to)
+        // this.$log('item TO', to)
         if (to) {
           if (to.outputType === 'VIDEO') {
             this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)

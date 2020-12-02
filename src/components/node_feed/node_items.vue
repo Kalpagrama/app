@@ -133,14 +133,14 @@ export default {
         {id: 'FROM', name: 'До', pair: 'TO'},
         {id: 'TO', name: 'После', pair: 'FROM'},
         // fake/disproof
-        {id: 'FAKE', name: 'Опровержение', pair: 'FALSE'},
-        {id: 'DISPROOF', name: 'Факт', pair: 'TRUE'},
+        {id: 'FAKE', name: 'Фэйк', pair: 'FALSE'},
+        {id: 'DISPROOF', name: 'Опровержение', pair: 'TRUE'},
         // fact/proof
-        {id: 'FACT', name: 'Опровержение', pair: 'FALSE'},
-        {id: 'PROOF', name: 'Факт', pair: 'TRUE'},
+        {id: 'FACT', name: 'Факт', pair: 'FALSE'},
+        {id: 'PROOF', name: 'Подтверждение', pair: 'TRUE'},
         // question/answer
-        {id: 'QUESTION', name: 'Опровержение', pair: 'ANSWER'},
-        {id: 'ANSWER', name: 'Факт', pair: 'QUESTION'},
+        {id: 'QUESTION', name: 'Вопрос', pair: 'ANSWER'},
+        {id: 'ANSWER', name: 'Ответ', pair: 'QUESTION'},
       ]
     },
   },
