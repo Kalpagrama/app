@@ -5,7 +5,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
     @click="actionsShow = !actionsShow"
     round flat color="grey-7" icon="tune" dense
     :style=`{
-      position: 'absolute', zIndex: 1000, right: '4px', bottom: '0px',
+      position: 'absolute', zIndex: 1000, right: '4px', bottom: '4px',
     }`)
   //- overflowY: 'hidden',
   div(

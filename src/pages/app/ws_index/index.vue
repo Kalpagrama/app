@@ -13,10 +13,17 @@
       height: $q.screen.height+'px',
     }`).b-30
     template(v-slot:header)
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-        .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
+      .row.full-width.q-py-sm
+        div(
+          :style=`{
+            minHeight: '60px',
+            borderRadius: '10px', overflow: 'hidden',
+          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
+          q-icon(name="bookmark_outline" color="white" size="30px").q-ml-sm
+          .col.q-px-sm
+            span(
+              :style=`{fontSize: '18px'}`
+              ).text-white.text-bold Закладки
     template(v-slot:tint=`{item}`)
       div(
         @click="itemFound(item)"

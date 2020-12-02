@@ -4,7 +4,8 @@ q-page(
     paddingTop: '8px',
     paddingBottom: '100vh',
   }`
-  ).row.full-width.justify-center
+  ).row.full-width.items-start.content-start.justify-center
+  slot
   kalpa-loader(
     :immediate="true"
     @items="nodesLoaded"

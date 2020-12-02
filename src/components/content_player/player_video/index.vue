@@ -1,11 +1,42 @@
 <template lang="pug">
 div(
   :style=`{
-    //- borderRadius: '10px',
+    ...styles,
+  }`
+  ).column.full-width
+  //- body
+  div(
+    :style=`{
+      position: 'relative',
+      overflow: 'hidden',
+    }`
+    ).col.full-width
+    component(
+      v-if="isActiveLocal"
+      :is="playerComponent[source]"
+      :url="url"
+      @player="player = $event, $emit('player', $event)"
+      :style=`{
+        position: 'absolute', zIndex: 1000, top: 0,
+        //- top: '0%', left: '-50%',
+        //- minHeight: '200%', minWidth: '200%',
+      }`).fit.bg-black
+  div(:style=`{position: 'relative',}`).row.full-width.q-px-xl.q-py-sm
+    //- .row.full-width
+    player-bar(v-if="player && options.showBar" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
+  //- .row.full-with
+//- div(
+  :style=`{
+    ...styles
   }`
   ).row.full-width.items-start.content-start.bg-black
   //- player wrapper:
-  div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
+  div(
+    :style=`{
+      position: 'relative',
+      ...styles,
+    }`
+    ).row.full-width.items-start.content-start
     img(
       draggable="false"
       :src="thumbUrl"
@@ -66,6 +97,7 @@ export default {
     source: {type: String, required: true},
     url: {type: String, required: true},
     thumbUrl: {type: String, required: true},
+    styles: {type: Object},
     options: {
       type: Object,
       default () {

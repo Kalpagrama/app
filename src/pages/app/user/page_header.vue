@@ -1,7 +1,13 @@
 <template lang="pug">
 .row.full-width.justify-center.b-30
   div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-    div(:style=`{position: 'relative', height: '140px',}`).row.full-width
+    div(
+      :style=`{
+        position: 'relative', height: '140px',
+        marginTop: '8px',
+        borderRadius: '10px 10px 0 0',
+        overflow: 'hidden',
+      }`).row.full-width
       img(
         v-if="user"
         draggable="false"
@@ -12,7 +18,7 @@
         v-if="itsMe"
         :style=`{position: 'absolute', zIndex: 100, bottom: '20px',}`
         ).row.full-width.items-center.content-center
-        .col.q-pl-sm
+        .col.q-pl-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
             no-caps active-color="green" align="left").full-width.text-white

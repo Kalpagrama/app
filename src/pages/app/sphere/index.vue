@@ -8,9 +8,6 @@ q-layout(view="hHh Lpr lff")
             minHeight: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          //- q-btn(
-            @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="blur_on" color="white" size="30px").q-ml-sm
           .col.q-px-sm
             span(
@@ -24,24 +21,12 @@ q-layout(view="hHh Lpr lff")
             :thumbUrl="''"
             :isActive="true")
   q-page-container
-    q-page(
-      :style=`{
-        paddingTop: '8px', paddingBottom: '200px',
-      }`)
-      .row.full-width.items-start.content-start.justify-center
-        div(
-          :class=`{
-          }`
-          :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-          }`
-          ).row.full-width.items-start.content-start
-          kalpa-loader(
-            v-if="sphere" :query="query" :limit="12" v-slot=`{items, next}`)
-            list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-              q-infinite-scroll(@load="next" :offset="$q.screen.height")
-              template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-                node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+    component(
+      v-if="sphere"
+      :is="`page-${pageId}`"
+      :sphere="sphere")
+      //- .row.full-width.bg-red.q-py-md
+        span.text-white tabs
 </template>
 
 <script>
@@ -49,22 +34,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageApp_sphere',
-  components: {},
+  components: {
+    pageNodes: () => import('./page_nodes/index.vue'),
+    pageContent: () => import('./page_content/index.vue'),
+  },
   data () {
     return {
+      pageId: 'nodes',
       sphere: null,
-    }
-  },
-  computed: {
-    query () {
-      return {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-          oidSphere: this.$route.params.oid
-        },
-        populateObjects: true,
-      }
     }
   },
   watch: {
@@ -72,12 +49,12 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$log('$route.params.oid TO', to)
         if (to) {
+          this.$log('$route.params.oid TO', to)
           this.sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
         }
       }
     }
-  },
+  }
 }
 </script>

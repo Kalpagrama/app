@@ -92,7 +92,7 @@ div(
                 span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
       //- item.type
       div(
-        v-if="node.vertices[ii] && node.vertices[ii] !== 'ASSOCIATIVE'"
+        v-if="node.vertices[ii] && node.vertices[ii] !== 'ASSOCIATIVE' && node.vertices[ii] !== 'ESSENCE'"
         ).row.full-width.justify-center.q-pt-xs
         small.text-white {{ itemType(ii).name }}
         //- small.text-white {{ node.vertices[ii] }}

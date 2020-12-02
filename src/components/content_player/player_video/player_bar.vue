@@ -102,6 +102,39 @@ div(
       opacity: 0.9,
     }`
     ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
+  //- template(v-slot:bar)
+    div(
+      v-if="player && figures.length > 0"
+      :style=`{
+        position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+        //- borderRadius: '10px', overflow: 'hidden',
+      }`
+      ).row.fit
+      template(v-for="(f,fi) in figures")
+        div(
+          v-if="f.length === 1"
+          :key="fi"
+          :style=`{
+            position: 'absolute', zIndex: 2050, top: '0px',
+            left: f[0].t/player.duration*100+'%',
+            width: '2px',
+            background: 'rgba(255,255,255, 0.5)',
+          }`
+          ).row.full-height
+        div(
+          v-if="f.length === 2"
+          :key="fi"
+          :style=`{
+            position: 'absolute', zIndex: 2050, top: '-2px',
+            left: f[0].t/player.duration*100+'%',
+            width: (f[1].t-f[0].t)/player.duration*100+'%',
+            height: 'calc(100% + 4px)',
+            border: '2px solid rgb(76,175,80)',
+            borderRadius: '4px',
+            background: 'rgba(255,255,255,0.2)',
+            pointerEvents: 'none',
+          }`
+          ).row
 </template>
 
 <script>
@@ -151,7 +184,7 @@ export default {
       this.currentTimeMove = t
     },
     barPan (e) {
-      this.$log('barPan', e)
+      // this.$log('barPan', e)
       if (e.isFirst) {
         this.panning = true
         // this.player.pause()

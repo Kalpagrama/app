@@ -1,9 +1,6 @@
 <template lang="pug">
-q-page(
-  :style=`{
-    paddingBottom: '100px',
-  }`).row.full-width.justify-center
-  div(:style=`{maxWidth: '700px'}`).row.full-width
+.row.full-width.justify-center
+  div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start
     //- DETAILS:
     .row.full-width.q-pa-sm
       div(
@@ -32,13 +29,17 @@ q-page(
             :fields=`{contentType: contentKalpa.type}`
             @bookmark="$event => $emit('bookmark', $event)")
           .col.full-height.q-px-sm
+            //- TODO: contentKalpa.sourse
+            //- kalpa, youtube, vk, instagram, tiktok, onlyfans
             q-btn(
               @click="gotToOriginal"
-              outline color="grey-5" icon="launch" no-caps).fit.b-50
-              span.text-bold.q-ml-sm на оригинал
+              align="left"
+              outline color="grey-9" no-caps).fit.b-50
+              q-icon(name="fab fa-youtube" color="red" size="30px")
+              span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
           kalpa-share(type="content" :item="contentKalpa")
     //- SIMILAR:
-    .row.full-width.items-start.content-start.q-px-sm
+    //- .row.full-width.items-start.content-start.q-px-sm
       div(
         v-for="(c,ci) in 10" :key="ci"
         :style=`{

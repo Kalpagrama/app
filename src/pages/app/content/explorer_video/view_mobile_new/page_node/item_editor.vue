@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width
-  div(
+//- .row.full-width
+div(
     :style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-30
     //- NODE
     div(
@@ -29,6 +29,7 @@
       :style=`{
         position: 'relative',
         borderRadius: '10px',
+        ...styles,
       }`
       ).row.full-width.items-start.content-start.bg-black.q-pb-sm
       //- composition-editor(
@@ -42,7 +43,38 @@
         :style=`{
           borderRadius: '10px',
         }`).fit
-        template(v-slot:bar)
+      q-btn(
+        v-if="!item.outputType"
+        @click="nodeCreateStart()"
+        round flat color="green" icon="add"
+        :style=`{
+          position: 'absolute', zIndex: 2000, right: '4px', bottom: '5px'
+        }`
+        )
+      q-btn(
+        v-if="item.outputType"
+        @click="editing = !editing"
+        round flat
+        :color="editing ? 'green' : 'white'"
+        :icon="editing ? 'check' : 'edit'"
+        :style=`{
+          position: 'absolute', zIndex: 2000, right: '4px', bottom: '5px'
+        }`
+        )
+      div(
+        v-if="item.outputType === 'VIDEO'"
+        ).row.full-width
+        composition-editor(
+          v-if="editing"
+          :player="player" :composition="item"
+          :contentKalpa="contentKalpa"
+          :style=`{
+            //- position: 'absolute', zIndex: 2000, bottom: '-110px',
+            borderRadius: '0 0 10px 10px',
+          }`).bg-black
+        .row.full-width
+          slot(name="footer")
+        //- template(v-slot:bar)
           div(
             v-if="player && figures.length > 0"
             :style=`{
@@ -75,7 +107,7 @@
                   pointerEvents: 'none',
                 }`
                 ).row
-        template(
+        //- template(
           v-if="!item.outputType"
           v-slot:bar-current-time=`{panning}`)
           transition(enter-active-class="animated fadeIn" leave-active-class="none")
@@ -87,7 +119,7 @@
                 position: 'absolute', zIndex: 1000, top: '-44px', borderRadius: '50%',
                 left: 'calc('+(player.currentTime/player.duration)*100+'% - 17px)',
               }`)
-      q-btn(
+      //- q-btn(
         v-if="item.outputType === 'VIDEO'"
         @click="editing = !editing"
         round flat dense
@@ -97,7 +129,7 @@
           position: 'absolute', zIndex: 2000, right: '4px', bottom: '10px',
           //- borderRadius: '50%',
         }`)
-    composition-editor(
+    //- composition-editor(
       v-if="item.outputType === 'VIDEO' && editing"
       :player="player" :composition="item"
       :contentKalpa="contentKalpa")
@@ -127,7 +159,7 @@ import compositionEditor from 'components/composition/composition_editor/index.v
 
 export default {
   name: 'pageNode_itemEditor',
-  props: ['item'],
+  props: ['item', 'styles'],
   components: {
     contentPlayer,
     compositionEditor
