@@ -20,12 +20,15 @@ q-page(
       :style=`{maxWidth: '700px',}`).q-px-sm
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         node-item(
+          :ref="'node-'+item.oid"
           :node="item" :player="player" :contentKalpa="contentKalpa"
           :isActive="isActive" :isVisible="isVisible"
           :isFocused="nodeFocused ? nodeFocused.oid === item.oid : false"
           @isFocused="$event => nodeFocusedHandle(item, $event[0], $event[1])"
           :style=`{
             marginBottom: '0px',
+            border: nodeQuery === item.oid ? '2px solid rgb(76,175,79)' : 'none',
+            borderRadius: '10px',
           }`)
 </template>
 
@@ -35,7 +38,7 @@ import nodeItem from './node_item.vue'
 
 export default {
   name: 'pageNodes',
-  props: ['contentKalpa', 'player'],
+  props: ['contentKalpa', 'player', 'nodeQuery'],
   components: {
     nodeItem,
   },
@@ -90,7 +93,7 @@ export default {
         this.$emit('figures', this.figures)
       }
     },
-    nodesLoaded (nodes) {
+    async nodesLoaded (nodes) {
       // this.$emit('figures')
       this.$log('figuresUpdate', nodes.length)
       // get figures
@@ -107,6 +110,12 @@ export default {
       }, [])
       this.figures = figures
       this.$emit('figures', figures)
+      // // check nodeQuery
+      // await this.$wait(1000)
+      // if (this.nodeQuery) {
+      //   let n = this.$refs['node-' + this.nodeQuery]
+      //   this.$log('n', n)
+      // }
     }
   },
   // beforeDestroy () {

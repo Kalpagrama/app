@@ -1,111 +1,236 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff"
-  @scroll="onScroll").b-30
-  //- q-header(
-   ).b-30
-    .row.full-width.justify-center
-      //- q-resize-observer(@resize="onResize")
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
-        .row.full-width.q-pa-sm
-          div(
-            :style=`{
-              height: '60px',
-              borderRadius: '10px',
-            }`
-            ).row.full-width.items-center.content-center.q-pa-sm.b-40
-            q-btn(
-              @click="$router.back()"
-              round flat color="white" icon="keyboard_arrow_left")
-            q-btn(
-              round flat color="white" icon="filter_tilt_shift")
-            .col.q-px-sm
-              span.text-white.text-bold Ядро
-            kalpa-menu-actions(:actions="actions" icon="more_vert")
-        list-middle(
-          v-if="node"
-          rootMargin="-30% 0px"
-          :items="[node]" :itemStyles=`{marginTop: '0px',}`)
-          template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-            node-feed(
-              v-if="node"
-              :node="node" :isActive="itemActive" :isVisible="itemVisible")
-        node-mockup(
-          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
+  view="hHh Lpr lff").b-30
+  kalpa-loader(
+    v-if="node"
+    @items="nodesLoaded"
+    :immediate="true"
+    :query="nodesQuery" :limit="12" v-slot=`{items, next, nexting}`)
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '16px',
+        paddingTop: '8px',
       }`
       ).row.full-width.justify-center
       div(
-        v-if="node"
+        v-if="nodeActive"
         :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        .col-6
-          node-feed(
-            v-if="node"
-            :node="node" :isActive="true" :isVisible="true"
-            :style=`{
-              transform: 'perspective(600px) rotateY(10deg)',
-            }`)
-        .col-6.br
-    //- component(
-      v-if="node"
-      :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
-      template(v-slot:bottom)
-        .row.full-width.justify-center
-          div(:style=`{maxWidth: 770+'px'}`).row.full-width
-            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm.q-mr-lg Назад
-            .col
-              q-tabs(
-                v-model="pageId"
-                align="justify"
-                no-caps active-color="green").full-width.text-grey-8
-                q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
+        node-feed(
+          :node="nodeActive"
+          :showItems="false"
+          :showHeader="true"
+          :showActions="nodeActive.oid"
+          :showCategory="nodeActive.oid")
+          template(v-slot:footer)
+            nodeEditor(
+              v-if="nodeNew"
+              ref="nodeEditor"
+              :node="nodeNew"
+              @close="nodeNew = null")
+          template(v-slot:items)
+            //- items wrapper
+            div(:style=`{paddingTop: '80px',paddingBottom: '0px',}`).row.full-width.q-px-sm
+              //- leftItem
+              .col-6
+                node-item(
+                  :item="leftItem"
+                  :itemActive="true"
+                  :itemVertice="'ASSOCIATIVE'"
+                  :itemIndex="0")
+                  template(v-slot:default)
+                    //- center
+                    div(:style=`{position: 'absolute', zIndex: 210, left: '0px', top: '60px', height: 'calc(100% - 120px)',}`).row
+                      //- change leftItem => rightItem
+                      q-btn(
+                        v-if="!nodeNew && stepIndex !== 0"
+                        flat color="white" icon="west"
+                        ).fit
+              //- rightItem
+              .col-6
+                node-item(
+                  :item="nodeActive.items[1]"
+                  :itemActive="true"
+                  :itemIndex="1"
+                  :itemVertice="'ASSOCIATIVE'")
+                  template(v-slot:default)
+                    //- add btn
+                    q-btn(
+                      v-if="nodeNew && !nodeNew.items[1]"
+                      @click="$refs.nodeEditor.itemFinderStart()"
+                      flat color="green" icon="add" size="xl"
+                      ).fit.b-50
+                    q-btn(
+                      v-if="!nodeNew && nodeActive && !nodeActive.items[1]"
+                      @click="nodeNewCreate()"
+                      flat color="green" icon="add" size="xl"
+                      ).fit.b-50
+                    //- item editor
+                    div(
+                      v-if="nodeNew && nodeNew.items[1]"
+                      :style=`{position: 'relative',}`).row.fit
+                      item-editor(
+                        :isActive="true"
+                        :item="nodeNew.items[1]"
+                        @item="itemFound($event, 1)"
+                        :styles=`{
+                          height: '100%',
+                        }`
+                        :style=`{
+                          position: 'absolute', zIndex: 200,
+                          height: '100%',
+                        }`)
+                    //- top
+                    div(:style=`{position: 'absolute', zIndex: 210, right: '0px', top: '-4px'}`).row
+                      div(:style=`{position: 'absolute', zIndex: 210, right: '0px', bottom: '0px'}`).row
+                        //- rightItem PREV
+                        div(
+                          v-if="!nodeNew && rightItemPrevExists"
+                          :style=`{
+                            position: 'relative',
+                          }`).row.full-width
+                          q-btn(
+                            @click="nodeActiveIndex -= 1"
+                            flat color="white" icon="north"
+                            :style=`{
+                              position: 'absolute', zIndex: 100,
+                              background: 'rgba(0,0,0,0.8)'}`
+                            ).fit
+                          img(
+                            @click="nodeActiveIndex -= 1"
+                            :src="leftItem.thumbUrl"
+                            :style=`{
+                              height: '60px',
+                              borderRadius: '10px',
+                            }`).cursor-pointer
+                    //- center
+                    div(:style=`{position: 'absolute', zIndex: 210, right: '0px', top: '60px', height: 'calc(100% - 120px)',}`).row
+                      //- change rightItem => leftItem
+                      q-btn(
+                        v-if="!nodeNew && nodeActive.items[1]"
+                        flat color="white" icon="east"
+                        :style=`{
+                          background: 'rgba(0,0,0,0.1)'
+                        }`
+                        ).fit
+                    //- bottom
+                    div(:style=`{position: 'absolute', zIndex: 2000, right: '0px', bottom: '-4px'}`).row
+                      div(:style=`{position: 'absolute', zIndex: 2000, right: '0px', top: '0px'}`).row.justify-end
+                        //- rightItem NEXT
+                        div(
+                          v-if="!nodeNew && rightItemNextExists"
+                          :style=`{
+                            position: 'relative',
+                          }`).row.full-width
+                          q-btn(
+                            @click="nodeActiveIndex += 1"
+                            flat color="white" icon="south"
+                            :style=`{
+                              position: 'absolute', zIndex: 100,
+                              background: 'rgba(0,0,0,0.8)'}`
+                            ).fit
+                          img(
+                            :src="nodes[nodeActiveIndex + 1].thumbUrl"
+                            :style=`{
+                              height: '60px',
+                              borderRadius: '10px',
+                            }`)
+                        q-btn(
+                          v-if="!nodeNew && nodeActive.items[1]"
+                          @click="nodeNewCreate()"
+                          flat color="green" icon="add"
+                          :style=`{
+                            zIndex: 2000,
+                            width: '60px',
+                            height: '60px',
+                          }`
+                          ).b-40.q-mt-xs
+      //- .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          //- .row.full-width
+            small.text-white {{ node }}
+          //- .row.full-width
+            small.text-white {{ nodeNew }}
+          //- graph
+          div(v-if="nodes.length > 0").row.full-width.items-start.content-start
+            div(
+              v-for="(item, itemii) in nodes" :key="item.oid"
+              :style=`{
+                height: '60px',
+              }`
+              ).row.full-width.text-white {{ item.oid }}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeMockup from './node_mockup/index.vue'
-import debounce from 'lodash/debounce'
 
 export default {
   name: 'pageApp_node',
   components: {
-    nodeMockup,
-    // pageInside: () => import('./view_joints/index.vue'),
-    pageInside: () => import('./page_inside/index.vue'),
-    // pageOutside: () => import('./page_outside/index.vue'),
-    // contentPlayer: () => import('components/content_player/index.vue')
+    kalpaFinder: () => import('components/kalpa_finder/index.vue'),
+    nodeItem: () => import('components/node_feed/node_items_item.vue'),
+    nodeEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/index.vue'),
+    itemEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/item_editor.vue')
   },
   data () {
     return {
       node: null,
-      node_tmp: null,
-      nodeOpened: true,
-      pageId: 'inside',
-      headerHeight: 0,
-      headerWidth: 0,
-      mounted: false,
+      nodeActiveIndex: null,
+      nodeNew: null,
+      nodeNewTemplate: {
+        oid: null,
+        name: '',
+        items: [],
+        layout: 'VERTICAL',
+        vertices: [],
+        spheres: [],
+        category: 'FUN',
+        author: {
+          oid: '',
+          name: '',
+          thumbUrl: '',
+        },
+        rateStat: []
+      },
+      nodes: [],
+      itemFinderShow: false,
+      stepIndex: 0,
+      steps: []
     }
   },
   computed: {
-    pages () {
-      return [
-        {id: 'inside', name: 'Ядра'},
-        {id: 'outside', name: 'Связи'}
-      ]
+    nodeActive () {
+      if (this.nodes[this.nodeActiveIndex]) return this.nodes[this.nodeActiveIndex]
+      else {
+        let nodeTemp = JSON.parse(JSON.stringify(this.nodeNewTemplate))
+        nodeTemp.items[0] = this.node
+        return nodeTemp
+        // return this.nodeNew
+      }
     },
-    actions () {
+    rightItemPrevExists () {
+      return this.nodes[this.nodeActiveIndex - 1] ? true : false
+    },
+    rightItemNextExists () {
+      return (this.nodes[this.nodeActiveIndex + 1] && this.nodes.length > 1) ? true : false
+    },
+    leftItem () {
+      if (!this.node) return null
+      if (this.node.items[1]) {
+        return this.node.items[0]
+      }
+      else {
+        return this.node
+      }
+    },
+    nodesQuery () {
       return {
-        report: {
-          name: 'Пожаловаться',
-          cb: () => {
-            this.$log('nodeReport...')
-          }
-        }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          oidSphere: this.leftItem.oid,
+          sortStrategy: 'AGE',
+        },
+        populateObjects: true,
       }
     }
   },
@@ -116,89 +241,49 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.oid TO', to)
         if (to) {
-          if (this.$store.state.core.progressInfo.CREATE[to]) {
-            this.$log('CREATE intital', this.$store.state.core.progressInfo.CREATE[to])
-            this.nodeWatch(to)
-          }
-          else {
-            this.$log('LOADING NODE...')
-            this.nodeLoad(to)
-          }
+          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
         }
       }
     },
-    pageId: {
-      handler (to, from) {
-        if (to && to === 'outside') {
-          this.nodeOpened = false
-        }
-      }
-    },
-    node_tmp: {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$logW('node_tmp changed', from, to)
-      }
-    }
   },
   methods: {
-    onResize (e) {
-      this.$log('onResize', e)
-      this.headerHeight = e.height
-      this.headerWidth = e.width
+    async nodeNewCreate () {
+      this.$log('nodeNewCreate')
+      this.nodeActiveIndex = -1
+      let nodeNewInput = JSON.parse(JSON.stringify(this.nodeNewTemplate))
+      let currentUser = this.$store.getters.currentUser()
+      nodeNewInput.items[0] = this.node
+      nodeNewInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+      nodeNewInput.author = {
+        oid: currentUser.oid,
+        name: currentUser.name,
+        thumbUrl: currentUser.thumbUrl,
+      }
+      this.nodeNew = nodeNewInput
+      // await this.$wait(300)
+      // this.$refs.nodeEditor.itemFinderStart()
     },
-    onScroll (e) {
-      // this.$log('onScroll', e)
-      if (this.nodeOpened && this.mounted) this.nodeOpened = false
+    itemFound (item, itemIndex) {
+      this.$log('itemFound', item, itemIndex)
+      // nodeNew.items[1] = $event
+      this.$set(this.nodeNew.items, itemIndex, item)
     },
-    nodeWatch (oid) {
-      this.$log('nodeWatch', oid)
-      var unwatch = this.$watch(
-        '$store.state.core.progressInfo.CREATE',
-        (valOld, valNew) => {
-          if (valNew) {
-            this.$log('CREATE valOld/valNew', valOld, valNew[oid])
-            if (valNew[oid] === 100) {
-              this.$q.notify({
-                type: 'positive',
-                position: 'top',
-                message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро готово!')
-              })
-              this.nodeLoad(oid)
-              unwatch()
-              this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])
-            }
-          }
-          else {
-            if (unwatch) unwatch()
-          }
-        },
-        {
-          immediate: true,
-          deep: true
-        }
-      )
-    },
-    async nodeLoad (oid) {
-      this.$log('nodeLoad', oid)
-      this.node_tmp = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-      this.node = this.node_tmp
+    nodesLoaded (nodes) {
+      this.$log('nodesLoaded', nodes)
+      if (nodes.length === 0) {
+      }
+      else {
+        this.nodeActiveIndex = nodes.findIndex(n => n.items[0].oid === this.leftItem.oid)
+        this.$log('nodeActiveIndex', this.nodeActiveIndex)
+      }
+      this.nodes = nodes
     }
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(2000)
-    this.mounted = true
-    // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

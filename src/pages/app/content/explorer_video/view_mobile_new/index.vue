@@ -75,6 +75,7 @@ q-layout(
   q-page-container
     page-nodes(
       v-if="!node"
+      :nodeQuery="(query && query.node) ? query.node : false"
       :player="player"
       :contentKalpa="contentKalpa")
       page-details(
@@ -106,6 +107,16 @@ export default {
       frames: [],
       headerHeight: 0,
     }
+  },
+  watch: {
+    // query: {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     if (to && to.node) {
+    //       // alert(to.node)
+    //     }
+    //   }
+    // }
   },
   methods: {
     itemFound (item, itemIndex) {

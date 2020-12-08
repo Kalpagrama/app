@@ -60,7 +60,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-
+import { RxCollectionEnum } from 'src/system/rxdb'
 import kalpaMenu from 'components/kalpa_menu/index.vue'
 import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
 
@@ -74,6 +74,10 @@ export default {
     }
   },
   watch: {
+  },
+  async mounted () {
+    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   async created () {
     this.$store.commit('ui/stateSet', ['pageHeight', this.$q.screen.height])

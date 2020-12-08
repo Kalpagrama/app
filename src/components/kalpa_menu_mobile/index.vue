@@ -6,10 +6,10 @@
     router-link(:to="{name: 'feeds'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
-          round flat dense icon="view_week"
+          round flat dense icon="home"
           :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-4'")
         .row.full-width.justify-center
-          small.text-grey-6 Ленты
+          small.text-grey-6 Домашняя
     router-link(:to="{name: 'trends'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(

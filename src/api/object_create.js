@@ -63,6 +63,7 @@ class ObjectCreateApi {
    }
 
    static makeCompositionInput (composition) {
+      console.log('makeCompositionInput', composition)
       assert.ok(Array.isArray(composition.layers), '!composition.layers')
       assert(composition.operation, '!operation')
       if (composition.layers.length === 0) { // если ничего не выделено - считаем что выделен весь контент
@@ -142,12 +143,29 @@ class ObjectCreateApi {
          return { name: s.name, oid: s.oid }
       })
       nodeInput.items = essence.items.map(i => {
-         let itemInput
-         if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
-         else itemInput = ObjectCreateApi.makeEssenceInput(i)
-         return {
-            compositionInput: ObjectCreateApi.makeCompositionInput(i)
+         // let itemInput
+         if (i.oid) {
+            return {
+               oid: i.oid
+            }
          }
+         else if (i.layers) {
+            return {
+               compositionInput: ObjectCreateApi.makeCompositionInput(i)
+            }
+         }
+         else {
+            return {
+               essenceInput: ObjectCreateApi.makeEssenceInput(i)
+            }
+         }
+         // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
+         // else if (i.oid) itemInput = {oid: i.oid}
+         // else itemInput = ObjectCreateApi.makeEssenceInput(i)
+         // return itemInput
+         // return {
+         //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
+         // }
       })
       nodeInput.vertices = essence.vertices || []
       return nodeInput
@@ -159,6 +177,7 @@ class ObjectCreateApi {
       const t1 = performance.now()
       const cb = async () => {
          let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
+         console.log('essenceInput', essenceInput)
          let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}

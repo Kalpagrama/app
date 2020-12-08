@@ -38,13 +38,26 @@ export default {
       layersChecked: []
     }
   },
-  methods: {
+  watch: {
+    composition: {
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          this.$log('composition TO', to)
+          let figures = this.composition.layers[0].figuresAbsolute
+          this.player.stateSet('figures', [figures])
+        }
+      }
+    }
   },
   mounted () {
     this.$log('mounted')
     if (this.composition.layers.length === 1) {
       this.layerEditingId = this.composition.layers[0].id
     }
-  }
+  },
+  // beforeDestroy () {
+  //   this.player.stateSet('figures', [])
+  // }
 }
 </script>

@@ -73,6 +73,8 @@ export default {
       mutedLocal: false,
       events: {},
       isFullscreen: false,
+      figures: [],
+      points: []
     }
   },
   watch: {
@@ -84,6 +86,10 @@ export default {
     }
   },
   methods: {
+    stateSet (key, val) {
+      if (!this[key]) return
+      this[key] = val
+    },
     fullscreenToggle (to) {
       this.$log('fullscreenToggle')
       this.isFullscreen = to === undefined ? !this.isFullscreen : to

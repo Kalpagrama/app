@@ -1,16 +1,15 @@
 <template lang="pug">
 component(
   :is="playerComponent[composition.outputType]"
+  :oid="oid"
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
-  :options="options"
-  @previewClick="$emit('previewClick')"
-  @ended="$emit('ended')")
-  template(v-for="(index, name) in $slots" v-slot:[name])
-    slot(:name="name")
-  template(v-for="(index, name) in $scopedSlots")
-    slot(:name="name" v-bind="data")
+  :options="options")
+  //- template(v-for="(index, name) in $slots" v-slot:[name])
+  //-   slot(:name="name")
+  //- template(v-for="(index, name) in $scopedSlots")
+  //-   slot(:name="name" v-bind="data")
 </template>
 
 <script>
@@ -20,7 +19,7 @@ import playerImage from './player_image/index.vue'
 export default {
   name: 'compositionPlayer',
   components: {playerVideo, playerImage},
-  props: ['isActive', 'isVisible', 'composition', 'options'],
+  props: ['oid', 'isActive', 'isVisible', 'composition', 'options'],
   data () {
     return {
       playerComponent: {

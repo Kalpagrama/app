@@ -1,7 +1,35 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  //- ADD
+  div(
+    v-if="item.type === 'ADD'"
+    ).row.fit
+    q-btn(
+      @click="$emit('add')"
+      flat color="green" icon="add" size="xl").fit.b-50
   //- SPHERE
+  div(
+    v-if="['SPHERE', 'WORD', 'SENTENCE'].includes(item.type)"
+    ).row.fit.items-center.content-center.justify-center
+    q-icon(
+      name="blur_on"
+      size="60px"
+      color="white")
+    .row.full-width.justify-center
+      span.text-white {{ item.name }}
   //- USER
+  div(
+    v-if="item.type === 'USER'"
+    ).row.fit.items-center.contnet-center.justify-center
+    img(
+      :src="item.thumbUrl"
+      :style=`{
+        height: '60px',
+        width: '60px',
+        borderRadius: '50%',
+      }`)
+    .row.full-width.justify-center
+      span.text-white {{ item.name }}
   //- NODE
   div(
     v-if="item.type === 'NODE'"
@@ -30,7 +58,16 @@
       ...styles,
     }`
     ).row.full-width.items-start.content-start
-    img(
+    content-player(
+      :contentKalpa="contentKalpa"
+      :styles="styles"
+      @player="playerLoaded"
+      @error="playerError = $event"
+      :style=`{
+        borderRadius: '10px',
+        zIndex: 210,
+      }`).fit.bg-black
+    //- img(
       :src="item.url"
       :style=`{
         borderRadius: '10px',
@@ -47,8 +84,9 @@
     ).row.full-width.items-start.content-start
     content-player(
       :contentKalpa="contentKalpa"
-      @player="player = $event"
+      @player="playerLoaded"
       @error="playerError = $event"
+      :styles="styles"
       :style=`{
         borderRadius: '10px',
         zIndex: 210,
@@ -58,7 +96,7 @@
       @click="nodeCreateStart()"
       round flat dense
       color="green"
-      icon="crop"
+      icon="add"
       :style=`{
         position: 'absolute', zIndex: 2000, right: '8px', bottom: 8+1+'px'
       }`)
@@ -74,7 +112,7 @@
     div(
       v-if="item.outputType === 'VIDEO'"
       :style=`{
-        position: 'absolute', zIndex: 200, bottom: '0px',
+        position: 'absolute', zIndex: 400, bottom: '0px',
       }`).row.full-width
       div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
         composition-editor(
@@ -96,7 +134,7 @@ import contentPlayer from 'components/content_player/index.vue'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
 export default {
-  name: 'itemEditor',
+  name: 'nodeEditor_itemEditor',
   props: ['item', 'styles', 'isActive'],
   components: {
     contentPlayer,
@@ -128,6 +166,13 @@ export default {
       async handler (to, from) {
         // this.$log('item TO', to)
         if (to) {
+          if (to.outputType === 'IMAGE') {
+            this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
+            this.figures = [to.layers[0].figuresAbsolute]
+          }
+          if (to.oid && to.type === 'IMAGE') {
+            this.contentKalpa = to
+          }
           if (to.outputType === 'VIDEO') {
             this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
             this.figures = [to.layers[0].figuresAbsolute]
@@ -136,6 +181,12 @@ export default {
             this.contentKalpa = to
           }
         }
+      }
+    },
+    editing: {
+      immediate: true,
+      handler (to, from) {
+        this.$emit('editing', to)
       }
     }
   },
@@ -170,10 +221,20 @@ export default {
         }
         // this.editing = true
       }
+    },
+    playerLoaded (player) {
+      this.$log('playerLoaded', player)
+      this.player = player
+      this.$emit('player', player)
     }
   },
   mounted () {
     this.$log('mounted')
+    // alert('itemEditor MOUNTED')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    // alert('itemEditor beforeDestroy')
   }
 }
 </script>

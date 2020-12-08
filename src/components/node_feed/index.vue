@@ -8,7 +8,7 @@ div(
     :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
-      borderRadius: '10px', overflow: 'hidden',
+      borderRadius: '10px',
     }`).row.full-width
     //- HEADER: author, createdAt
     div(
@@ -26,53 +26,78 @@ div(
       kalpa-menu-actions(:actions="actions")
     //- ITEMS: one or two
     slot(name="items")
-    node-item(v-if="showItems && !$slots.items && node.items.length === 1" v-bind="$props")
-    node-items(v-if="showItems && !$slots.items && node.items.length === 2" v-bind="$props")
+    node-item(
+      v-if="showItems && !$slots.items && node.items.length === 1"
+      v-bind="$props"
+      @itemActive="$emit('itemActive', $event)")
+    node-items(
+      v-if="showItems && !$slots.items && node.items.length === 2"
+      v-bind="$props"
+      :itemsStyles="itemsStyles"
+      @itemActive="$emit('itemActive', $event)")
     //- ESSENCE:
-    slot(name="name")
-    div(
-      v-if="showName && node.name.length > 0"
-      :style=`{position: 'relative',}`).row.full-width
-      router-link(
-        :to="'/node/'+node.oid"
-        :style=`{
-          position: 'relative',
-          textAlign: 'center',
-        }`
-        ).row.full-width.items-start.content-start.justify-center.cursor-pointer
-        slot(name="name-left")
-        .col
-          div(
-            :style=`{
-              position: 'relative',
-              minHeight: '60px',
-              textAlign: 'center',
-            }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
-            slot(name="name")
-            span(
-              :style=`{
-                fontSize: nodeNameSize+'px',
-              }`).text-white.text-bold.cursor-pointer {{ node.name }}
-      //- SPHERES: category & spheres...
-      div(
-        v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll.q-pb-sm
-        .row.no-wrap.q-pl-sm
-          router-link(
-            v-for="(s,si) in node.spheres" :key="s.oid"
-            :to="'/sphere/'+s.oid"
-            :style=`{
-              whiteSpace: 'nowrap',
-              borderRadius: '10px',
-            }`
-            ).text-grey-4.q-py-xs.q-px-sm.b-50.q-mr-sm
-            q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
-            span {{ s.name }}
-          slot(name="name-bottom")
-        slot(name="name-right")
     .row.full-width
-      slot(name="footer")
-  //- FOOTER: share, vote, link?
-  node-actions(v-if="showActions" :node="node" :isActive="isActive" :isVisible="isVisible")
+      slot(name="name")
+      //- btn
+      //- div(
+        v-if="showName && node.oid && node.vertices[0] && !['ESSENCE'].includes(node.vertices[0])"
+        ).row.full-width.justify-center
+        q-btn(
+          :to="nodeEssenceLink"
+          round flat color="green" icon="link" size="lg")
+      //- link
+      router-link(
+        v-if="showName && node.oid"
+        :to="nodeEssenceLink"
+        :style=`{
+          textAlign: 'center',
+          minHeight: '60px',
+          fontSize: nodeNameSize+'px',
+          //- whiteSpace: 'nowrap',
+        }`
+        ).row.full-width.items-center.content-center.justify-center.cursor-pointer.text-white.text-bold
+        span(
+          v-if="node.items.length === 1 || node.vertices[0] === 'ESSENCE' || node.vertices[0] === 'ASSOCIATIVE'"
+          :style=`{
+          }`).text-white.text-bold.cursor-pointer {{ nodeName }}
+        div(v-else).row.full-width
+          .col
+            .row.full-width.justify-end
+              span.text-white {{ $nodeItemType(node.vertices[0]).name }}
+          span.text-white.text-bold.q-mx-sm -
+          //- q-btn
+          .col
+            .row.full-width
+              span.text-white {{ $nodeItemType(node.vertices[1]).name }}
+    //- SPHERES
+    div(
+      v-if="showSpheres && node.oid && !$slots['name-bottom']").row.full-width.justify-center.scroll.q-pb-sm
+      .row.no-wrap.q-pl-sm
+        q-btn(
+          :to="'/trends/'+category.sphere.oid"
+          flat color="grey-5" no-caps size="md" dense
+          ).q-px-sm.q-mr-sm.b-40 {{ category.alias }}
+        router-link(
+          v-for="(s,si) in node.spheres" :key="s.oid"
+          :to="'/sphere/'+s.oid"
+          :style=`{
+            whiteSpace: 'nowrap',
+            borderRadius: '10px',
+          }`
+          ).text-grey-4.q-py-xs.q-px-sm.b-40.q-mr-sm
+          q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
+          span {{ s.name }}
+    //- CATEGORY
+    //- div(
+      v-if="showCategory && node.category"
+      ).row.full-width.items-center.content-center.justify-center.q-pb-xs
+      q-btn(
+        :to="'/trends/'+category.sphere.oid"
+        flat color="grey-8" no-caps size="md"
+        ) {{ category.alias }}
+  //- FOOTER: slot, actions
+  slot(name="footer")
+  node-actions(v-if="showActions && node.oid" :node="node" :isActive="isActive" :isVisible="isVisible")
 </template>
 
 <script>
@@ -92,17 +117,44 @@ export default {
     showName: {type: Boolean, default: true},
     showActions: {type: Boolean, default: true},
     showSpheres: {type: Boolean, default: true},
-    showItems: {type: Boolean, default: true}
+    showCategory: {type: Boolean, default: true},
+    showItems: {type: Boolean, default: true},
+    itemsStyles: { type: Array, default () { return [{}, {}] } }
   },
   data () {
     return {
     }
   },
   computed: {
+    nodeName () {
+      if (this.node.items.length === 1 || this.node.vertices[0] === 'ESSENCE') {
+        return this.node.name
+      }
+      else if (this.node.vertices[0] === 'ASSOCIATIVE') {
+        return 'Похожи'
+      }
+      else {
+        return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name
+      }
+    },
+    nodeEssenceLink () {
+      if (!this.node) return null
+      if (this.node.items[0].layers) {
+        return '/content/' + this.node.items[0].layers[0].contentOid + '?node=' + this.node.oid
+      }
+      // TODO: handle non node/composition case
+      else {
+        return '/node/' + this.node.oid
+      }
+    },
+    category () {
+      if (!this.node) return null
+      return this.$store.state.ui.nodeCategories.find(c => c.type === this.node.category)
+    },
     // TODO: impl better way
     nodeNameSize () {
       let l = this.node.name.length
-      if (l < 50) return 18
+      if (l < 50) return 20
       else if (l >= 50 && l < 100) return 14
       else if (l >= 100) return 12
       else return 10

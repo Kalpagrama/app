@@ -195,7 +195,6 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     layers {
       contentOid
       figuresAbsolute{...figureFragment}
-      figuresRelative {...figureFragment}
       speed
       name
       thumbUrl(preferWidth: 600)

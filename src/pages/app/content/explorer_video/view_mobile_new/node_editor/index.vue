@@ -38,11 +38,22 @@ div(
     }`
     ).row.full-width
     name-editor(:node="node")
+    //- spheres list
+    div(v-if="node.spheres.length > 0").row.full-width.justify-center.scroll.q-pa-sm
+      .row.no-wrap.q-pr-sm
+        q-btn(
+          v-for="(s,si) in node.spheres" :key="si"
+          @click="sphereClick(s, si)"
+          flat no-caps color="grey-4" dense
+          ).b-40.q-mr-sm
+          .row.items-center.content-center.no-wrap
+            q-icon(name="blur_on" size="18px" color="grey-4").q-mr-sm
+            span(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
     //- spheres, links, names
-    div(:style=`{order: 2}`).row.full-width.justify-center.q-py-sm
+    .row.full-width.justify-center.q-py-sm
       //- innputs
-      div(:style=`{maxWidth: '480px',}`).row.full-width.justify-center
-        q-btn(round flat color="green" icon="link")
+      div(:style=`{maxWidth: '400px',}`).row.full-width.justify-center
+        //- q-btn(round flat color="green" icon="link")
         .col
           q-input(
             v-if="true"
@@ -61,25 +72,14 @@ div(
             }`
             @keyup.enter="sphereAdd"
             ).b-40
-        q-btn(
+        //- q-btn(
           v-if="!node.items[1]"
           @click="itemFinderShow = true, $emit('active', false)"
           round flat color="green" icon="link")
-        q-btn(
+        //- q-btn(
           v-else
           @click="node.items = [node.items[0]], node.vertices = []"
           round flat color="green" icon="link_off")
-    //- spheres list
-    div(:style=`{height: 'auto'}`).row.full-width.justify-center.scroll.q-pa-sm
-      .row.no-wrap.q-pr-sm
-        q-btn(
-          v-for="(s,si) in node.spheres" :key="si"
-          @click="sphereClick(s, si)"
-          flat no-caps color="grey-4" dense
-          ).b-40.q-mr-sm
-          .row.items-center.content-center.no-wrap
-            q-icon(name="blur_on" size="18px" color="grey-4").q-mr-sm
-            span(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
     div(:style=`{order: 2}`).row.full-width.justify-center.q-pb-sm
       category-editor(
         :node="node"
@@ -88,20 +88,31 @@ div(
         }`)
   //- footer
   .row.full-width.justify-center.q-py-sm
-    div(:style=`{maxWidth: '400px'}`).row.full-width
-      q-btn(
-        @click="publish()"
-        color="green" no-caps
-        :loading="publishing"
-        :style=`{
-          height: '50px',
-        }`
-        ).full-width
-        span.text-bold Опубликовать
+    div(:style=`{maxWidth: '520px'}`).row.full-width
       q-btn(
         @click="$emit('close')"
-        color="grey-4" no-caps flat
-        ).full-width.q-mt-sm Отмена
+        flat color="white" icon="west"
+        :style=`{height: '60px', width: '60px'}`)
+      .col
+        q-btn(
+          @click="publish()"
+          color="green" no-caps
+          :loading="publishing"
+          :style=`{
+            height: '60px',
+          }`
+          ).full-width
+          span(:style=`{fontSize: '18px',}`).text-bold Опубликовать
+      q-btn(
+        @click="linkToggle()"
+        flat
+        color="white"
+        :icon="node.items[1] ? 'link_off' : 'link'"
+        :style=`{height: '60px', width: '60px'}`)
+      //- q-btn(
+      //-   @click="$emit('close')"
+      //-   color="grey-4" no-caps flat
+      //-   ).full-width.q-mt-sm Отмена
 </template>
 
 <script>
@@ -125,6 +136,21 @@ export default {
     }
   },
   methods: {
+    linkToggle () {
+      this.$log('linkToggle')
+      if (this.node.items[1]) {
+        this.node.items = [this.node.items[0]]
+        this.node.vertices = []
+      }
+      else {
+        this.itemFinderShow = true
+        this.$emit('active', false)
+      }
+    },
+    itemFinderStart () {
+      this.$log('itemFinderStart')
+      this.itemFinderShow = true
+    },
     sphereAdd () {
       this.$log('sphereAdd')
       if (this.sphere.length === 0) return

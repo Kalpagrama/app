@@ -13,7 +13,8 @@
       q-btn(
         @click="$router.push('/node/'+node.oid)"
         round flat color="grey-9")
-        q-icon(name="link").rotate-90
+        //- q-icon(name="link").rotate-90
+        q-icon(name="link")
   //- extend/add/link ONE item node...
   //- .row.full-width.justify-center
     div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start

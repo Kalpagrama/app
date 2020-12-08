@@ -104,16 +104,16 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
-            redirect: 'node/:oid/joints',
+            // redirect: 'node/:oid/joints',
             component: () => import('pages/app/node/index.vue'),
-            children: [
-               {
-                  name: 'node.joints',
-                  path: 'joints',
-                  component: () => import('pages/app/node/view_joints/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               }
-            ],
+            // children: [
+            //    {
+            //       name: 'node.joints',
+            //       path: 'joints',
+            //       component: () => import('pages/app/node/view_joints/index.vue'),
+            //       meta: { roleMinimal: 'GUEST' }
+            //    }
+            // ],
             meta: { roleMinimal: 'GUEST' }
          },
          {

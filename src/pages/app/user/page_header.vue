@@ -14,7 +14,7 @@
         :src="user.profile.photoUrl"
         :style=`{objectFit: 'cover', borderRadius: '0 0 10px 10px',}`
         ).fit
-      div(
+      //- div(
         v-if="itsMe"
         :style=`{position: 'absolute', zIndex: 100, bottom: '20px',}`
         ).row.full-width.items-center.content-center
