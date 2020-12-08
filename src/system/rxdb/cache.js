@@ -233,7 +233,6 @@ class Cache {
                try {
                   let insertedPlainDocs = {}
                   for (let { plainDoc } of debouncedUpdateQueueCopy) insertedPlainDocs[plainDoc.id] = plainDoc
-                  // если такие уже есть - удалим
                   let updatedRxDocs = await this.db.cache.find({ selector: { id: { $in: Object.keys(insertedPlainDocs) } } }).exec() // эти обновляем
                   for (let updated of updatedRxDocs) {
                      let inserted = insertedPlainDocs[updated.id]

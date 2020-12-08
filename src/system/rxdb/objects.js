@@ -284,7 +284,11 @@ class Objects {
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            if (event.path){
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            } else { // объект изменился целиком
+               let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
+            }
             break
          }
          case 'OBJECT_CREATED':

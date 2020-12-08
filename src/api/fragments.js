@@ -113,7 +113,7 @@ const videoFragment = gql`${objectFragment}
     url
     urlOriginal
     duration
-    frameUrls
+    strips
     contentProvider
     contentSource
     contentProvider
@@ -195,12 +195,12 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     layers {
       contentOid
       figuresAbsolute{...figureFragment}
-      figuresRelative {...figureFragment}
+#      figuresRelative {...figureFragment}
       speed
       name
-      thumbUrl(preferWidth: 600)
-      url
-      contentSource
+#      thumbUrl(preferWidth: 600)
+#      url
+#      contentSource
     }
     operation{... operationFragment}
     outputType
