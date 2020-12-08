@@ -129,13 +129,13 @@ const routes = [
                {
                   name: 'sphere.nodes',
                   path: 'nodes',
-                  component: () => import('pages/app/sphere/view_nodes/index.vue'),
+                  component: () => import('pages/app/sphere/page_nodes/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {
                   name: 'sphere.spheres',
                   path: 'spheres',
-                  component: () => import('pages/app/sphere/view_spheres/index.vue'),
+                  component: () => import('pages/app/sphere/page_spheres/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                }
             ],
