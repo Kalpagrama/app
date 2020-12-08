@@ -8,7 +8,11 @@
 kalpa-loader(
   :immediate="true"
   :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
-  .row.full-width.items-start.content-start.q-px-sm
+  div(
+    :style=`{
+      paddingTop: '16px',
+    }`
+    ).row.full-width.items-start.content-start.q-px-sm
     div(
       v-for="(s,si) in items" :key="s.oid"
       :style=`{

@@ -8,7 +8,7 @@ q-btn(round flat dense :icon="icon" :color="color")
         borderRadius: '10px',
       }`
       ).row.full-width.items-start.content-start.b-40
-      kalpa-share(type="node" :item="node").full-width
+      //- kalpa-share(type="node" :item="node").full-width
         template(v-slot:btn=`{start}`)
           q-btn(
             @click="start"

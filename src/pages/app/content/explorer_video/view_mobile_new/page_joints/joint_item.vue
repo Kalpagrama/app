@@ -25,7 +25,7 @@ div(
     :style=`{
       position: 'relative',
     }`
-    ).row.fit.bg-black
+    ).row.fit
     composition-player(
       :composition="item" :isVisible="true" :isActive="isActive"
       :options=`{
@@ -71,7 +71,7 @@ div(
     :style=`{
       position: 'relative',
     }`
-    ).row.fit.bg-black
+    ).row.fit
     composition-player(
       :composition="item.items[0]" :isVisible="true" :isActive="isActive"
       :options=`{

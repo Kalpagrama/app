@@ -2,10 +2,10 @@
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
-  z-index: 100
+  // z-index: 100
   border-radius: 10px
-  overflow: hidden
-  pointer-events: none
+  // overflow: hidden
+  // pointer-events: none
 // @media (min-width: 900px)
 //   iframe[id$="_youtube_iframe"]
 //     width: 1000%
@@ -24,7 +24,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 10}`).row.full-width.items-start.content-start.justify-center
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center
   video(
     ref="videoRef"
     :src="url"
@@ -36,20 +36,20 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIn
     :style=`{}`
     ).fit
   //- tint on top
-  div(
+  //- div(
     :style=`{
       position: 'absolute', top: '0px', zIndex: 1000, transform: 'translate3d(0,0,0)', height: '10%',
       background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(0,0,0,0) 100%, rgba(10,10,10,0.9) 0%)',
       borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
     }`).row.full-width
   //- tint on bottom
-  div(
+  //- div(
     :style=`{
       position: 'absolute', bottom: '0px', zIndex: 1000, transform: 'translate3d(0,0,0)', height: '20%',
       background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px 10px 0 0', overflow: 'hidden', pointerEvents: 'none',
     }`).row.full-width
-  slot
+  //- slot
 </template>
 
 <script>
@@ -73,6 +73,8 @@ export default {
       mutedLocal: false,
       events: {},
       isFullscreen: false,
+      figures: [],
+      points: []
     }
   },
   watch: {
@@ -84,6 +86,10 @@ export default {
     }
   },
   methods: {
+    stateSet (key, val) {
+      if (!this[key]) return
+      this[key] = val
+    },
     fullscreenToggle (to) {
       this.$log('fullscreenToggle')
       this.isFullscreen = to === undefined ? !this.isFullscreen : to

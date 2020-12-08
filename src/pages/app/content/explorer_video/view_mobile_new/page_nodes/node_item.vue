@@ -1,61 +1,36 @@
 <template lang="pug">
 node-feed(
   :node="node" :isActive="isActive" :isVisible="isVisible"
-  :showName="node.items.length === 2")
-  template(v-slot:items v-if="node.items.length === 1")
+  :showName="isOpened")
+  template(v-slot:items v-if="!isOpened")
     .row.full-width.items-start.content-start.q-px-sm
       div(
+        @click="isOpened = true"
         :style=`{
           position: 'relative',
           borderRadius: '10px',
+          height: '60px',
         }`).row.full-width.b-40.q-mb-sm
-        //- tint inActive
-        div(
-          v-if="!isFocused"
-          @click="$emit('isFocused', [item, true])"
+        img(
+          :src="item.thumbUrl"
           :style=`{
-            position: 'absolute', zIndex: 100,
-          }`
-          ).row.fit
-        //- currentTime
-        div(
-          v-if="isFocused"
-          :style=`{
-            position: 'absolute', zIndex: 200,
+            height: '60px',
             borderRadius: '10px',
-            overflow: 'hidden',
-            background: 'rgba(255,255,255,0.2)',
-          }`
-          ).row.fit
-          div(
-            :style=`{
-              position: 'absolute', zIndex: 210, left: '0px',
-              width: (player.currentTime-start)/duration*100+'%',
-              background: 'rgba(255,255,255,0.5)',
-            }`
-            ).row.full-height
-        //- currentTime stop
-        q-btn(
-          v-if="isFocused"
-          @click="$emit('isFocused', [item, false])"
-          round flat color="white" icon="clear" dense
-          :style=`{
-            position: 'absolute', zIndex: 220, top: '-38px',
-            left: 'calc(50% - 20px)',
           }`)
-        //- name
-        .col.q-pa-sm
-          span.text-white.text-bold {{ node.name || node.vertices }}
-        //- preview
-        .col
-          .row.full-width.items-start.content-start.justify-end
-            img(
-              v-if="item"
-              :src="item.thumbUrl"
+        .col.full-height
+          .row.fit.items-center.content-center.justify-center
+            span(
               :style=`{
-                height: '60px',
-                borderRadius: '10px',
-              }`).b-30
+                fontSize: '20px',
+                //- marginRight: '100px',
+              }`).text-white.text-bold {{ name }}
+        img(
+          v-if="itemRight"
+          :src="itemRight.thumbUrl"
+          :style=`{
+            height: '60px',
+            borderRadius: '10px',
+          }`)
 </template>
 
 <script>
@@ -66,6 +41,7 @@ export default {
   },
   data () {
     return {
+      isOpened: false,
     }
   },
   computed: {
@@ -97,6 +73,51 @@ export default {
     },
     duration () {
       return this.end - this.start
+    },
+    name () {
+      if (this.node.vertices.length > 0) {
+        if (this.node.vertices[0] === 'ESSENCE') {
+          return this.node.name
+        }
+        else if (this.node.vertices[0] === 'ASSOCIATIVE') {
+          return ''
+        }
+        else {
+          return `${this.itemType(0).name}-${this.itemType(1).name}`
+        }
+      }
+      else {
+        return this.node.name
+      }
+    },
+    itemTypes () {
+      return [
+        {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
+        {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
+        // cause/effect
+        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
+        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
+        // problem/solution
+        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
+        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
+        // from/to
+        {id: 'FROM', name: 'До', pair: 'TO'},
+        {id: 'TO', name: 'После', pair: 'FROM'},
+        // fake/disproof
+        {id: 'FAKE', name: 'Фэйк', pair: 'FALSE'},
+        {id: 'DISPROOF', name: 'Опровержение', pair: 'TRUE'},
+        // fact/proof
+        {id: 'FACT', name: 'Факт', pair: 'FALSE'},
+        {id: 'PROOF', name: 'Подтверждение', pair: 'TRUE'},
+        // question/answer
+        {id: 'QUESTION', name: 'Вопрос', pair: 'ANSWER'},
+        {id: 'ANSWER', name: 'Ответ', pair: 'QUESTION'},
+      ]
+    },
+  },
+  methods: {
+    itemType (index) {
+      return this.itemTypes.find(i => i.id === this.node.vertices[index])
     }
   }
 }

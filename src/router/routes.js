@@ -104,16 +104,16 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
-            redirect: 'node/:oid/joints',
+            // redirect: 'node/:oid/joints',
             component: () => import('pages/app/node/index.vue'),
-            children: [
-               {
-                  name: 'node.joints',
-                  path: 'joints',
-                  component: () => import('pages/app/node/view_joints/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               }
-            ],
+            // children: [
+            //    {
+            //       name: 'node.joints',
+            //       path: 'joints',
+            //       component: () => import('pages/app/node/view_joints/index.vue'),
+            //       meta: { roleMinimal: 'GUEST' }
+            //    }
+            // ],
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -129,13 +129,13 @@ const routes = [
                {
                   name: 'sphere.nodes',
                   path: 'nodes',
-                  component: () => import('pages/app/sphere/view_nodes/index.vue'),
+                  component: () => import('pages/app/sphere/page_nodes/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {
                   name: 'sphere.spheres',
                   path: 'spheres',
-                  component: () => import('pages/app/sphere/view_spheres/index.vue'),
+                  component: () => import('pages/app/sphere/page_spheres/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                }
             ],

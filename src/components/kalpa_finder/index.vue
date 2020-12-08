@@ -8,11 +8,12 @@ q-layout(
       //- pages
       div(
         v-if="pagesShow"
-        :style=`{marginBottom: '-2px'}`).row.full-width.q-pl-sm
+        :style=`{marginBottom: '-2px'}`).row.full-width.q-pl-md
         q-tabs(
           v-model="pageId" no-caps
           dense active-color="green"
-          ).full-width.text-grey-6
+          aling="left"
+          ).text-grey-6
           q-tab(
             v-for="p in pagesFiltered" :key="p.id"
             :name="p.id" :label="p.name")

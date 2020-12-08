@@ -3,14 +3,14 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.fit.bg-black
+  ).row.fit
   //- small.text-white {{ item }}
   img(
     :src="item.thumbUrl"
     :style=`{
       objectFit: 'contain',
     }`
-    ).fit.bg-black
+    ).fit
   //- top
   div(
     :style=`{

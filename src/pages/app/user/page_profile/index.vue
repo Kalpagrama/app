@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(
   :style=`{
-    //- paddingTop: '40px',
+    //- paddingTop: '8px',
     paddingBottom: '0px',
   }`
   ).row.full-width.items-start.content-start.justify-center
@@ -12,18 +12,18 @@ q-page(
   div(
     :style=`{
       position: 'sticky', top: '0px',
-      maxWidth: $store.state.ui.pageWidth+'px',
       zIndex: 2000,
     }`
-    ).row.full-width.q-px-sm.b-30
-    q-tabs(
-      no-caps active-color="green" align="left" dense
-      stretch :breakpoint="100" inline-label
-      :switch-indicator="true").full-width.text-grey-8
-      q-route-tab(
-        v-for="t in tabs" :key="t.id"
-        inline-label
-        :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
+    ).row.full-width.justify-center.b-30
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-px-md
+      q-tabs(
+        no-caps active-color="green" align="left" dense
+        stretch :breakpoint="100" inline-label
+        :switch-indicator="true").full-width.text-grey-8
+        q-route-tab(
+          v-for="t in tabs" :key="t.id"
+          inline-label
+          :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
   component(
     :is="`tab-${$route.params.tab}`"
     :user="user"

@@ -53,11 +53,11 @@ q-page(
           'q-pb-sm': !leftItemEditorShow,
         }`
         :style=`{
-          paddingTop: '20px',
-          borderRadius: '10px',
+          //- paddingTop: '20px',
+          //- borderRadius: '10px',
           zIndex: 10,
         }`
-        ).row.full-width.bg-black
+        ).row.full-width
         composition-editor(
           v-show="leftItemEditorShow"
           :player="player" :composition="item"
@@ -75,21 +75,16 @@ q-page(
             :placeholder="'В чем суть?'")
           div(
             :style=`{
-              position: 'absolute', zIndex: 200, left: '0px',
+              position: 'absolute', zIndex: 200, right: '0px',
               width: '50px',
             }`
             ).row.full-height.items-center.content-center.justify-center
-            div(
+            //- div(
               v-if="node.items[1]"
               :style=`{
                 position: 'absolute', zIndex: 100,
-                //- right: '0px',
-                left: '10px',
+                right: '10px',
                 width: '30px',
-                //- borderRadius: '10px 0 0 10px',
-                //- borderTop: '2px solid green',
-                //- borderLeft: '20px solid green',
-                //- borderBottom: '2px solid green',
               }`
               ).row.full-height.bg-green
             q-btn(
@@ -100,35 +95,8 @@ q-page(
                 //- background: 'rgb(35,35,35)',
               }`
               ).rotate-90
-          div(
-            :style=`{
-              position: 'absolute', zIndex: 200, right: '0px',
-              width: '50px',
-            }`
-            ).row.full-height.items-center.content-center.justify-center
-            //- div(
-              :style=`{
-                position: 'absolute', zIndex: 100,
-                //- right: '0px',
-                left: '10px',
-                width: '40px',
-                //- borderRadius: '10px 0 0 10px',
-                //- borderTop: '2px solid green',
-                //- borderLeft: '20px solid green',
-                //- borderBottom: '2px solid green',
-              }`
-              ).row.full-height.bg-green
-            q-btn(
-              v-if="node.items[1]"
-              @click="rightItemToggle()"
-              round flat color="white" icon="link_off" size="md" dense
-              :style=`{
-                zIndex: 110,
-                //- background: 'rgb(35,35,35)',
-              }`
-              ).rotate-90
         //- add
-        .row.full-width.q-mb-sm
+        //- .row.full-width.q-mb-sm
           item-editor(
             v-if="node.items[1]"
             @item="rightItemUpdated"

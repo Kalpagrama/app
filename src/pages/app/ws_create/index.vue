@@ -1,4 +1,5 @@
 <template lang="pug">
+//- memer()
 .row.full-width.justify-center
   kalpa-finder(
     @contentKalpa="contentKalpaFound"
@@ -27,6 +28,7 @@
 export default {
   name: 'wsCreate',
   components: {
+    memer: () => import('./memer.vue'),
     kalpaFinder: () => import('components/kalpa_finder/index.vue'),
   },
   data () {

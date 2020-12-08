@@ -5,7 +5,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
     @click="actionsShow = !actionsShow"
     round flat color="grey-7" icon="tune" dense
     :style=`{
-      position: 'absolute', zIndex: 1000, right: '4px', bottom: '0px',
+      position: 'absolute', zIndex: 1000, right: '4px', bottom: '4px',
     }`)
   //- overflowY: 'hidden',
   div(
@@ -395,10 +395,24 @@ export default {
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
       this.$log('scrollLeft', scrollLeft)
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
+    },
+    async playerBarClickHandle (e) {
+      this.$log('playerBarClickHandle', e.detail.t)
+      let start = e.detail.t
+      let end = start + 30 < this.player.duration ? start + 30 : this.player.duration
+      this.layer.figuresAbsolute[0].t = start
+      this.layer.figuresAbsolute[1].t = end
+      await this.$wait(250)
+      this.framesLayerCenter()
     }
   },
   async mounted () {
     this.$log('mounted')
+    this.player.events.on('bar-click', this.playerBarClickHandle)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.player.events.off('bar-click', this.playerBarClickHandle)
   }
 }
 </script>

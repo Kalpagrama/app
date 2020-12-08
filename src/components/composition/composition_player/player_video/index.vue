@@ -11,10 +11,10 @@ div(
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
   content-explorer(
     v-if="options.showContentExplorer && isActive"
-    :composition="composition")
+    :oid="oid" :composition="composition")
   //- video spinner
   slot(name="left-bottom")
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="options.showContentMeta && isActive"
       :style=`{
@@ -85,6 +85,7 @@ export default {
     contentExplorer: () => import('../content_explorer.vue')
   },
   props: {
+    oid: {type: String},
     isVisible: {type: Boolean},
     isActive: {type: Boolean},
     composition: {type: Object, required: true},

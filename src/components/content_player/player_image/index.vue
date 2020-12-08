@@ -1,13 +1,16 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative',}`
+  :style=`{
+    position: 'relative',
+    ...styles,
+  }`
   ).row.full-width
-  slot(name="bar")
+  //- slot(name="bar")
   img(
     draggable="false"
     :src="contentKalpa.url"
     :style=`{
-      maxHeight: $q.screen.height*0.5+'px',
+      //- maxHeight: $q.screen.height*0.5+'px',
       borderRadius: '10px',
       objectFit: 'contain',
       background: 'rgb(35,35,35)',
@@ -22,8 +25,16 @@ export default {
   props: ['contentKalpa', 'styles'],
   data () {
     return {
-      currentPage: 0
+      currentPage: 0,
+      figures: [],
+      points: [],
     }
+  },
+  methods: {
+    stateSet (key, val) {
+      if (!this[key]) return
+      this[key] = val
+    },
   },
   mounted () {
     this.$log('mounted')

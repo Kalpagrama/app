@@ -34,9 +34,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
-    // quasar stuff
-    // Screen.setSizes({ xs: 600, sm: 900, md: 1260, lg: 1600, xl: 1900 })
-
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {
@@ -57,30 +54,48 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
+    const nodeItemTypes = [
+      {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
+      {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
+      // cause/effect
+      {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
+      {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
+      // problem/solution
+      {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
+      {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
+      // from/to
+      {id: 'FROM', name: 'До', pair: 'TO'},
+      {id: 'TO', name: 'После', pair: 'FROM'},
+      // fake/disproof
+      {id: 'FAKE', name: 'Фэйк', pair: 'DISPROOF'},
+      {id: 'DISPROOF', name: 'Опровержение', pair: 'FAKE'},
+      // fact/proof
+      {id: 'FACT', name: 'Факт', pair: 'PROOF'},
+      {id: 'PROOF', name: 'Подтверждение', pair: 'FACT'},
+      // question/answer
+      {id: 'QUESTION', name: 'Вопрос', pair: 'ANSWER'},
+      {id: 'ANSWER', name: 'Ответ', pair: 'QUESTION'},
+    ]
+    const nodeItemType = (type) => {
+      // console.log('nodeItemType:type', type)
+      return nodeItemTypes.find(t => t.id === type)
+    }
+    Vue.prototype.$nodeItemTypes = nodeItemTypes
+    Vue.prototype.$nodeItemType = nodeItemType
     // global components
     Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
-    // Vue.component('nodeMini', () => import('components/node_mini/index.vue'))
-    // Vue.component('jointFeed', () => import('components/joint_feed/index.vue'))
-    // Vue.component('listMasonry', () => import('components/list_masonry'))
+    // lists
     Vue.component('listMiddle', () => import('components/list_middle'))
     // Vue.component('listSlider', () => import('components/list_slider/index.vue'))
     // Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
-    // // user
+    // user
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
     // kalpa
-    // Vue.component('kalpaFinder', () => import('components/kalpa_finder/index.vue'))
     Vue.component('kalpaBookmark', () => import('components/kalpa_bookmark/index.vue'))
     Vue.component('kalpaShare', () => import('components/kalpa_share/index.vue'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('kalpaMenuActions', () => import('components/kalpa_menu_actions/index.vue'))
-    // workspace
-    // Vue.component('wsSearch', () => import('components/ws_search/index.vue'))
-    // Vue.component('wsNodeItem', () => import('components/ws_node_item/index.vue'))
-    // Vue.component('wsContentItem', () => import('components/ws_content_item/index.vue'))
-    // spheres
-    // Vue.component('wsSphereItem', () => import('components/ws_sphere_item/index.vue'))
-    // Vue.component('wsSphereEditor', () => import('components/ws_sphere_editor/index.vue'))
   } catch (err) {
     logC(err)
     throw err

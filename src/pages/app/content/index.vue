@@ -1,7 +1,6 @@
 <template lang="pug">
-component(
+explorer(
   v-if="contentKalpa"
-  :is="explorerComponent[contentKalpa.type]"
   :key="contentKalpa.oid"
   :contentKalpa="contentKalpa"
   :query="query")
@@ -10,22 +9,28 @@ component(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import explorerImage from './explorer_image/index.vue'
-import explorerVideo from './explorer_video/index.vue'
+import explorer from './explorer/index.vue'
+// import explorerImage from './explorer_image/index.vue'
+// import explorerVideo from './explorer_video/index.vue'
+// :is="explorerComponent[contentKalpa.type]"
 
 export default {
   name: 'contentExplorer',
-  components: {explorerVideo, explorerImage},
+  components: {
+    explorer,
+    // explorerVideo,
+    // explorerImage
+  },
   props: ['oid', 'query'],
   data () {
     return {
       contentKalpa: null,
-      explorerComponent: {
-        VIDEO: 'explorer-video',
-        IMAGE: 'explorer-image',
-        BOOK: 'explorer-book',
-        WEB: 'explorer-web',
-      }
+      // explorerComponent: {
+      //   VIDEO: 'explorer-video',
+      //   IMAGE: 'explorer-image',
+      //   BOOK: 'explorer-book',
+      //   WEB: 'explorer-web',
+      // }
     }
   },
   watch: {

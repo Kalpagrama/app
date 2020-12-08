@@ -39,7 +39,7 @@ div(
             borderRadius: '10px',
             objectFit: 'contain',
           }`
-          ).fit.bg-black
+          ).fit
       div(:style=`{height: '60px'}`).row.full-width
     //- from sphere
     //- from user

@@ -42,10 +42,10 @@ q-layout(view="lHh lpR lFf")
         maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
       }`).row.fit.items-start.content-start.justify-end.q-pa-sm
       kalpa-menu(
-        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 190"
+        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 280"
         :style=`{
           borderRadius: '10px',
-          maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 190 ? '60px' : '190px',
+          maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -60,7 +60,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
-
+import { RxCollectionEnum } from 'src/system/rxdb'
 import kalpaMenu from 'components/kalpa_menu/index.vue'
 import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
 
@@ -74,6 +74,10 @@ export default {
     }
   },
   watch: {
+  },
+  async mounted () {
+    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   async created () {
     this.$store.commit('ui/stateSet', ['pageHeight', this.$q.screen.height])

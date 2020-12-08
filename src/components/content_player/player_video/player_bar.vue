@@ -102,6 +102,44 @@ div(
       opacity: 0.9,
     }`
     ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
+  //- POINTS
+  div(
+    v-if="player && player.points && player.points.length > 0"
+    :style=`{
+      position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+    }`
+    ).row.fit
+    div(
+      v-for="(f,fi) in player.points" :key="fi"
+      :style=`{
+        position: 'absolute', zIndex: 2050, top: '0px',
+        left: f[0].t/player.duration*100+'%',
+        width: '2px',
+        background: 'rgba(255,255,255, 0.5)',
+        pointerEvents: 'none',
+      }`
+      ).row.full-height
+  //- FIGURES
+  div(
+    v-if="player && player.figures && player.figures.length > 0"
+    :style=`{
+      position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+    }`
+    ).row.fit
+    //- TODO: left and width -3px + 6px etc...
+    div(
+      v-for="(f,fi) in player.figures" :key="fi"
+      :style=`{
+        position: 'absolute', zIndex: 2050, top: '-3px',
+        left: f[0].t/player.duration*100+'%',
+        width: (f[1].t-f[0].t)/player.duration*100+'%',
+        height: 'calc(100% + 6px)',
+        border: '3px solid rgb(76,175,80)',
+        borderRadius: '4px',
+        background: 'rgba(255,255,255,0.2)',
+        pointerEvents: 'none',
+      }`
+      ).row
 </template>
 
 <script>
@@ -151,7 +189,7 @@ export default {
       this.currentTimeMove = t
     },
     barPan (e) {
-      this.$log('barPan', e)
+      // this.$log('barPan', e)
       if (e.isFirst) {
         this.panning = true
         // this.player.pause()
