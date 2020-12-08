@@ -86,12 +86,12 @@ q-btn(
     ).row.fit.items-center.content-center
     //- header: rateMax
     div(
-      :style=`{position: 'absolute', zIndex: 100, top: '2px'}`
+      :style=`{position: 'absolute', zIndex: 100, top: '-6px'}`
       ).row.full-width.justify-center
       small.text-grey-8 {{ rateStat[rateMax].name }}
     //- footer: count
     div(
-      :style=`{position: 'absolute', zIndex: 100, bottom: '2px'}`
+      :style=`{position: 'absolute', zIndex: 100, bottom: '-6px'}`
       ).row.full-width.justify-center
       small.text-grey-8 {{votesCount}}
     //- bars

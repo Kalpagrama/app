@@ -51,6 +51,8 @@
         borderRadius: '10px',
       }`
       ).full-width
+  //- BOOK
+  //- IMAGE
   div(
     v-if="item.type === 'IMAGE' || item.outputType === 'IMAGE'"
     :style=`{

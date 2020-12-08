@@ -77,8 +77,9 @@ div(
               span.text-white {{ $nodeItemType(node.vertices[1]).name }}
     //- SPHERES
     div(
-      v-if="showSpheres && node.oid && !$slots['name-bottom']").row.full-width.justify-center.scroll.q-pb-sm
-      .row.no-wrap.q-pl-sm
+      v-if="showSpheres && node.oid && !$slots['name-bottom']").row.full-width.justify-start.scroll.q-pb-sm
+      .row.full-width.no-wrap.q-pl-sm
+        .col
         q-btn(
           :to="'/trends/'+category.sphere.oid"
           flat color="grey-5" no-caps size="md" dense
@@ -93,6 +94,7 @@ div(
           ).text-grey-4.q-py-xs.q-px-sm.b-40.q-mr-sm.sphere-item
           q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
           span {{ s.name }}
+        .col
     //- CATEGORY
     //- div(
       v-if="showCategory && node.category"

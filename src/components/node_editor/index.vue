@@ -26,38 +26,44 @@
         div(
           @click="itemFound(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
+  //- editors wrapper
   div(
     :style=`{
       background: 'rgb(35,35,35)',
       borderRadius: '10px'
     }`
     ).row.full-width
+    //- items wrapper
     div(
+      :class=`{
+        'q-pa-sm': node.items.length === 2
+      }`
       :style=`{
         position: 'relative', zIndex: 100,
       }`
       ).row.full-width
+      //- item cols
       div(
         v-for="(item, itemii) in node.items" :key="itemii"
         :style=`{
-          position: 'relative', zIndex: 10,
+          position: 'relative',
         }`
         :class=`{
           'col-12': node.items.length === 1,
           'col-6': node.items.length === 2
         }`
         )
+        //- item paddingBottom square...
         div(
           :style=`{
             position: 'relative',
-            paddingBottom: node.items.length === 1 ? '50%' : '100%',
-            transform: node.items.length === 1 ? 'none' : itemEditing === itemii ? 'perspective(600px) rotateY(8deg)' : 'perspective(600px) rotateY(-8deg)',
+            paddingBottom: itemPaddingBottom(item, itemii),
+            transform: itemTransform(item, itemii)
           }`).row.full-width
           div(
             :style=`{
-              position: 'absolute', zIndex: 400, transform: 'translate3d(0,0,0)',
-              left: itemEditing === itemii ? '-90%' : '0px',
-              minWidth: itemEditing === itemii ? 'calc(100% + 90%)' : '100%',
+              position: 'absolute',
+              ...itemStyles(item,itemii)
             }`).row.fit
             item-editor(
               @add="itemFinderShow = true"
@@ -138,6 +144,87 @@ export default {
     }
   },
   methods: {
+    itemStyles (item, itemii) {
+      if (this.node.items.length === 1) {
+        return {
+          zIndex: 100
+        }
+      }
+      else {
+        if (this.itemEditing === itemii) {
+          let styles = {
+            zIndex: 200,
+            top: '-5px',
+            minWidth: 'calc(200% + 10px)',
+            maxWidth: 'calc(200% + 10px)',
+            minHeight: 'calc(200% + 10px)',
+            maxHeight: 'calc(200% + 10px)',
+          }
+          if (itemii === 1) {
+            styles.right = '-5px'
+          }
+          else {
+            styles.left = '-5px'
+          }
+          return styles
+        }
+        else {
+          let styles = {
+            zIndex: 100,
+            top: '0px',
+            minWidth: '100%',
+            maxWidth: '100%',
+            minHeight: '100%',
+            maxHeight: '100%',
+          }
+          return styles
+        }
+      }
+    },
+    itemPaddingBottom (item, itemii) {
+      if (this.node.items.length === 1) return '50%'
+      else return '100%'
+    },
+    itemTransform (item, itemii) {
+      if (this.node.items.length === 1) return 'none'
+      else {
+        if (this.itemEditing === itemii) {
+          return 'none'
+        }
+        else {
+          if (itemii === 0) {
+            return 'perspective(600px) rotateY(8deg)'
+          }
+          else {
+            return 'perspective(600px) rotateY(-8deg)'
+          }
+        }
+      }
+    },
+    itemMinWidth (item, itemii) {
+      if (this.node.items.length === 1) return '100%'
+      else {
+        if (this.itemEditing === itemii) {
+          return '180%'
+        }
+        else {
+          return '100%'
+        }
+      }
+    },
+    itemLeft (item, itemii) {
+      // , itemEditing === itemii ? '-90%' : '0px',
+      if (this.node.items.length === 1) return '0px'
+      else {
+        // if (this.itemEditing === itemii) {
+        //   return '0px'
+        // }
+        // else {
+        //   return '100px'
+        // }
+        return '0px'
+      }
+    },
     itemEditingHandle (isEditing, ii) {
       this.$log('itemEditingHandle', isEditing, ii)
       if (isEditing) {
@@ -147,6 +234,7 @@ export default {
         }
       }
       else {
+        this.itemEditing = null
         this.editorsPaddingTop = 8
       }
     },

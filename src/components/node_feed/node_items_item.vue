@@ -74,7 +74,7 @@ div(
         :style=`{
           position: 'absolute', zIndex: 2010, bottom: 0
         }`
-        ).row.full-width.q-pa-sm
+        ).row.full-width.q-pa-sm.cursor-pointer
         .row.full-width.justify-center.scroll
           div(
             :style=`{

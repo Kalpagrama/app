@@ -4,7 +4,11 @@ q-layout(
   q-header.b-30
     div(:style=`{}`).row.full-width.justify-center
       q-resize-observer(@resize="headerOnResize")
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pt-sm
+      div(
+        :class=`{
+          'q-pt-sm': $q.screen.gt.xs
+        }`
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         node-editor(
           v-if="node"
           @node="nodeReset"
