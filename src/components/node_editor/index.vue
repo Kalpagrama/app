@@ -69,7 +69,7 @@
                 height: '100%',
               }`
               :style=`{}`).fit
-    //- editors
+    //- editors: name, spheres, category
     div(
       v-if="showEditor"
       :style=`{
@@ -82,7 +82,7 @@
         category-editor(
           :node="node"
           :style=`{maxWidth: '400px',}`)
-  //- footer
+  //- footer: cancel, publish, link
   div(v-if="showEditor").row.full-width.justify-center.q-py-sm
     div(:style=`{maxWidth: '520px'}`).row.full-width
       q-btn(

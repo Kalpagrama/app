@@ -37,8 +37,9 @@ node-feed(
           position: 'relative',
           borderRadius: '10px',
           height: '60px',
-        }`).row.full-width.items-center.content-center.justify-center.b-40.q-mb-sm.cursor-pointer.node-item
-        //- TODO: paddingLeft, paddingRight 60px,
+          background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
+        }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
+        //- TODO: paddingLeft, paddingRight 60px
         img(
           :src="node.items[0].thumbUrl"
           :style=`{
@@ -50,8 +51,6 @@ node-feed(
             objectFit: 'cover',
             border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
           }`)
-        //- .col.full-height
-          .row.fit.items-center.content-center.justify-center
         span(
           :style=`{
             fontSize: '20px',

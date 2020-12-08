@@ -1,3 +1,9 @@
+<style lang="sass">
+.sphere-item
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 div(
   :style=`{
@@ -84,7 +90,7 @@ div(
             whiteSpace: 'nowrap',
             borderRadius: '10px',
           }`
-          ).text-grey-4.q-py-xs.q-px-sm.b-40.q-mr-sm
+          ).text-grey-4.q-py-xs.q-px-sm.b-40.q-mr-sm.sphere-item
           q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
           span {{ s.name }}
     //- CATEGORY
