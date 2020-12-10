@@ -5,11 +5,11 @@ div(:style=`{position: 'relative',}`).row.full-width
     v-if="composition.layers.length === 1"
     :style=`{}`
     ).row.full-width
-    layer-strips(
+    //- layer-strips(
       :composition="composition"
       :contentKalpa="contentKalpa"
       :player="player")
-    //- layer-frames(
+    layer-frames(
       :player="player"
       :layer="composition.layers[0]"
       :layerStart="composition.layers[0].figuresAbsolute[0].t"
