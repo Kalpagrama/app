@@ -28,6 +28,8 @@ const objectFragment = gql`${objectShortFragment}
     thumbUrl(preferWidth: 600)
     thumbWidth
     thumbHeight
+    uploadStage
+    uploadStageProgress
     createdAt
     deletedAt
     subscriberCnt
@@ -212,6 +214,7 @@ const essenceFragmentLeaf = gql`
   ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragmentLeaf on Essence {
     ...objectFragment
+    relatedSphereOids  
     sphereFromName{...objectShortFragment}
     rate
     weight
@@ -249,6 +252,7 @@ const essenceFragment = gql`
   ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragment on Essence {
     ...objectFragment
+    relatedSphereOids
     sphereFromName{...objectShortFragment}
     rate
     weight

@@ -30,6 +30,7 @@ function getMangoQueryFromId (id) {
 class Lists {
   constructor (cache) {
     this.cache = cache
+    Lists.cache = cache
     // setTimeout(async () => {
     //   let arr = ['AF6DVu7AMAY=', 'AHDF9_IAoIc=', 'AJ2jxUPCMc4=', 'AJ2V+LzCsEU=', 'AJxhm8MCcFo=']
     //   logD('before frind...', arr)
@@ -69,6 +70,53 @@ class Lists {
     let rxDoc = await this.cache.get(id, fetchFunc)
     if (!rxDoc) throw new Error('объект не найден')
     return rxDoc
+  }
+
+  static async addRemoveObjectToLists(type, sphereOids, object) {
+    assert(type.in('OBJECT_DELETED', 'OBJECT_CREATED'), 'type in ???')
+    assert(sphereOids && Array.isArray(sphereOids), 'bad array')
+    assert(object && object.type && object.oid, 'bad obj')
+    const f = Lists.addRemoveObjectToLists
+    logD(f, 'start')
+    const t1 = performance.now()
+    // добавим на все сферы (sphereOids)
+    let rxDocs = await Lists.cache.find({
+      selector: {
+        'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
+        'props.oid': { $in: sphereOids },
+        'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [object.type]}
+      }
+    })
+    if (type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
+      let rxDocsFeed = await Lists.cache.find({
+        selector: {
+          'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
+        }
+      })
+      rxDocs = [...rxDocs, ...rxDocsFeed]
+    }
+    logD(f, 'finded lists: ', rxDocs)
+    for (let rxDoc of rxDocs) {
+      logD('apply to rxdoc', rxDoc.toJSON())
+      let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+      assert(reactiveItem.items, '!reactiveItem.items')
+      let indx = reactiveItem.items.findIndex(el => el.oid === object.oid)
+      if (type === 'OBJECT_CREATED') {
+        if (indx === -1) {
+          logD(f, 'add created object to begin of list.', object)
+          reactiveItem.items.splice(0, 0, object)
+          reactiveItem.count++
+          reactiveItem.totalCount++
+        }
+      } else if (type === 'OBJECT_DELETED') {
+        if (indx >= 0) {
+          logD(f, 'delete object from list', indx)
+          reactiveItem.items.splice(indx, 1)
+          reactiveItem.count--
+          reactiveItem.totalCount--
+        }
+      }
+    }
   }
 
   // от сервера прилетел эвент (поправим данные в кэше)
@@ -155,44 +203,46 @@ class Lists {
       case 'OBJECT_DELETED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
-        let rxDocs = await this.cache.find({
-          selector: {
-            'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-            'props.oid': { $in: event.sphereOids },
-            'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
-          }
-        })
-        if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
-          let rxDocsFeed = await this.cache.find({
-            selector: {
-              'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
-            }
-          })
-          rxDocs = [...rxDocs, ...rxDocsFeed]
-        }
-        logD(f, 'finded lists: ', rxDocs)
-        for (let rxDoc of rxDocs) {
-          logD('apply event to rxdoc', rxDoc.toJSON())
-          let reactiveItem = getReactiveDoc(rxDoc).getPayload()
-          assert(reactiveItem.items, '!reactiveItem.items')
-          assert(event.object, '!event.object')
-          let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
-          if (event.type === 'OBJECT_CREATED') {
-            if (indx === -1) {
-              logD(f, 'add created object to begin of list.', event.object)
-              reactiveItem.items.splice(0, 0, event.object)
-              reactiveItem.count++
-              reactiveItem.totalCount++
-            }
-          } else if (event.type === 'OBJECT_DELETED') {
-            if (indx >= 0) {
-              logD(f, 'delete object from list', indx)
-              reactiveItem.items.splice(indx, 1)
-              reactiveItem.count--
-              reactiveItem.totalCount--
-            }
-          }
-        }
+        await Lists.addRemoveObjectToLists(event.type, event.sphereOids, event.object)
+        //
+        // let rxDocs = await this.cache.find({
+        //   selector: {
+        //     'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
+        //     'props.oid': { $in: event.sphereOids },
+        //     'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
+        //   }
+        // })
+        // if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
+        //   let rxDocsFeed = await this.cache.find({
+        //     selector: {
+        //       'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
+        //     }
+        //   })
+        //   rxDocs = [...rxDocs, ...rxDocsFeed]
+        // }
+        // logD(f, 'finded lists: ', rxDocs)
+        // for (let rxDoc of rxDocs) {
+        //   logD('apply event to rxdoc', rxDoc.toJSON())
+        //   let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+        //   assert(reactiveItem.items, '!reactiveItem.items')
+        //   assert(event.object, '!event.object')
+        //   let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
+        //   if (event.type === 'OBJECT_CREATED') {
+        //     if (indx === -1) {
+        //       logD(f, 'add created object to begin of list.', event.object)
+        //       reactiveItem.items.splice(0, 0, event.object)
+        //       reactiveItem.count++
+        //       reactiveItem.totalCount++
+        //     }
+        //   } else if (event.type === 'OBJECT_DELETED') {
+        //     if (indx >= 0) {
+        //       logD(f, 'delete object from list', indx)
+        //       reactiveItem.items.splice(indx, 1)
+        //       reactiveItem.count--
+        //       reactiveItem.totalCount--
+        //     }
+        //   }
+        // }
         break
       }
       case 'VOTED': {
