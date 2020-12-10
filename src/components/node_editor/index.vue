@@ -316,6 +316,7 @@ export default {
         this.$log('publish createdNode', createdNode)
         this.$log('publish done')
         this.publishing = false
+        this.$emit('published', createdNode)
         this.cancel()
       }
       catch (e) {

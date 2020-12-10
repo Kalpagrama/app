@@ -11,6 +11,7 @@ q-layout(
         :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         node-editor(
           v-if="node"
+          @published="nodePublished"
           @node="nodeReset"
           @player="player = $event"
           :node="node"
@@ -56,6 +57,11 @@ export default {
     }
   },
   methods: {
+    async nodePublished (node) {
+      this.$log('nodePublished', node)
+      // await this.$wait(300)
+      this.$router.push({query: {node: node.oid}})
+    },
     nodeReset (node) {
       this.$log('nodeReset', node)
       this.$set(this, 'node', node)
