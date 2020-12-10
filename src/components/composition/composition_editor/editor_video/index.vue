@@ -5,7 +5,11 @@ div(:style=`{position: 'relative',}`).row.full-width
     v-if="composition.layers.length === 1"
     :style=`{}`
     ).row.full-width
-    layer-frames(
+    layer-strips(
+      :composition="composition"
+      :contentKalpa="contentKalpa"
+      :player="player")
+    //- layer-frames(
       :player="player"
       :layer="composition.layers[0]"
       :layerStart="composition.layers[0].figuresAbsolute[0].t"
@@ -26,10 +30,11 @@ div(:style=`{position: 'relative',}`).row.full-width
 <script>
 import compositionBar from 'components/composition/composition_bar/index.vue'
 import layerFrames from './layer_frames.vue'
+import layerStrips from './layer_strips.vue'
 
 export default {
   name: 'compositionEditor_video',
-  components: {compositionBar, layerFrames},
+  components: {compositionBar, layerFrames, layerStrips},
   props: ['composition', 'player', 'contentKalpa'],
   data () {
     return {

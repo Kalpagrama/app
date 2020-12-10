@@ -33,7 +33,9 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     :autoplay="autoplay"
     :muted="mutedLocal"
     :loop="loop"
-    :style=`{}`
+    :style=`{
+      objectFit: 'contain'
+    }`
     ).fit
   //- tint on top
   //- div(
@@ -74,7 +76,7 @@ export default {
       events: {},
       isFullscreen: false,
       figures: [],
-      points: []
+      points: [],
     }
   },
   watch: {

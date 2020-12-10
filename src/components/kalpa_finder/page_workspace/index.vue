@@ -46,7 +46,8 @@ export default {
   },
   data () {
     return {
-      viewId: null
+      viewId: null,
+      subsriptions: []
     }
   },
   computed: {

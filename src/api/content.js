@@ -40,11 +40,11 @@ class ContentApi {
     const t1 = performance.now()
     const cb = async () => {
       assert.ok(file)
-      file.lastModifiedDate = file.lastModifiedDate || new Date()
-      file.name = file.name || '*empty*'
-      if (file.size > 5 * 1024 * 1024){
-        throw new Error('client_max_body_size 5M')
-      }
+      // file.lastModifiedDate = file.lastModifiedDate || new Date()
+      // file.name = file.name || '*empty*'
+      // if (file.size > 5 * 1024 * 1024){
+      //   throw new Error('client_max_body_size 5M')
+      // }
       let { data: { contentCreateFromFile } } = await apollo.clients.upload.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}

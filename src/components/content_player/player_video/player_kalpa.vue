@@ -3,8 +3,9 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.full-width.items-start.content-start.justify-center.br
+  ).row.full-width.items-start.content-start.justify-center
   video(
+    @click="playing ? pause() : play()"
     ref="videoRef"
     :src="url"
     type="video/mp4"
@@ -12,12 +13,14 @@ div(
     :autoplay="autoplay"
     :loop="loop"
     :muted="mutedLocal"
-    :style=`{}`
+    :style=`{
+      objectFit: 'contain'
+    }`
     @loadeddata="loadeddataHandle"
     @timeupdate="timeupdateHandle"
     @play="playHandle"
     @pause="pauseHandle").fit
-  slot
+  //- slot
 </template>
 
 <script>
@@ -37,6 +40,9 @@ export default {
       duration: 0,
       mutedLocal: false,
       isFullscreen: false,
+      events: {},
+      figures: [],
+      points: [],
     }
   },
   watch: {
@@ -48,6 +54,10 @@ export default {
     }
   },
   methods: {
+    stateSet (key, val) {
+      if (!this[key]) return
+      this[key] = val
+    },
     fullscreenToggle () {
       this.$log('fullscreenToggle')
       this.isFullscreen = !this.isFullscreen
@@ -68,7 +78,7 @@ export default {
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
       this.currentTime = t
-      if (this.$refs.videoRef) this.$refs.videoRef.setCurrentTime(t)
+      if (this.$refs.videoRef) this.$refs.videoRef.currentTime = t
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
@@ -90,6 +100,18 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.events = {
+      on: (event, cb) => {
+        if (this.$refs.videoRef) this.$refs.videoRef.addEventListener(event, cb)
+      },
+      off: (event, cb) => {
+        if (this.$refs.videoRef) this.$refs.videoRef.removeEventListener(event, cb)
+      },
+      emit: (event, val) => {
+        if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+      }
+    }
+    this.$emit('player', this)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
