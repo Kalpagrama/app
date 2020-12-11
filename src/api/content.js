@@ -18,8 +18,8 @@ class ContentApi {
       let { data: { contentCreateFromUrl } } = await apollo.clients.upload.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation ($url: String!) {
-            contentCreateFromUrl (url: $url) {
+          mutation ($url: String!, $youtubeUpload: Boolean!) {
+            contentCreateFromUrl (url: $url, youtubeUpload: $youtubeUpload) {
               ...objectFullFragment
             }
           }
