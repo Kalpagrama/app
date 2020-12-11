@@ -119,6 +119,10 @@ module.exports = function (ctx) {
          // extractCSS: false,
          extendWebpack (cfg) {
             cfg.module.rules.push({
+               test: /\.md$/i,
+               use: 'raw-loader',
+            })
+            cfg.module.rules.push({
                enforce: 'pre',
                test: /\.(js|vue)$/,
                loader: 'eslint-loader',
