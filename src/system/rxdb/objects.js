@@ -280,14 +280,14 @@ class Objects {
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start')
+      logD(f, 'start', event.path, event.value)
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            if (event.path){
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
-            } else { // объект изменился целиком
+            if (!event.path || (event.path === 'uploadStage' && event.value === 'COMPLETE')) { // объект изменился целиком
                let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
+            } else {
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
             }
             break
          }

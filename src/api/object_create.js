@@ -6,6 +6,7 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
 import { apiCall } from 'src/api/index'
+import { Lists } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -191,7 +192,10 @@ class ObjectCreateApi {
                essence: essenceInput
             }
          })
-         let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'zero' }) // поместим ядро/joint в кэш (на всяк случай)
+         let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'day' })
+
+         assert(reactiveEssence.relatedSphereOids)
+         await Lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
          assert(store, '!store')
