@@ -9,7 +9,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class ContentApi {
-  static async contentCreateFromUrl (url) {
+  static async contentCreateFromUrl (url, youtubeUpload = false) {
     const f = ContentApi.contentCreateFromUrl
     logD(f, 'start', url)
     const t1 = performance.now()
@@ -25,7 +25,8 @@ class ContentApi {
           }
         `,
         variables: {
-          url
+          url,
+          youtubeUpload
         }
       })
       logD('contentCreateFromUrl complete', contentCreateFromUrl)
