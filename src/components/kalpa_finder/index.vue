@@ -21,7 +21,7 @@ q-layout(
       .row.full-width
         ws-search(
           @searchString="searchString = $event"
-          @contentKalpa="$emit('contentKalpa', $event)")
+          @contentKalpa="contentKalpaFound")
   q-page-container
     component(
       v-bind="$props"

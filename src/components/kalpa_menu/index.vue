@@ -112,6 +112,12 @@
             span(
               v-if="!mini"
               :style=`{fontSize: '18px'}`).text-bold.q-ml-md Создать ядро
+        //- docs
+        kalpa-docs(
+          v-if="!mini"
+          :style=`{
+            maxWidth: '200px',
+          }`).q-py-sm
         //- version
         div(v-if="!mini").row.full-width.items-center.q-pa-md
           small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-8 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
@@ -120,8 +126,13 @@
 <script>
 import { AuthApi } from 'src/api/auth'
 
+import kalpaDocs from 'components/kalpa_docs/index.vue'
+
 export default {
   name: 'kalpaMenu',
+  components: {
+    kalpaDocs,
+  },
   props: {
     mini: {
       type: Boolean,

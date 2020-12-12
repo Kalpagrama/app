@@ -99,25 +99,22 @@ q-page(:style=`{paddingBottom: '200px',}`)
             }`
             ).full-width
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
-      .row.full-width.q-px-sm
-        with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
-      .row.full-width.justify-center.text-grey-8
-        small.text-grey-8.q-mr-sm Продолжая, вы соглашаетесь с
-        router-link(:to="'/settings/docs'").q-px-sm
-          small.text-grey-8 Пользовательским соглашением,
-        router-link(:to="'/settings/docs'").q-px-sm
-          small.text-grey-8 Политикой конфиденциальности,
-        router-link(:to="'/settings/docs'").q-px-sm
-          small.text-grey-8 DMCA
+      with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
+      kalpa-docs(title="Продолжая, вы соглашаетесь с:")
 </template>
 
 <script>
 import { AuthApi } from 'src/api/auth'
+
 import withSocials from './with_socials.vue'
+import kalpaDocs from 'components/kalpa_docs/index.vue'
 
 export default {
   name: 'pageAuth__signIn',
-  components: {withSocials},
+  components: {
+    withSocials,
+    kalpaDocs,
+  },
   data () {
     return {
       userId: null,

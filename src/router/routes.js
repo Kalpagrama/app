@@ -32,6 +32,10 @@ const routes = [
       }
    },
    {
+      path: '/docs/:id?',
+      component: () => import('layouts/docs_layout.vue')
+   },
+   {
       path: '/share', // этот маршрут обрабатыватся хуком в initPWA()
    },
    {
@@ -249,12 +253,12 @@ routes.push({
 })
 
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
-for (let r of routes[2].children) {
-   assert(r.path, '!r.path' + JSON.stringify(r))
-   let path = r.path.split('/')[0]
-   assert(path, '!path')
-   if (path === '*') continue
-   assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
-}
+// for (let r of routes[2].children) {
+//    assert(r.path, '!r.path' + JSON.stringify(r))
+//    let path = r.path.split('/')[0]
+//    assert(path, '!path')
+//    if (path === '*') continue
+//    assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
+// }
 
 export default routes

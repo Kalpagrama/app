@@ -44,6 +44,7 @@ class UserApi {
     const f = UserApi.subscribe
     logD(f, 'start', oid)
     const t1 = performance.now()
+    // let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid) // вне cb - иначе дедлок
     const cb = async () => {
       let { data: { subscribe } } = await apollo.clients.api.mutate({
         mutation: gql`
@@ -58,8 +59,6 @@ class UserApi {
           oid
         }
       })
-      // let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
-
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, subscribe)
       return subscribe
     }

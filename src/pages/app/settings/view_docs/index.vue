@@ -25,9 +25,9 @@ a
 </template>
 
 <script>
-import termsRu from 'assets/terms_ru.md'
-import dmcaRu from 'assets/dmca_ru.md'
-import policyRu from 'assets/policy_ru.md'
+import termsRu from 'assets/docs/terms_ru.md'
+import dmcaRu from 'assets/docs/dmca_ru.md'
+import policyRu from 'assets/docs/policy_ru.md'
 
 export default {
   name: 'pageApp_settings_viewDocs',

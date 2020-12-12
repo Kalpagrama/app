@@ -9,7 +9,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class ContentApi {
-  static async contentCreateFromUrl (url) {
+  static async contentCreateFromUrl (url, youtubeUpload = false) {
     const f = ContentApi.contentCreateFromUrl
     logD(f, 'start', url)
     const t1 = performance.now()
@@ -18,14 +18,15 @@ class ContentApi {
       let { data: { contentCreateFromUrl } } = await apollo.clients.upload.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation ($url: String!) {
-            contentCreateFromUrl (url: $url) {
+          mutation ($url: String!, $youtubeUpload: Boolean!) {
+            contentCreateFromUrl (url: $url, youtubeUpload: $youtubeUpload) {
               ...objectFullFragment
             }
           }
         `,
         variables: {
-          url
+          url,
+          youtubeUpload
         }
       })
       logD('contentCreateFromUrl complete', contentCreateFromUrl)
