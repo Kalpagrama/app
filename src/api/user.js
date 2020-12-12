@@ -58,7 +58,7 @@ class UserApi {
           oid
         }
       })
-      let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
+      // let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
 
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, subscribe)
       return subscribe
