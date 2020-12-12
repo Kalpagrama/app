@@ -8,7 +8,7 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="tune" color="white" size="30px").q-mx-sm
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
-          q-btn(round flat color="red" icon="power_off" @click="logout()")
+          //- q-btn(round flat color="red" icon="power_off" @click="logout()")
         .row.full-width.q-px-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
@@ -31,8 +31,8 @@ export default {
     views () {
       return [
         {id: 'settings.account', name: this.$t('pageSettings_account_title', 'Профиль')},
-        {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')},
-        {id: 'settings.docs', name: this.$t('pageSettings_docs_title', 'Документы')}
+        // {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')},
+        // {id: 'settings.docs', name: this.$t('pageSettings_docs_title', 'Документы')}
       ]
     }
   },

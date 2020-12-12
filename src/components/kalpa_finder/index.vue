@@ -21,7 +21,7 @@ q-layout(
       .row.full-width
         ws-search(
           @searchString="searchString = $event"
-          @contentKalpa="$emit('contentKalpa', $event)")
+          @contentKalpa="contentKalpaFound")
   q-page-container
     component(
       v-bind="$props"
@@ -49,6 +49,7 @@ export default {
   },
   components: {
     wsSearch: () => import('components/ws_search/index.vue'),
+    pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
     pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
     pageWeb: () => import('./page_web/index.vue'),
@@ -67,6 +68,7 @@ export default {
     },
     pagesFiltered () {
       return [
+        {id: 'content', name: 'Мой контент', component: 'page-content'},
         {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Кальпаграма', component: 'page-kalpa'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},

@@ -12,5 +12,10 @@ export default {
   userTyping: false,
   nodeEditorItem: null,
   jointEditorItem: null,
-  nodeCategories: []
+  nodeCategories: [],
+  docs: [
+    {id: 'terms', name: 'Пользовательское соглашение'},
+    {id: 'policy', name: 'Политика конфиденциальности Kalpagrama'},
+    {id: 'dmca', name: 'DMCA (Регламент рассмотрения заявлений правообладателей)'},
+  ]
 }

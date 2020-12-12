@@ -2,8 +2,9 @@
 .row.full-width.justify-center
   kalpa-finder(
     @contentKalpa="contentKalpaFound"
-    :pagesShow="false"
+    :pagesShow="true"
     :pages=`{
+      content: {views: ['image', 'video']},
       workspace: {views: ['image', 'video', 'node', 'user', 'sphere']},
     }`
     :style=`{

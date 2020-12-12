@@ -8,6 +8,7 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
+import VueShowdown from 'vue-showdown'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -30,6 +31,15 @@ const time = (sec) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
+    // the second parameter of Vue.use() is optional
+    Vue.use(VueShowdown, {
+      // set default flavor of showdown
+      flavor: 'github',
+      // set default options of showdown (will override the flavor options)
+      options: {
+        emoji: false,
+      },
+    })
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))

@@ -48,7 +48,21 @@ div(
       objectFit: options.objectFit,
     }`
     ).full-width
+  //- div(:style=`{height: '45px'}`).row.full-width
   //- video wrapper
+  //- content-player(
+    :contentKalpa=`{
+      url: composition.url,
+      type: 'VIDEO',
+      contentSource: 'KALPA',
+    }`
+    :styles=`{
+      height: '100%', objectFit: 'cover',
+      borderRadius: '10px',
+    }`
+    :style=`{
+      position: 'absolute', zIndex: 100, bottom: '0px',
+    }`).fit
   div(
     v-if="isActive && isVisible"
     :style=`{
@@ -78,10 +92,12 @@ div(
 </template>
 
 <script>
+import contentPlayer from 'components/content_player/index.vue'
 
 export default {
   name: 'compositionPlayer_playerVideo',
   components: {
+    contentPlayer,
     contentExplorer: () => import('../content_explorer.vue')
   },
   props: {
