@@ -60,6 +60,94 @@ class ReactiveDocDbMemCache {
    }
 }
 
+// var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
+// var util = require('util')
+// import memdown from 'src/system/rxdb/rxdb_vuex_adapter'
+import memdown from 'memdown'
+
+// // Constructor
+// function FakeLevelDOWN () {
+//    // AbstractLevelDOWN.call(this)
+//    AbstractLevelDOWN.call(this, {
+//       bufferKeys: true,
+//       snapshots: true,
+//       permanence: false,
+//       seek: true,
+//       clear: true
+//    })
+// }
+//
+// // Our new prototype inherits from AbstractLevelDOWN
+// util.inherits(FakeLevelDOWN, AbstractLevelDOWN)
+//
+// FakeLevelDOWN.prototype._open = function (options, callback) {
+//    // Initialize a memory storage object
+//    this._store = {}
+//
+//    // Use nextTick to be a nice async citizen
+//    process.nextTick(callback)
+// }
+//
+// FakeLevelDOWN.prototype._serializeKey = function (key) {
+//    // As an example, prefix all input keys with an exclamation mark.
+//    // Below methods will receive serialized keys in their arguments.
+//    return '!' + key
+// }
+//
+// FakeLevelDOWN.prototype._serializeValue = function (value) {
+//    return JSON.stringify(value)
+// }
+//
+// FakeLevelDOWN.prototype._put = function (key, value, options, callback) {
+//    this._store[key] = value
+//    process.nextTick(callback)
+// }
+//
+// FakeLevelDOWN.prototype._get = function (key, options, callback) {
+//    var value = this._store[key]
+//
+//    if (value === undefined) {
+//       // 'NotFound' error, consistent with LevelDOWN API
+//       return process.nextTick(callback, new Error('NotFound'))
+//    }
+//
+//    process.nextTick(callback, null, value)
+// }
+//
+// FakeLevelDOWN.prototype._del = function (key, options, callback) {
+//    delete this._store[key]
+//    process.nextTick(callback)
+// }
+//
+// FakeLevelDOWN.prototype._batch = function (array, options, callback) {
+//    var i = -1
+//    var key
+//    var value
+//    var iter
+//    var len = array.length
+//    var tree = this._store
+//
+//    while (++i < len) {
+//       key = array[i].key
+//       iter = tree.find(key)
+//
+//       if (array[i].type === 'put') {
+//          value = array[i].value
+//          tree = iter.valid ? iter.update(value) : tree.insert(key, value)
+//       } else {
+//          tree = iter.remove()
+//       }
+//    }
+//
+//    this._store = tree
+//
+//    setImmediate(callback)
+// }
+//
+// FakeLevelDOWN.prototype._iterator = function (options) {
+//    return {}
+// }
+
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -68,7 +156,10 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      addRxPlugin(require('pouchdb-adapter-idb'))
+      // addRxPlugin(require('pouchdb-adapter-idb'))
+      addRxPlugin(require('pouchdb-adapter-indexeddb')) // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
+      addRxPlugin(require('pouchdb-adapter-leveldb')) // leveldown adapters need the leveldb plugin to work
+
       addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
@@ -148,7 +239,9 @@ class RxDBWrapper {
          logD('before createRxDatabase')
          this.db = await createRxDatabase({
             name: 'rxdb',
-            adapter: 'idb', // <- storage-adapter
+            // adapter: 'idb', устарел // <- storage-adapter
+            // adapter: 'indexeddb', // <- storage-adapter
+            adapter: memdown, // memdown, // new FakeLevelDOWN(), // <- storage-adapter
             multiInstance: true, // <- multiInstance (optional, default: true)
             eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             pouchSettings: { revs_limit: 1 }
@@ -195,8 +288,11 @@ class RxDBWrapper {
       for (let collection of collections) {
          if (this[collection]) await this[collection].updateCollections(operation)
       }
-      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', {beforeCreate: true}))) { // эта вкладка первой инициализироваля rxdb
-         await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', valueString: Date.now().toString() }, {beforeCreate: true})
+      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', { beforeCreate: true }))) { // эта вкладка первой инициализироваля rxdb
+         await this.set(RxCollectionEnum.META, {
+            id: 'rxdbCreateDate',
+            valueString: Date.now().toString()
+         }, { beforeCreate: true })
          setSyncEventStorageValue('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -526,7 +622,16 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+   async getRxDoc (id, {
+      fetchFunc,
+      notEvict = false,
+      clientFirst = true,
+      priority = 0,
+      force = false,
+      onFetchFunc = null,
+      params = null,
+      beforeCreate = false
+   } = {}) {
       assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
       const t1 = performance.now()
@@ -554,7 +659,17 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+   async get (rxCollectionEnum, idOrRawId, {
+      id = null,
+      fetchFunc,
+      notEvict = false,
+      clientFirst = true,
+      priority = 0,
+      force = false,
+      onFetchFunc = null,
+      params = null,
+      beforeCreate = false
+   } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
@@ -669,5 +784,5 @@ const rxdbWrapper = new RxDBWrapper()
 export {
    rxdbWrapper,
    rxdbWrapper as rxdb,
-   getReactiveDoc,
+   getReactiveDoc
 }
