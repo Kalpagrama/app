@@ -15,7 +15,7 @@ div(
       position: 'relative',
       background: 'rgb(35,35,35)',
       borderRadius: '10px',
-    }`).row.full-width
+    }`).row.full-width.items-start.content-start
     //- HEADER: author, createdAt
     div(
       v-if="showHeader"
@@ -171,21 +171,37 @@ export default {
       return this.node.author.oid === this.$store.getters.currentUser().oid
     },
     actions () {
-      let res = {
-        report: {
-          name: 'Пожаловаться',
-          color: 'red',
-          cb: () => {
-            this.$log('report...')
-          }
-        },
-      }
+      let res = {}
+      // TODO: implement by igor
       if (this.nodeIsMine) {
         res.delete = {
           name: 'Удалить',
           color: 'red',
           cb: () => {
             this.$log('nodeDelete...')
+          }
+        }
+      }
+      else {
+        res.hide = {
+          name: 'Скрыть',
+          color: 'white',
+          cb: () => {
+            this.$log('hide...')
+          }
+        }
+        res.hideAll = {
+          name: 'Скрыть источник',
+          color: 'white',
+          cb: () => {
+            this.$log('hideAll...')
+          }
+        }
+        res.report = {
+          name: 'Пожаловаться',
+          color: 'red',
+          cb: () => {
+            this.$log('report...')
           }
         }
       }

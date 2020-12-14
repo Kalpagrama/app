@@ -6,7 +6,7 @@ q-layout(
     @items="nodesLoaded"
     :immediate="true"
     :query="nodesQuery" :limit="12" v-slot=`{items, next, nexting}`)
-  q-page-container
+  //- q-page-container
     q-page(
       :style=`{
         paddingTop: '8px',
@@ -168,8 +168,8 @@ export default {
   components: {
     kalpaFinder: () => import('components/kalpa_finder/index.vue'),
     nodeItem: () => import('components/node_feed/node_items_item.vue'),
-    nodeEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/index.vue'),
-    itemEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/item_editor.vue')
+    // nodeEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/index.vue'),
+    // itemEditor: () => import('pages/app/content/explorer_video/view_mobile_new/node_editor/item_editor.vue')
   },
   data () {
     return {

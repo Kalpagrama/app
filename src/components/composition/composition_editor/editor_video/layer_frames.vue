@@ -34,7 +34,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
               borderRight: f === framesCount+1 ? 'none' : '1px solid rgb(120,120,120)',
             }`
             ).row.items-center.content-center.justify-center
-            span(:style=`{userSelect: 'none', pointerEvents: 'none'}`) {{ $time((f - 1)*10) }}
+            span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-black {{ $time((f - 1)*10) }}
         //- currentTime line
         div(
           v-show="!poingDragging && (player.currentTime < layerStart || player.currentTime > layerEnd)"

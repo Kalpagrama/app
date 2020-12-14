@@ -115,12 +115,13 @@
         //- docs
         kalpa-docs(
           v-if="!mini"
+          :textAlign="'left'"
           :style=`{
-            maxWidth: '200px',
+            maxWidth: '210px',
           }`).q-py-sm
         //- version
-        div(v-if="!mini").row.full-width.items-center.q-pa-md
-          small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-8 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+        div(v-if="!mini").row.full-width.items-center.q-pa-sm
+          small(:style=`{userSelect: 'none', marginLeft: '0px'}`).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

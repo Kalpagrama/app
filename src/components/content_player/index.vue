@@ -8,6 +8,7 @@ component(
   :thumbUrl="contentKalpa.thumbUrl"
   :isActive="isActive"
   :isVisible="isVisible"
+  :figures="figures"
   :options="options"
   :styles="styles"
   @player="$emit('player', $event)")
@@ -30,6 +31,7 @@ export default {
     isVisible: {type: Boolean, default: true},
     contentKalpa: {type: Object, required: true},
     options: {type: Object},
+    figures: {type: Array},
     styles: {type: Object},
   },
   data () {

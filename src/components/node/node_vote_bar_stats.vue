@@ -14,7 +14,7 @@ div(
       textAlign: 'center'
     }`
     ).row.full-width.justify-center.q-py-md
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold Спектр голосов
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold Статистика голосов
     q-btn(
       @click="$emit('close')"
       round flat color="white" icon="clear"

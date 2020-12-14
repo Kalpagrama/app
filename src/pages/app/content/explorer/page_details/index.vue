@@ -2,22 +2,41 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start
     //- DETAILS:
-    .row.full-width.q-pa-sm
+    .row.full-width
       div(
         :style=`{
           background: 'rgb(35,35,35)',
-          borderRadius: '10px',
+          borderRadius: '0 0 10px 10px',
         }`
         ).row.full-width
         //- HEADER:
-        .row.full-width.q-pa-md
-          span.text-white.text-bold {{ contentKalpa.name }}
-          .row.full-width.q-py-xs
-            small.text-grey-8.q-mr-xs 10923
-            q-icon(name="visibility" color="grey-8").q-mr-xs
-            small.text-grey-8.q-mr-xs {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
+        .row.full-width.q-py-sm.q-px-sm
+          q-btn(
+            @click="$router.back()"
+            round flat color="white" icon="west")
+          .col
+            span.text-white.text-bold {{ contentKalpa.name }}
+            .row.full-width.q-py-xs.q-pr-xl
+              q-icon(name="visibility" color="grey-8").q-mr-xs
+              small.text-grey-8.q-mr-xs 10923
+              .col
+              small.text-grey-8.q-mr-xs {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
         //- FOOTER:
-        .row.full-width.q-pa-sm
+        .row.full-width.q-pa-xs
+          kalpa-share(type="content" :item="contentKalpa")
+          .col.full-height.q-px-xs
+            //- TODO: contentKalpa.sourse
+            //- kalpa, youtube, vk, instagram, tiktok, onlyfans
+            q-btn(
+              v-if="contentKalpa.contentSource !== 'KALPA'"
+              @click="gotToOriginal"
+              align="left"
+              flat color="grey-9" no-caps
+              :style=`{
+                background: 'rgb(38,38,38)'
+              }`).fit
+              q-icon(name="fab fa-youtube" color="red" size="30px")
+              span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
@@ -28,17 +47,6 @@
             inactiveColor="grey-8"
             :fields=`{contentType: contentKalpa.type}`
             @bookmark="$event => $emit('bookmark', $event)")
-          .col.full-height.q-px-sm
-            //- TODO: contentKalpa.sourse
-            //- kalpa, youtube, vk, instagram, tiktok, onlyfans
-            q-btn(
-              v-if="contentKalpa.contentSource !== 'KALPA'"
-              @click="gotToOriginal"
-              align="left"
-              outline color="grey-9" no-caps).fit.b-50
-              q-icon(name="fab fa-youtube" color="red" size="30px")
-              span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
-          kalpa-share(type="content" :item="contentKalpa")
 </template>
 
 <script>

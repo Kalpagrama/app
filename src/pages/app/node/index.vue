@@ -23,7 +23,7 @@ q-layout(
           :node="node"
           :isActive="true"
           :isVisible="true")
-        .row.full-width.q-pa-md
+        //- .row.full-width.q-pa-md
           div(
             :style=`{
               height: '100px',

@@ -1,14 +1,14 @@
 <template lang="pug">
 .row.full-width.justify-center.items-center.content-center
-  .row.full-width.justify-center.q-px-sm
+  .row.full-width.justify-center.q-px-sm.q-py-xs
     div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
       slot(name="action-left")
-      q-btn(
+      //- q-btn(
         round flat color="grey-9" icon="reply")
+      kalpa-share(type="node" :item="node")
       .col.full-height
         node-vote-bar(v-if="node" :node="node")
       slot(name="action-right")
-      //- kalpa-share(type="node" :item="node")
       kalpa-bookmark(
         v-if="!$slots['action-left']"
         :oid="node.oid" :type="useBookmarkType" :name="node.name"

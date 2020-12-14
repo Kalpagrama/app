@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    transform: itemIndex === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
+    transform: itemIndex === 0 ? 'perspective(600px) rotateY(6deg)' : 'perspective(600px) rotateY(-6deg)',
     borderRadius: '10px',
     ...itemStyles,
     //- overflow: 'hidden',
@@ -27,6 +27,10 @@ div(
         :composition="item.items[0]"
         :isActive="itemActive"
         :isVisible="true"
+        :styles=`{
+          height: '100%',
+          objectFit: 'cover',
+        }`
         :options=`{
           height: '100%', objectFit: 'cover', loop: true,
           showContentExplorer: true,
@@ -39,6 +43,10 @@ div(
         :composition="item"
         :isActive="itemActive"
         :isVisible="true"
+        :styles=`{
+          height: '100%',
+          objectFit: 'cover',
+        }`
         :options=`{
           height: '100%', objectFit: 'cover', loop: true,
           showContentExplorer: true,
@@ -46,6 +54,7 @@ div(
           borderRadius: '10px',
           overflow: 'hidden'
         }`)
+      //- CONTENT, USER, SPHERE, GIF ?
       //- FALLBACK
       //- fallback image
       img(
@@ -60,27 +69,32 @@ div(
       //- context and name
       div(
         :style=`{
-          position: 'absolute', zIndex: 1000, bottom: '-0.5px',
+          position: 'absolute', zIndex: 1000,
+          //- bottom: '-0.5px',
+          top: '-0.5px',
+          minHeight: '40px',
           transform: 'translate3d(0,0,0)',
-          background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
+          //- background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '10px',
         }`
-        ).row.full-width.items-center.content-center.justify-between
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          q-btn(
-            v-if="itemActive && item.type === 'NODE'"
-            round flat dense color="white" icon="select_all")
+        ).row.full-width.items-center.content-center.justify-between.q-px-xs
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        q-btn(
+          v-if="item.type === 'NODE' || item.__typename === 'Composition'"
+          :to="itemContextLink"
+          round flat dense color="grey-5" icon="select_all")
         .col
           router-link(
-            v-if="item.type === 'NODE'"
-            :to="'/node/'+item.oid"
+            v-if="true"
+            :to="itemLink"
             :style=`{minHeight: '36px',}`
             ).row.full-width.items-center.content-center.justify-center.cursor-pointer
-            span.text-white {{ item.name }}
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          q-btn(
-            v-if="itemActive"
-            round flat dense color="white" icon="link")
+            span.text-grey-2 {{ item.name }}
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        q-btn(
+          v-if="true"
+          :to="itemLinksLink"
+          round flat dense color="grey-5" icon="link")
 </template>
 
 <script>
@@ -94,6 +108,36 @@ export default {
   },
   data () {
     return {
+    }
+  },
+  computed: {
+    itemLink () {
+      // '/node/'+item.oid
+      if (this.item.type === 'NODE') {
+        return '/node/' + this.item.oid
+      }
+      else if (this.item.__typename === 'Composition') {
+        return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+      }
+      // else if (this.item.type === '')
+      else {
+        return '//'
+      }
+    },
+    itemContextLink () {
+      if (this.item.type === 'NODE') {
+        return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+      }
+      else if (this.item.__typename === 'Composition') {
+        return '/content/' + this.item.layers[0].contentOid
+      }
+      // else if (this.item.type === '')
+      else {
+        return '//'
+      }
+    },
+    itemLinksLink () {
+      return '/links/' + this.item.oid
     }
   }
 }
