@@ -10,6 +10,15 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class EventApi {
+   static verbalizeRate(float){
+      assert(float >= 0 && float <= 1)
+      if (float <= 0.2) return 'Очень далеко'
+      else if (float <= 0.4) return 'Далеко'
+      else if (float <= 0.6) return 'Где-то рядом'
+      else if (float <= 0.8) return 'Близко'
+      else if (float <= 1) return 'Прямо в точку!'
+   }
+
    // ф-я дублируется на сервере (при изменении - синхронизировать)
    static makeEventCard (event) {
       const myOid = rxdb.getCurrentUser().oid
@@ -62,7 +71,7 @@ class EventApi {
             if (event.subject.oid === myOid) {
                resultCard.items = [`вы проголосовали за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
             } else {
-               resultCard.items = [cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+               resultCard.items = [cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)} - ${EventApi.verbalizeRate(event.rateUser)}`, cropObj(event.object)]
             }
             break
          case 'OBJECT_CREATED':
