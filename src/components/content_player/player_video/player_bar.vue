@@ -7,12 +7,13 @@ div(
   v-touch-pan.left.right.prevent.mouse="barPan"
   accessKey="bar-body"
   :style=`{
-    position: 'relative', height: '20px', borderRadius: '10px',
+    position: 'relative', height: '20px', borderRadius: '8px',
   }`).row.full-width.b-50
   slot(name="bar")
   slot(name="bar-current-time" :panning="panning")
   //- volume
   q-btn(
+    v-if="!mini"
     round flat dense :color="color"
     :style=`{
       position: 'absolute', left: '-40px', top: '-8px', zIndex: 300,
@@ -27,12 +28,12 @@ div(
       position: 'absolute', zIndex: 300,
       pointerEvents: 'none', left: '8px', top: '2px',
     }`
-    ).text-grey-4 {{$time(player.currentTime)}} / {{$time(player.duration)}}
+    ).text-grey-4 {{$time(currentTime)}} / {{$time(duration)}}
   //- currentTime width/line
   div(
     :style=`{
       position: 'absolute', zIndex: 200, left: '0px', top: '0px',
-      width: (player.currentTime/player.duration)*100+'%',
+      width: (currentTime/duration)*100+'%',
       pointerEvents: 'none',
       borderRadius: '10px 0 0 10px',
     }`
@@ -44,40 +45,40 @@ div(
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
       }`
-      ).row.bg-red
+      ).row.bg-green
   //- currentTime line
   div(
     :style=`{
       position: 'absolute', zIndex: 2100, left: '0px', top: '-4px',
-      left: 'calc('+(player.currentTime/player.duration)*100+'% - 2px)',
+      left: 'calc('+(currentTime/duration)*100+'% - 2px)',
       width: '4px', borderRadius: '2px', overflow: 'hidden',
       height: 'calc(100% + 8px)',
       pointerEvents: 'none',
     }`
-    ).row.bg-red
+    ).row.bg-green
   //- onMoving over line currentTime
   div(
     v-if="currentTimeMove"
     :style=`{
       position: 'absolute', zIndex: 200, top: '-4px',
-      left: 'calc('+(currentTimeMove/player.duration)*100+'% - 2px)',
+      left: 'calc('+(currentTimeMove/duration)*100+'% - 2px)',
       height: 'calc(100% + 8px)',
       width: '4px', borderRadius: '2px', overflow: 'hidden',
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.bg-red
+    ).row.bg-green
   //- onMoving over rect label
   div(
     v-if="currentTimeMove"
     :style=`{
       position: 'absolute', zIndex: 9999, top: '-40px',
-      left: 'calc('+(currentTimeMove/player.duration)*100+'% - 2px)',
+      left: 'calc('+(currentTimeMove/duration)*100+'% - 2px)',
       borderRadius: '10px 10px 10px 0', overflow: 'hidden',
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimeMove) }}
+    ).row.text-white.q-pa-sm.bg-green {{ $time(currentTimeMove) }}
   //- onPanning line currentTime
   div(
     v-if="panning"
@@ -89,7 +90,7 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.bg-red
+    ).row.bg-green
   //- onPanning rect label
   div(
     v-if="panning"
@@ -101,7 +102,7 @@ div(
       userSelect: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*player.duration) }}
+    ).row.text-white.q-pa-sm.bg-green {{ $time(currentTimePercent/100*duration) }}
   //- POINTS
   div(
     v-if="player && player.points && player.points.length > 0"
@@ -113,7 +114,7 @@ div(
       v-for="(f,fi) in player.points" :key="fi"
       :style=`{
         position: 'absolute', zIndex: 2050, top: '0px',
-        left: f[0].t/player.duration*100+'%',
+        left: f[0].t/duration*100+'%',
         width: '2px',
         background: 'rgba(255,255,255, 0.5)',
         pointerEvents: 'none',
@@ -131,8 +132,8 @@ div(
       v-for="(f,fi) in player.figures" :key="fi"
       :style=`{
         position: 'absolute', zIndex: 2050, top: '-3px',
-        left: f[0].t/player.duration*100+'%',
-        width: (f[1].t-f[0].t)/player.duration*100+'%',
+        left: f[0].t/duration*100+'%',
+        width: (f[1].t-f[0].t)/duration*100+'%',
         height: 'calc(100% + 6px)',
         border: '3px solid rgb(76,175,80)',
         borderRadius: '4px',
@@ -145,7 +146,7 @@ div(
 <script>
 export default {
   name: 'playerBar',
-  props: ['player'],
+  props: ['player', 'start', 'end', 'mini'],
   data () {
     return {
       panning: false,
@@ -154,7 +155,47 @@ export default {
       currentTimePanned: 0,
     }
   },
+  computed: {
+    currentTime () {
+      if (this.start && this.end) {
+        return this.player.currentTime - this.start
+      }
+      else {
+        return this.player.currentTime
+      }
+    },
+    duration () {
+      if (this.start && this.end) {
+        return this.end - this.start
+      }
+      else {
+        return this.player.duration
+      }
+    }
+  },
+  watch: {
+    'player.currentTime': {
+      handler (to, from) {
+        if (this.start && this.end) {
+          // this.$log('player.currentTime TO', to, this.end)
+          if (to >= this.end) {
+            this.$log('PLAYER TO START start&&end', to, this.end)
+            this.setCurrentTime(0)
+            this.player.play()
+          }
+        }
+      }
+    }
+  },
   methods: {
+    setCurrentTime (t) {
+      if (this.start && this.end) {
+        this.player.setCurrentTime(t + this.start)
+      }
+      else {
+        this.player.setCurrentTime(t)
+      }
+    },
     barClick (e) {
       // this.$log('barClick', e)
       this.$log('barClick accessKey', e.target.accessKey)
@@ -163,10 +204,10 @@ export default {
       let width = e.target.clientWidth
       if (left > width) return
       // this.$log('left/width', left, width)
-      let t = (left / width) * this.player.duration
+      let t = (left / width) * this.duration
       this.$log('t', this.$time(t))
       this.player.events.emit('bar-click', {t: t})
-      this.player.setCurrentTime(t)
+      this.setCurrentTime(t)
       this.$wait(400).then(() => {
         this.currentTimeMove = null
       })
@@ -185,7 +226,7 @@ export default {
       let left = e.layerX
       let width = e.target.clientWidth
       // this.$log('left/width', left, width)
-      let t = (left / width) * this.player.duration
+      let t = (left / width) * this.duration
       this.currentTimeMove = t
     },
     barPan (e) {
@@ -200,15 +241,15 @@ export default {
       if (e.isFinal) {
         this.currentTimePercent = null
         this.currentTimeMove = null
-        if (this.currentTimePanned) this.player.setCurrentTime(this.currentTimePanned)
+        if (this.currentTimePanned) this.setCurrentTime(this.currentTimePanned)
         this.panning = false
       }
       if (!this.currentTimePercent) return
       this.currentTimePercent += (e.delta.x / this.$el.clientWidth) * 100
-      let t = (this.currentTimePercent / 100) * this.player.duration
-      if (t > 0 && t < this.player.duration) {
+      let t = (this.currentTimePercent / 100) * this.duration
+      if (t > 0 && t < this.duration) {
         this.currentTimePanned = t
-        this.player.setCurrentTime(t)
+        this.setCurrentTime(t)
       }
     }
   }

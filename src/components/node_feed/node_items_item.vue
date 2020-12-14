@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    transform: itemIndex === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
+    transform: itemIndex === 0 ? 'perspective(600px) rotateY(6deg)' : 'perspective(600px) rotateY(-6deg)',
     borderRadius: '10px',
     ...itemStyles,
     //- overflow: 'hidden',
@@ -27,6 +27,10 @@ div(
         :composition="item.items[0]"
         :isActive="itemActive"
         :isVisible="true"
+        :styles=`{
+          height: '100%',
+          objectFit: 'cover',
+        }`
         :options=`{
           height: '100%', objectFit: 'cover', loop: true,
           showContentExplorer: true,
@@ -39,6 +43,10 @@ div(
         :composition="item"
         :isActive="itemActive"
         :isVisible="true"
+        :styles=`{
+          height: '100%',
+          objectFit: 'cover',
+        }`
         :options=`{
           height: '100%', objectFit: 'cover', loop: true,
           showContentExplorer: true,
@@ -46,6 +54,7 @@ div(
           borderRadius: '10px',
           overflow: 'hidden'
         }`)
+      //- CONTENT, USER, SPHERE, GIF ?
       //- FALLBACK
       //- fallback image
       img(
@@ -57,40 +66,35 @@ div(
           borderRadius: '10px',
         }`
         ).fit.b-30
-      //- tint
+      //- context and name
       div(
-        v-if="item && item.type === 'NODE'"
         :style=`{
-          position: 'absolute', bottom: '-1px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
-          //- background: 'rgb(0,0,0)',
-          left: '-1px', minWidth: 'calc(100% + 2px)',
-          background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
-          borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
-        }`).row.full-width
-      //- name
-      div(
-        v-if="item && item.type === 'NODE'"
-        @click="$router.push('/node/'+item.oid)"
-        :style=`{
-          position: 'absolute', zIndex: 2010, bottom: 0
+          position: 'absolute', zIndex: 1000,
+          //- bottom: '-0.5px',
+          top: '-0.5px',
+          minHeight: '40px',
+          transform: 'translate3d(0,0,0)',
+          //- background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
+          borderRadius: '10px',
         }`
-        ).row.full-width.q-pa-sm.cursor-pointer
-        .row.full-width.justify-center.scroll
-          div(
-            :style=`{
-              maxHeight: '40px',
-            }`
-            ).row.no-wrap
-            span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
-  //- VERTEX
-  //- item.type
-  //- div(
-    v-if="itemVertex && itemVertex !== 'ASSOCIATIVE' && itemVertex !== 'ESSENCE'"
-    :class=`{
-      'justify-end': itemIndex === 0
-    }`
-    ).row.full-width.q-px-sm.q-pt-xs
-    span.text-white {{ $nodeItemType(itemVertex).name }}
+        ).row.full-width.items-center.content-center.justify-between.q-px-xs
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        q-btn(
+          v-if="item.type === 'NODE' || item.__typename === 'Composition'"
+          :to="itemContextLink"
+          round flat dense color="grey-5" icon="select_all")
+        .col
+          router-link(
+            v-if="true"
+            :to="itemLink"
+            :style=`{minHeight: '36px',}`
+            ).row.full-width.items-center.content-center.justify-center.cursor-pointer
+            span.text-grey-2 {{ item.name }}
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        q-btn(
+          v-if="true"
+          :to="itemLinksLink"
+          round flat dense color="grey-5" icon="link")
 </template>
 
 <script>
@@ -104,6 +108,36 @@ export default {
   },
   data () {
     return {
+    }
+  },
+  computed: {
+    itemLink () {
+      // '/node/'+item.oid
+      if (this.item.type === 'NODE') {
+        return '/node/' + this.item.oid
+      }
+      else if (this.item.__typename === 'Composition') {
+        return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+      }
+      // else if (this.item.type === '')
+      else {
+        return '//'
+      }
+    },
+    itemContextLink () {
+      if (this.item.type === 'NODE') {
+        return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+      }
+      else if (this.item.__typename === 'Composition') {
+        return '/content/' + this.item.layers[0].contentOid
+      }
+      // else if (this.item.type === '')
+      else {
+        return '//'
+      }
+    },
+    itemLinksLink () {
+      return '/links/' + this.item.oid
     }
   }
 }

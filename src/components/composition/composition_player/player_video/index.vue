@@ -2,14 +2,15 @@
 div(
   :style=`{
     position: 'relative',
-    height: options.height,
+    ...styles,
+    //- height: options.height,
     //- border: $slots.lefttop ? '1px solid red' : 'none'
     }`
   ).row.full-width.items-start.content-start
   //- content explorer btn
   slot(name="lefttop")
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-  content-explorer(
+  //- content-explorer(
     v-if="options.showContentExplorer && isActive"
     :oid="oid" :composition="composition")
   //- video spinner
@@ -44,26 +45,35 @@ div(
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
-      height: options.height,
+      ...styles,
+      maxHeight: '50vh',
+      //- height: options.height,
       objectFit: options.objectFit,
     }`
     ).full-width
   //- div(:style=`{height: '45px'}`).row.full-width
   //- video wrapper
-  //- content-player(
+  content-player(
+    v-if="isActive && isVisible"
     :contentKalpa=`{
       url: composition.url,
       type: 'VIDEO',
       contentSource: 'KALPA',
     }`
+    :figures="figures"
     :styles=`{
-      height: '100%', objectFit: 'cover',
+      height: '100%',
+      //- objectFit: 'contain',
       borderRadius: '10px',
     }`
+    :options=`{
+      mini: true
+    }`
     :style=`{
-      position: 'absolute', zIndex: 100, bottom: '0px',
+      position: 'absolute', zIndex: 100,
+      //- bottom: '0px',
     }`).fit
-  div(
+  //- div(
     v-if="isActive && isVisible"
     :style=`{
       position: 'absolute', zIndex: 200,
@@ -105,6 +115,7 @@ export default {
     isVisible: {type: Boolean},
     isActive: {type: Boolean},
     composition: {type: Object, required: true},
+    styles: {type: Object, default: {}},
     options: {
       type: Object,
       default () {
@@ -131,6 +142,24 @@ export default {
       if (this.$q.screen.width > this.$store.state.ui.pageWidth) return this.$store.state.ui.pageWidth
       else {
         return this.$q.screen.width
+      }
+    },
+    figures () {
+      if (this.composition.outputType === 'VIDEO') {
+        let arr = this.composition.url.split('#t=')
+        if (arr.length > 1) {
+          let [start, end] = arr[1].split(',')
+          return [
+            {t: parseFloat(start)},
+            {t: parseFloat(end)},
+          ]
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        return false
       }
     }
   },

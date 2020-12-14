@@ -14,7 +14,10 @@ div(
     :loop="loop"
     :muted="mutedLocal"
     :style=`{
-      objectFit: 'contain'
+      objectFit: 'cover',
+      //- objectFit: 'contain',
+      borderRadius: '10px',
+      overflow: 'hidden',
     }`
     @loadeddata="loadeddataHandle"
     @timeupdate="timeupdateHandle"

@@ -5,68 +5,164 @@
 </style>
 
 <template lang="pug">
-node-feed(
-  :node="node" :isActive="isActive" :isVisible="isVisible"
-  :showName="isOpened"
-  @itemActive="itemActiveHandle"
-  :itemsStyles=`itemsStyles`
-  :class=`{
-    //- 'bg-red': nodeQuery === node.oid,
-    //- 'bg-red': isActive,
-    //- 'b-40': isActive,
-  }`
-  :style=`{
-    //- minHeight: '192px',
-    //- maxHeight: '192px',
-    borderRadius: '10px',
-  }`)
-  template(v-slot:name v-if="isOpened")
-    div(:style=`{position: 'relative'}`).row.full-width
-      q-btn(
-        @click="isOpened = false"
-        round flat color="red" icon="vertical_align_center"
+//- .row.full-width.items-start.content-start
+  //- small.text-white {{ node }}
+  .row.full-width.items-center.content-center.q-px-xs
+    q-btn(
+      round flat dense color="white"
+      :style=`{
+        width: '30px',
+        height: '30px',
+        borderRadius: '50%',
+      }`
+      ).row.items-center.content-center.justify-center
+      img(
+        src="~/assets/vote.png"
         :style=`{
-          position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
-          width: '60px', height: '60px',
+          width: '20px,', height: '20px',
+          borderRadius: '50%',
         }`)
-  template(v-slot:items v-if="!isOpened")
-    .row.full-width.items-start.content-start.q-px-sm
+    .col
+      .row.full-width.justify-between.q-px-xs
+        router-link(:to="'/user/'+node.author.oid")
+          span.text-grey-8 {{ node.author.name }}
+    .row.full-height.items-center.content-center
+      small.text-grey-8 {{ $date(node.createdAt) }}
+      q-btn(
+        round flat dense size="sm" color="grey-9" icon="more_horiz"
+      ).q-ml-sm
+  div(
+    :style=`{
+      paddingLeft: '26px',
+    }`
+    ).row.full-width.items-start.content-start
+    div(
+      :style=`{
+        position: 'relative',
+        background: isActive ? 'rgb(40,40,40)' : 'rgb(33,33,33)',
+        borderRadius: '10px',
+      }`
+      ).row.full-width
+      //- connection
       div(
-        @click="isOpened = true"
+        v-if="node.items.length === 2"
         :style=`{
-          position: 'relative',
-          borderRadius: '10px',
-          height: '60px',
-          background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
-        }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
-        //- TODO: paddingLeft, paddingRight 60px
+          position: 'absolute', top: '50%', zIndex: 5,
+          height: '1px',
+        }`
+        ).row.full-width.bg-grey-8
+      //- 0 item
+      div(
+        :style=`{
+          width: '50px',
+        }`
+        ).row.items-start.content-start
         img(
+          v-if="node.items[0]"
           :src="node.items[0].thumbUrl"
           :style=`{
-            position: 'absolute', zIndex: 100,
-            top: '0px', left: '0px',
-            height: '60px',
-            width: '60px',
+            height: '50px',
+            width: '50px',
             borderRadius: '10px',
             objectFit: 'cover',
+            zIndex: 10,
             border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
           }`)
-        span(
-          :style=`{
-            fontSize: '20px',
-          }`).text-white.text-bold {{ name }}
-        img(
-          v-if="node.items[1]"
-          :src="node.items[1].thumbUrl"
-          :style=`{
-            position: 'absolute', zIndex: 100,
-            top: '0px', right: '0px',
-            height: '60px',
-            width: '60px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
-          }`)
+        .row.full-width.justify-center
+          small(v-if="node.items[0].layers").text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
+      //- center
+      .col
+        div(
+          v-if="node.items.length === 1"
+          ).row.fit.items-between.content-between.justify-start.q-px-sm.q-py-xs
+          span.text-white {{ node.name || node.vertices }}
+        div(
+          v-if="node.items.length === 2"
+          ).row.fit.items-center.content-center.justify-center
+          span.text-white.q-mb-lg {{ name }}
+      //- 1 item
+      img(
+        v-if="node.items[1]"
+        :src="node.items[1].thumbUrl"
+        :style=`{
+          height: '50px',
+          width: '50px',
+          borderRadius: '10px',
+          objectFit: 'cover',
+          zIndex: 10,
+          border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
+        }`)
+    .row.full-width.q-px-sm
+      q-btn(flat dense color="grey-8" no-caps size="sm") Reply
+    div(:style=`{position: 'relative',}`).row.full-width
+      slot
+.row.full-width
+  .col
+    node-feed(
+      :node="node" :isActive="isActive" :isVisible="isVisible"
+      :showName="isOpened"
+      @itemActive="itemActiveHandle"
+      :itemsStyles=`itemsStyles`
+      :class=`{
+      }`
+      :style=`{
+        borderRadius: '10px',
+      }`)
+      template(v-slot:items v-if="!isOpened")
+        .row.full-width.items-start.content-start.q-px-sm
+          div(
+            @click="isOpened = true"
+            :style=`{
+              position: 'relative',
+              borderRadius: '10px',
+              minHeight: '60px',
+              paddingLeft: '64px',
+              paddingRight: node.items[1] ? '64px' : '64px',
+              background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
+            }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
+            //- TODO: paddingLeft, paddingRight 60px
+            img(
+              :src="node.items[0].thumbUrl"
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                top: '0px', left: '0px',
+                height: '60px',
+                width: '60px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
+              }`)
+            span(
+              :style=`{
+                //- fontSize: '20px',
+              }`).text-white.text-bold {{ name }}
+            img(
+              v-if="node.items[1]"
+              :src="node.items[1].thumbUrl"
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                top: '0px', right: '0px',
+                height: '60px',
+                width: '60px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
+              }`)
+  //- right side resizer
+  div(
+    :style=`{
+      width: '60px',
+    }`
+    ).row.items-center.content-center.justify-center
+    q-btn(
+      @click="isOpened = !isOpened"
+      round flat
+      color="grey-8"
+      :icon="isOpened ? 'unfold_less' : 'unfold_more'"
+      :style=`{
+        position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
+        width: '60px', height: '60px',
+      }`)
 </template>
 
 <script>

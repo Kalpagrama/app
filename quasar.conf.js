@@ -40,6 +40,8 @@ module.exports = function (ctx) {
          'app.styl'
       ],
 
+      animations: 'all',
+
       // https://github.com/quasarframework/quasar/tree/dev/extras
       extras: [
          'roboto-font',

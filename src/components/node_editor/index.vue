@@ -182,7 +182,14 @@ export default {
       }
     },
     itemPaddingBottom (item, itemii) {
-      if (this.node.items.length === 1) return '50%'
+      if (this.node.items.length === 1) {
+        if (item.thumbHeight && item.thumbWidth) {
+          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 42px)'
+        }
+        else {
+          return '50%'
+        }
+      }
       else return '100%'
     },
     itemTransform (item, itemii) {

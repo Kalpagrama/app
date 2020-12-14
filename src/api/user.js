@@ -87,6 +87,7 @@ class UserApi {
   static async unSubscribe (oid) {
     const f = UserApi.subscribe
     logD(f, 'start', oid)
+    console.log('unSubscribe', oid)
     const t1 = performance.now()
     const cb = async () => {
       let { data: { unSubscribe } } = await apollo.clients.api.mutate({

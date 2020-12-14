@@ -642,7 +642,7 @@ class Workspace {
          reactiveBookmark.beforeRemove = async (permanent = false) => {
             // удалить себя(букмарк) из всех коллекций
             assert(reactiveBookmark.collections, '!removedItem.collections')
-            if (permanent) {
+            if (permanent && reactiveBookmark.collections && reactiveBookmark.collections.length > 0) {
                let collections = await rxdb.find({ selector: { id: { $in: reactiveBookmark.collections } } })
                for (let c of collections) {
                   c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)

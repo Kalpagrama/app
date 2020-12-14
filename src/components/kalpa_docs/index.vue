@@ -10,23 +10,32 @@
   div(
     v-if="title"
     ).row.full-width.justify-center.q-py-sm
-    small.text-grey-8 {{ title }}
+    small.text-grey-9 {{ title }}
   //- body
   .row.full-width.items-start.content-start
     router-link(
       v-for="(d,di) in docs" :key="di"
       :to="'/docs/'+d.id"
       :style=`{
-        textAlign: 'center',
+        textAlign: textAlign,
       }`
-      ).row.full-width.justify-center.q-px-sm.q-pt-xs
-      small.text-grey-8.doc-item {{ d.name }}
+      ).row.full-width.q-px-sm.q-pt-xs
+      small.text-grey-9.doc-item {{ d.name }}
 </template>
 
 <script>
 export default {
   name: 'kalpaDocs',
-  props: ['title'],
+  // props: ['title'],
+  props: {
+    title: {
+      type: String
+    },
+    textAlign: {
+      type: String,
+      default: 'center'
+    }
+  },
   data () {
     return {
     }

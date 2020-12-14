@@ -6,7 +6,7 @@ div(
     }`
   ).row.full-width.items-start.content-start
   slot(name="left-top")
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     content-explorer(
       v-if="!$slots['left-top'] && isActive"
       :composition="composition"

@@ -1,25 +1,51 @@
 <template lang="pug">
 q-page(
   :style=`{
-    paddingTop: '8px',
-    paddingBottom: '100vh',
+    position: 'relative',
+    paddingTop: '0px',
+    paddingBottom: '50vh',
   }`
   ).row.full-width.items-start.content-start.justify-center
   slot
+  //- div(
+    :style=`{
+      position: 'absolute', left: '27px', top: '-8px', zIndex: 1,
+      width: '1px',
+    }`
+    ).row.full-height.bg-grey-8
   kalpa-loader(
     :immediate="true"
     @items="nodesLoaded"
     :query="nodesQuery" v-slot=`{items,next,nexting}`)
     list-middle(
       :items="items" :itemStyles=`{marginBottom: '40px',}`
-      :style=`{maxWidth: '700px',}`).q-px-sm
+      :style=`{position: 'relative', maxWidth: '700px',}`).q-px-sm
+      //- div(
+        v-if="items && items.length > 0"
+        :style=`{
+          position: 'absolute', left: '27px', top: '-8px', zIndex: 1,
+          width: '1px',
+          minHeight: 'calc(100% + 50vh + 16px)',
+        }`
+        ).row.bg-grey-8
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         node-item(
           :ref="'node-'+item.oid"
           :node="item" :player="player" :contentKalpa="contentKalpa"
           :nodeQuery="nodeQuery"
           :isActive="isActive" :isVisible="isVisible"
+          :style=`{
+            zIndex: 2
+          }`
           @scrollme="nodeScroll(item,itemIndex)")
+          //- node-item(
+            :ref="'node-'+item.oid"
+            :node="item" :player="player" :contentKalpa="contentKalpa"
+            :nodeQuery="nodeQuery"
+            :isActive="isActive" :isVisible="isVisible"
+            :style=`{
+              zIndex: 2
+            }`)
 </template>
 
 <script>

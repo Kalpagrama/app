@@ -9,7 +9,7 @@ q-layout(view="hHh Lpr lff")
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
           //- q-btn(round flat color="red" icon="power_off" @click="logout()")
-        .row.full-width.q-px-md
+        //- .row.full-width.q-px-md
           q-tabs(
             :value="$route.name" @input="$router.push({name: $event})"
             no-caps dense active-color="green" align="left" switch-indicator).text-grey-8

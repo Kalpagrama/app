@@ -23,10 +23,6 @@
             span(
               :style=`{fontSize: '18px'}`
               ).text-white.text-bold Закладки
-    template(v-slot:tint=`{item}`)
-      div(
-        @click="itemFound(item)"
-        :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
 </template>
 
 <script>
@@ -52,14 +48,6 @@ export default {
       this.$log('contentKalpaFound', contentKalpa)
       this.$router.replace('/content/' + contentKalpa.oid)
     }
-  },
-  mounted () {
-    this.$log('mounted')
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
-    // this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
   }
 }
 </script>

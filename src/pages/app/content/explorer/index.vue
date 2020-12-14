@@ -1,3 +1,8 @@
+<style lang="sass">
+.q-header
+  border-radius: 0 0 10px 10px !important
+</style>
+
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
@@ -24,7 +29,11 @@ q-layout(
       :player="player"
       :headerHeight="headerHeight")
       page-details(
-        :contentKalpa="contentKalpa").q-mb-sm
+        :contentKalpa="contentKalpa"
+        :style=`{
+          marginTop: '-20px',
+          paddingTop: '20px',
+        }`).q-mb-sm
 </template>
 
 <script>

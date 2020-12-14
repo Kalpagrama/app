@@ -1,18 +1,5 @@
 <template lang="pug">
 .row
-  //- transition-show="none" transition-hide="none"
-  //- q-dialog(
-    v-model="showDialog"
-    position="bottom"
-    :maximized="$q.screen.width < 800")
-    feeds-selector(
-      :oid="oid"
-      :bookmark="bookmark"
-      :style=`{
-        height: $q.screen.width < 800 ? $q.screen.height+'px' : '600px',
-        maxWidth: $q.screen.width < 800 ? '100%' : '500px',
-      }`
-      @close="showDialog = false")
   slot(name="action" :start="start" :bookmark="bookmark")
   q-btn(
     v-if="!$scopedSlots.action"
@@ -72,14 +59,17 @@ export default {
       try {
         this.$log('start')
         this.loading = true
+        await this.$wait(500)
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
-        // await UserApi.subscribe(this.oid)
+        this.$log('start [bookmark]', bookmark)
         if (bookmark) {
-          // TODO: delete bookmark and unSubscribe...
-          // this.bookmark = bookmark
-          // this.showDialog = true
+          this.$log('bookmark DELETE')
+          await bookmark.remove(true)
+          if (!await UserApi.isSubscribed(this.oid)) await UserApi.unSubscribe(this.oid)
+          bookmark = null
         }
         else {
+          this.$log('bookmark CREATE')
           // TODO: where to handle bookmarkInput create?
           let bookmarkInput = {
             type: this.type,
@@ -87,6 +77,7 @@ export default {
             name: this.name,
             thumbUrl: this.thumbUrl,
             ...this.fields || {},
+            isSubscribed: true
           }
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
           // subscribe to this oid...
@@ -99,6 +90,7 @@ export default {
       }
       catch (e) {
         this.$log('start error', e)
+        this.loading = false
       }
     }
   }

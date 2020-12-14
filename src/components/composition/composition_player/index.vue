@@ -5,6 +5,7 @@ component(
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
+  :styles="styles"
   :options="options")
   //- template(v-for="(index, name) in $slots" v-slot:[name])
   //-   slot(:name="name")
@@ -19,7 +20,7 @@ import playerImage from './player_image/index.vue'
 export default {
   name: 'compositionPlayer',
   components: {playerVideo, playerImage},
-  props: ['oid', 'isActive', 'isVisible', 'composition', 'options'],
+  props: ['oid', 'isActive', 'isVisible', 'composition', 'styles', 'options'],
   data () {
     return {
       playerComponent: {
