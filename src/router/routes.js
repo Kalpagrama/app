@@ -43,17 +43,16 @@ const routes = [
       component: () => import('layouts/main_layout'),
       children: [
          {
+            name: 'about',
+            path: 'about',
+            component: () => import('pages/app/about/index.vue'),
+         },
+         {
             name: 'feeds',
             path: 'feeds/:id?',
             component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
-         // {
-         //    name: 'welcome',
-         //    path: 'welcome',
-         //    component: () => import('pages/app/welcome/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
          {
             name: 'settings',
             path: 'settings',
@@ -65,21 +64,8 @@ const routes = [
                   path: 'account',
                   component: () => import('pages/app/settings/view_account/index.vue'),
                   meta: { roleMinimal: 'MEMBER' }
-               },
-               {
-                  name: 'settings.workspace',
-                  path: 'workspace',
-                  component: () => import('pages/app/settings/view_workspace/index.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               },
-               {
-                  name: 'settings.docs',
-                  path: 'docs',
-                  component: () => import('pages/app/settings/view_docs/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
                }
-            ],
-            // meta: { roleMinimal: 'MEMBER' }
+            ]
          },
          {
             path: 'user/:oid',
@@ -89,18 +75,6 @@ const routes = [
                   path: ':tab?',
                   name: 'user',
                   component: () => import('pages/app/user/page_profile/index.vue')
-               },
-               {
-                  path: 'workspace/:tab?',
-                  name: 'user.workspace',
-                  redirect: '/workspace',
-                  // component: () => import('pages/app/user/page_workspace/index.vue')
-               },
-               {
-                  path: 'settings/:tab?',
-                  name: 'user.settings',
-                  redirect: '/settings'
-                  // component: () => import('pages/app/user/page_settings/index.vue')
                }
             ],
             meta: { roleMinimal: 'GUEST' }
@@ -108,22 +82,14 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
-            // redirect: 'node/:oid/joints',
             component: () => import('pages/app/node/index.vue'),
-            // children: [
-            //    {
-            //       name: 'node.joints',
-            //       path: 'joints',
-            //       component: () => import('pages/app/node/view_joints/index.vue'),
-            //       meta: { roleMinimal: 'GUEST' }
-            //    }
-            // ],
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'joint',
-            path: 'joint/:oid',
-            component: () => import('pages/app/joint/index.vue')
+            name: 'links',
+            path: 'links/:oid',
+            component: () => import('pages/app/links/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'sphere',
@@ -171,12 +137,12 @@ const routes = [
             ],
             meta: { roleMinimal: 'MEMBER' }
          },
-         {
-            name: 'messages',
-            path: 'messages',
-            component: () => import('pages/app/messages/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'messages',
+         //    path: 'messages',
+         //    component: () => import('pages/app/messages/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'workspace.create',
             path: 'workspace/create',
@@ -189,36 +155,6 @@ const routes = [
             component: () => import('pages/app/ws_index/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
-         // {
-         //    name: 'workspace.collection',
-         //    path: 'workspace/collection/:id',
-         //    component: () => import('pages/app/ws_collection/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
-         // {
-         //    name: 'workspace.collection-view',
-         //    path: 'workspace/collection-view/:id/:viewid',
-         //    component: () => import('pages/app/ws_collection_view/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
-         // {
-         //    name: 'workspace.node',
-         //    path: 'workspace/node/:id',
-         //    component: () => import('pages/app/ws_node/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
-         // {
-         //    name: 'workspace.joint',
-         //    path: 'workspace/joint/:id',
-         //    component: () => import('pages/app/ws_joint/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
-         // {
-         //    name: 'workspace.trash',
-         //    path: 'workspace/trash',
-         //    component: () => import('pages/app/ws_joint/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
          {
             name: 'fallback',
             path: '*',

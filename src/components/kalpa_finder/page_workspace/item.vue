@@ -12,9 +12,13 @@ div(
     borderRadius: '10px',
   }`
   ).row.full-width.items-start.content-start
+  //- left side
   div(:style=`{position: 'relative',}`).col.full-height
     slot(name="tint" :item="item")
-    .row.fit
+    //- default
+    router-link(
+      :to="itemLink"
+      ).row.fit
       div(
         :style=`{
           width: '80px', height: '80px',
@@ -34,6 +38,7 @@ div(
       .col
         .row.fit.items-center.content-center.justify-start.q-pa-md
           span(:style=`{zIndex: 102}`).text-white {{ item.name.slice(0, 150) }}
+  //- right side
   div().row.full-height.items-center.content-center.justify-center.q-pa-md
     q-btn(
       @click="itemSubscriptionToggle()"
@@ -47,7 +52,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'kalpaFinder_item',
+  name: 'kalpaFinder_pageWorkspace_item',
   props: ['item'],
   data () {
     return {
@@ -66,6 +71,17 @@ export default {
           }
         }
       }
+    },
+    itemLink () {
+      let itemLinkMap = {
+        NODE: '/node/',
+        USER: '/user/',
+        SPHERE: '/sphere/',
+        VIDEO: '/content/',
+        IMAGE: '/content/',
+        BOOK: '/content/'
+      }
+      return itemLinkMap[this.item.type] + this.item.oid
     }
   },
   methods: {

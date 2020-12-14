@@ -9,7 +9,7 @@ div(
   //- content explorer btn
   slot(name="lefttop")
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-  content-explorer(
+  //- content-explorer(
     v-if="options.showContentExplorer && isActive"
     :oid="oid" :composition="composition")
   //- video spinner

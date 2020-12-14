@@ -5,68 +5,70 @@
 </style>
 
 <template lang="pug">
-node-feed(
-  :node="node" :isActive="isActive" :isVisible="isVisible"
-  :showName="isOpened"
-  @itemActive="itemActiveHandle"
-  :itemsStyles=`itemsStyles`
-  :class=`{
-    //- 'bg-red': nodeQuery === node.oid,
-    //- 'bg-red': isActive,
-    //- 'b-40': isActive,
-  }`
-  :style=`{
-    //- minHeight: '192px',
-    //- maxHeight: '192px',
-    borderRadius: '10px',
-  }`)
-  template(v-slot:name v-if="isOpened")
-    div(:style=`{position: 'relative'}`).row.full-width
-      q-btn(
-        @click="isOpened = false"
-        round flat color="red" icon="vertical_align_center"
-        :style=`{
-          position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
-          width: '60px', height: '60px',
-        }`)
-  template(v-slot:items v-if="!isOpened")
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        @click="isOpened = true"
-        :style=`{
-          position: 'relative',
-          borderRadius: '10px',
-          height: '60px',
-          background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
-        }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
-        //- TODO: paddingLeft, paddingRight 60px
-        img(
-          :src="node.items[0].thumbUrl"
-          :style=`{
-            position: 'absolute', zIndex: 100,
-            top: '0px', left: '0px',
-            height: '60px',
-            width: '60px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
-          }`)
-        span(
-          :style=`{
-            fontSize: '20px',
-          }`).text-white.text-bold {{ name }}
-        img(
-          v-if="node.items[1]"
-          :src="node.items[1].thumbUrl"
-          :style=`{
-            position: 'absolute', zIndex: 100,
-            top: '0px', right: '0px',
-            height: '60px',
-            width: '60px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
-          }`)
+.row.full-width
+  .col
+    node-feed(
+      :node="node" :isActive="isActive" :isVisible="isVisible"
+      :showName="isOpened"
+      @itemActive="itemActiveHandle"
+      :itemsStyles=`itemsStyles`
+      :class=`{
+      }`
+      :style=`{
+        borderRadius: '10px',
+      }`)
+      template(v-slot:items v-if="!isOpened")
+        .row.full-width.items-start.content-start.q-px-sm
+          div(
+            :style=`{
+              position: 'relative',
+              borderRadius: '10px',
+              height: '60px',
+              background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
+            }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
+            //- TODO: paddingLeft, paddingRight 60px
+            img(
+              :src="node.items[0].thumbUrl"
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                top: '0px', left: '0px',
+                height: '60px',
+                width: '60px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
+              }`)
+            span(
+              :style=`{
+                fontSize: '20px',
+              }`).text-white.text-bold {{ name }}
+            img(
+              v-if="node.items[1]"
+              :src="node.items[1].thumbUrl"
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                top: '0px', right: '0px',
+                height: '60px',
+                width: '60px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
+              }`)
+  //- right side resizer
+  div(
+    :style=`{
+      width: '60px',
+    }`
+    ).row.items-center.content-center.justify-center
+    q-btn(
+      @click="isOpened = !isOpened"
+      round flat
+      color="grey-8"
+      :icon="isOpened ? 'unfold_less' : 'unfold_more'"
+      :style=`{
+        position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
+        width: '60px', height: '60px',
+      }`)
 </template>
 
 <script>

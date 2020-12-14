@@ -71,6 +71,7 @@
   .row.full-width.justify-center
     //- toggle name/fixed_name
     q-btn(
+      v-if="node.items.length === 2"
       @click="toggle()"
       round flat
       :color="verticesFixed ? 'green' : 'grey-8'"

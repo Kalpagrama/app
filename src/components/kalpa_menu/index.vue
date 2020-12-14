@@ -147,7 +147,8 @@ export default {
         {id: 'feeds', name: 'Домашняя', icon: 'home'},
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
-        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'}
+        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
+        {id: 'about', name: 'Что это?', icon: 'support'}
       ]
     }
   },

@@ -47,7 +47,7 @@ export default {
     tabs () {
       return [
         // {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
-        {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'filter_tilt_shift'},
+        {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'panorama_fish_eye'},
         // {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
         {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},

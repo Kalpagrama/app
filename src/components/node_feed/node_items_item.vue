@@ -57,40 +57,30 @@ div(
           borderRadius: '10px',
         }`
         ).fit.b-30
-      //- tint
+      //- context and name
       div(
-        v-if="item && item.type === 'NODE'"
         :style=`{
-          position: 'absolute', bottom: '-1px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
-          //- background: 'rgb(0,0,0)',
-          left: '-1px', minWidth: 'calc(100% + 2px)',
+          position: 'absolute', zIndex: 1000, bottom: '-0.5px',
+          transform: 'translate3d(0,0,0)',
           background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
-          borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
-        }`).row.full-width
-      //- name
-      div(
-        v-if="item && item.type === 'NODE'"
-        @click="$router.push('/node/'+item.oid)"
-        :style=`{
-          position: 'absolute', zIndex: 2010, bottom: 0
+          borderRadius: '10px',
         }`
-        ).row.full-width.q-pa-sm.cursor-pointer
-        .row.full-width.justify-center.scroll
-          div(
-            :style=`{
-              maxHeight: '40px',
-            }`
-            ).row.no-wrap
-            span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
-  //- VERTEX
-  //- item.type
-  //- div(
-    v-if="itemVertex && itemVertex !== 'ASSOCIATIVE' && itemVertex !== 'ESSENCE'"
-    :class=`{
-      'justify-end': itemIndex === 0
-    }`
-    ).row.full-width.q-px-sm.q-pt-xs
-    span.text-white {{ $nodeItemType(itemVertex).name }}
+        ).row.full-width.items-center.content-center.justify-between
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          q-btn(
+            v-if="itemActive && item.type === 'NODE'"
+            round flat dense color="white" icon="select_all")
+        .col
+          router-link(
+            v-if="item.type === 'NODE'"
+            :to="'/node/'+item.oid"
+            :style=`{minHeight: '36px',}`
+            ).row.full-width.items-center.content-center.justify-center.cursor-pointer
+            span.text-white {{ item.name }}
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          q-btn(
+            v-if="itemActive"
+            round flat dense color="white" icon="link")
 </template>
 
 <script>
