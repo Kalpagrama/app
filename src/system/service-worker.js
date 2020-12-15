@@ -66,7 +66,8 @@ async function sendMsg (type, msgData) {
 // common init sw
 {
    logD('common init sw', swVer)
-   { // precache
+   // precache
+   {
       precacheAndRoute(self.__WB_MANIFEST) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching

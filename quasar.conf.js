@@ -125,7 +125,7 @@ module.exports = function (ctx) {
                use: 'raw-loader'
             })
             // cfg.module.rules.push({
-            //    test: /\.dmg|\.md|\.mp4$/i,
+            //    test: /\.dmg$/i,
             //    use: 'file-loader'
             // })
             cfg.module.rules.push({
