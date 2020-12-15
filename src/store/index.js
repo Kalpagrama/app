@@ -12,7 +12,7 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
 
 Vue.use(Vuex)
-alert('vuex init!')
+// alert('vuex init!')
 
 const store = new Vuex.Store({
   modules: {

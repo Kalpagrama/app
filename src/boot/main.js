@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
@@ -31,6 +31,9 @@ const time = (sec) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
+    const f = {nameExtra: 'boot::main'}
+    logD(f, 'start')
+    const t1 = performance.now()
     // the second parameter of Vue.use() is optional
     Vue.use(VueShowdown, {
       // set default flavor of showdown
@@ -106,6 +109,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('kalpaMenuActions', () => import('components/kalpa_menu_actions/index.vue'))
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)
     throw err

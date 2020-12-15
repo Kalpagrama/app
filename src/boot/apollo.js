@@ -17,7 +17,7 @@ import {
    sessionStorage,
    window,
    localStorage,
-   isSsr
+   isSsr, performance
 } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import axios from 'axios'
@@ -30,8 +30,11 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
+      const f = {nameExtra: 'boot::apollo'}
+      logD(f, 'start')
+      const t1 = performance.now()
       let fetchFunc
-      console.error('apollo::isSsr=', isSsr)
+      // console.error('apollo::isSsr=', isSsr)
       if (isSsr) {
          fetchFunc = async (uri, options) => {
             options.url = uri
@@ -267,7 +270,7 @@ export default async ({ Vue, store, app }) => {
          ws: wsApollo
       }
       await rxdb.init() // после инициализации apollo (нужно для event.init())
-      logD('apollo init done')
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logC(err)
       throw err // без apollo работать не можем!

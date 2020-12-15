@@ -17,7 +17,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_CACHE)
 
 // todo DEPRECATED!!!!! модуль не нужен (не выкинул - тк код рабочий и может пригодиться)
-
+alert('DEPRECATED!!!!!')
 // долговременное(между запусками) хранилище объектов
 class CachePersist {
   constructor (props) {
