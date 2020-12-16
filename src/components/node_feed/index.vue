@@ -46,7 +46,7 @@ div(
       slot(name="name")
       //- link
       div(
-        v-if="showName && node.oid && node.vertices[0] !== 'ASSOCIATIVE'"
+        v-if="showName && node.oid"
         :style=`{
           minHeight: '50px',
         }`
@@ -59,6 +59,7 @@ div(
           :style=`{width: '50px', height: '50px',}`)
         //- NAME
         router-link(
+          v-if="node.vertices[0] !== 'ASSOCIATIVE'"
           :to="'/node/'+node.oid"
           :style=`{
             fontSize: nodeNameSize+'px',
@@ -70,6 +71,10 @@ div(
             }`
             ).row.fit.items-center.content-center.justify-center
             span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ nodeName }}
+        div(
+          v-else
+          ).row.full-width.justify-center
+          q-btn(round flat color="green" icon="link")
         //- node links
         q-btn(
           v-if="node.items.length === 1"
@@ -78,7 +83,10 @@ div(
           :style=`{width: '50px', height: '50px',}`)
     //- SPHERES
     div(
-      v-if="showSpheres && node.oid && node.spheres.length > 0").row.full-width.justify-start.scroll.q-pb-sm
+      v-if="showSpheres && node.oid"
+      :style=`{
+        height: '46px',
+      }`).row.full-width.items-center.content-center.justify-start.scroll
       .row.full-width.no-wrap.q-pl-sm
         .col
         //- q-btn(

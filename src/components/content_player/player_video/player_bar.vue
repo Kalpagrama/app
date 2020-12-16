@@ -179,7 +179,7 @@ export default {
         if (this.start && this.end) {
           // this.$log('player.currentTime TO', to, this.end)
           if (to >= this.end) {
-            this.$log('PLAYER TO START start&&end', to, this.end)
+            // this.$log('PLAYER TO START start&&end', to, this.end)
             this.setCurrentTime(0)
             this.player.play()
           }

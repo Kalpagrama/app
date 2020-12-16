@@ -111,6 +111,15 @@ export default {
       else if (this.item.__typename === 'Composition') {
         return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
       }
+      else if (this.item.__typename === 'Sphere') {
+        return '/sphere/' + this.item.oid
+      }
+      else if (this.item.__typename === 'User') {
+        return '/user/' + this.item.oid
+      }
+      else if (['Video', 'Image', 'Book'].includes(this.item.__typename)) {
+        return '/content/' + this.item.oid
+      }
       // else if (this.item.type === '')
       else {
         return '//'
