@@ -1,15 +1,13 @@
-import { ApolloClient } from 'apollo-client'
-import { ApolloLink } from 'apollo-link'
+import { ApolloClient, InMemoryCache, ApolloLink, createHttpLink } from '@apollo/client/core'
+
 import { onError } from 'apollo-link-error'
-import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-import introspectionQueryResultData from '../api/graphql.schema.json'
-import { createHttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
-import possibleTypes from 'public/scripts/possibleTypes.json'
+
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+
 import {
    getLogFunc,
    LogLevelEnum,
@@ -116,29 +114,7 @@ export default async ({ Vue, store, app }) => {
          }
       })
 
-      // // todo После выхода apollo-client 3 - выкинуть fragmentMatcher и перейти на possibleTypes
-      const fragmentMatcher = new IntrospectionFragmentMatcher({
-         introspectionQueryResultData
-      })
-      const cache = new InMemoryCache({
-         addTypename: true,
-         fragmentMatcher,
-         dataIdFromObject: object => {
-            // logD('dataIdFromObject', object)
-            if (!object.__typename || !object.oid) return null
-            if (possibleTypes.Object.includes(object.__typename)) {
-               return object.oid
-            } else {
-               return object.__typename + ':' + object.oid
-            } // если так не сделать - то например objectShort может перезаписать в кэше полный объект
-         },
-         possibleTypes,
-         cacheRedirects: {
-            Query: {
-               objectFull: (_, args, { getCacheKey }) => getCacheKey({ oid: args.oid })
-            }
-         }
-      })
+      const cache = new InMemoryCache()
       const defaultOptions = {
          watchQuery: {
             fetchPolicy: 'no-cache'
