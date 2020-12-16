@@ -18,7 +18,7 @@ div(
     }`).row.full-width.items-start.content-start
     //- HEADER: author, createdAt
     div(
-      v-if="showHeader"
+      v-if="showHeader && node.oid"
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
@@ -46,16 +46,18 @@ div(
       slot(name="name")
       //- link
       div(
-        v-if="showName && node.oid"
+        v-if="showName && node.oid && node.vertices[0] !== 'ASSOCIATIVE'"
         :style=`{
           minHeight: '50px',
         }`
         ).row.full-width.q-pa-xs
+        //- node context
         q-btn(
           v-if="node.items.length === 1"
           :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
           round flat color="grey-6" icon="select_all"
           :style=`{width: '50px', height: '50px',}`)
+        //- NAME
         router-link(
           :to="'/node/'+node.oid"
           :style=`{
@@ -63,20 +65,12 @@ div(
           }`
           ).col.full-height
           div(
-            v-if="node.items.length === 1"
-            :style=`{textAlign: 'center'}`
-            ).row.fit.items-center.content-center.justify-center.q-py-sm
-            span(
-              :style=`{
-              }`).text-white.text-bold.cursor-pointer {{ nodeName }}
-          div(v-else).row.fit.items-center.content-center
-            .col
-              .row.full-width.justify-end
-                span.text-white.text-bold {{ $nodeItemType(node.vertices[0]).name }}
-            span.text-white.text-bold.q-mx-sm -
-            .col
-              .row.full-width
-                span.text-white.text-bold {{ $nodeItemType(node.vertices[1]).name }}
+            :style=`{
+              textAlign: 'center',
+            }`
+            ).row.fit.items-center.content-center.justify-center
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ nodeName }}
+        //- node links
         q-btn(
           v-if="node.items.length === 1"
           :to="'/links/'+node.oid"
@@ -138,7 +132,7 @@ export default {
         return this.node.name
       }
       else if (this.node.vertices[0] === 'ASSOCIATIVE') {
-        return 'Похожи'
+        return ''
       }
       else {
         return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name

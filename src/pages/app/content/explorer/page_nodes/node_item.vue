@@ -256,7 +256,7 @@ export default {
   methods: {
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     if (this.nodeQuery === this.node.oid) {
       this.$emit('scrollme')
     }

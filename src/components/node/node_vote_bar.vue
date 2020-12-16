@@ -234,7 +234,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   }
 }
 </script>

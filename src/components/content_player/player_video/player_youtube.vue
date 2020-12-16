@@ -183,6 +183,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.init()
+    // alert('playerYoutube MOUNTED')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
@@ -195,6 +196,7 @@ export default {
       this.player.remove()
       this.player = null
     }
+    // alert('playerYoutube beforeDestroy')
   }
 }
 </script>

@@ -24,11 +24,12 @@ div(
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="player && player.duration > 0"
+      v-show="!options.mini"
       :class=`{
         'q-px-xl': !options.mini,
       }`
       :style=`{
-        ...(() => options.mini ? {position: 'absolute', bottom: '0px', zIndex: 1000} : {position: 'relative', paddingTop: '8px', paddingBottom: '16px'})(),
+        ...(() => options.mini ? {position: 'absolute', bottom: '0px', zIndex: 1000} : {position: 'relative', paddingTop: '12px', paddingBottom: '12px'})(),
       }`
       ).row.full-width
       player-bar(

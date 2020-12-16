@@ -11,13 +11,8 @@
       slot(name="action-right")
       kalpa-bookmark(
         v-if="!$slots['action-left']"
-        :oid="node.oid" :type="useBookmarkType" :name="node.name"
+        :oid="node.oid" :type="node.type" :name="node.name"
         :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-      //- q-btn(
-        @click="$router.push('/node/'+node.oid)"
-        round flat color="grey-9")
-        //- q-icon(name="link").rotate-90
-        q-icon(name="link")
 </template>
 
 <script>
@@ -29,13 +24,7 @@ export default {
   props: {
     node: {type: Object, required: true},
     isActive: {type: Boolean},
-    isVisible: {type: Boolean},
-    useShare: {type: Boolean, default: true},
-    useBookmark: {type: Boolean, default: true},
-    useBookmarkType: {type: String, default: 'NODE'},
-    useRemake: {type: Boolean, default: true},
-    useConnect: {type: Boolean, default: true},
-    useVote: {type: Boolean, default: true},
+    isVisible: {type: Boolean}
   },
   components: {
     nodeVoteBar,

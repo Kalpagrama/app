@@ -12,7 +12,7 @@ q-layout(
         ).row.full-width.items-center.content-center.q-px-sm.b-40
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
         .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Ядро
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-page-container
     q-page.row.full-width.justify-center.q-py-md
       div(
@@ -51,6 +51,17 @@ export default {
   data () {
     return {
       node: null,
+    }
+  },
+  computed: {
+    title () {
+      if (this.node) {
+        if (this.node.items.length === 1) return 'Ядро'
+        else return 'Связь'
+      }
+      else {
+        return ''
+      }
     }
   },
   watch: {
