@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.justify-center
-  div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start.q-px-sm
     //- DETAILS:
     .row.full-width
       div(

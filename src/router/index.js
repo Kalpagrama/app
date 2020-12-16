@@ -14,11 +14,11 @@ export default function (/* { store, ssrContext } */) {
       // debug('sb', to, from)
       // console.log('scrollBehavior', to, from)
       if (savedPosition) {
-        console.log('### savedPosition', savedPosition)
+        // console.log('### savedPosition', savedPosition)
         // alert('### savedPosition' + savedPosition.toString())
         return savedPosition
       } else {
-        console.log('### no savedPosition!')
+        // console.log('### no savedPosition!')
         // alert('### no savedPosition !!!')
         return {x: 0, y: 0}
       }

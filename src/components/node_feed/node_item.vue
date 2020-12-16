@@ -22,7 +22,7 @@ div(
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
-  name: 'nodeFeed_nodeItem',
+  name: 'nodeFeed__nodeItem',
   props: ['node', 'isActive', 'isVisible'],
   components: {
     compositionPlayer,

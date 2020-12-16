@@ -31,7 +31,7 @@
     .row.full-width.justify-center
       span.text-white {{ item.name }}
   //- NODE
-  div(
+  //- div(
     v-if="item.type === 'NODE'"
     ).row.fit
     img(
@@ -41,8 +41,35 @@
         objectFit: 'cover',
       }`
       ).fit
-  //- GIF
+  //- NODE
   div(
+    v-if="item && item.type === 'NODE' && item.type !== 'ADD'"
+    :style=`{position: 'relative'}`).row.fit
+    composition-player(
+      :composition="item.items[0]"
+      :isActive="isActive"
+      :isVisible="true"
+      :styles=`{
+        height: '100%',
+        objectFit: 'cover',
+      }`
+      :options=`{
+        height: '100%', objectFit: 'cover', loop: true,
+      }`)
+    //- name
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 1000, bottom: '-0.5px',
+        transform: 'translate3d(0,0,0)',
+        background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
+        borderRadius: '10px',
+        textAlign: 'center',
+        minHeight: '40px',
+      }`
+      ).row.full-width.items-center.content-center.justify-center
+      span(:style=`{userSelect: 'none'}`).text-white.cursor-pointer {{ item.name }}
+  //- GIF
+  //- div(
     v-if="item.type === 'GIF'"
     ).row.full-width.items-start.content-start
     img(
@@ -53,7 +80,7 @@
       ).full-width
   //- BOOK
   //- IMAGE
-  div(
+  //- div(
     v-if="item.type === 'IMAGE' || item.outputType === 'IMAGE'"
     :style=`{
       position: 'relative',
@@ -78,12 +105,11 @@
       ).fit
   //- CONTENT(VIDEO,IMAGE,AUDIO,BOOK) => COMPOSITION
   div(
-    v-if="contentKalpa && (item.type === 'VIDEO' || item.outputType === 'VIDEO')"
-    :style=`{
-      position: 'relative',
-      ...styles,
-    }`
+    v-if="contentKalpa && item.type !== 'ADD'"
+    :style=`{position: 'relative', ...styles}`
     ).row.full-width.items-start.content-start
+    //- small.text-white {{ item.oid }}
+    //- :figures="item.layers ? item.layers[0].figuresAbsolute : false"
     content-player(
       :contentKalpa="contentKalpa"
       @player="playerLoaded"
@@ -91,48 +117,50 @@
       :styles="styles"
       :style=`{
         borderRadius: '10px',
-        zIndex: 210,
-      }`).fit.bg-black
+      }`).bg-black
+    //- ADD btn, create composition from content
     q-btn(
-      v-if="!item.outputType"
+      v-if="item.__typename !== 'Composition'"
       @click="nodeCreateStart()"
       round flat dense
       color="green"
       icon="add"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: 8+1+'px'
+        position: 'absolute', zIndex: 2000, right: '8px', bottom: 6+'px'
       }`)
+    //- toggle composition editing => show/hide composition editor
     q-btn(
-      v-if="item.outputType"
+      v-if="item.__typename === 'Composition'"
       @click="editing = !editing"
       round flat dense
       :color="editing ? 'green' : 'white'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: 8+1+'px'
+        position: 'absolute', zIndex: 2000, right: '8px', bottom: 6+'px'
       }`)
+    //- compositionEditor for VIDEO
     div(
-      v-if="item.outputType === 'VIDEO'"
+      v-if="item.__typename === 'Composition' && item.outputType === 'VIDEO' && player"
       :style=`{
         position: 'absolute', zIndex: 400, bottom: '0px',
       }`).row.full-width
       div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
-        composition-editor(
-          v-if="editing"
-          :player="player" :composition="item"
-          :contentKalpa="contentKalpa"
-          :style=`{
-            zIndex: 2000,
-            borderRadius: '0 0 10px 10px',
-          }`).bg-black
-        .row.full-width
-          slot(name="footer")
+        transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+          composition-editor(
+            v-if="editing"
+            :player="player" :composition="item"
+            :contentKalpa="contentKalpa"
+            :style=`{
+              zIndex: 2000,
+              borderRadius: '0 0 10px 10px',
+            }`).bg-black
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'components/content_player/index.vue'
+import compositionPlayer from 'components/composition/composition_player/index.vue'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 
 export default {
@@ -140,14 +168,15 @@ export default {
   props: ['item', 'styles', 'isActive'],
   components: {
     contentPlayer,
-    compositionEditor
+    compositionPlayer,
+    compositionEditor,
   },
   data () {
     return {
+      contentKalpa: null,
       editing: false,
       player: null,
       playerError: null,
-      contentKalpa: null,
       figures: [],
     }
   },
@@ -168,19 +197,12 @@ export default {
       async handler (to, from) {
         // this.$log('item TO', to)
         if (to) {
-          if (to.outputType === 'IMAGE') {
-            this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
-            this.figures = [to.layers[0].figuresAbsolute]
+          // content
+          if (['Video', 'Image', 'Book'].includes(to.__typename)) {
+            if (!this.contentKalpa) this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
           }
-          if (to.oid && to.type === 'IMAGE') {
-            this.contentKalpa = to
-          }
-          if (to.outputType === 'VIDEO') {
-            this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
-            this.figures = [to.layers[0].figuresAbsolute]
-          }
-          if (to.oid && to.type === 'VIDEO') {
-            this.contentKalpa = to
+          else if (to.__typename === 'Composition') {
+            if (!this.contentKalpa) this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
           }
         }
       }
@@ -200,11 +222,14 @@ export default {
       let composition = {
         id: Date.now().toString(),
         thumbUrl: this.item.thumbUrl,
+        thumbHeight: this.item.thumbHeight,
+        thumbWidth: this.item.thumbWidth,
         outputType: 'VIDEO',
         layers: [
           {id: Date.now().toString(), contentOid: this.item.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
+        __typename: 'Composition',
       }
       // this.$set(this, 'item', composition)
       this.$emit('item', composition)

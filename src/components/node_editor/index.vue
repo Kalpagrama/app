@@ -2,7 +2,6 @@
 .row.full-width
   //- itemFinder
   q-dialog(
-    v-if="showEditor"
     v-model="itemFinderShow"
     position="bottom" maximized)
     kalpa-finder(
@@ -25,7 +24,8 @@
       template(v-slot:tint=`{item}`)
         div(
           @click="itemFound(item)"
-          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
+          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
+  slot(name="header")
   //- editors wrapper
   div(
     :style=`{
@@ -58,6 +58,7 @@
           :style=`{
             position: 'relative',
             paddingBottom: itemPaddingBottom(item, itemii),
+            //- paddingBottom: '50%',
             transform: itemTransform(item, itemii)
           }`).row.full-width
           div(
@@ -66,15 +67,23 @@
               ...itemStyles(item,itemii)
             }`).row.fit
             item-editor(
+              v-if="itemsEditable.includes(itemii)"
+              @player="$emit('player', $event)"
               @add="itemFinderShow = true"
               @item="$event => itemChanged($event,itemii)"
               @editing="$event => itemEditingHandle($event,itemii)"
-              @player="$emit('player', $event)"
+              :isActive="true"
               :item="item"
               :styles=`{
                 height: '100%',
               }`
               :style=`{}`).fit
+            item-player(
+              v-else
+              :oid="node.oid"
+              :item="item"
+              :itemActive="true"
+              :itemStyles=`{height: '100%',}`)
     //- editors: name, spheres, category
     div(
       v-if="showEditor"
@@ -123,15 +132,22 @@ import nameEditor from './name_editor.vue'
 import spheresEditor from './spheres_editor.vue'
 import categoryEditor from './category_editor.vue'
 import itemEditor from './item_editor.vue'
+import itemPlayer from 'components/node_feed/node_items_item.vue'
 
 export default {
   name: 'nodeEditor',
-  props: ['node', 'showEditor'],
+  // props: ['node', 'showEditor', 'itemsReadonly'],
+  props: {
+    node: {type: Object},
+    showEditor: {type: Boolean},
+    itemsEditable: {type: Array, default () { return [0, 1] }}
+  },
   components: {
     nameEditor,
     spheresEditor,
     categoryEditor,
     itemEditor,
+    itemPlayer,
     kalpaFinder,
   },
   data () {
@@ -184,11 +200,12 @@ export default {
     itemPaddingBottom (item, itemii) {
       if (this.node.items.length === 1) {
         if (item.thumbHeight && item.thumbWidth) {
-          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 42px)'
+          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 45px)'
         }
         else {
           return '50%'
         }
+        // return '50%'
       }
       else return '100%'
     },
@@ -206,30 +223,6 @@ export default {
             return 'perspective(600px) rotateY(-8deg)'
           }
         }
-      }
-    },
-    itemMinWidth (item, itemii) {
-      if (this.node.items.length === 1) return '100%'
-      else {
-        if (this.itemEditing === itemii) {
-          return '180%'
-        }
-        else {
-          return '100%'
-        }
-      }
-    },
-    itemLeft (item, itemii) {
-      // , itemEditing === itemii ? '-90%' : '0px',
-      if (this.node.items.length === 1) return '0px'
-      else {
-        // if (this.itemEditing === itemii) {
-        //   return '0px'
-        // }
-        // else {
-        //   return '100px'
-        // }
-        return '0px'
       }
     },
     itemEditingHandle (isEditing, ii) {
@@ -308,6 +301,7 @@ export default {
         }
         if (nodeInput.items.length === 2) {
           if (nodeInput.name.length === 0) {
+            nodeInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
           }
           else {
             nodeInput.vertices = ['ESSENCE', 'ESSENCE']
@@ -333,8 +327,8 @@ export default {
     },
     cancel () {
       this.$log('cancel')
+      // emit nodeInitial
       this.$emit('node', JSON.parse(JSON.stringify(this.nodeInitial)))
-      // return to prev state, self-destruct?
     }
   },
   created () {

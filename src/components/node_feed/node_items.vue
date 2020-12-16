@@ -1,26 +1,40 @@
 <template lang="pug">
 div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
+  //- link btn
   q-btn(
     flat color="green" icon="link" size="lg"
+    :to="'/node/'+node.oid"
     :style=`{
       position: 'absolute', zIndex: 1000,
       left: 'calc(50% - 30px)',
       top: 'calc(50% - 30px)',
       width: '60px', height: '60px',
     }`)
+  //- items left/right
   div(
     v-for="(item, ii) in node.items" :key="ii"
     :style=`{
       position: 'relative',
     }`
     ).col-6
-    item(
-      :oid="node.oid"
-      :item="item"
-      :itemIndex="ii"
-      :itemActive="isActive && itemActive === ii"
-      :itemVertex="node.vertices[ii]"
-      :itemStyles="itemsStyles[ii]")
+    div(
+      :style=`{
+        position: 'relative',
+        paddingBottom: '100%',
+        transform: ii === 0 ? 'perspective(600px) rotateY(6deg)' : 'perspective(600px) rotateY(-6deg)',
+      }`
+      ).row.full-width
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 100,
+        }`
+        ).row.fit
+        item(
+          :oid="node.oid"
+          :item="item"
+          :itemIndex="ii"
+          :itemActive="isActive && itemActive === ii"
+          :itemStyles="itemsStyles[ii]")
     //- inActive tint
     div(
       v-if="itemActive !== ii"
@@ -35,7 +49,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
 import item from './node_items_item.vue'
 
 export default {
-  name: 'nodeFeed_items',
+  name: 'nodeFeed__nodeItems',
   props: ['node', 'isActive', 'isVisible', 'itemsStyles'],
   components: {
     item,

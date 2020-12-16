@@ -1,26 +1,31 @@
 <style lang="sass">
 .q-header
+  background: none !important
   border-radius: 0 0 10px 10px !important
 </style>
 
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
-  q-header.b-30
+  q-header
     div(:style=`{}`).row.full-width.justify-center
-      q-resize-observer(@resize="headerOnResize")
+      q-resize-observer(@resize="headerOnResize" :debounce="300")
       div(
         :class=`{
           'q-pt-sm': $q.screen.gt.xs
         }`
-        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '0 0 10px 10px',
+          //- background: 'rgb(35,35,35)',
+        }`).row.full-width
         node-editor(
           v-if="node"
           @published="nodePublished"
           @node="nodeReset"
           @player="player = $event"
           :node="node"
-          :showEditor="node.items[0].layers")
+          :showEditor="node.items[0].layers ? true : false")
   q-page-container
     page-nodes(
       v-if="!node.items[0].layers"
@@ -74,13 +79,8 @@ export default {
     nodeReset (node) {
       this.$log('nodeReset', node)
       this.$set(this, 'node', node)
-      // this.node.items[0] = node.items[0]
-      // this.node.items.unshift(node.items[0])
-      // this.$set(this.node.items, 0, node.items[0])
-      // this.node.name = node.name
-      // this.node.spheres = []
-      // this.node.vertices = []
-      // this.node.category = 'FUN'
+      this.player.stateSet('points', [])
+      this.player.stateSet('figures', [])
     },
     headerOnResize (e) {
       this.$log('headerOnResize', e)
@@ -90,7 +90,7 @@ export default {
   },
   created () {
     let nodeNew = JSON.parse(JSON.stringify(this.nodeTemplate))
-    nodeNew.items[0] = this.contentKalpa
+    nodeNew.items[0] = JSON.parse(JSON.stringify(this.contentKalpa))
     this.node = nodeNew
   }
 }
