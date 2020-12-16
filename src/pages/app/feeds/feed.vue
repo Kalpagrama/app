@@ -47,6 +47,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.$store.getters.currentUser().oid,
           // subscription: {$in: this.feedSubscriptions}
+          matterReason: {$ne: 'AUTHOR'} // только события относительно объектов, где я не являюсь автором объекта
         }
       }
       // add subscription array if not empty

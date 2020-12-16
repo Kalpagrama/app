@@ -60,6 +60,14 @@ class ReactiveDocDbMemCache {
    }
 }
 
+// import memdown from 'src/system/rxdb/rxdb_vuex_adapter'
+// import memdown from 'memdown'
+
+// let adapter = 'idb' устарел
+let adapter = 'indexeddb'
+// let adapter = memdown
+// let adapter = 'memory'
+
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -68,7 +76,11 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      addRxPlugin(require('pouchdb-adapter-idb'))
+      // addRxPlugin(require('pouchdb-adapter-idb'))  устарел
+      addRxPlugin(require('pouchdb-adapter-indexeddb')) // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
+      // addRxPlugin(require('pouchdb-adapter-leveldb')) // leveldown adapters need the leveldb plugin to work
+      // addRxPlugin(require('pouchdb-adapter-memory'))
+
       addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
@@ -147,8 +159,8 @@ class RxDBWrapper {
          this.store = store
          logD('before createRxDatabase')
          this.db = await createRxDatabase({
-            name: 'rxdb',
-            adapter: 'idb', // <- storage-adapter
+            name: 'kalpadb',
+            adapter,
             multiInstance: true, // <- multiInstance (optional, default: true)
             eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             pouchSettings: { revs_limit: 1 }
@@ -171,7 +183,7 @@ class RxDBWrapper {
       } catch (err) {
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         else await removeRxDatabase('rxdb', 'idb')
+         else await removeRxDatabase('kalpadb', adapter)
          throw err
       } finally {
          await mutexGlobal.release('rxdb::create')
@@ -195,8 +207,11 @@ class RxDBWrapper {
       for (let collection of collections) {
          if (this[collection]) await this[collection].updateCollections(operation)
       }
-      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', {beforeCreate: true}))) { // эта вкладка первой инициализироваля rxdb
-         await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', valueString: Date.now().toString() }, {beforeCreate: true})
+      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', { beforeCreate: true }))) { // эта вкладка первой инициализироваля rxdb
+         await this.set(RxCollectionEnum.META, {
+            id: 'rxdbCreateDate',
+            valueString: Date.now().toString()
+         }, { beforeCreate: true })
          setSyncEventStorageValue('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -318,7 +333,7 @@ class RxDBWrapper {
       } catch (err) {
          logE(f, 'err on deInitGlobal! remove db!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         else await removeRxDatabase('rxdb', 'idb')
+         else await removeRxDatabase('kalpadb', adapter)
          throw err
       } finally {
          await mutexGlobal.release('rxdb::deinitGlobal')
@@ -526,7 +541,16 @@ class RxDBWrapper {
       }
    }
 
-   async getRxDoc (id, { fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+   async getRxDoc (id, {
+      fetchFunc,
+      notEvict = false,
+      clientFirst = true,
+      priority = 0,
+      force = false,
+      onFetchFunc = null,
+      params = null,
+      beforeCreate = false
+   } = {}) {
       assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
       const t1 = performance.now()
@@ -554,7 +578,17 @@ class RxDBWrapper {
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
    // params - допюпараметры для RxCollectionEnum.GQL_QUERY
-   async get (rxCollectionEnum, idOrRawId, { id = null, fetchFunc, notEvict = false, clientFirst = true, priority = 0, force = false, onFetchFunc = null, params = null, beforeCreate = false } = {}) {
+   async get (rxCollectionEnum, idOrRawId, {
+      id = null,
+      fetchFunc,
+      notEvict = false,
+      clientFirst = true,
+      priority = 0,
+      force = false,
+      onFetchFunc = null,
+      params = null,
+      beforeCreate = false
+   } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
@@ -669,5 +703,5 @@ const rxdbWrapper = new RxDBWrapper()
 export {
    rxdbWrapper,
    rxdbWrapper as rxdb,
-   getReactiveDoc,
+   getReactiveDoc
 }

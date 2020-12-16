@@ -1,5 +1,5 @@
 /* eslint-disable */
-const swVer = 2
+const swVer = 1
 const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
@@ -66,10 +66,10 @@ async function sendMsg (type, msgData) {
 // common init sw
 {
    logD('common init sw', swVer)
-   { // precache
-
-      // грузим сразу(пока не загрузит весь сайт - будет висеть)
-      precacheAndRoute(self.__WB_MANIFEST) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке
+   // precache
+   {
+      // precacheAndRoute позволяет в фоне предварительно закэшировать весь сайт при первой установке
+      precacheAndRoute(self.__WB_MANIFEST)
 
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
@@ -234,7 +234,7 @@ async function sendMsg (type, msgData) {
          event.waitUntil(sendToken()) // пришел новый сервис-воркер - отправить всем новый webPushToken
       })
       self.addEventListener('fetch', async event => {
-         logD('ready to handle fetches! request=', event.request)
+         // logD('ready to handle fetches! request=', event.request)
       })
       self.addEventListener('updatefound', event => {
          logD('ready to update!', swVer)
@@ -532,7 +532,7 @@ if (useCache) {
          })
       )
       registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'origin images' }))
-      registerRoute(/^http.*(kalpa\.store).+\.mp4$/, async ({ url, event, params }) => {
+      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.mp4$/, async ({ url, event, params }) => {
          return fetch(event.request)
       })
       // // почему-то закэшитрованное видео не играет...
@@ -544,7 +544,7 @@ if (useCache) {
       //   }
       // )
 
-      // vue router ( /menu /create etc look at index.html)
+      // vue router ( /menu /create etc looks at index.html)
       registerRoute(vueRoutesRegexp, async ({ url, event, params }) => {
          // logD('vue router 1', url, getCacheKeyForURL('/index.html'))
          if (getCacheKeyForURL('/index.html')) {

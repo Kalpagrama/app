@@ -36,7 +36,7 @@ const routes = [
       component: () => import('layouts/docs_layout.vue')
    },
    {
-      path: '/share', // этот маршрут обрабатыватся хуком в initPWA()
+      path: '/share' // этот маршрут обрабатыватся хуком в initPWA()
    },
    {
       path: '/',
@@ -45,7 +45,7 @@ const routes = [
          {
             name: 'about',
             path: 'about',
-            component: () => import('pages/app/about/index.vue'),
+            component: () => import('pages/app/about/index.vue')
          },
          {
             name: 'feeds',
@@ -189,12 +189,19 @@ routes.push({
 })
 
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
-// for (let r of routes[2].children) {
-//    assert(r.path, '!r.path' + JSON.stringify(r))
-//    let path = r.path.split('/')[0]
-//    assert(path, '!path')
-//    if (path === '*') continue
-//    assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
-// }
+// при добавлении роута - добавить его в vueRoutesRegexp
+for (let route of routes) {
+   if (route.path === '/') {
+      for (let r of route.children) {
+         assert(r.path, '!r.path' + JSON.stringify(r))
+         let path = r.path.split('/')[0]
+         assert(path, '!path')
+         if (path === '*') continue
+         assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
+      }
+   } else {
+      assert(vueRoutesRegexp.test(`https://kalpa.app/${route.path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${route.path}/params`)
+   }
+}
 
 export default routes

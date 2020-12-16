@@ -17,7 +17,9 @@
   "server": {
     "iosScheme": "app.kalpa",
     "allowNavigation": [
-      "*.kalpa.app"
+      "kalpa.app",
+      "dev.kalpa.app",
+      "mac.kalpa.app"
     ]
   },
   "android": {

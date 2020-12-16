@@ -66,7 +66,7 @@ div(
             user-avatar(:url="v.thumbUrl" :width="28" :height="28")
             span.text-grey-4.q-ml-sm {{ v.name }}
           .col
-          small.text-grey-8.q-mx-xs {{ $date(v.createdAt, 'DD.MM.YYYY') }}
+          small.text-grey-8.q-mx-xs {{ $date(v.date, 'DD.MM.YYYY') }}
   //- rate again
   div(
     v-if="node.rateUser !== null && node.author.oid !== $store.getters.currentUser().oid"

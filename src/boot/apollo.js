@@ -1,15 +1,13 @@
-import { ApolloClient } from 'apollo-client'
-import { ApolloLink } from 'apollo-link'
+import { ApolloClient, InMemoryCache, ApolloLink, createHttpLink } from '@apollo/client/core'
+
 import { onError } from 'apollo-link-error'
-import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-import introspectionQueryResultData from '../api/graphql.schema.json'
-import { createHttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
-import possibleTypes from 'public/scripts/possibleTypes.json'
+
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+
 import {
    getLogFunc,
    LogLevelEnum,
@@ -17,7 +15,7 @@ import {
    sessionStorage,
    window,
    localStorage,
-   isSsr
+   isSsr, performance
 } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import axios from 'axios'
@@ -30,8 +28,11 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
+      const f = {nameExtra: 'boot::apollo'}
+      logD(f, 'start')
+      const t1 = performance.now()
       let fetchFunc
-      console.error('apollo::isSsr=', isSsr)
+      // console.error('apollo::isSsr=', isSsr)
       if (isSsr) {
          fetchFunc = async (uri, options) => {
             options.url = uri
@@ -64,7 +65,6 @@ export default async ({ Vue, store, app }) => {
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
-      // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
       logD('SERVICES_URL=' + SERVICES_URL)
       const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
          if (graphQLErrors) {
@@ -113,29 +113,7 @@ export default async ({ Vue, store, app }) => {
          }
       })
 
-      // // todo После выхода apollo-client 3 - выкинуть fragmentMatcher и перейти на possibleTypes
-      const fragmentMatcher = new IntrospectionFragmentMatcher({
-         introspectionQueryResultData
-      })
-      const cache = new InMemoryCache({
-         addTypename: true,
-         fragmentMatcher,
-         dataIdFromObject: object => {
-            // logD('dataIdFromObject', object)
-            if (!object.__typename || !object.oid) return null
-            if (possibleTypes.Object.includes(object.__typename)) {
-               return object.oid
-            } else {
-               return object.__typename + ':' + object.oid
-            } // если так не сделать - то например objectShort может перезаписать в кэше полный объект
-         },
-         possibleTypes,
-         cacheRedirects: {
-            Query: {
-               objectFull: (_, args, { getCacheKey }) => getCacheKey({ oid: args.oid })
-            }
-         }
-      })
+      const cache = new InMemoryCache()
       const defaultOptions = {
          watchQuery: {
             fetchPolicy: 'no-cache'
@@ -267,7 +245,7 @@ export default async ({ Vue, store, app }) => {
          ws: wsApollo
       }
       await rxdb.init() // после инициализации apollo (нужно для event.init())
-      logD('apollo init done')
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logC(err)
       throw err // без apollo работать не можем!

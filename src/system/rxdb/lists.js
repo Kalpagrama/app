@@ -72,11 +72,11 @@ class Lists {
     return rxDoc
   }
 
-  static async addRemoveObjectToLists(type, sphereOids, object) {
+  async addRemoveObjectToLists(type, sphereOids, object) {
     assert(type.in('OBJECT_DELETED', 'OBJECT_CREATED'), 'type in ???')
     assert(sphereOids && Array.isArray(sphereOids), 'bad array')
     assert(object && object.type && object.oid, 'bad obj')
-    const f = Lists.addRemoveObjectToLists
+    const f = this.addRemoveObjectToLists
     logD(f, 'start')
     const t1 = performance.now()
     // добавим на все сферы (sphereOids)
@@ -203,7 +203,7 @@ class Lists {
       case 'OBJECT_DELETED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
-        await Lists.addRemoveObjectToLists(event.type, event.sphereOids, event.object)
+        await this.addRemoveObjectToLists(event.type, event.sphereOids, event.object)
         //
         // let rxDocs = await this.cache.find({
         //   selector: {
