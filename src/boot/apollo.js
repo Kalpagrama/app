@@ -65,7 +65,6 @@ export default async ({ Vue, store, app }) => {
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
       let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
-      // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
       logD('SERVICES_URL=' + SERVICES_URL)
       const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
          if (graphQLErrors) {

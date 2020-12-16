@@ -68,7 +68,9 @@ async function sendMsg (type, msgData) {
    logD('common init sw', swVer)
    // precache
    {
-      precacheAndRoute(self.__WB_MANIFEST) // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке
+      // precacheAndRoute позволяет в фоне предварительно закэшировать весь сайт при первой установке
+      precacheAndRoute(self.__WB_MANIFEST)
+
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
       // https://github.com/GoogleChrome/workbox/issues/155
@@ -530,7 +532,7 @@ if (useCache) {
          })
       )
       registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'origin images' }))
-      registerRoute(/^http.*(kalpa\.store).+\.mp4$/, async ({ url, event, params }) => {
+      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.mp4$/, async ({ url, event, params }) => {
          return fetch(event.request)
       })
       // // почему-то закэшитрованное видео не играет...
@@ -542,7 +544,7 @@ if (useCache) {
       //   }
       // )
 
-      // vue router ( /menu /create etc look at index.html)
+      // vue router ( /menu /create etc looks at index.html)
       registerRoute(vueRoutesRegexp, async ({ url, event, params }) => {
          // logD('vue router 1', url, getCacheKeyForURL('/index.html'))
          if (getCacheKeyForURL('/index.html')) {
