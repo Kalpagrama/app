@@ -2,8 +2,8 @@
   "version": 2,
   "build": {
     "env": {
-      "SERVICES_URL": "https://api-dev.kalpa.app/graphql",
-      "SERVICES_URL_DEBUG": "https://api-dev.kalpa.app/graphql"
+      "SERVICES_URL": "https://services-api-dev.kalpa.app/graphql",
+      "SERVICES_URL_DEBUG": "https://services-api-dev.kalpa.app/graphql"
     }
   },
   "builds": [{ "src": "package.json", "use": "@now/static-build" }],

@@ -191,12 +191,12 @@ routes.push({
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
 // при добавлении роута - добавить его в vueRoutesRegexp
 for (let route of routes) {
-   if (route.path === '/') {
-      for (let r of route.children) {
-         assert(r.path, '!r.path' + JSON.stringify(r))
-         let path = r.path.split('/')[0]
+   assert(route.path, '!route.path')
+   if (route.children) {
+      for (let cr of route.children) {
+         assert(cr.path, '!cr.path' + JSON.stringify(cr))
+         let path = (route.path + '/' + cr.path).split('/').filter(p => p)[0]
          assert(path, '!path')
-         if (path === '*') continue
          assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
       }
    } else {

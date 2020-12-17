@@ -162,10 +162,13 @@ class ObjectApi {
       const t1 = performance.now()
       const cb = async () => {
          assert.ok(oid)
-         let { data: { unPublish } } = await apollo.clients.api.mutate({
+         let { data: { unPublish: deletedObject } } = await apollo.clients.api.mutate({
             mutation: gql`
+                ${fragments.objectFullFragment}
                 mutation unPublish($oid: OID!) {
-                    unPublish (oid: $oid)
+                    unPublish (oid: $oid){
+                        ...objectFullFragment
+                    }
                 }
             `,
             variables: {
@@ -173,9 +176,10 @@ class ObjectApi {
             }
          })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return unPublish
+         return deletedObject
       }
-      return await apiCall(f, cb)
+      let deletedObject = await apiCall(f, cb)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
    }
 
    static async stat (oid) {
