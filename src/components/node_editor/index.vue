@@ -233,7 +233,7 @@ export default {
       if (isEditing) {
         this.itemEditing = ii
         if (this.node.items.length === 1) {
-          this.editorsPaddingTop = 100
+          this.editorsPaddingTop = 120
         }
       }
       else {
