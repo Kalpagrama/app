@@ -72,18 +72,18 @@ class Lists {
     return rxDoc
   }
 
-  async addRemoveObjectToLists(type, sphereOids, object) {
+  async addRemoveObjectToLists(type, relatedSphereOids, object) {
     assert(type.in('OBJECT_DELETED', 'OBJECT_CREATED'), 'type in ???')
-    assert(sphereOids && Array.isArray(sphereOids), 'bad array')
+    assert(relatedSphereOids && Array.isArray(relatedSphereOids), 'bad array')
     assert(object && object.type && object.oid, 'bad obj')
     const f = this.addRemoveObjectToLists
-    logD(f, 'start')
+    logD(f, 'start', relatedSphereOids, object)
     const t1 = performance.now()
-    // добавим на все сферы (sphereOids)
+    // добавим на все сферы (relatedSphereOids)
     let rxDocs = await Lists.cache.find({
       selector: {
         'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-        'props.oid': { $in: sphereOids },
+        'props.oid': { $in: relatedSphereOids },
         'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [object.type]}
       }
     })
@@ -201,14 +201,14 @@ class Lists {
       }
       case 'OBJECT_CREATED':
       case 'OBJECT_DELETED': {
-        assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
-        // добавим на все сферы (event.sphereOids)
-        await this.addRemoveObjectToLists(event.type, event.sphereOids, event.object)
+        assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
+        // добавим на все сферы (event.relatedSphereOids)
+        await this.addRemoveObjectToLists(event.type, event.relatedSphereOids, event.object)
         //
         // let rxDocs = await this.cache.find({
         //   selector: {
         //     'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-        //     'props.oid': { $in: event.sphereOids },
+        //     'props.oid': { $in: event.relatedSphereOids },
         //     'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
         //   }
         // })
@@ -314,8 +314,8 @@ class Lists {
         if (event.subject.oid !== context.rootState.auth.userOid) continue // прилетевшее ядро создано НЕ этим пользователем
         // список - это личная сфера этого пользователя
       }
-      assert(event.sphereOids)
-      if (!event.sphereOids.includes(oid)) continue // sphereOids - список сфер, на которые падает созданное ядро
+      assert(event.relatedSphereOids)
+      if (!event.relatedSphereOids.includes(oid)) continue // relatedSphereOids - список сфер, на которые падает созданное ядро
       if (!this.isRestricted(context, filter, objectShort)) continue // элемент не подходит под этот фильр
 
       logD('try add item to list... ', { oid, pagination, filter, sortStrategy })

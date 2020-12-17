@@ -41,7 +41,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$logW('query CHANGED', to)
+        // this.$logW('query CHANGED', to)
         if (this.items) {
           this.items = null
           this.itemsCreated = false

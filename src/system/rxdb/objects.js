@@ -292,7 +292,7 @@ class Objects {
             break
          }
          case 'OBJECT_CREATED':
-            assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
+            assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
                logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
@@ -300,7 +300,7 @@ class Objects {
                logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
             }
             if (event.object.type === 'JOINT') { // создан новый джойнт. обновляем статистику джойнтов на ядре
-               for (let oid of event.sphereOids) {
+               for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
                   if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints++ // обновляем статистику джойнтов на ядре
                }
@@ -331,10 +331,10 @@ class Objects {
          }
          case 'OBJECT_DELETED': {
             await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'deletedAt', new Date(), false)
-            assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
+            assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.object.type === 'JOINT') { // удален джойнт. обновляем статистику джойнтов на ядре
-               for (let oid of event.sphereOids) {
+               for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
                   if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints = reactiveItem.countJoints ? reactiveItem.countJoints - 1 : 0 // обновляем статистику джойнтов на ядре
                }

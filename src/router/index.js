@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import assert from 'assert'
 import routes from './routes'
-import { router } from 'src/boot/system'
 
 const debug = require('debug')('[router]:index')
 debug.enabled = true

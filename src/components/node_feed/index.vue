@@ -103,6 +103,8 @@ div(
 
 <script>
 
+import { ObjectApi } from 'src/api/object'
+
 export default {
   name: 'nodeFeed',
   components: {
@@ -166,13 +168,13 @@ export default {
     },
     actions () {
       let res = {}
-      // TODO: implement by igor
       if (this.nodeIsMine) {
         res.delete = {
           name: 'Удалить',
           color: 'red',
-          cb: () => {
+          cb: async () => {
             this.$log('nodeDelete...')
+            await ObjectApi.unPublish(this.node.oid)
           }
         }
       }

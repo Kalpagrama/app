@@ -196,8 +196,9 @@ class ObjectCreateApi {
          assert(reactiveEssence.relatedSphereOids)
          await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence)
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
+
          assert(store, '!store')
+         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
          store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
          return reactiveEssence
       }

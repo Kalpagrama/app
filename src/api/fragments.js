@@ -329,7 +329,7 @@ const eventFragment = gql`
         ... on EventObjectCreateDelete{
             subject{... objectShortFragment}
             object{... objectShortFragment}
-            sphereOids
+            relatedSphereOids
             matter {reason subscription}
         }
         ... on EventObjectRate{

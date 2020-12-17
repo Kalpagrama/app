@@ -1509,30 +1509,6 @@
             "deprecationReason": null
           },
           {
-            "name": "emojiSpheres",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "ws",
             "description": null,
             "args": [],
@@ -10179,7 +10155,7 @@
             "deprecationReason": null
           },
           {
-            "name": "sphereOids",
+            "name": "relatedSphereOids",
             "description": "на какие сферы попал объект",
             "args": [],
             "type": {
