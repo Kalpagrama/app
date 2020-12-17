@@ -9,6 +9,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
       left: 'calc(50% - 30px)',
       top: 'calc(50% - 30px)',
       width: '60px', height: '60px',
+      pointerEvents: 'none'
     }`)
   //- items left/right
   div(
@@ -22,6 +23,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
         position: 'relative',
         paddingBottom: '100%',
         transform: ii === 0 ? 'perspective(600px) rotateY(6deg)' : 'perspective(600px) rotateY(-6deg)',
+        zIndex: 10,
       }`
       ).row.full-width
       div(

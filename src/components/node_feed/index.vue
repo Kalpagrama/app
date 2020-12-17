@@ -60,7 +60,7 @@ div(
         //- NAME
         router-link(
           v-if="node.vertices[0] !== 'ASSOCIATIVE'"
-          :to="'/node/'+node.oid"
+          :to="nodeEssenceLink"
           :style=`{
             fontSize: nodeNameSize+'px',
           }`
@@ -74,7 +74,9 @@ div(
         div(
           v-else
           ).row.full-width.justify-center
-          q-btn(round flat color="green" icon="link")
+          q-btn(
+            :to="nodeEssenceLink"
+            round flat color="green" icon="link")
         //- node links
         q-btn(
           v-if="node.items.length === 1"
@@ -147,11 +149,9 @@ export default {
       }
     },
     nodeEssenceLink () {
-      if (!this.node) return null
-      if (this.node.items[0].layers) {
-        return '/content/' + this.node.items[0].layers[0].contentOid + '?node=' + this.node.oid
+      if (this.node.items.length === 2) {
+        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
       }
-      // TODO: handle non node/composition case
       else {
         return '/node/' + this.node.oid
       }

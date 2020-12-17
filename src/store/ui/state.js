@@ -15,7 +15,7 @@ export default {
   nodeCategories: [],
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},
-    {id: 'policy', name: 'Политика конфиденциальности Kalpagrama'},
+    {id: 'policy', name: 'Политика конфиденциальности'},
     {id: 'dmca', name: 'DMCA (Регламент рассмотрения заявлений правообладателей)'},
   ]
 }

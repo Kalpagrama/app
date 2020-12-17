@@ -12,7 +12,7 @@
           q-icon(name="blur_on" size="18px" color="grey-4").q-mr-sm
           span(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
   //- spheres, links, names
-  .row.full-width.justify-center.q-py-sm
+  div(:style=`{paddingLeft: '60px', paddingRight: '60px',}`).row.full-width.justify-center.q-py-sm
     //- innputs
     div(:style=`{maxWidth: '400px',}`).row.full-width.justify-center
       .col

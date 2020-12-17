@@ -14,10 +14,10 @@ q-layout(
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-page-container
-    q-page.row.full-width.justify-center.q-py-md
+    q-page.row.full-width.justify-center.q-pt-sm
       div(
         :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
-        ).row.full-width.items-start.content-start
+        ).row.full-width.items-start.content-start.q-px-sm
         node-feed(
           v-if="node"
           :node="node"

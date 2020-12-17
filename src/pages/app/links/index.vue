@@ -1,12 +1,11 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff").b-30
   kalpa-loader(
-    v-if="joint"
     :immediate="true"
     :query="jointsQuery" :limit="12"
     @items="jointsUpdated"
     v-slot=`{items, next, nexting}`)
-  q-header.b-30
+  //- q-header.b-30
     .row.full-width.justify-center.q-px-sm.q-pt-sm
       div(
         :style=`{
@@ -18,131 +17,118 @@ q-layout(view="hHh Lpr lff").b-30
           @click="cancel()"
           round flat color="white" icon="west")
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Links
-  q-page-container()
-    q-page(
-      :style=`{
-        paddingTop: '8px',
-      }`
-      ).row.full-width.justify-center
+  q-header.b-30
+    .row.full-width.justify-center
+      q-resize-observer(@resize="headerOnResize" :debounce="300")
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
-        .row.full-width
-          node-feed(
-            v-if="joint"
-            :node="joint"
-            :showHeader="joint.oid"
-            :showActions="joint.oid")
-            template(v-slot:items)
-              node-editor(
-                v-if="itemsLoaded"
-                :node="joint"
-                :showEditor="jointEditing"
-                :itemsEditable="jointEditing ? [1] : []"
-                :style=`{}`
-                @node="jointEditCancel")
-        //- pult 0
-        .row.full-width.justify-center.q-pa-md
-          div(
-            :style=`{
-              position: 'relative',
-              maxWidth: '300px',
-              borderRadius: '10px',
-            }`
-            ).row.full-width.b-40
-            .col
-              q-btn(
-                @click="itemPrev()"
-                flat color="grey-4" icon="west"
-                ).fit
-            .col
-              .row.fit
-                div(:style=`{width: '50px',}`).row.full-height.items-center.content-center
-                  q-btn(
-                    @click="jointEditStart()"
-                    flat color="green" icon="add"
-                    ).fit
-                div(:style=`{width: '50px',}`).row.full-height.items-center.content-center
-                  q-btn(
-                    round flat color="grey-4" icon="keyboard_arrow_up"
-                    ).full-width.q-py-sm
-                  q-btn(
-                    round flat color="grey-4" icon="keyboard_arrow_down"
-                    ).full-width.q-py-sm
-                div(:style=`{width: '50px',}`).row.full-height.items-center.content-center
-                  q-btn(
-                    @click="itemNext()"
-                    flat color="grey-4" icon="keyboard_arrow_right"
-                    ).fit
-        //- pult 1
-        //- .row.full-width.q-pa-lg
-          .col
-          .col
-            .row.full-width.justify-center
-              div(:style=`{width: '150px',height: '150px',borderRadius: '50%'}`).row.b-40
-                div(:style=`{height: '50px'}`).row.full-width
-                  .col
-                  .col
-                    q-btn(
-                      round flat color="grey-4" icon="north"
-                      :style=`{borderRadius: '50%',}`).fit
-                  .col
-                div(:style=`{height: '50px'}`).row.full-width
-                  .col
-                    q-btn(
-                      round flat color="grey-4" icon="west"
-                      :style=`{borderRadius: '50%',}`).fit
-                  .col
-                    q-btn(
-                      color="green" icon="add"
-                      :style=`{borderRadius: '50%',}`).fit.bg
-                  .col
-                    q-btn(
-                      round flat color="grey-4" icon="east"
-                      :style=`{borderRadius: '50%',}`).fit
-                div(:style=`{height: '50px'}`).row.full-width
-                  .col
-                  .col
-                    q-btn(
-                      round flat color="grey-4" icon="south"
-                      :style=`{borderRadius: '50%',}`).fit
-                  .col
-        //- graph
+        node-feed(
+          v-if="joint"
+          :node="joint"
+          :showHeader="joint.oid"
+          :showActions="joint.oid")
+          template(v-slot:items)
+            node-editor(
+              :node="joint"
+              :showEditor="jointEditing"
+              :itemsEditable="jointEditing ? [1] : []"
+              :style=`{}`
+              @node="jointEditCancel")
+  q-page-container
+    q-page(
+      v-if="joint"
+      ).row.full-width.justify-center.q-px-xs.q-pt-sm
+      div(
+        v-show="!jointEditing"
+        :style=`{
+          position: 'relative',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          height: $q.screen.height-headerHeight-8+'px',
+        }`
+        ).row.full-width.items-start.content-start
+        //- TINT top
         div(
-          v-if="itemsLoaded"
-          ).row.full-width.text-white.q-py-md
-          //- left side
-          .col-6.q-pr-xs
-            .row.justify-end
+          :style=`{
+            position: 'absolute', top: '0px', zIndex: 100, transform: 'translate3d(0,0,0)',
+            height: drumsLineMarginTop+'px',
+            background: 'linear-gradient(0deg, rgba(30,30,30,0) 0%, rgba(30,30,30,1) 100%)',
+            pointerEvents: 'none',
+          }`).row.full-width
+        //- TINT bottom
+        div(
+          :style=`{
+            position: 'absolute', bottom: '0px', zIndex: 100, transform: 'translate3d(0,0,0)',
+            height: drumsLineMarginTop*2+'px',
+            background: 'linear-gradient(0deg, rgba(30,30,30,1) 0%, rgba(30,30,30,0) 100%)',
+            pointerEvents: 'none',
+          }`).row.full-width
+        //- left item
+        .col.full-height.q-pr-xs
+          div(:style=`{position: 'relative',}`).row.fit.items-start.content-start
+            q-btn(
+              @click="jointPrev()"
+              round flat icon="west" color="white"
+              :style=`{
+                position: 'absolute', zIndex: 200, left: '16px', bottom: '16px',
+              }`)
+            joint-item(
+              :itemIndex="0"
+              :joint="joint"
+              :style=`{
+                marginTop: drumsLineMarginTop+'px',
+              }`).b-60
               q-btn(
-                @click="itemPrev()"
-                flat icon="keyboard_arrow_left" color="grey-8"
-                :style=`{width: '40px', heigth: '40px',}`).b-40
-              .col.q-pl-xs
-                link-item(:item="joint.items[0]")
-          //- right side
-          .col-6.q-pl-xs
-            .row.full-width.justify-start
-              .row.full-width.justify-start.q-mb-xs
-                q-btn(
-                  @click="jointEditStart()"
-                  flat color="green" icon="add"
-                  :style=`{
-                    width: '40px', height: '40px',
-                  }`).b-40
+                flat color="green" icon="link"
+                :style=`{
+                  position: 'absolute', zIndex: 200, right: '-24px',
+                  width: '40px', height: '40px',
+                  pointerEvents: 'none',
+                }`)
+        //- right item
+        .col.full-height.q-pl-xs
+          div(:style=`{position: 'relative'}`).column.fit
+            //- EDIT
+            q-btn(
+              @click="jointEditStart()"
+              color="green" icon="add"
+              :style=`{
+                position: 'absolute', bottom: '16px', zIndex: 200,
+                right: '16px',
+                borderRadius: '50%',
+                width: '40px', height: '40px',
+              }`)
+            //- body
+            div(
+              ref="jointsScroll"
+              :style=`{position: 'relative'}`).col.full-width.scroll
               div(
-                v-for="(i,ii) in joints" :key="i.joint.oid"
-                ).row.full-width.justify-start.q-mb-xs
+                :style=`{
+                  marginTop: drumsLineMarginTop+'px',
+                  marginBottom: $q.screen.height-headerHeight-drumsLineMarginTop-44-8+'px',
+                }`).row.full-width.items-start.content-start
                 div(
-                  @click="itemClick(i.joint.items[i.itemIndex],ii)"
-                  ).col.q-pr-xs
-                  link-item(
-                    :item="i.joint.items[i.itemIndex]"
+                  v-for="(j,ji) in joints" :key="j.oid"
+                  :ref="'joint-'+j.oid"
+                  ).row.full-width.justify-center.q-mb-xs
+                  div(
+                    @click="$router.push({query: {joint: j.oid}})"
                     :style=`{
-                      border: i.joint.items[i.itemIndex].oid === itemActive ? '3px solid rgb(76,175,79)' : 'none'
-                    }`)
-                q-btn(
-                  @click="itemNext(item,ii)"
-                  flat icon="keyboard_arrow_right" color="grey-8"
-                  :style=`{width: '40px', heigth: '40px',}`).b-40
+                      maxWidth: j.oid === $route.query.joint ? '100%' : 'calc(100% - 16px)',
+                    }`
+                    ).col
+                    joint-item(
+                      :itemOid="joint.items[0].oid"
+                      :joint="j"
+                      :class=`{
+                        'b-60': j.oid === $route.query.joint
+                      }`)
+                      q-btn(
+                        @click="jointNext(joint,ii)"
+                        v-if="j.oid === $route.query.joint"
+                        flat color="white" icon="fast_forward"
+                        :style=`{
+                          position: 'absolute', zIndex: 300, top: '0px', right: '0px',
+                          width: '40px', height: '40px',
+                        }`)
 </template>
 
 <script>
@@ -152,7 +138,7 @@ export default {
   name: 'pageApp_links',
   components: {
     nodeEditor: () => import('components/node_editor/index.vue'),
-    linkItem: () => import('./link_item.vue')
+    jointItem: () => import('./joint_item.vue')
   },
   data () {
     return {
@@ -168,9 +154,12 @@ export default {
       },
       jointEditing: false,
       joints: [],
-      items: [],
-      itemsLoaded: false,
-      itemActive: null,
+      // jointsLoaded: false,
+      // jointActiveOid: null,
+      headerWidth: 0,
+      headerHeight: 0,
+      // drums
+      drumsLineMarginTop: 60,
     }
   },
   computed: {
@@ -179,7 +168,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['JOINT'] },
-          oidSphere: this.joint ? this.joint.items[0].oid : false,
+          oidSphere: this.$route.params.oid,
           sortStrategy: 'AGE',
         },
         populateObjects: true,
@@ -191,14 +180,24 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        // this.$log('$route.params.oid TO', to)
-        if (to) {
+        if (to && this.jointsLoaded) {
+          this.$log('$route.params.oid TO', to)
           let item = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           let joint = JSON.parse(JSON.stringify(this.jointNew))
           joint.items[0] = item
           this.$set(this, 'joint', joint)
-          // if (to.query.joint)
-          // when items are loaded do what?
+        }
+      }
+    },
+    '$route.query.joint': {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        if (to && this.jointsLoaded) {
+          this.$log('$route.query.joint TO', to)
+          let joint = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+          this.$log('$route.query.joint => jointSet')
+          this.jointSet(joint)
         }
       }
     }
@@ -207,92 +206,84 @@ export default {
     jointEditStart () {
       this.$log('nodeEditStart')
       this.$set(this.joint.items, 1, {type: 'ADD'})
-      this.itemActive = null
       this.jointEditing = true
+      // this.jointActiveOid = null
       let joint = JSON.parse(JSON.stringify(this.jointNew))
       joint.items = this.joint.items
       this.$set(this, 'joint', joint)
     },
     async jointEditCancel () {
       this.$log('nodeEditCancel')
-      this.itemSetInitial()
+      this.jointEditing = false
+      // this.itemSetInitial()
     },
-    itemPrev () {
-      this.$log('itemPrev')
-      this.$set(this, 'joint', null)
-      this.itemsLoaded = false
+    jointPrev () {
+      this.$log('jointPrev')
       this.$router.back()
     },
-    itemNext (item, ii) {
-      this.$log('itemNext', item, ii)
-      this.itemsLoaded = false
-      this.$set(this, 'joint', null)
-      this.$router.push({params: {oid: item.oid}})
+    jointNext (joint, ii) {
+      this.$log('jointNext', joint, ii)
+      let item = joint.items.find(i => i.oid !== this.$route.params.oid)
+      this.$router.push({params: {oid: item.oid}, query: {joint: joint.oid}})
     },
-    async itemClick (item, ii) {
-      this.$log('itemClick', item, ii)
-      this.itemActive = item.oid
-      let joint = this.joints[ii]
-      for (const p in joint) {
-        if (p !== 'items') {
-          this.$set(this.joint, p, joint[p])
-        }
-      }
-      this.itemSet(item, 1)
-    },
-    async itemSet (item, index) {
-      this.$log('itemSet', item, index)
-      this.$set(this.joint.items, index, item)
-    },
-    itemSetInitial () {
-      this.$log('itemSetInitial')
+    async jointSet (joint) {
+      this.$log('jointSet', joint)
       if (this.joints.length > 0) {
-        this.jointEditing = false
-        this.itemActive = this.joints[0].joint.items[this.joints[0].itemIndex].oid
-        let joint = this.joints[0].joint
+        if (!joint) {
+          joint = this.joints[2] || this.joints[1] || this.joints[0] || null
+        }
+        // need joint!
+        if (!joint) return
+        // this.jointActiveOid = joint.oid
+        // find and set item from joint
+        let item = joint.items.find(i => i.oid !== this.$route.params.oid)
+        this.$set(this.joint.items, 1, item)
+        // set joint fields
         for (const p in joint) {
           if (p !== 'items') {
             this.$set(this.joint, p, joint[p])
           }
         }
-        this.itemSet(this.joints[0].joint.items[this.joints[0].itemIndex], 1)
+        await this.$wait(200)
+        let jointIndex = this.joints.findIndex(j => j.oid === joint.oid)
+        this.$log('jointIndex', jointIndex)
+        let scrollTop = jointIndex * (40 + 4)
+        this.$tween.to(this.$refs.jointsScroll, 0.8, {scrollTop: scrollTop})
+        // this.$refs.jointsScroll.scrollTop = scrollTop
       }
       else {
         this.jointEditing = true
-        this.itemActive = null
-        this.joint.oid = null
-        this.itemSet({type: 'ADD'}, 1)
+        // this.jointActiveOid = null
+        // kill joint?
+        this.$set(this.joint.items, 1, {type: 'ADD'})
       }
     },
-    jointsUpdated (joints) {
+    async jointsUpdated (joints) {
       this.$log('jointsUpdated')
-      if (joints && joints.length > 0) {
-        // this.joints = joints
-        // joints = {itemIndex: 0,1, joint: joint, needSwap or not?}
-        // this.items = joints.reduce((acc, val) => {
-        //   // find joint.items[0] by oid? yep
-        //   let i = val.items.findIndex(i => i.oid === this.joint.items[0].oid)
-        //   let item = val.items[i === 0 ? 1 : 0]
-        //   acc.push(item)
-        //   return acc
-        // }, [])
-        this.joints = joints.reduce((acc, val) => {
-          // find itemIndex
-          let i = val.items.findIndex(i => i.oid === this.joint.items[0].oid)
-          acc.push({
-            itemIndex: i === 0 ? 1 : 0,
-            joint: val
-          })
-          return acc
-        }, [])
-      }
-      if (this.itemsLoaded) {
-        // do nothing...
+      if (joints) this.joints = joints
+      await this.$wait(300)
+      if (this.jointsLoaded) {
       }
       else {
-        this.itemsLoaded = true
-        this.itemSetInitial()
+        this.jointsLoaded = true
+        let item = await this.$rxdb.get(RxCollectionEnum.OBJ, this.$route.params.oid)
+        let joint = JSON.parse(JSON.stringify(this.jointNew))
+        joint.items[0] = item
+        this.$set(this, 'joint', joint)
+        if (this.$route.query.joint) {
+          let joint = await this.$rxdb.get(RxCollectionEnum.OBJ, this.$route.query.joint)
+          this.$log('jointsUpdated => jointSet')
+          this.jointSet(joint)
+        }
+        else {
+          this.$router.push({query: {joint: this.joints[0].oid}})
+        }
       }
+    },
+    headerOnResize (e) {
+      this.$log('headerOnResize', e)
+      this.headerWidth = e.width
+      this.headerHeight = e.height
     }
   },
   mounted () {

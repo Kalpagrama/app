@@ -74,19 +74,30 @@ div(
       //- top: '-0.5px',
       minHeight: '40px',
       transform: 'translate3d(0,0,0)',
-      background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 0%, rgba(0,0,0,0) 100%)',
+      background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.justify-between.q-px-xs
-    .col
-      router-link(
-        v-if="true"
-        :to="itemLink"
-        :style=`{minHeight: '36px',}`
-        ).row.full-width.items-center.content-center.justify-center.cursor-pointer
-        span(v-if="item.type === 'NODE'").text-grey-2 {{ item.name }}
-        span(v-if="item.__typename === 'Sphere'").text-grey-2 {{ item.name }}
-        q-btn(v-if="item.__typename === 'Composition'" round flat color="white" icon="select_all")
+    ).row.full-width.items-center.content-center.justify-center
+    router-link(
+      :to="itemLink"
+      :style=`{
+        height: '36px',
+        textAlign: 'center',
+        //- paddingLeft: '100%',
+      }`
+      ).row.items-center.content-center.scroll
+      //- .row.full-width.br
+      q-btn(
+        v-if="item.__typename === 'Composition'"
+        round flat color="white" icon="select_all")
+      span(
+        v-else
+        :style=`{
+          whiteSpace: 'nowrap',
+          marginLeft: '8px',
+          //- marginRight: '100%',
+          textAlign: 'center',
+        }`).text-white {{ item.name }}
 </template>
 
 <script>

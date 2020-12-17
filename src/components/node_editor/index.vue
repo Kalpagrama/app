@@ -92,8 +92,11 @@
         paddingTop: editorsPaddingTop+'px',
       }`).row.full-width.q-pb-sm
       name-editor(:node="node")
-      spheres-editor(:node="node")
       .row.full-width.justify-center
+        spheres-editor(
+          :node="node"
+          )
+      div(:style=`{paddingLeft: '60px', paddingRight: '60px',}`).row.full-width.justify-center
         category-editor(
           :node="node"
           :style=`{maxWidth: '400px',}`)
@@ -301,7 +304,9 @@ export default {
         }
         if (nodeInput.items.length === 2) {
           if (nodeInput.name.length === 0) {
-            nodeInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+            if (nodeInput.vertices.length === 0) {
+              nodeInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+            }
           }
           else {
             nodeInput.vertices = ['ESSENCE', 'ESSENCE']

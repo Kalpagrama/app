@@ -19,6 +19,8 @@
   40%, 60%
     transform: translate3d(2px, 0, 0)
     color: #4caf50 !important
+.q-footer
+  transform: translate3d(0,0,30px) !important
 </style>
 
 <template lang="pug">
@@ -52,7 +54,7 @@ q-layout(view="lHh lpR lFf")
     q-footer(
       v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow"
       :style=`{
-         paddingBottom: 'env(safe-area-inset-bottom)'
+         paddingBottom: 'env(safe-area-inset-bottom)',
       }`).b-30
       kalpa-menu-mobile
   q-page-container
