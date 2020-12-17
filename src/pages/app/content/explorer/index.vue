@@ -28,7 +28,7 @@ q-layout(
           :showEditor="node.items[0].layers ? true : false")
   q-page-container
     page-nodes(
-      v-if="!node.items[0].layers"
+      v-if="!node.items[0].layers && !pageId"
       :nodeQuery="query.node"
       :contentKalpa="contentKalpa"
       :player="player"
@@ -38,13 +38,31 @@ q-layout(
         :style=`{
           marginTop: '-20px',
           paddingTop: '20px',
-        }`).q-mb-sm
+        }`
+        @page="pageId = $event").q-mb-sm
+    component(
+      v-if="pageId"
+      v-show="!node.items[0].layers"
+      :is="`page-${pageId}`"
+      :node="node"
+      :contentKalpa="contentKalpa"
+      :player="player"
+      :style=`{
+        position: 'fixed', zIndex: 1000, bottom: '0px',
+        height: $q.screen.height-headerHeight+'px',
+      }`
+      @node="node = $event"
+      @close="pageId = null")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 import nodeEditor from 'components/node_editor/index.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageDetails from './page_details/index.vue'
+import pageDrafts from './page_drafts/index.vue'
+import pageContents from './page_contents/index.vue'
 
 export default {
   name: 'contentExplorer',
@@ -53,6 +71,8 @@ export default {
     nodeEditor,
     pageNodes,
     pageDetails,
+    pageDrafts,
+    pageContents,
   },
   data () {
     return {
@@ -68,6 +88,7 @@ export default {
       player: null,
       headerWidth: 0,
       headerHeight: 0,
+      pageId: null, // drafts,contents
     }
   },
   methods: {
@@ -76,8 +97,16 @@ export default {
       // await this.$wait(300)
       this.$router.push({query: {node: node.oid}})
     },
-    nodeReset (node) {
+    async nodeReset (node) {
       this.$log('nodeReset', node)
+      if (this.node.wsItemType === 'WS_NODE') {
+        // do nothing...
+      }
+      else {
+        if (confirm('Save node ?')) {
+          await this.$rxdb.set(RxCollectionEnum.WS_NODE, this.node)
+        }
+      }
       this.$set(this, 'node', node)
       this.player.stateSet('points', [])
       this.player.stateSet('figures', [])

@@ -48,7 +48,7 @@ div(
       div(
         v-if="showName && node.oid"
         :style=`{
-          minHeight: '50px',
+          minHeight: '40px',
         }`
         ).row.full-width.q-pa-xs
         //- node context
@@ -59,7 +59,7 @@ div(
           :style=`{width: '50px', height: '50px',}`)
         //- NAME
         router-link(
-          v-if="node.vertices[0] !== 'ASSOCIATIVE'"
+          v-if="true"
           :to="nodeEssenceLink"
           :style=`{
             fontSize: nodeNameSize+'px',
@@ -71,7 +71,7 @@ div(
             }`
             ).row.fit.items-center.content-center.justify-center
             span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ nodeName }}
-        div(
+        //- div(
           v-else
           ).row.full-width.justify-center
           q-btn(
@@ -144,7 +144,7 @@ export default {
         return this.node.name
       }
       else if (this.node.vertices[0] === 'ASSOCIATIVE') {
-        return ''
+        return 'Ассоциация'
       }
       else {
         return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name

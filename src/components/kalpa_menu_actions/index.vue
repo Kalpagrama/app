@@ -21,6 +21,7 @@ q-btn(round flat dense :icon="icon" :color="color")
       q-btn(
         @click="a.cb()"
         v-for="(a,akey) in actions" :key="akey"
+        v-close-popup
         flat no-caps
         :color="a.color || 'white'"
         :style=`{height: '50px',}`).full-width

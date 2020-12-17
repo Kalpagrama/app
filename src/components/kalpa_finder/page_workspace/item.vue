@@ -11,7 +11,7 @@ div(
     background: 'rgb(35,35,35)',
     borderRadius: '10px',
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-start.content-start.justufy-between
   //- left side
   div(:style=`{position: 'relative',}`).col.full-height
     slot(name="tint" :item="item")
@@ -36,15 +36,18 @@ div(
           v-else
           name="blur_on" size="50px" color="white")
       .col
-        .row.fit.items-center.content-center.justify-start.q-pa-md
+        .row.fit.items-center.content-center.justify-start.q-pa-sm
           span(:style=`{zIndex: 102}`).text-white {{ item.name.slice(0, 150) }}
   //- right side
-  div().row.full-height.items-center.content-center.justify-center.q-pa-md
-    q-btn(
-      @click="itemSubscriptionToggle()"
-      round flat
-      :color="item.isSubscribed ? 'grey-4' : 'grey-9'"
-      :icon="item.isSubscribed ? 'notifications_active' : 'notifications_none'")
+  div(:style=`{width: '46px',}`).row.full-height.items-start.content-start.justify-end.q-pa-xs
+    .row.full-width.justify-end
+      kalpa-menu-actions(:actions="actions")
+    .row.full-width.justify-end.q-pt-sm
+      q-btn(
+        @click="itemSubscriptionToggle()"
+        round flat dense
+        :color="item.isSubscribed ? 'grey-4' : 'grey-9'"
+        :icon="item.isSubscribed ? 'notifications_active' : 'notifications_none'")
 </template>
 
 <script>
@@ -61,13 +64,30 @@ export default {
   computed: {
     actions () {
       return {
+        copyLink: {
+          name: 'Copy link',
+          cb: async () => {
+            this.$log('copy link...')
+          }
+        },
+        share: {
+          name: 'Share',
+          cb: () => {
+            this.$log('share...')
+          }
+        },
         delete: {
           name: 'Удалить',
           color: 'red',
           styles: {},
           cb: async () => {
             this.$log('actionDelete', this.item)
-            this.$emit('delete')
+            if (confirm('Удалить?')) {
+              if (this.item.isSubscribed) {
+                await UserApi.unSubscribe(this.item.oid)
+              }
+              await this.item.remove(true)
+            }
           }
         }
       }
@@ -82,6 +102,7 @@ export default {
         IMAGE: '/content/',
         BOOK: '/content/'
       }
+      // TODO: handle /links/?joint= ...
       return itemLinkMap[this.item.type] + this.item.oid
     }
   },

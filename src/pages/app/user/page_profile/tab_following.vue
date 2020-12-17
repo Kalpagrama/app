@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-q-page(:style=`{paddingTop: '50px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
+q-page(:style=`{paddingTop: '16px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     kalpa-loader(
       :immediate="true"

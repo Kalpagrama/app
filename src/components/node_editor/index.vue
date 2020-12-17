@@ -334,6 +334,7 @@ export default {
       this.$log('cancel')
       // emit nodeInitial
       this.$emit('node', JSON.parse(JSON.stringify(this.nodeInitial)))
+      // this.$emit('node', this.node)
     }
   },
   created () {

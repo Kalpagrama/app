@@ -3,7 +3,7 @@ q-layout(
   view="hHh Lpr lff"
   container).b-30
   q-header(reveal).b-30
-    .row.full-width.justify-center.q-px-sm
+    .row.full-width.justify-center.q-px-sm.b-30
       slot(name="header")
       //- pages
       div(
@@ -68,7 +68,7 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'content', name: 'Мой контент', component: 'page-content'},
+        {id: 'content', name: 'Загрузки', component: 'page-content'},
         {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Кальпаграма', component: 'page-kalpa'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
