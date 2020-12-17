@@ -9,6 +9,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
+import { Lists } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -292,9 +293,6 @@ class ReactiveListWithPaginationFactory {
       if (rxQueryOrRxDoc.reactiveListHolderMaster) {
          // this.reactiveListFull = rxQueryOrRxDoc.reactiveListHolderMaster.reactiveListFull
          // this.reactiveListPagination = rxQueryOrRxDoc.reactiveListHolderMaster.reactiveListPagination
-         this.next = rxQueryOrRxDoc.reactiveListHolderMaster.next
-         this.getProperty = rxQueryOrRxDoc.reactiveListHolderMaster.getProperty
-         this.setProperty = rxQueryOrRxDoc.reactiveListHolderMaster.setProperty
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
@@ -354,8 +352,15 @@ class ReactiveListWithPaginationFactory {
             let prefetchItems = []
             if (count < 12) prefetchItems = this.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждпющее чтение
             if (this.populateFunc) nextItems = await this.populateFunc(nextItems, prefetchItems) // запрашиваем полные сущности
+            let blackLists = await Lists.getBlackLists()
+            nextItems = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
             this.vm.reactiveListPagination.splice(this.vm.reactiveListPagination.length, 0, ...nextItems)
             return this.nextIndex < this.reactiveListFull.length
+         }
+         this.reactiveListPagination.refresh = async () => {
+            let blackLists = await Lists.getBlackLists()
+            let filtered = this.reactiveListPagination.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+            this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...filtered)
          }
 
          this.rxQuerySubscribe()

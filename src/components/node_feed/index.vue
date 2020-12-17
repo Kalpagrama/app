@@ -114,6 +114,7 @@ div(
 <script>
 
 import { ObjectApi } from 'src/api/object'
+import { i18n } from 'src/boot/i18n'
 
 export default {
   name: 'nodeFeed',
@@ -178,7 +179,7 @@ export default {
       let res = {}
       if (this.nodeIsMine) {
         res.delete = {
-          name: 'Удалить',
+          name: i18n.t('Delete', 'Удалить'),
           color: 'red',
           cb: async () => {
             this.$log('nodeDelete...')
@@ -188,24 +189,27 @@ export default {
       }
       else {
         res.hide = {
-          name: 'Скрыть',
+          name: i18n.t('Hide', 'Скрыть'),
           color: 'white',
-          cb: () => {
+          cb: async () => {
             this.$log('hide...')
+            await this.$rxdb.hideObjectOrSource(this.node.oid, null)
           }
         }
         res.hideAll = {
-          name: 'Скрыть источник',
+          name: i18n.t('Hide source', 'Скрыть источник'),
           color: 'white',
-          cb: () => {
-            this.$log('hideAll...')
+          cb: async () => {
+            this.$log('hide source')
+            if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
           }
         }
         res.report = {
-          name: 'Пожаловаться',
+          name: i18n.t('Claim', 'Пожаловаться'),
           color: 'red',
           cb: () => {
             this.$log('report...')
+            let reason = prompt(i18n.t('specify the reason', 'укажите причину'))
           }
         }
       }

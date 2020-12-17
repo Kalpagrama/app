@@ -259,7 +259,7 @@ export default {
       }
     },
     async jointsUpdated (joints) {
-      this.$log('jointsUpdated')
+      this.$log('jointsUpdated', joints)
       if (joints) this.joints = joints
       await this.$wait(300)
       if (this.jointsLoaded) {

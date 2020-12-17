@@ -679,6 +679,12 @@ class RxDBWrapper {
          this.removeMutex.release()
       }
    }
+
+   // уберет со всех лент объект или все объекты определенного автора
+   async hideObjectOrSource (oid, authorOid) {
+      assert(this.created, 'cant find! !this.created')
+      await this.lists.hideObjectOrSource(oid, authorOid)
+   }
 }
 
 const rxdbWrapper = new RxDBWrapper()
