@@ -8,7 +8,8 @@ q-layout(view="hHh Lpr lff")
             minHeight: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-icon(name="blur_on" color="white" size="30px").q-ml-sm
+          q-btn(round flat color="white" icon="west" @click="$router.back()")
+          q-icon(name="blur_on" color="white" size="30px")
           .col.q-px-sm
             span(
               v-if="sphere" :style=`{fontSize: '18px'}`
@@ -20,13 +21,12 @@ q-layout(view="hHh Lpr lff")
             :name="sphere.name"
             :thumbUrl="''"
             :isActive="true")
+          kalpa-menu-actions(:actions="actions" icon="more_vert")
   q-page-container
     component(
       v-if="sphere"
       :is="`page-${pageId}`"
       :sphere="sphere")
-      //- .row.full-width.bg-red.q-py-md
-        span.text-white tabs
 </template>
 
 <script>
@@ -42,6 +42,31 @@ export default {
     return {
       pageId: 'nodes',
       sphere: null,
+    }
+  },
+  computed: {
+    actions () {
+      return {
+        copyLink: {
+          name: 'Copy link',
+          cb: () => {
+            this.$log('copyLink')
+          }
+        },
+        share: {
+          name: 'Share',
+          cb: () => {
+            this.$log('share')
+          }
+        },
+        hide: {
+          name: 'Hide',
+          color: 'red',
+          cb: async () => {
+            this.$log('hide')
+          }
+        }
+      }
     }
   },
   watch: {

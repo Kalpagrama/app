@@ -3,13 +3,13 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
   //- link btn
   q-btn(
     flat color="green" icon="link" size="lg"
-    :to="'/node/'+node.oid"
+    :to="'/links/'+node.items[0].oid+'?joint='+node.oid"
     :style=`{
       position: 'absolute', zIndex: 1000,
       left: 'calc(50% - 30px)',
       top: 'calc(50% - 30px)',
       width: '60px', height: '60px',
-      pointerEvents: 'none'
+      //- pointerEvents: 'none'
     }`)
   //- items left/right
   div(

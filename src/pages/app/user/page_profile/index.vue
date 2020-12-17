@@ -23,7 +23,7 @@ q-page(
         q-route-tab(
           v-for="t in tabs" :key="t.id"
           inline-label
-          :to="t.id" :name="t.id" :label="t.name" :icon="t.icon").q-px-sm
+          :to="t.id" :name="t.id" :label="t.name").q-px-sm
   component(
     :is="`tab-${$route.params.tab}`"
     :user="user"
@@ -41,16 +41,16 @@ export default {
     tabJoints: () => import('./tab_joints.vue'),
     tabVotes: () => import('./tab_votes.vue'),
     tabFollowers: () => import('./tab_followers.vue'),
+    tabFollowing: () => import('./tab_following.vue')
   },
   props: ['user'],
   computed: {
     tabs () {
       return [
-        // {id: 'collections', name: this.$t('Collections', 'Коллекции'), icon: 'view_week'},
-        {id: 'nodes', name: this.$t('Nodes', 'Ядра'), icon: 'panorama_fish_eye'},
-        // {id: 'joints', name: this.$t('Joints', 'Связи'), icon: 'link'},
-        {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust'},
-        {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account'},
+        {id: 'nodes', name: this.$t('Nodes and Links', 'Ядра и связи'), icon: 'panorama_fish_eye', count: 356},
+        {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust', count: 12},
+        {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account', count: 1233},
+        {id: 'following', name: this.$t('Following', 'Подписки'), icon: null, count: 123}
       ]
     },
   },

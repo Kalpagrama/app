@@ -55,7 +55,7 @@ div(
       height: 'calc(100% + 8px)',
       pointerEvents: 'none',
     }`
-    ).row.bg-green
+    ).row.bg-red
   //- onMoving over line currentTime
   div(
     v-if="currentTimeMove"
@@ -198,7 +198,7 @@ export default {
     },
     barClick (e) {
       // this.$log('barClick', e)
-      this.$log('barClick accessKey', e.target.accessKey)
+      // this.$log('barClick accessKey', e.target.accessKey)
       if (e.target.accessKey !== 'bar-body') return
       let left = e.layerX
       let width = e.target.clientWidth
@@ -221,7 +221,7 @@ export default {
     },
     barMousemove (e) {
       // this.$log('barMousemove', e)
-      this.$log('barMousemove accessKey', e.target.accessKey)
+      // this.$log('barMousemove accessKey', e.target.accessKey)
       if (e.target.accessKey !== 'bar-body') return
       let left = e.layerX
       let width = e.target.clientWidth

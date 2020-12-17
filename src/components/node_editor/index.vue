@@ -233,7 +233,7 @@ export default {
       if (isEditing) {
         this.itemEditing = ii
         if (this.node.items.length === 1) {
-          this.editorsPaddingTop = 100
+          this.editorsPaddingTop = 120
         }
       }
       else {
@@ -334,6 +334,7 @@ export default {
       this.$log('cancel')
       // emit nodeInitial
       this.$emit('node', JSON.parse(JSON.stringify(this.nodeInitial)))
+      // this.$emit('node', this.node)
     }
   },
   created () {

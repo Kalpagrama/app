@@ -41,7 +41,7 @@
         span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
         .row.full-width.q-px-sm
           small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
-      kalpa-share(
+      //- kalpa-share(
         v-if="user"
         type="user" :item="user")
       kalpa-bookmark(

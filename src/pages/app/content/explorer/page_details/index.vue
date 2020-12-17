@@ -47,6 +47,9 @@
             inactiveColor="grey-8"
             :fields=`{contentType: contentKalpa.type}`
             @bookmark="$event => $emit('bookmark', $event)")
+    .row.full-width.justify-center
+      q-btn(flat dense color="white" no-caps @click="$emit('page', 'drafts')").col Черновики
+      q-btn(flat dense color="white" no-caps @click="$emit('page', 'contents')").col Похожее
 </template>
 
 <script>

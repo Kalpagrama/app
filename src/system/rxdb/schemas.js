@@ -120,6 +120,9 @@ export const wsSchemaItem = {
         type: 'string'
       }
     },
+    vertices: {
+      type: 'array',
+    },
     // ---- bookmark ----
     collections: { // список id коллекций в которые попал букмарк
       type: 'array',
