@@ -5,6 +5,7 @@ import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
 import { EventApi } from 'src/api/event'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -133,6 +134,7 @@ class ListsApi {
    }
 
    static async find (collection, mangoQuery, search = false) {
+      mangoQuery = cloneDeep(mangoQuery)
       ListsApi.checkMangoQuery(mangoQuery)
       const f = ListsApi.find
       logD(f, 'start')

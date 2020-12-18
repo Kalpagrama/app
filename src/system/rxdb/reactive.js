@@ -3,7 +3,7 @@ import assert from 'assert'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'
-import { rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
@@ -315,6 +315,26 @@ class ReactiveListWithPaginationFactory {
             listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          } else if (this.rxDoc) { // лента полученная с сервера {items, count, totalCount}
             listItems = this.rxDoc.toJSON().cached.data.items
+            assert(this.rxDoc.props.mangoQuery, '!mangoQuery')
+            assert(this.rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+            // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
+            if (this.rxDoc.props.mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SPHERE_ITEMS) {
+               assert(this.rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
+               for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
+                  assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
+                  if (type === 'OBJECT_CREATED') { // если нет такого - создадим
+                     let indx = listItems.findIndex(el => el.oid === oidObject && relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere))
+                     if (indx === -1) {
+                        listItems.push({ oid: oidObject })
+                     }
+                  } else if (type === 'OBJECT_DELETED') { // если есть на этой сфере такой объект - удалим его
+                     let indx = listItems.findIndex(el => el.oid === oidObject && relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere))
+                     if (indx >= 0) {
+                        listItems.splice(indx, 1)
+                     }
+                  }
+               }
+            }
          } else throw new Error('bad collection' + this.rxQuery.collection.name)
          assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
          this.vm = new Vue({

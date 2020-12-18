@@ -41,7 +41,6 @@ class Lists {
       let fetchFunc = async () => {
          let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
          let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
-
          // todo
          let itemFilter = () => {
             // фильтровать items по mangoQuery
@@ -65,6 +64,17 @@ class Lists {
       else blackLists = { blackListObjectOids: [], blackListAuthorOids: [] }
       assert(blackLists && blackLists.blackListObjectOids && blackLists.blackListAuthorOids, 'bad blackLists')
       return blackLists
+   }
+
+   // список последних созданных/удаленных сущностей и сферы на которые они попали
+   // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
+   // то мы можем запросить сферу до того как объект будет на нее помещен
+   static async getObjectsWithRelatedSpheres () {
+      let objectsWithRelatedSpheres = await rxdb.get(RxCollectionEnum.META, 'objectsWithRelatedSpheres')
+      if (objectsWithRelatedSpheres) objectsWithRelatedSpheres = JSON.parse(objectsWithRelatedSpheres)
+      else objectsWithRelatedSpheres = []
+      assert(objectsWithRelatedSpheres && Array.isArray(objectsWithRelatedSpheres), 'bad objectsWithRelatedSpheres')
+      return objectsWithRelatedSpheres
    }
 
    static isElementBlacklisted (el, blackLists) {
@@ -112,6 +122,10 @@ class Lists {
       const f = this.addRemoveObjectToLists
       logD(f, 'start', relatedSphereOids, object)
       const t1 = performance.now()
+      let objectsWithRelatedSpheres = await Lists.getObjectsWithRelatedSpheres()
+      objectsWithRelatedSpheres.splice(10, objectsWithRelatedSpheres.length) // не более 10 последних
+      objectsWithRelatedSpheres.push({type, relatedSphereOids, oidObject: object.oid})
+      await rxdb.set(RxCollectionEnum.META, { id: 'objectsWithRelatedSpheres', valueString: JSON.stringify(objectsWithRelatedSpheres) })
       // добавим на все сферы (relatedSphereOids)
       let rxDocs = await Lists.cache.find({
          selector: {
