@@ -322,15 +322,12 @@ class ReactiveListWithPaginationFactory {
                assert(this.rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
                for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
                   assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
-                  if (type === 'OBJECT_CREATED') { // если нет такого - создадим
-                     let indx = listItems.findIndex(el => el.oid === oidObject && relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere))
-                     if (indx === -1) {
-                        listItems.push({ oid: oidObject })
-                     }
-                  } else if (type === 'OBJECT_DELETED') { // если есть на этой сфере такой объект - удалим его
-                     let indx = listItems.findIndex(el => el.oid === oidObject && relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere))
-                     if (indx >= 0) {
-                        listItems.splice(indx, 1)
+                  if (relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
+                     let indx = listItems.findIndex(el => el.oid === oidObject)
+                     if (indx === -1 && type === 'OBJECT_CREATED') {
+                        listItems.push({ oid: oidObject }) // если нет такого - создадим
+                     } else if (indx >= 0 && type === 'OBJECT_DELETED') {
+                        listItems.splice(indx, 1) // удалим
                      }
                   }
                }
