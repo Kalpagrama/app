@@ -91,7 +91,12 @@ class Workspace {
             let onWsChangedByUser = async (id, operation, plainData) => {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                assert('hasChanges' in plainData, '! hasChanges in plainData')
-               if (plainData.hasChanges || operation === WsOperationEnum.DELETE) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+               if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
+                  let deletedDocs = await this.db.ws_changes.find({selector: {id, operation: WsOperationEnum.DELETE }}).exec()
+                  if (deletedDocs.length === 0) { // только если не удален
+                     await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+                  }
+               }
             }
             const initWsItem = (plainData) => {
                assert(plainData.wsItemType, '!plainData.wsItemType')
@@ -130,9 +135,6 @@ class Workspace {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
                await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
             }, false)
-            this.db.ws_items.preRemove(function(plainData, rxDocument){
-               logD('preRemove')
-            }, true);
             this.db.ws_items.postRemove(async (plainData) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
                // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
@@ -140,7 +142,7 @@ class Workspace {
                if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
                rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
                // plainData.deletedAt = Date.now()
-            }, true)
+            }, false)
          }
       } finally {
          this.release()
@@ -425,7 +427,7 @@ class Workspace {
                // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
                await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
                await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
-            } else {
+            } else if (type !== 'WS_ITEM_DELETED'){
                // logD(f, 'try update ws item')
                assert(!itemServer.hasChanges, 'itemServer.hasChanges')
                await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
@@ -503,7 +505,7 @@ class Workspace {
       delete mangoQuery.selector.rxCollectionEnum
       if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
 
-      mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные
+      mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные ( да! rxdb по умолчанию выводит! )
       if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
       let rxQuery = this.db.ws_items.find(mangoQuery)
       return rxQuery
@@ -650,7 +652,7 @@ class Workspace {
             // удалить себя(букмарк) из всех коллекций
             assert(reactiveBookmark.collections, '!removedItem.collections')
             if (permanent && reactiveBookmark.collections && reactiveBookmark.collections.length > 0) {
-               let collections = await rxdb.find({ selector: { id: { $in: reactiveBookmark.collections } } })
+               let collections = await rxdb.find({ selector: { rxCollectionEnum: RxCollectionEnum.WS_COLLECTION, id: { $in: reactiveBookmark.collections } } })
                for (let c of collections) {
                   c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)
                }
