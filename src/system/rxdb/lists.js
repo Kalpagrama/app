@@ -69,8 +69,8 @@ class Lists {
 
    static isElementBlacklisted (el, blackLists) {
       assert(blackLists && blackLists.blackListObjectOids && blackLists.blackListAuthorOids, 'bad blackLists')
-      assert(el && el.oid, 'bad el')
-      if (blackLists.blackListObjectOids.includes(el.oid)) return true
+      assert(el, 'bad el')
+      if (el.oid && blackLists.blackListObjectOids.includes(el.oid)) return true
       if (el.author && blackLists.blackListAuthorOids.includes(el.author.oid)) return true
       return false
    }

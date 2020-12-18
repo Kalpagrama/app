@@ -94,7 +94,7 @@ export default {
           cb: async () => {
             if (confirm('Удалить?')) {
               this.$log('draftDelete', n)
-              await n.remove()
+              await n.remove(true)
             }
           }
         }

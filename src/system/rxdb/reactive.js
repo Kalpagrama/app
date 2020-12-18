@@ -160,8 +160,10 @@ class ReactiveDocFactory {
                if (payload.wsItemType) {
                   payload.remove = async (permanent = false) => {
                      if (payload.beforeRemove) await payload.beforeRemove(permanent)
-                     if (permanent) await this.rxDoc.remove()
+                     // await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false) // ставим всегда (чтобы списки реактивно обновились)
+                     if (permanent) await this.rxDoc.remove() // удаляем навсегда (отловим в ws_items.postRemove и отправим на сервер)
                      else await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false)
+                     logD('complete')
                   }
                   payload.restoreFromTrash = async () => {
                      await updateRxDocPayload(this.rxDoc, 'deletedAt', 0, false)

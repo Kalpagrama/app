@@ -91,7 +91,7 @@ class Workspace {
             let onWsChangedByUser = async (id, operation, plainData) => {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                assert('hasChanges' in plainData, '! hasChanges in plainData')
-               if (plainData.hasChanges) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+               if (plainData.hasChanges || operation === WsOperationEnum.DELETE) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
             }
             const initWsItem = (plainData) => {
                assert(plainData.wsItemType, '!plainData.wsItemType')
@@ -130,12 +130,17 @@ class Workspace {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
                await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
             }, false)
+            this.db.ws_items.preRemove(function(plainData, rxDocument){
+               logD('preRemove')
+            }, true);
             this.db.ws_items.postRemove(async (plainData) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
                // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+               logD('postRemove')
                if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
                rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
-            }, false)
+               // plainData.deletedAt = Date.now()
+            }, true)
          }
       } finally {
          this.release()
@@ -497,6 +502,8 @@ class Workspace {
       assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       delete mangoQuery.selector.rxCollectionEnum
       if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
+
+      mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные
       if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
       let rxQuery = this.db.ws_items.find(mangoQuery)
       return rxQuery
