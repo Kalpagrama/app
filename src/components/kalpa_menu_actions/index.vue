@@ -6,7 +6,7 @@ q-btn(round flat dense :icon="icon" :color="color")
     div(
       :style=`{
         borderRadius: '10px',
-        maxWidth: '200px',
+        //- maxWidth: '200px',
       }`
       ).row.full-width.items-start.content-start.b-40
       //- kalpa-share(type="node" :item="node").full-width

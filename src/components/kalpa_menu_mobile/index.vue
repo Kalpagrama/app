@@ -1,8 +1,32 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(
+    v-if="isGuest"
     :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
-    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs
+    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs.b-40
+    .row.full-height.items-center.content-center.justify-center
+      q-btn(
+        round flat dense color="white" icon="explore"
+        :to="'/trends'")
+      .row.full-width.justify-center
+            small.text-grey-6 Новое
+    q-btn(
+      :to="'/auth'"
+      flat color="white" no-caps
+      :style=`{
+        height: '44px',
+      }`).q-px-md.b-50
+      span.text-white Войти
+    .row.full-height.items-center.content-center.justify-center
+      q-btn(
+        @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
+        round flat dense color="white" icon="menu")
+      .row.full-width.justify-center
+        small.text-grey-6 Меню
+  div(
+    v-if="!isGuest"
+    :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
+    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs.b-40
     router-link(:to="{name: 'feeds'}").col
       .row.full-height.items-center.content-center.justify-center
         q-btn(
@@ -52,6 +76,11 @@ export default {
   name: 'kalpaMenuMobile',
   data () {
     return {
+    }
+  },
+  computed: {
+    isGuest () {
+      return this.$store.getters.currentUser().profile.role === 'GUEST'
     }
   },
   methods: {

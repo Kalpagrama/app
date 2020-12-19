@@ -18,7 +18,7 @@
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать контент
-    template(v-slot:tint=`{item}`)
+    //- template(v-slot:tint=`{item}`)
       div(
         @click="itemFound(item)"
         :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
