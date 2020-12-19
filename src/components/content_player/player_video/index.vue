@@ -17,7 +17,7 @@ div(
       :url="url"
       :objectFit="styles.objectFit"
       :style=`{
-        position: 'absolute', zIndex: 1000, top: 0,
+        position: 'absolute', zIndex: 100, top: 0,
       }`
       @player="player = $event, $emit('player', $event)").fit
     //- taps arrows
@@ -46,13 +46,14 @@ div(
   div(v-if="!options.mini" :style=`{height: '20px',}`).row.full-width
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="player && player.duration && player.duration > 0"
+      v-if="player"
       v-show="options.showBar"
       :class=`{
         'q-px-xl': !options.mini,
       }`
       :style=`{
-        position: 'absolute', zIndex: 1000,
+        position: 'absolute', zIndex: 3000,
+        transform: 'translate3d(0,0,10px)',
         bottom: options.mini ? '0px' : '12px',
         opacity: options.mini ? 0.6 : 1,
       }`

@@ -22,7 +22,7 @@ div(
     q-icon(
       :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
       :color="player.mutedLocal ? 'red' : 'white'"
-      size="20px" @click="player.volumeToggle()")
+      size="20px" @click="volumeToggle()")
   q-btn(
     round flat dense color="white" icon="fullscreen"
     :style=`{
@@ -191,11 +191,45 @@ export default {
             this.setCurrentTime(0)
             this.player.play()
           }
+          if (to < this.start) {
+            this.setCurrentTime(0)
+            // this.player.play()
+          }
+          if (to === this.start) {
+            this.player.play()
+          }
+        }
+        else {
+          // this.player.play()
         }
       }
     }
   },
+  mounted () {
+    if (!this.start || !this.end) {
+      this.player.play()
+    }
+    // TODO: platform handle
+    // if (this.$q.platform)
+    if (localStorage.getItem('k_volume')) {
+      this.player.stateSet('mutedLocal', false)
+    }
+    else {
+      this.player.stateSet('mutedLocal', true)
+    }
+  },
   methods: {
+    volumeToggle () {
+      this.$log('volumeToggle')
+      if (this.player.mutedLocal) {
+        this.player.stateSet('mutedLocal', false)
+        localStorage.setItem('k_volume', 'on')
+      }
+      else {
+        this.player.stateSet('mutedLocal', true)
+        localStorage.removeItem('k_volume')
+      }
+    },
     setCurrentTime (t) {
       if (this.start && this.end) {
         this.player.setCurrentTime(t + this.start)

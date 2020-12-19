@@ -24,19 +24,26 @@ q-page(
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     .row.full-width.items-start.content-start.q-pa-sm
-      div(
+      router-link(
         v-for="(item,ii) in items" :key="ii"
-        ).row.full-width
-        small.text-white {{ item.name }}
-      //- item(
-        v-for="(item,ii) in items" :key="ii"
-        @click.native="$emit('item', item)"
-        :item="item"
+        :to="itemLink(item)"
         :style=`{
+          borderRadius: '10px',
+          background: 'rgb(35,35,35)',
         }`
-        ).q-mb-sm
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
+        ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer
+        img(
+          :src="item.thumbUrl"
+          :style=`{
+            height: '50px',
+            borderRadius: '10px',
+          }`
+          )
+        .col
+          .row.full-width.items-center.content-center.q-pa-sm
+            span.text-white {{ item.name }}
+            .row.full-width
+              small.text-grey-6 {{ item.type }}
 </template>
 
 <script>
@@ -95,6 +102,21 @@ export default {
     },
   },
   methods: {
+    itemLink (item) {
+      let m = {
+        VIDEO: '/content/',
+        IMAGE: '/content/',
+        BOOK: '/content',
+        GIF: '/content/',
+        USER: '/user/',
+        NODE: '/node/',
+        JOINT: '/node',
+        SPHERE: '/sphere/',
+        WORD: '/sphere/',
+        SENTENCE: '/sphere/',
+      }
+      return m[item.type] + item.oid
+    }
   },
   created () {
     this.$log('created')

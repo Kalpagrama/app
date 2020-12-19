@@ -30,28 +30,13 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     :src="url"
     type="video/youtube"
     :playsinline="true"
-    :autoplay="autoplay"
+    :autoplay="true"
+    :loop="true"
     :muted="mutedLocal"
-    :loop="loop"
     :style=`{
       objectFit: 'contain'
     }`
     ).fit
-  //- tint on top
-  //- div(
-    :style=`{
-      position: 'absolute', top: '0px', zIndex: 1000, transform: 'translate3d(0,0,0)', height: '10%',
-      background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(0,0,0,0) 100%, rgba(10,10,10,0.9) 0%)',
-      borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
-    }`).row.full-width
-  //- tint on bottom
-  //- div(
-    :style=`{
-      position: 'absolute', bottom: '0px', zIndex: 1000, transform: 'translate3d(0,0,0)', height: '20%',
-      background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)',
-      borderRadius: '10px 10px 0 0', overflow: 'hidden', pointerEvents: 'none',
-    }`).row.full-width
-  //- slot
 </template>
 
 <script>
@@ -62,9 +47,9 @@ export default {
   name: 'playerVideo__playerYoutube',
   props: {
     url: {type: String, required: true},
-    muted: {type: Boolean, default () { return false }},
-    loop: {type: Boolean, default () { return true }},
-    autoplay: {type: Boolean, default () { return true }}
+    // muted: {type: Boolean, default () { return false }},
+    // loop: {type: Boolean, default () { return true }},
+    // autoplay: {type: Boolean, default () { return true }}
   },
   data () {
     return {
@@ -80,27 +65,33 @@ export default {
     }
   },
   watch: {
-    muted: {
-      immediate: true,
-      handler (to, from) {
-        this.mutedLocal = to
-      }
-    }
+    // mutedLocal: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     // this.mutedLocal = to
+    //     this.player.setMuted(to)
+    //   }
+    // }
   },
   methods: {
     stateSet (key, val) {
-      if (!this[key]) return
-      this[key] = val
+      // if (!this[key]) return
+      this.$log('stateSet', key, val)
+      // this[key] = val
+      if (key === 'mutedLocal') {
+        this.player.setMuted(val)
+      }
+      this.$set(this, key, val)
     },
     fullscreenToggle (to) {
       this.$log('fullscreenToggle')
       this.isFullscreen = to === undefined ? !this.isFullscreen : to
     },
-    volumeToggle () {
-      this.$log('volumeToggle')
-      this.mutedLocal = !this.mutedLocal
-      this.player.setMuted(this.mutedLocal)
-    },
+    // volumeToggle () {
+    //   this.$log('volumeToggle')
+    //   this.mutedLocal = !this.mutedLocal
+    //   this.player.setMuted(this.mutedLocal)
+    // },
     play () {
       // this.$log('play')
       this.player.play()
@@ -141,7 +132,7 @@ export default {
       // this.$log('playerInit videoRef', this.$refs.videoRef)
       let me = new window.MediaElementPlayer(this.$refs.videoRef, {
         loop: this.loop,
-        muted: this.muted,
+        muted: this.mutedLocal,
         autoplay: this.autoplay,
         controls: true,
         features: [],

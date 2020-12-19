@@ -115,6 +115,7 @@
       @player="playerLoaded"
       @error="playerError = $event"
       :styles="styles"
+      :figures="(item.__typename === 'Composition' && !editing) ? item.layers[0].figuresAbsolute : false"
       :style=`{
         borderRadius: '10px',
       }`).bg-black
@@ -126,7 +127,7 @@
       color="green"
       icon="add"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: 6+'px'
+        position: 'absolute', zIndex: 10000, right: '8px', bottom: 6+'px'
       }`)
     //- toggle composition editing => show/hide composition editor
     q-btn(
@@ -136,7 +137,7 @@
       :color="editing ? 'green' : 'white'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{
-        position: 'absolute', zIndex: 2000, right: '8px', bottom: 6+'px'
+        position: 'absolute', zIndex: 10000, right: '8px', bottom: 6+'px'
       }`)
     //- compositionEditor for VIDEO
     div(

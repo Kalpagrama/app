@@ -40,11 +40,11 @@ import { UserApi } from 'src/api/user'
 export default {
   name: 'kalpaFinder',
   props: {
-    pageId_: {type: String, default: 'workspace'},
+    pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
-    workspaceTypes: {type: Array},
-    kalpaTypes: {type: Array},
+    // workspaceTypes: {type: Array},
+    // kalpaTypes: {type: Array},
     pages: {type: Object},
   },
   components: {
@@ -70,9 +70,9 @@ export default {
       return [
         {id: 'content', name: 'Загрузки', component: 'page-content'},
         {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
-        {id: 'kalpagrama', name: 'Кальпаграма', component: 'page-kalpa'},
-        {id: 'gif', name: 'Gif', component: 'page-gif'},
-        {id: 'web', name: 'Web', component: 'page-web'},
+        {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
+        // {id: 'gif', name: 'Gif', component: 'page-gif'},
+        // {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {
         if (this.pages) {
           return this.pages[p.id]

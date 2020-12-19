@@ -4,25 +4,34 @@ q-page(
     paddingTop: '0px',
   }`
   ).row.full-width.justify-center.items-start.content-start
-  .row.full-width.justify-center
+  .row.full-width.justify-center.q-py-sm
     div(
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
         height: '60px',
+        borderRadius: '10px',
       }`
-      ).row.full-width.items-center.content-center.q-pa-sm
+      ).row.full-width.items-center.content-center.q-pa-sm.b-40
       q-btn(
         @click="$emit('close')"
-        flat color="white" no-caps icon="keyboard_arrow_left")
-        span.text-white.q-ml-sm назад к категориям
+        flat color="white" no-caps icon="west")
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Поиск
+        //- span.text-white.q-ml-sm назад к категориям
   .row.full-width.justify-center
     kalpa-finder(
       @contentKalpa="$event => $router.push('/content/'+$event.oid)"
+      :pagesShow="false"
+      :pages=`{
+        //- workspace: {views: ['image', 'video', 'node', 'user', 'sphere']},
+        kalpagrama: {views: ['all', 'users', 'nodes']},
+        //- gif: {views: ['all']},
+        //- web: {views: ['all', 'image', 'video',]}
+      }`
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
         height: $q.screen.height-60+'px',
       }`)
-      template(v-slot:tint=`{item}`)
+      //- template(v-slot:tint=`{item}`)
         div(
           @click="itemLaunch(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
@@ -33,6 +42,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'trends_viewSearch',
+  components: {
+    kalpaFinder: () => import('components/kalpa_finder/index.vue'),
+  },
   data () {
     return {
     }

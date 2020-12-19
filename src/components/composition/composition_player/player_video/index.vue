@@ -14,12 +14,14 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
-      objectFit: styles.objectFit
+      objectFit: styles.objectFit,
+      //- border: (player && player.currentTime < figures[0].t) ? '2px solid red' : 'none'
     }`
     ).full-width
   //- video wrapper
   content-player(
     v-if="isActive && isVisible"
+    @player="player = $event"
     :contentKalpa=`{
       url: composition.url,
       type: 'VIDEO',
@@ -37,7 +39,10 @@ div(
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
       borderRadius: '10px',
+      opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
+  //- .row.full-width.bg-red
+    span {{ figures }}
 </template>
 
 <script>
