@@ -2,20 +2,21 @@
 div(
   :style=`{
     position: 'relative',
-    paddingBottom: Math.min(Math.round(ratio*100), 100)+'%',
+    paddingBottom: Math.round(ratio*100)+'%',
   }`
   ).row.full-width
-  composition-player(
-    :oid="node.oid"
-    :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-    :options=`{
-      height: '100%', objectFit: 'contain', loop: true,
-      showContentExplorer: true,
-      showContentMeta: true,
-    }`
-    :style=`{
-      position: 'absolute', zIndex: 100, top: 0,
-    }`)
+  div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
+    composition-player(
+      :oid="node.oid"
+      :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
+      :styles=`{
+        height: '100%',
+        objectFit: 'contain',
+      }`
+      :options=`{
+        loop: true,
+        showBar: true,
+      }`)
 </template>
 
 <script>
@@ -32,10 +33,18 @@ export default {
     }
   },
   computed: {
+    ratioMax () {
+      return 0.6
+    },
     ratio () {
       let height = this.node.items[0].thumbHeight
-      if (height) return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
-      else return 1
+      if (height) {
+        let ratio = this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
+        return Math.min(this.ratioMax, ratio)
+      }
+      else {
+        return this.ratioMax
+      }
     }
   },
   watch: {

@@ -82,10 +82,19 @@ div(
           v-if="node.items.length === 1"
           :to="'/links/'+node.oid"
           round flat color="grey-6" icon="link"
-          :style=`{width: '50px', height: '50px',}`)
+          :style=`{
+            position: 'relative',
+            width: '50px', height: '50px',
+          }`)
+          small(
+            v-if="node.countJoints > 0"
+            :style=`{
+              position: 'absolute', zIndex: 200, bottom: '-2px',
+            }`
+          ).text-grey-6 {{ node.countJoints }}
     //- SPHERES
     div(
-      v-if="showSpheres && node.oid"
+      v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
       :style=`{
         height: '46px',
       }`).row.full-width.items-center.content-center.justify-start.scroll
@@ -131,6 +140,7 @@ export default {
     showName: {type: Boolean, default: true},
     showActions: {type: Boolean, default: true},
     showSpheres: {type: Boolean, default: true},
+    showSpheresAlways: {type: Boolean, default: false},
     showCategory: {type: Boolean, default: true},
     showItems: {type: Boolean, default: true},
     itemsStyles: { type: Array, default () { return [{}, {}] } }

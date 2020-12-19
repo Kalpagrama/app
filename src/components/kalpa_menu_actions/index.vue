@@ -6,6 +6,7 @@ q-btn(round flat dense :icon="icon" :color="color")
     div(
       :style=`{
         borderRadius: '10px',
+        maxWidth: '200px',
       }`
       ).row.full-width.items-start.content-start.b-40
       //- kalpa-share(type="node" :item="node").full-width
@@ -22,10 +23,13 @@ q-btn(round flat dense :icon="icon" :color="color")
         @click="a.cb()"
         v-for="(a,akey) in actions" :key="akey"
         v-close-popup
-        flat no-caps
+        flat dense no-caps
         :color="a.color || 'white'"
-        :style=`{height: '50px',}`).full-width
-        span.text-bold {{ a.name }}
+        :style=`{
+          //- height: '50px',
+        }`
+        ).full-width
+        span {{ a.name }}
 </template>
 
 <script>

@@ -15,21 +15,46 @@ div(
       v-if="isActiveLocal"
       :is="playerComponent[source]"
       :url="url"
-      @player="player = $event, $emit('player', $event)"
+      :objectFit="styles.objectFit"
       :style=`{
         position: 'absolute', zIndex: 1000, top: 0,
-      }`).fit
+      }`
+      @player="player = $event, $emit('player', $event)").fit
+    //- taps arrows
+    div(
+      v-for="(t,ti) in 2" :key="ti"
+      @click="tapClick(ti)"
+      :style=`{
+        position: 'absolute', zIndex: 1000, top: '0px', left: ti === 0 ? '0px' : '70%',
+        width: '40%',
+        borderRadius: '10px',
+      }`
+      ).row.full-height.items-center.content-center.justify-center.cursor-pointer
+      q-btn(
+        v-if="tapIndex === ti && tapCount > 1"
+        flat color="white" no-caps
+        :icon="ti === 0 ? 'fast_rewind' : 'null'"
+        :icon-right="ti === 1 ? 'fast_forward' : 'null'"
+        :style=`{
+          userSelect: 'none !important',
+          opacity: 0.8
+        }`).fit
+        span(
+          :style=`{userSelect: 'none !important'}`
+          ).text-white.text-bold {{ $time(5 * (tapCount - 1)) }}
   //- footer
-  //- footer styles ? position relative/absolute paddingBottom ???
+  div(v-if="!options.mini" :style=`{height: '20px',}`).row.full-width
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="player && player.duration > 0"
-      v-show="!options.mini"
+      v-if="player && player.duration && player.duration > 0"
+      v-show="options.showBar"
       :class=`{
         'q-px-xl': !options.mini,
       }`
       :style=`{
-        ...(() => options.mini ? {position: 'absolute', bottom: '0px', zIndex: 1000} : {position: 'relative', paddingTop: '12px', paddingBottom: '12px'})(),
+        position: 'absolute', zIndex: 1000,
+        bottom: options.mini ? '0px' : '12px',
+        opacity: options.mini ? 0.6 : 1,
       }`
       ).row.full-width
       player-bar(
@@ -39,6 +64,7 @@ div(
         :end="end"
         :mini="options.mini"
         :style=`{maxWidth: '770px'}`)
+  div(v-if="!options.mini" :style=`{height: '12px',}`).row.full-width
 </template>
 
 <script>
@@ -65,8 +91,7 @@ export default {
       default () {
         return {
           mini: false,
-          showActions: true,
-          showBar: true
+          showBar: true,
         }
       }
     }
@@ -79,6 +104,9 @@ export default {
         KALPA: 'player-kalpa',
       },
       isActiveLocal: false,
+      tapTimer: null,
+      tapIndex: null,
+      tapCount: 0,
     }
   },
   computed: {
@@ -106,6 +134,49 @@ export default {
         this.$log('isActive TO', to)
         this.isActiveLocal = to
       }
+    }
+  },
+  methods: {
+    tapClick (index) {
+      this.$log('tapClick', this.tapTimer)
+      this.tapIndex = index
+      this.tapCount += 1
+      if (this.tapTimer) {
+        this.$log('tapTimer restart')
+        clearTimeout(this.tapTimer)
+        // this.tapTimer = null
+      }
+      // if more that one click in 200 we do the math
+      // handle TWO and more clicks to stack T
+      if (this.tapCount > 1) {
+        this.$log('dbClick', this.tapCount)
+        let t = this.player.currentTime
+        let d = 5 * (this.tapCount - 1)
+        this.$log('d', d)
+        if (index === 0) t -= d
+        else t += d
+        // check borders
+        if (t < 0) t = 0
+        if (t > this.player.duration) t = this.player.duration
+        // set currentTime
+        this.player.setCurrentTime(t)
+      }
+      // // handle ONE click
+      // if (this.tapCount === 1) {
+      //   if (this.player.playing) this.player.pause()
+      //   else this.player.play()
+      // }
+      this.tapTimer = setTimeout(() => {
+        this.$log('tapTimer work')
+        // handle ONE click
+        if (this.tapCount === 1) {
+          if (this.player.playing) this.player.pause()
+          else this.player.play()
+        }
+        this.tapCount = 0
+        this.tapTimer = null
+        this.tapIndex = null
+      }, 200)
     }
   }
 }

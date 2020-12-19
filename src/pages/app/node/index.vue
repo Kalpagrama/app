@@ -10,14 +10,14 @@ q-layout(
           borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-px-sm.b-40
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="white" icon="west" @click="$router.back()")
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-page-container
     q-page.row.full-width.justify-center.q-pt-sm
       div(
         :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
-        ).row.full-width.items-start.content-start.q-px-sm
+        ).row.full-width.items-start.content-start
         node-feed(
           v-if="node"
           :node="node"

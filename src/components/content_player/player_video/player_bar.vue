@@ -12,21 +12,29 @@ div(
   slot(name="bar")
   slot(name="bar-current-time" :panning="panning")
   //- volume
+  //- v-if="!mini"
   q-btn(
-    v-if="!mini"
-    round flat dense :color="color"
+    round flat dense
+    :color="player.mutedLocal ? 'red' : 'white'"
     :style=`{
-      position: 'absolute', left: '-40px', top: '-8px', zIndex: 300,
+      position: 'absolute', top: '-34px', left: '12px', zIndex: 300,
     }`)
     q-icon(
       :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
-      :color="player.mutedLocal ? 'red' : color"
+      :color="player.mutedLocal ? 'red' : 'white'"
       size="20px" @click="player.volumeToggle()")
+  q-btn(
+    round flat dense color="white" icon="fullscreen"
+    :style=`{
+      position: 'absolute', top: '-34px', right: '12px', zIndex: 300,
+    }`
+    )
   //- currentTime/duration
   small(
     :style=`{
       position: 'absolute', zIndex: 300,
       pointerEvents: 'none', left: '8px', top: '2px',
+      userSelect: 'none',
     }`
     ).text-grey-4 {{$time(currentTime)}} / {{$time(duration)}}
   //- currentTime width/line
@@ -45,7 +53,7 @@ div(
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
       }`
-      ).row.bg-green
+      ).row.bg-red
   //- currentTime line
   div(
     :style=`{
@@ -67,7 +75,7 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.bg-green
+    ).row.bg-red
   //- onMoving over rect label
   div(
     v-if="currentTimeMove"
@@ -78,7 +86,7 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm.bg-green {{ $time(currentTimeMove) }}
+    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimeMove) }}
   //- onPanning line currentTime
   div(
     v-if="panning"
@@ -90,7 +98,7 @@ div(
       pointerEvents: 'none',
       opacity: 0.9,
     }`
-    ).row.bg-green
+    ).row.bg-red
   //- onPanning rect label
   div(
     v-if="panning"
@@ -102,7 +110,7 @@ div(
       userSelect: 'none',
       opacity: 0.9,
     }`
-    ).row.text-white.q-pa-sm.bg-green {{ $time(currentTimePercent/100*duration) }}
+    ).row.text-white.q-pa-sm.bg-red {{ $time(currentTimePercent/100*duration) }}
   //- POINTS
   div(
     v-if="player && player.points && player.points.length > 0"

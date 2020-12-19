@@ -54,7 +54,7 @@
         objectFit: 'cover',
       }`
       :options=`{
-        height: '100%', objectFit: 'cover', loop: true,
+        loop: true,
       }`)
     //- name
     div(
