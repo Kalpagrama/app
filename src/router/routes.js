@@ -45,7 +45,8 @@ const routes = [
          {
             name: 'about',
             path: 'about',
-            component: () => import('pages/app/about/index.vue')
+            component: () => import('pages/app/about/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'feeds',
@@ -65,7 +66,8 @@ const routes = [
                   component: () => import('pages/app/settings/view_account/index.vue'),
                   meta: { roleMinimal: 'MEMBER' }
                }
-            ]
+            ],
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             path: 'user/:oid',
@@ -89,7 +91,7 @@ const routes = [
             name: 'links',
             path: 'links/:oid',
             component: () => import('pages/app/links/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'sphere',
@@ -122,7 +124,7 @@ const routes = [
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid, query: route.query }),
             component: () => import('pages/app/content/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             path: 'notifications',
