@@ -18,9 +18,8 @@ div(
       objectFit: 'cover',
     }`
     :options=`{
-      height: '100%', objectFit: 'cover', loop: true,
-      showContentExplorer: true,
-      showContentMeta: false,
+      loop: true,
+      showBar: false,
     }`)
   //- COMPOSITION
   composition-player(
@@ -34,11 +33,8 @@ div(
       objectFit: 'cover',
     }`
     :options=`{
-      height: '100%', objectFit: 'cover', loop: true,
-      showContentExplorer: true,
-      showContentMeta: false,
-      borderRadius: '10px',
-      overflow: 'hidden'
+      loop: true,
+      showBar: false,
     }`)
   div(
     v-else-if="item.__typename === 'Sphere'"
@@ -47,13 +43,6 @@ div(
     }`
     ).row.fit.items-center.content-center.justify-center.b-30
     q-icon(name="blur_on" color="white" size="100px")
-    //- div(
-      :style=`{
-        position: 'absolute',
-        textAlign: 'center'
-      }`
-      ).row.full-width.justify-center
-      span.text-white {{ item.name }}
   //- CONTENT, USER, SPHERE, GIF ?
   //- FALLBACK
   //- fallback image
@@ -83,7 +72,6 @@ div(
       :style=`{
         height: '36px',
         textAlign: 'center',
-        //- paddingLeft: '100%',
       }`
       ).row.items-center.content-center.scroll
       //- .row.full-width.br
@@ -95,7 +83,6 @@ div(
         :style=`{
           whiteSpace: 'nowrap',
           marginLeft: '8px',
-          //- marginRight: '100%',
           textAlign: 'center',
         }`).text-white {{ item.name }}
 </template>

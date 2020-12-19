@@ -25,7 +25,8 @@ q-layout(view="hHh Lpr lff").b-30
           v-if="joint"
           :node="joint"
           :showHeader="joint.oid"
-          :showActions="joint.oid")
+          :showActions="joint.oid"
+          :showSpheresAlways="true")
           template(v-slot:items)
             node-editor(
               :node="joint"

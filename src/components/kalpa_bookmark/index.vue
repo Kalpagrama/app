@@ -27,7 +27,7 @@ export default {
     activeColor: {type: String, default: 'green'},
   },
   components: {
-    feedsSelector: () => import('./feeds_selector.vue')
+    // feedsSelector: () => import('./feeds_selector.vue')
   },
   data () {
     return {

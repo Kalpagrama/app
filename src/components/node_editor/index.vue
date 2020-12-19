@@ -76,6 +76,7 @@
               :item="item"
               :styles=`{
                 height: '100%',
+                objectFit: 'cover',
               }`
               :style=`{}`).fit
             item-player(
@@ -203,7 +204,7 @@ export default {
     itemPaddingBottom (item, itemii) {
       if (this.node.items.length === 1) {
         if (item.thumbHeight && item.thumbWidth) {
-          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 45px)'
+          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 34px)'
         }
         else {
           return '50%'

@@ -14,8 +14,7 @@ div(
     :loop="loop"
     :muted="mutedLocal"
     :style=`{
-      objectFit: 'cover',
-      //- objectFit: 'contain',
+      objectFit: objectFit,
       borderRadius: '10px',
       overflow: 'hidden',
     }`
@@ -23,7 +22,6 @@ div(
     @timeupdate="timeupdateHandle"
     @play="playHandle"
     @pause="pauseHandle").fit
-  //- slot
 </template>
 
 <script>
@@ -33,7 +31,8 @@ export default {
     url: {type: String, required: true},
     muted: {type: Boolean, default () { return true }},
     loop: {type: Boolean, default () { return true }},
-    autoplay: {type: Boolean, default () { return true }}
+    autoplay: {type: Boolean, default () { return true }},
+    objectFit: {type: String, default () { return 'cover' }}
   },
   data () {
     return {
@@ -85,7 +84,8 @@ export default {
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
-      this.duration = this.$refs.videoRef.duration
+      // this.duration = this.$refs.videoRef.duration
+      this.duration = e.path[0].duration || this.$refs.videoRef.duration
       // TODO: create player ??? with methods...
     },
     timeupdateHandle (e) {

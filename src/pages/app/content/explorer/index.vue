@@ -18,7 +18,7 @@ q-layout(
           maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '0 0 10px 10px',
           //- background: 'rgb(35,35,35)',
-        }`).row.full-width
+        }`).row.full-width.b-30
         node-editor(
           v-if="node"
           @published="nodePublished"

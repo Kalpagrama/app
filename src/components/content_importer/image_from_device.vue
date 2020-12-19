@@ -3,7 +3,7 @@
   //- header
   div().row.full-width.items-center.content-center.q-pa-sm
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold Add image to workspace
+    span(:style=`{fontSize: '18px', userSelect: 'none',}`).text-white.text-bold Add image to workspace
   //- TODO: set name?
   .row.full-width.q-pa-sm
     div(:style=`{position: 'relative',borderRadius: '10px',overflow: 'hidden'}`).row.full-width

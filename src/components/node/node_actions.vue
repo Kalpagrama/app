@@ -39,6 +39,7 @@ export default {
   watch: {
     isActive: {
       async handler (to, from) {
+        if (this.$store.getters.currentUser().profile.role === 'GUEST') return
         if (to) {
           this.isActiveStart = Date.now()
         }
@@ -51,6 +52,6 @@ export default {
         }
       }
     }
-  },
+  }
 }
 </script>
