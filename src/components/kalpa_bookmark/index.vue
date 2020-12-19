@@ -59,6 +59,11 @@ export default {
       try {
         this.$log('start')
         this.loading = true
+        if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+          // TODO: remeber his bookmark Intension
+          this.$router.push('/auth')
+          return
+        }
         await this.$wait(500)
         let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
         this.$log('start [bookmark]', bookmark)

@@ -68,6 +68,21 @@
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
               small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
+        //- login for GUEST
+        q-btn(
+          v-if="isGuest"
+          color="green" no-caps icon="login"
+          :align="mini ? 'center' : 'left'"
+          :to="'/auth'"
+          :style=`{
+            height: '50px',
+            maxWidth: '210px',
+            paddingLeft: '0px'
+          }`
+          ).full-width.items-center.content-center
+          span(
+            v-if="!mini"
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Войти
         //- actions
         .row.full-width
           q-btn(
@@ -99,7 +114,9 @@
               v-if="!mini"
               :style=`{fontSize: '18px'}`).text-bold.q-ml-md Eще
         //- create node
-        .row.full-width.items-center.content-center.q-mt-sm
+        div(
+          v-if="!isGuest"
+          ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
             :to="isGuest ? '/auth' : '/workspace/create'"
             color="green" no-caps icon="add" size="md"
@@ -111,7 +128,7 @@
             }`).full-width.menu-item
             span(
               v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-md Создать ядро
+              :style=`{fontSize: '18px'}`).text-bold.q-ml-md Создать
         //- docs
         kalpa-docs(
           v-if="!mini"
@@ -149,7 +166,7 @@ export default {
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'about', name: 'Что это?', icon: 'support'}
+        {id: 'about', name: 'О проекте', icon: 'support'}
       ]
     }
   },

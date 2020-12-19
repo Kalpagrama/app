@@ -35,7 +35,7 @@ q-layout(view="lHh lpR lFf")
     kalpa-menu(
       :mini="false"
       :style=`{borderRadius: '0 10px 10px 0'}`
-      ).full-height.b-40.q-pt-md
+      ).full-height.b-40.q-pt-md.q-px-sm
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
