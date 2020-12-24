@@ -29,6 +29,7 @@
               paddingLeft: '64px',
               paddingRight: node.items[1] ? '64px' : '64px',
               background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
+              textAlign: 'center',
             }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
             //- TODO: paddingLeft, paddingRight 60px
             img(
@@ -42,7 +43,7 @@
                 objectFit: 'cover',
                 border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
               }`)
-            span(
+            small(
               :style=`{
                 //- fontSize: '20px',
               }`).text-white.text-bold {{ name }}
@@ -91,7 +92,7 @@ export default {
     name () {
       if (this.node.vertices.length === 2) {
         if (this.node.vertices[0] === 'ESSENCE') return this.node.name
-        else if (this.node.vertices[0] === 'ASSOCIATIVE') return ''
+        else if (this.node.vertices[0] === 'ASSOCIATIVE') return 'Ассоциация'
         else {
           return this.$nodeItemType(this.node.vertices[0]).name + ' - ' + this.$nodeItemType(this.node.vertices[1]).name
         }
