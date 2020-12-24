@@ -150,10 +150,11 @@ class Lists {
          let indx = reactiveItem.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
-               logD(f, 'add created object to begin of list.', object)
-               reactiveItem.items.splice(0, 0, object)
+               logD(f, 'add created object to begin of list aaa.', object, reactiveItem.items.length)
+               reactiveItem.items.splice(0, 0, {oid: object.oid})
                reactiveItem.count++
                reactiveItem.totalCount++
+               logD(f, 'add created object to begin of list bbb.', object, reactiveItem.items.length)
             }
          } else if (type === 'OBJECT_DELETED') {
             if (indx >= 0) {

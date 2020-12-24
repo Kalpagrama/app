@@ -54,7 +54,7 @@ export default {
       handler (to, from) {
         // this.$log('items UPDATED')
         if (to && from) {
-          this.$log('items UPDATED', to.length)
+          this.$log('items UPDATED', to.length, to)
           this.$emit('items', to)
         }
         // this.$log('items UPDATED', to)
@@ -81,8 +81,8 @@ export default {
         // this.$log('*** NEXT itemsCreating next', this.items)
       }
       // this.$log('*** NEXT hasMore ***')
-      let hasMore = await this.items.next(this.limit)
-      if (hasMore) done()
+      await this.items.next(this.limit)
+      if (this.items.hasMore) done()
       else {
         this.$emit('items', this.items)
         done(true)
