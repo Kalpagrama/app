@@ -10,7 +10,7 @@ q-layout(
           borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-px-sm.b-40
-        q-btn(round flat color="white" icon="west" @click="$router.back()")
+        q-btn(round flat color="white" icon="west" @click="$router.back()").q-mr-sm
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-page-container

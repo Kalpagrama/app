@@ -16,8 +16,9 @@ q-layout(view="hHh Lpr lff").bg-black
             position: 'relative',
             height: creatorHeight+'px',
             paddingTop: '35px',
+            paddingBottom: '35px',
           }`
-          ).row.full-width.bg-black.q-pa-sm
+          ).row.full-width.bg-black.br
           div(
             :style=`{
               position: 'absolute', zIndex: 3000, top: '-30px', left: '0px',
@@ -127,7 +128,7 @@ export default {
   beforeDestroy () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

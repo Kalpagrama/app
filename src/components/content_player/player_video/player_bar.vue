@@ -13,22 +13,25 @@ div(
   slot(name="bar-current-time" :panning="panning")
   //- volume
   //- v-if="!mini"
-  q-btn(
-    round flat dense
-    :color="player.mutedLocal ? 'red' : 'white'"
+  //- actions
+  div(
     :style=`{
-      position: 'absolute', top: '-34px', left: '12px', zIndex: 300,
-    }`)
-    q-icon(
-      :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
-      :color="player.mutedLocal ? 'red' : 'white'"
-      size="20px" @click="volumeToggle()")
-  q-btn(
-    round flat dense color="white" icon="fullscreen"
-    :style=`{
-      position: 'absolute', top: '-34px', right: '12px', zIndex: 300,
+      position: 'absolute', zIndex: 300, top: '-34px', left: '4px',
     }`
-    )
+    ).row
+    //- q-btn(
+      round flat dense
+      color="white"
+      icon="play_arrow")
+    q-btn(
+      round flat dense
+      :color="player.mutedLocal ? 'red' : 'white'")
+      q-icon(
+        :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
+        :color="player.mutedLocal ? 'red' : 'white'"
+        size="20px" @click="volumeToggle()")
+    q-btn(
+      round flat dense color="white" icon="fullscreen")
   //- currentTime/duration
   small(
     :style=`{
@@ -57,10 +60,10 @@ div(
   //- currentTime line
   div(
     :style=`{
-      position: 'absolute', zIndex: 2100, left: '0px', top: '-4px',
+      position: 'absolute', zIndex: 2100, left: '0px', top: '-5px',
       left: 'calc('+(currentTime/duration)*100+'% - 2px)',
-      width: '4px', borderRadius: '2px', overflow: 'hidden',
-      height: 'calc(100% + 8px)',
+      width: '3px', borderRadius: '1px', overflow: 'hidden',
+      height: 'calc(100% + 10px)',
       pointerEvents: 'none',
     }`
     ).row.bg-red
@@ -116,6 +119,7 @@ div(
     v-if="player && player.points && player.points.length > 0"
     :style=`{
       position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+      borderRadius: '10px', pointerEvents: 'none', overflow: 'hidden',
     }`
     ).row.fit
     div(
@@ -133,6 +137,8 @@ div(
     v-if="player && player.figures && player.figures.length > 0"
     :style=`{
       position: 'absolute', zIndex: 2050, pointerEvents: 'none',
+      borderRadius: '10px', pointerEvents: 'none',
+      //- overflow: 'hidden',
     }`
     ).row.fit
     //- TODO: left and width -3px + 6px etc...

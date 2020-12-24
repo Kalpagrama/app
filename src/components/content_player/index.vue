@@ -11,6 +11,7 @@ component(
   :figures="figures"
   :options="options"
   :styles="styles"
+  @add="$emit('add')"
   @player="$emit('player', $event)")
   template(v-for="(index, name) in $slots" v-slot:[name])
     slot(:name="name")

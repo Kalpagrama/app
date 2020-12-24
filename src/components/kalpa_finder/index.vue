@@ -68,9 +68,9 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'content', name: 'Загрузки', component: 'page-content'},
         {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
+        {id: 'content', name: 'Загрузки', component: 'page-content'},
         // {id: 'gif', name: 'Gif', component: 'page-gif'},
         // {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {

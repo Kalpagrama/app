@@ -40,8 +40,8 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           :style=`{
             position: 'absolute', zIndex: 2000,
             left: 'calc('+(player.currentTime/player.duration)*100+'% - 2px)',
-            top: '-14px',
-            height: 'calc(100% + 28px)',
+            top: '-7px',
+            height: 'calc(100% + 14px)',
             width: '4px',
             borderRadius: '2px', overflow: 'hidden',
             pointerEvents: 'none'
@@ -99,7 +99,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
       left: '0px', width: '100%',
     }`
     ).row.items-center.content-center.justify-center
-    .row.full-width.items-center.content-center.q-px-sm
+    div(:style=`{maxWidth: '410px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
       .col
       q-btn(round flat dense color="grey-8" @click="layerForward(0,false)")

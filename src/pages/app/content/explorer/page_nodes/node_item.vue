@@ -1,89 +1,86 @@
 <style lang="sass">
 .node-item
   &:hover
-    background: rgb(50,50,50) !important
+    background: rgb(40,40,40) !important
 </style>
 
 <template lang="pug">
 .row.full-width
-  .col
-    node-feed(
-      :node="node" :isActive="isActive" :isVisible="isVisible"
-      :showName="isOpened"
-      :showSpheres="false"
-      @itemActive="itemActiveHandle"
-      :itemsStyles=`itemsStyles`
-      :class=`{
+  q-dialog(
+    v-model="isOpened" maximized
+    )
+    div(
+      @click.self="isOpened = false"
+      :style=`{
+        //- zIndex: 10000,
+        transform: 'translate3d(0,0,0)',
+        width: $q.screen.width+'px',
+        minWidth: Math.min($store.state.ui.pageWidth, $q.screen.width)+'px',
+        height: $q.screen.height+'px',
+        //- background: 'rgba(0,0,0,0.8)',
       }`
+      ).row.full-width.items-center.content-center.justify-center
+      div(
+        :style=`{
+          background: 'rgb(30,30,30)',
+          borderRadius: '10px', overflow: 'hidden',
+          maxWidth: $store.state.ui.pageWidth+'px',
+        }`).row.full-width.q-pb-xs
+        node-feed(:node="node" :isActive="true" :isVisible="true")
+      .row.full-width.items-center.content-center.justify-center.q-pa-sm
+        //- icon="south" icon-right="south"
+        q-btn(
+          @click="isOpened = false"
+          flat dense color="white" no-caps)
+          span.q-mx-sm Закрыть
+  .row.full-width.items-start.content-start
+    div(
+      @click="onClick"
       :style=`{
+        position: 'relative',
         borderRadius: '10px',
-      }`)
-      template(v-slot:items v-if="!isOpened")
-        .row.full-width.items-start.content-start.q-px-sm
-          div(
-            @click="isOpened = true"
-            :style=`{
-              position: 'relative',
-              borderRadius: '10px',
-              minHeight: '60px',
-              paddingLeft: '64px',
-              paddingRight: node.items[1] ? '64px' : '64px',
-              background: isActive ? 'rgb(45,45,45)' : 'rgb(40,40,40)',
-              textAlign: 'center',
-            }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
-            //- TODO: paddingLeft, paddingRight 60px
-            img(
-              :src="node.items[0].thumbUrl"
-              :style=`{
-                position: 'absolute', zIndex: 100,
-                top: '0px', left: '0px',
-                height: '60px',
-                width: '60px',
-                borderRadius: '10px',
-                objectFit: 'cover',
-                border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
-              }`)
-            small(
-              :style=`{
-                //- fontSize: '20px',
-              }`).text-white.text-bold {{ name }}
-            img(
-              v-if="node.items[1]"
-              :src="node.items[1].thumbUrl"
-              :style=`{
-                position: 'absolute', zIndex: 100,
-                top: '0px', right: '0px',
-                height: '60px',
-                width: '60px',
-                borderRadius: '10px',
-                objectFit: 'cover',
-                border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
-              }`)
-  //- right side resizer
-  div(
-    :style=`{
-      width: '60px',
-    }`
-    ).row.items-center.content-center.justify-center
-    q-btn(
-      @click="isOpened = !isOpened"
-      round flat
-      color="grey-8"
-      :icon="isOpened ? 'unfold_less' : 'unfold_more'"
-      :style=`{
-        position: 'absolute', zIndex: 1000, right: '0px', top: '0px',
-        width: '60px', height: '60px',
-      }`)
+        minHeight: '50px',
+        paddingLeft: '64px',
+        paddingRight: node.items[1] ? '64px' : '64px',
+        //- background: isActive ? 'rgb(38,38,38)' : 'rgb(35,35,35)',
+        background: 'rgb(35,35,35)',
+        textAlign: 'center',
+      }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
+      img(
+        :src="node.items[0].thumbUrl"
+        :style=`{
+          position: 'absolute', zIndex: 100,
+          top: '0px', left: '0px',
+          height: '50px',
+          width: '50px',
+          borderRadius: '10px',
+          objectFit: 'cover',
+          border: figures[0] ? '3px solid rgb(76,175,79)' : 'none'
+        }`)
+      small.text-white.text-bold {{ name }}
+      img(
+        v-if="node.items[1]"
+        :src="node.items[1].thumbUrl"
+        :style=`{
+          position: 'absolute', zIndex: 100,
+          top: '0px', right: '0px',
+          height: '50px',
+          width: '50px',
+          borderRadius: '10px',
+          objectFit: 'cover',
+          border: figures[1] ? '3px solid rgb(76,175,79)' : 'none'
+        }`)
 </template>
 
 <script>
 export default {
   name: 'pageNodes_item',
-  props: ['node', 'player', 'contentKalpa', 'nodeQuery', 'isActive', 'isVisible'],
+  props: ['node', 'player', 'contentKalpa', 'nodeQuery', 'isActive', 'isSelected', 'isVisible'],
   components: {
   },
   data () {
     return {
+      // isSelected: false,
       isOpened: false,
       figures: [],
     }
@@ -115,7 +112,8 @@ export default {
     }
   },
   watch: {
-    isActive: {
+    // isOpened: {},
+    isSelected: {
       handler (to, from) {
         if (to) {
           // let figures = []
@@ -165,12 +163,24 @@ export default {
     }
   },
   methods: {
+    onClick (e) {
+      this.$log('onClick', e)
+      if (!this.isSelected) {
+        // this.isSelected = true
+        this.$emit('select', this.node.oid)
+      }
+      if (this.isSelected) {
+        this.player.pause()
+        this.isOpened = true
+      }
+      // if (this.isSelected)
+    }
   },
   mounted () {
     // this.$log('mounted')
-    if (this.nodeQuery === this.node.oid) {
-      this.$emit('scrollme')
-    }
+    // if (this.nodeQuery === this.node.oid) {
+    //   this.$emit('scrollme')
+    // }
   }
 }
 </script>

@@ -204,7 +204,7 @@ export default {
     itemPaddingBottom (item, itemii) {
       if (this.node.items.length === 1) {
         if (item.thumbHeight && item.thumbWidth) {
-          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 34px)'
+          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 20px)'
         }
         else {
           return '50%'

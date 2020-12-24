@@ -21,6 +21,7 @@ iframe[id$="_youtube_iframe"]
 .mejs__overlay
   width: 100% !important
   height: 100% !important
+  display: none !important
 </style>
 
 <template lang="pug">

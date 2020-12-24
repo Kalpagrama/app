@@ -10,6 +10,12 @@ q-layout(
   q-header
     div(:style=`{}`).row.full-width.justify-center
       q-resize-observer(@resize="headerOnResize" :debounce="300")
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        nav-desktop(
+          v-if="contentKalpa && $q.screen.gt.sm"
+          :contentKalpa="contentKalpa"
+          :pageId="pageId"
+          @pageId="pageId = $event")
       div(
         :class=`{
           'q-pt-sm': $q.screen.gt.xs
@@ -26,53 +32,60 @@ q-layout(
           @player="player = $event"
           :node="node"
           :showEditor="node.items[0].layers ? true : false")
-  q-page-container
-    page-nodes(
-      v-if="!node.items[0].layers && !pageId"
-      :nodeQuery="query.node"
-      :contentKalpa="contentKalpa"
-      :player="player"
-      :headerHeight="headerHeight")
-      page-details(
+  q-footer(
+    reveal
+    :style=`{
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      zIndex: 900,
+    }`).b-40
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      nav-mobile(
+        v-if="contentKalpa && $q.screen.lt.md && !node.items[0].layers"
         :contentKalpa="contentKalpa"
+        :pageId="pageId"
+        @pageId="pageId = $event"
         :style=`{
-          marginTop: '-20px',
-          paddingTop: '20px',
-        }`
-        @page="pageId = $event").q-mb-sm
+          zIndex: 900,
+        }`)
+  q-page-container
     component(
-      v-if="pageId"
-      v-show="!node.items[0].layers"
+      v-if="pageId && !node.items[0].layers"
       :is="`page-${pageId}`"
       :node="node"
       :contentKalpa="contentKalpa"
       :player="player"
-      :style=`{
-        position: 'fixed', zIndex: 1000, bottom: '0px',
-        height: $q.screen.height-headerHeight+'px',
-      }`
       @node="node = $event"
       @close="pageId = null")
+      content-details(
+        :contentKalpa="contentKalpa"
+        @page="pageId = $event")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import navDesktop from './nav_desktop.vue'
+import navMobile from './nav_mobile.vue'
+
+import contentDetails from './content_details.vue'
+
 import nodeEditor from 'components/node_editor/index.vue'
+
 import pageNodes from './page_nodes/index.vue'
-import pageDetails from './page_details/index.vue'
 import pageDrafts from './page_drafts/index.vue'
-import pageContents from './page_contents/index.vue'
+import pageSimilar from './page_similar/index.vue'
 
 export default {
   name: 'contentExplorer',
   props: ['query', 'contentKalpa'],
   components: {
+    navDesktop,
+    navMobile,
+    contentDetails,
     nodeEditor,
     pageNodes,
-    pageDetails,
     pageDrafts,
-    pageContents,
+    pageSimilar,
   },
   data () {
     return {
@@ -88,7 +101,7 @@ export default {
       player: null,
       headerWidth: 0,
       headerHeight: 0,
-      pageId: null, // drafts,contents
+      pageId: 'nodes', // nodes,drafts,contents
     }
   },
   methods: {

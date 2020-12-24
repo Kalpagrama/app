@@ -17,9 +17,19 @@ div(
       :url="url"
       :objectFit="styles.objectFit"
       :style=`{
-        position: 'absolute', zIndex: 100, top: 0,
+        position: 'absolute',
+        zIndex: 100, top: 0,
       }`
       @player="player = $event, $emit('player', $event)").fit
+    //- add
+    //- q-btn(
+      @click="$emit('add')"
+      round flat color="green" icon="add_circle_outline"
+      size="lg"
+      :style=`{
+        position: 'absolute', zIndex: 1100, top: 'calc(50% - 20px)', right: '8px',
+        borderRadius: '50%',
+      }`)
     //- taps arrows
     div(
       v-for="(t,ti) in 2" :key="ti"
@@ -43,18 +53,20 @@ div(
           :style=`{userSelect: 'none !important'}`
           ).text-white.text-bold {{ $time(5 * (tapCount - 1)) }}
   //- footer
+  //- div(v-if="!options.mini" :style=`{height: '12px',}`).row.full-width.br
   div(v-if="!options.mini" :style=`{height: '20px',}`).row.full-width
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="player"
       v-show="options.showBar"
       :class=`{
-        'q-px-xl': !options.mini,
+        //- 'q-px-xl': !options.mini,
+        //- 'q-px-sm': !options.mini,
       }`
       :style=`{
         position: 'absolute', zIndex: 3000,
         transform: 'translate3d(0,0,10px)',
-        bottom: options.mini ? '0px' : '12px',
+        bottom: options.mini ? '0px' : '0px',
         opacity: options.mini ? 0.6 : 1,
       }`
       ).row.full-width
@@ -65,7 +77,7 @@ div(
         :end="end"
         :mini="options.mini"
         :style=`{maxWidth: '770px'}`)
-  div(v-if="!options.mini" :style=`{height: '12px',}`).row.full-width
+  //- div(v-if="!options.mini" :style=`{height: '12px',}`).row.full-width
 </template>
 
 <script>

@@ -108,10 +108,20 @@
     v-if="contentKalpa && item.type !== 'ADD'"
     :style=`{position: 'relative', ...styles}`
     ).row.full-width.items-start.content-start
+    //- ADD btn, create composition from content
+    q-btn(
+      @click="nodeCreateStart()"
+      round flat color="green" icon="add_circle_outline"
+      size="lg"
+      :style=`{
+        position: 'absolute', zIndex: 10000, top: 'calc(50% - 20px)', right: '8px',
+        borderRadius: '50%',
+      }`)
     //- small.text-white {{ item.oid }}
     //- :figures="item.layers ? item.layers[0].figuresAbsolute : false"
     content-player(
       :contentKalpa="contentKalpa"
+      @add="nodeCreateStart()"
       @player="playerLoaded"
       @error="playerError = $event"
       :styles="styles"
@@ -119,15 +129,16 @@
       :style=`{
         borderRadius: '10px',
       }`).bg-black
-    //- ADD btn, create composition from content
-    q-btn(
+    //- q-btn(
       v-if="item.__typename !== 'Composition'"
       @click="nodeCreateStart()"
       round flat dense
       color="green"
-      icon="add"
+      icon="add_circle_outline" size="xl"
       :style=`{
-        position: 'absolute', zIndex: 10000, right: '8px', bottom: 6+'px'
+        position: 'absolute', zIndex: 10000, right: 14+'px', bottom: 60+'px',
+        //- transform: 'translate3d(0,0,10px)',
+        borderRadius: '50%',
       }`)
     //- toggle composition editing => show/hide composition editor
     q-btn(

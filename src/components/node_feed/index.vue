@@ -48,7 +48,7 @@ div(
       div(
         v-if="showName && node.oid"
         :style=`{
-          minHeight: '40px',
+          minHeight: '50px',
         }`
         ).row.full-width.q-pa-xs
         //- node context

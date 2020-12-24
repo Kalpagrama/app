@@ -40,7 +40,7 @@
             'b-40': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 600 ? '55px' : '55px',
+            height: $q.screen.width > 600 ? '60px' : '60px',
             borderRadius: '10px', overflow: 'hidden',
             maxWidth: '210px',
           }`
@@ -75,7 +75,7 @@
           :align="mini ? 'center' : 'left'"
           :to="'/auth'"
           :style=`{
-            height: '50px',
+            height: '60px',
             maxWidth: '210px',
             paddingLeft: '0px'
           }`
@@ -119,11 +119,12 @@
           ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
             :to="isGuest ? '/auth' : '/workspace/create'"
-            color="green" no-caps icon="add" size="md"
+            color="green" no-caps size="lg"
+            icon="add_circle_outline"
             :align="mini ? 'center' : 'left'"
             :style=`{
-              height: '50px',
-              paddingLeft: '2px',
+              height: '60px',
+              paddingLeft: '0px',
               maxWidth: '210px',
             }`).full-width.menu-item
             span(
