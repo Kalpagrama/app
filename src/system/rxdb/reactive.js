@@ -369,17 +369,12 @@ class ReactiveListWithPaginationFactory {
             let nextItems = this.vm.reactiveListFull.slice(fromIndex, this.nextIndex)
             let prefetchItems = []
             if (count < 12) prefetchItems = this.vm.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждающее чтение
-            if (this.populateFunc) {
-               // logD(f, 'try populate... nextItems=' + JSON.stringify(nextItems))
+            if (this.populateFunc) { // запрашиваем полные сущности
                nextItems = await this.populateFunc(nextItems, prefetchItems)
-               // logD(f, 'populated =' + JSON.stringify(nextItems.map(item => item.oid)), nextItems)
-            } // запрашиваем полные сущности
+            }
             let blackLists = await Lists.getBlackLists()
             nextItems = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-            // logD(f, 'populated(after isElementBlacklisted) =' + JSON.stringify(nextItems.map(item => item.oid)), nextItems)
-            // logD(f, 'reactiveListPagination len before = ', this.vm.reactiveListPagination.length)
             this.vm.reactiveListPagination.splice(this.vm.reactiveListPagination.length, 0, ...nextItems)
-            // logD(f, 'reactiveListPagination len after = ', this.vm.reactiveListPagination.length)
             this.vm.reactiveListPagination.hasMore = this.nextIndex < this.vm.reactiveListFull.length
             return this.nextIndex < this.vm.reactiveListFull.length
          }

@@ -54,7 +54,7 @@ export default {
       handler (to, from) {
         // this.$log('items UPDATED')
         if (to && from) {
-          this.$log('items UPDATED', to.length, to)
+          this.$log('items UPDATED', to.length)
           this.$emit('items', to)
         }
         // this.$log('items UPDATED', to)
