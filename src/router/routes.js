@@ -123,14 +123,7 @@ const routes = [
             name: 'content',
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid, query: route.query }),
-            component: () => import('pages/app/content/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
-         },
-         {
-            name: 'content_book',
-            path: 'content_book/:oid',
-            props: (route) => ({ oid: route.params.oid, epubUrl: '/other/22606412.epub', theme: 'night' }),
-            component: () => import('pages/app/content_book/index.vue'),
+            component: () => import('src/pages/app/content/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {

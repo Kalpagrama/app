@@ -129,6 +129,14 @@ const videoFragment = gql`${objectFragment}
     subtitlesEng: subtitles(lang: ENG)
   }
 `
+const bookFragment = gql`${objectFragment}
+  fragment bookFragment on Book {
+    ...objectFragment
+    url
+    contentProvider
+    contentSource
+  }
+`
 const imageFragment = gql`${objectFragment}
   fragment imageFragment on Image {
     ...objectFragment
@@ -138,7 +146,7 @@ const imageFragment = gql`${objectFragment}
     contentSource
   }
 `
-const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragment}
+const compositionFragment = gql`${objectFragment} ${imageFragment}
   fragment figureFragment on Figure {
     t
     points {
@@ -202,12 +210,6 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     layers {
       contentOid
       figuresAbsolute{...figureFragment}
-#      figuresRelative {...figureFragment}
-      speed
-      name
-#      thumbUrl(preferWidth: 600)
-#      url
-#      contentSource
     }
     operation{... operationFragment}
     outputType
@@ -216,7 +218,7 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
   }
 `
 const essenceFragmentLeaf = gql`
-  ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragmentLeaf on Essence {
     ...objectFragment
     relatedSphereOids  
@@ -240,6 +242,7 @@ const essenceFragmentLeaf = gql`
     layout
     items {
         ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
         ...on Image {...imageFragment}
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
@@ -249,7 +252,7 @@ const essenceFragmentLeaf = gql`
   }
 `
 const essenceFragment = gql`
-  ${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragment on Essence {
     ...objectFragment
     relatedSphereOids
@@ -273,6 +276,7 @@ const essenceFragment = gql`
     layout
     items {
         ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
         ...on Image {...imageFragment}
         ...on Essence {...essenceFragmentLeaf}
         ...on Sphere {... sphereFragment}
@@ -349,11 +353,12 @@ const eventFragmentWithBatch = gql`
 `
 
 const objectFullFragment = gql`
-    ${compositionFragment} ${videoFragment} ${imageFragment} ${essenceFragment}
+    ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment}
     ${sphereFragment} ${userFragment} ${objectFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
         ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
         ...on Image {...imageFragment}
         ...on Essence {... essenceFragment}
         ...on Sphere {... sphereFragment}

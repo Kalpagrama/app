@@ -40,7 +40,7 @@
 
 <script>
 import { ContentApi } from 'src/api/content'
-import contentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 
 export default {
   name: 'contentImporter_fromDeviceVideo',
@@ -50,6 +50,7 @@ export default {
     return {
       name: '',
       src: null,
+      file: null,
       uploading: false,
     }
   },
@@ -58,8 +59,8 @@ export default {
       return {
         name: '',
         thumbUrl: '',
-        url: this.src,
-        type: 'VIDEO',
+        url: this.file,
+        type: 'BOOK',
         contentSource: 'KALPA',
       }
     }
@@ -72,6 +73,7 @@ export default {
         this.$log('contentFile TO', to)
         if (to) {
           this.src = URL.createObjectURL(to)
+          this.file = to
           this.name = to.name
         }
       }

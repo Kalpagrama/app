@@ -23,7 +23,7 @@ import * as assert from 'assert'
 export default {
   name: 'contentPlayer_book',
   props: {
-    epubUrl: {
+    url: {
       type: String,
       required: true
     },
@@ -188,7 +188,7 @@ export default {
   },
   mounted () {
     this.$log('mounted!!!')
-    this.book = new Book(this.epubUrl, {})
+    this.book = new Book(this.url, {})
     this.book.loaded.navigation.then(({ toc }) => {
       this.toc = toc
       this.$emit('toc', this.toc)

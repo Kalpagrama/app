@@ -58,6 +58,7 @@ export default {
     views () {
       return [
         {id: 'video', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
+        {id: 'book', name: 'Книги', selector: {wsItemType: 'WS_BOOKMARK', type: 'BOOK'}},
         {id: 'image', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
         {id: 'node', name: 'Ядра', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
         {id: 'joint', name: 'Связи', selector: {wsItemType: 'WS_BOOKMARK', type: 'JOINT'}},
