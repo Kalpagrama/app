@@ -7,6 +7,7 @@
     kalpa-finder(
       @contentKalpa="itemFound"
       :pages=`{
+        nodes: {views: ['all']},
         workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
         kalpagrama: {views: ['all', 'users', 'nodes']},
         gif: {views: ['all']},
@@ -25,7 +26,7 @@
         div(
           @click="itemFound(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
-  slot(name="header")
+  //- slot(name="header")
   //- editors wrapper
   div(
     :style=`{
@@ -58,7 +59,7 @@
           :style=`{
             position: 'relative',
             paddingBottom: itemPaddingBottom(item, itemii),
-            //- paddingBottom: '50%',
+            //- paddingBottom: '100%',
             transform: itemTransform(item, itemii)
           }`).row.full-width
           div(
@@ -135,6 +136,7 @@ import kalpaFinder from 'components/kalpa_finder/index.vue'
 import nameEditor from './name_editor.vue'
 import spheresEditor from './spheres_editor.vue'
 import categoryEditor from './category_editor.vue'
+
 import itemEditor from './item_editor.vue'
 import itemPlayer from 'components/node_feed/node_items_item.vue'
 
@@ -250,40 +252,35 @@ export default {
         // WS_BOOKMARK
         if (item.wsItemType === 'WS_BOOKMARK') {
           item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
-          this.$set(this.node.items, 1, item)
+          // this.$set(this.node.items, 1, item)
         }
         // WS_NODE
         if (item.wsItemType === 'WS_NODE') {
-          this.node.items[1] = item
+          // this.node.items[1] = item
         }
       }
       // from kalpa, published
       else {
-        if (item.type === 'VIDEO') {
-          alert('VIDEO')
-          this.node.items[1] = item
+        if (item.type === 'GIF') {
+          // item = ???
+          // TODO: schedule getContentByUrl()
+          // this.node.items[1] = item
+          // this.$set(this.node.items, 1, item)
         }
-        else if (item.type === 'IMAGE') {
-          this.node.items[1] = item
-        }
-        else if (item.type === 'NODE') {
-          // ?
-        }
-        else if (item.type === 'USER') {
-          // ?
-        }
-        else if (['SPHERE', 'WORD', 'SENTENCE'].includes(item.type)) {
-          // ?
-        }
-        else if (item.type === 'GIF') {
-          alert('content.GIF')
-          this.node.items[1] = item
+        else {
+          // this.node.items[1] = item
+          // this.$set(this.node.items, 1, item)
         }
       }
+      this.$set(this.node.items, 1, item)
     },
     itemChanged (item, ii) {
-      this.$log('itemChanged', item, ii)
+      // this.$log('itemChanged', item, ii)
+      this.$log('itemChanged')
       this.$set(this.node.items, ii, item)
+      // for (const p in item) {
+      //   this.$set(this.node.items[ii], p, item[p])
+      // }
     },
     linkToggle () {
       this.$log('linkToggle')

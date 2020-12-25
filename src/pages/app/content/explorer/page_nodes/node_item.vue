@@ -147,7 +147,7 @@ export default {
                 // TODO: zoom in?
                 // this.player.setZoom(figures)
               }
-              this.player.stateSet('figures', this.figures.reduce((acc, val) => {
+              this.player.setState('figures', this.figures.reduce((acc, val) => {
                 if (val) acc.push(val)
                 return acc
               }, []))
@@ -156,7 +156,7 @@ export default {
           // set styles
         }
         else {
-          this.player.stateSet('figures', [])
+          this.player.setState('figures', [])
           this.figures = []
         }
       }

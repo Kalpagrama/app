@@ -105,20 +105,12 @@
       ).fit
   //- CONTENT(VIDEO,IMAGE,AUDIO,BOOK) => COMPOSITION
   div(
-    v-if="contentKalpa && item.type !== 'ADD'"
-    :style=`{position: 'relative', ...styles}`
+    v-if="contentKalpa"
+    :style=`{
+      position: 'relative',
+      ...styles,
+    }`
     ).row.full-width.items-start.content-start
-    //- ADD btn, create composition from content
-    q-btn(
-      @click="nodeCreateStart()"
-      round flat color="green" icon="add_circle_outline"
-      size="lg"
-      :style=`{
-        position: 'absolute', zIndex: 10000, top: 'calc(50% - 20px)', right: '8px',
-        borderRadius: '50%',
-      }`)
-    //- small.text-white {{ item.oid }}
-    //- :figures="item.layers ? item.layers[0].figuresAbsolute : false"
     content-player(
       :contentKalpa="contentKalpa"
       @add="nodeCreateStart()"
@@ -129,32 +121,55 @@
       :style=`{
         borderRadius: '10px',
       }`).bg-black
-    //- q-btn(
+    //- ADD btn, create composition from content
+    q-btn(
       v-if="item.__typename !== 'Composition'"
       @click="nodeCreateStart()"
-      round flat dense
-      color="green"
-      icon="add_circle_outline" size="xl"
+      flat color="green" icon="add_circle_outline"
       :style=`{
-        position: 'absolute', zIndex: 10000, right: 14+'px', bottom: 60+'px',
-        //- transform: 'translate3d(0,0,10px)',
-        borderRadius: '50%',
+        position: 'absolute', zIndex: 10000, right: '12px',
+        bottom: '2px',
+        width: '34px', height: '34px',
+        //- top: 'calc(50% - 20px)',
+        //- borderRadius: '50%',
       }`)
     //- toggle composition editing => show/hide composition editor
     q-btn(
       v-if="item.__typename === 'Composition'"
       @click="editing = !editing"
-      round flat dense
+      flat
       :color="editing ? 'green' : 'white'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{
-        position: 'absolute', zIndex: 10000, right: '8px', bottom: 6+'px'
+        position: 'absolute', zIndex: 10000, right: '12px',
+        bottom: '2px',
+        width: '34px', height: '34px',
+        //- top: 'calc(50% - 20px)',
       }`)
     //- compositionEditor for VIDEO
     div(
       v-if="item.__typename === 'Composition' && item.outputType === 'VIDEO' && player"
       :style=`{
+        //- position: 'absolute', zIndex: 400, bottom: '0px',
+        marginTop: '-20px',
+        paddingTop: '10px',
+        overflow: 'hidden',
+      }`).row.full-width
+      //- div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
+      transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+        composition-editor(
+          v-if="editing"
+          :player="player" :composition="item"
+          :contentKalpa="contentKalpa"
+          :style=`{
+            //- zIndex: 2000,
+            borderRadius: '0 0 10px 10px',
+          }`).bg-black
+    //- div(
+      v-if="item.__typename === 'Composition' && item.outputType === 'VIDEO' && player"
+      :style=`{
         position: 'absolute', zIndex: 400, bottom: '0px',
+        //- overflow: 'hidden',
       }`).row.full-width
       div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
         transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")

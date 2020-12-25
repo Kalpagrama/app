@@ -1,27 +1,30 @@
 <template lang="pug">
 //- memer()
-.row.full-width.justify-center
-  kalpa-finder(
-    @contentKalpa="contentKalpaFound"
-    :pages=`{
-      workspace: {views: ['image', 'video', 'node', 'user', 'sphere']},
-      kalpagrama: {views: ['all', 'users', 'nodes']},
-      gif: {views: ['all']},
-      web: {views: ['all', 'image', 'video',]}
-    }`
-    :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-      height: $q.screen.height+'px',
-    }`).b-30
-    template(v-slot:header)
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+//- .row.full-width.justify-center
+kalpa-finder(
+  @contentKalpa="contentKalpaFound"
+  :pages=`{
+    workspace: {views: ['image', 'video', 'node', 'user', 'sphere']},
+    kalpagrama: {views: ['all', 'users', 'nodes']},
+    gif: {views: ['all']},
+    web: {views: ['all', 'image', 'video',]}
+  }`
+  :style=`{
+    //- maxWidth: $store.state.ui.pageWidth+'px',
+    height: $q.screen.height+'px',
+  }`).b-30
+  template(v-slot:header)
+    .row.full-width.justify-center.q-py-sm
+      div(
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '10px',
+        }`
+        ).row.full-width.items-center.content-center.q-pa-sm.b-40
+        q-btn(round flat color="white" icon="west" @click="$router.back()").q-mr-sm
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать контент
-    //- template(v-slot:tint=`{item}`)
-      div(
-        @click="itemFound(item)"
-        :style=`{position: 'absolute', zIndex: 1000,}`).row.fit
 </template>
 
 <script>

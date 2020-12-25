@@ -53,7 +53,7 @@ div(
         ).row.full-width.q-pa-xs
         //- node context
         q-btn(
-          v-if="node.items.length === 1"
+          v-if="node.items.length === 1 && node.items[0].layers"
           :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
           round flat color="grey-6" icon="select_all"
           :style=`{width: '50px', height: '50px',}`)

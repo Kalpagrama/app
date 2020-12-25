@@ -7,9 +7,9 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
-  q-header
+  q-header.b-30
     div(:style=`{}`).row.full-width.justify-center
-      q-resize-observer(@resize="headerOnResize" :debounce="300")
+      //- q-resize-observer(@resize="headerOnResize" :debounce="300")
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         nav-desktop(
           v-if="contentKalpa && $q.screen.gt.sm"
@@ -99,16 +99,15 @@ export default {
         category: 'FUN',
       },
       player: null,
-      headerWidth: 0,
-      headerHeight: 0,
+      // headerWidth: 0,
+      // headerHeight: 0,
       pageId: 'nodes', // nodes,drafts,contents
     }
   },
   methods: {
     async nodePublished (node) {
       this.$log('nodePublished', node)
-      // await this.$wait(300)
-      this.$router.push({query: {node: node.oid}})
+      // this.$router.push({query: {node: node.oid}})
     },
     async nodeReset (node) {
       this.$log('nodeReset', node)
@@ -121,8 +120,8 @@ export default {
         }
       }
       this.$set(this, 'node', node)
-      this.player.stateSet('points', [])
-      this.player.stateSet('figures', [])
+      this.player.setState('points', [])
+      this.player.setState('figures', [])
     },
     headerOnResize (e) {
       this.$log('headerOnResize', e)

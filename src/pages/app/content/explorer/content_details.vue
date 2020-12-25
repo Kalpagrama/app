@@ -39,7 +39,7 @@
               background: 'rgb(38,38,38)'
             }`).full-height
             q-icon(name="fab fa-youtube" color="red" size="30px")
-            span(:style=`{fontSize: '16px'}`).text-grey-7.text-bold.q-ml-sm YouTube
+            span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
               //- q-icon(name="launch" color="grey-9" size="18px")
           .col
           kalpa-menu-actions(icon="more_vert" :actions="actions")

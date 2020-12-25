@@ -110,7 +110,7 @@ export default {
         return acc
       }, [])
       this.figures = figures
-      this.player.stateSet('points', figures)
+      this.player.setState('points', figures)
     }
   }
 }

@@ -5,7 +5,7 @@ q-page(
     paddingBottom: '0px',
   }`
   ).row.full-width.justify-center
-  .row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
     //- header
     div(
       :style=`{position: 'sticky', zIndex: 1000, top: '0px',}`
@@ -30,7 +30,7 @@ q-page(
       //- div(v-if="viewId === 'bookmarked'").row.full-width.items-start.content-start.justify-center
         h6.text-white Your favorite GIFs will be here soon :)
       //- search
-      div(v-if="viewId === 'search'").row.full-width.items-start.content-start.q-pl-xs.q-pr-sm
+      div(v-if="viewId === 'search'").row.full-width.items-start.content-start
         masonry(
           :cols="3"
           :gutter="{default: 6}").full-width.items-start.content-start

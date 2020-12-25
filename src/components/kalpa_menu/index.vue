@@ -129,7 +129,7 @@
             }`).full-width.menu-item
             span(
               v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-md Создать
+              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Создать
         //- docs
         kalpa-docs(
           v-if="!mini"
@@ -167,7 +167,7 @@ export default {
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'about', name: 'О проекте', icon: 'support'}
+        {id: 'about', name: 'О проекте', icon: 'panorama_fish_eye'}
       ]
     }
   },
