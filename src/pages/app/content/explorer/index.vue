@@ -107,6 +107,10 @@ export default {
   methods: {
     async nodePublished (node) {
       this.$log('nodePublished', node)
+      // nodeReset
+      let nodeNew = JSON.parse(JSON.stringify(this.nodeTemplate))
+      nodeNew.items[0] = JSON.parse(JSON.stringify(this.contentKalpa))
+      this.node = nodeNew
       // this.$router.push({query: {node: node.oid}})
     },
     async nodeReset (node) {

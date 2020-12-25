@@ -14,14 +14,20 @@
         web: {views: ['all', 'image', 'video',]}
       }`
       :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
+        //- maxWidth: $store.state.ui.pageWidth+'px',
         height: $q.screen.height+'px',
       }`).b-30
       template(v-slot:header)
-        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
-          .col
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
+        .row.full-width.justify-center
+          div(
+            :style=`{
+              maxWidth: $store.state.ui.pageWidth+'px',
+              height: '60px',
+            }`
+            ).row.full-width.items-center.content-center
+            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
+            .col
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
       template(v-slot:tint=`{item}`)
         div(
           @click="itemFound(item)"
@@ -321,7 +327,7 @@ export default {
         this.$log('publish done')
         this.publishing = false
         this.$emit('published', createdNode)
-        this.cancel()
+        // this.cancel()
       }
       catch (e) {
         this.$log('publish error', e)
@@ -330,9 +336,7 @@ export default {
     },
     cancel () {
       this.$log('cancel')
-      // emit nodeInitial
       this.$emit('node', JSON.parse(JSON.stringify(this.nodeInitial)))
-      // this.$emit('node', this.node)
     }
   },
   created () {

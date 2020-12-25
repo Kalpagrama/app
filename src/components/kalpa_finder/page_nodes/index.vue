@@ -2,11 +2,15 @@
 q-page(
   :style=`{
     paddingTop: '8px',
-  }`)
+  }`).row.full-width.justify-center
   kalpa-loader(
     :immediate="true"
     :query="query" :limit="12" v-slot=`{items,next,nexting}`)
-    .row.full-width.items-start.content-start.q-pa-sm
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.pageWidth+'px',
+      }`
+      ).row.full-width.items-start.content-start
       q-infinite-scroll(@load="next" :offset="$q.screen.height")
       div(
         v-for="(i,ii) in items" :key="ii"
