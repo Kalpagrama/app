@@ -127,6 +127,13 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'content_book',
+            path: 'content_book/:oid',
+            props: (route) => ({ oid: route.params.oid, epubUrl: '/other/22606412.epub', theme: 'night' }),
+            component: () => import('pages/app/content_book/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
             children: [
