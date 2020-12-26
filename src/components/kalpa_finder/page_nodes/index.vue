@@ -2,7 +2,7 @@
 q-page(
   :style=`{
     paddingTop: '8px',
-  }`).row.full-width.justify-center
+  }`).row.full-width.justify-center.q-px-sm
   kalpa-loader(
     :immediate="true"
     :query="query" :limit="12" v-slot=`{items,next,nexting}`)

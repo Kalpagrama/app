@@ -40,8 +40,8 @@ q-layout(view="hHh Lpr lff").bg-black
             v-if="jointCreating"
             :style=`{
               position: 'absolute', zIndex: 1000, top: '50%', height: '50%',
-              paddingTop: '33px',
-              paddingBottom: '33px',
+              //- paddingTop: '30px',
+              //- paddingBottom: '30px',
             }`
             ).row.full-width
             joint-creator(
@@ -49,7 +49,7 @@ q-layout(view="hHh Lpr lff").bg-black
               @published="jointPublished"
               @cancel="jointCreating = false")
         //- joint CURRENT
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        transition(enter-active-class="animated fadeIn" leave-active-class="none")
           div(
             v-if="!jointCreating && !rowsNexting"
             :style=`{

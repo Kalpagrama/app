@@ -7,7 +7,10 @@ div(
   //- name
   div(
     :style=`{
-      position: 'absolute', zIndex: 100, bottom: '0px',
+      position: 'absolute', zIndex: 100,
+      //- bottom: '0px',
+      //- ...(() => itemPinned ? {top: '0px'} : {bottom: '0px'})(),
+      bottom: '34px',
     }`
     ).row.full-width.justify-center
     span(
@@ -30,6 +33,6 @@ div(
 <script>
 export default {
   name: 'jointsRowItem',
-  props: ['item'],
+  props: ['item', 'itemPinned'],
 }
 </script>

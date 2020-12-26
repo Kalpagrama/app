@@ -47,12 +47,13 @@ div(
       :style=`{
         maxWidth: width+'px',
         minWidth: width+'px',
-        paddingBottom: '34px',
-        paddingTop: '34px',
+        //- paddingBottom: '30px',
+        //- paddingTop: '30px',
       }`
       ).row.full-width.items-start.content-start
       item(
-        :item="row.item")
+        :item="row.item"
+        :itemPinned="isPinned")
   //- row joints wrapper
   div(
     v-if="row.oid"
@@ -74,8 +75,8 @@ div(
           position: 'relative',
           maxWidth: width+'px',
           minWidth: width+'px',
-          paddingBottom: '34px',
-          paddingTop: '34px',
+          //- paddingBottom: '30px',
+          //- paddingTop: '30px',
           marginLeft: jointMargin(ji),
           marginRight: jointMargin(ji),
         }`
@@ -92,6 +93,7 @@ div(
         item(
           v-show="isPinned ? ji === jointIndex : true"
           :item="j.items.find(i => i.oid !== row.oid)"
+          :itemPinned="isPinned"
           :style=`{
             minWidth: width+'px',
             maxWidth: width+'px',

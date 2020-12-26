@@ -30,16 +30,6 @@ div(
             span.text-white Причина
           div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
             span.text-white Следствие
-    //- header
-    //- div(
-      v-if="jointOpened"
-      :style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-start.q-px-sm
-      span author
-    //- voting...
-    //- div(
-      v-if="jointOpened"
-      :style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-center
-      span voting
 </template>
 
 <script>
