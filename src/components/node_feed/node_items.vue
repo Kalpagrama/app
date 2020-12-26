@@ -22,7 +22,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
       :style=`{
         position: 'relative',
         paddingBottom: '100%',
-        transform: ii === 0 ? 'perspective(600px) rotateY(6deg)' : 'perspective(600px) rotateY(-6deg)',
+        transform: ii === 0 ? 'perspective(1000px) rotateY(8deg) translate3d(0,0,-40px)' : 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-40px)',
         zIndex: 10,
       }`
       ).row.full-width

@@ -7,8 +7,8 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
-  q-header.b-30
-    div(:style=`{}`).row.full-width.justify-center
+  q-header
+    div(:style=`{}`).row.full-width.justify-center.b-30
       //- q-resize-observer(@resize="headerOnResize" :debounce="300")
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         nav-desktop(
@@ -112,6 +112,7 @@ export default {
       nodeNew.items[0] = JSON.parse(JSON.stringify(this.contentKalpa))
       this.node = nodeNew
       // this.$router.push({query: {node: node.oid}})
+      // check contentKalpa bookmark...
     },
     async nodeReset (node) {
       this.$log('nodeReset', node)

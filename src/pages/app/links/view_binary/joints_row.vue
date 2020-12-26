@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  v-touch-swipe.mouse.left.right="jointsNext"
+  v-touch-swipe.mouse.left.right="isPinned ? null : jointsNext"
   :style=`{
     position: 'relative',
   }`
@@ -12,7 +12,7 @@ div(
     v-slot=`{items, next, nexting}`)
   //- row joints  helpers
   div(
-    v-if="row.type === 'bottom'"
+    v-if="!isPinned"
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '0px',
       pointerEvents: 'none',
@@ -42,8 +42,6 @@ div(
   div(
     ref="jointsScrollArea"
     :style=`{
-      paddingLeft: ($q.screen.width-$store.state.ui.pageWidth)/2+'px',
-      //- overflowX: row.type === 'top' ? 'hidden' : 'scroll',
       overflow: 'hidden',
     }`
     ).row.fit
@@ -51,13 +49,13 @@ div(
       :style=`{
         position: 'relative',
       }`
-      ).row.fit.no-wrap
+      ).row.no-wrap
       div(
         v-for="(j,ji) in joints" :key="j.oid"
+        v-show="isPinned ? ji === jointIndex : true"
         :class=`{
           'items-end': row.type === 'top',
           'items-start': row.type === 'bottom',
-          //- 'q-px-lg': !(isActive && jointIndex === ji)
         }`
         :style=`{
           position: 'relative',
@@ -65,8 +63,19 @@ div(
           minWidth: width+'px',
           paddingBottom: '34px',
           paddingTop: '34px',
+          marginLeft: ji === 0 ? ($q.screen.width-$store.state.ui.pageWidth)/2+'px' : '0px',
+          marginRight: ji === (joints.length-1) ? ($q.screen.width-$store.state.ui.pageWidth)/2+'px' : '0px',
         }`
         ).row.fit
+        //- tint inActive
+        div(
+          v-if="!(isVisible && jointIndex === ji)"
+          @click="jointsNext(ji > jointIndex ? {direction: 'left'} : {direction: 'right'})"
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            //- background: 'rgba(0,0,0,0.1)',
+          }`
+          ).row.fit.cursor-pointer
         //- name
         div(
           :style=`{
@@ -81,7 +90,6 @@ div(
           :style=`{
             borderRadius: '10px',
             objectFit: 'contain',
-            //- border: (isActive && jointIndex === ji) ? '1px solid red' : '1px solid black',
           }`
           ).fit.bg-black
 </template>
@@ -91,7 +99,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'jointsRow',
-  props: ['row', 'rowIndex', 'isActive'],
+  props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible'],
   data () {
     return {
       jointIndex: 0,

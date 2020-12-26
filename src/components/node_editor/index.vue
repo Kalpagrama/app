@@ -229,10 +229,11 @@ export default {
         }
         else {
           if (itemii === 0) {
-            return 'perspective(600px) rotateY(8deg)'
+            // perspective(1000px) rotateY(6deg) translate3d(0,0,-40px)
+            return 'perspective(1000px) rotateY(8deg) translate3d(0,0,-40px)'
           }
           else {
-            return 'perspective(600px) rotateY(-8deg)'
+            return 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-40px)'
           }
         }
       }
