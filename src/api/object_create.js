@@ -98,9 +98,9 @@ class ObjectCreateApi {
          thumbUrl: composition.thumbUrl,
          layers: composition.layers.map(l => {
             return {
-               name: '',
+               // name: '',
                contentOid: l.contentOid || l.content.oid,
-               speed: l.speed,
+               // speed: l.speed,
                figuresAbsolute: l.figuresAbsolute.map(f => {
                   return {
                      t: f.t,
@@ -110,8 +110,8 @@ class ObjectCreateApi {
                      })
                   }
                }),
-               color: l.color,
-               thumbUrl: l.thumbUrl
+               // color: l.color,
+               // thumbUrl: l.thumbUrl
             }
          }),
          operation: {

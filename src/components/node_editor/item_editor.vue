@@ -151,8 +151,8 @@
       v-if="item.__typename === 'Composition' && item.outputType === 'VIDEO' && player"
       :style=`{
         //- position: 'absolute', zIndex: 400, bottom: '0px',
-        marginTop: '-20px',
-        paddingTop: '10px',
+        marginTop: '-10px',
+        //- paddingTop: '10px',
         overflow: 'hidden',
       }`).row.full-width
       //- div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
@@ -165,22 +165,6 @@
             //- zIndex: 2000,
             borderRadius: '0 0 10px 10px',
           }`).bg-black
-    //- div(
-      v-if="item.__typename === 'Composition' && item.outputType === 'VIDEO' && player"
-      :style=`{
-        position: 'absolute', zIndex: 400, bottom: '0px',
-        //- overflow: 'hidden',
-      }`).row.full-width
-      div(:style=`{position: 'absolute', zIndex: 10, top: '-8px'}`).row.full-width
-        transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-          composition-editor(
-            v-if="editing"
-            :player="player" :composition="item"
-            :contentKalpa="contentKalpa"
-            :style=`{
-              zIndex: 2000,
-              borderRadius: '0 0 10px 10px',
-            }`).bg-black
 </template>
 
 <script>

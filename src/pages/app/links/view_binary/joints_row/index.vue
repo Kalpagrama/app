@@ -6,6 +6,7 @@ div(
   }`
   ).row.full-width
   kalpa-loader(
+    v-if="row.oid"
     :immediate="true"
     :query="jointsQuery" :limit="12"
     @items="jointsUpdated"
@@ -38,8 +39,23 @@ div(
             borderRadius: '1px',
           }`
           ).row.fit
+  //- item
+  div(
+    v-if="row.item"
+    ).row.fit.justify-center
+    div(
+      :style=`{
+        maxWidth: width+'px',
+        minWidth: width+'px',
+        paddingBottom: '34px',
+        paddingTop: '34px',
+      }`
+      ).row.full-width.items-start.content-start
+      item(
+        :item="row.item")
   //- row joints wrapper
   div(
+    v-if="row.oid"
     ref="jointsScrollArea"
     :style=`{
       overflow: 'hidden',
@@ -49,13 +65,10 @@ div(
       :style=`{
         position: 'relative',
       }`
-      ).row.no-wrap
+      ).row.full-height.no-wrap
       div(
         v-for="(j,ji) in joints" :key="j.oid"
-        v-show="isPinned ? ji === jointIndex : true"
         :class=`{
-          'items-end': row.type === 'top',
-          'items-start': row.type === 'bottom',
         }`
         :style=`{
           position: 'relative',
@@ -63,43 +76,38 @@ div(
           minWidth: width+'px',
           paddingBottom: '34px',
           paddingTop: '34px',
-          marginLeft: ji === 0 ? ($q.screen.width-$store.state.ui.pageWidth)/2+'px' : '0px',
-          marginRight: ji === (joints.length-1) ? ($q.screen.width-$store.state.ui.pageWidth)/2+'px' : '0px',
+          marginLeft: jointMargin(ji),
+          marginRight: jointMargin(ji),
         }`
         ).row.fit
         //- tint inActive
         div(
-          v-if="!(isVisible && jointIndex === ji)"
+          v-if="!isPinned && !(isVisible && jointIndex === ji)"
           @click="jointsNext(ji > jointIndex ? {direction: 'left'} : {direction: 'right'})"
           :style=`{
             position: 'absolute', zIndex: 100,
             //- background: 'rgba(0,0,0,0.1)',
           }`
           ).row.fit.cursor-pointer
-        //- name
-        div(
+        item(
+          v-show="isPinned ? ji === jointIndex : true"
+          :item="j.items.find(i => i.oid !== row.oid)"
           :style=`{
-            position: 'absolute', zIndex: 100, bottom: '34px',
-          }`
-          ).row.full-width.justify-center
-          span.text-white.bg-black.q-pa-xs node name
-        //- preview
-        img(
-          draggable="false"
-          :src="j.items[row.type === 'top' ? 0 : 1].thumbUrl"
-          :style=`{
-            borderRadius: '10px',
-            objectFit: 'contain',
-          }`
-          ).fit.bg-black
+            minWidth: width+'px',
+            maxWidth: width+'px',
+          }`)
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import item from './item.vue'
 
 export default {
   name: 'jointsRow',
   props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible'],
+  components: {
+    item,
+  },
   data () {
     return {
       jointIndex: 0,
@@ -129,14 +137,49 @@ export default {
         this.$log('jointsNexting TO', to)
         this.$emit('nexting', to)
       }
+    },
+    isVisible: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('isVisible TO', to)
+        if (to) {
+          window.addEventListener('keydown', this.onKeydown)
+        }
+        else {
+          window.removeEventListener('keydown', this.onKeydown)
+        }
+      }
     }
   },
   methods: {
+    jointMargin (ji) {
+      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return '0px'
+      else {
+        // if first/last item
+        if (ji === 0 || ji === this.joints.length - 1) {
+          return (this.$q.screen.width - this.$store.state.ui.pageWidth) / 2 + 'px'
+        }
+      }
+    },
+    onKeydown (e) {
+      if (e.key === 'ArrowLeft') {
+        this.jointsNext({direction: 'right'})
+      }
+      else if (e.key === 'ArrowRight') {
+        this.jointsNext({direction: 'left'})
+      }
+    },
     jointsNext (e) {
       this.$log('jointsNext', this.jointIndex)
+      if (this.jointsNexting) return
+      if (this.isPinned) return
       let index
       if (e.direction === 'left') {
         index = this.jointIndex + 1
+        if (!this.joints[index]) {
+          this.$log('jointsNext left RETURN !this.joints[index]', this.jointIndex)
+          return
+        }
       }
       else if (e.direction === 'right') {
         if (this.jointIndex === 0) {
@@ -144,6 +187,10 @@ export default {
           return
         }
         index = this.jointIndex - 1
+        if (!this.joints[index]) {
+          this.$log('jointsNext left RETURN !this.joints[index]', this.jointIndex)
+          return
+        }
       }
       let scrollTo = index * this.width
       this.jointsNexting = true
@@ -156,13 +203,24 @@ export default {
             this.$log('jointsNext done', index)
             this.jointIndex = index
             this.jointsNexting = false
+            let joint = this.joints[this.jointIndex]
+            this.$emit('joint', joint)
+            let item = joint.items.find(i => i.oid !== this.row.oid)
+            this.$emit('item', item)
           }
         }
       )
     },
     jointsUpdated (joints) {
       this.$log('jointsUpdated', joints ? joints.length : joints)
+      this.$log('jointUpdated this.row', this.row)
       this.joints = joints
+      if (this.joints.length > 0) {
+        let joint = this.joints[0]
+        this.$emit('joint', joint)
+        let item = joint.items.find(i => i.oid !== this.row.oid)
+        this.$emit('item', item)
+      }
     }
   }
 }

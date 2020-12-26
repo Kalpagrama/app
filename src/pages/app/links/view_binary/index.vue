@@ -1,6 +1,8 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff").bg-black
-  q-footer(reveal).bg-black
+  q-footer(
+    v-if="!jointCreating"
+    reveal).bg-black
     div(
       :style=`{
         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -10,37 +12,19 @@ q-layout(view="hHh Lpr lff").bg-black
         :style=`{
           maxWidth: $store.state.ui.pageWidth+'px',
         }`).row.full-width
-        div(
-          v-if="jointCreating"
-          :style=`{
-            position: 'relative',
-            height: rowHeight+'px',
-            paddingTop: '35px',
-            paddingBottom: '35px',
-          }`
-          ).row.full-width.bg-black.br
-          div(
-            :style=`{
-              position: 'absolute', zIndex: 3000, top: '-30px', left: '0px',
-              height: '60px',
-            }`
-            ).row.full-width.q-px-md
-            div(
-              :style=`{
-                height: '60px',
-                borderRadius: '10px',
-              }`
-              ).row.full-width.b-40
-          q-btn(
-            round flat color="green" icon="add" size="xl"
-            ).fit.b-30
         .row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="west" @click="$router.back()")
           .col
           q-btn(
             @click="jointCreating = !jointCreating"
-            round flat color="green"
-            :icon="jointCreating ? 'check' : 'add'")
+            color="green"
+            :icon="jointCreating ? 'check' : 'add'"
+            :style=`{
+              borderRadius: '50%',
+              width: '40px', height: '40px',
+            }`)
+          .col
+          q-btn(round flat color="white" icon="more_vert")
   q-page-container
     q-page
       div(
@@ -50,42 +34,31 @@ q-layout(view="hHh Lpr lff").bg-black
           height: height+'px'
         }`
         ).column.full-width.bg-black
-        //- current joint bar
+        //- joint CREATOR
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
-            v-if="!rowsNexting"
+            v-if="jointCreating"
+            :style=`{
+              position: 'absolute', zIndex: 1000, top: '50%', height: '50%',
+              paddingTop: '33px',
+              paddingBottom: '33px',
+            }`
+            ).row.full-width
+            joint-creator(
+              :item="null"
+              @published="jointPublished"
+              @cancel="jointCreating = false")
+        //- joint CURRENT
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="!jointCreating && !rowsNexting"
             :style=`{
               position: 'absolute', zIndex: 2000, top: '50%',
             }`
             ).row.full-width.justify-center
-            div(
-              :style=`{
-                maxWidth: $store.state.ui.pageWidth+'px',
-              }`).row.full-width.q-px-md
-              div(
-                @click.self="jointOpened = !jointOpened"
-                :style=`{
-                  marginTop: jointOpened ? '-80px' : '-30px',
-                  //- minHeight: '60px',
-                  borderRadius: '10px',
-                }`
-                ).row.full-width.b-40
-                div(
-                  v-if="jointOpened"
-                  :style=`{height: '50px',}`).row.full-width
-                div(
-                  :style=`{
-                    pointerEvents: 'none',
-                    height: '60px',
-                  }`
-                  ).row.full-width.items-center.content-center
-                  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-                    span.text-white Причина
-                  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-                    span.text-white Следствие
-                div(
-                  v-if="jointOpened"
-                  :style=`{height: '50px',}`).row.full-width
+            joint-current(
+              v-if="jointCurrent"
+              :joint="jointCurrent")
         //- body joints
         div(
           ref="rowsScrollArea"
@@ -99,28 +72,43 @@ q-layout(view="hHh Lpr lff").bg-black
             :rowIndex="ri"
             :isActive="rowIndex === ri || rowIndex+1 === ri"
             :isPinned="rowIndex === ri"
-            :isVisible="rowIndex === ri || rowIndex+1 === ri"
+            :isVisible="rowIndex+1 === ri"
             :style=`{
               height: rowHeight+'px',
+              opacity: rowIndex === ri ? 1 : jointCreating ? 0 : 1
             }`
-            @nexting="rowsNexting = $event")
+            @nexting="rowsNexting = $event"
+            @item="itemSelected"
+            @joint="$event => jointChanged($event, r, ri)")
 </template>
 
 <script>
-import jointsRow from './joints_row.vue'
+import jointsRow from './joints_row/index.vue'
+import jointCreator from './joint_creator/index.vue'
+import jointCurrent from './joint_current/index.vue'
 
 export default {
   name: 'viewBinary',
   props: ['item'],
   components: {
     jointsRow,
+    jointCreator,
+    jointCurrent,
   },
   created () {
     this.$log('created')
     this.rows = [
-      {oid: this.item.oid},
-      {oid: this.item.oid}
+      {oid: null, item: this.item},
+      {oid: this.item.oid, item: null}
     ]
+  },
+  mounted () {
+    this.$log('mounted')
+    window.addEventListener('keydown', this.onKeydown)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    window.removeEventListener('keydown', this.onKeydown)
   },
   data () {
     return {
@@ -132,8 +120,11 @@ export default {
         // {oid: '124314345793390611', type: 'bottom'},
         // {oid: '124314345793390611', type: 'bottom'}
       ],
-      jointsScrollAreaOverflow: 'hidden',
-      jointOpened: false,
+      // jointsScrollAreaOverflow: 'hidden',
+      // jointOpened: false,
+      jointCreating: false,
+      jointCurrent: null,
+      itemActive: null,
     }
   },
   computed: {
@@ -145,19 +136,59 @@ export default {
     },
   },
   methods: {
+    onKeydown (e) {
+      this.$log('onKeydown', e.key)
+      if (e.key === 'ArrowUp') {
+        this.rowsNext({direction: 'down'})
+      }
+      else if (e.key === 'ArrowDown') {
+        this.rowsNext({direction: 'up'})
+      }
+    },
+    jointPublished (joint) {
+      this.$log('jointPublished', joint)
+      // reload what this row or the whole page ?
+    },
+    jointChanged (joint, r, ri) {
+      this.$log('jointChanged', joint, r, ri)
+      // save jointCurrent
+      this.jointCurrent = joint
+      // depeneds on row.oid ? take another...
+      // on last row?
+    },
+    itemSelected (item) {
+      this.$log('itemSelected', item)
+      this.itemActive = item
+    },
     rowsNext (e) {
       this.$log('rowsNext start', this.rowIndex)
+      if (this.rowsNexting) return
+      if (this.jointCreating) return
       let index
+      // before
+      // up
       if (e.direction === 'up') {
-        this.rows.push({oid: '124314345793390611', type: 'bottom'})
+        this.$log('rowsNext up')
         index = this.rowIndex + 1
+        if (!this.rows[index]) {
+          this.$log('rowsNext up !this.rows[index]')
+          return
+        }
+        this.rows.push({oid: this.itemActive.oid, item: null})
       }
+      // down
       else if (e.direction === 'down') {
+        this.$log('rowsNext down')
         if (this.rowIndex === 0) {
-          this.$log('donw RETURN', this.rowIndex)
+          this.$log('rowsNext down RETURN', this.rowIndex)
           return
         }
         index = this.rowIndex - 1
+        if (!this.rows[index]) {
+          this.$log('rowsNext down !this.rows[index]')
+          return
+        }
+        // this.rows.pop()
       }
       let scrollTop = index * this.rowHeight
       this.rowsNexting = true
@@ -170,6 +201,12 @@ export default {
             this.$log('rowsNext done')
             this.rowIndex = index
             this.rowsNexting = false
+            // after hook
+            if (e.direction === 'up') {
+            }
+            else if (e.direction === 'down') {
+              this.rows.pop()
+            }
           }
         }
       )

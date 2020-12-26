@@ -93,8 +93,9 @@ div(
             }`
           ).text-grey-6 {{ node.countJoints }}
     //- SPHERES
+    //- v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
     div(
-      v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
+      v-if="showSpheres && node.oid"
       :style=`{
         height: '46px',
       }`).row.full-width.items-center.content-center.justify-start.scroll

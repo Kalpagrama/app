@@ -28,6 +28,7 @@ q-page(
             width: '50px',
             height: '50px',
             borderRadius: '10px',
+            objectFit: 'cover',
           }`)
         .col
           .row.fit.items-center.content-center.q-pa-sm
