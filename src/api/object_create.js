@@ -98,20 +98,22 @@ class ObjectCreateApi {
          thumbUrl: composition.thumbUrl,
          layers: composition.layers.map(l => {
             return {
-               name: '',
+               // name: '',
                contentOid: l.contentOid || l.content.oid,
-               speed: l.speed,
+               // speed: l.speed,
                figuresAbsolute: l.figuresAbsolute.map(f => {
                   return {
                      t: f.t,
                      // points: []
                      points: f.points.map(p => {
                         return { x: p.x, y: p.y }
-                     })
+                     }),
+                     epubCfi: f.epubCfi,
+                     epubCfiText: f.epubCfiText
                   }
                }),
-               color: l.color,
-               thumbUrl: l.thumbUrl
+               // color: l.color,
+               // thumbUrl: l.thumbUrl
             }
          }),
          operation: {
