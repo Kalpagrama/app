@@ -365,7 +365,7 @@ class ReactiveListWithPaginationFactory {
             this.nextAskedIndex = this.nextIndex + count
             if (this.nextIndex >= this.vm.reactiveListFull.length) return false // дошли до конца списка
             let fromIndex = this.nextIndex
-            this.nextIndex = Math.max(this.nextIndex + count, this.vm.reactiveListFull.length)
+            this.nextIndex = Math.min(this.nextIndex + count, this.vm.reactiveListFull.length)
             let nextItems = this.vm.reactiveListFull.slice(fromIndex, this.nextIndex)
             let prefetchItems = []
             if (count < 12) prefetchItems = this.vm.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждающее чтение

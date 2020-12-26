@@ -96,19 +96,19 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.prototype.$nodeItemTypes = nodeItemTypes
     Vue.prototype.$nodeItemType = nodeItemType
     // global components
-    Vue.component('nodeFeed', () => import('components/node_feed/index.vue'))
+    Vue.component('nodeFeed', () => import('src/components/node_feed/index.vue'))
     // lists
-    Vue.component('listMiddle', () => import('components/list_middle'))
+    Vue.component('listMiddle', () => import('src/components/list_middle'))
     // Vue.component('listSlider', () => import('components/list_slider/index.vue'))
     // Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
     // user
-    Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
+    Vue.component('userAvatar', () => import('src/components/user_avatar/index.vue'))
     // kalpa
-    Vue.component('kalpaBookmark', () => import('components/kalpa_bookmark/index.vue'))
-    Vue.component('kalpaShare', () => import('components/kalpa_share/index.vue'))
-    Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
-    Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
-    Vue.component('kalpaMenuActions', () => import('components/kalpa_menu_actions/index.vue'))
+    Vue.component('kalpaBookmark', () => import('src/components/kalpa_bookmark/index.vue'))
+    Vue.component('kalpaShare', () => import('src/components/kalpa_share/index.vue'))
+    Vue.component('kalpaLogo', () => import('src/components/kalpa_logo/index.vue'))
+    Vue.component('kalpaLoader', () => import('src/components/kalpa_loader/index.vue'))
+    Vue.component('kalpaMenuActions', () => import('src/components/kalpa_menu_actions/index.vue'))
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

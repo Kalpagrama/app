@@ -80,8 +80,9 @@ export default {
         this.itemsCreated = true
         // this.$log('*** NEXT itemsCreating next', this.items)
       }
-      // this.$log('*** NEXT hasMore ***')
+      this.$log('before next. limit=', this.limit)
       await this.items.next(this.limit)
+      this.$log('after next. hasMore=', this.items.hasMore)
       if (this.items.hasMore) done()
       else {
         this.$emit('items', this.items)
