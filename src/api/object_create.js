@@ -107,7 +107,9 @@ class ObjectCreateApi {
                      // points: []
                      points: f.points.map(p => {
                         return { x: p.x, y: p.y }
-                     })
+                     }),
+                     epubCfi: f.epubCfi,
+                     epubCfiText: f.epubCfiText
                   }
                }),
                // color: l.color,

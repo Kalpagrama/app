@@ -153,6 +153,8 @@ const compositionFragment = gql`${objectFragment} ${imageFragment}
       x
       y
     }
+    epubCfi
+    epubCfiText
   }
   fragment operationFragment on LayerOperation{
     type
