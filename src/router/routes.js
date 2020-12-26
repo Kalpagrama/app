@@ -123,7 +123,7 @@ const routes = [
             name: 'content',
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid, query: route.query }),
-            component: () => import('pages/app/content/index.vue'),
+            component: () => import('src/pages/app/content/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {

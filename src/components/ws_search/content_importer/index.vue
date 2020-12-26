@@ -23,11 +23,16 @@ q-layout(
         v-if="contentFile && contentFile.type.split('/')[0] === 'video'"
         :contentFile="contentFile"
         @contentKalpa="$emit('contentKalpa', $event), $emit('close')")
+      from-device-book(
+        v-if="contentFile && contentFile.type === 'application/epub+zip'"
+        :contentFile="contentFile"
+        @contentKalpa="$emit('contentKalpa', $event), $emit('close')")
 </template>
 
 <script>
 import fromDeviceImage from './from_device_image.vue'
 import fromDeviceVideo from './from_device_video.vue'
+import fromDeviceBook from './from_device_book.vue'
 
 export default {
   name: 'contentImporter',
@@ -37,6 +42,7 @@ export default {
   components: {
     fromDeviceImage,
     fromDeviceVideo,
+    fromDeviceBook
   },
   data () {
     return {

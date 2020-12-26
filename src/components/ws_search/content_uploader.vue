@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     accept () {
-      return 'image/*, video/*'
+      return 'image/*, video/*, application/epub+zip'
     },
   },
   methods: {

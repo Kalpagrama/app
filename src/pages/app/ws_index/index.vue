@@ -5,7 +5,7 @@
     :pagesShow="true"
     :pages=`{
       content: {views: ['image', 'video']},
-      workspace: {views: ['image', 'video', 'node', 'joint', 'user', 'sphere']},
+      workspace: {views: ['image', 'video', 'node', 'joint', 'user', 'sphere', 'book']},
     }`
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',

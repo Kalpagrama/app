@@ -81,8 +81,8 @@ export default {
         // this.$log('*** NEXT itemsCreating next', this.items)
       }
       // this.$log('*** NEXT hasMore ***')
-      let hasMore = await this.items.next(this.limit)
-      if (hasMore) done()
+      await this.items.next(this.limit)
+      if (this.items.hasMore) done()
       else {
         this.$emit('items', this.items)
         done(true)

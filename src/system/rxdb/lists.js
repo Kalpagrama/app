@@ -150,8 +150,7 @@ class Lists {
          let indx = reactiveItem.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
-               logD(f, 'add created object to begin of list.', object)
-               reactiveItem.items.splice(0, 0, object)
+               reactiveItem.items.splice(0, 0, {oid: object.oid})
                reactiveItem.count++
                reactiveItem.totalCount++
             }
