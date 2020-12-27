@@ -1,18 +1,32 @@
 <template lang="pug">
-  q-page-container
-    q-page.row.full-width.justify-center
-      div(
-        :style=`{maxWidth: '700px', height: '60px',borderRadius: '10px',}`
-      ).row.full-width.items-center.content-center.b-40.q-px-sm
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
-        q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-        input(size='3' type='range' max='100' min='0' step='1' @change='onChange($event.target.value)' :value='progress')
-        input(type='text' :value='progress' @change='onChange($event.target.value)')
-        q-btn(v-if="selection.cfiRange" round flat color="white" icon="add_circle" @click='createEssence')
-      div(
-        :id='bookArea'
-        :style=`{maxWidth: '600px',borderRadius: '10px',}`
-      ).row.full-width.items-center.content-center.b-40.q-px-sm
+div(
+  :style=`{
+    position: 'relative',
+    //- ...styles,
+    height: '100%',
+  }`
+  ).column.full-width.bg-black
+  div(
+    :style=`{
+      position: 'relative',
+      borderRadius: '0 0 10px 10px',
+    }`).col.full-width
+    q-resize-observer(@resize="onResize" :debounce="300")
+    div(
+      :id="bookArea"
+      :style=`{
+        borderRadius: '0 0 10px 10px',
+        overflow: 'hidden'
+      }`
+      ).row.fit
+    //- div(
+      :style=`{}`)
+  .row.full-width.justify-center
+    q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
+    q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
+    //- input(size='3' type='range' max='100' min='0' step='1' @change='onChange($event.target.value)' :value='progress')
+    //- input(type='text' :value='progress' @change='onChange($event.target.value)')
+    //- q-btn(v-if="selection.cfiRange" round flat color="white" icon="add_circle" @click='createEssence')
 </template>
 
 <script>
@@ -23,6 +37,10 @@ import * as assert from 'assert'
 export default {
   name: 'contentPlayer_book',
   props: {
+    contentKalpa: {
+      type: Object,
+      required: true,
+    },
     url: {
       type: String,
       required: true
@@ -37,22 +55,22 @@ export default {
       default: {
         white: {
           body: {
-            color: '#000000',
-            background: '#ffffff'
+            color: 'black',
+            background: 'white'
           },
           name: 'WHITE'
         },
-        beige: {
-          body: {
-            color: '#000000',
-            background: '#f3e8d2'
-          },
-          name: 'BEIGE'
-        },
+        // beige: {
+        //   body: {
+        //     color: '#000000',
+        //     background: '#f3e8d2'
+        //   },
+        //   name: 'BEIGE'
+        // },
         night: {
           body: {
-            color: '#ffffff',
-            background: '#4a4a4a'
+            color: 'white',
+            background: 'black'
           },
           name: 'NIGHT'
         }
@@ -91,7 +109,8 @@ export default {
       selection: {
         cfiRange: null,
         text: null
-      }
+      },
+      isFullscreen: false,
     }
   },
   watch: {
@@ -106,10 +125,20 @@ export default {
     }
   },
   methods: {
+    setState (key, val) {
+      this.$log('setState', key, val)
+    },
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+      this.height = e.height
+      if (this.rendition) this.rendition.resize(this.width, this.height)
+    },
     initReader () {
       this.rendition = this.book.renderTo(this.bookArea, {
         contained: true,
-        height: this.height
+        height: this.height,
+        width: this.width,
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -187,8 +216,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted!!!')
-    this.book = new Book(this.url, {})
+    this.$log('mounted')
+    // init
+    this.book = new Book(this.contentKalpa.url, {})
+    // book navigation ready
     this.book.loaded.navigation.then(({ toc }) => {
       this.toc = toc
       this.$emit('toc', this.toc)
@@ -197,6 +228,7 @@ export default {
         this.$emit('click')
       })
     })
+    // book ready
     this.book.ready.then(() => {
       return this.book.locations.generate()
     }).then(() => {
@@ -209,16 +241,19 @@ export default {
         this.$emit('relocated')
       })
     })
-    window.addEventListener('resize', debounce(() => {
-      this.resizeToScreenSize()
-    }, 250))
-    this.updateScreenSizeInfo()
+    // window.addEventListener('resize', debounce(() => {
+    //   this.resizeToScreenSize()
+    // }, 250))
+    // this.updateScreenSizeInfo()
+    this.$emit('player', this)
   },
   created () {
-    window.addEventListener('keyup', this.keyListener)
+    this.$log('created')
+    // window.addEventListener('keyup', this.keyListener)
   },
   beforeDestroy () {
-    window.removeEventListener('keyup', this.keyListener)
+    this.$log('beforeDestroy')
+    // window.removeEventListener('keyup', this.keyListener)
   }
 }
 </script>

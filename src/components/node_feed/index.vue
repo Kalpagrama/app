@@ -48,12 +48,12 @@ div(
       div(
         v-if="showName && node.oid"
         :style=`{
-          minHeight: '40px',
+          minHeight: '50px',
         }`
         ).row.full-width.q-pa-xs
         //- node context
         q-btn(
-          v-if="node.items.length === 1"
+          v-if="node.items.length === 1 && node.items[0].layers"
           :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
           round flat color="grey-6" icon="select_all"
           :style=`{width: '50px', height: '50px',}`)
@@ -93,8 +93,9 @@ div(
             }`
           ).text-grey-6 {{ node.countJoints }}
     //- SPHERES
+    //- v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
     div(
-      v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
+      v-if="showSpheres && node.oid"
       :style=`{
         height: '46px',
       }`).row.full-width.items-center.content-center.justify-start.scroll

@@ -6,22 +6,26 @@ q-layout(
     .row.full-width.justify-center.q-px-sm.b-30
       slot(name="header")
       //- pages
-      div(
-        v-if="pagesShow"
-        :style=`{marginBottom: '-2px'}`).row.full-width.q-pl-md
-        q-tabs(
-          v-model="pageId" no-caps
-          dense active-color="green"
-          aling="left"
-          ).text-grey-6
-          q-tab(
-            v-for="p in pagesFiltered" :key="p.id"
-            :name="p.id" :label="p.name")
+      div().row.full-width.justify-center
+        div(
+          v-if="pagesShow"
+          :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-md
+          q-tabs(
+            v-model="pageId" no-caps
+            dense active-color="green"
+            aling="left"
+            ).text-grey-6
+            q-tab(
+              v-for="p in pagesFiltered" :key="p.id"
+              :name="p.id" :label="p.name")
       //- search
-      .row.full-width
+      div().row.full-width.justify-center
         ws-search(
           @searchString="searchString = $event"
-          @contentKalpa="contentKalpaFound")
+          @contentKalpa="contentKalpaFound"
+          :style=`{
+            maxWidth: $store.state.ui.pageWidth+'px',
+          }`)
   q-page-container
     component(
       v-bind="$props"
@@ -43,8 +47,6 @@ export default {
     pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
-    // workspaceTypes: {type: Array},
-    // kalpaTypes: {type: Array},
     pages: {type: Object},
   },
   components: {
@@ -52,6 +54,7 @@ export default {
     pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
     pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
+    pageNodes: () => import('./page_nodes/index.vue'),
     pageWeb: () => import('./page_web/index.vue'),
     pageGif: () => import('./page_gif/index.vue'),
   },
@@ -68,10 +71,11 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'content', name: 'Загрузки', component: 'page-content'},
+        {id: 'nodes', name: 'Ядра', component: 'page-nodes'},
         {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
-        // {id: 'gif', name: 'Gif', component: 'page-gif'},
+        {id: 'content', name: 'Загрузки', component: 'page-content'},
+        {id: 'gif', name: 'Gif', component: 'page-gif'},
         // {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {
         if (this.pages) {

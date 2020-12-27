@@ -21,7 +21,7 @@ div(
       ).row.fit
       div(
         :style=`{
-          width: '80px', height: '80px',
+          width: '86px', height: '86px',
         }`
         ).row.items-center.content-center.justify-center
         img(
@@ -36,17 +36,17 @@ div(
           v-else
           name="blur_on" size="50px" color="white")
       .col
-        .row.fit.items-center.content-center.justify-start.q-pa-sm
+        .row.fit.items-start.content-start.justify-start.q-pa-sm
           span(:style=`{zIndex: 102}`).text-white {{ item.name.slice(0, 150) }}
   //- right side
-  div(:style=`{width: '46px',}`).row.full-height.items-start.content-start.justify-end.q-pa-xs
+  div(:style=`{width: '46px',}`).row.full-height.items-start.content-start.justify-end
     .row.full-width.justify-end
       kalpa-menu-actions(:actions="actions")
-    .row.full-width.justify-end.q-pt-sm
+    .row.full-width.justify-end
       q-btn(
         @click="itemSubscriptionToggle()"
-        round flat dense
-        :color="item.isSubscribed ? 'grey-4' : 'grey-9'"
+        round flat
+        :color="item.isSubscribed ? 'grey-6' : 'grey-9'"
         :icon="item.isSubscribed ? 'notifications_active' : 'notifications_none'")
 </template>
 

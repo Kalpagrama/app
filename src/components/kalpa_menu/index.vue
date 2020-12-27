@@ -40,11 +40,11 @@
             'b-40': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 600 ? '55px' : '55px',
+            height: $q.screen.width > 600 ? '60px' : '60px',
             borderRadius: '10px', overflow: 'hidden',
-            maxWidth: '210px',
+            //- maxWidth: '210px',
           }`
-          ).row.full-width.items-center.menu-item.q-mb-md
+          ).row.full-width.items-center.menu-item.q-mb-sm
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="30px" :name="p.icon" :color="p.color || 'white'")
           span(
@@ -59,7 +59,7 @@
           }`
           :style=`{
             height: '60px', borderRadius: '10px', overflow: 'hidden',
-            maxWidth: '210px',
+            //- maxWidth: '210px',
           }`
           ).row.full-width.items-center.content-center.menu-item
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -68,6 +68,35 @@
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
               small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
+        //- refresh
+        q-btn(
+          @click="refresh()"
+          flat color="white" no-caps icon="refresh"
+          :align="mini ? 'center' : 'left'"
+          :style=`{
+            height: '60px',
+            paddingLeft: '0px'
+            //- maxWidth: '210px',
+          }`
+          ).full-width.items-center.content-center.menu-item.q-mt-sm
+          span(
+            v-if="!mini"
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Обновить
+        //- logout
+        q-btn(
+          v-if="!isGuest"
+          @click="logout()"
+          flat color="white" no-caps icon="logout"
+          :align="mini ? 'center' : 'left'"
+          :style=`{
+            height: '60px',
+            paddingLeft: '0px'
+            //- maxWidth: '210px',
+          }`
+          ).full-width.items-center.content-center.menu-item.q-mt-sm
+          span(
+            v-if="!mini"
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Выйти
         //- login for GUEST
         q-btn(
           v-if="isGuest"
@@ -75,16 +104,16 @@
           :align="mini ? 'center' : 'left'"
           :to="'/auth'"
           :style=`{
-            height: '50px',
-            maxWidth: '210px',
+            height: '60px',
             paddingLeft: '0px'
+            //- maxWidth: '210px',
           }`
           ).full-width.items-center.content-center
           span(
             v-if="!mini"
             :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Войти
         //- actions
-        .row.full-width
+        //- .row.full-width
           q-btn(
             icon="more_horiz"
             flat color="white" no-caps
@@ -92,7 +121,7 @@
             :style=`{
               height: '60px',
               paddingLeft: '2px',
-              maxWidth: '210px',
+              //- maxWidth: '210px',
             }`
             ).full-width.menu-item
             q-popup-proxy(
@@ -119,20 +148,21 @@
           ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
             :to="isGuest ? '/auth' : '/workspace/create'"
-            color="green" no-caps icon="add" size="md"
+            color="green" no-caps size="lg"
+            icon="add_circle_outline"
             :align="mini ? 'center' : 'left'"
             :style=`{
-              height: '50px',
-              paddingLeft: '2px',
-              maxWidth: '210px',
+              height: '60px',
+              paddingLeft: '0px',
+              maxWidth: '240px',
             }`).full-width.menu-item
             span(
               v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-md Создать
+              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Создать
         //- docs
         kalpa-docs(
           v-if="!mini"
-          :textAlign="'left'"
+          :textAlign="'center'"
           :style=`{
             maxWidth: '210px',
           }`).q-py-sm
@@ -166,7 +196,8 @@ export default {
         {id: 'trends', name: 'Новое', icon: 'explore'},
         {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'about', name: 'О проекте', icon: 'support'}
+        {id: 'about', name: 'О проекте', icon: 'panorama_fish_eye'},
+        {id: 'settings', name: 'Настройки', icon: 'settings'},
       ]
     }
   },
@@ -211,6 +242,16 @@ export default {
         }
       }
       return res
+    }
+  },
+  methods: {
+    async logout () {
+      await AuthApi.logout()
+      await this.$router.replace('/auth')
+    },
+    async refresh () {
+      await this.$systemUtils.vibrate(200)
+      await this.$systemUtils.reset()
     }
   }
 }

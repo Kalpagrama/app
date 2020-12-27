@@ -1,5 +1,5 @@
 <template lang="pug">
-q-btn(round flat dense :icon="icon" :color="color")
+q-btn(round flat :icon="icon" :color="color")
   q-popup-proxy(
     maximized position="bottom" dark
     cover anchor="top right" self="top right").b-40

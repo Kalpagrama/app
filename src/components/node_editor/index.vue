@@ -7,25 +7,32 @@
     kalpa-finder(
       @contentKalpa="itemFound"
       :pages=`{
+        nodes: {views: ['all']},
         workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
         kalpagrama: {views: ['all', 'users', 'nodes']},
         gif: {views: ['all']},
         web: {views: ['all', 'image', 'video',]}
       }`
       :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
+        //- maxWidth: $store.state.ui.pageWidth+'px',
         height: $q.screen.height+'px',
       }`).b-30
       template(v-slot:header)
-        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
-          .col
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
+        .row.full-width.justify-center
+          div(
+            :style=`{
+              maxWidth: $store.state.ui.pageWidth+'px',
+              height: '60px',
+            }`
+            ).row.full-width.items-center.content-center
+            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
+            .col
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
       template(v-slot:tint=`{item}`)
         div(
           @click="itemFound(item)"
           :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
-  slot(name="header")
+  //- slot(name="header")
   //- editors wrapper
   div(
     :style=`{
@@ -135,6 +142,7 @@ import kalpaFinder from 'components/kalpa_finder/index.vue'
 import nameEditor from './name_editor.vue'
 import spheresEditor from './spheres_editor.vue'
 import categoryEditor from './category_editor.vue'
+
 import itemEditor from './item_editor.vue'
 import itemPlayer from 'components/node_feed/node_items_item.vue'
 
@@ -203,13 +211,15 @@ export default {
     },
     itemPaddingBottom (item, itemii) {
       if (this.node.items.length === 1) {
-        if (item.thumbHeight && item.thumbWidth) {
-          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 34px)'
+        if (item.__typename === 'Book') {
+          return '100%'
+        }
+        else if (item.thumbHeight && item.thumbWidth) {
+          return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 20px)'
         }
         else {
           return '50%'
         }
-        // return '50%'
       }
       else return '100%'
     },
@@ -221,10 +231,11 @@ export default {
         }
         else {
           if (itemii === 0) {
-            return 'perspective(600px) rotateY(8deg)'
+            // perspective(1000px) rotateY(6deg) translate3d(0,0,-40px)
+            return 'perspective(1000px) rotateY(8deg) translate3d(0,0,-40px)'
           }
           else {
-            return 'perspective(600px) rotateY(-8deg)'
+            return 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-40px)'
           }
         }
       }
@@ -250,40 +261,35 @@ export default {
         // WS_BOOKMARK
         if (item.wsItemType === 'WS_BOOKMARK') {
           item = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
-          this.$set(this.node.items, 1, item)
+          // this.$set(this.node.items, 1, item)
         }
         // WS_NODE
         if (item.wsItemType === 'WS_NODE') {
-          this.node.items[1] = item
+          // this.node.items[1] = item
         }
       }
       // from kalpa, published
       else {
-        if (item.type === 'VIDEO') {
-          alert('VIDEO')
-          this.node.items[1] = item
+        if (item.type === 'GIF') {
+          // item = ???
+          // TODO: schedule getContentByUrl()
+          // this.node.items[1] = item
+          // this.$set(this.node.items, 1, item)
         }
-        else if (item.type === 'IMAGE') {
-          this.node.items[1] = item
-        }
-        else if (item.type === 'NODE') {
-          // ?
-        }
-        else if (item.type === 'USER') {
-          // ?
-        }
-        else if (['SPHERE', 'WORD', 'SENTENCE'].includes(item.type)) {
-          // ?
-        }
-        else if (item.type === 'GIF') {
-          alert('content.GIF')
-          this.node.items[1] = item
+        else {
+          // this.node.items[1] = item
+          // this.$set(this.node.items, 1, item)
         }
       }
+      this.$set(this.node.items, 1, item)
     },
     itemChanged (item, ii) {
-      this.$log('itemChanged', item, ii)
+      // this.$log('itemChanged', item, ii)
+      this.$log('itemChanged')
       this.$set(this.node.items, ii, item)
+      // for (const p in item) {
+      //   this.$set(this.node.items[ii], p, item[p])
+      // }
     },
     linkToggle () {
       this.$log('linkToggle')
@@ -324,7 +330,7 @@ export default {
         this.$log('publish done')
         this.publishing = false
         this.$emit('published', createdNode)
-        this.cancel()
+        // this.cancel()
       }
       catch (e) {
         this.$log('publish error', e)
@@ -333,9 +339,7 @@ export default {
     },
     cancel () {
       this.$log('cancel')
-      // emit nodeInitial
       this.$emit('node', JSON.parse(JSON.stringify(this.nodeInitial)))
-      // this.$emit('node', this.node)
     }
   },
   created () {

@@ -2,13 +2,13 @@
 q-page(
   :style=`{
     paddingTop: '40px',
-  }`)
+  }`).row.full-width.justify-center
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000}`).b-30
     //- types
-    .row.full-width.q-px-sm
-      .row.full-width.items-start.content-start.scroll.q-py-xs
+    .row.full-width.justify-center.q-px-sm
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start.scroll.q-py-xs
         .row.items-center.content-center.no-wrap
           q-btn(
             @click="viewId = v.id"
@@ -22,7 +22,11 @@ q-page(
   kalpa-loader(
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
-    .row.full-width.items-start.content-start.q-pa-sm
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.pageWidth+'px'
+      }`
+      ).row.full-width.items-start.content-start.q-pa-sm
       item(
         v-for="(item,ii) in items" :key="ii"
         @click.native="$emit('item', item)"

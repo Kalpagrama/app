@@ -5,12 +5,10 @@ div(
     ...styles,
   }`
   ).row.full-width
-  //- slot(name="bar")
   img(
     draggable="false"
     :src="contentKalpa.url"
     :style=`{
-      //- maxHeight: $q.screen.height*0.5+'px',
       borderRadius: '10px',
       objectFit: 'contain',
       background: 'rgb(35,35,35)',
@@ -28,11 +26,12 @@ export default {
       currentPage: 0,
       figures: [],
       points: [],
+      isFullscreen: false,
     }
   },
   methods: {
-    stateSet (key, val) {
-      if (!this[key]) return
+    setState (key, val) {
+      this.$log('setState', key, val)
       this[key] = val
     },
   },

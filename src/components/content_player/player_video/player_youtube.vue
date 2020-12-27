@@ -21,18 +21,19 @@ iframe[id$="_youtube_iframe"]
 .mejs__overlay
   width: 100% !important
   height: 100% !important
+  display: none !important
 </style>
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center
   video(
     ref="videoRef"
-    :src="url"
+    :src="contentKalpa.url"
     type="video/youtube"
     :playsinline="true"
     :autoplay="true"
     :loop="true"
-    :muted="mutedLocal"
+    :muted="muted"
     :style=`{
       objectFit: 'contain'
     }`
@@ -46,10 +47,7 @@ import 'mediaelement/full'
 export default {
   name: 'playerVideo__playerYoutube',
   props: {
-    url: {type: String, required: true},
-    // muted: {type: Boolean, default () { return false }},
-    // loop: {type: Boolean, default () { return true }},
-    // autoplay: {type: Boolean, default () { return true }}
+    contentKalpa: {type: Object, required: true},
   },
   data () {
     return {
@@ -57,41 +55,51 @@ export default {
       playing: false,
       currentTime: 0,
       duration: 0,
-      mutedLocal: false,
+      muted: false,
       events: {},
-      isFullscreen: false,
       figures: [],
       points: [],
+      isFullscreen: false
     }
   },
   watch: {
-    // mutedLocal: {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     // this.mutedLocal = to
-    //     this.player.setMuted(to)
-    //   }
-    // }
+    isFullscreen: {
+      handler (to, from) {
+        this.$log('isFullscreen TO', to)
+        if (to) {
+          this.$q.fullscreen.request()
+            .then(() => {
+              // success!
+            })
+            .catch(err => {
+              this.$log('err', err)
+            })
+        }
+        else {
+          // Exiting fullscreen mode:
+          this.$q.fullscreen.exit()
+            .then(() => {
+              // success!
+            })
+            .catch(err => {
+              this.$log('err', err)
+            })
+        }
+      }
+    }
   },
   methods: {
-    stateSet (key, val) {
-      // if (!this[key]) return
-      this.$log('stateSet', key, val)
-      // this[key] = val
-      if (key === 'mutedLocal') {
-        this.player.setMuted(val)
-      }
+    setState (key, val) {
+      this.$log('setState', key, val)
+      if (this[key] === undefined) return
       this.$set(this, key, val)
     },
-    fullscreenToggle (to) {
-      this.$log('fullscreenToggle')
-      this.isFullscreen = to === undefined ? !this.isFullscreen : to
+    // setMuted (val) {},
+    setCurrentTime (t) {
+      // this.$log('setCurrentTime', t)
+      this.currentTime = t
+      this.player.setCurrentTime(t)
     },
-    // volumeToggle () {
-    //   this.$log('volumeToggle')
-    //   this.mutedLocal = !this.mutedLocal
-    //   this.player.setMuted(this.mutedLocal)
-    // },
     play () {
       // this.$log('play')
       this.player.play()
@@ -100,40 +108,34 @@ export default {
       // this.$log('pause')
       this.player.pause()
     },
-    setCurrentTime (t) {
-      // this.$log('setCurrentTime', t)
-      // if (this.currentTimeBlocked) return
-      this.currentTime = t
-      this.currentTimeBlocked = true
-      this.player.setCurrentTime(t)
-      this.$wait(500).then(() => {
-        this.currentTimeBlocked = false
-      })
-    },
     loadeddataHandle (e) {
-      this.$log('loadeddataHandle', e)
-      this.duration = this.player.duration
+      this.$log('loadeddataHandle')
+      if (this.player && this.player.duration > 0) {
+        this.duration = this.player.duration
+      }
+      else {
+        this.duration = this.contentKalpa.duration
+      }
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
-      if (this.currentTimeBlocked) return
       this.currentTime = this.player.currentTime
     },
     playHandle (e) {
-      // this.$log('playHandle', e)
+      this.$log('playHandle', this.playing)
       this.playing = true
     },
     pauseHandle (e) {
-      // this.$log('pauseHandle', e)
+      this.$log('pauseHandle', this.playing)
       this.playing = false
     },
     init () {
       this.$log('init start')
       // this.$log('playerInit videoRef', this.$refs.videoRef)
       let me = new window.MediaElementPlayer(this.$refs.videoRef, {
-        loop: this.loop,
-        muted: this.mutedLocal,
-        autoplay: this.autoplay,
+        loop: true,
+        muted: this.muted,
+        autoplay: true,
         controls: true,
         features: [],
         // enableAutosize: true,
@@ -144,7 +146,6 @@ export default {
         success: async (mediaElement, originalNode, instance) => {
           this.$log('init done')
           this.player = mediaElement
-          // this.$nextTick(() => {
           this.player.addEventListener('loadeddata', this.loadeddataHandle)
           this.player.addEventListener('timeupdate', this.timeupdateHandle, false)
           this.player.addEventListener('pause', this.pauseHandle)
@@ -160,7 +161,6 @@ export default {
               if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
             }
           }
-          // })
           this.$emit('player', this)
           this.player.play()
         },
@@ -174,11 +174,9 @@ export default {
   mounted () {
     this.$log('mounted')
     this.init()
-    // alert('playerYoutube MOUNTED')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // if (this.playingInterval) this.playerIntervalStop()
     if (this.player) {
       this.player.removeEventListener('loadeddata', this.loadeddataHandle)
       this.player.removeEventListener('timeupdate', this.timeupdateHandle)
@@ -187,7 +185,6 @@ export default {
       this.player.remove()
       this.player = null
     }
-    // alert('playerYoutube beforeDestroy')
   }
 }
 </script>

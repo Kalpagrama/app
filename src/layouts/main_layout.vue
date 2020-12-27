@@ -19,8 +19,6 @@
   40%, 60%
     transform: translate3d(2px, 0, 0)
     color: #4caf50 !important
-.q-footer
-  transform: translate3d(0,0,30px) !important
 </style>
 
 <template lang="pug">
@@ -30,7 +28,7 @@ q-layout(view="lHh lpR lFf")
     side="left" no-swipe-open
     :value="$store.state.ui.mobileMenuShow"
     behavior="mobile"
-    :width="$q.screen.width - 70"
+    :width="$q.screen.width - 68"
     @before-hide="$store.commit('ui/stateSet', ['mobileMenuShow', false])")
     kalpa-menu(
       :mini="false"
@@ -54,9 +52,13 @@ q-layout(view="lHh lpR lFf")
     q-footer(
       v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow"
       :style=`{
-         paddingBottom: 'env(safe-area-inset-bottom)',
-      }`).b-30
-      kalpa-menu-mobile
+      }`)
+      div(
+        :style=`{
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }`
+        ).row.full-width.b-40
+        kalpa-menu-mobile
   q-page-container
     router-view
 </template>

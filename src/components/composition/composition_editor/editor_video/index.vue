@@ -1,5 +1,11 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-width
+layer-frames(
+  :player="player"
+  :layer="composition.layers[0]"
+  :layerStart="composition.layers[0].figuresAbsolute[0].t"
+  :layerEnd="composition.layers[0].figuresAbsolute[1].t"
+  :layerDuration="composition.layers[0].figuresAbsolute[1].t-composition.layers[0].figuresAbsolute[0].t")
+//- div(:style=`{position: 'relative',}`).row.full-width
   //- one layer composition ONLY, for now...
   div(
     v-if="composition.layers.length === 1"
@@ -35,9 +41,9 @@ export default {
   props: ['composition', 'player', 'contentKalpa'],
   data () {
     return {
-      layerSelectedId: null,
-      layerEditingId: null,
-      layersChecked: []
+      // layerSelectedId: null,
+      // layerEditingId: null,
+      // layersChecked: []
     }
   },
   watch: {
@@ -47,19 +53,19 @@ export default {
         if (to) {
           this.$log('composition TO', to)
           let figures = this.composition.layers[0].figuresAbsolute
-          this.player.stateSet('figures', [figures])
+          this.player.setState('figures', [figures])
         }
       }
     }
   },
   mounted () {
     this.$log('mounted')
-    if (this.composition.layers.length === 1) {
-      this.layerEditingId = this.composition.layers[0].id
-    }
+    // if (this.composition.layers.length === 1) {
+    //   this.layerEditingId = this.composition.layers[0].id
+    // }
   },
   // beforeDestroy () {
-  //   this.player.stateSet('figures', [])
+  //   this.player.setState('figures', [])
   // }
 }
 </script>

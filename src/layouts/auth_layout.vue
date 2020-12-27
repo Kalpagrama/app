@@ -9,7 +9,9 @@ q-layout(
     q-page(:style=`{}`)
       div(
         @click="$router.replace('/auth').catch(e => e)"
-        :style=`{height: '200px', overflow: 'hidden',}`).row.full-width.items-center.content-center.justify-center.b-30
+        :style=`{
+          height: '280px', overflow: 'hidden',
+        }`).row.full-width.items-center.content-center.justify-center.b-30
         kalpa-logo(:width="100" :height="100").q-mb-md
         h4.text-white.text-bold.q-ma-xs.q-pa-xs {{$t('kalpagrama', 'Кальпаграма')}}
       router-view(v-if="!$route.query.token")

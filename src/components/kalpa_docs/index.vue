@@ -12,14 +12,14 @@
     ).row.full-width.justify-center.q-py-sm
     small.text-grey-9 {{ title }}
   //- body
-  .row.full-width.items-start.content-start
+  .row.full-width.items-start.content-start.justify-center
     router-link(
       v-for="(d,di) in docs" :key="di"
       :to="'/docs/'+d.id"
       :style=`{
-        textAlign: textAlign,
+        textAlign: textAlign
       }`
-      ).row.full-width.q-px-sm.q-pt-xs
+      ).row.full-width.justify-center.q-px-sm.q-pt-xs
       small.text-grey-9.doc-item {{ d.name }}
 </template>
 

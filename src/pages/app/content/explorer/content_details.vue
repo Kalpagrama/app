@@ -1,16 +1,17 @@
 <template lang="pug">
 .row.full-width.justify-center
-  div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start.q-px-sm
+  div(:style=`{maxWidth: '700px'}`).row.full-width.items-start.content-start
     //- DETAILS:
-    .row.full-width
+    .row.full-width.q-pt-sm
       div(
         :style=`{
           background: 'rgb(35,35,35)',
-          borderRadius: '0 0 10px 10px',
+          //- borderRadius: '0 0 10px 10px',
+          borderRadius: '10px',
         }`
         ).row.full-width
         //- HEADER:
-        .row.full-width.q-py-sm.q-px-sm
+        //- .row.full-width.q-py-sm.q-px-sm
           q-btn(
             @click="$router.back()"
             round flat color="white" icon="west")
@@ -21,22 +22,27 @@
               small.text-grey-8.q-mr-xs 10923
               .col
               small.text-grey-8.q-mr-xs {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
+        .row.full-width.q-pa-md
+          span.text-white.text-bold {{ contentKalpa.name }}
         //- FOOTER:
-        .row.full-width.q-pa-xs
-          kalpa-share(type="content" :item="contentKalpa")
-          .col.full-height.q-px-xs
+        .row.full-width.q-pa-sm
+          //- kalpa-share(type="content" :item="contentKalpa")
+          //- .col.full-height
             //- TODO: contentKalpa.sourse
             //- kalpa, youtube, vk, instagram, tiktok, onlyfans
-            q-btn(
-              v-if="contentKalpa.contentSource !== 'KALPA'"
-              @click="gotToOriginal"
-              align="left"
-              flat color="grey-9" no-caps
-              :style=`{
-                background: 'rgb(38,38,38)'
-              }`).fit
-              q-icon(name="fab fa-youtube" color="red" size="30px")
-              span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
+          q-btn(
+            v-if="contentKalpa.contentSource !== 'KALPA'"
+            @click="gotToOriginal"
+            align="left"
+            flat color="grey-9" no-caps
+            :style=`{
+              background: 'rgb(38,38,38)'
+            }`).full-height
+            q-icon(name="fab fa-youtube" color="red" size="30px")
+            span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
+              //- q-icon(name="launch" color="grey-9" size="18px")
+          .col
+          kalpa-menu-actions(icon="more_vert" :actions="actions")
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
@@ -47,7 +53,7 @@
             inactiveColor="grey-8"
             :fields=`{contentType: contentKalpa.type}`
             @bookmark="$event => $emit('bookmark', $event)")
-    .row.full-width.justify-center
+    //- .row.full-width.justify-center
       q-btn(flat dense color="white" no-caps @click="$emit('page', 'drafts')").col Черновики
       q-btn(flat dense color="white" no-caps @click="$emit('page', 'contents')").col Похожее
 </template>
@@ -56,7 +62,7 @@
 import { openURL } from 'quasar'
 
 export default {
-  name: 'pageDetails',
+  name: 'contentDetails',
   props: ['contentKalpa'],
   methods: {
     gotToOriginal () {
@@ -76,6 +82,10 @@ export default {
   computed: {
     actions () {
       return {
+        block: {
+          name: 'Block',
+          cb: () => {},
+        },
         report: {
           name: 'Пожаловаться',
           cb: () => {

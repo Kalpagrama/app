@@ -36,6 +36,10 @@
         }`).row.full-width
     div(:style=`{position: 'relative', zIndex: 100, height: '60px', borderRadius: '10px',marginTop: '-20px',paddingTop: '0px',}`
       ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
+      q-btn(
+        @click="$router.back()"
+        round flat color="white" icon="west"
+        )
       user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
       .col
         span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}

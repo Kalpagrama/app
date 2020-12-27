@@ -7,12 +7,12 @@ div(
   video(
     @click="playing ? pause() : play()"
     ref="videoRef"
-    :src="url"
+    :src="contentKalpa.url"
     type="video/mp4"
     :playsinline="true"
     :autoplay="false"
     :loop="true"
-    :muted="mutedLocal"
+    :muted="muted"
     :style=`{
       objectFit: objectFit,
       borderRadius: '10px',
@@ -28,10 +28,8 @@ div(
 export default {
   name: 'playerVideo__playerKalpa',
   props: {
+    contentKalpa: {type: Object, required: true},
     url: {type: String, required: true},
-    // muted: {type: Boolean, default () { return true }},
-    // loop: {type: Boolean, default () { return true }},
-    // autoplay: {type: Boolean, default () { return true }},
     objectFit: {type: String, default () { return 'cover' }}
   },
   data () {
@@ -40,41 +38,24 @@ export default {
       playing: false,
       currentTime: 0,
       duration: 0,
-      mutedLocal: false,
-      isFullscreen: false,
+      muted: false,
       events: {},
       figures: [],
       points: [],
+      isFullscreen: false,
     }
   },
-  // watch: {
-  //   muted: {
-  //     immediate: true,
-  //     handler (to, from) {
-  //       this.mutedLocal = to
-  //     }
-  //   }
-  // },
   methods: {
-    stateSet (key, val) {
-      // if (!this[key]) return
-      // this[key] = val
-      this.$log('stateSet', key, val)
+    setState (key, val) {
+      this.$log('setState', key, val)
+      if (this[key] === undefined) return
       this.$set(this, key, val)
     },
-    fullscreenToggle () {
-      this.$log('fullscreenToggle')
-      this.isFullscreen = !this.isFullscreen
+    setCurrentTime (t) {
+      // this.$log('setCurrentTime', t)
+      this.currentTime = t
+      if (this.$refs.videoRef) this.$refs.videoRef.currentTime = t
     },
-    // volumeToggle () {
-    //   this.$log('volumeToggle')
-    //   this.mutedLocal = !this.mutedLocal
-    //   this.$refs.videoRef.muted = this.mutedLocal
-    // },
-    // setMuted (val) {
-    //   this.$log('setMuted')
-    //   this.mutedLocal = val
-    // },
     play () {
       // this.$log('play')
       this.$refs.videoRef.play()
@@ -83,27 +64,25 @@ export default {
       // this.$log('pause')
       this.$refs.videoRef.pause()
     },
-    setCurrentTime (t) {
-      // this.$log('setCurrentTime', t)
-      this.currentTime = t
-      if (this.$refs.videoRef) this.$refs.videoRef.currentTime = t
-    },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
-      this.duration = this.$refs.videoRef.duration
-      // this.duration = e.path[0].duration || this.$refs.videoRef.duration
-      // TODO: create player ??? with methods...
+      if (this.$refs.videoRef && this.$refs.videoRef.duration > 0) {
+        this.duration = this.$refs.videoRef.duration
+      }
+      else {
+        this.duration = this.contentKalpa.duration
+      }
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
       if (this.$refs.videoRef) this.currentTime = this.$refs.videoRef.currentTime
     },
     playHandle (e) {
-      this.$log('playHandle', e)
+      // this.$log('playHandle', e)
       this.playing = true
     },
     pauseHandle (e) {
-      this.$log('pauseHandle', e)
+      // this.$log('pauseHandle', e)
       this.playing = false
     },
   },
