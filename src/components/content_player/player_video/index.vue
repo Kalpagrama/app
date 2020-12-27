@@ -32,12 +32,12 @@ div(
       }`
       :style=`{
         position: 'absolute', zIndex: 3000,
-        bottom: options.mini ? '8px' : '8px',
+        bottom: options.mini ? '16px' : '16px',
         //- opacity: options.mini ? 0.6 : 1,
         paddingRight: '56px',
         paddingLeft: '56px',
       }`
-      ).row.full-width.br
+      ).row.full-width.justify-center
       player-bar(
         v-if="player"
         :player="player"
@@ -46,8 +46,10 @@ div(
         :start="start"
         :end="end"
         :mini="options.mini"
-        :style=`{maxWidth: '770px'}`)
-  div(v-if="!options.mini" :style=`{height: '8px',}`).row.full-width
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth-112+'px'
+        }`)
+  div(v-if="!options.mini" :style=`{height: '16px',}`).row.full-width
 </template>
 
 <script>

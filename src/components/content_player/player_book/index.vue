@@ -11,6 +11,7 @@ div(
       position: 'relative',
       borderRadius: '0 0 10px 10px',
     }`).col.full-width
+    q-resize-observer(@resize="onResize" :debounce="300")
     div(
       :id="bookArea"
       :style=`{
@@ -54,22 +55,22 @@ export default {
       default: {
         white: {
           body: {
-            color: '#000000',
-            background: '#ffffff'
+            color: 'black',
+            background: 'white'
           },
           name: 'WHITE'
         },
-        beige: {
-          body: {
-            color: '#000000',
-            background: '#f3e8d2'
-          },
-          name: 'BEIGE'
-        },
+        // beige: {
+        //   body: {
+        //     color: '#000000',
+        //     background: '#f3e8d2'
+        //   },
+        //   name: 'BEIGE'
+        // },
         night: {
           body: {
-            color: '#ffffff',
-            background: '#4a4a4a'
+            color: 'white',
+            background: 'black'
           },
           name: 'NIGHT'
         }
@@ -108,7 +109,8 @@ export default {
       selection: {
         cfiRange: null,
         text: null
-      }
+      },
+      isFullscreen: false,
     }
   },
   watch: {
@@ -126,12 +128,17 @@ export default {
     setState (key, val) {
       this.$log('setState', key, val)
     },
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+      this.height = e.height
+      if (this.rendition) this.rendition.resize(this.width, this.height)
+    },
     initReader () {
       this.rendition = this.book.renderTo(this.bookArea, {
         contained: true,
-        // height: this.height
-        // height: 500
-        height: '100%',
+        height: this.height,
+        width: this.width,
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -209,8 +216,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted!!!')
+    this.$log('mounted')
+    // init
     this.book = new Book(this.contentKalpa.url, {})
+    // book navigation ready
     this.book.loaded.navigation.then(({ toc }) => {
       this.toc = toc
       this.$emit('toc', this.toc)
@@ -219,6 +228,7 @@ export default {
         this.$emit('click')
       })
     })
+    // book ready
     this.book.ready.then(() => {
       return this.book.locations.generate()
     }).then(() => {
@@ -231,17 +241,19 @@ export default {
         this.$emit('relocated')
       })
     })
-    window.addEventListener('resize', debounce(() => {
-      this.resizeToScreenSize()
-    }, 250))
-    this.updateScreenSizeInfo()
+    // window.addEventListener('resize', debounce(() => {
+    //   this.resizeToScreenSize()
+    // }, 250))
+    // this.updateScreenSizeInfo()
     this.$emit('player', this)
   },
   created () {
-    window.addEventListener('keyup', this.keyListener)
+    this.$log('created')
+    // window.addEventListener('keyup', this.keyListener)
   },
   beforeDestroy () {
-    window.removeEventListener('keyup', this.keyListener)
+    this.$log('beforeDestroy')
+    // window.removeEventListener('keyup', this.keyListener)
   }
 }
 </script>

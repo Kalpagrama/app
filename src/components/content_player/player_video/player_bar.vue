@@ -31,7 +31,9 @@ div(
         :color="player.mutedLocal ? 'red' : 'white'"
         size="20px" @click="volumeToggle()")
     q-btn(
-      round flat dense color="white" icon="fullscreen")
+      @click="player.setState('isFullscreen', !player.isFullscreen)"
+      round flat dense color="white"
+      :icon="player.isFullscreen ? 'fullscreen_exit' : 'fullscreen'")
   //- currentTime/duration
   small(
     :style=`{

@@ -1,5 +1,10 @@
 <template lang="pug">
-component(
+explorer-default(
+  v-if="contentKalpa"
+  :key="contentKalpa.oid"
+  :contentKalpa="contentKalpa"
+  :query="query")
+//- component(
   v-if="contentKalpa"
   :is="explorerComponent[contentKalpa.type]"
   :key="contentKalpa.oid"
@@ -10,15 +15,17 @@ component(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import explorerBook from './explorer_book/index.vue'
-import explorerVideo from './explorer/index.vue'
+import explorerDefault from './explorer_default/index.vue'
+// import explorerBook from './explorer_book/index.vue'
+// import explorerVideo from './explorer/index.vue'
 // import explorerImage from './explorer/index.vue'
 
 export default {
   name: 'contentExplorer',
   components: {
-    explorerBook,
-    explorerVideo,
+    explorerDefault,
+    // explorerBook,
+    // explorerVideo,
     // explorerImage
   },
   props: ['oid', 'query'],
@@ -50,10 +57,12 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

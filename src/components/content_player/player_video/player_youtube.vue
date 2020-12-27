@@ -59,6 +59,33 @@ export default {
       events: {},
       figures: [],
       points: [],
+      isFullscreen: false
+    }
+  },
+  watch: {
+    isFullscreen: {
+      handler (to, from) {
+        this.$log('isFullscreen TO', to)
+        if (to) {
+          this.$q.fullscreen.request()
+            .then(() => {
+              // success!
+            })
+            .catch(err => {
+              this.$log('err', err)
+            })
+        }
+        else {
+          // Exiting fullscreen mode:
+          this.$q.fullscreen.exit()
+            .then(() => {
+              // success!
+            })
+            .catch(err => {
+              this.$log('err', err)
+            })
+        }
+      }
     }
   },
   methods: {

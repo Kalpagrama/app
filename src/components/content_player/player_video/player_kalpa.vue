@@ -42,6 +42,7 @@ export default {
       events: {},
       figures: [],
       points: [],
+      isFullscreen: false,
     }
   },
   methods: {

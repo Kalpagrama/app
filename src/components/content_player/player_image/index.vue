@@ -26,6 +26,7 @@ export default {
       currentPage: 0,
       figures: [],
       points: [],
+      isFullscreen: false,
     }
   },
   methods: {
