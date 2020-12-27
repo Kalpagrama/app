@@ -58,11 +58,11 @@ div(
   //- context and name
   div(
     :style=`{
-      position: 'absolute', zIndex: 1000,
+      position: 'absolute', zIndex: 200,
       bottom: '-0.5px',
       //- top: '-0.5px',
       minHeight: '40px',
-      transform: 'translate3d(0,0,0)',
+      //- transform: 'translate3d(0,0,0)',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px',
     }`

@@ -2,6 +2,75 @@
 .row.full-width.justify-center
   div(
     v-if="isGuest"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+      borderRadius: '10px 10px 0 0',
+    }`
+    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    q-btn(
+      flat icon="explore" no-caps
+      :to="'/trends'"
+      :color="'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Новое
+    q-btn(
+      :to="'/auth'"
+      flat color="white" no-caps
+      :style=`{
+        height: '44px',
+      }`).q-px-md.q-mt-xs.b-50
+      span.text-white Войти
+    q-btn(
+      @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
+      flat icon="menu" no-caps
+      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Меню
+  div(
+    v-if="!isGuest"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+      borderRadius: '10px 10px 0 0',
+    }`
+    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    q-btn(
+      flat icon="home" no-caps
+      :to="'/feeds/all'"
+      :color="'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Лента
+    q-btn(
+      flat icon="explore" no-caps
+      :to="'/trends'"
+      :color="'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Новое
+    q-btn(
+      no-caps icon="add" size="lg"
+      :to="'/workspace/create'"
+      :color="'green'"
+      :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+    q-btn(
+      flat no-caps icon="bookmark_outline"
+      :to="'/workspace/'"
+      :color="pageId === 'similar' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Закладки
+    q-btn(
+      @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
+      flat icon="menu" no-caps
+      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Меню
+//- .row.full-width.justify-center
+  div(
+    v-if="isGuest"
     :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
     ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs.b-40
     .row.full-height.items-center.content-center.justify-center

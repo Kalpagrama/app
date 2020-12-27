@@ -15,7 +15,7 @@ div(
   div(
     v-if="!isPinned"
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '0px',
+      position: 'absolute', zIndex: 5000, bottom: '0px',
       pointerEvents: 'none',
     }`
     ).row.full-width.justify-center
@@ -27,9 +27,18 @@ div(
       div(
         v-for="(j,ji) in joints" :key="j.oid"
         :style=`{
+          position: 'relative',
           height: '2px',
         }`
         ).col.q-pr-xs
+        div(
+          v-if="jointIndex === ji"
+          :style=`{
+            position: 'absolute', zIndex: 100, top: '-16px',
+          }`
+          ).row.full-width.justify-center
+          small.text-white {{ j.items.find(i => i.oid !== row.oid).countJoints }}
+          //- small.text-white 123
         div(
           :class=`{
             'bg-white': jointIndex === ji,
@@ -53,6 +62,7 @@ div(
       ).row.full-width.items-start.content-start
       item(
         :item="row.item"
+        :itemActive="isPinned"
         :itemPinned="isPinned")
   //- row joints wrapper
   div(
@@ -65,6 +75,7 @@ div(
     div(
       :style=`{
         position: 'relative',
+        paddingLeft: ($q.screen.width-$store.state.ui.pageWidth)/2+'px',
       }`
       ).row.full-height.no-wrap
       div(
@@ -77,8 +88,7 @@ div(
           minWidth: width+'px',
           //- paddingBottom: '30px',
           //- paddingTop: '30px',
-          marginLeft: jointMargin(ji),
-          marginRight: jointMargin(ji),
+          marginRight: jointMarginRight(ji),
         }`
         ).row.fit
         //- tint inActive
@@ -93,6 +103,7 @@ div(
         item(
           v-show="isPinned ? ji === jointIndex : true"
           :item="j.items.find(i => i.oid !== row.oid)"
+          :itemActive="(isPinned || isVisible) && ji === jointIndex"
           :itemPinned="isPinned"
           :style=`{
             minWidth: width+'px',
@@ -154,11 +165,10 @@ export default {
     }
   },
   methods: {
-    jointMargin (ji) {
+    jointMarginRight (ji) {
       if (this.$q.screen.width < this.$store.state.ui.pageWidth) return '0px'
       else {
-        // if first/last item
-        if (ji === 0 || ji === this.joints.length - 1) {
+        if (ji === this.joints.length - 1) {
           return (this.$q.screen.width - this.$store.state.ui.pageWidth) / 2 + 'px'
         }
       }
@@ -198,7 +208,7 @@ export default {
       this.jointsNexting = true
       this.$tween.to(
         this.$refs.jointsScrollArea,
-        0.5,
+        0.3,
         {
           scrollLeft: scrollTo,
           onComplete: () => {

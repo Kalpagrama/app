@@ -2,10 +2,12 @@
 q-layout(view="hHh Lpr lff").bg-black
   q-footer(
     v-if="!jointCreating"
-    reveal).bg-black
+    :heightHint="65"
+    ).bg-black
     div(
       :style=`{
         paddingBottom: 'env(safe-area-inset-bottom)',
+        minHeight: '65px',
       }`
       ).row.full-width.justify-center
       div(
@@ -17,16 +19,17 @@ q-layout(view="hHh Lpr lff").bg-black
           .col
           q-btn(
             @click="jointCreating = !jointCreating"
-            color="green"
+            color="green" size="lg"
             :icon="jointCreating ? 'check' : 'add'"
             :style=`{
               borderRadius: '50%',
-              width: '40px', height: '40px',
+              width: '50px', height: '50px',
             }`)
           .col
           q-btn(round flat color="white" icon="more_vert")
   q-page-container
     q-page
+      q-resize-observer(:debounce="300" @resize="onResize")
       div(
         v-touch-swipe.mouse.up.down="rowsNext"
         :style=`{
@@ -43,9 +46,12 @@ q-layout(view="hHh Lpr lff").bg-black
               //- paddingTop: '30px',
               //- paddingBottom: '30px',
             }`
-            ).row.full-width
+            ).row.full-width.justify-center
             joint-creator(
               :item="null"
+              :style=`{
+                maxWidth: $store.state.ui.pageWidth+'px',
+              }`
               @published="jointPublished"
               @cancel="jointCreating = false")
         //- joint CURRENT
@@ -55,10 +61,13 @@ q-layout(view="hHh Lpr lff").bg-black
             :style=`{
               position: 'absolute', zIndex: 2000, top: '50%',
             }`
-            ).row.full-width.justify-center
+            ).row.full-width.justify-center.q-px-md
             joint-current(
               v-if="jointCurrent"
-              :joint="jointCurrent")
+              :joint="jointCurrent"
+              :style=`{
+                maxWidth: '500px',
+              }`)
         //- body joints
         div(
           ref="rowsScrollArea"
@@ -125,12 +134,13 @@ export default {
       jointCreating: false,
       jointCurrent: null,
       itemActive: null,
+      height: 0,
     }
   },
   computed: {
-    height () {
-      return this.$q.screen.height - 60
-    },
+    // height () {
+    //   return this.$q.screen.height - 60
+    // },
     rowHeight () {
       return this.height / 2
     },
@@ -194,7 +204,7 @@ export default {
       this.rowsNexting = true
       this.$tween.to(
         this.$refs.rowsScrollArea,
-        0.5,
+        0.3,
         {
           scrollTop: scrollTop,
           onComplete: () => {
@@ -210,6 +220,12 @@ export default {
           }
         }
       )
+    },
+    onResize (e) {
+      this.$log('onResize', e)
+      if (this.height === 0) this.height = e.height
+      // this.height = e.height
+      this.width = e.width
     }
   }
 }

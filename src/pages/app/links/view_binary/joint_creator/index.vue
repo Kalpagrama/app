@@ -39,13 +39,14 @@ div(
   //- joint name/vertices
   div(
     :style=`{
-      position: 'absolute', zIndex: 1001, top: '-30px',
+      position: 'absolute', zIndex: 5001, top: '-30px',
     }`
-    ).row.full-width.q-px-md
+    ).row.full-width.justify-center.q-px-md
     div(
       :style=`{
         height: '60px',
         borderRadius: '10px',
+        maxWidth: '500px',
       }`
       ).row.full-width.items-center.content-center.justify-center.b-30
       .row.full-width.justify-center
@@ -56,8 +57,8 @@ div(
   div(
     v-if="!itemEditing"
     :style=`{
-      position: 'absolute', zIndex: 1001, bottom: -60+'px',
-      height: 60+'px',
+      position: 'absolute', zIndex: 1001, bottom: -65+'px',
+      height: 65+'px',
     }`
     ).row.full-width.bg-black
     div(
@@ -72,13 +73,21 @@ div(
         .row.full-width.items-center.content-center.q-pa-sm
           q-btn(round flat color="white" icon="west" @click="cancel()")
           .col
-            q-btn(
+            //- q-btn(
               @click="publish()"
               color="green" no-caps
               :loading="publishing"
               ).full-width
               span.text-white.text-bold Publish
-          q-btn(round flat color="white" icon="more_vert")
+          q-btn(
+            v-if="joint.items[1]"
+            @click="itemDelete(1)"
+            round flat color="red" icon="clear")
+          .col
+          q-btn(
+            @click="publish()"
+            round flat color="green" icon="check"
+            :loading="publishing")
   //- add placeholder
   div(
     v-if="!joint.items[1]"
@@ -115,11 +124,12 @@ div(
         }`
         :style=`{}`).fit
     div(
+      v-if="joint.items[1].__typename === 'Composition' || joint.items[1].__typename === 'Video'"
       :style=`{
-        opacity: itemEditing ? 0 : 1,
+        height: '46px',
       }`
-      ).row.full-width.justify-center.q-py-md
-      q-btn(
+      ).row.full-width.justify-center
+      //- q-btn(
         @click="itemDelete(1)"
         flat dense no-caps).text-red Delete item
 </template>

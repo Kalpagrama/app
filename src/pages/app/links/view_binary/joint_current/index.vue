@@ -2,11 +2,13 @@
 div(
   :style=`{
     position: 'relative',
-    maxWidth: '500px',
-  }`).row.full-width.q-px-md
+    //- maxWidth: '500px',
+  }`).row.full-width
   div(
     :style=`{
-      marginTop: jointOpened ? '-80px' : '-30px',
+      position: 'absolute', zIndex: 10000,
+      top: '-30px',
+      //- marginTop: jointOpened ? '-80px' : '-30px',
       borderRadius: '10px',
     }`
     ).row.full-width.b-40

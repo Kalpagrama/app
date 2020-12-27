@@ -65,7 +65,7 @@
           :style=`{
             position: 'relative',
             paddingBottom: itemPaddingBottom(item, itemii),
-            //- paddingBottom: '100%',
+            //- paddingBottom: '50%',
             transform: itemTransform(item, itemii)
           }`).row.full-width
           div(
@@ -211,13 +211,15 @@ export default {
     },
     itemPaddingBottom (item, itemii) {
       if (this.node.items.length === 1) {
-        if (item.thumbHeight && item.thumbWidth) {
+        if (item.__typename === 'Book') {
+          return '100%'
+        }
+        else if (item.thumbHeight && item.thumbWidth) {
           return 'calc(' + item.thumbHeight / item.thumbWidth * 100 + '% + 20px)'
         }
         else {
           return '50%'
         }
-        // return '50%'
       }
       else return '100%'
     },

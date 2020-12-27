@@ -25,19 +25,19 @@ div(
   //- footer
   div(v-if="!options.mini" :style=`{height: '28px',}`).row.full-width
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    //- v-show="options.showBar"
     div(
       v-if="player"
-      v-show="options.showBar"
       :class=`{
       }`
       :style=`{
         position: 'absolute', zIndex: 3000,
         bottom: options.mini ? '8px' : '8px',
-        opacity: options.mini ? 0.6 : 1,
+        //- opacity: options.mini ? 0.6 : 1,
         paddingRight: '56px',
         paddingLeft: '56px',
       }`
-      ).row.full-width
+      ).row.full-width.br
       player-bar(
         v-if="player"
         :player="player"

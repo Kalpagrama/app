@@ -7,7 +7,7 @@ div(
   //- name
   div(
     :style=`{
-      position: 'absolute', zIndex: 100,
+      position: 'absolute', zIndex: 1000,
       //- bottom: '0px',
       //- ...(() => itemPinned ? {top: '0px'} : {bottom: '0px'})(),
       bottom: '34px',
@@ -20,19 +20,31 @@ div(
       }`
     ).text-white.bg-black.q-pa-sm {{ item.name }}
   //- preview
-  img(
+  //- img(
     draggable="false"
     :src="item.thumbUrl"
     :style=`{
       borderRadius: '10px',
-      objectFit: 'contain',
+      //- objectFit: 'contain',
+      objectFit: 'cover',
     }`
     ).fit.bg-black
+  item(
+    :oid="item.oid"
+    :item="item"
+    :itemIndex="0"
+    :itemActive="itemActive"
+    :itemStyles="{}")
 </template>
 
 <script>
+import item from 'components/node_feed/node_items_item.vue'
+
 export default {
   name: 'jointsRowItem',
-  props: ['item', 'itemPinned'],
+  props: ['item', 'itemActive', 'itemPinned'],
+  components: {
+    item,
+  }
 }
 </script>

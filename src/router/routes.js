@@ -20,7 +20,6 @@ const routes = [
       component: () => import('layouts/auth_layout.vue'),
       children: [
          { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
-         { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') }
       ],
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))

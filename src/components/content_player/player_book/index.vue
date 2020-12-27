@@ -1,18 +1,31 @@
 <template lang="pug">
-  q-page-container
-    q-page.row.full-width.justify-center
-      div(
-        :style=`{maxWidth: '700px', height: '60px',borderRadius: '10px',}`
-      ).row.full-width.items-center.content-center.b-40.q-px-sm
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
-        q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-        input(size='3' type='range' max='100' min='0' step='1' @change='onChange($event.target.value)' :value='progress')
-        input(type='text' :value='progress' @change='onChange($event.target.value)')
-        q-btn(v-if="selection.cfiRange" round flat color="white" icon="add_circle" @click='createEssence')
-      div(
-        :id='bookArea'
-        :style=`{maxWidth: '600px',borderRadius: '10px',}`
-      ).row.full-width.items-center.content-center.b-40.q-px-sm
+div(
+  :style=`{
+    position: 'relative',
+    //- ...styles,
+    height: '100%',
+  }`
+  ).column.full-width.bg-black
+  div(
+    :style=`{
+      position: 'relative',
+      borderRadius: '0 0 10px 10px',
+    }`).col.full-width
+    div(
+      :id="bookArea"
+      :style=`{
+        borderRadius: '0 0 10px 10px',
+        overflow: 'hidden'
+      }`
+      ).row.fit
+    //- div(
+      :style=`{}`)
+  .row.full-width.justify-center
+    q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
+    q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
+    //- input(size='3' type='range' max='100' min='0' step='1' @change='onChange($event.target.value)' :value='progress')
+    //- input(type='text' :value='progress' @change='onChange($event.target.value)')
+    //- q-btn(v-if="selection.cfiRange" round flat color="white" icon="add_circle" @click='createEssence')
 </template>
 
 <script>
@@ -23,6 +36,10 @@ import * as assert from 'assert'
 export default {
   name: 'contentPlayer_book',
   props: {
+    contentKalpa: {
+      type: Object,
+      required: true,
+    },
     url: {
       type: String,
       required: true
@@ -106,10 +123,15 @@ export default {
     }
   },
   methods: {
+    setState (key, val) {
+      this.$log('setState', key, val)
+    },
     initReader () {
       this.rendition = this.book.renderTo(this.bookArea, {
         contained: true,
-        height: this.height
+        // height: this.height
+        // height: 500
+        height: '100%',
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -188,7 +210,7 @@ export default {
   },
   mounted () {
     this.$log('mounted!!!')
-    this.book = new Book(this.url, {})
+    this.book = new Book(this.contentKalpa.url, {})
     this.book.loaded.navigation.then(({ toc }) => {
       this.toc = toc
       this.$emit('toc', this.toc)
@@ -213,6 +235,7 @@ export default {
       this.resizeToScreenSize()
     }, 250))
     this.updateScreenSizeInfo()
+    this.$emit('player', this)
   },
   created () {
     window.addEventListener('keyup', this.keyListener)

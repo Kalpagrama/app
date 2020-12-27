@@ -7,8 +7,30 @@
 <template lang="pug">
 div(
   :style=`{overflow: 'hidden'}`
-  ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
-  .row.full-width.justify-center.q-py-sm
+  ).row.full-width.items-center.content-center.q-pa-sm.q-my-sm
+  .row.full-width.justify-center
+    div(
+      @click="serviceClick({id: 'oAuthUrlGoogle'})"
+      :style=`{
+        width: '268px', height: '54px',
+        borderRadius: '5px',
+      }`
+      ).row.items-center.content-center.justify-center.bg-white.cursor-pointer
+      q-icon(name="fab fa-google" size="18px").q-mr-xs
+      //- span.text-bold Sign in with Google
+      span.text-bold Войти с Google
+  .row.full-width.justify-center.q-mt-md
+    div(
+      @click="serviceClick({id: 'oAuthUrlApple'})"
+      :style=`{
+        width: '268px', height: '54px',
+        borderRadius: '5px',
+      }`
+      ).row.items-center.content-center.justify-center.bg-white.cursor-pointer
+      q-icon(name="fab fa-apple" size="20px").q-mr-sm
+      //- span.text-bold Sign in with Apple
+      span.text-bold Войти с Apple
+  //- .row.full-width.justify-center.q-py-sm
     q-btn(
       @click="serviceClick({id: 'oAuthUrlGoogle'})"
       flat color="white" no-caps
