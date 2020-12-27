@@ -33,6 +33,13 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Детали
+    q-btn(
+      @click="$emit('toggle')"
+      flat icon="keyboard_arrow_down" no-caps
+      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Свернуть
     //- q-btn(
       @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
       flat icon="menu" no-caps

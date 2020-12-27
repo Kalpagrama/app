@@ -10,6 +10,7 @@ div(
     minHeight: $q.screen.height+'px'
   }`).row.full-width.bg-black
   div(
+    v-if="showMenu"
     reveal
     :style=`{
       position: 'fixed', zIndex: 10000, bottom: '0px',
@@ -25,6 +26,7 @@ div(
         }`
         ).row.full-width.items-end.content-end.b-40
         nav-mobile(
+          @toggle="showMenu = false"
           @pageId="pageIdChanged"
           :pageId="pageId")
   .row.full-width.justify-center
@@ -32,7 +34,7 @@ div(
       :style=`{
         position: 'relative',
         maxWidth: player ? player.isFullscreen ? '100%' : $store.state.ui.pageWidth+'px' : $store.state.ui.pageWidth+'px',
-        height: $q.screen.height-65+'px',
+        height: $q.screen.height-(showMenu ? 65 : 0)+'px',
         //- paddingBottom: 0+0+'px',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }`
@@ -49,13 +51,21 @@ div(
             height: '100%',
           }`
           ).full-width.bg-black
-        q-btn(
+        //- q-btn(
           v-if="!pageId"
           @click="essenceCreateStart()"
           round flat dense color="green" icon="add_circle_outline"
           :style=`{
             position: 'absolute', zIndex: 3000,
             right: '12px', bottom: '8px'
+          }`)
+        q-btn(
+          v-if="!showMenu"
+          @click="showMenu = true"
+          round flat dense color="white" icon="keyboard_arrow_up"
+          :style=`{
+            position: 'absolute', zIndex: 3000,
+            right: '12px', bottom: '10px'
           }`)
 //- q-layout(
   view="hHh Lpr lff").bg-black
@@ -123,6 +133,7 @@ export default {
       player: null,
       pageId: null,
       headerHeight: 65,
+      showMenu: false,
     }
   },
   computed: {
@@ -176,6 +187,16 @@ export default {
   mounted () {
     this.$log('mounted')
     document.body.style.background = 'black !important'
+    // window.onorientationchange = function(event) {
+    //   // console.log('the orientation of the device is now ' + event.target.screen.orientation.angle)
+    //   alert('OOO: ' + event.target.screen.orientation.angle)
+    // }
+    window.addEventListener('orientationchange', async (event) => {
+      // console.log("the orientation of the device is now " + event.target.screen.orientation.angle)
+      alert('OOO: ' + event.target.screen.orientation.angle)
+      await this.$wait(2000)
+      this.$q.notify({type: 'negative', position: 'top', message: event.target.screen.orientation.angle})
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
