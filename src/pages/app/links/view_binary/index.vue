@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: $q.screen.height-65+'px',
+    height: $q.screen.height-65-8+'px',
   }`
   ).row.full-width.bg-black
   div(
@@ -59,9 +59,10 @@ div(
               //- paddingTop: '30px',
               //- paddingBottom: '30px',
             }`
-            ).row.full-width.justify-center
+            ).row.full-width.justify-center.br
             joint-creator(
-              :item="null"
+              :item="itemPinned"
+              :jointCurrent="jointCurrent"
               :style=`{
                 maxWidth: $store.state.ui.pageWidth+'px',
               }`
@@ -95,102 +96,12 @@ div(
             :isActive="rowIndex === ri || rowIndex+1 === ri"
             :isPinned="rowIndex === ri"
             :isVisible="rowIndex+1 === ri"
+            :jointStart="$route.query.joint"
             :style=`{
               height: rowHeight+'px',
               opacity: rowIndex === ri ? 1 : jointCreating ? 0 : 1
             }`
             @nexting="rowsNexting = $event"
-            @item="itemSelected"
-            @joint="$event => jointChanged($event, r, ri)")
-//- q-layout(view="hHh Lpr lff").bg-black
-  q-footer(
-    v-if="!jointCreating"
-    ).bg-black
-    div(
-      :style=`{
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        //- paddingBottom: '60px',
-        //- minHeight: '65px',
-      }`
-      ).row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-        }`).row.full-width
-        .row.full-width.items-center.content-center.q-pa-sm
-          q-btn(round flat color="white" icon="west" @click="$router.back()")
-          .col
-          q-btn(
-            @click="jointCreating = !jointCreating"
-            color="green" size="md"
-            :icon="jointCreating ? 'check' : 'add'"
-            :style=`{
-              borderRadius: '50%',
-              width: '40px', height: '40px',
-            }`)
-          .col
-          q-btn(round flat color="white" icon="more_vert")
-  q-page-container
-    q-page
-      q-resize-observer(:debounce="300" @resize="onResize")
-      div(
-        v-touch-swipe.mouse.up.down="rowsNext"
-        :style=`{
-          position: 'relative',
-          height: height+'px'
-        }`
-        ).column.full-width.bg-black
-        //- joint CREATOR
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          div(
-            v-if="jointCreating"
-            :style=`{
-              position: 'absolute', zIndex: 1000, top: '50%', height: '50%',
-              //- paddingTop: '30px',
-              //- paddingBottom: '30px',
-            }`
-            ).row.full-width.justify-center
-            joint-creator(
-              :item="null"
-              :style=`{
-                maxWidth: $store.state.ui.pageWidth+'px',
-              }`
-              @published="jointPublished"
-              @cancel="jointCreating = false")
-        //- joint CURRENT
-        transition(enter-active-class="animated fadeIn" leave-active-class="none")
-          div(
-            v-if="!jointCreating && !rowsNexting"
-            :style=`{
-              position: 'absolute', zIndex: 2000, top: '50%',
-            }`
-            ).row.full-width.justify-center.q-px-md
-            joint-current(
-              v-if="jointCurrent"
-              :joint="jointCurrent"
-              :style=`{
-                maxWidth: '500px',
-              }`)
-        //- body joints
-        div(
-          ref="rowsScrollArea"
-          :style=`{
-            overflow: 'hidden',
-          }`
-          ).col.full-width
-          joints-row(
-            v-for="(r,ri) in rows" :key="ri"
-            :row="r"
-            :rowIndex="ri"
-            :isActive="rowIndex === ri || rowIndex+1 === ri"
-            :isPinned="rowIndex === ri"
-            :isVisible="rowIndex+1 === ri"
-            :style=`{
-              height: rowHeight+'px',
-              opacity: rowIndex === ri ? 1 : jointCreating ? 0 : 1
-            }`
-            @nexting="rowsNexting = $event"
-            @item="itemSelected"
             @joint="$event => jointChanged($event, r, ri)")
 </template>
 
@@ -238,6 +149,7 @@ export default {
       jointCreating: false,
       jointCurrent: null,
       itemActive: null,
+      itemPinned: null,
       height: 0,
     }
   },
@@ -267,12 +179,9 @@ export default {
       this.$log('jointChanged', joint, r, ri)
       // save jointCurrent
       this.jointCurrent = joint
-      // depeneds on row.oid ? take another...
-      // on last row?
-    },
-    itemSelected (item) {
-      this.$log('itemSelected', item)
-      this.itemActive = item
+      // save itemPinned(top) and itemActive(bottom)
+      this.itemPinned = joint.items.find(i => i.oid === r.oid)
+      this.itemActive = joint.items.find(i => i.oid !== r.oid)
     },
     rowsNext (e) {
       this.$log('rowsNext start', this.rowIndex)

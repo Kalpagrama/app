@@ -211,6 +211,7 @@ const compositionFragment = gql`${objectFragment} ${imageFragment}
     }
     layers {
       contentOid
+      contentName
       figuresAbsolute{...figureFragment}
     }
     operation{... operationFragment}

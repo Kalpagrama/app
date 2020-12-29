@@ -176,6 +176,8 @@ function init (store) {
       }
       if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.') {
          console.warn('window.onerror: ', message, source, line, column, error)
+      } else if (message === 'ResizeObserver loop limit exceeded') {
+         // console.warn('window.onerror: ', message, source, line, column, error)
       } else {
          console.error('window.onerror: ', message, source, line, column, error)
       }

@@ -122,7 +122,7 @@ import item from './item.vue'
 
 export default {
   name: 'jointsRow',
-  props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible'],
+  props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible', 'jointStart'],
   components: {
     item,
   },
@@ -223,8 +223,8 @@ export default {
             this.jointsNexting = false
             let joint = this.joints[this.jointIndex]
             this.$emit('joint', joint)
-            let item = joint.items.find(i => i.oid !== this.row.oid)
-            this.$emit('item', item)
+            // let item = joint.items.find(i => i.oid !== this.row.oid)
+            // this.$emit('item', item)
           }
         }
       )
@@ -235,10 +235,23 @@ export default {
       this.joints = joints
       this.jointsLoaded = true
       if (this.joints.length > 0) {
-        let joint = this.joints[0]
-        this.$emit('joint', joint)
-        let item = joint.items.find(i => i.oid !== this.row.oid)
-        this.$emit('item', item)
+        if (this.jointStart) {
+          let jointIndex = joints.findIndex(j => j.oid === this.jointStart)
+          this.$log('jointIndex', jointIndex)
+          if (jointIndex >= 0) {
+            let scrollTo = jointIndex * this.width
+            this.$refs.jointsScrollArea.scrollLeft = scrollTo
+            this.jointIndex = jointIndex
+            let joint = this.joints[this.jointIndex]
+            this.$emit('joint', joint)
+          }
+        }
+        else {
+          let joint = this.joints[0]
+          this.$emit('joint', joint)
+        }
+        // let item = joint.items.find(i => i.oid !== this.row.oid)
+        // this.$emit('item', item)
       }
     }
   }
