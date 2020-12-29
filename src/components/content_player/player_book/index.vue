@@ -77,17 +77,17 @@ export default {
           },
           name: 'WHITE'
         },
-        // beige: {
-        //   body: {
-        //     color: '#000000',
-        //     background: '#f3e8d2'
-        //   },
-        //   name: 'BEIGE'
-        // },
+        beige: {
+          body: {
+            color: '#000000',
+            background: '#f3e8d2'
+          },
+          name: 'BEIGE'
+        },
         night: {
           body: {
-            color: 'white',
-            background: 'black'
+            color: '#c8c8c8',
+            background: '#282828'
           },
           name: 'NIGHT'
         }
@@ -222,24 +222,52 @@ export default {
       this.registerThemes()
       this.setTheme(this.theme)
       this.setFontSize(this.fontSize)
+      this.rendition.themes.default({
+        '::selection': {
+          background: 'rgba(200,200,200, 0.3)',
+          color: 'black'
+        },
+        // 'epubjs-hl': {
+        //   background: 'rgba(200,200,200, 0.3)',
+        //   color: 'black'
+        // }
+      });
       this.rendition.display()
       this.rendition.on('selected', async (cfiRange, contents) => {
         // this.$log('selected', cfiRange)
-        if (this.selection.cfiRange) {
-          // this.$log('remove range', cfiRange)
-          this.rendition.annotations.remove(this.selection.cfiRange, 'highlight')
-          this.selection.cfiRange = null
-          this.selection.text = null
-        }
         let range = await this.book.getRange(cfiRange)
         if (range) {
           this.$log('current range', cfiRange)
-          this.selection.cfiRange = cfiRange
+          this.selection.cfiRange = cfiRange // запомним тут. Обработаем в mouseup
           this.selection.text = range.toString()
-          this.rendition.annotations.highlight(cfiRange, {})
-          // alert('selection changed: ' + this.selection.text)
         }
-        // contents.window.getSelection().removeAllRanges();
+        // // // contents.window.getSelection().removeAllRanges();
+      })
+      this.rendition.on('rendered', (section, iframe) => {
+        iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
+          if (this.selection.cfiRange){ // закончим выделение
+            let rangeCurrent = this.selection.cfiRange
+            this.rendition.annotations.highlight(this.selection.cfiRange, {}, (e) => {
+              console.log('highlight clicked', rangeCurrent);
+            }, undefined, {
+              fill: 'gold',
+              'fill-opacity': '0.3',
+              'mix-blend-mode': 'multiply',
+            })
+            // let range = await this.book.getRange(this.selection.cfiRange)
+            // console.error('range=', range)
+
+            this.selection.cfiRange = null
+            this.selection.text = null
+          }
+        })
+        iframe.document.documentElement.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault();
+          console.error(ev)
+          alert('contextmenu')
+          // ev.preventDefault()
+          return false;
+        })
       })
       this.rendition.on('keyup', this.keyListener)
       this.rendition.on('click', () => {
@@ -247,22 +275,19 @@ export default {
       })
     }
 
-    for (let chapter of toc){
-      this.$log('chapter=', chapter)
-      chapter.go = () => {
-        alert('go ' + chapter.label)
-        this.tableOfContents = false
-        this.rendition.display(chapter.href)
-      }
-      for (let subchapter of chapter.subitems){
-        // this.$log('subchapter=', subchapter)
-        subchapter.go = () => {
-          alert('go ' + subchapter.label)
+    const populateToc = (toc) => {
+      for (let chapter of toc){
+        // this.$log('chapter=', chapter)
+        chapter.go = () => {
+          alert('go ' + chapter.label)
           this.tableOfContents = false
-          this.rendition.display(subchapter.href)
+          this.rendition.display(chapter.href)
         }
+        if (chapter.subitems) populateToc(chapter.subitems)
       }
     }
+    populateToc(toc)
+
     // go to saved position
     let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
     this.contentBookmark = bookmark
