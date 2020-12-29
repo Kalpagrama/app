@@ -110,6 +110,8 @@ div(
 <script>
 import navMobile from './nav_mobile.vue'
 import contentPlayer from 'components/content_player/index.vue'
+import assert from 'assert'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'explorerDefault',
@@ -148,13 +150,40 @@ export default {
     // }
   },
   methods: {
-    essenceCreateStart () {
+    async essenceCreateStart () {
       this.$log('essenceCreateStart')
       // go to square/essence height
       this.$tween.to(this, 0.3, {
         headerHeight: this.$q.screen.height - this.heightSquare
       })
       // create composition...
+      this.$log('asdasd', this.player.selection.text)
+      assert(this.player.selection.cfiRange, '!this.player.selection.cfiRange')
+      assert(this.player.selection.text, '!this.player.selection.text')
+      let essenceInput = {
+        category: 'FUN',
+        layout: 'VERTICAL',
+        name: prompt('укажите суть'),
+        spheres: [],
+        vertices: [],
+        items: [
+          {
+            compositionInput: {
+              operation: {items: [], operations: [], type: 'CONCAT'},
+              layers: [{
+                contentOid: this.contentKalpa.oid,
+                figuresAbsolute: [{
+                  points: [],
+                  epubCfi: this.player.selection.cfiRange,
+                  epubCfiText: this.player.selection.text,
+                  t: 0
+                }]
+              }]
+            }
+          }
+        ]
+      }
+      await ObjectCreateApi.essenceCreate(essenceInput)
     },
     pageIdChanged (pageId) {
       if (this.pageId === pageId) {

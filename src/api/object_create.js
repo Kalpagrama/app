@@ -151,9 +151,9 @@ class ObjectCreateApi {
                oid: i.oid
             }
          }
-         else if (i.layers) {
+         else if (i.layers || i.compositionInput) {
             return {
-               compositionInput: ObjectCreateApi.makeCompositionInput(i)
+               compositionInput: ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
             }
          }
          else {
