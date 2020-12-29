@@ -7,15 +7,16 @@ div(
   div(
     :style=`{
       position: 'absolute', zIndex: 10000,
-      top: '-30px',
+      top: jointOpened ? '-80px' : '-30px',
       //- marginTop: jointOpened ? '-80px' : '-30px',
-      borderRadius: '10px',
+      borderRadius: jointOpened ? '10px' : '30px',
+      overflow: 'hidden',
     }`
-    ).row.full-width.b-40
+    ).row.full-width.b-30
     node-feed(
       :node="joint"
       :showHeader="jointOpened"
-      :showSpheres="jointOpened"
+      :showSpheres="false"
       :showActions="jointOpened"
       :showName="false"
       :showItems="false")
@@ -26,11 +27,15 @@ div(
           :style=`{
             //- pointerEvents: 'none',
             height: '60px',
+            //- borderRadius: '10px',
+            borderRadius: '30px',
           }`
-          ).row.full-width.items-center.content-center
-          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+          ).row.full-width.items-center.content-center.cursor-pointer.b-50
+          div(:style=`{pointerEvents: 'none'}`).row.full-width.justify-center
+            span(:style=`{userSelect: 'none'}`).text-white {{ joint.name || joint.vertices }}
+          //- div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
             span.text-white Причина
-          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+          //- div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
             span.text-white Следствие
 </template>
 
@@ -42,6 +47,6 @@ export default {
     return {
       jointOpened: false,
     }
-  }
+  },
 }
 </script>

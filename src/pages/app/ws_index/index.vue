@@ -48,6 +48,10 @@ export default {
       this.$log('contentKalpaFound', contentKalpa)
       this.$router.replace('/content/' + contentKalpa.oid)
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    document.body.style.background = 'rgb(30,30,30)'
   }
 }
 </script>

@@ -1,13 +1,116 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff").bg-black
+div(
+  :style=`{
+    position: 'relative',
+    height: $q.screen.height-65+'px',
+  }`
+  ).row.full-width.bg-black
+  div(
+    :style=`{
+      position: 'fixed', zIndex: 1000, bottom: '0px',
+      //- background: 'none',
+      //- paddingBottom: '60px',
+      //- height: '65px',
+    }`
+    ).row.full-width.justify-center
+    div(
+      :style=`{
+        height: '65px',
+        maxWidth: $store.state.ui.pageWidth+'px',
+        borderRadius: '10px 10px 0 0',
+      }`
+      ).row.full-width.items-center.content-center.q-px-sm.b-40
+      q-btn(round flat color="white" icon="west" @click="$router.back()")
+      .col
+      q-btn(
+        @click="jointCreating = !jointCreating"
+        color="green" icon="add"
+        :style=`{
+          width: '45px', height: '45px',
+          borderRadius: '50%',
+        }`)
+      .col
+      q-btn(
+        round flat color="white" icon="more_vert")
+  q-resize-observer(:debounce="300" @resize="onResize")
+  div(
+        v-touch-swipe.mouse.up.down="rowsNext"
+        :style=`{
+          position: 'relative',
+          height: height+'px'
+        }`
+        ).column.full-width.bg-black
+        //- div(
+          v-if="!rowsNexting"
+          :style=`{
+            position: 'absolute',
+            zIndex: 500,
+            top: 'calc(50% - 60px)',
+            height: '120px',
+            background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0) 100%)',
+          }`
+          ).row.full-width
+        //- joint CREATOR
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="jointCreating"
+            :style=`{
+              position: 'absolute', zIndex: 1000, top: '50%', height: '50%',
+              //- paddingTop: '30px',
+              //- paddingBottom: '30px',
+            }`
+            ).row.full-width.justify-center
+            joint-creator(
+              :item="null"
+              :style=`{
+                maxWidth: $store.state.ui.pageWidth+'px',
+              }`
+              @published="jointPublished"
+              @cancel="jointCreating = false")
+        //- joint CURRENT
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="!jointCreating && !rowsNexting"
+            :style=`{
+              position: 'absolute', zIndex: 2000, top: '50%',
+            }`
+            ).row.full-width.justify-center
+            joint-current(
+              v-if="jointCurrent"
+              :joint="jointCurrent"
+              :style=`{
+                maxWidth: '500px',
+              }`)
+        //- body joints
+        div(
+          ref="rowsScrollArea"
+          :style=`{
+            overflow: 'hidden',
+          }`
+          ).col.full-width
+          joints-row(
+            v-for="(r,ri) in rows" :key="ri"
+            :row="r"
+            :rowIndex="ri"
+            :isActive="rowIndex === ri || rowIndex+1 === ri"
+            :isPinned="rowIndex === ri"
+            :isVisible="rowIndex+1 === ri"
+            :style=`{
+              height: rowHeight+'px',
+              opacity: rowIndex === ri ? 1 : jointCreating ? 0 : 1
+            }`
+            @nexting="rowsNexting = $event"
+            @item="itemSelected"
+            @joint="$event => jointChanged($event, r, ri)")
+//- q-layout(view="hHh Lpr lff").bg-black
   q-footer(
     v-if="!jointCreating"
-    :heightHint="65"
     ).bg-black
     div(
       :style=`{
         paddingBottom: 'env(safe-area-inset-bottom)',
-        minHeight: '65px',
+        //- paddingBottom: '60px',
+        //- minHeight: '65px',
       }`
       ).row.full-width.justify-center
       div(
@@ -19,11 +122,11 @@ q-layout(view="hHh Lpr lff").bg-black
           .col
           q-btn(
             @click="jointCreating = !jointCreating"
-            color="green" size="lg"
+            color="green" size="md"
             :icon="jointCreating ? 'check' : 'add'"
             :style=`{
               borderRadius: '50%',
-              width: '50px', height: '50px',
+              width: '40px', height: '40px',
             }`)
           .col
           q-btn(round flat color="white" icon="more_vert")
@@ -114,6 +217,7 @@ export default {
   mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.onKeydown)
+    document.body.style.background = 'black'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

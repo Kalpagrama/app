@@ -145,7 +145,7 @@ export default {
       this.setFontSize(this.fontSize)
       this.rendition.display()
       this.rendition.on('selected', async (cfiRange, contents) => {
-        // this.$log('selected', cfiRange)
+        this.$log('selected', cfiRange, contents)
         if (this.selection.cfiRange) {
           // this.$log('remove range', cfiRange)
           this.rendition.annotations.remove(this.selection.cfiRange, 'highlight')

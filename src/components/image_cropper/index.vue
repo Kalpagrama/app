@@ -9,6 +9,7 @@ div(
       //- position: 'relative',
       //- borderRadius: '10px', overflow: 'hidden',
     }`).row.fit
+    //- crossorigin='anonymous'
     img(
       v-if="src"
       ref="cropRef"
@@ -64,17 +65,18 @@ export default {
   mounted () {
     this.$log('mounted')
     this.cropper = new Cropper(this.$refs.cropRef, {
-      // ...this.options,
       // aspectRatio: 16 / 9,
       // viewMode: 1,
       // initialAspectRatio: 10 / 10,
-      viewMode: 0,
+      viewMode: 2,
       dragMode: 'move',
       background: false,
+      ...this.options,
       crop: (event) => {
         this.$emit('crop', event)
       }
     })
+    this.$emit('cropper', this.cropper)
     // this.cropper.setDragMode('move')
   }
 }

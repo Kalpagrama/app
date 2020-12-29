@@ -5,7 +5,7 @@
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    ).row.full-width.justify-between.b-40.q-px-sm.q-pb-xs.q-pt-sm
     q-btn(
       @click="$router.back()"
       flat color="grey-7" icon="west" no-caps

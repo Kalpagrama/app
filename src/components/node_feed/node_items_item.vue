@@ -59,32 +59,40 @@ div(
   div(
     :style=`{
       position: 'absolute', zIndex: 200,
-      bottom: '-0.5px',
+      //- bottom: '-0.5px',
+      bottom: '34px',
+      //- bottom: '0px',
       //- top: '-0.5px',
-      minHeight: '40px',
+      //- minHeight: '40px',
       //- transform: 'translate3d(0,0,0)',
-      background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
-      borderRadius: '10px',
+      //- background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
+      //- borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.justify-center
-    router-link(
-      :to="itemLink"
+    ).row.full-width.items-center.content-center.justify-center.q-px-md
+    div(
       :style=`{
-        height: '36px',
-        textAlign: 'center',
+        borderRadius: '10px',
+        maxWidth: '100%',
       }`
-      ).row.items-center.content-center.scroll
-      //- .row.full-width.br
-      q-btn(
-        v-if="item.__typename === 'Composition'"
-        round flat color="white" icon="select_all")
-      span(
-        v-else
+      ).row.bg-black
+      router-link(
+        :to="itemLink"
         :style=`{
-          whiteSpace: 'nowrap',
-          marginLeft: '8px',
+          height: '36px',
           textAlign: 'center',
-        }`).text-white {{ item.name }}
+        }`
+        ).row.items-center.content-center.scroll
+        //- .row.full-width.br
+        q-btn(
+          v-if="item.__typename === 'Composition'"
+          round flat dense color="white" icon="select_all")
+        span(
+          v-else
+          :style=`{
+            whiteSpace: 'nowrap',
+            marginLeft: '8px',
+            textAlign: 'center',
+          }`).text-white.q-mr-sm {{ item.name }}
 </template>
 
 <script>

@@ -54,6 +54,7 @@ export default {
     // this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // document.body.style.background = 'black !important'
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

@@ -7,19 +7,20 @@ component(
   :isActive="isActive"
   :styles="styles"
   :options="options")
-  //- template(v-for="(index, name) in $slots" v-slot:[name])
-  //-   slot(:name="name")
-  //- template(v-for="(index, name) in $scopedSlots")
-  //-   slot(:name="name" v-bind="data")
 </template>
 
 <script>
 import playerVideo from './player_video/index.vue'
 import playerImage from './player_image/index.vue'
+import playerBook from './player_book/index.vue'
 
 export default {
   name: 'compositionPlayer',
-  components: {playerVideo, playerImage},
+  components: {
+    playerVideo,
+    playerImage,
+    playerBook
+  },
   props: ['oid', 'isActive', 'isVisible', 'composition', 'styles', 'options'],
   data () {
     return {

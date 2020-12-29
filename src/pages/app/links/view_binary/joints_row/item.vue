@@ -5,18 +5,21 @@ div(
   }`
   ).row.fit
   //- name
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 1000,
       //- bottom: '0px',
       //- ...(() => itemPinned ? {top: '0px'} : {bottom: '0px'})(),
       bottom: '34px',
     }`
-    ).row.full-width.justify-center
+    ).row.full-width.justify-center.bg-black
+    q-btn(
+      round flat dense color="white" icon="select_all")
     span(
       :style=`{
         //- borderRadius: '10px 10px 0 0',
         borderRadius: '10px',
+        whiteSpace: 'nowrap',
       }`
     ).text-white.bg-black.q-pa-sm {{ item.name }}
   //- preview

@@ -64,8 +64,8 @@ export default {
     //   this.layerEditingId = this.composition.layers[0].id
     // }
   },
-  // beforeDestroy () {
-  //   this.player.setState('figures', [])
-  // }
+  beforeDestroy () {
+    this.player.setState('figures', [])
+  }
 }
 </script>
