@@ -35,7 +35,15 @@
       borderRadius: '10px 10px 0 0',
     }`
     ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
-    q-btn(
+    div(
+      :style=`{
+        width: '60px',
+      }`
+      ).row.items-center.content-center.justify-center.q-pb-xs
+      kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
+      .row.full-width.justify-center.q-pt-xs
+        small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
+    //- q-btn(
       flat icon="home" no-caps
       :to="'/feeds/all'"
       :color="'grey-7'"

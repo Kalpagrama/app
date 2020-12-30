@@ -2,10 +2,11 @@
 .row.full-width.justify-center
   div(
     :style=`{
+      height: '70px',
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.justify-between.b-40.q-px-sm.q-pb-xs.q-pt-sm
+    ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
     q-btn(
       @click="$router.back()"
       flat color="grey-7" icon="west" no-caps
@@ -18,7 +19,16 @@
       :color="pageId === 'nodes' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Ядра и связи
+        small(:style=`{whiteSpace: 'nowrap'}`) Смыслы
+    q-btn(
+      @click="$emit('create-start')"
+      round flat color="green"
+      :style=`{
+        width: '50px', height: '50px',
+        borderRadius: '50%',
+      }`
+      ).q-mb-md
+      q-icon(name="add_circle_outline" size="40px")
     q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="tonality" no-caps
@@ -33,7 +43,7 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Детали
-    q-btn(
+    //- q-btn(
       @click="$emit('toggle')"
       flat icon="keyboard_arrow_down" no-caps
       :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"

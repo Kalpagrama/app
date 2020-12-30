@@ -4,7 +4,7 @@
     v-if="!verticesFixed"
     v-model="node.name"
     borderless
-    placeholder="В чем суть?" dark
+    placeholder="В чем смысл?" dark
     autogrow
     :input-style=`{
       fontSize: '20px',

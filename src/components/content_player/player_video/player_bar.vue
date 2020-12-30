@@ -10,20 +10,38 @@ div(
     position: 'relative', height: '20px', borderRadius: '8px',
   }`).row.full-width.b-50
   //- play/pause
-  q-btn(
+  //- q-btn(
     @click="player.playing ? player.pause() : player.play()"
     round flat dense color="white"
     :icon="player.playing ? 'pause' : 'play_arrow'"
     :style=`{
       position: 'absolute', left: '-44px', bottom: '-6px',
     }`)
+  q-btn(
+    @click="player.setState('isFullscreen', !player.isFullscreen)"
+    round flat dense color="white"
+    :icon="player.isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+    :style=`{
+      position: 'absolute', left: '-44px', bottom: '-6px',
+    }`)
+  q-btn(
+    round flat dense
+    :color="player.mutedLocal ? 'red' : 'white'"
+    :style=`{
+        position: 'absolute', right: '-44px', bottom: '-6px',
+      }`)
+    q-icon(
+      :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
+      :color="player.mutedLocal ? 'red' : 'white'"
+      size="20px" @click="volumeToggle()"
+      )
   //- actions
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 300, top: '-34px', left: '0px',
     }`
     ).row
-    q-btn(
+    //- q-btn(
       round flat dense
       :color="player.mutedLocal ? 'red' : 'white'")
       q-icon(
