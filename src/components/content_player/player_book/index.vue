@@ -36,6 +36,8 @@ div(
     //- div(
       :style=`{}`)
   .row.full-width.justify-center
+    input(v-model="cfi" width="300").row.full-width
+    q-btn(round flat color="white" icon="check" @click='goToCfi')
     q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
     q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
@@ -119,7 +121,6 @@ export default {
       toc: [],
       progressValue: 0,
       slide: null,
-      cfi: null,
       width: 0,
       height: 0,
       locations: null,
@@ -129,7 +130,8 @@ export default {
       },
       isFullscreen: false,
       contentBookmark: null,
-      tableOfContents: false
+      tableOfContents: false,
+      cfi: 'epubcfi(/6/12[id83]!/4/2/2[id2]/12,/1:0,/1:263)'
     }
   },
   watch: {
@@ -168,7 +170,17 @@ export default {
     async goToNextPage () {
       await this.rendition.next()
     },
-
+    goToPercent (value) {
+      const percentage = value / 100
+      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : 0
+      this.rendition.display(target)
+      if (percentage === 1) this.goToNextPage()
+    },
+    async goToCfi () {
+      this.$log('goToCfi', this.cfi)
+      await this.rendition.display(this.cfi)
+      await this.rendition.annotations.highlight(this.cfi)
+    },
     async showTableOfContents () {
       this.tableOfContents = !this.tableOfContents
     },
@@ -178,12 +190,6 @@ export default {
     },
     setFontSize (size) {
       this.rendition.themes.fontSize(size + '%')
-    },
-    goToPercent (value) {
-      const percentage = value / 100
-      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : 0
-      this.rendition.display(target)
-      if (percentage === 1) this.goToNextPage()
     },
     updateScreenSizeInfo () {
       this.width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -273,6 +279,19 @@ export default {
       this.rendition.on('click', () => {
         this.$emit('click')
       })
+      this.rendition.on('relocated', async (location) => {
+        this.$log('relocated to', location.start.cfi)
+        // percentageFromCfi нормально НЕ работает пока не сработал this.book.locations.generate()
+        const percent = this.book.locations.percentageFromCfi(location.start.cfi)
+        const percentage = percent * 100
+        this.progressValue = percentage
+        this.$emit('relocated')
+        this.$log('relocated (progress) = ', percentage)
+        if (this.contentBookmark){ // save position
+          if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
+          this.contentBookmark.meta.currentCfi = location.start.cfi
+        }
+      })
     }
 
     const populateToc = (toc) => {
@@ -294,22 +313,18 @@ export default {
     if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) this.rendition.display(this.contentBookmark.meta.currentCfi)
 
     await this.book.ready // book ready
-    await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
+    this.ready = true
+    let locs = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
+    // this.$log('locations.generate tm = ', Date.now() - tm)
     // this.locations = JSON.parse(this.book.locations.save())
     // this.$log('this.locations=', this.locations)
-    this.ready = true
-    this.rendition.on('relocated', async (location) => {
-      // this.$log('relocated location = ', location.start.cfi)
-      const percent = this.book.locations.percentageFromCfi(location.start.cfi)
-      const percentage = percent * 100
-      this.progressValue = percentage
-      this.$emit('relocated')
-      this.$log('relocated (progress) = ', percentage)
-      if (this.contentBookmark){ // save position
-        if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
-        this.contentBookmark.meta.currentCfi = location.start.cfi
-      }
-    })
+    // let i = 0
+    // for (let cfi of this.locations) {
+    //   if (++i < 100) continue
+    //   await this.rendition.display(cfi)
+    //   await this.$wait(1000)
+    //   await this.rendition.annotations.highlight(cfi)
+    // }
     this.$emit('player', this)
 
     // window.addEventListener('resize', debounce(() => {
