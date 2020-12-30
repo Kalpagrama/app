@@ -19,7 +19,14 @@ div(
         zIndex: 100, top: 0,
       }`
       @player="player = $event, $emit('player', $event)").fit
-    player-taps(
+    //- div(
+      v-show="showTint"
+      :style=`{
+        position: 'absolute', zIndex: 2000,
+        background: 'rgba(0,0,0,0.5)',
+      }`
+      ).row.fit.bg-red
+    //- player-taps(
       v-if="player"
       :player="player")
   //- footer
@@ -28,7 +35,7 @@ div(
     //- v-show="options.showBar"
     div(
       v-if="player"
-      v-show="options.showBar"
+      v-show="true && options.showBar"
       :class=`{
       }`
       :style=`{
@@ -86,7 +93,8 @@ export default {
       playerComponent: {
         YOUTUBE: 'player-youtube',
         KALPA: 'player-kalpa',
-      }
+      },
+      showTint: true,
     }
   },
   computed: {

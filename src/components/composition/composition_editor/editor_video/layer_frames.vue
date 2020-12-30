@@ -98,8 +98,8 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
       position: 'absolute', zIndex: 300, bottom: '4px',
       left: '0px', width: '100%',
     }`
-    ).row.items-center.content-center.justify-center
-    div(:style=`{maxWidth: '410px'}`).row.full-width.items-center.content-center.q-px-sm
+    ).row.items-center.content-center.justify-center.q-px-xs
+    div(:style=`{maxWidth: '400px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
       .col
       q-btn(round flat dense color="grey-8" @click="layerForward(0,false)")

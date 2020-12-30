@@ -5,10 +5,12 @@ q-btn(round flat :icon="icon" :color="color")
     cover anchor="top right" self="top right").b-40
     div(
       :style=`{
-        borderRadius: '10px',
-        //- maxWidth: '200px',
       }`
       ).row.full-width.items-start.content-start.b-40
+      .row.full-width.items-center.content-center.q-pa-sm
+        div(:style=`{overflow: 'hidden',}`).col
+          span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ title }}
+        q-btn(round flat dense color="white" icon="clear" v-close-popup)
       //- kalpa-share(type="node" :item="node").full-width
         template(v-slot:btn=`{start}`)
           q-btn(
@@ -23,10 +25,10 @@ q-btn(round flat :icon="icon" :color="color")
         @click="a.cb()"
         v-for="(a,akey) in actions" :key="akey"
         v-close-popup
-        flat dense no-caps
+        flat no-caps
         :color="a.color || 'white'"
         :style=`{
-          //- height: '50px',
+          height: '50px',
         }`
         ).full-width
         span {{ a.name }}
@@ -36,6 +38,9 @@ q-btn(round flat :icon="icon" :color="color")
 export default {
   name: 'kalpaMenuActions',
   props: {
+    title: {
+      type: String,
+    },
     actions: {
       type: Object
     },

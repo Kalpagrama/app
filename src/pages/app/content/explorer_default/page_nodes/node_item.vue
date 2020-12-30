@@ -1,7 +1,7 @@
 <style lang="sass">
 .node-item
   &:hover
-    background: rgb(40,40,40) !important
+    background: rgb(45,45,45) !important
 </style>
 
 <template lang="pug">
@@ -43,7 +43,7 @@
         paddingLeft: '64px',
         paddingRight: node.items[1] ? '64px' : '64px',
         //- background: isActive ? 'rgb(38,38,38)' : 'rgb(35,35,35)',
-        background: 'rgb(35,35,35)',
+        background: 'rgb(45,45,45)',
         textAlign: 'center',
       }`).row.full-width.items-center.content-center.justify-center.q-mb-sm.cursor-pointer.node-item
       img(

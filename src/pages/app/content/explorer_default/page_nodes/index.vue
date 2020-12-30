@@ -3,6 +3,10 @@ div(
   :style=`{
     paddingTop: '0px'
   }`).row.full-width.items-start.content-start.justify-center
+  .row.full-width.items-center.content-center.justify-between.q-pa-sm
+    span.text-grey-7.text-bold.q-ml-sm Смыслы - 1231
+    q-btn(
+      round flat color="grey-7" icon="tune")
   slot
   kalpa-loader(
     :immediate="true"

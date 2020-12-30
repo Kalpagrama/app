@@ -124,7 +124,7 @@ const videoFragment = gql`${objectFragment}
     contentProvider
     contentSource
     contentProvider
-    relatedVideos
+    relatedContent
     subtitlesRus: subtitles(lang: RUS)
     subtitlesEng: subtitles(lang: ENG)
   }
