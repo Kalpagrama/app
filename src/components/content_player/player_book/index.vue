@@ -186,8 +186,37 @@ export default {
     },
     async goToCfi () {
       this.$log('goToCfi', this.cfi)
+      let loc = await this.rendition.currentLocation()
+      this.$log('loc=', loc)
+      this.$log('loc start=', loc.start.cfi)
+      this.$log('loc end=', loc.end.cfi)
+
+      // let spineItem = this.book.spine.get(this.cfi);
+      // this.$log('loc spineItem=', spineItem)
+      // let navItem = this.book.navigation.get(spineItem.href);
+      // this.$log('loc navItem=', navItem)
+      // this.$log('loc navItem=', navItem)
+
+      // let cfi = new EpubCFI(this.cfi)
+      // this.$log('loc cfi=', cfi)
+      // cfi.collapse(true)
+      //
+      // this.$log('loc start=', cfi)
+      //
+      // let spineItem = this.book.spine.get(cfi);
+      // this.$log('loc spineItem=', spineItem)
+      // this.$log('loc spineItem=', spineItem.href)
+      // let navItem = this.book.navigation.get(spineItem.href);
+      // this.$log('loc navItem=', navItem)
+      //
+      // this.$log('loc end=', loc.end.cfi)
+
       await this.rendition.display(this.cfi)
-      await this.rendition.annotations.highlight(this.cfi)
+      // await this.rendition.annotations.highlight(this.cfi)
+
+      // let loc2 = await this.book.locations.locationFromCfi(this.cfi)
+      // this.$log('loc loc2=', loc2)
+      // this.$log('loc loc2=', loc2)
     },
     async showTableOfContents () {
       this.tableOfContents = !this.tableOfContents
@@ -231,7 +260,7 @@ export default {
       this.rendition = this.book.renderTo(this.bookArea, {
         contained: true,
         height: this.height,
-        width: this.width,
+        width: this.width
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -299,6 +328,11 @@ export default {
           if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
           this.contentBookmark.meta.currentCfi = location.start.cfi
         }
+      })
+
+      this.book.spine.hooks.serialize.register(function(text, section, xxx) {
+        // this.$log('this.book.spine.hooks.serialize')
+        return true
       })
     }
 
