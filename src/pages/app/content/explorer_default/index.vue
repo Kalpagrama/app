@@ -15,7 +15,8 @@ div(
     .row.full-width.justify-center
       div(
         :style=`{
-          height: headerHeight+'px',
+          height: (pageId || nodeCreating) ? $q.screen.height-heightPage+'px' : 70+'px',
+          //- height: $q.screen.height-heightPage+'px',
           maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '10px 10px 0 0',
           //- paddingBottom: 'env(safe-area-inset-bottom)',
@@ -51,7 +52,8 @@ div(
         position: 'relative',
         //- paddingBottom: 'env(safe-area-inset-bottom)',
         maxWidth: player ? player.isFullscreen ? '100%' : $store.state.ui.pageWidth+'px' : $store.state.ui.pageWidth+'px',
-        height: (pageId || nodeCreating) ? heightSquare+'px' : ($q.screen.height-65)+'px',
+        //- height: (pageId || nodeCreating) ? heightPage+'px' : ($q.screen.height-65)+'px',
+        height: (pageId || nodeCreating) ? heightPage+'px' : ($q.screen.height-70)+'px',
       }`
       ).row.full-width.justify-center
       div(
@@ -131,7 +133,11 @@ export default {
       }
     },
     heightPage () {
-      return this.$q.screen.height - this.heightSquare
+      // this.width / this.contentKalpa.thumbWidth this.contentKalpa.thumbHeight
+      let width = Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth)
+      // let height = (width * this.contentKalpa.thumbHeight) / this.contentKalpa.thumbWidth
+      let d = this.contentKalpa.thumbHeight / this.contentKalpa.thumbWidth
+      return width * d
     }
   },
   watch: {
@@ -184,9 +190,9 @@ export default {
       }
       else {
         this.pageId = pageId
-        this.$tween.to(this, 0.3, {
-          headerHeight: this.heightPage
-        })
+        // this.$tween.to(this, 0.3, {
+        //   headerHeight: this.heightPage
+        // })
       }
     },
   },

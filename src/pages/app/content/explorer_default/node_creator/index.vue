@@ -175,5 +175,8 @@ export default {
     // if this.nodeInput = ?
     this.create()
   },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+  }
 }
 </script>

@@ -44,13 +44,13 @@
     .row.full-width.q-pa-sm
       div(
         @click="relatedContentClick(c)"
-        v-for="(c,ci) in contentKalpa.relatedVideos" :key="ci"
+        v-for="(c,ci) in contentKalpa.relatedContent" :key="ci"
         :style=`{
           height: '70px',
           borderRadius: '10px',
           background: 'rgb(45,45,45)',
         }`
-        ).row.full-width.items-center.content-center.q-mb-sm
+        ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer
         div(
           :style=`{
             width: '70px', height: '70px',
@@ -58,18 +58,19 @@
           ).row
           img(
             draggable="false"
-            :src="c.thumbnails[0].url"
+            :src="c.thumbUrl"
             :style=`{
               borderRadius: '10px',
               objectFit: 'cover',
             }`).fit
         .col.q-pa-sm
           .row.fit.items-center.content-center
-            span.text-white {{ c.title }}
+            span.text-white {{ c.name }}
 </template>
 
 <script>
 import { openURL } from 'quasar'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'pageDetails',
@@ -110,8 +111,12 @@ export default {
         return ''
       }
     },
-    relatedContentClick (content) {
+    async relatedContentClick (content) {
       this.$log('relatedContentClick', content)
+      let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal)
+      if (contentKalpa) {
+        this.$router.push('/content/' + contentKalpa.oid)
+      }
     }
   }
 }

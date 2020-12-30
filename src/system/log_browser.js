@@ -169,7 +169,7 @@ function init (store) {
    let logger = new Logger(store)
    // глобальный обработчик ошибок для всего. Сработает только если ОПРЕДЕЛЕНА Vue.config.errorHandler. Это странно...
    window.onerror = function (message, source, line, column, error) {
-      console.log('window.onerror')
+      // console.log('window.onerror')
       if (error) {
          if (error.processed) return
          error.processed = true

@@ -1,7 +1,7 @@
 <style lang="sass">
 .node-item
   &:hover
-    background: rgb(40,40,40) !important
+    background: rgb(45,45,45) !important
 </style>
 
 <template lang="pug">
