@@ -9,17 +9,25 @@ div(
   div(
     v-if="tableOfContents === true"
     :id="bookMenu"
-    )
-    q-btn(
-      v-for="chapter in toc" :key="chapter.href"
-      @click="chapter.go()"
-      ).row.full-width.scroll
-      span(:style=`{fontSize: '18px', color: 'red', userSelect: 'none'}`).text-bold {{ chapter.label }}
+    :style=`{
+      position: 'absolute', zIndex: 1000, top: '0px',
+      borderRadius: '10px',
+      height: 'calc(100% - 120px)',
+    }`
+    ).column.full-width.b-40
+    .col.full-width.scroll
       q-btn(
-        v-for="subchapter in chapter.subitems" :key="subchapter.href"
-        @click="subchapter.go()"
-      ).row.full-width.scroll
-        span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
+        v-for="chapter in toc" :key="chapter.href"
+        @click="chapter.go()"
+        no-caps
+        ).row.full-width.scroll
+        span(:style=`{fontSize: '18px', color: 'red', userSelect: 'none'}`).text-bold {{ chapter.label }}
+        q-btn(
+          v-for="subchapter in chapter.subitems" :key="subchapter.href"
+          @click="subchapter.go()"
+          no-caps
+          ).row.full-width.scroll
+          span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
   div(
     :style=`{
       position: 'relative',

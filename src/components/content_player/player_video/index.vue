@@ -28,6 +28,7 @@ div(
     //- v-show="options.showBar"
     div(
       v-if="player"
+      v-show="options.showBar"
       :class=`{
       }`
       :style=`{

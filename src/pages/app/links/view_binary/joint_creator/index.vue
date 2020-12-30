@@ -57,7 +57,7 @@ div(
   div(
     v-if="!itemEditing"
     :style=`{
-      position: 'absolute', zIndex: 1001, bottom: -65+'px',
+      position: 'absolute', zIndex: 1001, bottom: -65-8+'px',
       height: 65+'px',
     }`
     ).row.full-width.bg-black
@@ -143,7 +143,7 @@ import itemEditor from 'components/node_editor/item_editor.vue'
 
 export default {
   name: 'jointCreator',
-  props: ['item'],
+  props: ['jointCurrent', 'item'],
   components: {
     kalpaFinder,
     itemEditor
@@ -227,10 +227,28 @@ export default {
         this.$log('publish start')
         this.publishing = true
         await this.$wait(500)
-        // let jointInput =
+        let jointInput = JSON.parse(JSON.stringify(this.joint))
+        if (jointInput.items.length === 1) {
+          jointInput.vertices = []
+        }
+        if (jointInput.items.length === 2) {
+          if (jointInput.name.length === 0) {
+            if (jointInput.vertices.length === 0) {
+              jointInput.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+            }
+          }
+          else {
+            jointInput.vertices = ['ESSENCE', 'ESSENCE']
+          }
+        }
+        // let jointInput = this.joint
+        jointInput.items[0] = this.item
+        this.$log('jointInput', jointInput)
         this.$log('publish done')
         this.publishing = false
-        let createdNode = null
+        // let createdNode = null
+        let createdNode = await ObjectCreateApi.essenceCreate(jointInput)
+        this.$log('publish createdNode', createdNode)
         this.$emit('published', createdNode)
         this.cancel()
       }

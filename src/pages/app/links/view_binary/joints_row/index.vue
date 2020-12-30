@@ -23,7 +23,7 @@ div(
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
-      ).row.full-width.q-pt-sm.q-pl-lg.q-pr-md
+      ).row.full-width.q-pt-sm.q-px-sm
       div(
         v-for="(j,ji) in joints" :key="j.oid"
         :style=`{
@@ -31,18 +31,18 @@ div(
           height: '2px',
         }`
         ).col.q-pr-xs
+        //- countJoints
         div(
           v-if="jointIndex === ji"
           :style=`{
-            position: 'absolute', zIndex: 100, top: '-16px',
+            position: 'absolute', zIndex: 100, top: '-14px',
           }`
-          ).row.full-width.justify-center
+          ).row.full-width.justify-center.q-pr-xs
           small.text-white {{ j.items.find(i => i.oid !== row.oid).countJoints }}
-          //- small.text-white 123
         div(
           :class=`{
             'bg-white': jointIndex === ji,
-            'b-40': jointIndex !== ji,
+            'b-90': jointIndex !== ji,
           }`
           :style=`{
             borderRadius: '1px',
@@ -64,6 +64,11 @@ div(
         :item="row.item"
         :itemActive="isPinned"
         :itemPinned="isPinned")
+  //- no joints
+  div(
+    v-if="jointsLoaded && joints.length === 0"
+    ).row.fit.items-center.content-center.justify-center
+    span.text-white No links yet, create one!
   //- row joints wrapper
   div(
     v-if="row.oid"
@@ -117,7 +122,7 @@ import item from './item.vue'
 
 export default {
   name: 'jointsRow',
-  props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible'],
+  props: ['row', 'rowIndex', 'isActive', 'isPinned', 'isVisible', 'jointStart'],
   components: {
     item,
   },
@@ -126,6 +131,7 @@ export default {
       jointIndex: 0,
       jointsNexting: false,
       joints: [],
+      jointsLoaded: false,
     }
   },
   computed: {
@@ -217,21 +223,35 @@ export default {
             this.jointsNexting = false
             let joint = this.joints[this.jointIndex]
             this.$emit('joint', joint)
-            let item = joint.items.find(i => i.oid !== this.row.oid)
-            this.$emit('item', item)
+            // let item = joint.items.find(i => i.oid !== this.row.oid)
+            // this.$emit('item', item)
           }
         }
       )
     },
     jointsUpdated (joints) {
       this.$log('jointsUpdated', joints ? joints.length : joints)
-      this.$log('jointUpdated this.row', this.row)
+      // this.$log('jointUpdated this.row', this.row)
       this.joints = joints
+      this.jointsLoaded = true
       if (this.joints.length > 0) {
-        let joint = this.joints[0]
-        this.$emit('joint', joint)
-        let item = joint.items.find(i => i.oid !== this.row.oid)
-        this.$emit('item', item)
+        if (this.jointStart) {
+          let jointIndex = joints.findIndex(j => j.oid === this.jointStart)
+          this.$log('jointIndex', jointIndex)
+          if (jointIndex >= 0) {
+            let scrollTo = jointIndex * this.width
+            this.$refs.jointsScrollArea.scrollLeft = scrollTo
+            this.jointIndex = jointIndex
+            let joint = this.joints[this.jointIndex]
+            this.$emit('joint', joint)
+          }
+        }
+        else {
+          let joint = this.joints[0]
+          this.$emit('joint', joint)
+        }
+        // let item = joint.items.find(i => i.oid !== this.row.oid)
+        // this.$emit('item', item)
       }
     }
   }

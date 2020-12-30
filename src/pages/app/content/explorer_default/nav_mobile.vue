@@ -5,7 +5,7 @@
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    ).row.full-width.justify-between.b-40.q-px-sm.q-pb-xs.q-pt-sm
     q-btn(
       @click="$router.back()"
       flat color="grey-7" icon="west" no-caps
@@ -33,6 +33,13 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Детали
+    q-btn(
+      @click="$emit('toggle')"
+      flat icon="keyboard_arrow_down" no-caps
+      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Свернуть
     //- q-btn(
       @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
       flat icon="menu" no-caps

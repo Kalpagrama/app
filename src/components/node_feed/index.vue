@@ -14,7 +14,9 @@ div(
     :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
-      borderRadius: '10px',
+      //- borderRadius: '10px',
+      //- borderRadius: '10px 10px 30px 30px',
+      borderRadius: borderRadius,
     }`).row.full-width.items-start.content-start
     //- HEADER: author, createdAt
     div(
@@ -144,7 +146,8 @@ export default {
     showSpheresAlways: {type: Boolean, default: false},
     showCategory: {type: Boolean, default: true},
     showItems: {type: Boolean, default: true},
-    itemsStyles: { type: Array, default () { return [{}, {}] } }
+    itemsStyles: { type: Array, default () { return [{}, {}] } },
+    borderRadius: {type: String, default: '10px'}
   },
   data () {
     return {
