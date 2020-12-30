@@ -13,6 +13,21 @@ q-layout(
         q-btn(round flat color="white" icon="west" @click="$router.back()").q-mr-sm
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-footer(
+      v-if="showEssences"
+      reveal
+      )
+      div(:style=`{height: '526px'}`).column.full-width.b-30
+        .row.full-width.items-center.content-center
+          .col.q-pa-sm
+            span.text-white Essences - 213
+          q-btn(round flat color="white" icon="clear" @click="showEssences = false")
+        .col.full-width.scroll
+          div(
+            v-for="n in 100" :key="n" :style=`{}`
+            ).row.full-width.q-pa-sm.q-mb-sm
+            span.text-white essence {{ n }}
   q-page-container
     q-page.row.full-width.justify-center.q-pt-sm
       div(
@@ -23,6 +38,15 @@ q-layout(
           :node="node"
           :isActive="true"
           :isVisible="true")
+        .row.full-width.q-pa-sm
+          div(
+            @click="showEssences = true"
+            :style=`{
+              borderRadius: '10px',
+              background: 'rgb(35,35,35)',
+            }`
+            ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-py-md
+            span.text-white Show essences - 213
         //- .row.full-width.q-pa-md
           div(
             :style=`{
@@ -51,6 +75,7 @@ export default {
   data () {
     return {
       node: null,
+      showEssences: false,
     }
   },
   computed: {

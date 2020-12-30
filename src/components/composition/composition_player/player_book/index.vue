@@ -7,8 +7,9 @@ div(
   div(
     :style=`{
       position: 'relative',
+      maxHeight: '100%',
     }`
-    ).row.full-width.q-pl-lg
+    ).row.full-width.q-pl-lg.scroll.q-py-sm
     div(
       :style=`{
         position: 'absolute', left: '10px',

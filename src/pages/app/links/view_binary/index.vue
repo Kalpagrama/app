@@ -59,7 +59,7 @@ div(
               //- paddingTop: '30px',
               //- paddingBottom: '30px',
             }`
-            ).row.full-width.justify-center.br
+            ).row.full-width.justify-center
             joint-creator(
               :item="itemPinned"
               :jointCurrent="jointCurrent"

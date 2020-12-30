@@ -19,7 +19,8 @@ div(
       :showSpheres="false"
       :showActions="jointOpened"
       :showName="false"
-      :showItems="false")
+      :showItems="false"
+      borderRadius="10px 10px 30px 30px")
       template(v-slot:items)
         //- name
         div(

@@ -34,6 +34,10 @@ export default {
       viewId: 'trends',
       headerRevealed: false
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    document.body.style.background = 'rgb(30,30,30)'
   }
 }
 </script>

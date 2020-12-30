@@ -14,12 +14,12 @@ div(
     v-if="showMenu"
     reveal
     :style=`{
-      position: 'fixed', zIndex: 10000, bottom: '0px',
+      position: 'fixed', zIndex: 1000, bottom: '0px',
     }`).row.full-width
     .row.full-width.justify-center
       div(
         :style=`{
-          //- height: headerHeight+'px',
+          height: headerHeight+'px',
           maxWidth: $store.state.ui.pageWidth+'px',
           //- maxWidth: '500px',
           borderRadius: '10px 10px 0 0',
@@ -30,9 +30,9 @@ div(
         div(
           v-if="player && node"
           :style=`{
-            height: $q.screen.height-heightSquare+'px',
+            //- height: $q.screen.height-heightSquare+'px',
           }`
-          ).row.full-width.items-between.content-between
+          ).row.fit.items-between.content-between.b-30
           composition-editor(
             v-if="player && node"
             :player="player"
@@ -42,10 +42,9 @@ div(
             }`).bg-black
           name-editor(:node="node")
           spheres-editor(:node="node")
-          .row.full-width.justify-center
-            category-editor(:node="node" :style=`{maxWidth: '300px',}`)
-          //- div(:style=`{height: '60px'}`).row.full-width.text-white name editor
-          //- div(:style=`{height: '120px'}`).row.full-width.text-white sphere/category editor
+          div(:style=`{paddingLeft: '60px', paddingRight: '60px',}`).row.full-width.justify-center
+            category-editor(:node="node" :style=`{}`)
+          //- footer
           .row.full-width.justify-center
             div(
               :style=`{
@@ -54,23 +53,30 @@ div(
               }`
               ).row.full-width.justify-between.b-40.q-px-sm.q-pb-xs.q-pt-sm
               q-btn(
-                @click="node = null"
+                @click="node = null, headerHeight = 65"
                 flat color="grey-7" icon="west" no-caps
                 :style=`{maxWidth: '60px'}`)
                 .row.full-width.justify-center
                   small Назад
               q-btn(
-                @click="node = null"
+                @click="node = null, headerHeight = 65"
                 flat color="green" icon="check" no-caps
                 :style=`{maxWidth: '60px'}`)
                 .row.full-width.justify-center
                   small Опубликовать
         //- navigation
-        nav-mobile(
+        div(
           v-if="!node"
-          @toggle="pageId = null, showMenu = false"
-          @pageId="pageIdChanged"
-          :pageId="pageId")
+          ).column.fit
+          div(v-if="pageId === 'nodes'").col.full-width.scroll
+            page-nodes(
+              v-if="pageId && pageId === 'nodes'"
+              :contentKalpa="contentKalpa" :player="player")
+          nav-mobile(
+            v-if="!node"
+            @toggle="pageId = null, showMenu = false"
+            @pageId="pageIdChanged"
+            :pageId="pageId")
   .row.full-width.justify-center
     div(
       :style=`{
@@ -79,7 +85,7 @@ div(
         maxWidth: player ? player.isFullscreen ? '100%' : $store.state.ui.pageWidth+'px' : $store.state.ui.pageWidth+'px',
         //- height: $q.screen.height-(showMenu ? 65+(node ? 310 : 0) : 0)+'px',
         //- height: node ? heightSquare+'px' : ($q.screen.height-65)+'px',
-        height: $q.screen.height-68+'px',
+        height: (pageId || node) ? heightSquare+'px' : ($q.screen.height-65)+'px',
         //- maxWidth: '500px', maxHeight: '500px',
         //- paddingBottom: 0+0+'px',
       }`
@@ -103,7 +109,7 @@ div(
           }`
           ).row.full-width.justify-center
           div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-            //- q-btn(
+            q-btn(
               v-if="showMenu && !pageId"
               @click="essenceCreateStart()"
               round flat dense color="green" icon="add_circle_outline"
@@ -132,6 +138,8 @@ import nameEditor from 'components/node_editor/name_editor.vue'
 import spheresEditor from 'components/node_editor/spheres_editor.vue'
 import categoryEditor from 'components/node_editor/category_editor.vue'
 
+import pageNodes from './page_nodes/index.vue'
+
 export default {
   name: 'explorerDefault',
   props: ['contentKalpa', 'query'],
@@ -143,6 +151,7 @@ export default {
     nameEditor,
     spheresEditor,
     categoryEditor,
+    pageNodes,
   },
   data () {
     return {
@@ -172,7 +181,7 @@ export default {
       }
     },
     heightPage () {
-      return this.$q.screen.height * 0.6
+      return this.$q.screen.height - this.heightSquare
     }
   },
   watch: {
@@ -201,9 +210,9 @@ export default {
     essenceCreateStart () {
       this.$log('essenceCreateStart')
       // go to square/essence height
-      // this.$tween.to(this, 0.3, {
-      //   headerHeight: this.$q.screen.height - this.heightSquare
-      // })
+      this.$tween.to(this, 0.3, {
+        headerHeight: this.$q.screen.height - this.heightSquare
+      })
       // create composition...
       let start = this.player.currentTime
       let end = start + 30 > this.player.duration ? this.player.duration : start + 30
