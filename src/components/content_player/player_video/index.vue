@@ -6,6 +6,9 @@ div(
   ).column.full-width
   //- body
   div(
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
+    @mousemove="onMouseMove"
     :style=`{
       position: 'relative',
     }`
@@ -19,23 +22,32 @@ div(
         zIndex: 100, top: 0,
       }`
       @player="player = $event, $emit('player', $event)").fit
-    //- div(
-      v-show="showTint"
-      :style=`{
-        position: 'absolute', zIndex: 2000,
-        background: 'rgba(0,0,0,0.5)',
-      }`
-      ).row.fit.bg-red
-    //- player-taps(
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="player"
+        v-show="player && showTint"
+        :style=`{
+          position: 'absolute', zIndex: 2000,
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '10px',
+          pointerEvents: 'none',
+          //- opacity: 0.5,
+        }`
+        ).row.fit.items-center-content-center.justify-center
+        q-btn(
+          @click=""
+          round flat color="white" size="xl"
+          :icon="player.playing ? 'pause' : 'play_arrow'")
+    player-taps(
       v-if="player"
       :player="player")
   //- footer
-  div(v-if="!options.mini" :style=`{height: '28px',}`).row.full-width
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  div(v-if="!options.mini" :style=`{height: '46px',}`).row.full-width
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
     //- v-show="options.showBar"
     div(
       v-if="player"
-      v-show="true && options.showBar"
+      v-show="options.showBar"
       :class=`{
       }`
       :style=`{
@@ -57,7 +69,7 @@ div(
         :style=`{
           maxWidth: $store.state.ui.pageWidth-112+'px'
         }`)
-  div(v-if="!options.mini" :style=`{height: '16px',}`).row.full-width
+  //- div(v-if="!options.mini" :style=`{height: '16px',}`).row.full-width
 </template>
 
 <script>
@@ -94,7 +106,8 @@ export default {
         YOUTUBE: 'player-youtube',
         KALPA: 'player-kalpa',
       },
-      showTint: true,
+      showTint: false,
+      moveTimer: null,
     }
   },
   computed: {
@@ -113,6 +126,31 @@ export default {
       else {
         return false
       }
+    }
+  },
+  methods: {
+    onMouseMove (e) {
+      this.$log('onMouseMove', e)
+      if (this.moveTimer) {
+        clearTimeout(this.moveTimer)
+        this.moveTimer = null
+      }
+      if (!this.showTint) {
+        this.showTint = true
+      }
+      this.moveTimer = setTimeout(() => {
+        this.moveTimer = null
+        this.showTint = false
+      }, 2000)
+    },
+    onMouseEnter (e) {
+      this.$log('onMouseEnter', e)
+      this.showTint = true
+    },
+    async onMouseLeave (e) {
+      this.$log('onMouseLeave', e)
+      // await this.$wait(300)
+      // this.showTint = false
     }
   }
 }

@@ -56,6 +56,7 @@ q-layout(view="lHh lpR lFf")
       div(
         :style=`{
           paddingBottom: 'env(safe-area-inset-bottom)',
+          //- paddingBottom: '30px',
         }`
         ).row.full-width.b-40
         kalpa-menu-mobile
