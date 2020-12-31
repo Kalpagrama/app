@@ -55,7 +55,7 @@ export default {
       playing: false,
       currentTime: 0,
       duration: 0,
-      muted: false,
+      muted: true,
       events: {},
       figures: [],
       points: [],
@@ -93,6 +93,9 @@ export default {
       this.$log('setState', key, val)
       if (this[key] === undefined) return
       this.$set(this, key, val)
+      if (key === 'muted') {
+        this.player.setMuted(val)
+      }
     },
     // setMuted (val) {},
     setCurrentTime (t) {

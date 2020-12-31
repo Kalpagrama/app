@@ -63,11 +63,11 @@ q-layout(
           .row.full-width.justify-center
             small Смыслы
         q-btn(
-          flat icon="list" no-caps
+          flat icon="link" no-caps
           :color="pageId === 'drafts' ? 'green' : 'grey-7'"
           :style=`{maxWidth: '60px'}`)
           .row.full-width.justify-center
-            small Смыслы
+            small Связи
   q-page-container
     q-page.row.full-width.justify-center
       div(

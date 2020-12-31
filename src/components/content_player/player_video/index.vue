@@ -41,6 +41,28 @@ div(
     player-taps(
       v-if="player"
       :player="player")
+    div(
+      v-if="player && player.muted && !options.showBar"
+      @click="player.setState('muted', false)"
+      :style=`{
+        position: 'absolute', zIndex: 900,
+        //- background: 'rgba(0,0,0,0.5)',
+      }`
+      ).row.fit
+    q-btn(
+      v-if="player && !options.showBar"
+      @click="volumeToggle()"
+      round flat dense
+      :color="player.muted ? 'red' : 'white'"
+      :style=`{
+        position: 'absolute', zIndex: 1000, right: '8px',
+        top: 'calc(50% - 20px)',
+        //- bottom: '40px',
+      }`)
+      q-icon(
+        :name="player.muted ? 'volume_off' : 'volume_up'"
+        :color="player.muted ? 'red' : 'white'"
+        size="20px")
   //- footer
   div(v-if="!options.mini" :style=`{height: '46px',}`).row.full-width
   transition(enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
@@ -129,6 +151,17 @@ export default {
     }
   },
   methods: {
+    volumeToggle () {
+      this.$log('volumeToggle')
+      if (this.player.muted) {
+        this.player.setState('muted', false)
+        // localStorage.setItem('k_volume', 'on')
+      }
+      else {
+        this.player.setState('muted', true)
+        // localStorage.removeItem('k_volume')
+      }
+    },
     onMouseMove (e) {
       // this.$log('onMouseMove', e)
       if (this.moveTimer) {

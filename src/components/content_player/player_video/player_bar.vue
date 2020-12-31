@@ -25,16 +25,16 @@ div(
       position: 'absolute', left: '-44px', bottom: '-6px',
     }`)
   q-btn(
+    @click="volumeToggle()"
     round flat dense
-    :color="player.mutedLocal ? 'red' : 'white'"
+    :color="player.muted ? 'red' : 'white'"
     :style=`{
         position: 'absolute', right: '-44px', bottom: '-6px',
       }`)
     q-icon(
-      :name="player.mutedLocal ? 'volume_off' : 'volume_up'"
-      :color="player.mutedLocal ? 'red' : 'white'"
-      size="20px" @click="volumeToggle()"
-      )
+      :name="player.muted ? 'volume_off' : 'volume_up'"
+      :color="player.muted ? 'red' : 'white'"
+      size="20px")
   //- actions
   //- div(
     :style=`{
@@ -229,12 +229,12 @@ export default {
     }
     // TODO: platform handle
     // if (this.$q.platform)
-    if (localStorage.getItem('k_volume')) {
-      this.player.setState('muted', false)
-    }
-    else {
-      this.player.setState('muted', true)
-    }
+    // if (localStorage.getItem('k_volume')) {
+    //   this.player.setState('muted', false)
+    // }
+    // else {
+    //   this.player.setState('muted', true)
+    // }
   },
   methods: {
     volumeToggle () {
