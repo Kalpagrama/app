@@ -38,7 +38,7 @@ export default {
       playing: false,
       currentTime: 0,
       duration: 0,
-      muted: false,
+      muted: true,
       events: {},
       figures: [],
       points: [],

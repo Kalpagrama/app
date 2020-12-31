@@ -40,19 +40,21 @@ div(
           height: height+'px'
         }`
         ).column.full-width.bg-black
-        div(
+        //- div(
           v-if="true"
           :style=`{
             position: 'absolute',
             zIndex: 500,
             top: 'calc(50% - 60px)',
+            pointerEvents: 'none',
           }`
-          ).row.full-width.justify-center
+          ).row.full-width.justify-center.br
           div(
             :style=`{
               maxWidth: $store.state.ui.pageWidth+'px',
               height: '120px',
               background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0) 100%)',
+              pointerEvents: 'none',
             }`
             ).row.full-width
         //- joint CREATOR

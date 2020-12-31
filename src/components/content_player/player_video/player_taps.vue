@@ -2,7 +2,7 @@
 div(
   @click.self="player.playing ? player.pause() : player.play()"
   :style=`{
-    position: 'absolute', zInded: 200,
+    position: 'absolute', zIndex: 500,
   }`
   ).row.fit
   div(
