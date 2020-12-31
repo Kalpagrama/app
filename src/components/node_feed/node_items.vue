@@ -36,7 +36,8 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
           :item="item"
           :itemIndex="ii"
           :itemActive="isActive && itemActive === ii"
-          :itemStyles="itemsStyles[ii]")
+          :itemStyles="itemsStyles[ii]"
+          :stylesName=`{}`)
     //- inActive tint
     div(
       v-if="itemActive !== ii"

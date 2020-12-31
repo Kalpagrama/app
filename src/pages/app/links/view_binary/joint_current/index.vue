@@ -31,23 +31,39 @@ div(
             //- borderRadius: '10px',
             borderRadius: '30px',
           }`
-          ).row.full-width.items-center.content-center.cursor-pointer.b-50
-          div(:style=`{pointerEvents: 'none'}`).row.full-width.justify-center
-            span(:style=`{userSelect: 'none'}`).text-white {{ joint.name || joint.vertices }}
-          //- div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white Причина
-          //- div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white Следствие
+          ).row.full-width.items-center.content-center.justify-center.cursor-pointer.b-50
+          span(v-if="typeof name === 'string'").text-white {{ name }}
+          div(v-else).row.full-width.items-center.content-center.justify-center
+            div(v-for="n in name" :key="n").row.full-width.justify-center
+              span.text-white {{ n }}
 </template>
 
 <script>
 export default {
   name: 'jointCurrent',
-  props: ['joint', 'item'],
+  props: ['joint', 'itemPinned'],
   data () {
     return {
       jointOpened: false,
     }
   },
+  computed: {
+    needSwap () {
+      return this.joint.items[0].oid !== this.itemPinned.oid
+    },
+    name () {
+      if (this.joint.vertices[0] === 'ASSOCIATIVE') {
+        return 'Ассоциация'
+      }
+      else if (this.joint.vertices[0] === 'ESSENCE') {
+        return this.joint.name
+      }
+      else {
+        let vertices = this.joint.vertices
+        if (this.needSwap) vertices.reverse()
+        return [this.$nodeItemType(vertices[0]).name, this.$nodeItemType(vertices[1]).name]
+      }
+    }
+  }
 }
 </script>

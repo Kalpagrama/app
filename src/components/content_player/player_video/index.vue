@@ -130,7 +130,7 @@ export default {
   },
   methods: {
     onMouseMove (e) {
-      this.$log('onMouseMove', e)
+      // this.$log('onMouseMove', e)
       if (this.moveTimer) {
         clearTimeout(this.moveTimer)
         this.moveTimer = null

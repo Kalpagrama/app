@@ -45,14 +45,65 @@ div(
     div(
       :style=`{
         height: '60px',
-        borderRadius: '10px',
+        borderRadius: '30px',
         maxWidth: '500px',
       }`
-      ).row.full-width.items-center.content-center.justify-center.b-30
-      .row.full-width.justify-center
-        span.text-white Причина
-      .row.full-width.justify-center
-        span.text-white Следствие
+      ).row.full-width.items-center.content-center.justify-center.b-50
+      q-btn(
+        @click="nameToggle()"
+        round flat
+        icon="multiple_stop"
+        :color="joint.vertices[0] === 'ESSENCE' ? 'white' : 'green'"
+        :style=`{
+          borderRadius: '50%',
+          overflow: 'hidden',
+        }`).q-ml-sm.rotate-90
+      div(
+        :style=`{position: 'relative',}`
+        ).col
+        div(
+          v-if="showVertices"
+          :style=`{
+            position: 'absolute', zIndex: 300,
+            left: '8px', maxWidth: 'calc(100% - 16px)',
+            bottom: 'calc(50% - 218px)',
+            //- bottom: '0px',
+            borderRadius: '30px',
+          }`
+          ).row.full-width.items-start.cotent-start.q-pa-sm.b-60
+          q-btn(
+            v-for="(v,vi) in vertices" :key="vi"
+            @click="vertexClick(v)"
+            flat dense color="white" no-caps
+            :style=`{
+              height: '30px',
+            }`
+            ).row.full-width {{ v.name }}
+        .row.fit.items-center.content-center.justify-center
+          //- span(v-if="typeof name === 'string'").text-white {{ name }}
+          q-input(
+            v-if="typeof name === 'string' && joint.vertices[0] === 'ESSENCE'"
+            v-model="joint.name"
+            borderless color="white" dark
+            placeholder="В чем связь?"
+            :inputStyle=`{
+              textAlign: 'center'
+            }`
+            ).fit
+          div(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").row.fit.items-center.content-center.justify-center
+            span.text-white Ассоциация
+          div(v-else).row.full-width.items-center.content-center.justify-center
+            div(v-for="n in name" :key="n").row.full-width.justify-center
+              span.text-white {{ n }}
+      q-btn(
+        @click="showVertices = !showVertices"
+        round flat color="white"
+        :icon="showVertices ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+        :style=`{
+          borderRadius: '50%',
+          opacity: joint.vertices[0] === 'ESSENCE' ? 0 : 1,
+        }`).q-mr-sm
+        //- q-menu-popup
   //- footer
   div(
     v-if="!itemEditing"
@@ -92,9 +143,9 @@ div(
   div(
     v-if="!joint.items[1]"
     :style=`{
-      paddingTop: '30px',
+      //- paddingTop: '30px',
     }`
-    ).row.fit.q-pa-md
+    ).row.fit
     q-btn(
       @click="itemFinderShow = true"
       flat color="green" icon="add" size="lg"
@@ -157,15 +208,50 @@ export default {
         name: '',
         layout: 'HORIZONTAL',
         items: [],
-        vertices: [],
+        vertices: ['ASSOCIATIVE', 'ASSOCIATIVE'],
         spheres: [],
         category: 'FUN',
       },
       itemEditing: null,
-      editorsPaddingTop: 0
+      editorsPaddingTop: 0,
+      showVertices: false,
+    }
+  },
+  computed: {
+    name () {
+      if (this.joint.vertices[0] === 'ASSOCIATIVE') {
+        return 'Ассоциация'
+      }
+      else if (this.joint.vertices[0] === 'ESSENCE') {
+        return this.joint.name
+      }
+      else {
+        let vertices = this.joint.vertices
+        // if (this.needSwap) vertices.reverse()
+        return [this.$nodeItemType(vertices[0]).name, this.$nodeItemType(vertices[1]).name]
+      }
+    },
+    vertices () {
+      return this.$nodeItemTypes
     }
   },
   methods: {
+    vertexClick (v) {
+      this.$log('vertexClick')
+      // this.joint.name = ''
+      this.joint.vertices = [v.id, v.pair]
+      this.showVertices = false
+    },
+    nameToggle () {
+      this.$log('nameToggle')
+      if (this.joint.vertices[0] === 'ESSENCE') {
+        this.joint.name = ''
+        this.joint.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+      }
+      else {
+        this.joint.vertices = ['ESSENCE', 'ESSENCE']
+      }
+    },
     itemEditingHandle (isEditing, ii) {
       this.$log('itemEditingHandle', isEditing, ii)
       if (isEditing) {
