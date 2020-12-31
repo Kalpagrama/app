@@ -20,19 +20,6 @@ export default {
   data () {
     return {
       item: null,
-      // joint: null,
-      // jointNew: {
-      //   oid: null,
-      //   items: [],
-      //   name: '',
-      //   vertices: [],
-      //   spheres: [],
-      //   category: 'FUN',
-      //   layout: 'HORIZONTAL',
-      // },
-      // jointCreating: false,
-      // joints: [],
-      // jointsLoaded: false,
       viewId: 'binary', // threads, binary
     }
   },

@@ -40,16 +40,21 @@ div(
           height: height+'px'
         }`
         ).column.full-width.bg-black
-        //- div(
-          v-if="!rowsNexting"
+        div(
+          v-if="true"
           :style=`{
             position: 'absolute',
             zIndex: 500,
             top: 'calc(50% - 60px)',
-            height: '120px',
-            background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0) 100%)',
           }`
-          ).row.full-width
+          ).row.full-width.justify-center
+          div(
+            :style=`{
+              maxWidth: $store.state.ui.pageWidth+'px',
+              height: '120px',
+              background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0) 100%)',
+            }`
+            ).row.full-width
         //- joint CREATOR
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
@@ -79,6 +84,7 @@ div(
             joint-current(
               v-if="jointCurrent"
               :joint="jointCurrent"
+              :itemPinned="itemPinned"
               :style=`{
                 maxWidth: '500px',
               }`)

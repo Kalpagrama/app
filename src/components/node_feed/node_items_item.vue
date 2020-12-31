@@ -60,11 +60,6 @@ div(
     :style=`{
       position: 'absolute', zIndex: 200,
       bottom: '-0.5px',
-      //- bottom: '34px',
-      //- bottom: '0px',
-      //- top: '-0.5px',
-      //- minHeight: '40px',
-      //- transform: 'translate3d(0,0,0)',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px',
     }`
@@ -73,6 +68,9 @@ div(
       :style=`{
         borderRadius: '10px',
         maxWidth: '100%',
+        ...stylesName,
+        //- marginBottom: '34px',
+        //- background: 'black',
       }`
       ).row
       router-link(
@@ -100,7 +98,7 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 
 export default {
   name: 'nodeFeed__nodeItemsItem',
-  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemVertex', 'itemStyles'],
+  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemVertex', 'itemStyles', 'stylesName'],
   components: {
     compositionPlayer,
   },
