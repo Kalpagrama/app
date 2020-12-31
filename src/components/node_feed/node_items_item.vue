@@ -59,22 +59,22 @@ div(
   div(
     :style=`{
       position: 'absolute', zIndex: 200,
-      //- bottom: '-0.5px',
-      bottom: '34px',
+      bottom: '-0.5px',
+      //- bottom: '34px',
       //- bottom: '0px',
       //- top: '-0.5px',
       //- minHeight: '40px',
       //- transform: 'translate3d(0,0,0)',
-      //- background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
-      //- borderRadius: '10px',
+      background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
+      borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.justify-center.q-px-md
+    ).row.full-width.items-center.content-center.justify-center
     div(
       :style=`{
         borderRadius: '10px',
         maxWidth: '100%',
       }`
-      ).row.bg-black
+      ).row
       router-link(
         :to="itemLink"
         :style=`{

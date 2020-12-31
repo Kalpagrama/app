@@ -232,13 +232,13 @@ module.exports = function (ctx) {
          //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
          // },
          // https: true,
-         port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-         host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
-         // https: false,
-         https: ctx.mode.capacitor || ctx.mode.spa ? false : {
-            key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
-            cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
-         },
+         // port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+         // host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
+         // // https: false,
+         // https: ctx.mode.capacitor || ctx.mode.spa ? false : {
+         //    key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
+         //    cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
+         // },
          open: true // opens browser window automatically
       },
 

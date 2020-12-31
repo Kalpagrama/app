@@ -24,8 +24,8 @@ div(
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        flat color="white" dense no-caps)
-        user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
+        round flat color="white" no-caps :style=`{paddingLeft: 'px',}`).q-px-sm
+        user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
         span.text-grey-4.q-ml-sm {{ node.author.name }}
       .col
       small.text-grey-8.q-mr-xs {{ node.countViews }}
@@ -54,7 +54,7 @@ div(
         }`
         ).row.full-width.q-pa-xs
         //- node context
-        //- q-btn(
+        q-btn(
           v-if="node.items.length === 1 && node.items[0].layers"
           :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
           round flat color="grey-6" icon="select_all"
@@ -80,7 +80,7 @@ div(
             :to="nodeEssenceLink"
             round flat color="green" icon="link")
         //- node links
-        //- q-btn(
+        q-btn(
           v-if="node.items.length === 1"
           :to="'/links/'+node.oid"
           round flat color="grey-6" icon="link"

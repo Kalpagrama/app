@@ -71,14 +71,14 @@ q-layout(
   q-page-container
     q-page.row.full-width.justify-center
       div(
+        v-if="node"
         :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
         ).row.full-width.items-start.content-start
         node-feed(
-          v-if="node"
           :node="node"
           :isActive="true"
           :isVisible="true")
-        .row.full-width.q-pa-md
+        //- .row.full-width.q-pa-md
           p.text-grey-5 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
         //- .row.full-width.q-pa-sm
           div(

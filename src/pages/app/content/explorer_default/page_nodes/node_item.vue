@@ -17,7 +17,7 @@
         width: $q.screen.width+'px',
         minWidth: Math.min($store.state.ui.pageWidth, $q.screen.width)+'px',
         height: $q.screen.height+'px',
-        //- background: 'rgba(0,0,0,0.8)',
+        background: 'rgba(0,0,0,0.8)',
       }`
       ).row.full-width.items-center.content-center.justify-center
       div(
