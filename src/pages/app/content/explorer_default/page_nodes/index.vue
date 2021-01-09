@@ -31,12 +31,14 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeItem from './node_item.vue'
+import nodeItemNew from './node_item_new.vue'
 
 export default {
   name: 'pageNodes',
   props: ['contentKalpa', 'player', 'nodeQuery', 'headerHeight'],
   components: {
     nodeItem,
+    nodeItemNew,
   },
   data () {
     return {

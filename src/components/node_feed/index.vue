@@ -24,7 +24,7 @@ div(
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        round flat color="white" no-caps :style=`{paddingLeft: 'px',}`).q-px-sm
+        round flat color="white" no-caps :style=`{paddingLeft: '0px',}`).q-px-sm
         user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
         span.text-grey-4.q-ml-sm {{ node.author.name }}
       .col
@@ -54,7 +54,7 @@ div(
         }`
         ).row.full-width.q-pa-xs
         //- node context
-        q-btn(
+        //- q-btn(
           v-if="node.items.length === 1 && node.items[0].layers"
           :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
           round flat color="grey-6" icon="select_all"
@@ -80,7 +80,7 @@ div(
             :to="nodeEssenceLink"
             round flat color="green" icon="link")
         //- node links
-        q-btn(
+        //- q-btn(
           v-if="node.items.length === 1"
           :to="'/links/'+node.oid"
           round flat color="grey-6" icon="link"
@@ -180,11 +180,11 @@ export default {
     // TODO: impl better way
     nodeNameSize () {
       let l = this.node.name.length
-      if (l < 20) return 20
-      else if (l >= 20 && l < 50) return 18
-      else if (l >= 50 && l < 100) return 14
-      else if (l >= 100) return 12
-      else return 10
+      if (l < 20) return 16
+      else if (l >= 20 && l < 50) return 14
+      else if (l >= 50 && l < 100) return 12
+      else if (l >= 100) return 10
+      else return 8
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid

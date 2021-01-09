@@ -58,12 +58,13 @@ div(
   //- context and name
   div(
     :style=`{
-      position: 'absolute', zIndex: 200,
+      position: 'absolute',
+      zIndex: 200,
       bottom: '-0.5px',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.justify-center
+    ).row.full-width.items-center.content-center.justify-center.q-py-sm
     div(
       :style=`{
         borderRadius: '10px',

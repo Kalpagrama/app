@@ -5,6 +5,12 @@ div(
     paddingBottom: Math.round(ratio*100)+'%',
   }`
   ).row.full-width
+  //- div(
+    :style=`{
+      position: 'absolute', bottom: '-25px', left: '0px', zIndex: 10000,
+      height: '50px', width: '50px',
+    }`
+    ).row.bg-red
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
     composition-player(
       :oid="node.oid"

@@ -16,7 +16,7 @@ div(
     :style=`{
       objectFit: objectFit,
       borderRadius: '10px',
-      overflow: 'hidden',
+      //- overflow: 'hidden',
     }`
     @loadeddata="loadeddataHandle"
     @timeupdate="timeupdateHandle"
