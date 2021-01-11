@@ -51,7 +51,7 @@
         }`
         ).row.fit.items-center.contnet-center
         //- points
-        div(
+        //- div(
           v-for="(f,fi) in player.points" :key="fi"
           v-if="player.points && player.points.length > 0"
           :style=`{
@@ -74,13 +74,27 @@
             top: '10%',
             height: '80%',
             //- border: '2px solid rgb(76,175,80)',
-            //- borderRadius: '4px',
-            borderRadius: '50%',
+            borderRadius: '4px',
+            //- borderRadius: '50%',
             //- background: 'rgba(255,255,255,0.2)',
             background: 'rgba(76,175,80, 0.5)',
             pointerEvents: 'none',
           }`
           ).row
+        //- tint
+        div(
+          v-show="!mini"
+          :style=`{
+            position: 'absolute', zIndex: 10,
+            pointerEvents: 'none',
+          }`
+          ).row.fit.items-center.content-center
+          div(
+            :style=`{
+              height: height+'px',
+              borderRadius: '2px',
+            }`
+            ).row.full-width.b-50
         div(
           :style=`{
             position: 'relative',

@@ -3,11 +3,14 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.fit
+  ).row.full-width
   //- footer
   div(
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '0px',
+      //- position: 'absolute', zIndex: 1000, bottom: '0px',
+      position: 'fixed', zIndex: 1000, bottom: '0px',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      order: 10,
     }`
     ).row.full-width.items-center.content-center
     div(

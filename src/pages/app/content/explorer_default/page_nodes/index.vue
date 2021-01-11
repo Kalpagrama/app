@@ -3,14 +3,16 @@ div(
   :style=`{
     paddingTop: '0px'
   }`).row.full-width.items-start.content-start.justify-center
-  .row.full-width.items-center.content-center.justify-between.q-pa-sm
-    span.text-grey-7.text-bold.q-ml-sm Смыслы - 1231
+  .row.full-width.items-center.content-center.justify-start.q-pa-sm
+    .col
+      span().text-grey-7.text-bold.q-ml-xs.q-mr-xs Ядра
+      span(v-if="nodesLoaded").text-grey-7.text-bold - {{ nodes.length }}
     q-btn(
       round flat color="grey-7" icon="tune")
   slot
   kalpa-loader(
     :immediate="true"
-    @items="nodesLoaded"
+    @items="nodesUpdated"
     :query="nodesQuery" v-slot=`{items,next,nexting}`)
     list-middle(
       :items="items" :itemStyles=`{marginBottom: '0px',}`
@@ -42,6 +44,8 @@ export default {
   },
   data () {
     return {
+      nodes: [],
+      nodesLoaded: false,
       nodeSelectedOid: null,
     }
   },
@@ -72,8 +76,10 @@ export default {
     //     window.scrollTo(0, top - this.headerHeight - 8)
     //   }
     // },
-    async nodesLoaded (nodes) {
-      this.$log('nodesLoaded', nodes.length)
+    async nodesUpdated (nodes) {
+      this.$log('nodesUpdated', nodes.length)
+      this.nodes = nodes
+      this.nodesLoaded = true
       let figures = nodes.reduce((acc, node) => {
         node.items.map(i => {
           if (i.layers) {

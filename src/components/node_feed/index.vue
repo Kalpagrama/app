@@ -97,7 +97,7 @@ div(
     //- SPHERES
     //- v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
     div(
-      v-if="showSpheres && node.oid && showSpheresAlways"
+      v-if="showSpheres && node.oid && node.spheres.length > 0"
       :style=`{
         height: '46px',
       }`).row.full-width.items-center.content-center.justify-start.scroll

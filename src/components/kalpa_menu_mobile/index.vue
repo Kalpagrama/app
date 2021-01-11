@@ -34,22 +34,17 @@
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
-    div(
+    ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
+    q-btn(
+      flat no-caps
+      :to="'/feeds/all'"
       :style=`{
         width: '60px',
       }`
-      ).row.items-center.content-center.justify-center.q-pb-xs
-      kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
+      ).row.items-center.content-center.justify-center
+      kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`).q
       .row.full-width.justify-center.q-pt-xs
         small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
-    //- q-btn(
-      flat icon="home" no-caps
-      :to="'/feeds/all'"
-      :color="'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Лента
     q-btn(
       flat icon="explore" no-caps
       :to="'/trends'"

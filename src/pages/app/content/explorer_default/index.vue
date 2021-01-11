@@ -1,5 +1,63 @@
 <template lang="pug">
-div(
+q-layout(
+  view="hHh Lpr lff"
+  ).bg-black
+  //- q-resize-observer(@resize="onResize" :debounce="300")
+  q-header().bg-black
+    div(
+      :style=`{
+        //- height: 'calc('+ ($q.screen.height-500) +'px - 70px - 15px - env(safe-area-inset-bottom))',
+        height: 'calc('+ heightContent +'px - 0px - 0px - env(safe-area-inset-bottom))',
+      }`
+      ).row.full-width.bg-black
+      content-player(
+        @player="player = $event"
+        :contentKalpa="contentKalpa"
+        :style=`{
+          height: '100%',
+        }`
+        :styles=`{
+          padding: {
+            paddingTop: '50px',
+          }
+        }`
+        ).full-width.bg-black
+  q-footer(
+    v-if="!nodeCreating"
+    reveal
+    :style=`{
+      //- paddingBottom: 'env(safe-area-inset-bottom)',
+    }`)
+    div(
+      :style=`{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }`
+      ).row.full-width.b-40
+      nav-mobile(
+        v-if="!nodeCreating"
+        @create-start="essenceCreateStart()"
+        @pageId="pageIdChange"
+        :pageId="pageId"
+        :style=`{
+          zIndex: 1000,
+        }`)
+  q-page-container
+    q-page(
+      :style=`{
+        paddingTop: '15px',
+      }`)
+      node-creator(
+        v-if="player && nodeCreating"
+        :contentKalpa="contentKalpa"
+        :player="player"
+        @cancel="nodeCancelled"
+        @publish="nodePublished")
+      component(
+        v-if="!nodeCreating"
+        :is="`page-${pageId}`"
+        :contentKalpa="contentKalpa"
+        :player="player")
+//- div(
   view="hHh Lpr lff"
   :style=`{
     minHeight: $q.screen.height+'px'
@@ -12,7 +70,12 @@ div(
     :style=`{
       position: 'fixed', zIndex: 1000, bottom: '0px',
     }`).row.full-width
-    .row.full-width.justify-center
+    div(
+      :style=`{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        borderRadius: '10px 10px 0 0',
+      }`
+      ).row.full-width.justify-center.b-40
       div(
         :style=`{
           height: (pageId || nodeCreating) ? $q.screen.height-heightPage+'px' : 70+'px',
@@ -138,7 +201,10 @@ export default {
       // let height = (width * this.contentKalpa.thumbHeight) / this.contentKalpa.thumbWidth
       let d = this.contentKalpa.thumbHeight / this.contentKalpa.thumbWidth
       return width * d
-    }
+    },
+    heightContent () {
+      return (this.pageId || this.nodeCreating) ? this.heightPage : this.$q.screen.height - 70 - 15
+    },
   },
   watch: {
   },
