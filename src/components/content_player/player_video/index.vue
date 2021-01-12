@@ -17,6 +17,7 @@ div(
         position: 'absolute',
         zIndex: 100,
         top: 0,
+        ...styles,
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
@@ -44,7 +45,7 @@ div(
         :style=`{
           position: 'absolute', zIndex: 901,
           top: '0px', left: '0px',
-          ...styles.padding,
+          //- ...styles.padding,
         }`
         ).row.full-width.items-center.content-center.q-pa-sm
         router-link(

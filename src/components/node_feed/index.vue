@@ -11,16 +11,14 @@ div(
     ...styles,
   }`
   ).row.full-width.items-start.content-start
+  //- wrapper
   div(
     :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
-      //- borderRadius: '10px',
-      //- borderRadius: '10px 10px 30px 30px',
       borderRadius: borderRadius,
-      //- ...styles,
     }`).row.full-width.items-start.content-start
-    //- HEADER: author, createdAt
+    //- HEADER: author, createdAt, actions, date, views
     div(
       v-if="showHeader && node.oid"
       ).row.full-width.items-center.content-center.q-pa-xs
@@ -45,81 +43,44 @@ div(
       v-bind="$props"
       :itemsStyles="itemsStyles"
       @itemActive="$emit('itemActive', $event)")
-    //- ESSENCE:
-    .row.full-width
-      slot(name="name")
-      //- link
-      div(
-        v-if="showName && node.oid"
-        :style=`{
-          minHeight: '60px',
-        }`
-        ).row.full-width.q-pa-xs
-        //- node context
-        //- q-btn(
-          v-if="node.items.length === 1 && node.items[0].layers"
-          :to="'/content/'+node.items[0].layers[0].contentOid+'?node='+node.oid"
-          round flat color="grey-6" icon="select_all"
-          :style=`{width: '50px', height: '50px',}`)
-        //- NAME
-        router-link(
-          v-if="true"
-          :to="nodeEssenceLink"
-          :style=`{
-            fontSize: nodeNameSize+'px',
-          }`
-          ).col.full-height
-          div(
-            :style=`{
-              textAlign: 'center',
-            }`
-            ).row.fit.items-center.content-center.justify-center
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ nodeName }}
-        //- div(
-          v-else
-          ).row.full-width.justify-center
-          q-btn(
-            :to="nodeEssenceLink"
-            round flat color="green" icon="link")
-        //- node links
-        //- q-btn(
-          v-if="node.items.length === 1"
-          :to="'/links/'+node.oid"
-          round flat color="grey-6" icon="link"
-          :style=`{
-            position: 'relative',
-            width: '50px', height: '50px',
-          }`)
-          small(
-            v-if="node.countJoints > 0"
-            :style=`{
-              position: 'absolute', zIndex: 200, bottom: '-2px',
-            }`
-          ).text-grey-6 {{ node.countJoints }}
-    //- SPHERES
-    //- v-if="showSpheres && node.oid && showSpheresAlways || node.spheres.length > 0"
-    div(
-      v-if="showSpheres && node.oid && node.spheres.length > 0"
+    //- NAME: dynamic link/ dynamic fontSize
+    slot(name="name")
+    router-link(
+      v-if="showName && node.oid"
+      :to="nodeEssenceLink"
       :style=`{
-        height: '46px',
-      }`).row.full-width.items-center.content-center.justify-start.scroll
-      .row.full-width.no-wrap.q-pl-sm
-        .col
-        //- q-btn(
-          :to="'/trends/'+category.sphere.oid"
-          flat color="grey-5" no-caps size="md" dense
-          ).q-px-sm.q-mr-sm.b-40 {{ category.alias }}
-        router-link(
+        minHeight: '60px',
+        fontSize: nodeNameSize+'px',
+        textAlign: 'center',
+      }`
+      ).row.full-width.items-center.content-center.justify-center
+      span.text-white.text-bold {{ nodeName }}
+    //- SPHERES
+    div(
+      v-if="showSpheres && node.spheres.length > 0"
+      ).row.full-width.q-pa-sm
+      q-tabs(
+        :value="null"
+        flat no-caps dense dark
+        align="center"
+        indicator-color="rgb(30,30,30)"
+       ).full-width
+        //- :label="s.name"
+        q-route-tab(
           v-for="(s,si) in node.spheres" :key="s.oid"
           :to="'/sphere/'+s.oid"
           :style=`{
-            whiteSpace: 'nowrap',
             borderRadius: '10px',
-          }`
-          ).text-grey-4.q-py-xs.q-px-sm.b-40.q-mr-sm.sphere-item
-          q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
-          span {{ s.name }}
-        .col
+            background: 'rgb(40,40,40)',
+            //- overflow: 'hidden',
+          }`).q-mr-sm
+          span(
+            :style=`{
+              whiteSpace: 'nowrap',
+              //- background: 'rgb(45,45,45)',
+              //- borderRadius: '10px',
+            }`
+            ).text-white.q-pa-xs {{ s.name }}
   //- FOOTER: slot, actions
   slot(name="footer")
   node-actions(v-if="showActions && node.oid" :node="node" :isActive="isActive" :isVisible="isVisible")
@@ -184,11 +145,11 @@ export default {
     // TODO: impl better way
     nodeNameSize () {
       let l = this.node.name.length
-      if (l < 20) return 16
-      else if (l >= 20 && l < 50) return 14
-      else if (l >= 50 && l < 100) return 12
-      else if (l >= 100) return 10
-      else return 8
+      if (l < 20) return 18
+      else if (l >= 20 && l < 50) return 16
+      else if (l >= 50 && l < 100) return 14
+      else if (l >= 100) return 12
+      else return 10
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid
@@ -197,7 +158,8 @@ export default {
       let res = {}
       if (this.nodeIsMine) {
         res.delete = {
-          name: i18n.t('Delete', 'Удалить'),
+          // name: i18n.t('Delete', 'Удалить'),
+          name: 'Снять с публикации',
           color: 'red',
           cb: async () => {
             this.$log('nodeDelete...')

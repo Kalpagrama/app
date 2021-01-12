@@ -70,7 +70,7 @@ export default {
       // initialAspectRatio: 10 / 10,
       viewMode: 2,
       dragMode: 'move',
-      background: false,
+      // background: false,
       ...this.options,
       crop: (event) => {
         this.$emit('crop', event)

@@ -20,6 +20,8 @@ q-layout(
             height: '100%',
           }`
           :styles=`{
+            height: '100%',
+            objectFit: 'contain',
             padding: {
               paddingTop: '50px',
             }

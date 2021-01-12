@@ -154,7 +154,7 @@
             :style=`{
               height: '60px',
               paddingLeft: '0px',
-              maxWidth: '240px',
+              maxWidth: '200px',
             }`).full-width.menu-item
             span(
               v-if="!mini"
