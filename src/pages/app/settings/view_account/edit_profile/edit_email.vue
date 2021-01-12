@@ -2,7 +2,7 @@
 .row.full-width.q-pa-md
   .row.full-width
     span.text-bold.text-white Email
-  .row.full-width.items-center.content-center.q-py-sm
+  .row.full-width.items-center.content-center.q-py-sm.br
     span(:style=`{marginBottom: '2px'}`).text-white.text-bold {{ $store.getters.currentUser().profile.email }}
     //- q-btn(
       @click="editing = true"
@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: 'emailEditor',
+  name: 'editEmail',
   data () {
     return {
       editing: true,

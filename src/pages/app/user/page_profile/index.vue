@@ -17,9 +17,10 @@ q-page(
     ).row.full-width.justify-center.b-30
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-px-md
       q-tabs(
-        no-caps active-color="green" align="left" dense
+        no-caps active-color="green" align="justify"
         stretch :breakpoint="100" inline-label
         :switch-indicator="true").full-width.text-grey-8
+        //- t.name +' '+ t.count
         q-route-tab(
           v-for="t in tabs" :key="t.id"
           inline-label
@@ -47,10 +48,13 @@ export default {
   computed: {
     tabs () {
       return [
-        {id: 'nodes', name: this.$t('Nodes and Links', 'Ядра и связи'), icon: 'panorama_fish_eye', count: 356},
+        // {id: 'nodes', name: this.$t('Nodes and Links', 'Ядра и связи'), icon: 'panorama_fish_eye', count: 356},
+        {id: 'collections', name: 'Подборки', icon: 'view_week', count: 11},
+        {id: 'nodes', name: 'Ядра', icon: 'panorama_fish_eye', count: 356},
+        {id: 'joints', name: 'Связи', icon: 'panorama_fish_eye', count: 356},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust', count: 12},
-        {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account', count: 1233},
-        {id: 'following', name: this.$t('Following', 'Подписки'), icon: null, count: 123}
+        // {id: 'followers', name: this.$t('Subscribers', 'Подписчики'), icon: 'supervisor_account', count: 1233},
+        // {id: 'following', name: this.$t('Following', 'Подписки'), icon: null, count: 123}
       ]
     },
   },

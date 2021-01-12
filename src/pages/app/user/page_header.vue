@@ -18,6 +18,19 @@
           //- borderRadius: '0 0 10px 10px',
         }`
         ).fit
+      kalpa-menu-actions(
+        :actions="actions" icon="more_vert"
+        color="white"
+        :style=`{
+          position: 'absolute', zIndex: 200, top: '8px', right: '8px',
+        }`).q-mr-xs
+      q-btn(
+        v-if="$q.screen.lt.md"
+        @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
+        round flat color="white" icon="menu"
+        :style=`{
+          position: 'absolute', zIndex: 200, top: '8px', left: '8px',
+        }`)
       div(
         :style=`{
           position: 'absolute', bottom: '0px', zIndex: 90, transform: 'translate3d(0,0,0)', height: '100%',
@@ -28,20 +41,46 @@
         }`).row.full-width
     //- header: back, avatar, name, rating, options, menu caller
     div(
-      :style=`{position: 'relative', zIndex: 100, height: '60px', borderRadius: '10px',marginTop: '-20px',paddingTop: '0px',}`
+      :style=`{
+        position: 'relative', zIndex: 100,
+        minHeight: '60px',
+        borderRadius: '10px',
+        marginTop: '-20px',
+        paddingTop: '0px',
+      }`
       ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
-      q-btn(
-        @click="$router.back()"
-        round flat color="white" icon="west")
-      user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
-      .col
-        span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
-        .row.full-width.q-px-sm
-          small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
+      div(:style=`{height: '60px',}`).row.full-width.items-center.content-center.justify-between
+        q-btn(
+          @click="$router.back()"
+          round flat color="white" icon="west")
+        user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
+        .col
+          span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
+          .row.full-width.q-px-sm
+            //- small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
+            small(:style=`{lineHeight: 0.8}`).text-white @username
+        q-btn(
+          v-if="true || !itsMe"
+          outline color="green" no-caps)
+          span Подписаться
+      //- about user
+      .row.full-width.q-px-sm.q-pb-sm
+        .row.full-widthq
+          p.text-grey-2 status lorem ipsum lorem ipsum lorem ipsum status lorem ipsum lorem ipsum lorem ipsum status lorem
+        .row.full-width.q-pb-sm
+          //- weight
+          span.text-white.q-mr-xs 1231
+          span.text-grey-7.q-mr-md Вес
+          //- following
+          span.text-white.q-mr-xs 1419
+          span.text-grey-7.q-mr-md Подписки
+          //- followers
+          span.text-white.q-mr-xs 9293
+          span.text-grey-7 Подписчики
       //- kalpa-share(
         v-if="user"
         type="user" :item="user")
-      kalpa-bookmark(
+      //- kalpa-bookmark(
         v-if="user && !itsMe"
         :oid="user.oid"
         type="USER"
@@ -49,9 +88,9 @@
         :name="user.name"
         :thumbUrl="user.thumbUrl"
         :isActive="true")
-      kalpa-menu-actions(:actions="actions" icon="more_vert").q-mr-xs
+      //- kalpa-menu-actions(:actions="actions" icon="more_vert").q-mr-xs
       //- menu caller
-      q-btn(
+      //- q-btn(
         v-if="$q.screen.lt.md"
         @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
         round flat color="white" icon="menu")

@@ -12,8 +12,8 @@ q-layout(view="hHh Lpr lff")
           .col
             span(
               :style=`{fontSize: '18px', userSelect: 'none'}`
-              ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
-          //- q-btn(round flat color="grey-8" icon="settings")
+              ).text-bold.text-white {{$t('pageApp_activity_title', 'Активность')}}
+          q-btn(round flat color="grey-8" icon="more_vert")
   q-page-container
     router-view
     //- iframe(

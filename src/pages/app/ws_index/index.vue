@@ -18,11 +18,13 @@
             minHeight: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-icon(name="bookmark_outline" color="white" size="30px").q-ml-sm
+          //- q-icon(name="bookmark_outline" color="white" size="30px").q-ml-sm
+          anvil(size="30px").q-mx-xs
           .col.q-px-sm
             span(
               :style=`{fontSize: '18px'}`
-              ).text-white.text-bold Закладки
+              ).text-white.text-bold Мастерская
+          q-btn(round flat color="grey-8" icon="more_vert")
 </template>
 
 <script>
@@ -30,6 +32,7 @@ export default {
   name: 'wsCreate',
   components: {
     kalpaFinder: () => import('components/kalpa_finder/index.vue'),
+    anvil: () => import('components/kalpa_icons/anvil.vue'),
   },
   data () {
     return {

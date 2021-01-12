@@ -46,7 +46,7 @@
       }`
       ).row.items-center.content-center.justify-center
       kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
-      .row.full-width.justify-center.q-pt-xs
+      .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
     q-btn(
       flat icon="search" no-caps
@@ -56,17 +56,26 @@
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Поиск
     q-btn(
-      no-caps icon="add" size="lg"
-      :to="'/workspace/create'"
+      round no-caps
+      :to="'/workspace'"
       :color="'green'"
       :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-    q-btn(
+      anvil(size="30px")
+    //- q-btn(
       flat no-caps icon="bookmark_outline"
       :to="'/workspace/'"
       :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Закладки
+    q-btn(
+      flat no-caps icon="notifications_none"
+      :to="'/notifications/'"
+      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      q-badge(color="red" floating transparent) 9
+      .row.full-width.justify-center
+        small Активность
     //- currentUserPage
     q-btn(
       flat no-caps
@@ -74,7 +83,7 @@
       :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       user-avatar(
-        :url="$store.getters.currentUser().profile.photoUrl" :width="30" :height="30"
+        :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
         :style=`{
           borderRadius: '50%',
           border: ($route.name.split('.')[0] === 'user' && $route.params.oid === $store.getters.currentUser().oid) ? '2px solid rgb(76,175,79)' : '2px solid rgba(0,0,0,0)'
@@ -86,6 +95,9 @@
 <script>
 export default {
   name: 'kalpaMenuMobile',
+  components: {
+    anvil: () => import('components/kalpa_icons/anvil.vue')
+  },
   data () {
     return {
     }
