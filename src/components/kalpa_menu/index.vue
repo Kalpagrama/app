@@ -69,7 +69,7 @@
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
               small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
         //- refresh
-        q-btn(
+        //- q-btn(
           @click="refresh()"
           flat color="white" no-caps icon="refresh"
           :align="mini ? 'center' : 'left'"
@@ -83,7 +83,7 @@
             v-if="!mini"
             :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Обновить
         //- logout
-        q-btn(
+        //- q-btn(
           v-if="!isGuest"
           @click="logout()"
           flat color="white" no-caps icon="logout"
@@ -192,10 +192,10 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'feeds', name: 'Домашняя', icon: 'home'},
-        {id: 'trends', name: 'Новое', icon: 'explore'},
+        // {id: 'feeds', name: 'Домашняя', icon: 'home'},
+        {id: 'trends', name: 'Поиск', icon: 'search'},
         {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
-        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
+        // {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'about', name: 'О проекте', icon: 'panorama_fish_eye'},
         {id: 'settings', name: 'Настройки', icon: 'settings'},
       ]

@@ -1,23 +1,40 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(
-    v-if="viewId !== 'search'"
-    reveal @reveal="headerRevealed = $event"
+    reveal
     :style=`{
       paddingTop: 'env(safe-area-inset-top)',
     }`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
-          q-icon(name="explore" color="white" size="30px").q-mx-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Новое
+          ).row.full-width.items-center.content-center.justify-between.b-40
           .col
-          q-btn(
-            @click="viewId = 'search'"
-            round flat color="white" icon="search")
+            q-input(
+              v-model="searchString"
+              placeholder="Поиск"
+              flat borderless dark
+              icon="search"
+              :style=`{}`
+              :input-style=`{
+                color: 'white',
+                fontSize: '18px',
+                fontWeight: 'bold',
+              }`
+              ).full-width
+              template(v-slot:prepend)
+                q-icon(name="search" color="white" size="30px").q-ml-md
+              template(v-slot:append)
+                q-btn(
+                  v-if="searchString.length > 0"
+                  @click="searchString = ''"
+                  round flat dense color="white" icon="clear").q-mr-sm
   q-page-container
-    component(:is="`view-${viewId}`" :oid="$route.params.oid" @close="viewId = 'trends'" :headerRevealed="headerRevealed")
+    component(
+      :is="`page-${pageId}`"
+      :oid="$route.params.oid"
+      :searchString="searchString"
+      @close="viewId = 'trends'")
 </template>
 
 <script>
@@ -26,13 +43,26 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageApp_trends',
   components: {
-    viewTrends: () => import('./view_trends.vue'),
-    viewSearch: () => import('./view_search.vue'),
+    pageTrends: () => import('./page_trends/index.vue'),
+    pageSearch: () => import('./page_search/index.vue'),
   },
   data () {
     return {
-      viewId: 'trends',
-      headerRevealed: false
+      pageId: 'trends',
+      searchString: '',
+    }
+  },
+  watch: {
+    searchString: {
+      handler (to, from) {
+        this.$log('searchString TO', to)
+        if (to.length > 0) {
+          this.pageId = 'search'
+        }
+        else {
+          this.pageId = 'trends'
+        }
+      }
     }
   },
   mounted () {

@@ -39,7 +39,7 @@ q-page(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'trends_viewTrends',
+  name: 'trends_pageTrends',
   props: ['oid', 'headerRevealed'],
   data () {
     return {

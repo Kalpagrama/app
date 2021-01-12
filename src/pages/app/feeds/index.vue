@@ -5,8 +5,10 @@ q-layout(view="hHh Lpr lff")
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-sm.b-40
-          q-icon(name="home" color="white" size="30px").q-mx-sm
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Домашняя
+          //- q-icon(name="home" color="white" size="30px").q-mx-sm
+          div(:style=`{width: '30px', height: '30px',}`).row.items-center.content-center.justify-center.q-mr-sm
+            kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
+          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Лента
           .col
           //- q-btn(round flat color="white" icon="launch" @click="feedCollection()")
   q-page-container
