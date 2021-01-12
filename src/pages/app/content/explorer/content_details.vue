@@ -13,7 +13,7 @@
         //- HEADER:
         //- .row.full-width.q-py-sm.q-px-sm
           q-btn(
-            @click="$router.back()"
+            @click="$routerKalpa.back()"
             round flat color="white" icon="west")
           .col
             span.text-white.text-bold {{ contentKalpa.name }}

@@ -45,6 +45,17 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     })
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
+    Vue.prototype.$routerKalpa = new Proxy(VueRouter, {
+      get (target, prop) {
+        alert(prop)
+        if (prop === 'back'){
+          if (window.history.length > 2) return VueRouter.back
+          else return VueRouter.push.bind(target, '/')
+        }
+        let value = target[prop]
+        return (typeof value === 'function') ? value.bind(target) : value // иначе - this - будет указывать на Proxy
+      }
+    })
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
     Vue.prototype.$tween = TweenMax

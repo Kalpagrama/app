@@ -8,7 +8,7 @@ q-layout(view="hHh Lpr lff")
             minHeight: '60px',
             borderRadius: '10px', overflow: 'hidden',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-btn(round flat color="white" icon="west" @click="$router.back()")
+          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           q-icon(name="blur_on" color="white" size="30px")
           .col.q-px-sm
             span(

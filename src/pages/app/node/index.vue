@@ -10,7 +10,7 @@ q-layout(
           borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-px-sm.b-40
-        q-btn(round flat color="white" icon="west" @click="$router.back()").q-mr-sm
+        q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()").q-mr-sm
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-footer(
@@ -38,7 +38,7 @@ q-layout(
         }`
         ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
         q-btn(
-          @click="$router.back()"
+          @click="$routerKalpa.back()"
           flat color="grey-7" icon="west" no-caps
           :style=`{maxWidth: '60px'}`)
           .row.full-width.justify-center

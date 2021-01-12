@@ -40,7 +40,7 @@ q-layout(view="hHh Lpr lff").b-30
         v-if="true"
         ).row.full-width.justify-center
         div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-between.q-pa-sm
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
           span(:style=`{fontSize: '18px'}`).text-white.text-bold Создание связи
           q-btn(round flat color="white" icon="more_vert")
       //- items
