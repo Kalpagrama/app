@@ -15,9 +15,11 @@ div(
       :contentKalpa="contentKalpa"
       :style=`{
         position: 'absolute',
-        zIndex: 100, top: 0,
+        zIndex: 100,
+        top: 0,
       }`
-      @player="player = $event, $emit('player', $event)").fit
+      :styles="styles"
+      @player="player = $event, $emit('player', $event)")
   //- player tint
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(

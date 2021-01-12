@@ -7,6 +7,7 @@ component(
   :isActive="isActive"
   :styles="styles"
   :options="options")
+  slot
 </template>
 
 <script>

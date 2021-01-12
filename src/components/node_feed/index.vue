@@ -8,6 +8,7 @@
 div(
   :style=`{
     position: 'relative',
+    ...styles,
   }`
   ).row.full-width.items-start.content-start
   div(
@@ -17,6 +18,7 @@ div(
       //- borderRadius: '10px',
       //- borderRadius: '10px 10px 30px 30px',
       borderRadius: borderRadius,
+      //- ...styles,
     }`).row.full-width.items-start.content-start
     //- HEADER: author, createdAt
     div(
@@ -147,6 +149,7 @@ export default {
     showCategory: {type: Boolean, default: true},
     showItems: {type: Boolean, default: true},
     itemsStyles: { type: Array, default () { return [{}, {}] } },
+    styles: {type: Object},
     borderRadius: {type: String, default: '10px'}
   },
   data () {
@@ -167,7 +170,8 @@ export default {
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
-        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
+        // return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
+        return '/node/' + this.node.oid
       }
       else {
         return '/node/' + this.node.oid

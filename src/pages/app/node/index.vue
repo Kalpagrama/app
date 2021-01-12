@@ -13,11 +13,32 @@ q-layout(
         q-btn(round flat color="white" icon="west" @click="$router.back()").q-mr-sm
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
-  q-footer(
+  q-header(reveal).b-30
+    .row.full-width.justify-center
+      div(
+        v-if="node"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        node-feed(
+          :node="node"
+          :isActive="true"
+          :isVisible="true")
+        //- widgets
+        widget-joints(:node="node")
+  q-footer(reveal).b-40
+    div(
+      v-if="pageId"
+      :style=`{
+        height: pageHeight+'px',
+        borderRadius: '10px 10px 0 0',
+      }`).row.full-width.b-40
+    nav-mobile(
+      :pageId="pageId"
+      @pageId="pageIdChange")
+  //- q-footer(
     reveal)
     transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
-        v-if="showEssences"
+        v-if="true"
         :style=`{height: '526px'}`).column.full-width.b-30
         .row.full-width.items-center.content-center
           .col.q-pa-sm
@@ -28,47 +49,7 @@ q-layout(
             v-for="n in 100" :key="n" :style=`{}`
             ).row.full-width.q-pa-sm.q-mb-sm
             span.text-white lorem ipsum {{ n }}
-    //- navigation
-    .row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          height: '70px',
-          borderRadius: '10px 10px 0 0',
-        }`
-        ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
-        q-btn(
-          @click="$router.back()"
-          flat color="grey-7" icon="west" no-caps
-          :style=`{maxWidth: '60px'}`)
-          .row.full-width.justify-center
-            small Назад
-        q-btn(
-          flat icon="tonality" no-caps
-          :color="pageId === 'drafts' ? 'green' : 'grey-7'"
-          :style=`{maxWidth: '60px'}`)
-          .row.full-width.justify-center
-            small Разборы
-        q-btn(
-          @click="jointCreating = !jointCreating"
-          color="green" icon="link"
-          :style=`{
-            width: '50px', height: '50px',
-            borderRadius: '50%',
-          }`)
-        q-btn(
-          flat icon="list" no-caps
-          :color="pageId === 'drafts' ? 'green' : 'grey-7'"
-          :style=`{maxWidth: '60px'}`)
-          .row.full-width.justify-center
-            small Смыслы
-        q-btn(
-          flat icon="link" no-caps
-          :color="pageId === 'drafts' ? 'green' : 'grey-7'"
-          :style=`{maxWidth: '60px'}`)
-          .row.full-width.justify-center
-            small Связи
-  q-page-container
+  //- q-page-container
     q-page.row.full-width.justify-center
       div(
         v-if="node"
@@ -94,11 +75,25 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import navMobile from './nav_mobile.vue'
+import widgetJoints from './widget_joints/index.vue'
+
+import pageInside from './page_inside/index.vue'
+import pageNames from './page_names/index.vue'
+
 export default {
   name: 'pageApp_node',
+  components: {
+    navMobile,
+    widgetJoints,
+    pageInside,
+    pageNames,
+  },
   data () {
     return {
       node: null,
+      pageId: null,
+      pageHeight: 0,
       showEssences: false,
     }
   },
@@ -125,8 +120,32 @@ export default {
       }
     },
   },
-  created () {
-    this.$log('created')
+  methods: {
+    pageIdChange (pageId) {
+      if (this.pageId === pageId) {
+        // this.pageId = null
+        this.$tween.to(this, 0.3, {
+          pageHeight: 0,
+          onComplete: () => {
+            this.pageId = null
+          }
+        })
+      }
+      else {
+        this.pageId = pageId
+        // this.pageHeight
+        // TODO: get height from node_feed, different what? checkpoints of height?
+        // author/items/name/spheres/actions/padding ?
+        this.$tween.to(this, 0.3, {
+          pageHeight: this.$q.screen.height / 2,
+          onComplete: () => {}
+        })
+        // and ???
+      }
+    }
+  },
+  mounted () {
+    this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
   },
   beforeDestroy () {

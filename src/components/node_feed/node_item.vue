@@ -3,6 +3,7 @@ div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
+    //- ...styles,
   }`
   ).row.full-width
   //- div(
@@ -17,7 +18,7 @@ div(
       :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
       :styles=`{
         height: '100%',
-        objectFit: 'contain',
+        objectFit: 'cover',
       }`
       :options=`{
         loop: true,
@@ -40,7 +41,8 @@ export default {
   },
   computed: {
     ratioMax () {
-      return 0.6
+      // return 0.6
+      return 1
     },
     ratio () {
       let height = this.node.items[0].thumbHeight

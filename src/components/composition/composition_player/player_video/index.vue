@@ -3,8 +3,9 @@ div(
   :style=`{
     position: 'relative',
     height: styles.height,
-    }`
+  }`
   ).row.full-width.items-start.content-start
+  slot
   //- preview
   img(
     draggable="false"
@@ -49,7 +50,7 @@ div(
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'compositionPlayer_playerVideo',
+  name: 'compositionPlayer_Video',
   components: {
     contentPlayer
   },
