@@ -3,8 +3,9 @@ div(
   :style=`{
     position: 'relative',
     height: styles.height,
-    }`
+  }`
   ).row.full-width.items-start.content-start
+  slot
   //- preview
   img(
     draggable="false"
@@ -23,6 +24,8 @@ div(
     v-if="isActive && isVisible"
     @player="player = $event"
     :contentKalpa=`{
+      oid: composition.layers[0].contentOid,
+      name: composition.layers[0].contentName,
       url: composition.url,
       type: 'VIDEO',
       contentSource: 'KALPA',
@@ -38,28 +41,16 @@ div(
     }`
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      borderRadius: '10px',
-      opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
+      //- borderRadius: '10px',
+      //- opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
-  //- router-link(
-    :to="'/content/'+composition.layers[0].contentOid"
-    :style=`{
-      position: 'absolute', zIndex: 200, top: '0px', left: '0px',
-      background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%)',
-      borderRadius: '10px 10px 0 0',
-    }`
-    ).row.full-width.items-center.content-center.q-pa-sm
-    q-icon(name="select_all" color="white" size="26px").q-mr-sm
-    small.text-white {{ composition.layers[0].contentName }}
-  //- .row.full-width.bg-red
-    span {{ figures }}
 </template>
 
 <script>
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'compositionPlayer_playerVideo',
+  name: 'compositionPlayer_Video',
   components: {
     contentPlayer
   },

@@ -3,11 +3,14 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.fit
+  ).row.full-width
   //- footer
   div(
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '0px',
+      //- position: 'absolute', zIndex: 1000, bottom: '0px',
+      position: 'fixed', zIndex: 1000, bottom: '0px',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      order: 10,
     }`
     ).row.full-width.items-center.content-center
     div(
@@ -125,20 +128,51 @@ export default {
   },
   methods: {
     create () {
-      let start = this.player.currentTime
-      let end = start + 30 > this.player.duration ? this.player.duration : start + 30
-      let composition = {
-        id: Date.now().toString(),
-        thumbUrl: this.contentKalpa.thumbUrl,
-        thumbHeight: this.contentKalpa.thumbHeight,
-        thumbWidth: this.contentKalpa.thumbWidth,
-        outputType: 'VIDEO',
-        layers: [
-          {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
-        ],
-        operation: { items: null, operations: null, type: 'CONCAT'},
-        __typename: 'Composition',
+      let composition
+      // VIDEO select 30 sec from currentTime
+      if (this.contentKalpa.type === 'VIDEO') {
+        let start = this.player.currentTime
+        let end = start + 30 > this.player.duration ? this.player.duration : start + 30
+        composition = {
+          id: Date.now().toString(),
+          thumbUrl: this.contentKalpa.thumbUrl,
+          thumbHeight: this.contentKalpa.thumbHeight,
+          thumbWidth: this.contentKalpa.thumbWidth,
+          outputType: 'VIDEO',
+          layers: [
+            {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT'},
+          __typename: 'Composition',
+        }
       }
+      // IMAGE select all image
+      else if (this.contentKalpa.type === 'IMAGE') {
+        composition = {
+          id: Date.now().toString(),
+          thumbUrl: this.contentKalpa.thumbUrl,
+          thumbHeight: this.contentKalpa.thumbHeight,
+          thumbWidth: this.contentKalpa.thumbWidth,
+          outputType: 'IMAGE',
+          layers: [
+            {
+              id: Date.now().toString(),
+              contentOid: this.contentKalpa.oid,
+              figuresAbsolute: [
+                {t: null, points: []}
+                // {t: null, points: [{x: 0, y: 0}]},
+                // {t: null, points: [{x: 100, y: 0}]},
+                // {t: null, points: [{x: 0, y: 100}]},
+                // {t: null, points: [{x: 100, y: 100}]}
+              ]},
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT'},
+          __typename: 'Composition',
+        }
+      }
+      // BOOK
+      // AUDIO: like video 30 sec from currentTime
+      // WEB
       let node = JSON.parse(JSON.stringify(this.nodeNew))
       node.items[0] = composition
       this.node = node

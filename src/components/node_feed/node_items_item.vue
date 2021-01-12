@@ -2,11 +2,21 @@
 div(
   :style=`{
     borderRadius: '12px',
-    ...itemStyles,
+    //- ...itemStyles,
+    ...styles,
   }`
-  ).row.fit
+  ).row.full-width
   slot
   //- NODE
+  //- node-feed(
+    v-if="item && item.type === 'NODE'"
+    :node="item"
+    :isActive="isActive"
+    :showHeader="itemOpened"
+    :showName="itemOpened"
+    :showActions="itemOpened"
+    :showSpheres="itemOpened"
+    )
   composition-player(
     v-if="item && item.type === 'NODE'"
     :oid="oid"
@@ -14,13 +24,46 @@ div(
     :isActive="itemActive"
     :isVisible="true"
     :styles=`{
-      height: '100%',
-      objectFit: 'cover',
+      //- height: '100%',
+      //- objectFit: 'cover',
+      //- objectFit: 'contain',
+      ...styles,
     }`
     :options=`{
       loop: true,
       showBar: false,
     }`)
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 200, bottom: '-0.8px',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
+        borderRadius: '0 0 10px 10px',
+      }`
+      ).row.full-width.justify-center
+      router-link(
+        :to="'/node/'+item.oid"
+        :style=`{
+          height: '36px',
+          textAlign: 'center',
+        }`
+        ).row.items-center.content-center.scroll
+        //- .row.full-width.br
+        q-btn(
+          v-if="item.__typename === 'Composition'"
+          round flat dense color="white" icon="select_all")
+        span(
+          v-else
+          :style=`{
+            whiteSpace: 'nowrap',
+            marginLeft: '8px',
+            textAlign: 'center',
+          }`).text-white.q-mr-sm {{ item.name }}
+    //- div(
+      :style=`{
+        position: 'absolute', zIndex: 1000, bottom: '0px',
+      }`
+      ).row.full-width.bg-red.q-pa-md
+      small footer
   //- COMPOSITION
   composition-player(
     v-else-if="item && item.__typename === 'Composition'"
@@ -29,8 +72,10 @@ div(
     :isActive="itemActive"
     :isVisible="true"
     :styles=`{
-      height: '100%',
-      objectFit: 'cover',
+      //- height: '100%',
+      //- objectFit: 'cover',
+      //- objectFit: 'contain',
+      ...styles
     }`
     :options=`{
       loop: true,
@@ -51,19 +96,20 @@ div(
     :src="item.thumbUrl"
     :style=`{
       borderRadius: '10px',
-      objectFit: 'cover',
       borderRadius: '10px',
+      objectFit: 'cover',
     }`
     ).fit.b-30
   //- context and name
-  div(
+  //- div(
     :style=`{
-      position: 'absolute', zIndex: 200,
+      position: 'absolute',
+      zIndex: 200,
       bottom: '-0.5px',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.justify-center
+    ).row.full-width.items-center.content-center.justify-center.q-py-sm.br
     div(
       :style=`{
         borderRadius: '10px',
@@ -98,7 +144,7 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 
 export default {
   name: 'nodeFeed__nodeItemsItem',
-  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemVertex', 'itemStyles', 'stylesName'],
+  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'itemVertex', 'itemStyles', 'stylesName', 'styles'],
   components: {
     compositionPlayer,
   },

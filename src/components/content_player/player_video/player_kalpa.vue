@@ -2,6 +2,7 @@
 div(
   :style=`{
     position: 'relative',
+    ...styles,
   }`
   ).row.full-width.items-start.content-start.justify-center
   video(
@@ -14,14 +15,15 @@ div(
     :loop="true"
     :muted="muted"
     :style=`{
-      objectFit: objectFit,
       borderRadius: '10px',
-      overflow: 'hidden',
+      //- objectFit: objectFit,
+      //- overflow: 'hidden',
+      ...styles,
     }`
     @loadeddata="loadeddataHandle"
     @timeupdate="timeupdateHandle"
     @play="playHandle"
-    @pause="pauseHandle").fit
+    @pause="pauseHandle").full-width
 </template>
 
 <script>
@@ -30,7 +32,16 @@ export default {
   props: {
     contentKalpa: {type: Object, required: true},
     url: {type: String, required: true},
-    objectFit: {type: String, default () { return 'cover' }}
+    // objectFit: {type: String, default () { return 'cover' }},
+    styles: {
+      type: Object,
+      default () {
+        return {
+          height: '100%',
+          objectFit: 'cover',
+        }
+      }
+    }
   },
   data () {
     return {

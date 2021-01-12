@@ -19,21 +19,20 @@ div(
       ).row.full-height.b-90
     p.text-white.text-caption {{ name }}
     router-link(
-      v-if="contentKalpa"
-      :to="'/content/'+contentKalpa.oid"
+      v-if="true"
+      :to="'/content/'+composition.layers[0].contentOid"
       ).row.full-width
-      small.text-white.text-italic {{ contentKalpa.name }}
+      small.text-white.text-italic {{ composition.layers[0].contentName }}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'playerBook',
+  name: 'compositionPlayer_Book',
   props: ['composition'],
   data () {
     return {
-      contentKalpa: null,
     }
   },
   computed: {
@@ -46,12 +45,12 @@ export default {
     }
   },
   methods: {
-    // setState (key, val) {},
-    // play () {}
   },
   async mounted () {
-    this.$log('mounted')
-    if (!this.contentKalpa) this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.layers[0].contentOid))
+    // this.$log('mounted')
   },
+  beforeDestroy () {
+    // this.$log('beforeDestroy')
+  }
 }
 </script>

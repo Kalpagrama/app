@@ -19,7 +19,7 @@
       :color="pageId === 'nodes' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Смыслы
+        small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     q-btn(
       @click="$emit('create-start')"
       round flat color="green"
@@ -31,7 +31,7 @@
       q-icon(name="add_circle_outline" size="40px")
     q-btn(
       @click="$emit('pageId', 'drafts')"
-      flat icon="tonality" no-caps
+      flat icon="filter_tilt_shift" no-caps
       :color="pageId === 'drafts' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center

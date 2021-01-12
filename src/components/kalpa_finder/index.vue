@@ -19,9 +19,11 @@ q-layout(
               v-for="p in pagesFiltered" :key="p.id"
               :name="p.id" :label="p.name")
       //- search
-      div().row.full-width.justify-center
+      div(
+        v-if="!searchString"
+        ).row.full-width.justify-center
         ws-search(
-          @searchString="searchString = $event"
+          @searchString="searchStringLocal = $event"
           @contentKalpa="contentKalpaFound"
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
@@ -30,7 +32,7 @@ q-layout(
     component(
       v-bind="$props"
       :is="`page-${pageId}`"
-      :searchString="searchString"
+      :searchString="searchStringLocal"
       :page="page"
       :style=`{}`)
       template(v-slot:tint=`{item}`)
@@ -48,6 +50,7 @@ export default {
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
     pages: {type: Object},
+    searchString: {type: String},
   },
   components: {
     wsSearch: () => import('components/ws_search/index.vue'),
@@ -61,7 +64,7 @@ export default {
   data () {
     return {
       pageId: null,
-      searchString: ''
+      searchStringLocal: ''
     }
   },
   computed: {
@@ -88,6 +91,13 @@ export default {
     }
   },
   watch: {
+    searchString: {
+      handler (to, from) {
+        if (to) {
+          this.searchStringLocal = to
+        }
+      }
+    },
     pageId_: {
       immediate: true,
       handler (to, from) {

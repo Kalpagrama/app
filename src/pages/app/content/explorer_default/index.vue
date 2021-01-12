@@ -1,96 +1,71 @@
 <template lang="pug">
-div(
+q-layout(
   view="hHh Lpr lff"
-  :style=`{
-    minHeight: $q.screen.height+'px'
-  }`).row.full-width.bg-black
-  q-resize-observer(@resize="onResize" :debounce="300")
-  //- footer
-  div(
-    v-if="showMenu"
-    reveal
-    :style=`{
-      position: 'fixed', zIndex: 1000, bottom: '0px',
-    }`).row.full-width
+  ).bg-black
+  //- q-resize-observer(@resize="onResize" :debounce="300")
+  q-header().bg-black
     .row.full-width.justify-center
       div(
         :style=`{
-          height: (pageId || nodeCreating) ? $q.screen.height-heightPage+'px' : 70+'px',
-          //- height: $q.screen.height-heightPage+'px',
-          maxWidth: $store.state.ui.pageWidth+'px',
-          borderRadius: '10px 10px 0 0',
-          //- paddingBottom: 'env(safe-area-inset-bottom)',
-        }`
-        ).row.full-width.items-start.content-start.b-40
-        node-creator(
-          v-if="player && nodeCreating"
-          :contentKalpa="contentKalpa"
-          :player="player"
-          @cancel="nodeCancelled"
-          @publish="nodePublished")
-        //- navigation
-        div(
-          v-if="!nodeCreating"
-          ).column.fit
-          div(v-if="pageId").col.full-width.scroll
-            component(
-              :is="`page-${pageId}`"
-              :contentKalpa="contentKalpa"
-              :player="player")
-          nav-mobile(
-            v-if="!node"
-            @create-start="essenceCreateStart()"
-            @pageId="pageIdChange"
-            :pageId="pageId"
-            :style=`{
-              zIndex: 1000,
-            }`)
-  //- body
-  .row.full-width.justify-center
-    div(
-      :style=`{
-        position: 'relative',
-        //- paddingBottom: 'env(safe-area-inset-bottom)',
-        maxWidth: player ? player.isFullscreen ? '100%' : $store.state.ui.pageWidth+'px' : $store.state.ui.pageWidth+'px',
-        //- height: (pageId || nodeCreating) ? heightPage+'px' : ($q.screen.height-65)+'px',
-        height: (pageId || nodeCreating) ? heightPage+'px' : ($q.screen.height-70)+'px',
-      }`
-      ).row.full-width.justify-center
-      div(
-        :style=`{
+          //- height: 'calc('+ ($q.screen.height-500) +'px - 70px - 15px - env(safe-area-inset-bottom))',
           position: 'relative',
+          height: 'calc('+ heightContent +'px - 0px - 0px - env(safe-area-inset-bottom))',
+          maxWidth: $store.state.ui.pageWidth+'px',
         }`
-        ).row.fit
+        ).row.full-width.bg-black
         content-player(
           @player="player = $event"
           :contentKalpa="contentKalpa"
           :style=`{
             height: '100%',
           }`
-          ).full-width.bg-black
-        //- actions
-        div(
-          :style=`{
-            position: 'absolute', zIndex: 3000, bottom: '0px',
+          :styles=`{
+            height: '100%',
+            objectFit: 'contain',
+            padding: {
+              paddingTop: '50px',
+            }
           }`
-          ).row.full-width.justify-center
-          div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-            //- q-btn(
-              v-if="showMenu && !pageId"
-              @click="essenceCreateStart()"
-              round flat dense color="green" icon="add_circle_outline"
-              :style=`{
-                position: 'absolute', zIndex: 3000,
-                right: '12px', top: '-44px'
-              }`)
-            //- q-btn(
-              v-if="!showMenu && !pageId"
-              @click="showMenu = true"
-              round flat dense color="white" icon="keyboard_arrow_up"
-              :style=`{
-                position: 'absolute', zIndex: 3000,
-                right: '12px', top: '-44px'
-              }`)
+          ).full-width.bg-black
+  q-footer(
+    v-if="!nodeCreating"
+    reveal
+    :style=`{
+      //- paddingBottom: 'env(safe-area-inset-bottom)',
+    }`)
+    .row.full-width.justify-center
+      div(
+        :style=`{
+          borderRadius: '10px 10px 0 0',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }`
+        ).row.full-width.b-40
+        nav-mobile(
+          v-if="!nodeCreating"
+          @create-start="essenceCreateStart()"
+          @pageId="pageIdChange"
+          :pageId="pageId"
+          :style=`{
+            zIndex: 1000,
+          }`)
+  q-page-container
+    q-page(
+      :style=`{
+        paddingTop: '15px',
+      }`).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        node-creator(
+          v-if="player && nodeCreating"
+          :contentKalpa="contentKalpa"
+          :player="player"
+          @cancel="nodeCancelled"
+          @publish="nodePublished")
+        component(
+          v-if="!nodeCreating"
+          :is="`page-${pageId}`"
+          :contentKalpa="contentKalpa"
+          :player="player")
 </template>
 
 <script>
@@ -137,8 +112,13 @@ export default {
       let width = Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth)
       // let height = (width * this.contentKalpa.thumbHeight) / this.contentKalpa.thumbWidth
       let d = this.contentKalpa.thumbHeight / this.contentKalpa.thumbWidth
-      return width * d
-    }
+      let height = width * d
+      return height
+      // return Math.min(height, width)
+    },
+    heightContent () {
+      return (this.pageId || this.nodeCreating) ? this.heightPage : this.$q.screen.height - 70 - 15
+    },
   },
   watch: {
   },
@@ -160,9 +140,9 @@ export default {
       this.$log('essenceCreateStart')
       // go to square/essence height
       this.nodeCreating = true
-      this.$tween.to(this, 0.3, {
-        headerHeight: this.$q.screen.height - this.heightSquare
-      })
+      // this.$tween.to(this, 0.3, {
+      //   headerHeight: this.$q.screen.height - this.heightSquare
+      // })
     },
     nodeCancelled () {
       this.$log('nodeCancelled')

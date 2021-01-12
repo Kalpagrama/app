@@ -9,14 +9,30 @@
 
 <template lang="pug">
 div(
-  :class=`{
-  }`
   :style=`{
     position: 'relative',
     ...styles,
   }`
   ).row.full-width
-  image-cropper(
+  img(
+    v-if="contentKalpa.url"
+    draggable="false"
+    :src="contentKalpa.url"
+    :style=`{
+      objectFit: 'contain',
+      borderRadius: '10px',
+    }`
+    ).fit
+  player-tint(
+    :contentKalpa="contentKalpa")
+  //- div(
+    :style=`{
+      position: 'absolute', top: 0,
+      zIndex: 200,
+      background: 'rgb(0,0,0,0.5)',
+    }`
+    ).row.fit.bg
+  //- image-cropper(
     v-if="contentKalpa.url"
     ref="imageCropper"
     :src="contentKalpa.url"
@@ -42,7 +58,8 @@ div(
       //- border: imageValid ? 'none' : '2px solid red',
       borderRadius: '10px', overflow: 'hidden',
     }`)
-  div(
+  //- footer
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '8px',
     }`
@@ -65,7 +82,8 @@ div(
         round flat dense
         :color="cropping ? 'white' : 'green'"
         :icon="cropping ? 'clear' : 'add_circle_outline'")
-  div(
+  //- publish
+  //- div(
     v-if="url"
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '50px',
@@ -102,17 +120,19 @@ div(
 </template>
 
 <script>
+import playerTint from './player_tint.vue'
 import imageCropper from 'components/image_cropper/index.vue'
 
 export default {
   name: 'contentPlayer_image',
   props: ['contentKalpa', 'styles'],
   components: {
+    playerTint,
     imageCropper,
   },
   data () {
     return {
-      // currentPage: 0,
+      events: {},
       figures: [],
       points: [],
       isFullscreen: false,
@@ -142,6 +162,9 @@ export default {
       this.$log('setState', key, val)
       this[key] = val
     },
+    play () {},
+    pause () {},
+    setCurrentTime (t) {},
     async imageCrop () {
       this.$log('imageCrop')
       // TODO: get data...
@@ -158,6 +181,17 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$emit('player', this)
+    this.events = {
+      on: (event, cb) => {
+        // if (this.$refs.videoRef) this.$refs.videoRef.addEventListener(event, cb)
+      },
+      off: (event, cb) => {
+        // if (this.$refs.videoRef) this.$refs.videoRef.removeEventListener(event, cb)
+      },
+      emit: (event, val) => {
+        // if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+      }
+    }
     this.isFullscreen = true
   },
   beforeDestroy () {
