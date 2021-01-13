@@ -8,6 +8,7 @@
 div(
   :style=`{
     position: 'relative',
+    //- border: isActive ? '2px solid red' : '2px solid rgb(30,30,30)',
     ...styles,
   }`
   ).row.full-width.items-start.content-start
@@ -53,7 +54,7 @@ div(
         fontSize: nodeNameSize+'px',
         textAlign: 'center',
       }`
-      ).row.full-width.items-center.content-center.justify-center
+      ).row.full-width.items-center.content-center.justify-center.q-px-sm
       span.text-white.text-bold {{ nodeName }}
     //- SPHERES
     div(

@@ -4,6 +4,7 @@ div(
     borderRadius: '12px',
     //- ...itemStyles,
     ...styles,
+    //- border: itemActive ? '2px solid red' : '2px solid rgb(30,30,30)',
   }`
   ).row.full-width
   slot

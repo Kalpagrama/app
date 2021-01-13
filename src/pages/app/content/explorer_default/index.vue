@@ -7,26 +7,29 @@ q-layout(
     .row.full-width.justify-center
       div(
         :style=`{
-          //- height: 'calc('+ ($q.screen.height-500) +'px - 70px - 15px - env(safe-area-inset-bottom))',
+          //- height: 'calc('+ ($q.screen.height-500) +'px - 70px - 0px - env(safe-area-inset-bottom))',
           position: 'relative',
           height: 'calc('+ heightContent +'px - 0px - 0px - env(safe-area-inset-bottom))',
           maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '0 0 10px 10px',
         }`
-        ).row.full-width.bg-black
-        content-player(
-          @player="player = $event"
-          :contentKalpa="contentKalpa"
-          :style=`{
-            height: '100%',
-          }`
-          :styles=`{
-            height: '100%',
-            objectFit: 'contain',
-            padding: {
-              paddingTop: '50px',
-            }
-          }`
-          ).full-width.bg-black
+        ).column.full-width.bg-black
+        div(:style=`{position: 'relative',}`).col
+          content-player(
+            @player="player = $event"
+            :contentKalpa="contentKalpa"
+            :style=`{
+              height: '100%',
+            }`
+            :styles=`{
+              height: '100%',
+              objectFit: 'contain',
+              padding: {
+                paddingTop: '50px',
+              }
+            }`
+            ).full-width.bg-black
+        .row.full-width.q-py-sm
   q-footer(
     v-if="!nodeCreating"
     reveal
@@ -113,7 +116,7 @@ export default {
       // let height = (width * this.contentKalpa.thumbHeight) / this.contentKalpa.thumbWidth
       let d = this.contentKalpa.thumbHeight / this.contentKalpa.thumbWidth
       let height = width * d
-      return height
+      return height + 20
       // return Math.min(height, width)
     },
     heightContent () {

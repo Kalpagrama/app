@@ -16,7 +16,7 @@ div(
       userSelect: 'none',
       height: styles.height,
       objectFit: styles.objectFit,
-      //- border: (player && player.currentTime < figures[0].t) ? '2px solid red' : 'none'
+      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)'
     }`
     ).full-width
   //- video wrapper
@@ -42,7 +42,7 @@ div(
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
       //- borderRadius: '10px',
-      //- opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
+      opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
 </template>
 

@@ -12,12 +12,15 @@
     ).row.full-width.justify-center.q-py-sm
     small.text-grey-9 {{ title }}
   //- body
-  .row.full-width.items-start.content-start.justify-center.q-px-sm
+  div(
+    :style=`{
+      ...styles,
+    }`
+    ).row.full-width.items-start.content-start.justify-center.q-px-sm
     router-link(
       v-for="(d,di) in docs" :key="di"
       :to="'/docs/'+d.id"
       :style=`{
-        //- textAlign: textAlign
       }`
       ).row.full-width.justify-start
       small.text-grey-9.doc-item {{ d.name }}
@@ -26,15 +29,11 @@
 <script>
 export default {
   name: 'kalpaDocs',
-  // props: ['title'],
   props: {
     title: {
       type: String
     },
-    // textAlign: {
-    //   type: String,
-    //   default: 'center'
-    // }
+    styles: {type: Object, default: {}}
   },
   data () {
     return {

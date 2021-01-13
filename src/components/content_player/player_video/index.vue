@@ -25,7 +25,7 @@ div(
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === false"
-      @click="tintShow = true"
+      @click="player.muted ? player.setState('muted', false) : tintShow = true"
       :style=`{
         position: 'absolute', zIndex: 900,
       }`
@@ -67,7 +67,7 @@ div(
         ).row.items-center.content-center.justify-center
         q-btn(
           @click="tapClick(0)"
-          round flat color="white" size="lg"
+          round flat color="white" size="md"
           :style=`{
             borderRadius: '50%',
           }`)
@@ -75,7 +75,7 @@ div(
             name="replay_5" size="40px" color="white")
         q-btn(
           @click="player.playing ? player.pause() : player.play()"
-          round flat color="white" size="xl"
+          round flat color="white" size="lg"
           :style=`{
             borderRadius: '50%',
           }`).q-mx-lg
@@ -84,7 +84,7 @@ div(
             :name="player.playing ? 'pause' : 'play_arrow'")
         q-btn(
           @click="tapClick(1)"
-          round flat color="white" size="lg"
+          round flat color="white" size="md"
           :style=`{
             borderRadius: '50%',
           }`)
@@ -92,7 +92,7 @@ div(
             name="forward_5" size="40px" color="white")
       //- FOOTER
       //- sound
-      q-btn(
+      //- q-btn(
         @click="volumeToggle()"
         round flat dense
         :color="player.muted ? 'red' : 'white'"
@@ -102,6 +102,17 @@ div(
           right: '8px',
           bottom: 'calc(50% - 16px)',
         }`)
+  q-btn(
+    v-if="player"
+    @click="volumeToggle()"
+    round flat dense
+    :color="player.muted ? 'red' : 'white'"
+    :icon="player.muted ? 'volume_off' : 'volume_up'"
+    :style=`{
+      position: 'absolute', zIndex: 901,
+      right: '8px',
+      bottom: 'calc(50% - 16px)',
+    }`)
   //- player mini-bar
   player-bar-mini(
     v-if="player" :player="player" :figures="figures"
