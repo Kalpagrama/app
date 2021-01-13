@@ -159,6 +159,12 @@ export default {
     // }
     this.$log('created')
     this.player.play()
+    if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
+      let muted = localStorage.getItem('k_muted')
+      if (muted === 'false') {
+        this.player.setState('muted', false)
+      }
+    }
   },
   computed: {
     start () {
@@ -218,10 +224,10 @@ export default {
             this.setCurrentTime(0)
             this.player.play()
           }
-          if (to < this.start) {
-            this.setCurrentTime(0)
-            // this.player.play()
-          }
+          // if (to < this.start) {
+          //   this.setCurrentTime(0)
+          //   // this.player.play()
+          // }
           // if (to === this.start) {
           //   this.player.play()
           // }

@@ -61,6 +61,15 @@ export default {
       this.$log('setState', key, val)
       if (this[key] === undefined) return
       this.$set(this, key, val)
+      if (key === 'muted') {
+        if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
+          localStorage.setItem('k_muted', val)
+          // let muted = localStorage.setItem('muted', 'false')
+          // if (muted === 'false') {
+          //   this.player.setState('muted', false)
+          // }
+        }
+      }
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
