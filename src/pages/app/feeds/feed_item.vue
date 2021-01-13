@@ -8,7 +8,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- header
-  div(
+  //- div(
     :style=`{
       borderRadius: '10px 10px 0 0',
       background: 'rgb(32,32,32)',
@@ -44,6 +44,9 @@
     small(v-else).text-grey-6.q-mr-sm {{ item.object.type }}
   //- object
   .row.full-width
+    node-feed(v-if="object" :node="object" :isActive="isActive" :isVisible="isVisible")
+    //- small.text-white {{ item.object }}
+  //- .row.full-width
     node-feed(v-if="object" :node="object" :isActive="isActive" :isVisible="isVisible" :width="width")
     //- VIDEO
     router-link(
@@ -82,7 +85,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'feedItem',
-  props: ['item', 'isActive', 'isVisible', 'width'],
+  props: ['item', 'isActive', 'isVisible'],
   components: {
   },
   data () {

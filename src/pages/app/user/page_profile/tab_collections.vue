@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center.q-py-xl
   div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-    span.text-white Скоро пользователи смогу делиться своими коллекциями
+    span.text-grey-6 Нет подборок
 </template>
 
 <script>

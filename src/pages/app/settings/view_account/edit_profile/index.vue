@@ -3,7 +3,10 @@
   //- header
   .row.full-width.q-px-md
     span.text-white.text-bold {{ $t('Profile', 'Профиль') }}
+  //- status
+  edit-status(:currentUser="currentUser")
   //- username
+  edit-username(:currentUser="currentUser")
   .row.full-width.q-pa-xs
     div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
       q-input(
@@ -32,8 +35,8 @@
         minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
       }`).full-width
   //- password
-  email-editor()
-  password-editor()
+  edit-email(:currentUser="currentUser")
+  edit-password(:currentUser="currentUser")
   //- save
   //- .row.full-width.justify-start.q-py-md.q-px-sm
     //- .col
@@ -52,6 +55,12 @@ import { rxdb } from 'src/system/rxdb'
 export default {
   name: 'editProfile',
   props: ['currentUser'],
+  components: {
+    editStatus: () => import('./edit_status.vue'),
+    editUsername: () => import('./edit_username.vue'),
+    editEmail: () => import('./edit_email.vue'),
+    editPassword: () => import('./edit_password.vue'),
+  },
   data () {
     return {
       loading: false,
@@ -62,6 +71,12 @@ export default {
         {value: 'ENG', label: 'English'},
         {value: 'RUS', label: 'Русский'},
       ],
+      form: {
+        username: '',
+        name: '',
+        lang: '',
+        email: ''
+      }
     }
   },
   methods: {

@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
-    .row.full-width.justify-center.b-30.q-px-sm.q-pt-sm
+    .row.full-width.justify-center.b-30.q-px-sm.q-py-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
           :style=`{

@@ -105,7 +105,7 @@
 import { AuthApi } from 'src/api/auth'
 
 export default {
-  name: 'passwordEditor',
+  name: 'editPassword',
   data () {
     return {
       loading: false,

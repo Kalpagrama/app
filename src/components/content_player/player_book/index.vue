@@ -495,6 +495,32 @@ export default {
         }
         // получить все абзацы для озвучки
         {
+          let currentLoc = await this.rendition.currentLocation()
+          let sectionLocation = await this.book.section(location.start.href)
+          let contentsLocation = await sectionLocation.load(this.book.load.bind(this.book))
+          let cfiBase = new EpubCFI(location.start.cfi)
+          let paragraphsLocation = findAllParagraphs(sectionLocation.document)
+          for (let i = 1; i < paragraphsLocation.length; i++){
+            let start = paragraphsLocation[i - 1]
+            let end = paragraphsLocation[i]
+            let range = document.createRange();
+            range.setStart(start, 0);
+            range.setEnd(end, 0);
+            let cfiParagraph = new EpubCFI(range, cfiBase.base)
+            this.$log('chapter range=', range)
+            this.$log('chapter range.visible=', range.startContainer.visible)
+            this.$log('chapter Paragraph=', range.toString())
+            this.$log('chapter cfiParagraph=', cfiParagraph.toString())
+            // start.addEventListener('click', (ev) => {
+            //   ev.preventDefault();
+            //   console.error(ev)
+            //   alert('contextmenu2')
+            //   // ev.preventDefault()
+            //   return false;
+            // })
+            // this.rendition.annotations.highlight(cfiParagraph.toString(), {})
+          }
+
           // let chapters = await getChapters(location.start.cfi, location.end.cfi)
           // for (let chapter of chapters){
           //   this.$log(chapter)

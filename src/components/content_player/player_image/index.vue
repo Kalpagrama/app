@@ -19,7 +19,8 @@ div(
     draggable="false"
     :src="contentKalpa.url"
     :style=`{
-      objectFit: 'contain',
+      //- objectFit: 'contain',
+      objectFit: 'cover',
       borderRadius: '10px',
     }`
     ).fit
