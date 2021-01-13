@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
-    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+    .row.full-width.justify-center.b-30.q-py-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-sm.b-40
@@ -10,27 +10,13 @@ q-layout(view="hHh Lpr lff")
             kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Лента
           .col
-          //- q-btn(round flat color="white" icon="launch" @click="feedCollection()")
+          q-btn(round flat color="grey-8" icon="more_vert")
   q-page-container
     q-page(
       :style=`{
         paddingTop: '8px', paddingBottom: '200px',
       }`)
-      //- kalpa-loader(
-        :immediate="true"
-        :query="queryFeeds" :limit="1000" v-slot=`{items,next}` @items="feeds = $event, feedsLoaded")
-      //- feed...
       feed(:feed="feed")
-      //- q-page-sticky(
-        expand position="top" :style=`{zIndex: 1000}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md
-            q-tabs(
-              :value="$route.params.id" @input="$router.push({params: {id: $event}}).catch(e => e)"
-              dense no-caps active-color="green" switch-indicator
-              ).full-width.text-grey-8
-              q-tab(name="all" label="Все")
-              q-tab(v-for="(feed,ii) in feeds" :key="feed.id" :name="feed.id" :label="feed.name" dense)
 </template>
 
 <script>

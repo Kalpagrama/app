@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  ).bg-black
+  ).b-30
   //- q-resize-observer(@resize="onResize" :debounce="300")
   q-header().bg-black
     .row.full-width.justify-center
@@ -178,10 +178,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    document.body.style.background = 'black !important'
+    // document.body.style.background = 'black'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    document.body.style.background = 'rgb(30,30,30)'
   }
 }
 </script>

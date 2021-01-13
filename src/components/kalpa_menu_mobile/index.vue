@@ -73,7 +73,7 @@
       :to="'/notifications/'"
       :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
-      q-badge(color="red" floating transparent) 9
+      q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
         small Активность
     //- currentUserPage

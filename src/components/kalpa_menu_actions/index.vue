@@ -9,7 +9,7 @@ q-btn(round flat :icon="icon" :color="color")
       ).row.full-width.items-start.content-start.b-40
       .row.full-width.items-center.content-center.q-pa-sm
         div(:style=`{overflow: 'hidden',}`).col
-          span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ title }}
+          span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold.q-ml-sm {{ title }}
         q-btn(round flat dense color="white" icon="clear" v-close-popup)
       //- kalpa-share(type="node" :item="node").full-width
         template(v-slot:btn=`{start}`)

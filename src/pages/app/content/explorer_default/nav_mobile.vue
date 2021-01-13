@@ -15,7 +15,7 @@
         small Назад
     q-btn(
       @click="$emit('pageId', 'nodes')"
-      flat icon="panorama_fish_eye" no-caps
+      flat icon="adjust" no-caps
       :color="pageId === 'nodes' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
