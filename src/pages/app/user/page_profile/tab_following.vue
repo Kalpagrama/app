@@ -36,7 +36,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px', minHeight: '100vh'}`
             v-if="s.type === 'NODE'"
             @click="subscriptionClick(s)"
             ).row.fit.items-center.content-center
-            q-icon(name="filter_tilt_shift" color="white" size="30px").q-mr-sm
+            q-icon(name="adjust" color="white" size="30px").q-mr-sm
             span.text-white {{ s.name }}
           div(
             v-if="s.type === 'VIDEO' || s.type === 'IMAGE'"
