@@ -47,33 +47,6 @@
         paddingTop: '0px',
       }`
       ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
-<<<<<<< HEAD
-      q-btn(
-        @click="$routerKalpa.back()"
-        round flat color="white" icon="west")
-      user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
-      .col
-        span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
-        .row.full-width.q-px-sm
-          small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
-      //- kalpa-share(
-        v-if="user"
-        type="user" :item="user")
-      kalpa-bookmark(
-        v-if="user && !itsMe"
-        :oid="user.oid"
-        type="USER"
-        inactiveColor="grey-8"
-        :name="user.name"
-        :thumbUrl="user.thumbUrl"
-        :isActive="true")
-      kalpa-menu-actions(:actions="actions" icon="more_vert").q-mr-xs
-      //- menu caller
-      q-btn(
-        v-if="$q.screen.lt.md"
-        @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
-        round flat color="white" icon="menu")
-=======
       //- header: back, avatar, name, rating
       div(:style=`{height: '60px',}`).row.full-width.items-center.content-center.justify-between
         q-btn(
@@ -113,7 +86,6 @@
             ).row.full-height.items-center.content-center
             span.text-white.q-mr-xs 9293
             span.text-grey-7 Подписчики
->>>>>>> f10a90a8ed314a74e3c6617dbd51e02895a1623c
 </template>
 
 <script>

@@ -47,10 +47,10 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.use(VueObserveVisibility)
     Vue.prototype.$routerKalpa = new Proxy(VueRouter, {
       get (target, prop) {
-        alert(prop)
         if (prop === 'back'){
-          if (window.history.length > 2) return VueRouter.back
-          else return VueRouter.push.bind(target, '/')
+          // если в истории пусто (зашли например по ссылке на контент), то переход назад приведет к выходу их приложения
+          if (VueRouter.historyKalpa.length > 1) return VueRouter.back
+          else return VueRouter.push.bind(target, '/') // В истории пусто. переходим на корневую страницу
         }
         let value = target[prop]
         return (typeof value === 'function') ? value.bind(target) : value // иначе - this - будет указывать на Proxy

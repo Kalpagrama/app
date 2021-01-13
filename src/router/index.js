@@ -24,12 +24,13 @@ export default function (/* { store, ssrContext } */) {
     },
     routes,
     mode: process.env.VUE_ROUTER_MODE,
-    base: process.env.VUE_ROUTER_BASE,
+    base: process.env.VUE_ROUTER_BASE
   })
-  // router.beforeEach((to, from, next) => {
-  //   console.error('to: ', to)
-  //   alert('before to!')
-  //   next()
-  // })
+  router.historyKalpa = [] // храним тут историю последних 100 переходов
+  router.beforeEach((to, from, next) => {
+    router.historyKalpa.push(to.path)
+    if (router.historyKalpa.length > 100)router.historyKalpa.splice(0, router.historyKalpa.length - 100)
+    next()
+  })
   return router
 }
