@@ -163,7 +163,7 @@ div(
     }`).b-30
     template(v-slot:header)
       div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать контент
     template(v-slot:tint=`{item}`)

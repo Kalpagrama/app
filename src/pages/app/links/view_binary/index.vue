@@ -20,7 +20,7 @@ div(
         borderRadius: '10px 10px 0 0',
       }`
       ).row.full-width.items-center.content-center.q-px-sm.b-40
-      q-btn(round flat color="white" icon="west" @click="$router.back()")
+      q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
       .col
       q-btn(
         @click="jointCreating = !jointCreating"

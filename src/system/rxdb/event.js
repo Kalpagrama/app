@@ -33,7 +33,7 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start')
+      logD(f, 'start', event)
       const t1 = performance.now()
 
       if (event.type === 'BATCH_EVENTS') {

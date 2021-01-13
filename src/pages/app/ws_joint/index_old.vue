@@ -11,7 +11,7 @@
           borderRadius: '10px',overflow: 'hidden'
         }`
         ).row.full-width.items-center.content-center.q-px-sm
-        q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
         span(:style=`{fontSize: '1rem'}`).text-grey-6.text-bold Создание связи
         .col
@@ -127,7 +127,7 @@
         }`).row.full-width
         view-add(v-if="joint" :joint="joint" @item="(item, ii) => itemFound(item, ii)")
   div(v-else).row.full-width
-    q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$router.back()")
+    q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
 </template>
 
 <script>

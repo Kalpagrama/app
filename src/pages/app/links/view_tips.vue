@@ -220,7 +220,7 @@ export default {
     },
     jointPrev () {
       this.$log('jointPrev')
-      this.$router.back()
+      this.$routerKalpa.back()
     },
     jointNext (joint, ii) {
       this.$log('jointNext', joint, ii)

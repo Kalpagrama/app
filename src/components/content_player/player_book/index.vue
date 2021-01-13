@@ -44,6 +44,8 @@ div(
     //- div(
       :style=`{}`)
   .row.full-width.justify-center
+    input(v-if = "true" v-model="cfi" width="300").row.full-width
+    q-btn(v-if = "true" round flat color="white" icon="check" @click='goToCfi')
     q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
     q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
@@ -127,7 +129,6 @@ export default {
       toc: [],
       progressValue: 0,
       slide: null,
-      cfi: null,
       width: 0,
       height: 0,
       locations: null,
@@ -137,7 +138,8 @@ export default {
       },
       isFullscreen: false,
       contentBookmark: null,
-      tableOfContents: false
+      tableOfContents: false,
+      cfi: 'epubcfi(/6/12[id83]!/4/2/2[id2]/12,/1:0,/1:263)'
     }
   },
   watch: {
@@ -176,7 +178,47 @@ export default {
     async goToNextPage () {
       await this.rendition.next()
     },
+    goToPercent (value) {
+      const percentage = value / 100
+      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : 0
+      this.rendition.display(target)
+      if (percentage === 1) this.goToNextPage()
+    },
+    async goToCfi () {
+      this.$log('goToCfi', this.cfi)
+      this.rendition.annotations.highlight(this.cfi, {})
+      let loc = await this.rendition.currentLocation()
+      this.$log('loc=', loc)
+      this.$log('loc start=', loc.start.cfi)
+      this.$log('loc end=', loc.end.cfi)
 
+      // let spineItem = this.book.spine.get(this.cfi);
+      // this.$log('loc spineItem=', spineItem)
+      // let navItem = this.book.navigation.get(spineItem.href);
+      // this.$log('loc navItem=', navItem)
+      // this.$log('loc navItem=', navItem)
+
+      // let cfi = new EpubCFI(this.cfi)
+      // this.$log('loc cfi=', cfi)
+      // cfi.collapse(true)
+      //
+      // this.$log('loc start=', cfi)
+      //
+      // let spineItem = this.book.spine.get(cfi);
+      // this.$log('loc spineItem=', spineItem)
+      // this.$log('loc spineItem=', spineItem.href)
+      // let navItem = this.book.navigation.get(spineItem.href);
+      // this.$log('loc navItem=', navItem)
+      //
+      // this.$log('loc end=', loc.end.cfi)
+
+      await this.rendition.display(this.cfi)
+      // await this.rendition.annotations.highlight(this.cfi)
+
+      // let loc2 = await this.book.locations.locationFromCfi(this.cfi)
+      // this.$log('loc loc2=', loc2)
+      // this.$log('loc loc2=', loc2)
+    },
     async showTableOfContents () {
       this.tableOfContents = !this.tableOfContents
     },
@@ -186,12 +228,6 @@ export default {
     },
     setFontSize (size) {
       this.rendition.themes.fontSize(size + '%')
-    },
-    goToPercent (value) {
-      const percentage = value / 100
-      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : 0
-      this.rendition.display(target)
-      if (percentage === 1) this.goToNextPage()
     },
     updateScreenSizeInfo () {
       this.width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -220,12 +256,174 @@ export default {
     // book navigation ready
     let { toc } = await this.book.loaded.navigation
     this.toc = toc
+    const populateToc = (toc) => {
+      for (let chapter of toc){
+        // this.$log('chapter=', chapter)
+        chapter.go = () => {
+          alert('go ' + chapter.label)
+          this.tableOfContents = false
+          this.rendition.display(chapter.href)
+          // let section = await this.book.section(chapter.href)
+        }
+        if (chapter.subitems) populateToc(chapter.subitems)
+      }
+    }
+    populateToc(this.toc)
+
+    const makeRangeCfi = (a, b) => {
+      const CFI = new EpubCFI()
+      const start = CFI.parse(a)
+      const end = CFI.parse(b)
+      start.base.steps = start.base.steps.filter(step => step)
+      end.base.steps = end.base.steps.filter(step => step)
+      start.path.steps = start.path.steps.filter(step => step)
+      end.path.steps = end.path.steps.filter(step => step)
+      const cfi = {
+        range: true,
+        base: start.base,
+        path: {
+          steps: [],
+          terminal: null
+        },
+        start: start.path,
+        end: end.path
+      }
+      const len = cfi.start.steps.length
+      for (let i = 0; i < len; i++) {
+        if (CFI.equalStep(cfi.start.steps[i], cfi.end.steps[i])) {
+          if (i === len - 1) {
+            // Last step is equal, check terminals
+            if (cfi.start.terminal === cfi.end.terminal) {
+              // CFI's are equal
+              cfi.path.steps.push(cfi.start.steps[i])
+              // Not a range
+              cfi.range = false
+            }
+          } else cfi.path.steps.push(cfi.start.steps[i])
+        } else break
+      }
+      cfi.start.steps = cfi.start.steps.slice(cfi.path.steps.length)
+      cfi.end.steps = cfi.end.steps.slice(cfi.path.steps.length)
+      let z = CFI.segmentString(cfi.base)
+      let x = CFI.segmentString(cfi.path)
+      let c = CFI.segmentString(cfi.start)
+      let v = CFI.segmentString(cfi.end)
+
+      return 'epubcfi(' + CFI.segmentString(cfi.base) + '!' + CFI.segmentString(cfi.path) + ',' + CFI.segmentString(cfi.start) + ',' + CFI.segmentString(cfi.end) + ')'
+    }
+    // вернет главы, попавшие в диапазон cfiStart, cfiEnd
+    let getChapters = async (cfiStart, cfiEnd) => {
+          // for (let chapter of this.toc){
+          //   return chapter.subitems
+          // }
+          // список наимельчайших глав
+          let getLowestChapters = (chapter) => {
+            let res = []
+            if (chapter.subitems && chapter.subitems.length){
+              for (let subchapter of chapter.subitems){
+                res.push(...getLowestChapters(subchapter))
+              }
+            } else res.push(chapter)
+            return res
+          }
+          let chapters = [] // список всех глав (если в главе есть подглавы, то выводятся ТОЛЬКО подглавы)
+          for (let chapter of this.toc){
+            chapters.push(...getLowestChapters(chapter))
+          }
+          let innerChapterIndexes = []
+
+          // // todo не обрабатывается последняя глава
+          // for (let i = 1; i < chapters.length; i++){
+          //   let prevSection = this.book.spine.get(chapters[i - 1].href)
+          //   let nextSection = this.book.spine.get(chapters[i].href)
+          //   let contentsPrev = await prevSection.load(this.book.load.bind(this.book))
+          //   let contentsNext = await nextSection.load(this.book.load.bind(this.book))
+          //   let cfiChapterPrev = new EpubCFI(prevSection.cfiFromElement(prevSection.document.firstElementChild))
+          //   let cfiChapterNext = new EpubCFI(nextSection.cfiFromElement(nextSection.document.firstElementChild))
+          //   let start = cfiChapterPrev
+          //   let end = cfiChapterNext
+          //   // a.start <= b.end AND a.end >= b.start
+          //   let one = (new EpubCFI()).compare(cfiStart, end) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+          //   let two = (new EpubCFI()).compare(cfiEnd, start) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+          //   if (one <= 0 && two >= 1){ // пересекаются
+          //     let rangeCfi = makeRangeCfi(start.str, end.str)
+          //     let range = await this.book.getRange(rangeCfi)
+          //     this.$log('range=', range)
+          //     this.$log('range text =', range.toString())
+          //     this.$log('range text =', range.toString())
+          //   }
+          // }
+          // ищем те главы, начала которых попали непосредственно в диапазон
+          for (let i = 0; i < chapters.length; i++){
+            assert(chapters[i].href, '!href')
+            let section = this.book.spine.get(chapters[i].href)
+            let contents = await section.load(this.book.load.bind(this.book))
+            let cfiChapter = new EpubCFI(section.cfiFromElement(section.document.firstElementChild))
+            let startRes = (new EpubCFI()).compare(cfiChapter, cfiStart) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+            let endRes = (new EpubCFI()).compare(cfiChapter, cfiEnd) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+            if (startRes >= 0 && endRes <= 0) { // начало главы попало в диапазон
+              innerChapterIndexes.push(i)
+            }
+          }
+          // добавим главы, НАЧИНАЮЩИЕСЯ слева и справа от диапазона
+          for (let i = 1; i < chapters.length; i++){
+            let prevSection = this.book.spine.get(chapters[i - 1].href)
+            let nextSection = this.book.spine.get(chapters[i].href)
+            let contentsPrev = await prevSection.load(this.book.load.bind(this.book))
+            let contentsNext = await nextSection.load(this.book.load.bind(this.book))
+            let cfiChapterPrev = new EpubCFI(prevSection.cfiFromElement(prevSection.document.firstElementChild))
+            let cfiChapterNext = new EpubCFI(nextSection.cfiFromElement(nextSection.document.firstElementChild))
+            {
+              let startResPrev = (new EpubCFI()).compare(cfiChapterPrev, cfiStart) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+              let startResNext = (new EpubCFI()).compare(cfiChapterNext, cfiStart) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+              if (startResPrev < 0 && startResNext >= 0) { // prev - до диапазона, next - в диапазоне либо после него
+                innerChapterIndexes.push(i - 1) // добавляем prev
+              }
+            }
+            {
+              let endResPrev = (new EpubCFI()).compare(cfiChapterPrev, cfiEnd) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+              let endResNext = (new EpubCFI()).compare(cfiChapterNext, cfiEnd) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+              if (endResNext > 0 && endResPrev <= 0) { // next - после диапазона, prev - в диапазоне либо до него
+                innerChapterIndexes.push(i) // добавляем next
+                break
+              }
+            }
+          }
+          let result = []
+          for (let i of innerChapterIndexes){
+            let chapter = chapters[i]
+            // todo  надо получить chapter rangeCFI и отсечь те, что не пересекаются с cfiStart, cfiEnd
+            // let sectionChapter = await this.book.section(chapter.href)
+            let sectionChapter = this.book.spine.get(chapter.href)
+            this.$log('chapter=', chapter)
+            this.$log('sectionChapter=', sectionChapter)
+            let section = sectionChapter
+            let contents = await section.load(this.book.load.bind(this.book))
+            let cfiBase = new EpubCFI(section.cfiFromElement(section.document.firstElementChild))
+            this.$log('contents=', contents)
+            this.$log('cfiBase=', cfiBase)
+            this.$log('doc=', section.document)
+            result.push(chapter)
+          }
+          return result
+    }
+    const findAllParagraphs = (el) => {
+      let res = []
+      if (el.children.length > 1 && el.tagName !== 'head' && el.tagName !== 'html') {
+        res.push(...el.children)
+      } else if (el.children.length && el.tagName !== 'head') {
+        for (let child of el.children) res.push(...findAllParagraphs(child))
+      }
+      return res
+    }
+
     this.$emit('toc', this.toc)
+
     { // initReader
       this.rendition = this.book.renderTo(this.bookArea, {
         contained: true,
         height: this.height,
-        width: this.width,
+        width: this.width
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -281,20 +479,72 @@ export default {
       this.rendition.on('click', () => {
         this.$emit('click')
       })
-    }
-
-    const populateToc = (toc) => {
-      for (let chapter of toc){
-        // this.$log('chapter=', chapter)
-        chapter.go = () => {
-          alert('go ' + chapter.label)
-          this.tableOfContents = false
-          this.rendition.display(chapter.href)
+      this.rendition.on('relocated', async (location) => {
+        this.$log('relocated to', location.start.cfi)
+        // percentageFromCfi нормально НЕ работает пока не сработал this.book.locations.generate()
+        const percent = this.book.locations.percentageFromCfi(location.start.cfi)
+        const percentage = percent * 100
+        this.progressValue = percentage
+        this.$emit('relocated')
+        // let cfiLoc = this.book.locations.cfiFromLocation(location.start.index)
+        // this.$log('relocated cfiLoc = ', cfiLoc)
+        this.$log('relocated (progress) = ', percentage)
+        if (this.contentBookmark){ // save position
+          if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
+          this.contentBookmark.meta.currentCfi = location.start.cfi
         }
-        if (chapter.subitems) populateToc(chapter.subitems)
-      }
+        // получить все абзацы для озвучки
+        {
+          let currentLoc = await this.rendition.currentLocation()
+          let sectionLocation = await this.book.section(location.start.href)
+          let contentsLocation = await sectionLocation.load(this.book.load.bind(this.book))
+          let cfiBase = new EpubCFI(location.start.cfi)
+          let paragraphsLocation = findAllParagraphs(sectionLocation.document)
+          for (let i = 1; i < paragraphsLocation.length; i++){
+            let start = paragraphsLocation[i - 1]
+            let end = paragraphsLocation[i]
+            let range = document.createRange();
+            range.setStart(start, 0);
+            range.setEnd(end, 0);
+            let cfiParagraph = new EpubCFI(range, cfiBase.base)
+            this.$log('chapter range=', range)
+            this.$log('chapter range.visible=', range.startContainer.visible)
+            this.$log('chapter Paragraph=', range.toString())
+            this.$log('chapter cfiParagraph=', cfiParagraph.toString())
+            // start.addEventListener('click', (ev) => {
+            //   ev.preventDefault();
+            //   console.error(ev)
+            //   alert('contextmenu2')
+            //   // ev.preventDefault()
+            //   return false;
+            // })
+            // this.rendition.annotations.highlight(cfiParagraph.toString(), {})
+          }
+
+          // let chapters = await getChapters(location.start.cfi, location.end.cfi)
+          // for (let chapter of chapters){
+          //   this.$log(chapter)
+          //   let sectionChapter = await this.book.section(chapter.href)
+          //   this.$log(chapter, sectionChapter)
+          //   let section = sectionChapter
+          //   let contents = await section.load(this.book.load.bind(this.book))
+          //   let cfiBase = new EpubCFI(section.cfiFromElement(section.document.firstElementChild))
+          //   this.$log('section.document:', section.document)
+          //   let paragraphs = findAllParagraphs(section.document)
+          //   for (let i = 1; i < paragraphs.length; i++){
+          //     let start = paragraphs[i - 1]
+          //     let end = paragraphs[i]
+          //     let range = document.createRange();
+          //     range.setStart(start, 0);
+          //     range.setEnd(end, 0);
+          //     let cfiParagraph = new EpubCFI(range, cfiBase.base)
+          //     this.$log('chapter Paragraph=', range.toString())
+          //     this.$log('chapter cfiParagraph=', cfiParagraph.toString())
+          //   }
+          // }
+        }
+      })
     }
-    populateToc(toc)
 
     // go to saved position
     let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
@@ -302,22 +552,10 @@ export default {
     if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) this.rendition.display(this.contentBookmark.meta.currentCfi)
 
     await this.book.ready // book ready
-    await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
-    // this.locations = JSON.parse(this.book.locations.save())
-    // this.$log('this.locations=', this.locations)
     this.ready = true
-    this.rendition.on('relocated', async (location) => {
-      // this.$log('relocated location = ', location.start.cfi)
-      const percent = this.book.locations.percentageFromCfi(location.start.cfi)
-      const percentage = percent * 100
-      this.progressValue = percentage
-      this.$emit('relocated')
-      this.$log('relocated (progress) = ', percentage)
-      if (this.contentBookmark){ // save position
-        if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
-        this.contentBookmark.meta.currentCfi = location.start.cfi
-      }
-    })
+
+    this.locations = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
+
     this.$emit('player', this)
 
     // window.addEventListener('resize', debounce(() => {

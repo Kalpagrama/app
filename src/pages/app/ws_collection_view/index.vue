@@ -11,7 +11,7 @@ q-layout(
           maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '10px',
         }`).row.full-width.items-center.content-center.q-px-sm.b-30
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
           .row.fit.items-center.content-center
             q-input(

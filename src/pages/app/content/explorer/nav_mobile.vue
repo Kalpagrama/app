@@ -7,7 +7,7 @@
     }`
     ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
     q-btn(
-      @click="$router.back()"
+      @click="$routerKalpa.back()"
       flat color="grey-7" icon="west" no-caps
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center

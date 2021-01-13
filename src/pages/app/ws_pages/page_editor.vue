@@ -4,7 +4,7 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.items-start.content-start.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center.q-py-sm
         q-btn(
-          flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
+          flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()"
           :style=`{width: '40px', height: '56px'}`).q-mr-xs
         .col
           div(

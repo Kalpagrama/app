@@ -51,7 +51,7 @@ export default {
       // if we got 0 items on this sphere...
       // await this.$rxdb.remove(this.node.id)
       await this.sphere.remove()
-      this.$router.back()
+      this.$routerKalpa.back()
     }
   }
 }

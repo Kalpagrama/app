@@ -4,6 +4,9 @@ import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
+import { AuthApi } from 'src/api/auth'
+import { router } from 'src/boot/system'
+import { notify } from 'src/boot/notify'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -94,6 +97,7 @@ class EventApi {
    }
 
    static async init () {
+      if (EventApi.initialized) return true
       const f = EventApi.init
       logD(f, 'start')
       const t1 = performance.now()
@@ -104,15 +108,22 @@ class EventApi {
             client: 'wsApollo',
             query: gql`
                 ${fragments.eventFragmentWithBatch}
-                subscription event {
+                subscription {
                     event {...eventFragmentWithBatch}
                 }
             `
          })
          EventApi.subscription = observerEvent.subscribe({
             next: async ({ data: { event } }) => {
-               logD(`EVENT received ${event.type}`, event)
-               await rxdb.processEvent(event)
+               logD('EVENT received', event)
+               if (event.type === 'NOTICE' && event.typeNotice === 'CONFIRM_CODE'){
+                  let {result, failReason, oid} = await AuthApi.userAuthenticate(event.message, null)
+                  if (result === false) throw new Error(`Error on userAuthenticate: ${failReason}`)
+                  else {
+                     notify('info', 'Welcome to KALPAGRAMA!')
+                     await router.replace('/')
+                  }
+               } else await rxdb.processEvent(event)
             },
             error: (error) => {
                logE('apollo subscribe (websocket) error', error)
@@ -120,10 +131,13 @@ class EventApi {
          })
          return true
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      EventApi.initialized = true
+      return res
    }
 
    static async deInit () {
+      if (!EventApi.initialized) return true
       const f = EventApi.deInit
       logD(f, 'start')
       const t1 = performance.now()
@@ -135,7 +149,9 @@ class EventApi {
          }
          return true
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      EventApi.initialized = false
+      return res
    }
 }
 

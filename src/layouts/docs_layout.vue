@@ -32,7 +32,7 @@ q-layout(view="lHh lpR lFf")
       div(
         :style=`{maxWidth: '700px', height: '60px',borderRadius: '10px',}`
         ).row.full-width.items-center.content-center.b-40.q-px-sm
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
           span(:style=`{fontSize: '20px'}`).text-bold Документы
         q-btn(
