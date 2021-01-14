@@ -145,17 +145,27 @@ const routes = [
          //    meta: { roleMinimal: 'MEMBER' }
          // },
          {
-            name: 'workspace.create',
-            path: 'workspace/create',
-            component: () => import('pages/app/ws_create/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            name: 'workspace',
+            path: 'workspace',
+            component: () => import('pages/app/ws_index/index.vue'),
          },
          {
-            name: 'workspace',
-            path: 'workspace/:viewId?',
-            component: () => import('pages/app/ws_index/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            name: 'workspace.bookmarks',
+            path: 'workspace/bookmarks',
+            component: () => import('pages/app/ws_index/page_bookmarks/index.vue')
          },
+         // {
+         //    name: 'workspace.create',
+         //    path: 'workspace/create',
+         //    component: () => import('pages/app/ws_create/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace',
+         //    path: 'workspace/:viewId?',
+         //    component: () => import('pages/app/ws_index/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'fallback',
             path: '*',
