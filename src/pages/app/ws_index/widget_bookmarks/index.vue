@@ -1,14 +1,15 @@
 <template lang="pug">
 .row.full-width.q-px-sm
-  router-link(
-    to="/workspace/bookmarks"
+  div(
     :style=`{
       borderRadius: '10px',
       background: 'rgb(35,35,35)',
     }`
     ).row.full-width
     //- header
-    div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
+    router-link(
+      to="/workspace/bookmarks"
+      :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       .col
         span.text-white.text-bold Закладки
       q-icon(name="bookmark_outline" color="white" size="24px")
@@ -29,8 +30,9 @@
           ).row.b-50.q-mr-sm
       //- bookmarks loaded
       div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
-        div(
+        router-link(
           v-for="b in bookmarks" :key="b.oid"
+          to="/workspace/bookmarks"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
@@ -72,7 +74,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.WS_ANY,
         },
         limit: 10,
-        sort: [{updatedAt: 'desc'}]
+        sort: [{createdAt: 'desc'}]
       }
       return res
     }

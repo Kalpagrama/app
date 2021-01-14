@@ -1,22 +1,55 @@
 <template lang="pug">
-div(
-  v-if="node.items.length === 1"
-  ).row.full-width
-  kalpa-loader(
-    :immediate="true"
-    :query="jointsQuery" :limit="12"
-    @items="jointsUpdated"
-    v-slot=`{items, next, nexting}`)
-  .row.full-width.justify-center.q-py-md
-    q-btn(
-      :to="'/links/'+node.oid"
-      flat color="grey-6" no-caps size="md"
-      icon-right="launch"
-      :style=`{
-        height: '50px',
-      }`
-      ).b-40
-      span.q-mr-sm Связи {{ jointsCount }}
+.row.full-width.justify-center.q-px-sm
+  div(
+    :style=`{
+      maxWidth: '500px',
+      borderRadius: '10px',
+      background: 'rgb(35,35,35)',
+    }`
+    ).row.full-width
+    //- header
+    router-link(
+      to="/workspace/bookmarks"
+      :style=`{}`).row.full-width.items-center.content-center.q-pa-md
+      .col
+        span.text-white.text-bold Связи
+      //- q-icon(name="bookmark_outline" color="white" size="24px")
+      q-btn(round flat dense color="grey-9")
+        q-icon(name="power_settings_new" size="24px").rotate-90
+    kalpa-loader(
+      :immediate="true"
+      :query="jointsQuery" :limit="12"
+      @items="jointsUpdated"
+      v-slot=`{items, next, nexting}`)
+    //- scrolled bookmarks preview max 10...
+    .row.full-width.scroll
+      //- joints mockup
+      div(v-if="!joints").row.full-width.no-wrap.q-pa-sm
+        div(
+          v-for="n in 5" :key="n"
+          :style=`{
+            height: '50px', width: '50px', minWidth: '50px',
+            borderRadius: '10px',
+          }`
+          ).row.b-40.q-mr-sm
+      //- joints loaded
+      div(v-if="joints").row.full-width.no-wrap.q-pa-sm
+        router-link(
+          v-for="j in joints" :key="j.oid"
+          to="/workspace/bookmarks"
+          :style=`{
+            height: '50px', width: '50px', minWidth: '50px',
+            borderRadius: '10px',
+          }`
+          ).row.b-50.q-mr-sm
+          img(
+            draggable="false"
+            :src="j.items.find(i => i.oid !== node.oid).thumbUrl"
+            :style=`{
+              objectFit: 'cover',
+              borderRadius: '10px',
+            }`
+            ).fit
 </template>
 
 <script>
@@ -27,7 +60,7 @@ export default {
   props: ['node'],
   data () {
     return {
-      joints: []
+      joints: null
     }
   },
   computed: {

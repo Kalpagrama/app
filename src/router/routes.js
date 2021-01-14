@@ -154,6 +154,11 @@ const routes = [
             path: 'workspace/bookmarks',
             component: () => import('pages/app/ws_index/page_bookmarks/index.vue')
          },
+         {
+            name: 'workspace.create',
+            path: 'workspace/create',
+            component: () => import('pages/app/ws_index/page_create/index.vue')
+         },
          // {
          //    name: 'workspace.create',
          //    path: 'workspace/create',

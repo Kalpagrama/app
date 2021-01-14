@@ -19,7 +19,7 @@ q-layout(
     :style=`{
       paddingTop: 'env(safe-area-inset-top)'
     }`)
-    .row.full-width.justify-center
+    .row.full-width.justify-center.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
         div(
           :style=`{
@@ -37,19 +37,22 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
+        minHeight: '70vh',
         paddingTop: '20px',
         paddingBottom: '70px',
       }`).column.full-width.justify-between
-      widget-bookmarks
-      widget-url
+      .row.full-width
+        widget-bookmarks.q-mb-md
+        widget-url
       //- create
-      .row.full-width.q-pa-sm
+      .row.full-width.q-pa-md
         q-btn(
           outline color="green" no-caps
+          to="/workspace/create" icon-right="attach_file"
           :style=`{
             height: '60px',
           }`
-          ).full-width Создать
+          ).full-width Загрузить с устройства
 </template>
 
 <script>

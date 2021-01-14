@@ -25,14 +25,26 @@ div(
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        round flat color="white" no-caps :style=`{paddingLeft: '0px',}`).q-px-sm
+        round flat color="white" no-caps :style=`{paddingLeft: '0px',}`).row.q-px-sm
         user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
-        span.text-grey-4.q-ml-sm {{ node.author.name }}
+        .col
+          .row.items-center.content-center.q-px-sm
+            span.text-grey-4 {{ node.author.name }}
+            .row.full-width
+              small(:style=`{lineHeight: 0.8}`).text-grey-8 @username
       .col
-      small.text-grey-8.q-mr-xs {{ node.countViews }}
-      q-icon(name="visibility" color="grey-8").q-mr-xs
-      small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-      kalpa-menu-actions(:actions="actions")
+      .row.items-center.content-center.justify-end.q-pt-sm
+        small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+        .row.full-width.items-center.content-center.justify-end
+          small(:style=`{lineHeight: 0.8}`).text-grey-8.q-mr-xs {{ node.countViews }}
+          q-icon(name="visibility" color="grey-9")
+      kalpa-menu-actions(
+        :title="node.name"
+        :actions="actions" icon="more_vert")
+      //- small.text-grey-8.q-mr-xs {{ node.countViews }}
+      //- q-icon(name="visibility" color="grey-8").q-mr-md
+      //- small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      //- kalpa-menu-actions(:actions="actions")
     //- ITEMS: one or two
     slot(name="items")
     node-item(

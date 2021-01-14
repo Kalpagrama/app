@@ -23,7 +23,7 @@ q-layout(
           :isActive="true"
           :isVisible="true")
         //- widgets
-        widget-joints(:node="node")
+        widget-joints(:node="node").q-mt-xl
   q-footer(reveal)
     div(
       v-if="pageId"

@@ -59,6 +59,7 @@
     "rxjs": "^6.6.3",
     "subscriptions-transport-ws": "^0.9.18",
     "vue": "^2.6.10",
+    "vue-click-outside": "^1.1.0",
     "vue-masonry-css": "^1.0.3",
     "vue-observe-visibility": "^0.4.6",
     "vue-router": "^3.4.5",
