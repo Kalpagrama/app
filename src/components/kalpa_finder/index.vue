@@ -3,21 +3,29 @@ q-layout(
   view="hHh Lpr lff"
   container).b-30
   q-header(reveal).b-30
-    .row.full-width.justify-center.q-px-sm.b-30
+    div(
+      :style=`{
+        paddingTop: 'env(safe-area-inset-top)',
+      }`
+      ).row.full-width.justify-center.q-px-sm.b-30
       slot(name="header")
       //- pages
       div().row.full-width.justify-center
-        div(
-          v-if="pagesShow"
-          :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-md
-          q-tabs(
-            v-model="pageId" no-caps
-            dense active-color="green"
-            aling="left"
-            ).text-grey-6
-            q-tab(
-              v-for="p in pagesFiltered" :key="p.id"
-              :name="p.id" :label="p.name")
+        q-btn(
+          rounnd flat dense color="white" icon="construction"
+          )
+        .col
+          div(
+            v-if="pagesShow"
+            :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+            q-tabs(
+              v-model="pageId" no-caps
+              dense active-color="green"
+              aling="left"
+              ).text-grey-6
+              q-tab(
+                v-for="p in pagesFiltered" :key="p.id"
+                :name="p.id" :label="p.name")
       //- search
       div(
         v-if="!searchString"

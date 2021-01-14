@@ -94,7 +94,7 @@ const routes = [
          },
          {
             name: 'sphere',
-            path: 'sphere/:oid',
+            path: 'sphere/:oid/:page?',
             component: () => import('pages/app/sphere/index.vue'),
             children: [
                {

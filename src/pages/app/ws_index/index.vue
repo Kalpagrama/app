@@ -1,17 +1,17 @@
 <template lang="pug">
-.row.full-width.justify-center
-  kalpa-finder(
-    @contentKalpa="contentKalpaFound"
-    :pagesShow="true"
-    :pages=`{
-      content: {views: ['image', 'video']},
-      workspace: {views: ['image', 'video', 'node', 'joint', 'user', 'sphere', 'book']},
-    }`
-    :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-      height: $q.screen.height+'px',
-    }`).b-30
-    template(v-slot:header)
+//- .row.full-width.justify-center
+kalpa-finder(
+  @contentKalpa="contentKalpaFound"
+  :pagesShow="true"
+  :pages=`{
+    content: {views: ['image', 'video']},
+    workspace: {views: ['image', 'video', 'node', 'joint', 'user', 'sphere', 'book']},
+  }`
+  :style=`{
+    maxWidth: $store.state.ui.pageWidth+'px',
+    height: $q.screen.height-70+'px',
+  }`).b-30.br
+    //- template(v-slot:header)
       .row.full-width.q-py-sm
         div(
           :style=`{

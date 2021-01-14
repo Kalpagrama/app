@@ -14,6 +14,7 @@ div(
       v-if="src"
       ref="cropRef"
       draggable="false"
+      crossorigin='anonymous'
       :src="src"
       :style=`{
         //- maxHeight: $q.screen.height/2+'px',
@@ -70,6 +71,7 @@ export default {
       // initialAspectRatio: 10 / 10,
       viewMode: 2,
       dragMode: 'move',
+      checkCrossOrigin: false,
       // background: false,
       ...this.options,
       crop: (event) => {

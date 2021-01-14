@@ -142,8 +142,24 @@
             span(
               v-if="!mini"
               :style=`{fontSize: '18px'}`).text-bold.q-ml-md Eще
-        //- create node
         div(
+          v-if="!isGuest"
+          ).row.full-width.items-center.content-center.q-mt-sm
+          q-btn(
+            :to="isGuest ? '/auth' : '/workspace'"
+            color="green" no-caps size="lg"
+            icon="construction"
+            :align="mini ? 'center' : 'left'"
+            :style=`{
+              height: '60px',
+              paddingLeft: '0px',
+              maxWidth: '200px',
+            }`).full-width.menu-item
+            span(
+              v-if="!mini"
+              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Мастерская
+        //- create node
+        //- div(
           v-if="!isGuest"
           ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
@@ -194,7 +210,7 @@ export default {
       pages: [
         // {id: 'feeds', name: 'Домашняя', icon: 'home'},
         {id: 'trends', name: 'Поиск', icon: 'search'},
-        {id: 'workspace', name: 'Закладки', icon: 'bookmark_outline'},
+        // {id: 'workspace', name: 'Мастерская', icon: 'bookmark_outline'},
         // {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'about', name: 'О проекте', icon: 'panorama_fish_eye'},
         {id: 'settings', name: 'Настройки', icon: 'settings'},

@@ -36,7 +36,7 @@
       }`).full-width
   //- password
   edit-email(:currentUser="currentUser")
-  edit-password(:currentUser="currentUser")
+  //- edit-password(:currentUser="currentUser")
   //- save
   //- .row.full-width.justify-start.q-py-md.q-px-sm
     //- .col
