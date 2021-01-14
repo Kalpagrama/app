@@ -4,9 +4,9 @@ import Vuex from 'vuex'
 import core from './core'
 import ui from './ui'
 import debug from './debug'
-import {rxdb} from 'src/system/rxdb'
+import { rxdb } from 'src/system/rxdb'
 import assert from 'assert'
-import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
@@ -15,21 +15,22 @@ Vue.use(Vuex)
 // alert('vuex init!')
 
 const store = new Vuex.Store({
-  modules: {
-    core,
-    ui,
-    debug
-  },
-  strict: process.env.DEV,
-  state: {},
-  getters: {
-    currentUser: (state, getters, rootState, rootGetters) => id => {
-      assert(rxdb, '!rxdb')
-      assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
-      assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
-      return rxdb.getCurrentUser()
-    }
-  }
+   modules: {
+      core,
+      ui,
+      debug
+   },
+   strict: process.env.DEV,
+   state: {},
+   getters: {
+      currentUser: (state, getters, rootState, rootGetters) => id => {
+         assert(rxdb, '!rxdb')
+         // assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
+         // assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
+         if (rxdb.getCurrentUser) return rxdb.getCurrentUser()
+         else return null
+      }
+   }
 })
 
 // export default function (/* { ssrContext } */) {

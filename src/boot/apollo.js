@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, ApolloLink, createHttpLink } from '@apollo/client/core'
+import { SubscriptionClient } from 'subscriptions-transport-ws'
 
 import { onError } from 'apollo-link-error'
 import { WebSocketLink } from 'apollo-link-ws'
@@ -28,7 +29,7 @@ let apollo
 
 export default async ({ Vue, store, app }) => {
    try {
-      const f = {nameExtra: 'boot::apollo'}
+      const f = { nameExtra: 'boot::apollo' }
       logD(f, 'start')
       const t1 = performance.now()
       let fetchFunc
@@ -200,26 +201,46 @@ export default async ({ Vue, store, app }) => {
       let wsApollo = null
       if (!isSsr) {
          wsApollo = new ApolloClient({
-            link: ApolloLink.from([
-               errLinkWs,
-               new WebSocketLink({
-                  uri: linkWs,
-                  options: {
-                     minTimeout: 6000,
-                     reconnect: true,
-                     lazy: true,
-                     connectionParams: () => {
-                        return {
-                           Authorization: localStorage.getItem('k_token'),
-                           'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
-                        }
-                     }
-                  }
-               })
-            ]),
+            // link: wsLink,
             defaultOptions,
             cache
          })
+         const client = new SubscriptionClient(linkWs, {
+            minTimeout: 6000,
+            reconnect: true,
+            lazy: true,
+            connectionParams: () => {
+               let token = localStorage.getItem('k_token')
+               return {
+                  Authorization: token,
+                  'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+               }
+            }
+         });
+         let rawLink = new WebSocketLink(client)
+         // let rawLink = new WebSocketLink({
+         //    uri: linkWs,
+         //    options: {
+         //       minTimeout: 6000,
+         //       reconnect: true,
+         //       lazy: true,
+         //       connectionParams: () => {
+         //          let token = localStorage.getItem('k_token')
+         //          return {
+         //             Authorization: token,
+         //             'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
+         //          }
+         //       }
+         //    }
+         // })
+         let wsLink = ApolloLink.from([errLinkWs, rawLink])
+         wsApollo.setLink(wsLink)
+         wsApollo.closeConnection = () => {
+            client.close()
+         }
+         wsApollo.openConnection = () => {
+            client.connect()
+         }
       }
       const uploadApollo = new ApolloClient({
          link: ApolloLink.from([
