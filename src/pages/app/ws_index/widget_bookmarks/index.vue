@@ -32,28 +32,32 @@
       div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
         router-link(
           v-for="b in bookmarks" :key="b.oid"
-          to="/workspace/bookmarks"
+          :to="'/workspace/bookmarks'"
           :style=`{
-            height: '50px', width: '50px', minWidth: '50px',
-            borderRadius: '10px',
+            height: '50px', width: '58px', minWidth: '58px',
           }`
-          ).row.b-50.q-mr-sm
-          img(
-            v-if="!bookmarksErrored.includes(b.oid)"
-            draggable="false"
-            :src="b.thumbUrl"
-            :style=`{
-              objectFit: 'cover',
-              borderRadius: '10px',
-            }`
-            @error="bookmarksErrored.push(b.oid)"
-            ).fit
+          ).row.q-pr-sm
           div(
-            v-else
             :style=`{
               borderRadius: '10px',
             }`
-            ).row.fit
+            ).row.fit.b-50
+            img(
+              v-if="!bookmarksErrored.includes(b.oid)"
+              draggable="false"
+              :src="b.thumbUrl"
+              :style=`{
+                objectFit: 'cover',
+                borderRadius: '10px',
+              }`
+              @error="bookmarksErrored.push(b.oid)"
+              ).fit
+            div(
+              v-else
+              :style=`{
+                borderRadius: '10px',
+              }`
+              ).row.fit
 </template>
 
 <script>

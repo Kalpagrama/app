@@ -21,7 +21,7 @@ q-layout(
         expand position="bottom"
         :offset=`[0,80]`
         :style=`{zIndex: 1000,}`
-        ).row.full-width.justify-center.br
+        ).row.full-width.justify-center
         q-btn-group(
           flat no-caps
           :style=`{

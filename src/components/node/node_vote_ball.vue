@@ -33,8 +33,15 @@ div(
         //- opacity: 0.6,
         background: rateUser.colorBackground,
         borderRadius: '50%',
-      }`
-      )
+      }`)
+  //- voteCounts
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 100,
+      bottom: '-10px',
+    }`
+    ).row.full-width.justify-center
+    small.text-grey-9 1231
 </template>
 
 <script>

@@ -10,23 +10,30 @@
       span(:style=`{fontSize: '18px',}`).text-white Добавить контент по ссылке
     div(
       :style=`{borderRadius: '10px',}`
-      ).row.full-width.b-40.q-pr-md
+      ).row.full-width.b-40
       q-input(
         v-model="url"
-        dark borderless placeholder="Вставье сслыку на контент"
+        color="green"
+        placeholder="Вставье сслыку на контент"
+        :dark="urlInputFocused"
         :loading="urlLoading"
+        :debounce="500"
+        borderless
         :input-style=`{
           padding: '12px',
-          //- background: 'rgb(40,40,40)',
-          //- borderRadius: '10px',
+          borderRadius: '10px',
+          color: 'white'
         }`
-        ).full-width
-      //- template(v-slot:prepend)
-        q-btn(
-          round flat dense color="grey-5" icon="menu")
+        :style=`{
+          borderRadius: '10px',
+          color: 'white',
+          border: '2px solid rgb(76,175,79)',
+        }`
+        @focus="urlInputFocused = true"
+        @blur="urlInputFocused = false"
+        ).full-width.text-white.b-40
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-py-sm
       small.text-grey-5 YouTube Twitter Spotify Webpage Instagram
-      small.text-grey-5 популярные сервисы откуда мы принимаем ссылки и soon может быть перечислить
 </template>
 
 <script>
@@ -39,7 +46,8 @@ export default {
   data () {
     return {
       url: '',
-      urlLoading: false
+      urlLoading: false,
+      urlInputFocused: false,
     }
   },
   watch: {
@@ -72,11 +80,10 @@ export default {
       }
       else {
         let bookmarkInput = {
-          type: this.type,
-          oid: this.oid,
-          name: this.name,
-          thumbUrl: this.thumbUrl,
-          ...this.fields || {},
+          type: contentKalpa.type,
+          oid: contentKalpa.oid,
+          name: contentKalpa.name,
+          thumbUrl: contentKalpa.thumbUrl,
           isSubscribed: true
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)

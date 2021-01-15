@@ -13,53 +13,64 @@
         v-if="!$slots['action-left']"
         :oid="node.oid" :type="node.type" :name="node.name"
         :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-.row.full-width.q-pa-sm
-  div(:style=`{position: 'relative',}`).row.full-width.justify-between
-    q-btn(round flat dense color="grey-9")
-      q-icon(name="logout" size="22px").rotate-270
-    .row.items-center.content-center
-      small.text-grey-9 123
-      q-btn(round flat dense color="grey-9" icon="arrow_circle_down")
-    .row.items-center.content-center
-      small.text-grey-9 {{ node.countVotes }}
-      node-vote-ball(:node="node" @click.native="voteStarted = true")
-      //- q-btn(
-        round flat dense color="white"
-        :style=`{
-          borderRadius: '50%',
-        }`)
-        img(
-          src="~/assets/vote.png"
-          :style=`{
-            width: '24px',
-            height: '24px',
-            opacity: 0.6
-          }`)
-    .row.items-center.content-center
-      small.text-grey-9 {{ node.countJoints || 123 }}
-      q-btn(round flat dense color="grey-9")
-        q-icon(name="power_settings_new" size="24px").rotate-90
-    .row.items-center.content-center
-      small.text-grey-9 {{ node.countBookmarks || 123 }}
-      q-btn(round flat dense color="grey-9" icon="bookmark_outline")
+.row.full-width.q-px-sm
+  div(
+    :style=`{
+      position: 'relative',
+      height: '50px',
+    }`).row.full-width.items-center.contnet-center
+    .col
+      .row.full-width
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="share")
+        .col
+          .row.fit.items-center.content-center.justify-start
+            small.text-grey-9 {{ node.countJoints }}
+    .col
+      .row.full-width
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="radio_button_checked")
+        .col
+          .row.fit.items-center.content-center.justify-start
+            small.text-grey-9 {{ node.countJoints }}
+    node-vote-ball(:node="node" @click.native="voteStarted = true")
+    //- joints
+    .col
+      .row.full-width
+        .col
+          .row.fit.items-center.content-center.justify-end
+            small.text-grey-9 {{ node.countJoints }}
+        .row.items-center.content-center
+          //- q-btn(round flat dense color="grey-9" icon="link")
+          q-btn(round flat dense color="grey-9")
+            q-icon(name="link" size="22px").rotate-90
+    //- bookmarks
+    .col
+      .row.full-width
+        .col
+          .row.fit.items-center.content-center.justify-end
+            small.text-grey-9 {{ node.countBookmarks }}
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="bookmark_outline")
+    //- ======
+    //- VOTING:
     //- vote bar
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="voteStarted"
         :style=`{
-          position: 'absolute',
-          zIndex: 200,
+          position: 'absolute', top: '0px', zIndex: 900,
+          height: '50px',
         }`
-        ).row.fit.b-30
+        ).row.full-width.b-30
     transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
-      //- v-click-outside="voteStarted ? voteStarted = false : null"
       div(
         v-if="voteStarted"
         :style=`{
-          position: 'absolute',
-          zIndex: 1000,
+          position: 'absolute', top: '0px', zIndex: 1000,
+          height: '50px',
         }`
-        ).row.fit.items-center.content-center.justify-center.q-px-sm
+        ).row.full-width.items-center.content-center.justify-center
         div(
           :style=`{
             position: 'relative',
@@ -168,12 +179,20 @@ export default {
   },
   methods: {
     async vote (val) {
-      this.$log('vote', val)
-      this.voteVoting = val
-      await this.$wait(1500)
-      let res = await ObjectApi.vote(this.node.oid, val)
-      this.voteVoting = null
-      this.voteStarted = false
+      try {
+        this.$log('vote', val)
+        this.voteVoting = val
+        await this.$wait(1500)
+        let res = await ObjectApi.vote(this.node.oid, val)
+        this.$log('vote done', res)
+        this.voteVoting = null
+        this.voteStarted = false
+      }
+      catch (e) {
+        this.$log('vote error', e)
+        this.voteVoting = false
+        this.voteStarted = false
+      }
     }
   }
 }

@@ -3,8 +3,7 @@ q-layout(
   view="hHh Lpr lff")
   q-drawer(
     side="right"
-    v-model="menuOpened"
-    )
+    v-model="menuOpened")
     div(
       :style=`{
         borderRadius: '10px 0 0 10px',
@@ -30,34 +29,46 @@ q-layout(
           q-btn(
             round flat color="white" icon="construction")
           .col
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
-          q-btn(
+            .row.fit.items-center.content-center.justify-center
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
+          //- q-btn(
             @click="menuOpened = true"
             round flat color="white" icon="menu")
+          q-btn(
+            round flat color="white" icon="more_vert")
   q-page-container
     q-page(
       :style=`{
-        minHeight: '70vh',
-        paddingTop: '20px',
-        paddingBottom: '70px',
-      }`).column.full-width.justify-between
-      .row.full-width
-        widget-bookmarks.q-mb-md
-        widget-url
-      //- create
-      .row.full-width.q-pa-md
-        q-btn(
-          outline color="green" no-caps
-          to="/workspace/create" icon-right="attach_file"
-          :style=`{
-            height: '60px',
-          }`
-          ).full-width Загрузить с устройства
+        paddingTop: '40px',
+      }`
+      ).row.full-width.justify-center
+      div(
+        :style=`{
+          //- maxWidth: $store.state.ui.pageWidth+'px',
+          maxWidth: '600px',
+        }`).row.full-width.items-start.content-start
+        .row.full-width
+          //- widget-bookmarks.q-mb-sm
+          widget-bookmarks.q-mb-sm
+        //- create
+        .row.full-width.justify-center.q-pt-xl
+          div(:style=`{maxWidth: '600px',}`).row.full-width
+            widget-url
+            .row.full-width.q-pt-sm.q-px-lg
+              //- to="/workspace/create"
+              //- TODO: upload from device !
+              q-btn(
+                outline color="grey-8" no-caps
+                :style=`{
+                  height: '60px',
+                }`
+                ).full-width
+                span.text-grey-6 Загрузить с устройства
 </template>
 
 <script>
 export default {
-  name: 'wsCreate',
+  name: 'wsIndex',
   components: {
     widgetBookmarks: () => import('./widget_bookmarks/index.vue'),
     widgetUrl: () => import('./widget_url/index.vue')
@@ -72,18 +83,12 @@ export default {
   watch: {
   },
   methods: {
-    // itemFound (item) {
-    //   this.$log('itemFound', item)
-    //   this.contentKalpaFound(item)
-    // },
-    // contentKalpaFound (contentKalpa) {
-    //   this.$log('contentKalpaFound', contentKalpa)
-    //   this.$router.replace('/content/' + contentKalpa.oid)
-    // }
   },
   mounted () {
     this.$log('mounted')
-    // document.body.style.background = 'rgb(30,30,30)'
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
