@@ -34,11 +34,11 @@
       .row.full-width
         .row.items-center.content-center
           //- q-btn(round flat dense color="grey-9" icon="group_work")
-          q-btn(round flat dense color="grey-9" icon="motion_photos_on")
-          //- q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
-            q-icon(name="workspaces" size="13px"
+          //- q-btn(round flat dense color="grey-9" icon="motion_photos_on")
+          q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
+            q-icon(name="workspaces" size="12px"
               :style=`{
-                position: 'absolute'
+                position: 'absolute', top: '10px',
               }`)
         .col
           .row.fit.items-center.content-center.justify-start
@@ -51,8 +51,11 @@
           .row.fit.items-center.content-center.justify-end
             small.text-grey-9 {{ node.countJoints }}
         .row.items-center.content-center
-          //- q-btn(round flat dense color="grey-9" icon="hdr_weak")
+          //- q-btn(round flat dense color="grey-9" icon="fab fa-hubspot")
           q-btn(round flat dense color="grey-9")
+            q-icon(name="fab fa-hubspot" :style=`{transform: 'rotate(160deg)'}`)
+          //- q-btn(round flat dense color="grey-9" icon="hdr_weak")
+          //- q-btn(round flat dense color="grey-9")
             q-icon(name="hdr_weak" size="24px").rotate-180
           //- q-btn(
             round flat dense color="grey-9"
@@ -62,7 +65,7 @@
               q-icon(name="linear_scale" size="50px").rotate-45
           //- q-btn(round flat dense color="grey-9" icon="share")
           //- q-btn(round flat dense color="grey-9")
-            q-icon(name="share" size="22px").rotate-90
+            q-icon(name="link" size="22px")
     //- bookmarks
     .col
       .row.full-width
@@ -106,7 +109,7 @@
             :style=`{
               position: 'absolute', zIndex: 2000,
               bottom: '-46px',
-            }`).full-width
+            }`).full-width.b-30
             small.text-grey-8 Отмена
           //- vote rates
           div(
