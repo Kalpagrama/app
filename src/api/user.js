@@ -65,7 +65,28 @@ class UserApi {
     return await apiCall(f, cb)
   }
 
-  // check subscription
+  static async checkUsernameFree (username) {
+    const f = UserApi.checkUsernameFree
+    logD(f, 'start', username)
+    const t1 = performance.now()
+    const cb = async () => {
+      let { data: { checkUsernameFree } } = await apollo.clients.auth.query({
+        query: gql`
+          query  ($username: String!){
+            checkUsernameFree(username: $username)
+          }
+        `,
+        variables: {
+          username
+        }
+      })
+      return checkUsernameFree
+    }
+    let res = await apiCall(f, cb)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
+    return res
+  }
+
   static async isSubscribed (oid) {
     const f = UserApi.isSubscribed
     logD(f, 'start', oid)

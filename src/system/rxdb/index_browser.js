@@ -364,7 +364,7 @@ class RxDBWrapper {
          try {
             await mutexGlobal.lock('rxdb::processEvent')
             await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
-            assert(this.initialized, '! this.initialized !')
+            assert(this.initialized, '! this.initialized1 !')
             assert(event.id, '!event.id')
             assert(this.store, '!this.store')
             await this.event.processEvent(event, this.store)
@@ -466,7 +466,7 @@ class RxDBWrapper {
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
          await this.findMutex.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
-         assert(this.initialized, '! this.initialized !')
+         assert(this.initialized, '! this.initialized2 !')
          const queryId = JSON.stringify(mangoQuery)
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
          let findResult

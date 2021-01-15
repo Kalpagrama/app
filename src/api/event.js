@@ -104,6 +104,7 @@ class EventApi {
       const cb = async () => {
          assert(apollo.clients.ws, '!apollo.clients.ws1')
          assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
+         apollo.clients.ws.openConnection()
          const observerEvent = apollo.clients.ws.subscribe({
             client: 'wsApollo',
             query: gql`
@@ -147,6 +148,7 @@ class EventApi {
             // assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
             EventApi.subscription.unsubscribe()
          }
+         apollo.clients.ws.closeConnection()
          return true
       }
       let res = await apiCall(f, cb)

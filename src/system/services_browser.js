@@ -223,10 +223,11 @@ async function resetLocalStorage () {
    logD(f, 'start')
    try {
       await mutexGlobal.lock('system::resetLocalStorage')
-      for (let i = 0; i < localStorage.length; i++) {
-         let key = localStorage.key(i)
-         if (key.startsWith('k_') && key !== 'k_global_lock') localStorage.removeItem(key)
+      let keysForRemove = []
+      for (let key in localStorage){
+         if (key.startsWith('k_') && key !== 'k_global_lock') keysForRemove.push(key)
       }
+      for (let key of keysForRemove) localStorage.removeItem(key)
    } finally {
       await mutexGlobal.release('system::resetLocalStorage')
    }

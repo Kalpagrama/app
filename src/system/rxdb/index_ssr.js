@@ -62,7 +62,7 @@ class RxDBDummy {
       const t1 = performance.now()
       logD(f, 'start')
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-      assert(this.initialized, '! this.initialized !')
+      assert(this.initialized, '! this.initialized0 !')
       const queryId = JSON.stringify(mangoQuery)
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
       let findResult = []
