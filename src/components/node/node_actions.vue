@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.items-center.content-center
+//- .row.full-width.justify-center.items-center.content-center
   .row.full-width.justify-center.q-px-sm.q-py-xs
     div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
       slot(name="action-left")
@@ -13,11 +13,114 @@
         v-if="!$slots['action-left']"
         :oid="node.oid" :type="node.type" :name="node.name"
         :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+.row.full-width.q-px-sm
+  div(
+    :style=`{
+      position: 'relative',
+      height: '50px',
+    }`).row.full-width.items-center.contnet-center
+    .col
+      .row.full-width
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="share")
+        .col
+          .row.fit.items-center.content-center.justify-start
+            small.text-grey-9 {{ node.countJoints }}
+    .col
+      .row.full-width
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="radio_button_checked")
+        .col
+          .row.fit.items-center.content-center.justify-start
+            small.text-grey-9 {{ node.countJoints }}
+    node-vote-ball(:node="node" @click.native="voteStarted = true")
+    //- joints
+    .col
+      .row.full-width
+        .col
+          .row.fit.items-center.content-center.justify-end
+            small.text-grey-9 {{ node.countJoints }}
+        .row.items-center.content-center
+          //- q-btn(round flat dense color="grey-9" icon="link")
+          q-btn(round flat dense color="grey-9")
+            q-icon(name="link" size="22px").rotate-90
+    //- bookmarks
+    .col
+      .row.full-width
+        .col
+          .row.fit.items-center.content-center.justify-end
+            small.text-grey-9 {{ node.countBookmarks }}
+        .row.items-center.content-center
+          q-btn(round flat dense color="grey-9" icon="bookmark_outline")
+    //- ======
+    //- VOTING:
+    //- vote bar
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="voteStarted"
+        :style=`{
+          position: 'absolute', top: '0px', zIndex: 900,
+          height: '50px',
+        }`
+        ).row.full-width.b-30
+    transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+      div(
+        v-if="voteStarted"
+        :style=`{
+          position: 'absolute', top: '0px', zIndex: 1000,
+          height: '50px',
+        }`
+        ).row.full-width.items-center.content-center.justify-center
+        div(
+          :style=`{
+            position: 'relative',
+            maxWidth: '400px',
+            height: '20px',
+            //- borderRadius: '10px',
+            //- overflow: 'hidden',
+          }`
+          ).row.full-width.items-center.content-center
+          //- cancel btn
+          q-btn(
+            @click="voteStarted = false"
+            flat dense color="grey-8" no-caps
+            :style=`{
+              position: 'absolute', zIndex: 2000,
+              bottom: '-36px',
+            }`).full-width
+            small.text-grey-8 Отмена
+          //- vote rates
+          div(
+            :style=`{
+              borderRadius: '10px',
+              overflow: 'hidden',
+            }`
+            ).row.fit.items-center.content-center
+            div(
+              v-for="r in rateMeta" :key="r.value"
+              @mouseover="rateOver = r.value"
+              :style=`{
+                background: rateOver === r.value ? r.color : r.colorBackground,
+              }`
+              ).col.full-height
+              div(
+                @click="vote(r.value)"
+                ).row.fit.items-center.content-center.justify-center.cursor-pointer
+                q-spinner(
+                  v-if="voteVoting === r.value"
+                  color="white" size="10px")
+                small(
+                  v-else
+                  :style=`{fontSize: '9px', pointerEvents: 'none', userSelect: 'none'}`).text-white {{ r.name }}
 </template>
 
 <script>
 import { ObjectApi } from 'src/api/object'
+import { EventApi } from 'src/api/event'
+
 import nodeVoteBar from 'components/node/node_vote_bar.vue'
+import nodeVoteBall from './node_vote_ball.vue'
+import ClickOutside from 'vue-click-outside'
 
 export default {
   name: 'nodeActions',
@@ -28,13 +131,31 @@ export default {
   },
   components: {
     nodeVoteBar,
+    nodeVoteBall,
+  },
+  directives: {
+    ClickOutside
   },
   data () {
     return {
       showStats: false,
       isActiveStart: 0,
       votesShow: false,
+      voteStarted: false,
+      voteVoting: null,
+      rateOver: null,
     }
+  },
+  computed: {
+    rateMeta () {
+      return [
+        {name: EventApi.verbalizeRate(0.2), value: 0, valueMin: -1, valueMax: 0.2, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
+        {name: EventApi.verbalizeRate(0.4), value: 0.25, valueMin: 0.2, valueMax: 0.4, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
+        {name: EventApi.verbalizeRate(0.6), value: 0.5, valueMin: 0.4, valueMax: 0.6, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
+        {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
+        {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
+      ]
+    },
   },
   watch: {
     isActive: {
@@ -49,7 +170,28 @@ export default {
           let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
           // this.$log('statValue stat', stat)
           this.isActiveStart = 0
+          // handle voteStart
+          this.voteStarted = false
+          this.voteVoting = false
         }
+      }
+    }
+  },
+  methods: {
+    async vote (val) {
+      try {
+        this.$log('vote', val)
+        this.voteVoting = val
+        await this.$wait(1500)
+        let res = await ObjectApi.vote(this.node.oid, val)
+        this.$log('vote done', res)
+        this.voteVoting = null
+        this.voteStarted = false
+      }
+      catch (e) {
+        this.$log('vote error', e)
+        this.voteVoting = false
+        this.voteStarted = false
       }
     }
   }

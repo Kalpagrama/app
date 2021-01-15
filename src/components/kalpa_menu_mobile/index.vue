@@ -55,12 +55,20 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Поиск
+    //- transition(enter-active-class="animated fadeIn")
     q-btn(
-      round no-caps
+      round no-caps icon="construction"
       :to="'/workspace'"
       :color="'green'"
       :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-      anvil(size="30px")
+    //- q-btn(
+      v-if="$route.name.split('.')[0] === 'workspace'"
+      round no-caps
+      :to="'/workspace/create'"
+      :color="'green'"
+      :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+      q-icon(name="add" size="30px")
+      //- anvil(size="30px")
     //- q-btn(
       flat no-caps icon="bookmark_outline"
       :to="'/workspace/'"

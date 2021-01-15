@@ -57,7 +57,7 @@
           span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
           .row.full-width.q-px-sm
             //- small(v-if="user" :style=`{lineHeight: 0.8}`).text-grey-4 {{ Math.round(user.weightVal) }}
-            small(:style=`{lineHeight: 0.8}`).text-white @username
+            small(:style=`{lineHeight: 0.8}`).text-white @{{ user.username }}
         q-btn(
           v-if="true || !itsMe"
           @click="followToggle()"

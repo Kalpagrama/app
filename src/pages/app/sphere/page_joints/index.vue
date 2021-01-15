@@ -19,7 +19,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_sphere_pageNodes',
+  name: 'pageApp_sphere_pageJoints',
   props: ['sphere'],
   computed: {
     query () {
@@ -27,7 +27,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           // objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.sphere.oid
         },
         populateObjects: true,

@@ -18,6 +18,11 @@
       }`
       @contentKalpa="contentKalpaFound"
       @close="contentImporterShow = false")
+  //- q-btn(
+    round flat color="white" icon="construction"
+    :style=`{
+      width: '58px',
+    }`)
   .col
     q-input(
       v-model="searchString"
@@ -42,7 +47,7 @@
         q-btn(
           v-if="searchString.length > 0 && !loading"
           round flat dense color="grey-8" icon="clear" @click="searchString = ''")
-  content-uploader(
+  //- content-uploader(
     v-if="true"
     @file="contentFile = $event, contentImporterShow = true")
 </template>

@@ -41,24 +41,16 @@ div(
       }`
       ).row.fit.items-center.content-center.justify-center
       //- CONTENT: routerLink: contentName, actions
-      div(
+      q-btn(
+        flat dense color="white" no-caps align="left"
+        :to="'/content/'+contentKalpa.oid"
         :style=`{
           position: 'absolute', zIndex: 901,
-          top: '0px', left: '0px',
-          //- ...styles.padding,
-        }`
-        ).row.full-width.items-center.content-center.q-pa-sm
-        router-link(
-          :to="'/content/'+contentKalpa.oid"
-          :style=`{overflow: 'hidden'}`
-          ).col
-          q-btn(
-            flat dense color="white" no-caps).row.no-wrap
-            q-icon(name="select_all" color="white" size="20px")
-            .col
-              span(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`).text-white.q-pl-xs {{ contentKalpa.name }}
-        //- q-btn(
-          round flat dense color="grey-5" icon="more_vert")
+          top: '8px', left: '48px',
+          overflow: 'hidden',
+          maxWidth: 'calc(100% - 96px)',
+        }`).row.full-width.no-wrap.q-px-xs
+        span(:style=`{whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',}`).text-white {{ contentKalpa.name }}
       //- ACTIONS: replay,play/pause,forward
       div(
         :style=`{
@@ -90,40 +82,42 @@ div(
           }`)
           q-icon(
             name="forward_5" size="40px" color="white")
-      //- FOOTER
-      //- sound
-      //- q-btn(
-        @click="volumeToggle()"
-        round flat dense
-        :color="player.muted ? 'red' : 'white'"
-        :icon="player.muted ? 'volume_off' : 'volume_up'"
-        :style=`{
-          position: 'absolute', zIndex: 901,
-          right: '8px',
-          bottom: 'calc(50% - 16px)',
-        }`)
-  q-btn(
-    v-if="player"
-    @click="volumeToggle()"
-    round flat dense
-    :color="player.muted ? 'red' : 'white'"
-    :icon="player.muted ? 'volume_off' : 'volume_up'"
-    :style=`{
-      position: 'absolute', zIndex: 901,
-      right: '8px',
-      bottom: 'calc(50% - 16px)',
-    }`)
+  //- context
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-btn(
+      v-if="player"
+      round flat dense
+      :to="'/content/'+contentKalpa.oid"
+      color="white"
+      icon="select_all"
+      :style=`{
+        position: 'absolute', zIndex: 901,
+        left: '8px', top: '8px',
+      }`)
+  //- sound
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-btn(
+      v-if="player"
+      @click="volumeToggle()"
+      round flat dense
+      :color="player.muted ? 'red' : 'white'"
+      :icon="player.muted ? 'volume_off' : 'volume_up'"
+      :style=`{
+        position: 'absolute', zIndex: 901,
+        right: '8px', top: '8px',
+      }`)
   //- player mini-bar
-  player-bar-mini(
-    v-if="player" :player="player" :figures="figures"
-    @started="tintShow = true"
-    :mini="!tintShow"
-    :style=`{
-      position: 'absolute',
-      zIndex: 1000,
-      transform: 'translate3d(0,0,10px)',
-      bottom: '-15px',
-    }`)
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    player-bar-mini(
+      v-if="player" :player="player" :figures="figures"
+      @started="tintShow = true"
+      :mini="!tintShow"
+      :style=`{
+        position: 'absolute',
+        zIndex: 1000,
+        transform: 'translate3d(0,0,10px)',
+        bottom: '-15px',
+      }`)
   //- subtitles
   //- div(
     :style=`{

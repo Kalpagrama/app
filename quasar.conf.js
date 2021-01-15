@@ -228,9 +228,9 @@ module.exports = function (ctx) {
                res.redirect(req.originalUrl)
             })
          },
-         headers: {
-           'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
-         },
+         // headers: {
+         // //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
+         // },
          port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
          host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
          https: ctx.mode.capacitor || ctx.mode.spa ? false : {

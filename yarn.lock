@@ -15144,6 +15144,11 @@ vscode-uri@^1.0.6:
   resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-1.0.8.tgz#9769aaececae4026fb6e22359cb38946580ded59"
   integrity sha512-obtSWTlbJ+a+TFRYGaUumtVwb+InIUVI0Lu0VBUAPmj2cU5JutEXg3xUE0c2J5Tcy7h2DEKVJBFi+Y9ZSFzzPQ==
 
+vue-click-outside@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/vue-click-outside/-/vue-click-outside-1.1.0.tgz#48b7680b518923e701643cccb3e165854aad99eb"
+  integrity sha512-pNyvAA9mRXJwPHlHJyjMb4IONSc7khS5lxGcMyE2EIKgNMAO279PWM9Hyq0d5J4FkiSRdmFLwnbjDd5UtPizHQ==
+
 vue-eslint-parser@^7.0.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-7.2.0.tgz#1e17ae94ca71e617025e05143c8ac5593aacb6ef"

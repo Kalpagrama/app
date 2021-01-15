@@ -1,41 +1,81 @@
 <template lang="pug">
-.row.full-width.justify-center
-  kalpa-finder(
-    @contentKalpa="contentKalpaFound"
-    :pagesShow="true"
-    :pages=`{
-      content: {views: ['image', 'video']},
-      workspace: {views: ['image', 'video', 'node', 'joint', 'user', 'sphere', 'book']},
-    }`
+q-layout(
+  view="hHh Lpr lff")
+  q-drawer(
+    side="right"
+    v-model="menuOpened")
+    div(
+      :style=`{
+        borderRadius: '10px 0 0 10px',
+      }`
+      ).column.fit.b-30
+      div(:style=`{height: '60px'}`).row.full-width.q-my-sm
+      .col.full-width.scroll
+        .row.full-width.items-start.content-start.q-px-sm
+          div(v-for="n in 100" :key="n").row.full-width.q-pa-md.q-mb-sm.br {{ n }}
+  q-header(
+    reveal
     :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-      height: $q.screen.height+'px',
-    }`).b-30
-    template(v-slot:header)
-      .row.full-width.q-py-sm
+      paddingTop: 'env(safe-area-inset-top)'
+    }`)
+    .row.full-width.justify-center.b-30
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
         div(
           :style=`{
-            minHeight: '60px',
-            borderRadius: '10px', overflow: 'hidden',
-          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          //- q-icon(name="bookmark_outline" color="white" size="30px").q-ml-sm
-          anvil(size="30px").q-mx-xs
-          .col.q-px-sm
-            span(
-              :style=`{fontSize: '18px'}`
-              ).text-white.text-bold Мастерская
-          q-btn(round flat color="grey-8" icon="more_vert")
+            height: '60px',
+            borderRadius: '10px',
+          }`
+          ).row.full-width.items-center.content-center.q-pa-sm.b-40.q-my-sm
+          q-btn(
+            round flat color="white" icon="construction")
+          .col
+            .row.fit.items-center.content-center.justify-center
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold Мастерская
+          //- q-btn(
+            @click="menuOpened = true"
+            round flat color="white" icon="menu")
+          q-btn(
+            round flat color="white" icon="more_vert")
+  q-page-container
+    q-page(
+      :style=`{
+        paddingTop: '40px',
+      }`
+      ).row.full-width.justify-center
+      div(
+        :style=`{
+          //- maxWidth: $store.state.ui.pageWidth+'px',
+          maxWidth: '600px',
+        }`).row.full-width.items-start.content-start
+        .row.full-width
+          //- widget-bookmarks.q-mb-sm
+          widget-bookmarks.q-mb-sm
+        //- create
+        .row.full-width.justify-center.q-pt-xl
+          div(:style=`{maxWidth: '600px',}`).row.full-width
+            widget-url
+            .row.full-width.q-pt-sm.q-px-lg
+              //- to="/workspace/create"
+              //- TODO: upload from device !
+              q-btn(
+                outline color="grey-8" no-caps
+                :style=`{
+                  height: '60px',
+                }`
+                ).full-width
+                span.text-grey-6 Загрузить с устройства
 </template>
 
 <script>
 export default {
-  name: 'wsCreate',
+  name: 'wsIndex',
   components: {
-    kalpaFinder: () => import('components/kalpa_finder/index.vue'),
-    anvil: () => import('components/kalpa_icons/anvil.vue'),
+    widgetBookmarks: () => import('./widget_bookmarks/index.vue'),
+    widgetUrl: () => import('./widget_url/index.vue')
   },
   data () {
     return {
+      menuOpened: false,
     }
   },
   computed: {
@@ -43,18 +83,12 @@ export default {
   watch: {
   },
   methods: {
-    itemFound (item) {
-      this.$log('itemFound', item)
-      this.contentKalpaFound(item)
-    },
-    contentKalpaFound (contentKalpa) {
-      this.$log('contentKalpaFound', contentKalpa)
-      this.$router.replace('/content/' + contentKalpa.oid)
-    }
   },
   mounted () {
     this.$log('mounted')
-    document.body.style.background = 'rgb(30,30,30)'
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

@@ -23,14 +23,20 @@ q-layout(
           :isActive="true"
           :isVisible="true")
         //- widgets
-        widget-joints(:node="node")
-  q-footer(reveal).b-40
+        widget-joints(:node="node").q-mt-xl
+  q-footer(reveal)
     div(
       v-if="pageId"
       :style=`{
         height: pageHeight+'px',
-        borderRadius: '10px 10px 0 0',
-      }`).row.full-width.b-40
+        marginBottom: '-10px',
+      }`).row.full-width.justify-center
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '10px 10px 0 0',
+        }`
+        ).row.full-width.b-40
     nav-mobile(
       :pageId="pageId"
       @pageId="pageIdChange")
