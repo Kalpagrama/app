@@ -22,8 +22,8 @@ div(
         v-for="(r,ri) in rateMeta" :key="ri"
         :style=`{
           position: 'absolute', zIndex: 100+ri,
-          width: 100-(6*ri)+'%',
-          height: 100-(6*ri)+'%',
+          width: 100-(6*ri+1)+'%',
+          height: 100-(6*ri+1)+'%',
           borderRadius: '50%',
           background: rateMeta[ri].colorBackground,
         }`)
@@ -45,14 +45,14 @@ div(
         ).row.fit
     //- rateUser
     div(
-      v-if="node.rateUser"
+      v-if="node.rateUser >= 0"
       :style=`{
         position: 'absolute', zIndex: 300,
         //- top: '-4px', right: '-4px',
         top: '12px', left: '-16px',
         width: '10px', height: '10px',
         borderRadius: '50%',
-        background: rateMeta.find(r => node.rateUser > r.valueMin && node.rateUser < r.valueMax).color,
+        background: rateMeta.find(r => node.rateUser > r.valueMin && node.rateUser < r.valueMax).colorBackground,
       }`
       ).row
     //- voteCounts
