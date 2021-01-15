@@ -9,7 +9,7 @@ div(
   ).row.full-width
   slot
   //- NODE
-  //- node-feed(
+  node-feed(
     v-if="item && item.type === 'NODE'"
     :node="item"
     :isActive="isActive"
@@ -17,48 +17,50 @@ div(
     :showName="itemOpened"
     :showActions="itemOpened"
     :showSpheres="itemOpened"
-    )
-  composition-player(
-    v-if="item && item.type === 'NODE'"
-    :oid="oid"
-    :composition="item.items[0]"
-    :isActive="itemActive"
-    :isVisible="true"
-    :styles=`{
-      //- height: '100%',
-      //- objectFit: 'cover',
-      //- objectFit: 'contain',
-      ...styles,
-    }`
-    :options=`{
-      loop: true,
-      showBar: false,
-    }`)
-    div(
-      :style=`{
-        position: 'absolute', zIndex: 200, bottom: '-0.8px',
-        background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
-        borderRadius: '0 0 10px 10px',
-      }`
-      ).row.full-width.justify-center
-      router-link(
-        :to="'/node/'+item.oid"
+    :styles="styles"
+    :style=`{
+      borderRadius: '10px',
+    }`).b-30
+    template(v-slot:items)
+      composition-player(
+        v-if="item && item.type === 'NODE'"
+        :oid="oid"
+        :composition="item.items[0]"
+        :isActive="itemActive"
+        :isVisible="true"
+        :isMini="!itemOpened"
+        :styles=`{
+          ...styles,
+        }`)
+    template(v-slot:wrapper)
+      div(
+        @click="$emit('open')"
+        v-show="!itemOpened"
         :style=`{
-          height: '36px',
-          textAlign: 'center',
+          position: 'absolute', zIndex: 200, bottom: '-0.8px',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
+          borderRadius: '0 0 10px 10px',
         }`
-        ).row.items-center.content-center.scroll
-        //- .row.full-width.br
-        q-btn(
-          v-if="item.__typename === 'Composition'"
-          round flat dense color="white" icon="select_all")
-        span(
-          v-else
+        ).row.full-width.justify-center
+        router-link(
+          :to="'/node/'+item.oid"
           :style=`{
-            whiteSpace: 'nowrap',
-            marginLeft: '8px',
+            height: '36px',
             textAlign: 'center',
-          }`).text-white.q-mr-sm {{ item.name }}
+            pointerEvents: 'none',
+          }`
+          ).row.items-center.content-center.scroll
+          //- .row.full-width.br
+          q-btn(
+            v-if="item.__typename === 'Composition'"
+            round flat dense color="white" icon="select_all")
+          span(
+            v-else
+            :style=`{
+              whiteSpace: 'nowrap',
+              marginLeft: '8px',
+              textAlign: 'center',
+            }`).text-white.q-mr-sm {{ item.name }}
     //- div(
       :style=`{
         position: 'absolute', zIndex: 1000, bottom: '0px',
@@ -68,14 +70,11 @@ div(
   //- COMPOSITION
   composition-player(
     v-else-if="item && item.__typename === 'Composition'"
-    :oid="oid"
     :composition="item"
     :isActive="itemActive"
     :isVisible="true"
+    :isMini="!itemOpened"
     :styles=`{
-      //- height: '100%',
-      //- objectFit: 'cover',
-      //- objectFit: 'contain',
       ...styles
     }`
     :options=`{

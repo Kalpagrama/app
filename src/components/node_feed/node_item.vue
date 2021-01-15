@@ -3,19 +3,14 @@ div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
-    //- ...styles,
   }`
   ).row.full-width
-  //- div(
-    :style=`{
-      position: 'absolute', bottom: '-25px', left: '0px', zIndex: 10000,
-      height: '50px', width: '50px',
-    }`
-    ).row.bg-red
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
     composition-player(
-      :oid="node.oid"
-      :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
+      :composition="node.items[0]"
+      :isVisible="isVisible"
+      :isActive="isActive"
+      :isMini="false"
       :styles=`{
         height: '100%',
         objectFit: 'cover',
@@ -23,6 +18,7 @@ div(
       :options=`{
         loop: true,
         showBar: true,
+        showHeader: true,
       }`)
 </template>
 

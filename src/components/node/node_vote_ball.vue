@@ -17,8 +17,9 @@ div(
   div(
     :style=`{
       position: 'relative',
-      width: '26px', height: '26px',
+      width: '40px', height: '40px',
       borderRadius: '50%',
+      transform: 'blur(10px)',
     }`
     ).row.items-center.content-center.justify-center
     //- img(
@@ -71,10 +72,10 @@ div(
           width: 100-(20*ri)+'%',
           height: 100-(20*ri)+'%',
           borderRadius: '50%',
-          background: rateMeta[ri].colorBackground,
+          background: rateMeta[ri].color,
         }`)
   //- voteCounts
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 100,
       bottom: '-16px',

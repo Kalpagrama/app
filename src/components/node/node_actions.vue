@@ -86,7 +86,7 @@
             flat dense color="grey-8" no-caps
             :style=`{
               position: 'absolute', zIndex: 2000,
-              bottom: '-36px',
+              bottom: '-46px',
             }`).full-width
             small.text-grey-8 Отмена
           //- vote rates

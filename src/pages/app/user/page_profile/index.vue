@@ -13,6 +13,7 @@ q-page(
     :style=`{
       position: 'sticky', top: '0px',
       zIndex: 2000,
+      transform: 'translate3d(0,0,100px)',
     }`
     ).row.full-width.justify-center.b-30
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-px-md

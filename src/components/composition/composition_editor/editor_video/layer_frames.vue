@@ -179,10 +179,11 @@ export default {
           this.$log('>= layerEnd')
           this.player.setCurrentTime(this.layerStart)
         }
-        if (to < this.layerStart) {
-          this.$log('< layerStart')
-          this.player.setCurrentTime(this.layerStart)
-        }
+        // if (to < this.layerStart) {
+        //   this.$log('< layerStart')
+        //   this.player.setCurrentTime(this.layerStart)
+        //   this.player.play()
+        // }
       }
     },
     tickFramesLayerCenter: {
@@ -311,7 +312,9 @@ export default {
         this.pointDraggingError = false
         // final action of pointDragging, the same layerForward...
         if (index === 0) {
+          this.player.setCurrentTime(t)
           this.player.play()
+          // this.player.pause()
         }
         else {
           let tBeforeTheEnd = t - 3 > this.layerStart ? t - 3 : this.layerStart

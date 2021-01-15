@@ -4,41 +4,43 @@ div(
     position: 'relative',
   }`
   ).row.full-width
-  //- footer
-  div(
-    :style=`{
-      //- position: 'absolute', zIndex: 1000, bottom: '0px',
-      position: 'fixed', zIndex: 1000, bottom: '0px',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-      order: 10,
-    }`
-    ).row.full-width.items-center.content-center
+  //- footer: cancel,publish,link
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
+      v-if="$q.screen.lt.md ? !$store.state.ui.userTyping : true"
       :style=`{
-        height: '70px',
+        //- position: 'absolute', zIndex: 1000, bottom: '0px',
+        position: 'fixed', zIndex: 1000, bottom: '0px',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        order: 10,
       }`
-      ).row.full-width.items-center.content-center.justify-between.q-px-sm
-      q-btn(
-        @click="cancel()"
-        flat color="grey-7" icon="west" no-caps
-        :style=`{maxWidth: '60px'}`)
-        .row.full-width.justify-center
-          small Отмена
-      //- .col
-      q-btn(
-        @click="publish()"
-        color="green" no-caps
-        :loading="publishing"
+      ).row.full-width.items-center.content-center
+      div(
         :style=`{
-          height: '40px',
-        }`)
-        span.text-bold Опубликовать
-      q-btn(
-        @click="link()"
-        flat color="grey-7" icon="link" no-caps
-        :style=`{maxWidth: '60px',}`)
-        .row.full-width.justify-center
-          small Связать
+          height: '70px',
+        }`
+        ).row.full-width.items-center.content-center.justify-between.q-px-sm
+        q-btn(
+          @click="cancel()"
+          flat color="grey-7" icon="west" no-caps
+          :style=`{maxWidth: '60px'}`)
+          .row.full-width.justify-center
+            small Отмена
+        //- .col
+        q-btn(
+          @click="publish()"
+          color="green" no-caps
+          :loading="publishing"
+          :style=`{
+            height: '40px',
+          }`)
+          span.text-bold Опубликовать
+        q-btn(
+          @click="link()"
+          flat color="grey-7" icon="link" no-caps
+          :style=`{maxWidth: '60px',}`)
+          .row.full-width.justify-center
+            small Связать
   //- body
   div(
     v-if="node"
@@ -186,11 +188,13 @@ export default {
         // nodeInput.shit...
         let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$log('publish done')
+        this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
         this.$emit('publish', createdNode)
         this.publishing = false
       }
       catch (e) {
-        this.$log('publish error')
+        this.$log('publish error', e)
+        this.$q.notify({type: 'negative', message: e.toString()})
         this.publishing = false
       }
     },
