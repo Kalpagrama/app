@@ -30,18 +30,18 @@ div(
       type: 'VIDEO',
       contentSource: 'KALPA',
     }`
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :isMini="isMini"
+    :showHeader="showHeader"
+    :showFooter="showFooter"
+    :showTimeline="showTimeline"
+    :showTime="showTime"
+    :showTint="showTint"
     :figures="figures"
-    :styles=`{
-      height: styles.height,
-      objectFit: styles.objectFit,
-    }`
-    :options=`{
-      mini: true,
-      showBar: options.showBar
-    }`
+    :styles="styles"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      //- borderRadius: '10px',
       opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
 </template>
@@ -55,20 +55,16 @@ export default {
     contentPlayer
   },
   props: {
-    oid: {type: String},
-    isVisible: {type: Boolean},
-    isActive: {type: Boolean},
     composition: {type: Object, required: true},
+    isActive: {type: Boolean},
+    isVisible: {type: Boolean},
+    isMini: {type: Boolean},
+    showHeader: {type: Boolean},
+    showFooter: {type: Boolean},
+    showTimeline: {type: Boolean},
+    showTime: {type: Boolean},
+    showTint: {type: Boolean},
     styles: {type: Object, default: {}},
-    options: {
-      type: Object,
-      default () {
-        return {
-          loop: true,
-          showBar: true
-        }
-      }
-    }
   },
   data () {
     return {
@@ -76,6 +72,7 @@ export default {
     }
   },
   computed: {
+    // TODO: figures always...
     figures () {
       if (this.composition.outputType === 'VIDEO') {
         let arr = this.composition.url.split('#t=')

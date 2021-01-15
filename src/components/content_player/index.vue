@@ -15,7 +15,9 @@ export default {
     playerBook: () => import('./player_book/index.vue'),
   },
   props: {
-    isActive: {type: Boolean, default: true},
+    isVisible: {type: Boolean},
+    isActive: {type: Boolean},
+    isMini: {type: Boolean},
     contentKalpa: {type: Object, required: true},
     options: {type: Object},
     figures: {type: Array},

@@ -17,10 +17,11 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
       v-if="itemOpened !== null"
       :style=`{
         position: 'fixed', zIndex: 10000, top: 0, left: 0, right: 0, bottom: 0,
+        transform: 'translate3d(0,0,100px)',
         //- background: 'black',
-        background: 'rgba(0,0,0,0.95)',
+        //- background: 'rgba(0,0,0,0.95)',
       }`
-      ).row.fit
+      ).row.fit.b-30
   //- items left/right
   div(
     v-for="(item, ii) in node.items" :key="ii"
@@ -71,16 +72,22 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
           :styles=`{
             objectFit: itemOpened === ii ? 'contain' : 'cover',
             height: itemOpened === ii ? 'auto' : '100%',
-          }`)
+          }`
+          @open="itemClick(ii)")
         //- itemOpened footer: close? only?
         div(
           v-if="itemOpened === ii"
           @click="itemClick(ii)"
-          ).row.full-width.items-center.content-center.justify-center.q-py-md
-          q-btn(flat color="white" no-caps)
-            span Закрыть
+          ).row.full-width.items-center.content-center.justify-center.q-py-lg
+          q-btn(
+            outline color="grey-8" no-caps
+            :style=`{
+              height: '50px',
+            }`).q-px-md
+            span Свернуть
     //- tint
     div(
+      v-if="itemActive !== ii"
       @click="itemClick(ii)"
       :style=`{
         position: 'absolute', zIndex: 110, top: 0,

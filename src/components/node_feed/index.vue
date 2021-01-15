@@ -12,12 +12,14 @@ div(
     ...styles,
   }`
   ).row.full-width.items-start.content-start
+  slot(name="wrapper")
   //- wrapper
   div(
     :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
       borderRadius: borderRadius,
+      ...styles,
     }`).row.full-width.items-start.content-start
     //- HEADER: author, createdAt, actions, date, views
     div(

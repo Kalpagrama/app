@@ -83,7 +83,7 @@
           ).row
         //- tint
         div(
-          v-show="!mini"
+          v-show="panning"
           :style=`{
             position: 'absolute', zIndex: 10,
             pointerEvents: 'none',
@@ -108,7 +108,7 @@
           ).row.bg-red
           //- right circle
           div(
-            v-show="!mini"
+            v-show="panning"
             :style=`{
               position: 'absolute', zIndex: 1001,
               right: -(height*heightK)/2+'px',
@@ -191,6 +191,9 @@ export default {
     }
   },
   watch: {
+    // panning: {
+    //   handler (to, from) {}
+    // },
     mini: {
       immediate: true,
       handler (to, from) {
@@ -241,6 +244,7 @@ export default {
   methods: {
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
+      // this.$q.notify({type: 'negative', message: 'setCurrentTime' + t})
       if (this.start && this.end) {
         this.player.setCurrentTime(t + this.start)
       }
@@ -259,16 +263,18 @@ export default {
       // this.$log('left/width', left, width)
       let t = (left / width) * this.duration
       // this.$log('t', this.$time(t))
-      // this.player.events.emit('bar-click', {t: t})
+      this.player.events.emit('bar-click', {t: t})
       this.setCurrentTime(t)
     },
     barPan (e) {
       // this.$log('barPan', e)
       if (e.isFirst) {
         this.$emit('started')
+        this.panning = true
       }
       if (e.isFinal) {
         this.$emit('ended')
+        this.panning = false
       }
       let rect = this.$refs['bar-body'].getBoundingClientRect()
       let left = e.position.left - rect.left

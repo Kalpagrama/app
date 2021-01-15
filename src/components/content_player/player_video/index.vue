@@ -21,7 +21,7 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
-  //- player tint
+  //- player tint caller
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === false"
@@ -30,6 +30,7 @@ div(
         position: 'absolute', zIndex: 900,
       }`
       ).row.fit
+  //- player tint
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === true"
@@ -42,6 +43,7 @@ div(
       ).row.fit.items-center.content-center.justify-center
       //- CONTENT: routerLink: contentName, actions
       q-btn(
+        v-if="showHeader"
         flat dense color="white" no-caps align="left"
         :to="'/content/'+contentKalpa.oid"
         :style=`{
@@ -58,6 +60,7 @@ div(
         }`
         ).row.items-center.content-center.justify-center
         q-btn(
+          v-if="!isMini"
           @click="tapClick(0)"
           round flat color="white" size="md"
           :style=`{
@@ -75,6 +78,7 @@ div(
             size="60px" color="white"
             :name="player.playing ? 'pause' : 'play_arrow'")
         q-btn(
+          v-if="!isMini"
           @click="tapClick(1)"
           round flat color="white" size="md"
           :style=`{
@@ -91,7 +95,7 @@ div(
       color="white"
       icon="select_all"
       :style=`{
-        position: 'absolute', zIndex: 901,
+        position: 'absolute', zIndex: 1000,
         left: '8px', top: '8px',
       }`)
   //- sound
@@ -103,15 +107,15 @@ div(
       :color="player.muted ? 'red' : 'white'"
       :icon="player.muted ? 'volume_off' : 'volume_up'"
       :style=`{
-        position: 'absolute', zIndex: 901,
+        position: 'absolute', zIndex: 1000,
         right: '8px', top: '8px',
       }`)
   //- player mini-bar
+  //- @started="tintShow = true"
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     player-bar-mini(
       v-if="player" :player="player" :figures="figures"
-      @started="tintShow = true"
-      :mini="!tintShow"
+      :mini="isMini || !tintShow"
       :style=`{
         position: 'absolute',
         zIndex: 1000,
@@ -130,7 +134,7 @@ div(
         borderRadius: '10px',
       }`
     ).text-white.bg-black.q-pa-sm lorem ipsum subtitles
-  //- div(v-if="!options.mini" :style=`{height: '20px',}`).row.full-width
+  //- div(v-if="!isMini" :style=`{height: '20px',}`).row.full-width
 </template>
 
 <script>
@@ -145,17 +149,11 @@ export default {
   },
   props: {
     contentKalpa: {type: Object, required: true},
+    isVisible: {type: Boolean, default: true},
     isActive: {type: Boolean, default: true},
+    isMini: {type: Boolean, default: false},
+    options: {type: Object, default: {}},
     figures: {type: Array},
-    options: {
-      type: Object,
-      default () {
-        return {
-          mini: false,
-          showBar: true,
-        }
-      }
-    },
     styles: {
       type: Object,
       default () {
@@ -178,6 +176,20 @@ export default {
     }
   },
   computed: {
+  },
+  watch: {
+    tintShow: {
+      async handler (to, from) {
+        this.$log('tintShow TO', to)
+        if (to) {
+          await this.$wait(2500)
+          this.tintShow = false
+        }
+        else {
+          // do nothing
+        }
+      }
+    }
   },
   methods: {
     tapClick (index) {

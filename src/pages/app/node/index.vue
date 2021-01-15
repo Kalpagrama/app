@@ -14,16 +14,14 @@ q-layout(
         .col
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
   q-header(reveal).b-30
-    .row.full-width.justify-center
+    .row.full-width.justify-center.b-30
       div(
         v-if="node"
-        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
         node-feed(
           :node="node"
           :isActive="true"
           :isVisible="true")
-        //- widgets
-        widget-joints(:node="node").q-mt-xl
   q-footer(reveal)
     div(
       v-if="pageId"
@@ -40,6 +38,13 @@ q-layout(
     nav-mobile(
       :pageId="pageId"
       @pageId="pageIdChange")
+  q-page-container
+    q-page(
+      :style=`{
+        paddingTop: '8px',
+        paddingBottom: '200px',
+      }`)
+      widget-joints(v-if="node" :node="node")
   //- q-footer(
     reveal)
     transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")

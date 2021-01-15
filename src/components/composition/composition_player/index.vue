@@ -1,12 +1,12 @@
 <template lang="pug">
 component(
   :is="playerComponent[composition.outputType]"
-  :oid="oid"
   :composition="composition"
   :isVisible="isVisible"
   :isActive="isActive"
-  :styles="styles"
-  :options="options")
+  :isMini="isMini"
+  :options="options"
+  :styles="styles")
   slot
 </template>
 
@@ -22,7 +22,14 @@ export default {
     playerImage,
     playerBook
   },
-  props: ['oid', 'isActive', 'isVisible', 'composition', 'styles', 'options'],
+  props: [
+    'composition',
+    'isVisible',
+    'isActive',
+    'isMini',
+    'options',
+    'styles'
+  ],
   data () {
     return {
       playerComponent: {
