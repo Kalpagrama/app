@@ -25,10 +25,9 @@ const store = new Vuex.Store({
    getters: {
       currentUser: (state, getters, rootState, rootGetters) => id => {
          assert(rxdb, '!rxdb')
-         // assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
-         // assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
-         if (rxdb.getCurrentUser) return rxdb.getCurrentUser()
-         else return null
+         assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
+         assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
+         return rxdb.getCurrentUser()
       }
    }
 })
