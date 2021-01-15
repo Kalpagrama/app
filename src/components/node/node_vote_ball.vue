@@ -45,14 +45,14 @@ div(
         ).row.fit
     //- rateUser
     div(
-      v-if="node.rateUser"
+      v-if="node.rateUser >= 0"
       :style=`{
         position: 'absolute', zIndex: 300,
         //- top: '-4px', right: '-4px',
         top: '12px', left: '-16px',
         width: '10px', height: '10px',
         borderRadius: '50%',
-        background: rateMeta.find(r => node.rateUser > r.valueMin && node.rateUser < r.valueMax).color,
+        background: rateMeta.find(r => node.rateUser > r.valueMin && node.rateUser < r.valueMax).colorBackground,
       }`
       ).row
     //- voteCounts
