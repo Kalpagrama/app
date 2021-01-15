@@ -40,6 +40,8 @@ const objectFragment = gql`${objectShortFragment}
     countRemakes
     countShares
     countBookmarks
+    countSubscribers
+    countSubscriptions
   }
 `
 
