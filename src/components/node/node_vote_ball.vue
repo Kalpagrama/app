@@ -6,14 +6,22 @@ div(
   }`
   ).row.items-center.content-center.justify-center
   //- vote btn start
-  q-btn(
-    @click="voteStart"
-    round flat dense color="white"
+  //- q-btn(
+  //-   @click="voteStart"
+  //-   round flat dense color="white"
+  //-   :style=`{
+  //-     position: 'relative',
+  //-     width: '30px', height: '30px',
+  //-     borderRadius: '50%',
+  //-   }`).bg
+  div(
     :style=`{
       position: 'relative',
+      width: '26px', height: '26px',
       borderRadius: '50%',
-    }`)
-    img(
+    }`
+    ).row.items-center.content-center.justify-center
+    //- img(
       src="~/assets/vote.png"
       :style=`{
         zIndex: 10,
@@ -22,7 +30,7 @@ div(
         opacity: 0.6,
         filter: 'grayscale(20%)'
       }`)
-    div(
+    //- div(
       v-if="rateUser"
       :style=`{
         position: 'absolute', zIndex: 300,
@@ -34,11 +42,42 @@ div(
         background: rateUser.colorBackground,
         borderRadius: '50%',
       }`)
+    div(
+      v-if="node.rateStat.length > 0"
+      :style=`{position: 'relative'}`).row.fit.items-center.content-center.justify-center
+      div(
+        v-for="(r,ri) in rateCircles" :key="ri"
+        v-if="r.percent > 0"
+        :style=`{
+          position: 'absolute', zIndex: 100+ri,
+          top: ri === 0 ? '0px' : r.percent/2+'%',
+          left: ri === 0 ? '0px' : r.percent/2+'%',
+          //- top: '8px', left: '8px',
+          width: ri === 0 ? 100+'%' : 100-r.percent+'%',
+          height: ri === 0 ? 100+'%' : 100-r.percent+'%',
+          borderRadius: '50%',
+          background: r.color,
+        }`)
+    div(
+      v-if="node.rateStat.length === 0"
+      :style=`{position: 'relative'}`).row.fit.items-center.content-center.justify-center
+      div(
+        v-for="(r,ri) in rateMeta" :key="ri"
+        :style=`{
+          position: 'absolute', zIndex: 100+ri,
+          //- top: 100-r.percent/2+'%',
+          //- left: 100-r.percent/2+'%',
+          //- top: '8px', left: '8px',
+          width: 100-(20*ri)+'%',
+          height: 100-(20*ri)+'%',
+          borderRadius: '50%',
+          background: rateMeta[ri].colorBackground,
+        }`)
   //- voteCounts
   div(
     :style=`{
       position: 'absolute', zIndex: 100,
-      bottom: '-10px',
+      bottom: '-16px',
     }`
     ).row.full-width.justify-center
     small.text-grey-9 1231
@@ -82,6 +121,18 @@ export default {
           })
         }
       }
+    },
+    rateCircles () {
+      return this.node.rateStat.reduce((acc, val, idx, arr) => {
+        acc.push({
+          percent: idx === 0 ? 100 : arr[idx - 1].percent,
+          idx: idx,
+          rateMetaIdx: this.rateMeta.length - 1 - idx,
+          color: this.rateMeta[idx].color,
+          colorBackground: this.rateMeta[idx].colorBackground,
+        })
+        return acc
+      }, [])
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid

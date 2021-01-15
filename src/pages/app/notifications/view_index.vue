@@ -4,10 +4,11 @@ q-page(
   ).row.full-width.justify-center.q-px-sm
   kalpa-loader(
     v-if="sphereOid"
-    :immediate="true" :query="query" :limit="100" v-slot=`{items,next}`)
+    :immediate="true" :query="query" :limit="12" v-slot=`{items,next}`)
     div(
       :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
       ).row.full-width.items-start.content-start
+      q-infinite-scroll(@load="next" :offset="$q.screen.height")
       div(
         v-for="(n,ni) in items" :key="n.id"
         v-if="n.subject && n.object"
@@ -45,6 +46,9 @@ q-page(
             v-if="typeof i === 'string'"
             ).row.q-pa-sm
             span.text-white {{ i }}
+      //- loading pagination
+      div(:style=`{height: '50px'}`).row.full-width.justify-center
+        q-spinner-dots(v-show="nexting" color="green" size="50px")
 </template>
 
 <script>

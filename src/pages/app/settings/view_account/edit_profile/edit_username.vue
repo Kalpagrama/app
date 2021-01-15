@@ -22,19 +22,42 @@ import { UserApi } from 'src/api/user'
 
 export default {
   name: 'editUsername',
+  props: ['currentUser'],
   data () {
     return {
-      username: ''
+      username: '',
+      usernameTaken: false,
+      usernameLock: false,
     }
   },
   watch: {
+    currentUser: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('currentUser TO', to)
+        if (to.username) {
+          this.usernameLock = true
+          this.username = to.username
+          this.usernameLock = false
+        }
+      }
+    },
     username: {
       async handler (to, from) {
         this.$log('username TO', to)
-        // await ObjectApi.update(oidUser, 'username', 'new username')
+        if (this.usernameLock) return
         if (to && to.length >= 3) {
-          let usernameAvaible = await UserApi.checkUsernameFree('name to check')
+          let usernameAvaible = await UserApi.checkUsernameFree(to)
           this.$log('usernameAvaible', usernameAvaible)
+          if (usernameAvaible === true) {
+            // update username
+            await ObjectApi.update(this.currentUser.oid, 'username', to)
+          }
+          // username is taken ?
+          if (usernameAvaible === false) {
+            this.usernameTaken = true
+          }
         }
       }
     }

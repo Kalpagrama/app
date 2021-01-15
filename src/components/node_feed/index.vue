@@ -31,7 +31,7 @@ div(
           .row.items-center.content-center.q-px-sm
             span.text-grey-4 {{ node.author.name }}
             .row.full-width
-              small(:style=`{lineHeight: 0.8}`).text-grey-8 @username
+              small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
       .col
       .row.items-center.content-center.justify-end.q-pt-sm
         small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
