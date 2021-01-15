@@ -11,6 +11,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
       width: '60px', height: '60px',
       //- pointerEvents: 'none'
     }`)
+  //- tint for opened item
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="itemOpened !== null"

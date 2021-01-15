@@ -7,7 +7,7 @@
   edit-status(:currentUser="currentUser")
   //- username
   edit-username(:currentUser="currentUser")
-  .row.full-width.q-pa-xs
+  //- .row.full-width.q-pa-xs
     div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
       q-input(
         v-model="username"
