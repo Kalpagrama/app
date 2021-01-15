@@ -5,83 +5,71 @@ div(
     width: '40px',
   }`
   ).row.items-center.content-center.justify-center
-  //- vote btn start
-  //- q-btn(
-  //-   @click="voteStart"
-  //-   round flat dense color="white"
-  //-   :style=`{
-  //-     position: 'relative',
-  //-     width: '30px', height: '30px',
-  //-     borderRadius: '50%',
-  //-   }`).bg
+  //- btn start...
   div(
     :style=`{
       position: 'relative',
-      width: '40px', height: '40px',
+      width: '34px', height: '34px',
       borderRadius: '50%',
       transform: 'blur(10px)',
     }`
     ).row.items-center.content-center.justify-center
-    //- img(
-      src="~/assets/vote.png"
-      :style=`{
-        zIndex: 10,
-        width: '24px',
-        height: '24px',
-        opacity: 0.6,
-        filter: 'grayscale(20%)'
-      }`)
-    //- div(
-      v-if="rateUser"
-      :style=`{
-        position: 'absolute', zIndex: 300,
-        top: '5px',
-        left: '5px',
-        width: '24px',
-        height: '24px',
-        //- opacity: 0.6,
-        background: rateUser.colorBackground,
-        borderRadius: '50%',
-      }`)
+    //- rainbow circle
     div(
-      v-if="node.rateStat.length > 0"
-      :style=`{position: 'relative'}`).row.fit.items-center.content-center.justify-center
-      div(
-        v-for="(r,ri) in rateCircles" :key="ri"
-        v-if="r.percent > 0"
-        :style=`{
-          position: 'absolute', zIndex: 100+ri,
-          top: ri === 0 ? '0px' : r.percent/2+'%',
-          left: ri === 0 ? '0px' : r.percent/2+'%',
-          //- top: '8px', left: '8px',
-          width: ri === 0 ? 100+'%' : 100-r.percent+'%',
-          height: ri === 0 ? 100+'%' : 100-r.percent+'%',
-          borderRadius: '50%',
-          background: r.color,
-        }`)
-    div(
-      v-if="node.rateStat.length === 0"
+      v-if="true"
       :style=`{position: 'relative'}`).row.fit.items-center.content-center.justify-center
       div(
         v-for="(r,ri) in rateMeta" :key="ri"
         :style=`{
           position: 'absolute', zIndex: 100+ri,
-          //- top: 100-r.percent/2+'%',
-          //- left: 100-r.percent/2+'%',
-          //- top: '8px', left: '8px',
-          width: 100-(20*ri)+'%',
-          height: 100-(20*ri)+'%',
+          width: 100-(6*ri)+'%',
+          height: 100-(6*ri)+'%',
           borderRadius: '50%',
-          background: rateMeta[ri].color,
+          background: rateMeta[ri].colorBackground,
         }`)
-  //- voteCounts
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 100,
-      bottom: '-16px',
-    }`
-    ).row.full-width.justify-center
-    small.text-grey-9 1231
+    //- rateMax
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 300,
+        width: '70%', minWidth: '70%', maxWidth: '70%',
+        height: '70%', minHeight: '70%', maxHeight: '70%',
+        borderRadius: '50%',
+        padding: '4px',
+      }`
+      ).row.items-center.content-center.justify-center.b-30
+      div(
+        :style=`{
+          borderRadius: '50%',
+          background: rateMeta.find(r => node.rate > r.valueMin && node.rate < r.valueMax).color,
+        }`
+        ).row.fit
+    //- rateUser
+    div(
+      v-if="node.rateUser"
+      :style=`{
+        position: 'absolute', zIndex: 300,
+        //- top: '-4px', right: '-4px',
+        top: '12px', left: '-16px',
+        width: '10px', height: '10px',
+        borderRadius: '50%',
+        background: rateMeta.find(r => node.rateUser > r.valueMin && node.rateUser < r.valueMax).color,
+      }`
+      ).row
+    //- voteCounts
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 100,
+        top: '9px', right: '-39px',
+      }`
+      ).row.full-width.justify-start
+      small.text-grey-9 {{ node.countVotes }}
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 100,
+        bottom: '-18px',
+      }`
+      ).row.full-width.justify-center
+      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ rateMeta.find(r => node.rate > r.valueMin && node.rate < r.valueMax).name }}
 </template>
 
 <script>
@@ -104,36 +92,6 @@ export default {
         {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
         {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
       ]
-    },
-    rateUser () {
-      if (this.nodeIsMine) {
-        return this.rateMeta.find(r => {
-          return r.value >= this.node.rate && r.value < this.node.rate
-        })
-      }
-      else {
-        if (this.node.rateUser) {
-          return this.rateMeta.find(r => r.value === this.node.rateUser)
-        }
-        else {
-          // return null
-          return this.rateMeta.find(r => {
-            return r.value >= this.node.rate && r.value < this.node.rate
-          })
-        }
-      }
-    },
-    rateCircles () {
-      return this.node.rateStat.reduce((acc, val, idx, arr) => {
-        acc.push({
-          percent: idx === 0 ? 100 : arr[idx - 1].percent,
-          idx: idx,
-          rateMetaIdx: this.rateMeta.length - 1 - idx,
-          color: this.rateMeta[idx].color,
-          colorBackground: this.rateMeta[idx].colorBackground,
-        })
-        return acc
-      }, [])
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid

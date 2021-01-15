@@ -22,14 +22,24 @@
     .col
       .row.full-width
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9" icon="share")
+          q-btn(round flat dense color="grey-9" icon="reply")
+          //- q-btn(round flat dense color="grey-9" icon="logout")
+          //- q-btn(round flat dense color="grey-9")
+            q-icon(name="logout" size="22px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countJoints }}
+    //- micronodes
     .col
       .row.full-width
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9" icon="radio_button_checked")
+          //- q-btn(round flat dense color="grey-9" icon="group_work")
+          q-btn(round flat dense color="grey-9" icon="motion_photos_on")
+          //- q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
+            q-icon(name="workspaces" size="13px"
+              :style=`{
+                position: 'absolute'
+              }`)
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countJoints }}
@@ -41,9 +51,18 @@
           .row.fit.items-center.content-center.justify-end
             small.text-grey-9 {{ node.countJoints }}
         .row.items-center.content-center
-          //- q-btn(round flat dense color="grey-9" icon="link")
+          //- q-btn(round flat dense color="grey-9" icon="hdr_weak")
           q-btn(round flat dense color="grey-9")
-            q-icon(name="link" size="22px").rotate-90
+            q-icon(name="hdr_weak" size="24px").rotate-180
+          //- q-btn(
+            round flat dense color="grey-9"
+            :style=`{
+            }`).br
+            div(:style=`{overflow: 'hidden',}`).row.fit.bg
+              q-icon(name="linear_scale" size="50px").rotate-45
+          //- q-btn(round flat dense color="grey-9" icon="share")
+          //- q-btn(round flat dense color="grey-9")
+            q-icon(name="share" size="22px").rotate-90
     //- bookmarks
     .col
       .row.full-width
