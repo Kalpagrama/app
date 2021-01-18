@@ -1,5 +1,6 @@
 <template lang="pug">
 .row.justify-center.items-center.content-center
+  //- share dialog
   q-dialog(
     v-model="shareDialogOpened"
     position="bottom"
@@ -32,7 +33,7 @@
               q-btn(color="green" flat no-caps @click="shareLinkCopy()")
                 span.text-bold {{$t('Copy', 'Скопировать')}}
       //- links
-      div(
+      //- div(
         v-if="!shareTarget").row.full-width.q-px-md
         q-btn(
           @click="shareEmbed"
@@ -46,7 +47,7 @@
           round icon="fab fa-vk" color="blue-8" size="lg"
           :style=`{borderRadius: '50%'}`).q-mr-md
       //- embed
-      div(
+      //- div(
         v-if="shareTarget === 'embed'"
         ).row.full-width.q-pa-md
         div(
@@ -59,16 +60,17 @@
             template(v-slot:append)
               q-btn(color="green" flat no-caps @click="shareEmbedCopy()")
                 span.text-bold {{$t('Copy', 'Скопировать')}}
-  slot(name="btn" :start="shareStart")
-  //- share start btn
-  q-btn(
-    v-if="!$scopedSlots.btn"
+  div(
     @click="shareStart()"
-    round flat no-caps
-    :color="'grey-9'"
-    icon="share"
-    :loading="loading")
-  //- slot(name="footer")
+    ).row
+    slot
+    //- share start btn
+    q-btn(
+      v-if="!$slots.default"
+      round flat no-caps
+      icon="share"
+      :color="'grey-9'"
+      :loading="loading")
 </template>
 
 <script>
@@ -109,7 +111,7 @@ export default {
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
-      this.clipboardWrite(this.shareLink, 'Link copied to clipboard!')
+      this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
       await this.$wait(500)
       this.shareDialogOpened = false
     },

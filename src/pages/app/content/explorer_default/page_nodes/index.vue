@@ -12,35 +12,38 @@ div(
   slot
   kalpa-loader(
     :immediate="true"
-    @items="nodesUpdated"
+    @items="nodesUpdated" :limit="10"
     :query="nodesQuery" v-slot=`{items,next,nexting}`)
     list-middle(
       :items="items" :itemStyles=`{marginBottom: '0px',}`
       :style=`{position: 'relative', maxWidth: '700px',}`).q-pa-sm
+      q-infinite-scroll(@load="next" :offset="$q.screen.height")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         node-item(
           :ref="'node-'+item.oid"
           :node="item" :player="player" :contentKalpa="contentKalpa"
-          :nodeQuery="nodeQuery"
+          :nodeSelected="query.nodeOid === item.oid"
           :isActive="isActive" :isVisible="isVisible"
           :isSelected="item.oid === nodeSelectedOid"
           :style=`{
             zIndex: 2
           }`
-          @select="nodeSelectedOid = item.oid")
+          @select="$emit('node', item)"
+          ).q-mb-md
+      template(v-slot:append)
+        div(:style=`{height: '50px'}`).row.full-width.justify-center
+          q-spinner-dots(v-show="nexting" color="green" size="50px")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import nodeItem from './node_item.vue'
-import nodeItemNew from './node_item_new.vue'
 
 export default {
   name: 'pageNodes',
-  props: ['contentKalpa', 'player', 'nodeQuery', 'headerHeight'],
+  props: ['contentKalpa', 'player', 'nodeQuery', 'headerHeight', 'query'],
   components: {
     nodeItem,
-    nodeItemNew,
   },
   data () {
     return {

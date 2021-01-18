@@ -1,12 +1,7 @@
 <template lang="pug">
 component(
   :is="playerComponent[composition.outputType]"
-  :composition="composition"
-  :isVisible="isVisible"
-  :isActive="isActive"
-  :isMini="isMini"
-  :options="options"
-  :styles="styles")
+  v-bind="$props")
   slot
 </template>
 

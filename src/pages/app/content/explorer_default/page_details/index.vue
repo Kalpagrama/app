@@ -1,3 +1,9 @@
+<style lang="sass" scoped>
+.content-wrapper
+  &:hover
+    background: rgb(40,40,40) !important
+</style>
+
 <template lang="pug">
 .row.full-width.justify-center
   div(
@@ -5,18 +11,16 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`).row.full-width.items-start.content-start
     //- header
-    .row.full-width.q-pa-sm
+    .row.full-width.q-pa-md
       .row.full-width.items-center.content-center
         .col.q-pa-sm
           span.text-white.text-bold {{ contentKalpa.name }}
         kalpa-menu-actions(icon="more_vert" :title="contentKalpa.name" :actions="actions")
-      .row.full-width.q-pt-md.q-px-sm
-        q-icon(name="visibility" color="grey-8").q-mr-xs
-        small.text-grey-8.q-mr-xs 10923
-        .col
-        small.text-grey-8.q-mr-xs {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
+      .row.full-width.items-end.content-end.q-pt-xs.q-px-sm
+        span.text-grey-5.q-mr-xs 0 просмотров
+        small.text-grey-7.q-mr-xs - {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
     //- actions
-    .row.full-width.q-pl-xs.q-pr-sm
+    .row.full-width.q-pa-sm
       q-btn(
         v-if="contentKalpa.contentSource !== 'KALPA'"
         @click="gotToOriginal"
@@ -37,23 +41,25 @@
         :name="contentKalpa.name"
         :thumbUrl="contentKalpa.thumbUrl"
         :isActive="true"
-        inactiveColor="grey-8"
+        inactiveColor="grey-9"
         :fields=`{contentType: contentKalpa.type}`
-        @bookmark="$event => $emit('bookmark', $event)")
+        @bookmark="$event => $emit('bookmark', $event)").q-mr-sm
     //- similar content
+    .row.full-width.q-px-lg.q-py-xs
+      span.text-grey-6 Похожее:
     .row.full-width.q-pa-sm
       div(
         @click="relatedContentClick(c)"
         v-for="(c,ci) in contentKalpa.relatedContent" :key="ci"
         :style=`{
-          height: '70px',
+          height: '50px',
           borderRadius: '10px',
-          background: 'rgb(45,45,45)',
+          background: 'rgb(35,35,35)',
         }`
-        ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer
+        ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer.content-wrapper
         div(
           :style=`{
-            width: '70px', height: '70px',
+            width: '50px', height: '50px',
           }`
           ).row
           img(

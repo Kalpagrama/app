@@ -32,7 +32,7 @@
       div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
         router-link(
           v-for="b in bookmarks" :key="b.oid"
-          :to="'/workspace/bookmarks'"
+          :to="'/content/'+b.oid"
           :style=`{
             height: '50px', width: '58px', minWidth: '58px',
           }`
@@ -76,6 +76,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_ANY,
+          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
         },
         limit: 10,
         sort: [{createdAt: 'desc'}]

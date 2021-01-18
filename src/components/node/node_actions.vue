@@ -1,40 +1,25 @@
 <template lang="pug">
-//- .row.full-width.justify-center.items-center.content-center
-  .row.full-width.justify-center.q-px-sm.q-py-xs
-    div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
-      slot(name="action-left")
-      //- q-btn(
-        round flat color="grey-9" icon="reply")
-      kalpa-share(type="node" :item="node")
-      .col.full-height
-        node-vote-bar(v-if="node" :node="node")
-      slot(name="action-right")
-      kalpa-bookmark(
-        v-if="!$slots['action-left']"
-        :oid="node.oid" :type="node.type" :name="node.name"
-        :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
-.row.full-width.q-px-sm
+.row.full-width.justify-center.q-px-sm
   div(
     :style=`{
       position: 'relative',
       height: '50px',
+      maxWidth: '500px',
     }`).row.full-width.items-center.contnet-center
+    //- share
     .col
       .row.full-width
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9" icon="reply")
-          //- q-btn(round flat dense color="grey-9" icon="logout")
-          //- q-btn(round flat dense color="grey-9")
-            q-icon(name="logout" size="22px").rotate-270
+          kalpa-share(type="node" :item="node")
+            q-btn(round flat dense color="grey-9")
+              q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
-            small.text-grey-9 {{ node.countJoints }}
-    //- micronodes
+            small.text-grey-9 {{ node.countShares || '' }}
+    //- micronodes/comments
     .col
       .row.full-width
         .row.items-center.content-center
-          //- q-btn(round flat dense color="grey-9" icon="group_work")
-          //- q-btn(round flat dense color="grey-9" icon="motion_photos_on")
           q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
             q-icon(name="workspaces" size="12px"
               :style=`{
@@ -42,38 +27,31 @@
               }`)
         .col
           .row.fit.items-center.content-center.justify-start
-            small.text-grey-9 {{ node.countJoints }}
+            small.text-grey-9 {{ node.countComments || '' }}
     node-vote-ball(:node="node" @click.native="voteStarted = true")
-    //- joints
+    //- joints/links/chains
     .col
       .row.full-width
         .col
           .row.fit.items-center.content-center.justify-end
-            small.text-grey-9 {{ node.countJoints }}
+            small.text-grey-9 {{ node.countJoints || '' }}
         .row.items-center.content-center
-          //- q-btn(round flat dense color="grey-9" icon="fab fa-hubspot")
           q-btn(round flat dense color="grey-9")
-            q-icon(name="fab fa-hubspot" :style=`{transform: 'rotate(160deg)'}`)
-          //- q-btn(round flat dense color="grey-9" icon="hdr_weak")
-          //- q-btn(round flat dense color="grey-9")
-            q-icon(name="hdr_weak" size="24px").rotate-180
-          //- q-btn(
-            round flat dense color="grey-9"
-            :style=`{
-            }`).br
-            div(:style=`{overflow: 'hidden',}`).row.fit.bg
-              q-icon(name="linear_scale" size="50px").rotate-45
-          //- q-btn(round flat dense color="grey-9" icon="share")
-          //- q-btn(round flat dense color="grey-9")
-            q-icon(name="link" size="22px")
+            q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col
       .row.full-width
         .col
           .row.fit.items-center.content-center.justify-end
-            small.text-grey-9 {{ node.countBookmarks }}
+            small.text-grey-9 {{ node.countBookmarks || '' }}
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9" icon="bookmark_outline")
+          //- kalpa-bookmark(
+            :oid="node.oid" :type="node.type" :name="node.name"
+            :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+          q-btn(
+            round flat dense
+            color="grey-9")
+            q-icon(name="bookmark_outline" size="26px")
     //- ======
     //- VOTING:
     //- vote bar
@@ -96,7 +74,7 @@
         div(
           :style=`{
             position: 'relative',
-            maxWidth: '400px',
+            maxWidth: '500px',
             height: '20px',
             //- borderRadius: '10px',
             //- overflow: 'hidden',

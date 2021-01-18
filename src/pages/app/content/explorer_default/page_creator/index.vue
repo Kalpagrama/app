@@ -9,12 +9,12 @@ div(
     div(
       v-if="$q.screen.lt.md ? !$store.state.ui.userTyping : true"
       :style=`{
-        //- position: 'absolute', zIndex: 1000, bottom: '0px',
-        position: 'fixed', zIndex: 1000, bottom: '0px',
+        position: 'absolute', zIndex: 1000, bottom: '10px',
+        //- position: 'fixed', zIndex: 1000, bottom: '0px',
         paddingBottom: 'env(safe-area-inset-bottom)',
         order: 10,
       }`
-      ).row.full-width.items-center.content-center
+      ).row.full-width.items-center.content-center.br
       div(
         :style=`{
           height: '70px',
@@ -53,44 +53,8 @@ div(
         borderRadius: '0 0 10px 10px',
       }`).bg-black
     name-editor(:node="node")
+    .row.full-width.q-py-lg
     spheres-editor(:node="node")
-//- div(
-          v-if="player && node"
-          :style=`{
-            //- height: $q.screen.height-heightSquare+'px',
-          }`
-          ).row.fit.items-between.content-between.b-30
-          composition-editor(
-            v-if="player && node"
-            :player="player"
-            :composition="node.items[0]"
-            :contentKalpa="contentKalpa"
-            :style=`{
-            }`).bg-black
-          name-editor(:node="node")
-          spheres-editor(:node="node")
-          div(:style=`{paddingLeft: '60px', paddingRight: '60px',}`).row.full-width.justify-center
-            category-editor(:node="node" :style=`{}`)
-          //- footer
-          .row.full-width.justify-center
-            div(
-              :style=`{
-                maxWidth: $store.state.ui.pageWidth+'px',
-                borderRadius: '10px 10px 0 0',
-              }`
-              ).row.full-width.justify-between.b-40.q-px-sm.q-pb-xs.q-pt-sm
-              q-btn(
-                @click="node = null, headerHeight = 65"
-                flat color="grey-7" icon="west" no-caps
-                :style=`{maxWidth: '60px'}`)
-                .row.full-width.justify-center
-                  small Назад
-              q-btn(
-                @click="node = null, headerHeight = 65"
-                flat color="green" icon="check" no-caps
-                :style=`{maxWidth: '60px'}`)
-                .row.full-width.justify-center
-                  small Опубликовать
 </template>
 
 <script>
@@ -104,7 +68,7 @@ import spheresEditor from 'components/node_editor/spheres_editor.vue'
 import categoryEditor from 'components/node_editor/category_editor.vue'
 
 export default {
-  name: 'nodeCreator',
+  name: 'pageCreator',
   props: ['contentKalpa', 'player'],
   components: {
     compositionPlayer,

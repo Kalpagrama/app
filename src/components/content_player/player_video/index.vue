@@ -4,6 +4,7 @@ div(
     ...styles
   }`
   ).column.full-width
+  //- .row.full-width.q-py-lg.bg-black
   //- body
   div(
     :style=`{
@@ -43,9 +44,9 @@ div(
       ).row.fit.items-center.content-center.justify-center
       //- CONTENT: routerLink: contentName, actions
       q-btn(
-        v-if="showHeader"
+        v-if="!isMini"
         flat dense color="white" no-caps align="left"
-        :to="'/content/'+contentKalpa.oid"
+        :to="contentLink"
         :style=`{
           position: 'absolute', zIndex: 901,
           top: '8px', left: '48px',
@@ -91,7 +92,7 @@ div(
     q-btn(
       v-if="player"
       round flat dense
-      :to="'/content/'+contentKalpa.oid"
+      :to="contentLink"
       color="white"
       icon="select_all"
       :style=`{
@@ -176,6 +177,13 @@ export default {
     }
   },
   computed: {
+    contentLink () {
+      let res = '/content/' + this.contentKalpa.oid
+      if (this.options.nodeOid) {
+        res += '?nodeOid=' + this.options.nodeOid
+      }
+      return res
+    }
   },
   watch: {
     tintShow: {
