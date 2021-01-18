@@ -33,11 +33,7 @@ div(
     :isActive="isActive"
     :isVisible="isVisible"
     :isMini="isMini"
-    :showHeader="showHeader"
-    :showFooter="showFooter"
-    :showTimeline="showTimeline"
-    :showTime="showTime"
-    :showTint="showTint"
+    :options="options"
     :figures="figures"
     :styles="styles"
     :style=`{
@@ -59,11 +55,7 @@ export default {
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
     isMini: {type: Boolean},
-    showHeader: {type: Boolean},
-    showFooter: {type: Boolean},
-    showTimeline: {type: Boolean},
-    showTime: {type: Boolean},
-    showTint: {type: Boolean},
+    options: {type: Object},
     styles: {type: Object, default: {}},
   },
   data () {

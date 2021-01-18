@@ -87,15 +87,13 @@ div(
           :style=`{
             borderRadius: '10px',
             background: 'rgb(40,40,40)',
-            //- overflow: 'hidden',
+            padding: 0,
           }`).q-mr-sm
           span(
             :style=`{
               whiteSpace: 'nowrap',
-              //- background: 'rgb(45,45,45)',
-              //- borderRadius: '10px',
             }`
-            ).text-white.q-pa-xs {{ s.name }}
+            ).text-grey-4.q-mx-sm {{ s.name }}
   //- FOOTER: slot, actions
   slot(name="footer")
   node-actions(v-if="showActions && node.oid" :node="node" :isActive="isActive" :isVisible="isVisible")

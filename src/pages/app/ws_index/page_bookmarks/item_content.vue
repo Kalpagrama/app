@@ -1,5 +1,6 @@
 <template lang="pug">
-div(
+router-link(
+  :to="itemLink"
   :style=`{
     minHeight: '60px',
     background: 'rgb(35,35,35)',
@@ -48,6 +49,11 @@ export default {
   data () {
     return {
       thumbUrlErrored: false
+    }
+  },
+  computed: {
+    itemLink () {
+      return '/content/' + this.bookmark.oid
     }
   },
   methods: {

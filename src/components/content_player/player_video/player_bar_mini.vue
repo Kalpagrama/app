@@ -50,6 +50,7 @@
           borderRadius: '10px',
         }`
         ).row.fit.items-center.contnet-center
+        //- .b-80
         //- points
         //- div(
           v-for="(f,fi) in player.points" :key="fi"

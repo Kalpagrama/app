@@ -1,12 +1,16 @@
 <template lang="pug">
 q-page(
-  :style=`{}`)
-  .row.full-width.q-pa-lg
+  :style=`{}`).row.full-width.items-start.content-start.justify-center
+  div(
+    :style=`{
+      maxWidth: '400px',
+    }`
+    ).row.full-width.items-start.content-start.q-pa-lg
     q-input(
       v-model="email"
       borderless dark
       placeholder="Введите почту"
-      type="email"
+      type="email" autocomplete="username" name="username" required
       :input-style=`{
         fontSize: '20px',
         fontWeight: 'bold',
@@ -39,9 +43,42 @@ q-page(
           :styles=`{
             maxWidth: '200px',
           }`)
-    //- emai sended, waiting for link to be clicked
+    //- email sended hasPermanentPassword
     div(
-      v-if="emailSended"
+      v-if="emailSended && hasPermanentPassword"
+      :style=`{}`
+      ).row.full-width.q-mt-sm
+      div(:style=`{}`).row.full-width
+      q-input(
+        v-model="password"
+        borderless dark
+        type="password" name="password" autocomplete="current-password" required
+        :placeholder="'Enter password'"
+        :input-style=`{
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: 'white',
+          textAlign: 'center',
+          borderRadius: '10px',
+          background: 'rgb(40,40,40)',
+          minHeight: '60px',
+        }`
+        :style=`{}`
+        @keyup.enter="passwordSend()"
+        ).full-width
+      .row.full-width.q-py-md
+        q-btn(
+          @click="passwordSend()"
+          color="green" no-caps
+          :loading="passwordSending"
+          :style=`{
+            height: '60px',
+          }`
+          ).full-width
+          span.text-white.text-bold Войти
+    //- email sended, waiting for link to be clicked
+    div(
+      v-if="emailSended && !hasPermanentPassword"
       :style=`{}`
       ).row.full-width
       div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
@@ -56,6 +93,7 @@ q-page(
 </template>
 
 <script>
+import { AuthApi } from 'src/api/auth'
 import kalpaDocs from 'components/kalpa_docs/index.vue'
 
 export default {
@@ -67,7 +105,10 @@ export default {
     return {
       email: '',
       emailSending: false,
-      emailSended: false
+      emailSended: false,
+      hasPermanentPassword: false,
+      password: '',
+      passwordSending: false,
     }
   },
   methods: {
@@ -76,16 +117,46 @@ export default {
         this.$log('emailSend start')
         this.emailSending = true
         // check email
-        await this.$wait(500)
-        // send email
+        if (this.email.length === 0) throw new Error('Login is empty!')
+        let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.email)
+        console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
+        // do stuff
+        if (hasPermanentPassword) {
+          this.hasPermanentPassword = hasPermanentPassword
+        }
+        else {
+          // waiting for the shit
+        }
         this.emailSending = false
         this.emailSended = true
+        // await this.$wait(500)
+        // send email
       }
       catch (e) {
         this.$log('emailSend error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.emailSending = false
       }
-    }
+    },
+    async passwordSend () {
+      try {
+        this.$log('passwordSend start')
+        this.passwordSending = true
+        if (this.password.length === 0) throw new Error('Code is empty!')
+        let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password, null)
+        if (result === false) throw new Error(`Error: ${failReason}`)
+        this.$log('passwordSend done')
+        this.passwordSending = false
+        // TODO: first time login ?
+        await this.$router.replace('/')
+      }
+      catch (e) {
+        this.$log('passwordSend error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.passwordSending = false
+      }
+      this.$log('passwordSend start')
+    },
   }
 }
 </script>

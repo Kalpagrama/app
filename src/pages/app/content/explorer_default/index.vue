@@ -1,15 +1,14 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff"
-  ).b-30
+  view="hHh Lpr lff")
   //- q-resize-observer(@resize="onResize" :debounce="300")
-  q-header().bg-black
+  //- header: content player
+  q-header(:style=`{opacity: 1,}`).bg-black
     .row.full-width.justify-center
       div(
         :style=`{
-          //- height: 'calc('+ ($q.screen.height-500) +'px - 70px - 0px - env(safe-area-inset-bottom))',
           position: 'relative',
-          height: 'calc('+ heightContent +'px - 0px - 0px - env(safe-area-inset-bottom))',
+          height: 'calc('+ heightPage +'px - env(safe-area-inset-bottom))',
           maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '0 0 10px 10px',
         }`
@@ -21,17 +20,18 @@ q-layout(
             :style=`{
               height: '100%',
             }`
+            :options=`{
+              showHeader: false,
+            }`
             :styles=`{
               height: '100%',
               objectFit: 'contain',
-              padding: {
-                paddingTop: '50px',
-              }
             }`
             ).full-width.bg-black
-        .row.full-width.q-py-sm
+        //- .row.full-width.q-py-sm
+  //- footer: navigation
   q-footer(
-    v-if="!nodeCreating"
+    v-if="!['node', 'creator'].includes(pageId)"
     reveal
     :style=`{
       //- paddingBottom: 'env(safe-area-inset-bottom)',
@@ -44,40 +44,57 @@ q-layout(
           paddingBottom: 'env(safe-area-inset-bottom)',
         }`
         ).row.full-width.b-40
+        //- @create-start="essenceCreateStart()"
         nav-mobile(
           v-if="!nodeCreating"
-          @create-start="essenceCreateStart()"
           @pageId="pageIdChange"
           :pageId="pageId"
           :style=`{
             zIndex: 1000,
           }`)
+  //- pages or node creator...
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '15px',
+        //- paddingTop: heightPage+'px',
       }`).row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        node-creator(
-          v-if="player && nodeCreating"
+      div(
+        v-if="contentKalpa && player"
+        :style=`{
+          position: 'relative',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '10px 10px 0 0',
+          //- marginBottom: '-10px',
+        }`
+        ).row.full-width.b-30
+        //- node-creator(
+          v-if="pageId === 'node'"
           :contentKalpa="contentKalpa"
           :player="player"
           @cancel="nodeCancelled"
           @publish="nodePublished")
         component(
-          v-if="!nodeCreating"
           :is="`page-${pageId}`"
+          :node="node"
           :contentKalpa="contentKalpa"
-          :player="player")
+          :player="player"
+          :query="query"
+          @cancel="nodeCancelled"
+          @publish="nodePublished"
+          @nodeCancel="pageId = 'nodes', node = null"
+          @node="node = $event, pageId = 'node'")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from './nav_mobile.vue'
 import contentPlayer from 'components/content_player/index.vue'
+
 import pageNodes from './page_nodes/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageDetails from './page_details/index.vue'
-import nodeCreator from './node_creator/index.vue'
+import pageCreator from './page_creator/index.vue'
+import pageNode from './page_node/index.vue'
 
 export default {
   name: 'explorerDefault',
@@ -88,29 +105,25 @@ export default {
     pageNodes,
     pageDrafts,
     pageDetails,
-    nodeCreator,
+    pageCreator,
+    pageNode,
   },
   data () {
     return {
-      width: 0,
-      height: 0,
+      // width: 0,
+      // height: 0,
       player: null,
-      pageId: null,
-      headerHeight: 65,
-      showMenu: true,
-      nodeCreating: false,
+      pageId: 'nodes',
+      // headerHeight: 65,
+      // showMenu: true,
+      // nodeCreating: false,
+      heightPage: 0,
+      // heightPageMin: 0,
+      node: null,
     }
   },
   computed: {
-    heightSquare () {
-      if (this.$q.screen.width > this.$store.state.ui.pageWidth) {
-        return this.$store.state.ui.pageWidth
-      }
-      else {
-        return this.$q.screen.width
-      }
-    },
-    heightPage () {
+    heightPageMin () {
       // this.width / this.contentKalpa.thumbWidth this.contentKalpa.thumbHeight
       let width = Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth)
       // let height = (width * this.contentKalpa.thumbHeight) / this.contentKalpa.thumbWidth
@@ -119,11 +132,48 @@ export default {
       return height + 20
       // return Math.min(height, width)
     },
-    heightContent () {
-      return (this.pageId || this.nodeCreating) ? this.heightPage : this.$q.screen.height - 70 - 15
+    heightPageMax () {
+      return this.$q.screen.height - 70 - 15
     },
+    // heightContent () {
+    //   return (this.pageId || this.nodeCreating) ? this.heightPage : this.$q.screen.height - 70 - 15
+    // },
   },
   watch: {
+    pageId: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('pageId TO', to)
+        if (this.query.nodeOid) {
+          let query = Object.assign({}, this.$route.query)
+          delete query.nodeOid
+          this.$router.replace({ query })
+          this.pageId = 'node'
+          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.query.nodeOid)
+        }
+        else {
+          // do stuff
+        }
+        if (to) {
+          this.$tween.to(this, 0.3, {
+            heightPage: this.heightPageMin,
+            onComplete: () => {
+              this.$log('pageId Done to ', to)
+              // this.pageId = null
+            }
+          })
+        }
+        else {
+          this.$tween.to(this, 0.3, {
+            heightPage: this.heightPageMax,
+            onComplete: () => {
+              this.$log('pageId Done to null')
+              // this.pageId = null
+            }
+          })
+        }
+      }
+    },
   },
   methods: {
     onResize (e) {
@@ -139,49 +189,40 @@ export default {
         }
       }
     },
-    essenceCreateStart () {
-      this.$log('essenceCreateStart')
-      // go to square/essence height
-      this.nodeCreating = true
-      // this.$tween.to(this, 0.3, {
-      //   headerHeight: this.$q.screen.height - this.heightSquare
-      // })
-    },
+    // essenceCreateStart () {
+    //   this.$log('essenceCreateStart')
+    //   // go to square/essence height
+    //   this.nodeCreating = true
+    //   // this.$tween.to(this, 0.3, {
+    //   //   headerHeight: this.$q.screen.height - this.heightSquare
+    //   // })
+    // },
     nodeCancelled () {
       this.$log('nodeCancelled')
       this.pageId = null
-      this.headerHeight = 70
-      this.nodeCreating = false
+      // this.headerHeight = 70
+      // this.nodeCreating = false
     },
     nodePublished () {
       this.$log('nodePublished')
       // this.pageId = 'nodes'
       this.pageIdChange('nodes')
-      this.nodeCreating = false
+      // this.nodeCreating = false
       // do what?
     },
     pageIdChange (pageId) {
-      // go back to
+      this.$log('pageIdChange', pageId)
       if (this.pageId === pageId) {
-        // this.pageId = null
-        this.$tween.to(this, 0.3, {
-          headerHeight: 70,
-          onComplete: () => {
-            this.pageId = null
-          }
-        })
+        this.pageId = null
       }
       else {
         this.pageId = pageId
-        // this.$tween.to(this, 0.3, {
-        //   headerHeight: this.heightPage
-        // })
       }
     },
   },
   mounted () {
     this.$log('mounted')
-    // document.body.style.background = 'black'
+    document.body.style.background = 'rgb(0,0,0) !important'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

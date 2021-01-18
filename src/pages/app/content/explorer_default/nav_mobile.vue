@@ -21,14 +21,12 @@
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     q-btn(
-      @click="$emit('create-start')"
-      round flat color="green"
-      :style=`{
-        width: '50px', height: '50px',
-        borderRadius: '50%',
-      }`
-      ).q-mb-md
-      q-icon(name="add_circle_outline" size="40px")
+      @click="$emit('pageId', 'creator')"
+      flat icon="add_circle_outline" no-caps
+      :color="'green'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Ядрануть
     q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps
@@ -38,25 +36,12 @@
         small Заметки
     q-btn(
       @click="$emit('pageId', 'details')"
-      flat icon="grain" no-caps
+      flat no-caps
       :color="pageId === 'details' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
+      q-icon(name="fas fa-info" size="19px").q-mb-xs
       .row.full-width.justify-center
         small Детали
-    //- q-btn(
-      @click="$emit('toggle')"
-      flat icon="keyboard_arrow_down" no-caps
-      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Свернуть
-    //- q-btn(
-      @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
-      flat icon="menu" no-caps
-      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Меню
 </template>
 
 <script>

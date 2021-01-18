@@ -1,9 +1,7 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff")
-  q-header(
-    reveal
-    )
+  view="hHh Lpr lff").b-30
+  q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
@@ -44,7 +42,7 @@ q-layout(
             background: 'none',
             minHeight: '70vh',
           }`
-          ).full-width.items-start.content-start.justify-center.q-pa-sm
+          ).row.full-width.items-start.content-start.justify-center.q-pa-sm
           kalpa-loader(
             :immediate="true"
             :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
@@ -56,7 +54,7 @@ q-layout(
               //- item-content()
               component(
                 v-for="(b,bi) in items" :key="b.oid"
-                :is="'item-'+pageId"
+                :is="'item-content'"
                 :bookmark="b")
       q-page-sticky(
         expand position="top-left" :offset="[0, 0]").row.full-width.q-px-md.b-30
@@ -112,6 +110,12 @@ export default {
       }
       else if (this.pageId === 'joints') {
         res.selector.type = {$in: ['JOINT']}
+      }
+      else if (this.pageId === 'people') {
+        res.selector.type = {$in: ['USER']}
+      }
+      else if (this.pageId === 'spheres') {
+        res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
       }
       // else if ()
       return res

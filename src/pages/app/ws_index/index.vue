@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff")
+  view="hHh Lpr lff").b-30
   q-drawer(
     side="right"
     v-model="menuOpened")
@@ -39,31 +39,27 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '40px',
+        paddingTop: '8px',
       }`
       ).row.full-width.justify-center
       div(
         :style=`{
-          //- maxWidth: $store.state.ui.pageWidth+'px',
-          maxWidth: '600px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          //- maxWidth: '600px',
         }`).row.full-width.items-start.content-start
-        .row.full-width
-          //- widget-bookmarks.q-mb-sm
-          widget-bookmarks.q-mb-sm
-        //- create
-        .row.full-width.justify-center.q-pt-xl
-          div(:style=`{maxWidth: '600px',}`).row.full-width
-            widget-url
-            .row.full-width.q-pt-sm.q-px-lg
-              //- to="/workspace/create"
-              //- TODO: upload from device !
-              q-btn(
-                outline color="grey-8" no-caps
-                :style=`{
-                  height: '60px',
-                }`
-                ).full-width
-                span.text-grey-6 Загрузить с устройства
+        widget-bookmarks.q-mb-md
+        //- add/create
+        widget-url
+        .row.full-width.q-pt-sm.q-px-lg
+          //- to="/workspace/create"
+          //- TODO: upload from device !
+          q-btn(
+            outline color="grey-8" no-caps
+            :style=`{
+              height: '60px',
+            }`
+            ).full-width
+            span.text-grey-6 Загрузить с устройства
 </template>
 
 <script>
@@ -86,6 +82,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    document.body.style.background = 'rgb(30,30,30)'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

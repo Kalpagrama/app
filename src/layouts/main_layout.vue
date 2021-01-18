@@ -86,7 +86,7 @@ export default {
   },
   async created () {
     this.$store.commit('ui/stateSet', ['pageHeight', this.$q.screen.height])
-    this.$q.addressbarColor.set('#424242')
+    // this.$q.addressbarColor.set('#424242')
   }
 }
 </script>

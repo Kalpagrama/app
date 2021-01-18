@@ -19,6 +19,7 @@ div(
         loop: true,
         showBar: true,
         showHeader: true,
+        nodeOid: node.oid,
       }`)
 </template>
 
