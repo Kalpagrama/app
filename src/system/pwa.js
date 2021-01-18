@@ -154,7 +154,7 @@ async function initPWA (store) {
 
 async function pwaShareWith (title, text, url) {
    if (!('share' in navigator)) {
-      alert('Web Share API not supported!')
+      alert('Web Share API not supported!!!')
       return
    }
    await navigator.share({ title, text, url })

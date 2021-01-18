@@ -99,7 +99,8 @@ export default {
   },
   methods: {
     async shareStart () {
-      this.$log('shareStart')
+      this.$log('shareStart', Platform.is)
+      // eslint-disable-next-line no-unreachable
       if (Platform.is.desktop) {
         this.shareLink = makeRoutePath(this.item, true)
         this.shareDialogOpened = true

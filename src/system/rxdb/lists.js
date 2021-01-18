@@ -58,6 +58,14 @@ class Lists {
       return rxDoc
    }
 
+   // запросит с сервера новые данные и загрузит в rxDoc
+   async paginate (rxDoc, token) {
+      const f = this.paginate
+      // logD(f, 'start')
+      assert(rxDoc && token, '!rxdoc && token')
+      return rxDoc
+   }
+
    static async getBlackLists () {
       let blackLists = await rxdb.get(RxCollectionEnum.META, 'blackLists')
       if (blackLists) blackLists = JSON.parse(blackLists)
