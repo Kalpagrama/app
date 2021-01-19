@@ -41,7 +41,7 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '8px',
+        paddingTop: '30px',
         paddingBottom: '200px',
       }`)
       widget-joints(v-if="node" :node="node")

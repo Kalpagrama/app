@@ -6,7 +6,7 @@
     @click="start()"
     round flat no-caps
     :color="bookmark ? activeColor : inactiveColor"
-    :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
+    :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
     :loading="loading")
 </template>
 

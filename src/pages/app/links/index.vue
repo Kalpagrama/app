@@ -10,17 +10,19 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import viewThreads from './view_threads/index.vue'
 import viewBinary from './view_binary/index.vue'
+import viewGallery from './view_gallery/index.vue'
 
 export default {
   name: 'pageApp_links',
   components: {
     viewThreads,
     viewBinary,
+    viewGallery,
   },
   data () {
     return {
       item: null,
-      viewId: 'binary', // threads, binary
+      viewId: 'gallery', // threads, binary
     }
   },
   watch: {

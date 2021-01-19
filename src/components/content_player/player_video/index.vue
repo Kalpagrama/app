@@ -1,7 +1,8 @@
 <template lang="pug">
 div(
   :style=`{
-    ...styles
+    ...styles,
+    borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width
   //- .row.full-width.q-py-lg.bg-black
@@ -22,8 +23,11 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
+  player-tint(
+    v-bind="$props"
+    :player="player")
   //- player tint caller
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === false"
       @click="player.muted ? player.setState('muted', false) : tintShow = true"
@@ -32,7 +36,7 @@ div(
       }`
       ).row.fit
   //- player tint
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === true"
       @click.self="tintShow = false"
@@ -49,10 +53,10 @@ div(
         :to="contentLink"
         :style=`{
           position: 'absolute', zIndex: 901,
-          top: '8px', left: '48px',
+          top: '8px', left: '42px',
           overflow: 'hidden',
           maxWidth: 'calc(100% - 96px)',
-        }`).row.full-width.no-wrap.q-px-xs
+        }`).row.full-width.no-wrap
         span(:style=`{whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',}`).text-white {{ contentKalpa.name }}
       //- ACTIONS: replay,play/pause,forward
       div(
@@ -88,7 +92,7 @@ div(
           q-icon(
             name="forward_5" size="40px" color="white")
   //- context
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
       v-if="player"
       round flat dense
@@ -100,7 +104,7 @@ div(
         left: '8px', top: '8px',
       }`)
   //- sound
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
       v-if="player"
       @click="volumeToggle()"
@@ -113,16 +117,21 @@ div(
       }`)
   //- player mini-bar
   //- @started="tintShow = true"
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    player-bar-mini(
-      v-if="player" :player="player" :figures="figures"
-      :mini="isMini || !tintShow"
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
       :style=`{
         position: 'absolute',
         zIndex: 1000,
         transform: 'translate3d(0,0,10px)',
         bottom: '-15px',
-      }`)
+      }`
+      ).row.full-width.justify-center.bg
+      player-bar-mini(
+        v-if="player" :player="player" :figures="figures"
+        :mini="isMini || !tintShow"
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+        }`).br
   //- subtitles
   //- div(
     :style=`{
@@ -140,6 +149,7 @@ div(
 
 <script>
 import playerBarMini from './player_bar_mini.vue'
+import playerTint from './player_tint/index.vue'
 
 export default {
   name: 'contentPlayer_video',
@@ -147,6 +157,7 @@ export default {
     playerYoutube: () => import('./player_youtube.vue'),
     playerKalpa: () => import('./player_kalpa.vue'),
     playerBarMini,
+    playerTint
   },
   props: {
     contentKalpa: {type: Object, required: true},
@@ -190,8 +201,8 @@ export default {
       async handler (to, from) {
         this.$log('tintShow TO', to)
         if (to) {
-          await this.$wait(2500)
-          this.tintShow = false
+          // await this.$wait(2500)
+          // this.tintShow = false
         }
         else {
           // do nothing

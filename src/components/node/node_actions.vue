@@ -17,7 +17,9 @@
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countShares || '' }}
     //- micronodes/comments
-    .col
+    div(
+      v-if="node.items.length === 1"
+      ).col
       .row.full-width
         .row.items-center.content-center
           q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
@@ -30,7 +32,10 @@
             small.text-grey-9 {{ node.countComments || '' }}
     node-vote-ball(:node="node" @click.native="voteStarted = true")
     //- joints/links/chains
-    .col
+    router-link(
+      v-if="node.items.length === 1"
+      :to="'/links/'+node.oid"
+      ).col
       .row.full-width
         .col
           .row.fit.items-center.content-center.justify-end

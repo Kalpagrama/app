@@ -24,6 +24,9 @@ div(
     //- HEADER: author, createdAt, actions, date, views
     div(
       v-if="showHeader && node.oid"
+      :style=`{
+        order: orderHeader,
+      }`
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
@@ -64,6 +67,7 @@ div(
       v-if="showName && node.oid"
       :to="nodeEssenceLink"
       :style=`{
+        order: orderName,
         minHeight: '60px',
         fontSize: nodeNameSize+'px',
         textAlign: 'center',
@@ -73,6 +77,9 @@ div(
     //- SPHERES
     div(
       v-if="showSpheres && node.spheres.length > 0"
+      :style=`{
+        order: orderSpheres,
+      }`
       ).row.full-width.q-pa-sm
       q-tabs(
         :value="null"
@@ -96,7 +103,14 @@ div(
             ).text-grey-4.q-mx-sm {{ s.name }}
   //- FOOTER: slot, actions
   slot(name="footer")
-  node-actions(v-if="showActions && node.oid" :node="node" :isActive="isActive" :isVisible="isVisible")
+  node-actions(
+    v-if="showActions && node.oid"
+    :node="node"
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :style=`{
+      order: orderActions,
+    }`)
 </template>
 
 <script>
@@ -122,6 +136,10 @@ export default {
     showSpheresAlways: {type: Boolean, default: false},
     showCategory: {type: Boolean, default: true},
     showItems: {type: Boolean, default: true},
+    orderHeader: {type: Number, default: -1},
+    orderName: {type: Number, default: 1},
+    orderSpheres: {type: Number, default: 2},
+    orderActions: {type: Number, default: 3},
     itemsStyles: { type: Array, default () { return [{}, {}] } },
     styles: {type: Object},
     borderRadius: {type: String, default: '10px'}
@@ -144,8 +162,8 @@ export default {
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
-        // return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
-        return '/node/' + this.node.oid
+        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
+        // return '/node/' + this.node.oid
       }
       else {
         return '/node/' + this.node.oid
