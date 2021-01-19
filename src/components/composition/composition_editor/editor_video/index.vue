@@ -52,8 +52,8 @@ export default {
       handler (to, from) {
         if (to) {
           this.$log('composition TO', to)
-          let figures = this.composition.layers[0].figuresAbsolute
-          this.player.setState('figures', [figures])
+          // let figures = this.composition.layers[0].figuresAbsolute
+          // this.player.setState('figures', [figures])
         }
       }
     }

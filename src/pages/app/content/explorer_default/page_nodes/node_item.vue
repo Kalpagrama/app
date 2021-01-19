@@ -7,7 +7,9 @@
 <template lang="pug">
 div(
   :style=`{
-    background: isSelected ? 'rgb(45,45,45)' : 'rgb(35,35,35)',
+    //- background: isSelected ? 'rgb(45,45,45)' : 'rgb(35,35,35)',
+    //- background: isOverVideo ? 'rgb(60,60,60)' : 'rgb(35,35,35)',
+    background: backgroundColor,
     borderRadius: '10px',
   }`
   ).row.full-width.q-mb-sm.node-item.cursor-pointer
@@ -68,6 +70,17 @@ div(
       :style=`{
         opacity: 0.5
       }`)
+  //- footer: for selected node
+  div(
+    v-if="isSelected"
+    :style=`{
+      //- height: '50px',
+    }`
+    ).row.full-width.items-center.content-center.q-pa-sm
+    .col
+    q-btn(
+      :to="itemLink"
+      round flat dense color="white" icon="launch")
 </template>
 
 <script>
@@ -93,13 +106,45 @@ export default {
         })
       }
     },
+    backgroundColor () {
+      // if (this.isSelected) {
+      //   return 'rgb(80,80,80)'
+      // }
+      // else {
+      //   if (this.isOverVideo) {
+      //     return 'rgb(60,60,60)'
+      //   }
+      //   else {
+      //     return 'rgb(35,35,35)'
+      //   }
+      // }
+      if (this.isOverVideo) {
+        return 'rgb(50,50,50)'
+      }
+      else {
+        return 'rgb(35,35,35)'
+      }
+    },
+    isOverVideo () {
+      if (this.contentKalpa.type === 'VIDEO') {
+        return this.player.currentTime >= this.composition.layers[0].figuresAbsolute[0].t && this.player.currentTime < this.composition.layers[0].figuresAbsolute[1].t
+      }
+      else {
+        return false
+      }
+    },
+    itemLink () {
+      if (this.node.items.length === 1) return '/node/' + this.node.oid
+      else if (this.node.items.length === 2) return '/links/' + this.node.items[this.contentItemIndex].oid
+      else return '/'
+    }
   },
   watch: {
     isSelected: {
       handler (to, from) {
         if (to) {
           this.player.setCurrentTime(this.composition.layers[0].figuresAbsolute[0].t)
-          this.player.play()
+          // this.player.play()
         }
       }
     }

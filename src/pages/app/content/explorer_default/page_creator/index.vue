@@ -152,7 +152,7 @@ export default {
         // nodeInput.shit...
         let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$log('publish done')
-        this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
+        // this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
         this.$emit('publish', createdNode)
         this.publishing = false
       }

@@ -6,6 +6,11 @@ div(
   }`
   ).column.full-width
   //- .row.full-width.q-py-lg.bg-black
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      .row.full-width.items-center.content-center.q-py-xs.q-px-sm
+        q-btn(round flat dense color="white" icon="west" @click="$routerKalpa.back()").q-mr-xs
+        router-link(:to="'/content/'+contentKalpa.oid").text-white content {{ contentKalpa.name }}
   //- body
   div(
     :style=`{
@@ -23,7 +28,16 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
-  player-tint(
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+      .row.full-width.items-center.content-center.q-px-sm
+        q-btn(round flat dense color="white" icon="fullscreen")
+        .col
+          tint-bar-new(
+            v-if="player && player.duration"
+            :player="player" :contentKalpa="contentKalpa")
+        q-btn(round flat dense color="white" icon="volume_up")
+  //- player-tint(
     v-bind="$props"
     :player="player")
   //- player tint caller
@@ -150,6 +164,7 @@ div(
 <script>
 import playerBarMini from './player_bar_mini.vue'
 import playerTint from './player_tint/index.vue'
+import tintBarNew from './player_tint/tint_bar_new.vue'
 
 export default {
   name: 'contentPlayer_video',
@@ -157,7 +172,8 @@ export default {
     playerYoutube: () => import('./player_youtube.vue'),
     playerKalpa: () => import('./player_kalpa.vue'),
     playerBarMini,
-    playerTint
+    playerTint,
+    tintBarNew
   },
   props: {
     contentKalpa: {type: Object, required: true},

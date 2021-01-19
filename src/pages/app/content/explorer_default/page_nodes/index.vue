@@ -16,7 +16,7 @@ div(
     q-btn(
       round flat color="grey-7" icon="tune")
   div(
-    ref="itemsScroll"
+    ref="items-scroll"
     :style=`{
       //- position: 'relative',
     }`
@@ -24,19 +24,20 @@ div(
     div(
       :style=`{
         position: 'absolute', zIndex: 1000, top: '60px',
-        height: '60px',
+        height: '10px',
         background: 'linear-gradient(0deg, rgba(30,30,30,0.1) 0%, rgba(30,30,30,1) 100%)',
         pointerEvents: 'none',
       }`
       ).row.full-width
     div(
       :style=`{
-        marginTop: 60+'px',
-        marginBottom: height/2+'px',
+        marginTop: 10+'px',
+        marginBottom: height-120+'px',
       }`
       ).row.full-width.items-start.content-start.q-px-sm
       node-item(
         v-for="(i,ii) in itemsLocal" :key="i.oid"
+        :ref="`item-${i.oid}`"
         :node="i.node"
         :composition="i.composition"
         :contentKalpa="contentKalpa"
@@ -110,6 +111,25 @@ export default {
       handler (to, from) {
         this.itemsUpdated(to)
       }
+    },
+    'player.currentTime': {
+      handler (to, from) {
+        // this.$log('player.currentTime TO', to)
+        let item = this.itemsLocal.find(i => {
+          return to >= i.composition.layers[0].figuresAbsolute[0].t && to < i.composition.layers[0].figuresAbsolute[1].t
+        })
+        if (item) {
+          let refItemsScroll = this.$refs['items-scroll']
+          let refItem = this.$refs[`item-${item.oid}`][0].$el
+          let refItemOffsetTop = refItem.offsetTop
+          // this.$log({refItemsScroll, refItem, refItemOffsetTop})
+          // this.$log('ref')
+          this.$tween.to(refItemsScroll, 0.5, {
+            scrollTop: refItemOffsetTop - 120
+          })
+        }
+        // find item with composition of mine, scrollto its position ?
+      }
     }
   },
   methods: {
@@ -156,10 +176,12 @@ export default {
       }
       let figures = items.map(i => {
         return {
+          oid: i.node.oid,
           nodeOid: i.node.oid,
           name: i.node.name || i.node.vertices,
           thumbUrl: i.composition.thumbUrl,
-          figures: i.composition.layers[0].figuresAbsolute
+          figures: i.composition.layers[0].figuresAbsolute,
+          node: i.node
         }
       })
       this.player.setState('figures', figures)

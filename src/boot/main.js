@@ -12,7 +12,7 @@ import VueShowdown from 'vue-showdown'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
-const time = (sec) => {
+const time = (sec, addSeconds = true) => {
   let hrs = ~~(sec / 3600)
   let mins = ~~((sec % 3600) / 60)
   let secs = ~~sec % 60
@@ -22,9 +22,17 @@ const time = (sec) => {
 
   let result = ''
   if (hrs > 0) result += '' + hrs + ':' + (mins < 10 ? '0' : '')
+  // result += '' + mins + ':' + (secs < 10 ? '0' : '')
+  // result += '' + secs
 
-  result += '' + mins + ':' + (secs < 10 ? '0' : '')
-  result += '' + secs
+  if (addSeconds) {
+    result += '' + mins + ':' + (secs < 10 ? '0' : '')
+    result += '' + secs
+  }
+  else {
+    result += '' + mins
+  }
+
   // if (ms !== '') result += ':' + ms.substring(0, 3)
   return result
 }
