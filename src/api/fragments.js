@@ -378,6 +378,7 @@ const findResultFragment = gql`
         count
         totalCount
         nextPageToken
+        currentPageToken
         prevPageToken
         ... on EventFindResult { events {...eventFragment} }
         ... on ObjectsFindResult { objects{ oid } }
@@ -390,6 +391,7 @@ const findResultFragmentForSearch = gql`
         count
         totalCount
         nextPageToken
+        currentPageToken
         prevPageToken
         ... on EventFindResult { events {...eventFragment} }
         ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }

@@ -10,8 +10,8 @@ import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
-import { Lists } from 'src/system/rxdb/lists'
-import { getReactiveDoc, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
+import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
+import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
@@ -20,6 +20,8 @@ import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services_browser'
 import { getRxCollectionEnumFromId, getRawIdFromId, makeId } from 'src/system/rxdb'
+import debounce from 'lodash/debounce'
+import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
@@ -256,7 +258,7 @@ class RxDBWrapper {
             //    return {
             //       notEvict: true, // живет вечно
             //       item: dummyUser,
-            //       actualAge: 'century' // dummyUser не устаревает
+            //       actualAge: 'infinity' // dummyUser не устаревает
             //    }
             // }
             // assert(dummyUser.oid, 'dummyUser.oid')
@@ -483,10 +485,7 @@ class RxDBWrapper {
                findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery)
                assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
-               let populateObjects = mangoQuery.populateObjects
-               delete mangoQuery.populateObjects // мешает нормальному кэшированию
-               let rxDoc = await this.lists.find(mangoQuery)
-               let populateFunc = async (itemsForPopulate, itemsForPrefetch) => {
+               let populateFunc = async (itemsForPopulate, itemsForPrefetch, reactiveListFulFilled) => {
                   const f = populateFunc
                   f.nameExtra = 'populateFunc'
                   logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
@@ -494,24 +493,29 @@ class RxDBWrapper {
                   assert(itemsForPopulate && itemsForPrefetch)
                   let populatedItems
                   if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
-                     // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-                     const itemsFull = await Promise.all(
-                        itemsForPopulate.reduce((accumulator, { object, subject }) => {
-                           accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
-                           // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
-                           return accumulator
-                        }, [])
-                     )
-                     populatedItems = cloneDeep(itemsForPopulate)
-                     for (let item of populatedItems) {
-                        item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
-                     }
+                     let promises = itemsForPopulate.map(event => {
+                        let f = async () => {
+                           if (reactiveListFulFilled) {
+                              let fulfilled = reactiveListFulFilled.find(eventFull => eventFull.id === event.id)
+                              if (fulfilled) return fulfilled
+                           }
+                           let copyEvent = cloneDeep(event)
+                           copyEvent.object = await this.get(RxCollectionEnum.OBJ, event.object.oid, { clientFirst: true }) || event.object
+                           return copyEvent
+                        }
+                        return f()
+                     })
+                     populatedItems = await Promise.all(promises)
                   } else {
-                     // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-                     populatedItems = await Promise.all(itemsForPopulate.map(objShort => {
+                     let promises = itemsForPopulate.map(objShort => {
                         // logD('objShort=', objShort)
+                        if (reactiveListFulFilled) {
+                           let fulfilled = reactiveListFulFilled.find(itemFull => itemFull.oid === objShort.oid)
+                           if (fulfilled) return fulfilled
+                        }
                         return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
-                     }))
+                     })
+                     populatedItems = await Promise.all(promises)
                      if (itemsForPrefetch) {
                         itemsForPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
                            clientFirst: true,
@@ -523,7 +527,31 @@ class RxDBWrapper {
                   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
                   return populatedItems.filter(obj => !!obj)
                }
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc, populateObjects ? populateFunc : null)
+               let paginateFunc = async (pageToken, pageSize) => {
+                  assert(pageToken && pageSize, 'bad pagination params')
+                  let paginationMangoQuery = cloneDeep(mangoQuery)
+                  paginationMangoQuery.pagination = {pageSize, pageToken}
+                  let rxDocPagination = await this.lists.find(paginationMangoQuery)
+                  return rxDocPagination
+               }
+               let populateObjects = mangoQuery.populateObjects
+               delete mangoQuery.populateObjects // мешает нормальному кэшированию
+               mangoQuery.pagination = {
+                  pageSize: mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000,
+                  pageToken: null
+               }
+               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery))
+               let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {fetchFunc: async () => {
+                     return {
+                        item: {}, // пустой объект для начальной иницализации props
+                        actualAge: 'infinity'
+                     }
+                  }})
+               if (propsReactive.currentPageToken && propsReactive.currentPageSize){
+                  mangoQuery.pagination = {pageSize: propsReactive.currentPageSize, pageToken: propsReactive.currentPageToken}
+               }
+               let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
@@ -568,6 +596,9 @@ class RxDBWrapper {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          rxDoc = await this.db.meta.findOne(rawId).exec()
+      } else if (rxCollectionEnum === RxCollectionEnum.LOCAL) {
+         assert(fetchFunc)
+         rxDoc = await this.cache.get(id, fetchFunc)
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }

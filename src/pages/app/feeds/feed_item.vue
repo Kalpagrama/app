@@ -95,7 +95,8 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.object = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.object.oid)
+    // this.object = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.object.oid)
+    this.object = this.item.object
   }
 }
 </script>

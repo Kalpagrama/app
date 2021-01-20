@@ -20,7 +20,7 @@
         height: '50px',
       }`
       ).full-width.b-40
-      span Перезагрузка
+      span Очистить кэш
     q-btn(
       @click="logout()"
       outline color="red" no-caps

@@ -3,7 +3,7 @@ import assert from 'assert'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
@@ -290,123 +290,292 @@ class ReactiveDocFactory {
 }
 
 class ReactiveListWithPaginationFactory {
-   async create (rxQueryOrRxDoc, populateFunc) {
+   async create (rxQueryOrRxDoc, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
       if (rxQueryOrRxDoc.reactiveListHolderMaster) {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
-         if (isRxQuery(rxQueryOrRxDoc)) {
-            this.rxQuery = rxQueryOrRxDoc
-            logD('ReactiveListHolder::constructor: ', this.rxQuery.mangoQuery.selector)
-         } else if (isRxDocument(rxQueryOrRxDoc)) {
-            this.rxDoc = rxQueryOrRxDoc
-            logD('ReactiveListHolder::constructor: ', this.rxDoc.id)
-         } else throw new Error('bad rxQueryOrRxDoc')
-         assert(this.rxQuery || this.rxDoc, '!this.rxQuery || this.rxDoc')
-
-         let listItems
-         if (this.rxQuery) { // мастерская (элементы в списке [WS_ITEM])
-            assert(this.rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
-            let rxDocs = await this.rxQuery.exec()
-            assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-            listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
-         } else if (this.rxDoc) { // лента полученная с сервера {items, count, totalCount}
-            listItems = this.rxDoc.toJSON().cached.data.items
-            assert(this.rxDoc.props.mangoQuery, '!mangoQuery')
-            assert(this.rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-            // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
-            if (this.rxDoc.props.mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SPHERE_ITEMS) {
-               assert(this.rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
-               for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
-                  assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
-                  if (relatedSphereOids.includes(this.rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
-                     let indx = listItems.findIndex(el => el.oid === oidObject)
-                     if (indx === -1 && type === 'OBJECT_CREATED') {
-                        listItems.push({ oid: oidObject }) // если нет такого - создадим
-                     } else if (indx >= 0 && type === 'OBJECT_DELETED') {
-                        listItems.splice(indx, 1) // удалим
+         this.vm = new Vue({
+            data: {
+               reactiveListFulFilled: []
+            }
+         })
+         const BATCH_SZ = 12
+         this.loadedPages = [] // вся лента разбита на пагинированные блоки(страницы)
+         this.totalLen = 0
+         this.addPaginationPage = async (rxQueryOrRxDoc, position) => {
+            assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
+            assert(position.in('top', 'bottom'), 'bad position')
+            let rxQuery, rxDoc
+            if (isRxQuery(rxQueryOrRxDoc)) {
+               rxQuery = rxQueryOrRxDoc
+               logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
+            } else if (isRxDocument(rxQueryOrRxDoc)) {
+               rxDoc = rxQueryOrRxDoc
+               logD('ReactiveListHolder::constructor: ', rxDoc.id)
+            } else throw new Error('bad rxQueryOrRxDoc')
+            assert(rxQuery || rxDoc, '!this.rxQuery || this.rxDoc')
+            let listItems = []
+            if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
+               assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
+               let rxDocs = await rxQuery.exec()
+               assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
+               listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
+               this.totalLen = listItems.length
+            } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
+               let {
+                  items,
+                  count,
+                  totalCount,
+                  nextPageToken,
+                  prevPageToken,
+                  currentPageToken
+               } = rxDoc.toJSON().cached.data
+               listItems = items
+               this.totalLen = totalCount
+               assert(rxDoc.props.mangoQuery, '!mangoQuery')
+               assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+               // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
+               if (rxDoc.props.mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SPHERE_ITEMS) {
+                  assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
+                  for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
+                     assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
+                     if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
+                        let indx = listItems.findIndex(el => el.oid === oidObject)
+                        if (indx === -1 && type === 'OBJECT_CREATED') {
+                           listItems.push({ oid: oidObject }) // если нет такого - создадим
+                        } else if (indx >= 0 && type === 'OBJECT_DELETED') {
+                           listItems.splice(indx, 1) // удалим
+                        }
                      }
                   }
                }
+            } else throw new Error('bad rxQueryOrRxDoc')
+            assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
+            let page = {
+               listItems,
+               id: rxDoc ? rxDoc.id : null,
+               nextPageToken: rxDoc ? rxDoc.cached.data.nextPageToken : null,
+               prevPageToken: rxDoc ? rxDoc.cached.data.prevPageToken : null,
+               currentPageToken: rxDoc ? rxDoc.cached.data.currentPageToken : null
             }
-         } else throw new Error('bad collection' + this.rxQuery.collection.name)
-         assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
-         this.vm = new Vue({
-            data: {
-               reactiveListFull: listItems,
-               reactiveListPagination: []
+            if (position === 'top') {
+               this.loadedPages.unshift(page)
+            } else {
+               this.loadedPages.push(page)
             }
-         })
-         assert(Array.isArray(this.vm.reactiveListFull) && Array.isArray(this.vm.reactiveListPagination), 'Array.isArray(this.vm.reactiveListFull)')
-
-         this.nextIndex = 0 // первая незаполненная позиция
-         this.nextAskedIndex = 0 // последняя позиция, которую запрашивали
-         this.props = {}
-         this.populateFunc = populateFunc
-         // setProperty / getProperty - хранение метаинформации на списке (currentIndex, итд)
-         this.vm.reactiveListPagination.setProperty = (name, value) => {
-            this.props[name] = value
+            this.rxQuerySubscribe(rxQueryOrRxDoc)
+            // чтобы в след раз загрузилось с этого места
+            // this.vm.reactiveListFulFilled.saveCurrentPos(null, page)
          }
-         this.vm.reactiveListPagination.getProperty = (name) => this.props[name]
-         this.vm.reactiveListPagination.next = async (count) => {
-            const f = this.vm.reactiveListPagination.next
+         this.loadedLen = () => {
+            let len = 0
+            for (let page of this.loadedPages) {
+               len += page.listItems.length
+            }
+            return len
+         }
+         this.loadedItems = () => {
+            let res = []
+            for (let page of this.loadedPages) res.push(...page.listItems)
+            return res
+         }
+         // диапазон из loadedItems, загруженный в reactiveListFulFilled
+         this.fulFilledRange = () => {
+            let loadedList = this.loadedItems()
+            // ищет начало reactiveListFulFilled в loadedList
+            let findStart = () => {
+               let searchIndx = 0
+               let indx = -1
+               while (searchIndx < this.vm.reactiveListFulFilled.length && indx === -1) {
+                  let searchId = this.vm.reactiveListFulFilled[searchIndx].oid || this.vm.reactiveListFulFilled[searchIndx].id
+                  indx = loadedList.findIndex(item => item.oid === searchId || item.id === searchId)
+                  searchIndx++ // ищем дальше
+               }
+               return indx
+            }
+            // ищет конец reactiveListFulFilled в loadedList
+            let findEnd = () => {
+               let searchIndx = this.vm.reactiveListFulFilled.length - 1
+               let indx = -1
+               while (searchIndx >= 0 && indx === -1) {
+                  let searchId = this.vm.reactiveListFulFilled[searchIndx].oid || this.vm.reactiveListFulFilled[searchIndx].id
+                  indx = loadedList.findIndex(item => item.oid === searchId || item.id === searchId)
+                  searchIndx-- // ищем дальше
+               }
+               return indx
+            }
+            // область из loadedList, загруженная в reactiveListFulFilled
+            let startFullFil = findStart()
+            let endFullFil = findEnd()
+            if (startFullFil === -1) assert(endFullFil === -1, 'endFullFil === -1')
+            if (endFullFil === -1) assert(startFullFil === -1, 'startFullFil === -1')
+            assert(endFullFil >= startFullFil, 'logic error end < start' + startFullFil + ':' + endFullFil)
+            return { startFullFil, endFullFil }
+         }
+         this.propsReactive = propsReactive
+         assert(this.propsReactive, '!this.propsReactive')
+         this.populateFunc = populateFunc
+         this.paginateFunc = paginateFunc
+         // setProperty / getProperty - хранение метаинформации на списке (currentIndex, итд)
+         this.vm.reactiveListFulFilled.setProperty = (name, value) => {
+            Vue.set(this.propsReactive, name, value)
+         }
+         this.vm.reactiveListFulFilled.getProperty = (name) => this.propsReactive[name]
+         this.vm.reactiveListFulFilled.refresh = async () => {
+            let blackLists = await Lists.getBlackLists()
+            let filtered = this.vm.reactiveListFulFilled.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+            this.vm.reactiveListFulFilled.splice(0, this.vm.reactiveListFulFilled.length, ...filtered)
+         }
+         this.vm.reactiveListFulFilled.next = async (count) => {
+            const f = this.vm.reactiveListFulFilled.next
             f.nameExtra = 'reactiveList::next'
-            logD(f, 'start', `nextIndex=${this.nextIndex}, nextAskedIndex=${this.nextAskedIndex}, props=${JSON.stringify(this.props)}`, 'this.rxDoc =', this.rxDoc ? this.rxDoc.toJSON() : null)
-            if (this.populateFunc && count > 12) {
+            logD(f, 'start')
+            if (this.populateFunc && count > BATCH_SZ) {
                logW('next allow only 12 with populate')
                // assert(count <= 12, 'count <= 12! value =' + count)
-               count = 12
-            } // сервер работает пачками по 16 (12 + побочные запросы)
-            if (!count && this.nextIndex === 0) { // autoNext
-               if (this.populateFunc) count = 12 // дорогая операция
-               else count = this.vm.reactiveListFull.length // выдаем все элементы разом
+               count = BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
             }
-            this.nextAskedIndex = this.nextIndex + count
-            if (this.nextIndex >= this.vm.reactiveListFull.length) return false // дошли до конца списка
-            let fromIndex = this.nextIndex
-            this.nextIndex = Math.min(this.nextIndex + count, this.vm.reactiveListFull.length)
-            let nextItems = this.vm.reactiveListFull.slice(fromIndex, this.nextIndex)
-            let prefetchItems = []
-            if (count < 12) prefetchItems = this.vm.reactiveListFull.slice(this.nextIndex, this.nextIndex + 4) // упреждающее чтение
+            if (!count && this.vm.reactiveListFulFilled.length === 0) { // autoNext
+               if (this.populateFunc) count = BATCH_SZ // дорогая операция
+               else count = this.loadedLen() // выдаем все элементы разом
+            }
+            assert(count)
+            let { startFullFil, endFullFil } = this.fulFilledRange()
+            if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
+               // запросим данные с сервера
+               if (this.loadedPages.length && this.loadedPages[this.loadedPages.length - 1].nextPageToken) {
+                  let rxDocPagination = await this.paginateFunc(this.loadedPages[this.loadedPages.length - 1].nextPageToken, count * 2)
+                  await this.addPaginationPage(rxDocPagination, 'bottom')
+                  let range = this.fulFilledRange() // новые значения для fulfilled области
+                  startFullFil = range.startFullFil
+                  endFullFil = range.endFullFil
+               }
+            }
+            if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
+            let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
+            let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+            let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
             if (this.populateFunc) { // запрашиваем полные сущности
+               let prefetchItems = []
+               // if (count < BATCH_SZ) prefetchItems = this.loadedItems().slice(fulfillTo, fulfillTo + 4) // упреждающее чтение
                nextItems = await this.populateFunc(nextItems, prefetchItems)
             }
             let blackLists = await Lists.getBlackLists()
             nextItems = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-            this.vm.reactiveListPagination.splice(this.vm.reactiveListPagination.length, 0, ...nextItems)
-            this.vm.reactiveListPagination.hasMore = this.nextIndex < this.vm.reactiveListFull.length
-            return this.nextIndex < this.vm.reactiveListFull.length
+            this.vm.reactiveListFulFilled.splice(this.vm.reactiveListFulFilled.length, 0, ...nextItems)
          }
-         this.vm.reactiveListPagination.refresh = async () => {
+         this.vm.reactiveListFulFilled.prev = async (count) => {
+            const f = this.vm.reactiveListFulFilled.prev
+            f.nameExtra = 'reactiveList::prev'
+            logD(f, 'start')
+            if (this.populateFunc && count > BATCH_SZ) {
+               logW('next allow only 12 with populate')
+               count = BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
+            }
+            if (!count && this.vm.reactiveListFulFilled.length === 0) { // autoNext
+               if (this.populateFunc) count = BATCH_SZ // дорогая операция
+               else count = this.loadedLen() // выдаем все элементы разом
+            }
+            assert(count)
+            let { startFullFil, endFullFil } = this.fulFilledRange()
+            if (this.paginateFunc && startFullFil !== -1 && count > startFullFil) {
+               // запросим данные с сервера (вверх)
+               if (this.loadedPages.length && this.loadedPages[0].prevPageToken) {
+                  let rxDocPagination = await this.paginateFunc(this.loadedPages[0].prevPageToken, count * 2)
+                  await this.addPaginationPage(rxDocPagination, 'top')
+                  let range = this.fulFilledRange() // новые значения для fulfilled области
+                  startFullFil = range.startFullFil
+                  endFullFil = range.endFullFil
+               }
+            }
+            if (startFullFil === 0) return false // дошли до начала списка
+            let fulfillFrom = Math.max(startFullFil - count, 0) // начиная с какого индекса грузить
+            let fulfillTo = startFullFil === -1 ? BATCH_SZ : startFullFil // до куда грузить (end + 1)
+            let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
+            if (this.populateFunc) { // запрашиваем полные сущности
+               let prefetchItems = []
+               // if (count < BATCH_SZ) prefetchItems = this.loadedItems().slice(Math.max(fulfillFrom - 4, 0), fulfillFrom) // упреждающее чтение
+               nextItems = await this.populateFunc(nextItems, prefetchItems)
+            }
             let blackLists = await Lists.getBlackLists()
-            let filtered = this.vm.reactiveListPagination.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-            this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...filtered)
+            nextItems = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+            this.vm.reactiveListFulFilled.splice(0, 0, ...nextItems)
          }
-         this.vm.reactiveListPagination.hasMore = this.nextIndex < this.vm.reactiveListFull.length
-
-         this.rxQuerySubscribe()
-         this.reactiveListSubscribe()
+         this.vm.reactiveListFulFilled.hasNext = () => {
+            let { startFullFil, endFullFil } = this.fulFilledRange()
+            return endFullFil < this.loadedLen() - 1 || this.loadedPages.length === 0 || this.loadedPages[this.loadedPages.length - 1].nextPageToken
+         }
+         this.vm.reactiveListFulFilled.hasPrev = () => {
+            let { startFullFil, endFullFil } = this.fulFilledRange()
+            return startFullFil > 0 || this.loadedPages.length === 0 || this.loadedPages[0].prevPageToken
+         }
+         this.vm.reactiveListFulFilled.saveCurrentPos = (indx, currentPage = null) => {
+            let currentIdItem
+            if (!currentPage) {
+               assert(indx >= 0 && indx < this.vm.reactiveListFulFilled.length, 'bad indx')
+               let fullItem = this.vm.reactiveListFulFilled[indx]
+               currentIdItem = fullItem.oid || fullItem.id
+               for (let page of this.loadedPages) {
+                  if (page.listItems.find(item => item.oid === currentIdItem || item.id === currentIdItem)) {
+                     currentPage = page
+                     break
+                  }
+               }
+            }
+            if (currentPage) {
+               if (!currentIdItem) currentIdItem = currentPage.listItems[0].oid || currentPage.listItems[0].id
+               assert(currentIdItem, '!currentIdItem')
+               let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
+               this.vm.reactiveListFulFilled.setProperty('currentPageToken', currentPageToken)
+               this.vm.reactiveListFulFilled.setProperty('currentPageSize', listItems.length)
+               this.vm.reactiveListFulFilled.setProperty('currentIdItem', currentIdItem)
+            }
+         }
+         await this.addPaginationPage(rxQueryOrRxDoc, 'top')
+         if (this.vm.reactiveListFulFilled.getProperty('currentIdItem')){ // загрузить в reactiveListFulFilled currentIdItem (дальше пойдем вверх и вниз от нее)
+            for (let page of this.loadedPages) {
+               let itemCurrent = page.listItems.find(item => item.oid === this.vm.reactiveListFulFilled.getProperty('currentIdItem') || item.id === this.vm.reactiveListFulFilled.getProperty('currentIdItem'))
+               if (itemCurrent){
+                  let nextItems = [itemCurrent]
+                  if (this.populateFunc) { // запрашиваем полные сущности
+                     nextItems = await this.populateFunc(nextItems, [])
+                  }
+                  let blackLists = await Lists.getBlackLists()
+                  nextItems = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+                  this.vm.reactiveListFulFilled.splice(this.vm.reactiveListFulFilled.length, 0, ...nextItems)
+                  break
+               }
+            }
+         }
       }
-      assert(rxQueryOrRxDoc.reactiveListHolderMaster.vm.reactiveListPagination, '!this.reactiveListPagination!')
-      return rxQueryOrRxDoc.reactiveListHolderMaster.vm.reactiveListPagination
+      assert(rxQueryOrRxDoc.reactiveListHolderMaster.vm.reactiveListFulFilled, '!this.reactiveListFulFilled!')
+      return rxQueryOrRxDoc.reactiveListHolderMaster.vm.reactiveListFulFilled
    }
 
-   rxQuerySubscribe () {
+   rxQuerySubscribe (rxQueryOrRxDoc) {
       const f = this.rxQuerySubscribe
-      if (this.rxSubscription) return
-      if (this.rxQuery) {
-         // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-         this.rxSubscription = this.rxQuery.$.pipe(skip(1)).subscribe(async results => {
+      let rxQuery, rxDoc
+      if (isRxQuery(rxQueryOrRxDoc)) {
+         rxQuery = rxQueryOrRxDoc
+         logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
+      } else if (isRxDocument(rxQueryOrRxDoc)) {
+         rxDoc = rxQueryOrRxDoc
+         logD('ReactiveListHolder::constructor: ', rxDoc.id)
+      } else throw new Error('bad rxQueryOrRxDoc')
+      if (rxQuery) {
+         // skip - для пропуска n первых эвентов (после subscribe - сразу генерится эвент(даже если данные не менялись))
+         let rxSubscription = rxQuery.$.pipe(skip(1)).subscribe(async results => {
             try {
                await this.mutex.lock('List::rxQuerySubscribe')
-               this.reactiveListUnsubscribe()
                // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
                // logD(f, 'rxQuery changed 1', results)
-               if (this.vm.reactiveListFull.length === results.length) {
+               if (this.loadedLen() === results.length) {
                   let arrayChanged = false
+                  let listItems = this.loadedItems()
                   for (let i = 0; i < results.length; i++) {
-                     if (results[i].id !== this.vm.reactiveListFull[i].id) {
+                     if (results[i].id !== listItems[i].id) {
                         arrayChanged = true
                         break
                      }
@@ -414,53 +583,50 @@ class ReactiveListWithPaginationFactory {
                   if (!arrayChanged) return // если список не изменился - просто выходим
                }
                // logD(f, 'rxQuery changed 2', results)
-               let listItems = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
-               this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...listItems)
-               this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...this.vm.reactiveListFull.slice(0, this.nextIndex))
-               this.vm.reactiveListPagination.next(3) // если nextIndex === 0, то никто не узнает что можно вызывать next()
+               let listItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
+               this.loadedPages = [{
+                  listItems: listItemsNew,
+                  id: null,
+                  nextPageToken: null,
+                  prevPageToken: null,
+                  currentPageToken: null
+
+               }]
+               this.totalLen = listItemsNew.length
+               let { startFullFil, endFullFil } = this.fulFilledRange()
+               if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
+                  startFullFil = 0
+                  endFullFil = 11
+               }
+               this.vm.reactiveListFulFilled.splice(0, this.vm.reactiveListFulFilled.length, ...listItemsNew.slice(startFullFil, endFullFil + 1))
             } finally {
-               this.reactiveListSubscribe()
                this.mutex.release()
             }
          })
-      } else if (this.rxDoc) {
-         this.rxSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
+      } else if (rxDoc) {
+         // в список быди добавлены элементы(например при подписке)
+         let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
             try {
                await this.mutex.lock('List::rxDocSubscribe') // обязательно сначала блокируем !!! (см querySubscribe)
-               this.reactiveListUnsubscribe()
-               logD(f, 'List::rxDoc changed. try to change reactiveListFull')
+               logD(f, 'List::rxDoc changed. try to change this.listItems')
                assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-               this.vm.reactiveListFull.splice(0, this.vm.reactiveListFull.length, ...change.cached.data.items)
-               let nextItems = this.vm.reactiveListFull.slice(0, this.nextAskedIndex)
-               if (this.populateFunc) nextItems = await this.populateFunc(nextItems, []) // запрашиваем полные сущности
-               this.vm.reactiveListPagination.splice(0, this.vm.reactiveListPagination.length, ...nextItems)
-               this.nextIndex = nextItems.length
-               this.vm.reactiveListPagination.hasMore = this.nextIndex < this.vm.reactiveListFull.length
+               let page = this.loadedPages.find(pg => pg.id === change.id)
+               assert(page, '!page')
+               page.listItems = change.cached.data.items
+
+               let { startFullFil, endFullFil } = this.fulFilledRange()
+               if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
+                  startFullFil = 0
+                  endFullFil = 11
+               }
+               let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
+               if (this.populateFunc) nextItems = await this.populateFunc(nextItems, [], this.vm.reactiveListFulFilled) // запрашиваем полные сущности
+               this.vm.reactiveListFulFilled.splice(0, this.vm.reactiveListFulFilled.length, ...nextItems)
             } finally {
-               this.reactiveListSubscribe()
                this.mutex.release()
             }
          })
       } else throw new Error('!this.rxQuery && !this.rxDoc')
-   }
-
-   rxUnsubscribe () {
-      if (this.rxSubscription) this.rxSubscription.unsubscribe()
-      delete this.rxSubscription
-   }
-
-   reactiveListSubscribe () {
-      const f = this.reactiveListSubscribe
-      if (this.reactiveListUnsubscribeFunc) return
-      this.reactiveListUnsubscribeFunc = this.vm.$watch('reactiveListFull', async (newVal, oldVal) => {
-         logD('изменения списка из UI!')
-         // assert(false, 'изменения списка из UI запрещены')
-      }, { deep: false, immediate: false })
-   }
-
-   reactiveListUnsubscribe () {
-      if (this.reactiveListUnsubscribeFunc) this.reactiveListUnsubscribeFunc()
-      delete this.reactiveListUnsubscribeFunc
    }
 }
 

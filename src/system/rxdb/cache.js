@@ -174,8 +174,8 @@ class Cache {
          case 'year':
             actualAge = 1000 * 60 * 60 * 24 * 360
             break
-         case 'century':
-            actualAge = 1000 * 60 * 60 * 24 * 360
+         case 'infinity':
+            actualAge = 1000 * 60 * 60 * 24 * 360 * 100
             break
          case 'prolong': {
             let current = this.cacheLru.get(id)
@@ -270,7 +270,7 @@ class Cache {
 
    isActual (id, cachedInfo = null) {
       cachedInfo = cachedInfo || this.cacheLru.get(id) // {actualUntil, actualAge, failReason}
-      return cachedInfo && Date.now() <= cachedInfo.actualUntil
+      return cachedInfo && (cachedInfo.actualAge === 'infinity' || Date.now() <= cachedInfo.actualUntil)
    }
 
    // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null

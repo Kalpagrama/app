@@ -30,7 +30,8 @@ const RxCollectionEnum = Object.freeze({
    ...WsCollectionEnum, // списки мастерской
    ...LstCollectionEnum, // списки из objectShort
    OBJ: 'OBJ', // список закэшированных объектов
-   GQL_QUERY: 'GQL_QUERY', // иное
+   GQL_QUERY: 'GQL_QUERY', // произвольный(из конечного списка) запрос к серверу
+   LOCAL: 'LOCAL', // иное (любые данные, хранимые тоько на клиенте) (удаялется по мере заполнения кэша)
    META: 'META'
 })
 

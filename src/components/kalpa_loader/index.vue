@@ -76,14 +76,15 @@ export default {
       this.nexting = true
       if (!this.itemsCreated) {
         // this.$log('*** NEXT itemsCreating before', this.items)
-        this.items = await this.$rxdb.find(this.query, false)
+        this.items = await this.$rxdb.find(this.query, true)
         this.itemsCreated = true
         // this.$log('*** NEXT itemsCreating next', this.items)
+      } else {
+        this.$log('before next. limit=', this.limit)
+        await this.items.next(this.limit)
+        this.$log('after next. hasNext()=', this.items.hasNext())
       }
-      this.$log('before next. limit=', this.limit)
-      await this.items.next(this.limit)
-      this.$log('after next. hasMore=', this.items.hasMore)
-      if (this.items.hasMore) done()
+      if (this.items.hasNext()) done()
       else {
         this.$emit('items', this.items)
         done(true)
