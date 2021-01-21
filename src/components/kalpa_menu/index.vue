@@ -11,8 +11,9 @@
     :style=`{borderRadius: '10px',}`
     ).row.full-width.items-center.content-center
     //- home
+    //- :to="isGuest ? '/trends' : '/feeds/all'"
     router-link(
-      :to="isGuest ? '/trends' : '/feeds/all'"
+      :to="'/about'"
       :style=`{borderRadius: '10px',}`
       ).row.full-width
       div(
@@ -68,35 +69,6 @@
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
               small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
-        //- refresh
-        //- q-btn(
-          @click="refresh()"
-          flat color="white" no-caps icon="refresh"
-          :align="mini ? 'center' : 'left'"
-          :style=`{
-            height: '60px',
-            paddingLeft: '0px'
-            //- maxWidth: '210px',
-          }`
-          ).full-width.items-center.content-center.menu-item.q-mt-sm
-          span(
-            v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Обновить
-        //- logout
-        //- q-btn(
-          v-if="!isGuest"
-          @click="logout()"
-          flat color="white" no-caps icon="logout"
-          :align="mini ? 'center' : 'left'"
-          :style=`{
-            height: '60px',
-            paddingLeft: '0px'
-            //- maxWidth: '210px',
-          }`
-          ).full-width.items-center.content-center.menu-item.q-mt-sm
-          span(
-            v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Выйти
         //- login for GUEST
         q-btn(
           v-if="isGuest"
@@ -112,37 +84,7 @@
           span(
             v-if="!mini"
             :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Войти
-        //- actions
-        //- .row.full-width
-          q-btn(
-            icon="more_horiz"
-            flat color="white" no-caps
-            :align="mini ? 'center' : 'left'"
-            :style=`{
-              height: '60px',
-              paddingLeft: '2px',
-              //- maxWidth: '210px',
-            }`
-            ).full-width.menu-item
-            q-popup-proxy(
-              fit anchor="top right" self="bottom right"
-              )
-              div(:style=`{maxWidth: '210px', borderRadius: '10px',}`).row.full-width.b-40
-                q-btn(
-                  v-for="(a,akey) in actions" :key="akey"
-                  @click="a.cb()"
-                  flat color="white" no-caps
-                  align="left"
-                  :style=`{
-                    height: '50px',
-                    paddingLeft: '40px',
-                  }`
-                  ).full-width
-                  span(:style=`{fontSize: '14px'}`).text-bold {{a.name}}
-            span(
-              v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-md Eще
-        div(
+        //- div(
           v-if="!isGuest"
           ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
@@ -158,33 +100,19 @@
             span(
               v-if="!mini"
               :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Мастерская
-        //- create node
-        //- div(
-          v-if="!isGuest"
-          ).row.full-width.items-center.content-center.q-mt-sm
-          q-btn(
-            :to="isGuest ? '/auth' : '/workspace/create'"
-            color="green" no-caps size="lg"
-            icon="add_circle_outline"
-            :align="mini ? 'center' : 'left'"
-            :style=`{
-              height: '60px',
-              paddingLeft: '0px',
-              maxWidth: '200px',
-            }`).full-width.menu-item
-            span(
-              v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Создать
         //- docs
-        kalpa-docs(
-          v-if="!mini"
-          :textAlign="'center'"
-          :style=`{
-            maxWidth: '210px',
-          }`).q-py-sm
+        .row.full-width.q-mt-sm
+          kalpa-docs(
+            v-if="!mini"
+            :textAlign="'center'"
+            :style=`{
+              maxWidth: '210px',
+            }`).q-py-sm
         //- version
         div(v-if="!mini").row.full-width.items-center.q-pa-sm
-          small(:style=`{userSelect: 'none', marginLeft: '0px'}`).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+          small(
+            :style=`{userSelect: 'none', marginLeft: '0px'}`
+            ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>
@@ -208,11 +136,10 @@ export default {
   data () {
     return {
       pages: [
-        // {id: 'feeds', name: 'Домашняя', icon: 'home'},
+        {id: 'feeds', name: 'Лента', icon: 'view_agenda'},
         {id: 'trends', name: 'Поиск', icon: 'search'},
-        // {id: 'workspace', name: 'Мастерская', icon: 'bookmark_outline'},
-        // {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'about', name: 'О проекте', icon: 'panorama_fish_eye'},
+        {id: 'workspace', name: 'Мастерская', icon: 'construction'},
+        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'settings', name: 'Настройки', icon: 'settings'},
       ]
     }

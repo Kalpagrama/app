@@ -14,8 +14,8 @@
       .col
         span.text-white.text-bold Связи
       //- q-icon(name="bookmark_outline" color="white" size="24px")
-      q-btn(round flat dense color="grey-9")
-        q-icon(name="fas fa-link" size="24px").rotate-90
+      //- q-btn(round flat dense color="grey-9")
+      q-icon(name="fas fa-link" color="grey-9" size="24px")
     kalpa-loader(
       :immediate="true"
       :query="jointsQuery" :limit="12"
@@ -33,7 +33,7 @@
           }`
           ).row.b-40.q-mr-sm
       //- joints loaded
-      div(v-if="joints").row.full-width.no-wrap.q-pa-sm
+      div(v-if="joints && joints.length > 0").row.full-width.no-wrap.q-pa-sm
         router-link(
           v-for="j in joints" :key="j.oid"
           :to="'/links/'+node.oid"
@@ -50,6 +50,17 @@
               borderRadius: '10px',
             }`
             ).fit
+      //- no joints, create one
+      div(
+        v-if="joints && joints.length === 0"
+        ).row.full-width
+        q-btn(
+          :to="'/links/'+node.oid"
+          flat no-caps color="grey-5" align="left"
+          :style=`{
+            height: '50px',
+          }`
+          ).full-width Add some links
 </template>
 
 <script>

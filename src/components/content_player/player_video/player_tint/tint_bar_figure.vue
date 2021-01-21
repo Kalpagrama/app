@@ -36,7 +36,7 @@ div(
       height: 'calc(100% + 12px)',
       cursor: 'grabbing',
     }`
-    ).row.br
+    ).row
   //- drag indicator icon right
   div(
     :style=`{
@@ -62,7 +62,7 @@ div(
       height: 'calc(100% + 12px)',
       cursor: 'grabbing',
     }`
-    ).row.br
+    ).row
 </template>
 
 <script>
@@ -78,23 +78,26 @@ export default {
   methods: {
     pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
+      // first
       if (e.isFirst) {
         this.$emit('first')
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.player.pause()
       }
-      if (e.isFinal) {
-        this.$emit('final')
-        this.pointDragging = false
-        this.pointDraggingIndex = -1
-      }
+      // work
       let tNow = this.player.figure[index].t
       let tDelta = this.convert(e.delta.x)
       let t = tNow + tDelta
       this.$log('pointDrag t', t)
       this.player.setCurrentTime(t)
       this.player.figure[index].t = t
+      // final
+      if (e.isFinal) {
+        this.$emit('final')
+        this.pointDragging = false
+        this.pointDraggingIndex = -1
+      }
     }
   }
 }

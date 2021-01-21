@@ -1,12 +1,16 @@
 <template lang="pug">
-.row.full-width.q-pa-xs
+div(
+  :style=`{
+    paddingBottom: '2px',
+  }`
+  ).row.full-width.q-px-xs
   q-input(
     v-model="status"
     type="textarea" autogrow dark
     borderless flat
     placeholder="Расскажи о себе"
     :input-style=`{
-      background: 'rgb(40,40,40)',
+      background: 'rgb(45,45,45)',
       borderRadius: '10px',
       padding: '12px',
       minHeight: '80px',

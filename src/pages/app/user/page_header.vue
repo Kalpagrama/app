@@ -65,26 +65,29 @@
           span Подписаться
       //- about user
       .row.full-width.q-px-sm.q-pb-sm
-        .row.full-width
-          p.text-grey-2 status lorem ipsum lorem ipsum lorem ipsum status lorem ipsum lorem ipsum lorem ipsum status lorem
+        div(
+          v-if="user.profile.status"
+          ).row.full-width
+          p.text-grey-2 {{ user.profile.status }}
+        //- stat fields, TODO: add countSubsribers, countSubsriptions, countWeight...
         .row.full-width.q-pb-sm
           //- weight
-          router-link(
-            :to=`{params: {tab: 'weight'}}`
+          //- :to="'/user/'+$store.getters.currentUser().oid"
+          div(
             ).row.full-height.items-center.content-center
-            span.text-white.q-mr-xs 1231
+            span.text-white.q-mr-xs {{ user.weightVal }}
             span.text-grey-7.q-mr-md Вес
           //- following
           router-link(
             :to=`{params: {tab: 'following'}}`
             ).row.full-height.items-center.content-center
-            span.text-white.q-mr-xs 1419
+            span.text-white.q-mr-xs {{ user.subscriptions.length }}
             span.text-grey-7.q-mr-md Подписки
           //- followers
           router-link(
             :to=`{params: {tab: 'followers'}}`
             ).row.full-height.items-center.content-center
-            span.text-white.q-mr-xs 9293
+            span.text-white.q-mr-xs {{ user.subscribers.length }}
             span.text-grey-7 Подписчики
 </template>
 

@@ -128,6 +128,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaLogo', () => import('src/components/kalpa_logo/index.vue'))
     Vue.component('kalpaLoader', () => import('src/components/kalpa_loader/index.vue'))
     Vue.component('kalpaMenuActions', () => import('src/components/kalpa_menu_actions/index.vue'))
+    Vue.component('kalpaMenuPopupGlobal', () => import('src/components/kalpa_menu_popup_global/index.vue'))
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

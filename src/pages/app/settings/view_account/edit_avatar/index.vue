@@ -13,7 +13,7 @@
       @avatar="avatarEdited"
       @close="avatarEditorOpened = false")
   //- header
-  .row.full-width.q-px-md
+  //- .row.full-width.q-px-md
     span.text-bold.text-white {{ $t('Avatar', 'Аватар') }}
   //- preview & actions
   .row.full-width.q-py-sm

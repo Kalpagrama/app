@@ -38,14 +38,14 @@
     }`
     ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
     q-btn(
-      flat no-caps
+      flat no-caps icon="view_agenda"
       :to="'/feeds/all'"
       :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
       :style=`{
         width: '60px',
       }`
       ).row.items-center.content-center.justify-center
-      kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
+      //- kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
     q-btn(
@@ -83,9 +83,10 @@
       :style=`{maxWidth: '60px'}`)
       q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
-        small Активность
+        //- small Активность
+        small Уведомления
     //- currentUserPage
-    q-btn(
+    //- q-btn(
       flat no-caps
       :to="'/user/'+$store.getters.currentUser().oid"
       :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
@@ -98,6 +99,7 @@
         }`)
       .row.full-width.justify-center
         small Профиль
+    kalpa-menu-popup-global
 </template>
 
 <script>

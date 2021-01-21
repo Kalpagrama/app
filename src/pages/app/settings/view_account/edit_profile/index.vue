@@ -1,12 +1,12 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.q-pt-sm
   //- header
-  .row.full-width.q-px-md
+  //- .row.full-width.q-px-md
     span.text-white.text-bold {{ $t('Profile', 'Профиль') }}
-  //- status
-  edit-status(:currentUser="currentUser")
   //- username
   edit-username(:currentUser="currentUser")
+  //- status
+  edit-status(:currentUser="currentUser")
   //- .row.full-width.q-pa-xs
     div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
       q-input(

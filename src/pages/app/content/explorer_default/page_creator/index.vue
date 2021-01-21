@@ -9,15 +9,16 @@ div(
     div(
       v-if="$q.screen.lt.md ? !$store.state.ui.userTyping : true"
       :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '10px',
-        //- position: 'fixed', zIndex: 1000, bottom: '0px',
+        //- position: 'absolute', zIndex: 1000, bottom: '0px',
+        position: 'fixed', zIndex: 1000, bottom: '0px', left: '0px',
         paddingBottom: 'env(safe-area-inset-bottom)',
         order: 10,
       }`
-      ).row.full-width.items-center.content-center.br
+      ).row.full-width.items-center.content-center.justify-center
       div(
         :style=`{
           height: '70px',
+          maxWidth: $store.state.ui.pageWidth+'px',
         }`
         ).row.full-width.items-center.content-center.justify-between.q-px-sm
         q-btn(
@@ -35,7 +36,7 @@ div(
             height: '40px',
           }`)
           span.text-bold Опубликовать
-        q-btn(
+        //- q-btn(
           @click="link()"
           flat color="grey-7" icon="link" no-caps
           :style=`{maxWidth: '60px',}`)
@@ -44,11 +45,14 @@ div(
   //- body
   div(
     v-if="node"
+    :style=`{
+      paddingBottom: '100px',
+    }`
     ).row.full-width.items-start.content-start
     //- figure debug
-    div(v-if="player").row.full-width
+    //- div(v-if="player").row.full-width
       small.text-white {{ player.figure }}
-    div(v-if="node.items[0]").row.full-width
+    //- div(v-if="node.items[0]").row.full-width
       small.text-white {{ node.items[0].layers[0].figuresAbsolute }}
     //- composition-editor(
       :player="player"
@@ -57,7 +61,7 @@ div(
       :style=`{
         borderRadius: '0 0 10px 10px',
       }`).bg-black
-    name-editor(:node="node")
+    name-editor(:node="node").q-my-xl
     .row.full-width.q-py-lg
     spheres-editor(:node="node")
 </template>
@@ -69,7 +73,8 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 import compositionEditor from 'components/composition/composition_editor/index.vue'
 import nameEditor from 'components/node_editor/name_editor.vue'
-import spheresEditor from 'components/node_editor/spheres_editor.vue'
+// import spheresEditor from 'components/node_editor/spheres_editor.vue'
+import spheresEditor from './spheres_editor.vue'
 import categoryEditor from 'components/node_editor/category_editor.vue'
 
 export default {

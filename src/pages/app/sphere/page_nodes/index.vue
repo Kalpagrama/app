@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.b-30
+.row.full-width.justify-center.b-30.q-pt-sm
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     kalpa-loader(
         v-if="sphere" :query="query" :limit="12" v-slot=`{items, next}`)

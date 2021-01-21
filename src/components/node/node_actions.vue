@@ -22,11 +22,11 @@
       ).col
       .row.full-width
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
-            q-icon(name="workspaces" size="12px"
+          q-btn(round flat dense color="grey-9")
+            q-icon(name="workspaces" size="22px"
               :style=`{
-                position: 'absolute', left: '11px', top: '11px',
-              }`).rotate-180
+                //- position: 'absolute', left: '11px', top: '11px',
+              }`)
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countComments || '' }}

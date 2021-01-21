@@ -42,19 +42,7 @@
       q-icon(name="fas fa-info" size="19px").q-mb-xs
       .row.full-width.justify-center
         small Детали
-    //- :to="'/user/'+$store.getters.currentUser().oid"
-    q-btn(
-      flat no-caps
-      @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
-      :color="'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      user-avatar(
-        :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
-        :style=`{
-          borderRadius: '50%',
-        }`)
-      .row.full-width.justify-center
-        small Профиль
+    kalpa-menu-popup-global
 </template>
 
 <script>

@@ -5,7 +5,7 @@ q-layout(view="hHh Lpr lff")
       .row.full-width.justify-center
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           //- sphere avatar(s)
-          div(
+          //- div(
             :style=`{
               position: 'relative', height: '140px',
             }`).row.full-width
@@ -33,7 +33,8 @@ q-layout(view="hHh Lpr lff")
           div(
             :style=`{
               zIndex: 100,
-              marginTop: '-10px',
+              //- marginTop: '-10px',
+              marginTop: '8px',
               //- paddingTop: '8px',
               //- minHeight: '60px',
               borderRadius: '10px',
@@ -84,7 +85,7 @@ q-layout(view="hHh Lpr lff")
                   span.text-grey-7 Подписчики
             //- kalpa-menu-actions(:actions="actions" icon="more_vert")
       //- tabs sticky
-      div(
+      //- div(
         :style=`{
           position: 'sticky', top: '0px',
           zIndex: 2000,

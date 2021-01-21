@@ -66,9 +66,11 @@ div(
               :player="player"
               :convert="convertPxToTime"
               :style=`{
-                left: (player.figure[0].t/player.duration)*100+'%',
-                width: ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'%',
-              }`)
+                left: 'calc(' + (player.figure[0].t/player.duration)*100+'% - 6px)',
+                width:'calc(' + ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'% + 16px)',
+              }`
+              @first="zoomWorking = true"
+              @final="zoomWorking = false")
           //- figures
           div(
             v-for="(f,fi) in player.figures" :key="fi"
@@ -226,26 +228,26 @@ export default {
     }
   },
   watch: {
-    // 'player.currentTime': {
-    //   async handler (to, from) {
-    //     if (this.zoomWrapperScrolling) return
-    //     if (!this.zoomed) return
-    //     if (this.zoomWorking) return
-    //     this.$log('player.currentTime TO', to)
-    //     let ref = this.$refs['minutes-wrapper']
-    //     let {width} = ref.getBoundingClientRect()
-    //     let scrollLeft = (to / this.player.duration) * width
-    //     this.zoomWrapperScrollingAuthor = 'player'
-    //     this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-    //     if (this.playerCurrentTimeTimer) {
-    //       clearTimeout(this.playerCurrentTimeTimer)
-    //       this.playerCurrentTimeTimer = null
-    //     }
-    //     this.playerCurrentTimeTimer = setTimeout(() => {
-    //       this.zoomWrapperScrollingAuthor = null
-    //     }, 200)
-    //   }
-    // },
+    'player.currentTime': {
+      async handler (to, from) {
+        if (this.zoomWrapperScrolling) return
+        if (!this.zoomed) return
+        if (this.zoomWorking) return
+        this.$log('player.currentTime TO', to)
+        let ref = this.$refs['minutes-wrapper']
+        let {width} = ref.getBoundingClientRect()
+        let scrollLeft = (to / this.player.duration) * width
+        this.zoomWrapperScrollingAuthor = 'player'
+        this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
+        if (this.playerCurrentTimeTimer) {
+          clearTimeout(this.playerCurrentTimeTimer)
+          this.playerCurrentTimeTimer = null
+        }
+        this.playerCurrentTimeTimer = setTimeout(() => {
+          this.zoomWrapperScrollingAuthor = null
+        }, 200)
+      }
+    },
     zoomed: {
       // immediate: true,
       handler (to, from) {
@@ -314,7 +316,11 @@ export default {
     zoomWrapperOnPan (e) {},
     async zoomIn () {
       this.$log('zoomIn')
+      // this.zoomWrapperScrollingAuthor = 'player'
+      this.zoomPercent = this.player.currentTime / this.duration
       this.zoomed = true
+      // await this.$wait(500)
+      // this.zoomWrapperScrollingAuthor = null
       // do someting to save currentPosition...
     },
     async zoomOut () {
@@ -323,7 +329,7 @@ export default {
       this.player.pause()
       // need to save currentTime
       this.zoomWrapperScrollingAuthor = 'player'
-      await this.$wait(500)
+      await this.$wait(550)
       this.zoomWrapperScrollingAuthor = null
     },
     tintClick (e) {
@@ -332,7 +338,7 @@ export default {
       let width = e.target.clientWidth
       this.$log({left, width})
       this.zoomPercent = left / width
-      this.zoomed = !this.zoomed
+      // this.zoomed = !this.zoomed
       let t = this.zoomPercent * this.player.duration
       this.player.setCurrentTime(t)
     },
