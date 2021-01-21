@@ -7,7 +7,7 @@ div(
     :style=`{
       position: 'relative',
       height: '36px',
-      opacity: 0.1,
+      //- opacity: 0.1,
     }`
     ).row.full-width
     //- middle currentTime

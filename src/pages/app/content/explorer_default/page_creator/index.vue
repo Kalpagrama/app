@@ -63,6 +63,7 @@ div(
       }`).bg-black
     name-editor(:node="node").q-my-xl
     .row.full-width.q-py-lg
+    category-editor(:node="node")
     spheres-editor(:node="node")
 </template>
 
@@ -70,19 +71,14 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 
-import compositionPlayer from 'components/composition/composition_player/index.vue'
-import compositionEditor from 'components/composition/composition_editor/index.vue'
-import nameEditor from 'components/node_editor/name_editor.vue'
-// import spheresEditor from 'components/node_editor/spheres_editor.vue'
+import nameEditor from './name_editor.vue'
 import spheresEditor from './spheres_editor.vue'
-import categoryEditor from 'components/node_editor/category_editor.vue'
+import categoryEditor from './category_editor.vue'
 
 export default {
   name: 'pageCreator',
   props: ['contentKalpa', 'player'],
   components: {
-    compositionPlayer,
-    compositionEditor,
     nameEditor,
     spheresEditor,
     categoryEditor

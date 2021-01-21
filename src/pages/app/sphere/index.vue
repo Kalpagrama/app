@@ -2,19 +2,27 @@
 q-layout(view="hHh Lpr lff")
   q-page-container
     q-page
-      .row.full-width.justify-center
+      .row.full-width.justify-center.q-pt-sm.q-px-sm
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           //- sphere avatar(s)
-          //- div(
+          div(
             :style=`{
               position: 'relative', height: '140px',
-            }`).row.full-width
-            img(
+              borderRadius: '10px 10px 0 0',
+            }`).row.full-width.b-40
+            //- img(
               :src="$store.getters.currentUser().thumbUrl"
               :style=`{
                 objectFit: 'cover',
               }`
               ).fit
+            q-btn(
+              @click="$routerKalpa.back()"
+              round flat color="white" icon="west"
+              :style=`{
+                position: 'absolute', zIndex: 1000,
+                top: '8px', left: '8px',
+              }`)
             kalpa-menu-actions(
               :actions="actions" icon="more_vert"
               color="white"
@@ -33,8 +41,8 @@ q-layout(view="hHh Lpr lff")
           div(
             :style=`{
               zIndex: 100,
-              //- marginTop: '-10px',
-              marginTop: '8px',
+              marginTop: '-10px',
+              //- marginTop: '8px',
               //- paddingTop: '8px',
               //- minHeight: '60px',
               borderRadius: '10px',
@@ -43,16 +51,20 @@ q-layout(view="hHh Lpr lff")
             //- header
             div(
               :style=`{
-                height: '60px',
-
+                minHeight: '60px',
               }`
               ).row.full-width.items-center.content-center.q-pa-sm
-              q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-              q-icon(name="blur_on" color="white" size="30px")
+              q-icon(name="blur_on" color="white" size="30px").q-ml-xs
               .col.q-px-sm
                 span(
-                  v-if="sphere" :style=`{fontSize: '18px'}`
-                  ).text-white.text-bold {{ sphere.name }}
+                  v-if="sphere"
+                  :class=`{
+                    'text-bold': sphere.length < 20,
+                  }`
+                  :style=`{
+                    fontSize: fontSize+'px',
+                  }`
+                  ).text-white {{ sphere.name }}
               kalpa-bookmark(
                 v-if="sphere"
                 :oid="sphere.oid"
@@ -124,19 +136,19 @@ export default {
     actions () {
       return {
         copyLink: {
-          name: 'Copy link',
+          name: 'Скопировать ссылку',
           cb: () => {
             this.$log('copyLink')
           }
         },
         share: {
-          name: 'Share',
+          name: 'Поделиться',
           cb: () => {
             this.$log('share')
           }
         },
         hide: {
-          name: 'Hide',
+          name: 'Пожаловаться',
           color: 'red',
           cb: async () => {
             this.$log('hide')
@@ -152,7 +164,15 @@ export default {
         {id: 'people', name: 'Люди'},
         {id: 'spheres', name: 'Сферы'}
       ]
-    }
+    },
+    fontSize () {
+      if (!this.sphere) return 14
+      let l = this.sphere.name.length
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else return 14
+    },
   },
   watch: {
     '$route.params.oid': {

@@ -6,7 +6,6 @@
 
 <template lang="pug">
 q-btn(
-  @click="menuShow = true"
   flat no-caps
   :color="'grey-7'"
   :style=`{maxWidth: '60px'}`)
@@ -76,7 +75,6 @@ export default {
   name: 'kalpaMenuPopupGlobal',
   data () {
     return {
-      menuShow: false,
     }
   },
   computed: {

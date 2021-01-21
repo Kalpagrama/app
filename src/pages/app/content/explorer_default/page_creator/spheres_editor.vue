@@ -21,7 +21,8 @@
         textAlign: 'center',
       }`
       :style=`{
-        maxWidth: '386px',
+        //- maxWidth: '386px',
+        maxWidth: '280px',
       }`
       ).full-width
       template(v-slot:append)
@@ -37,7 +38,8 @@
   .row.full-width.justify-center.q-px-sm
     div(
       :style=`{
-        maxWidth: '386px',
+        //- maxWidth: '386px',
+        maxWidth: '280px',
       }`
       ).row.full-width.items-start.content-start.q-py-sm
       div(

@@ -29,14 +29,14 @@ div(
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
   //- footer
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="player && player.duration"
       :style=`options.footerOverlay ?
         {
           position: 'absolute', zIndex: 1000,
           bottom: '0px',
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.666) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 6px 6px',
         }
         :
@@ -137,17 +137,17 @@ div(
           q-icon(
             name="forward_5" size="40px" color="white")
   //- context
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
+      v-if="player && player.duration"
       :style=`{
         position: 'absolute', zIndex: 1000,
         left: '0px', top: '0px',
-        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.666) 100%)',
         borderRadius: '8px',
       }`
       ).row.full-width
       q-btn(
-        v-if="player"
         flat color="white" no-caps dense
         :to="contentLink"
         :style=`{
@@ -160,48 +160,6 @@ div(
           }`
           ).col
           span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
-  //- sound
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="player"
-      @click="volumeToggle()"
-      round flat dense
-      :color="player.muted ? 'red' : 'white'"
-      :icon="player.muted ? 'volume_off' : 'volume_up'"
-      :style=`{
-        position: 'absolute', zIndex: 1000,
-        right: '8px', top: '8px',
-      }`)
-  //- player mini-bar
-  //- @started="tintShow = true"
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      :style=`{
-        position: 'absolute',
-        zIndex: 1000,
-        transform: 'translate3d(0,0,10px)',
-        bottom: '-15px',
-      }`
-      ).row.full-width.justify-center.bg
-      player-bar-mini(
-        v-if="player" :player="player" :figures="figures"
-        :mini="isMini || !tintShow"
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-        }`).br
-  //- subtitles
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 901,
-      bottom: '8px',
-    }`
-    ).row.full-width.items-center.content-center.justify-center
-    small(
-      :style=`{
-        borderRadius: '10px',
-      }`
-    ).text-white.bg-black.q-pa-sm lorem ipsum subtitles
-  //- div(v-if="!isMini" :style=`{height: '20px',}`).row.full-width
 </template>
 
 <script>

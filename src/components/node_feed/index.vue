@@ -69,11 +69,15 @@ div(
       :style=`{
         order: orderName,
         minHeight: '60px',
-        fontSize: nodeNameSize+'px',
+        fontSize: fontSize+'px',
         textAlign: 'center',
       }`
-      ).row.full-width.items-center.content-center.justify-center.q-px-sm
-      span.text-white.text-bold {{ nodeName }}
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
+      span(
+        :class=`{
+          'text-bold': node.name.length < 20
+        }`
+        ).text-white {{ nodeName }}
     //- SPHERES
     div(
       v-if="showSpheres && node.spheres.length > 0"
@@ -173,14 +177,12 @@ export default {
       if (!this.node) return null
       return this.$store.state.ui.nodeCategories.find(c => c.type === this.node.category)
     },
-    // TODO: impl better way
-    nodeNameSize () {
+    fontSize () {
       let l = this.node.name.length
-      if (l < 20) return 18
-      else if (l >= 20 && l < 50) return 16
-      else if (l >= 50 && l < 100) return 14
-      else if (l >= 100) return 12
-      else return 10
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else return 14
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid

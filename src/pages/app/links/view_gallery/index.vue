@@ -58,18 +58,7 @@
             :style=`{maxWidth: '60px'}`)
             .row.full-width.justify-center
               small(:style=`{whiteSpace: 'nowrap'}`) Добавить связь
-          q-btn(
-            flat no-caps
-            :to="'/user/'+$store.getters.currentUser().oid"
-            :color="'grey-7'"
-            :style=`{maxWidth: '60px'}`)
-            user-avatar(
-              :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
-              :style=`{
-                borderRadius: '50%',
-              }`)
-            .row.full-width.justify-center
-              small Профиль
+          kalpa-menu-popup-global
   //- joint current
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(

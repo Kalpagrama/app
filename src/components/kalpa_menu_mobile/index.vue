@@ -22,13 +22,7 @@
         height: '44px',
       }`).q-px-md.q-mt-xs.b-50
       span.text-white Войти
-    q-btn(
-      @click="$store.commit('ui/stateSet', ['mobileMenuShow', true])"
-      flat icon="menu" no-caps
-      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Меню
+    kalpa-menu-popup-global
   //- menu for users
   div(
     v-if="!isGuest"
@@ -45,7 +39,6 @@
         width: '60px',
       }`
       ).row.items-center.content-center.justify-center
-      //- kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
     q-btn(
@@ -55,27 +48,11 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Поиск
-    //- transition(enter-active-class="animated fadeIn")
     q-btn(
       round no-caps icon="construction"
       :to="'/workspace'"
       :color="'green'"
       :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-    //- q-btn(
-      v-if="$route.name.split('.')[0] === 'workspace'"
-      round no-caps
-      :to="'/workspace/create'"
-      :color="'green'"
-      :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-      q-icon(name="add" size="30px")
-      //- anvil(size="30px")
-    //- q-btn(
-      flat no-caps icon="bookmark_outline"
-      :to="'/workspace/'"
-      :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Закладки
     q-btn(
       flat no-caps icon="notifications_none"
       :to="'/notifications/'"
@@ -85,20 +62,6 @@
       .row.full-width.justify-center
         //- small Активность
         small Уведомления
-    //- currentUserPage
-    //- q-btn(
-      flat no-caps
-      :to="'/user/'+$store.getters.currentUser().oid"
-      :color="$store.state.ui.mobileMenuShow ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      user-avatar(
-        :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
-        :style=`{
-          borderRadius: '50%',
-          border: ($route.name.split('.')[0] === 'user' && $route.params.oid === $store.getters.currentUser().oid) ? '2px solid rgb(76,175,79)' : '2px solid rgba(0,0,0,0)'
-        }`)
-      .row.full-width.justify-center
-        small Профиль
     kalpa-menu-popup-global
 </template>
 
