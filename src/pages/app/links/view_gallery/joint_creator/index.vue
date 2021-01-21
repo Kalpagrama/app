@@ -133,7 +133,7 @@ div(
   div(
     v-if="viewId === 'editor'"
     ).row.full-width.items-start.content-start
-    img(
+    //- img(
       :src="joint.items[1].thumbUrl"
       :style=`{
         borderRadius: '10px',
@@ -141,6 +141,10 @@ div(
         objectFit: 'contain',
       }`
       ).full-width
+    node-items-item(
+      :item="joint.items[1]"
+      :itemOpened="false"
+      :itemActive="true")
     //- small.text-white {{ joint.items[1] }}
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
       q-btn(
@@ -168,7 +172,8 @@ export default {
   name: 'jointCreator',
   props: ['item', 'height'],
   components: {
-    kalpaFinder
+    kalpaFinder,
+    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
   },
   data () {
     return {

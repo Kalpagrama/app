@@ -6,7 +6,7 @@ div(
   }`
   ).column.full-width
   //- .row.full-width.q-py-lg.bg-black
-  .row.full-width.justify-center
+  //- .row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       .row.full-width.items-center.content-center.q-py-xs.q-px-sm
         q-btn(round flat dense color="white" icon="west" @click="$routerKalpa.back()").q-mr-xs
@@ -28,7 +28,38 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
-  .row.full-width.justify-center
+  //- footer
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="player && player.duration"
+      :style=`options.footerOverlay ?
+        {
+          position: 'absolute', zIndex: 1000,
+          bottom: '0px',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
+          borderRadius: '0 0 6px 6px',
+        }
+        :
+        {
+          position: 'relative',
+        }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+        tint-bar-new(
+          :player="player" :contentKalpa="contentKalpa"
+          :style=`{
+          }`).full-width
+          template(v-slot:actions)
+            .row
+              q-btn(
+                v-if="player"
+                @click="volumeToggle()"
+                round flat dense size="sm"
+                :color="player.muted ? 'red' : 'white'"
+                :icon="player.muted ? 'volume_off' : 'volume_up'"
+                :style=`{
+                }`)
+  //- .row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
       .row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat dense color="white" icon="fullscreen")
@@ -106,17 +137,18 @@ div(
           q-icon(
             name="forward_5" size="40px" color="white")
   //- context
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
       v-if="player"
-      round flat dense
+      flat color="white" no-caps dense
       :to="contentLink"
-      color="white"
-      icon="select_all"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        left: '8px', top: '8px',
-      }`)
+        left: '0px', top: '0px',
+      }`).row.q-py-sm
+      q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
+      .col
+        span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
   //- sound
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(

@@ -10,6 +10,7 @@ q-layout(
           position: 'relative',
           height: 'calc('+ heightPage +'px - env(safe-area-inset-bottom))',
           //- maxWidth: $store.state.ui.pageWidth+'px',
+          maxWidth: widthPage+'px',
           borderRadius: '0 0 10px 10px',
         }`
         ).column.full-width.bg-black
@@ -114,6 +115,7 @@ export default {
       // showMenu: true,
       // nodeCreating: false,
       heightPage: 0,
+      widthPage: 0,
       // heightPageMin: 0,
       node: null,
     }
@@ -153,6 +155,7 @@ export default {
         if (to) {
           this.$tween.to(this, 0.3, {
             heightPage: this.heightPageMin,
+            widthPage: Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth),
             onComplete: () => {
               this.$log('pageId Done to ', to)
               // this.pageId = null
@@ -162,6 +165,7 @@ export default {
         else {
           this.$tween.to(this, 0.3, {
             heightPage: this.heightPageMax,
+            widthPage: Math.max(this.$q.screen.width, this.$store.state.ui.pageWidth),
             onComplete: () => {
               this.$log('pageId Done to null')
               // this.pageId = null

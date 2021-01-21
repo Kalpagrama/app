@@ -20,6 +20,7 @@ div(
         showBar: true,
         showHeader: true,
         nodeOid: node.oid,
+        footerOverlay: true,
       }`)
 </template>
 

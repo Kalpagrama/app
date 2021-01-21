@@ -45,7 +45,12 @@ div(
   div(
     v-if="node"
     ).row.full-width.items-start.content-start
-    composition-editor(
+    //- figure debug
+    div(v-if="player").row.full-width
+      small.text-white {{ player.figure }}
+    div(v-if="node.items[0]").row.full-width
+      small.text-white {{ node.items[0].layers[0].figuresAbsolute }}
+    //- composition-editor(
       :player="player"
       :composition="node.items[0]"
       :contentKalpa="contentKalpa"
@@ -142,6 +147,7 @@ export default {
       let node = JSON.parse(JSON.stringify(this.nodeNew))
       node.items[0] = composition
       this.node = node
+      this.player.setState('figure', composition.layers[0].figuresAbsolute)
     },
     async publish () {
       try {
@@ -179,6 +185,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.player.setState('figure', null)
   }
 }
 </script>

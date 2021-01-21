@@ -26,7 +26,8 @@ div(
     :contentKalpa=`{
       oid: composition.layers[0].contentOid,
       name: composition.layers[0].contentName,
-      url: composition.url,
+      //- url: composition.url,
+      url: compositionUrl,
       type: 'VIDEO',
       contentSource: 'KALPA',
     }`
@@ -38,7 +39,7 @@ div(
     :styles="styles"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
+      //- opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
 </template>
 
@@ -63,12 +64,48 @@ export default {
       player: null,
     }
   },
+  watch: {
+    player: {
+      handler (to, from) {
+        if (to) {
+          if (this.composition.outputType === 'VIDEO') {
+            // let arr = this.composition.url.split('#t=')
+            // if (arr.length > 1) {
+            //   let [start, end] = arr[1].split(',')
+            //   this.player.setCurrentTime(parseFloat(start))
+            // }
+            // else {
+            //   // do nothing
+            // }
+            this.player.play()
+          }
+        }
+      }
+    }
+  },
   computed: {
+    compositionUrl () {
+      if (this.composition.outputType === 'VIDEO') {
+        let arr = this.composition.url.split('#t=')
+        if (arr.length > 1) {
+          // return arr[0]
+          return this.composition.url
+        }
+        else {
+          // return arr[0]
+          return this.composition.url
+        }
+      }
+      else {
+        return this.composition.url
+      }
+    },
     // TODO: figures always...
     figures () {
       if (this.composition.outputType === 'VIDEO') {
         let arr = this.composition.url.split('#t=')
         if (arr.length > 1) {
+          // this.composition.url = arr[0]
           let [start, end] = arr[1].split(',')
           return [
             {t: parseFloat(start)},
@@ -83,8 +120,6 @@ export default {
         return false
       }
     }
-  },
-  watch: {
   },
   methods: {
   },

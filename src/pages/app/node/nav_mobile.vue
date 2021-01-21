@@ -15,32 +15,38 @@
         small Назад
     q-btn(
       @click="$emit('pageId', 'inside')"
-      flat icon="tonality" no-caps
+      flat icon="workspaces" no-caps
       :color="pageId === 'inside' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Микроядра
     //- q-btn(
-      @click="jointCreating = !jointCreating"
-      color="green" icon="link"
-      :style=`{
-        width: '50px', height: '50px',
-        borderRadius: '50%',
-      }`)
+      @click="$emit('pageId', 'inside')"
+      round flat dense no-caps
+      :color="pageId === 'inside' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      q-icon(name="workspaces" size="18px" :style=`{marginBottom: '6px',}`).rotate-180
+      .row.full-width.justify-center
+        small Микроядра
     q-btn(
       @click="$emit('pageId', 'names')"
-      flat icon="list" no-caps
+      flat icon="blur_circular" no-caps
       :color="pageId === 'names' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Смыслы
-    //- q-btn(
-      @click="$emit('pageId', 'links')"
-      flat icon="link" no-caps
-      :color="pageId === 'links' ? 'green' : 'grey-7'"
+    q-btn(
+      flat no-caps
+      :to="'/user/'+$store.getters.currentUser().oid"
+      :color="'grey-7'"
       :style=`{maxWidth: '60px'}`)
+      user-avatar(
+        :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
+        :style=`{
+          borderRadius: '50%',
+        }`)
       .row.full-width.justify-center
-        small Связи
+        small Профиль
 </template>
 
 <script>

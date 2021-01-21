@@ -25,8 +25,8 @@
           q-btn(round flat dense color="grey-9" icon="radio_button_unchecked")
             q-icon(name="workspaces" size="12px"
               :style=`{
-                position: 'absolute', top: '10px',
-              }`)
+                position: 'absolute', left: '11px', top: '11px',
+              }`).rotate-180
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countComments || '' }}

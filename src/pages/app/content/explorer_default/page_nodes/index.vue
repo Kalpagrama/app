@@ -44,33 +44,6 @@ div(
         :player="player"
         :isSelected="itemSelectedOid === i.oid"
         @click.native="itemSelectedOid = i.oid")
-//- div(
-  :style=`{
-    paddingTop: '0px'
-  }`).row.full-width.items-start.content-start.justify-center.br
-  //- header: sticky ?
-  .row.full-width.items-center.content-center.justify-start.q-pa-sm
-    .col
-      span().text-grey-7.text-bold.q-ml-xs.q-mr-xs Ядра
-      span(v-if="itemsLoaded").text-grey-7.text-bold - {{ itemsLocal.length }}
-    q-btn(
-      round flat color="grey-7" icon="tune")
-  //- slot
-  //- items loaded independent?
-  //- kalpa-loader(
-    :immediate="true"
-    @items="itemsUpdated" :limit="10"
-    :query="itemsQuery" v-slot=`{items,next,nexting}`)
-  .row.full-width.items-start.content-start.q-px-sm
-    //- q-infinite-scroll(@load="next" :offset="$q.screen.height")
-    node-item(
-      v-for="(i,ii) in itemsLocal" :key="i.oid"
-      :node="i.node"
-      :composition="i.composition"
-      :contentKalpa="contentKalpa"
-      :player="player"
-      :isSelected="itemSelectedOid === i.oid"
-      @click.native="itemSelectedOid = i.oid")
 </template>
 
 <script>

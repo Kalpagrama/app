@@ -14,7 +14,7 @@
       }`
       ).row.full-width.items-start.content-start.q-pt-xs.q-px-xs
       q-resize-observer(@resize="onResizeHeader" :debounce="300")
-      img(
+      //- img(
         draggable="false"
         :src="item.thumbUrl"
         :style=`{
@@ -23,6 +23,10 @@
           objectFit: 'contain',
         }`
         ).full-width.b-40
+      node-items-item(
+        :item="item"
+        :itemOpened="false"
+        :itemActive="true")
   //- footer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -43,12 +47,29 @@
         div().row.full-width.justify-between.q-pa-sm
           q-btn(
             @click="$routerKalpa.back()"
-            round flat icon="west" color="white")
+            flat color="grey-7" icon="west" no-caps
+            :style=`{maxWidth: '60px'}`)
+            .row.full-width.justify-center
+              small Назад
           q-btn(
             @click="jointCreating = true"
-            round flat icon="fas fa-link" color="green")
+            flat icon="add" no-caps
+            :color="'green'"
+            :style=`{maxWidth: '60px'}`)
+            .row.full-width.justify-center
+              small(:style=`{whiteSpace: 'nowrap'}`) Добавить связь
           q-btn(
-            round flat icon="more_vert" color="white")
+            flat no-caps
+            :to="'/user/'+$store.getters.currentUser().oid"
+            :color="'grey-7'"
+            :style=`{maxWidth: '60px'}`)
+            user-avatar(
+              :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
+              :style=`{
+                borderRadius: '50%',
+              }`)
+            .row.full-width.justify-center
+              small Профиль
   //- joint current
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -109,13 +130,39 @@
         position: 'relative',
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
-      ).row.full-width
+      ).row.full-width.q-px-xs
+      //- header joint name
+      div(
+        :style=`{
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: '60px',
+          textAlign: 'center',
+        }`
+        ).row.full-width.items-center.content-center.justify-center.q-pa-sm
+        span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm Связи
+        span().text-grey-6.text-bold - {{ item.countJoints }}
+        q-icon(
+          name="fas fa-link" size="80px"
+          :style=`{
+            color: 'rgb(38,38,38)',
+            position: 'absolute', zIndex: 200,
+            top: '-10px',
+            //- left: 'calc(50% - 40px)',
+            left: '8px',
+          }`)
+        //- q-btn(
+          @click="$emit('close')"
+          round flat color="grey-6" icon="clear"
+          :style=`{
+            position: 'absolute', zIndex: 200,
+            top: '8px', right: '8px',
+          }`)
       joints-gallery(
         :oid="item.oid"
         :height="$q.screen.height-headerHeight"
         @joint="joint = $event"
-        @create="jointCreating = true"
-        )
+        @create="jointCreating = true")
 </template>
 
 <script>
@@ -128,6 +175,7 @@ export default {
     jointCreator: () => import('./joint_creator/index.vue'),
     jointCurrent: () => import('./joint_current/index.vue'),
     jointsGallery: () => import('./joints_gallery/index.vue'),
+    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
   },
   data () {
     return {

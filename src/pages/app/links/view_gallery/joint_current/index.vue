@@ -10,6 +10,7 @@ div(
       overflow: 'hidden',
       minHeight: '60px',
       textAlign: 'center',
+      paddingLeft: '60px', paddingRight: '60px',
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
     span(:style=`{zIndex: 300,}`).text-white {{ joint.name || joint.vertices }}
@@ -54,7 +55,7 @@ div(
             round flat color="white" icon="adjust")
           .col
             span.text-white {{ joint.items[itemIndex].name }}
-        router-link(
+        //- router-link(
           v-if="joint.items[itemIndex].type === 'NODE'"
           :to="'/node/'+joint.items[itemIndex].oid"
           :style=`{
@@ -75,7 +76,7 @@ div(
             top: 'calc(50% - 20px)',
           }`)
         //- img
-        img(
+        //- img(
           draggable="false"
           :src="joint.items.find(i => i.oid !== item.oid).thumbUrl"
           :style=`{
@@ -85,12 +86,19 @@ div(
             maxHeight: height-200+'px',
           }`
           ).full-width.b-40
+        node-items-item(
+          :item="joint.items[itemIndex]"
+          :itemOpened="false"
+          :itemActive="true")
 </template>
 
 <script>
 export default {
   name: 'jointCurrent',
   props: ['item', 'joint', 'height'],
+  components: {
+    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
+  },
   data () {
     return {
     }

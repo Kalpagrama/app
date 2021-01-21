@@ -51,6 +51,7 @@ export default {
       duration: 0,
       muted: true,
       events: {},
+      figure: null,
       figures: [],
       points: [],
       isFullscreen: false,

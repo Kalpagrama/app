@@ -22,7 +22,7 @@ export default {
   data () {
     return {
       item: null,
-      viewId: 'gallery', // threads, binary
+      viewId: 'gallery', // gallery, threads, binary
     }
   },
   watch: {
@@ -42,13 +42,13 @@ export default {
   mounted () {
     // this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
     // document.body.style.background = 'black !important'
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

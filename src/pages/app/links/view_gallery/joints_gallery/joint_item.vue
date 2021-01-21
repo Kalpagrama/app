@@ -46,7 +46,7 @@ div(
           ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-pb-sm.q-pt-lg
           small(
             :style=`{
-              whiteSpace: 'nowrap',
+              //- whiteSpace: 'nowrap',
             }`
             ).text-white {{ jointName }}
 </template>

@@ -2,36 +2,14 @@
 div(
   :style=`{
     position: 'relative',
-    height: '50px',
-  }`).row.q-px-sm
+  }`).row.full-width.q-px-sm
   div(
     :style=`{
       position: 'relative',
+      height: '36px',
+      //- opacity: 0.1,
     }`
-    ).row.fit
-    //- time
-    small(
-      :style=`{
-        position: 'absolute', zIndex: 200, left: '8px', bottom: '-3px',
-        fontSize: '8px',
-      }`
-      ).text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
-    //- zoom out
-    q-btn(
-      v-if="zoomed"
-      @click="zoomOut()"
-      round flat dense color="white" icon="remove_circle_outline" size="sm"
-      :style=`{
-        position: 'absolute', zIndex: 200, right: '-12px', top: '-12px',
-      }`)
-    //- tint
-    //- div(
-      v-if="!zoomed"
-      @click="tintClick"
-      :style=`{
-        position: 'absolute', zIndex: 200,
-      }`
-      ).row.fit.br
+    ).row.full-width
     //- middle currentTime
     div(
       v-if="zoomed"
@@ -76,20 +54,21 @@ div(
           div(
             v-if="!zoomed"
             @click="tintClick"
+            v-touch-pan.mouse.prevent="tintOnPan"
             :style=`{
               position: 'absolute', zIndex: 3000,
             }`
             ).row.fit
-          //- figure
-          div(
-            :style=`{
-              position: 'absolute', zIndex: 1000,
-              top: '-4px', left: '33%',
-              width: '10%', height: 'calc(100% + 8px)',
-              border: '4px solid rgb(76,175,79)',
-              borderRadius: '10px',
-            }`
-            ).row
+          //- figure editor
+          transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+            tint-bar-figure(
+              v-if="player && player.figure"
+              :player="player"
+              :convert="convertPxToTime"
+              :style=`{
+                left: (player.figure[0].t/player.duration)*100+'%',
+                width: ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'%',
+              }`)
           //- figures
           div(
             v-for="(f,fi) in player.figures" :key="fi"
@@ -104,15 +83,17 @@ div(
             }`
             ).row
           //- currentTime
-          div(
-            v-if="!zoomed"
-            :style=`{
-              position: 'absolute', zIndex: 2000,
-              left: (player.currentTime/player.duration)*100+'%',
-              height: '100%',
-              width: '2px',
-            }`
-            ).row.bg-red
+          transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+            div(
+              v-if="!zoomed"
+              :style=`{
+                position: 'absolute', zIndex: 2000,
+                left: (player.currentTime/player.duration)*100+'%',
+                height: '100%',
+                width: '2px',
+                pointerEvents: 'none',
+              }`
+              ).row.bg-red
           //- minutes
           div(
             v-for="(m,mi) in minCount" :key="mi"
@@ -122,14 +103,15 @@ div(
               width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
               minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
               //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
-              borderLeft: zoomed ? '1px solid rgb(200,200,200,0.1)' : 'none'
+              borderLeft: (mi !== 0 && (minWidthMin > 40 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none'
             }`
             ).row
             small(
-              v-if="zoomed ? true : minWidthMin > 40"
+              v-if="zoomed ? true : minWidthMin > 50"
               :style=`{
                 fontSize: '8px',
-              }`).text-grey-6.q-mx-xs {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
+                marginLeft: mi === 0 ? '8px' : '4px',
+              }`).text-grey-6 {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
           //- background
           div(
             :style=`{
@@ -146,6 +128,39 @@ div(
             height: heightBar+'px',
           }`
           ).row
+  //- footer
+  div(
+    :style=`{
+      position: 'relative',
+    }`
+    ).row.full-width.items-center.content-center.q-pl-sm
+    //- time
+    small.text-grey-6.q-mr-xs {{$time(player.currentTime)}}
+    small.text-grey-8 / {{$time(player.duration)}}
+    .col
+    //- middle: zoomIn/zoomOut
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 100,
+        left: 'calc(50% - 10px)',
+      }`
+      ).row.full-height.items-center.content-center
+      q-btn(
+        v-if="zoomed"
+        @click="zoomOut()"
+        round flat dense color="grey-6" size="sm")
+        q-icon(name="unfold_less").rotate-90
+      q-btn(
+        v-if="!zoomed"
+        @click="zoomIn()"
+        round flat dense color="grey-6" size="sm")
+        q-icon(name="unfold_more").rotate-90
+    //- right side
+    q-btn(
+      round flat dense color="grey-6" icon="more_vert" size="sm").q-mr-sm
+    q-btn(
+      round flat dense color="grey-6" icon="fullscreen" size="sm").q-mr-sm
+    slot(name="actions")
 </template>
 
 <script>
@@ -154,11 +169,14 @@ import { EventApi } from 'src/api/event'
 export default {
   name: 'tintBarNew',
   props: ['player', 'contentKalpa'],
+  components: {
+    tintBarFigure: () => import('./tint_bar_figure.vue'),
+  },
   data () {
     return {
       width: 0,
       height: 0,
-      heightBar: 24,
+      heightBar: 20,
       minWidth: 0,
       zoomed: null,
       zoomWorking: false,
@@ -168,6 +186,9 @@ export default {
       zoomWrapperScrollingAuthor: null,
       playerCurrentTimeTimer: null,
       leftRightMarginWidth: 0,
+      tintPanning: false,
+      tintRect: null,
+      convertRect: null,
     }
   },
   computed: {
@@ -200,28 +221,31 @@ export default {
         {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
       ]
     },
+    duration () {
+      return this.player.duration
+    }
   },
   watch: {
-    'player.currentTime': {
-      async handler (to, from) {
-        if (this.zoomWrapperScrolling) return
-        if (!this.zoomed) return
-        if (this.zoomWorking) return
-        this.$log('player.currentTime TO', to)
-        let ref = this.$refs['minutes-wrapper']
-        let {width} = ref.getBoundingClientRect()
-        let scrollLeft = (to / this.player.duration) * width
-        this.zoomWrapperScrollingAuthor = 'player'
-        this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-        if (this.playerCurrentTimeTimer) {
-          clearTimeout(this.playerCurrentTimeTimer)
-          this.playerCurrentTimeTimer = null
-        }
-        this.playerCurrentTimeTimer = setTimeout(() => {
-          this.zoomWrapperScrollingAuthor = null
-        }, 200)
-      }
-    },
+    // 'player.currentTime': {
+    //   async handler (to, from) {
+    //     if (this.zoomWrapperScrolling) return
+    //     if (!this.zoomed) return
+    //     if (this.zoomWorking) return
+    //     this.$log('player.currentTime TO', to)
+    //     let ref = this.$refs['minutes-wrapper']
+    //     let {width} = ref.getBoundingClientRect()
+    //     let scrollLeft = (to / this.player.duration) * width
+    //     this.zoomWrapperScrollingAuthor = 'player'
+    //     this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
+    //     if (this.playerCurrentTimeTimer) {
+    //       clearTimeout(this.playerCurrentTimeTimer)
+    //       this.playerCurrentTimeTimer = null
+    //     }
+    //     this.playerCurrentTimeTimer = setTimeout(() => {
+    //       this.zoomWrapperScrollingAuthor = null
+    //     }, 200)
+    //   }
+    // },
     zoomed: {
       // immediate: true,
       handler (to, from) {
@@ -248,8 +272,23 @@ export default {
     },
   },
   methods: {
+    convertPxToTime (px) {
+      // width (300px) ___ player.duration
+      // px                t
+      if (this.convertRect === null) {
+        this.convertRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
+      }
+      let width = this.convertRect.width
+      let t = (px * this.duration) / width
+      return t
+    },
+    setCurrentTime (t) {
+      // this.$log('setCurrentTime', t)
+      // TODO: handle figures/offset here...
+      this.player.setCurrentTime(t)
+    },
     zoomWrapperOnScroll (e) {
-      this.$log('zoomWrapperOnScroll', this.zoomWrapperScrollingAuthor)
+      // this.$log('zoomWrapperOnScroll', this.zoomWrapperScrollingAuthor)
       if (this.zoomWrapperScrollingTimer) {
         clearTimeout(this.zoomWrapperScrollingTimer)
         this.zoomWrapperScrollingTimer = null
@@ -269,10 +308,15 @@ export default {
       let scrollWidth = ref.scrollWidth - (this.leftRightMarginWidth * 2)
       let scrollLeft = ref.scrollLeft
       let t = (scrollLeft / scrollWidth) * this.player.duration
-      this.$log({scrollWidth: scrollWidth, scrollLeft: scrollLeft, t: t})
+      // this.$log({scrollWidth: scrollWidth, scrollLeft: scrollLeft, t: t})
       this.player.setCurrentTime(t)
     },
     zoomWrapperOnPan (e) {},
+    async zoomIn () {
+      this.$log('zoomIn')
+      this.zoomed = true
+      // do someting to save currentPosition...
+    },
     async zoomOut () {
       this.$log('zoomOut')
       this.zoomed = false
@@ -292,17 +336,47 @@ export default {
       let t = this.zoomPercent * this.player.duration
       this.player.setCurrentTime(t)
     },
+    tintOnPan (e) {
+      // this.$log('tintOnPan', e)
+      if (e.isFirst) {
+        this.$emit('started')
+        this.tintPanning = true
+      }
+      if (e.isFinal) {
+        this.$emit('ended')
+        this.tintPanning = false
+      }
+      // get rect position...
+      if (this.tintRect === null) {
+        this.tintRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
+        // this.tintRectLeft = rect.left
+      }
+      let left = e.position.left - this.tintRect.left
+      let width = this.tintRect.width
+      // this.$log('left/width', left, width)
+      if (left < 0 || left > width) {
+        this.$log('left < 0 || left > width !')
+        return
+      }
+      let t = left / width * this.duration
+      // this.$log('t', t)
+      this.setCurrentTime(t)
+      // this.barClick({layerX: left, target: {clientWidth: width}})
+    },
   },
   mounted () {
     this.$log('mounted', this.player.duration)
     // this.zoomed = true
     let {width, height} = this.$refs['zoom-wrapper'].getBoundingClientRect()
-    this.width = width
-    this.height = height
-    let minCount = Math.ceil(this.player.duration / 60)
-    let minWidthMin = this.width / minCount
-    this.$log({minWidthMin: minWidthMin, minCount: minCount, width: width})
-    this.minWidth = minWidthMin
+    this.$set(this, 'width', width)
+    this.$set(this, 'height', height)
+    // this.width = width
+    // this.height = height
+    this.$log('mounted', {minCount: this.minCount, minWidthMin: this.minWidthMin, minWidth: this.minWidth, minWidthMax: this.minWidthMax, width, height})
+    // let minCount = Math.ceil(this.player.duration / 60)
+    // let minWidthMin = this.width / minCount
+    // this.$log({minWidthMin: minWidthMin, minCount: minCount, width: width})
+    this.minWidth = this.minWidthMin
   }
 }
 </script>
