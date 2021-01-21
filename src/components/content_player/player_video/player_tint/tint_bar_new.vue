@@ -80,7 +80,7 @@ div(
               width: ((f.figures[1].t-f.figures[0].t)/player.duration)*100+'%',
               height: '100%',
               //- background: 'rgba(200,200,200,0.3)',
-              background: rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
+              background: $rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
               opacity: 0.2,
             }`
             ).row
@@ -166,8 +166,6 @@ div(
 </template>
 
 <script>
-import { EventApi } from 'src/api/event'
-
 export default {
   name: 'tintBarNew',
   props: ['player', 'contentKalpa'],
@@ -213,15 +211,6 @@ export default {
     },
     minWidthMax () {
       return this.width * 0.8
-    },
-    rateMeta () {
-      return [
-        {name: EventApi.verbalizeRate(0.2), value: 0, valueMin: -1, valueMax: 0.2, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
-        {name: EventApi.verbalizeRate(0.4), value: 0.25, valueMin: 0.2, valueMax: 0.4, color: 'rgba(255,221,2,0.7)', colorBackground: 'rgba(255,221,2,0.5)', order: 4},
-        {name: EventApi.verbalizeRate(0.6), value: 0.5, valueMin: 0.4, valueMax: 0.6, color: 'rgba(75,172,79,0.7)', colorBackground: 'rgba(75,172,79,0.5)', order: 3},
-        {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, color: 'rgba(44,85,179,0.7)', colorBackground: 'rgba(44,85,179,0.5)', order: 2},
-        {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
-      ]
     },
     duration () {
       return this.player.duration
