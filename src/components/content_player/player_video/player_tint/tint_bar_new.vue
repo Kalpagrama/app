@@ -7,7 +7,7 @@ div(
     :style=`{
       position: 'relative',
       height: '36px',
-      //- opacity: 0.1,
+      opacity: options.showBar ? 1 : 0,
     }`
     ).row.full-width
     //- middle currentTime
@@ -138,15 +138,18 @@ div(
     ).row.full-width.items-center.content-center.q-pl-sm
     //- time
     small.text-grey-6.q-mr-xs {{$time(player.currentTime)}}
-    small.text-grey-8 / {{$time(player.duration)}}
+    small.text-grey-6 / {{$time(player.duration)}}
     .col
     //- middle: zoomIn/zoomOut
     div(
       :style=`{
         position: 'absolute', zIndex: 100,
-        left: 'calc(50% - 10px)',
+        left: 'calc(50% - 44px)',
       }`
       ).row.full-height.items-center.content-center
+      q-btn(
+        @click="tapClick(0)"
+        round flat dense  color="grey-6" size="sm" icon="replay_5").q-mr-sm
       q-btn(
         v-if="zoomed"
         @click="zoomOut()"
@@ -157,6 +160,9 @@ div(
         @click="zoomIn()"
         round flat dense color="grey-6" size="sm")
         q-icon(name="unfold_more").rotate-90
+      q-btn(
+        @click="tapClick(1)"
+        round flat dense  color="grey-6" size="sm" icon="forward_5").q-ml-sm
     //- right side
     q-btn(
       round flat dense color="grey-6" icon="more_vert" size="sm").q-mr-sm
@@ -168,7 +174,7 @@ div(
 <script>
 export default {
   name: 'tintBarNew',
-  props: ['player', 'contentKalpa'],
+  props: ['player', 'contentKalpa', 'options'],
   components: {
     tintBarFigure: () => import('./tint_bar_figure.vue'),
   },
@@ -189,6 +195,18 @@ export default {
       tintPanning: false,
       tintRect: null,
       convertRect: null,
+    }
+  },
+  created () {
+    // if (this.start) {
+    // }
+    this.$log('created')
+    // this.player.play()
+    if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
+      let muted = localStorage.getItem('k_muted')
+      if (muted === 'false') {
+        this.player.setState('muted', false)
+      }
     }
   },
   computed: {
@@ -263,6 +281,14 @@ export default {
     },
   },
   methods: {
+    tapClick (index) {
+      this.$log('tapClick', index)
+      // TODO: cant go -1 and +1 duration
+      let t = this.player.currentTime
+      if (index === 0) t -= 5
+      if (index === 1) t += 5
+      this.player.setCurrentTime(t)
+    },
     convertPxToTime (px) {
       // width (300px) ___ player.duration
       // px                t

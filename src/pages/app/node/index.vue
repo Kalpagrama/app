@@ -27,7 +27,7 @@ q-layout(
       v-if="pageId"
       :style=`{
         height: pageHeight+'px',
-        marginBottom: '-10px',
+        //- marginBottom: '-10px',
       }`).row.full-width.justify-center
       div(
         :style=`{

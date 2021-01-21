@@ -17,10 +17,9 @@ div(
       }`
       :options=`{
         loop: true,
-        showBar: true,
-        showHeader: true,
         nodeOid: node.oid,
         footerOverlay: true,
+        showBar: false,
       }`)
 </template>
 

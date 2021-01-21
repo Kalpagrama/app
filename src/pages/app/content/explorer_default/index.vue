@@ -23,6 +23,7 @@ q-layout(
             }`
             :options=`{
               showHeader: false,
+              showBar: true,
             }`
             :styles=`{
               height: '100%',

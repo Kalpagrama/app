@@ -47,6 +47,7 @@ div(
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
         tint-bar-new(
           :player="player" :contentKalpa="contentKalpa"
+          :options="options"
           :style=`{
           }`).full-width
           template(v-slot:actions)

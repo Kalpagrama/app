@@ -1,5 +1,9 @@
 <template lang="pug">
-.row.full-width.justify-center
+div(
+  :style=`{
+    paddingBottom: 'env(safe-area-inset-bottom)',
+  }`
+  ).row.full-width.justify-center.b-40
   div(
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
