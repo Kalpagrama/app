@@ -1,10 +1,13 @@
 <template lang="pug">
 .row.full-width.q-pa-md
-  .row.full-width
+  //- .row.full-width
     span.text-bold.text-white Почта и пароль
   .row.full-width.items-center.content-center.q-py-sm
     .row.full-width.q-px-xs
-      span(:style=`{}`).text-white.text-bold {{ email || 'user@mail.com' }}
+      span(
+        :style=`{
+          fontSize: '20px',
+        }`).text-white.text-bold {{ email || 'user@mail.com' }}
     .row.full-width
       q-btn(
         @click="editing = true"

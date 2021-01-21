@@ -186,7 +186,15 @@ export default {
       return this.node.author.oid === this.$store.getters.currentUser().oid
     },
     actions () {
-      let res = {}
+      let res = {
+        copyLink: {
+          name: 'Скопировать ссылку',
+          cb: async () => {
+            this.$log('copyLink')
+            // TODO: handle copy link...
+          }
+        }
+      }
       if (this.nodeIsMine) {
         res.delete = {
           // name: i18n.t('Delete', 'Удалить'),
@@ -207,14 +215,14 @@ export default {
             await this.$rxdb.hideObjectOrSource(this.node.oid, null)
           }
         }
-        res.hideAll = {
-          name: i18n.t('Hide source', 'Скрыть источник'),
-          color: 'white',
-          cb: async () => {
-            this.$log('hide source')
-            if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
-          }
-        }
+        // res.hideAll = {
+        //   name: i18n.t('Hide source', 'Скрыть источник'),
+        //   color: 'white',
+        //   cb: async () => {
+        //     this.$log('hide source')
+        //     if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
+        //   }
+        // }
         res.report = {
           name: i18n.t('Claim', 'Пожаловаться'),
           color: 'red',

@@ -1,34 +1,20 @@
 <template lang="pug">
 q-btn(round flat :icon="icon" :color="color")
-  q-popup-proxy(
-    maximized position="bottom" dark
-    cover anchor="top right" self="top right").b-40
+  //- maximized position="bottom" dark
+  q-menu(
+    cover anchor="top right" self="top right" dark
+    max-width="200px")
     div(
       :style=`{
       }`
-      ).row.full-width.items-start.content-start.b-40
-      .row.full-width.items-center.content-center.q-pa-sm
-        div(:style=`{overflow: 'hidden',}`).col
-          span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold.q-ml-sm {{ title }}
-        q-btn(round flat dense color="white" icon="clear" v-close-popup)
-      //- kalpa-share(type="node" :item="node").full-width
-        template(v-slot:btn=`{start}`)
-          q-btn(
-            @click="start"
-            flat color="white" no-caps
-            :style=`{
-              height: '50px',
-            }`
-            ).full-width
-            span.text-bold Поделиться
+      ).row.full-width.items-start.content-start
       q-btn(
         @click="a.cb()"
         v-for="(a,akey) in actions" :key="akey"
         v-close-popup
-        flat no-caps
+        flat no-caps dense
         :color="a.color || 'white'"
         :style=`{
-          height: '50px',
         }`
         ).full-width
         span {{ a.name }}

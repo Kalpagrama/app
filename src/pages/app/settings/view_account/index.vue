@@ -17,9 +17,10 @@ q-page(
       .col-xs-12.col-sm-8.q-px-sm
         edit-profile(:currentUser="currentUser")
         actions(:currentUser="currentUser")
-        .row.full-width.q-px-sm.q-py-xs
-          small.text-grey-8 Правовые документы:
-        kalpa-docs
+        .row.full-width.q-px-sm
+          .row.full-width.q-px-sm.q-py-xs
+            small.text-grey-8 Правовые документы:
+          kalpa-docs
 </template>
 
 <script>

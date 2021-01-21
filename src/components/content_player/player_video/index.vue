@@ -138,17 +138,28 @@ div(
             name="forward_5" size="40px" color="white")
   //- context
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="player"
-      flat color="white" no-caps dense
-      :to="contentLink"
+    div(
       :style=`{
         position: 'absolute', zIndex: 1000,
         left: '0px', top: '0px',
-      }`).row.q-py-sm
-      q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
-      .col
-        span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)',
+        borderRadius: '8px',
+      }`
+      ).row.full-width
+      q-btn(
+        v-if="player"
+        flat color="white" no-caps dense
+        :to="contentLink"
+        :style=`{
+          overflow: 'hidden',
+        }`).row.q-py-sm.q-pr-sm
+        q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
+        div(
+          :style=`{
+            overflow: 'hidden',
+          }`
+          ).col
+          span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
   //- sound
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
