@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm
+.row.full-width
   div(
     :style=`{
       borderRadius: '10px',

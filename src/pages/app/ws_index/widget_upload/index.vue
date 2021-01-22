@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm
+.row.full-width
   div(
     :style=`{
       background: 'rgb(35,35,35)',
@@ -34,6 +34,18 @@
         ).full-width.text-white.b-40
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-py-sm
       small.text-grey-5 YouTube Twitter Spotify Webpage Instagram
+  //- from device
+  .row.full-width
+    .row.full-width.q-pt-sm.q-px-md
+      //- to="/workspace/create"
+      //- TODO: upload from device !
+      q-btn(
+        outline color="grey-8" no-caps
+        :style=`{
+          height: '60px',
+        }`
+        ).full-width
+        span.text-grey-6 Загрузить с устройства
 </template>
 
 <script>
@@ -42,7 +54,7 @@ import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
 
 export default {
-  name: 'widgetUrl',
+  name: 'widgetUpload',
   data () {
     return {
       url: '',

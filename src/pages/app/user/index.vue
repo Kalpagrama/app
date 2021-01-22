@@ -30,8 +30,8 @@ export default {
       async handler (to, from) {
         if (to) {
           this.$log('$route.params.oid TO', to)
-          // this.user = null
-          // await this.$wait(300)
+          this.user = null
+          await this.$wait(300)
           this.user = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           // this.userSubscribed = await UserApi.isSubscribed(this.user.oid)
         }

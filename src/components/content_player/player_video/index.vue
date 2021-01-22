@@ -1,10 +1,16 @@
 <template lang="pug">
 div(
   :style=`{
-    ...styles
+    ...styles,
+    borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width
   //- .row.full-width.q-py-lg.bg-black
+  //- .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      .row.full-width.items-center.content-center.q-py-xs.q-px-sm
+        q-btn(round flat dense color="white" icon="west" @click="$routerKalpa.back()").q-mr-xs
+        router-link(:to="'/content/'+contentKalpa.oid").text-white content {{ contentKalpa.name }}
   //- body
   div(
     :style=`{
@@ -22,8 +28,52 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
+  //- footer
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="player && player.duration"
+      :style=`options.footerOverlay ?
+        {
+          position: 'absolute', zIndex: 1000,
+          bottom: '0px',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.666) 0%, rgba(0,0,0,0) 100%)',
+          borderRadius: '0 0 6px 6px',
+        }
+        :
+        {
+          position: 'relative',
+        }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+        tint-bar-new(
+          :player="player" :contentKalpa="contentKalpa"
+          :options="options"
+          :style=`{
+          }`).full-width
+          template(v-slot:actions)
+            .row
+              q-btn(
+                v-if="player"
+                @click="volumeToggle()"
+                round flat dense size="sm"
+                :color="player.muted ? 'red' : 'white'"
+                :icon="player.muted ? 'volume_off' : 'volume_up'"
+                :style=`{
+                }`)
+  //- .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+      .row.full-width.items-center.content-center.q-px-sm
+        q-btn(round flat dense color="white" icon="fullscreen")
+        .col
+          tint-bar-new(
+            v-if="player && player.duration"
+            :player="player" :contentKalpa="contentKalpa")
+        q-btn(round flat dense color="white" icon="volume_up")
+  //- player-tint(
+    v-bind="$props"
+    :player="player")
   //- player tint caller
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === false"
       @click="player.muted ? player.setState('muted', false) : tintShow = true"
@@ -32,7 +82,7 @@ div(
       }`
       ).row.fit
   //- player tint
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="tintShow === true"
       @click.self="tintShow = false"
@@ -49,10 +99,10 @@ div(
         :to="contentLink"
         :style=`{
           position: 'absolute', zIndex: 901,
-          top: '8px', left: '48px',
+          top: '8px', left: '42px',
           overflow: 'hidden',
           maxWidth: 'calc(100% - 96px)',
-        }`).row.full-width.no-wrap.q-px-xs
+        }`).row.full-width.no-wrap
         span(:style=`{whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',}`).text-white {{ contentKalpa.name }}
       //- ACTIONS: replay,play/pause,forward
       div(
@@ -88,58 +138,35 @@ div(
           q-icon(
             name="forward_5" size="40px" color="white")
   //- context
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="player"
-      round flat dense
-      :to="contentLink"
-      color="white"
-      icon="select_all"
+  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="player && player.duration"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        left: '8px', top: '8px',
-      }`)
-  //- sound
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="player"
-      @click="volumeToggle()"
-      round flat dense
-      :color="player.muted ? 'red' : 'white'"
-      :icon="player.muted ? 'volume_off' : 'volume_up'"
-      :style=`{
-        position: 'absolute', zIndex: 1000,
-        right: '8px', top: '8px',
-      }`)
-  //- player mini-bar
-  //- @started="tintShow = true"
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    player-bar-mini(
-      v-if="player" :player="player" :figures="figures"
-      :mini="isMini || !tintShow"
-      :style=`{
-        position: 'absolute',
-        zIndex: 1000,
-        transform: 'translate3d(0,0,10px)',
-        bottom: '-15px',
-      }`)
-  //- subtitles
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 901,
-      bottom: '8px',
-    }`
-    ).row.full-width.items-center.content-center.justify-center
-    small(
-      :style=`{
-        borderRadius: '10px',
+        left: '0px', top: '0px',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.666) 100%)',
+        borderRadius: '8px',
       }`
-    ).text-white.bg-black.q-pa-sm lorem ipsum subtitles
-  //- div(v-if="!isMini" :style=`{height: '20px',}`).row.full-width
+      ).row.full-width
+      q-btn(
+        flat color="white" no-caps dense
+        :to="contentLink"
+        :style=`{
+          overflow: 'hidden',
+        }`).row.q-py-sm.q-pr-sm
+        q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
+        div(
+          :style=`{
+            overflow: 'hidden',
+          }`
+          ).col
+          span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
 </template>
 
 <script>
 import playerBarMini from './player_bar_mini.vue'
+import playerTint from './player_tint/index.vue'
+import tintBarNew from './player_tint/tint_bar_new.vue'
 
 export default {
   name: 'contentPlayer_video',
@@ -147,6 +174,8 @@ export default {
     playerYoutube: () => import('./player_youtube.vue'),
     playerKalpa: () => import('./player_kalpa.vue'),
     playerBarMini,
+    playerTint,
+    tintBarNew
   },
   props: {
     contentKalpa: {type: Object, required: true},
@@ -190,8 +219,8 @@ export default {
       async handler (to, from) {
         this.$log('tintShow TO', to)
         if (to) {
-          await this.$wait(2500)
-          this.tintShow = false
+          // await this.$wait(2500)
+          // this.tintShow = false
         }
         else {
           // do nothing

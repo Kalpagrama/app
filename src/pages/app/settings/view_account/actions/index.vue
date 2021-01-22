@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm.q-pt-xl
+.row.full-width.q-pa-sm
   //- header
   .row.full-width.q-px-sm.q-py-sm
     span.text-white.text-bold Действия

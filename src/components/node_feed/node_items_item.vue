@@ -29,6 +29,9 @@ div(
         :isActive="itemActive"
         :isVisible="true"
         :isMini="!itemOpened"
+        :options=`{
+          footerOverlay: true
+        }`
         :styles=`{
           ...styles,
         }`)
@@ -47,18 +50,21 @@ div(
           :style=`{
             height: '36px',
             textAlign: 'center',
-            pointerEvents: 'none',
+            //- pointerEvents: 'none',
           }`
           ).row.items-center.content-center.scroll
           //- .row.full-width.br
           q-btn(
             v-if="item.__typename === 'Composition'"
             round flat dense color="white" icon="select_all")
+          q-icon(
+            v-if="item.type === 'NODE'"
+            color="white" name="adjust" size="14px").q-mr-xs
           span(
-            v-else
+            v-if="item.type === 'NODE'"
             :style=`{
               whiteSpace: 'nowrap',
-              marginLeft: '8px',
+              //- marginLeft: '8px',
               textAlign: 'center',
             }`).text-white.q-mr-sm {{ item.name }}
     //- div(
@@ -80,6 +86,7 @@ div(
     :options=`{
       loop: true,
       showBar: false,
+      footerOverlay: true
     }`)
   div(
     v-else-if="item.__typename === 'Sphere'"

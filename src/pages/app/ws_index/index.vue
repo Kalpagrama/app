@@ -18,14 +18,14 @@ q-layout(
     :style=`{
       paddingTop: 'env(safe-area-inset-top)'
     }`)
-    .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-sm
+    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(
           :style=`{
             height: '60px',
             borderRadius: '10px',
           }`
-          ).row.full-width.items-center.content-center.q-pa-sm.b-40.q-my-sm
+          ).row.full-width.items-center.content-center.q-pa-sm.b-40
           q-btn(
             round flat color="white" icon="construction")
           .col
@@ -41,25 +41,15 @@ q-layout(
       :style=`{
         paddingTop: '8px',
       }`
-      ).row.full-width.justify-center
+      ).row.full-width.justify-center.q-px-sm
       div(
         :style=`{
           maxWidth: $store.state.ui.pageWidth+'px',
-          //- maxWidth: '600px',
         }`).row.full-width.items-start.content-start
+        //- .col-xs-12.col-sm-5
         widget-bookmarks.q-mb-md
-        //- add/create
-        widget-url
-        .row.full-width.q-pt-sm.q-px-lg
-          //- to="/workspace/create"
-          //- TODO: upload from device !
-          q-btn(
-            outline color="grey-8" no-caps
-            :style=`{
-              height: '60px',
-            }`
-            ).full-width
-            span.text-grey-6 Загрузить с устройства
+        //- .col-xs-12.col-sm-7
+        widget-upload
 </template>
 
 <script>
@@ -67,7 +57,7 @@ export default {
   name: 'wsIndex',
   components: {
     widgetBookmarks: () => import('./widget_bookmarks/index.vue'),
-    widgetUrl: () => import('./widget_url/index.vue')
+    widgetUpload: () => import('./widget_upload/index.vue')
   },
   data () {
     return {

@@ -27,7 +27,7 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Ядрануть
-    q-btn(
+    //- q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps
       :color="pageId === 'drafts' ? 'green' : 'grey-7'"
@@ -42,6 +42,7 @@
       q-icon(name="fas fa-info" size="19px").q-mb-xs
       .row.full-width.justify-center
         small Детали
+    kalpa-menu-popup-global
 </template>
 
 <script>

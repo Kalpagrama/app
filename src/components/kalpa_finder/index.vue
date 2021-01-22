@@ -11,13 +11,11 @@ q-layout(
       slot(name="header")
       //- pages
       div().row.full-width.justify-center
-        q-btn(
-          rounnd flat dense color="white" icon="construction"
-          )
+        //- q-btn(rounnd flat dense color="white" icon="construction")
         .col
           div(
             v-if="pagesShow"
-            :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+            :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-sm
             q-tabs(
               v-model="pageId" no-caps
               dense active-color="green"

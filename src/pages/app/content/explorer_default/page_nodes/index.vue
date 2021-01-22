@@ -1,38 +1,49 @@
 <template lang="pug">
 div(
   :style=`{
-    paddingTop: '0px'
-  }`).row.full-width.items-start.content-start.justify-center
-  .row.full-width.items-center.content-center.justify-start.q-pa-sm
-    .col
-      span().text-grey-7.text-bold.q-ml-xs.q-mr-xs Ядра
-      span(v-if="nodesLoaded").text-grey-7.text-bold - {{ nodes.length }}
+    height: height+'px',
+  }`
+  ).column.full-width
+  //- header: sticky ?
+  div(
+    :style=`{
+      height: '60px',
+    }`
+    ).row.full-width.items-center.content-center.justify-start.q-px-sm
+    .col.q-px-sm
+      span().text-grey-7.text-bold.q-mr-xs Ядра
+      span(v-if="itemsLoaded").text-grey-7.text-bold - {{ itemsLocal.length }}
     q-btn(
       round flat color="grey-7" icon="tune")
-  slot
-  kalpa-loader(
-    :immediate="true"
-    @items="nodesUpdated" :limit="10"
-    :query="nodesQuery" v-slot=`{items,next,nexting}`)
-    list-middle(
-      :items="items" :itemStyles=`{marginBottom: '0px',}`
-      :style=`{position: 'relative', maxWidth: '700px',}`).q-pa-sm
-      q-infinite-scroll(@load="next" :offset="$q.screen.height")
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-        node-item(
-          :ref="'node-'+item.oid"
-          :node="item" :player="player" :contentKalpa="contentKalpa"
-          :nodeSelected="query.nodeOid === item.oid"
-          :isActive="isActive" :isVisible="isVisible"
-          :isSelected="item.oid === nodeSelectedOid"
-          :style=`{
-            zIndex: 2
-          }`
-          @select="$emit('node', item)"
-          ).q-mb-md
-      template(v-slot:append)
-        div(:style=`{height: '50px'}`).row.full-width.justify-center
-          q-spinner-dots(v-show="nexting" color="green" size="50px")
+  div(
+    ref="items-scroll"
+    :style=`{
+      //- position: 'relative',
+    }`
+    ).col.full-width.scroll
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 1000, top: '60px',
+        height: '10px',
+        background: 'linear-gradient(0deg, rgba(30,30,30,0.1) 0%, rgba(30,30,30,1) 100%)',
+        pointerEvents: 'none',
+      }`
+      ).row.full-width
+    div(
+      :style=`{
+        marginTop: 10+'px',
+        marginBottom: height-120+'px',
+      }`
+      ).row.full-width.items-start.content-start.q-px-sm
+      node-item(
+        v-for="(i,ii) in itemsLocal" :key="i.oid"
+        :ref="`item-${i.oid}`"
+        :node="i.node"
+        :composition="i.composition"
+        :contentKalpa="contentKalpa"
+        :player="player"
+        :isSelected="itemSelectedOid === i.oid"
+        @click.native="itemSelectedOid = i.oid")
 </template>
 
 <script>
@@ -41,19 +52,20 @@ import nodeItem from './node_item.vue'
 
 export default {
   name: 'pageNodes',
-  props: ['contentKalpa', 'player', 'nodeQuery', 'headerHeight', 'query'],
+  props: ['contentKalpa', 'player', 'height'],
   components: {
     nodeItem,
   },
   data () {
     return {
-      nodes: [],
-      nodesLoaded: false,
-      nodeSelectedOid: null,
+      itemSelectedOid: null,
+      items: [],
+      itemsLocal: [],
+      itemsLoaded: false
     }
   },
   computed: {
-    nodesQuery () {
+    itemsQuery () {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -65,6 +77,33 @@ export default {
       }
       return res
     },
+  },
+  watch: {
+    items: {
+      deep: true,
+      handler (to, from) {
+        this.itemsUpdated(to)
+      }
+    },
+    'player.currentTime': {
+      handler (to, from) {
+        // this.$log('player.currentTime TO', to)
+        let item = this.itemsLocal.find(i => {
+          return to >= i.composition.layers[0].figuresAbsolute[0].t && to < i.composition.layers[0].figuresAbsolute[1].t
+        })
+        if (item) {
+          let refItemsScroll = this.$refs['items-scroll']
+          let refItem = this.$refs[`item-${item.oid}`][0].$el
+          let refItemOffsetTop = refItem.offsetTop
+          // this.$log({refItemsScroll, refItem, refItemOffsetTop})
+          // this.$log('ref')
+          this.$tween.to(refItemsScroll, 0.5, {
+            scrollTop: refItemOffsetTop - 120
+          })
+        }
+        // find item with composition of mine, scrollto its position ?
+      }
+    }
   },
   methods: {
     // async nodeScroll (node, nodeIndex) {
@@ -79,27 +118,62 @@ export default {
     //     window.scrollTo(0, top - this.headerHeight - 8)
     //   }
     // },
-    async nodesUpdated (nodes) {
-      this.$log('nodesUpdated', nodes.length)
-      this.nodes = nodes
-      this.nodesLoaded = true
-      let figures = nodes.reduce((acc, node) => {
-        node.items.map(i => {
-          if (i.layers) {
-            if (i.layers[0].contentOid === this.contentKalpa.oid) {
-              let figureInput = i.layers[0].figuresAbsolute[0]
-              acc.push([figureInput])
-            }
+    async itemsUpdated (nodes) {
+      this.$log('itemsUpdated', nodes.length)
+      let items = nodes.map(n => {
+        // get composition
+        let composition
+        n.items.map(i => {
+          if (i.type === 'COMPOSITION' && i.layers[0].contentOid === this.contentKalpa.oid) {
+            composition = i
+          }
+          if (i.type === 'NODE' && i.items[0].layers[0].contentOid === this.contentKalpa.oid) {
+            composition = i.items[0]
           }
         })
-        return acc
-      }, [])
-      this.figures = figures
-      this.player.setState('points', figures)
+        return {
+          oid: n.oid,
+          composition: composition,
+          node: n
+        }
+      })
+      // filter
+      items = items.filter(i => {
+        return i.composition
+      })
+      // sort items for video ASC
+      if (this.contentKalpa.type === 'VIDEO') {
+        items = items.sort((a, b) => {
+          return a.composition.layers[0].figuresAbsolute[0].t - b.composition.layers[0].figuresAbsolute[0].t
+        })
+      }
+      let figures = items.map(i => {
+        return {
+          oid: i.node.oid,
+          nodeOid: i.node.oid,
+          name: i.node.name || i.node.vertices,
+          thumbUrl: i.composition.thumbUrl,
+          figures: i.composition.layers[0].figuresAbsolute,
+          node: i.node
+        }
+      })
+      this.player.setState('figures', figures)
+      this.itemsLocal = items
+      this.itemsLoaded = true
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    let items = await this.$rxdb.find(this.itemsQuery, false)
+    while (items.hasMore) {
+      this.$log('items.next !!!')
+      await items.next(10)
+      this.$log('items.length', items.length)
+    }
+    this.items = items
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

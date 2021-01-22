@@ -24,6 +24,9 @@ div(
     //- HEADER: author, createdAt, actions, date, views
     div(
       v-if="showHeader && node.oid"
+      :style=`{
+        order: orderHeader,
+      }`
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
@@ -64,15 +67,23 @@ div(
       v-if="showName && node.oid"
       :to="nodeEssenceLink"
       :style=`{
+        order: orderName,
         minHeight: '60px',
-        fontSize: nodeNameSize+'px',
+        fontSize: fontSize+'px',
         textAlign: 'center',
       }`
-      ).row.full-width.items-center.content-center.justify-center.q-px-sm
-      span.text-white.text-bold {{ nodeName }}
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
+      span(
+        :class=`{
+          'text-bold': node.name.length < 20
+        }`
+        ).text-white {{ nodeName }}
     //- SPHERES
     div(
       v-if="showSpheres && node.spheres.length > 0"
+      :style=`{
+        order: orderSpheres,
+      }`
       ).row.full-width.q-pa-sm
       q-tabs(
         :value="null"
@@ -96,7 +107,14 @@ div(
             ).text-grey-4.q-mx-sm {{ s.name }}
   //- FOOTER: slot, actions
   slot(name="footer")
-  node-actions(v-if="showActions && node.oid" :node="node" :isActive="isActive" :isVisible="isVisible")
+  node-actions(
+    v-if="showActions && node.oid"
+    :node="node"
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :style=`{
+      order: orderActions,
+    }`)
 </template>
 
 <script>
@@ -122,6 +140,10 @@ export default {
     showSpheresAlways: {type: Boolean, default: false},
     showCategory: {type: Boolean, default: true},
     showItems: {type: Boolean, default: true},
+    orderHeader: {type: Number, default: -1},
+    orderName: {type: Number, default: 1},
+    orderSpheres: {type: Number, default: 2},
+    orderActions: {type: Number, default: 3},
     itemsStyles: { type: Array, default () { return [{}, {}] } },
     styles: {type: Object},
     borderRadius: {type: String, default: '10px'}
@@ -144,8 +166,8 @@ export default {
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
-        // return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
-        return '/node/' + this.node.oid
+        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
+        // return '/node/' + this.node.oid
       }
       else {
         return '/node/' + this.node.oid
@@ -155,20 +177,26 @@ export default {
       if (!this.node) return null
       return this.$store.state.ui.nodeCategories.find(c => c.type === this.node.category)
     },
-    // TODO: impl better way
-    nodeNameSize () {
+    fontSize () {
       let l = this.node.name.length
-      if (l < 20) return 18
-      else if (l >= 20 && l < 50) return 16
-      else if (l >= 50 && l < 100) return 14
-      else if (l >= 100) return 12
-      else return 10
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else return 14
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid
     },
     actions () {
-      let res = {}
+      let res = {
+        copyLink: {
+          name: 'Скопировать ссылку',
+          cb: async () => {
+            this.$log('copyLink')
+            // TODO: handle copy link...
+          }
+        }
+      }
       if (this.nodeIsMine) {
         res.delete = {
           // name: i18n.t('Delete', 'Удалить'),
@@ -189,14 +217,14 @@ export default {
             await this.$rxdb.hideObjectOrSource(this.node.oid, null)
           }
         }
-        res.hideAll = {
-          name: i18n.t('Hide source', 'Скрыть источник'),
-          color: 'white',
-          cb: async () => {
-            this.$log('hide source')
-            if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
-          }
-        }
+        // res.hideAll = {
+        //   name: i18n.t('Hide source', 'Скрыть источник'),
+        //   color: 'white',
+        //   cb: async () => {
+        //     this.$log('hide source')
+        //     if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
+        //   }
+        // }
         res.report = {
           name: i18n.t('Claim', 'Пожаловаться'),
           color: 'red',

@@ -57,6 +57,7 @@ export default {
       duration: 0,
       muted: true,
       events: {},
+      figure: null,
       figures: [],
       points: [],
       isFullscreen: false
@@ -90,7 +91,7 @@ export default {
   },
   methods: {
     setState (key, val) {
-      this.$log('setState', key, val)
+      // this.$log('setState', key, val)
       if (this[key] === undefined) return
       this.$set(this, key, val)
       if (key === 'muted') {

@@ -10,17 +10,19 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import viewThreads from './view_threads/index.vue'
 import viewBinary from './view_binary/index.vue'
+import viewGallery from './view_gallery/index.vue'
 
 export default {
   name: 'pageApp_links',
   components: {
     viewThreads,
     viewBinary,
+    viewGallery,
   },
   data () {
     return {
       item: null,
-      viewId: 'binary', // threads, binary
+      viewId: 'gallery', // gallery, threads, binary
     }
   },
   watch: {
@@ -40,13 +42,13 @@ export default {
   mounted () {
     // this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
     // document.body.style.background = 'black !important'
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

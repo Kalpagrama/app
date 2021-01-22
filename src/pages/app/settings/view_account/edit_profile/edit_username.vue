@@ -1,8 +1,18 @@
 <template lang="pug">
 .row.full-width.q-pa-xs
-  .row.full-width.q-px-sm.q-py-xs
+  .row.full-width.q-pa-sm
+    span(
+      :style=`{
+        fontSize: '20px',
+      }`
+    ).text-white.text-bold.q-ml-xs @{{ username}}
+  .row.full-width.q-px-sm
+    q-btn(
+      @click="editing = true"
+      flat dense color="grey-6" no-caps size="sm") Изменить никнейм
+  //- .row.full-width.q-px-sm.q-py-xs
     small.text-white Username
-  q-input(
+  //- q-input(
     v-model="username"
     dark
     borderless flat

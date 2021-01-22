@@ -50,7 +50,7 @@ export default {
     tabs () {
       return [
         // {id: 'nodes', name: this.$t('Nodes and Links', 'Ядра и связи'), icon: 'panorama_fish_eye', count: 356},
-        {id: 'collections', name: 'Каналы', icon: 'view_week', count: 11},
+        // {id: 'collections', name: 'Каналы', icon: 'view_week', count: 11},
         {id: 'nodes', name: 'Ядра', icon: 'panorama_fish_eye', count: 356},
         {id: 'joints', name: 'Связи', icon: 'panorama_fish_eye', count: 356},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust', count: 12},

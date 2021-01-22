@@ -9,7 +9,8 @@ q-layout(
         :style=`{
           position: 'relative',
           height: 'calc('+ heightPage +'px - env(safe-area-inset-bottom))',
-          maxWidth: $store.state.ui.pageWidth+'px',
+          //- maxWidth: $store.state.ui.pageWidth+'px',
+          maxWidth: widthPage+'px',
           borderRadius: '0 0 10px 10px',
         }`
         ).column.full-width.bg-black
@@ -22,6 +23,7 @@ q-layout(
             }`
             :options=`{
               showHeader: false,
+              showBar: true,
             }`
             :styles=`{
               height: '100%',
@@ -67,18 +69,14 @@ q-layout(
           //- marginBottom: '-10px',
         }`
         ).row.full-width.b-30
-        //- node-creator(
-          v-if="pageId === 'node'"
-          :contentKalpa="contentKalpa"
-          :player="player"
-          @cancel="nodeCancelled"
-          @publish="nodePublished")
         component(
+          v-if="pageId === 'node' ? node : true"
           :is="`page-${pageId}`"
           :node="node"
           :contentKalpa="contentKalpa"
           :player="player"
           :query="query"
+          :height="$q.screen.height-heightPage-70"
           @cancel="nodeCancelled"
           @publish="nodePublished"
           @nodeCancel="pageId = 'nodes', node = null"
@@ -118,6 +116,7 @@ export default {
       // showMenu: true,
       // nodeCreating: false,
       heightPage: 0,
+      widthPage: 0,
       // heightPageMin: 0,
       node: null,
     }
@@ -133,7 +132,7 @@ export default {
       // return Math.min(height, width)
     },
     heightPageMax () {
-      return this.$q.screen.height - 70 - 15
+      return this.$q.screen.height - 70 - 0
     },
     // heightContent () {
     //   return (this.pageId || this.nodeCreating) ? this.heightPage : this.$q.screen.height - 70 - 15
@@ -144,19 +143,20 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('pageId TO', to)
-        if (this.query.nodeOid) {
-          let query = Object.assign({}, this.$route.query)
-          delete query.nodeOid
-          this.$router.replace({ query })
-          this.pageId = 'node'
-          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.query.nodeOid)
-        }
-        else {
-          // do stuff
-        }
+        // if (this.query.nodeOid) {
+        //   let query = Object.assign({}, this.$route.query)
+        //   delete query.nodeOid
+        //   this.$router.replace({ query })
+        //   this.pageId = 'node'
+        //   this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.query.nodeOid)
+        // }
+        // else {
+        //   // do stuff
+        // }
         if (to) {
           this.$tween.to(this, 0.3, {
             heightPage: this.heightPageMin,
+            widthPage: Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth),
             onComplete: () => {
               this.$log('pageId Done to ', to)
               // this.pageId = null
@@ -166,6 +166,7 @@ export default {
         else {
           this.$tween.to(this, 0.3, {
             heightPage: this.heightPageMax,
+            widthPage: Math.max(this.$q.screen.width, this.$store.state.ui.pageWidth),
             onComplete: () => {
               this.$log('pageId Done to null')
               // this.pageId = null

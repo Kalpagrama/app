@@ -1,18 +1,7 @@
 <template lang="pug">
-.row.full-width
-  //- header
-  .row.full-width.q-px-md
-    span.text-white.text-bold {{ $t('Profile', 'Профиль') }}
-  //- status
-  edit-status(:currentUser="currentUser")
-  //- username
+.row.full-width.q-pt-sm
   edit-username(:currentUser="currentUser")
-  //- .row.full-width.q-pa-xs
-    div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-      q-input(
-        v-model="username"
-        :label="$t('Whats your username?', 'Введите ник')"
-        filled dark color="white").full-width
+  edit-status(:currentUser="currentUser")
   //- name
   .row.full-width.q-pa-xs
     div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
@@ -24,7 +13,7 @@
   .row.full-width.q-pa-xs
     q-select(
       filled
-      dark color="white"
+      dark color="white" dense
       :label="$t('Pick your language', 'Выберите язык')"
       v-model="lang"
       option-value="value"
@@ -36,16 +25,6 @@
       }`).full-width
   //- password
   edit-email(:currentUser="currentUser")
-  //- edit-password(:currentUser="currentUser")
-  //- save
-  //- .row.full-width.justify-start.q-py-md.q-px-sm
-    //- .col
-    q-btn(
-      @click="save()"
-      color="green" no-caps size="lg"
-      :disabled="nextDisabled"
-      :loading="loading"
-      ).full-width.q-px-md {{$t('save', 'Сохранить')}}
 </template>
 
 <script>
