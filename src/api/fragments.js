@@ -371,30 +371,29 @@ const objectFullFragment = gql`
         ...on Composition {...compositionFragment}
     }
 `
-
-const findResultFragment = gql`
-    ${eventFragment}
-    fragment findResultFragment on FindResult {
-        count
-        totalCount
-        nextPageToken
-        currentPageToken
-        prevPageToken
-        ... on EventFindResult { events {...eventFragment} }
-        ... on ObjectsFindResult { objects{ oid } }
-        ... on WSFindResult { items }
+const topObjectFragment = gql`
+    fragment topObjectFragment on TopObject {
+        oid
+        name
+        countVotes
+        weight
+        rate
+        relatedOids
+        figuresAbsoluteList{points{x y}, epubCfi, epubCfiText, t}
+        vertexType
     }
 `
-const findResultFragmentForSearch = gql`
-    ${eventFragment}
+
+const findResultFragment = gql`
+    ${eventFragment} ${topObjectFragment}
     fragment findResultFragment on FindResult {
         count
         totalCount
         nextPageToken
         currentPageToken
         prevPageToken
-        ... on EventFindResult { events {...eventFragment} }
-        ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }
+        ... on EventFindResult { events: items {...eventFragment} }
+        ... on ObjectsFindResult { objects: items { ...topObjectFragment } }
         ... on WSFindResult { items }
     }
 `
@@ -409,8 +408,7 @@ const fragments = {
    objectShortStatFragment,
    essenceFragment,
    sphereFragment,
-   findResultFragment,
-   findResultFragmentForSearch
+   findResultFragment
 }
 
 export {

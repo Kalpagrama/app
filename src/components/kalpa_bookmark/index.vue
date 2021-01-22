@@ -42,7 +42,7 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
+          let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
           if (bookmark) this.bookmark = bookmark
         }
       }
@@ -65,7 +65,7 @@ export default {
           return
         }
         await this.$wait(500)
-        let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
+        let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
         this.$log('start [bookmark]', bookmark)
         if (bookmark) {
           this.$log('bookmark DELETE')

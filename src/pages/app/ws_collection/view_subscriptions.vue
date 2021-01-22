@@ -30,13 +30,14 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.bookmarks = await this.$rxdb.find({
+    let {items} = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
         id: {$in: this.collection.bookmarks}
       },
       sort: [{updatedAt: 'desc'}]
     })
+    this.bookmarks = items
   }
 }
 </script>

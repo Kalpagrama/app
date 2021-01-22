@@ -125,7 +125,7 @@ export default {
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // this.$router.replace('/content/' + contentKalpa.oid)
-      let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) {
         await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
       } else {

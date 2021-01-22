@@ -171,7 +171,7 @@ export default {
       this.$log('feedCreateStart')
       if (this.searchString.length === 0) return
       // if there is no such collection...
-      let [collection] = await this.$rxdb.find({
+      let {items: [collection]} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_COLLECTION, name: this.searchString,
         }

@@ -79,7 +79,7 @@ class ListsApi {
             res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere)
             break
          case RxCollectionEnum.LST_SEARCH:
-            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination, true)
+            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
             break
          default:
             throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)
@@ -133,7 +133,7 @@ class ListsApi {
       return res
    }
 
-   static async find (collection, mangoQuery, pagination, search = false) {
+   static async find (collection, mangoQuery, pagination) {
       mangoQuery = cloneDeep(mangoQuery)
       ListsApi.checkMangoQuery(mangoQuery)
       const f = ListsApi.find
@@ -142,7 +142,7 @@ class ListsApi {
       const cb = async () => {
          let { data: { find: { items, events, objects, count, totalCount, nextPageToken, prevPageToken, currentPageToken } } } = await apollo.clients.api.query({
             query: gql`
-                ${search ? fragments.findResultFragmentForSearch : fragments.findResultFragment}
+                ${fragments.findResultFragment}
                 query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON! $pagination: PaginationInput){
                     find (collection: $collection, mangoQuery: $mangoQuery, pagination: $pagination) {
                         ...findResultFragment

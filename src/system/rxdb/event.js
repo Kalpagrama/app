@@ -69,7 +69,7 @@ class Event {
                   // обнулим прогресс
                   let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: event.object.oid, progress: -1 }
                   store.commit('core/processEvent', fakeProgressEvent)
-                  let createdWsNodes = await rxdb.find({
+                  let {items: createdWsNodes} = await rxdb.find({
                      selector: {
                         rxCollectionEnum: RxCollectionEnum.WS_NODE,
                         $or: [{ oid: event.object.oid }, { oid: null }]
@@ -82,15 +82,6 @@ class Event {
                      await wsNode.updateExtended('stage', 'draft', false)// без debounce
                      delete wsNode.oid
                   }
-                  // await wait(3000)
-                  // let createdWsNodes2 = await rxdb.find({
-                  //    selector: {
-                  //       rxCollectionEnum: RxCollectionEnum.WS_NODE,
-                  //       stage: 'published',
-                  //       oid: event.object.oid
-                  //    }
-                  // })
-                  // logD(f, 'createdWsNodes2=', createdWsNodes2)
                }
                this.notifyError(event)
                break

@@ -25,7 +25,7 @@ export default {
       async handler (to, from) {
         if (to) {
           this.$log('isActive TO', to)
-          let [jointBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.joint.oid}})
+          let {items: [jointBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.joint.oid}})
           if (jointBookmark) this.jointBookmark = jointBookmark
         }
       }
@@ -35,7 +35,7 @@ export default {
     async start () {
       this.$log('start')
       this.loading = true
-      let [jointBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.joint.oid}})
+      let {items: [jointBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.joint.oid}})
       if (!jointBookmark) {
         let jointBookmarkInput = {
           type: 'JOINT',
