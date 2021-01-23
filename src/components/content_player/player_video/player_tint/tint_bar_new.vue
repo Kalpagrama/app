@@ -7,7 +7,7 @@ div(
     :style=`{
       position: 'relative',
       height: heightWrapper+'px',
-      //- opacity: options.showBar ? 1 : 0,
+      opacity: options.showBar ? 1 : player.figure ? 1 : 0,
     }`
     ).row.full-width
     //- middle nodeEditor...
@@ -18,7 +18,7 @@ div(
         :convert="convertPxToTime"
         :style=`{
           position: 'absolute', zIndex: 1000,
-          top: '-16px',
+          top: '-34px',
         }`
         @first="zoomWorking = true"
         @final="zoomWorking = false")
@@ -147,8 +147,11 @@ div(
           ).row
   //- footer:
   //- actions figure
-  //- div(
+  div(
     v-if="player && player.figure"
+    :style=`{
+      order: -1,
+    }`
     ).row.full-width.justify-center
     div(:style=`{maxWidth: '300px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180

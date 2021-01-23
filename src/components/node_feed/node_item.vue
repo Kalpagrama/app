@@ -1,5 +1,5 @@
 <template lang="pug">
-div(
+//- div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
@@ -24,6 +24,23 @@ div(
         showHeader: true,
         showFooter: true,
       }`)
+composition-player(
+  :composition="node.items[0]"
+  :isVisible="isVisible"
+  :isActive="isActive"
+  :isMini="false"
+  :styles=`{
+    //- height: '100%',
+    objectFit: 'cover',
+  }`
+  :options=`{
+    loop: true,
+    nodeOid: node.oid,
+    footerOverlay: true,
+    showBar: false,
+    showHeader: true,
+    showFooter: true,
+  }`)
 </template>
 
 <script>

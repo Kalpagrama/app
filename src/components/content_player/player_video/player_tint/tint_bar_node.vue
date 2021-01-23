@@ -9,8 +9,9 @@ div(
       position: 'absolute', bottom: '0px',
       borderRadius: '10px',
       maxWidth: '340px',
+      background: 'rgb(35,35,35)',
     }`
-    ).row.b-30.q-pa-sm
+    ).row.q-pa-sm
     div(
       :style=`{
         position: 'absolute', top: '0px', right: '-36px',

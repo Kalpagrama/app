@@ -15,8 +15,10 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
+      //- height: 'calc(' + styles.height + ' - 100px)',
       objectFit: styles.objectFit,
-      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)'
+      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)',
+      marginBottom: marginBottom+'px',
     }`
     ).full-width
   //- video wrapper
@@ -62,9 +64,24 @@ export default {
   data () {
     return {
       player: null,
+      marginBottom: 0,
     }
   },
   watch: {
+    'player.figure': {
+      handler (to, from) {
+        if (to) {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 230,
+          })
+        }
+        else {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 0
+          })
+        }
+      }
+    },
     // 'player.currentTime': {}
     // player: {
     //   handler (to, from) {

@@ -98,11 +98,6 @@ div(
         position: 'absolute', zIndex: 1000,
         right: '8px', top: 'calc(50% - 20px)',
       }`)
-  div(
-    :style=`{
-      height: '100px',
-    }`
-    ).row.full-width.bg-red
 </template>
 
 <script>
