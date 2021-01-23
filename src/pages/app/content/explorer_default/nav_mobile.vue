@@ -27,7 +27,7 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Создать
-    q-btn(
+    //- q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps
       :color="pageId === 'drafts' ? 'green' : 'grey-7'"

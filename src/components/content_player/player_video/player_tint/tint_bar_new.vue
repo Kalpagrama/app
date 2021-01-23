@@ -15,23 +15,25 @@ div(
       tint-bar-node(
         v-if="player && player.figure"
         :player="player"
+        :contentKalpa="contentKalpa"
         :convert="convertPxToTime"
         :style=`{
           position: 'absolute', zIndex: 1000,
-          top: '-34px',
+          top: '-16px',
         }`
         @first="zoomWorking = true"
         @final="zoomWorking = false")
     //- middle currentTime
-    div(
-      v-if="zoomed"
-      :style=`{
-        position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
-        width: '2px',
-        height: '100%',
-        pointerEvents: 'none',
-      }`
-      ).row.bg-red
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="zoomWrapperScrolling"
+        :style=`{
+          position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
+          width: '2px',
+          height: '100%',
+          pointerEvents: 'none',
+        }`
+        ).row.bg-red
     //- scroll
     div(
       ref="zoom-wrapper"
@@ -82,8 +84,8 @@ div(
                 left: 'calc(' + (player.figure[0].t/player.duration)*100+'% - 6px)',
                 width:'calc(' + ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'% + 16px)',
               }`
-              @first="zoomWorking = true"
-              @final="zoomWorking = false")
+              @first="zoomWorking = true, figureEditing = true"
+              @final="zoomWorking = false, figureEditing = false")
           //- figures
           div(
             v-for="(f,fi) in player.figures" :key="fi"
@@ -100,7 +102,7 @@ div(
           //- currentTime
           transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
             div(
-              v-if="!zoomed"
+              v-if="!zoomWrapperScrolling"
               :style=`{
                 position: 'absolute', zIndex: 2000,
                 left: (player.currentTime/player.duration)*100+'%',
@@ -168,7 +170,7 @@ div(
         @click="tapClick(0)"
         round flat dense  color="grey-6" icon="replay_5" :size="actionsSize").col
       q-btn(
-        v-if="player && !player.figure"
+        v-if="player && !player.figure && options.context !== 'feed'"
         @click="nodeCreate()"
         round flat dense color="green"
         :style=`{
@@ -237,7 +239,8 @@ export default {
       tintPanning: false,
       tintRect: null,
       convertRect: null,
-      actionsSize: 'md'
+      actionsSize: 'md',
+      figureEditing: false,
     }
   },
   created () {
@@ -484,7 +487,7 @@ export default {
       this.zoomWrapperScrolling = true
       this.zoomWrapperScrollingTimer = setTimeout(() => {
         this.zoomWrapperScrolling = false
-      }, 200)
+      }, 500)
       // whos first?
       if (this.zoomWorking) return
       if (this.zoomWrapperScrollingAuthor === 'player') return
@@ -508,6 +511,10 @@ export default {
       // await this.$wait(500)
       // this.zoomWrapperScrollingAuthor = null
       // do someting to save currentPosition...
+      // need to save currentTime
+      this.zoomWrapperScrollingAuthor = 'player'
+      await this.$wait(550)
+      this.zoomWrapperScrollingAuthor = null
     },
     async zoomOut () {
       this.$log('zoomOut')

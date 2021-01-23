@@ -18,7 +18,6 @@ div(
   div(
     ref="items-scroll"
     :style=`{
-      //- position: 'relative',
     }`
     ).col.full-width.scroll
     div(
@@ -43,7 +42,8 @@ div(
         :contentKalpa="contentKalpa"
         :player="player"
         :isSelected="itemSelectedOid === i.oid"
-        @click.native="itemSelectedOid = i.oid")
+        @select="itemSelectedOid === i.oid ? itemSelectedOid = null : itemSelectedOid = i.oid"
+        ).q-mb-xs
 </template>
 
 <script>
@@ -93,19 +93,19 @@ export default {
     'player.currentTime': {
       handler (to, from) {
         // this.$log('player.currentTime TO', to)
-        let item = this.itemsLocal.find(i => {
-          return to >= i.composition.layers[0].figuresAbsolute[0].t && to < i.composition.layers[0].figuresAbsolute[1].t
-        })
-        if (item) {
-          let refItemsScroll = this.$refs['items-scroll']
-          let refItem = this.$refs[`item-${item.oid}`][0].$el
-          let refItemOffsetTop = refItem.offsetTop
-          // this.$log({refItemsScroll, refItem, refItemOffsetTop})
-          // this.$log('ref')
-          this.$tween.to(refItemsScroll, 0.5, {
-            scrollTop: refItemOffsetTop - 120
-          })
-        }
+        // let item = this.itemsLocal.find(i => {
+        //   return to >= i.composition.layers[0].figuresAbsolute[0].t && to < i.composition.layers[0].figuresAbsolute[1].t
+        // })
+        // if (item) {
+        //   let refItemsScroll = this.$refs['items-scroll']
+        //   let refItem = this.$refs[`item-${item.oid}`][0].$el
+        //   let refItemOffsetTop = refItem.offsetTop
+        //   // this.$log({refItemsScroll, refItem, refItemOffsetTop})
+        //   // this.$log('ref')
+        //   this.$tween.to(refItemsScroll, 0.5, {
+        //     scrollTop: refItemOffsetTop - 120
+        //   })
+        // }
         // find item with composition of mine, scrollto its position ?
       }
     }
@@ -176,6 +176,11 @@ export default {
       // this.$log('items.length', items.length)
     }
     this.items = this.findRes.items
+    // handle player.event nodeCreated to do the shit
+    this.player.events.on('node-created', (e) => {
+      this.$log('nodeCreated', e.detail)
+      this.itemSelectedOid = e.detail.oid
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

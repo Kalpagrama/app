@@ -96,7 +96,9 @@ div(
       :icon="player.muted ? 'volume_off' : 'volume_up'"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        right: '12px', top: 'calc(50% - 20px)',
+        right: '12px',
+        //- top: 'calc(50% - 20px)',
+        bottom: '30%',
       }`)
 </template>
 

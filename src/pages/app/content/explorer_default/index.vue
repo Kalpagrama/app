@@ -109,16 +109,10 @@ export default {
   },
   data () {
     return {
-      // width: 0,
-      // height: 0,
       player: null,
-      pageId: 'nodes',
-      // headerHeight: 65,
-      // showMenu: true,
-      // nodeCreating: false,
+      pageId: null,
       heightPage: 0,
       widthPage: 0,
-      // heightPageMin: 0,
       node: null,
     }
   },

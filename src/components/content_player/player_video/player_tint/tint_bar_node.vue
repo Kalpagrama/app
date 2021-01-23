@@ -21,7 +21,7 @@ div(
         :counter="true || node.name.length > 10"
         :maxlength="120"
         :input-style=`{
-          paddingLeft: '10px',
+          paddingLeft: '12px',
           paddingTop: '8px',
           paddingRight: '8px',
           fontSize: fontSize+'px',
@@ -34,6 +34,7 @@ div(
         v-model="spheres"
         borderless dark dense size="xs" no-caps
         type="textarea" autogrow
+        placeholder="Введите сферы сути"
         :rows="1"
         :input-style=`{
           fontSize: '12px',
@@ -45,7 +46,27 @@ div(
           //- height: '20px',
         }`).full-width.text-grey-5
         template(v-slot:prepend)
-          small(:style=`{fontSize: '12px',marginLeft: '12px'}`).text-grey-7 Развлечения
+          small(
+            v-if="nodeCategories.length > 0 && options.length > 0"
+            @click.self="nodeCategoriesShow = true"
+            :style=`{
+              position: 'relative',
+              fontSize: '12px',marginLeft: '12px'}`).text-grey-5.cursor-pointer {{ options.find(o => o.value === node.category).label }}:
+              div(
+                v-if="nodeCategoriesShow"
+                :style=`{
+                  position: 'absolute', zIndex: 1000,
+                  bottom: '0px', left: '0px',
+                  width: '200px',
+                  borderRadius: '10px',
+                  //- height: '500px',
+                }`
+                ).row.items-start.content-start.q-pa-xs.b-30
+                q-btn(
+                  v-for="(c,ci) in options" :key="ci"
+                  @click="categoryClick(c)"
+                  flat dense color="white" no-caps align="left" size="sm"
+                  ).full-width {{ c.label }}
     //- handle video start, refresh
     div(
       :style=`{
@@ -60,7 +81,7 @@ div(
         @click="nodeRefresh()"
         round flat dense color="grey-8" icon="refresh")
       .col
-      q-btn(
+      //- q-btn(
         round flat dense color="green" icon="fas fa-link")
       .col
       q-btn(
@@ -73,9 +94,12 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { ObjectCreateApi } from 'src/api/object_create'
+
 export default {
   name: 'tintBarNode',
-  props: ['player', 'convert'],
+  props: ['player', 'convert', 'contentKalpa'],
   data () {
     return {
       node: {
@@ -88,6 +112,8 @@ export default {
       },
       nodePublishing: false,
       nodePlaying: false,
+      nodeCategories: [],
+      nodeCategoriesShow: false,
       width: 0,
       spheres: ''
     }
@@ -105,6 +131,18 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
+    },
+    options () {
+      // return this.nodeCategories
+      return this.nodeCategories.reduce((acc, val) => {
+        if (val.type !== 'ALL') {
+          acc.push({
+            value: val.type,
+            label: val.alias.charAt(0).toUpperCase() + val.alias.slice(1),
+          })
+        }
+        return acc
+      }, [])
     }
   },
   watch: {
@@ -119,6 +157,11 @@ export default {
     }
   },
   methods: {
+    categoryClick (c) {
+      this.$log('categoryClick', c)
+      this.$set(this.node, 'category', c.value)
+      this.nodeCategoriesShow = false
+    },
     async onPan (e) {
       this.$log('onPan', e)
       if (e.delta.x === 0) return
@@ -149,10 +192,35 @@ export default {
       try {
         this.$log('nodePublish start')
         this.nodePublishing = true
-        await this.$wait(1000)
-        // TODO: do stuff
+        let composition = {
+          id: Date.now().toString(),
+          thumbUrl: this.contentKalpa.thumbUrl,
+          thumbHeight: this.contentKalpa.thumbHeight,
+          thumbWidth: this.contentKalpa.thumbWidth,
+          outputType: this.contentKalpa.type,
+          layers: [
+            {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: this.player.figure},
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT' },
+          __typename: 'Composition',
+        }
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        nodeInput.items[0] = composition
+        if (this.spheres.length > 0) {
+          let spheres = this.spheres.split(',')
+          nodeInput.spheres = spheres.reduce((acc, val) => {
+            if (val.length > 0) {
+              acc.push({name: val})
+            }
+            return acc
+          }, [])
+        }
+        let nodeCreated = await ObjectCreateApi.essenceCreate(nodeInput)
+        this.$log('nodePublish nodeCreated', nodeCreated)
+        this.player.events.emit('node-created', nodeCreated)
         this.$log('nodePublish done')
         this.nodePublishing = false
+        this.player.setState('figure', null)
       }
       catch (e) {
         this.$log('nodePublish')
@@ -187,8 +255,9 @@ export default {
       // this.player.play()
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     // let {width, height} = this.$refs['figure-wrapper'].getBoundingClientRect()
     // this.width = width
   }

@@ -5,7 +5,7 @@ div(
     borderRadius: '12px',
     ...styles,
   }`
-  ).row.full-width.br
+  ).row.full-width
   slot
   //- NODE
   node-feed(
@@ -43,7 +43,7 @@ div(
           borderRadius: '0 0 10px 10px',
           minHeight: '30%',
         }`
-        ).row.full-width.justify-center.cursor-pointer.br
+        ).row.full-width.justify-center.cursor-pointer
   //- COMPOSITION
   composition-player(
     v-else-if="item && item.__typename === 'Composition'"
@@ -87,7 +87,7 @@ div(
       borderRadius: '0 0 10px 10px',
       minHeight: '60px',
     }`
-    ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-pa-sm.bg
+    ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-pa-sm
     router-link(
       :to="itemMeta.link"
       :style=`{

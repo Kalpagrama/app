@@ -182,6 +182,7 @@ export default {
       // make item active
       else {
         this.itemActive = index
+        // if item is muted ???
       }
     }
   }

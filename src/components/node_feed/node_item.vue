@@ -1,5 +1,5 @@
 <template lang="pug">
-//- div(
+div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
@@ -14,7 +14,7 @@
       :isMini="false"
       :styles=`{
         height: '100%',
-        objectFit: 'cover',
+        objectFit: 'contain',
       }`
       :options=`{
         loop: true,
@@ -23,8 +23,9 @@
         showBar: false,
         showHeader: true,
         showFooter: true,
+        context: 'feed',
       }`)
-composition-player(
+//- composition-player(
   :composition="node.items[0]"
   :isVisible="isVisible"
   :isActive="isActive"
@@ -64,7 +65,7 @@ export default {
       return 1
     },
     ratio () {
-      let height = this.node.items[0].thumbHeight + 100
+      let height = this.node.items[0].thumbHeight
       if (height) {
         let ratio = height / this.node.items[0].thumbWidth
         return Math.min(this.ratioMax, ratio)
