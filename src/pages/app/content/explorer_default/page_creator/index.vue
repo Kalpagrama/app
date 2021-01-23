@@ -7,7 +7,7 @@ div(
   //- footer: cancel,publish,link
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$q.screen.lt.md ? !$store.state.ui.userTyping : true"
+      v-if="$q.platform.is.mobile ? !$store.state.ui.userTyping : true"
       :style=`{
         //- position: 'absolute', zIndex: 1000, bottom: '0px',
         position: 'fixed', zIndex: 1000, bottom: '0px', left: '0px',

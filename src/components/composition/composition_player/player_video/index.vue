@@ -15,14 +15,18 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
+      //- height: 'calc(' + styles.height + ' - 100px)',
       objectFit: styles.objectFit,
-      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)'
+      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)',
+      marginBottom: marginBottom+'px',
+      //- maxHeight: '500px',
+      //- opacity: player ? 0.1 : 1,
     }`
     ).full-width
   //- video wrapper
   content-player(
     v-if="isActive && isVisible"
-    @player="player = $event"
+    @player="playerCreated"
     :contentKalpa=`{
       oid: composition.layers[0].contentOid,
       name: composition.layers[0].contentName,
@@ -62,26 +66,42 @@ export default {
   data () {
     return {
       player: null,
+      marginBottom: 0,
     }
   },
   watch: {
-    player: {
-      handler (to, from) {
-        if (to) {
-          if (this.composition.outputType === 'VIDEO') {
-            // let arr = this.composition.url.split('#t=')
-            // if (arr.length > 1) {
-            //   let [start, end] = arr[1].split(',')
-            //   this.player.setCurrentTime(parseFloat(start))
-            // }
-            // else {
-            //   // do nothing
-            // }
-            this.player.play()
-          }
-        }
-      }
-    }
+    // 'player.figure': {
+    //   handler (to, from) {
+    //     if (to) {
+    //       this.$tween.to(this, 0.3, {
+    //         marginBottom: 230,
+    //       })
+    //     }
+    //     else {
+    //       this.$tween.to(this, 0.3, {
+    //         marginBottom: 0
+    //       })
+    //     }
+    //   }
+    // },
+    // 'player.currentTime': {}
+    // player: {
+    //   handler (to, from) {
+    //     if (to) {
+    //       if (this.composition.outputType === 'VIDEO') {
+    //         // let arr = this.composition.url.split('#t=')
+    //         // if (arr.length > 1) {
+    //         //   let [start, end] = arr[1].split(',')
+    //         //   this.player.setCurrentTime(parseFloat(start))
+    //         // }
+    //         // else {
+    //         //   // do nothing
+    //         // }
+    //         this.player.play()
+    //       }
+    //     }
+    //   }
+    // }
   },
   computed: {
     compositionUrl () {
@@ -99,29 +119,24 @@ export default {
       else {
         return this.composition.url
       }
-    },
-    // TODO: figures always...
-    figures () {
-      if (this.composition.outputType === 'VIDEO') {
-        let arr = this.composition.url.split('#t=')
-        if (arr.length > 1) {
-          // this.composition.url = arr[0]
-          let [start, end] = arr[1].split(',')
-          return [
-            {t: parseFloat(start)},
-            {t: parseFloat(end)},
-          ]
-        }
-        else {
-          return false
-        }
-      }
-      else {
-        return false
-      }
     }
   },
   methods: {
+    playerCreated (player) {
+      this.$log('playerCreated', player)
+      this.player = player
+      if (this.composition.outputType === 'VIDEO') {
+        let arr = this.composition.url.split('#t=')
+        if (arr.length > 1) {
+          let [start, end] = arr[1].split(',')
+          let figureOffset = [
+            {t: parseFloat(start)},
+            {t: parseFloat(end)},
+          ]
+          this.player.setState('figureOffset', figureOffset)
+        }
+      }
+    }
   },
   mounted () {
     // this.$log('mounted')

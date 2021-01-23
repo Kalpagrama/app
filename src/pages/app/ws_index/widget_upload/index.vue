@@ -35,7 +35,7 @@
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-py-sm
       small.text-grey-5 YouTube Twitter Spotify Webpage Instagram
   //- from device
-  .row.full-width
+  //- .row.full-width
     .row.full-width.q-pt-sm.q-px-md
       //- to="/workspace/create"
       //- TODO: upload from device !

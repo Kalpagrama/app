@@ -1,5 +1,5 @@
 <template lang="pug">
-q-btn(round flat :icon="icon" :color="color")
+q-btn(round flat :icon="icon" :color="color" :dense="dense")
   //- maximized position="bottom" dark
   q-menu(
     cover anchor="top right" self="top right" dark
@@ -37,6 +37,10 @@ export default {
     color: {
       type: String,
       default: 'grey-9'
+    },
+    dense: {
+      type: Boolean,
+      default: false,
     }
   }
 }

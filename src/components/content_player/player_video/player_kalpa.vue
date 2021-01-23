@@ -11,7 +11,7 @@ div(
     :src="contentKalpa.url"
     type="video/mp4"
     :playsinline="true"
-    :autoplay="false"
+    :autoplay="true"
     :loop="true"
     :muted="muted"
     :style=`{
@@ -52,6 +52,7 @@ export default {
       muted: true,
       events: {},
       figure: null,
+      figureOffset: null,
       figures: [],
       points: [],
       isFullscreen: false,
@@ -74,7 +75,10 @@ export default {
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
-      this.currentTime = t
+      if (this.figureOffset) {
+        t += this.figureOffset[0].t
+      }
+      // this.currentTime = t
       if (this.$refs.videoRef) this.$refs.videoRef.currentTime = t
     },
     play () {
@@ -87,16 +91,32 @@ export default {
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)
+      let duration
       if (this.$refs.videoRef && this.$refs.videoRef.duration > 0) {
-        this.duration = this.$refs.videoRef.duration
+        duration = this.$refs.videoRef.duration
       }
       else {
-        this.duration = this.contentKalpa.duration
+        duration = this.contentKalpa.duration
       }
+      if (this.figureOffset) {
+        duration = this.figureOffset[1].t - this.figureOffset[0].t
+      }
+      this.duration = duration
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
-      if (this.$refs.videoRef) this.currentTime = this.$refs.videoRef.currentTime
+      if (this.$refs.videoRef) {
+        if (this.figureOffset) {
+          this.currentTime = this.$refs.videoRef.currentTime - this.figureOffset[0].t
+          // handle currentTime here ?
+          // if (this.currentTime < 0 && this.currentTime > this.duration) {
+          //   this.player.setCurrentTime(0)
+          // }
+        }
+        else {
+          this.currentTime = this.$refs.videoRef.currentTime
+        }
+      }
     },
     playHandle (e) {
       // this.$log('playHandle', e)

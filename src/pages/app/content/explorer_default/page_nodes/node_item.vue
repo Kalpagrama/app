@@ -84,6 +84,8 @@ div(
 </template>
 
 <script>
+import { ObjectApi } from 'src/api/object'
+
 import nodeVoteBall from 'components/node/node_vote_ball.vue'
 
 export default {
@@ -91,6 +93,11 @@ export default {
   props: ['player', 'contentKalpa', 'node', 'composition', 'isSelected'],
   components: {
     nodeVoteBall,
+  },
+  data () {
+    return {
+      isActiveStart: 0,
+    }
   },
   computed: {
     contentItemIndex () {
@@ -141,10 +148,24 @@ export default {
   },
   watch: {
     isSelected: {
-      handler (to, from) {
+      async handler (to, from) {
         if (to) {
-          this.player.setCurrentTime(this.composition.layers[0].figuresAbsolute[0].t)
-          // this.player.play()
+          // handle player
+          // TODO: player.setNodeWatcher = node.oid/node
+          if (this.contentKalpa.type === 'VIDEO') {
+            this.player.setCurrentTime(this.composition.layers[0].figuresAbsolute[0].t)
+            this.player.play()
+          }
+          // handle views
+          this.isActiveStart = Date.now()
+        }
+        else {
+          // handle views
+          let statValue = Date.now() - this.isActiveStart
+          this.$log('statValue', statValue)
+          let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
+          // this.$log('statValue stat', stat)
+          this.isActiveStart = 0
         }
       }
     }

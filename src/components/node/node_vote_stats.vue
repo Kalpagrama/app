@@ -157,14 +157,28 @@ export default {
       }
     }
   },
-  async mounted () {
-    this.$log('mounted')
+  async created () {
+    this.$log('created')
     // get node stats
     this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}}))
     // set rateMax
-    let rateMax = this.$rateMeta.find(r => {
-      return this.node.rate >= r.valueMin && this.node.rate < r.valueMax
+    let percentMax = null
+    let percentMaxIndex = 0
+    this.node.rateStat.map((r, ri) => {
+      if (percentMax) {
+        if (r.percent > percentMax) {
+          percentMax = r.percent
+          percentMaxIndex = ri
+        }
+      }
+      else {
+        percentMaxIndex = ri
+      }
     })
+    let rateMax = this.$rateMeta[percentMaxIndex]
+    // let rateMax = this.$rateMeta.find(r => {
+    //   return this.node.rate >= r.valueMin && this.node.rate < r.valueMax
+    // })
     if (rateMax) {
       this.rateId = rateMax.value
     }

@@ -42,27 +42,73 @@ div(
       //- overflow: 'hidden',
       minHeight: '60px',
       textAlign: 'center',
+      paddingLeft: '70px', paddingRight: '70px',
     }`
     ).row.full-width.items-center.content-center.justify-center
-    q-input(
-      v-model="joint.name"
-      borderless dark
-      type="textarea" autorgrow
-      :placeholder="'В чем связь ?'"
-      :rows="1"
-      :input-style=`{
-        textAlign: 'center',
-        paddingTop: '18px',
-        paddingBottom: '18px',
-        paddingLeft: '50px',
-        paddingRight: '50px',
-        //- minHeight: '60px',
-      }`
+    q-btn(
+      @click="nameToggle()"
+      round flat
+      icon="multiple_stop"
+      :color="joint.vertices[0] === 'ESSENCE' ? 'white' : 'green'"
       :style=`{
-        zIndex: 300,
-        //- textAlign: 'center'
-      }`
-      ).full-width
+        borderRadius: '50%',
+        overflow: 'hidden',
+      }`).q-ml-sm.rotate-90
+    div(:style=`{position: 'relative',}`).col
+      div(
+        v-if="showVertices"
+        :style=`{
+          position: 'absolute', zIndex: 10000,
+          //- top: '0px',
+          transform: 'translate3d(0,0,1000px)',
+          left: '8px', maxWidth: 'calc(100% - 16px)',
+          //- bottom: 'calc(50% - 218px)',
+          //- bottom: '0px',
+          borderRadius: '30px',
+        }`
+        ).row.full-width.items-start.cotent-start.q-pa-sm.b-60.br
+        q-btn(
+          v-for="(v,vi) in vertices" :key="vi"
+          @click="vertexClick(v)"
+          flat dense color="white" no-caps
+          :style=`{
+            height: '30px',
+          }`
+          ).row.full-width {{ v.name }}
+      q-input(
+        v-if="joint.vertices[0] === 'ESSENCE'"
+        v-model="joint.name"
+        borderless dark
+        type="textarea" autorgrow
+        :placeholder="'В чем связь ?'"
+        :rows="1"
+        :input-style=`{
+          textAlign: 'center',
+          paddingTop: '18px',
+          paddingBottom: '18px',
+          paddingLeft: '50px',
+          paddingRight: '50px',
+          //- minHeight: '60px',
+        }`
+        :style=`{
+          zIndex: 300,
+          //- textAlign: 'center'
+        }`
+        ).full-width
+      span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white Ассоциация
+      div(v-else).row.full-width
+        .row.full-width.justify-center
+          span.text-white {{ $nodeItemType(joint.vertices[0]).name }}
+        .row.full-width.justify-center
+          span.text-white {{ $nodeItemType(joint.vertices[1]).name }}
+    q-btn(
+      @click="showVertices = !showVertices"
+      round flat color="white"
+      :icon="showVertices ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+      :style=`{
+        borderRadius: '50%',
+        opacity: joint.vertices[0] === 'ESSENCE' ? 0 : 1,
+      }`).q-mr-sm
     q-icon(
       name="fas fa-link" size="80px"
       :style=`{
@@ -165,6 +211,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
+import { ContentApi } from 'src/api/content'
 
 import kalpaFinder from 'components/kalpa_finder/index.vue'
 
@@ -187,10 +234,32 @@ export default {
         category: 'FUN',
       },
       publishing: false,
+      showVertices: false,
       // itemFinderShow: false,
     }
   },
+  computed: {
+    vertices () {
+      return this.$nodeItemTypes
+    }
+  },
   methods: {
+    vertexClick (v) {
+      this.$log('vertexClick')
+      // this.joint.name = ''
+      this.joint.vertices = [v.id, v.pair]
+      this.showVertices = false
+    },
+    nameToggle () {
+      this.$log('nameToggle')
+      if (this.joint.vertices[0] === 'ESSENCE') {
+        this.joint.name = ''
+        this.joint.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
+      }
+      else {
+        this.joint.vertices = ['ESSENCE', 'ESSENCE']
+      }
+    },
     itemEdit () {
       this.$log('itemEdit')
     },
@@ -246,7 +315,7 @@ export default {
       try {
         this.$log('publish start')
         this.publishing = true
-        await this.$wait(500)
+        // await this.$wait(500)
         let jointInput = JSON.parse(JSON.stringify(this.joint))
         jointInput.items[0] = this.item
         if (jointInput.items.length === 1) {
@@ -263,7 +332,13 @@ export default {
           }
         }
         // let jointInput = this.joint
-        jointInput.items[0] = this.item
+        // jointInput.items[0] = this.item
+        // popuplate jointInput.items[1] fo GIF
+        this.$log('jointInput', jointInput)
+        if (jointInput.items[1].type === 'GIF' && !jointInput.items[1].oid) {
+          let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
+          jointInput.items[1].oid = contentKalpa.oid
+        }
         this.$log('jointInput', jointInput)
         this.$log('publish done')
         this.publishing = false

@@ -24,6 +24,7 @@ q-layout(
             :options=`{
               showHeader: false,
               showBar: true,
+              showFooter: true,
             }`
             :styles=`{
               height: '100%',

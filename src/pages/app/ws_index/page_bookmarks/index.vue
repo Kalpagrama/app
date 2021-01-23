@@ -34,7 +34,8 @@ q-layout(
       }`)
       q-tab-panels(
         v-model="pageId"
-        swipeable animated
+        :swipeable="$q.platform.is.mobile"
+        :animated="$q.platform.is.mobile"
         :style=`{}`).b-30
         q-tab-panel(
           v-for="(p,pi) in pages" :key="p.id" :name="p.id"
@@ -55,7 +56,8 @@ q-layout(
               component(
                 v-for="(b,bi) in items" :key="b.oid"
                 :is="'item-content'"
-                :bookmark="b")
+                :bookmark="b"
+                ).q-mb-sm
       q-page-sticky(
         expand position="top-left" :offset="[0, 0]").row.full-width.q-px-md.b-30
         q-tabs(

@@ -173,7 +173,7 @@ export default {
     this.findRes = await this.$rxdb.find(this.itemsQuery, true) // {items, next, hasNext, prev, hasPrev}
     while (this.findRes.hasNext()) {
       // this.$log('items.next !!!')
-      await this.findRes.next(10)
+      await this.findRes.next(12)
       // this.$log('items.length', items.length)
     }
     this.items = this.findRes.items

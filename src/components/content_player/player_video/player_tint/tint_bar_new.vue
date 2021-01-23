@@ -6,10 +6,22 @@ div(
   div(
     :style=`{
       position: 'relative',
-      height: '36px',
-      opacity: options.showBar ? 1 : 0,
+      height: heightWrapper+'px',
+      opacity: options.showBar ? 1 : player.figure ? 1 : 0,
     }`
     ).row.full-width
+    //- middle nodeEditor...
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      tint-bar-node(
+        v-if="player && player.figure"
+        :player="player"
+        :convert="convertPxToTime"
+        :style=`{
+          position: 'absolute', zIndex: 1000,
+          top: '-34px',
+        }`
+        @first="zoomWorking = true"
+        @final="zoomWorking = false")
     //- middle currentTime
     div(
       v-if="zoomed"
@@ -29,8 +41,9 @@ div(
       }`
       :style=`{
         position: 'absolute', zIndex: 100,
+        overflowY: 'hidden',
       }`
-      ).row.fit.items-center.content-center.scroll.q-py-sm
+      ).row.fit.items-center.content-center.scroll.scroll-clear.q-py-sm
       .row.no-wrap
         //- left padding
         div(
@@ -101,7 +114,8 @@ div(
             v-for="(m,mi) in minCount" :key="mi"
             :style=`{
               zIndex: 101+mi,
-              height: heightBar+'px',
+              //- height: heightBar+'px',
+              height: '100%',
               width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
               minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
               //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
@@ -119,6 +133,7 @@ div(
             :style=`{
               position: 'absolute', zIndex: 100,
               borderRadius: '10px',
+              opacity: 0.8
             }`
             ).row.fit.b-40
         //- right padding
@@ -130,44 +145,110 @@ div(
             height: heightBar+'px',
           }`
           ).row
-  //- footer
+  //- footer:
+  //- actions figure
   div(
+    v-if="player && player.figure"
+    :style=`{
+      order: -1,
+    }`
+    ).row.full-width.justify-center
+    div(:style=`{maxWidth: '300px'}`).row.full-width.items-center.content-center.q-px-sm
+      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
+      .col
+      q-btn(round flat dense color="grey-8" @click="layerForward(0,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
+      q-btn(round flat dense color="grey-8" @click="layerForward(0,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
+      .col
+      small(
+        :class=`{
+          'text-red': player.figure[1].t-player.figure[0].t > 60,
+          'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
+        }`
+        :style=`{
+          userSelect: 'none',
+          pointerEvents: 'none',
+        }`
+        ) {{$time(player.figure[1].t-player.figure[0].t)}}
+      .col
+      q-btn(round flat dense color="grey-8" @click="layerForward(1,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
+      q-btn(round flat dense color="grey-8" @click="layerForward(1,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
+      .col
+      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
+  //- debug
+  //- div(
+    v-if="player"
+    :style=`{
+      height: '50px',
+    }`
+    ).row.full-width.text-white.br
+    //- small width: {{width}}, minWidthTotal: {{minWidthTotal}}, minWidthMin: {{minWidthMin}}, minWidth: {{minWidth}}, minWidthMax: {{minWidthMax}}
+    //- small minDelta: {{minDelta}}, minCount: {{minCount}},
+    small player.figureOffset {{player.figureOffset}}
+  //- actions global
+  div(
+    v-show="options.showFooter"
     :style=`{
       position: 'relative',
     }`
-    ).row.full-width.items-center.content-center.q-pl-sm
+    ).row.full-width.items-center.content-center
     //- time
-    small.text-grey-6.q-mr-xs {{$time(player.currentTime)}}
-    small.text-grey-6 / {{$time(player.duration)}}
+    small(
+      :style=`{
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }`
+      ).text-grey-6.q-mr-xs {{$time(player.currentTime)}}
+    small(
+      :style=`{
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }`
+      ).text-grey-6 / {{$time(player.duration)}}
     .col
     //- middle: zoomIn/zoomOut
     div(
       :style=`{
         position: 'absolute', zIndex: 100,
-        left: 'calc(50% - 44px)',
+        left: 'calc(50% - 58px)',
       }`
       ).row.full-height.items-center.content-center
       q-btn(
         @click="tapClick(0)"
-        round flat dense  color="grey-6" size="sm" icon="replay_5").q-mr-sm
+        round flat dense  color="grey-6" icon="replay_5" :size="actionsSize").q-mr-sm
       q-btn(
         v-if="zoomed"
         @click="zoomOut()"
-        round flat dense color="grey-6" size="sm")
+        round flat dense color="grey-6"
+        :size="actionsSize"
+        :style=`{
+          opacity: options.context === 'feed' ? 0 : 1,
+        }`)
         q-icon(name="unfold_less").rotate-90
       q-btn(
         v-if="!zoomed"
         @click="zoomIn()"
-        round flat dense color="grey-6" size="sm")
+        round flat dense color="grey-6"
+        :size="actionsSize"
+        :style=`{
+          opacity: options.context === 'feed' ? 0 : 1,
+        }`)
         q-icon(name="unfold_more").rotate-90
       q-btn(
         @click="tapClick(1)"
-        round flat dense  color="grey-6" size="sm" icon="forward_5").q-ml-sm
+        round flat dense  color="grey-6" icon="forward_5" :size="actionsSize").q-ml-sm
     //- right side
-    q-btn(
-      round flat dense color="grey-6" icon="more_vert" size="sm").q-mr-sm
-    q-btn(
-      round flat dense color="grey-6" icon="fullscreen" size="sm").q-mr-sm
+    //- q-btn(
+      round flat dense color="grey-6" icon="more_vert" :size="actionsSize").q-mr-sm
+    //- q-btn(
+      round flat dense color="grey-6" icon="fullscreen" :size="actionsSize").q-mr-sm
+    //- q-btn(
+      v-if="player && !player.figure"
+      @click="nodeCreate()"
+      round flat dense color="green" icon="add_circle_outline")
     slot(name="actions")
 </template>
 
@@ -177,12 +258,18 @@ export default {
   props: ['player', 'contentKalpa', 'options'],
   components: {
     tintBarFigure: () => import('./tint_bar_figure.vue'),
+    tintBarNode: () => import('./tint_bar_node.vue'),
   },
   data () {
     return {
       width: 0,
       height: 0,
       heightBar: 20,
+      heightBarMin: 20,
+      heightBarMax: 30,
+      heightWrapper: 36,
+      heightWrapperMin: 36,
+      heightWrapperMax: 46,
       minWidth: 0,
       zoomed: null,
       zoomWorking: false,
@@ -195,6 +282,7 @@ export default {
       tintPanning: false,
       tintRect: null,
       convertRect: null,
+      actionsSize: 'md'
     }
   },
   created () {
@@ -218,17 +306,55 @@ export default {
       return p / 60
     },
     minWidthMin () {
-      // let res = this.width / this.minCount
-      // if (res * this.minCount < this.width) {
-      //   return this.width / this.minDelta
-      // }
-      // else {
-      //   return res
-      // }
-      return this.width / this.minCount
+      let minWidthMin = this.width / this.minCount
+      let width = 0
+      for (let i = 0; i < this.minCount; i++) {
+        if (i + 1 === this.minCount) {
+          width += minWidthMin * this.minDelta
+        }
+        else {
+          width += minWidthMin
+        }
+      }
+      // this.$log('width/this.width', {width: width, 'this.width': this.width})
+      // if we got smaller then width...
+      if (width < this.width) {
+        return minWidthMin / (width / this.width)
+        // return minWidthMin
+      }
+      else {
+        return minWidthMin
+      }
     },
     minWidthMax () {
-      return this.width * 0.8
+      let minWidthMax = this.width * 0.8
+      let width = 0
+      for (let i = 0; i < this.minCount; i++) {
+        if (i + 1 === this.minCount) {
+          width += minWidthMax * this.minDelta
+        }
+        else {
+          width += minWidthMax
+        }
+      }
+      if (width < this.width) {
+        return this.minWidthMin
+      }
+      else {
+        return minWidthMax
+      }
+    },
+    minWidthTotal () {
+      let width = 0
+      for (let i = 0; i < this.minCount; i++) {
+        if (i + 1 === this.minCount) {
+          width += this.minWidthMin * this.minDelta
+        }
+        else {
+          width += this.minWidthMin
+        }
+      }
+      return width
     },
     duration () {
       return this.player.duration
@@ -253,6 +379,25 @@ export default {
         this.playerCurrentTimeTimer = setTimeout(() => {
           this.zoomWrapperScrollingAuthor = null
         }, 200)
+      }
+    },
+    'player.figure': {
+      async handler (to, from) {
+        this.$log('player.figure TO', to)
+        if (to) {
+          this.zoomIn()
+          this.$tween.to(this, 0.5, {
+            heightBar: this.heightBarMax,
+            heightWrapper: this.heightWrapperMax,
+          })
+        }
+        else {
+          this.zoomOut()
+          this.$tween.to(this, 0.5, {
+            heightBar: this.heightBarMin,
+            heightWrapper: this.heightWrapperMin,
+          })
+        }
       }
     },
     zoomed: {
@@ -281,21 +426,41 @@ export default {
     },
   },
   methods: {
+    nodeCreate () {
+      this.$log('nodeCreate')
+      let start = this.player.currentTime
+      let end = start + 30 > this.player.duration ? this.player.duration : start + 30
+      // let composition = {
+      //   id: Date.now().toString(),
+      //   thumbUrl: this.contentKalpa.thumbUrl,
+      //   thumbHeight: this.contentKalpa.thumbHeight,
+      //   thumbWidth: this.contentKalpa.thumbWidth,
+      //   outputType: 'VIDEO',
+      //   layers: [
+      //     {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
+      //   ],
+      //   operation: { items: null, operations: null, type: 'CONCAT'},
+      //   __typename: 'Composition',
+      // }
+      let figure = [{t: start, points: []}, {t: end, points: []}]
+      this.player.setState('figure', figure)
+    },
     tapClick (index) {
       this.$log('tapClick', index)
-      // TODO: cant go -1 and +1 duration
       let t = this.player.currentTime
       if (index === 0) t -= 5
       if (index === 1) t += 5
+      if (t < 0) t = 0
+      if (t > this.player.duration) t = this.player.duration
       this.player.setCurrentTime(t)
     },
-    convertPxToTime (px) {
+    convertPxToTime (px, _width) {
       // width (300px) ___ player.duration
       // px                t
       if (this.convertRect === null) {
         this.convertRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
       }
-      let width = this.convertRect.width
+      let width = _width || this.convertRect.width
       let t = (px * this.duration) / width
       return t
     },
@@ -325,6 +490,9 @@ export default {
       let scrollWidth = ref.scrollWidth - (this.leftRightMarginWidth * 2)
       let scrollLeft = ref.scrollLeft
       let t = (scrollLeft / scrollWidth) * this.player.duration
+      // handle t figureOffset
+      if (t < 0) t = 0
+      if (t > this.player.duration) t = this.player.duration
       // this.$log({scrollWidth: scrollWidth, scrollLeft: scrollLeft, t: t})
       this.player.setCurrentTime(t)
     },
@@ -348,13 +516,14 @@ export default {
       this.zoomWrapperScrollingAuthor = null
     },
     tintClick (e) {
-      this.$log('tintClick', e)
+      // this.$log('tintClick', e)
       let left = e.layerX
       let width = e.target.clientWidth
       this.$log({left, width})
       this.zoomPercent = left / width
       // this.zoomed = !this.zoomed
       let t = this.zoomPercent * this.player.duration
+      this.$log('t', t)
       this.player.setCurrentTime(t)
     },
     tintOnPan (e) {

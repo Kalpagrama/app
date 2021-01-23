@@ -4,8 +4,10 @@ html, body
   font-family: 'Open Sans', sans-serif;
   background: rgb(30,30,30)
 ::-webkit-scrollbar
-  width: 0px
+  width: 0px !important
   height: 0px !important
+.scroll-clear::-webkit-scrollbar
+  display: none // Safari and Chrome
 .q-field--outlined .q-field__control
   border-radius: 10px !important
 .q-drawer

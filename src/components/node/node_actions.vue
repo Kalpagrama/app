@@ -177,7 +177,7 @@ export default {
   methods: {
     nodeVoteBallClick () {
       this.$log('nodeVoteBallClick')
-      if (this.node.rateUser) {
+      if (this.node.rateUser || this.node.author.oid === this.$store.getters.currentUser().oid) {
         this.voteStatsShow = true
       }
       else {
@@ -186,6 +186,7 @@ export default {
     },
     async voteAgain () {
       this.$log('voteAgain')
+      if (this.node.author.oid === this.$store.getters.currentUser().oid) return
       this.voteStatsShow = false
       await this.$wait(200)
       this.voteStarted = true

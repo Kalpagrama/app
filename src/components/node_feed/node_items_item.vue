@@ -1,12 +1,11 @@
 <template lang="pug">
 div(
   :style=`{
+    position: 'relative',
     borderRadius: '12px',
-    //- ...itemStyles,
     ...styles,
-    //- border: itemActive ? '2px solid red' : '2px solid rgb(30,30,30)',
   }`
-  ).row.full-width
+  ).row.full-width.br
   slot
   //- NODE
   node-feed(
@@ -24,55 +23,27 @@ div(
     template(v-slot:items)
       composition-player(
         v-if="item && item.type === 'NODE'"
-        :oid="oid"
         :composition="item.items[0]"
         :isActive="itemActive"
         :isVisible="true"
         :isMini="!itemOpened"
         :options=`{
-          footerOverlay: true
+          footerOverlay: true,
+          showHeader: true,
+          showFooter: false,
         }`
-        :styles=`{
-          ...styles,
-        }`)
+        :styles="styles")
     template(v-slot:wrapper)
       div(
         @click="$emit('open')"
         v-show="!itemOpened"
         :style=`{
-          position: 'absolute', zIndex: 200, bottom: '-0.8px',
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
+          position: 'absolute', zIndex: 300, bottom: '-0.8px',
+          //- background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 10px 10px',
+          minHeight: '30%',
         }`
-        ).row.full-width.justify-center
-        router-link(
-          :to="'/node/'+item.oid"
-          :style=`{
-            height: '36px',
-            textAlign: 'center',
-            //- pointerEvents: 'none',
-          }`
-          ).row.items-center.content-center.scroll
-          //- .row.full-width.br
-          q-btn(
-            v-if="item.__typename === 'Composition'"
-            round flat dense color="white" icon="select_all")
-          q-icon(
-            v-if="item.type === 'NODE'"
-            color="white" name="adjust" size="14px").q-mr-xs
-          span(
-            v-if="item.type === 'NODE'"
-            :style=`{
-              whiteSpace: 'nowrap',
-              //- marginLeft: '8px',
-              textAlign: 'center',
-            }`).text-white.q-mr-sm {{ item.name }}
-    //- div(
-      :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '0px',
-      }`
-      ).row.full-width.bg-red.q-pa-md
-      small footer
+        ).row.full-width.justify-center.cursor-pointer.br
   //- COMPOSITION
   composition-player(
     v-else-if="item && item.__typename === 'Composition'"
@@ -80,9 +51,7 @@ div(
     :isActive="itemActive"
     :isVisible="true"
     :isMini="!itemOpened"
-    :styles=`{
-      ...styles
-    }`
+    :styles="styles"
     :options=`{
       loop: true,
       showBar: false,
@@ -95,7 +64,7 @@ div(
     }`
     ).row.fit.items-center.content-center.justify-center.b-30
     q-icon(name="blur_on" color="white" size="100px")
-  //- CONTENT, USER, SPHERE, GIF ?
+  //- CONTENT, USER, SPHERE, GIF ?, joint ?
   //- FALLBACK
   //- fallback image
   img(
@@ -107,43 +76,27 @@ div(
       objectFit: 'cover',
     }`
     ).fit.b-30
-  //- context and name
-  //- div(
+  //- itemMeta
+  div(
+    v-if="itemMeta"
+    v-show="!itemOpened"
     :style=`{
-      position: 'absolute',
-      zIndex: 200,
-      bottom: '-0.5px',
+      position: 'absolute', zIndex: 200,
+      bottom: '0px', right: '0px', left: '0px',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
-      borderRadius: '10px',
+      borderRadius: '0 0 10px 10px',
+      minHeight: '60px',
     }`
-    ).row.full-width.items-center.content-center.justify-center.q-py-sm.br
-    div(
+    ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-pa-sm.bg
+    router-link(
+      :to="itemMeta.link"
       :style=`{
-        borderRadius: '10px',
-        maxWidth: '100%',
-        ...stylesName,
-        //- marginBottom: '34px',
-        //- background: 'black',
+        textAlign: 'center',
       }`
-      ).row
-      router-link(
-        :to="itemLink"
-        :style=`{
-          height: '36px',
-          textAlign: 'center',
-        }`
-        ).row.items-center.content-center.scroll
-        //- .row.full-width.br
-        q-btn(
-          v-if="item.__typename === 'Composition'"
-          round flat dense color="white" icon="select_all")
-        span(
-          v-else
-          :style=`{
-            whiteSpace: 'nowrap',
-            marginLeft: '8px',
-            textAlign: 'center',
-          }`).text-white.q-mr-sm {{ item.name }}
+      ).row.items-center.content-center
+      q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs
+      .col
+        small.text-white {{ itemMeta.name }}
 </template>
 
 <script>
@@ -151,7 +104,7 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 
 export default {
   name: 'nodeFeed__nodeItemsItem',
-  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'itemVertex', 'itemStyles', 'stylesName', 'styles'],
+  props: ['item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
   components: {
     compositionPlayer,
   },
@@ -160,42 +113,53 @@ export default {
     }
   },
   computed: {
-    itemLink () {
-      // '/node/'+item.oid
+    itemMeta () {
+      // node
       if (this.item.type === 'NODE') {
-        return '/node/' + this.item.oid
+        return {
+          link: '/node/' + this.item.oid,
+          name: this.item.name,
+          icon: 'adjust'
+        }
       }
+      // composition
       else if (this.item.__typename === 'Composition') {
-        return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+        // return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
+        return {
+          link: '/content/' + this.item.layers[0].contentOid,
+          name: this.item.layers[0].contentName || 'Источник',
+          icon: 'select_all'
+        }
       }
+      // sphere
       else if (this.item.__typename === 'Sphere') {
-        return '/sphere/' + this.item.oid
+        return {
+          link: '/sphere/' + this.item.oid,
+          name: this.item.name,
+          icon: 'blur_on'
+        }
       }
+      // user
       else if (this.item.__typename === 'User') {
-        return '/user/' + this.item.oid
+        return {
+          link: '/user/' + this.item.oid,
+          name: this.item.name,
+          icon: 'blur_on'
+        }
       }
+      // content
       else if (['Video', 'Image', 'Book'].includes(this.item.__typename)) {
-        return '/content/' + this.item.oid
+        return {
+          link: '/content/' + this.item.oid,
+          name: this.item.name || 'Источник',
+          icon: 'select_all'
+        }
       }
+      // joint?
       // else if (this.item.type === '')
       else {
-        return '//'
+        return null
       }
-    },
-    itemContextLink () {
-      if (this.item.type === 'NODE') {
-        return '/content/' + this.item.items[0].layers[0].contentOid + '?node=' + this.oid
-      }
-      else if (this.item.__typename === 'Composition') {
-        return '/content/' + this.item.layers[0].contentOid
-      }
-      // else if (this.item.type === '')
-      else {
-        return '//'
-      }
-    },
-    itemLinksLink () {
-      return '/links/' + this.item.oid
     }
   }
 }

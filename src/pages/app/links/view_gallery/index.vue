@@ -14,15 +14,6 @@
       }`
       ).row.full-width.items-start.content-start.q-pt-xs.q-px-xs
       q-resize-observer(@resize="onResizeHeader" :debounce="300")
-      //- img(
-        draggable="false"
-        :src="item.thumbUrl"
-        :style=`{
-          borderRadius: '10px',
-          maxHeight: $q.screen.width*0.7+'px',
-          objectFit: 'contain',
-        }`
-        ).full-width.b-40
       node-items-item(
         :item="item"
         :itemOpened="false"

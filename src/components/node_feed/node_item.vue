@@ -1,8 +1,9 @@
 <template lang="pug">
-div(
+//- div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
+    //- marginBottom: '100px',
   }`
   ).row.full-width
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
@@ -20,7 +21,28 @@ div(
         nodeOid: node.oid,
         footerOverlay: true,
         showBar: false,
+        showHeader: true,
+        showFooter: true,
       }`)
+composition-player(
+  :composition="node.items[0]"
+  :isVisible="isVisible"
+  :isActive="isActive"
+  :isMini="false"
+  :styles=`{
+    height: '100%',
+    objectFit: 'cover',
+    //- objectFit: 'contain',
+  }`
+  :options=`{
+    loop: true,
+    nodeOid: node.oid,
+    footerOverlay: true,
+    showBar: false,
+    showHeader: true,
+    showFooter: true,
+    context: 'feed',
+  }`)
 </template>
 
 <script>
@@ -42,10 +64,11 @@ export default {
       return 1
     },
     ratio () {
-      let height = this.node.items[0].thumbHeight
+      let height = this.node.items[0].thumbHeight + 100
       if (height) {
-        let ratio = this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
+        let ratio = height / this.node.items[0].thumbWidth
         return Math.min(this.ratioMax, ratio)
+        // return this.ratioMax
       }
       else {
         return this.ratioMax

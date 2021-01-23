@@ -5,6 +5,7 @@
     borderless dark color="white"
     type="textarea" autogrow
     placeholder="В чем суть?"
+    :maxlength="120"
     :resize="false"
     :input-style=`{
       fontSize: fontSize+'px',

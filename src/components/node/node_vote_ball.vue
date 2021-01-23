@@ -44,7 +44,7 @@ div(
       div(
         :style=`{
           borderRadius: '50%',
-          background: $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax).color,
+          background: rateMax.color,
         }`
         ).row.fit
     //- rateUser
@@ -76,7 +76,8 @@ div(
         bottom: '-18px',
       }`
       ).row.full-width.justify-center
-      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax).name }}
+      //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax).name }}
+      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ rateMax.name }}
 </template>
 
 <script>
@@ -97,6 +98,24 @@ export default {
   computed: {
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid
+    },
+    rateMax () {
+      // $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax)
+      let percentMax = null
+      let percentMaxIndex = 0
+      this.node.rateStat.map((r, ri) => {
+        if (percentMax) {
+          if (r.percent > percentMax) {
+            percentMax = r.percent
+            percentMaxIndex = ri
+          }
+        }
+        else {
+          percentMaxIndex = ri
+        }
+      })
+      let rateMax = this.$rateMeta[percentMaxIndex]
+      return rateMax
     }
   },
   methods: {

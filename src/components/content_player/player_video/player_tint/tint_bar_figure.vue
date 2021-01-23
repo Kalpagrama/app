@@ -76,7 +76,7 @@ export default {
     }
   },
   methods: {
-    pointDrag (e, index) {
+    async pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
       // first
       if (e.isFirst) {
@@ -94,9 +94,10 @@ export default {
       this.player.figure[index].t = t
       // final
       if (e.isFinal) {
-        this.$emit('final')
         this.pointDragging = false
         this.pointDraggingIndex = -1
+        await this.$wait(300)
+        this.$emit('final')
       }
     }
   }
