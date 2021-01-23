@@ -34,7 +34,8 @@ q-layout(
       }`)
       q-tab-panels(
         v-model="pageId"
-        swipeable animated
+        :swipeable="$q.platform.is.mobile"
+        :animated="$q.platform.is.mobile"
         :style=`{}`).b-30
         q-tab-panel(
           v-for="(p,pi) in pages" :key="p.id" :name="p.id"

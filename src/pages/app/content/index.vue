@@ -13,6 +13,7 @@ explorer-default(
 </template>
 
 <script>
+import { ObjectApi } from 'src/api/object'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import explorerDefault from './explorer_default/index.vue'
@@ -37,7 +38,8 @@ export default {
         IMAGE: 'explorer-video',
         BOOK: 'explorer-book',
         WEB: 'explorer-web',
-      }
+      },
+      isActiveStart: 0
     }
   },
   watch: {
@@ -59,11 +61,19 @@ export default {
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // handle views stats
+    this.isActiveStart = Date.now()
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    // handle views stats
+    let statValue = Date.now() - this.isActiveStart
+    this.$log('statValue', statValue)
+    let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
+    this.$log('statValue stat', stat)
+    this.isActiveStart = 0
   }
 }
 </script>

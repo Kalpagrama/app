@@ -11,7 +11,7 @@ div(
     }`
     ).row.full-width
     //- middle nodeEditor...
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       tint-bar-node(
         v-if="player && player.figure"
         :player="player"
@@ -190,10 +190,11 @@ div(
     small player.figureOffset {{player.figureOffset}}
   //- actions global
   div(
+    v-show="options.showFooter"
     :style=`{
       position: 'relative',
     }`
-    ).row.full-width.items-center.content-center.q-pl-sm
+    ).row.full-width.items-center.content-center
     //- time
     small(
       :style=`{
@@ -221,12 +222,20 @@ div(
       q-btn(
         v-if="zoomed"
         @click="zoomOut()"
-        round flat dense color="grey-6" :size="actionsSize")
+        round flat dense color="grey-6"
+        :size="actionsSize"
+        :style=`{
+          opacity: options.context === 'feed' ? 0 : 1,
+        }`)
         q-icon(name="unfold_less").rotate-90
       q-btn(
         v-if="!zoomed"
         @click="zoomIn()"
-        round flat dense color="grey-6" :size="actionsSize")
+        round flat dense color="grey-6"
+        :size="actionsSize"
+        :style=`{
+          opacity: options.context === 'feed' ? 0 : 1,
+        }`)
         q-icon(name="unfold_more").rotate-90
       q-btn(
         @click="tapClick(1)"
@@ -236,7 +245,7 @@ div(
       round flat dense color="grey-6" icon="more_vert" :size="actionsSize").q-mr-sm
     //- q-btn(
       round flat dense color="grey-6" icon="fullscreen" :size="actionsSize").q-mr-sm
-    q-btn(
+    //- q-btn(
       v-if="player && !player.figure"
       @click="nodeCreate()"
       round flat dense color="green" icon="add_circle_outline")

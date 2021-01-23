@@ -13,7 +13,13 @@ div(
       paddingLeft: '60px', paddingRight: '60px',
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-    span(:style=`{zIndex: 300,}`).text-white {{ joint.name || joint.vertices }}
+    span(v-if="joint.vertices[0] === 'ESSENCE'").text-white {{ joint.name }}
+    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white Ассоциация
+    div(v-else).row.full-width
+      .row.full-width.justify-center
+        span.text-white {{ $nodeItemType(joint.vertices[itemIndex === 1 ? 0 : 1]).name }}
+      .row.full-width.justify-center
+        span.text-white {{ $nodeItemType(joint.vertices[itemIndex]).name }}
     q-icon(
       name="fas fa-link" size="80px"
       :style=`{
@@ -43,29 +49,6 @@ div(
           position: 'relative',
         }`
         ).row.full-width.items-start.content-start
-        //- header
-        //- div(
-          v-if="joint.items[itemIndex].type === 'NODE'"
-          :style=`{
-            position: 'absolute', zIndex: 100, top: '0px',
-          }`
-          ).row.full-width.items-center.content-center.q-pa-sm
-          q-btn(
-            :to="'/node/'+joint.items[itemIndex].oid"
-            round flat color="white" icon="adjust")
-          .col
-            span.text-white {{ joint.items[itemIndex].name }}
-        //- router-link(
-          v-if="joint.items[itemIndex].type === 'NODE'"
-          :to="'/node/'+joint.items[itemIndex].oid"
-          :style=`{
-            position: 'absolute', zIndex: 100, bottom: '0px',
-            background: 'linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)',
-            borderRadius: '0 0 10px 10px',
-          }`
-          ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-          q-icon(name="adjust" size="20px" color="white").q-mr-xs
-          span.text-white {{ joint.items[itemIndex].name }}
         q-btn(
           v-if="true"
           round flat color="green" icon="fas fa-link"
@@ -75,17 +58,6 @@ div(
             right: '8px',
             top: 'calc(50% - 20px)',
           }`)
-        //- img
-        //- img(
-          draggable="false"
-          :src="joint.items.find(i => i.oid !== item.oid).thumbUrl"
-          :style=`{
-            borderRadius: '10px',
-            objectFit: 'contain',
-            //- maxHeight: '400px',
-            maxHeight: height-200+'px',
-          }`
-          ).full-width.b-40
         node-items-item(
           :item="joint.items[itemIndex]"
           :itemOpened="false"

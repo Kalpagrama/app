@@ -30,8 +30,9 @@ composition-player(
   :isActive="isActive"
   :isMini="false"
   :styles=`{
-    //- height: '100%',
+    height: '100%',
     objectFit: 'cover',
+    //- objectFit: 'contain',
   }`
   :options=`{
     loop: true,
@@ -40,6 +41,7 @@ composition-player(
     showBar: false,
     showHeader: true,
     showFooter: true,
+    context: 'feed',
   }`)
 </template>
 

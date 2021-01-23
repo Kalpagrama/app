@@ -87,6 +87,12 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'joint',
+            path: 'joint/:oid',
+            component: () => import('pages/app/joint/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'links',
             path: 'links/:oid',
             component: () => import('pages/app/links/index.vue'),

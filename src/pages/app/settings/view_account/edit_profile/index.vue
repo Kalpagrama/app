@@ -12,16 +12,19 @@
   //- lang
   .row.full-width.q-pa-xs
     q-select(
-      filled
-      dark color="white" dense
+      color="white"
+      dark borderless
       :label="$t('Pick your language', 'Выберите язык')"
       v-model="lang"
       option-value="value"
       option-label="label"
+      dropdown-icon="keyboard_arrow_down"
       :options="langs"
       :style=`{
+        background: 'rgb(40,40,40)',
         borderRadius: '10px', overflow: 'hidden',
-        minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
+        paddingLeft: '12px',
+        paddingRight: '12px',
       }`).full-width
   //- password
   edit-email(:currentUser="currentUser")

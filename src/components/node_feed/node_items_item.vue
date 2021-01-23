@@ -30,7 +30,7 @@ div(
         :options=`{
           footerOverlay: true,
           showHeader: true,
-          showFooter: true,
+          showFooter: false,
         }`
         :styles="styles")
     template(v-slot:wrapper)

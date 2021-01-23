@@ -144,11 +144,16 @@ export default {
       this.$log('followingToggle')
       let following = await UserApi.isSubscribed(this.user.oid)
       if (following) {
+        this.following = false
         await UserApi.unSubscribe(this.user.oid)
       }
       else {
-         await UserApi.subscribe(this.user.oid)
+        this.following = true
+        await UserApi.subscribe(this.user.oid)
       }
+      // TODO: handle await for real data from this query
+      // this.following = await UserApi.isSubscribed(this.user.oid)
+      // this.followingConfirmed = true
     }
   }
 }

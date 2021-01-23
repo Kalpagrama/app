@@ -17,23 +17,24 @@
           span.text-white.text-bold {{ contentKalpa.name }}
         kalpa-menu-actions(icon="more_vert" :title="contentKalpa.name" :actions="actions")
       .row.full-width.items-end.content-end.q-pt-xs.q-px-sm
-        span.text-grey-5.q-mr-xs 0 просмотров
+        span.text-grey-5.q-mr-xs {{ contentKalpa.countViews }} просмотров
         small.text-grey-7.q-mr-xs - {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
     //- actions
-    .row.full-width.q-pa-sm
-      q-btn(
+    .row.full-width.items-center.content-center.q-pa-sm
+      div(
         v-if="contentKalpa.contentSource !== 'KALPA'"
-        @click="gotToOriginal"
-        align="left"
-        flat color="grey-9" no-caps
-        :style=`{
-          //- background: 'rgb(38,38,38)'
-        }`).full-height
-        q-icon(name="fab fa-youtube" color="red" size="30px")
-        span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
+        ).row.full-height.items-center.content-center.q-pl-md
+          small.text-grey-6 Источник:
+          q-btn(
+            @click="gotToOriginal"
+            align="left"
+            flat color="grey-9" no-caps
+            :style=`{
+            }`)
+            q-icon(name="fab fa-youtube" color="red" size="30px")
+            span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
       .col
       kalpa-share(type="content" :item="contentKalpa")
-      //- kalpa-menu-actions(icon="more_vert" :actions="actions")
       kalpa-bookmark(
         v-if="contentKalpa"
         :oid="contentKalpa.oid"
@@ -45,7 +46,7 @@
         :fields=`{contentType: contentKalpa.type}`
         @bookmark="$event => $emit('bookmark', $event)").q-mr-sm
     //- similar content
-    .row.full-width.q-px-lg.q-py-xs
+    .row.full-width.q-pl-lg.q-py-xs
       span.text-grey-6 Похожее:
     .row.full-width.q-pa-sm
       div(

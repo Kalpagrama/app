@@ -29,7 +29,7 @@ div(
           }`
           :style=`{marginLeft: '10px',}`)
         div(
-          v-show="!isMini"
+          v-show="!isMini && $q.screen.gt.sm"
           :style=`{
             overflow: 'hidden',
           }`
@@ -77,7 +77,7 @@ div(
           :options="options"
           :style=`{
           }`).full-width
-          template(v-slot:actions)
+          //- template(v-slot:actions)
             .row
               q-btn(
                 v-if="player"
@@ -87,16 +87,16 @@ div(
                 :icon="player.muted ? 'volume_off' : 'volume_up'"
                 :style=`{
                 }`)
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
-      v-if="player && !options.showFooter"
+      v-if="player"
       @click="volumeToggle()"
       round flat dense size="md"
       :color="player.muted ? 'red' : 'grey-6'"
       :icon="player.muted ? 'volume_off' : 'volume_up'"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        right: '8px', top: 'calc(50% - 20px)',
+        right: '12px', top: 'calc(50% - 20px)',
       }`)
 </template>
 
