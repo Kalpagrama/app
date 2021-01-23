@@ -85,7 +85,7 @@ export default {
     }
   },
   async mounted () {
-    this.items = await this.$rxdb.find({
+    let {items} = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
         id: {$in: this.collection.bookmarks}
@@ -93,6 +93,7 @@ export default {
       sort: [{updatedAt: 'desc'}],
       limit: 3
     })
+    this.items = items
   }
 }
 </script>

@@ -18,6 +18,11 @@
       }`
       @contentKalpa="contentKalpaFound"
       @close="contentImporterShow = false")
+  //- q-btn(
+    round flat color="white" icon="construction"
+    :style=`{
+      width: '58px',
+    }`)
   .col
     q-input(
       v-model="searchString"
@@ -42,7 +47,7 @@
         q-btn(
           v-if="searchString.length > 0 && !loading"
           round flat dense color="grey-8" icon="clear" @click="searchString = ''")
-  content-uploader(
+  //- content-uploader(
     v-if="true"
     @file="contentFile = $event, contentImporterShow = true")
 </template>
@@ -96,7 +101,7 @@ export default {
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // check bookmark...
-      let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
       this.$emit('contentKalpa', contentKalpa)
       // this.$router.push(`/content/${this.contentKalpa.oid}`)

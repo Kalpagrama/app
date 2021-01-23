@@ -1,81 +1,126 @@
+<style lang="sass">
+.sphere-item
+  &:hover
+    background: rgb(50,50,50)
+</style>
+
 <template lang="pug">
 div(
   :style=`{
     position: 'relative',
+    //- border: isActive ? '2px solid red' : '2px solid rgb(30,30,30)',
+    ...styles,
   }`
   ).row.full-width.items-start.content-start
+  slot(name="wrapper")
+  //- wrapper
   div(
     :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
-      borderRadius: '10px', overflow: 'hidden',
-    }`).row.full-width
-    //- HEADER: author, createdAt
+      borderRadius: borderRadius,
+      ...styles,
+    }`).row.full-width.items-start.content-start
+    //- HEADER: author, createdAt, actions, date, views
     div(
-      v-if="showHeader"
+      v-if="showHeader && node.oid"
+      :style=`{
+        order: orderHeader,
+      }`
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        flat color="white" dense no-caps)
-        user-avatar(:url="node.author.thumbUrl" :width="24" :height="24")
-        span.text-grey-4.q-ml-sm {{ node.author.name }}
+        round flat color="white" no-caps :style=`{paddingLeft: '0px',}`).row.q-px-sm
+        user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
+        .col
+          .row.items-center.content-center.q-px-sm
+            span.text-grey-4 {{ node.author.name }}
+            .row.full-width
+              small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
       .col
-      small.text-grey-8.q-mr-xs {{ node.countViews }}
-      q-icon(name="visibility" color="grey-8").q-mr-xs
-      small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-      kalpa-menu-actions(:actions="actions")
+      .row.items-center.content-center.justify-end.q-pt-sm
+        small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+        .row.full-width.items-center.content-center.justify-end
+          small(:style=`{lineHeight: 0.8}`).text-grey-8.q-mr-xs {{ node.countViews }}
+          q-icon(name="visibility" color="grey-9")
+      kalpa-menu-actions(
+        :title="node.name"
+        :actions="actions" icon="more_vert")
+      //- small.text-grey-8.q-mr-xs {{ node.countViews }}
+      //- q-icon(name="visibility" color="grey-8").q-mr-md
+      //- small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
+      //- kalpa-menu-actions(:actions="actions")
     //- ITEMS: one or two
     slot(name="items")
-    node-item(v-if="showItems && !$slots.items && node.items.length === 1" v-bind="$props")
-    node-items(v-if="showItems && !$slots.items && node.items.length === 2" v-bind="$props")
-    //- ESSENCE:
+    node-item(
+      v-if="showItems && !$slots.items && node.items.length === 1"
+      v-bind="$props"
+      @itemActive="$emit('itemActive', $event)")
+    node-items(
+      v-if="showItems && !$slots.items && node.items.length === 2"
+      v-bind="$props"
+      :itemsStyles="itemsStyles"
+      @itemActive="$emit('itemActive', $event)")
+    //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
-    div(
-      v-if="showName && node.name.length > 0"
-      :style=`{position: 'relative',}`).row.full-width
-      router-link(
-        :to="'/node/'+node.oid"
-        :style=`{
-          position: 'relative',
-          textAlign: 'center',
+    router-link(
+      v-if="showName && node.oid"
+      :to="nodeEssenceLink"
+      :style=`{
+        order: orderName,
+        minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
+      span(
+        :class=`{
+          'text-bold': node.name.length < 20
         }`
-        ).row.full-width.items-start.content-start.justify-center.cursor-pointer
-        slot(name="name-left")
-        .col
-          div(
-            :style=`{
-              position: 'relative',
-              minHeight: '60px',
-              textAlign: 'center',
-            }`).row.full-width.items-center.content-center.justify-center.q-pa-sm
-            slot(name="name")
-            span(
-              :style=`{
-                fontSize: nodeNameSize+'px',
-              }`).text-white.text-bold.cursor-pointer {{ node.name }}
-      //- SPHERES: category & spheres...
-      div(
-        v-if="showSpheres && !$slots['name-bottom'] && node.spheres.length > 0").row.full-width.scroll.q-pb-sm
-        .row.no-wrap.q-pl-sm
-          router-link(
-            v-for="(s,si) in node.spheres" :key="s.oid"
-            :to="'/sphere/'+s.oid"
+        ).text-white {{ nodeName }}
+    //- SPHERES
+    div(
+      v-if="showSpheres && node.spheres.length > 0"
+      :style=`{
+        order: orderSpheres,
+      }`
+      ).row.full-width.q-pa-sm
+      q-tabs(
+        :value="null"
+        flat no-caps dense dark
+        align="center"
+        indicator-color="rgb(30,30,30)"
+       ).full-width
+        //- :label="s.name"
+        q-route-tab(
+          v-for="(s,si) in node.spheres" :key="s.oid"
+          :to="'/sphere/'+s.oid"
+          :style=`{
+            borderRadius: '10px',
+            background: 'rgb(40,40,40)',
+            padding: 0,
+          }`).q-mr-sm
+          span(
             :style=`{
               whiteSpace: 'nowrap',
-              borderRadius: '10px',
             }`
-            ).text-grey-4.q-py-xs.q-px-sm.b-50.q-mr-sm
-            q-icon(name="blur_on" size="18px" color="grey-4" :style=`{marginBottom: '2px',}`).q-mr-xs
-            span {{ s.name }}
-          slot(name="name-bottom")
-        slot(name="name-right")
-    .row.full-width
-      slot(name="footer")
-  //- FOOTER: share, vote, link?
-  node-actions(v-if="showActions" :node="node" :isActive="isActive" :isVisible="isVisible")
+            ).text-grey-4.q-mx-sm {{ s.name }}
+  //- FOOTER: slot, actions
+  slot(name="footer")
+  node-actions(
+    v-if="showActions && node.oid"
+    :node="node"
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :style=`{
+      order: orderActions,
+    }`)
 </template>
 
 <script>
+
+import { ObjectApi } from 'src/api/object'
+import { i18n } from 'src/boot/i18n'
 
 export default {
   name: 'nodeFeed',
@@ -92,40 +137,100 @@ export default {
     showName: {type: Boolean, default: true},
     showActions: {type: Boolean, default: true},
     showSpheres: {type: Boolean, default: true},
-    showItems: {type: Boolean, default: true}
+    showSpheresAlways: {type: Boolean, default: false},
+    showCategory: {type: Boolean, default: true},
+    showItems: {type: Boolean, default: true},
+    orderHeader: {type: Number, default: -1},
+    orderName: {type: Number, default: 1},
+    orderSpheres: {type: Number, default: 2},
+    orderActions: {type: Number, default: 3},
+    itemsStyles: { type: Array, default () { return [{}, {}] } },
+    styles: {type: Object},
+    borderRadius: {type: String, default: '10px'}
   },
   data () {
     return {
     }
   },
   computed: {
-    // TODO: impl better way
-    nodeNameSize () {
+    nodeName () {
+      if (this.node.items.length === 1 || this.node.vertices[0] === 'ESSENCE') {
+        return this.node.name
+      }
+      else if (this.node.vertices[0] === 'ASSOCIATIVE') {
+        return 'Ассоциация'
+      }
+      else {
+        return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name
+      }
+    },
+    nodeEssenceLink () {
+      if (this.node.items.length === 2) {
+        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
+        // return '/node/' + this.node.oid
+      }
+      else {
+        return '/node/' + this.node.oid
+      }
+    },
+    category () {
+      if (!this.node) return null
+      return this.$store.state.ui.nodeCategories.find(c => c.type === this.node.category)
+    },
+    fontSize () {
       let l = this.node.name.length
-      if (l < 50) return 18
-      else if (l >= 50 && l < 100) return 14
-      else if (l >= 100) return 12
-      else return 10
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else return 14
     },
     nodeIsMine () {
       return this.node.author.oid === this.$store.getters.currentUser().oid
     },
     actions () {
       let res = {
-        report: {
-          name: 'Пожаловаться',
-          color: 'red',
-          cb: () => {
-            this.$log('report...')
+        copyLink: {
+          name: 'Скопировать ссылку',
+          cb: async () => {
+            this.$log('copyLink')
+            // TODO: handle copy link...
           }
-        },
+        }
       }
       if (this.nodeIsMine) {
         res.delete = {
-          name: 'Удалить',
+          // name: i18n.t('Delete', 'Удалить'),
+          name: 'Снять с публикации',
+          color: 'red',
+          cb: async () => {
+            this.$log('nodeDelete...')
+            await ObjectApi.unPublish(this.node.oid)
+          }
+        }
+      }
+      else {
+        res.hide = {
+          name: i18n.t('Hide', 'Скрыть'),
+          color: 'white',
+          cb: async () => {
+            this.$log('hide...')
+            await this.$rxdb.hideObjectOrSource(this.node.oid, null)
+          }
+        }
+        // res.hideAll = {
+        //   name: i18n.t('Hide source', 'Скрыть источник'),
+        //   color: 'white',
+        //   cb: async () => {
+        //     this.$log('hide source')
+        //     if (this.node.author) await this.$rxdb.hideObjectOrSource(null, this.node.author.oid)
+        //   }
+        // }
+        res.report = {
+          name: i18n.t('Claim', 'Пожаловаться'),
           color: 'red',
           cb: () => {
-            this.$log('nodeDelete...')
+            this.$log('report...')
+            let reason = prompt(i18n.t('specify the reason', 'укажите причину'))
           }
         }
       }

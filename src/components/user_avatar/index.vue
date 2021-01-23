@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative', height: height+'px', width: width+'px',
-    margin: 0, padding: 0,
+    //- margin: 0, padding: 0,
   }`
   ).row.items-center.content-center.justify-center
   img(

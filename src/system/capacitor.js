@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import assert from 'assert'
 import { router } from 'src/boot/system'
 import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
@@ -6,7 +6,7 @@ import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { wait } from 'src/system/utils'
-import { shareIn } from 'src/system/services'
+import { shareIn } from 'src/system/services_browser'
 
 const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
 

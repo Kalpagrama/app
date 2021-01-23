@@ -2,8 +2,9 @@
 import assert from 'assert'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { makeId, rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { wait } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 
@@ -279,15 +280,19 @@ class Objects {
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start')
+      logD(f, 'start', event.path, event.value)
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            if (!event.path || (event.path === 'uploadStage' && event.value === 'COMPLETE')) { // объект изменился целиком
+               let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
+            } else {
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            }
             break
          }
          case 'OBJECT_CREATED':
-            assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
+            assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.subject.oid === rxdb.getCurrentUser().oid) { // если это мы создали ядро
                logD('ядро до обновления (фейковый вариант):', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
@@ -295,7 +300,7 @@ class Objects {
                logD('ядро после обновления:', await rxdb.get(RxCollectionEnum.OBJ, event.object.oid))
             }
             if (event.object.type === 'JOINT') { // создан новый джойнт. обновляем статистику джойнтов на ядре
-               for (let oid of event.sphereOids) {
+               for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
                   if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints++ // обновляем статистику джойнтов на ядре
                }
@@ -326,10 +331,10 @@ class Objects {
          }
          case 'OBJECT_DELETED': {
             await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'deletedAt', new Date(), false)
-            assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
+            assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
             assert(event.object.type, '!event.object.type')
             if (event.object.type === 'JOINT') { // удален джойнт. обновляем статистику джойнтов на ядре
-               for (let oid of event.sphereOids) {
+               for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
                   if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints = reactiveItem.countJoints ? reactiveItem.countJoints - 1 : 0 // обновляем статистику джойнтов на ядре
                }

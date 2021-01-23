@@ -1,135 +1,122 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff"
-  @scroll="onScroll").b-30
-  q-header(
-   ).b-30
-    .row.full-width.justify-center
-      //- q-resize-observer(@resize="onResize")
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.items-start.content-start.full-width
-        //- .row.full-width.items-center.content-center
-          q-btn(
-            @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left")
-          q-btn(
-            round flat color="white" icon="filter_tilt_shift")
-          span.text-white Ядро
-        //- div(
-          :style=`{paddingLeft: '42px',}`
-          ).row.full-width.items-center.content-center
-          q-btn(round flat color="white" icon="select_all")
-          .col
-            .row.full-width.items-center.content-center.q-pb-sm
-              .row.full-width
-                //- span.text-white В гостях у Дмитра Гордона
-              .row.full-width
-                small(:style=`{lineHeight: 0.6}`).text-grey-4 from YouTube video
-        list-middle(
-          v-if="node"
-          rootMargin="-30% 0px"
-          :items="[node]" :itemStyles=`{marginTop: '0px',}`)
-          template(v-slot:item=`{item,itemIndex,isActive:itemActive,isVisible: itemVisible}`)
-            content-player(
-              :contentKalpa=`{
-                name: '',
-                url: node.items[0].url,
-                thumbUrl: node.thumbUrl,
-                contentSource: 'KALPA',
-                type: 'VIDEO',
-              }`)
-            //- node-feed(
-              :node="item" :isActive="true" :isVisible="itemVisible"
-              :showHeader="nodeOpened" :showActions="nodeOpened" :showSpheres="nodeOpened")
-              template(v-slot:name)
-                div(
-                  @click="nodeOpened = !nodeOpened"
-                  :style=`{
-                    position: 'absolute', zIndex: 100,
-                  }`).row.fit
-              //- template(v-slot:name-left)
-                q-btn(
-                  @click="nodeOpened = !nodeOpened"
-                  round flat color="grey-6"
-                  :icon="nodeOpened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-              //- template(v-slot:name-right)
-                q-btn(round flat color="grey-6" icon="add")
-              //- template(v-slot:name-bottom v-if="nodeOpened && node.spheres.length > 0")
-                div(:style=`{paddingLeft: '42px', paddingRight: '42px',}`).row.full-width
-                  router-link(
-                    v-for="(s,si) in node.spheres" :key="si"
-                    v-if="si < 3"
-                    :to="'/sphere/'+s.oid"
-                    :style=`{
-                      textAlign: 'center',
-                      minHeight: '30px',
-                      borderRadius: '10px',
-                    }`
-                    ).row.full-width.items-center.content-center.justify-center.b-40.q-mb-xs
-                    span.text-white {{s.name}}
-        node-mockup(
-          v-if="!node && $store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :value="$store.state.core.progressInfo.CREATE[$route.params.oid]"
-          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-  //- q-header(
-    v-if="nodeOpened"
-    reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
-    .row.full-width.justify-center.q-px-sm.q-pt-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-mb-sm
-        div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
-          ).row.full-width.items-center.content-center.b-40.q-pa-sm
-          q-btn(
-            @click="$router.back()"
-            round flat color="white" icon="keyboard_arrow_left")
-          q-icon(name="filter_tilt_shift" color="white" size="30px").q-my-xs
-          div(:style=`{overflowX: 'auto'}`).col.q-px-md
-            span(:style=`{fontSize: '18px', lineHeight: 0.8, whiteSpace: 'nowrap'}`).text-white.text-bold Ядро
+  view="hHh Lpr lff").b-30
+  //- q-header(reveal).b-30
+    .row.full-width.justify-center.q-pt-sm.q-px-sm
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+          minHeight: '60px',
+          borderRadius: '10px',
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.b-40
+        q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()").q-mr-sm
+        .col
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
+  q-header(reveal).b-30
+    .row.full-width.justify-center.b-30
+      div(
+        v-if="node"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
+        node-feed(
+          :node="node"
+          :isActive="true"
+          :isVisible="true")
+  q-footer(reveal)
+    div(
+      v-if="pageId"
+      :style=`{
+        height: pageHeight+'px',
+        //- marginBottom: '-10px',
+      }`).row.full-width.justify-center
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+          borderRadius: '10px 10px 0 0',
+        }`
+        ).row.full-width.b-40
+    nav-mobile(
+      :pageId="pageId"
+      @pageId="pageIdChange")
   q-page-container
-    component(
-      v-if="node"
-      :is="`page-${pageId}`" :node="node" :pageHeight="$q.screen.height-headerHeight-50")
-      template(v-slot:bottom)
-        .row.full-width.justify-center
-          div(:style=`{maxWidth: 770+'px'}`).row.full-width
-            q-btn(round flat dense color="grey-8" icon="keyboard_arrow_left" @click="$router.back()" no-caps).q-ml-sm.q-mr-lg Назад
-            .col
-              q-tabs(
-                v-model="pageId"
-                align="justify"
-                no-caps active-color="green").full-width.text-grey-8
-                q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
+    q-page(
+      :style=`{
+        paddingTop: '30px',
+        paddingBottom: '200px',
+      }`)
+      widget-joints(v-if="node" :node="node")
+  //- q-footer(
+    reveal)
+    transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      div(
+        v-if="true"
+        :style=`{height: '526px'}`).column.full-width.b-30
+        .row.full-width.items-center.content-center
+          .col.q-pa-sm
+            span.text-white Другие смыслы - 213
+          q-btn(round flat color="white" icon="clear" @click="showEssences = false")
+        .col.full-width.scroll
+          div(
+            v-for="n in 100" :key="n" :style=`{}`
+            ).row.full-width.q-pa-sm.q-mb-sm
+            span.text-white lorem ipsum {{ n }}
+  //- q-page-container
+    q-page.row.full-width.justify-center
+      div(
+        v-if="node"
+        :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+        ).row.full-width.items-start.content-start
+        node-feed(
+          :node="node"
+          :isActive="true"
+          :isVisible="true")
+        //- .row.full-width.q-pa-md
+          p.text-grey-5 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+        //- .row.full-width.q-pa-sm
+          div(
+            @click="showEssences = true"
+            :style=`{
+              borderRadius: '10px',
+              background: 'rgb(35,35,35)',
+            }`
+            ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-py-md
+            span.text-white Показать другие смыслы - 123
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import nodeMockup from './node_mockup/index.vue'
-import debounce from 'lodash/debounce'
+
+import navMobile from './nav_mobile.vue'
+import widgetJoints from './widget_joints/index.vue'
+
+import pageInside from './page_inside/index.vue'
+import pageNames from './page_names/index.vue'
 
 export default {
   name: 'pageApp_node',
   components: {
-    nodeMockup,
-    // pageInside: () => import('./view_joints/index.vue'),
-    pageInside: () => import('./page_inside/index.vue'),
-    // pageOutside: () => import('./page_outside/index.vue'),
-    contentPlayer: () => import('components/content_player/index.vue')
+    navMobile,
+    widgetJoints,
+    pageInside,
+    pageNames,
   },
   data () {
     return {
       node: null,
-      node_tmp: null,
-      nodeOpened: true,
-      pageId: 'inside',
-      headerHeight: 0,
-      headerWidth: 0,
-      mounted: false,
+      pageId: null,
+      pageHeight: 0,
+      showEssences: false,
     }
   },
   computed: {
-    pages () {
-      return [
-        {id: 'inside', name: 'Ядра'},
-        {id: 'outside', name: 'Связи'}
-      ]
+    title () {
+      if (this.node) {
+        if (this.node.items.length === 1) return 'Ядро'
+        else return 'Связь'
+      }
+      else {
+        return ''
+      }
     }
   },
   watch: {
@@ -139,89 +126,42 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.oid TO', to)
         if (to) {
-          if (this.$store.state.core.progressInfo.CREATE[to]) {
-            this.$log('CREATE intital', this.$store.state.core.progressInfo.CREATE[to])
-            this.nodeWatch(to)
-          }
-          else {
-            this.$log('LOADING NODE...')
-            this.nodeLoad(to)
-          }
+          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
         }
       }
     },
-    pageId: {
-      handler (to, from) {
-        if (to && to === 'outside') {
-          this.nodeOpened = false
-        }
-      }
-    },
-    node_tmp: {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$logW('node_tmp changed', from, to)
-      }
-    }
   },
   methods: {
-    onResize (e) {
-      this.$log('onResize', e)
-      this.headerHeight = e.height
-      this.headerWidth = e.width
-    },
-    onScroll (e) {
-      // this.$log('onScroll', e)
-      if (this.nodeOpened && this.mounted) this.nodeOpened = false
-    },
-    nodeWatch (oid) {
-      this.$log('nodeWatch', oid)
-      var unwatch = this.$watch(
-        '$store.state.core.progressInfo.CREATE',
-        (valOld, valNew) => {
-          if (valNew) {
-            this.$log('CREATE valOld/valNew', valOld, valNew[oid])
-            if (valNew[oid] === 100) {
-              this.$q.notify({
-                type: 'positive',
-                position: 'top',
-                message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро готово!')
-              })
-              this.nodeLoad(oid)
-              unwatch()
-              this.$store.commit('core/stateSet', ['progressInfo', {UPLOAD: {}, CREATE: {}}])
-            }
+    pageIdChange (pageId) {
+      if (this.pageId === pageId) {
+        // this.pageId = null
+        this.$tween.to(this, 0.3, {
+          pageHeight: 0,
+          onComplete: () => {
+            this.pageId = null
           }
-          else {
-            if (unwatch) unwatch()
-          }
-        },
-        {
-          immediate: true,
-          deep: true
-        }
-      )
-    },
-    async nodeLoad (oid) {
-      this.$log('nodeLoad', oid)
-      this.node_tmp = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-      this.node = this.node_tmp
+        })
+      }
+      else {
+        this.pageId = pageId
+        // this.pageHeight
+        // TODO: get height from node_feed, different what? checkpoints of height?
+        // author/items/name/spheres/actions/padding ?
+        this.$tween.to(this, 0.3, {
+          pageHeight: this.$q.screen.height / 2,
+          onComplete: () => {}
+        })
+        // and ???
+      }
     }
   },
-  async mounted () {
+  mounted () {
     this.$log('mounted')
-    await this.$wait(2000)
-    this.mounted = true
-    // this.$store.commit('ui/stateSet', ['pageWidth', this.$q.screen.width - 140])
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    // this.$store.commit('ui/stateSet', ['pageWidth', this.$store.state.ui.pageWidthDefault])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

@@ -1,15 +1,27 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
+import { AuthApi } from 'src/api/auth'
+import { router } from 'src/boot/system'
+import { notify } from 'src/boot/notify'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class EventApi {
+   static verbalizeRate(float){
+      assert(float >= 0 && float <= 1)
+      if (float <= 0.2) return 'Очень далеко'
+      else if (float <= 0.4) return 'Далеко'
+      else if (float <= 0.6) return 'Где-то рядом'
+      else if (float <= 0.8) return 'Близко'
+      else if (float <= 1) return 'Прямо в точку!'
+   }
+
    // ф-я дублируется на сервере (при изменении - синхронизировать)
    static makeEventCard (event) {
       const myOid = rxdb.getCurrentUser().oid
@@ -62,7 +74,7 @@ class EventApi {
             if (event.subject.oid === myOid) {
                resultCard.items = [`вы проголосовали за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
             } else {
-               resultCard.items = [cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)}`, cropObj(event.object)]
+               resultCard.items = [cropObj(event.subject), `проголосовал за ${verbalizeObjectType(event.object)} - ${EventApi.verbalizeRate(event.rateUser)}`, cropObj(event.object)]
             }
             break
          case 'OBJECT_CREATED':
@@ -85,25 +97,34 @@ class EventApi {
    }
 
    static async init () {
+      if (EventApi.initialized) return true
       const f = EventApi.init
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
          assert(apollo.clients.ws, '!apollo.clients.ws1')
          assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
+         apollo.clients.ws.openConnection()
          const observerEvent = apollo.clients.ws.subscribe({
             client: 'wsApollo',
             query: gql`
                 ${fragments.eventFragmentWithBatch}
-                subscription event {
+                subscription {
                     event {...eventFragmentWithBatch}
                 }
             `
          })
          EventApi.subscription = observerEvent.subscribe({
             next: async ({ data: { event } }) => {
-               logD(`EVENT received ${event.type}`, event)
-               await rxdb.processEvent(event)
+               logD('EVENT received', event)
+               if (event.type === 'NOTICE' && event.typeNotice === 'CONFIRM_CODE'){
+                  let {result, failReason, oid} = await AuthApi.userAuthenticate(event.message, null)
+                  if (result === false) throw new Error(`Error on userAuthenticate: ${failReason}`)
+                  else {
+                     notify('info', 'Welcome to KALPAGRAMA!')
+                     await router.replace('/')
+                  }
+               } else await rxdb.processEvent(event)
             },
             error: (error) => {
                logE('apollo subscribe (websocket) error', error)
@@ -111,10 +132,13 @@ class EventApi {
          })
          return true
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      EventApi.initialized = true
+      return res
    }
 
    static async deInit () {
+      if (!EventApi.initialized) return true
       const f = EventApi.deInit
       logD(f, 'start')
       const t1 = performance.now()
@@ -124,9 +148,12 @@ class EventApi {
             // assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
             EventApi.subscription.unsubscribe()
          }
+         apollo.clients.ws.closeConnection()
          return true
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      EventApi.initialized = false
+      return res
    }
 }
 

@@ -28,11 +28,20 @@ const objectFragment = gql`${objectShortFragment}
     thumbUrl(preferWidth: 600)
     thumbWidth
     thumbHeight
+    uploadStage
+    uploadStageProgress
     createdAt
     deletedAt
     subscriberCnt
     subscribers {...objectShortFragment}
     rev
+    countViews
+    countJoints
+    countRemakes
+    countShares
+    countBookmarks
+    countSubscribers
+    countSubscriptions
   }
 `
 
@@ -113,10 +122,21 @@ const videoFragment = gql`${objectFragment}
     url
     urlOriginal
     duration
-    frameUrls
+    strips
     contentProvider
     contentSource
     contentProvider
+    relatedContent
+    subtitlesRus: subtitles(lang: RUS)
+    subtitlesEng: subtitles(lang: ENG)
+  }
+`
+const bookFragment = gql`${objectFragment}
+  fragment bookFragment on Book {
+    ...objectFragment
+    url
+    contentProvider
+    contentSource
   }
 `
 const imageFragment = gql`${objectFragment}
@@ -128,13 +148,15 @@ const imageFragment = gql`${objectFragment}
     contentSource
   }
 `
-const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragment}
+const compositionFragment = gql`${objectFragment} ${imageFragment}
   fragment figureFragment on Figure {
     t
     points {
       x
       y
     }
+    epubCfi
+    epubCfiText
   }
   fragment operationFragment on LayerOperation{
     type
@@ -191,13 +213,8 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     }
     layers {
       contentOid
+      contentName
       figuresAbsolute{...figureFragment}
-      figuresRelative {...figureFragment}
-      speed
-      name
-      thumbUrl(preferWidth: 600)
-      url
-      contentSource
     }
     operation{... operationFragment}
     outputType
@@ -205,20 +222,17 @@ const compositionFragment = gql`${objectFragment} ${videoFragment} ${imageFragme
     contentSource
   }
 `
-const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
-  fragment nodeFragment on Node {
+const essenceFragmentLeaf = gql`
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+  fragment essenceFragmentLeaf on Essence {
     ...objectFragment
+    relatedSphereOids  
     sphereFromName{...objectShortFragment}
     rate
     weight
     rateStat {percent, weight, count}
     rateUser
     countVotes
-    countViews
-    countJoints
-    countRemakes
-    countShares
-    countBookmarks
     author {
       oid
       type
@@ -232,47 +246,50 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
     category
     layout
     items {
-    ...on Composition {...compositionFragment}
+        ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
+        ...on Image {...imageFragment}
+        ...on Sphere {... sphereFragment}
+        ...on User {... userFragment}
+        ...on Composition {...compositionFragment}
     }
     vertices
   }
 `
-const jointFragment = gql`${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment} ${objectShortFragment} ${compositionFragment}
-fragment jointFragment on Joint {
+const essenceFragment = gql`
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
+  fragment essenceFragment on Essence {
     ...objectFragment
+    relatedSphereOids
     sphereFromName{...objectShortFragment}
     rate
     weight
     rateStat {percent, weight, count}
     rateUser
     countVotes
-    countViews
-    countJoints
-    countRemakes
-    countShares
-    countBookmarks
     author {
-        oid
-        type
-        name
-        thumbUrl(preferWidth: 50)
+      oid
+      type
+      name
+      thumbUrl(preferWidth: 50)
     }
     spheres {
-        oid
-        name
+      oid
+      name
     }
     category
     layout
     items {
         ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
         ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
+        ...on Essence {...essenceFragmentLeaf}
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
     }
     vertices
-}
+  }
 `
 
 const eventFragment = gql`
@@ -316,7 +333,7 @@ const eventFragment = gql`
         ... on EventObjectCreateDelete{
             subject{... objectShortFragment}
             object{... objectShortFragment}
-            sphereOids
+            relatedSphereOids
             matter {reason subscription}
         }
         ... on EventObjectRate{
@@ -341,41 +358,42 @@ const eventFragmentWithBatch = gql`
 `
 
 const objectFullFragment = gql`
-    ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
-    ${sphereFragment} ${userFragment} ${objectFragment} ${jointFragment}
+    ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment}
+    ${sphereFragment} ${userFragment} ${objectFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
         ...on Video {...videoFragment}
+        ...on Book {...bookFragment}
         ...on Image {...imageFragment}
-        ...on Node {... nodeFragment}
+        ...on Essence {... essenceFragment}
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
-        ...on Joint {...jointFragment}
+    }
+`
+const topObjectFragment = gql`
+    fragment topObjectFragment on TopObject {
+        oid
+        name
+        countVotes
+        weight
+        rate
+        relatedOids
+        figuresAbsoluteList{points{x y}, epubCfi, epubCfiText, t}
+        vertexType
     }
 `
 
 const findResultFragment = gql`
-    ${eventFragment}
+    ${eventFragment} ${topObjectFragment}
     fragment findResultFragment on FindResult {
         count
         totalCount
         nextPageToken
+        currentPageToken
         prevPageToken
-        ... on EventFindResult { events {...eventFragment} }
-        ... on ObjectsFindResult { objects{ oid } }
-        ... on WSFindResult { items }
-    }
-`
-const findResultFragmentForSearch = gql`
-    ${eventFragment}
-    fragment findResultFragment on FindResult {
-        count
-        totalCount
-        nextPageToken
-        prevPageToken
-        ... on EventFindResult { events {...eventFragment} }
-        ... on ObjectsFindResult { objects{ oid, name, type, thumbUrl(preferWidth: 600) } }
+        ... on EventFindResult { events: items {...eventFragment} }
+        ... on ObjectsFindResult { objects: items { ...topObjectFragment } }
         ... on WSFindResult { items }
     }
 `
@@ -388,10 +406,9 @@ const fragments = {
    dummyUserFragment,
    objectShortFragment,
    objectShortStatFragment,
-   nodeFragment,
+   essenceFragment,
    sphereFragment,
-   findResultFragment,
-   findResultFragmentForSearch
+   findResultFragment
 }
 
 export {

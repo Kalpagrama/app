@@ -32,13 +32,13 @@ export default {
       let newName = prompt('New sphere name', this.sphere.name)
       if (newName && newName.length > 0 && newName !== this.sphere.name) {
         this.sphere.name = newName
-        let [sphere] = await this.$rxdb.find({
+        let {items: [sphere]} = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
             name: newName,
             objectTypeEnum: { $in: ['CHAR', 'WORD', 'SENTENCE'] }
           },
-          populateObjects: false
+          // populateObjects: true
         })
         this.$log('sphere', sphere)
         if (sphere) {
@@ -51,7 +51,7 @@ export default {
       // if we got 0 items on this sphere...
       // await this.$rxdb.remove(this.node.id)
       await this.sphere.remove()
-      this.$router.back()
+      this.$routerKalpa.back()
     }
   }
 }

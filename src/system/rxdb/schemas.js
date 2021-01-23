@@ -120,6 +120,9 @@ export const wsSchemaItem = {
         type: 'string'
       }
     },
+    vertices: {
+      type: 'array',
+    },
     // ---- bookmark ----
     collections: { // список id коллекций в которые попал букмарк
       type: 'array',
@@ -128,11 +131,19 @@ export const wsSchemaItem = {
         type: 'string'
       }
     },
+    isSubscribed: {
+      type: 'boolean',
+      default: true,
+    },
     // ------ system -----
     hasChanges: { // hasChanges === false - либо нет изменений, либо изменения учтены в ws_changes
       type: 'boolean',
       default: true // по умолчанию - если не указано - изменения есть (новый элемент в мастерской)
-    }
+    },
+    // -- разные свойства (например для букмарков книг - прогресс)
+    meta: {
+      type: 'object'
+    },
   },
   required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt', 'deletedAt'],
   indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'deletedAt']

@@ -1,36 +1,32 @@
 <template lang="pug">
-q-btn(round flat dense :icon="icon" :color="color")
-  q-popup-proxy(
-    maximized position="bottom" dark
-    cover anchor="top right" self="top right").b-40
+q-btn(round flat :icon="icon" :color="color")
+  //- maximized position="bottom" dark
+  q-menu(
+    cover anchor="top right" self="top right" dark
+    max-width="200px")
     div(
       :style=`{
-        borderRadius: '10px',
       }`
-      ).row.full-width.items-start.content-start.b-40
-      kalpa-share(type="node" :item="node").full-width
-        template(v-slot:btn=`{start}`)
-          q-btn(
-            @click="start"
-            flat color="white" no-caps
-            :style=`{
-              height: '50px',
-            }`
-            ).full-width
-            span.text-bold Поделиться
+      ).row.full-width.items-start.content-start
       q-btn(
         @click="a.cb()"
         v-for="(a,akey) in actions" :key="akey"
-        flat no-caps
+        v-close-popup
+        flat no-caps dense
         :color="a.color || 'white'"
-        :style=`{height: '50px',}`).full-width
-        span.text-bold {{ a.name }}
+        :style=`{
+        }`
+        ).full-width
+        span {{ a.name }}
 </template>
 
 <script>
 export default {
   name: 'kalpaMenuActions',
   props: {
+    title: {
+      type: String,
+    },
     actions: {
       type: Object
     },

@@ -2,60 +2,56 @@
 div(
   :style=`{
     position: 'relative',
-    height: options.height,
+    height: styles.height,
     }`
   ).row.full-width.items-start.content-start
-  slot(name="left-top")
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    content-explorer(
-      v-if="!$slots['left-top'] && isActive"
-      :composition="composition"
-      :options="options")
-  //- preview
-  img(
-    @click="$emit('previewClick')"
-    :src="composition.thumbUrl"
-    draggable="false"
-    :style=`{
-      maxHeight: maxHeight+'px',
-      //- background: 'rgb(35,35,35)',
-      borderRadius: '10px', overflow: 'hidden',
-      userSelect: 'none',
-      height: options.height,
-      objectFit: options.objectFit,
+  slot
+  //- video wrapper
+  content-player(
+    v-if="true"
+    @player="player = $event"
+    :contentKalpa=`{
+      oid: composition.layers[0].contentOid,
+      name: composition.layers[0].contentName,
+      url: composition.url,
+      type: 'IMAGE',
+      contentSource: 'KALPA',
     }`
-    ).full-width.b-40
+    :figures="null"
+    :styles=`{
+      height: styles.height,
+      objectFit: styles.objectFit,
+    }`
+    :options=`options`
+    :style=`{
+      position: 'absolute', zIndex: 100, top: '0px',
+      //- borderRadius: '10px',
+      //- opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
+    }`).fit
 </template>
 
 <script>
+import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'compositionPlayer_playerImage',
+  name: 'compositionPlayer_Image',
   components: {
-    contentExplorer: () => import('../content_explorer.vue')
+    contentPlayer
   },
   props: {
     isVisible: {type: Boolean},
     isActive: {type: Boolean},
     composition: {type: Object, required: true},
+    styles: {type: Object, default: {}},
     options: {
       type: Object,
       default () {
         return {
-          height: 'auto',
-          objectFit: 'cover',
-          loop: true,
         }
       }
     }
   },
   computed: {
-    maxHeight () {
-      if (this.$q.screen.width > this.$store.state.ui.pageWidth) return this.$store.state.ui.pageWidth
-      else {
-        return this.$q.screen.width
-      }
-    }
   }
 }
 </script>

@@ -1,10 +1,11 @@
 import { apollo } from 'src/boot/apollo'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api'
 import { fragments } from 'src/api/fragments'
+import { EventApi } from 'src/api/event'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
@@ -18,7 +19,7 @@ const ActionEnum = Object.freeze({
 
 class AuthApi {
    static getRole () {
-      return rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
+      return rxdb && rxdb.getCurrentUser ? rxdb.getCurrentUser().profile.role : 'GUEST'
    }
 
    static isGuest () {
@@ -127,7 +128,21 @@ class AuthApi {
       const t1 = performance.now()
       await systemReset(true, true, false, false) // вне cb (иначе дедлок)
       const cb = async () => {
-         let { data: { userIdentify: { userId = null, loginType = null, userExist = null, needInvite = null, needConfirm = null, hasPermanentPassword = null, dummyUser = null, token = null, expires = null } } } = await apollo.clients.auth.query({
+         let {
+            data: {
+               userIdentify: {
+                  userId = null,
+                  loginType = null,
+                  userExist = null,
+                  needInvite = null,
+                  needConfirm = null,
+                  hasPermanentPassword = null,
+                  dummyUser = null,
+                  token = null,
+                  expires = null
+               }
+            }
+         } = await apollo.clients.auth.query({
             query: gql`
                 ${fragments.dummyUserFragment}
                 query  ($userId: String, $forceSendConfirmation: Boolean){
@@ -169,7 +184,10 @@ class AuthApi {
             expires
          }
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+
+      await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
+      return res
    }
 
    // oauth вход
@@ -203,7 +221,18 @@ class AuthApi {
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
-         let { data: { userAuthenticate: { result, role, oid, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.query({
+         let {
+            data: {
+               userAuthenticate: {
+                  result,
+                  role,
+                  oid,
+                  nextAttemptDate,
+                  attempts,
+                  failReason
+               }
+            }
+         } = await apollo.clients.auth.query({
             query: gql`
                 query ($password: String!, $inviteCode: String) {
                     userAuthenticate(password: $password, inviteCode: $inviteCode){

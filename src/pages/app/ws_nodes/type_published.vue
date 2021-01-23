@@ -123,7 +123,7 @@ export default {
       return await Promise.all(
         spheres.map(async (s) => {
           // for every sphere try to find this sphere in ws
-          let [sphere] = await this.$rxdb.find({
+          let {items: [sphere]} = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name,
             }
@@ -190,7 +190,7 @@ export default {
       this.$log('nodesLoaded', nodes)
       await Promise.all(
         nodes.map(async (n) => {
-          let [nodeBookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: n.oid}})
+          let {items: [nodeBookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: n.oid}})
           if (!nodeBookmark) {
             let nodeBookmarkInput = {
               type: 'NODE',
@@ -206,7 +206,7 @@ export default {
           console.log('n.spheres.length', n.spheres.length)
           await Promise.all(
             n.spheres.map(async (s) => {
-              let [sphere] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name}})
+              let {items: [sphere]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE, name: s.name}})
               if (!sphere) {
                 let sphereInput = {
                   name: s.name,

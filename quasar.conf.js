@@ -4,11 +4,6 @@ const webpack = require('webpack')
 require('dotenv').config()
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-// const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-// const TerserPlugin = require('terser-webpack-plugin')
-
-// const packageJson = fs.readFileSync('./package.json')
-// const version = JSON.parse(packageJson).version || 0
 
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
@@ -22,6 +17,8 @@ module.exports = function (ctx) {
       // --> boot files are part of "main.js"
       // https://quasar.dev/quasar-cli/boot-files
       boot: [
+         // { path: 'log_ssr', client: false },
+         // { path: 'log', server: false },
          'log',
          'rxdb',
          'notify',
@@ -38,6 +35,8 @@ module.exports = function (ctx) {
          'app.styl'
       ],
 
+      animations: 'all',
+
       // https://github.com/quasarframework/quasar/tree/dev/extras
       extras: [
          'roboto-font',
@@ -45,7 +44,7 @@ module.exports = function (ctx) {
          'fontawesome-v5'
       ],
 
-     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
+      // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
       framework: {
          importStrategy: 'auto',
          // components: [
@@ -103,7 +102,7 @@ module.exports = function (ctx) {
          env: {
             ORIGIN_URL: process.env.ORIGIN_URL,
             ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
-            SERVICES_URL: process.env.AUTH_URL || process.env.SERVICES_URL,
+            SERVICES_URL: process.env.SERVICES_URL,
             SERVICES_URL_DEBUG: process.env.SERVICES_URL_DEBUG,
             BUILD_DATE: (new Date().toISOString()).split('T')[0],
             BUILD_VERSION: require('./package.json').version
@@ -116,6 +115,19 @@ module.exports = function (ctx) {
          // analyze: true,
          // extractCSS: false,
          extendWebpack (cfg) {
+            // cfg.performance = {
+            //    hints: false,
+            //    maxEntrypointSize: 512000000,
+            //    maxAssetSize: 512000000
+            // }
+            cfg.module.rules.push({
+               test: /\.md$/i,
+               use: 'raw-loader'
+            })
+            // cfg.module.rules.push({
+            //    test: /\.dmg$/i,
+            //    use: 'file-loader'
+            // })
             cfg.module.rules.push({
                enforce: 'pre',
                test: /\.(js|vue)$/,
@@ -141,25 +153,27 @@ module.exports = function (ctx) {
                   new webpack.IgnorePlugin(/@capacitor\/core/)
                )
             }
-            if (ctx.dev) {
+            if (ctx.dev && !ctx.mode.ssr) {
                cfg.plugins.push(
                   new BundleAnalyzerPlugin({ analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 })
                )
             }
             // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
             // eslint-disable-next-line no-constant-condition
-            if (!ctx.mode.capacitor) {
-               cfg.devtool = 'source-map'
-               cfg.plugins.push(
-                  new webpack.SourceMapDevToolPlugin({
-                     filename: '[file].js.map'
-                  })
-               )
-               cfg.plugins.push(
-                  new webpack.EvalSourceMapDevToolPlugin({
-                     filename: '[file].map'
-                  })
-               )
+            if (ctx.dev) {
+               if (!ctx.mode.capacitor) {
+                  cfg.devtool = 'inline-source-map' // 'source-map'
+                  cfg.plugins.push(
+                     new webpack.SourceMapDevToolPlugin({
+                        filename: '[file].js.map'
+                     })
+                  )
+                  cfg.plugins.push(
+                     new webpack.EvalSourceMapDevToolPlugin({
+                        filename: '[file].map'
+                     })
+                  )
+               }
             }
 
             // cfg.plugins.push(
@@ -171,23 +185,25 @@ module.exports = function (ctx) {
                schema: path.resolve(__dirname, './src/api'),
                public: path.resolve(__dirname, './public')
             }
-            cfg.optimization = {
-               runtimeChunk: 'single',
-               splitChunks: {
-                  chunks: 'all',
-                  maxInitialRequests: Infinity,
-                  // minSize: 0,
-                  cacheGroups: {
-                     vendor: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name (module) {
-                           // получает имя, то есть node_modules/packageName/not/this/part.js
-                           // или node_modules/packageName
-                           const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            if (!ctx.mode.ssr) {
+               cfg.optimization = {
+                  runtimeChunk: 'single',
+                  splitChunks: {
+                     chunks: 'all',
+                     maxInitialRequests: Infinity,
+                     // minSize: 0,
+                     cacheGroups: {
+                        vendor: {
+                           test: /[\\/]node_modules[\\/]/,
+                           name (module) {
+                              // получает имя, то есть node_modules/packageName/not/this/part.js
+                              // или node_modules/packageName
+                              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
 
-                           // имена npm-пакетов можно, не опасаясь проблем, использовать
-                           // в URL, но некоторые серверы не любят символы наподобие @
-                           return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
+                              // имена npm-пакетов можно, не опасаясь проблем, использовать
+                              // в URL, но некоторые серверы не любят символы наподобие @
+                              return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
+                           }
                         }
                      }
                   }
@@ -196,7 +212,7 @@ module.exports = function (ctx) {
          }
       },
 
-     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
+      // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
       devServer: {
          // writeToDisk: true,
          before (app) {
@@ -213,12 +229,10 @@ module.exports = function (ctx) {
             })
          },
          // headers: {
-         //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
+         // //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
          // },
-         // https: true,
-         port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+         port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
          host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
-         // https: false,
          https: ctx.mode.capacitor || ctx.mode.spa ? false : {
             key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
             cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
@@ -226,13 +240,43 @@ module.exports = function (ctx) {
          open: true // opens browser window automatically
       },
 
-     // animations: 'all', // --- includes all animations
-     // https://quasar.dev/options/animations
-     //  animations: 'all', // animations: [],
+      // animations: 'all', // --- includes all animations
+      // https://quasar.dev/options/animations
+      //  animations: 'all', // animations: [],
 
       ssr: {
-         pwa: false
+         pwa: false, // should a PWA take over (default: false), or just a SPA?
+         // manualHydration: true
+         // manualHydration: true/false, // (@quasar/app v1.4.2+) Manually hydrate the store
+         // componentCache: {...} // lru-cache package options,
+
+         // -- @quasar/app v1.9.5+ --
+         // optional; add/remove/change properties
+         // of production generated package.json
+         // extendPackageJson (pkg) {
+         //    // directly change props of pkg;
+         //    // no need to return anything
+         // },
+
+         // -- @quasar/app v1.5+ --
+         // optional; webpack config Object for
+         // the Webserver part ONLY (/src-ssr/)
+         // which is invoked for production (NOT for dev)
+         // extendWebpack (cfg) {
+         //    // directly change props of cfg;
+         //    // no need to return anything
+         // },
+
+         // -- @quasar/app v1.5+ --
+         // optional; EQUIVALENT to extendWebpack() but uses webpack-chain;
+         // the Webserver part ONLY (/src-ssr/)
+         // which is invoked for production (NOT for dev)
+         // chainWebpack (chain) {
+         //    // chain is a webpack-chain instance
+         //    // of the Webpack configuration
+         // }
       },
+
       pwa: {
          workboxPluginMode: 'InjectManifest', // 'GenerateSW', //
          workboxOptions: {
@@ -306,7 +350,6 @@ module.exports = function (ctx) {
                }
             }
          },
-
          metaVariables: {
             appleMobileWebAppCapable: 'yes',
             appleMobileWebAppStatusBarStyle: 'default',
@@ -318,11 +361,10 @@ module.exports = function (ctx) {
             msapplicationTileImage: 'icons/ms-icon-144x144.png',
             msapplicationTileColor: '#222222'
          }
-
       },
 
-     // Full list of options: https://quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
-     capacitor: {
+      // Full list of options: https://quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
+      capacitor: {
          hideSplashscreen: false, // disables auto-hiding the Splashscreen by Quasar CLI
          iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
          backButtonExit: false // Quasar handles app exit on mobile phone back button

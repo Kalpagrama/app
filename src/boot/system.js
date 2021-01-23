@@ -1,12 +1,7 @@
-// import VueI18n from 'vue-i18n'
-// import messages from 'src/i18n'
-
-import { initApplication } from 'src/system/services'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.SW)
+import { getLogFunc, isSsr, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 function t (str) {
   return str
@@ -16,10 +11,16 @@ let router
 
 export default async ({ app, store, Vue, router: VueRouter }) => {
   try {
-    // alert('SYSTEM router init')
+    const f = {nameExtra: 'boot::system'}
+    logD(f, 'start')
+    const t1 = performance.now()
     router = VueRouter
-    Vue.prototype.$systemUtils = await initApplication()
-    // await initApplication()
+    if (isSsr) {
+    } else {
+      const {initApplication} = await import('src/system/services_browser')
+      Vue.prototype.$systemUtils = await initApplication()
+    }
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)
     throw err // без initApplication работать не можем!

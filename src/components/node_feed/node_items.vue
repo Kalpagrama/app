@@ -1,132 +1,193 @@
 <template lang="pug">
-//- items
-div(
-  :style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
+div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
+  //- link btn: to go to /links mode
+  q-btn(
+    flat color="green" icon="fas fa-link" size="lg"
+    :to="'/links/'+node.items[0].oid+'?joint='+node.oid"
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      left: 'calc(50% - 30px)',
+      top: 'calc(50% - 30px)',
+      width: '60px', height: '60px',
+      //- pointerEvents: 'none'
+    }`)
+  //- tint for opened item
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="itemOpened !== null"
+      :style=`{
+        position: 'fixed', zIndex: 10000, top: 0, left: 0, right: 0, bottom: 0,
+        transform: 'translate3d(0,0,100px)',
+        //- background: 'black',
+        //- background: 'rgba(0,0,0,0.95)',
+      }`
+      ).row.fit.b-30
+  //- items left/right
   div(
     v-for="(item, ii) in node.items" :key="ii"
     :style=`{
+      position: 'relative',
     }`
     ).col-6
     div(
       :style=`{
         position: 'relative',
-        transform: ii === 0 ? 'perspective(600px) rotateY(10deg)' : 'perspective(600px) rotateY(-10deg)',
+        paddingBottom: '100%',
+        transform: itemOpened === ii ? 'none' : ii === 0 ? 'perspective(1000px) rotateY(8deg) translate3d(0,0,-10px)' : 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-10px)',
+        //- zIndex: 10,
       }`
       ).row.full-width
       div(
-        :style=`{
-          position: 'relative',
-          paddingTop: '100%',
-        }`).row.full-width
-        div(
-          v-if="itemActive !== ii"
-          @click="itemActive = ii"
-          :style=`{
-            position: 'absolute', zIndex: 110, top: 0,
+        ref="refMini"
+        @click.self="itemClick(ii)"
+        :style=`
+          itemOpened === ii ?
+          {
+            position: 'fixed', zIndex: 300000,
+            top: itemTop+'px',
+            left: itemLeft+'px',
+            maxWidth: itemWidth+'px',
+            maxHeight: itemHeight+'px',
+            //- background: 'rgba(0,0,0,0.5)',
+            //- background: 'rgba(30,30,30,'+itemBackgroundOpacity+')',
+            transform: 'translate3d(0,0,100px)',
+          }
+          :
+          {
+            position: 'absolute', zIndex: 100,
           }`
-          ).row.fit
-        div(
+        ).row.fit.items-center.content-center.justify-center
+        item(
+          :oid="node.oid"
+          :item="item"
+          :itemIndex="ii"
+          :itemActive="isActive && itemActive === ii"
+          :itemStyles="itemsStyles[ii]"
+          :itemOpened="itemOpened === ii"
+          :stylesName=`{}`
           :style=`{
-            position: 'absolute', zIndex: 100, top: 0,
+            maxWidth: $store.state.ui.pageWidth+'px',
+            //- height: '100%',
           }`
-          ).row.fit
-          composition-player(
-            v-if="item.type === 'NODE'"
-            :composition="item.items[0]"
-            :isActive="isActive && itemActive === ii"
-            :isVisible="isVisible"
-            :options=`{
-              height: '100%', objectFit: 'cover', loop: true,
-              showContentExplorer: true,
-              showContentMeta: false,
-            }`)
-            //- template(v-slot:lefttop)
-              q-btn(
-                v-if="isActive && itemActive === ii"
-                @click="$router.push('/node/'+item.oid)"
-                round flat color="white" icon="filter_tilt_shift"
-                :style=`{
-                  position: 'absolute', left: 0, top: 0, zIndex: 1000,
-                  background: 'rgba(0,0,0,0.15)'
-                }`)
-          //- fallback image
-          img(
-            v-else
-            :src="item.thumbUrl"
+          :styles=`{
+            objectFit: itemOpened === ii ? 'contain' : 'cover',
+            height: itemOpened === ii ? 'auto' : '100%',
+          }`
+          @open="itemClick(ii)")
+        //- itemOpened footer: close? only?
+        div(
+          v-if="itemOpened === ii"
+          @click="itemClick(ii)"
+          ).row.full-width.items-center.content-center.justify-center.q-py-lg
+          q-btn(
+            outline color="grey-8" no-caps
             :style=`{
-              borderRadius: '10px',
-              objectFit: 'cover',
-              borderRadius: '10px',
-            }`
-            ).fit.b-30
-          //- tint
-          div(
-            :style=`{
-              position: 'absolute', bottom: '-2px', zIndex: 2000, transform: 'translate3d(0,0,0)', height: '40%',
-              //- background: 'rgb(0,0,0)',
-              background: 'linear-gradient(0deg, rgba(15,15,15,0.9) 30%, rgba(0,0,0,0) 100%)',
-              borderRadius: '0 0 10px 10px', overflow: 'hidden', pointerEvents: 'none',
-            }`).row.full-width
-          //- name
-          div(
-            @click="$router.push('/node/'+item.oid)"
-            :style=`{
-              position: 'absolute', zIndex: 2010, bottom: 0
-            }`
-            ).row.full-width.q-pa-sm
-            .row.full-width.scroll
-              div(
-                :style=`{
-                  maxHeight: '40px',
-                }`
-                ).row.no-wrap
-                span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ item.name }}
-      //- item.type
-      div(
-        v-if="node.vertices[ii] && node.vertices[ii] !== 'ASSOCIATIVE'"
-        ).row.full-width.justify-center.q-pt-xs
-        small.text-white {{ itemType(ii).name }}
-  //- link btn
-  //- TODO: btn color
-  q-btn(
-    round flat color="green" icon="link" size="lg"
-    :style=`{position: 'absolute', zIndex: 100, bottom: 'calc(50% - 30.5px)', left: 'calc(50% - 30.5px)',}`)
+              height: '50px',
+            }`).q-px-md
+            span Свернуть
+    //- tint
+    div(
+      v-if="itemActive !== ii"
+      @click="itemClick(ii)"
+      :style=`{
+        position: 'absolute', zIndex: 110, top: 0,
+      }`
+      ).row.fit.cursor-pointer
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
-import compositionPlayer from 'components/composition/composition_player/index.vue'
+import item from './node_items_item.vue'
 
 export default {
-  name: 'nodeFeed_items',
-  props: ['node', 'isActive', 'isVisible'],
+  name: 'nodeFeed__nodeItems',
+  props: ['node', 'isActive', 'isVisible', 'itemsStyles'],
   components: {
-    compositionPlayer
+    item,
   },
   data () {
     return {
       itemActive: 0,
+      itemOpened: null,
+      itemTop: 0,
+      itemTopMini: 0,
+      itemLeft: 0,
+      itemLeftMini: 0,
+      itemWidth: 0,
+      itemWidthMini: 0,
+      itemHeight: 0,
+      itemHeightMini: 0,
+      itemBackgroundOpacity: 0,
     }
   },
-  computed: {
-    itemTypes () {
-      return [
-        {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
-        {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},
-        {id: 'CAUSE', name: 'Причина', pair: 'EFFECT'},
-        {id: 'EFFECT', name: 'Следствие', pair: 'CAUSE'},
-        {id: 'PROBLEM', name: 'Проблема', pair: 'SOLUTION'},
-        {id: 'SOLUTION', name: 'Решение', pair: 'PROBLEM'},
-        {id: 'TRUE', name: 'Опровержение', pair: 'FALSE'},
-        {id: 'FALSE', name: 'Факт', pair: 'TRUE'},
-        {id: 'FROM', name: 'Факт', pair: 'TO'},
-        {id: 'TO', name: 'Подтверждение', pair: 'FROM'},
-      ]
-    },
+  watch: {
+    itemActive: {
+      immediate: true,
+      handler (to, from) {
+        if (to >= 0) {
+          this.$emit('itemActive', to)
+        }
+      }
+    }
   },
   methods: {
-    itemType (index) {
-      return this.itemTypes.find(i => i.id === this.node.vertices[index])
+    async itemClick (index) {
+      this.$log('itemClick', index)
+      // open item if it is active
+      if (this.itemActive === index) {
+        // close item if it is opened
+        if (this.itemOpened === index) {
+          this.$tween.to(this, 0.3, {
+            itemTop: this.itemTopMini,
+            itemLeft: this.itemLeftMini,
+            itemWidth: this.itemWidthMini,
+            itemHeight: this.itemHeightMini,
+            itemBackgroundOpacity: 0,
+            onComplete: () => {
+              this.$log('itemOpen done')
+              // this.itemOpened = null
+            }
+          })
+          await this.$wait(100)
+          this.itemOpened = null
+        }
+        // open item if it is closed/only active...
+        else {
+          this.itemOpened = index
+          // set position
+          let {top, left, width, height} = this.$refs.refMini[index].getBoundingClientRect()
+          this.$log({top, left, width, height})
+          this.itemTop = top
+          this.itemTopMini = top
+          this.itemLeft = left
+          this.itemLeftMini = left
+          this.itemWidth = width
+          this.itemWidthMini = width
+          this.itemHeight = height
+          this.itemHeightMini = height
+          // get item ratio...
+          let item = this.node.items[index]
+          // shift
+          this.$tween.to(this, 0.3, {
+            // itemTop: (this.$q.screen.height - height) / 2,
+            itemTop: 0,
+            // itemLeft: (this.$q.screen.width - width * 2) / 2,
+            itemLeft: 0,
+            // itemWidth: width * 2,
+            itemWidth: this.$q.screen.width,
+            // itemHeight: height,
+            itemHeight: this.$q.screen.height,
+            itemBackgroundOpacity: 0.95,
+            onComplete: () => {
+              this.$log('itemOpen done')
+              // this.itemOpened = index
+            }
+          })
+        }
+      }
+      // make item active
+      else {
+        this.itemActive = index
+      }
     }
   }
 }

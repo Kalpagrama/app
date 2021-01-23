@@ -1,24 +1,21 @@
 <template lang="pug">
 div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
   q-resize-observer(@resize="e => width = e.width")
-  q-btn(
-    @click="actionsShow = !actionsShow"
-    round flat color="grey-7" icon="tune" dense
-    :style=`{
-      position: 'absolute', zIndex: 1000, right: '4px', bottom: '0px',
-    }`)
-  //- overflowY: 'hidden',
+  //- scroll wrapper
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{paddingTop: '20px', paddingBottom: '44px'}`).row.full-width.scroll
+    :style=`{
+      paddingTop: '20px',
+      paddingBottom: '50px',
+      overflow: pointDragging ? 'hidden !important' : 'auto',
+    }`).row.full-width.scroll
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
       //- center
-      //- TODO: desktop only framesDragging
       div(
         @click="framesClick"
-        v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? framesDrag : false"
+        v-touch-pan.left.right.mouse="framesDrag"
         accessKey="frames"
         :style=`{
           position: 'relative',
@@ -26,7 +23,9 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
           borderRadius: '10px',
         }`).row.no-wrap.items-center.content-center.justify-start.b-220
         //- frames
-        div(:style=`{minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).row
+        div(
+          :style=`{
+            minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).row
           div(
             v-for="f in framesCount" :key="f"
             :style=`{
@@ -34,68 +33,46 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
               borderRight: f === framesCount+1 ? 'none' : '1px solid rgb(120,120,120)',
             }`
             ).row.items-center.content-center.justify-center
-            span(:style=`{userSelect: 'none', pointerEvents: 'none'}`) {{ $time((f - 1)*10) }}
+            span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-grey-9 {{ $time((f - 1)*10) }}
         //- currentTime line
         div(
-          v-show="!poingDragging && (player.currentTime < layerStart || player.currentTime > layerEnd)"
+          v-show="!pointDragging"
           :style=`{
-            position: 'absolute', zIndex: 200,
-            left: 'calc('+(player.currentTime/player.duration)*100+'% - 0px)',
-            top: '-10px',
-            height: 'calc(100% + 20px)',
+            position: 'absolute', zIndex: 2000,
+            left: 'calc('+(player.currentTime/player.duration)*100+'% - 2px)',
+            top: '-7px',
+            height: 'calc(100% + 14px)',
             width: '4px',
             borderRadius: '2px', overflow: 'hidden',
             pointerEvents: 'none'
           }`
           ).bg-red
-        //- left tint
-        //- div(
-          :style=`{
-            position: 'absolute', zIndex: 100,
-            left: '0px',
-            width: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% + 8px)',
-            height: '50px', background: 'rgba(0,0,0,0.3)',
-            pointerEvents: 'none',
-            borderRadius: '10px',
-          }`)
         //- left drag
         div(
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 13px)',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 10px + 2px)',
             height: '50px',
             width: '20px',
             cursor: 'grabbing',
-            borderRadius: '10px',
-            //- opacity: 0.55,
+            borderRadius: '4px',
             background: 'rgba(76,175,79,0.5)'
           }`
           ).row.items-center.content-center.justify-center
           q-icon(
             name="more_vert" color="white" size="22px"
             :style=`{pointerEvents: 'none'}`)
-        //- right tint
-        //- div(
-          :style=`{
-            position: 'absolute', zIndex: 100,
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 8px)',
-            width: 'calc('+((player.duration-layer.figuresAbsolute[1].t)/player.duration)*100+'% + 1px)',
-            height: '50px', background: 'rgba(0,0,0,0.3)',
-            pointerEvents: 'none',
-            borderRadius: '10px',
-          }`)
         //- right drag
         div(
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% + 2px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/player.duration)*100+'% - 10px - 2px)',
             height: '50px',
             width: '20px',
             cursor: 'grabbing',
-            borderRadius: '10px',
-            //- opacity: 0.1,
+            borderRadius: '4px',
             background: 'rgba(76,175,79,0.5)'
           }`
           ).row.items-center.content-center.justify-center
@@ -105,65 +82,44 @@ div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
         //- rect
         div(
           :style=`{
-            position: 'absolute', zIndex: 300, top: '-8px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 8px)',
-            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 24px)',
-            height: 50+8+8+'px',
-            borderRadius: '18px',
-            border: '8px solid rgb(76,175,80)',
+            position: 'absolute', zIndex: 300, top: '-4px',
+            left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% - 0px)',
+            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 0px)',
+            height: 50+8+'px',
+            borderRadius: '10px',
+            border: '4px solid rgb(76,175,80)',
             pointerEvents: 'none',
-          }`)
-        //- meta
-        div(:style=`{
-          position: 'absolute', zIndex: 400, top: '-7px',
-          left: 'calc('+(layer.figuresAbsolute[0].t/player.duration)*100+'% + 0px)',
-          width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/player.duration)*100+'% + 8px)',
-          height: 50+8+8+'px',
-          }`).row
-          slot(name="meta" :panning="pointDragging")
+          }`).br
       //- right margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
   //- actions at the bottom
   div(
-    v-show="actionsShow"
     :style=`{
-      position: 'absolute', zIndex: 300, bottom: '0px',
+      position: 'absolute', zIndex: 300, bottom: '4px',
       left: '0px', width: '100%',
     }`
-    ).row.items-center.content-center.justify-center
-    div(:style=`{maxWidth: '300px'}`).row.full-width.items-center.content-center.no-wrap
-      q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
-        div(:style=`{
-          position: 'absolute', zIndex: 100,
-          left: 'calc(50% - 2px)', width: '3px',
-          height: '80%', top: '10%',
-          borderRadius: '2px',
-          opacity: 0.9
-        }`).row.bg-red
-      q-btn(round flat dense color="white" @click="layerForward(0,false)")
-        q-icon(name="keyboard_arrow_left" color="white" size="30px")
-      q-btn(round flat dense color="white" @click="layerForward(0,true)")
-        q-icon(name="keyboard_arrow_right" color="white" size="30px")
+    ).row.items-center.content-center.justify-center.q-px-xs
+    div(:style=`{maxWidth: '400px'}`).row.full-width.items-center.content-center.q-px-sm
+      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
+      .col
+      q-btn(round flat dense color="grey-8" @click="layerForward(0,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
+      q-btn(round flat dense color="grey-8" @click="layerForward(0,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
       .col
       small(
         :class=`{
           'text-red': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t > 60,
-          'text-white': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t <= 60
+          'text-grey-7': layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t <= 60
         }`
-        ).q-mt-sm {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
+        ) {{$time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)}}
       .col
-      q-btn(round flat dense color="white" @click="layerForward(1,false)")
-        q-icon(name="keyboard_arrow_left" color="white" size="30px")
-      q-btn(round flat dense color="white" @click="layerForward(1,true)")
-        q-icon(name="keyboard_arrow_right" color="white" size="30px")
-      q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
-        div(:style=`{
-          position: 'absolute', zIndex: 100,
-          left: 'calc(50% - 2px)', width: '3px',
-          height: '80%', top: '10%',
-          borderRadius: '2px',
-          opacity: 0.9
-        }`).row.bg-red
+      q-btn(round flat dense color="grey-8" @click="layerForward(1,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
+      q-btn(round flat dense color="grey-8" @click="layerForward(1,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
+      .col
+      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
 </template>
 
 <script>
@@ -179,6 +135,7 @@ export default {
       pointDraggingError: false,
       layerForwarding: null,
       actionsShow: false,
+      compositionPlaying: true
     }
   },
   computed: {
@@ -213,11 +170,20 @@ export default {
     },
   },
   watch: {
-    layer: {
+    'player.currentTime': {
       deep: true,
-      immediate: true,
       handler (to, from) {
-        // this.$store.commit('ui/stateSet', ['contentNodes', ])
+        if (!this.compositionPlaying) return
+        // this.$log('player.currentTime TO', to)
+        if (to > this.layerEnd) {
+          this.$log('>= layerEnd')
+          this.player.setCurrentTime(this.layerStart)
+        }
+        // if (to < this.layerStart) {
+        //   this.$log('< layerStart')
+        //   this.player.setCurrentTime(this.layerStart)
+        //   this.player.play()
+        // }
       }
     },
     tickFramesLayerCenter: {
@@ -270,7 +236,8 @@ export default {
         let t = this.layer.figuresAbsolute[1].t - 1.5
         if (t < this.layer.figuresAbsolute[0].t) t = this.layer.figuresAbsolute[0].t
         this.player.setCurrentTime(t)
-        this.player.events.emit('edit-end')
+        // this.player.events.emit('edit-end')
+        this.compositionPlaying = true
       }
       this.player.play()
       // center frames
@@ -281,7 +248,8 @@ export default {
       this.$log('layerForward', pointIndex, goingForward)
       if (this.player.playing) this.player.pause()
       let t = this.layer.figuresAbsolute[pointIndex].t
-      this.player.events.emit('edit-start')
+      // this.player.events.emit('edit-start')
+      this.compositionPlaying = false
       if (goingForward) t += 0.1
       else t -= 0.1
       this.$log('t', t)
@@ -303,7 +271,8 @@ export default {
         }
         this.framesLayerCenter()
         this.player.play()
-        this.player.events.emit('edit-end')
+        // this.player.events.emit('edit-end')
+        this.compositionPlaying = true
         this.layerForwarding = null
       }, 500)
     },
@@ -328,12 +297,14 @@ export default {
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
         this.player.pause()
-        this.player.events.emit('edit-start')
+        // this.player.events.emit('edit-start')
+        this.compositionPlaying = false
         this.pointDragging = true
         this.pointDraggingIndex = index
       }
       if (e.isFinal) {
-        this.player.events.emit('edit-end')
+        // this.player.events.emit('edit-end')
+        this.compositionPlaying = true
         this.pointDragging = false
         this.pointDraggingIndex = null
         await this.$wait(300)
@@ -341,7 +312,9 @@ export default {
         this.pointDraggingError = false
         // final action of pointDragging, the same layerForward...
         if (index === 0) {
+          this.player.setCurrentTime(t)
           this.player.play()
+          // this.player.pause()
         }
         else {
           let tBeforeTheEnd = t - 3 > this.layerStart ? t - 3 : this.layerStart
@@ -357,17 +330,10 @@ export default {
       // this.player.events.emit('edit-event', {t: t})
       let t = e.offsetX / this.framesWidth * this.player.duration
       this.$log('t', t)
-      this.player.setCurrentTime(t)
-      // play layer if got this frames...
-      if (t > this.layerStart && t < this.layerEnd) {
-        // do nothing...
-        // TODO: unreacheable code,cos we listen only for targer === frames!
-        this.$log('framesClick INside')
-        this.player.events.emit('edit-end')
-      }
-      else {
+      // move frames in we not in the fragment borders
+      if (t < this.layerStart || t > this.layerEnd) {
         this.$log('framesClick OUTside')
-        this.player.events.emit('edit-start')
+        // this.player.events.emit('edit-start')
         let index = 0
         if (t > this.layerEnd) index = 1
         this.layer.figuresAbsolute[index].t = t
@@ -375,30 +341,51 @@ export default {
         await this.$wait(240)
         this.framesLayerCenter()
       }
+      else {
+        this.player.setCurrentTime(t)
+      }
     },
     framesDrag (e) {
       // this.$log('framesDrag', e)
-      if (this.poingDragging) return
-      // if (this.$q.screen.xs) return
-      if (this.$q.screen.width < this.$store.state.ui.pageWidth) return
+      if (this.pointDragging) return
+      if (e.isFirst) {
+        this.framesDragging = true
+      }
+      if (e.isFinal) {
+        this.framesDragging = false
+      }
+      if (this.$q.platform.has.touch) return
       this.$refs.layerItemFramesScrollArea.scrollLeft -= e.delta.x
-      if (e.isFirst) this.framesDragging = true
-      if (e.isFinal) this.framesDragging = false
     },
     framesLayerCenter () {
-      this.$log('framesLayerCenter width:', this.width)
-      this.$log('framesLayerCenter layerDuration:', this.layerDuration)
-      this.$log('framesLayerCenter layerStart:', this.layerStart)
-      this.$log('framesLayerCenter framesWidth:', this.framesWidth)
+      // this.$log('framesLayerCenter)
       let layerLeft = ((this.layerStart / this.player.duration) * this.framesWidth) + (this.width / 2)
       let layerWidth = (this.layerDuration / this.player.duration) * this.framesWidth
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
-      this.$log('scrollLeft', scrollLeft)
+      // this.$log('scrollLeft', scrollLeft)
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
+    },
+    async playerBarClickHandle (e) {
+      this.$log('playerBarClickHandle', e.detail.t)
+      let t = e.detail.t
+      // move frames in we not in the fragment borders
+      if (t < this.layerStart || t > this.layerEnd) {
+        let start = e.detail.t
+        let end = start + 30 < this.player.duration ? start + 30 : this.player.duration
+        this.layer.figuresAbsolute[0].t = start
+        this.layer.figuresAbsolute[1].t = end
+        await this.$wait(250)
+        this.framesLayerCenter()
+      }
     }
   },
   async mounted () {
     this.$log('mounted')
+    this.player.events.on('bar-click', this.playerBarClickHandle)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.player.events.off('bar-click', this.playerBarClickHandle)
   }
 }
 </script>

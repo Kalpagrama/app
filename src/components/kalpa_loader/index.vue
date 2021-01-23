@@ -32,44 +32,65 @@ export default {
   data () {
     return {
       items: null,
+      findRes: null,
       nexting: false
     }
   },
   watch: {
     query: {
       deep: true,
+      immediate: true,
       async handler (to, from) {
-        this.$logW('query CHANGED', to, this.query)
-        // this.items = []
-        this.nextDebounced(0, () => {}, true)
+        // this.$logW('query CHANGED', to)
+        if (this.items) {
+          this.items = null
+          this.findRes = null
+          await this.next(0, () => {})
+        }
       }
     },
     items: {
-      deep: true,
+      deep: false,
       handler (to, from) {
-        this.$emit('items', to)
+        // this.$log('items UPDATED')
+        if (this.findRes && this.findRes.hasPrev()){
+          alert('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
+        }
+        if (to && from) {
+          this.$log('items UPDATED', to.length)
+          this.$emit('items', to)
+        }
+        // this.$log('items UPDATED', to)
+        // this.$emit('items', to)
+      }
+    },
+    immediate: {
+      immediate: true,
+      handler (to, from) {
+        if (to === true) {
+          this.next(0, () => {})
+        }
       }
     }
   },
   methods: {
-    async next(i, done, queryChanged = false) {
-      this.$log('next')
+    async next (i, done) {
+      this.$log('*** NEXT start ***')
       this.nexting = true
-      if (!this.items || queryChanged) {
-        this.items = await this.$rxdb.find(this.query, false)
+      if (!this.findRes) {
+        // this.$log('*** NEXT itemsCreating before', this.items)
+        this.findRes = await this.$rxdb.find(this.query) // {items, next, hasNext, prev, hasPrev}
+        this.items = this.findRes.items
+      } else {
+        await this.findRes.next(this.limit)
       }
-      assert(this.items.next, '!this.items.next')
-      let hasMore = await this.items.next(this.limit)
-      if (hasMore) done()
-      else done(true)
+      if (this.findRes.hasNext()) done()
+      else {
+        this.$emit('items', this.findRes.items)
+        done(true)
+      }
       this.nexting = false
-      this.$emit('next')
     }
-  },
-  async mounted () {
-    this.nextDebounced = debounce(this.next, 1000, {leading: true, maxWait: 1000}) // leading - срабатывает в начале
-    this.$log('mounted')
-    if (this.immediate) await this.next(0, () => {})
   }
 }
 </script>

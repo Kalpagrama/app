@@ -1,10 +1,11 @@
 import LruCache from 'lru-cache'
 import assert from 'assert'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { MutexLocal, mutexGlobal } from 'src/system/rxdb/mutex'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { mutexGlobal } from 'src/system/rxdb/mutex_global'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'
-import { getRxCollectionEnumFromId, makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import { wait } from 'src/system/utils'
@@ -173,8 +174,8 @@ class Cache {
          case 'year':
             actualAge = 1000 * 60 * 60 * 24 * 360
             break
-         case 'century':
-            actualAge = 1000 * 60 * 60 * 24 * 360
+         case 'infinity':
+            actualAge = 1000 * 60 * 60 * 24 * 360 * 100
             break
          case 'prolong': {
             let current = this.cacheLru.get(id)
@@ -232,7 +233,6 @@ class Cache {
                try {
                   let insertedPlainDocs = {}
                   for (let { plainDoc } of debouncedUpdateQueueCopy) insertedPlainDocs[plainDoc.id] = plainDoc
-                  // если такие уже есть - удалим
                   let updatedRxDocs = await this.db.cache.find({ selector: { id: { $in: Object.keys(insertedPlainDocs) } } }).exec() // эти обновляем
                   for (let updated of updatedRxDocs) {
                      let inserted = insertedPlainDocs[updated.id]
@@ -270,7 +270,7 @@ class Cache {
 
    isActual (id, cachedInfo = null) {
       cachedInfo = cachedInfo || this.cacheLru.get(id) // {actualUntil, actualAge, failReason}
-      return cachedInfo && Date.now() <= cachedInfo.actualUntil
+      return cachedInfo && (cachedInfo.actualAge === 'infinity' || Date.now() <= cachedInfo.actualUntil)
    }
 
    // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null

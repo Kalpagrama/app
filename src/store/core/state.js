@@ -1,4 +1,4 @@
-import { LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 export default {
    initialized: false,
@@ -14,8 +14,8 @@ export default {
    logFormat: {time: false, moduleName: true, funcName: true},
    logDbgModulesBlackList: [
       LogSystemModulesEnum.SYSTEM,
-      // LogSystemModulesEnum.SW,
-      // LogSystemModulesEnum.PWA,
+      LogSystemModulesEnum.SW,
+      LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
       LogSystemModulesEnum.API,
       LogSystemModulesEnum.ROUTER,
@@ -25,14 +25,14 @@ export default {
       LogSystemModulesEnum.VUEX_DBG,
       LogSystemModulesEnum.RXDB,
       LogSystemModulesEnum.RXDB_REACTIVE,
-      // LogSystemModulesEnum.RXDB_WS,
+      LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
-      // LogSystemModulesEnum.RXDB_OBJ,
+      LogSystemModulesEnum.RXDB_OBJ,
       LogSystemModulesEnum.RXDB_GQL,
-      // LogSystemModulesEnum.RXDB_LST,
-      LogSystemModulesEnum.RXDB_EVENT,
+      LogSystemModulesEnum.RXDB_LST,
+      // LogSystemModulesEnum.RXDB_EVENT,
       LogSystemModulesEnum.MUTEX,
-      LogSystemModulesEnum.BOOT,
+      // LogSystemModulesEnum.BOOT,
       LogSystemModulesEnum.CP,
    ],
    colors: {

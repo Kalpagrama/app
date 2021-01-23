@@ -2,7 +2,7 @@ import i18next from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import VueI18Next from '@panter/vue-i18next'
 import translations from '../i18n/index'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, document, performance } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.BOOT)
@@ -10,6 +10,9 @@ let i18n
 
 export default async ({ Vue, store, app }) => {
   try {
+    const f = {nameExtra: 'boot::i18n'}
+    logD(f, 'start')
+    const t1 = performance.now()
     Vue.use(VueI18Next)
     const languageDetector = new LanguageDetector()
     await i18next
@@ -61,6 +64,7 @@ export default async ({ Vue, store, app }) => {
     i18next.on('missingKey', function (lngs, namespace, key, res) {
       // logE('translate is missing', lngs, namespace, key, res)
     })
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logE(err)
   }

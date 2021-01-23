@@ -2,26 +2,32 @@
 div(
   :style=`{
     position: 'relative',
-    paddingBottom: Math.min(Math.round(ratio*100), 100)+'%',
+    paddingBottom: Math.round(ratio*100)+'%',
   }`
   ).row.full-width
-  composition-player(
-    :composition="node.items[0]" :isVisible="isVisible" :isActive="isActive"
-    :options=`{
-      height: '100%', objectFit: 'contain', loop: true,
-      showContentExplorer: true,
-      showContentMeta: true,
-    }`
-    :style=`{
-      position: 'absolute', zIndex: 100, top: 0,
-    }`)
+  div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
+    composition-player(
+      :composition="node.items[0]"
+      :isVisible="isVisible"
+      :isActive="isActive"
+      :isMini="false"
+      :styles=`{
+        height: '100%',
+        objectFit: 'cover',
+      }`
+      :options=`{
+        loop: true,
+        nodeOid: node.oid,
+        footerOverlay: true,
+        showBar: false,
+      }`)
 </template>
 
 <script>
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
-  name: 'nodeFeed_nodeItem',
+  name: 'nodeFeed__nodeItem',
   props: ['node', 'isActive', 'isVisible'],
   components: {
     compositionPlayer,
@@ -31,10 +37,29 @@ export default {
     }
   },
   computed: {
+    ratioMax () {
+      // return 0.6
+      return 1
+    },
     ratio () {
       let height = this.node.items[0].thumbHeight
-      if (height) return this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
-      else return 1
+      if (height) {
+        let ratio = this.node.items[0].thumbHeight / this.node.items[0].thumbWidth
+        return Math.min(this.ratioMax, ratio)
+      }
+      else {
+        return this.ratioMax
+      }
+    }
+  },
+  watch: {
+    isActive: {
+      immediate: true,
+      handler (to, from) {
+        this.$emit('itemActive', to ? 0 : false)
+        // if (to) {}
+        // this.$log('isActive', to)
+      }
     }
   }
 }

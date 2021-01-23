@@ -5,18 +5,15 @@
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    //- maxWidth: mini ? '60px' : '100%',
-  }`).column.full-width
-  //- $q.platform.is.capacitor paddingTop 20px ?
+.column.full-width
   //- header
   div(
     :style=`{borderRadius: '10px',}`
     ).row.full-width.items-center.content-center
     //- home
+    //- :to="isGuest ? '/trends' : '/feeds/all'"
     router-link(
-      :to="$store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/'"
+      :to="'/about'"
       :style=`{borderRadius: '10px',}`
       ).row.full-width
       div(
@@ -25,26 +22,10 @@ div(
         kalpa-logo(:width="40" :height="40" :style=`{pointEvents: 'none'}`)
       div(v-if="!mini").col
         div(
-          @click="$router.push($store.getters.currentUser().profile.role === 'GUEST' ? '/trends' : '/').catch(e => e)"
           ).row.fit.items-center.content-center.cursor-pointer
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpagrama', 'Кальпаграма')}}
           .row.full-width
-            small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
-    //- user
-    router-link(
-      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-      :to="'/user/'+$store.getters.currentUser().oid"
-      :class=`{
-        //- 'b-60': $route.path.split('/')[1] === 'user'
-      }`
-      :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.content-center.menu-item
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
-      div(v-if="!mini").col.full-height
-        .row.fit.items-center.content-center
-          span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-          small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
+            small.text-grey-4 {{$t('kalpaMenu_title', 'Продвигай суть!')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -54,84 +35,96 @@ div(
       ).column.full-width.q-pt-sm
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
-          v-if="p.id === 'trends' ? true : $store.getters.currentUser().profile.role !== 'GUEST'"
+          v-if="p.id === 'trends' ? true : !isGuest"
           :to="{name: p.id}"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 600 ? '55px' : '55px',
-            borderRadius: '10px', overflow: 'hidden'
+            height: $q.screen.width > 600 ? '60px' : '60px',
+            borderRadius: '10px', overflow: 'hidden',
+            //- maxWidth: '210px',
           }`
-          ).row.full-width.items-center.menu-item
+          ).row.full-width.items-center.menu-item.q-mb-sm
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
-            q-icon(size="22px" :name="p.icon" :color="p.color || 'white'")
+            q-icon(size="30px" :name="p.icon" :color="p.color || 'white'")
           span(
             v-if="!mini"
-            :style=`{fontSize: '16px'}`).text-white {{ p.name }}
-        //- refresh
-        div(
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="refresh()"
-          ).row.full-width.items-center.content-center.menu-item.cursor-pointer
-          div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
+            :style=`{fontSize: '18px'}`).text-bold.text-white {{ p.name }}
+        //- user
+        router-link(
+          v-if="!isGuest"
+          :to="'/user/'+$store.getters.currentUser().oid"
+          :class=`{
+            'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
+          }`
+          :style=`{
+            height: '60px', borderRadius: '10px', overflow: 'hidden',
+            //- maxWidth: '210px',
+          }`
+          ).row.full-width.items-center.content-center.menu-item
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+            user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+          div(v-if="!mini").col.full-height
+            .row.fit.items-center.content-center
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+              small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
+        //- login for GUEST
+        q-btn(
+          v-if="isGuest"
+          color="green" no-caps icon="login"
+          :align="mini ? 'center' : 'left'"
+          :to="'/auth'"
+          :style=`{
+            height: '60px',
+            paddingLeft: '0px'
+            //- maxWidth: '210px',
+          }`
+          ).full-width.items-center.content-center
           span(
             v-if="!mini"
-            :style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
-        //- logout
-        div(
-          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="logout()"
-          ).row.full-width.items-center.content-center.menu-item.cursor-pointer
-          div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(
-            v-if="!mini"
-            :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
-        //- login
-        div(
-          v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="login()"
-          ).row.full-width.items-center.content-center.menu-item.cursor-pointer
-          div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round dense flat icon="power" color="white" :loading="loginLoading")
-          span(
-            v-if="!mini"
-            :style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_login', 'Войти')}}
-        //- create joint
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Войти
         //- div(
-          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-          ).row.full-width.items-center.content-center.justify-center
+          v-if="!isGuest"
+          ).row.full-width.items-center.content-center.q-mt-sm
           q-btn(
-            :to="'/workspace/joint/new'"
-            flat color="green" no-caps icon="link" size="md"
+            :to="isGuest ? '/auth' : '/workspace'"
+            color="green" no-caps size="lg"
+            icon="construction"
             :align="mini ? 'center' : 'left'"
-            :style=`{height: '60px', paddingLeft: '0px'}`).full-width.menu-item
+            :style=`{
+              height: '60px',
+              paddingLeft: '0px',
+              maxWidth: '200px',
+            }`).full-width.menu-item
             span(
               v-if="!mini"
-              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create joint', 'Создать связь')}}
-        //- create node
-        div(
-          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-          ).row.full-width.items-center.content-center
-          q-btn(
-            :to="'/workspace/create'"
-            flat color="green" no-caps icon="add" size="md"
-            :align="mini ? 'center' : 'left'"
-            :style=`{height: '60px', paddingLeft: '2px'}`).full-width.menu-item
-            span(
-              v-if="!mini"
-              :style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('Create node', 'Создать')}}
+              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Мастерская
+        //- docs
+        .row.full-width.q-mt-sm
+          kalpa-docs(
+            v-if="!mini"
+            :textAlign="'center'"
+            :style=`{
+              maxWidth: '210px',
+            }`).q-py-sm
         //- version
-        div(v-if="!mini").row.full-width.items-center.q-pa-md
-          small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-8 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+        div(v-if="!mini").row.full-width.items-center.q-pa-sm
+          small(
+            :style=`{userSelect: 'none', marginLeft: '0px'}`
+            ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>
 import { AuthApi } from 'src/api/auth'
 
+import kalpaDocs from 'components/kalpa_docs/index.vue'
+
 export default {
   name: 'kalpaMenu',
+  components: {
+    kalpaDocs,
+  },
   props: {
     mini: {
       type: Boolean,
@@ -143,51 +136,66 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'feeds', name: 'Ленты', icon: 'view_week'},
-        {id: 'trends', name: 'Новое', icon: 'explore'},
-        {id: 'workspace', name: this.$t('pageWorkspace_title', 'Мастерская'), icon: 'school'},
+        {id: 'feeds', name: 'Лента', icon: 'view_agenda'},
+        {id: 'trends', name: 'Поиск', icon: 'search'},
+        {id: 'workspace', name: 'Мастерская', icon: 'construction'},
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        // {id: 'messages', name: 'Сообщения', icon: 'mail_outline'},
-        {id: 'settings', name: this.$t('pageSettings_title', 'Настройки'), icon: 'tune'},
-      ],
-      refreshLoading: false,
-      logoutLoading: false,
-      loginLoading: false,
-      loginButtonShow: true
+        {id: 'settings', name: 'Настройки', icon: 'settings'},
+      ]
     }
   },
   computed: {
-  },
-  methods: {
-    async refresh () {
-      this.$log('refresh')
-      this.refreshLoading = true
-      // await this.$wait(300)
-      await this.$systemUtils.vibrate(200)
-      await this.$systemUtils.reset()
-      // await this.$systemUtils.openUrl()
-      // await this.$systemUtils.openUrl('https://kalpagrama.com/', true)
-      // await this.$systemUtils.hapticsImpact()
-      this.refreshLoading = false
+    isGuest () {
+      return this.$store.getters.currentUser().profile.role === 'GUEST'
     },
-    async logout () {
-      this.$log('logout')
-      if (!confirm('Really logout ?')) return
-      this.logoutLoading = true
-      await this.$wait(300)
-      await AuthApi.logout()
-      this.$log('AuthApi.logout() complete')
-      await this.$router.replace('/auth')
-      this.$log('this.$router.replace auth complete')
-      this.logoutLoading = false
-    },
-    async login () {
-      this.$log('login')
-      this.loginLoading = true
-      await this.$wait(300)
-      await this.$router.push('/auth')
-      this.loginLoading = false
+    actions () {
+      let res = {
+        refresh: {
+          name: 'Обновить',
+          cb: async () => {
+            await this.$systemUtils.vibrate(200)
+            await this.$systemUtils.reset()
+          }
+        }
+      }
+      if (this.isGuest) {
+        res.login = {
+          name: 'Войти',
+          cb: async () => {
+            this.$log('action:login')
+            this.$router.push('/auth')
+          }
+        }
+      }
+      else {
+        res.settings = {
+          name: 'Настройки',
+          cb: async () => {
+            this.$log('action:settings')
+            this.$router.push('/settings')
+          }
+        }
+        res.logout = {
+          name: 'Выйти',
+          cb: async () => {
+            this.$log('action:logout')
+            await AuthApi.logout()
+            await this.$router.replace('/auth')
+          }
+        }
+      }
+      return res
     }
   },
+  methods: {
+    async logout () {
+      await AuthApi.logout()
+      await this.$router.replace('/auth')
+    },
+    async refresh () {
+      await this.$systemUtils.vibrate(200)
+      await this.$systemUtils.reset()
+    }
+  }
 }
 </script>

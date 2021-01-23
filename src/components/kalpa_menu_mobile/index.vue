@@ -1,57 +1,83 @@
 <template lang="pug">
 .row.full-width.justify-center
+  //- menu for guests
   div(
-    :style=`{maxWidth: 700+'px', borderRadius: '10px 10px 0 0'}`
-    ).row.full-width.items-center.content-center.justify-between.q-pt-sm.q-pb-xs
-    router-link(:to="{name: 'feeds'}").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round flat dense icon="view_week"
-          :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-4'")
-        .row.full-width.justify-center
-          small.text-grey-6 Ленты
-    router-link(:to="{name: 'trends'}").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round flat dense icon="explore"
-          :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-4'")
-        .row.full-width.justify-center
-          small.text-grey-6 Новое
-    router-link(:to="'/workspace/create'").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round dense color="green" icon="add" size="lg"
-          :style=`{borderRadius: '50%'}`).q-mb-xs
-        //- .row.full-width.justify-center
-          small.text-grey-6 Создать
-    router-link(:to="{name: 'notifications'}").col
-      .row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round flat dense icon="notifications"
-          :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-4'")
-        .row.full-width.justify-center
-          small.text-grey-6 Уведомления
-    //- profile/menu
-    .col
-      div(
-        @click="profileClick()"
-        ).row.full-height.items-center.content-center.justify-center
-        //- @click.native="profileClick"
-        user-avatar(
-          :url="$store.getters.currentUser().profile.photoUrl" :width="30" :height="30"
-          :style=`{
-            borderRadius: '50%',
-            border: ($route.name.split('.')[0] === 'user' && $route.params.oid === $store.getters.currentUser().oid) ? '2px solid rgb(76,175,79)' : '2px solid rgba(0,0,0,0)'
-          }`)
-        .row.full-width.justify-center.q-mt-xs
-          small.text-grey-6 Профиль
+    v-if="isGuest"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+      borderRadius: '10px 10px 0 0',
+    }`
+    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    q-btn(
+      flat icon="search" no-caps
+      :to="'/trends'"
+      :color="'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Поиск
+    q-btn(
+      :to="'/auth'"
+      flat color="white" no-caps
+      :style=`{
+        height: '44px',
+      }`).q-px-md.q-mt-xs.b-50
+      span.text-white Войти
+    kalpa-menu-popup-global
+  //- menu for users
+  div(
+    v-if="!isGuest"
+    :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+      borderRadius: '10px 10px 0 0',
+    }`
+    ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
+    q-btn(
+      flat no-caps icon="view_agenda"
+      :to="'/feeds/all'"
+      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
+      :style=`{
+        width: '60px',
+      }`
+      ).row.items-center.content-center.justify-center
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
+    q-btn(
+      flat icon="search" no-caps
+      :to="'/trends'"
+      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Поиск
+    q-btn(
+      round no-caps icon="construction"
+      :to="'/workspace'"
+      :color="'green'"
+      :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+    q-btn(
+      flat no-caps icon="notifications_none"
+      :to="'/notifications/'"
+      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      q-badge(color="red" floating transparent) •
+      .row.full-width.justify-center
+        //- small Активность
+        small Уведомления
+    kalpa-menu-popup-global
 </template>
 
 <script>
 export default {
   name: 'kalpaMenuMobile',
+  components: {
+    anvil: () => import('components/kalpa_icons/anvil.vue')
+  },
   data () {
     return {
+    }
+  },
+  computed: {
+    isGuest () {
+      return this.$store.getters.currentUser().profile.role === 'GUEST'
     }
   },
   methods: {

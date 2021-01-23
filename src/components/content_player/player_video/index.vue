@@ -1,78 +1,198 @@
 <template lang="pug">
 div(
   :style=`{
-    //- borderRadius: '10px',
+    ...styles,
+    borderRadius: '10px', overflow: 'hidden',
   }`
-  ).row.full-width.items-start.content-start.bg-black
-  div(:style=`{position: 'relative',}`).row.full-width.items-start.content-start
-    img(
-      draggable="false"
-      :src="thumbUrl"
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        maxHeight: $q.screen.height/2+'px',
-      }`).full-width
-    q-btn(
-      v-if="!isActiveLocal"
-      @click="isActiveLocal = true"
-      flat color="white"
-      :style=`{position: 'absolute', zIndex: 1000, top: 0, borderRadius: '10px',}`
-      ).fit
-      q-icon(color="white" size="100px" name="play_arrow")
+  ).column.full-width
+  //- .row.full-width.q-py-lg.bg-black
+  //- .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      .row.full-width.items-center.content-center.q-py-xs.q-px-sm
+        q-btn(round flat dense color="white" icon="west" @click="$routerKalpa.back()").q-mr-xs
+        router-link(:to="'/content/'+contentKalpa.oid").text-white content {{ contentKalpa.name }}
+  //- body
+  div(
+    :style=`{
+      position: 'relative',
+    }`
+    ).col.full-width
     component(
-      v-if="isActiveLocal"
-      :is="playerComponent[source]"
-      :url="url"
-      @player="player = $event, $emit('player', $event)"
+      :is="playerComponent[contentKalpa.contentSource]"
+      :contentKalpa="contentKalpa"
       :style=`{
-        position: 'absolute', zIndex: 1000, top: 0,
-      }`).fit.bg-black
-    //- actions slots...
-    div(:style=`{position: 'absolute', zIndex: 1100, left: '0px', bottom: '0px'}`).row
-      slot(name="left-bottom")
-    div(:style=`{position: 'absolute', zIndex: 1100, right: '0px', top: '50%'}`).row
-      slot(name="right")
-    //- actions player
-  div(v-if="showActions || isActiveLocal" :style=`{position: 'relative', height: '20px', borderRadius: '0 0 10px 10px',}`).row.full-width.justify-center.bg-black
-    div(:style=`{position: 'absolute', zIndex: 1101, bottom: '0px'}`).row.full-width.justify-center.q-px-lg
-      player-actions(
-        v-if="player && !player.playing && options.showActions"
-        :player="player" :style=`{maxWidth: '770px',}`)
-      player-bar(v-if="player && options.showBar" :player="player" :options="options" :style=`{maxWidth: '770px'}`)
-        template(v-slot:bar)
-          slot(name="bar")
-        template(v-slot:bar-current-time="data")
-          slot(name="bar-current-time" v-bind="data")
-  slot(name="footer")
+        position: 'absolute',
+        zIndex: 100,
+        top: 0,
+        ...styles,
+      }`
+      :styles="styles"
+      @player="player = $event, $emit('player', $event)")
+  //- footer
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="player && player.duration"
+      :style=`options.footerOverlay ?
+        {
+          position: 'absolute', zIndex: 1000,
+          bottom: '0px',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.666) 0%, rgba(0,0,0,0) 100%)',
+          borderRadius: '0 0 6px 6px',
+        }
+        :
+        {
+          position: 'relative',
+        }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+        tint-bar-new(
+          :player="player" :contentKalpa="contentKalpa"
+          :options="options"
+          :style=`{
+          }`).full-width
+          template(v-slot:actions)
+            .row
+              q-btn(
+                v-if="player"
+                @click="volumeToggle()"
+                round flat dense size="sm"
+                :color="player.muted ? 'red' : 'white'"
+                :icon="player.muted ? 'volume_off' : 'volume_up'"
+                :style=`{
+                }`)
+  //- .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
+      .row.full-width.items-center.content-center.q-px-sm
+        q-btn(round flat dense color="white" icon="fullscreen")
+        .col
+          tint-bar-new(
+            v-if="player && player.duration"
+            :player="player" :contentKalpa="contentKalpa")
+        q-btn(round flat dense color="white" icon="volume_up")
+  //- player-tint(
+    v-bind="$props"
+    :player="player")
+  //- player tint caller
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="tintShow === false"
+      @click="player.muted ? player.setState('muted', false) : tintShow = true"
+      :style=`{
+        position: 'absolute', zIndex: 900,
+      }`
+      ).row.fit
+  //- player tint
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="tintShow === true"
+      @click.self="tintShow = false"
+      :style=`{
+        position: 'absolute', zIndex: 900,
+        background: 'rgba(0,0,0,0.5)',
+        borderRadius: '10px',
+      }`
+      ).row.fit.items-center.content-center.justify-center
+      //- CONTENT: routerLink: contentName, actions
+      q-btn(
+        v-if="!isMini"
+        flat dense color="white" no-caps align="left"
+        :to="contentLink"
+        :style=`{
+          position: 'absolute', zIndex: 901,
+          top: '8px', left: '42px',
+          overflow: 'hidden',
+          maxWidth: 'calc(100% - 96px)',
+        }`).row.full-width.no-wrap
+        span(:style=`{whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',}`).text-white {{ contentKalpa.name }}
+      //- ACTIONS: replay,play/pause,forward
+      div(
+        :style=`{
+          position: 'relative',
+        }`
+        ).row.items-center.content-center.justify-center
+        q-btn(
+          v-if="!isMini"
+          @click="tapClick(0)"
+          round flat color="white" size="md"
+          :style=`{
+            borderRadius: '50%',
+          }`)
+          q-icon(
+            name="replay_5" size="40px" color="white")
+        q-btn(
+          @click="player.playing ? player.pause() : player.play()"
+          round flat color="white" size="lg"
+          :style=`{
+            borderRadius: '50%',
+          }`).q-mx-lg
+          q-icon(
+            size="60px" color="white"
+            :name="player.playing ? 'pause' : 'play_arrow'")
+        q-btn(
+          v-if="!isMini"
+          @click="tapClick(1)"
+          round flat color="white" size="md"
+          :style=`{
+            borderRadius: '50%',
+          }`)
+          q-icon(
+            name="forward_5" size="40px" color="white")
+  //- context
+  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="player && player.duration"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        left: '0px', top: '0px',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.666) 100%)',
+        borderRadius: '8px',
+      }`
+      ).row.full-width
+      q-btn(
+        flat color="white" no-caps dense
+        :to="contentLink"
+        :style=`{
+          overflow: 'hidden',
+        }`).row.q-py-sm.q-pr-sm
+        q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
+        div(
+          :style=`{
+            overflow: 'hidden',
+          }`
+          ).col
+          span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
 </template>
 
 <script>
-import playerActions from './player_actions.vue'
-import playerBar from './player_bar.vue'
+import playerBarMini from './player_bar_mini.vue'
+import playerTint from './player_tint/index.vue'
+import tintBarNew from './player_tint/tint_bar_new.vue'
 
 export default {
   name: 'contentPlayer_video',
   components: {
     playerYoutube: () => import('./player_youtube.vue'),
     playerKalpa: () => import('./player_kalpa.vue'),
-    playerActions,
-    playerBar,
+    playerBarMini,
+    playerTint,
+    tintBarNew
   },
   props: {
-    isActive: {type: Boolean, default: true},
+    contentKalpa: {type: Object, required: true},
     isVisible: {type: Boolean, default: true},
-    source: {type: String, required: true},
-    url: {type: String, required: true},
-    thumbUrl: {type: String, required: true},
-    options: {
+    isActive: {type: Boolean, default: true},
+    isMini: {type: Boolean, default: false},
+    options: {type: Object, default: {}},
+    figures: {type: Array},
+    styles: {
       type: Object,
       default () {
         return {
-          showActions: true,
-          showBar: true
+          global: {},
+          padding: {}
         }
       }
-    }
+    },
   },
   data () {
     return {
@@ -81,15 +201,68 @@ export default {
         YOUTUBE: 'player-youtube',
         KALPA: 'player-kalpa',
       },
-      isActiveLocal: false,
+      tintShow: false,
+      moveTimer: null,
+    }
+  },
+  computed: {
+    contentLink () {
+      let res = '/content/' + this.contentKalpa.oid
+      if (this.options.nodeOid) {
+        res += '?nodeOid=' + this.options.nodeOid
+      }
+      return res
     }
   },
   watch: {
-    isActive: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('isActive TO', to)
-        this.isActiveLocal = to
+    tintShow: {
+      async handler (to, from) {
+        this.$log('tintShow TO', to)
+        if (to) {
+          // await this.$wait(2500)
+          // this.tintShow = false
+        }
+        else {
+          // do nothing
+        }
+      }
+    }
+  },
+  methods: {
+    tapClick (index) {
+      this.$log('tapClick', this.tapTimer)
+      let t = this.figures ? this.player.currentTime - this.figures[0].t : this.player.currentTime
+      if (index === 0) t -= 5
+      else t += 5
+      this.$log('t', t)
+      if (this.figures) {
+        this.player.setCurrentTime(t + this.figures[0].t)
+      }
+      else {
+        this.player.setCurrentTime(t)
+      }
+    },
+    tintClick () {
+      this.$log('tintClick', this.tintShow)
+      if (this.tintShow) {
+        // do stuff
+      }
+      else {
+        // this.player.play()
+        if (this.player.playing) this.player.pause()
+        else this.player.play()
+      }
+      this.tintShow = !this.tintShow
+    },
+    volumeToggle () {
+      this.$log('volumeToggle')
+      if (this.player.muted) {
+        this.player.setState('muted', false)
+        // localStorage.setItem('k_volume', 'on')
+      }
+      else {
+        this.player.setState('muted', true)
+        // localStorage.removeItem('k_volume')
       }
     }
   }

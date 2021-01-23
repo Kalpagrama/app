@@ -1,26 +1,30 @@
 <template lang="pug">
 component(
   :is="playerComponent[composition.outputType]"
-  :composition="composition"
-  :isVisible="isVisible"
-  :isActive="isActive"
-  :options="options"
-  @previewClick="$emit('previewClick')"
-  @ended="$emit('ended')")
-  template(v-for="(index, name) in $slots" v-slot:[name])
-    slot(:name="name")
-  template(v-for="(index, name) in $scopedSlots")
-    slot(:name="name" v-bind="data")
+  v-bind="$props")
+  slot
 </template>
 
 <script>
 import playerVideo from './player_video/index.vue'
 import playerImage from './player_image/index.vue'
+import playerBook from './player_book/index.vue'
 
 export default {
   name: 'compositionPlayer',
-  components: {playerVideo, playerImage},
-  props: ['isActive', 'isVisible', 'composition', 'options'],
+  components: {
+    playerVideo,
+    playerImage,
+    playerBook
+  },
+  props: [
+    'composition',
+    'isVisible',
+    'isActive',
+    'isMini',
+    'options',
+    'styles'
+  ],
   data () {
     return {
       playerComponent: {

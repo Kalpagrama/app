@@ -7,12 +7,53 @@
 <template lang="pug">
 div(
   :style=`{overflow: 'hidden'}`
-  ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
-  .row.full-width.justify-center.q-py-sm
-    img(
+  ).row.full-width.items-center.content-center.q-pa-sm.q-my-sm
+  .row.full-width.justify-center
+    div(
       @click="serviceClick({id: 'oAuthUrlGoogle'})"
-      src="other/btn_google_signin_light_normal_web@2x.png"
-      :style="{width: '268px', height: '60px'}").cursor-pointer.q-mb-sm
+      :style=`{
+        width: '268px', height: '54px',
+        borderRadius: '5px',
+      }`
+      ).row.items-center.content-center.justify-center.bg-white.cursor-pointer
+      q-icon(name="fab fa-google" size="18px").q-mr-xs
+      //- span.text-bold Sign in with Google
+      span.text-bold Войти с Google
+  .row.full-width.justify-center.q-mt-md
+    div(
+      @click="serviceClick({id: 'oAuthUrlApple'})"
+      :style=`{
+        width: '268px', height: '54px',
+        borderRadius: '5px',
+      }`
+      ).row.items-center.content-center.justify-center.bg-white.cursor-pointer
+      q-icon(name="fab fa-apple" size="20px").q-mr-sm
+      //- span.text-bold Sign in with Apple
+      span.text-bold Войти с Apple
+  //- .row.full-width.justify-center.q-py-sm
+    q-btn(
+      @click="serviceClick({id: 'oAuthUrlGoogle'})"
+      flat color="white" no-caps
+      :style=`{
+        position: 'relative',
+        //- height: '55px',
+        padding: '0px',
+      }`).full-width.b-40.q-mb-xs
+      div(
+        :style=`{
+          position: 'relative',
+          minWidth: '264px',
+          height: '50px',
+          borderRadius: '10px',
+          overflow: 'hidden',
+        }`).row
+        img(
+          src="other/btn_google_signin_light_normal_web@2x.png"
+          :style=`{
+            position: 'absolute', zIndex: 100, top: '-10px', left: '-10px',
+            width: 'calc(100% + 20px)',
+            height: 'calc(100% + 20px)',
+          }`)
     q-btn(
       @click="serviceClick({id: 'oAuthUrlApple'})"
       flat color="white" no-caps).full-width.b-40

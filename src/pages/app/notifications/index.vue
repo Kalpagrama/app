@@ -13,7 +13,7 @@ q-layout(view="hHh Lpr lff")
             span(
               :style=`{fontSize: '18px', userSelect: 'none'}`
               ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
-          //- q-btn(round flat color="grey-8" icon="settings")
+          q-btn(round flat color="grey-8" icon="more_vert")
   q-page-container
     router-view
     //- iframe(

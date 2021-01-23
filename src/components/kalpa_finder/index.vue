@@ -3,29 +3,42 @@ q-layout(
   view="hHh Lpr lff"
   container).b-30
   q-header(reveal).b-30
-    .row.full-width.justify-center.q-px-sm
+    div(
+      :style=`{
+        paddingTop: 'env(safe-area-inset-top)',
+      }`
+      ).row.full-width.justify-center.q-px-sm.b-30
       slot(name="header")
       //- pages
-      div(
-        v-if="pagesShow"
-        :style=`{marginBottom: '-2px'}`).row.full-width.q-pl-sm
-        q-tabs(
-          v-model="pageId" no-caps
-          dense active-color="green"
-          ).full-width.text-grey-6
-          q-tab(
-            v-for="p in pagesFiltered" :key="p.id"
-            :name="p.id" :label="p.name")
+      div().row.full-width.justify-center
+        //- q-btn(rounnd flat dense color="white" icon="construction")
+        .col
+          div(
+            v-if="pagesShow"
+            :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-sm
+            q-tabs(
+              v-model="pageId" no-caps
+              dense active-color="green"
+              aling="left"
+              ).text-grey-6
+              q-tab(
+                v-for="p in pagesFiltered" :key="p.id"
+                :name="p.id" :label="p.name")
       //- search
-      .row.full-width
+      div(
+        v-if="!searchString"
+        ).row.full-width.justify-center
         ws-search(
-          @searchString="searchString = $event"
-          @contentKalpa="$emit('contentKalpa', $event)")
+          @searchString="searchStringLocal = $event"
+          @contentKalpa="contentKalpaFound"
+          :style=`{
+            maxWidth: $store.state.ui.pageWidth+'px',
+          }`)
   q-page-container
     component(
       v-bind="$props"
       :is="`page-${pageId}`"
-      :searchString="searchString"
+      :searchString="searchStringLocal"
       :page="page"
       :style=`{}`)
       template(v-slot:tint=`{item}`)
@@ -36,33 +49,28 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
-// filters: {[page-id]: filter, [page-id]: filter, [page-id]: options}
-
 export default {
   name: 'kalpaFinder',
   props: {
-    pageId_: {type: String, default: 'workspace'},
+    pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
-    workspaceTypes: {type: Array},
-    kalpaTypes: {type: Array},
     pages: {type: Object},
+    searchString: {type: String},
   },
   components: {
     wsSearch: () => import('components/ws_search/index.vue'),
+    pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
-    pageKalpa: () => import('./page_kalpa.vue'),
-    pageNodesMine: () => import('./page_nodes_mine.vue'),
-    pageNodesBookmark: () => import('./page_nodes_bookmark.vue'),
+    pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
+    pageNodes: () => import('./page_nodes/index.vue'),
     pageWeb: () => import('./page_web/index.vue'),
     pageGif: () => import('./page_gif/index.vue'),
-    // pageQuery: () => import('./page_query.vue')
   },
   data () {
     return {
-      // pageId: 'workspace',
       pageId: null,
-      searchString: ''
+      searchStringLocal: ''
     }
   },
   computed: {
@@ -72,12 +80,12 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
-        {id: 'kalpagrama', name: 'Кальпаграма', component: 'page-kalpa'},
-        {id: 'nodes-mine', name: 'Мои ядра', component: 'page-nodes-mine'},
-        {id: 'nodes-bookmark', name: 'Ядра из закладок', component: 'page-nodes-bookmark'},
+        {id: 'nodes', name: 'Ядра', component: 'page-nodes'},
+        {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
+        {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
+        {id: 'content', name: 'Загрузки', component: 'page-content'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
-        {id: 'web', name: 'Web', component: 'page-web'},
+        // {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {
         if (this.pages) {
           return this.pages[p.id]
@@ -85,12 +93,17 @@ export default {
         else {
           return true
         }
-        // if (this.pagesFilter) return this.pagesFilter.includes(p.id)
-        // else return true
       })
     }
   },
   watch: {
+    searchString: {
+      handler (to, from) {
+        if (to) {
+          this.searchStringLocal = to
+        }
+      }
+    },
     pageId_: {
       immediate: true,
       handler (to, from) {
@@ -110,7 +123,7 @@ export default {
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // this.$router.replace('/content/' + contentKalpa.oid)
-      let [bookmark] = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
       if (bookmark) {
         await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
       } else {
@@ -118,7 +131,8 @@ export default {
           type: contentKalpa.type,
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl
+          thumbUrl: contentKalpa.thumbUrl,
+          isSubscribed: true
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       }

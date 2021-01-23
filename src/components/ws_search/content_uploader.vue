@@ -4,7 +4,7 @@
     @click.native="start"
     round flat dense color="grey-6" icon="get_app"
     :style=`{
-      width: '42px',
+      width: '58px',
     }`).full-height
   input(
     ref="inputFile" type="file"
@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     accept () {
-      return 'image/*, video/*'
+      return 'image/*, video/*, application/epub+zip'
     },
   },
   methods: {
@@ -33,6 +33,7 @@ export default {
     async fileChanged (e) {
       this.$log('fileChanged', e)
       this.$emit('file', e.target.files[0])
+      // this.$emit('file', new Blob(e.target.files[0]))
       e.target.value = ''
     },
   },

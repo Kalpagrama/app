@@ -1,15 +1,15 @@
-import { isRxDocument } from 'rxdb'
-
 import assert from 'assert'
+import { RxCollectionEnum, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/common'
 import { wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { mutexGlobal, MutexLocal } from 'src/system/rxdb/mutex'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { mutexGlobal } from 'src/system/rxdb/mutex_global'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
-import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
@@ -46,19 +46,6 @@ class WaitBreakable {
    }
 }
 
-const WsItemTypeEnum = Object.freeze({
-   WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
-   WS_NODE: 'WS_NODE',
-   WS_CONTENT: 'WS_CONTENT',
-   WS_SPHERE: 'WS_SPHERE',
-   WS_BOOKMARK: 'WS_BOOKMARK',
-   WS_JOINT: 'WS_JOINT',
-   WS_COLLECTION: 'WS_COLLECTION'
-})
-const WsCollectionEnum = Object.freeze({
-   ...WsItemTypeEnum,
-   WS_CHANGES: 'WS_CHANGES'
-})
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
@@ -104,7 +91,17 @@ class Workspace {
             let onWsChangedByUser = async (id, operation, plainData) => {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                assert('hasChanges' in plainData, '! hasChanges in plainData')
-               if (plainData.hasChanges) await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+               if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
+                  let deletedDocs = await this.db.ws_changes.find({
+                     selector: {
+                        id,
+                        operation: WsOperationEnum.DELETE
+                     }
+                  }).exec()
+                  if (deletedDocs.length === 0) { // только если не удален
+                     await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+                  }
+               }
             }
             const initWsItem = (plainData) => {
                assert(plainData.wsItemType, '!plainData.wsItemType')
@@ -146,8 +143,10 @@ class Workspace {
             this.db.ws_items.postRemove(async (plainData) => {
                // сработает НЕ на всех вкладках (только на той, что изменила итем)
                // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+               logD('postRemove')
                if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
                rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
+               // plainData.deletedAt = Date.now()
             }, false)
          }
       } finally {
@@ -336,7 +335,7 @@ class Workspace {
          operations.push({ operation, wsItemInput })
       }
       try {
-         if (operations.length){
+         if (operations.length) {
             await WorkspaceApi.wsBatchOperation(operations, wsRevisionLocal, wsVersionLocal)
          }
          this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
@@ -433,7 +432,7 @@ class Workspace {
                // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
                await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
                await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
-            } else {
+            } else if (type !== 'WS_ITEM_DELETED') {
                // logD(f, 'try update ws item')
                assert(!itemServer.hasChanges, 'itemServer.hasChanges')
                await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
@@ -510,6 +509,8 @@ class Workspace {
       assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
       delete mangoQuery.selector.rxCollectionEnum
       if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
+
+      mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные ( да! rxdb по умолчанию выводит! )
       if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
       let rxQuery = this.db.ws_items.find(mangoQuery)
       return rxQuery
@@ -531,17 +532,17 @@ class Workspace {
                })
                return acc
             }, [])
-         } else if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE){
+         } else if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE) {
             const foundOtherDocs = await this.db.ws_items.find({
                selector: {
                   wsItemType: RxCollectionEnum.WS_SPHERE,
                   name: itemCopy.name,
-                  id: {$ne: itemCopy.id || 0}
+                  id: { $ne: itemCopy.id || 0 }
                }
             }).exec()
             // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
             if (foundOtherDocs.length) {
-               if (!itemCopy.id){ // создание нового элемента
+               if (!itemCopy.id) { // создание нового элемента
                   return foundOtherDocs[0] // вернем существующий
                } else { // изменение существующего элемента
                   throw new Error(`same sphere found! ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
@@ -613,13 +614,13 @@ class Workspace {
                bm = objectShortOrWsBookmark
             } else { // найти / создать букмарк из objectShort и добавить его в коллекцию
                assert(objectShortOrWsBookmark.oid && objectShortOrWsBookmark.type && objectShortOrWsBookmark.thumbUrl, '!objectShortOrWsBookmark.oid')
-               let [found] = await rxdb.find({
+               let { items } = await rxdb.find({
                   selector: {
                      rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
                      oid: objectShortOrWsBookmark.oid
                   }
                })
-               if (found) bm = found
+               if (items.length) bm = items[0]
                else {
                   let objBookmarkInput = {
                      oid: objectShortOrWsBookmark.oid,
@@ -644,7 +645,7 @@ class Workspace {
             // удалить себя(коллекцию) из всех bookmarks
             assert(reactiveCollection.bookmarks, '!reactiveCollection.bookmarks')
             if (permanent) {
-               let bookmarks = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
+               let {items: bookmarks} = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
                for (let bm of bookmarks) {
                   bm.collections = bm.collections.filter(id => id !== reactiveCollection.id)
                }
@@ -655,8 +656,13 @@ class Workspace {
          reactiveBookmark.beforeRemove = async (permanent = false) => {
             // удалить себя(букмарк) из всех коллекций
             assert(reactiveBookmark.collections, '!removedItem.collections')
-            if (permanent) {
-               let collections = await rxdb.find({ selector: { id: { $in: reactiveBookmark.collections } } })
+            if (permanent && reactiveBookmark.collections && reactiveBookmark.collections.length > 0) {
+               let {items: collections} = await rxdb.find({
+                  selector: {
+                     rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
+                     id: { $in: reactiveBookmark.collections }
+                  }
+               })
                for (let c of collections) {
                   c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)
                }

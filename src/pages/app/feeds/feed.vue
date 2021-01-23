@@ -8,7 +8,11 @@
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
           feed-item(
             v-if="item.subject"
-            :item="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+            :item="item" :isActive="isActive" :isVisible="isVisible")
+          //- div(
+            v-if="item.type === 'OBJECT_CREATED'"
+            ).row.full-width.br
+            small.text-white {{ item.type }}
         template(v-slot:append)
           div(:style=`{height: '50px'}`).row.full-width.justify-center
             q-spinner-dots(v-show="nexting" color="green" size="50px")
@@ -47,12 +51,15 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.$store.getters.currentUser().oid,
           // subscription: {$in: this.feedSubscriptions}
-        }
+          matterReason: {$ne: 'AUTHOR'}, // только события относительно объектов, где я не являюсь автором объекта
+          eventType: {$in: ['OBJECT_CREATED']} // только события о создании объектов
+        },
+        populateObjects: true
       }
       // add subscription array if not empty
-      if (this.feedSubscriptions.length > 0) {
-        res.selector.subscription = {$in: this.feedSubscriptions}
-      }
+      // if (this.feedSubscriptions.length > 0) {
+      //   res.selector.subscription = {$in: this.feedSubscriptions}
+      // }
       return res
     }
   },

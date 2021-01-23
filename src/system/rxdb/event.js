@@ -1,10 +1,11 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
-import { getReactiveDoc, rxdb } from 'src/system/rxdb'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { rxdb } from 'src/system/rxdb/index_browser'
+import { RxCollectionEnum } from 'src/system/rxdb/common'
+import { getReactiveDoc } from 'src/system/rxdb/reactive'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
@@ -32,7 +33,7 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start')
+      logD(f, 'start', event)
       const t1 = performance.now()
 
       if (event.type === 'BATCH_EVENTS') {
@@ -68,7 +69,7 @@ class Event {
                   // обнулим прогресс
                   let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: event.object.oid, progress: -1 }
                   store.commit('core/processEvent', fakeProgressEvent)
-                  let createdWsNodes = await rxdb.find({
+                  let {items: createdWsNodes} = await rxdb.find({
                      selector: {
                         rxCollectionEnum: RxCollectionEnum.WS_NODE,
                         $or: [{ oid: event.object.oid }, { oid: null }]
@@ -81,15 +82,6 @@ class Event {
                      await wsNode.updateExtended('stage', 'draft', false)// без debounce
                      delete wsNode.oid
                   }
-                  // await wait(3000)
-                  // let createdWsNodes2 = await rxdb.find({
-                  //    selector: {
-                  //       rxCollectionEnum: RxCollectionEnum.WS_NODE,
-                  //       stage: 'published',
-                  //       oid: event.object.oid
-                  //    }
-                  // })
-                  // logD(f, 'createdWsNodes2=', createdWsNodes2)
                }
                this.notifyError(event)
                break

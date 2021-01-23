@@ -3,7 +3,7 @@ q-layout(view="hHh Lpr lff")
   q-page-container
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
           q-input(
             v-if="sphere"
@@ -80,7 +80,7 @@ export default {
     outHandle ([type, val]) {
       this.$log('outHandle', type, val)
       if (type === 'back') {
-        this.$router.back()
+        this.$routerKalpa.back()
       }
     },
   },

@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
 import assert from 'assert'
@@ -20,7 +20,6 @@ const routes = [
       component: () => import('layouts/auth_layout.vue'),
       children: [
          { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
-         { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') }
       ],
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
@@ -32,24 +31,28 @@ const routes = [
       }
    },
    {
-      path: '/share', // этот маршрут обрабатыватся хуком в initPWA()
+      path: '/docs/:id?',
+      component: () => import('layouts/docs_layout.vue')
+   },
+   {
+      path: '/share' // этот маршрут обрабатыватся хуком в initPWA()
    },
    {
       path: '/',
       component: () => import('layouts/main_layout'),
       children: [
          {
+            name: 'about',
+            path: 'about',
+            component: () => import('pages/app/about/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'feeds',
             path: 'feeds/:id?',
             component: () => import('pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
-         // {
-         //    name: 'welcome',
-         //    path: 'welcome',
-         //    component: () => import('pages/app/welcome/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
          {
             name: 'settings',
             path: 'settings',
@@ -61,21 +64,9 @@ const routes = [
                   path: 'account',
                   component: () => import('pages/app/settings/view_account/index.vue'),
                   meta: { roleMinimal: 'MEMBER' }
-               },
-               {
-                  name: 'settings.workspace',
-                  path: 'workspace',
-                  component: () => import('pages/app/settings/view_workspace/index.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               },
-               {
-                  name: 'settings.docs',
-                  path: 'docs',
-                  component: () => import('pages/app/settings/view_docs/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
                }
             ],
-            // meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             path: 'user/:oid',
@@ -85,18 +76,6 @@ const routes = [
                   path: ':tab?',
                   name: 'user',
                   component: () => import('pages/app/user/page_profile/index.vue')
-               },
-               {
-                  path: 'workspace/:tab?',
-                  name: 'user.workspace',
-                  redirect: '/workspace',
-                  // component: () => import('pages/app/user/page_workspace/index.vue')
-               },
-               {
-                  path: 'settings/:tab?',
-                  name: 'user.settings',
-                  redirect: '/settings'
-                  // component: () => import('pages/app/user/page_settings/index.vue')
                }
             ],
             meta: { roleMinimal: 'GUEST' }
@@ -104,38 +83,30 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
-            redirect: 'node/:oid/joints',
             component: () => import('pages/app/node/index.vue'),
-            children: [
-               {
-                  name: 'node.joints',
-                  path: 'joints',
-                  component: () => import('pages/app/node/view_joints/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               }
-            ],
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'joint',
-            path: 'joint/:oid',
-            component: () => import('pages/app/joint/index.vue')
+            name: 'links',
+            path: 'links/:oid',
+            component: () => import('pages/app/links/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'sphere',
-            path: 'sphere/:oid',
+            path: 'sphere/:oid/:page?',
             component: () => import('pages/app/sphere/index.vue'),
             children: [
                {
                   name: 'sphere.nodes',
                   path: 'nodes',
-                  component: () => import('pages/app/sphere/view_nodes/index.vue'),
+                  component: () => import('pages/app/sphere/page_nodes/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                },
                {
                   name: 'sphere.spheres',
                   path: 'spheres',
-                  component: () => import('pages/app/sphere/view_spheres/index.vue'),
+                  component: () => import('pages/app/sphere/page_spheres/index.vue'),
                   meta: { roleMinimal: 'GUEST' }
                }
             ],
@@ -151,8 +122,8 @@ const routes = [
             name: 'content',
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid, query: route.query }),
-            component: () => import('pages/app/content/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            component: () => import('src/pages/app/content/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             path: 'notifications',
@@ -167,54 +138,39 @@ const routes = [
             ],
             meta: { roleMinimal: 'MEMBER' }
          },
+         // {
+         //    name: 'messages',
+         //    path: 'messages',
+         //    component: () => import('pages/app/messages/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
-            name: 'messages',
-            path: 'messages',
-            component: () => import('pages/app/messages/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            name: 'workspace',
+            path: 'workspace',
+            component: () => import('pages/app/ws_index/index.vue'),
+         },
+         {
+            name: 'workspace.bookmarks',
+            path: 'workspace/bookmarks',
+            component: () => import('pages/app/ws_index/page_bookmarks/index.vue')
          },
          {
             name: 'workspace.create',
             path: 'workspace/create',
-            component: () => import('pages/app/ws_create/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            component: () => import('pages/app/ws_index/page_create/index.vue')
          },
-         {
-            name: 'workspace',
-            path: 'workspace/:viewId?',
-            component: () => import('pages/app/ws_index/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.collection',
-            path: 'workspace/collection/:id',
-            component: () => import('pages/app/ws_collection/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.collection-view',
-            path: 'workspace/collection-view/:id/:viewid',
-            component: () => import('pages/app/ws_collection_view/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.node',
-            path: 'workspace/node/:id',
-            component: () => import('pages/app/ws_node/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.joint',
-            path: 'workspace/joint/:id',
-            component: () => import('pages/app/ws_joint/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.trash',
-            path: 'workspace/trash',
-            component: () => import('pages/app/ws_joint/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
+         // {
+         //    name: 'workspace.create',
+         //    path: 'workspace/create',
+         //    component: () => import('pages/app/ws_create/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
+         // {
+         //    name: 'workspace',
+         //    path: 'workspace/:viewId?',
+         //    component: () => import('pages/app/ws_index/index.vue'),
+         //    meta: { roleMinimal: 'MEMBER' }
+         // },
          {
             name: 'fallback',
             path: '*',
@@ -249,12 +205,19 @@ routes.push({
 })
 
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
-for (let r of routes[2].children) {
-   assert(r.path, '!r.path' + JSON.stringify(r))
-   let path = r.path.split('/')[0]
-   assert(path, '!path')
-   if (path === '*') continue
-   assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
+// при добавлении роута - добавить его в vueRoutesRegexp
+for (let route of routes) {
+   assert(route.path, '!route.path')
+   if (route.children) {
+      for (let cr of route.children) {
+         assert(cr.path, '!cr.path' + JSON.stringify(cr))
+         let path = (route.path + '/' + cr.path).split('/').filter(p => p)[0]
+         assert(path, '!path')
+         assert(vueRoutesRegexp.test(`https://kalpa.app/${path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${path}/params`)
+      }
+   } else {
+      assert(vueRoutesRegexp.test(`https://kalpa.app/${route.path}/params`), '!vueRoutesRegexp.test not pass: bad path: ' + `https://kalpa.app/${route.path}/params`)
+   }
 }
 
 export default routes

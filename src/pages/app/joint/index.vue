@@ -6,7 +6,7 @@ q-layout(view="hHh Lpr lff")
         div(:style=`{height: '60px',borderRadius: '10px', overflow: 'hidden',}`
           ).row.full-width.items-center.content-center.b-40.q-px-sm
           q-btn(
-            @click="$router.back()"
+            @click="$routerKalpa.back()"
             round flat color="white" icon="keyboard_arrow_left")
           q-icon(name="link" color="white" size="30px").q-mr-sm.q-my-xs
           div(:style=`{overflowX: 'auto'}`).col

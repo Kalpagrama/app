@@ -1,10 +1,11 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
 import { EventApi } from 'src/api/event'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -53,11 +54,12 @@ class ListsApi {
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 4' + JSON.stringify(mangoQuery))
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      let pagination = mangoQuery.pagination || null
+      delete mangoQuery.pagination
       let res
-      let pagination = { pageSize: 1000, pageToken: null }
       switch (rxCollectionEnum) {
          case RxCollectionEnum.LST_FEED:
-            res = await ListsApi.find(FindCollectionEnum.EVENTS, mangoQuery)
+            res = await ListsApi.find(FindCollectionEnum.EVENTS, mangoQuery, pagination)
             for (let event of res.items) {
                event.card = EventApi.makeEventCard(event)
             }
@@ -66,19 +68,18 @@ class ListsApi {
          case RxCollectionEnum.LST_SPHERE_ITEMS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
             if (!mangoQuery.selector.objectTypeEnum) mangoQuery.selector.objectTypeEnum = { $in: ['JOINT', 'NODE'] }
-            // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
-            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery)
+            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SUBSCRIBERS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere, pagination)
+            res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere)
             break
          case RxCollectionEnum.LST_SUBSCRIPTIONS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere, pagination)
+            res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere)
             break
          case RxCollectionEnum.LST_SEARCH:
-            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, true)
+            res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
             break
          default:
             throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)
@@ -132,31 +133,32 @@ class ListsApi {
       return res
    }
 
-   static async find (collection, mangoQuery, search = false) {
+   static async find (collection, mangoQuery, pagination) {
+      mangoQuery = cloneDeep(mangoQuery)
       ListsApi.checkMangoQuery(mangoQuery)
       const f = ListsApi.find
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
-         let { data: { find: { items, events, objects, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+         let { data: { find: { items, events, objects, count, totalCount, nextPageToken, prevPageToken, currentPageToken } } } = await apollo.clients.api.query({
             query: gql`
-                ${search ? fragments.findResultFragmentForSearch : fragments.findResultFragment}
-                query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON!){
-                    find (collection: $collection, mangoQuery: $mangoQuery) {
+                ${fragments.findResultFragment}
+                query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON! $pagination: PaginationInput){
+                    find (collection: $collection, mangoQuery: $mangoQuery, pagination: $pagination) {
                         ...findResultFragment
                     }
                 }
             `,
-            variables: { collection, mangoQuery }
+            variables: { collection, mangoQuery, pagination }
          })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          assert(count >= 0, 'count >= 0')
-         return { items: items || events || objects, count, totalCount, nextPageToken }
+         return { items: items || events || objects, count, totalCount, nextPageToken, prevPageToken, currentPageToken }
       }
       return await apiCall(f, cb)
    }
 
-   static async userSubscriptions (oid, pagination) {
+   static async userSubscriptions (oid) {
       let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
       assert(user && user.subscriptions, '!user')
       assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
@@ -164,12 +166,14 @@ class ListsApi {
          items: user.subscriptions,
          count: user.subscriptions.length,
          totalCount: user.subscriptions.length,
-         nextPageToken: null
+         nextPageToken: null,
+         currentPageToken: null,
+         prevPageToken: null
       }
    }
 
    // внимание ! вернет НЕ реактивный элемент!!!
-   static async objSubscribers (oid, pagination) {
+   static async objSubscribers (oid) {
       const f = ListsApi.objSubscribers
       logD(f, 'start')
       let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, { clientFirst: false }) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
@@ -180,7 +184,9 @@ class ListsApi {
          items: subscribers,
          count: subscribers.length,
          totalCount: subscribers.length,
-         nextPageToken: null
+         nextPageToken: null,
+         currentPageToken: null,
+         prevPageToken: null
       }
    }
 }

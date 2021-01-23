@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 

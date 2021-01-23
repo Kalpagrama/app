@@ -3,8 +3,7 @@ component(
   :is="editorComponent[composition.outputType]"
   :composition="composition"
   :contentKalpa="contentKalpa"
-  :player="player"
-  )
+  :player="player")
 </template>
 
 <script>

@@ -47,7 +47,7 @@ export default {
     },
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     window.addEventListener('scroll', this.onScroll)
   },
   beforeDestroy () {

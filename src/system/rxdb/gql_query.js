@@ -1,7 +1,7 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb, makeId, getRawIdFromId } from 'src/system/rxdb/index'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getRawIdFromId } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ObjectApi } from 'src/api/object'
@@ -17,11 +17,7 @@ class GqlQueries {
       this.cache = cache
    }
 
-   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
-   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
-   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-   async get (id, clientFirst, force, onFetchFunc = null, params = null) {
+   static getFetchFunc(id, params){
       let fetchFunc
       switch (getRawIdFromId(id)) {
          case 'services' :
@@ -63,6 +59,15 @@ class GqlQueries {
          default:
             throw new Error(`bad id ${id}`)
       }
+      return fetchFunc
+   }
+
+   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
+   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
+   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
+   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
+   async get (id, clientFirst, force, onFetchFunc = null, params = null) {
+      let fetchFunc = GqlQueries.getFetchFunc(id, params)
 
       // logD('objects::get start')
       let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)

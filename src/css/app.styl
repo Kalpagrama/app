@@ -2,27 +2,48 @@
   touch-action: manipulation
 html, body
   font-family: 'Open Sans', sans-serif;
-  background: rgb(30,30,30) !important;
+  background: rgb(30,30,30)
 ::-webkit-scrollbar
   width: 0px
   height: 0px !important
+.q-field--outlined .q-field__control
+  border-radius: 10px !important
 .q-drawer
   background: none !important
+//   // transform: translate3d(0,0,100px) !important
+// .q-tabs
+//   // transform: translate3d(0,0,100px) !important
 .q-btn
-  border-radius: 8px
-.q-item
-  border-radius: 10px !important
+  border-radius: 10px
+// .q-item
+//   border-radius: 10px !important
 .q-menu
-  background: none !important
+//   background: none !important
+  transform: translate3d(0,0,200px) !important
   border-radius: 10px
   overflow: hidden
+  text-decoration: none !important
+.q-dialog
+  transform: translate3d(0,0,100px) !important
+.q-dialog__inner
+  border-radius: 10px !important
+  overflow hidden
+.q-header
+  // border-radius: 0 0 10px 10px !important
+  // overflow: hidden !important
+  background: none !important
+  transform: translate3d(0,0,100px) !important
 .q-footer
-  border-radius: 10px 10px 0 0
-  overflow: hidden
-.k-item
-  cursor: pointer
-  &:hover
-    background: rgb(50,50,50) !important
+  border-radius: 10px 10px 0 0 !important
+  overflow: hidden !important
+  background: none !important
+  transform: translate3d(0,0,100px) !important
+.q-drawer
+  // transform: translate3d(0,0,100px) !important
+.q-tabs
+  transform: translate3d(0,0,100px) !important
+.q-page-sticky
+  // transform: translate3d(0,0,100px) !important
 h1
   font-size: 20px
   margin: 0

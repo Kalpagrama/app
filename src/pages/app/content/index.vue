@@ -1,5 +1,10 @@
 <template lang="pug">
-component(
+explorer-default(
+  v-if="contentKalpa"
+  :key="contentKalpa.oid"
+  :contentKalpa="contentKalpa"
+  :query="query")
+//- component(
   v-if="contentKalpa"
   :is="explorerComponent[contentKalpa.type]"
   :key="contentKalpa.oid"
@@ -10,19 +15,26 @@ component(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import explorerImage from './explorer_image/index.vue'
-import explorerVideo from './explorer_video/index.vue'
+import explorerDefault from './explorer_default/index.vue'
+// import explorerBook from './explorer_book/index.vue'
+// import explorerVideo from './explorer/index.vue'
+// import explorerImage from './explorer/index.vue'
 
 export default {
   name: 'contentExplorer',
-  components: {explorerVideo, explorerImage},
+  components: {
+    explorerDefault,
+    // explorerBook,
+    // explorerVideo,
+    // explorerImage
+  },
   props: ['oid', 'query'],
   data () {
     return {
       contentKalpa: null,
       explorerComponent: {
         VIDEO: 'explorer-video',
-        IMAGE: 'explorer-image',
+        IMAGE: 'explorer-video',
         BOOK: 'explorer-book',
         WEB: 'explorer-web',
       }
@@ -44,11 +56,14 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

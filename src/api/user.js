@@ -1,8 +1,8 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
-import { LstCollectionEnum } from 'src/system/rxdb/lists'
+import { LstCollectionEnum } from 'src/system/rxdb/common'
 import { apiCall } from 'src/api/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
@@ -44,6 +44,7 @@ class UserApi {
     const f = UserApi.subscribe
     logD(f, 'start', oid)
     const t1 = performance.now()
+    // let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid) // вне cb - иначе дедлок
     const cb = async () => {
       let { data: { subscribe } } = await apollo.clients.api.mutate({
         mutation: gql`
@@ -58,21 +59,40 @@ class UserApi {
           oid
         }
       })
-      let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
-
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, subscribe)
       return subscribe
     }
     return await apiCall(f, cb)
   }
 
-  // check subscription
+  static async checkUsernameFree (username) {
+    const f = UserApi.checkUsernameFree
+    logD(f, 'start', username)
+    const t1 = performance.now()
+    const cb = async () => {
+      let { data: { checkUsernameFree } } = await apollo.clients.auth.query({
+        query: gql`
+          query  ($username: String!){
+            checkUsernameFree(username: $username)
+          }
+        `,
+        variables: {
+          username
+        }
+      })
+      return checkUsernameFree
+    }
+    let res = await apiCall(f, cb)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
+    return res
+  }
+
   static async isSubscribed (oid) {
     const f = UserApi.isSubscribed
     logD(f, 'start', oid)
     const t1 = performance.now()
     let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
-    let items = await rxdb.find({
+    let { items } = await rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,
         oidSphere: oid
@@ -88,6 +108,7 @@ class UserApi {
   static async unSubscribe (oid) {
     const f = UserApi.subscribe
     logD(f, 'start', oid)
+    console.log('unSubscribe', oid)
     const t1 = performance.now()
     const cb = async () => {
       let { data: { unSubscribe } } = await apollo.clients.api.mutate({
