@@ -55,7 +55,7 @@ export default {
         this.$log('items UPDATED')
         if (this.findRes && this.findRes.hasPrev()){
           this.$logE('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
-          await this.findRes.prev(5)
+          await this.findRes.prev(10)
         }
         if (to && from) {
           this.$log('items UPDATED', to.length)

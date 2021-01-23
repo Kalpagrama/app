@@ -73,6 +73,7 @@ export default {
           objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
+          groupByContentLocation: false
         },
         populateObjects: true,
       }
@@ -169,7 +170,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.findRes = await this.$rxdb.find(this.itemsQuery, false) // {items, next, hasNext, prev, hasPrev}
+    this.findRes = await this.$rxdb.find(this.itemsQuery, true) // {items, next, hasNext, prev, hasPrev}
     while (this.findRes.hasNext()) {
       // this.$log('items.next !!!')
       await this.findRes.next(10)
