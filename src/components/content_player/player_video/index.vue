@@ -5,12 +5,36 @@ div(
     borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width
-  //- .row.full-width.q-py-lg.bg-black
-  //- .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-      .row.full-width.items-center.content-center.q-py-xs.q-px-sm
-        q-btn(round flat dense color="white" icon="west" @click="$routerKalpa.back()").q-mr-xs
-        router-link(:to="'/content/'+contentKalpa.oid").text-white content {{ contentKalpa.name }}
+  //- header: context
+  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="player && player.duration && options.showHeader"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        left: '0px', top: '0px',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.666) 100%)',
+        borderRadius: '8px',
+      }`
+      ).row.full-width
+      q-btn(
+        flat color="white" no-caps dense
+        :to="contentLink"
+        :style=`{
+          overflow: 'hidden',
+        }`).row.q-py-sm.q-pr-sm
+        q-icon(
+          name="select_all" size="20px"
+          :class=`{
+            'q-mr-sm': !isMini
+          }`
+          :style=`{marginLeft: '10px',}`)
+        div(
+          v-show="!isMini"
+          :style=`{
+            overflow: 'hidden',
+          }`
+          ).col
+          span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
   //- body
   div(
     :style=`{
@@ -28,6 +52,7 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
+  //- tint
   //- footer
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
@@ -38,10 +63,12 @@ div(
           bottom: '0px',
           background: 'linear-gradient(0deg, rgba(0,0,0,0.666) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 6px 6px',
+          opacity: options.showFooter ? 1 : 0,
         }
         :
         {
           position: 'relative',
+          opacity: options.showFooter ? 1 : 0,
         }`
       ).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
@@ -55,117 +82,32 @@ div(
               q-btn(
                 v-if="player"
                 @click="volumeToggle()"
-                round flat dense size="sm"
-                :color="player.muted ? 'red' : 'white'"
+                round flat dense size="md"
+                :color="player.muted ? 'red' : 'grey-6'"
                 :icon="player.muted ? 'volume_off' : 'volume_up'"
                 :style=`{
                 }`)
-  //- .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-xs
-      .row.full-width.items-center.content-center.q-px-sm
-        q-btn(round flat dense color="white" icon="fullscreen")
-        .col
-          tint-bar-new(
-            v-if="player && player.duration"
-            :player="player" :contentKalpa="contentKalpa")
-        q-btn(round flat dense color="white" icon="volume_up")
-  //- player-tint(
-    v-bind="$props"
-    :player="player")
-  //- player tint caller
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="tintShow === false"
-      @click="player.muted ? player.setState('muted', false) : tintShow = true"
-      :style=`{
-        position: 'absolute', zIndex: 900,
-      }`
-      ).row.fit
-  //- player tint
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="tintShow === true"
-      @click.self="tintShow = false"
-      :style=`{
-        position: 'absolute', zIndex: 900,
-        background: 'rgba(0,0,0,0.5)',
-        borderRadius: '10px',
-      }`
-      ).row.fit.items-center.content-center.justify-center
-      //- CONTENT: routerLink: contentName, actions
-      q-btn(
-        v-if="!isMini"
-        flat dense color="white" no-caps align="left"
-        :to="contentLink"
-        :style=`{
-          position: 'absolute', zIndex: 901,
-          top: '8px', left: '42px',
-          overflow: 'hidden',
-          maxWidth: 'calc(100% - 96px)',
-        }`).row.full-width.no-wrap
-        span(:style=`{whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',}`).text-white {{ contentKalpa.name }}
-      //- ACTIONS: replay,play/pause,forward
-      div(
-        :style=`{
-          position: 'relative',
-        }`
-        ).row.items-center.content-center.justify-center
-        q-btn(
-          v-if="!isMini"
-          @click="tapClick(0)"
-          round flat color="white" size="md"
-          :style=`{
-            borderRadius: '50%',
-          }`)
-          q-icon(
-            name="replay_5" size="40px" color="white")
-        q-btn(
-          @click="player.playing ? player.pause() : player.play()"
-          round flat color="white" size="lg"
-          :style=`{
-            borderRadius: '50%',
-          }`).q-mx-lg
-          q-icon(
-            size="60px" color="white"
-            :name="player.playing ? 'pause' : 'play_arrow'")
-        q-btn(
-          v-if="!isMini"
-          @click="tapClick(1)"
-          round flat color="white" size="md"
-          :style=`{
-            borderRadius: '50%',
-          }`)
-          q-icon(
-            name="forward_5" size="40px" color="white")
-  //- context
-  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-    div(
-      v-if="player && player.duration"
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="player && !options.showFooter"
+      @click="volumeToggle()"
+      round flat dense size="md"
+      :color="player.muted ? 'red' : 'grey-6'"
+      :icon="player.muted ? 'volume_off' : 'volume_up'"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        left: '0px', top: '0px',
-        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.666) 100%)',
-        borderRadius: '8px',
-      }`
-      ).row.full-width
-      q-btn(
-        flat color="white" no-caps dense
-        :to="contentLink"
-        :style=`{
-          overflow: 'hidden',
-        }`).row.q-py-sm.q-pr-sm
-        q-icon(name="select_all" size="20px" :style=`{marginLeft: '10px',}`).q-mr-sm
-        div(
-          :style=`{
-            overflow: 'hidden',
-          }`
-          ).col
-          span(:style=`{whiteSpace: 'nowrap'}`) {{ contentKalpa.name }}
+        right: '8px', top: 'calc(50% - 20px)',
+      }`)
+  div(
+    :style=`{
+      height: '100px',
+    }`
+    ).row.full-width.bg-red
 </template>
 
 <script>
-import playerBarMini from './player_bar_mini.vue'
-import playerTint from './player_tint/index.vue'
+// import playerBarMini from './player_bar_mini.vue'
+// import playerTint from './player_tint/index.vue'
 import tintBarNew from './player_tint/tint_bar_new.vue'
 
 export default {
@@ -173,8 +115,8 @@ export default {
   components: {
     playerYoutube: () => import('./player_youtube.vue'),
     playerKalpa: () => import('./player_kalpa.vue'),
-    playerBarMini,
-    playerTint,
+    // playerBarMini,
+    // playerTint,
     tintBarNew
   },
   props: {
@@ -184,15 +126,7 @@ export default {
     isMini: {type: Boolean, default: false},
     options: {type: Object, default: {}},
     figures: {type: Array},
-    styles: {
-      type: Object,
-      default () {
-        return {
-          global: {},
-          padding: {}
-        }
-      }
-    },
+    styles: {type: Object},
   },
   data () {
     return {

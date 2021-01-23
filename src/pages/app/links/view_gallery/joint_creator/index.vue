@@ -165,6 +165,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
+import { ContentApi } from 'src/api/content'
 
 import kalpaFinder from 'components/kalpa_finder/index.vue'
 
@@ -246,7 +247,7 @@ export default {
       try {
         this.$log('publish start')
         this.publishing = true
-        await this.$wait(500)
+        // await this.$wait(500)
         let jointInput = JSON.parse(JSON.stringify(this.joint))
         jointInput.items[0] = this.item
         if (jointInput.items.length === 1) {
@@ -263,7 +264,13 @@ export default {
           }
         }
         // let jointInput = this.joint
-        jointInput.items[0] = this.item
+        // jointInput.items[0] = this.item
+        // popuplate jointInput.items[1] fo GIF
+        this.$log('jointInput', jointInput)
+        if (jointInput.items[1].type === 'GIF' && !jointInput.items[1].oid) {
+          let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
+          jointInput.items[1].oid = contentKalpa.oid
+        }
         this.$log('jointInput', jointInput)
         this.$log('publish done')
         this.publishing = false

@@ -20,8 +20,9 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
         transform: 'translate3d(0,0,100px)',
         //- background: 'black',
         //- background: 'rgba(0,0,0,0.95)',
+        background: 'rgba(30,30,30,'+itemBackgroundOpacity+')',
       }`
-      ).row.fit.b-30
+      ).row.fit
   //- items left/right
   div(
     v-for="(item, ii) in node.items" :key="ii"
@@ -48,8 +49,6 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
             left: itemLeft+'px',
             maxWidth: itemWidth+'px',
             maxHeight: itemHeight+'px',
-            //- background: 'rgba(0,0,0,0.5)',
-            //- background: 'rgba(30,30,30,'+itemBackgroundOpacity+')',
             transform: 'translate3d(0,0,100px)',
           }
           :
@@ -85,7 +84,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
               height: '50px',
             }`).q-px-md
             span Свернуть
-    //- tint
+    //- tint to make item active...
     div(
       v-if="itemActive !== ii"
       @click="itemClick(ii)"
@@ -136,7 +135,7 @@ export default {
       if (this.itemActive === index) {
         // close item if it is opened
         if (this.itemOpened === index) {
-          this.$tween.to(this, 0.3, {
+          this.$tween.to(this, 0.8, {
             itemTop: this.itemTopMini,
             itemLeft: this.itemLeftMini,
             itemWidth: this.itemWidthMini,
@@ -147,7 +146,7 @@ export default {
               // this.itemOpened = null
             }
           })
-          await this.$wait(100)
+          await this.$wait(400)
           this.itemOpened = null
         }
         // open item if it is closed/only active...
@@ -167,14 +166,10 @@ export default {
           // get item ratio...
           let item = this.node.items[index]
           // shift
-          this.$tween.to(this, 0.3, {
-            // itemTop: (this.$q.screen.height - height) / 2,
+          this.$tween.to(this, 0.8, {
             itemTop: 0,
-            // itemLeft: (this.$q.screen.width - width * 2) / 2,
             itemLeft: 0,
-            // itemWidth: width * 2,
             itemWidth: this.$q.screen.width,
-            // itemHeight: height,
             itemHeight: this.$q.screen.height,
             itemBackgroundOpacity: 0.95,
             onComplete: () => {

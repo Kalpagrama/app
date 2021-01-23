@@ -26,7 +26,7 @@
       :color="'green'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Ядрануть
+        small(:style=`{whiteSpace: 'nowrap'}`) Создать
     //- q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps
