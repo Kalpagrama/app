@@ -51,10 +51,11 @@ export default {
     },
     items: {
       deep: false,
-      handler (to, from) {
-        // this.$log('items UPDATED')
+      async handler (to, from) {
+        this.$log('items UPDATED')
         if (this.findRes && this.findRes.hasPrev()){
-          alert('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
+          this.$logE('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
+          await this.findRes.prev(5)
         }
         if (to && from) {
           this.$log('items UPDATED', to.length)
