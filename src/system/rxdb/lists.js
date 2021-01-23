@@ -10,7 +10,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
 
-function makeListCacheId (mangoQuery) {
+export function makeListCacheId (mangoQuery) {
    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 3' + JSON.stringify(mangoQuery))
    let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
    assert(rxCollectionEnum in LstCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
@@ -40,7 +40,7 @@ class Lists {
       let id = makeListCacheId(mangoQuery) // запишется в cache.props.oid
       let fetchFunc = async () => {
          let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
-         let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
+         let { items, count, totalCount, nextPageToken, prevPageToken, currentPageToken } = await ListApi.getList(mangoQuery)
          // todo
          let itemFilter = () => {
             // фильтровать items по mangoQuery
@@ -48,7 +48,7 @@ class Lists {
          }
          items = items.filter(itemFilter)
          return {
-            item: { items, count: items.length, totalCount, nextPageToken, oid },
+            item: { items, count: items.length, totalCount, nextPageToken, prevPageToken, currentPageToken, oid },
             actualAge: 'day',
             mangoQuery
          }
@@ -369,7 +369,7 @@ class Lists {
             key: key,
             path: '',
             setter: (value) => {
-               // { items, count, totalCount, nextPageToken }
+               // { items, count, totalCount, nextPageToken, currentPageToken, prevPageToken }
                logD('setter: ', value)
                assert(value.items && value.count >= 0 && value.totalCount >= 0)
                let insertedIndx

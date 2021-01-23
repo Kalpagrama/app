@@ -23,14 +23,15 @@ const LstCollectionEnum = Object.freeze({
    LST_FEED: 'LST_FEED',
    LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
    LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
-   LST_SEARCH: 'LST_SEARCH' // подписки пользователя
+   LST_SEARCH: 'LST_SEARCH'
 })
 
 const RxCollectionEnum = Object.freeze({
    ...WsCollectionEnum, // списки мастерской
    ...LstCollectionEnum, // списки из objectShort
    OBJ: 'OBJ', // список закэшированных объектов
-   GQL_QUERY: 'GQL_QUERY', // иное
+   GQL_QUERY: 'GQL_QUERY', // произвольный(из конечного списка) запрос к серверу
+   LOCAL: 'LOCAL', // иное (любые данные, хранимые тоько на клиенте) (удаялется по мере заполнения кэша)
    META: 'META'
 })
 

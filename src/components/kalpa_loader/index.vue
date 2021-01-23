@@ -32,7 +32,7 @@ export default {
   data () {
     return {
       items: null,
-      itemsCreated: false,
+      findRes: null,
       nexting: false
     }
   },
@@ -44,8 +44,8 @@ export default {
         // this.$logW('query CHANGED', to)
         if (this.items) {
           this.items = null
-          this.itemsCreated = false
-          this.next(0, () => {})
+          this.findRes = null
+          await this.next(0, () => {})
         }
       }
     },
@@ -53,6 +53,9 @@ export default {
       deep: false,
       handler (to, from) {
         // this.$log('items UPDATED')
+        if (this.findRes && this.findRes.hasPrev()){
+          alert('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
+        }
         if (to && from) {
           this.$log('items UPDATED', to.length)
           this.$emit('items', to)
@@ -74,21 +77,18 @@ export default {
     async next (i, done) {
       this.$log('*** NEXT start ***')
       this.nexting = true
-      if (!this.itemsCreated) {
+      if (!this.findRes) {
         // this.$log('*** NEXT itemsCreating before', this.items)
-        this.items = await this.$rxdb.find(this.query, false)
-        this.itemsCreated = true
-        // this.$log('*** NEXT itemsCreating next', this.items)
+        this.findRes = await this.$rxdb.find(this.query) // {items, next, hasNext, prev, hasPrev}
+        this.items = this.findRes.items
+      } else {
+        await this.findRes.next(this.limit)
       }
-      this.$log('before next. limit=', this.limit)
-      await this.items.next(this.limit)
-      this.$log('after next. hasMore=', this.items.hasMore)
-      if (this.items.hasMore) done()
+      if (this.findRes.hasNext()) done()
       else {
-        this.$emit('items', this.items)
+        this.$emit('items', this.findRes.items)
         done(true)
       }
-      // this.$log('*** NEXT done ***')
       this.nexting = false
     }
   }
