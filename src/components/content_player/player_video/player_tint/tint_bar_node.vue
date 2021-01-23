@@ -12,20 +12,7 @@ div(
       background: 'rgb(35,35,35)',
     }`
     ).row.q-pa-sm
-    div(
-      :style=`{
-        position: 'absolute', top: '0px', right: '-36px',
-        width: '36px',
-      }`
-      ).row.items-start.content-start.full-height
-      q-btn(
-        @click="nodePublish()"
-        round flat dense color="green" icon="check"
-        :loading="nodePublishing")
-      q-btn(
-        @click="nodeDelete()"
-        round flat dense color="red" icon="delete_outline")
-    .row.full-width
+    .row.full-width.q-pr-xs
       q-input(
         v-model="node.name"
         borderless dark dense
@@ -34,68 +21,15 @@ div(
         :counter="true || node.name.length > 10"
         :maxlength="120"
         :input-style=`{
-          paddingLeft: '8px',
+          paddingLeft: '10px',
           paddingTop: '8px',
           paddingRight: '8px',
           fontSize: fontSize+'px',
         }`
         :style=`{
         }`).full-width
-        template(v-slot:hint)
-          .row.full-width
-            q-btn(
-              @click="nodeStart()"
-              round flat dense size="sm"
-              :color="nodePlaying ? 'red' : 'white'"
-              :icon="nodePlaying ? 'stop' : 'play_arrow'").q-mr-sm
-            q-btn(
-              @click="nodeRefresh()"
-              round flat dense size="sm" icon="refresh")
-    //- .row.full-width.br
-      //- template(v-slot:hint)
-      div(:style=`{}`).row.full-width.bg
-          div(:style=`{}`).row.full-width
-            q-btn(
-              @click="nodeStart()"
-              round flat dense size="sm"
-              :color="player.playing ? 'red' : 'white'"
-              :icon="player.playing ? 'pause' : 'play_arrow'")
-            .col.q-px-sm
-              div(:style=`{position: 'relative',}`).row.fit.items-center.content-center
-                div(
-                  ref="figure-wrapper"
-                  :style=`{position: 'relative', height: '6px',borderRadius: '3px',marginBottom: '1px',}`).row.full-width.b-50
-                  div(
-                    v-show="figurePercent >= 0 && figurePercent <= 1"
-                    :style=`{
-                      position: 'absolute', zIndex: 100,
-                      left: '0px',
-                      width: figurePercent*100+'%',
-                      height: '100%',
-                      borderRadius: '3px',
-                    }`).row.bg-white
-                    div(
-                      v-touch-pan.mouse.prevent="onPan"
-                      :style=`{
-                        position: 'absolute', zIndex: 1000,
-                        right: -20+3+'px',
-                        top: -20+3+'px',
-                        width: '40px', height: '40px',
-                        cursor: 'grabbing',
-                      }`
-                      ).row.items-center.content-center.justify-center
-                      div(
-                        :style=`{
-                          pointerEvents: 'none',
-                          height: 16+'px', width: 16+'px',
-                          borderRadius: '50%',
-                        }`
-                        ).row.bg-white
-            q-btn(
-              @click="nodeRefresh()"
-              round flat dense size="sm" icon="refresh")
+    //- add category and spheres
     .row.full-width.q-pt-xs.q-mt-sm
-      //- small.text-grey-7 Развлечения, #sphereald maklsd mlaksmd alk1, #sphere2 alskd alskd laksd alks, #sphere3 kadsals dalsk dlaskd laskd lak
       q-input(
         v-model="spheres"
         borderless dark dense size="xs" no-caps
@@ -111,7 +45,31 @@ div(
           //- height: '20px',
         }`).full-width.text-grey-5
         template(v-slot:prepend)
-          small(:style=`{fontSize: '12px',}`).text-grey-7 Развлечения
+          small(:style=`{fontSize: '12px',marginLeft: '12px'}`).text-grey-7 Развлечения
+    //- handle video start, refresh
+    div(
+      :style=`{
+      }`
+      ).row.full-width.items-start.content-start.full-height
+      q-btn(
+        @click="nodeStart()"
+        round flat dense
+        :color="nodePlaying ? 'red' : 'white'"
+        :icon="nodePlaying ? 'stop' : 'play_arrow'").q-mr-sm
+      q-btn(
+        @click="nodeRefresh()"
+        round flat dense color="grey-8" icon="refresh")
+      .col
+      q-btn(
+        round flat dense color="green" icon="fas fa-link")
+      .col
+      q-btn(
+        @click="nodeCancel()"
+        round flat dense color="grey-8" icon="clear")
+      q-btn(
+        @click="nodePublish()"
+        round flat dense color="green" icon="check"
+        :loading="nodePublishing")
 </template>
 
 <script>
@@ -183,8 +141,8 @@ export default {
         // this.pointDraggingIndex = -1
       }
     },
-    nodeDelete () {
-      this.$log('nodeDelete')
+    nodeCancel () {
+      this.$log('nodeCancel')
       this.player.setState('figure', null)
     },
     async nodePublish () {

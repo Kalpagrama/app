@@ -70,20 +70,20 @@ export default {
     }
   },
   watch: {
-    // 'player.figure': {
-    //   handler (to, from) {
-    //     if (to) {
-    //       this.$tween.to(this, 0.3, {
-    //         marginBottom: 230,
-    //       })
-    //     }
-    //     else {
-    //       this.$tween.to(this, 0.3, {
-    //         marginBottom: 0
-    //       })
-    //     }
-    //   }
-    // },
+    'player.figure': {
+      handler (to, from) {
+        if (to) {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 230,
+          })
+        }
+        else {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 0
+          })
+        }
+      }
+    },
     // 'player.currentTime': {}
     // player: {
     //   handler (to, from) {

@@ -11,6 +11,25 @@ div(
     borderRadius: '3px',
   }`
   ).row
+  //- figure duration hint reminder max 60sec...
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 100, top: '-18px',
+      height: '10px',
+      pointerEvents: 'none',
+    }`
+    ).row.full-width.justify-center
+    small(
+      :class=`{
+        'text-red': player.figure[1].t-player.figure[0].t > 60,
+        'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
+        }`
+      :style=`{
+        userSelect: 'none',
+        pointerEvents: 'none',
+        fontSize: '10px',
+      }`
+      ) {{$time(player.figure[1].t-player.figure[0].t)}}
   //- drag indicator icon left
   div(
     :style=`{
@@ -30,10 +49,10 @@ div(
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
     :style=`{
       position: 'absolute', zIndex: 2010,
-      top: '-6px',
-      left: -8-6+'px',
-      width: '20px',
-      height: 'calc(100% + 12px)',
+      top: '-10px',
+      left: -25-6+'px',
+      width: '50px',
+      height: 'calc(100% + 20px)',
       cursor: 'grabbing',
     }`
     ).row
@@ -56,10 +75,10 @@ div(
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
     :style=`{
       position: 'absolute', zIndex: 2020,
-      top: '-6px',
-      right: -8-6+'px',
-      width: '20px',
-      height: 'calc(100% + 12px)',
+      top: '-10px',
+      right: -25-6+'px',
+      width: '50px',
+      height: 'calc(100% + 20px)',
       cursor: 'grabbing',
     }`
     ).row
@@ -89,7 +108,7 @@ export default {
       let tNow = this.player.figure[index].t
       let tDelta = this.convert(e.delta.x)
       let t = tNow + tDelta
-      this.$log('pointDrag t', t)
+      // this.$log('pointDrag t', t)
       this.player.setCurrentTime(t)
       this.player.figure[index].t = t
       // final
