@@ -247,7 +247,7 @@ export default {
     // if (this.start) {
     // }
     this.$log('created')
-    // this.player.play()
+    this.player.play()
     if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
       let muted = localStorage.getItem('k_muted')
       if (muted === 'false') {
