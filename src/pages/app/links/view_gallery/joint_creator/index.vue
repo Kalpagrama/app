@@ -59,14 +59,11 @@ div(
         v-if="showVertices"
         :style=`{
           position: 'absolute', zIndex: 10000,
-          //- top: '0px',
           transform: 'translate3d(0,0,1000px)',
           left: '8px', maxWidth: 'calc(100% - 16px)',
-          //- bottom: 'calc(50% - 218px)',
-          //- bottom: '0px',
           borderRadius: '30px',
         }`
-        ).row.full-width.items-start.cotent-start.q-pa-sm.b-60.br
+        ).row.full-width.items-start.cotent-start.q-pa-sm.b-60
         q-btn(
           v-for="(v,vi) in vertices" :key="vi"
           @click="vertexClick(v)"

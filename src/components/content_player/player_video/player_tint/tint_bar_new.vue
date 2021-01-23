@@ -11,27 +11,29 @@ div(
     }`
     ).row.full-width
     //- middle nodeEditor...
-    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       tint-bar-node(
         v-if="player && player.figure"
         :player="player"
+        :contentKalpa="contentKalpa"
         :convert="convertPxToTime"
         :style=`{
           position: 'absolute', zIndex: 1000,
-          top: '-34px',
+          top: '-16px',
         }`
         @first="zoomWorking = true"
         @final="zoomWorking = false")
     //- middle currentTime
-    div(
-      v-if="zoomed"
-      :style=`{
-        position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
-        width: '2px',
-        height: '100%',
-        pointerEvents: 'none',
-      }`
-      ).row.bg-red
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="zoomWrapperScrolling"
+        :style=`{
+          position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
+          width: '2px',
+          height: '100%',
+          pointerEvents: 'none',
+        }`
+        ).row.bg-red
     //- scroll
     div(
       ref="zoom-wrapper"
@@ -82,8 +84,8 @@ div(
                 left: 'calc(' + (player.figure[0].t/player.duration)*100+'% - 6px)',
                 width:'calc(' + ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'% + 16px)',
               }`
-              @first="zoomWorking = true"
-              @final="zoomWorking = false")
+              @first="zoomWorking = true, figureEditing = true"
+              @final="zoomWorking = false, figureEditing = false")
           //- figures
           div(
             v-for="(f,fi) in player.figures" :key="fi"
@@ -100,7 +102,7 @@ div(
           //- currentTime
           transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
             div(
-              v-if="!zoomed"
+              v-if="!zoomWrapperScrolling"
               :style=`{
                 position: 'absolute', zIndex: 2000,
                 left: (player.currentTime/player.duration)*100+'%',
@@ -145,111 +147,66 @@ div(
             height: heightBar+'px',
           }`
           ).row
-  //- footer:
-  //- actions figure
-  div(
-    v-if="player && player.figure"
-    :style=`{
-      order: -1,
-    }`
-    ).row.full-width.justify-center
-    div(:style=`{maxWidth: '300px'}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(0)" :style=`{position: 'relative'}`).rotate-180
-      .col
-      q-btn(round flat dense color="grey-8" @click="layerForward(0,false)")
-        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
-      q-btn(round flat dense color="grey-8" @click="layerForward(0,true)")
-        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
-      .col
-      small(
-        :class=`{
-          'text-red': player.figure[1].t-player.figure[0].t > 60,
-          'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
-        }`
-        :style=`{
-          userSelect: 'none',
-          pointerEvents: 'none',
-        }`
-        ) {{$time(player.figure[1].t-player.figure[0].t)}}
-      .col
-      q-btn(round flat dense color="grey-8" @click="layerForward(1,false)")
-        q-icon(name="keyboard_arrow_left" color="grey-8" size="30px")
-      q-btn(round flat dense color="grey-8" @click="layerForward(1,true)")
-        q-icon(name="keyboard_arrow_right" color="grey-8" size="30px")
-      .col
-      q-btn(round flat dense color="grey-8" icon="flip" @click="layerSet(1)" :style=`{position: 'relative'}`)
-  //- debug
-  //- div(
-    v-if="player"
-    :style=`{
-      height: '50px',
-    }`
-    ).row.full-width.text-white.br
-    //- small width: {{width}}, minWidthTotal: {{minWidthTotal}}, minWidthMin: {{minWidthMin}}, minWidth: {{minWidth}}, minWidthMax: {{minWidthMax}}
-    //- small minDelta: {{minDelta}}, minCount: {{minCount}},
-    small player.figureOffset {{player.figureOffset}}
-  //- actions global
-  div(
-    v-show="options.showFooter"
-    :style=`{
-      position: 'relative',
-    }`
-    ).row.full-width.items-center.content-center
-    //- time
+  //- footer: actions
+  div(:style=`{position: 'relative', minHeight: '34px',}`).row.full-width.items-center.content-center.justify-between
+    //- left: time
     small(
       :style=`{
         userSelect: 'none',
         pointerEvents: 'none',
+        fontSize: '10px',
       }`
-      ).text-grey-6.q-mr-xs {{$time(player.currentTime)}}
-    small(
-      :style=`{
-        userSelect: 'none',
-        pointerEvents: 'none',
-      }`
-      ).text-grey-6 / {{$time(player.duration)}}
-    .col
-    //- middle: zoomIn/zoomOut
+      ).text-grey-8 {{$time(player.currentTime)}} / {{$time(player.duration)}}
+    //- default actions
     div(
+      v-if="player && !player.figure"
       :style=`{
-        position: 'absolute', zIndex: 100,
-        left: 'calc(50% - 58px)',
+        position: 'absolute', zIndex: 10,
+        left: 'calc(50% - 80px)',
+        width: '160px',
       }`
-      ).row.full-height.items-center.content-center
+      ).row.full-height.items-center.content-center.justify-between
       q-btn(
         @click="tapClick(0)"
-        round flat dense  color="grey-6" icon="replay_5" :size="actionsSize").q-mr-sm
+        round flat dense  color="grey-6" icon="replay_5" :size="actionsSize").col
       q-btn(
-        v-if="zoomed"
-        @click="zoomOut()"
-        round flat dense color="grey-6"
-        :size="actionsSize"
+        v-if="player && !player.figure && options.context !== 'feed'"
+        @click="nodeCreate()"
+        round flat dense color="green"
         :style=`{
-          opacity: options.context === 'feed' ? 0 : 1,
-        }`)
-        q-icon(name="unfold_less").rotate-90
-      q-btn(
-        v-if="!zoomed"
-        @click="zoomIn()"
-        round flat dense color="grey-6"
-        :size="actionsSize"
-        :style=`{
-          opacity: options.context === 'feed' ? 0 : 1,
-        }`)
-        q-icon(name="unfold_more").rotate-90
+        }`).q-px-xs
+        q-icon(name="add_circle_outline" size="30px")
       q-btn(
         @click="tapClick(1)"
-        round flat dense  color="grey-6" icon="forward_5" :size="actionsSize").q-ml-sm
-    //- right side
-    //- q-btn(
-      round flat dense color="grey-6" icon="more_vert" :size="actionsSize").q-mr-sm
-    //- q-btn(
-      round flat dense color="grey-6" icon="fullscreen" :size="actionsSize").q-mr-sm
-    //- q-btn(
-      v-if="player && !player.figure"
-      @click="nodeCreate()"
-      round flat dense color="green" icon="add_circle_outline")
-    slot(name="actions")
+        round flat dense  color="grey-6" icon="forward_5" :size="actionsSize").col
+    //- figure actions
+    div(
+      v-if="player && player.figure"
+      :style=`{
+        position: 'absolute', zIndex: 10,
+        left: 'calc(50% - 110px)',
+        width: '220px',
+      }`
+      ).row.full-height.items-center.content-center.justify-between
+      q-btn(round flat dense color="grey-8" @click="figureSet(0)")
+        q-icon(name="flip" color="grey-8" size="24px").rotate-180
+      //- .col
+      q-btn(round flat dense color="grey-8" @click="figureForward(0,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="22px")
+      q-btn(round flat dense color="grey-8" @click="figureForward(0,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="22px")
+      //- .col
+      q-btn(round flat dense color="grey-8" @click="figureForward(1,false)")
+        q-icon(name="keyboard_arrow_left" color="grey-8" size="22px")
+      q-btn(round flat dense color="grey-8" @click="figureForward(1,true)")
+        q-icon(name="keyboard_arrow_right" color="grey-8" size="22px")
+      //- .col
+      q-btn(round flat dense color="grey-8" @click="figureSet(1)")
+        q-icon(name="flip" color="grey-8" size="22px").rotate-180
+    //- right side: actions slots
+    .row.full-height.items-center.content-center
+      slot(name="actions")
+      q-btn(round flat dense color="grey-8" icon="more_vert")
 </template>
 
 <script>
@@ -269,7 +226,7 @@ export default {
       heightBarMax: 30,
       heightWrapper: 36,
       heightWrapperMin: 36,
-      heightWrapperMax: 46,
+      heightWrapperMax: 60,
       minWidth: 0,
       zoomed: null,
       zoomWorking: false,
@@ -282,14 +239,15 @@ export default {
       tintPanning: false,
       tintRect: null,
       convertRect: null,
-      actionsSize: 'md'
+      actionsSize: 'md',
+      figureEditing: false,
     }
   },
   created () {
     // if (this.start) {
     // }
     this.$log('created')
-    // this.player.play()
+    this.player.play()
     if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
       let muted = localStorage.getItem('k_muted')
       if (muted === 'false') {
@@ -426,6 +384,54 @@ export default {
     },
   },
   methods: {
+    async figureSet (pointIndex) {
+      this.$log('figureSet', pointIndex)
+      let t = this.player.currentTime
+      if (pointIndex === 0) {
+        // wanna start AFTER the end
+        if (t >= this.player.figure[1].t) {
+          this.$set(this.player.figure[0], 't', t)
+          this.$set(this.player.figure[1], 't', Math.min(t + 10, this.player.duration))
+        }
+        // before the end is OK
+        else {
+          this.$set(this.player.figure[0], 't', t)
+        }
+      }
+      else if (pointIndex === 1) {
+        // wanna end BEFORE the start
+        if (t <= this.player.figure[0].t) {
+          this.$set(this.player.figure[0], 't', t)
+          this.$set(this.player.figure[1], 't', Math.min(t + 10, this.player.duration))
+        }
+        // after the start is OK
+        else {
+          this.$set(this.player.figure[1], 't', t)
+        }
+      }
+      // go to the layer new (maybe) start and play
+      if (pointIndex === 0) {
+        this.player.setCurrentTime(this.player.figure[0].t)
+      }
+      else if (pointIndex === 1) {
+        this.player.setCurrentTime(this.player.figure[1].t)
+      }
+    },
+    figureForward (pointIndex, goingForward) {
+      this.$log('figureForward', pointIndex, goingForward)
+      if (this.player.playing) this.player.pause()
+      let t = this.player.figure[pointIndex].t
+      // this.player.events.emit('edit-start')
+      // this.compositionPlaying = false
+      if (goingForward) t += 0.1
+      else t -= 0.1
+      this.$log('t', t)
+      // this.$set(this.player.figure[pointIndex], 't', t)
+      this.$tween.to(this.player.figure[pointIndex], 0.4, {
+        t: t
+      })
+      this.player.setCurrentTime(t)
+    },
     nodeCreate () {
       this.$log('nodeCreate')
       let start = this.player.currentTime
@@ -481,7 +487,7 @@ export default {
       this.zoomWrapperScrolling = true
       this.zoomWrapperScrollingTimer = setTimeout(() => {
         this.zoomWrapperScrolling = false
-      }, 200)
+      }, 500)
       // whos first?
       if (this.zoomWorking) return
       if (this.zoomWrapperScrollingAuthor === 'player') return
@@ -505,6 +511,10 @@ export default {
       // await this.$wait(500)
       // this.zoomWrapperScrollingAuthor = null
       // do someting to save currentPosition...
+      // need to save currentTime
+      this.zoomWrapperScrollingAuthor = 'player'
+      await this.$wait(550)
+      this.zoomWrapperScrollingAuthor = null
     },
     async zoomOut () {
       this.$log('zoomOut')

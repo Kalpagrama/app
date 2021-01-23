@@ -20,7 +20,7 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Ядра
-    q-btn(
+    //- q-btn(
       @click="$emit('pageId', 'creator')"
       flat icon="add_circle_outline" no-caps
       :color="'green'"
@@ -41,7 +41,7 @@
       :style=`{maxWidth: '60px'}`)
       q-icon(name="fas fa-info" size="19px").q-mb-xs
       .row.full-width.justify-center
-        small Детали
+        small Инфо
     kalpa-menu-popup-global
 </template>
 

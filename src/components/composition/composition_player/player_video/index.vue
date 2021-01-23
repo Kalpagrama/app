@@ -18,7 +18,7 @@ div(
       //- height: 'calc(' + styles.height + ' - 100px)',
       objectFit: styles.objectFit,
       //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)',
-      marginBottom: marginBottom+'px',
+      //- marginBottom: marginBottom+'px',
       //- maxHeight: '500px',
       //- opacity: player ? 0.1 : 1,
     }`
@@ -70,38 +70,38 @@ export default {
     }
   },
   watch: {
-    // 'player.figure': {
-    //   handler (to, from) {
-    //     if (to) {
-    //       this.$tween.to(this, 0.3, {
-    //         marginBottom: 230,
-    //       })
-    //     }
-    //     else {
-    //       this.$tween.to(this, 0.3, {
-    //         marginBottom: 0
-    //       })
-    //     }
-    //   }
-    // },
-    // 'player.currentTime': {}
-    // player: {
-    //   handler (to, from) {
-    //     if (to) {
-    //       if (this.composition.outputType === 'VIDEO') {
-    //         // let arr = this.composition.url.split('#t=')
-    //         // if (arr.length > 1) {
-    //         //   let [start, end] = arr[1].split(',')
-    //         //   this.player.setCurrentTime(parseFloat(start))
-    //         // }
-    //         // else {
-    //         //   // do nothing
-    //         // }
-    //         this.player.play()
-    //       }
-    //     }
-    //   }
-    // }
+    'player.figure': {
+      handler (to, from) {
+        if (to) {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 230,
+          })
+        }
+        else {
+          this.$tween.to(this, 0.3, {
+            marginBottom: 0
+          })
+        }
+      }
+    },
+    'player.currentTime': {
+      handler (to, from) {
+        if (to) {
+          if (this.composition.outputType === 'VIDEO') {
+            let arr = this.composition.url.split('#t=')
+            if (arr.length > 1) {
+              let [start, end] = arr[1].split(',')
+              start = parseFloat(start)
+              end = parseFloat(end)
+              // if (to < start) {}
+              if (to >= end) {
+                this.player.setCurrentTime(start)
+              }
+            }
+          }
+        }
+      }
+    }
   },
   computed: {
     compositionUrl () {
