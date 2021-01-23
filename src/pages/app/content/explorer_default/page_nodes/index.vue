@@ -60,6 +60,7 @@ export default {
     return {
       itemSelectedOid: null,
       items: [],
+      findRes: null,
       itemsLocal: [],
       itemsLoaded: false
     }
@@ -81,8 +82,12 @@ export default {
   watch: {
     items: {
       deep: true,
-      handler (to, from) {
-        this.itemsUpdated(to)
+      async handler (to, from) {
+        if (this.findRes && this.findRes.hasPrev()){
+          this.$logE('hasPrev! TODO нужно реализовать логику прокрутки вверх!!!!')
+          await this.findRes.prev(10)
+        }
+        await this.itemsUpdated(to)
       }
     },
     'player.currentTime': {
@@ -164,13 +169,13 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    let items = await this.$rxdb.find(this.itemsQuery, false)
-    while (items.hasMore) {
-      this.$log('items.next !!!')
-      await items.next(10)
-      this.$log('items.length', items.length)
+    this.findRes = await this.$rxdb.find(this.itemsQuery, false) // {items, next, hasNext, prev, hasPrev}
+    while (this.findRes.hasNext()) {
+      // this.$log('items.next !!!')
+      await this.findRes.next(10)
+      // this.$log('items.length', items.length)
     }
-    this.items = items
+    this.items = this.findRes.items
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
