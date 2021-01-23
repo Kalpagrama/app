@@ -387,17 +387,17 @@ const topObjectFragment = gql`${figureFragment}
         vertexType
     }
 `
-const groupFragment = gql`${figureFragment} ${topObjectFragment}
+const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFragment}
     fragment groupFragment on Group {
         figuresAbsolute{...figureFragment}
-        thumbUrl(preferWidth: 50)
+        groupThumbUrl: thumbUrl(preferWidth: 50)
         totalCount
-        items{...topObjectFragment}
+        items{...topObjectFragment ...objectShortFragment}
     }
 `
 
 const findResultFragment = gql`
-    ${eventFragment} ${topObjectFragment} ${groupFragment}
+    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment}
     fragment findResultFragment on FindResult {
         count
         totalCount
@@ -405,7 +405,7 @@ const findResultFragment = gql`
         currentPageToken
         prevPageToken
         ... on EventFindResult { events: items {...eventFragment} }
-        ... on ObjectsFindResult { objects: items { ...topObjectFragment ...groupFragment } }
+        ... on ObjectsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment} }
         ... on WSFindResult { items }
     }
 `
