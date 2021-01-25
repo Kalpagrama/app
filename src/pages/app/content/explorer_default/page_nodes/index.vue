@@ -73,6 +73,7 @@ export default {
           objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
+          groupByContentLocation: false
         },
         populateObjects: true,
       }

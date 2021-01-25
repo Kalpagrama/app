@@ -17,7 +17,7 @@
           span.text-white.text-bold {{ contentKalpa.name }}
         kalpa-menu-actions(icon="more_vert" :title="contentKalpa.name" :actions="actions")
       .row.full-width.items-end.content-end.q-pt-xs.q-px-sm
-        span.text-grey-5.q-mr-xs {{ contentKalpa.countViews }} просмотров
+        span.text-grey-5.q-mr-xs {{ contentKalpa.countStat.countViews }} просмотров
         small.text-grey-7.q-mr-xs - {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
     //- actions
     .row.full-width.items-center.content-center.q-pa-sm

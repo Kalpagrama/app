@@ -200,8 +200,8 @@ class ObjectCreateApi {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
          assert(store, '!store')
-         let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
-         store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
+         // let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
+         // store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
          return reactiveEssence
       }
       return await apiCall(f, cb)

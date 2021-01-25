@@ -112,8 +112,8 @@ div(
       paddingTop: '28px',
     }`
     ).row.full-width.items-center.content-center.justify-center.bg-green.q-px-sm.q-pb-sm
-    q-spinner(size="30px" color="white")
-    //- div(
+    q-spinner(v-if="node.uploadStage === 'BLANK'" size="30px" color="white")
+    div(v-if="node.uploadStageProgress < 100"
       :style=`{
         position: 'absolute', zIndex: 100,
         left: '0px',

@@ -41,12 +41,12 @@ div(
       .row.items-center.content-center.justify-end.q-pt-sm
         small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
         .row.full-width.items-center.content-center.justify-end
-          small(:style=`{lineHeight: 0.8}`).text-grey-8.q-mr-xs {{ node.countViews }}
+          small(:style=`{lineHeight: 0.8}`).text-grey-8.q-mr-xs {{ node.countStat.countViews }}
           q-icon(name="visibility" color="grey-9")
       kalpa-menu-actions(
         :title="node.name"
         :actions="actions" icon="more_vert")
-      //- small.text-grey-8.q-mr-xs {{ node.countViews }}
+      //- small.text-grey-8.q-mr-xs {{ node.countStat.countViews }}
       //- q-icon(name="visibility" color="grey-8").q-mr-md
       //- small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
       //- kalpa-menu-actions(:actions="actions")

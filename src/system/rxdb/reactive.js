@@ -391,21 +391,28 @@ class Group {
 
    async fulfill (nextItems, position) {
       assert(position.in('top', 'bottom', 'whole'), 'bad position')
-      let isGroupedList = (items) => items.length && items[0].items
+      // let isGroupedList = (items) => items.length && items[0].items
       let startPos = position === 'bottom' ? this.fulFilledItems.length : 0
       let deleteCount = position === 'whole' ? this.fulFilledItems.length : 0
       assert(startPos >= 0 && nextItems && Array.isArray(nextItems), 'bad fulfill params')
       if (this.itemType === 'GROUP') {
-         for (let i = 0; i < nextItems.length; i++) {
-            let nextGroup = nextItems[i]
-            let { items, totalCount, nextPageToken, prevPageToken, currentPageToken, figures, thumbUrl } = nextGroup
+         let makeNextGroup = async (nextGroup) => {
+            let {
+               items,
+               totalCount,
+               nextPageToken,
+               prevPageToken,
+               currentPageToken,
+               figuresAbsolute,
+               thumbUrl
+            } = nextGroup
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
             let group = new Group(this.populateFunc)
             await group.addPaginationPage(items, 'bottom')
             await group.next(3) // сразу грузим по 3 ядра в группе
             return {
-               figures,
+               figuresAbsolute,
                thumbUrl,
                items: group.fulFilledItems,
                totalCount: group.totalCount,
@@ -417,6 +424,7 @@ class Group {
                refresh: group.refresh.bind(group)
             }
          }
+         nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
             nextItems = await this.populateFunc(nextItems, [], this.fulFilledItems)
@@ -511,7 +519,7 @@ class Group {
 
    async addPaginationPage (rxQueryOrRxDocOrArray, position) {
       const f = this.addPaginationPage
-      assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray), '!isRxQuery(rxQuery)')
+      assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
       assert(position.in('top', 'bottom'), 'bad position')
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray

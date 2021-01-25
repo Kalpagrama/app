@@ -35,13 +35,15 @@ const objectFragment = gql`${objectShortFragment}
     subscriberCnt
     subscribers {...objectShortFragment}
     rev
-    countViews
-    countJoints
-    countRemakes
-    countShares
-    countBookmarks
-    countSubscribers
-    countSubscriptions
+    countStat{
+      countViews
+      countJoints
+      countNodes
+      countShares
+      countRemakes
+      countSubscribers
+      countSubscriptions
+      }
   }
 `
 
@@ -148,16 +150,20 @@ const imageFragment = gql`${objectFragment}
     contentSource
   }
 `
-const compositionFragment = gql`${objectFragment} ${imageFragment}
+
+const figureFragment = gql`
   fragment figureFragment on Figure {
-    t
-    points {
-      x
-      y
-    }
-    epubCfi
-    epubCfiText
+      t
+      points {
+          x
+          y
+      }
+      epubCfi
+      epubCfiText
   }
+`
+
+const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragment}
   fragment operationFragment on LayerOperation{
     type
     items
@@ -371,7 +377,7 @@ const objectFullFragment = gql`
         ...on Composition {...compositionFragment}
     }
 `
-const topObjectFragment = gql`
+const topObjectFragment = gql`${figureFragment}
     fragment topObjectFragment on TopObject {
         oid
         name
@@ -379,13 +385,21 @@ const topObjectFragment = gql`
         weight
         rate
         relatedOids
-        figuresAbsoluteList{points{x y}, epubCfi, epubCfiText, t}
+        figuresAbsoluteList{...figureFragment}
         vertexType
+    }
+`
+const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFragment}
+    fragment groupFragment on Group {
+        figuresAbsolute{...figureFragment}
+        groupThumbUrl: thumbUrl(preferWidth: 50)
+        totalCount
+        items{...topObjectFragment ...objectShortFragment}
     }
 `
 
 const findResultFragment = gql`
-    ${eventFragment} ${topObjectFragment}
+    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment}
     fragment findResultFragment on FindResult {
         count
         totalCount
@@ -393,7 +407,7 @@ const findResultFragment = gql`
         currentPageToken
         prevPageToken
         ... on EventFindResult { events: items {...eventFragment} }
-        ... on ObjectsFindResult { objects: items { ...topObjectFragment } }
+        ... on ObjectsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment} }
         ... on WSFindResult { items }
     }
 `

@@ -121,7 +121,7 @@
         }`
         ).row.full-width.items-center.content-center.justify-center.q-pa-sm
         span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm Связи
-        span().text-grey-6.text-bold - {{ item.countJoints }}
+        span().text-grey-6.text-bold - {{ item.countStat.countJoints }}
         q-icon(
           name="fas fa-link" size="80px"
           :style=`{

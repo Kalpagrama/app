@@ -2,6 +2,7 @@ import { LoadingBar } from 'quasar'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
+import { notify } from 'src/boot/notify'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -31,6 +32,7 @@ async function apiCall (func, cb, serialize = true) {
       return result
    } catch (err) {
       logE('apiCall ERROR', err)
+      notify('error', `ошибка при выполнении запроса: ${err.message}`)
       throw err
    } finally {
       if (serialize) apiMutex.release()

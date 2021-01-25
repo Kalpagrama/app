@@ -19,7 +19,7 @@ div(
           user-avatar(:url="joint.author.thumbUrl" :width="24" :height="24")
           span.text-grey-4.q-ml-sm {{ joint.author.name }}
         .col
-        small.text-grey-8.q-mr-xs {{ joint.countViews }}
+        small.text-grey-8.q-mr-xs {{ joint.countStat.countViews }}
         q-icon(name="visibility" color="grey-8").q-mr-md
         small.text-grey-8.q-mr-sm {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
       .row.full-width
