@@ -25,7 +25,7 @@
               q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
-            small.text-grey-9 {{ node.countShares || '' }}
+            small.text-grey-9 {{ node.countStat.countShares || '' }}
     //- micronodes/comments
     div(
       v-if="node.items.length === 1"
@@ -48,7 +48,7 @@
       .row.full-width
         .col
           .row.fit.items-center.content-center.justify-end
-            small.text-grey-9 {{ node.countJoints || '' }}
+            small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
           q-btn(round flat dense color="grey-9")
             q-icon(name="fas fa-link" size="20px")

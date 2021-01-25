@@ -35,13 +35,15 @@ const objectFragment = gql`${objectShortFragment}
     subscriberCnt
     subscribers {...objectShortFragment}
     rev
-    countViews
-    countJoints
-    countRemakes
-    countShares
-    countBookmarks
-    countSubscribers
-    countSubscriptions
+    countStat{
+      countViews
+      countJoints
+      countNodes
+      countShares
+      countRemakes
+      countSubscribers
+      countSubscriptions
+      }
   }
 `
 

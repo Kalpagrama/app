@@ -38,7 +38,7 @@ div(
             position: 'absolute', zIndex: 100, top: '-14px',
           }`
           ).row.full-width.justify-center.q-pr-xs
-          small.text-white {{ j.items.find(i => i.oid !== row.oid).countJoints }}
+          small.text-white {{ j.items.find(i => i.oid !== row.oid).countStat.countJoints }}
         div(
           :class=`{
             'bg-white': jointIndex === ji,

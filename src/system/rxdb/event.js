@@ -65,8 +65,8 @@ class Event {
          switch (event.type) {
             case 'ERROR':
                if (event.operation === 'OBJECT_CREATE') { // не удалось создать ядро!
-                  logD(f, 'снимаем с публикации')
-                  // обнулим прогресс
+                  logE(f, 'не удалось создать ядро!', event)
+                  // снимаем с публикации / обнулим прогресс
                   let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: event.object.oid, progress: -1 }
                   store.commit('core/processEvent', fakeProgressEvent)
                   let {items: createdWsNodes} = await rxdb.find({
