@@ -10,6 +10,9 @@ import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
 import VueShowdown from 'vue-showdown'
 import { EventApi } from 'src/api/event'
+// import Vue from 'vue'
+import VueVirtualScroller from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
@@ -43,6 +46,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     const f = {nameExtra: 'boot::main'}
     logD(f, 'start')
     const t1 = performance.now()
+    Vue.use(VueVirtualScroller)
     // the second parameter of Vue.use() is optional
     Vue.use(VueShowdown, {
       // set default flavor of showdown

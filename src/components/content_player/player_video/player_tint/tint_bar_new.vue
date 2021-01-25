@@ -11,7 +11,7 @@ div(
     }`
     ).row.full-width
     //- middle nodeEditor...
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       tint-bar-node(
         v-if="player && player.figure"
         :player="player"

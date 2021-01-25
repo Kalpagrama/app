@@ -52,6 +52,25 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="player && player.figure"
+        :style=`{
+          position: 'absolute', zIndex: 500,
+          background: 'rgba(0,0,0,0.8)',
+          //- paddingTop: '100px',
+        }`
+        ).row.fit.items-center.content-center.justify-center.br
+        q-input(
+          v-model="node.name"
+          borderless dark
+          placeholder="В чем суть ?"
+          :input-style=`{
+            fontSize: '30px',
+            textAlign: 'center',
+            color: 'white',
+          }`
+          ).full-width.br
   //- tint
   //- footer
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -134,6 +153,9 @@ export default {
       },
       tintShow: false,
       moveTimer: null,
+      node: {
+        name: ''
+      }
     }
   },
   computed: {
