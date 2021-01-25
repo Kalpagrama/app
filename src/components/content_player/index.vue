@@ -4,6 +4,8 @@ component(
   v-bind="$props"
   :is="playerComponent[contentKalpa.type]"
   @player="$emit('player', $event)")
+  template(v-slot:body)
+    slot(name="body")
 </template>
 
 <script>

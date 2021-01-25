@@ -39,6 +39,7 @@ div(
   div(
     :style=`{
       position: 'relative',
+      //- paddingBottom: '200px',
     }`
     ).col.full-width
     component(
@@ -52,7 +53,9 @@ div(
       }`
       :styles="styles"
       @player="player = $event, $emit('player', $event)")
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    slot(name="body")
+  //- div(v-if="player && player.figure" :style=`{height: '220px',}`).row.full-width.bg
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="player && player.figure"
         :style=`{
@@ -80,7 +83,10 @@ div(
         {
           position: 'absolute', zIndex: 1000,
           bottom: '0px',
+          //- paddingBottom: '70px',
+          //- paddingTop: '70px',
           background: 'linear-gradient(0deg, rgba(0,0,0,0.666) 0%, rgba(0,0,0,0) 100%)',
+          //- background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 6px 6px',
           opacity: options.showFooter ? 1 : 0,
         }

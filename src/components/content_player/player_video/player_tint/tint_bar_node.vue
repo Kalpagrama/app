@@ -18,7 +18,7 @@ div(
         borderless dark dense
         type="textarea" autogrow
         placeholder="В чем суть?"
-        :counter="true || node.name.length > 10"
+        :counter="false || node.name.length > 10"
         :maxlength="120"
         :input-style=`{
           paddingLeft: '12px',
@@ -29,7 +29,7 @@ div(
         :style=`{
         }`).full-width
     //- add category and spheres
-    .row.full-width.q-pt-xs.q-mt-sm
+    .row.full-width.q-pt-xs
       q-input(
         v-model="spheres"
         borderless dark dense size="xs" no-caps
@@ -68,7 +68,7 @@ div(
                   flat dense color="white" no-caps align="left" size="sm"
                   ).full-width {{ c.label }}
     //- handle video start, refresh
-    div(
+    //- div(
       :style=`{
       }`
       ).row.full-width.items-start.content-start.full-height

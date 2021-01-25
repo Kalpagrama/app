@@ -19,7 +19,8 @@ div(
         :convert="convertPxToTime"
         :style=`{
           position: 'absolute', zIndex: 1000,
-          top: '-16px',
+          //- top: '-16px',
+          //- position: 'fixed', top: '0px', left: '0px', zIndex: 1000,
         }`
         @first="zoomWorking = true"
         @final="zoomWorking = false")
@@ -46,6 +47,7 @@ div(
         overflowY: 'hidden',
       }`
       ).row.fit.items-center.content-center.scroll.scroll-clear.q-py-sm
+      q-resize-observer(@resize="e => width = e.width")
       .row.no-wrap
         //- left padding
         div(
@@ -174,7 +176,8 @@ div(
         @click="nodeCreate()"
         round flat dense color="green"
         :style=`{
-        }`).q-px-xs
+          borderRadius: '50%',
+        }`)
         q-icon(name="add_circle_outline" size="30px")
       q-btn(
         @click="tapClick(1)"
@@ -567,12 +570,12 @@ export default {
   mounted () {
     this.$log('mounted', this.player.duration)
     // this.zoomed = true
-    let {width, height} = this.$refs['zoom-wrapper'].getBoundingClientRect()
-    this.$set(this, 'width', width)
-    this.$set(this, 'height', height)
+    // let {width, height} = this.$refs['zoom-wrapper'].getBoundingClientRect()
+    // this.$set(this, 'width', width)
+    // this.$set(this, 'height', height)
     // this.width = width
     // this.height = height
-    this.$log('mounted', {minCount: this.minCount, minWidthMin: this.minWidthMin, minWidth: this.minWidth, minWidthMax: this.minWidthMax, width, height})
+    // this.$log('mounted', {minCount: this.minCount, minWidthMin: this.minWidthMin, minWidth: this.minWidth, minWidthMax: this.minWidthMax, width, height})
     // let minCount = Math.ceil(this.player.duration / 60)
     // let minWidthMin = this.width / minCount
     // this.$log({minWidthMin: minWidthMin, minCount: minCount, width: width})

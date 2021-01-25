@@ -82,176 +82,123 @@
           @publish="nodePublished"
           @nodeCancel="pageId = 'nodes', node = null"
           @node="node = $event, pageId = 'node'")
-//- q-layout(
-  view="hHh Lpr lff").bg-black
+q-layout(
+  view="hHh Lpr lff"
+  :class=`{
+    'bg-black': (player && !player.figure),
+    'b-30': (player && player.figure),
+  }`)
   q-page-container
-    q-page
-div
-  div(
-    :style=`{
-      position: 'fixed', top: '0px', bottom: '0px', zIndex: 10,
-      //- transform: 'translate3d(0, 0, 0)',
-      //- height: 500+'px',
-      //- minHeight: 500+'px',
-    }`
-    ).row.full-width.bg-black
-    div(
-      :style=`{
-        position: 'relative',
-        height: heightPage+'px',
+    q-page(
+      :class=`{
+        'q-pt-sm': (player && player.figure),
+        'q-px-sm': (player && player.figure),
       }`
-      ).row.full-width
-      content-player(
-        @player="player = $event"
-        :contentKalpa="contentKalpa"
-        :style=`{
-          height: '100%',
-        }`
-        :options=`{
-          showHeader: false,
-          showBar: true,
-          showFooter: true,
-        }`
-        :styles=`{
-          height: '100%',
-          objectFit: 'contain',
-        }`
-        ).full-width.bg-black
-  //- header name
-  //- transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-    div(
-      v-if="player && player.figure"
-      :style=`{
-        position: 'fixed', zIndex: 1000,
-        transform: 'translate3d(0, 0, 0)',
-        top: '0px',
-        //- height: heightFooter+'px',
-        minHeight: '70px',
-      }`
-      ).row.full-width.items-start.content-start.justify-center.q-pt-sm.q-px-sm.br
+      :style=`{}`
+      ).row.full-width.justify-center
       div(
         :style=`{
-          maxWidth: '500px',
+          position: 'relative',
+          height: contentHeight+'px',
+          maxWidth: contentWidth+'px',
           borderRadius: '10px',
         }`
-        ).row.full-width.b-30
-        q-input(
-          ref="nodeNameInput"
-          v-model="name"
-          borderless dark
-          type="textarea" autogrow
-          :rows="1"
-          :maxlength="120"
-          placeholder="В чем суть?"
-          :input-style=`{
-            textAlign: 'center',
-            fontSize: '20px',
+        ).row.full-width
+        content-player(
+          @player="player = $event"
+          :contentKalpa="contentKalpa"
+          :style=`{
+            zIndex: 100,
+            height: '100%',
           }`
-          ).full-width
-        //- div(v-if="nodeEditing").row.full-width
-          div(:style=`{height: '300px'}` @click="nodeEditing = false").row.full-width.br
-  //- footer default
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="player && !player.figure"
-      :style=`{
-        position: 'fixed', zIndex: 1000,
-        bottom: '0px',
-        height: 70+'px',
-      }`
-      ).row.full-width.items-start.content-start.justify-center
-      nav-mobile(
-        @pageId="pageIdChange"
-        :pageId="pageId"
-        :style=`{
-          zIndex: 1000,
-        }`)
-  //- footer node
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="player && player.figure"
-      v-show="!$store.state.ui.userTyping"
-      :style=`{
-        position: 'fixed', zIndex: 1000,
-        bottom: '0px',
-        //- height: 70+'px',
-        height: heightFooter+'px',
-      }`
-      ).row.full-width.items-start.content-start.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          background: 'rgb(30,30,30)',
-          borderRadius: '10px 10px 0 0',
-          minHeight: '70px',
-          background: 'rgba(30,30,30,1)',
-        }`
-        ).row.fit.items-start.content-start
-        div(:style=`{height: '70px',}`).row.full-width.items-center.content-center.q-px-sm
-          q-btn(
-            round flat color="white" icon="clear"
-          )
-          .col
-          q-btn(
-            round flat color="white" icon="play_arrow"
-            )
-          //- div(:style=`{position: 'relative',}`).col.q-px-sm
-            //- q-btn(
-              outline no-caps color="red"
-              @click="nodeEditing = false, player.setState('figure', null)").full-width Delete
-            //- div(
-              v-if="nodeEditing === false"
-              @click="nodeEditing = true"
-              :style=`{
-                position: 'absolute', zIndex: 1000,
-              }`
-              ).row.fit.br
-            //- q-input(
-              @click.native="nodeEditing = true"
-              ref="nodeNameInput"
-              v-model="name"
-              borderless dark
-              type="textarea" autogrow
-              :rows="1"
-              :maxlength="120"
-              :disable="heightFooter !== $q.screen.height - 170"
-              placeholder="В чем суть?"
-              :input-style=`{
-                textAlign: 'center',
-                fontSize: '20px',
-              }`
-              ).full-width
-          .col
-          q-btn(
-            round flat color="white" icon="refresh"
-            )
-        .row.full-width.justify-center.q-pt-lg.q-px-xl
-          div(:style=`{
-            maxWidth: '400px',
-          }`).row.full-width
+          :options=`{
+            showHeader: false,
+            showBar: true,
+            showFooter: true,
+            //- footerOverlay: true
+          }`
+          :styles=`{
+            height: '100%',
+            objectFit: 'contain',
+            borderRadius: '10px',
+          }`
+          ).full-width.bg-black
+        div(
+          v-if="player && player.figure"
+          :style=`{
+            marginTop: '-20px',
+            marginBottom: '400px',
+          }`
+          ).row.full-width
+          div(
+            :style=`{
+              paddingTop: '28px',
+              borderRadius: '0 0 10px 10px',
+            }`
+            ).row.full-width.b-40
             q-input(
               v-model="name"
-              borderless dark dense
-              :maxlength="120"
-              placeholder="Введите сферу"
+              borderless dark
+              placeholder="В чем суть ?"
               :input-style=`{
-                //- textAlign: 'center',
-                //- fontSize: '20px',
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px',
-                paddingLeft: '8px',
+                fontSize: '18px',
+                textAlign: 'center',
               }`
               ).full-width
-            div().row.full-width.q-pt-sm
-              div(v-for="n in 5" :key="n" :style=`{height: '35px', background: 'rgb(35,35,35)', borderRadius: '10px',}`).row.full-width.q-mb-xs
-        .row.full-width.justify-center.q-py-sm.q-px-xl
-          div(:style=`{maxWidth: '400px'}`).row.full-width
-            q-btn(
-              outline no-caps color="red"
-              @click="nodeEditing = false, player.setState('figure', null)").full-width Delete
-            q-btn(
-              flat no-caps color="grey-8"
-              @click="nodeEditing = false").full-width Close
+          .row.full-width
+            span spheres
+          .row.full-width
+            span category
+          div(
+            :style=`{
+            }`
+            ).row.full-width.q-pa-sm
+            .col
+            q-btn(color="green" no-caps) Publish
+  //- footer default
+  //- transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  div(
+    v-if="player && !player.figure"
+    :style=`{
+      position: 'fixed', zIndex: 1000,
+      bottom: '0px',
+      height: 70+'px',
+    }`
+    ).row.full-width.items-start.content-start.justify-center
+    nav-mobile(
+      @pageId="pageIdChange"
+      :pageId="pageId"
+      :style=`{
+        zIndex: 1000,
+      }`)
+  //- footer node
+  //- transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  div(
+    v-if="player && player.figure"
+    v-show="$q.platform.is.mobile ? !$store.state.ui.userTyping : true"
+    :style=`{
+      position: 'fixed', zIndex: 1000,
+      bottom: '0px',
+      height: 70+'px',
+    }`
+    ).row.full-width.items-start.content-start.justify-center
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.pageWidth+'px',
+        background: 'rgb(30,30,30)',
+        borderRadius: '10px 10px 0 0',
+        minHeight: '70px',
+        background: 'rgba(30,30,30,1)',
+      }`
+      ).row.fit.items-start.content-start
+      div(:style=`{height: '70px',}`).row.full-width.items-center.content-center.q-px-sm
+        q-btn(
+          @click="player.setState('figure', null)"
+          round flat color="white" icon="clear")
+        .col
+        q-btn(round flat color="white" icon="play_arrow")
+        .col
+        q-btn(round flat color="white" icon="refresh")
 </template>
 
 <script>
@@ -265,6 +212,8 @@ import pageDetails from './page_details/index.vue'
 import pageCreator from './page_creator/index.vue'
 import pageNode from './page_node/index.vue'
 
+import nodeEditor from './node_editor/index.vue'
+
 export default {
   name: 'explorerDefault',
   props: ['contentKalpa', 'query'],
@@ -276,6 +225,7 @@ export default {
     pageDetails,
     pageCreator,
     pageNode,
+    nodeEditor,
   },
   data () {
     return {
@@ -287,9 +237,23 @@ export default {
       node: null,
       nodeEditing: false,
       heightFooter: 70,
+      contentHeight: 0,
+      contentWidth: 0
     }
   },
   computed: {
+    contentHeightMin () {
+      return 300
+    },
+    contentHeightMax () {
+      return this.$q.screen.height - 70
+    },
+    contentWidthMin () {
+      return Math.min(this.$q.screen.width, 700)
+    },
+    contentWidthMax () {
+      return this.$q.screen.width
+    },
     heightPageMin () {
       let width = Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth)
       let d = this.contentKalpa.thumbHeight / this.contentKalpa.thumbWidth
@@ -306,24 +270,22 @@ export default {
     // },
   },
   watch: {
-    nodeEditing: {
+    'player.figure': {
       handler (to, from) {
         if (to) {
-          this.$tween.to(this, 0.5, {
-            heightPage: this.heightPageMin,
-            heightFooter: this.$q.screen.height - 170,
+          this.$tween.to(this, 0.3, {
+            contentHeight: this.contentHeightMin,
+            contentWidth: this.contentWidthMin,
             onComplete: async () => {
-              // await this.$wait(500)
-              let ref = this.$refs.nodeNameInput
-              // this.$log('ref', ref)
-              ref.focus()
             }
           })
         }
         else {
-          this.$tween.to(this, 0.5, {
-            heightPage: this.heightPageMax,
-            heightFooter: 70
+          this.$tween.to(this, 0.3, {
+            contentHeight: this.contentHeightMax,
+            contentWidth: this.contentWidthMax,
+            onComplete: async () => {
+            }
           })
         }
       }
@@ -412,11 +374,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    document.body.style.background = 'rgb(0,0,0) !important'
+    // document.body.style.background = 'rgb(0,0,0) !important'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    document.body.style.background = 'rgb(30,30,30)'
+    // document.body.style.background = 'rgb(30,30,30)'
   }
 }
 </script>
