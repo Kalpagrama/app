@@ -51,7 +51,7 @@
         .col
           span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
           .row.full-width.q-px-sm
-            small(:style=`{lineHeight: 0.9}`).text-grey-4 @{{ user.username || user.oid }}
+            //- small(:style=`{lineHeight: 0.9}`).text-grey-4 @{{ user.username || user.oid }}
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
             v-if="followingConfirmed && !itsMe"

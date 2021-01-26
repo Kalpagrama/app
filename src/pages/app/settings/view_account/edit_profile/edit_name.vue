@@ -5,18 +5,18 @@ div(
   }`
   ).row.full-width.q-px-xs
   .row.full-width.q-pl-sm
-    small.text-grey-6 Статус (расскажите о себе)
+    small.text-grey-6 Выберите имя
   q-input(
-    v-model="status"
-    type="textarea" autogrow dark color="white"
+    v-model="name"
+    dark color="white"
     borderless
-    placeholder="Расскажи о себе"
+    placeholder="Как вас зовут"
     :debounce="500"
     :input-style=`{
       background: 'rgb(45,45,45)',
       borderRadius: '10px',
       padding: '12px',
-      minHeight: '80px',
+      //- minHeight: '80px',
     }`
     :style=`{
       //- paddingLeft: '8px',
@@ -28,12 +28,12 @@ div(
 import { ObjectApi } from 'src/api/object'
 
 export default {
-  name: 'editStatus',
+  name: 'editName',
   props: ['currentUser'],
   data () {
     return {
       locked: false,
-      status: ''
+      name: ''
     }
   },
   watch: {
@@ -42,14 +42,14 @@ export default {
     //   immediate: true,
     //   handler (to, from) {
     //     this.$log('currentUser TO', to)
-    //     if (to.profile.status) {
+    //     if (to.name) {
     //       this.locked = true
-    //       this.status = to.profile.status
+    //       this.name = to.name
     //       this.locked = false
     //     }
     //   }
     // },
-    status: {
+    name: {
       handler (to, from) {
         if (this.locked) return
         this.$log('status TO', to)
@@ -59,14 +59,14 @@ export default {
   },
   methods: {
     async save () {
-      await ObjectApi.update(this.currentUser.oid, 'profile.status', this.status)
+      await ObjectApi.update(this.currentUser.oid, 'profile.name', this.name)
     }
   },
   mounted () {
     this.$log('mounted')
-    if (this.currentUser.profile.status) {
+    if (this.currentUser.name) {
       this.locked = true
-      this.status = this.currentUser.profile.status
+      this.name = this.currentUser.name
       this.locked = false
     }
   }

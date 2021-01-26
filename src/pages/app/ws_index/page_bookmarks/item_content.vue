@@ -121,7 +121,7 @@ export default {
           name: 'Перейти',
           cb: () => {
             this.$log('launch')
-            this.$router.push(this.itemLink)
+            this.$router.push(this.bookmarkMeta.link)
           }
         },
         delete: {

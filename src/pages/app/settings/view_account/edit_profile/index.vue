@@ -1,16 +1,10 @@
 <template lang="pug">
 .row.full-width.q-pt-sm
-  edit-username(:currentUser="currentUser")
+  //- edit-username(:currentUser="currentUser")
+  edit-name(:currentUser="currentUser").q-mb-sm
   edit-status(:currentUser="currentUser")
-  //- name
-  .row.full-width.q-pa-xs
-    div(:style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-      q-input(
-        v-model="name"
-        :label="$t('Whats your name?', 'Введите ваше имя')"
-        filled dark color="white").full-width
   //- lang
-  .row.full-width.q-pa-xs
+  //- .row.full-width.q-pa-xs
     q-select(
       color="white"
       dark borderless
@@ -39,6 +33,7 @@ export default {
   props: ['currentUser'],
   components: {
     editStatus: () => import('./edit_status.vue'),
+    editName: () => import('./edit_name.vue'),
     editUsername: () => import('./edit_username.vue'),
     editEmail: () => import('./edit_email.vue'),
     editPassword: () => import('./edit_password.vue'),

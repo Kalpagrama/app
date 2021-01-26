@@ -7,7 +7,7 @@
     }`
     ).row.full-width.q-pa-md
     .row.full-width.justify-center.q-py-md
-      span(:style=`{fontSize: '18px',}`).text-white Добавить видео YouTube
+      span(:style=`{fontSize: '18px',}`).text-white Добавить видео из YouTube
     div(
       :style=`{borderRadius: '10px',}`
       ).row.full-width.b-40

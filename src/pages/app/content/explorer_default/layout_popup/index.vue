@@ -293,6 +293,8 @@ export default {
         this.pageId = pageId
       }
     },
+    nodePublished () {},
+    nodeClosed () {},
     nodeDelete () {
       this.$log('nodeDelete')
       this.player.setState('figure', null)
