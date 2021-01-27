@@ -1,6 +1,12 @@
 import assert from 'assert'
 import { Workspace } from 'src/system/rxdb/workspace'
-import { WsCollectionEnum, LstCollectionEnum, RxCollectionEnum } from 'src/system/rxdb/common'
+import {
+   WsCollectionEnum,
+   LstCollectionEnum,
+   RxCollectionEnum,
+   rxdbOperationProxy,
+   rxdbOperationProxyExec
+} from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
@@ -14,7 +20,7 @@ import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
 import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
-import { schemaKeyValue } from 'src/system/rxdb/schemas'
+import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
@@ -22,7 +28,10 @@ import { setSyncEventStorageValue } from 'src/system/services_browser'
 import { getRxCollectionEnumFromId, getRawIdFromId, makeId } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { AuthApi } from 'src/api/auth'
+import { ObjectApi } from 'src/api/object'
+import { wait } from 'src/system/utils'
 
+const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
@@ -65,8 +74,8 @@ class ReactiveDocDbMemCache {
 // import memdown from 'src/system/rxdb/rxdb_vuex_adapter'
 // import memdown from 'memdown'
 
-// let adapter = 'idb' устарел
-let adapter = 'indexeddb'
+let adapter = 'idb'
+// let adapter = 'indexeddb' // глючит
 // let adapter = memdown
 // let adapter = 'memory'
 
@@ -78,8 +87,9 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      // addRxPlugin(require('pouchdb-adapter-idb'))  устарел
-      addRxPlugin(require('pouchdb-adapter-indexeddb')) // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
+      addRxPlugin(require('pouchdb-adapter-idb'))
+      // addRxPlugin(require('pouchdb-adapter-memory'))
+      // addRxPlugin(require('pouchdb-adapter-indexeddb')) // глючит // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
       // addRxPlugin(require('pouchdb-adapter-leveldb')) // leveldown adapters need the leveldb plugin to work
       // addRxPlugin(require('pouchdb-adapter-memory'))
 
@@ -151,6 +161,80 @@ class RxDBWrapper {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
+   async createTestDb () {
+      // const dbTest = await createRxDatabase({
+      //    name: 'test',
+      //    adapter: 'idb',
+      //    multiInstance: true,
+      //    eventReduce: false
+      // });
+      const dbTest = this.db
+      await dbTest.collection({ name: 'cache_test', schema: cacheSchema })
+      await dbTest.cache_test.remove();
+      await dbTest.collection({ name: 'cache_test', schema: cacheSchema })
+
+      // let collection = dbTest.cache_test
+      let collection = dbTest.cache
+
+      let allObjects = await ObjectApi.objectListAllTest()
+      logDT('allObjects', allObjects.length)
+      let f = this.createTestDb
+      let tmpObj
+      const findCycle = async () => {
+         for (let obj of allObjects){
+            let t = performance.now()
+            let id = RxCollectionEnum.OBJ + '::' + obj.oid + '::' + JSON.stringify({})
+            let finded1 = await collection.find({selector: {'cached.data.name': obj.name}}).exec()
+            let finded2 = await collection.findOne(id).exec()
+            logDT(f, `find complete: ${Math.floor(performance.now() - t)} msec`, finded1.length, finded2 ? 1 : 0)
+            // await wait(5)
+         }
+      }
+      const insert = async (prefix, from, to) => {
+         tmpObj = allObjects[from]
+
+         let inserted = []
+         for (let dbItem of allObjects.slice(from, to)) {
+            let id = RxCollectionEnum.OBJ + '::' + prefix + dbItem.oid + '::' + JSON.stringify({})
+            let plainDoc = {
+               id,
+               props: {
+                  notEvict: false,
+                  oid: 'kjnlkjhqwoiufhsakljdfhalskdjfhsalkdfjhaslkdfjhaslkdfjhaslkdfhjaskldjfhalksjhflaksdfhiowuqrhfklsajdfh',
+                  rxCollectionEnum: RxCollectionEnum.OBJ,
+                  mangoQuery: { selector: { oid: 'asdalkhfalskjdfhalskdjfhaklsjghsklfjghkldsjghkdsfjghklasjhflkjhsadfkljhsadfksajdhflksadjfhasdfklsjdhf' } }
+               },
+               cached: { data: dbItem }
+            }
+            inserted.push(plainDoc)
+         }
+         let oids = inserted.map(item => item.id)
+         let updatedRxDocs = await collection.find({ selector: { id: { $in: oids } } }).exec()
+         // if (updatedRxDocs.length) logDT(f, 'updatedRxDocs: ', updatedRxDocs.length)
+         for (let updated of updatedRxDocs) {
+            let itemForUpdate = inserted.find(item => item.id === updated.id)
+            assert(itemForUpdate, '!inserted')
+            await collection.atomicUpsert(itemForUpdate)
+            inserted = inserted.filter(it => it.id !== updated.id)
+         }
+         let { success, error } = collection.bulkInsert(inserted) // оставшиеся вставляем
+      }
+      // findCycle()
+      for (let prefix = 0; prefix < 1; prefix++){
+         let curr = 0
+         while (curr <= allObjects.length) {
+            let t = performance.now()
+            let next = Math.max(0, curr) + 100
+            await insert(prefix, curr, curr + 100)
+            curr = next
+            // await wait(100)
+            logDT(f, `${prefix}:${curr} cycle complete: ${Math.floor(performance.now() - t)} msec`)
+         }
+      }
+
+      logDT(f, 'complete')
+   }
+
    async create (store) {
       const f = this.create
       logD(f, 'start')
@@ -159,15 +243,13 @@ class RxDBWrapper {
       try {
          await mutexGlobal.lock('rxdb::create')
          this.store = store
-         logD('before createRxDatabase')
          this.db = await createRxDatabase({
             name: 'kalpadb',
             adapter,
             multiInstance: true, // <- multiInstance (optional, default: true)
-            eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
+            eventReduce: true, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             pouchSettings: { revs_limit: 1 }
          })
-         logD('after createRxDatabase')
          await this.purgeDb() // очистит бд от старых данных
 
          this.reactiveDocDbMemCache.reset()
@@ -198,10 +280,10 @@ class RxDBWrapper {
       const t1 = performance.now()
       logD(f, 'start')
       if (operation.in('delete', 'recreate')) {
-         if (this.db.meta) await this.db.meta.remove()
+         if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'remove')
       }
       if (operation.in('create', 'delete', 'recreate')) {
-         if (this.db.meta) await this.db.meta.destroy()
+         if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
       }
       if (operation.in('create', 'recreate')) {
          await this.db.collection({ name: 'meta', schema: schemaKeyValue })
@@ -276,6 +358,9 @@ class RxDBWrapper {
             return currentUser
          }
          this.initialized = true
+
+         // this.createTestDb()
+
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE('cant init rxdb. err = ', err)
@@ -488,7 +573,7 @@ class RxDBWrapper {
                let populateFunc = async (itemsForPopulate, itemsForPrefetch, reactiveListFulFilled) => {
                   const f = populateFunc
                   f.nameExtra = 'populateFunc'
-                  logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
+                  // logD(f, 'start', itemsForPopulate.length, itemsForPrefetch.length)
                   const t1 = performance.now()
                   assert(itemsForPopulate && itemsForPrefetch)
                   let populatedItems
@@ -530,7 +615,7 @@ class RxDBWrapper {
                let paginateFunc = async (pageToken, pageSize) => {
                   assert(pageToken && pageSize, 'bad pagination params')
                   let paginationMangoQuery = cloneDeep(mangoQuery)
-                  paginationMangoQuery.pagination = {pageSize, pageToken}
+                  paginationMangoQuery.pagination = { pageSize, pageToken }
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
@@ -541,14 +626,19 @@ class RxDBWrapper {
                   pageToken: null
                }
                let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery))
-               let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {fetchFunc: async () => {
+               let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
+                  fetchFunc: async () => {
                      return {
                         item: {}, // пустой объект для начальной иницализации props
                         actualAge: 'infinity'
                      }
-                  }})
-               if (propsReactive.currentPageToken && propsReactive.currentPageSize){
-                  mangoQuery.pagination = {pageSize: propsReactive.currentPageSize, pageToken: propsReactive.currentPageToken}
+                  }
+               })
+               if (propsReactive.currentPageToken && propsReactive.currentPageSize) {
+                  mangoQuery.pagination = {
+                     pageSize: propsReactive.currentPageSize,
+                     pageToken: propsReactive.currentPageToken
+                  }
                }
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
                findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
@@ -595,7 +685,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         rxDoc = await this.db.meta.findOne(rawId).exec()
+         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'findOne', rawId)
       } else if (rxCollectionEnum === RxCollectionEnum.LOCAL) {
          assert(fetchFunc)
          rxDoc = await this.cache.get(id, fetchFunc)
@@ -623,7 +713,7 @@ class RxDBWrapper {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
-      // logW(f, 'start', rxCollectionEnum, idOrRawId)
+      // logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
          assert(idOrRawId)
          if (idOrRawId.includes('::')) {
@@ -683,7 +773,7 @@ class RxDBWrapper {
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
-         rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
+         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', { id: data.id, valueString: data.valueString })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }

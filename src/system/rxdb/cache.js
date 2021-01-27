@@ -9,13 +9,14 @@ import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import { wait } from 'src/system/utils'
+import { rxdbOperationProxy, rxdbOperationProxyExec } from 'src/system/rxdb/common'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_CACHE)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_CACHE)
 
-const debounceIntervalDumpLru = 1000 * 8 // сохраняем весь LRU в idb с дебаунсом 8 сек
+const debounceIntervalDumpLru = 1000 * 30 // сохраняем весь LRU в idb с дебаунсом 30 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию час)
 const defaultCacheSize = 50 * 1024 * 1024 // кэш в rxdb
 if (defaultCacheSize < 50 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
@@ -35,7 +36,7 @@ class Cache {
       logD(f, 'start')
       const t1 = performance.now()
       if (operation.in('delete', 'recreate')) {
-         if (this.db.cache) await this.db.cache.remove()
+         if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'remove')
          try {
             this.lruResetInProgress = true
             if (this.cacheLru) this.cacheLru.reset()
@@ -44,7 +45,7 @@ class Cache {
          }
       }
       if (operation.in('create', 'delete', 'recreate')) {
-         if (this.db.cache) await this.db.cache.destroy()
+         if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
       }
       if (operation.in('create', 'recreate')) {
          await this.db.collection({ name: 'cache', schema: cacheSchema })
@@ -70,6 +71,18 @@ class Cache {
       assert(!this.created, 'this.created')
       try {
          this.mutex = new MutexLocal('rxdb::cache')
+         // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрогены эти элементы и это обычно долго)
+         this.fastCache = {}
+         this.fastCache.insert = (rxDoc) => {
+            if (!this.fastCache[rxDoc.id]){
+               this.fastCache[rxDoc.id] = rxDoc
+               this.fastCache.list = this.fastCache.list || []
+               let deleted = this.fastCache.list.splice(888, this.fastCache.list.length) // удалим старые
+               for (let deletedId of deleted) delete this.fastCache[deletedId]
+            }
+         }
+         this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
+
          // используется для контроля места (при переполнении - объект удалится из rxdb)
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
@@ -82,7 +95,7 @@ class Cache {
                const f = this.dispose
                if (this.lruResetInProgress) return
                assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-               let rxDoc = await this.db.cache.findOne(id).exec()
+               let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
                if (rxDoc) {
                   if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
                      setTimeout(() => {
@@ -98,7 +111,7 @@ class Cache {
 
          // заполняем cacheLru из idb
          // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') // так не делаем чтобы reactiveItem не дергался каждый раз при измнении
-         let lruDumpDoc = await rxdb.db.meta.findOne('lruDump').exec()
+         let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
          if (lruDumpDoc) {
             logD(f, 'восстанавливаем Lru')
             let lruDump = JSON.parse(lruDumpDoc.valueString)
@@ -109,14 +122,20 @@ class Cache {
             f.nameExtra = 'debouncedDumpLru'
             if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
             logD(f, 'start', 'debouncedDumpLru')
+            // logW('todo skip debouncedDumpLru')
+            // return
+            // eslint-disable-next-line no-unreachable
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()
-            await this.db.meta.atomicUpsert({ id: 'lruDump', valueString: JSON.stringify(lruDump) })
+            await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
+               id: 'lruDump',
+               valueString: JSON.stringify(lruDump)
+            })
             logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })
 
          // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
-         for (let rxDoc of await this.db.cache.find().exec()) {
+         for (let rxDoc of await rxdbOperationProxyExec(this.db.cache, 'find')) {
             if (!this.cacheLru.get(rxDoc.id)) {
                this.cacheLru.set(rxDoc.id, {
                   actualUntil: Date.now() + debounceIntervalDumpLru,
@@ -139,7 +158,7 @@ class Cache {
    }
 
    async find (mangoQuery) {
-      return await this.db.cache.find(mangoQuery).exec()
+      return await rxdbOperationProxyExec(this.db.cache, 'find', mangoQuery)
    }
 
    // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
@@ -149,7 +168,7 @@ class Cache {
       assert(id && data, '!id && data' + id + JSON.stringify(data))
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       const f = this.set
-      logD(f, 'start', id)
+      // logD(f, 'start', id)
       const t1 = performance.now()
       actualAge = actualAge || 'stale'
       switch (actualAge) {
@@ -215,7 +234,8 @@ class Cache {
       // const rxDoc = await this.db.cache.atomicUpsert(plainDoc) // // если вставлять через atomicUpsert, то на большом числе документов случаются тормоза (один апсерт длится до 5 секунд и они сериализуются)
       const rxDoc = await this.upsertRxDocDebounce(plainDoc) // сохраняем в rxdb
       this.cacheLru.set(id, { actualUntil, actualAge }) // сохраняем в lru
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      this.fastCache.insert(rxDoc) // сохраним для быстрого ответа
+      // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
    }
 
@@ -225,6 +245,7 @@ class Cache {
          this.debouncedBatchUpdate = debounce(async () => {
             const f = this.debouncedBatchUpdate
             f.nameExtra = 'debouncedBatchUpdate'
+            // logD(f, 'start')
             const t1 = performance.now()
             try {
                await this.lock('rxdb::cache::set')
@@ -233,31 +254,47 @@ class Cache {
                try {
                   let insertedPlainDocs = {}
                   for (let { plainDoc } of debouncedUpdateQueueCopy) insertedPlainDocs[plainDoc.id] = plainDoc
-                  let updatedRxDocs = await this.db.cache.find({ selector: { id: { $in: Object.keys(insertedPlainDocs) } } }).exec() // эти обновляем
+                  // let all = await this.db.cache.find().exec()
+                  // logD(f, `start3_1_1 t = ${Math.floor(performance.now() - t1)} msec, all`)
+                  let t2 = performance.now()
+                  // let updatedRxDocs = await this.db.cache.find({ selector: { id: { $in: Object.keys(insertedPlainDocs) } } }).exec() // эти обновляем
+                  let updatedRxDocs = Array.from((await rxdbOperationProxyExec(this.db.cache, 'findByIds', Object.keys(insertedPlainDocs))), ([name, value]) => value);
+                  let findByIdsTm = performance.now() - t2
+                  t2 = performance.now()
                   for (let updated of updatedRxDocs) {
                      let inserted = insertedPlainDocs[updated.id]
-                     assert(inserted, '!updated')
-                     await this.db.cache.atomicUpsert(inserted)
+                     assert(inserted, '!inserted')
+                     await rxdbOperationProxyExec(this.db.cache, 'atomicUpsert', inserted)
                      delete insertedPlainDocs[updated.id]
                   }
-                  let { success, error } = await this.db.cache.bulkInsert(Object.values(insertedPlainDocs)) // оставшиеся вставляем
+                  let atomicUpsertTm = performance.now() - t2
+                  t2 = performance.now()
+                  let {
+                     success,
+                     error
+                  } = await rxdbOperationProxyExec(this.db.cache, 'bulkInsert', Object.values(insertedPlainDocs)) // оставшиеся вставляем
+                  let bulkInsertTm = performance.now() - t2
                   success.push(...updatedRxDocs)
                   for (let { plainDoc, resolve, reject } of debouncedUpdateQueueCopy) {
                      let rxDocUpdated = success.find(rxDoc => rxDoc.id === plainDoc.id)
                      if (rxDocUpdated) resolve(rxDocUpdated)
                      else {
-                        reject('bulkInsert error! debouncedUpdateQueueCopy=' + JSON.stringify({debouncedUpdateQueueCopy, success, error}))
+                        reject('bulkInsert error! debouncedUpdateQueueCopy=' + JSON.stringify({
+                           debouncedUpdateQueueCopy,
+                           success,
+                           error
+                        }))
                      }
                   }
+                  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec (findByIdsTm=${Math.floor(findByIdsTm)} atomicUpsertTm= ${Math.floor(atomicUpsertTm)} bulkInsertTm=${Math.floor(bulkInsertTm)})`)
                } catch (err) {
                   logE('cant debouncedUpdateQueue', err)
-                  for (let { reject } of this.debouncedUpdateQueue)reject(err)
+                  for (let { reject } of this.debouncedUpdateQueue) reject(err)
                }
             } finally {
                this.release()
-               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
             }
-         }, 300, { leading: true, maxWait: 8888 })
+         }, 300, { leading: false, maxWait: 8888 })
          this.debouncedUpdateQueue = []
       }
       // запросы на обновление накапливаются и выполняются пачкой (иначе у rxdb - проблемы)
@@ -270,7 +307,9 @@ class Cache {
 
    isActual (id, cachedInfo = null) {
       cachedInfo = cachedInfo || this.cacheLru.get(id) // {actualUntil, actualAge, failReason}
-      return cachedInfo && (cachedInfo.actualAge === 'infinity' || Date.now() <= cachedInfo.actualUntil)
+      let res = cachedInfo && (cachedInfo.actualAge === 'infinity' || Date.now() <= cachedInfo.actualUntil)
+      // logD('res = ', res)
+      return res
    }
 
    // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
@@ -280,7 +319,7 @@ class Cache {
          assert(this.created, '!this.created')
          assert(id)
          const f = this.get
-         logD(f, 'start', id)
+         // logD(f, 'start', id)
          const t1 = performance.now()
          if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
          let cachedInfo = this.cacheLru.get(id) // {actualUntil, actualAge, failReason}
@@ -303,11 +342,15 @@ class Cache {
                   logD(f, 'данные с сервера получены', fetchRes)
                   assert(fetchRes, '!fetchRes')
                   assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
-                  let existingRxDoc = await this.db.cache.findOne(id).exec()
-                  let existingItem = existingRxDoc ? existingRxDoc.toJSON().cached.data : null
-                  let notEvict = fetchRes.notEvict || (existingRxDoc ? existingRxDoc.props.notEvict : false) // если у старой сущности стоял notEvict - храним его
+                  let existingRxDoc, existingItem
+                  let notEvict = fetchRes.notEvict
+                  if (this.cacheLru.get(id)){ // такой итем уже есть в кэше...
+                     existingRxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
+                     existingItem = existingRxDoc ? existingRxDoc.toJSON().cached.data : null
+                     notEvict = notEvict || (existingRxDoc ? existingRxDoc.props.notEvict : false) // если у старой сущности стоял notEvict - храним его
+                  }
                   let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
-                  logD(f, 'записаны в кэш')
+                  // logD(f, 'записаны в кэш')
                   if (onFetchFunc) {
                      await onFetchFunc(existingItem, fetchRes.item)
                   }
@@ -318,7 +361,7 @@ class Cache {
                   fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
                } else { // ждем ответа сервра
                   try {
-                     logD(f, 'запрашиваем данные с сервера синхронно...', clientFirst, cachedInfo)
+                     // logD(f, 'запрашиваем данные с сервера синхронно...', clientFirst, cachedInfo)
                      await saveFunc(await fetchFunc())
                   } catch (err) {
                      await processFetchErrorFunc(err)
@@ -329,12 +372,12 @@ class Cache {
          if (force || !this.isActual(id, cachedInfo)) { // данные отсутствуют в кэше, либо устарели
             await fetch()
          }
-         let rxDoc = await this.db.cache.findOne(id).exec() // выполняем строго после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
+         let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id) // выполняем строго после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
          if (cachedInfo && !rxDoc) { // наблюдается баг (в cacheLru запись есть, а в rxdb - нет) Не разобрался до конца как это происходит... Возможно это связано с ручной очисткой storage
             logW(f, 'record has in cacheLru but not in rxdb!', cachedInfo)
             clientFirst = false // ждем отвера сервера
             await fetch()
-            rxDoc = await this.db.cache.findOne(id).exec()
+            rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
          }
          if (!rxDoc) {
             logD(f, 'not found', rxDoc, cachedInfo)
@@ -345,7 +388,7 @@ class Cache {
             }
             return null
          }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, rxDoc)
+         // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, rxDoc)
          return rxDoc
       } finally {
          // this.release()

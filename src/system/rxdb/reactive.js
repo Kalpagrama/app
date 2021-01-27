@@ -10,6 +10,7 @@ import lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
+import { rxdbOperationProxy } from 'src/system/rxdb/common'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -243,6 +244,8 @@ class ReactiveDocFactory {
    }
 
    reactiveDocSubscribe () {
+      // return
+      // // eslint-disable-next-line no-unreachable
       const f = this.reactiveDocSubscribe
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
@@ -256,7 +259,7 @@ class ReactiveDocFactory {
                try {
                   await this.mutex.lock('reactiveDocSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
-                  // logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
+                  logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
                      let newData = JSON.parse(JSON.stringify(this.getReactiveDoc())) // убираем реактивную хрень
                      newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
@@ -283,6 +286,8 @@ class ReactiveDocFactory {
    }
 
    reactiveDocUnsubscribe () {
+      // return
+      // // eslint-disable-next-line no-unreachable
       const f = this.reactiveDocUnsubscribe
       if (this.itemUnsubscribeFunc) this.itemUnsubscribeFunc()
       delete this.itemUnsubscribeFunc
@@ -594,10 +599,10 @@ class Group {
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) {
          rxQuery = rxQueryOrRxDocOrArray
-         logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
+         // logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
       } else if (isRxDocument(rxQueryOrRxDocOrArray)) {
          rxDoc = rxQueryOrRxDocOrArray
-         logD('ReactiveListHolder::constructor: ', rxDoc.id)
+         // logD('ReactiveListHolder::constructor: ', rxDoc.id)
       } else if (Array.isArray(rxQueryOrRxDocOrArray)) {
          array = rxQueryOrRxDocOrArray
       } else throw new Error('bad rxQueryOrRxDocOrArray')

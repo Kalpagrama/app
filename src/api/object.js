@@ -76,6 +76,29 @@ class ObjectApi {
       })
    }
 
+   static async objectListAllTest () {
+      const f = ObjectApi.objectListAllTest
+      logD(f, 'start')
+      const t1 = performance.now()
+      const cb = async () => {
+         const t2 = performance.now()
+         let { data: { testAllEssence } } = await apollo.clients.api.query({
+            query: gql`
+                ${fragments.objectFullFragment}
+                query {
+                    testAllEssence {
+                        ... objectFullFragment
+                    }
+                }
+            `
+         })
+         // logD('objectList=', objectList)
+         logD(f, `complete: ${Math.floor(performance.now() - t1)}/${Math.floor(performance.now() - t2)} msec`)
+         return testAllEssence
+      }
+      return await apiCall(f, cb)
+   }
+
    static async objectList (oids) {
       const f = ObjectApi.objectList
       logD(f, 'start')

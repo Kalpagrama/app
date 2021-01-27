@@ -31,6 +31,7 @@ const LogLevelEnum = Object.freeze({
 Object.freeze(LogLevelEnum)
 const LogSystemModulesEnum = Object.freeze({
    SYSTEM: 'sys',
+   TEST: 'test',
    SW: 'sw',
    PWA: 'pwa',
    SSR: 'ssr',

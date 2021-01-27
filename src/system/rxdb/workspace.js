@@ -1,5 +1,11 @@
 import assert from 'assert'
-import { RxCollectionEnum, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/common'
+import {
+   RxCollectionEnum,
+   rxdbOperationProxy,
+   rxdbOperationProxyExec,
+   WsCollectionEnum,
+   WsItemTypeEnum
+} from 'src/system/rxdb/common'
 import { wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
@@ -68,12 +74,12 @@ class Workspace {
       try {
          await this.lock('ws::updateCollections')
          if (operation.in('delete', 'recreate')) {
-            if (this.db.ws_items) await this.db.ws_items.remove()
-            if (this.db.ws_changes) await this.db.ws_changes.remove()
+            if (this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'remove')
+            if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'remove')
          }
          if (operation.in('create', 'delete', 'recreate')) {
-            if (this.db.ws_items) await this.db.ws_items.destroy()
-            if (this.db.ws_changes) await this.db.ws_changes.destroy()
+            if (this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'destroy')
+            if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
          }
          if (operation.in('create', 'recreate')) {
             await this.db.collection({
@@ -92,14 +98,14 @@ class Workspace {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                assert('hasChanges' in plainData, '! hasChanges in plainData')
                if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
-                  let deletedDocs = await this.db.ws_changes.find({
+                  let deletedDocs = await rxdbOperationProxyExec(this.db.ws_changes, ' find', {
                      selector: {
                         id,
                         operation: WsOperationEnum.DELETE
                      }
-                  }).exec()
+                  })
                   if (deletedDocs.length === 0) { // только если не удален
-                     await this.db.ws_changes.atomicUpsert({ id, operation, rev: plainData.rev })
+                     await rxdbOperationProxyExec(this.db.ws_changes, 'atomicUpsert', { id, operation, rev: plainData.rev })
                   }
                }
             }
@@ -115,39 +121,39 @@ class Workspace {
                      break
                }
             }
-            this.db.ws_items.preSave(async (plainData, rxDoc) => {
-               initWsItem(plainData)
-               let plainDataCopy = cloneDeep(plainData) // newVal
-               let rxDocCopy = rxDoc.toJSON() // oldVal
-               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
-               delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
-               delete rxDocCopy.rev
-               delete plainDataCopy.hasChanges
-               delete rxDocCopy.hasChanges
-               if (isEqual(plainDataCopy, rxDocCopy)) {
-                  // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
-                  plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
-               }
-            }, false)
-            this.db.ws_items.preInsert(async (plainData) => {
-               initWsItem(plainData)
-            }, false);
-            this.db.ws_items.postSave(async (plainData, rxDoc) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            }, false)
-            this.db.ws_items.postInsert(async (plainData) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            }, false)
-            this.db.ws_items.postRemove(async (plainData) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
-               logD('postRemove')
-               if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
-               rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
-               // plainData.deletedAt = Date.now()
-            }, false)
+            // this.db.ws_items.preSave(async (plainData, rxDoc) => {
+            //    initWsItem(plainData)
+            //    let plainDataCopy = cloneDeep(plainData) // newVal
+            //    let rxDocCopy = rxDoc.toJSON() // oldVal
+            //    delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+            //    delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
+            //    delete rxDocCopy.rev
+            //    delete plainDataCopy.hasChanges
+            //    delete rxDocCopy.hasChanges
+            //    if (isEqual(plainDataCopy, rxDocCopy)) {
+            //       // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+            //       plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
+            //    }
+            // }, false)
+            // this.db.ws_items.preInsert(async (plainData) => {
+            //    initWsItem(plainData)
+            // }, false);
+            // this.db.ws_items.postSave(async (plainData, rxDoc) => {
+            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            //    await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+            // }, false)
+            // this.db.ws_items.postInsert(async (plainData) => {
+            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            //    await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+            // }, false)
+            // this.db.ws_items.postRemove(async (plainData) => {
+            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            //    // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+            //    logD('postRemove')
+            //    if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
+            //    rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
+            //    // plainData.deletedAt = Date.now()
+            // }, false)
          }
       } finally {
          this.release()
@@ -241,8 +247,8 @@ class Workspace {
             let outdatedItems = []
             let extraItems = []
             if (wsVersionLocal === wsServer.ver) {
-               let itemsLocal = await this.db.ws_items.find().exec()
-               let unsavedIds = new Set((await this.db.ws_changes.find().exec()).map(item => item.id))
+               let itemsLocal = await rxdbOperationProxyExec(this.db.ws_items, 'find')
+               let unsavedIds = new Set((await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(item => item.id))
 
                // есть на сервере, но нет у нас (эти надо вставить!)
                newItems = differenceWith(itemsServer, itemsLocal, (serverItem, localItem) => {
@@ -258,12 +264,12 @@ class Workspace {
                }).filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
                // logD(f, 'merge ws.(newItems, outdatedItems, extraItems):', newItems, outdatedItems, extraItems)
             } else { // на сервере совсем другая мастерская. Берем только ее (свои изменения убиваем)
-               await this.db.ws_items.find().remove() // удаялем все локальные! на сервере - другая мастерская
+               await rxdbOperationProxy(this.db.ws_items, 'find').remove() // удаялем все локальные! на сервере - другая мастерская
                newItems = itemsServer
             }
-            await this.db.ws_items.bulkInsert(newItems)
-            for (let outdated of outdatedItems) await this.db.ws_items.atomicUpsert(outdated)
-            if (extraItems.length) await this.db.ws_items.find({ selector: { id: { $in: extraItems.map(item => item.id) } } }).remove() // удаялем те, которых нет на сервере
+            await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
+            for (let outdated of outdatedItems) await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', outdated)
+            if (extraItems.length) await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove() // удаялем те, которых нет на сервере
             await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
@@ -294,11 +300,11 @@ class Workspace {
       // }
 
       const clearTrash = async () => {
-         await this.db.ws_items.find({
+         await rxdbOperationProxy(this.db.ws_items, 'find', {
             selector: { deletedAt: { $gt: 0 } },
             sort: [{ deletedAt: 'desc' }] // в начале списка те, что удалены недавно)
          }).skip(1000).remove() // оставляем максимум 1000 последних
-         await this.db.ws_items.find({
+         await rxdbOperationProxy(this.db.ws_items, 'find', {
             selector: {
                $and: [
                   { deletedAt: { $gt: 0 } },
@@ -311,22 +317,22 @@ class Workspace {
 
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()
-      let unsavedItems = (await this.db.ws_changes.find().exec()).map(rxDoc => rxDoc.toJSON()) // убираем реактивность
+      let unsavedItems = (await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(rxDoc => rxDoc.toJSON()) // убираем реактивность
       let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
       let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
       let operations = []
       // todo - по идее это избыточно (processEvent не завязан на этот список) - убрать после презентации
       // сначала удаляем из очереди, а потом шлем на отправку (processEvent может сработать в другой вкладке до того как  закончится saveToServer)
-      await this.db.ws_changes.find().remove() // удаляем информацию из очереди на отправку
+      await rxdbOperationProxy(this.db.ws_changes, 'find').remove() // удаляем информацию из очереди на отправку
       for (let unsavedItem of unsavedItems) {
          let { id, operation, rev } = unsavedItem
          let wsItemInput
          if (operation === WsOperationEnum.DELETE) {
             wsItemInput = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
          } else {
-            let rxDoc = await this.db.ws_items.findOne(id).exec()
+            let rxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'findOne', id)
             if (!rxDoc) { // в мастерской нет такого элемента!
-               await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
+               await rxdbOperationProxy(this.db.ws_changes, 'find', { selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
                continue
             }
             wsItemInput = rxDoc.toJSON()
@@ -343,7 +349,7 @@ class Workspace {
          if (err.networkError) { // если ошибка не сетевая - увеличить интервал
             logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
             this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-            await this.db.ws_changes.bulkInsert(unsavedItems)// вставляем обратно
+            await rxdbOperationProxyExec(this.db.ws_changes, 'bulkInsert', unsavedItems)// вставляем обратно
          } else {
             try {
                logE(f, 'критическая ошибка при отправке! пробуем слиться с сервером', err)
@@ -353,7 +359,7 @@ class Workspace {
                logE(f, 'неудачная синхронизация  с сервером', err)
                if (err.networkError) {
                   this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-                  await this.db.ws_changes.bulkInsert(unsavedItems)// вставляем обратно
+                  await rxdbOperationProxyExec(this.db.ws_changes, 'bulkInsert', unsavedItems)// вставляем обратно
                }
             }
          }
@@ -431,13 +437,13 @@ class Workspace {
             if (reactiveItem && type === 'WS_ITEM_DELETED') {
                // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
                await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
-               await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
+               await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: itemServer.id } }).remove()
             } else if (type !== 'WS_ITEM_DELETED') {
                // logD(f, 'try update ws item')
                assert(!itemServer.hasChanges, 'itemServer.hasChanges')
-               await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
+               await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
             }
-            await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
+            await rxdbOperationProxy(this.db.ws_changes, 'find', { selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
          } else {
             logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
             // просто возьмем ревизию с сервера (нальзя полностью менять данные тк у нас могут быть данные свежее, чем на сервере)
@@ -512,7 +518,7 @@ class Workspace {
 
       mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные ( да! rxdb по умолчанию выводит! )
       if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
-      let rxQuery = this.db.ws_items.find(mangoQuery)
+      let rxQuery = rxdbOperationProxy(this.db.ws_items, 'find', mangoQuery)
       return rxQuery
    }
 
@@ -533,13 +539,13 @@ class Workspace {
                return acc
             }, [])
          } else if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE) {
-            const foundOtherDocs = await this.db.ws_items.find({
+            const foundOtherDocs = await rxdbOperationProxyExec(this.db.ws_items, 'find', {
                selector: {
                   wsItemType: RxCollectionEnum.WS_SPHERE,
                   name: itemCopy.name,
                   id: { $ne: itemCopy.id || 0 }
                }
-            }).exec()
+            })
             // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
             if (foundOtherDocs.length) {
                if (!itemCopy.id) { // создание нового элемента
@@ -552,7 +558,7 @@ class Workspace {
          itemCopy.updatedAt = Date.now()
          if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
          if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
-         let rxDoc = await this.db.ws_items.atomicUpsert(itemCopy)
+         let rxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemCopy)
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
             let wsSynchroDateStr = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate')
             let wsSynchroDate = wsSynchroDateStr ? new Date(wsSynchroDateStr) : new Date(0)
@@ -572,7 +578,7 @@ class Workspace {
       const f = this.get
       logD(f, 'start', id)
       const t1 = performance.now()
-      let rxDoc = await this.db.ws_items.findOne(id).exec()
+      let rxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'findOne', id)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
    }
