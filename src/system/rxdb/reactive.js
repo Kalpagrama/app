@@ -244,8 +244,6 @@ class ReactiveDocFactory {
    }
 
    reactiveDocSubscribe () {
-      // return
-      // // eslint-disable-next-line no-unreachable
       const f = this.reactiveDocSubscribe
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
@@ -286,8 +284,6 @@ class ReactiveDocFactory {
    }
 
    reactiveDocUnsubscribe () {
-      // return
-      // // eslint-disable-next-line no-unreachable
       const f = this.reactiveDocUnsubscribe
       if (this.itemUnsubscribeFunc) this.itemUnsubscribeFunc()
       delete this.itemUnsubscribeFunc
@@ -307,7 +303,7 @@ class Group {
       this.propsReactive = propsReactive
       assert(this.propsReactive, '!this.propsReactive')
       // todo заполнять в addPaginationPage
-      this.itemType = 'ITEM' // ITEM / GROUP (ынутри группы мб подгруппы)
+      this.itemType = 'ITEM' // ITEM / GROUP (внутри группы мб подгруппы)
       const BATCH_SZ = 12
    }
 
@@ -539,6 +535,8 @@ class Group {
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          this.totalCount = listItems.length
+         this.groupId = JSON.stringify(rxQuery.mangoQuery) // todo для дебага
+         logW('groupId=', this.groupId)
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
             items,
@@ -567,9 +565,11 @@ class Group {
                }
             }
          }
+         this.groupId = rxDoc.id // todo для дебага
       } else if (array) {
          listItems = array
          this.totalCount = listItems.length
+         this.groupId = 'custom array'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
       assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
       let page = {
@@ -685,80 +685,6 @@ class ReactiveListWithPaginationFactory {
          refresh: group.refresh.bind(group)
       }
    }
-
-   // rxQuerySubscribe (rxQueryOrRxDoc) {
-   //    const f = this.rxQuerySubscribe
-   //    let rxQuery, rxDoc
-   //    if (isRxQuery(rxQueryOrRxDoc)) {
-   //       rxQuery = rxQueryOrRxDoc
-   //       logD('ReactiveListHolder::constructor: ', rxQuery.mangoQuery.selector)
-   //    } else if (isRxDocument(rxQueryOrRxDoc)) {
-   //       rxDoc = rxQueryOrRxDoc
-   //       logD('ReactiveListHolder::constructor: ', rxDoc.id)
-   //    } else throw new Error('bad rxQueryOrRxDoc')
-   //    if (rxQuery) {
-   //       // skip - для пропуска n первых эвентов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-   //       let rxSubscription = rxQuery.$.pipe(skip(1)).subscribe(async results => {
-   //          try {
-   //             await this.mutex.lock('List::rxQuerySubscribe')
-   //             // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
-   //             // logD(f, 'rxQuery changed 1', results)
-   //             if (this.loadedLen() === results.length) {
-   //                let arrayChanged = false
-   //                let listItems = this.loadedItems()
-   //                for (let i = 0; i < results.length; i++) {
-   //                   if (results[i].id !== listItems[i].id) {
-   //                      arrayChanged = true
-   //                      break
-   //                   }
-   //                }
-   //                if (!arrayChanged) return // если список не изменился - просто выходим
-   //             }
-   //             // logD(f, 'rxQuery changed 2', results)
-   //             let listItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
-   //             this.loadedPages = [{
-   //                listItems: listItemsNew,
-   //                id: null,
-   //                nextPageToken: null,
-   //                prevPageToken: null,
-   //                currentPageToken: null
-   //
-   //             }]
-   //             this.vm.reactiveListFulFilled.meta.totalLen = listItemsNew.length
-   //             let { startFullFil, endFullFil } = this.fulFilledRange()
-   //             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-   //                startFullFil = 0
-   //                endFullFil = 11
-   //             }
-   //             await this.fulfill(listItemsNew.slice(startFullFil, endFullFil + 1), 'whole')
-   //          } finally {
-   //             this.mutex.release()
-   //          }
-   //       })
-   //    } else if (rxDoc) {
-   //       // в список быди добавлены элементы(например при подписке)
-   //       let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
-   //          try {
-   //             await this.mutex.lock('List::rxDocSubscribe') // обязательно сначала блокируем !!! (см querySubscribe)
-   //             logD(f, 'List::rxDoc changed. try to change this.listItems')
-   //             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-   //             let page = this.loadedPages.find(pg => pg.id === change.id)
-   //             assert(page, '!page')
-   //             page.listItems = change.cached.data.items
-   //
-   //             let { startFullFil, endFullFil } = this.fulFilledRange()
-   //             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-   //                startFullFil = 0
-   //                endFullFil = 11
-   //             }
-   //             let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
-   //             await this.fulfill(nextItems, 'whole')
-   //          } finally {
-   //             this.mutex.release()
-   //          }
-   //       })
-   //    } else throw new Error('!this.rxQuery && !this.rxDoc')
-   // }
 }
 
 export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactiveDoc, updateRxDocPayload }

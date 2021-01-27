@@ -127,9 +127,10 @@ class Cache {
             // eslint-disable-next-line no-unreachable
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()
+            let lruDumpStr = JSON.stringify(lruDump)
             await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
                id: 'lruDump',
-               valueString: JSON.stringify(lruDump)
+               valueString: lruDumpStr
             })
             logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })

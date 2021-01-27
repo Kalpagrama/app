@@ -12,6 +12,7 @@ div(
     type="video/mp4"
     :playsinline="true"
     :autoplay="true"
+    preload="metadata"
     :loop="true"
     :muted="muted"
     :style=`{
