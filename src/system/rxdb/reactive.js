@@ -535,8 +535,7 @@ class Group {
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          this.totalCount = listItems.length
-         this.groupId = JSON.stringify(rxQuery.mangoQuery) // todo для дебага
-         logW('groupId=', this.groupId)
+         this.groupId = JSON.stringify(rxQuery.mangoQuery) // для дебага
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
             items,

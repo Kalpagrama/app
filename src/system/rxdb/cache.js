@@ -71,13 +71,13 @@ class Cache {
       assert(!this.created, 'this.created')
       try {
          this.mutex = new MutexLocal('rxdb::cache')
-         // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрогены эти элементы и это обычно долго)
+         // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
          this.fastCache = {}
          this.fastCache.insert = (rxDoc) => {
             if (!this.fastCache[rxDoc.id]){
                this.fastCache[rxDoc.id] = rxDoc
                this.fastCache.list = this.fastCache.list || []
-               let deleted = this.fastCache.list.splice(888, this.fastCache.list.length) // удалим старые
+               let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
                for (let deletedId of deleted) delete this.fastCache[deletedId]
             }
          }

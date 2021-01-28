@@ -121,39 +121,39 @@ class Workspace {
                      break
                }
             }
-            // this.db.ws_items.preSave(async (plainData, rxDoc) => {
-            //    initWsItem(plainData)
-            //    let plainDataCopy = cloneDeep(plainData) // newVal
-            //    let rxDocCopy = rxDoc.toJSON() // oldVal
-            //    delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
-            //    delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
-            //    delete rxDocCopy.rev
-            //    delete plainDataCopy.hasChanges
-            //    delete rxDocCopy.hasChanges
-            //    if (isEqual(plainDataCopy, rxDocCopy)) {
-            //       // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
-            //       plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
-            //    }
-            // }, false)
-            // this.db.ws_items.preInsert(async (plainData) => {
-            //    initWsItem(plainData)
-            // }, false);
-            // this.db.ws_items.postSave(async (plainData, rxDoc) => {
-            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
-            //    await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            // }, false)
-            // this.db.ws_items.postInsert(async (plainData) => {
-            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
-            //    await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            // }, false)
-            // this.db.ws_items.postRemove(async (plainData) => {
-            //    // сработает НЕ на всех вкладках (только на той, что изменила итем)
-            //    // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
-            //    logD('postRemove')
-            //    if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
-            //    rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
-            //    // plainData.deletedAt = Date.now()
-            // }, false)
+            this.db.ws_items.preSave(async (plainData, rxDoc) => {
+               initWsItem(plainData)
+               let plainDataCopy = cloneDeep(plainData) // newVal
+               let rxDocCopy = rxDoc.toJSON() // oldVal
+               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+               delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
+               delete rxDocCopy.rev
+               delete plainDataCopy.hasChanges
+               delete rxDocCopy.hasChanges
+               if (isEqual(plainDataCopy, rxDocCopy)) {
+                  // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+                  plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
+               }
+            }, false)
+            this.db.ws_items.preInsert(async (plainData) => {
+               initWsItem(plainData)
+            }, false)
+            this.db.ws_items.postSave(async (plainData, rxDoc) => {
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+            }, false)
+            this.db.ws_items.postInsert(async (plainData) => {
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+            }, false)
+            this.db.ws_items.postRemove(async (plainData) => {
+               // сработает НЕ на всех вкладках (только на той, что изменила итем)
+               // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+               logD('postRemove')
+               if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
+               rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
+               // plainData.deletedAt = Date.now()
+            }, false)
          }
       } finally {
          this.release()

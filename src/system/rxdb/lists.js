@@ -49,7 +49,7 @@ class Lists {
          items = items.filter(itemFilter)
          return {
             item: { items, count: items.length, totalCount, nextPageToken, prevPageToken, currentPageToken, oid },
-            actualAge: 'day',
+            actualAge: 'hour',
             mangoQuery
          }
       }

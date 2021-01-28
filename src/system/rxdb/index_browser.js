@@ -548,7 +548,7 @@ class RxDBWrapper {
       assert(this.created, 'cant find! !this.created')
       const f = this.find
       const t1 = performance.now()
-      // logD(f, 'start', mangoQuery)
+      logW(f, 'start', mangoQuery)
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
