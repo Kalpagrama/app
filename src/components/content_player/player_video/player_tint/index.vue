@@ -30,7 +30,7 @@ div(
     v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
     color="white" size="50px")
   //- player play/pause
-  q-btn(
+  //- q-btn(
     v-if="player.duration && tintFocused"
     @click="player.playing ? player.pause() : player.play()"
     round flat color="white")
@@ -42,21 +42,21 @@ div(
     div(
       v-if="player && player.duration"
       :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '0px',
+        position: 'absolute', zIndex: 1000,
+        bottom: '0px',
         pointerEvents: showTintBar ? 'auto' : 'none',
+        background: tintFocused ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
+        borderRadius: '0 0 10px 10px',
+        //- paddingBottom: options.mode === 'feed' ? '50%' : '0px',
       }`
-      ).row.full-width.justify-center
+      ).row.full-width.justify-center.q-pa-md
       tint-bar(
-        :player="player"
-        :contentKalpa="contentKalpa"
-        :options="options"
-        :isActive="isActive"
-        :isVisible="isVisible"
-        :isMini="isMini"
+        v-bind="$props"
         :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          borderRadius: '10px',
-          background: 'rgba(30,30,30,0.5)',
+          //- maxWidth: $store.state.ui.pageWidth+'px',
+          maxWidth: '600px',
+          borderRadius: '20px',
+          background: options.mode === 'editor' ? 'rgba(30,30,30,0.8)' : 'none',
           opacity: showTintBar ? 1 : 0,
           pointerEvents: showTintBar ? 'auto' : 'none',
         }`)
@@ -108,19 +108,17 @@ export default {
   methods: {
     tintClickSelf () {
       this.$log('tintClickSelf')
-      if (this.player.muted) {
-        this.player.setState('muted', false)
+      if (this.options.mode === 'feed') {
+        if (this.player.muted) {
+          this.player.setState('muted', false)
+        }
+        else {
+          this.tintFocused = !this.tintFocused
+        }
       }
-      else {
+      if (this.options.mode === 'editor') {
         this.tintFocused = !this.tintFocused
       }
-      // if (this.tintFocused)
-      // if (this.player.playing) {
-      //   this.player.pause()
-      // }
-      // else {
-      //   this.player.play()
-      // }
     },
     tintMouseenter () {
       this.$log('tintMouseenter')
@@ -130,6 +128,7 @@ export default {
     tintMouseleave () {},
     tintMousemove (e) {
       // this.$log('tintMousemove', e)
+      if (this.options.mode === 'editor') return
       let x = e.clientX
       let y = e.clientY
       let rect = this.$refs['tint-wrapper'].getBoundingClientRect()
@@ -143,7 +142,7 @@ export default {
       }
       this.tintMousemoveTimeout = setTimeout(() => {
         this.tintFocused = false
-      }, 2000)
+      }, 1000)
       // get in rect
       // this.$log({x, y, xTintMin, xTintMax, yTintMin, yTintMax})
       if (x >= xTintMin && x <= xTintMax && y >= yTintMin && y <= yTintMax) {

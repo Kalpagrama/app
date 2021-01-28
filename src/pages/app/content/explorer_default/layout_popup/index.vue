@@ -23,6 +23,7 @@ q-layout(
               showHeader: false,
               showBar: true,
               showFooter: true,
+              mode: 'editor',
             }`
             :styles=`{
               height: '100%',
@@ -33,13 +34,14 @@ q-layout(
   q-footer(reveal)
     div(
       :style=`{
-        paddingBottom: 'env(safe-area-inset-bottom)',
+        //- paddingBottom: 'env(safe-area-inset-bottom)',
       }`
       ).row.full-width.justify-center
       div(
         :style=`{
           borderRadius: '10px 10px 0 0',
           maxWidth: $store.state.ui.pageWidth+'px',
+          paddingBottom: 'env(safe-area-inset-bottom)',
         }`
         ).row.full-width.b-40
         nav-mobile(
@@ -156,6 +158,21 @@ export default {
             contentWidth: this.contentWidthMax
           })
         }
+      }
+    },
+    'player.figure': {
+      handler (to, from) {
+        if (to && !from) {
+          this.$log('player.figure Start creating node, pageId = null')
+          this.pageId = null
+        }
+        if (to === null) {
+          // this.pageId = null
+          if (this.footerHeight !== 70) {
+            this.footerToggle()
+          }
+        }
+        // if (to === null) {}
       }
     }
   },
