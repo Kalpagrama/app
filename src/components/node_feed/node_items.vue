@@ -135,7 +135,7 @@ export default {
       if (this.itemActive === index) {
         // close item if it is opened
         if (this.itemOpened === index) {
-          this.$tween.to(this, 0.8, {
+          this.$tween.to(this, 0.4, {
             itemTop: this.itemTopMini,
             itemLeft: this.itemLeftMini,
             itemWidth: this.itemWidthMini,
@@ -146,7 +146,7 @@ export default {
               // this.itemOpened = null
             }
           })
-          await this.$wait(400)
+          await this.$wait(200)
           this.itemOpened = null
         }
         // open item if it is closed/only active...
@@ -166,7 +166,7 @@ export default {
           // get item ratio...
           let item = this.node.items[index]
           // shift
-          this.$tween.to(this, 0.8, {
+          this.$tween.to(this, 0.4, {
             itemTop: 0,
             itemLeft: 0,
             itemWidth: this.$q.screen.width,

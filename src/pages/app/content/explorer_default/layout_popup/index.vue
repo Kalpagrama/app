@@ -8,6 +8,7 @@ q-layout(
         :style=`{
           position: 'relative',
           height: 'calc('+ contentHeight +'px - env(safe-area-inset-top))',
+          //- height: contentHeight+'px',
           maxWidth: contentWidth+'px',
           borderRadius: '0 0 10px 10px',
         }`
