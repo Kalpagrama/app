@@ -22,7 +22,7 @@
         height: '44px',
       }`).q-px-md.q-mt-xs.b-50
       span.text-white Войти
-    kalpa-menu-popup-global
+    //- kalpa-menu-popup-global
   //- menu for users
   div(
     v-if="!isGuest"
@@ -58,7 +58,8 @@
       :to="'/notifications/'"
       :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
-      q-badge(color="red" floating transparent) •
+      //- TODO: handle new notifications...
+      //- q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
         //- small Активность
         small Уведомления

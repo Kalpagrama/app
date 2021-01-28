@@ -13,15 +13,15 @@
   div(
     :style=`{
       position: 'relative',
-      height: '50px',
+      height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-center.contnet-center
+    }`).row.full-width.items-start.contnet-start.q-pt-sm
     //- share
     .col
       .row.full-width
         .row.items-center.content-center
           kalpa-share(type="node" :item="node")
-            q-btn(round flat dense color="grey-9")
+            q-btn(round flat color="grey-9")
               q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
@@ -33,13 +33,13 @@
       .row.full-width
         .row.items-center.content-center
           q-btn(
-            round flat dense color="grey-9"
+            round flat color="grey-9"
             :to="'/node/'+node.oid")
             q-icon(name="workspaces" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countComments || '' }}
-    node-vote-ball(:node="node" @click.native="nodeVoteBallClick")
+    node-vote-ball(:node="node" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
     //- joints/links/chains
     router-link(
       v-if="node.items.length === 1"
@@ -50,7 +50,7 @@
           .row.fit.items-center.content-center.justify-end
             small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
-          q-btn(round flat dense color="grey-9")
+          q-btn(round flat color="grey-9")
             q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col

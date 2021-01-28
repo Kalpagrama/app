@@ -13,13 +13,6 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Назад
-    q-btn(
-      @click="$emit('pageId', 'nodes')"
-      flat icon="adjust" no-caps
-      :color="pageId === 'nodes' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     //- q-btn(
       @click="$emit('pageId', 'creator')"
       flat icon="add_circle_outline" no-caps
@@ -27,13 +20,20 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Создать
-    //- q-btn(
+    q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps
       :color="pageId === 'drafts' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Заметки
+    q-btn(
+      @click="$emit('pageId', 'nodes')"
+      flat icon="adjust" no-caps
+      :color="pageId === 'nodes' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     q-btn(
       @click="$emit('pageId', 'details')"
       flat no-caps

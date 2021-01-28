@@ -87,13 +87,6 @@ export default {
   async mounted () {
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
-    let arr = ['1', '2', '3']
-    arr['name-pretty'] = 'Name'
-    arr.figure = [{t: 0}, {t: 10}]
-    this.$log('arr', arr)
-    arr.map(i => {
-      this.$log('i', i, arr['name-pretty'])
-    })
   },
   async created () {
     this.$store.commit('ui/stateSet', ['pageHeight', this.$q.screen.height])

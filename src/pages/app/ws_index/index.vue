@@ -39,7 +39,7 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '8px',
+        paddingTop: '16px',
       }`
       ).row.full-width.justify-center.q-px-sm
       div(
@@ -47,7 +47,7 @@ q-layout(
           maxWidth: $store.state.ui.pageWidth+'px',
         }`).row.full-width.items-start.content-start
         //- .col-xs-12.col-sm-5
-        widget-bookmarks.q-mb-md
+        widget-bookmarks.q-mb-sm
         //- .col-xs-12.col-sm-7
         widget-upload
 </template>

@@ -105,7 +105,9 @@ import imageFromDevice from './image_from_device.vue'
 
 export default {
   name: 'contentImporter',
-  components: {imageFromDevice},
+  components: {
+    imageFromDevice
+  },
   props: {
     contentKalpa: {type: Object},
     contentFile: {type: [String, Object]}

@@ -2,18 +2,6 @@
 q-layout(
   view="hHh Lpr lff").b-30
   //- q-header(reveal).b-30
-    .row.full-width.justify-center.q-pt-sm.q-px-sm
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          minHeight: '60px',
-          borderRadius: '10px',
-        }`
-        ).row.full-width.items-center.content-center.q-px-sm.b-40
-        q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()").q-mr-sm
-        .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
-  q-header(reveal).b-30
     .row.full-width.justify-center.b-30
       div(
         v-if="node"
@@ -41,10 +29,19 @@ q-layout(
   q-page-container
     q-page(
       :style=`{
-        paddingTop: '30px',
+        paddingTop: '8px',
         paddingBottom: '200px',
       }`)
-      widget-joints(v-if="node" :node="node")
+      .row.full-width.justify-center.b-30
+        div(
+          v-if="node"
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
+          node-feed(
+            :node="node"
+            :isActive="true"
+            :isVisible="true")
+          .row.full-width.q-pt-lg
+            widget-joints(v-if="node" :node="node")
   //- q-footer(
     reveal)
     transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -86,6 +83,7 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import nodeFeed from 'components/node_feed/index.vue'
 import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
 
@@ -95,6 +93,7 @@ import pageNames from './page_names/index.vue'
 export default {
   name: 'pageApp_node',
   components: {
+    nodeFeed,
     navMobile,
     widgetJoints,
     pageInside,

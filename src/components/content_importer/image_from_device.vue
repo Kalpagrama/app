@@ -50,7 +50,9 @@ import imageCropper from 'components/image_cropper/index.vue'
 
 export default {
   name: 'imageFromDevice',
-  components: {imageCropper},
+  components: {
+    imageCropper
+  },
   props: ['src', 'nameInitial'],
   data () {
     return {

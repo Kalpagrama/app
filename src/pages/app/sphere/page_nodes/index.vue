@@ -17,10 +17,14 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import nodeFeed from 'components/node_feed/index.vue'
 
 export default {
   name: 'pageApp_sphere_pageNodes',
   props: ['sphere'],
+  components: {
+    nodeFeed,
+  },
   computed: {
     query () {
       return {

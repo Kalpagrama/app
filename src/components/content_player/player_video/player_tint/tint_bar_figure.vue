@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', zIndex: 2000,
+    position: 'absolute', zIndex: 2200,
     top: '-2px',
     height: 'calc(100% + 4px)',
     borderTop: '2px solid rgb(76,175,79)',

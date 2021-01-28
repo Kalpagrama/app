@@ -8,10 +8,23 @@ div(
   ).row.full-width
   slot
   //- NODE
-  node-feed(
+  composition-player(
+    v-if="item && item.type === 'NODE'"
+    :composition="item.items[0]"
+    :isActive="itemActive"
+    :isVisible="true"
+    :isMini="!itemOpened"
+    :options=`{
+      footerOverlay: true,
+      showHeader: true,
+      showFooter: false,
+    }`
+    :styles="styles")
+  //- node-feed(
     v-if="item && item.type === 'NODE'"
     :node="item"
-    :isActive="isActive"
+    :isVisible="itemActive"
+    :isActive="itemActive"
     :showHeader="itemOpened"
     :showName="itemOpened"
     :showActions="itemOpened"
@@ -33,7 +46,7 @@ div(
           showFooter: false,
         }`
         :styles="styles")
-    template(v-slot:wrapper)
+    //- template(v-slot:wrapper)
       div(
         @click="$emit('open')"
         v-show="!itemOpened"
@@ -80,32 +93,42 @@ div(
   div(
     v-if="itemMeta"
     v-show="!itemOpened"
+    ref="item-meta"
     :style=`{
       position: 'absolute', zIndex: 200,
-      bottom: '0px', right: '0px', left: '0px',
+      bottom: '-1px', right: '0px', left: '0px',
       background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '0 0 10px 10px',
-      minHeight: '60px',
+      minHeight: '40px',
     }`
-    ).row.full-width.items-center.content-center.justify-center.cursor-pointer.q-pa-sm
-    router-link(
-      :to="itemMeta.link"
-      :style=`{
-        textAlign: 'center',
+    ).row.full-width.items-center.content-center.scroll.scroll-clear
+    div(
+      :class=`{
       }`
-      ).row.items-center.content-center
+      ).row.full-width.no-wrap.items-center.content-center.justify-center
       q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs
-      .col
-        small.text-white {{ itemMeta.name }}
+      small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ itemMeta.name }}
+    //- .row.full-width.justify-center
+      router-link(
+        :to="itemMeta.link"
+        :style=`{
+          textAlign: 'center',
+        }`
+        ).row.items-center.content-center.br
+        q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs
+        .col
+          small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ itemMeta.name }}
 </template>
 
 <script>
+import nodeFeed from 'components/node_feed/index.vue'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
   name: 'nodeFeed__nodeItemsItem',
   props: ['item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
   components: {
+    nodeFeed,
     compositionPlayer,
   },
   data () {

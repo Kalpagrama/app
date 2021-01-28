@@ -68,7 +68,7 @@
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-              small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
+              //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
         //- login for GUEST
         q-btn(
           v-if="isGuest"

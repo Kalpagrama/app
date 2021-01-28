@@ -19,6 +19,19 @@ export default {
         this.$store.commit('ui/stateSet', ['userTyping', false])
       }
     },
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+      this.height = e.height
+      if (this.$q.platform.is.mobile) {
+        if (this.width > this.height) {
+          // alert('HORIZONTAL')
+        }
+        if (this.width < this.height) {
+          // alert('VERTICAL')
+        }
+      }
+    },
   },
   mounted () {
     window.addEventListener('focusin', this.handleFocusin)

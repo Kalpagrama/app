@@ -3,7 +3,7 @@ div(
   :style=`{
     paddingBottom: 'env(safe-area-inset-bottom)',
   }`
-  ).row.full-width.justify-center.b-40
+  ).row.full-width.justify-center
   div(
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',

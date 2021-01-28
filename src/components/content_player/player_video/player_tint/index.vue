@@ -1,95 +1,169 @@
 <template lang="pug">
 div(
-  @click.self="onClickSelf"
+  ref="tint-wrapper"
+  @click.self="tintClickSelf"
   :style=`{
-    position: 'absolute', zIndex: 1000,
-    overflow: 'hidden',
+    position: 'absolute', zIndex: 200,
+    background: 'rgba(0,0,0,'+tintBackgroundOpacity+')',
     borderRadius: '10px',
-    //- background: tintShow ? 'rgba(0,0,0,0.5)' : 'none',
   }`
-  ).row.fit
-  //- tint
+  ).row.fit.items-center.content-center.justify-center
+  //- header
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    tint-header(
+      v-if="player && player.duration"
+      v-show="options.showHeader"
+      v-bind="$props"
+      :isFocused="tintFocused")
+  //- footer debug
+  //- div(
+    v-if="player && player.duration && tintFocused"
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      bottom: '0px',
+    }`
+    ).row.full-width.q-pa-md.bg-red.bg
+    small.text-white {{ player.figureOffset }}
+    small.text-white {{ player.currentTime }}
+  //- spinner for loading
+  q-spinner(
+    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
+    color="white" size="50px")
+  //- player play/pause
+  q-btn(
+    v-if="player.duration && tintFocused"
+    @click="player.playing ? player.pause() : player.play()"
+    round flat color="white")
+    q-icon(
+      size="50px"
+      :name="player.playing ? 'pause' : 'play_arrow'")
+  //- footer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="tintShow"
+      v-if="player && player.duration"
       :style=`{
-        position: 'absolute', zIndex: 1001,
-        background: 'rgba(0,0,0,0.5)',
-        //- pointerEvents: 'none',
-      }`
-      ).row.fit.items-center.content-center.justify-center
-      q-btn(
-        round flat color="white"
-        @click="onClickSelf")
-        q-icon(name="play_arrow" size="80px")
-  //- header
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      :style=`{
-        position: 'absolute', zIndex: 1002,
-        //- top: '60px',
-        top: '0px',
+        position: 'absolute', zIndex: 1000, bottom: '0px',
+        pointerEvents: showTintBar ? 'auto' : 'none',
       }`
       ).row.full-width.justify-center
-      div(
+      tint-bar(
+        :player="player"
+        :contentKalpa="contentKalpa"
+        :options="options"
+        :isActive="isActive"
+        :isVisible="isVisible"
+        :isMini="isMini"
         :style=`{
-          position: 'relative',
           maxWidth: $store.state.ui.pageWidth+'px',
-        }`
-        ).row.full-width.justify-start
-        q-btn(
-          flat color="white" no-caps icon="select_all"
-          :to="'/content/'+contentKalpa.oid"
-          :style=`{
-          }`).row.q-py-xs
-          div(
-            v-if="true || !isMini"
-            :style=`{
-            }`
-            ).col
-            span(
-              :style=`{
-                whiteSpace: 'nowrap',
-                pointerEvents: 'none',
-                userSelect: 'none',
-              }`).q-ml-sm {{ contentKalpa.name }}
-  //- bar
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    tint-bar(
-      v-if="true"
-      v-bind="$props"
-      :style=`{
-        position: 'absolute', zIndex: 1002,
-        //- bottom: '16px',
-        bottom: '0px',
-      }`)
+          borderRadius: '10px',
+          background: 'rgba(30,30,30,0.5)',
+          opacity: showTintBar ? 1 : 0,
+          pointerEvents: showTintBar ? 'auto' : 'none',
+        }`)
 </template>
 
 <script>
 import tintBar from './tint_bar.vue'
+import tintHeader from './tint_header.vue'
 
 export default {
   name: 'playerTint',
-  props: ['player', 'isActive', 'isVisible', 'isMini', 'contentKalpa'],
+  props: ['player', 'contentKalpa', 'options', 'styles', 'isActive', 'isVisible', 'isMini'],
   components: {
     tintBar,
+    tintHeader,
   },
   data () {
     return {
-      tintShow: false,
+      tintBackgroundOpacity: 0,
+      tintFocused: false,
+      tintMousemoveTimeout: null,
+    }
+  },
+  computed: {
+    showTintBar () {
+      if (this.player) {
+        if (this.player.figure) {
+          return true
+        }
+        else {
+          return this.tintFocused
+        }
+      }
+      else {
+        return this.tintFocused
+      }
+    }
+  },
+  watch: {
+    tintFocused: {
+      handler (to, from) {
+        this.$log('tintFocused TO', to)
+        this.$tween.to(this, 0.3, {
+          tintBackgroundOpacity: to ? 0.5 : 0,
+        })
+      }
     }
   },
   methods: {
-    onClickSelf (e) {
-      this.$log('onClickSelf', e)
-      if (this.player.playing) {
-        this.player.pause()
-        this.tintShow = true
+    tintClickSelf () {
+      this.$log('tintClickSelf')
+      if (this.player.muted) {
+        this.player.setState('muted', false)
       }
       else {
-        this.player.play()
-        this.tintShow = false
+        this.tintFocused = !this.tintFocused
       }
+      // if (this.tintFocused)
+      // if (this.player.playing) {
+      //   this.player.pause()
+      // }
+      // else {
+      //   this.player.play()
+      // }
+    },
+    tintMouseenter () {
+      this.$log('tintMouseenter')
+      if (this.$q.platform.is.desktop) {}
+      // this.tintFocused = !this.tintFocused
+    },
+    tintMouseleave () {},
+    tintMousemove (e) {
+      // this.$log('tintMousemove', e)
+      let x = e.clientX
+      let y = e.clientY
+      let rect = this.$refs['tint-wrapper'].getBoundingClientRect()
+      let xTintMin = rect.left
+      let xTintMax = rect.right
+      let yTintMin = rect.top
+      let yTintMax = rect.bottom
+      if (this.tintMousemoveTimeout) {
+        clearTimeout(this.tintMousemoveTimeout)
+        this.tintMousemoveTimeout = null
+      }
+      this.tintMousemoveTimeout = setTimeout(() => {
+        this.tintFocused = false
+      }, 2000)
+      // get in rect
+      // this.$log({x, y, xTintMin, xTintMax, yTintMin, yTintMax})
+      if (x >= xTintMin && x <= xTintMax && y >= yTintMin && y <= yTintMax) {
+        this.tintFocused = true
+      }
+      else {
+        // this.tintFocused = false
+      }
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    if (this.$q.platform.is.desktop) {
+      window.addEventListener('mousemove', this.tintMousemove)
+    }
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    if (this.$q.platform.is.desktop) {
+      window.removeEventListener('mousemove', this.tintMousemove)
     }
   }
 }

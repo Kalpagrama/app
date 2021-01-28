@@ -8,7 +8,6 @@ div(
   video(
     @click="playing ? pause() : play()"
     ref="videoRef"
-    :src="contentKalpa.url"
     type="video/mp4"
     :playsinline="true"
     :autoplay="true"
@@ -21,10 +20,14 @@ div(
       //- overflow: 'hidden',
       ...styles,
     }`
+    @canplay="canplayHandle"
+    @waiting="waitingHandle"
     @loadeddata="loadeddataHandle"
     @timeupdate="timeupdateHandle"
     @play="playHandle"
+    @playing="playingHandle"
     @pause="pauseHandle").full-width
+    source(:src="contentKalpa.url")
 </template>
 
 <script>
@@ -57,6 +60,9 @@ export default {
       figures: [],
       points: [],
       isFullscreen: false,
+      waiting: false,
+      canplay: false,
+      playing_: false,
     }
   },
   methods: {
@@ -91,7 +97,7 @@ export default {
       this.$refs.videoRef.pause()
     },
     loadeddataHandle (e) {
-      this.$log('loadeddataHandle', e)
+      // this.$log('loadeddataHandle', e)
       let duration
       if (this.$refs.videoRef && this.$refs.videoRef.duration > 0) {
         duration = this.$refs.videoRef.duration
@@ -119,6 +125,18 @@ export default {
         }
       }
     },
+    waitingHandle (e) {
+      // this.$log('waitingHandle', e)
+      this.waiting = true
+    },
+    canplayHandle (e) {
+      // this.$log('canplayHandle', e)
+      this.canplay = true
+    },
+    playingHandle (e) {
+      // this.$log('playingHandle', e)
+      this.playing_ = true
+    },
     playHandle (e) {
       // this.$log('playHandle', e)
       this.playing = true
@@ -129,7 +147,7 @@ export default {
     },
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.events = {
       on: (event, cb) => {
         if (this.$refs.videoRef) this.$refs.videoRef.addEventListener(event, cb)
@@ -144,7 +162,12 @@ export default {
     this.$emit('player', this)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
+    // alert('beforeDestroy')
+    if (this.$refs.videoRef) {
+      this.$refs.videoRef.src = ''
+      this.$refs.videoRef.load()
+    }
   }
 }
 </script>

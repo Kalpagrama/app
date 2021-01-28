@@ -30,13 +30,17 @@ div(
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
         :to="'/user/'+node.author.oid"
-        round flat color="white" no-caps :style=`{paddingLeft: '0px',}`).row.q-px-sm
+        round flat color="white" no-caps
+        :style=`{
+          paddingLeft: '0px',
+          //- transform: 'blur(10px)',
+        }`).row.q-px-sm
         user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
         .col
           .row.items-center.content-center.q-px-sm
             span.text-grey-4 {{ node.author.name }}
             .row.full-width
-              small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
+              //- small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
       .col
       .row.items-center.content-center.justify-end.q-pt-sm
         small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
@@ -122,12 +126,19 @@ div(
 import { ObjectApi } from 'src/api/object'
 import { i18n } from 'src/boot/i18n'
 
+import nodeItem from './node_item.vue'
+import nodeItems from './node_items.vue'
+import nodeActions from 'components/node/node_actions.vue'
+
 export default {
   name: 'nodeFeed',
   components: {
-    nodeItem: () => import('./node_item.vue'),
-    nodeItems: () => import('./node_items.vue'),
-    nodeActions: () => import('components/node/node_actions.vue')
+    nodeItem,
+    nodeItems,
+    nodeActions,
+    // nodeItem: () => import('./node_item.vue'),
+    // nodeItems: () => import('./node_items.vue'),
+    // nodeActions: () => import('components/node/node_actions.vue')
   },
   props: {
     node: {type: Object},
@@ -236,6 +247,9 @@ export default {
       }
       return res
     }
+  },
+  mounted () {
+    this.$log('mounted', this.node.name)
   }
 }
 </script>
