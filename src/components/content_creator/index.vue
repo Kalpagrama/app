@@ -9,7 +9,9 @@ import creatorVideo from './creator_video/index.vue'
 
 export default {
   name: 'contentCreator',
-  components: {creatorVideo},
+  components: {
+    creatorVideo
+  },
   props: ['type', 'options'],
   data () {
     return {

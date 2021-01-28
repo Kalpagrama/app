@@ -1,7 +1,6 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").bg-black
-  //- q-resize-observer(@resize="onResize" :debounce="300")
   //- header: content player
   q-header(:style=`{opacity: 1,}`).bg-black
     .row.full-width.justify-center
@@ -10,7 +9,6 @@ q-layout(
           position: 'relative',
           height: 'calc('+ contentHeight +'px - env(safe-area-inset-top))',
           maxWidth: contentWidth+'px',
-          //- maxWidth: $store.state.ui.pageWidth+'px',
           borderRadius: '0 0 10px 10px',
         }`
         ).column.full-width.bg-black
@@ -31,7 +29,6 @@ q-layout(
               objectFit: 'contain',
             }`
             ).full-width.bg-black
-        //- .row.full-width.q-py-sm
   //- footer: navigation
   q-footer(reveal)
     div(
@@ -53,56 +50,16 @@ q-layout(
             zIndex: 1000,
           }`)
         //- v-touch-pan.prevent.mouse="footerHeight === footerHeightMax ? null : footerOnPan"
-        div(
+        node-editor(
           v-if="player && player.figure"
+          :player="player"
+          :contentKalpa="contentKalpa"
+          :isMini="footerHeight === 70"
+          @toggle="footerToggle"
+          @nodePublished="nodePublished"
           :style=`{
-            minHeight: '70px',
             height: footerHeight+'px',
-          }`
-          ).column.full-width
-          div(
-            :style=`{
-              position: 'relative',
-              minHeight: '70px',
-            }`
-            ).row.full-width.items-center.content-center.q-px-sm
-            //- div(
-              @click="footerHeaderClick"
-              v-if="footerHeight === 70"
-              :style=`{position: 'absolute', zIndex: 1000,}`
-              ).row.fit.br
-            q-btn(round flat icon="play_arrow")
-            .col.full-height
-              div(:style=`{textAlign: 'center'}`).row.fit.items-center.content-center.justify-center.q-px-sm
-                //- span.text-white в чем суть в чем суть в чем суть
-                q-input(
-                  v-model="node.name"
-                  borderless dark
-                  type="textarea" autogrow :rows="1"
-                  placeholder="В чем суть?"
-                  :input-style=`{
-                    fontSize: '20px',
-                    textAlign: 'center',
-                    lineHeight: 1.2,
-                  }`
-                  ).full-width
-            q-btn(
-              @click="footerHeaderClick"
-              round flat
-              :icon="footerHeight === 70 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-          .col.full-width.scroll
-            .row.full-width.q-pa-sm
-              div(v-for="n in 10" :key="n" :style=`{}`).row.full-width.q-pa-md.q-mb-sm.b-40 {{ n }}
-            .row.full-width.q-pt-sm.q-pb-xl.q-px-xl
-              q-btn(
-                @click="nodePublish()"
-                color="green" no-caps
-                :style=`{
-                  height: '50px',
-                }`).full-width.q-mb-sm
-                span.text-bold Опубликовать
-              q-btn(outline color="green" no-caps @click="nodeSave()").full-width.q-mb-md Сохранить в черновики
-              q-btn(outline color="red" no-caps @click="nodeDelete()").full-width Удалить
+          }`)
   //- pages or node creator...
   q-page-container
     q-page(
@@ -123,54 +80,6 @@ q-layout(
           :player="player"
           :query="query"
           :height="$q.screen.height-contentHeight-70")
-        //- div(
-          v-if="player && player.figure"
-          ).row.full-width
-          div(
-            :style=`{
-              position: 'relative',
-              minHeight: '70px',
-            }`
-            ).row.full-width.items-center.content-center.q-px-sm
-            //- div(
-              @click="footerHeaderClick"
-              v-if="footerHeight === 70"
-              :style=`{position: 'absolute', zIndex: 1000,}`
-              ).row.fit.br
-            q-btn(round flat color="white" icon="play_arrow")
-            .col.full-height.bg
-              div(:style=`{textAlign: 'center'}`).row.fit.items-center.content-center.justify-center.q-px-sm
-                //- span.text-white в чем суть в чем суть в чем суть
-                q-input(
-                  v-model="node.name"
-                  borderless dark
-                  type="textarea" autogrow :rows="1"
-                  placeholder="В чем суть ?"
-                  :input-style=`{
-                    fontSize: '20px',
-                    textAlign: 'center',
-                    lineHeight: 1.2,
-                  }`
-                  ).full-width.br
-            q-btn(
-              @click="contentHeight === contentHeightMax ? contentHeight = contentHeightMin : contentHeight = contentHeightMax"
-              round flat color="white"
-              :icon="contentHeight === contentHeightMax ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-          .row.full-width.justify-center.q-pt-sm.q-pb-xl.q-px-xl
-            div(
-              :style=`{
-                maxWidth: '400px',
-              }`
-              ).row.full-width
-              q-btn(
-                @click="nodePublish()"
-                color="green" no-caps
-                :style=`{
-                  height: '50px',
-                }`).full-width.q-mb-sm
-                span.text-bold Опубликовать
-              q-btn(outline color="green" no-caps @click="nodeSave()").full-width.q-mb-md Сохранить в черновики
-              q-btn(outline color="red" no-caps @click="nodeDelete()").full-width Удалить
 </template>
 
 <script>
@@ -183,6 +92,8 @@ import pageDetails from '../page_details/index.vue'
 import pageCreator from '../page_creator/index.vue'
 import pageNode from '../page_node/index.vue'
 
+import nodeEditor from './node_editor/index.vue'
+
 export default {
   name: 'layoutPopup',
   props: ['contentKalpa', 'query'],
@@ -194,6 +105,7 @@ export default {
     pageDetails,
     pageCreator,
     pageNode,
+    nodeEditor,
   },
   data () {
     return {
@@ -263,8 +175,8 @@ export default {
         }
       }
     },
-    footerHeaderClick (e) {
-      this.$log('footerHeaderClick', e)
+    footerToggle (e) {
+      this.$log('footerToggle', e)
       let footerHeight = this.footerHeight === 70 ? this.footerHeightMax : this.footerHeightMin
       // let contentHeight = this.footerHeight === 70 ? this.contentHeightMin : this.contentHeightMax
       let contentHeight = () => {
@@ -276,11 +188,11 @@ export default {
           return this.contentHeightMax
         }
       }
-      this.$tween.to(this, 0.25, {
+      this.$tween.to(this, 0.3, {
         footerHeight: footerHeight,
         contentHeight: contentHeight(),
         onComplete: () => {
-          this.$log('footerHeaderClick DONE')
+          this.$log('footerToggle DONE')
         }
       })
     },
@@ -293,8 +205,18 @@ export default {
         this.pageId = pageId
       }
     },
-    nodePublished () {},
-    nodeClosed () {},
+    nodePublished () {
+      this.$log('nodePublished')
+      this.pageId = 'nodes'
+    },
+    nodeSaved () {
+      this.$log('nodeSaved')
+      this.pageId = 'drafts'
+    },
+    nodeClosed () {
+      this.$log('nodeClosed')
+      this.pageId = null
+    },
     nodeDelete () {
       this.$log('nodeDelete')
       this.player.setState('figure', null)

@@ -65,11 +65,16 @@ div(
 </template>
 
 <script>
+import nodeFeed from 'components/node_feed/index.vue'
+import nodeItemsItem from 'components/node_feed/node_items_item.vue'
+
 export default {
   name: 'jointCurrent',
   props: ['item', 'joint', 'height'],
   components: {
-    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
+    nodeFeed,
+    nodeItemsItem,
+    // nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
   },
   data () {
     return {

@@ -17,9 +17,13 @@ kalpa-loader(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import nodeFeed from 'components/node_feed/index.vue'
 
 export default {
   name: 'user_pageProfile_tabNodes',
+  components: {
+    nodeFeed,
+  },
   props: ['user'],
   data () {
     return {

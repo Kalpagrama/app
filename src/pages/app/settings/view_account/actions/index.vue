@@ -5,7 +5,7 @@
     span.text-white.text-bold Действия
   //- body
   .row.full-width
-    q-btn(
+    //- q-btn(
       @click="feedbackOpened = true"
       flat color="grey-6" no-caps
       :style=`{

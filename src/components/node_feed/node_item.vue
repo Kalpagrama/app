@@ -8,6 +8,7 @@ div(
   ).row.full-width
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
     composition-player(
+      :compositionKey="node.oid"
       :composition="node.items[0]"
       :isVisible="isVisible"
       :isActive="isActive"
@@ -51,7 +52,7 @@ import compositionPlayer from 'components/composition/composition_player/index.v
 
 export default {
   name: 'nodeFeed__nodeItem',
-  props: ['node', 'isActive', 'isVisible'],
+  props: ['node', 'nodeIndex', 'isActive', 'isVisible'],
   components: {
     compositionPlayer,
   },
@@ -61,15 +62,15 @@ export default {
   },
   computed: {
     ratioMax () {
-      // return 0.6
-      return 1
+      return 0.6
+      // return 1
     },
     ratio () {
       let height = this.node.items[0].thumbHeight
       if (height) {
         let ratio = height / this.node.items[0].thumbWidth
-        return Math.min(this.ratioMax, ratio)
-        // return this.ratioMax
+        // return Math.min(this.ratioMax, ratio)
+        return this.ratioMax
       }
       else {
         return this.ratioMax

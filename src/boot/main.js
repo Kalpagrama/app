@@ -129,7 +129,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     ]
     Vue.prototype.$rateMeta = rateMeta
     // global components
-    Vue.component('nodeFeed', () => import('src/components/node_feed/index.vue'))
+    // Vue.component('nodeFeed', () => import('src/components/node_feed/index.vue'))
+    // Vue.component('jointFeed', () => import('src/components/joint_feed/index.vue'))
     // lists
     Vue.component('listMiddle', () => import('src/components/list_middle'))
     // Vue.component('listSlider', () => import('components/list_slider/index.vue'))

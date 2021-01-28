@@ -18,6 +18,7 @@ export default {
     playerBook
   },
   props: [
+    'compositionKey',
     'composition',
     'isVisible',
     'isActive',

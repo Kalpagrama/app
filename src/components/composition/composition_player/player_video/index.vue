@@ -3,6 +3,8 @@ div(
   :style=`{
     position: 'relative',
     height: styles.height,
+    borderRadius: '10px',
+    background: 'rgb(10,10,10)',
   }`
   ).row.full-width.items-start.content-start
   slot
@@ -10,28 +12,41 @@ div(
   img(
     draggable="false"
     loading="lazy"
+    :key="compositionKey"
     :src="composition.thumbUrl"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
-      //- height: 'calc(' + styles.height + ' - 100px)',
       objectFit: styles.objectFit,
-      //- border: (player && figures && player.currentTime < figures[0].t) ? '2px solid red' : '2px solid rgb(30,30,30)',
-      //- marginBottom: marginBottom+'px',
-      //- maxHeight: '500px',
-      //- opacity: player ? 0.1 : 1,
+      opacity: previewOpacity,
+      //- opacity: 0.5,
     }`
     ).full-width
   //- video wrapper
+  //- video(
+    v-if="isActive && isVisible"
+    @click="isActive = !isActive"
+    @loadeddata="videoLoaded"
+    autoplay loop
+    preload="metadata"
+    :muted="false"
+    :poster="composition.thumbUrl"
+    :key="compositionKey"
+    :src="isActive ? composition.url : 'null'"
+    :style=`{
+      height: styles.height,
+      objectFit: styles.objectFit,
+      position: 'absolute', zIndex: 100, top: '0px',
+    }`
+    ).full-width.br
   content-player(
     v-if="isActive && isVisible"
     @player="playerCreated"
     :contentKalpa=`{
       oid: composition.layers[0].contentOid,
-      name: composition.layers[0].contentName,
-      //- url: composition.url,
-      url: compositionUrl,
+      name: composition.layers[0].contentName || 'Контекст',
+      url: composition.url,
       type: 'VIDEO',
       contentSource: 'KALPA',
     }`
@@ -39,11 +54,9 @@ div(
     :isVisible="isVisible"
     :isMini="isMini"
     :options="options"
-    :figures="figures"
     :styles="styles"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      //- opacity: (figures && player && (player.currentTime < figures[0].t || player.currentTime > figures[1].t)) ? 0 : 1
     }`).fit
 </template>
 
@@ -56,6 +69,7 @@ export default {
     contentPlayer
   },
   props: {
+    compositionKey: {type: String},
     composition: {type: Object, required: true},
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
@@ -66,80 +80,70 @@ export default {
   data () {
     return {
       player: null,
-      marginBottom: 0,
+    }
+  },
+  computed: {
+    previewOpacity () {
+      if (this.player) {
+        if (this.player.duration) {
+          return 0
+        }
+        else {
+          return 1
+        }
+      }
+      else {
+        return 1
+      }
+    },
+    figureOffset () {
+      let arr = this.composition.url.split('#t=')
+      if (arr.length > 1) {
+        let [start, end] = arr[1].split(',')
+        return [
+          {t: parseFloat(start)},
+          {t: parseFloat(end)},
+        ]
+      }
+      else {
+        return null
+      }
     }
   },
   watch: {
-    'player.figure': {
+    isActive: {
       handler (to, from) {
+        this.$log('isActive TO', to)
         if (to) {
-          this.$tween.to(this, 0.3, {
-            marginBottom: 230,
-          })
         }
         else {
-          this.$tween.to(this, 0.3, {
-            marginBottom: 0
-          })
+          this.player = null
         }
       }
     },
     'player.currentTime': {
       handler (to, from) {
-        if (to) {
-          if (this.composition.outputType === 'VIDEO') {
-            let arr = this.composition.url.split('#t=')
-            if (arr.length > 1) {
-              let [start, end] = arr[1].split(',')
-              start = parseFloat(start)
-              end = parseFloat(end)
-              // if (to < start) {}
-              if (to >= end) {
-                this.player.setCurrentTime(start)
-              }
-            }
-          }
+        // if (!this.player) return
+        if (to && to >= this.player.duration) {
+          this.$log('player.currentTime === player.duration')
+          this.player.setCurrentTime(0)
+          this.player.play()
         }
-      }
-    }
-  },
-  computed: {
-    compositionUrl () {
-      if (this.composition.outputType === 'VIDEO') {
-        let arr = this.composition.url.split('#t=')
-        if (arr.length > 1) {
-          // return arr[0]
-          return this.composition.url
-        }
-        else {
-          // return arr[0]
-          return this.composition.url
-        }
-      }
-      else {
-        return this.composition.url
       }
     }
   },
   methods: {
+    videoLoaded () {
+      this.$log('videoLoaded', this.compositionKey)
+    },
     playerCreated (player) {
-      this.$log('playerCreated', player)
+      // this.$log('playerCreated', player)
       this.player = player
-      if (this.composition.outputType === 'VIDEO') {
-        let arr = this.composition.url.split('#t=')
-        if (arr.length > 1) {
-          let [start, end] = arr[1].split(',')
-          let figureOffset = [
-            {t: parseFloat(start)},
-            {t: parseFloat(end)},
-          ]
-          this.player.setState('figureOffset', figureOffset)
-        }
-      }
+      if (this.figureOffset) this.player.setState('figureOffset', this.figureOffset)
     }
   },
   mounted () {
-    // this.$log('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

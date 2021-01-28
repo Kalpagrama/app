@@ -19,25 +19,22 @@
 div(
   ref="dc"
   ).row.full-width
-  DynamicScroller(
+  //- @update="itemUpdate"
+  dynamic-scroller(
     v-if="itemsRes"
     :items="itemsRes.items"
     :min-item-size="300"
     :emit-update="true"
-    :buffer="$q.screen.height"
+    :buffer="$q.screen.height*2"
     keyField="id"
     :style=`{
-      //- height: '500px',
-      //- height: '90%',
       height: $q.screen.height-2+'px',
       width: '100%',
-    }`
-    @update="itemUpdate"
-    )
-    template(v-slot:before)
-      div().row.full-width.bg-red.q-py-xl
+    }`)
+    //- template(v-slot:before)
+      div(:style=`{height: 300+'px',}`).row.full-width
     template(v-slot="{ item, index, active }")
-      DynamicScrollerItem(
+      dynamic-scroller-item(
         :item="item"
         :active="active"
         :size-dependencies=`[
@@ -48,10 +45,10 @@ div(
         div(
           :accessKey="index"
           :class=`{
-            'bg-red': indexMiddle === index,
+            //- 'bg-red': indexMiddle === index,
           }`
           :style=`{
-            marginBottom: '50px',
+            paddingBottom: '50px',
           }`
           v-observe-visibility=`{
             throttle: 200,
@@ -59,7 +56,6 @@ div(
             intersection: {
               root: $refs.dc,
               rootMargin: '-50% 0px',
-              //- rootMargin: rootMargin
             }
           }`
           ).row.full-width.justify-center
@@ -69,34 +65,47 @@ div(
               position: 'relative',
             }`
             ).row.full-width.items-start.content-start
-            //- h1(:style=`{position: 'absolute', zIndex: 100, top: '0px', left: '0px'}`).text-white {{ index }}: {{ active }}
-            //- img(
-              :src="item.object.thumbUrl"
-              :key="item.object.id"
-              :style=`{
-                maxHeight: '400px',
-                objectFit: 'contain',
-              }`).full-width
             node-feed(
               :node="item.object"
               :isVisible="true"
               :isActive="indexMiddle === index")
+            //- node-feed(
+              v-if="item.object.type === 'NODE'"
+              :key="item.id"
+              :node="item.object"
+              :isVisible="true"
+              :isActive="indexMiddle === index")
+            //- joint-feed(
+              v-if="item.object.type === 'JOINT'"
+              :key="item.id"
+              :joint="item.object"
+              :isVisible="true"
+              :isActive="indexMiddle === index")
+            //- h1.text-white {{ index }} -- {{ item.id }}
+            //- Wc4Jij3Iz0
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import feedItem from './feed_item.vue'
+// import feedItem from './feed_item.vue'
+
+import nodeFeed from 'components/node_feed/index.vue'
+import jointFeed from 'components/joint_feed/index.vue'
 
 export default {
   name: 'feeds_feed',
   props: ['feed'],
-  components: {feedItem},
+  components: {
+    // feedItem
+    nodeFeed,
+    jointFeed,
+  },
   data () {
     return {
       bookmarks: [],
-      items: [],
+      // items: [],
       itemsRes: null,
-      indexMiddle: -1,
+      indexMiddle: 0,
     }
   },
   methods: {
@@ -111,7 +120,7 @@ export default {
       }
       else {
         if (index === this.indexMiddle) {
-          this.indexMiddle = -1
+          // this.indexMiddle = -1
         }
       }
     }
@@ -146,7 +155,22 @@ export default {
       //   res.selector.subscription = {$in: this.feedSubscriptions}
       // }
       return res
-    }
+    },
+    // items () {
+    //   if (this.itemsRes) {
+    //     let lastIndex = localStorage.getItem('items-feed-last-index')
+    //     if (lastIndex) {
+    //       this.$log('lastIndex', lastIndex)
+    //       return this.itemsRes.items.slice(parseInt(lastIndex))
+    //     }
+    //     else {
+    //       return this.itemsRes.items
+    //     }
+    //   }
+    //   else {
+    //     return []
+    //   }
+    // }
   },
   watch: {
     indexMiddle: {
@@ -183,6 +207,14 @@ export default {
         // })
         // this.bookmarks = items
         this.itemsRes = await this.$rxdb.find(this.queryFeedItems, true)
+        // let itemsFeed = this.$store.state.ui.itemsFeed
+        // let itemsFeed = window['items-feed']
+        // if (!itemsFeed) {
+        //   itemsFeed = await this.$rxdb.find(this.queryFeedItems, true)
+        //   // this.$store.commit('ui/stateSet', ['itemsFeed', itemsFeed])
+        //   window['items-feed'] = itemsFeed
+        // }
+        // this.itemsRes = itemsFeed
         // let {items} = await this.$rxdb.find({
         //   selector: {
         //     rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
@@ -193,6 +225,15 @@ export default {
         // this.items = items
       }
     }
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    // let lastIndex = this.indexMiddle
+    // if (localStorage.getItem('items-feed-last-index')) {
+    //   lastIndex += this.indexMiddle
+    // }
+    // alert('lastIndex: => ' + lastIndex)
+    // localStorage.setItem('items-feed-last-index', lastIndex)
   }
 }
 </script>
