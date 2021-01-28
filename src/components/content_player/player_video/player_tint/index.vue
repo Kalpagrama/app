@@ -24,7 +24,7 @@ div(
   div(
     v-if="player.duration && tintFocused && player.playing_ && options.mode === 'feed'"
     :style=`{pointerEvents: 'none',}`
-    ).row.justify-center.br
+    ).row.justify-center
     //- q-btn(
       @click="tapClick(0)"
       round flat color="white")
