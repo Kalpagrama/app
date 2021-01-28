@@ -69,8 +69,8 @@ export default {
       let height = this.node.items[0].thumbHeight
       if (height) {
         let ratio = height / this.node.items[0].thumbWidth
-        // return Math.min(this.ratioMax, ratio)
-        return this.ratioMax
+        return Math.min(this.ratioMax, ratio)
+        // return this.ratioMax
       }
       else {
         return this.ratioMax

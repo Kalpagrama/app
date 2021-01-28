@@ -49,7 +49,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
             left: itemLeft+'px',
             maxWidth: itemWidth+'px',
             maxHeight: itemHeight+'px',
-            transform: 'translate3d(0,0,100px)',
+            transform: 'translate3d(0,0,300px)',
           }
           :
           {
