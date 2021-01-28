@@ -69,11 +69,13 @@ export default {
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     // handle views stats
-    let statValue = Date.now() - this.isActiveStart
-    this.$log('statValue', statValue)
-    let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
-    this.$log('statValue stat', stat)
-    this.isActiveStart = 0
+    if (this.isActiveStart){
+      let statValue = Date.now() - this.isActiveStart
+      this.$log('statValue', statValue)
+      let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
+      this.$log('statValue stat', stat)
+      this.isActiveStart = 0
+    }
   }
 }
 </script>

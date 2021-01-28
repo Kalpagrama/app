@@ -434,7 +434,12 @@ class Group {
 
       let blackLists = await Lists.getBlackLists()
       let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+      // this.fulFilledItems.splice(startPos, deleteCount, ...filtered)
       this.fulFilledItems.splice(startPos, deleteCount, ...filtered)
+      // if (this.fulFilledItems.length > 24) {
+      //    alert('splice!!! 24')
+      //    this.fulFilledItems.splice(0, this.fulFilledItems.length - 24,)
+      // } // отрезаем начало
    }
 
    async next (count, { fromId = null, fromT = null } = {}) {
@@ -480,6 +485,8 @@ class Group {
 
    async prev (count) {
       const f = this.prev
+      // return
+      // // eslint-disable-next-line no-unreachable
       logD(f, 'start')
       if (this.populateFunc && count > BATCH_SZ) {
          logW('next allow only 12 with populate')
