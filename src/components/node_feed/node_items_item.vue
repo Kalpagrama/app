@@ -8,7 +8,7 @@ div(
   ).row.full-width
   slot
   //- NODE
-  composition-player(
+  //- composition-player(
     v-if="item && item.type === 'NODE'"
     :composition="item.items[0]"
     :isActive="itemActive"
@@ -18,9 +18,10 @@ div(
       footerOverlay: true,
       showHeader: true,
       showFooter: false,
+      mode: 'feed',
     }`
     :styles="styles")
-  //- node-feed(
+  node-feed(
     v-if="item && item.type === 'NODE'"
     :node="item"
     :isVisible="itemActive"
@@ -44,9 +45,10 @@ div(
           footerOverlay: true,
           showHeader: true,
           showFooter: false,
+          mode: 'feed',
         }`
         :styles="styles")
-    //- template(v-slot:wrapper)
+    template(v-slot:wrapper)
       div(
         @click="$emit('open')"
         v-show="!itemOpened"
@@ -68,7 +70,8 @@ div(
     :options=`{
       loop: true,
       showBar: false,
-      footerOverlay: true
+      footerOverlay: true,
+      mode: 'feed',
     }`)
   div(
     v-else-if="item.__typename === 'Sphere'"
@@ -121,14 +124,14 @@ div(
 </template>
 
 <script>
-import nodeFeed from 'components/node_feed/index.vue'
+// import nodeFeed from 'components/node_feed/index.vue'
 import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
   name: 'nodeFeed__nodeItemsItem',
   props: ['item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
   components: {
-    nodeFeed,
+    // nodeFeed,
     compositionPlayer,
   },
   data () {

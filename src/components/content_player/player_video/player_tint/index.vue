@@ -4,7 +4,7 @@ div(
   @click.self="tintClickSelf"
   :style=`{
     position: 'absolute', zIndex: 200,
-    background: 'rgba(0,0,0,'+tintBackgroundOpacity+')',
+    background: options.mode === 'editor' ? 'none' : 'rgba(0,0,0,'+tintBackgroundOpacity+')',
     borderRadius: '10px',
   }`
   ).row.fit.items-center.content-center.justify-center
@@ -15,50 +15,78 @@ div(
       v-show="options.showHeader"
       v-bind="$props"
       :isFocused="tintFocused")
-  //- footer debug
-  //- div(
-    v-if="player && player.duration && tintFocused"
-    :style=`{
-      position: 'absolute', zIndex: 1000,
-      bottom: '0px',
-    }`
-    ).row.full-width.q-pa-md.bg-red.bg
-    small.text-white {{ player.figureOffset }}
-    small.text-white {{ player.currentTime }}
+  //- middle
   //- spinner for loading
   q-spinner(
     v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
     color="white" size="50px")
-  //- player play/pause
-  //- q-btn(
-    v-if="player.duration && tintFocused"
-    @click="player.playing ? player.pause() : player.play()"
-    round flat color="white")
-    q-icon(
-      size="50px"
-      :name="player.playing ? 'pause' : 'play_arrow'")
+  //- actions
+  div(
+    v-if="player.duration && tintFocused && player.playing_ && options.mode === 'feed'"
+    :style=`{pointerEvents: 'none',}`
+    ).row.justify-center.br
+    //- q-btn(
+      @click="tapClick(0)"
+      round flat color="white")
+      q-icon(name="replay_5" size="40px")
+    //- player play/pause
+    q-btn(
+      @click="player.playing ? player.pause() : player.play()"
+      round flat color="white"
+      :style=`{
+        pointerEvents: 'none',
+      }`)
+      q-icon(
+        size="80px"
+        :name="player.playing ? 'pause' : 'play_arrow'")
+    //- q-btn(
+      @click="tapClick(1)"
+      round flat  color="white")
+      q-icon(name="forward_5" size="40px")
+  //- footer
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+     div(
+        v-if="player.duration && player.playing_ && options.mode === 'feed' && !isMini"
+        :style=`{
+          position: 'absolute', zIndex: 1000,
+          bottom: '8px',
+        }`
+        ).row.justify-center
+        q-btn(
+          @click="tapClick(0)"
+          round flat color="grey-8")
+          q-icon(name="replay_5" size="40px").q-mr-lg
+        //- player play/pause
+        //- q-btn(
+          @click="player.playing ? player.pause() : player.play()"
+          round flat color="white")
+          q-icon(
+            size="80px"
+            :name="player.playing ? 'pause' : 'play_arrow'")
+        q-btn(
+          @click="tapClick(1)"
+          round flat  color="grey-8").q-ml-lg
+          q-icon(name="forward_5" size="40px")
   //- footer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="player && player.duration"
+      v-if="player && player.duration && options.mode === 'editor'"
       :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '0px',
-        pointerEvents: showTintBar ? 'auto' : 'none',
+        //- pointerEvents: showTintBar ? 'auto' : 'none',
         background: tintFocused ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
         borderRadius: '0 0 10px 10px',
-        //- paddingBottom: options.mode === 'feed' ? '50%' : '0px',
       }`
       ).row.full-width.justify-center.q-pa-md
       tint-bar(
         v-bind="$props"
         :style=`{
-          //- maxWidth: $store.state.ui.pageWidth+'px',
           maxWidth: '600px',
           borderRadius: '20px',
           background: options.mode === 'editor' ? 'rgba(30,30,30,0.8)' : 'none',
-          opacity: showTintBar ? 1 : 0,
-          pointerEvents: showTintBar ? 'auto' : 'none',
+          //- opacity: showTintBar ? 1 : 0,
+          //- pointerEvents: showTintBar ? 'auto' : 'none',
         }`)
 </template>
 
@@ -106,6 +134,15 @@ export default {
     }
   },
   methods: {
+    tapClick (index) {
+      this.$log('tapClick', index)
+      let t = this.player.currentTime
+      if (index === 0) t -= 5
+      if (index === 1) t += 5
+      if (t < 0) t = 0
+      if (t > this.player.duration) t = this.player.duration
+      this.player.setCurrentTime(t)
+    },
     tintClickSelf () {
       this.$log('tintClickSelf')
       if (this.options.mode === 'feed') {
@@ -113,8 +150,19 @@ export default {
           this.player.setState('muted', false)
         }
         else {
-          this.tintFocused = !this.tintFocused
+          // this.tintFocused = !this.tintFocused
+          if (this.player.playing) {
+            this.tintFocused = true
+            this.player.pause()
+          }
+          else {
+            this.tintFocused = false
+            this.player.play()
+          }
         }
+        // else {
+        //   this.tintFocused = !this.tintFocused
+        // }
       }
       if (this.options.mode === 'editor') {
         this.tintFocused = !this.tintFocused
