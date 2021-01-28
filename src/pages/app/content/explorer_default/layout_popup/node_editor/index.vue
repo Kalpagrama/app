@@ -12,23 +12,13 @@ div(
     }`
     ).row.full-width.items-start.content-start.q-px-md
     q-btn(
-      round flat icon="play_arrow"
+      @click="figureFocusToggle()"
+      round flat
+      :color="figureFocused ? 'red' : 'white'"
+      icon="camera"
       ).q-mt-md
     .col.full-height
       name-editor(:node="node")
-      //- div(:style=`{textAlign: 'center'}`).row.fit.items-center.content-center.justify-center.q-px-sm
-        //- span.text-white в чем суть в чем суть в чем суть
-        q-input(
-          v-model="node.name"
-          borderless dark
-          type="textarea" autogrow :rows="1"
-          placeholder="В чем суть?"
-          :input-style=`{
-            fontSize: '20px',
-            textAlign: 'center',
-            lineHeight: 1.2,
-          }`
-          ).full-width
     q-btn(
       @click="$emit('toggle')"
       round flat
@@ -44,13 +34,18 @@ div(
         q-btn(
           @click="nodePublish()"
           color="green" no-caps
+          :loading="nodePublishing"
           :style=`{
             height: '50px',
           }`).full-width.q-mb-sm
           span.text-bold Опубликовать
-        q-btn(outline color="green" no-caps @click="nodeSave()").full-width.q-mb-md Сохранить в черновики
+        q-btn(
+          @click="nodeSave()"
+          outline color="green" no-caps).full-width.q-mb-md Сохранить в черновики
         //- q-btn()
-        q-btn(outline color="red" no-caps @click="nodeDelete()").full-width Удалить
+        q-btn(
+          @click="nodeDelete()"
+          outline color="red" no-caps).full-width Удалить
 </template>
 
 <script>
@@ -81,9 +76,34 @@ export default {
       },
       nodePublishing: false,
       nodeSaving: false,
+      figureFocused: false,
     }
   },
+  watch: {
+    'player.currentTime': {
+      handler (to, from) {
+        if (this.figureFocused) {
+          if (to > this.player.figure[1].t) {
+            this.player.setCurrentTime(this.player.figure[0].t)
+          }
+          if (to < this.player.figure[0].t) {
+            this.player.setCurrentTime(this.player.figure[0].t)
+          }
+        }
+      }
+    },
+  },
   methods: {
+    figureFocusToggle () {
+      this.$log('figureFocusToggle')
+      this.figureFocused = !this.figureFocused
+      if (this.contentKalpa.type === 'VIDEO') {
+        if (this.figureFocused) {
+          this.player.setCurrentTime(this.player.figure[0].t)
+          this.player.play()
+        }
+      }
+    },
     compositionCreate () {
       let composition
       // VIDEO select 30 sec from currentTime

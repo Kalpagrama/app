@@ -24,7 +24,7 @@ div(
         showBar: false,
         showHeader: true,
         showFooter: true,
-        context: 'feed',
+        mode: 'feed',
       }`)
 //- composition-player(
   :composition="node.items[0]"

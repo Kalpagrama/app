@@ -1,243 +1,295 @@
 <template lang="pug">
 div(
-  :class=`{
-    //- 'q-px-md': true,
-  }`
   :style=`{
-    position: 'relative',
-    paddingLeft: barWrapperPaddingX+'px',
-    paddingRight: barWrapperPaddingX+'px'
-  }`).row.full-width
+    position: 'relative'
+  }`
+  ).row.full-width.items-start.content-start
+  //- time
+  div(
+    v-if="player && player.duration && options.mode === 'editor'"
+    :style=`{
+      position: 'absolute', zIndex: 200,
+      top: '3px',
+      //- left: '22px',
+      userSelect: 'none',
+      pointerEvents: 'none',
+      fontSize: '9px',
+    }`
+    ).row.full-width.justify-between.text-grey-6.q-px-lg
+    small {{ $time(player.currentTime) }}
+    small {{ $time(player.duration) }}
+  //- bar
   div(
     :style=`{
-      position: 'relative',
-      height: heightWrapper+'px',
-      //- opacity: options.showBar ? 1 : player.figure ? 1 : 0,
+      opacity: options.mode === 'editor' ? 1 : 0,
+      pointerEvents: options.mode === 'editor' ? 'auto' : 'none',
+      paddingLeft: barWrapperPaddingX+'px',
+      paddingRight: barWrapperPaddingX+'px'
     }`
     ).row.full-width
-    //- middle currentTime
-    //- v-if="true || zoomWrapperScrolling"
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="zoomed"
-        :style=`{
-          position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
-          width: '2px',
-          height: '100%',
-          pointerEvents: 'none',
-        }`
-        ).row.bg-red
-    //- scroll
     div(
-      ref="zoom-wrapper"
-      @scroll="zoomWrapperOnScroll"
-      @mousemove="zoomWrapperMousemove"
-      :class=`{
-        //- br: zoomWrapperScrolling
-      }`
       :style=`{
-        position: 'absolute', zIndex: 100,
-        overflowY: 'hidden',
+        position: 'relative',
+        height: heightWrapper+'px',
       }`
-      ).row.fit.items-center.content-center.scroll.scroll-clear.q-py-sm
-      q-resize-observer(@resize="zoomWrapperOnRezize")
-      .row.no-wrap
-        //- left padding
+      ).row.full-width
+      //- middle currentTime
+      //- v-if="true || zoomWrapperScrolling"
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
-          @click="zoomed = false"
+          v-if="zoomed"
           :style=`{
-            width: leftRightMarginWidth+'px',
-            minWidth: leftRightMarginWidth+'px',
-            height: heightBar+'px',
+            position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
+            width: '2px',
+            height: '100%',
             pointerEvents: 'none',
           }`
-          ).row
-        //- middle wrapper
-        //- @mousemove="minutesWrapperMousemove"
-        div(
-          ref="minutes-wrapper"
-          accessKey="minutes-wrapper"
-          :style=`{
-            position: 'relative',
-            height: heightBar+'px',
-            overflow: 'visible',
-          }`
-          ).row.no-wrap
-          //- tint
+          ).row.bg-red
+      //- scroll
+      div(
+        ref="zoom-wrapper"
+        @scroll="zoomWrapperOnScroll"
+        @mousemove="zoomWrapperMousemove"
+        :class=`{
+          //- br: zoomWrapperScrolling
+        }`
+        :style=`{
+          position: 'absolute', zIndex: 100,
+          overflowY: 'hidden',
+        }`
+        ).row.fit.items-center.content-center.scroll.scroll-clear.q-py-sm
+        q-resize-observer(@resize="zoomWrapperOnResize")
+        .row.no-wrap
+          //- left padding
           div(
-            v-if="!zoomed"
-            @click="tintClick"
-            accessKey="minutes-wrapper-tint"
-            v-touch-pan.mouse.prevent="tintOnPan"
+            @click="zoomed = false"
             :style=`{
-              position: 'absolute', zIndex: 3000,
-            }`
-            ).row.fit
-          //- figure editor
-          transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            tint-bar-figure(
-              v-if="player && player.figure"
-              :player="player"
-              :convert="convertPxToTime"
-              :style=`{
-                left: 'calc(' + (player.figure[0].t/player.duration)*100+'% - 6px)',
-                width:'calc(' + ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'% + 16px)',
-              }`
-              @first="zoomWorking = true, figureEditing = true"
-              @final="zoomWorking = false, figureEditing = false")
-          //- figures
-          div(
-            v-for="(f,fi) in player.figures" :key="fi"
-            :style=`{
-              position: 'absolute', zIndex: 1000+fi,
-              left: (f.figures[0].t/player.duration)*100+'%',
-              width: ((f.figures[1].t-f.figures[0].t)/player.duration)*100+'%',
-              height: '100%',
-              //- background: 'rgba(200,200,200,0.3)',
-              background: $rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
-              opacity: 0.2,
+              width: leftRightMarginWidth+'px',
+              minWidth: leftRightMarginWidth+'px',
+              height: heightBar+'px',
               pointerEvents: 'none',
             }`
             ).row
-          //- currentTime
-          //- v-if="true || !zoomWrapperScrolling"
-          transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          //- middle wrapper
+          //- @mousemove="minutesWrapperMousemove"
+          div(
+            ref="minutes-wrapper"
+            accessKey="minutes-wrapper"
+            :style=`{
+              position: 'relative',
+              height: heightBar+'px',
+              overflow: 'visible',
+            }`
+            ).row.no-wrap
+            //- tint
             div(
               v-if="!zoomed"
+              @click="tintClick"
+              accessKey="minutes-wrapper-tint"
+              v-touch-pan.mouse.prevent="tintOnPan"
+              :style=`{
+                position: 'absolute', zIndex: 3000,
+              }`
+              ).row.fit
+            //- figure editor
+            transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+              tint-bar-figure(
+                v-if="player && player.figure"
+                :player="player"
+                :convert="convertPxToTime"
+                :style=`{
+                  left: 'calc(' + (player.figure[0].t/player.duration)*100+'% - 6px)',
+                  width:'calc(' + ((player.figure[1].t-player.figure[0].t)/player.duration)*100+'% + 16px)',
+                }`
+                @first="zoomWorking = true, figureEditing = true"
+                @final="zoomWorking = false, figureEditing = false")
+            //- figures
+            div(
+              v-for="(f,fi) in player.figures" :key="fi"
+              :style=`{
+                position: 'absolute', zIndex: 1000+fi,
+                left: (f.figures[0].t/player.duration)*100+'%',
+                width: ((f.figures[1].t-f.figures[0].t)/player.duration)*100+'%',
+                height: '100%',
+                //- background: 'rgba(200,200,200,0.3)',
+                background: $rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
+                opacity: 0.2,
+                pointerEvents: 'none',
+              }`
+              ).row
+            //- currentTime
+            //- v-if="true || !zoomWrapperScrolling"
+            transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+              div(
+                v-if="!zoomed"
+                :style=`{
+                  position: 'absolute', zIndex: 2000,
+                  left: (player.currentTime/player.duration)*100+'%',
+                  height: '100%',
+                  width: '2px',
+                  pointerEvents: 'none',
+                }`
+                ).row.bg-red
+            //- currentTime hover percent
+            div(
+              v-if="currentTimeHoverPercent"
+              :style=`{
+                position: 'absolute', zIndex: 2001,
+                top: '-14px',
+                left: currentTimeHoverPercent+'%',
+                height: '14px',
+                //- width: '50px',
+              }`).row.items-center.content-center
+              small.text-white {{ $time(currentTimeHoverTime) }}
+              //- small.text-white {{ currentTimeHoverPercent }}
+            //- currentTime hover line
+            div(
+              v-if="currentTimeHoverPercent"
               :style=`{
                 position: 'absolute', zIndex: 2000,
-                left: (player.currentTime/player.duration)*100+'%',
+                left: currentTimeHoverPercent+'%',
                 height: '100%',
                 width: '2px',
                 pointerEvents: 'none',
+                opacity: 0.6,
               }`
               ).row.bg-red
-          //- currentTime hover percent
+            //- minutes
+            div(
+              v-for="(m,mi) in minCount" :key="mi"
+              :style=`{
+                zIndex: 101+mi,
+                //- height: heightBar+'px',
+                height: '100%',
+                width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
+                minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
+                //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
+                borderLeft: (mi !== 0 && (minWidthMin > 40 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none',
+                pointerEvents: 'none',
+                overflow: 'hidden',
+              }`
+              ).row
+              small(
+                v-if="zoomed ? true : minWidthMin > 50"
+                :style=`{
+                  fontSize: '8px',
+                  marginLeft: mi === 0 ? '8px' : '4px',
+                }`).text-grey-6 {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
+            //- background
+            //- @mouseleave="currentTimeHoverPercent = null"
+            div(
+              :style=`{
+                position: 'absolute', zIndex: 100,
+                borderRadius: '10px',
+                opacity: 0.8,
+                pointerEvents: 'none',
+              }`
+              ).row.fit.b-50
+          //- right padding
           div(
-            v-if="currentTimeHoverPercent"
+            @click="zoomed = false"
             :style=`{
-              position: 'absolute', zIndex: 2001,
-              top: '-14px',
-              left: currentTimeHoverPercent+'%',
-              height: '14px',
-              //- width: '50px',
-            }`).row.items-center.content-center
-            small.text-white {{ $time(currentTimeHoverTime) }}
-            //- small.text-white {{ currentTimeHoverPercent }}
-          //- currentTime hover line
-          div(
-            v-if="currentTimeHoverPercent"
-            :style=`{
-              position: 'absolute', zIndex: 2000,
-              left: currentTimeHoverPercent+'%',
-              height: '100%',
-              width: '2px',
-              pointerEvents: 'none',
-              opacity: 0.6,
-            }`
-            ).row.bg-red
-          //- minutes
-          div(
-            v-for="(m,mi) in minCount" :key="mi"
-            :style=`{
-              zIndex: 101+mi,
-              //- height: heightBar+'px',
-              height: '100%',
-              width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
-              minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
-              //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
-              borderLeft: (mi !== 0 && (minWidthMin > 40 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none',
+              width: leftRightMarginWidth+'px',
+              minWidth: leftRightMarginWidth+'px',
+              height: heightBar+'px',
               pointerEvents: 'none',
             }`
             ).row
-            small(
-              v-if="zoomed ? true : minWidthMin > 50"
-              :style=`{
-                fontSize: '8px',
-                marginLeft: mi === 0 ? '8px' : '4px',
-              }`).text-grey-6 {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
-          //- background
-          //- @mouseleave="currentTimeHoverPercent = null"
-          div(
-            :style=`{
-              position: 'absolute', zIndex: 100,
-              borderRadius: '10px',
-              opacity: 0.8,
-              pointerEvents: 'none',
-            }`
-            ).row.fit.b-50
-        //- right padding
-        div(
-          @click="zoomed = false"
-          :style=`{
-            width: leftRightMarginWidth+'px',
-            minWidth: leftRightMarginWidth+'px',
-            height: heightBar+'px',
-            pointerEvents: 'none',
-          }`
-          ).row
   //- footer: actions
-  div(:style=`{position: 'relative', minHeight: '34px',}`).row.full-width.items-center.content-center.justify-between.q-pb-xs.q-px-sm
-    //- left: time
-    small(
-      :style=`{
-        userSelect: 'none',
-        pointerEvents: 'none',
-        fontSize: '10px',
-      }`
-      ).text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
-    //- default actions
-    div(
-      v-if="player && !player.figure"
-      :style=`{
-        position: 'absolute', zIndex: 10,
-        left: 'calc(50% - 80px)',
-        width: '160px',
-      }`
-      ).row.full-height.items-center.content-center.justify-between
-      q-btn(
-        @click="tapClick(0)"
-        round flat dense  color="white" icon="replay_5" :size="actionsSize").col
-      //-  && options.context !== 'feed'
-      q-btn(
-        v-if="player && !player.figure"
-        @click="figureCreate()"
-        round flat dense color="green"
-        :style=`{
-          borderRadius: '50%',
-        }`)
-        q-icon(name="add_circle_outline" size="30px")
-      q-btn(
-        @click="tapClick(1)"
-        round flat dense  color="white" icon="forward_5" :size="actionsSize").col
+  div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center.justify-between
     //- figure actions
     div(
       v-if="player && player.figure"
       :style=`{
-        position: 'absolute', zIndex: 10,
-        left: 'calc(50% - 110px)',
-        width: '220px',
+        position: 'relative',
+        height: '50px',
       }`
-      ).row.full-height.items-center.content-center.justify-between
-      q-btn(round flat dense color="grey-8" @click="figureSet(0)")
-        q-icon(name="flip" color="grey-8" size="24px").rotate-180
-      //- .col
-      q-btn(round flat dense color="grey-8" @click="figureForward(0,false)")
-        q-icon(name="keyboard_arrow_left" color="grey-8" size="22px")
-      q-btn(round flat dense color="grey-8" @click="figureForward(0,true)")
-        q-icon(name="keyboard_arrow_right" color="grey-8" size="22px")
-      //- .col
-      q-btn(round flat dense color="grey-8" @click="figureForward(1,false)")
-        q-icon(name="keyboard_arrow_left" color="grey-8" size="22px")
-      q-btn(round flat dense color="grey-8" @click="figureForward(1,true)")
-        q-icon(name="keyboard_arrow_right" color="grey-8" size="22px")
-      //- .col
-      q-btn(round flat dense color="grey-8" @click="figureSet(1)")
-        q-icon(name="flip" color="grey-8" size="22px").rotate-180
-    //- right side: actions slots
-    .row.full-height.items-center.content-center
-      slot(name="actions")
-      q-btn(round flat dense color="white" icon="more_vert")
+      ).row.full-width.items-center.content-center.justify-between.q-px-sm
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 10,
+          //- left: 'calc(50% - 110px)',
+          //- width: '220px',
+          left: '0px',
+        }`
+        ).row.full-height.items-center.content-center.justify-between.full-width
+        //- q-btn(round flat dense color="grey-8" @click="figureSet(0)")
+          q-icon(name="flip" color="grey-8" size="24px").rotate-180
+        //- .col
+        q-btn(round flat dense color="grey-8" @click="figureForward(0,false)")
+          q-icon(name="keyboard_arrow_left" color="grey-8" size="26px")
+        //- q-btn(round flat dense color="grey-8" @click="figureSet(0)")
+          q-icon(name="flip" color="grey-8" size="24px").rotate-180
+        q-btn(round flat dense color="grey-8" @click="figureForward(0,true)")
+          q-icon(name="keyboard_arrow_right" color="grey-8" size="26px")
+        .col
+        q-btn(round flat dense color="grey-8" @click="figureSet(0)")
+          q-icon(name="flip" color="grey-8" size="22px").rotate-180
+        small(
+          :class=`{
+            'text-red': player.figure[1].t-player.figure[0].t > 60,
+            'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
+            }`
+          :style=`{
+            userSelect: 'none',
+            pointerEvents: 'none',
+            fontSize: '10px',
+          }`
+          ).text-bold.q-mx-sm {{ $time(player.figure[1].t-player.figure[0].t) }}
+        q-btn(round flat dense color="grey-8" @click="figureSet(1)")
+          q-icon(name="flip" color="grey-8" size="22px")
+        .col
+        q-btn(round flat dense color="grey-8" @click="figureForward(1,false)")
+          q-icon(name="keyboard_arrow_left" color="grey-8" size="26px")
+        //- q-btn(round flat dense color="grey-8" @click="figureSet(1)")
+          q-icon(name="flip" color="grey-8" size="22px")
+        q-btn(round flat dense color="grey-8" @click="figureForward(1,true)")
+          q-icon(name="keyboard_arrow_right" color="grey-8" size="26px")
+        //- .col
+        //- q-btn(round flat dense color="grey-8" @click="figureSet(1)")
+          q-icon(name="flip" color="grey-8" size="22px")
+    //- default actions
+    div(
+      v-if="player"
+      :style=`{
+        position: 'relative',
+        height: '50px',
+      }`
+      ).row.full-width.items-center.content-center.q-px-md
+      q-btn(
+        v-if="options.mode === 'editor'"
+        @click="player.setState('muted', !player.muted)"
+        round flat dense
+        :color="player.muted ? 'red' : 'white'"
+        :icon="player.muted ? 'volume_off' : 'volume_up'")
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 10,
+          left: 'calc(50% - 100px)',
+          width: '200px',
+        }`
+        ).row.full-height.items-center.content-center.justify-between
+        q-btn(
+          @click="tapClick(0)"
+          round flat dense  color="white" icon="replay_5" :size="actionsSize").col
+        q-btn(
+          @click="player.playing ? player.pause() : player.play()"
+          round flat dense color="white").q-px-sm
+          q-icon(
+            size="34px"
+            :name="player.playing ? 'pause' : 'play_arrow'")
+        q-btn(
+          @click="tapClick(1)"
+          round flat dense  color="white" icon="forward_5" :size="actionsSize").col
+      .col
+      q-btn(
+        v-if="player && !player.figure && options.mode === 'editor'"
+        @click="figureCreate()"
+        round flat dense color="green" icon="add_circle_outline")
+      q-btn(
+        v-if="player && player.figure && options.mode === 'editor'"
+        @click="player.setState('figure', null)"
+        round flat dense color="white" icon="clear")
 </template>
 
 <script>
@@ -251,14 +303,14 @@ export default {
   },
   data () {
     return {
-      barWrapperPaddingX: 8,
+      barWrapperPaddingX: 16,
       width: 0,
       height: 0,
       heightBar: 20,
       heightBarMin: 20,
       heightBarMax: 40,
       heightWrapper: 50,
-      heightWrapperMin: 50,
+      heightWrapperMin: 60,
       heightWrapperMax: 90,
       minWidth: 0,
       zoomed: null,
@@ -374,7 +426,7 @@ export default {
         }
         this.playerCurrentTimeTimer = setTimeout(() => {
           this.zoomWrapperScrollingAuthor = null
-        }, 200)
+        }, 300)
       }
     },
     'player.figure': {
@@ -401,17 +453,34 @@ export default {
       handler (to, from) {
         this.$log('zoomed TO', to)
         this.zoomWorking = true
+        if (to) this.width += 32
+        else this.width -= 32
         this.$tween.to(this, 0.5, {
-          // barWrapperPaddingX: to ? 0 : 8,
+          barWrapperPaddingX: to ? 0 : 16,
           leftRightMarginWidth: to ? this.width / 2 : 0,
           minWidth: to ? this.minWidthMax : this.minWidthMin,
           onComplete: async () => {
             this.$log('zoomed onComplete')
-            this.zoomWorking = false
+            // this.zoomWorking = false
+            // set scrollLeft finally...
+            await this.$wait(300)
+            let ref = this.$refs['minutes-wrapper']
+            let {width} = ref.getBoundingClientRect()
+            let scrollLeft = (this.zoomPercent * (width))
+            // this.$log('zoomed onUpdate scrollLeft', scrollLeft)
+            // this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
+            // this.zoomWorking = false
+            this.$tween.to(this.$refs['zoom-wrapper'], 0.5, {
+              scrollLeft: scrollLeft,
+              onComplete: () => {
+                this.player.play()
+                this.zoomWorking = false
+              }
+            })
           },
           onUpdate: () => {
             if (!this.zoomPercent) return
-            // this.$log('zoomed onUpdate')
+            this.$log('zoomed onUpdate')
             let ref = this.$refs['minutes-wrapper']
             let {width} = ref.getBoundingClientRect()
             let scrollLeft = (this.zoomPercent * width)
@@ -419,6 +488,9 @@ export default {
             this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
           }
         })
+        // this.$tween.to(this.$refs['zoom-wrapper'], 1, {
+        //   scrollLeft:
+        // })
       }
     },
   },
@@ -547,15 +619,16 @@ export default {
     zoomWrapperOnPan (e) {},
     async zoomIn () {
       this.$log('zoomIn')
-      // this.zoomWrapperScrollingAuthor = 'player'
+      this.zoomWrapperScrollingAuthor = 'player'
+      this.player.pause()
       this.zoomPercent = this.player.currentTime / this.duration
       this.zoomed = true
       // await this.$wait(500)
       // this.zoomWrapperScrollingAuthor = null
       // do someting to save currentPosition...
       // need to save currentTime
-      this.zoomWrapperScrollingAuthor = 'player'
-      await this.$wait(400)
+      // this.zoomWrapperScrollingAuthor = 'player'
+      await this.$wait(500)
       this.zoomWrapperScrollingAuthor = null
     },
     async zoomOut () {
@@ -564,7 +637,7 @@ export default {
       this.player.pause()
       // need to save currentTime
       this.zoomWrapperScrollingAuthor = 'player'
-      await this.$wait(550)
+      await this.$wait(500)
       this.zoomWrapperScrollingAuthor = null
     },
     tintClick (e) {

@@ -14,8 +14,13 @@ import { EventApi } from 'src/api/event'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
+// import global components
+import nodeFeed from 'components/node_feed/index.vue'
+
+// image editors
 // https://github.com/Norserium/vue-advanced-cropper
 // https://github.com/anvaka/panzoom
+
 const time = (sec, addSeconds = true) => {
   let hrs = ~~(sec / 3600)
   let mins = ~~((sec % 3600) / 60)
@@ -130,6 +135,9 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.prototype.$rateMeta = rateMeta
     // global components
     // Vue.component('nodeFeed', () => import('src/components/node_feed/index.vue'))
+    // const nodeFeed = import('src/components/node_feed/index.vue')
+    // import nodeFeed from 'components/node_feed/index.vue'
+    Vue.component('nodeFeed', nodeFeed)
     // Vue.component('jointFeed', () => import('src/components/joint_feed/index.vue'))
     // lists
     Vue.component('listMiddle', () => import('src/components/list_middle'))

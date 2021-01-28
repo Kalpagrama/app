@@ -89,16 +89,16 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 // import feedItem from './feed_item.vue'
 
-import nodeFeed from 'components/node_feed/index.vue'
-import jointFeed from 'components/joint_feed/index.vue'
+// import nodeFeed from 'components/node_feed/index.vue'
+// import jointFeed from 'components/joint_feed/index.vue'
 
 export default {
   name: 'feeds_feed',
   props: ['feed'],
   components: {
     // feedItem
-    nodeFeed,
-    jointFeed,
+    // nodeFeed,
+    // jointFeed,
   },
   data () {
     return {

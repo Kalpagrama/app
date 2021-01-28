@@ -12,7 +12,7 @@ div(
   }`
   ).row
   //- figure duration hint reminder max 60sec...
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 100, top: '-18px',
       height: '10px',
