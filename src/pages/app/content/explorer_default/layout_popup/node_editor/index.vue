@@ -3,7 +3,7 @@ div(
   :style=`{
     minHeight: '70px',
   }`
-  ).column.full-width
+  ).row.full-width
   //- header
   div(
     :style=`{
@@ -21,31 +21,18 @@ div(
       name-editor(:node="node")
     q-btn(
       @click="$emit('toggle')"
-      round flat
-      :icon="isMini ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+      round flat color="white"
+      :icon="isOpened ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"
       ).q-mt-md
-  //- body
-  .col.full-width.scroll
-    category-editor(:node="node").q-mt-xl
-    spheres-editor(:node="node")
-    //- footer: actions publish, save, delete
-    .row.full-width.justify-center.q-pa-xl
-      div(:style=`{maxWidth: '280px'}`).row.full-width
-        q-btn(
-          @click="nodePublish()"
-          color="green" no-caps
-          :loading="nodePublishing"
-          :style=`{
-            height: '50px',
-          }`).full-width.q-mb-sm
-          span.text-bold Опубликовать
-        q-btn(
-          @click="nodeSave()"
-          outline color="green" no-caps).full-width.q-mb-md Сохранить в черновики
-        //- q-btn()
-        q-btn(
-          @click="nodeDelete()"
-          outline color="red" no-caps).full-width Удалить
+  div(
+    v-if="isOpened"
+    :style=`{}`
+    ).row.full-width
+    spheres-editor-inline(:node="node")
+    .row.full-width.q-pt-md.q-px-md.q-pb-sm
+      q-btn(round flat color="red" icon="delete_outline" @click="nodeDelete()")
+      .col
+      q-btn(round flat color="green" icon="check" :loading="nodePublishing" @click="nodePublish()")
 </template>
 
 <script>
@@ -55,14 +42,16 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import nameEditor from './name_editor.vue'
 import categoryEditor from './category_editor.vue'
 import spheresEditor from './spheres_editor.vue'
+import spheresEditorInline from './spheres_editor_inline.vue'
 
 export default {
   name: 'nodeEditor',
-  props: ['player', 'contentKalpa', 'isMini'],
+  props: ['player', 'contentKalpa', 'isOpened'],
   components: {
     nameEditor,
     categoryEditor,
     spheresEditor,
+    spheresEditorInline,
   },
   data () {
     return {
@@ -91,7 +80,7 @@ export default {
           }
         }
       }
-    },
+    }
   },
   methods: {
     figureFocusToggle () {

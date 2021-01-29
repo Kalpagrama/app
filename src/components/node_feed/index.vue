@@ -29,11 +29,11 @@ div(
       }`
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
+        v-if="node.rateUser !== null"
         :to="'/user/'+node.author.oid"
         round flat color="white" no-caps
         :style=`{
           paddingLeft: '0px',
-          //- transform: 'blur(10px)',
         }`).row.q-px-sm
         user-avatar(:url="node.author.thumbUrl" :width="24" :height="24").q-ml-sm
         .col
@@ -41,6 +41,15 @@ div(
             span.text-grey-4 {{ node.author.name }}
             .row.full-width
               //- small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
+      div(
+        v-else
+        :style=`{
+          height: '40px',
+        }`
+        ).row.items-center.content-center.q-pa-sm
+        div(:style=`{width: '24px',minWidth: '24px',height: '24px',minHeight: '24px',borderRadius: '50%',}`).b-50.q-mr-sm
+        .col
+          div(:style=`{width: '80px', minWidth: '80px', height: '14px', borderRadius: '10px'}`).b-40
       .col
       .row.items-center.content-center.justify-end.q-pt-sm
         small.text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
@@ -50,10 +59,6 @@ div(
       kalpa-menu-actions(
         :title="node.name"
         :actions="actions" icon="more_vert")
-      //- small.text-grey-8.q-mr-xs {{ node.countStat.countViews }}
-      //- q-icon(name="visibility" color="grey-8").q-mr-md
-      //- small.text-grey-8.q-mr-xs {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-      //- kalpa-menu-actions(:actions="actions")
     //- ITEMS: one or two
     slot(name="items")
     node-item(
@@ -249,7 +254,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.node.name)
+    // this.$log('mounted', this.node.name)
   }
 }
 </script>

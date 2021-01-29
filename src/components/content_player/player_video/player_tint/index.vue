@@ -4,7 +4,7 @@ div(
   @click.self="tintClickSelf"
   :style=`{
     position: 'absolute', zIndex: 200,
-    background: options.mode === 'editor' ? 'none' : 'rgba(0,0,0,'+tintBackgroundOpacity+')',
+    //- background: options.mode === 'editor' ? 'none' : 'rgba(0,0,0,'+tintBackgroundOpacity+')',
     borderRadius: '10px',
   }`
   ).row.fit.items-center.content-center.justify-center
@@ -17,11 +17,18 @@ div(
       :isFocused="tintFocused")
   //- middle
   //- spinner for loading
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="none")
   q-spinner(
     v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
     color="white" size="50px")
   //- actions
-  div(
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-btn(
+      v-if="player && player.playing_ && options.mode === 'feed' && !player.playing"
+      round flat color="white"
+      :style=`{pointerEvents: 'none',}`)
+      q-icon(name="play_arrow" size="50px")
+  //- div(
     v-if="player.duration && tintFocused && player.playing_ && options.mode === 'feed'"
     :style=`{pointerEvents: 'none',}`
     ).row.justify-center
@@ -38,13 +45,13 @@ div(
       }`)
       q-icon(
         size="80px"
-        :name="player.playing ? 'pause' : 'play_arrow'")
+        :name="'play_arrow'")
     //- q-btn(
       @click="tapClick(1)"
       round flat  color="white")
       q-icon(name="forward_5" size="40px")
   //- footer
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
      div(
         v-if="player.duration && player.playing_ && options.mode === 'feed' && !isMini"
         :style=`{
@@ -70,13 +77,13 @@ div(
   //- footer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="player && player.duration && options.mode === 'editor'"
+      v-if="player && player.duration && options.mode === 'editor' && showTintBar"
       :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '0px',
-        //- pointerEvents: showTintBar ? 'auto' : 'none',
-        background: tintFocused ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
+        background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
         borderRadius: '0 0 10px 10px',
+        opacity: $store.state.ui.userTyping ? 0 : 1,
       }`
       ).row.full-width.justify-center.q-pa-md
       tint-bar(
@@ -84,9 +91,7 @@ div(
         :style=`{
           maxWidth: '600px',
           borderRadius: '20px',
-          background: options.mode === 'editor' ? 'rgba(30,30,30,0.8)' : 'none',
-          //- opacity: showTintBar ? 1 : 0,
-          //- pointerEvents: showTintBar ? 'auto' : 'none',
+          background: 'rgba(30,30,30,0.6)',
         }`)
 </template>
 
@@ -106,6 +111,8 @@ export default {
       tintBackgroundOpacity: 0,
       tintFocused: false,
       tintMousemoveTimeout: null,
+      tintClickSelfTimeout: null,
+      tintClickSelfCount: 0,
     }
   },
   computed: {
@@ -124,14 +131,14 @@ export default {
     }
   },
   watch: {
-    tintFocused: {
-      handler (to, from) {
-        this.$log('tintFocused TO', to)
-        this.$tween.to(this, 0.3, {
-          tintBackgroundOpacity: to ? 0.5 : 0,
-        })
-      }
-    }
+    // tintFocused: {
+    //   handler (to, from) {
+    //     // this.$log('tintFocused TO', to)
+    //     this.$tween.to(this, 0.3, {
+    //       tintBackgroundOpacity: to ? 0.5 : 0,
+    //     })
+    //   }
+    // }
   },
   methods: {
     tapClick (index) {
@@ -143,29 +150,55 @@ export default {
       if (t > this.player.duration) t = this.player.duration
       this.player.setCurrentTime(t)
     },
-    tintClickSelf () {
-      this.$log('tintClickSelf')
-      if (this.options.mode === 'feed') {
-        if (this.player.muted) {
-          this.player.setState('muted', false)
-        }
-        else {
-          // this.tintFocused = !this.tintFocused
-          if (this.player.playing) {
-            this.tintFocused = true
-            this.player.pause()
-          }
-          else {
-            this.tintFocused = false
-            this.player.play()
-          }
-        }
-        // else {
-        //   this.tintFocused = !this.tintFocused
-        // }
+    tintClickSelf (e) {
+      this.$log('tintClickSelf', this.tintClickSelfCount)
+      // this.tintClickSelfTimeout
+      this.tintClickSelfCount += 1
+      if (this.tintClickSelfTimeout) {
+        clearTimeout(this.tintClickSelfTimeout)
+        this.tintClickSelfTimeout = null
       }
-      if (this.options.mode === 'editor') {
-        this.tintFocused = !this.tintFocused
+      this.tintClickSelfTimeout = setTimeout(() => {
+        if (this.tintClickSelfCount === 1) {
+          this.$log('tintClickSelf ONE')
+          if (this.options.mode === 'feed') {
+            if (this.player.muted) {
+              this.player.setState('muted', false)
+            }
+            else {
+              // this.tintFocused = !this.tintFocused
+              if (this.player.playing) {
+                this.tintFocused = true
+                this.player.pause()
+              }
+              else {
+                this.tintFocused = false
+                this.player.play()
+              }
+            }
+          }
+          if (this.options.mode === 'editor') {
+            this.tintFocused = !this.tintFocused
+          }
+        }
+        this.tintClickSelfCount = 0
+      }, 200)
+      if (this.tintClickSelfCount === 1) {
+        // this.$log('tintClickSelf ONE')
+      }
+      else {
+        this.$log('tintClickSelf DOUBLE', e)
+        let t = this.player.currentTime
+        let d = (this.tintClickSelfCount * 5)
+        let width = e.target.offsetWidth
+        let x = e.layerX
+        let p = x / width
+        this.$log('p', p)
+        if (p <= 0.5) t -= d
+        else t += d
+        if (t < 0) t = 0
+        if (t > this.player.duration) t = this.player.duration
+        this.player.setCurrentTime(t)
       }
     },
     tintMouseenter () {
@@ -203,15 +236,15 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    if (this.$q.platform.is.desktop) {
-      window.addEventListener('mousemove', this.tintMousemove)
-    }
+    // if (this.$q.platform.is.desktop) {
+    //   window.addEventListener('mousemove', this.tintMousemove)
+    // }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (this.$q.platform.is.desktop) {
-      window.removeEventListener('mousemove', this.tintMousemove)
-    }
+    // if (this.$q.platform.is.desktop) {
+    //   window.removeEventListener('mousemove', this.tintMousemove)
+    // }
   }
 }
 </script>

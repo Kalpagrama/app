@@ -42,6 +42,7 @@ div(
       }`
       ).row.items-center.content-center.justify-center.b-30
       div(
+        v-if="node.rateUser !== null"
         :style=`{
           borderRadius: '50%',
           background: rateMax.color,
@@ -49,7 +50,7 @@ div(
         ).row.fit
     //- rateUser
     div(
-      v-if="showRateUser && node.rateUser >= 0"
+      v-if="showRateUser && node.rateUser !== null"
       :style=`{
         position: 'absolute', zIndex: 300,
         //- top: '-4px', right: '-4px',
@@ -77,7 +78,7 @@ div(
       }`
       ).row.full-width.justify-center
       //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax).name }}
-      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ rateMax.name }}
+      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ node.rateUser !== null ? rateMax.name : 'Проголосуйте' }}
 </template>
 
 <script>

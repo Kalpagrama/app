@@ -3,14 +3,14 @@ div(
   :style=`{
     position: 'absolute', zIndex: 1000,
     left: '0px', top: '0px',
-    //- background: 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)',
+    background: isFocused ? 'linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)' : 'none',
     borderRadius: '10px 10px 0 0',
   }`
   ).row.full-width.items-center.content-center.q-pa-xs
   .col
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       q-btn(
-        v-if="isFocused"
+        v-if="true"
         flat color="white" no-caps dense
         align="left" icon="select_all"
         :to="contentLink"

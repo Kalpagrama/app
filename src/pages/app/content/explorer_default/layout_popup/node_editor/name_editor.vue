@@ -7,7 +7,9 @@
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.justify-center.q-px-md
+div(
+  @click="onClick"
+  :style=`{position: 'relative', minHeight: '60px'}`).row.full-width.justify-center.q-px-md
   //- blinking green carette
   div(
     v-if="!isFocused && node.name.length === 0"
@@ -20,8 +22,10 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.q-px-md
     }`
     ).row.bg-green.blinking
   //- input with dynamic fontSize...
+  //- v-if="isActive"
   q-input(
     v-model="node.name"
+    ref="nameInput"
     borderless dark color="white"
     type="textarea" autogrow
     placeholder="В чем суть?"
@@ -32,29 +36,49 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.q-px-md
       //- fontWeight: 'bold',
       lineHeight: 1.1,
       textAlign: 'center',
+      paddingTop: '22px',
     }`
-    :style=`{}`
-    @focus="isFocused = true"
-    @blur="isFocused = false"
+    :style=`{
+      //- position: 'fixed', top: '0px',
+    }`
+    @focus="isFocused = true, $emit('focused')"
+    @blur="isFocused = false, $emit('blurred')"
     ).full-width
 </template>
 
 <script>
 export default {
   name: 'nameEditor',
-  props: ['node'],
+  props: ['node', 'isActive'],
   data () {
     return {
       isFocused: false,
+      // isShow: false
     }
   },
   computed: {
     fontSize () {
       let l = this.node.name.length
-      if (l < 20) return 30
-      else if (l < 30) return 20
-      else if (l < 40) return 16
-      else return 14
+      if (l < 20) return 20
+      else if (l < 30) return 16
+      else if (l < 40) return 14
+      else return 12
+    }
+  },
+  watch: {
+    isActive: {
+      async handler (to, from) {
+        if (to) {
+          // await this.$wait(300)
+          // this.isShow = true
+          this.$refs.nameInput.focus()
+        }
+      }
+    }
+  },
+  methods: {
+    onClick () {
+      this.$refs.nameInput.focus()
     }
   }
 }
