@@ -84,7 +84,8 @@ export default {
       let [itemRef] = this.$refs[`item-${this.itemMiddleKey}`]
       if (itemRef) {
         let itemRect = itemRef.getBoundingClientRect()
-        this.itemsRes.setProp('itemMeta', {
+        this.itemsRes.setProperty('currentId', this.itemMiddleKey)
+        this.itemsRes.setProperty('itemMeta', {
           top: itemRect.top,
           bottom: itemRect.bottom,
           left: itemRect.left,
