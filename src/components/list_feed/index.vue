@@ -34,6 +34,7 @@ div(
       q-btn(@click="positionDrop()" dense no-caps color="red" outline) Drop position
       q-btn(@click="prev()" dense no-caps color="red" outline) Prev
       q-btn(@click="next()" dense no-caps color="red" outline) Next
+      q-btn(@click="cutHere(item[itemKey])" dense no-caps color='white' outline) Cut here
       .row.full-width
         small.text-white itemKey: {{ item[itemKey] }}
       .row.full-width
@@ -78,6 +79,18 @@ export default {
       return this.root || document.body
     }
   },
+  watch: {
+    'itemsRes.items': {
+      handler (to, from) {
+        this.$log('itemsRes.items', to, from)
+        // items changed, changed scrollHeightOld => scrollHeightNew
+        // let scrollHeightOld = this.scrollHeight
+        // let scrollHeightNew = this.scrollHeight
+        // let delta = scrollHeightNew - scrollHeightOld
+        // until new items adding and scrollHeight is changing we scroll back to compensate...
+      }
+    }
+  },
   methods: {
     prev () {
       this.$log('prev')
@@ -90,6 +103,11 @@ export default {
       this.rootLocal.style.overflow = 'hidden'
       if (this.itemsRes.hasNext) this.itemsRes.next()
       this.rootLocal.style.overflow = 'auto'
+    },
+    cutHere (id) {
+      this.$log('cutHere')
+      this.itemsRes.setProperty('currentId', id)
+      this.itemsRes.goToItem(id)
     },
     indexMiddleHandler (isVisible, entry, i) {
       // let index = parseInt(entry.target.accessKey)
@@ -104,6 +122,7 @@ export default {
       this.$log('positionSave')
       let [itemRef] = this.$refs[`item-${this.itemMiddleKey}`]
       if (itemRef) {
+        // this.$log('itemRef offsetTop', itemRef.offsetTop)
         let itemRect = itemRef.getBoundingClientRect()
         this.itemsRes.setProperty('currentId', this.itemMiddleKey)
         const itemMetaInput = {
@@ -115,9 +134,8 @@ export default {
           height: itemRect.height,
           key: this.itemMiddleKey,
           offsetTop: itemRef.offsetTop,
-          offsetBottom: itemRef.offsetBottom,
-          scrollHeight: this.rootLocal.scrollHeight,
-          scrollTop: window.scrollTop,
+          scrollHeight: this.scrollHeight,
+          scrollTop: this.scrollTop
         }
         this.$log('positionSave itemMetaInput', itemMetaInput)
         this.itemsRes.setProperty('itemMeta', itemMetaInput)
@@ -133,11 +151,16 @@ export default {
       this.$log('positionDrop')
       this.itemsRes.setProperty('currentId', null)
       this.itemsRes.setProperty('itemMeta', null)
+      let currentId = this.itemsRes.getProperty('currentId')
+      let itemMeta = this.itemsRes.getProperty('itemMeta')
+      this.$log('positionDrop currentId', currentId)
+      this.$log('positionDrop itemMeta', itemMeta)
     },
     rootOnScroll (e) {
       this.$log('rootOnScroll')
       this.scrollTop = window.pageYOffset
       this.scrollHeight = this.rootLocal.scrollHeight
+      // this.scrollHeight = window.scrollHeight
     }
   },
   async mounted () {
@@ -147,20 +170,25 @@ export default {
     this.$log('mounted document.body', document.body.scrollTop)
     this.itemsRes = await this.$rxdb.find(this.query, true)
     let currentId = this.itemsRes.getProperty('currentId')
-    this.$log('currentId', currentId)
-    let itemMeta = this.itemsRes.getProperty('itemMeta')
-    this.$log('itemMeta', itemMeta)
-    this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
-    // this.rootLocal.style.overflow = 'hidden'
-    // this.rootLocal.scrollTop = itemMeta.offsetTop
-    // await this.$wait(500)
-    // window.scrollTop = itemMeta.scrollTop
+    if (currentId) {
+      this.$log('currentId', currentId)
+      let itemMeta = this.itemsRes.getProperty('itemMeta')
+      if (itemMeta) {
+        this.$log('itemMeta', itemMeta)
+        // this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
+        // await this.$wait(1000)
+        // window.scrollTop = itemMeta.scrollTop
+        window.scrollTo(0, itemMeta.scrollTop)
+      }
+    }
     // if (this.itemsRes.hasPrev) this.itemsRes.prev()
     // if (this.itemsRes.hasNext) this.itemsRes.next()
     // TODO: handle -1 to 0 first element
     // TODO: handle no elements at all event
     // TODO: handle emit items update, items count, preving, nexting, saved position
     window.addEventListener('scroll', this.rootOnScroll)
+    await this.$wait(1000)
+    this.rootOnScroll()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

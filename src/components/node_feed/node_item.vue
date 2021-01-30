@@ -1,4 +1,13 @@
 <template lang="pug">
+//- div(
+  :style=`{
+    position: 'relative',
+    aspectRatio: 1,
+  }`
+  ).row.full-width.bg
+  img(
+    :src="node.items[0].thumbUrl"
+    ).full-width.br
 div(
   :style=`{
     position: 'relative',

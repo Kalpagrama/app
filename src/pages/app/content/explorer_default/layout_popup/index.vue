@@ -56,7 +56,7 @@ div(
         :pageId="pageId"
         :style=`{
           zIndex: 1000,
-          //- borderRadius: '10px',
+          borderRadius: '10px 10px 0 0',
         }`).b-40
       node-editor(
         v-if="player && player.figure"
