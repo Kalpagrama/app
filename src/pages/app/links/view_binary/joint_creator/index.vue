@@ -190,14 +190,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 
 import kalpaFinder from 'components/kalpa_finder/index.vue'
-import itemEditor from 'components/node_editor/item_editor.vue'
+// import itemEditor from 'components/node_editor/item_editor.vue'
 
 export default {
   name: 'jointCreator',
   props: ['jointCurrent', 'item'],
   components: {
     kalpaFinder,
-    itemEditor
+    // itemEditor
   },
   created () {},
   data () {
