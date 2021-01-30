@@ -331,6 +331,16 @@ class Group {
 
    setProperty (name, value) {
       Vue.set(this.propsReactive, name, value)
+      if (name === 'currentId'){
+         // TODO!!!
+         let currentPage = this.reactiveGroup.pages[0]
+         if (currentPage) {
+            let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
+            this.setProperty('currentPageToken', currentPageToken)
+            this.setProperty('currentPageSize', listItems.length)
+            this.setProperty('currentIdItem', value)
+         }
+      }
    }
 
    getProperty (name) {
