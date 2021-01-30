@@ -570,6 +570,8 @@ class Group {
             //    saveCurrentPos: group.saveCurrentPos.bind(group),
             //    refresh: group.refresh.bind(group)
             // }
+            group.reactiveGroup.figuresAbsolute = figuresAbsolute
+            group.reactiveGroup.thumbUrl = thumbUrl
             return group.reactiveGroup
          }
          nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
@@ -593,7 +595,7 @@ class Group {
       this.updateReactiveGroup()
    }
 
-   async gotoCurrent() {
+   async gotoCurrent () {
       let currentId = this.getProperty('currentId')
       let currentPage
       // for (let page of this.reactiveGroup.pages) {
@@ -614,9 +616,12 @@ class Group {
       //    //    if (indxFrom >= 0) fulfillFrom = indxFrom
       //    // }
       // }
-      let count = GROUP_BATCH_SZ
       const f = this.gotoCurrent
       logD(f, 'start')
+      let count
+      if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
+      else count = this.loadedLen() // выдаем все элементы разом
+
       // let { startFullFil, endFullFil } = this.fulFilledRange()
       // if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
       //    // запросим данные с сервера
@@ -650,12 +655,12 @@ class Group {
       await this.fulfill(nextItems, 'whole')
    }
 
-   async gotoStart() {
+   async gotoStart () {
       this.setProperty('currentId', null)
       await this.gotoCurrent()
    }
 
-   async gotoEnd() {
+   async gotoEnd () {
       // TODO!!!
    }
 
