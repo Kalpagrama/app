@@ -144,39 +144,21 @@ const routes = [
             ],
             meta: { roleMinimal: 'MEMBER' }
          },
-         // {
-         //    name: 'messages',
-         //    path: 'messages',
-         //    component: () => import('pages/app/messages/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
          {
             name: 'workspace',
             path: 'workspace',
-            component: () => import('pages/app/ws_index/index.vue'),
+            component: () => import('pages/app/workspace/index.vue'),
          },
          {
             name: 'workspace.bookmarks',
             path: 'workspace/bookmarks',
-            component: () => import('pages/app/ws_index/page_bookmarks/index.vue')
+            component: () => import('pages/app/workspace/page_bookmarks/index.vue')
          },
          {
             name: 'workspace.create',
             path: 'workspace/create',
-            component: () => import('pages/app/ws_index/page_create/index.vue')
+            component: () => import('pages/app/workspace/page_create/index.vue')
          },
-         // {
-         //    name: 'workspace.create',
-         //    path: 'workspace/create',
-         //    component: () => import('pages/app/ws_create/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
-         // {
-         //    name: 'workspace',
-         //    path: 'workspace/:viewId?',
-         //    component: () => import('pages/app/ws_index/index.vue'),
-         //    meta: { roleMinimal: 'MEMBER' }
-         // },
          {
             name: 'fallback',
             path: '*',

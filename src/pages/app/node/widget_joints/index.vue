@@ -35,7 +35,7 @@
       //- joints loaded
       div(v-if="joints && joints.length > 0").row.full-width.no-wrap.q-pa-sm
         router-link(
-          v-for="j in joints" :key="j.oid"
+          v-for="j in joints" :key="j.populatedObject.oid"
           :to="'/links/'+node.oid"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
@@ -44,7 +44,7 @@
           ).row.b-50.q-mr-sm
           img(
             draggable="false"
-            :src="j.items.find(i => i.oid !== node.oid).thumbUrl"
+            :src="j.populatedObject.items.find(i => i.oid !== node.oid).thumbUrl"
             :style=`{
               objectFit: 'cover',
               borderRadius: '10px',

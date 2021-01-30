@@ -13,7 +13,7 @@ q-page(
       ).row.full-width.items-start.content-start
       q-infinite-scroll(@load="next" :offset="$q.screen.height")
       div(
-        v-for="(i,ii) in items" :key="ii"
+        v-for="(i, ii) in items" :key="ii"
         :style=`{
           position: 'relative',
           background: 'rgb(35,35,35)',
@@ -21,9 +21,9 @@ q-page(
         }`
         ).row.full-width.items-center.content-center.cursor-pointer.q-mb-sm
         //- template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="i")
+        slot(name="tint" :item="i.populatedObject")
         img(
-          :src="i.items[0].thumbUrl"
+          :src="i.populatedObject.items[0].thumbUrl"
           :style=`{
             width: '50px',
             height: '50px',
@@ -32,7 +32,7 @@ q-page(
           }`)
         .col
           .row.fit.items-center.content-center.q-pa-sm
-            span.text-white {{ i.name }}
+            span.text-white {{ i.populatedObject.name }}
       div(:style=`{height: '50px'}`).row.full-width.justify-center
         q-spinner-dots(v-show="nexting" color="green" size="50px")
 </template>

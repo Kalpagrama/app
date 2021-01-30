@@ -66,7 +66,7 @@ div(
             }`
             ).row.full-width.items-start.content-start
             node-feed(
-              :node="item.object"
+              :node="item.populatedObject"
               :isVisible="true"
               :isActive="indexMiddle === index")
             //- node-feed(

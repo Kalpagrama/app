@@ -1,15 +1,17 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  q-header(reveal)
-  q-page-container
-    q-page
 </template>
 
 <script>
 export default {
-  name: 'wsTrash',
-  data () {
-    return {
+  name: 'listFeed',
+  props: {
+    wrapper: {
+      type: Object,
+      default: window,
+    },
+    query: {
+      type: Object,
+      required: true,
     }
   },
   mounted () {

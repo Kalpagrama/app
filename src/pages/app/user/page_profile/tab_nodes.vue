@@ -9,7 +9,7 @@ kalpa-loader(
     }`)
     q-infinite-scroll(@load="next" :offset="$q.screen.height")
     template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-      node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+      node-feed(:node="item.populatedObject" :isActive="isActive" :isVisible="isVisible" :width="width")
     template(v-slot:append)
       div(:style=`{height: '50px'}`).row.full-width.justify-center
         q-spinner-dots(v-show="nexting" color="green" size="50px")

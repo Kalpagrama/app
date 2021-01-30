@@ -15,7 +15,16 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 // import global components
+import userAvatar from 'components/user_avatar/index.vue'
+import kalpaBookmark from 'components/kalpa_bookmark/index.vue'
+import kalpaShare from 'components/kalpa_share/index.vue'
+import kalpaLogo from 'components/kalpa_logo/index.vue'
+import kalpaLoader from 'components/kalpa_loader/index.vue'
+import kalpaMenuActions from 'components/kalpa_menu_actions/index.vue'
+import kalpaMenuPopupGlobal from 'components/kalpa_menu_popup_global/index.vue'
 import nodeFeed from 'components/node_feed/index.vue'
+import listMiddle from 'components/list_middle/index.vue'
+import listFeed from 'components/list_feed/index.vue'
 
 // image editors
 // https://github.com/Norserium/vue-advanced-cropper
@@ -133,25 +142,24 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 2, color: 'rgba(113,49,164,1)', colorBackground: 'rgba(113,49,164,0.5)', order: 1}
     ]
     Vue.prototype.$rateMeta = rateMeta
-    // global components
-    // Vue.component('nodeFeed', () => import('src/components/node_feed/index.vue'))
-    // const nodeFeed = import('src/components/node_feed/index.vue')
-    // import nodeFeed from 'components/node_feed/index.vue'
+
+    // global components registration NOT ASYNC
     Vue.component('nodeFeed', nodeFeed)
-    // Vue.component('jointFeed', () => import('src/components/joint_feed/index.vue'))
+    // Vue.component('jointFeed', jointFeed)
     // lists
-    Vue.component('listMiddle', () => import('src/components/list_middle'))
-    // Vue.component('listSlider', () => import('components/list_slider/index.vue'))
-    // Vue.component('listHorizontal', () => import('components/list_horizontal/index.vue'))
+    Vue.component('listMiddle', listMiddle)
+    Vue.component('listFeed', listFeed)
+    // Vue.component('listSlider', listSlider)
+    // Vue.component('listHorizontal', listHorizontal)
     // user
-    Vue.component('userAvatar', () => import('src/components/user_avatar/index.vue'))
-    // kalpa
-    Vue.component('kalpaBookmark', () => import('src/components/kalpa_bookmark/index.vue'))
-    Vue.component('kalpaShare', () => import('src/components/kalpa_share/index.vue'))
-    Vue.component('kalpaLogo', () => import('src/components/kalpa_logo/index.vue'))
-    Vue.component('kalpaLoader', () => import('src/components/kalpa_loader/index.vue'))
-    Vue.component('kalpaMenuActions', () => import('src/components/kalpa_menu_actions/index.vue'))
-    Vue.component('kalpaMenuPopupGlobal', () => import('src/components/kalpa_menu_popup_global/index.vue'))
+    Vue.component('userAvatar', userAvatar)
+    Vue.component('kalpaBookmark', kalpaBookmark)
+    Vue.component('kalpaShare', kalpaShare)
+    Vue.component('kalpaLogo', kalpaLogo)
+    Vue.component('kalpaLoader', kalpaLoader)
+    Vue.component('kalpaMenuActions', kalpaMenuActions)
+    Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
+
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

@@ -21,6 +21,10 @@ q-page(
           .row.full-width.q-px-sm.q-py-xs
             small.text-grey-8 Правовые документы:
           kalpa-docs
+          .row.full-width.q-pl-sm.q-py-xs
+            small(
+              :style=`{userSelect: 'none', marginLeft: '0px'}`
+              ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

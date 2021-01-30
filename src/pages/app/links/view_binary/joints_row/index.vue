@@ -107,7 +107,7 @@ div(
           ).row.fit.cursor-pointer
         item(
           v-show="isPinned ? ji === jointIndex : true"
-          :item="j.items.find(i => i.oid !== row.oid)"
+          :item="j.populatedObject.items.find(i => i.oid !== row.oid)"
           :itemActive="(isPinned || isVisible) && ji === jointIndex"
           :itemPinned="isPinned"
           :style=`{
