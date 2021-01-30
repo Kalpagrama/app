@@ -23,7 +23,7 @@
             span Добавить связь
       joint-item(
         v-for="(j,ji) in items" :key="j.oid"
-        :joint="j"
+        :joint="j.populatedObject"
         :oid="oid"
         @open="$emit('joint', j)")
 </template>

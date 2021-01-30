@@ -12,7 +12,7 @@
           }`)
           q-infinite-scroll(@load="next" :offset="$q.screen.height")
           template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-            node-feed(:node="item" :isActive="isActive" :isVisible="isVisible" :width="width")
+            node-feed(:node="item.populatedObject" :isActive="isActive" :isVisible="isVisible" :width="width")
 </template>
 
 <script>

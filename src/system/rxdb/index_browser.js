@@ -586,7 +586,7 @@ class RxDBWrapper {
                            }
                            let copyEvent = cloneDeep(event) // не меняем исходную ленту(она реактивна)
                            let populatedObject = await this.get(RxCollectionEnum.OBJ, event.object.oid, { clientFirst: true }) || event.object
-                           copyEvent.object = populatedObject // todo перейти на copyEvent.populatedObject
+                           // copyEvent.object = populatedObject // todo перейти на copyEvent.populatedObject
                            copyEvent.populatedObject = populatedObject
                            return copyEvent
                         }
@@ -602,10 +602,10 @@ class RxDBWrapper {
                         }
                         return this.get(RxCollectionEnum.OBJ, topObject.oid, { clientFirst: true })
                            .then(populatedObject => {
-                              // let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
-                              // topObjectCopy.populatedObject = populatedObject
-                              // return topObjectCopy
-                              return populatedObject
+                              let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
+                              topObjectCopy.populatedObject = populatedObject
+                              return topObjectCopy
+                              // return populatedObject
                            })
                      })
                      populatedItems = await Promise.all(promises)
