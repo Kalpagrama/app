@@ -448,9 +448,9 @@ class Group {
             case RxCollectionEnum.LST_FEED:
                this.reactiveGroup.itemPrimaryKey = 'id'
                break
-            // case RxCollectionEnum.LST_SEARCH:
-            //    this.reactiveGroup.itemPrimaryKey = 'oid'
-            //    break
+            case RxCollectionEnum.LST_SEARCH:
+               this.reactiveGroup.itemPrimaryKey = 'oid'
+               break
             default:
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + rxDoc.props.mangoQuery.selector.rxCollectionEnum)
          }
@@ -644,9 +644,9 @@ class Group {
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      if (!this.groupId.startsWith('{"selector"')){
-         logD('asdasdasasds')
-      }
+      // if (!this.groupId.startsWith('{"selector"')){
+      //    logD('asdasdasasds')
+      // }
       await this.fulfill(nextItems, 'whole')
    }
 
