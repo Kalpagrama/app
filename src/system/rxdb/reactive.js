@@ -595,7 +595,6 @@ class Group {
 
    async gotoCurrent() {
       let currentId = this.getProperty('currentId')
-      if (!currentId) return await this.gotoStart()
       let currentPage
       // for (let page of this.reactiveGroup.pages) {
       //    assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
@@ -652,11 +651,12 @@ class Group {
    }
 
    async gotoStart() {
-
+      this.setProperty('currentId', null)
+      await this.gotoCurrent()
    }
 
    async gotoEnd() {
-
+      // TODO!!!
    }
 
    hasNext () {
