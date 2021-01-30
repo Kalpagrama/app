@@ -292,19 +292,41 @@ class ReactiveDocFactory {
 
 // группа (может содержать элементы либо другие группы)
 const BATCH_SZ = 12
-
 class Group {
    constructor (populateFunc = null, paginateFunc = null, propsReactive = {}) {
-      this.pages = [] // вся лента разбита на пагинированные блоки(страницы)
-      this.fulFilledItems = [] // кусочек от this.pages
-      this.totalCount = 0
+      // this.pages = [] // вся лента разбита на пагинированные блоки(страницы)
+      // this.fulFilledItems = [] // кусочек от this.pages
+      // this.totalCount = 0
+      // todo заполнять в addPaginationPage
+      // this.itemType = 'ITEM' // ITEM / GROUP (внутри группы мб подгруппы)
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
       assert(this.propsReactive, '!this.propsReactive')
-      // todo заполнять в addPaginationPage
-      this.itemType = 'ITEM' // ITEM / GROUP (внутри группы мб подгруппы)
-      const BATCH_SZ = 12
+      this.vm = new Vue({
+         data: {
+            reactiveGroup: {
+               pages: [], // вся лента разбита на пагинированные блоки(страницы)
+               fulFilledItems: [], // кусочек от this.pages
+               items: [], // кусочек от this.pages
+               totalCount: 0,
+               itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
+               next: this.next.bind(this),
+               prev: this.prev.bind(this),
+               hasNext: false,
+               hasPrev: false,
+               setProperty: this.setProperty.bind(this),
+               getProperty: this.getProperty.bind(this),
+               saveCurrentPos: this.saveCurrentPos.bind(this),
+               refresh: this.refresh.bind(this)
+            }
+         }
+      })
+      this.reactiveGroup = this.vm.reactiveGroup
+      this.updateReactiveGroup = () => {
+         this.reactiveGroup.hasNext = this.hasNext()
+         this.reactiveGroup.hasPrev = this.hasPrev()
+      }
    }
 
    setProperty (name, value) {
@@ -318,10 +340,10 @@ class Group {
    saveCurrentPos (indx, currentPage = null) {
       let currentIdItem
       if (!currentPage) {
-         assert(indx >= 0 && indx < this.fulFilledItems.length, 'bad indx')
-         let fullItem = this.fulFilledItems[indx]
+         assert(indx >= 0 && indx < this.reactiveGroup.items.length, 'bad indx')
+         let fullItem = this.reactiveGroup.items[indx]
          currentIdItem = fullItem.oid || fullItem.id
-         for (let page of this.pages) {
+         for (let page of this.reactiveGroup.pages) {
             if (page.listItems.find(item => item.oid === currentIdItem || item.id === currentIdItem)) {
                currentPage = page
                break
@@ -339,12 +361,12 @@ class Group {
    }
 
    async refresh () {
-      await this.fulfill(this.fulFilledItems, 'whole')
+      await this.fulfill(this.reactiveGroup.items, 'whole')
    }
 
    loadedLen () {
       let len = 0
-      for (let page of this.pages) {
+      for (let page of this.reactiveGroup.pages) {
          len += page.listItems.length
       }
       return len
@@ -352,7 +374,7 @@ class Group {
 
    loadedItems () {
       let res = []
-      for (let page of this.pages) res.push(...page.listItems)
+      for (let page of this.reactiveGroup.pages) res.push(...page.listItems)
       return res
    }
 
@@ -363,8 +385,8 @@ class Group {
       let findStart = () => {
          let searchIndx = 0
          let indx = -1
-         while (searchIndx < this.fulFilledItems.length && indx === -1) {
-            let searchId = this.fulFilledItems[searchIndx].oid || this.fulFilledItems[searchIndx].id
+         while (searchIndx < this.reactiveGroup.items.length && indx === -1) {
+            let searchId = this.reactiveGroup.items[searchIndx].oid || this.reactiveGroup.items[searchIndx].id
             indx = loadedList.findIndex(item => item.oid === searchId || item.id === searchId)
             searchIndx++ // ищем дальше
          }
@@ -372,10 +394,10 @@ class Group {
       }
       // ищет конец reactiveListFulFilled в loadedList
       let findEnd = () => {
-         let searchIndx = this.fulFilledItems.length - 1
+         let searchIndx = this.reactiveGroup.items.length - 1
          let indx = -1
          while (searchIndx >= 0 && indx === -1) {
-            let searchId = this.fulFilledItems[searchIndx].oid || this.fulFilledItems[searchIndx].id
+            let searchId = this.reactiveGroup.items[searchIndx].oid || this.reactiveGroup.items[searchIndx].id
             indx = loadedList.findIndex(item => item.oid === searchId || item.id === searchId)
             searchIndx-- // ищем дальше
          }
@@ -393,10 +415,10 @@ class Group {
    async fulfill (nextItems, position) {
       assert(position.in('top', 'bottom', 'whole'), 'bad position')
       // let isGroupedList = (items) => items.length && items[0].items
-      let startPos = position === 'bottom' ? this.fulFilledItems.length : 0
-      let deleteCount = position === 'whole' ? this.fulFilledItems.length : 0
+      let startPos = position === 'bottom' ? this.reactiveGroup.items.length : 0
+      let deleteCount = position === 'whole' ? this.reactiveGroup.items.length : 0
       assert(startPos >= 0 && nextItems && Array.isArray(nextItems), 'bad fulfill params')
-      if (this.itemType === 'GROUP') {
+      if (this.reactiveGroup.itemType === 'GROUP') {
          let makeNextGroup = async (nextGroup) => {
             let {
                items,
@@ -412,35 +434,39 @@ class Group {
             let group = new Group(this.populateFunc)
             await group.addPaginationPage(items, 'bottom')
             await group.next(3) // сразу грузим по 3 ядра в группе
-            return {
-               figuresAbsolute,
-               thumbUrl,
-               items: group.fulFilledItems,
-               totalCount: group.totalCount,
-               next: group.next.bind(group),
-               prev: group.prev.bind(group),
-               hasNext: group.hasNext.bind(group),
-               hasPrev: group.hasPrev.bind(group),
-               saveCurrentPos: group.saveCurrentPos.bind(group),
-               refresh: group.refresh.bind(group)
-            }
+            // return {
+            //    figuresAbsolute,
+            //    thumbUrl,
+            //    items: group.fulFilledItems,
+            //    totalCount: group.totalCount,
+            //    next: group.next.bind(group),
+            //    prev: group.prev.bind(group),
+            //    hasNext: group.hasNext.bind(group),
+            //    hasPrev: group.hasPrev.bind(group),
+            //    saveCurrentPos: group.saveCurrentPos.bind(group),
+            //    refresh: group.refresh.bind(group)
+            // }
+            return group.reactiveGroup
          }
          nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
-            nextItems = await this.populateFunc(nextItems, [], this.fulFilledItems)
+            nextItems = await this.populateFunc(nextItems, [], this.reactiveGroup.items)
             // logD('nextItems= ', nextItems)
          }
       }
 
       let blackLists = await Lists.getBlackLists()
       let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-      // this.fulFilledItems.splice(startPos, deleteCount, ...filtered)
-      this.fulFilledItems.splice(startPos, deleteCount, ...filtered)
-      // if (this.fulFilledItems.length > 24) {
+      // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
+      this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
+
+      // if (this.reactiveGroup.items.length > 24) {
       //    alert('splice!!! 24')
-      //    this.fulFilledItems.splice(0, this.fulFilledItems.length - 24,)
+      //    this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length - 24,)
       // } // отрезаем начало
+
+      this.updateReactiveGroup()
    }
 
    async next (count, { fromId = null, fromT = null } = {}) {
@@ -451,7 +477,7 @@ class Group {
          // assert(count <= 12, 'count <= 12! value =' + count)
          count = BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
       }
-      if (!count && this.fulFilledItems.length === 0) { // autoNext
+      if (!count && this.reactiveGroup.items.length === 0) { // autoNext
          if (this.populateFunc) count = BATCH_SZ // дорогая операция
          else count = this.loadedLen() // выдаем все элементы разом
       }
@@ -459,7 +485,7 @@ class Group {
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
          // запросим данные с сервера
-         let pageToken = this.pages.length ? this.pages[this.pages.length - 1].nextPageToken : null
+         let pageToken = this.reactiveGroup.pages.length ? this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken : null
          // todo при указанных fromId и fromT - при необходимости сгенерировать токен (например когда переехали в конец контента)
          if (pageToken) {
             let rxDocPagination = await this.paginateFunc(pageToken, count * 2)
@@ -471,7 +497,7 @@ class Group {
       }
       if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
       let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
-      if (!fromId && !this.fulFilledItems.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+      if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
          fromId = this.getProperty('currentIdItem')
       }
       if (fromId) {
@@ -493,7 +519,7 @@ class Group {
          logW('next allow only 12 with populate')
          count = BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
       }
-      if (!count && this.fulFilledItems.length === 0) { // autoNext
+      if (!count && this.reactiveGroup.items.length === 0) { // autoNext
          if (this.populateFunc) count = BATCH_SZ // дорогая операция
          else count = this.loadedLen() // выдаем все элементы разом
       }
@@ -501,8 +527,8 @@ class Group {
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && startFullFil !== -1 && count > startFullFil) {
          // запросим данные с сервера (вверх)
-         if (this.pages.length && this.pages[0].prevPageToken) {
-            let rxDocPagination = await this.paginateFunc(this.pages[0].prevPageToken, count * 2)
+         if (this.reactiveGroup.pages.length && this.reactiveGroup.pages[0].prevPageToken) {
+            let rxDocPagination = await this.paginateFunc(this.reactiveGroup.pages[0].prevPageToken, count * 2)
             await this.addPaginationPage(rxDocPagination, 'top')
             let range = this.fulFilledRange() // новые значения для fulfilled области
             startFullFil = range.startFullFil
@@ -518,12 +544,12 @@ class Group {
 
    hasNext () {
       let { startFullFil, endFullFil } = this.fulFilledRange()
-      return endFullFil < this.loadedLen() - 1 || this.pages.length === 0 || this.pages[this.pages.length - 1].nextPageToken
+      return endFullFil < this.loadedLen() - 1 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken
    }
 
    hasPrev () {
       let { startFullFil, endFullFil } = this.fulFilledRange()
-      return startFullFil > 0 || this.pages.length === 0 || this.pages[0].prevPageToken
+      return startFullFil > 0 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[0].prevPageToken
    }
 
    async addPaginationPage (rxQueryOrRxDocOrArray, position) {
@@ -542,7 +568,7 @@ class Group {
          let rxDocs = await rxQuery.exec()
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
-         this.totalCount = listItems.length
+         this.reactiveGroup.totalCount = listItems.length
          this.groupId = JSON.stringify(rxQuery.mangoQuery) // для дебага
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
@@ -554,7 +580,7 @@ class Group {
             currentPageToken
          } = rxDoc.toJSON().cached.data
          listItems = items
-         this.totalCount = totalCount
+         this.reactiveGroup.totalCount = totalCount
          assert(rxDoc.props.mangoQuery, '!mangoQuery')
          assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
          // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
@@ -575,7 +601,7 @@ class Group {
          this.groupId = rxDoc.id // todo для дебага
       } else if (array) {
          listItems = array
-         this.totalCount = listItems.length
+         this.reactiveGroup.totalCount = listItems.length
          this.groupId = 'custom array'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
       assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
@@ -587,13 +613,13 @@ class Group {
          currentPageToken: rxDoc ? rxDoc.cached.data.currentPageToken : null
       }
       if (position === 'top') {
-         this.pages.unshift(page)
+         this.reactiveGroup.pages.unshift(page)
       } else {
-         this.pages.push(page)
+         this.reactiveGroup.pages.push(page)
       }
       if (listItems.length) {
-         if (listItems[0].items) this.itemType = 'GROUP'
-         else this.itemType = 'ITEM'
+         if (listItems[0].items) this.reactiveGroup.itemType = 'GROUP'
+         else this.reactiveGroup.itemType = 'ITEM'
       }
       this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
       // чтобы в след раз загрузилось с этого места
@@ -632,10 +658,10 @@ class Group {
             // logD(f, 'rxQuery changed 2', results)
             let listItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
 
-            let page = this.pages[0] // в случае с rxquery - у нас только одна страница
+            let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
             assert(page, '!page')
             page.listItems = listItemsNew // изменились итемы страницы
-            this.totalCount = listItemsNew.length
+            this.reactiveGroup.totalCount = listItemsNew.length
 
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
@@ -650,7 +676,7 @@ class Group {
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
             logD(f, 'List::rxDoc changed. try to change this.listItems')
             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            let page = this.pages.find(pg => pg.id === change.id)
+            let page = this.reactiveGroup.pages.find(pg => pg.id === change.id)
             assert(page, '!page')
             page.listItems = change.cached.data.items // изменились итемы страницы
 
@@ -681,16 +707,17 @@ class ReactiveListWithPaginationFactory {
       }
       assert(rxQueryOrRxDoc.reactiveListHolderMaster.group, '!this.group!')
       let group = rxQueryOrRxDoc.reactiveListHolderMaster.group
-      return {
-         items: group.fulFilledItems,
-         totalCount: group.totalCount,
-         next: group.next.bind(group),
-         prev: group.prev.bind(group),
-         hasNext: group.hasNext.bind(group),
-         hasPrev: group.hasPrev.bind(group),
-         saveCurrentPos: group.saveCurrentPos.bind(group),
-         refresh: group.refresh.bind(group)
-      }
+      return group.reactiveGroup
+      // return {
+      //    items: group.fulFilledItems,
+      //    totalCount: group.totalCount,
+      //    next: group.next.bind(group),
+      //    prev: group.prev.bind(group),
+      //    hasNext: group.hasNext.bind(group),
+      //    hasPrev: group.hasPrev.bind(group),
+      //    saveCurrentPos: group.saveCurrentPos.bind(group),
+      //    refresh: group.refresh.bind(group)
+      // }
    }
 }
 
