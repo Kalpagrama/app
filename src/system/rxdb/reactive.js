@@ -636,7 +636,7 @@ class Group {
 
       let fulfillFrom = 0
       let fromId
-      if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+      if (this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
          fromId = this.getProperty('currentId')
       }
       if (fromId) {
@@ -645,9 +645,9 @@ class Group {
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      // if (!this.groupId.startsWith('{"selector"')){
-      //    logD('asdasdasasds')
-      // }
+      if (!this.groupId.startsWith('{"selector"')){
+         logD('asdasdasasds')
+      }
       await this.fulfill(nextItems, 'whole')
    }
 
