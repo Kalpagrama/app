@@ -28,7 +28,7 @@ q-layout(
       div(
         v-if="!searchString"
         ).row.full-width.justify-center
-        ws-search(
+        //- ws-search(
           @searchString="searchStringLocal = $event"
           @contentKalpa="contentKalpaFound"
           :style=`{
@@ -59,7 +59,7 @@ export default {
     searchString: {type: String},
   },
   components: {
-    wsSearch: () => import('components/ws_search/index.vue'),
+    // wsSearch: () => import('components/ws_search/index.vue'),
     pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
     pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
