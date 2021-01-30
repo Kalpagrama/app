@@ -307,6 +307,10 @@ class Group {
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
+               gotoCurrent: this.gotoCurrent.bind(this),
+               gotoStart: this.gotoStart.bind(this),
+               gotoEnd: this.gotoEnd.bind(this),
+
                next: this.next.bind(this),
                prev: this.prev.bind(this),
                hasNext: false,
@@ -454,8 +458,8 @@ class Group {
       } else if (array) {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
-         if (listItems.length){
-            if(listItems.length[0].oid)this.reactiveGroup.itemPrimaryKey = 'oid'
+         if (listItems.length) {
+            if (listItems.length[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
             else if (listItems.length[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
          this.groupId = 'custom array'
@@ -589,7 +593,83 @@ class Group {
       this.updateReactiveGroup()
    }
 
-   async next (count, { fromId = null, fromT = null } = {}) {
+   async gotoCurrent() {
+      let currentId = this.getProperty('currentId')
+      if (!currentId) return await this.gotoStart()
+      let currentPage
+      // for (let page of this.reactiveGroup.pages) {
+      //    assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
+      //    if (page.listItems.find(item => item[this.reactiveGroup.itemPrimaryKey] === currentId)) {
+      //       currentPage = page
+      //       break
+      //    }
+      // }
+      // if (currentPage) {
+      //    let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
+      //    await this.next()
+      //    // if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+      //    //    fromId = this.getProperty('currentId')
+      //    // }
+      //    // if (fromId) {
+      //    //    let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
+      //    //    if (indxFrom >= 0) fulfillFrom = indxFrom
+      //    // }
+      // }
+      let count = GROUP_BATCH_SZ
+      const f = this.gotoCurrent
+      logD(f, 'start')
+      // let { startFullFil, endFullFil } = this.fulFilledRange()
+      // if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
+      //    // запросим данные с сервера
+      //    let pageToken = this.reactiveGroup.pages.length ? this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken : null
+      //    // todo при указанных fromId и fromT - при необходимости сгенерировать токен (например когда переехали в конец контента)
+      //    if (pageToken) {
+      //       let rxDocPagination = await this.paginateFunc(pageToken, count * 2)
+      //       await this.addPaginationPage(rxDocPagination, 'bottom')
+      //       let range = this.fulFilledRange() // новые значения для fulfilled области
+      //       startFullFil = range.startFullFil
+      //       endFullFil = range.endFullFil
+      //    }
+      // }
+      // if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
+      // let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
+
+      let fulfillFrom = 0
+      let fromId
+      if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+         fromId = this.getProperty('currentId')
+      }
+      if (fromId) {
+         let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
+         if (indxFrom >= 0) fulfillFrom = indxFrom
+      }
+      let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+      let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
+      // if (!this.groupId.startsWith('{"selector"')){
+      //    logD('asdasdasasds')
+      // }
+      await this.fulfill(nextItems, 'whole')
+   }
+
+   async gotoStart() {
+
+   }
+
+   async gotoEnd() {
+
+   }
+
+   hasNext () {
+      let { startFullFil, endFullFil } = this.fulFilledRange()
+      return endFullFil < this.loadedLen() - 1 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken
+   }
+
+   hasPrev () {
+      let { startFullFil, endFullFil } = this.fulFilledRange()
+      return startFullFil > 0 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[0].prevPageToken
+   }
+
+   async next (count) {
       const f = this.next
       logD(f, 'start')
       if (this.populateFunc && count > GROUP_BATCH_SZ) {
@@ -617,13 +697,14 @@ class Group {
       }
       if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
       let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
-      if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-         fromId = this.getProperty('currentId')
-      }
-      if (fromId) {
-         let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
-         if (indxFrom >= 0) fulfillFrom = indxFrom
-      }
+      // let fromId
+      // if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+      //    fromId = this.getProperty('currentId')
+      // }
+      // if (fromId) {
+      //    let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
+      //    if (indxFrom >= 0) fulfillFrom = indxFrom
+      // }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       // if (!this.groupId.startsWith('{"selector"')){
@@ -664,37 +745,8 @@ class Group {
       await this.fulfill(nextItems, 'top')
    }
 
-   // async gotoCurrent() {
-   //
-   // }
-
-   hasNext () {
-      let { startFullFil, endFullFil } = this.fulFilledRange()
-      return endFullFil < this.loadedLen() - 1 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken
-   }
-
-   hasPrev () {
-      let { startFullFil, endFullFil } = this.fulFilledRange()
-      return startFullFil > 0 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[0].prevPageToken
-   }
-
    setProperty (name, value) {
       Vue.set(this.propsReactive, name, value)
-      if (name === 'currentId') {
-         // TODO!!! идет сканирование всех страниц!!! (можно оптимизировать (value - принадлежит reactiveGroup.items (см fulFilledRange)) )
-         let currentPage
-         for (let page of this.reactiveGroup.pages) {
-            if (page.listItems.find(item => item.oid === value || item.id === value)) {
-               currentPage = page
-               break
-            }
-         }
-         if (currentPage) {
-            let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
-            this.setProperty('currentPageToken', currentPageToken)
-            this.setProperty('currentPageSize', listItems.length)
-         }
-      }
    }
 
    getProperty (name) {
