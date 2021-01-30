@@ -30,7 +30,10 @@ div(
       :isVisible="true")
     //- footer debug
     .row.full-width
-      q-btn(@click="positionSave()" flat dense no-caps color="red" outline) Save position
+      q-btn(@click="positionSave()" dense no-caps color="green" outline) Save position
+      q-btn(@click="positionDrop()" dense no-caps color="red" outline) Drop position
+      .row.full-width
+        small.text-white scrollTop: {{ rootLocal.scrollTop }}, scrollHeight: {{ rootLocal.scrollHeight }},
   slot(name="append")
 </template>
 
@@ -66,14 +69,14 @@ export default {
   },
   computed: {
     rootLocal () {
-      return this.roor || window
+      return this.root || document.body
     }
   },
   methods: {
     indexMiddleHandler (isVisible, entry, i) {
       // let index = parseInt(entry.target.accessKey)
       if (isVisible) {
-        this.$log('indexMiddleHandler', isVisible, entry, i)
+        // this.$log('indexMiddleHandler', isVisible, entry, i)
         // this.indexMiddle = index
         this.itemMiddleKey = entry.target.accessKey
       }
@@ -93,22 +96,47 @@ export default {
           width: itemRect.width,
           height: itemRect.height,
           key: this.itemMiddleKey,
+          offsetTop: itemRef.offsetTop,
+          offsetBottom: itemRef.offsetBottom,
         })
+        let itemMeta = this.itemsRes.getProperty('itemMeta')
+        this.$log('positionSave', itemMeta)
       }
     },
     positionRestore () {
       this.$log('positionRestore')
     },
+    positionDrop () {
+      this.$log('positionDrop')
+      this.itemsRes.setProperty('currentId', null)
+      this.itemsRes.setProperty('itemMeta', null)
+    },
+    rootOnScroll (e) {
+      this.$log('rootOnScroll', e)
+    }
   },
   async mounted () {
-    this.$log('mounted', window)
+    this.$log('mounted')
+    // this.$log('mounted window', window)
+    // this.$log('mounted document', document)
+    this.$log('mounted document.body', document.body.scrollTop)
     this.itemsRes = await this.$rxdb.find(this.query, true)
+    let currentId = this.itemsRes.getProperty('currentId')
+    this.$log('currentId', currentId)
+    let itemMeta = this.itemsRes.getProperty('itemMeta')
+    this.$log('itemMeta', itemMeta)
+    this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
+    // this.rootLocal.style.overflow = 'hidden'
+    // if (this.itemsRes.hasPrev) this.itemsRes.prev()
+    // if (this.itemsRes.hasNext) this.itemsRes.next()
     // TODO: handle -1 to 0 first element
     // TODO: handle no elements at all event
     // TODO: handle emit items update, items count, preving, nexting, saved position
+    // window.addEventListener('scroll', this.rootOnScroll)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    // window.removeEventListener('scroll', this.rootOnScroll)
     this.positionSave()
   }
 }
