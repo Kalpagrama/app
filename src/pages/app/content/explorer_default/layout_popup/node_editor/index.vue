@@ -20,10 +20,16 @@ div(
     .col.full-height
       name-editor(:node="node")
     q-btn(
+      v-if="isOpened"
       @click="$emit('toggle')"
       round flat color="white"
-      :icon="isOpened ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"
+      :icon="'keyboard_arrow_down'"
       ).q-mt-md
+    q-btn(
+      v-else
+      @click="$emit('toggle')"
+      flat color="white" no-caps
+      ).q-mt-md Далее
   div(
     v-if="isOpened"
     :style=`{}`

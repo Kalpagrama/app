@@ -2,6 +2,7 @@
 div(
   v-if="itemsRes"
   ).row.full-width.items-start.content-start
+  q-resize-observer(@resize="onResize")
   //- prepend slot
   slot(name="prepend")
   //- :accessKey="itemIndex"
@@ -68,6 +69,8 @@ export default {
   data () {
     return {
       itemsRes: null,
+      itemsPreving: false,
+      itemsNexting: false,
       indexMiddle: 0,
       itemMiddleKey: null,
       scrollTop: 0,
@@ -82,39 +85,51 @@ export default {
   watch: {
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items', to, from)
+        this.$log('itemsRes.items')
         // items changed, changed scrollHeightOld => scrollHeightNew
         let scrollHeightOld = this.scrollHeight
         // let scrollHeightNew = this.scrollHeight
         // let delta = scrollHeightNew - scrollHeightOld
         // until new items adding and scrollHeight is changing we scroll back to compensate...
-        this.rootLocal.style.overflow = 'hidden'
-        await this.$wait(2000)
-        let scrollHeightNew = this.scrollHeight
-        let delta = scrollHeightNew - scrollHeightOld
-        let itemMeta = this.itemsRes.getProperty('itemMeta')
-        window.scrollTo(0, itemMeta.offsetTop + delta)
-        this.rootLocal.style.overflow = 'auto'
+        if (this.itemsPreving) {
+          // let count = 0
+          // let i = setInterval(() => {
+          //   if (count === 2000) clearInterval(i)
+          //   count += 50
+          //   this.$log('itemsPreving: ', count)
+          //   this.rootOnScroll()
+          //   let scrollHeightNew = this.scrollHeight
+          //   let delta = scrollHeightNew - scrollHeightOld
+          //   this.$log({scrollHeightOld, scrollHeightNew, delta})
+          //   window.scrollTo(0, delta)
+          // }, 50)
+          // this.rootOnScroll()
+          // let scrollHeightNew = this.scrollHeight
+          // let delta = scrollHeightNew - scrollHeightOld
+          // this.$log({scrollHeightOld, scrollHeightNew, delta})
+          // // this.$tween.to(window, 1, {
+          // //   scrollTop: delta
+          // // })
+          // window.scrollTo(0, delta)
+        }
       }
     }
   },
   methods: {
     prev () {
       this.$log('prev')
-      this.rootLocal.style.overflow = 'hidden'
+      this.itemsPreving = true
       if (this.itemsRes.hasPrev) this.itemsRes.prev()
-      this.rootLocal.style.overflow = 'auto'
     },
     next () {
       this.$log('next')
-      this.rootLocal.style.overflow = 'hidden'
+      this.itemsNexting = true
       if (this.itemsRes.hasNext) this.itemsRes.next()
-      this.rootLocal.style.overflow = 'auto'
     },
     cutHere (id) {
       this.$log('cutHere')
       this.itemsRes.setProperty('currentId', id)
-      this.itemsRes.goToItem(id)
+      this.itemsRes.gotoCurrent(id)
     },
     indexMiddleHandler (isVisible, entry, i) {
       // let index = parseInt(entry.target.accessKey)
@@ -122,6 +137,7 @@ export default {
         // this.$log('indexMiddleHandler', isVisible, entry, i)
         // this.indexMiddle = index
         this.itemMiddleKey = entry.target.accessKey
+        this.positionSave()
       }
       // TODO: handle -1
     },
@@ -168,6 +184,15 @@ export default {
       this.scrollTop = window.pageYOffset
       this.scrollHeight = this.rootLocal.scrollHeight
       // this.scrollHeight = window.scrollHeight
+    },
+    onResize (e) {
+      this.$log('onResize', e)
+      if (this.itemsPreving) {
+        let scrollHeightNew = e.height
+        let delta = scrollHeightNew - this.scrollHeight
+        window.scrollTo(0, delta)
+        this.itemsPreving = false
+      }
     }
   },
   async mounted () {
@@ -196,6 +221,7 @@ export default {
     window.addEventListener('scroll', this.rootOnScroll)
     await this.$wait(1000)
     this.rootOnScroll()
+    this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

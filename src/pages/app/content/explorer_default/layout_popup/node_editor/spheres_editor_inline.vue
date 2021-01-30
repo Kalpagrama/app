@@ -6,7 +6,7 @@
     }`
     ).row.full-width.items-center.content-center
     div(
-      v-if="sphereAdding"
+      v-if="sphereAdding || node.spheres.length === 0"
       :style=`{
         position: 'absolute', zIndex: 100,
       }`
@@ -16,10 +16,15 @@
         borderless dark dense color="white"
         placeholder="Введите сферу"
         autofocus
+        @keyup.enter="sphereAdd(sphere)"
         ).full-width
         template(v-slot:append)
           q-btn(round flat dense color="grey-6" icon="clear" @click="sphere = '', sphereAdding = false").q-mr-sm
           q-btn(round flat dense color="green" icon="check" @click="sphereAdd(sphere)")
+    q-btn(
+      @click="sphereAdding = true"
+      round flat dense color="green" icon="add"
+      ).q-ma-xs
     .col.scroll
       div(
         v-if="node.spheres.length > 0"
@@ -35,10 +40,6 @@
       span(
         v-else
         ).text-grey-6 Сферы сути
-    q-btn(
-      @click="sphereAdding = true"
-      round flat dense color="green" icon="add"
-      ).q-ma-xs
 </template>
 
 <script>
