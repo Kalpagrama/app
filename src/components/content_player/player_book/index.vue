@@ -6,6 +6,21 @@ div(
     height: '100%',
   }`
   ).column.full-width.bg-black
+  //- figure editor...
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="figure"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        bottom: '50px',
+        width: '200px',
+        left: 'calc(50% - 100px)',
+        borderRadius: '10px',
+      }`
+      ).row.bg-black.q-pa-sm.br
+      q-btn(round flat color="red" icon="delete_outline" @click="figure = null")
+      .col
+      q-btn(round flat color="white" icon="edit")
   div(
     v-if="tableOfContents === true"
     :id="bookMenu"
@@ -139,7 +154,8 @@ export default {
       isFullscreen: false,
       contentBookmark: null,
       tableOfContents: false,
-      cfi: 'epubcfi(/6/12[id83]!/4/2/2[id2]/12,/1:0,/1:263)'
+      cfi: 'epubcfi(/6/12[id83]!/4/2/2[id2]/12,/1:0,/1:263)',
+      figure: null,
     }
   },
   watch: {
@@ -446,6 +462,14 @@ export default {
           this.$log('current range', cfiRange)
           this.selection.cfiRange = cfiRange // запомним тут. Обработаем в mouseup
           this.selection.text = range.toString()
+          this.figure = [
+            {
+              epubCfi: cfiRange,
+              epubCfiText: range.toString(),
+              points: [],
+              t: null
+            },
+          ]
         }
         // // // contents.window.getSelection().removeAllRanges();
       })

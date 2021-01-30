@@ -76,6 +76,8 @@ div(
           div(
             ref="minutes-wrapper"
             accessKey="minutes-wrapper"
+            v-touch-pan.left.right.mouse="minutesWrapperDrag"
+            @click="minutesWrapperClick"
             :style=`{
               position: 'relative',
               height: heightBar+'px',
@@ -332,6 +334,7 @@ export default {
       currentTimeHoverTime: null,
       currentTimeHoverPercent: null,
       zoomWrapperMousemoveRect: null,
+      minutesWrapperDragging: false,
     }
   },
   // created () {
@@ -689,6 +692,29 @@ export default {
       // this.$set(this, 'width', e.width)
       this.width = e.width
       this.height = e.height
+    },
+    minutesWrapperDrag (e) {
+      // this.$log('minutesWrapperDrag', e)
+      if (this.figureEditing) return
+      if (e.isFirst) {
+        this.minutesWrapperDragging = true
+      }
+      if (e.isFinal) {
+        this.minutesWrapperDragging = false
+      }
+      if (this.$q.platform.has.touch) return
+      this.$refs['zoom-wrapper'].scrollLeft -= e.delta.x
+    },
+    minutesWrapperClick (e) {
+      this.$log('minutesWrapperClick', e)
+      let left = e.layerX
+      let width = e.target.clientWidth
+      this.$log({left, width})
+      // this.zoomPercent = left / width
+      // this.zoomed = !this.zoomed
+      let t = (left / width) * this.player.duration
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
     }
   },
   mounted () {

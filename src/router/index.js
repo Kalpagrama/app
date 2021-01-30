@@ -15,7 +15,8 @@ export default function (/* { store, ssrContext } */) {
       if (savedPosition) {
         // console.log('### savedPosition', savedPosition)
         // alert('### savedPosition' + savedPosition.toString())
-        return savedPosition
+        // return savedPosition
+        return {x: 0, y: 0}
       } else {
         // console.log('### no savedPosition!')
         // alert('### no savedPosition !!!')

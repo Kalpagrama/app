@@ -137,6 +137,24 @@ export default {
         }
       }
       // BOOK
+      else if (this.contentKalpa.type === 'BOOK') {
+        composition = {
+          id: Date.now().toString(),
+          thumbUrl: this.contentKalpa.thumbUrl,
+          thumbHeight: this.contentKalpa.thumbHeight,
+          thumbWidth: this.contentKalpa.thumbWidth,
+          outputType: 'BOOK',
+          layers: [
+            {
+              id: Date.now().toString(),
+              contentOid: this.contentKalpa.oid,
+              figuresAbsolute: this.player.figure
+            },
+          ],
+          operation: { items: null, operations: null, type: 'CONCAT'},
+          __typename: 'Composition',
+        }
+      }
       // AUDIO: like video 30 sec from currentTime
       // WEB
       return composition

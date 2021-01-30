@@ -8,6 +8,28 @@ div(
     borderRadius: '10px',
   }`
   ).row.fit.items-center.content-center.justify-center
+  //- q-btn(
+    round flat color="white"
+    :style=`{
+      position: 'absolute', zIndex: 10,
+      right: '0px',
+      width: '50%',
+    }`
+    ).full-height.br
+  //- div(
+    :style=`{
+      position: 'absolute', zIndex: 10,
+      left: '0px',
+      width: '50%',
+    }`
+    ).row.full-height
+    div(:style=`{position: 'relative',}`).row.fit
+      q-btn(
+        round flat color="white"
+        :style=`{
+          position: 'relative',
+        }`
+        ).fit.br
   //- header
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     tint-header(
@@ -28,53 +50,20 @@ div(
       round flat color="white"
       :style=`{pointerEvents: 'none',}`)
       q-icon(name="play_arrow" size="50px")
-  //- div(
-    v-if="player.duration && tintFocused && player.playing_ && options.mode === 'feed'"
-    :style=`{pointerEvents: 'none',}`
-    ).row.justify-center
-    //- q-btn(
-      @click="tapClick(0)"
-      round flat color="white")
-      q-icon(name="replay_5" size="40px")
-    //- player play/pause
-    q-btn(
-      @click="player.playing ? player.pause() : player.play()"
-      round flat color="white"
+  //- footer feed
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="player && player.duration && options.mode === 'feed' && !isMini"
       :style=`{
+        position: 'absolute', zIndex: 1000,
+        bottom: '0px',
+        borderRadius: '0 0 10px 10px',
+        userSelect: 'none',
         pointerEvents: 'none',
-      }`)
-      q-icon(
-        size="80px"
-        :name="'play_arrow'")
-    //- q-btn(
-      @click="tapClick(1)"
-      round flat  color="white")
-      q-icon(name="forward_5" size="40px")
-  //- footer
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-     div(
-        v-if="player.duration && player.playing_ && options.mode === 'feed' && !isMini"
-        :style=`{
-          position: 'absolute', zIndex: 1000,
-          bottom: '8px',
-        }`
-        ).row.justify-center
-        q-btn(
-          @click="tapClick(0)"
-          round flat color="grey-8")
-          q-icon(name="replay_5" size="40px").q-mr-lg
-        //- player play/pause
-        //- q-btn(
-          @click="player.playing ? player.pause() : player.play()"
-          round flat color="white")
-          q-icon(
-            size="80px"
-            :name="player.playing ? 'pause' : 'play_arrow'")
-        q-btn(
-          @click="tapClick(1)"
-          round flat  color="grey-8").q-ml-lg
-          q-icon(name="forward_5" size="40px")
-  //- footer
+      }`
+      ).row.full-width.justify-start.q-pa-md
+      small(:style=`{borderRadius: '8px',}`).text-white.q-py-xs.q-px-sm.bg-black {{$time(player.currentTime)}} / {{$time(player.duration)}}
+  //- footer editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="player && player.duration && options.mode === 'editor' && showTintBar"
@@ -131,25 +120,8 @@ export default {
     }
   },
   watch: {
-    // tintFocused: {
-    //   handler (to, from) {
-    //     // this.$log('tintFocused TO', to)
-    //     this.$tween.to(this, 0.3, {
-    //       tintBackgroundOpacity: to ? 0.5 : 0,
-    //     })
-    //   }
-    // }
   },
   methods: {
-    tapClick (index) {
-      this.$log('tapClick', index)
-      let t = this.player.currentTime
-      if (index === 0) t -= 5
-      if (index === 1) t += 5
-      if (t < 0) t = 0
-      if (t > this.player.duration) t = this.player.duration
-      this.player.setCurrentTime(t)
-    },
     tintClickSelf (e) {
       this.$log('tintClickSelf', this.tintClickSelfCount)
       // this.tintClickSelfTimeout
@@ -189,7 +161,7 @@ export default {
       else {
         this.$log('tintClickSelf DOUBLE', e)
         let t = this.player.currentTime
-        let d = (this.tintClickSelfCount * 5)
+        let d = ((this.tintClickSelfCount - 1) * 5)
         let width = e.target.offsetWidth
         let x = e.layerX
         let p = x / width
