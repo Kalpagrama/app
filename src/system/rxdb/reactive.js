@@ -459,8 +459,8 @@ class Group {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
          if (listItems.length) {
-            if (listItems.length[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
-            else if (listItems.length[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
+            if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
+            else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
          this.groupId = 'custom array'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
