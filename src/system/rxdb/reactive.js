@@ -315,6 +315,8 @@ class Group {
                prev: this.prev.bind(this),
                hasNext: false,
                hasPrev: false,
+               setProperty: this.setProperty.bind(this),
+               getProperty: this.getProperty.bind(this),
                saveCurrentPos: this.saveCurrentPos.bind(this),
                refresh: this.refresh.bind(this)
             }
