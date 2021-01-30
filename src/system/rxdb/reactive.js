@@ -295,7 +295,6 @@ const BATCH_SZ = 12
 class Group {
    constructor (populateFunc = null, paginateFunc = null, propsReactive = {}) {
       // this.pages = [] // вся лента разбита на пагинированные блоки(страницы)
-      // this.fulFilledItems = [] // кусочек от this.pages
       // this.totalCount = 0
       // todo заполнять в addPaginationPage
       // this.itemType = 'ITEM' // ITEM / GROUP (внутри группы мб подгруппы)
@@ -307,7 +306,6 @@ class Group {
          data: {
             reactiveGroup: {
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
-               fulFilledItems: [], // кусочек от this.pages
                items: [], // кусочек от this.pages
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
@@ -317,7 +315,6 @@ class Group {
                hasPrev: false,
                setProperty: this.setProperty.bind(this),
                getProperty: this.getProperty.bind(this),
-               saveCurrentPos: this.saveCurrentPos.bind(this),
                refresh: this.refresh.bind(this)
             }
          }
@@ -332,42 +329,24 @@ class Group {
    setProperty (name, value) {
       Vue.set(this.propsReactive, name, value)
       if (name === 'currentId'){
-         // TODO!!!
-         let currentPage = this.reactiveGroup.pages[0]
+         // TODO!!! идет сканирование всех страниц!!! (можно оптимизировать (value - принадлежит reactiveGroup.items (см fulFilledRange)) )
+         let currentPage
+         for (let page of this.reactiveGroup.pages) {
+            if (page.listItems.find(item => item.oid === value || item.id === value)) {
+               currentPage = page
+               break
+            }
+         }
          if (currentPage) {
             let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
             this.setProperty('currentPageToken', currentPageToken)
             this.setProperty('currentPageSize', listItems.length)
-            this.setProperty('currentIdItem', value)
          }
       }
    }
 
    getProperty (name) {
       return this.propsReactive[name]
-   }
-
-   saveCurrentPos (indx, currentPage = null) {
-      let currentIdItem
-      if (!currentPage) {
-         assert(indx >= 0 && indx < this.reactiveGroup.items.length, 'bad indx')
-         let fullItem = this.reactiveGroup.items[indx]
-         currentIdItem = fullItem.oid || fullItem.id
-         for (let page of this.reactiveGroup.pages) {
-            if (page.listItems.find(item => item.oid === currentIdItem || item.id === currentIdItem)) {
-               currentPage = page
-               break
-            }
-         }
-      }
-      if (currentPage) {
-         if (!currentIdItem) currentIdItem = currentPage.listItems[0].oid || currentPage.listItems[0].id
-         assert(currentIdItem, '!currentIdItem')
-         let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
-         this.setProperty('currentPageToken', currentPageToken)
-         this.setProperty('currentPageSize', listItems.length)
-         this.setProperty('currentIdItem', currentIdItem)
-      }
    }
 
    async refresh () {
@@ -447,7 +426,6 @@ class Group {
             // return {
             //    figuresAbsolute,
             //    thumbUrl,
-            //    items: group.fulFilledItems,
             //    totalCount: group.totalCount,
             //    next: group.next.bind(group),
             //    prev: group.prev.bind(group),
@@ -508,10 +486,10 @@ class Group {
       if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
       let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
       if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-         fromId = this.getProperty('currentIdItem')
+         fromId = this.getProperty('currentId')
       }
       if (fromId) {
-         let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentIdItem') || item.id === this.getProperty('currentIdItem'))
+         let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
          if (indxFrom >= 0) fulfillFrom = indxFrom
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
@@ -719,7 +697,6 @@ class ReactiveListWithPaginationFactory {
       let group = rxQueryOrRxDoc.reactiveListHolderMaster.group
       return group.reactiveGroup
       // return {
-      //    items: group.fulFilledItems,
       //    totalCount: group.totalCount,
       //    next: group.next.bind(group),
       //    prev: group.prev.bind(group),
