@@ -8,7 +8,7 @@ div(
   div(
     v-if="player && !player.figure"
     :style=`{
-      paddingTop: pageId ? $q.screen.height/3+'px' : '0px',
+      paddingTop: pageId ? contentHeight+'px' : '0px',
     }`
     ).row.full-width
     component(
@@ -23,7 +23,7 @@ div(
     :style=`{
       position: 'fixed', zIndex: 10,
       top: offsetTop+'px',
-      height: pageId ? $q.screen.height/3+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
+      height: pageId ? contentHeight+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
     }`).row.full-width
     content-player(
       @player="player = $event"
@@ -104,6 +104,9 @@ export default {
     }
   },
   computed: {
+    contentHeight () {
+      return 300
+    },
     editorHeightMin () {
       return 70
     },
