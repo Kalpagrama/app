@@ -32,8 +32,12 @@ div(
     .row.full-width
       q-btn(@click="positionSave()" dense no-caps color="green" outline) Save position
       q-btn(@click="positionDrop()" dense no-caps color="red" outline) Drop position
+      q-btn(@click="prev()" dense no-caps color="red" outline) Prev
+      q-btn(@click="next()" dense no-caps color="red" outline) Next
       .row.full-width
-        small.text-white scrollTop: {{ rootLocal.scrollTop }}, scrollHeight: {{ rootLocal.scrollHeight }},
+        small.text-white itemKey: {{ item[itemKey] }}
+      .row.full-width
+        small.text-white scrollTop: {{ scrollTop }}, scrollHeight: {{ scrollHeight }},
   slot(name="append")
 </template>
 
@@ -65,6 +69,8 @@ export default {
       itemsRes: null,
       indexMiddle: 0,
       itemMiddleKey: null,
+      scrollTop: 0,
+      scrollHeight: 0,
     }
   },
   computed: {
@@ -73,6 +79,18 @@ export default {
     }
   },
   methods: {
+    prev () {
+      this.$log('prev')
+      this.rootLocal.style.overflow = 'hidden'
+      if (this.itemsRes.hasPrev) this.itemsRes.prev()
+      this.rootLocal.style.overflow = 'auto'
+    },
+    next () {
+      this.$log('next')
+      this.rootLocal.style.overflow = 'hidden'
+      if (this.itemsRes.hasNext) this.itemsRes.next()
+      this.rootLocal.style.overflow = 'auto'
+    },
     indexMiddleHandler (isVisible, entry, i) {
       // let index = parseInt(entry.target.accessKey)
       if (isVisible) {
@@ -88,7 +106,7 @@ export default {
       if (itemRef) {
         let itemRect = itemRef.getBoundingClientRect()
         this.itemsRes.setProperty('currentId', this.itemMiddleKey)
-        this.itemsRes.setProperty('itemMeta', {
+        const itemMetaInput = {
           top: itemRect.top,
           bottom: itemRect.bottom,
           left: itemRect.left,
@@ -98,9 +116,14 @@ export default {
           key: this.itemMiddleKey,
           offsetTop: itemRef.offsetTop,
           offsetBottom: itemRef.offsetBottom,
-        })
+          scrollHeight: this.rootLocal.scrollHeight,
+          scrollTop: window.scrollTop,
+        }
+        this.$log('positionSave itemMetaInput', itemMetaInput)
+        this.itemsRes.setProperty('itemMeta', itemMetaInput)
         let itemMeta = this.itemsRes.getProperty('itemMeta')
-        this.$log('positionSave', itemMeta)
+        this.$log('positionSave itemMeta', itemMeta)
+        this.$log('positionSave itemMetaInput = itemMeta', itemMetaInput === itemMeta)
       }
     },
     positionRestore () {
@@ -112,7 +135,9 @@ export default {
       this.itemsRes.setProperty('itemMeta', null)
     },
     rootOnScroll (e) {
-      this.$log('rootOnScroll', e)
+      this.$log('rootOnScroll')
+      this.scrollTop = window.pageYOffset
+      this.scrollHeight = this.rootLocal.scrollHeight
     }
   },
   async mounted () {
@@ -127,17 +152,20 @@ export default {
     this.$log('itemMeta', itemMeta)
     this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
     // this.rootLocal.style.overflow = 'hidden'
+    // this.rootLocal.scrollTop = itemMeta.offsetTop
+    // await this.$wait(500)
+    // window.scrollTop = itemMeta.scrollTop
     // if (this.itemsRes.hasPrev) this.itemsRes.prev()
     // if (this.itemsRes.hasNext) this.itemsRes.next()
     // TODO: handle -1 to 0 first element
     // TODO: handle no elements at all event
     // TODO: handle emit items update, items count, preving, nexting, saved position
-    // window.addEventListener('scroll', this.rootOnScroll)
+    window.addEventListener('scroll', this.rootOnScroll)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // window.removeEventListener('scroll', this.rootOnScroll)
-    this.positionSave()
+    window.removeEventListener('scroll', this.rootOnScroll)
+    // this.positionSave()
   }
 }
 </script>
