@@ -548,7 +548,7 @@ class RxDBWrapper {
       assert(this.created, 'cant find! !this.created')
       const f = this.find
       const t1 = performance.now()
-      logW(f, 'start', mangoQuery)
+      logD(f, 'start', mangoQuery)
       mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
@@ -584,21 +584,29 @@ class RxDBWrapper {
                               let fulfilled = reactiveListFulFilled.find(eventFull => eventFull.id === event.id)
                               if (fulfilled) return fulfilled
                            }
-                           let copyEvent = cloneDeep(event)
-                           copyEvent.object = await this.get(RxCollectionEnum.OBJ, event.object.oid, { clientFirst: true }) || event.object
+                           let copyEvent = cloneDeep(event) // не меняем исходную ленту(она реактивна)
+                           let populatedObject = await this.get(RxCollectionEnum.OBJ, event.object.oid, { clientFirst: true }) || event.object
+                           copyEvent.object = populatedObject // todo перейти на copyEvent.populatedObject
+                           copyEvent.populatedObject = populatedObject
                            return copyEvent
                         }
                         return f()
                      })
                      populatedItems = await Promise.all(promises)
                   } else {
-                     let promises = itemsForPopulate.map(objShort => {
-                        // logD('objShort=', objShort)
+                     let promises = itemsForPopulate.map(topObject => {
+                        // logD('topObject=', topObject)
                         if (reactiveListFulFilled) {
-                           let fulfilled = reactiveListFulFilled.find(itemFull => itemFull.oid === objShort.oid)
+                           let fulfilled = reactiveListFulFilled.find(itemFull => itemFull.oid === topObject.oid)
                            if (fulfilled) return fulfilled
                         }
-                        return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+                        return this.get(RxCollectionEnum.OBJ, topObject.oid, { clientFirst: true })
+                           .then(populatedObject => {
+                              // let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
+                              // topObjectCopy.populatedObject = populatedObject
+                              // return topObjectCopy
+                              return populatedObject
+                           })
                      })
                      populatedItems = await Promise.all(promises)
                      if (itemsForPrefetch) {

@@ -7,6 +7,7 @@ import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import throttle from 'lodash/throttle'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -203,6 +204,7 @@ class ObjectApi {
       }
       let deletedObject = await apiCall(f, cb)
       await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
+      await rxdb.set(RxCollectionEnum.WS_NODE, ObjectCreateApi.makeWsEssence(deletedObject)) // сохраним в черновиках
    }
 
    static async stat (oid) {

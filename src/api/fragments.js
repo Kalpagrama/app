@@ -384,6 +384,7 @@ const topObjectFragment = gql`${figureFragment}
         countVotes
         weight
         rate
+        votedUserRate
         relatedOids
         figuresAbsoluteList{...figureFragment}
         vertexType

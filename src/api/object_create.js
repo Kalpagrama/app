@@ -134,17 +134,17 @@ class ObjectCreateApi {
          assert.ok(essence.items.length > 0 && essence.items.length <= 2, 'essence.items.length > 0')
          assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essence.layout), 'essence.layout')
       }
-      let nodeInput = {}
-      nodeInput.layout = essence.layout
+      let essenceInput = {}
+      essenceInput.layout = essence.layout
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
-      nodeInput.name = essence.name
-      nodeInput.category = essence.category || 'FUN'
-      nodeInput.spheres = essence.spheres.map(s => {
+      essenceInput.name = essence.name
+      essenceInput.category = essence.category || 'FUN'
+      essenceInput.spheres = essence.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      nodeInput.items = essence.items.map(i => {
+      essenceInput.items = essence.items.map(i => {
          // let itemInput
          if (i.oid) {
             return {
@@ -169,8 +169,51 @@ class ObjectCreateApi {
          //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
          // }
       })
-      nodeInput.vertices = essence.vertices || []
-      return nodeInput
+      essenceInput.vertices = essence.vertices || []
+      return essenceInput
+   }
+
+   static makeWsEssence (essenceFull) {
+      const f = ObjectCreateApi.makeWsEssence
+      essenceFull = cloneDeep(essenceFull) // makeEssenceInput меняет essence
+      {
+         // checks
+         assert(essenceFull.type.in('NODE', 'JOINT'), 'type required')
+         assert.ok(essenceFull.category, 'essence.category')
+         assert.ok(essenceFull.spheres.length >= 0 && essenceFull.spheres.length <= 10, 'essence spheres')
+         assert.ok(essenceFull.items.length > 0 && essenceFull.items.length <= 2, 'essence.items.length > 0')
+         assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essenceFull.layout), 'essence.layout')
+      }
+      let type = essenceFull.type
+      let essenceInput = {}
+      essenceInput.layout = essenceFull.layout
+      // logD(f, nodeInput, essence.spheres, essence.spheres.length)
+      // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
+      // assert(nodeInput.name, '!nodeInput.name')
+      essenceInput.name = essenceFull.name
+      essenceInput.category = essenceFull.category || 'FUN'
+      essenceInput.spheres = essenceFull.spheres.map(s => {
+         return { name: s.name, oid: s.oid }
+      })
+      essenceInput.items = essenceFull.items.map(i => {
+         if (i.layers || i.compositionInput) {
+            return ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
+         }
+         else {
+            return {
+               essenceInput: ObjectCreateApi.makeEssenceInput(i)
+            }
+         }
+         // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
+         // else if (i.oid) itemInput = {oid: i.oid}
+         // else itemInput = ObjectCreateApi.makeEssenceInput(i)
+         // return itemInput
+         // return {
+         //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
+         // }
+      })
+      essenceInput.vertices = essenceFull.vertices || []
+      return essenceInput
    }
 
    static async essenceCreate (essence) {

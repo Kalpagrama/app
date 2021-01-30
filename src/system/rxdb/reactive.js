@@ -429,6 +429,7 @@ class Group {
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
             nextItems = await this.populateFunc(nextItems, [], this.fulFilledItems)
+            // logD('nextItems= ', nextItems)
          }
       }
 

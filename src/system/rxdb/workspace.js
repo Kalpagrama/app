@@ -98,7 +98,7 @@ class Workspace {
                assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
                assert('hasChanges' in plainData, '! hasChanges in plainData')
                if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
-                  let deletedDocs = await rxdbOperationProxyExec(this.db.ws_changes, ' find', {
+                  let deletedDocs = await rxdbOperationProxyExec(this.db.ws_changes, 'find', {
                      selector: {
                         id,
                         operation: WsOperationEnum.DELETE
