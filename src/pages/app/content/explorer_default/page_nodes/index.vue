@@ -23,7 +23,21 @@ div(
           ).row.full-width.q-pb-sm.q-mb-sm
           //- group header
           .row.full-width.q-py-sm.q-px-md
-            span.text-white Group: {{ group.totalCount }}
+            div(
+              v-if="contentKalpa.type === 'VIDEO'"
+              ).row.full-width.q-pa-sm
+              //- .row.full-width
+                span.text-white {{ group.totalCount }}
+              //- .row.full-width
+              .row.full-height.items-center.content-center
+                span.text-white.text-bold.q-mr-sm {{ $time(group.figuresAbsolute[0].t) }} -
+                span.text-white.text-bold {{ $time(group.figuresAbsolute[1].t) }}
+              .col
+              span.text-white.text-bold {{ group.totalCount }}
+            div(
+              v-else
+              ).row.full-width
+              span.text-white Группа: {{groupIndex+1}}
           .row.full-width
             //- prev
             .row.full-width.q-px-sm
@@ -41,8 +55,7 @@ div(
               v-for="(item,itemIndex) in group.items" :key="item.oid"
               :item="item.populatedObject"
               :player="player"
-              :contentKalpa="contentKalpa"
-              ).q-mb-xs
+              :contentKalpa="contentKalpa")
             //- next
             .row.full-width.q-px-sm
               q-btn(
@@ -53,7 +66,7 @@ div(
                 :style=`{
                   paddingLeft: '12px'
                 }`
-                ).full-width Еще
+                ).full-width Еще {{ group.totalCount-group.items.length }}
 </template>
 
 <script>

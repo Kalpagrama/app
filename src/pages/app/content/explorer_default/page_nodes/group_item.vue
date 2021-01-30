@@ -12,14 +12,12 @@
     :style=`{
       borderRadius: '10px',
     }`
-    ).row.full-width.q-pa-sm.item
+    ).row.full-width.q-px-sm.q-py-xs.item
     .row.full-width
-      //- small.text-white {{ item.oid }}
       span.text-white {{ itemName }}
     //- figure info
     div(v-if="itemFigure && contentKalpa.type === 'VIDEO'").row.full-width
       small.text-grey-6.q-mr-xs {{ $time(itemFigure[0].t) }}
-      //- small.text-grey-6 - {{ $time(itemFigure[1].t-itemFigure[0].t) }}
 </template>
 
 <script>
@@ -74,6 +72,11 @@ export default {
   methods: {
     itemClick () {
       this.$log('itemClick')
+      if (this.itemFigure) {
+        if (this.contentKalpa.type === 'VIDEO') {
+          this.player.setCurrentTime(this.itemFigure[0].t)
+        }
+      }
     }
   }
 }
