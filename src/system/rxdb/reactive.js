@@ -494,7 +494,9 @@ class Group {
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-
+      // if (!this.groupId.startsWith('{"selector"')){
+      //    logD('asdasdasasds')
+      // }
       await this.fulfill(nextItems, 'bottom')
    }
 
