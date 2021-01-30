@@ -84,7 +84,7 @@ export default {
     items: {
       deep: true,
       async handler (to, from) {
-        if (this.findRes && this.findRes.hasPrev()){
+        if (this.findRes && this.findRes.hasPrev){
           this.$logE('hasPrev! TODO нужно реализовать логику прокрутки вверх!!!!')
           await this.findRes.prev(10)
         }
@@ -171,7 +171,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.findRes = await this.$rxdb.find(this.itemsQuery, true) // {items, next, hasNext, prev, hasPrev}
-    while (this.findRes.hasNext()) {
+    while (this.findRes.hasNext) {
       // this.$log('items.next !!!')
       await this.findRes.next(12)
       // this.$log('items.length', items.length)

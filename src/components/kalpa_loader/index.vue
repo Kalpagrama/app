@@ -53,7 +53,7 @@ export default {
       deep: false,
       async handler (to, from) {
         this.$log('items UPDATED')
-        if (this.findRes && this.findRes.hasPrev()){
+        if (this.findRes && this.findRes.hasPrev){
           this.$logE('hasPrev!!! TODO нужно реализовать логику прокрутки вверх!!!!')
           await this.findRes.prev(10)
         }
@@ -85,7 +85,7 @@ export default {
       } else {
         await this.findRes.next(this.limit)
       }
-      if (this.findRes.hasNext()) done()
+      if (this.findRes.hasNext) done()
       else {
         this.$emit('items', this.findRes.items)
         done(true)
