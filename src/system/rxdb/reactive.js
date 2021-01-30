@@ -448,9 +448,9 @@ class Group {
             case RxCollectionEnum.LST_FEED:
                this.reactiveGroup.itemPrimaryKey = 'id'
                break
-            // case RxCollectionEnum.LST_SEARCH:
-            //    this.reactiveGroup.itemPrimaryKey = 'oid'
-            //    break
+            case RxCollectionEnum.LST_SEARCH:
+               this.reactiveGroup.itemPrimaryKey = 'oid'
+               break
             default:
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + rxDoc.props.mangoQuery.selector.rxCollectionEnum)
          }
@@ -459,8 +459,8 @@ class Group {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
          if (listItems.length) {
-            if (listItems.length[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
-            else if (listItems.length[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
+            if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
+            else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
          this.groupId = 'custom array'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
@@ -595,7 +595,6 @@ class Group {
 
    async gotoCurrent() {
       let currentId = this.getProperty('currentId')
-      if (!currentId) return await this.gotoStart()
       let currentPage
       // for (let page of this.reactiveGroup.pages) {
       //    assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
@@ -645,18 +644,19 @@ class Group {
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      if (!this.groupId.startsWith('{"selector"')){
-         logD('asdasdasasds')
-      }
+      // if (!this.groupId.startsWith('{"selector"')){
+      //    logD('asdasdasasds')
+      // }
       await this.fulfill(nextItems, 'whole')
    }
 
    async gotoStart() {
-
+      this.setProperty('currentId', null)
+      await this.gotoCurrent()
    }
 
    async gotoEnd() {
-
+      // TODO!!!
    }
 
    hasNext () {
