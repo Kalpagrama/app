@@ -2,14 +2,16 @@
 div(
   v-if="itemsRes"
   ).row.full-width.items-start.content-start
-  slot
+  //- prepend slot
+  slot(name="prepend")
+  //- :accessKey="itemIndex"
   div(
     v-for="(item, itemIndex) in itemsRes.items" :key="item[itemKey]"
     :ref="`item-${item[itemKey]}`"
-    :accessKey="itemIndex"
+    :accessKey="item[itemKey]"
     :style=`{
-      height: '300px',
-      border: itemIndex === indexMiddle ? '2px solid red' : 'none',
+      //- height: '300px',
+      //- border: item[itemKey] === itemMiddleKey ? '2px solid red' : 'none',
       ...itemStyles,
     }`
     v-observe-visibility=`{
@@ -20,12 +22,16 @@ div(
       }
     }`
     ).row.full-width.items-start.content-start.q-mb-xl
-    slot(:item="item" :itemIndex="itemIndex" :isActive="itemIndex === indexMiddle" :isVisible="true")
-    //- .row.full-width
-    //-   h1.text-white {{ rootLocal.scrollTop }}
-    //- small.text-white {{ item.oid }}
+    slot(
+      name="item"
+      :item="item"
+      :itemIndex="itemIndex"
+      :isActive="item[itemKey] === itemMiddleKey"
+      :isVisible="true")
+    //- footer debug
     .row.full-width
-      q-btn(@click="positionSave()" flat no-caps color="red" outline) Save position
+      q-btn(@click="positionSave()" flat dense no-caps color="red" outline) Save position
+  slot(name="append")
 </template>
 
 <script>
@@ -55,6 +61,7 @@ export default {
     return {
       itemsRes: null,
       indexMiddle: 0,
+      itemMiddleKey: null,
     }
   },
   computed: {
@@ -64,22 +71,28 @@ export default {
   },
   methods: {
     indexMiddleHandler (isVisible, entry, i) {
-      let index = parseInt(entry.target.accessKey)
+      // let index = parseInt(entry.target.accessKey)
       if (isVisible) {
         this.$log('indexMiddleHandler', isVisible, entry, i)
-        this.indexMiddle = index
+        // this.indexMiddle = index
+        this.itemMiddleKey = entry.target.accessKey
       }
       // TODO: handle -1
     },
     positionSave () {
       this.$log('positionSave')
-      let item = this.itemsRes.items[this.indexMiddle]
-      if (item) {
-        let [itemRef] = this.$refs[`item-${item[this.itemKey]}`]
-        if (itemRef) {
-          let itemRect = itemRef.getBoundingClientRect()
-          this.$log('itemRef', itemRect.top, itemRect.height, itemRect.bottom, itemRect.width)
-        }
+      let [itemRef] = this.$refs[`item-${this.itemMiddleKey}`]
+      if (itemRef) {
+        let itemRect = itemRef.getBoundingClientRect()
+        this.itemsRes.setProp('itemMeta', {
+          top: itemRect.top,
+          bottom: itemRect.bottom,
+          left: itemRect.left,
+          right: itemRect.right,
+          width: itemRect.width,
+          height: itemRect.height,
+          key: this.itemMiddleKey,
+        })
       }
     },
     positionRestore () {

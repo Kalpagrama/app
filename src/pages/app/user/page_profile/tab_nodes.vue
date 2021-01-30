@@ -1,11 +1,11 @@
 <template lang="pug">
 list-feed(
-  :query="query"
-  v-slot=`{item,isActive,isVisible}`)
-  node-feed(
-    :item="item.populatedObject"
-    :isActive="isActive"
-    :isVisible="isVisible")
+  :query="query")
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+    node-feed(
+      :node="item.populatedObject"
+      :isActive="isActive"
+      :isVisible="isVisible")
 //- kalpa-loader(
   :query="query" :limit="12" v-slot=`{items, next, nexting}`)
   list-middle(
