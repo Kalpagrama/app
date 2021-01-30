@@ -81,13 +81,20 @@ export default {
   },
   watch: {
     'itemsRes.items': {
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('itemsRes.items', to, from)
         // items changed, changed scrollHeightOld => scrollHeightNew
-        // let scrollHeightOld = this.scrollHeight
+        let scrollHeightOld = this.scrollHeight
         // let scrollHeightNew = this.scrollHeight
         // let delta = scrollHeightNew - scrollHeightOld
         // until new items adding and scrollHeight is changing we scroll back to compensate...
+        this.rootLocal.style.overflow = 'hidden'
+        await this.$wait(2000)
+        let scrollHeightNew = this.scrollHeight
+        let delta = scrollHeightNew - scrollHeightOld
+        let itemMeta = this.itemsRes.getProperty('itemMeta')
+        window.scrollTo(0, itemMeta.offsetTop + delta)
+        this.rootLocal.style.overflow = 'auto'
       }
     }
   },
@@ -178,7 +185,7 @@ export default {
         // this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
         // await this.$wait(1000)
         // window.scrollTop = itemMeta.scrollTop
-        window.scrollTo(0, itemMeta.scrollTop)
+        // window.scrollTo(0, itemMeta.scrollTop)
       }
     }
     // if (this.itemsRes.hasPrev) this.itemsRes.prev()
