@@ -55,7 +55,6 @@ class Event {
                assert(reactiveItem.items, '!reactiveItem.items')
                // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
                reactiveItem.items.splice(0, 0, event)
-               reactiveItem.count++
                reactiveItem.totalCount++
                // logD(f, `reactive LST_FEED changed (${reactiveItem.items.length})`, reactiveItem)
             }

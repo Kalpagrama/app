@@ -140,7 +140,7 @@ class ListsApi {
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
-         let { data: { find: { items, events, objects, count, totalCount, nextPageToken, prevPageToken, currentPageToken } } } = await apollo.clients.api.query({
+         let { data: { find: { items, events, objects, totalCount, nextPageToken, prevPageToken, currentPageToken } } } = await apollo.clients.api.query({
             query: gql`
                 ${fragments.findResultFragment}
                 query find ($collection: FindCollectionEnum! $mangoQuery: RawJSON! $pagination: PaginationInput){
@@ -152,8 +152,7 @@ class ListsApi {
             variables: { collection, mangoQuery, pagination }
          })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         assert(count >= 0, 'count >= 0')
-         return { items: items || events || objects, count, totalCount, nextPageToken, prevPageToken, currentPageToken }
+         return { items: items || events || objects, totalCount, nextPageToken, prevPageToken, currentPageToken }
       }
       return await apiCall(f, cb)
    }
@@ -164,7 +163,6 @@ class ListsApi {
       assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
       return {
          items: user.subscriptions,
-         count: user.subscriptions.length,
          totalCount: user.subscriptions.length,
          nextPageToken: null,
          currentPageToken: null,
@@ -182,7 +180,6 @@ class ListsApi {
       assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')
       return {
          items: subscribers,
-         count: subscribers.length,
          totalCount: subscribers.length,
          nextPageToken: null,
          currentPageToken: null,

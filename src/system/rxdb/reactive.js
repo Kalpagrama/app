@@ -418,7 +418,6 @@ class Group {
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
             items,
-            count,
             totalCount,
             nextPageToken,
             prevPageToken,
@@ -557,21 +556,13 @@ class Group {
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
             let group = new Group(this.populateFunc)
+            Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
+            Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
+            Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
+            Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
+            Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
             await group.addPaginationPage(items, 'bottom')
             await group.next(3) // сразу грузим по 3 ядра в группе
-            // return {
-            //    figuresAbsolute,
-            //    thumbUrl,
-            //    totalCount: group.totalCount,
-            //    next: group.next.bind(group),
-            //    prev: group.prev.bind(group),
-            //    hasNext: group.hasNext.bind(group),
-            //    hasPrev: group.hasPrev.bind(group),
-            //    saveCurrentPos: group.saveCurrentPos.bind(group),
-            //    refresh: group.refresh.bind(group)
-            // }
-            group.reactiveGroup.figuresAbsolute = figuresAbsolute
-            group.reactiveGroup.thumbUrl = thumbUrl
             return group.reactiveGroup
          }
          nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
@@ -596,47 +587,11 @@ class Group {
    }
 
    async gotoCurrent () {
-      let currentId = this.getProperty('currentId')
-      let currentPage
-      // for (let page of this.reactiveGroup.pages) {
-      //    assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
-      //    if (page.listItems.find(item => item[this.reactiveGroup.itemPrimaryKey] === currentId)) {
-      //       currentPage = page
-      //       break
-      //    }
-      // }
-      // if (currentPage) {
-      //    let { id, nextPageToken, prevPageToken, currentPageToken, listItems } = currentPage
-      //    await this.next()
-      //    // if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-      //    //    fromId = this.getProperty('currentId')
-      //    // }
-      //    // if (fromId) {
-      //    //    let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
-      //    //    if (indxFrom >= 0) fulfillFrom = indxFrom
-      //    // }
-      // }
       const f = this.gotoCurrent
       logD(f, 'start')
       let count
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом
-
-      // let { startFullFil, endFullFil } = this.fulFilledRange()
-      // if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
-      //    // запросим данные с сервера
-      //    let pageToken = this.reactiveGroup.pages.length ? this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken : null
-      //    // todo при указанных fromId и fromT - при необходимости сгенерировать токен (например когда переехали в конец контента)
-      //    if (pageToken) {
-      //       let rxDocPagination = await this.paginateFunc(pageToken, count * 2)
-      //       await this.addPaginationPage(rxDocPagination, 'bottom')
-      //       let range = this.fulFilledRange() // новые значения для fulfilled области
-      //       startFullFil = range.startFullFil
-      //       endFullFil = range.endFullFil
-      //    }
-      // }
-      // if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
-      // let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
 
       let fulfillFrom = 0
       let fromId
@@ -649,9 +604,6 @@ class Group {
       }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      // if (!this.groupId.startsWith('{"selector"')){
-      //    logD('asdasdasasds')
-      // }
       await this.fulfill(nextItems, 'whole')
    }
 
@@ -662,6 +614,7 @@ class Group {
 
    async gotoEnd () {
       // TODO!!!
+      logE('not impl!!!')
    }
 
    hasNext () {

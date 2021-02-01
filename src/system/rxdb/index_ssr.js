@@ -108,7 +108,7 @@ class RxDBDummy {
             return populatedItems.filter(obj => !!obj)
          }
 
-         let { items, count, totalCount, nextPageToken, currentPageToken, prevPageToken } = await ListApi.getList(mangoQuery)
+         let { items, totalCount, nextPageToken, currentPageToken, prevPageToken } = await ListApi.getList(mangoQuery)
          let totalItems = items
          findResult.next = async (count) => {
             if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)

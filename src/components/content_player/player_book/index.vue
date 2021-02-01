@@ -578,9 +578,9 @@ export default {
     await this.book.ready // book ready
     this.ready = true
 
-    this.locations = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
-
     this.$emit('player', this)
+    // долгая операция
+    this.locations = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
 
     // window.addEventListener('resize', debounce(() => {
     //   this.resizeToScreenSize()

@@ -22,7 +22,7 @@ function getRawIdFromId (id) {
    return rawId
 }
 
-function makeId (rxCollectionEnum, rawId, params) {
+function makeId (rxCollectionEnum, rawId, params = null) {
    assert(rawId, '!rawId')
    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
    assert(!rawId.includes('::'), 'bad rawId' + rawId)
