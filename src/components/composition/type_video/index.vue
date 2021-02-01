@@ -20,7 +20,6 @@ div(
       height: styles.height,
       objectFit: styles.objectFit,
       opacity: previewOpacity,
-      //- opacity: 0.5,
     }`
     ).full-width
   //- video wrapper
@@ -64,7 +63,7 @@ div(
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'compositionPlayer_Video',
+  name: 'typeVideo',
   components: {
     contentPlayer
   },

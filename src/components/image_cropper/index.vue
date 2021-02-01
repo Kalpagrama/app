@@ -1,6 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
+    ...styles,
   }`
   ).row.fit.items-start.content-start
   //- image wrapper
@@ -19,6 +20,7 @@ div(
       :style=`{
         //- maxHeight: $q.screen.height/2+'px',
         //- objectFit: 'contain',
+        ...styles,
       }`
       ).fit
     //- slot()
@@ -56,7 +58,7 @@ import Cropper from 'cropperjs'
 
 export default {
   name: 'imageCropper',
-  props: ['src', 'options'],
+  props: ['src', 'options', 'styles'],
   data () {
     return {
       cropper: null,
@@ -72,7 +74,7 @@ export default {
       viewMode: 2,
       dragMode: 'move',
       checkCrossOrigin: false,
-      // background: false,
+      background: true,
       ...this.options,
       crop: (event) => {
         this.$emit('crop', event)

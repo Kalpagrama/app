@@ -16,7 +16,7 @@ div(
   }`
   ).row.full-width
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
-    composition-player(
+    composition(
       :compositionKey="node.oid"
       :composition="node.items[0]"
       :isVisible="isVisible"
@@ -35,7 +35,7 @@ div(
         showFooter: true,
         mode: 'feed',
       }`)
-//- composition-player(
+//- composition(
   :composition="node.items[0]"
   :isVisible="isVisible"
   :isActive="isActive"
@@ -57,13 +57,10 @@ div(
 </template>
 
 <script>
-import compositionPlayer from 'components/composition/composition_player/index.vue'
-
 export default {
   name: 'nodeFeed__nodeItem',
   props: ['node', 'nodeIndex', 'isActive', 'isVisible'],
   components: {
-    compositionPlayer,
   },
   data () {
     return {

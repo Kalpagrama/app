@@ -9,15 +9,13 @@ div(
     @click="playing ? pause() : play()"
     ref="videoRef"
     type="video/mp4"
+    preload="metadata"
     :playsinline="true"
     :autoplay="true"
-    preload="metadata"
     :loop="true"
     :muted="muted"
     :style=`{
       borderRadius: '10px',
-      //- objectFit: objectFit,
-      //- overflow: 'hidden',
       ...styles,
     }`
     @canplay="canplayHandle"
@@ -35,8 +33,6 @@ export default {
   name: 'playerVideo__playerKalpa',
   props: {
     contentKalpa: {type: Object, required: true},
-    url: {type: String, required: true},
-    // objectFit: {type: String, default () { return 'cover' }},
     styles: {
       type: Object,
       default () {
@@ -56,6 +52,7 @@ export default {
       muted: true,
       events: {},
       figure: null,
+      figureFocused: false,
       figureOffset: null,
       figures: [],
       points: [],
@@ -63,6 +60,7 @@ export default {
       waiting: false,
       canplay: false,
       playing_: false,
+      clusters: [],
     }
   },
   methods: {

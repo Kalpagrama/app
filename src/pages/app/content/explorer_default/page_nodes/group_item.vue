@@ -12,12 +12,21 @@
     :style=`{
       borderRadius: '10px',
     }`
-    ).row.full-width.q-px-sm.q-py-xs.item
-    .row.full-width
-      span.text-white {{ itemName }}
-    //- figure info
-    div(v-if="itemFigure && contentKalpa.type === 'VIDEO'").row.full-width
-      small.text-grey-6.q-mr-xs {{ $time(itemFigure[0].t) }}
+    ).row.full-width.item
+    img(
+      draggable="false"
+      :src="itemComposition.thumbUrl"
+      :style=`{
+        height: '26px',
+        borderRadius: '10px',
+      }`)
+    .col.q-pl-sm
+      .row.full-width.items-center.content-center.q-pb-xs
+        .row.full-width
+          span.text-white {{ itemName }}
+        //- figure info
+        div(v-if="itemFigure && contentKalpa.type === 'VIDEO'").row.full-width
+          small.text-grey-6.q-mr-xs {{ $time(itemFigure[0].t) }}
 </template>
 
 <script>

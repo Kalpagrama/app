@@ -58,10 +58,12 @@ export default {
       muted: true,
       events: {},
       figure: null,
+      figureFocused: false,
       figureOffset: null,
       figures: [],
       points: [],
-      isFullscreen: false
+      isFullscreen: false,
+      clusters: [],
     }
   },
   watch: {

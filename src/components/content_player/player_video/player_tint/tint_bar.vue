@@ -4,20 +4,6 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  //- time
-  div(
-    v-if="player && player.duration && options.mode === 'editor'"
-    :style=`{
-      position: 'absolute', zIndex: 200,
-      top: '3px',
-      //- left: '22px',
-      userSelect: 'none',
-      pointerEvents: 'none',
-      fontSize: '9px',
-    }`
-    ).row.full-width.justify-between.text-grey-6.q-px-lg
-    small {{ $time(player.currentTime) }}
-    small {{ $time(player.duration) }}
   //- bar
   div(
     :style=`{
@@ -27,21 +13,44 @@ div(
       paddingRight: barWrapperPaddingX+'px'
     }`
     ).row.full-width
+    tint-bar-figure-player(
+      v-if="player && player.figure"
+      :player="player" :contentKalpa="contentKalpa")
     div(
       :style=`{
         position: 'relative',
         height: heightWrapper+'px',
       }`
       ).row.full-width
+      //- time bar
+      div(
+        v-if="player && player.duration && options.mode === 'editor'"
+        :class=`{
+          'q-px-sm': !zoomed,
+          'q-px-lg': zoomed,
+        }`
+        :style=`{
+          position: 'absolute', zIndex: 200,
+          bottom: '-4px',
+          //- left: '22px',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          //- fontSize: '9px',
+        }`
+        ).row.full-width.justify-between.text-grey-2
+        small {{ $time(player.currentTime) }}
+        small {{ $time(player.duration) }}
       //- middle currentTime
       //- v-if="true || zoomWrapperScrolling"
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
           v-if="zoomed"
           :style=`{
-            position: 'absolute', zIndex: 200, left: 'calc(50% + 1px)',
+            position: 'absolute', zIndex: 200,
+            left: 'calc(50% + 1px)',
             width: '2px',
-            height: '100%',
+            top: '15%',
+            height: '70%',
             pointerEvents: 'none',
           }`
           ).row.bg-red
@@ -106,20 +115,8 @@ div(
                 }`
                 @first="zoomWorking = true, figureEditing = true"
                 @final="zoomWorking = false, figureEditing = false")
-            //- figures
-            div(
-              v-for="(f,fi) in player.figures" :key="fi"
-              :style=`{
-                position: 'absolute', zIndex: 1000+fi,
-                left: (f.figures[0].t/player.duration)*100+'%',
-                width: ((f.figures[1].t-f.figures[0].t)/player.duration)*100+'%',
-                height: '100%',
-                //- background: 'rgba(200,200,200,0.3)',
-                background: $rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
-                opacity: 0.2,
-                pointerEvents: 'none',
-              }`
-              ).row
+            //- clusters
+            //- tint-bar-clusters(v-bind="$props" v-if="player.clusters.length > 0")
             //- currentTime
             //- v-if="true || !zoomWrapperScrolling"
             transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -201,56 +198,9 @@ div(
   //- footer: actions
   div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center.justify-between
     //- figure actions
-    div(
+    tint-bar-figure-actions(
       v-if="player && player.figure"
-      :style=`{
-        position: 'relative',
-        height: '50px',
-      }`
-      ).row.full-width.items-center.content-center.justify-between.q-px-sm
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 10,
-          //- left: 'calc(50% - 110px)',
-          //- width: '220px',
-          left: '0px',
-        }`
-        ).row.full-height.items-center.content-center.justify-between.full-width
-        //- q-btn(round flat dense color="grey-8" @click="figureSet(0)")
-          q-icon(name="flip" color="grey-8" size="24px").rotate-180
-        //- .col
-        q-btn(round flat dense color="grey-8" @click="figureForward(0,false)")
-          q-icon(name="keyboard_arrow_left" color="grey-8" size="26px")
-        //- q-btn(round flat dense color="grey-8" @click="figureSet(0)")
-          q-icon(name="flip" color="grey-8" size="24px").rotate-180
-        q-btn(round flat dense color="grey-8" @click="figureForward(0,true)")
-          q-icon(name="keyboard_arrow_right" color="grey-8" size="26px")
-        .col
-        q-btn(round flat dense color="grey-8" @click="figureSet(0)")
-          q-icon(name="flip" color="grey-8" size="22px").rotate-180
-        small(
-          :class=`{
-            'text-red': player.figure[1].t-player.figure[0].t > 60,
-            'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
-            }`
-          :style=`{
-            userSelect: 'none',
-            pointerEvents: 'none',
-            fontSize: '10px',
-          }`
-          ).text-bold.q-mx-sm {{ $time(player.figure[1].t-player.figure[0].t) }}
-        q-btn(round flat dense color="grey-8" @click="figureSet(1)")
-          q-icon(name="flip" color="grey-8" size="22px")
-        .col
-        q-btn(round flat dense color="grey-8" @click="figureForward(1,false)")
-          q-icon(name="keyboard_arrow_left" color="grey-8" size="26px")
-        //- q-btn(round flat dense color="grey-8" @click="figureSet(1)")
-          q-icon(name="flip" color="grey-8" size="22px")
-        q-btn(round flat dense color="grey-8" @click="figureForward(1,true)")
-          q-icon(name="keyboard_arrow_right" color="grey-8" size="26px")
-        //- .col
-        //- q-btn(round flat dense color="grey-8" @click="figureSet(1)")
-          q-icon(name="flip" color="grey-8" size="22px")
+      v-bind="$props")
     //- default actions
     div(
       v-if="player"
@@ -297,12 +247,18 @@ div(
 
 <script>
 import tintBarFigure from './tint_bar_figure.vue'
+import tintBarFigureActions from './tint_bar_figure_actions.vue'
+import tintBarFigurePlayer from './tint_bar_figure_player.vue'
+import tintBarClusters from './tint_bar_clusters.vue'
 
 export default {
   name: 'tintBar',
   props: ['player', 'contentKalpa', 'options'],
   components: {
     tintBarFigure,
+    tintBarFigureActions,
+    tintBarFigurePlayer,
+    tintBarClusters,
   },
   data () {
     return {
@@ -337,18 +293,6 @@ export default {
       minutesWrapperDragging: false,
     }
   },
-  // created () {
-  //   // if (this.start) {
-  //   // }
-  //   this.$log('created')
-  //   this.player.play()
-  //   if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
-  //     let muted = localStorage.getItem('k_muted')
-  //     if (muted === 'false') {
-  //       this.player.setState('muted', false)
-  //     }
-  //   }
-  // },
   computed: {
     minCount () {
       return Math.ceil(this.player.duration / 60)
@@ -513,54 +457,6 @@ export default {
         this.currentTimeHoverPercent = (x - rect.left) / rect.width * 100
         this.currentTimeHoverTime = ((x - rect.left) / rect.width) * this.player.duration
       }
-    },
-    async figureSet (pointIndex) {
-      this.$log('figureSet', pointIndex)
-      let t = this.player.currentTime
-      if (pointIndex === 0) {
-        // wanna start AFTER the end
-        if (t >= this.player.figure[1].t) {
-          this.$set(this.player.figure[0], 't', t)
-          this.$set(this.player.figure[1], 't', Math.min(t + 10, this.player.duration))
-        }
-        // before the end is OK
-        else {
-          this.$set(this.player.figure[0], 't', t)
-        }
-      }
-      else if (pointIndex === 1) {
-        // wanna end BEFORE the start
-        if (t <= this.player.figure[0].t) {
-          this.$set(this.player.figure[0], 't', t)
-          this.$set(this.player.figure[1], 't', Math.min(t + 10, this.player.duration))
-        }
-        // after the start is OK
-        else {
-          this.$set(this.player.figure[1], 't', t)
-        }
-      }
-      // go to the layer new (maybe) start and play
-      if (pointIndex === 0) {
-        this.player.setCurrentTime(this.player.figure[0].t)
-      }
-      else if (pointIndex === 1) {
-        this.player.setCurrentTime(this.player.figure[1].t)
-      }
-    },
-    figureForward (pointIndex, goingForward) {
-      this.$log('figureForward', pointIndex, goingForward)
-      if (this.player.playing) this.player.pause()
-      let t = this.player.figure[pointIndex].t
-      // this.player.events.emit('edit-start')
-      // this.compositionPlaying = false
-      if (goingForward) t += 0.1
-      else t -= 0.1
-      this.$log('t', t)
-      // this.$set(this.player.figure[pointIndex], 't', t)
-      this.$tween.to(this.player.figure[pointIndex], 0.4, {
-        t: t
-      })
-      this.player.setCurrentTime(t)
     },
     figureCreate () {
       this.$log('figureCreate')

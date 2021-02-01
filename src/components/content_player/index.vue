@@ -4,6 +4,10 @@ component(
   v-bind="$props"
   :is="playerComponent[contentKalpa.type]"
   @player="$emit('player', $event)")
+  template(v-slot:tint=`{tintFocused}`)
+    slot(name="tint" :tintFocused="tintFocused")
+  template(v-slot:tint-bar=`{tintFocused}`)
+    slot(name="tint-bar" :tintFocused="tintFocused")
 </template>
 
 <script>

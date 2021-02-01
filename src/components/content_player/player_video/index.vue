@@ -8,6 +8,10 @@ div(
     v-if="player"
     v-bind="$props"
     :player="player")
+    template(v-slot:tint-bar=`{tintFocused}`)
+      slot(name="tint-bar" :tintFocused="tintFocused")
+    template(v-slot:tint=`{tintFocused}`)
+      slot(name="tint" :tintFocused="tintFocused")
   //- body
   div(
     :style=`{

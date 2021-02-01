@@ -8,7 +8,7 @@ div(
   ).row.full-width
   slot
   //- NODE
-  //- composition-player(
+  //- composition(
     v-if="item && item.type === 'NODE'"
     :composition="item.items[0]"
     :isActive="itemActive"
@@ -35,7 +35,7 @@ div(
       borderRadius: '10px',
     }`).b-30
     template(v-slot:items)
-      composition-player(
+      composition(
         v-if="item && item.type === 'NODE'"
         :composition="item.items[0]"
         :isActive="itemActive"
@@ -60,7 +60,7 @@ div(
         }`
         ).row.full-width.justify-center.cursor-pointer
   //- COMPOSITION
-  composition-player(
+  composition(
     v-else-if="item && item.__typename === 'Composition'"
     :composition="item"
     :isActive="itemActive"
@@ -124,15 +124,10 @@ div(
 </template>
 
 <script>
-// import nodeFeed from 'components/node_feed/index.vue'
-import compositionPlayer from 'components/composition/composition_player/index.vue'
-
 export default {
   name: 'nodeFeed__nodeItemsItem',
   props: ['item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
   components: {
-    // nodeFeed,
-    compositionPlayer,
   },
   data () {
     return {

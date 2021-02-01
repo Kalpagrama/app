@@ -5,7 +5,7 @@ div(
   }`
   ).column.full-width
   .col.full-width.scroll
-    div(:style=`{}`).row.full-width.justify-center.q-px-md
+    div(:style=`{marginBottom: '300px',}`).row.full-width.justify-center.q-px-md
       div(
         v-if="itemsRes"
         :style=`{
@@ -55,7 +55,7 @@ div(
               v-for="(item,itemIndex) in group.items" :key="item.oid"
               :item="item.populatedObject"
               :player="player"
-              :contentKalpa="contentKalpa")
+              :contentKalpa="contentKalpa").q-mb-xs
             //- next
             .row.full-width.q-px-sm
               q-btn(

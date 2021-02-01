@@ -35,10 +35,12 @@ div(
     :style=`{}`
     ).row.full-width
     spheres-editor-inline(:node="node")
-    .row.full-width.q-pt-md.q-px-md.q-pb-sm
+    .row.full-width.items-center.content-center.justify-between.q-pt-md.q-px-md.q-pb-sm
       q-btn(round flat color="red" icon="delete_outline" @click="nodeDelete()")
-      .col
-      q-btn(round flat color="green" icon="check" :loading="nodePublishing" @click="nodePublish()")
+      q-btn(flat color="green" no-caps @click="nodePublish()") Опубликовать
+      q-btn(round flat color="white" icon="save" @click="nodeSave()")
+      //- .col
+      //- q-btn(round flat color="green" icon="check" :loading="nodePublishing" @click="nodePublish()")
 </template>
 
 <script>
@@ -103,8 +105,6 @@ export default {
       let composition
       // VIDEO select 30 sec from currentTime
       if (this.contentKalpa.type === 'VIDEO') {
-        // let start = this.player.currentTime
-        // let end = start + 30 > this.player.duration ? this.player.duration : start + 30
         composition = {
           id: Date.now().toString(),
           thumbUrl: this.contentKalpa.thumbUrl,
@@ -112,13 +112,17 @@ export default {
           thumbWidth: this.contentKalpa.thumbWidth,
           outputType: 'VIDEO',
           layers: [
-            {id: Date.now().toString(), contentOid: this.contentKalpa.oid, figuresAbsolute: this.player.figure},
+            {
+              id: Date.now().toString(),
+              contentOid: this.contentKalpa.oid,
+              figuresAbsolute: this.player.figure
+            },
           ],
           operation: { items: null, operations: null, type: 'CONCAT'},
           __typename: 'Composition',
         }
       }
-      // IMAGE select all image
+      // IMAGE select all image, or whole ?
       else if (this.contentKalpa.type === 'IMAGE') {
         composition = {
           id: Date.now().toString(),
@@ -130,13 +134,8 @@ export default {
             {
               id: Date.now().toString(),
               contentOid: this.contentKalpa.oid,
-              figuresAbsolute: [
-                {t: null, points: []}
-                // {t: null, points: [{x: 0, y: 0}]},
-                // {t: null, points: [{x: 100, y: 0}]},
-                // {t: null, points: [{x: 0, y: 100}]},
-                // {t: null, points: [{x: 100, y: 100}]}
-              ]},
+              figuresAbsolute: this.player.figure
+            }
           ],
           operation: { items: null, operations: null, type: 'CONCAT'},
           __typename: 'Composition',

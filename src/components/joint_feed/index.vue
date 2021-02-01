@@ -72,7 +72,7 @@
                 objectFit: 'cover',
               }`
               ).fit
-            composition-player(
+            composition(
               @click.native="itemActive = ii"
               :compositionKey="`${joint.oid}-${ii}`"
               :composition="joint.items[ii].type === 'NODE' ? joint.items[ii].items[0] : joint.items[ii]"
@@ -118,13 +118,11 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import compositionPlayer from 'components/composition/composition_player/index.vue'
 
 export default {
   name: 'jointFeed',
   props: ['joint', 'jointIndex', 'isActive', 'isVisible'],
   components: {
-    compositionPlayer
   },
   data () {
     return {

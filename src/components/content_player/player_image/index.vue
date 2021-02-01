@@ -14,7 +14,7 @@ div(
     ...styles,
   }`
   ).row.full-width
-  img(
+  //- img(
     v-if="contentKalpa.url"
     draggable="false"
     :src="contentKalpa.url"
@@ -24,23 +24,31 @@ div(
       borderRadius: '10px',
     }`
     ).fit
-  player-tint(
+  //- player-tint(
     :contentKalpa="contentKalpa")
-  //- div(
+  div(
+    v-if="figure"
     :style=`{
-      position: 'absolute', top: 0,
-      zIndex: 200,
-      background: 'rgb(0,0,0,0.5)',
+      position: 'absolute', zIndex: 1000,
     }`
-    ).row.fit.bg
-  //- image-cropper(
+    ).row.fit.items-start.content-start.b-30.br
+    img(
+      @click="url = null"
+      :src="url"
+      :style=`{
+        objectFit: 'contain',
+        background: 'rgb(35,35,35)',
+        borderRadius: '10px',
+      }`
+      ).fit.bg
+  image-cropper(
     v-if="contentKalpa.url"
     ref="imageCropper"
     :src="contentKalpa.url"
     :options=`{
       viewMode: 2,
-      //- dragMode: 'move',
-      dragMode: mode,
+      dragMode: 'move',
+      //- dragMode: mode,
       initialAspectRatio: 10/10,
       minCropBoxHeight: 100,
       minCropBoxWidth: 100,
@@ -60,7 +68,7 @@ div(
       borderRadius: '10px', overflow: 'hidden',
     }`)
   //- footer
-  //- div(
+  div(
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '8px',
     }`
@@ -68,9 +76,10 @@ div(
     div(
       :style=`{
         maxWidth: '300px',
-        borderRadius: '10px',
+        borderRadius: '20px',
+        background: 'rgba(30,30,30,0.5)',
       }`
-      ).row.full-width.q-pa-sm.bg-black
+      ).row.full-width.q-pa-sm
       q-btn(round flat dense color="white" icon="refresh" @click="player.reset()")
       .col
       q-btn(
@@ -142,6 +151,8 @@ export default {
       cropping: false,
       mode: 'move',
       url: null,
+      figure: null,
+      figureEditing: null
     }
   },
   watch: {
@@ -173,10 +184,37 @@ export default {
         this.url = URL.createObjectURL(blob)
         this.$log('url', this.url)
         this.cropping = false
+        // this.figure = [{t: null, points: []}]
+        this.figure = this.figureEditing
       })
     },
     imageCropped (e) {
       // this.$log('imageCropped', e)
+      let imageWidth = e.target.width
+      let imageHeight = e.target.height
+      let x = e.detail.x / imageHeight
+      let y = e.detail.y / imageHeight
+      let w = e.detail.width / imageWidth
+      let h = e.detail.height / imageHeight
+      // this.$log({imageWidth, imageHeight, x, y, w, h})
+      // this.figureEditing = [
+      //   {t: null, points: [{x: x, y: y}]},
+      //   {t: null, points: [{x: x + w, y: y}]},
+      //   {t: null, points: [{x: x + w, y: y + h}]},
+      //   {t: null, points: [{x: x, y: y + h}]}
+      // ]
+      this.figureEditing = [
+        {
+          t: null,
+          points: [
+            {x: x, y: y},
+            {x: x + w, y: y},
+            {x: x + w, y: y + h},
+            {x: x, y: y + h}
+          ]
+        }
+      ]
+      this.$log('figure', JSON.stringify(this.figureEditing))
     }
   },
   mounted () {

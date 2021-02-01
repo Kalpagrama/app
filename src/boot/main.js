@@ -13,6 +13,7 @@ import { EventApi } from 'src/api/event'
 // import Vue from 'vue'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+// import 'tiptap/src/style.css'
 
 // import global components
 import userAvatar from 'components/user_avatar/index.vue'
@@ -23,6 +24,7 @@ import kalpaLoader from 'components/kalpa_loader/index.vue'
 import kalpaMenuActions from 'components/kalpa_menu_actions/index.vue'
 import kalpaMenuPopupGlobal from 'components/kalpa_menu_popup_global/index.vue'
 import nodeFeed from 'components/node_feed/index.vue'
+import composition from 'components/composition/index.vue'
 import listMiddle from 'components/list_middle/index.vue'
 import listFeed from 'components/list_feed/index.vue'
 
@@ -145,6 +147,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
 
     // global components registration NOT ASYNC
     Vue.component('nodeFeed', nodeFeed)
+    Vue.component('composition', composition)
     // Vue.component('jointFeed', jointFeed)
     // lists
     Vue.component('listMiddle', listMiddle)

@@ -69,6 +69,8 @@ export default {
   data () {
     return {
       itemsRes: null,
+      itemsResInited: false,
+      itemsResFirstKey: null,
       itemsPreving: false,
       itemsNexting: false,
       indexMiddle: 0,
@@ -85,9 +87,11 @@ export default {
   watch: {
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items')
+        this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
         // items changed, changed scrollHeightOld => scrollHeightNew
         let scrollHeightOld = this.scrollHeight
+        let isReversed = this.itemsResFirstKey !== to[0][this.itemKey]
+        this.itemsResFirstKey = to[0][this.itemKey]
         // let scrollHeightNew = this.scrollHeight
         // let delta = scrollHeightNew - scrollHeightOld
         // until new items adding and scrollHeight is changing we scroll back to compensate...
@@ -112,19 +116,56 @@ export default {
           // // })
           // window.scrollTo(0, delta)
         }
+        if (this.itemsResInited) {
+          // if (isReversed) {
+          //   this.$nextTick(() => {
+          //     this.$log('REVERSED REVERSED COMPENSATION')
+          //     this.rootOnScroll()
+          //     const heightAfter = this.scrollHeight
+          //     const scrollPosition = this.scrollTop
+          //     const heightDifference = heightAfter - scrollHeightOld
+          //     // setScrollPosition(this.__scrollTarget, scrollPosition + heightDifference)
+          //     window.scrollTo(0, scrollPosition + heightDifference)
+          //   })
+          // }
+          this.$nextTick(() => {
+            this.$log('REVERSED REVERSED COMPENSATION')
+            this.rootOnScroll()
+            const heightAfter = this.scrollHeight
+            const scrollPosition = this.scrollTop
+            const heightDifference = heightAfter - scrollHeightOld
+            // setScrollPosition(this.__scrollTarget, scrollPosition + heightDifference)
+            window.scrollTo(0, scrollPosition + heightDifference)
+          })
+        }
+        this.itemsResInited = true
       }
-    }
+    },
+    // scrollTop: {
+    //   handler (to, from) {
+    //     if (this.scrollHeight - to < 1000) {
+    //       this.$log('NEXT NEXT NEXT')
+    //       this.next()
+    //     }
+    //   }
+    // }
   },
   methods: {
     prev () {
       this.$log('prev')
-      this.itemsPreving = true
-      if (this.itemsRes.hasPrev) this.itemsRes.prev()
+      if (this.itemsRes.hasPrev) {
+        this.itemsPreving = true
+        this.itemsRes.prev()
+        this.rootOnScroll()
+      }
     },
     next () {
       this.$log('next')
-      this.itemsNexting = true
-      if (this.itemsRes.hasNext) this.itemsRes.next()
+      if (this.itemsRes.hasNext) {
+        this.itemsNexting = true
+        this.itemsRes.next()
+        this.rootOnScroll()
+      }
     },
     cutHere (id) {
       this.$log('cutHere')
@@ -180,19 +221,19 @@ export default {
       this.$log('positionDrop itemMeta', itemMeta)
     },
     rootOnScroll (e) {
-      this.$log('rootOnScroll')
+      // this.$log('rootOnScroll')
       this.scrollTop = window.pageYOffset
       this.scrollHeight = this.rootLocal.scrollHeight
       // this.scrollHeight = window.scrollHeight
     },
     onResize (e) {
       this.$log('onResize', e)
-      if (this.itemsPreving) {
-        let scrollHeightNew = e.height
-        let delta = scrollHeightNew - this.scrollHeight
-        window.scrollTo(0, delta)
-        this.itemsPreving = false
-      }
+      // if (this.itemsPreving) {
+      //   let scrollHeightNew = e.height
+      //   let delta = scrollHeightNew - this.scrollHeight
+      //   window.scrollTo(0, delta)
+      //   this.itemsPreving = false
+      // }
     }
   },
   async mounted () {
@@ -219,8 +260,8 @@ export default {
     // TODO: handle no elements at all event
     // TODO: handle emit items update, items count, preving, nexting, saved position
     window.addEventListener('scroll', this.rootOnScroll)
-    await this.$wait(1000)
     this.rootOnScroll()
+    await this.$wait(300)
     this.prev()
   },
   beforeDestroy () {
