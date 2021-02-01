@@ -664,6 +664,9 @@ class Group {
    async next (count) {
       const f = this.next
       logD(f, 'start')
+      // if (!this.reactiveGroup.id.includes('WS_BOOKMARK')) {
+      //    logD('asdasdasasds')
+      // }
       if (this.populateFunc && count > GROUP_BATCH_SZ) {
          logW(f, 'next allow only 12 with populate')
          // assert(count <= 12, 'count <= 12! value =' + count)
@@ -699,9 +702,9 @@ class Group {
       // }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      // if (!this.groupId.startsWith('{"selector"')){
-      //    logD('asdasdasasds')
-      // }
+      // максимум 20 элементов (если больше - то отрезаем верх)
+      // if (this.reactiveGroup.items.length - 20 > 0) alert('cut begin of list!')
+      this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 20))
       await this.fulfill(nextItems, 'bottom')
    }
 
@@ -734,6 +737,9 @@ class Group {
       let fulfillFrom = Math.max(startFullFil - count, 0) // начиная с какого индекса грузить
       let fulfillTo = startFullFil === -1 ? GROUP_BATCH_SZ : startFullFil // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
+      // максимум 20 элементов (если больше - то отрезаем низ)
+      // if (this.reactiveGroup.items.length - 20 > 0) alert('cut end of list!')
+      this.reactiveGroup.items.splice(20, this.reactiveGroup.items.length)
       await this.fulfill(nextItems, 'top')
    }
 

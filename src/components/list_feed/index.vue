@@ -154,6 +154,7 @@ export default {
       }
     },
     async next () {
+      this.$log('next')
       if (this.itemsRes.hasNext && !this.itemsNexting) {
         this.$log('next next next')
         this.$q.notify('next next next')
