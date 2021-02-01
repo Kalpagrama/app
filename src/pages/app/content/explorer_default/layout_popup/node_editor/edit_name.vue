@@ -11,7 +11,7 @@ div(
   @click="onClick"
   :style=`{position: 'relative', minHeight: '60px'}`).row.full-width.justify-center.q-px-md
   //- blinking green carette
-  div(
+  //- div(
     v-if="!isFocused && node.name.length === 0"
     :style=`{
       position: 'absolute', zIndex: 1000,
@@ -35,7 +35,7 @@ div(
       fontSize: fontSize+'px',
       //- fontWeight: 'bold',
       lineHeight: 1.1,
-      textAlign: 'center',
+      //- textAlign: 'center',
       paddingTop: '22px',
     }`
     :style=`{

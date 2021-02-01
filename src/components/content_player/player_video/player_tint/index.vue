@@ -8,6 +8,7 @@ div(
     borderRadius: '10px',
   }`
   ).row.fit.items-center.content-center.justify-center
+  slot(name="tint" :tintFocused="tintFocused")
   //- q-btn(
     round flat color="white"
     :style=`{
@@ -62,7 +63,7 @@ div(
         pointerEvents: 'none',
       }`
       ).row.full-width.justify-start.q-pa-md
-      small(:style=`{borderRadius: '8px',}`).text-white.q-py-xs.q-px-sm.bg-black {{$time(player.currentTime)}} / {{$time(player.duration)}}
+      small(:style=`{borderRadius: '8px', background: 'rgba(0,0,0,0.7)'}`).text-white.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
   //- footer editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -72,9 +73,10 @@ div(
         bottom: '0px',
         background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
         borderRadius: '0 0 10px 10px',
-        opacity: $store.state.ui.userTyping ? 0 : 1,
+        //- opacity: $store.state.ui.userTyping ? 0 : 1,
       }`
       ).row.full-width.justify-center.q-pa-md
+      slot(name="tint-bar" :tintFocused="tintFocused")
       tint-bar(
         v-bind="$props"
         :style=`{
@@ -207,13 +209,13 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     // if (this.$q.platform.is.desktop) {
     //   window.addEventListener('mousemove', this.tintMousemove)
     // }
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     // if (this.$q.platform.is.desktop) {
     //   window.removeEventListener('mousemove', this.tintMousemove)
     // }

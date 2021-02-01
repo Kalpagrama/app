@@ -15,7 +15,7 @@ q-page(
         edit-avatar(:currentUser="currentUser")
       //- right side
       .col-xs-12.col-sm-8.q-px-sm
-        //- edit-profile(:currentUser="currentUser")
+        edit-profile(:currentUser="currentUser")
         actions(:currentUser="currentUser")
         .row.full-width.q-px-sm
           .row.full-width.q-px-sm.q-py-xs

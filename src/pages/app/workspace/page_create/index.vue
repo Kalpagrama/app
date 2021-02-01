@@ -2,22 +2,27 @@
 q-layout(
   view="hHh Lpr lff")
   q-header()
-    .row.full-width.justify-center
+    .row.full-width.justify-center.q-pa-sm
       div(
         :style=`{
           height: '60px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          background: 'rgb(40,40,40)',
+          borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-pa-sm
         q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
         .col
           .row.fit.items-center.content-center.justify-center.q-pa-sm
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold Creating
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold Сотворить
         q-btn(round flat color="white" icon="more_vert")
   q-page-container
     q-page
       component(
-        :is="'view-'+pageId")
+        :is="'view-'+pageId"
+        @started="pageStarted = true")
       q-page-sticky(
+        v-if="!pageStarted"
         expand position="bottom"
         :offset=`[0,80]`
         :style=`{zIndex: 1000,}`
@@ -36,24 +41,27 @@ q-layout(
 </template>
 
 <script>
+import viewWrite from './view_write/index.vue'
+import viewUpload from './view_upload/index.vue'
+
 export default {
   name: 'workspace_pageCreate',
   components: {
-    viewUpload: () => import('./view_upload/index.vue'),
-    viewWrite: () => import('./view_write/index.vue'),
-    viewStream: () => import('./view_stream/index.vue'),
+    viewWrite,
+    viewUpload,
   },
   data () {
     return {
       pageId: 'upload',
+      pageStarted: false,
     }
   },
   computed: {
     pages () {
       return [
-        {id: 'upload', name: 'Upload'},
-        {id: 'write', name: 'Write'},
-        {id: 'stream', name: 'Stream'},
+        {id: 'upload', name: 'Загрузить'},
+        {id: 'write', name: 'Статья/Книга'},
+        // {id: 'stream', name: 'Stream'},
       ]
     }
   }

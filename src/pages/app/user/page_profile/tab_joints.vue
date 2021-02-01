@@ -1,10 +1,11 @@
 <template lang="pug">
-kalpa-loader(
-  :query="query" :limit="12" v-slot=`{items,next,nexting}`)
-  list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
-    q-infinite-scroll(ref="qis" @load="next" :offset="$q.screen.height")
-    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      node-feed(:node="item.populatedObject" :isActive="isActive" :isVisible="isVisible")
+list-feed(
+  :query="query")
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+    node-feed(
+      :node="item.populatedObject"
+      :isActive="isActive"
+      :isVisible="isVisible")
 </template>
 
 <script>

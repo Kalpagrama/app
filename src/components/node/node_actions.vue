@@ -163,7 +163,7 @@ export default {
         }
         else if (this.isActiveStart) {
           let statValue = Date.now() - this.isActiveStart
-          this.$log('statValue', statValue)
+          // this.$log('statValue', statValue)
           let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
           this.isActiveStart = 0
           // handle voteStart

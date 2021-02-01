@@ -18,6 +18,15 @@ div(
       :player="player"
       :query="query"
       :height="$q.screen.height-70")
+  //- header node editor
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    node-editor-popup(
+      v-if="player && player.figure"
+      :player="player" :contentKalpa="contentKalpa"
+      :background="'rgba(30,30,30,0.95)'"
+      :style=`{
+        position: 'absolute', zIndex: 2000, top: '0px',
+      }`).q-pt-sm.q-px-sm
   //- header
   div(
     :style=`{
@@ -42,6 +51,28 @@ div(
         objectFit: 'contain',
       }`
       ).full-width.bg-black
+      //- template(v-slot:tint=`{tintFocused}`)
+        div(
+          v-if="tintFocused"
+          :style=`{
+            position: 'absolute', top: '0px', zIndex: 3000,
+          }`
+          ).row.full-width.justify-center.q-pa-sm
+          div(
+            :style=`{
+              maxWidth: '600px',
+              //- height: '60px',
+              background: 'rgba(30,30,30,0.6)',
+              borderRadius: '10px',
+            }`
+            ).row.full-width.q-pa-sm
+            q-btn(round flat color="white" icon="west")
+            .col
+      //- template(v-slot:tint-bar=`{tintFocused}`)
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-editor-popup(
+            v-if="player && player.figure"
+            :player="player" :contentKalpa="contentKalpa")
   //- footer
   div(:style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
     div(
@@ -50,6 +81,14 @@ div(
         paddingBottom: 'env(safe-area-inset-bottom)',
         borderRadius: '10px 10px 0 0',
       }`).row.full-width.b-40
+      //- nav-mobile(
+        v-if="player"
+        @pageId="pageIdChange"
+        :pageId="pageId"
+        :style=`{
+          zIndex: 1000,
+          borderRadius: '10px 10px 0 0',
+        }`).b-40
       nav-mobile(
         v-if="player && !player.figure"
         @pageId="pageIdChange"
@@ -71,6 +110,8 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 import navMobile from '../nav_mobile.vue'
 import contentPlayer from 'components/content_player/index.vue'
 
@@ -81,6 +122,7 @@ import pageCreator from '../page_creator/index.vue'
 import pageNode from '../page_node/index.vue'
 
 import nodeEditor from './node_editor/index.vue'
+import nodeEditorPopup from './node_editor_popup/index.vue'
 
 export default {
   name: 'layoutPopup',
@@ -94,13 +136,15 @@ export default {
     pageCreator,
     pageNode,
     nodeEditor,
+    nodeEditorPopup,
   },
   data () {
     return {
       offsetTop: 0,
       player: null,
       pageId: null,
-      editorHeight: 70
+      editorHeight: 70,
+      clustersRes: null,
     }
   },
   computed: {
@@ -112,6 +156,20 @@ export default {
     },
     editorHeightMax () {
       return 200
+    },
+    queryClusters () {
+      let res = {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          // objectTypeEnum: { $in: ['NODE'] },
+          oidSphere: this.contentKalpa.oid,
+          sortStrategy: 'AGE',
+          groupByContentLocation: true
+        },
+        populateObjects: true,
+      }
+      return res
     }
   },
   watch: {
@@ -145,15 +203,25 @@ export default {
       //   contentHeight: this.contentHeightMax,
       //   contentWidth: this.contentWidthMax
       // })
-    }
-  },
-  mounted () {
-    this.$log('mounted')
-    window.visualViewport.addEventListener('resize', (e) => {
+    },
+    visualViewportOnResize (e) {
+      this.$log('visualViewportOnResize', e)
       const viewport = window.visualViewport
       this.offsetTop = viewport.offsetTop
-      window.scrollTop = viewport.offsetTop
-    })
+      // window.scrollTop = viewport.offsetTop
+    }
+  },
+  async mounted () {
+    this.$log('mounted')
+    window.visualViewport.addEventListener('resize', this.visualViewportOnResize)
+    // get clusters
+    this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
+    this.$log('clustersRes', this.clustersRes)
+    this.player.setState('clusters', this.clustersRes.items)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    window.visualViewport.removeEventListener(this.visualViewportOnResize)
   }
 }
 </script>

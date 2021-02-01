@@ -30,7 +30,7 @@ div(
       :isActive="item[itemKey] === itemMiddleKey"
       :isVisible="true")
     //- footer debug
-    .row.full-width
+    //- .row.full-width
       q-btn(@click="positionSave()" dense no-caps color="green" outline) Save position
       q-btn(@click="positionDrop()" dense no-caps color="red" outline) Drop position
       q-btn(@click="prev()" dense no-caps color="red" outline) Prev
@@ -69,6 +69,8 @@ export default {
   data () {
     return {
       itemsRes: null,
+      itemsResInited: false,
+      itemsResFirstKey: null,
       itemsPreving: false,
       itemsNexting: false,
       indexMiddle: 0,
@@ -83,48 +85,84 @@ export default {
     }
   },
   watch: {
+    query: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('query TO')
+        if (this.itemsRes) {
+          this.positionDrop()
+          this.itemsRes = null
+        }
+        this.itemsRes = await this.$rxdb.find(to, true)
+        let currentId = this.itemsRes.getProperty('currentId')
+        if (currentId) {
+          this.$log('currentId', currentId)
+          let itemMeta = this.itemsRes.getProperty('itemMeta')
+          if (itemMeta) {
+          }
+        }
+      }
+    },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items')
-        // items changed, changed scrollHeightOld => scrollHeightNew
+        this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
+        // save old scroll height
         let scrollHeightOld = this.scrollHeight
-        // let scrollHeightNew = this.scrollHeight
-        // let delta = scrollHeightNew - scrollHeightOld
-        // until new items adding and scrollHeight is changing we scroll back to compensate...
-        if (this.itemsPreving) {
-          // let count = 0
-          // let i = setInterval(() => {
-          //   if (count === 2000) clearInterval(i)
-          //   count += 50
-          //   this.$log('itemsPreving: ', count)
-          //   this.rootOnScroll()
-          //   let scrollHeightNew = this.scrollHeight
-          //   let delta = scrollHeightNew - scrollHeightOld
-          //   this.$log({scrollHeightOld, scrollHeightNew, delta})
-          //   window.scrollTo(0, delta)
-          // }, 50)
-          // this.rootOnScroll()
-          // let scrollHeightNew = this.scrollHeight
-          // let delta = scrollHeightNew - scrollHeightOld
-          // this.$log({scrollHeightOld, scrollHeightNew, delta})
-          // // this.$tween.to(window, 1, {
-          // //   scrollTop: delta
-          // // })
-          // window.scrollTo(0, delta)
+        let scrollTopOld = this.scrollTop
+        // where items changed ? at top or at bottom ?
+        let isReversed = this.itemsResFirstKey !== to[0][this.itemKey]
+        // set last first key...
+        this.itemsResFirstKey = to[0][this.itemKey]
+        // call this no on first load
+        if (this.itemsResInited) {
+          if (isReversed) {
+            this.$nextTick(() => {
+              this.$log('REVERSED REVERSED COMPENSATION')
+              this.rootOnScroll()
+              const heightAfter = this.scrollHeight
+              // const scrollPosition = this.scrollTop
+              // const scrollTopOld
+              const heightDifference = heightAfter - scrollHeightOld
+              this.$log({scrollHeightOld, heightAfter, scrollTopOld, heightDifference})
+              window.scrollTo(0, scrollTopOld + heightDifference)
+            })
+          }
         }
+        // first load done
+        this.itemsResInited = true
+      }
+    },
+    scrollTop: {
+      immediate: true,
+      handler (to, from) {
+        if (!this.itemsRes) return
+        if (this.scrollHeight - to < 1000) this.next()
+        if (to < 1000) this.prev()
       }
     }
   },
   methods: {
-    prev () {
-      this.$log('prev')
-      this.itemsPreving = true
-      if (this.itemsRes.hasPrev) this.itemsRes.prev()
+    async prev () {
+      if (this.itemsRes.hasPrev && !this.itemsPreving) {
+        this.$log('prev prev prev')
+        this.$q.notify('prev prev prev')
+        this.itemsPreving = true
+        await this.itemsRes.prev()
+        await this.$wait(300)
+        this.itemsPreving = false
+        // this.rootOnScroll()
+      }
     },
-    next () {
-      this.$log('next')
-      this.itemsNexting = true
-      if (this.itemsRes.hasNext) this.itemsRes.next()
+    async next () {
+      if (this.itemsRes.hasNext && !this.itemsNexting) {
+        this.$log('next next next')
+        this.$q.notify('next next next')
+        this.itemsNexting = true
+        await this.itemsRes.next()
+        await this.$wait(300)
+        this.itemsNexting = false
+        // this.rootOnScroll()
+      }
     },
     cutHere (id) {
       this.$log('cutHere')
@@ -160,11 +198,11 @@ export default {
           scrollHeight: this.scrollHeight,
           scrollTop: this.scrollTop
         }
-        this.$log('positionSave itemMetaInput', itemMetaInput)
+        // this.$log('positionSave itemMetaInput', itemMetaInput)
         this.itemsRes.setProperty('itemMeta', itemMetaInput)
         let itemMeta = this.itemsRes.getProperty('itemMeta')
-        this.$log('positionSave itemMeta', itemMeta)
-        this.$log('positionSave itemMetaInput = itemMeta', itemMetaInput === itemMeta)
+        // this.$log('positionSave itemMeta', itemMeta)
+        // this.$log('positionSave itemMetaInput = itemMeta', itemMetaInput === itemMeta)
       }
     },
     positionRestore () {
@@ -180,53 +218,31 @@ export default {
       this.$log('positionDrop itemMeta', itemMeta)
     },
     rootOnScroll (e) {
-      this.$log('rootOnScroll')
+      // this.$log('rootOnScroll', this.scrollHeight)
       this.scrollTop = window.pageYOffset
       this.scrollHeight = this.rootLocal.scrollHeight
-      // this.scrollHeight = window.scrollHeight
+      // this.$log('rootOnScroll DONE', this.scrollHeight)
     },
     onResize (e) {
-      this.$log('onResize', e)
-      if (this.itemsPreving) {
-        let scrollHeightNew = e.height
-        let delta = scrollHeightNew - this.scrollHeight
-        window.scrollTo(0, delta)
-        this.itemsPreving = false
-      }
+      this.$log('onResize', this.scrollHeight)
+      this.scrollTop = window.pageYOffset
+      this.scrollHeight = this.rootLocal.scrollHeight
+      this.$log('onResize DONE', this.scrollHeight)
     }
   },
   async mounted () {
     this.$log('mounted')
     // this.$log('mounted window', window)
     // this.$log('mounted document', document)
-    this.$log('mounted document.body', document.body.scrollTop)
-    this.itemsRes = await this.$rxdb.find(this.query, true)
-    let currentId = this.itemsRes.getProperty('currentId')
-    if (currentId) {
-      this.$log('currentId', currentId)
-      let itemMeta = this.itemsRes.getProperty('itemMeta')
-      if (itemMeta) {
-        this.$log('itemMeta', itemMeta)
-        // this.$log('rootLocal', this.rootLocal.scrollTop, this.rootLocal.scrollHeight)
-        // await this.$wait(1000)
-        // window.scrollTop = itemMeta.scrollTop
-        // window.scrollTo(0, itemMeta.scrollTop)
-      }
-    }
-    // if (this.itemsRes.hasPrev) this.itemsRes.prev()
-    // if (this.itemsRes.hasNext) this.itemsRes.next()
-    // TODO: handle -1 to 0 first element
-    // TODO: handle no elements at all event
-    // TODO: handle emit items update, items count, preving, nexting, saved position
+    // this.$log('mounted document.body', document.body.scrollTop)
     window.addEventListener('scroll', this.rootOnScroll)
-    await this.$wait(1000)
     this.rootOnScroll()
-    this.prev()
+    await this.$wait(500)
+    if (this.itemsRes) this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     window.removeEventListener('scroll', this.rootOnScroll)
-    // this.positionSave()
   }
 }
 </script>

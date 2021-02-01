@@ -20,7 +20,6 @@ div(
       height: styles.height,
       objectFit: styles.objectFit,
       opacity: previewOpacity,
-      //- opacity: 0.5,
     }`
     ).full-width
   //- video wrapper
@@ -64,7 +63,7 @@ div(
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'compositionPlayer_Video',
+  name: 'typeVideo',
   components: {
     contentPlayer
   },
@@ -113,7 +112,7 @@ export default {
   watch: {
     isActive: {
       handler (to, from) {
-        this.$log('isActive TO', to)
+        // this.$log('isActive TO', to)
         if (to) {
         }
         else {
@@ -125,7 +124,7 @@ export default {
       handler (to, from) {
         // if (!this.player) return
         if (to && to >= this.player.duration) {
-          this.$log('player.currentTime === player.duration')
+          // this.$log('player.currentTime === player.duration')
           this.player.setCurrentTime(0)
           this.player.play()
         }
@@ -134,7 +133,7 @@ export default {
   },
   methods: {
     videoLoaded () {
-      this.$log('videoLoaded', this.compositionKey)
+      // this.$log('videoLoaded', this.compositionKey)
     },
     playerCreated (player) {
       // this.$log('playerCreated', player)

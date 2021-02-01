@@ -6,16 +6,16 @@ component(
 </template>
 
 <script>
-import playerVideo from './player_video/index.vue'
-import playerImage from './player_image/index.vue'
-import playerBook from './player_book/index.vue'
+import typeVideo from './type_video/index.vue'
+import typeImage from './type_image/index.vue'
+import typeBook from './type_book/index.vue'
 
 export default {
-  name: 'compositionPlayer',
+  name: 'composition',
   components: {
-    playerVideo,
-    playerImage,
-    playerBook
+    typeVideo,
+    typeImage,
+    typeBook
   },
   props: [
     'compositionKey',
@@ -29,10 +29,10 @@ export default {
   data () {
     return {
       playerComponent: {
-        VIDEO: 'player-video',
-        IMAGE: 'player-image',
-        BOOK: 'player-book',
-        WEB: 'player-web',
+        VIDEO: 'type-video',
+        IMAGE: 'type-image',
+        BOOK: 'type-book',
+        WEB: 'type-web',
       }
     }
   },

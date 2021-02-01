@@ -59,14 +59,16 @@ export default {
   },
   methods: {
     async save () {
+      this.$log('save')
       await ObjectApi.update(this.currentUser.oid, 'profile.status', this.status)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
     if (this.currentUser.profile.status) {
       this.locked = true
       this.status = this.currentUser.profile.status
+      await this.$wait(300)
       this.locked = false
     }
   }

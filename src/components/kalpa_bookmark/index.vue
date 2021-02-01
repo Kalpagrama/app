@@ -6,8 +6,9 @@
     @click="start()"
     round flat no-caps
     :color="bookmark ? activeColor : inactiveColor"
-    :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
+    icon="save_alt"
     :loading="loading")
+    //- :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
 </template>
 
 <script>
