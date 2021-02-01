@@ -557,7 +557,8 @@ class Group {
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
             let groupId = figuresAbsolute ? JSON.stringify(figuresAbsolute) : null
-            let group = new Group(groupId, this.populateFunc)
+            Vue.set(this.propsReactive, '')
+            let group = new Group(groupId, this.populateFunc, null, this.propsReactive)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
             Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
@@ -588,6 +589,28 @@ class Group {
       this.updateReactiveGroup()
    }
 
+   // async gotoCurrent () {
+   //    const f = this.gotoCurrent
+   //    logD(f, 'start')
+   //    let count
+   //    if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
+   //    else count = this.loadedLen() // выдаем все элементы разом
+   //
+   //    let fulfillFrom = 0
+   //    let fromId
+   //    if (this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
+   //       fromId = this.getProperty('currentId')
+   //    }
+   //    if (fromId) {
+   //       let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
+   //       if (indxFrom >= 0) fulfillFrom = indxFrom
+   //    }
+   //    let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+   //    let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
+   //    await this.fulfill(nextItems, 'whole')
+   // }
+
+   // обрежет список сферху и начнет с этого элемента
    async gotoCurrent () {
       const f = this.gotoCurrent
       logD(f, 'start')
@@ -595,18 +618,27 @@ class Group {
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом
 
-      let fulfillFrom = 0
-      let fromId
-      if (this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-         fromId = this.getProperty('currentId')
-      }
+      let indxFrom = -1
+      let fromId = this.getProperty('currentId')
       if (fromId) {
-         let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
-         if (indxFrom >= 0) fulfillFrom = indxFrom
+         let allItems = this.loadedItems()
+         let indxFrom = allItems.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === fromId)
+         if (indxFrom === -1) { // на этом уровне fromId не найден
+            if (this.reactiveGroup.itemType === 'GROUP') { // внутри нас группы
+               for (let i = 0; i < allItems.length; i++) {
+                  let reactiveGroup = allItems[i]
+                  let subgroupIndx = await reactiveGroup.gotoCurrent()
+                  if (subgroupIndx >= 0) indxFrom = i // искомый элемент в этой подгруппе
+               }
+            }
+         }
+         if (indxFrom >= 0) {
+            let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+            let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
+            await this.fulfill(nextItems, 'whole')
+         }
       }
-      let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
-      let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      await this.fulfill(nextItems, 'whole')
+      return indxFrom
    }
 
    async gotoStart () {
@@ -706,11 +738,14 @@ class Group {
    }
 
    setProperty (name, value) {
-      Vue.set(this.propsReactive, name, value)
+      let groupData = this.propsReactive[this.reactiveGroup.id] || {}
+      groupData[name] = value
+      Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
    }
 
    getProperty (name) {
-      return this.propsReactive[name]
+      let groupData = this.propsReactive[this.reactiveGroup.id]
+      return groupData ? groupData[name] : null
    }
 }
 
