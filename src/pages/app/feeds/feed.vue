@@ -1,7 +1,14 @@
 <template lang="pug">
-//- .row.full-width.justify-center
+.row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
-    kalpa-loader(
+    list-feed(
+      :query="queryFeedItems" :itemKey="'id'")
+      template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+        node-feed(
+          :node="item.populatedObject"
+          :isActive="isActive"
+          :isVisible="isVisible")
+    //- kalpa-loader(
       v-if="true" :query="queryFeedItems" :limit="12" v-slot=`{items, next, nexting}`)
       list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
         q-infinite-scroll(@load="next" :offset="$q.screen.height")
@@ -16,7 +23,7 @@
         template(v-slot:append)
           div(:style=`{height: '50px'}`).row.full-width.justify-center
             q-spinner-dots(v-show="nexting" color="green" size="50px")
-div(
+//- div(
   ref="dc"
   ).row.full-width
   //- @update="itemUpdate"
@@ -102,28 +109,28 @@ export default {
   },
   data () {
     return {
-      bookmarks: [],
+      // bookmarks: [],
       // items: [],
-      itemsRes: null,
-      indexMiddle: 0,
+      // itemsRes: null,
+      // indexMiddle: 0,
     }
   },
   methods: {
-    itemUpdate (start, end) {
-      this.$log('itemUpdate', start, end)
-    },
-    indexMiddleHandler (isVisible, entry, idx) {
-      let index = parseInt(entry.target.accessKey)
-      if (isVisible) {
-        this.indexMiddle = index
-        this.$log('indexMiddle', index)
-      }
-      else {
-        if (index === this.indexMiddle) {
-          // this.indexMiddle = -1
-        }
-      }
-    }
+    // itemUpdate (start, end) {
+    //   this.$log('itemUpdate', start, end)
+    // },
+    // indexMiddleHandler (isVisible, entry, idx) {
+    //   let index = parseInt(entry.target.accessKey)
+    //   if (isVisible) {
+    //     this.indexMiddle = index
+    //     this.$log('indexMiddle', index)
+    //   }
+    //   else {
+    //     if (index === this.indexMiddle) {
+    //       // this.indexMiddle = -1
+    //     }
+    //   }
+    // }
   },
   computed: {
     feedSubscriptions () {
@@ -173,16 +180,16 @@ export default {
     // }
   },
   watch: {
-    indexMiddle: {
-      handler (to, from) {
-        if (this.itemsRes) {
-          if (this.itemsRes.items.length - to < 5) {
-            this.$q.notify({type: 'positive', message: 'Next'})
-            this.itemsRes.next()
-          }
-        }
-      }
-    },
+    // indexMiddle: {
+    //   handler (to, from) {
+    //     if (this.itemsRes) {
+    //       if (this.itemsRes.items.length - to < 5) {
+    //         this.$q.notify({type: 'positive', message: 'Next'})
+    //         this.itemsRes.next()
+    //       }
+    //     }
+    //   }
+    // },
     feed: {
       deep: true,
       immediate: true,
@@ -206,7 +213,7 @@ export default {
         //   sort: [{updatedAt: 'desc'}]
         // })
         // this.bookmarks = items
-        this.itemsRes = await this.$rxdb.find(this.queryFeedItems, true)
+        // this.itemsRes = await this.$rxdb.find(this.queryFeedItems, true)
         // let itemsFeed = this.$store.state.ui.itemsFeed
         // let itemsFeed = window['items-feed']
         // if (!itemsFeed) {
