@@ -294,7 +294,8 @@ class ReactiveDocFactory {
 const GROUP_BATCH_SZ = 12
 
 class Group {
-   constructor (populateFunc = null, paginateFunc = null, propsReactive = {}) {
+   constructor (id, populateFunc = null, paginateFunc = null, propsReactive = {}) {
+      assert(id && typeof id === 'string')
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
@@ -302,6 +303,7 @@ class Group {
       this.vm = new Vue({
          data: {
             reactiveGroup: {
+               id,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
                items: [], // кусочек от this.pages
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
@@ -414,7 +416,6 @@ class Group {
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          this.reactiveGroup.totalCount = listItems.length
          this.reactiveGroup.itemPrimaryKey = 'id'
-         this.groupId = JSON.stringify(rxQuery.mangoQuery) // для дебага
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
             items,
@@ -429,7 +430,6 @@ class Group {
          assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
          switch (rxDoc.props.mangoQuery.selector.rxCollectionEnum) {
             case RxCollectionEnum.LST_SPHERE_ITEMS:
-               this.reactiveGroup.itemPrimaryKey = 'oid'
                // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
                assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
                for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
@@ -443,17 +443,19 @@ class Group {
                      }
                   }
                }
-               break
-            case RxCollectionEnum.LST_FEED:
-               this.reactiveGroup.itemPrimaryKey = 'id'
+               this.reactiveGroup.itemPrimaryKey = 'oid'
                break
             case RxCollectionEnum.LST_SEARCH:
+            case RxCollectionEnum.LST_SUBSCRIBERS:
+            case RxCollectionEnum.LST_SUBSCRIPTIONS:
                this.reactiveGroup.itemPrimaryKey = 'oid'
+               break
+            case RxCollectionEnum.LST_FEED:
+               this.reactiveGroup.itemPrimaryKey = 'id' // эвенты
                break
             default:
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + rxDoc.props.mangoQuery.selector.rxCollectionEnum)
          }
-         this.groupId = rxDoc.id // todo для дебага
       } else if (array) {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
@@ -461,7 +463,6 @@ class Group {
             if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
             else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
-         this.groupId = 'custom array'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
       assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
       assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
@@ -553,9 +554,13 @@ class Group {
                figuresAbsolute,
                thumbUrl
             } = nextGroup
+            if (!items) {
+               logD('asdfasdfsadfsadf')
+            }
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
-            let group = new Group(this.populateFunc)
+            let groupId = figuresAbsolute ? JSON.stringify(figuresAbsolute) : null
+            let group = new Group(groupId, this.populateFunc)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
             Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
@@ -718,7 +723,10 @@ class ReactiveListWithPaginationFactory {
       if (rxQueryOrRxDoc.reactiveListHolderMaster) {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
-         this.group = new Group(populateFunc, paginateFunc, propsReactive)
+         let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
+         assert(mangoQuery, '!mangoQuery')
+         let groupId = JSON.stringify(mangoQuery)
+         this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
          await this.group.addPaginationPage(rxQueryOrRxDoc, 'top')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
       }
