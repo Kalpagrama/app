@@ -392,10 +392,7 @@ class Group {
             let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
             await this.fulfill(nextItems, 'whole')
          })
-      } else if (array) {
-         // todo
-         logE(f, 'TDOD  subscribe to array changes!!!!')
-      } else throw new Error('!this.rxQuery && !this.rxDoc')
+      }
    }
 
    async addPaginationPage (rxQueryOrRxDocOrArray, position) {
