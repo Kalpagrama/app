@@ -25,7 +25,7 @@ div(
       :player="player" :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
       :style=`{
-        position: 'absolute', zIndex: 10000, top: '0px',
+        position: 'absolute', zIndex: 2000, top: '0px',
       }`).q-pt-sm.q-px-sm
   //- header
   div(
@@ -206,8 +206,8 @@ export default {
     },
     visualViewportOnResize (e) {
       this.$log('visualViewportOnResize', e)
-      // const viewport = window.visualViewport
-      // this.offsetTop = viewport.offsetTop
+      const viewport = window.visualViewport
+      this.offsetTop = viewport.offsetTop
       // window.scrollTop = viewport.offsetTop
     }
   },

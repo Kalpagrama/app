@@ -112,7 +112,7 @@ export default {
   watch: {
     isActive: {
       handler (to, from) {
-        this.$log('isActive TO', to)
+        // this.$log('isActive TO', to)
         if (to) {
         }
         else {
@@ -124,7 +124,7 @@ export default {
       handler (to, from) {
         // if (!this.player) return
         if (to && to >= this.player.duration) {
-          this.$log('player.currentTime === player.duration')
+          // this.$log('player.currentTime === player.duration')
           this.player.setCurrentTime(0)
           this.player.play()
         }
@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     videoLoaded () {
-      this.$log('videoLoaded', this.compositionKey)
+      // this.$log('videoLoaded', this.compositionKey)
     },
     playerCreated (player) {
       // this.$log('playerCreated', player)

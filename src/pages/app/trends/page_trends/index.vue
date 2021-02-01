@@ -11,7 +11,7 @@ q-page(
         maxWidth: $store.state.ui.pageWidth+'px',
       }`
       ).row.full-width.items-start.content-start
-      kalpa-loader(
+      //- kalpa-loader(
         v-if="sphereOid" :query="query" :limit="12" v-slot=`{items, next, nexting}`)
         list-middle(:items="items" :itemStyles=`{marginBottom: '50px',}`)
           q-infinite-scroll(@load="next" :offset="$q.screen.height")
@@ -20,6 +20,14 @@ q-page(
           template(v-slot:append)
             div(:style=`{height: '50px'}`).row.full-width.justify-center
               q-spinner-dots(v-show="nexting" color="green" size="50px")
+      list-feed(
+        v-if="sphereOid"
+        :query="query")
+        template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+          node-feed(
+            :node="item.populatedObject"
+            :isActive="isActive"
+            :isVisible="isVisible")
   q-page-sticky(
     expand position="top"
     :style=`{

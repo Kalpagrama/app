@@ -117,6 +117,7 @@ export default {
         if (this.player.figureFocused) {
           // this.$log('player.currentTime TO', to)
           if (to >= this.end) {
+            this.$log('to >= this.start')
             if (this.isLooping) {
               this.figureReplay()
             }
@@ -125,6 +126,7 @@ export default {
             }
           }
           if (to < this.start) {
+            this.$log('to < this.start')
             this.player.pause()
             this.figureReplay()
           }

@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     playerCreated (player) {
-      this.$log('playerCreated')
+      // this.$log('playerCreated')
       this.player = player
       this.$emit('player', player)
       if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {

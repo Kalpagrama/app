@@ -209,13 +209,13 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     // if (this.$q.platform.is.desktop) {
     //   window.addEventListener('mousemove', this.tintMousemove)
     // }
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     // if (this.$q.platform.is.desktop) {
     //   window.removeEventListener('mousemove', this.tintMousemove)
     // }
