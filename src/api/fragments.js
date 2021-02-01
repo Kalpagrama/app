@@ -402,7 +402,6 @@ const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFr
 const findResultFragment = gql`
     ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment}
     fragment findResultFragment on FindResult {
-        count
         totalCount
         nextPageToken
         currentPageToken
