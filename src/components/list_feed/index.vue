@@ -237,7 +237,8 @@ export default {
     // this.$log('mounted document.body', document.body.scrollTop)
     window.addEventListener('scroll', this.rootOnScroll)
     this.rootOnScroll()
-    this.prev()
+    await this.$wait(500)
+    if (this.itemsRes) this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
