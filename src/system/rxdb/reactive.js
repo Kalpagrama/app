@@ -603,17 +603,15 @@ class Group {
    // обрежет список сферху и начнет с этого элемента
    async gotoCurrent () {
       const f = this.gotoCurrent
-      logW(f, 'start')
+      logD(f, 'start')
       let count
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом
 
       let indxFrom = -1
       let fromId = this.getProperty('currentId')
-      logW('fromId=', fromId)
       if (fromId) {
          let allItems = this.loadedItems()
-         logW('allItems=', allItems)
          // найдет элемент в списке (поиск идет вглубь)
          let findItemIndex = (items, id) => {
             let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
@@ -631,11 +629,9 @@ class Group {
             return indx
          }
          let indxFrom = findItemIndex(allItems, fromId)
-         logW('indxFrom=', indxFrom)
          if (indxFrom >= 0) {
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
-            logW('nextItems=', nextItems)
             await this.fulfill(nextItems, 'whole')
             let firstItem = this.reactiveGroup.items[0]
             if (firstItem && this.reactiveGroup.itemType === 'GROUP'){
