@@ -630,13 +630,13 @@ class RxDBWrapper {
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
+               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery)) // до удаления populateObjects
                let populateObjects = mangoQuery.populateObjects
                delete mangoQuery.populateObjects // мешает нормальному кэшированию
                mangoQuery.pagination = {
                   pageSize: mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000,
                   pageToken: null
                }
-               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery))
                let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
                   fetchFunc: async () => {
                      return {

@@ -305,7 +305,7 @@ class Group {
             reactiveGroup: {
                id,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
-               items: [], // кусочек от this.pages
+               items: [], // кусочек от this.pages (для каждого item вызывается populate)
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
@@ -603,29 +603,45 @@ class Group {
    // обрежет список сферху и начнет с этого элемента
    async gotoCurrent () {
       const f = this.gotoCurrent
-      logD(f, 'start')
+      logW(f, 'start')
       let count
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом
 
       let indxFrom = -1
       let fromId = this.getProperty('currentId')
+      logW('fromId=', fromId)
       if (fromId) {
          let allItems = this.loadedItems()
-         let indxFrom = allItems.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === fromId)
-         if (indxFrom === -1) { // на этом уровне fromId не найден
-            if (this.reactiveGroup.itemType === 'GROUP') { // внутри нас группы
-               for (let i = 0; i < allItems.length; i++) {
-                  let reactiveGroup = allItems[i]
-                  let subgroupIndx = await reactiveGroup.gotoCurrent()
-                  if (subgroupIndx >= 0) indxFrom = i // искомый элемент в этой подгруппе
+         logW('allItems=', allItems)
+         // найдет элемент в списке (поиск идет вглубь)
+         let findItemIndex = (items, id) => {
+            let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
+            if (indx === -1) { // на этом уровне fromId не найден (идем вглубь)
+               for (let i = 0; i < items.length; i++) {
+                  let subitems = items[i].items
+                  if (subitems) {
+                     if (findItemIndex(subitems, id) >= 0) {
+                        indx = i
+                        break
+                     }
+                  }
                }
             }
+            return indx
          }
+         let indxFrom = findItemIndex(allItems, fromId)
+         logW('indxFrom=', indxFrom)
          if (indxFrom >= 0) {
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
+            logW('nextItems=', nextItems)
             await this.fulfill(nextItems, 'whole')
+            let firstItem = this.reactiveGroup.items[0]
+            if (firstItem && this.reactiveGroup.itemType === 'GROUP'){
+               firstItem.setProperty('currentId', fromId)
+               await firstItem.gotoCurrent()
+            }
          }
       }
       return indxFrom
@@ -753,7 +769,7 @@ class ReactiveListWithPaginationFactory {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
          let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
          assert(mangoQuery, '!mangoQuery')
-         let groupId = JSON.stringify(mangoQuery)
+         let groupId = JSON.stringify(mangoQuery) + populateFunc ? 'populate' : ''
          this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'top')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
@@ -761,15 +777,6 @@ class ReactiveListWithPaginationFactory {
       assert(rxQueryOrRxDoc.reactiveListHolderMaster.group, '!this.group!')
       let group = rxQueryOrRxDoc.reactiveListHolderMaster.group
       return group.reactiveGroup
-      // return {
-      //    totalCount: group.totalCount,
-      //    next: group.next.bind(group),
-      //    prev: group.prev.bind(group),
-      //    hasNext: group.hasNext.bind(group),
-      //    hasPrev: group.hasPrev.bind(group),
-      //    saveCurrentPos: group.saveCurrentPos.bind(group),
-      //    refresh: group.refresh.bind(group)
-      // }
    }
 }
 
