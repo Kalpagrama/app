@@ -31,7 +31,7 @@ div(
   div(
     :style=`{
       position: 'fixed', zIndex: 10,
-      top: offsetTop+'px',
+      top: 0+'px',
       height: pageId ? contentHeight+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
     }`).row.full-width
     content-player(
@@ -52,22 +52,6 @@ div(
       }`
       ).full-width.bg-black
       //- template(v-slot:tint=`{tintFocused}`)
-        div(
-          v-if="tintFocused"
-          :style=`{
-            position: 'absolute', top: '0px', zIndex: 3000,
-          }`
-          ).row.full-width.justify-center.q-pa-sm
-          div(
-            :style=`{
-              maxWidth: '600px',
-              //- height: '60px',
-              background: 'rgba(30,30,30,0.6)',
-              borderRadius: '10px',
-            }`
-            ).row.full-width.q-pa-sm
-            q-btn(round flat color="white" icon="west")
-            .col
       template(v-slot:tint-bar=`{tintFocused}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-editor-popup(
@@ -75,13 +59,13 @@ div(
             :player="player" :contentKalpa="contentKalpa"
             :background="'rgba(30,30,30,0.6)'"
             :style=`{
-              //- position: 'absolute', zIndex: 2000, top: '0px',
             }`).q-pt-sm.q-px-sm
   //- footer
   div(:style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
     div(
       :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
+        //- maxWidth: $store.state.ui.pageWidth+'px',
+        maxWidth: 600+'px',
         paddingBottom: 'env(safe-area-inset-bottom)',
         borderRadius: '10px 10px 0 0',
       }`).row.full-width.b-40
@@ -144,7 +128,6 @@ export default {
   },
   data () {
     return {
-      offsetTop: 0,
       player: null,
       pageId: null,
       editorHeight: 70,
@@ -194,37 +177,10 @@ export default {
       else {
         this.pageId = pageId
       }
-    },
-    nodePublished () {
-      this.$log('nodePublished')
-      // this.pageId = 'nodes'
-    },
-    nodeSaved () {
-      this.$log('nodeSaved')
-      // this.pageId = 'drafts'
-    },
-    nodeClosed () {
-      this.$log('nodeClosed')
-      // this.pageId = null
-    },
-    nodeDelete () {
-      this.$log('nodeDelete')
-      // this.player.setState('figure', null)
-      // this.$tween.to(this, 0.3, {
-      //   contentHeight: this.contentHeightMax,
-      //   contentWidth: this.contentWidthMax
-      // })
-    },
-    visualViewportOnResize (e) {
-      this.$log('visualViewportOnResize', e)
-      const viewport = window.visualViewport
-      this.offsetTop = viewport.offsetTop
-      // window.scrollTop = viewport.offsetTop
     }
   },
   async mounted () {
     this.$log('mounted')
-    window.visualViewport.addEventListener('resize', this.visualViewportOnResize)
     // get clusters
     this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
     this.$log('clustersRes', this.clustersRes)
@@ -232,7 +188,6 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    window.visualViewport.removeEventListener(this.visualViewportOnResize)
   }
 }
 </script>

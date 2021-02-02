@@ -5,19 +5,36 @@ div(
     paddingTop: '0px',
   }`
   ).row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+  div(:style=`{maxWidth: 600+'px'}`).row.full-width
     slot
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-grey-7.text-bold.q-ml-sm Заметки - {{ nodes.length }}
+      span.text-grey-7.text-bold.q-ml-sm Заметки - {{ itemsRes ? itemsRes.totalCount : '' }}
       q-btn(
         round flat color="grey-7" icon="tune")
-    .row.full-width.q-px-sm
-      kalpa-loader(
+    div(
+      v-if="itemsRes"
+      ).row.full-width.q-px-sm.br
+      div(
+        v-for="(i,ii) in itemsRes.items" :key="ii"
+        :style=`{
+          minHeight: '40px',
+        }`
+        ).row.full-width.items-center.content-center.q-pb-xs
+        //- node name
+        .row.full-width
+          span.text-white {{ i.name }}
+        //- figure info
+        div(v-if="contentKalpa.type === 'VIDEO'").row.full-width
+          small.text-grey-6.q-mr-xs {{ $time(i.items[0].layers[0].figuresAbsolute[0].t) }}
+      //- div(
+        ).row.full-width.q-mb-sm.br
+        small.text-white {{ i.name }}
+      //- kalpa-loader(
         :immediate="true"
         :query="query" :limit="1000"
         @items="nodesUpdated"
         v-slot=`{items,next,nexting}`)
-      div(
+      //- div(
         v-for="(n,ni) in nodes" :key="n.id"
         :style=`{
           minHeight: '50px',
@@ -38,14 +55,19 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import groupItem from '../page_nodes/group_item.vue'
 
 export default {
   name: 'pageDrafts',
   props: ['contentKalpa', 'player', 'node'],
+  components: {
+    groupItem
+  },
   data () {
     return {
       searchString: '',
       nodes: [],
+      itemsRes: null,
     }
   },
   computed: {
@@ -58,13 +80,14 @@ export default {
         sort: [
           {updatedAt: 'desc'},
           // {'items.0.layers.0.figuresAbsolute.0.t': 'desc'}
-        ]
+        ],
+        // limit: 1000
       }
       // add name filter
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
-      }
+      // if (this.searchString.length > 0) {
+      //   let nameRegExp = new RegExp(this.searchString, 'i')
+      //   res.selector.name = {$regex: nameRegExp}
+      // }
       return res
     }
   },
@@ -112,6 +135,10 @@ export default {
       this.figures = figures
       this.player.setState('points', figures)
     }
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.itemsRes = await this.$rxdb.find(this.query, true)
   }
 }
 </script>

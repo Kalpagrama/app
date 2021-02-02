@@ -26,9 +26,6 @@ div(
             div(
               v-if="contentKalpa.type === 'VIDEO'"
               ).row.full-width.q-pa-sm
-              //- .row.full-width
-                span.text-white {{ group.totalCount }}
-              //- .row.full-width
               .row.full-height.items-center.content-center
                 span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute.length) + '–' : 'весь контент' }}
                 span.text-white.text-bold {{ group.figuresAbsolute.length ? $time(group.figuresAbsolute[1].t) : '' }}
@@ -47,10 +44,6 @@ div(
                 flat no-caps dense color="grey-6"
                 ).full-width Up
             //- items
-            //- div(
-              v-for="(item,itemIndex) in group.items"
-              ).row.full-width.q-px-md.q-py-xs
-              span.text-white {{ item.oid }}
             group-item(
               v-for="(item,itemIndex) in group.items" :key="item.oid"
               :item="item.populatedObject"
@@ -101,8 +94,11 @@ export default {
     }
   },
   async mounted () {
-    this.itemsRes = await this.$rxdb.find(this.query, true)
     this.$log('mounted')
+    this.itemsRes = await this.$rxdb.find(this.query, true)
+    // 140449542704336959
+    // this.itemsRes.setProperty('currentId', '140449542704336959')
+    // await this.itemsRes.gotoCurrent()
   }
 }
 </script>

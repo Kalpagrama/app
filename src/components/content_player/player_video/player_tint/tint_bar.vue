@@ -245,7 +245,7 @@ div(
         round flat dense color="green" icon="add_circle_outline")
       q-btn(
         v-if="player && player.figure && options.mode === 'editor'"
-        @click="player.setState('figure', null)"
+        @click="figureDelete()"
         round flat dense color="white" icon="clear")
 </template>
 
@@ -471,6 +471,11 @@ export default {
       let end = start + 30 > this.player.duration ? this.player.duration : start + 30
       let figure = [{t: start, points: []}, {t: end, points: []}]
       this.player.setState('figure', figure)
+      this.player.events.emit('figure-create')
+    },
+    figureDelete () {
+      this.$log('figureDelete')
+      this.player.events.emit('figure-delete')
     },
     tapClick (index) {
       this.$log('tapClick', index)

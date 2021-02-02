@@ -6,31 +6,10 @@ div(
     position: 'absolute', zIndex: 200,
     //- background: options.mode === 'editor' ? 'none' : 'rgba(0,0,0,'+tintBackgroundOpacity+')',
     borderRadius: '10px',
+    overflow: 'hidden',
   }`
   ).row.fit.items-center.content-center.justify-center
   slot(name="tint" :tintFocused="tintFocused")
-  //- q-btn(
-    round flat color="white"
-    :style=`{
-      position: 'absolute', zIndex: 10,
-      right: '0px',
-      width: '50%',
-    }`
-    ).full-height.br
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 10,
-      left: '0px',
-      width: '50%',
-    }`
-    ).row.full-height
-    div(:style=`{position: 'relative',}`).row.fit
-      q-btn(
-        round flat color="white"
-        :style=`{
-          position: 'relative',
-        }`
-        ).fit.br
   //- header
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     tint-header(
@@ -44,6 +23,36 @@ div(
   q-spinner(
     v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
     color="white" size="50px")
+  //- tick left
+  transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
+    div(
+      v-if="tintClickSelfCountShow === 0"
+      :style=`{
+        position: 'absolute', zIndex: 10, left: '0px',
+        pointerEvents: 'none', userSelect: 'none',
+        height: '100%',
+        width: '33%',
+        background: 'linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
+        borderRadius: '10px 0 0 10px',
+      }`
+      ).row.items-center.content-center.justify-center
+      q-icon(name="fast_forward" color="white" size="20px").q-mr-xs
+      span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
+  //- tick right
+  transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+    div(
+      v-if="tintClickSelfCountShow === 1"
+      :style=`{
+        position: 'absolute', zIndex: 10, right: '0px',
+        pointerEvents: 'none', userSelect: 'none',
+        height: '100%',
+        width: '33%',
+        background: 'linear-gradient(270deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
+        borderRadius: '0 10px 10px 0',
+      }`
+      ).row.items-center.content-center.justify-center
+      span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
+      q-icon(name="fast_forward" color="white" size="20px").q-ml-xs
   //- actions
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(
@@ -104,6 +113,7 @@ export default {
       tintMousemoveTimeout: null,
       tintClickSelfTimeout: null,
       tintClickSelfCount: 0,
+      tintClickSelfCountShow: false,
     }
   },
   computed: {
@@ -125,16 +135,17 @@ export default {
   },
   methods: {
     tintClickSelf (e) {
-      this.$log('tintClickSelf', this.tintClickSelfCount)
+      // this.$log('tintClickSelf', this.tintClickSelfCount)
       // this.tintClickSelfTimeout
       this.tintClickSelfCount += 1
+      // this.tintClickSelfCountShow = true
       if (this.tintClickSelfTimeout) {
         clearTimeout(this.tintClickSelfTimeout)
         this.tintClickSelfTimeout = null
       }
-      this.tintClickSelfTimeout = setTimeout(() => {
+      this.tintClickSelfTimeout = setTimeout(async () => {
         if (this.tintClickSelfCount === 1) {
-          this.$log('tintClickSelf ONE')
+          // this.$log('tintClickSelf ONE')
           if (this.options.mode === 'feed') {
             if (this.player.muted) {
               this.player.setState('muted', false)
@@ -155,21 +166,29 @@ export default {
             this.tintFocused = !this.tintFocused
           }
         }
+        await this.$wait(300)
         this.tintClickSelfCount = 0
+        this.tintClickSelfCountShow = false
       }, 200)
       if (this.tintClickSelfCount === 1) {
         // this.$log('tintClickSelf ONE')
       }
       else {
-        this.$log('tintClickSelf DOUBLE', e)
+        // this.$log('tintClickSelf DOUBLE', e)
         let t = this.player.currentTime
         let d = ((this.tintClickSelfCount - 1) * 5)
         let width = e.target.offsetWidth
         let x = e.layerX
         let p = x / width
-        this.$log('p', p)
-        if (p <= 0.5) t -= d
-        else t += d
+        // this.$log('p', p)
+        if (p <= 0.5) {
+          t -= d
+          this.tintClickSelfCountShow = 0
+        }
+        else {
+          t += d
+          this.tintClickSelfCountShow = 1
+        }
         if (t < 0) t = 0
         if (t > this.player.duration) t = this.player.duration
         this.player.setCurrentTime(t)

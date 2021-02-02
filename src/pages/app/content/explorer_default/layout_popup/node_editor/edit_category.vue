@@ -28,13 +28,11 @@ export default {
   props: ['node'],
   data () {
     return {
-      nodeCategories: [],
     }
   },
   computed: {
     options () {
-      // return this.nodeCategories
-      return this.nodeCategories.reduce((acc, val) => {
+      return this.$store.state.ui.nodeCategories.reduce((acc, val) => {
         if (val.type !== 'ALL') {
           acc.push({
             value: val.type,
@@ -56,7 +54,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

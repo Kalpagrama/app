@@ -114,11 +114,39 @@ export default {
     },
     async nodeDelete () {
       this.$log('nodeDelete')
-      if (!this.isMini) {
-        this.$emit('toggle')
-      }
-      this.player.setState('figure', null)
+      this.player.events.emit('figure-delete')
+      // if (!this.isMini) {
+      //   this.$emit('toggle')
+      // }
+      // this.player.setState('figure', null)
     },
+    async playerFigureDeleteHandle (e) {
+      this.$log('playerFigureDeleteHandle', e)
+      if (confirm('Сохранить в черновики ?')) {
+        // do staff
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        nodeInput.items[0] = this.compositionCreate()
+        let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+        this.$log('nodeSaved', nodeSaved)
+        this.player.setState('figure', null)
+      }
+      else {
+        this.player.setState('figure', null)
+      }
+    },
+    playerFigureCreateHandle (e) {
+      this.$log('playerFigureCreateHandle', e)
+    },
+  },
+  mounted () {
+    this.$log('mounted')
+    this.player.events.on('figure-create', this.playerFigureCreateHandle)
+    this.player.events.on('figure-delete', this.playerFigureDeleteHandle)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.player.events.off('figure-create', this.playerFigureCreateHandle)
+    this.player.events.off('figure-delete', this.playerFigureDeleteHandle)
   }
 }
 </script>

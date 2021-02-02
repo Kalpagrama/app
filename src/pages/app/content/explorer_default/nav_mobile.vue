@@ -3,7 +3,8 @@
   div(
     :style=`{
       height: '70px',
-      maxWidth: $store.state.ui.pageWidth+'px',
+      //- maxWidth: $store.state.ui.pageWidth+'px',
+      maxWidth: 600+'px',
       borderRadius: '10px 10px 0 0',
     }`
     ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
@@ -13,13 +14,6 @@
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Назад
-    //- q-btn(
-      @click="$emit('pageId', 'creator')"
-      flat icon="add_circle_outline" no-caps
-      :color="'green'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Создать
     q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps

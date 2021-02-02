@@ -11,6 +11,7 @@ div(
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       q-btn(
         v-if="true"
+        @click="contentClick"
         flat color="white" no-caps dense
         align="left" icon="select_all"
         :to="contentLink"
@@ -39,5 +40,11 @@ export default {
       return '/content/' + this.contentKalpa.oid
     }
   },
+  methods: {
+    contentClick () {
+      this.$log('contentClick')
+      // this.$store.commit('ui/stateSet', ['nodeOnContent'])
+    },
+  }
 }
 </script>
