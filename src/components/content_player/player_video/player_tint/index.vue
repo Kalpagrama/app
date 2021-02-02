@@ -36,7 +36,7 @@ div(
         borderRadius: '10px 0 0 10px',
       }`
       ).row.items-center.content-center.justify-center
-      q-icon(name="fast_forward" color="white" size="20px").q-mr-xs
+      q-icon(name="fast_rewind" color="white" size="20px").q-mr-xs
       span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
   //- tick right
   transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
@@ -225,6 +225,29 @@ export default {
       else {
         // this.tintFocused = false
       }
+    },
+    onKeydown (e) {
+      // this.$log('onKeydown', e)
+      switch (e.key) {
+        case 'ArrowLeft':
+          // Left pressed
+          if (this.tintClickSelfCount === 0) this.tintClickSelfCount = 1
+          this.tintClickSelf({layerX: 0.1, target: {offsetWidth: 1}})
+          break
+        case 'ArrowRight':
+          // Right pressed
+          if (this.tintClickSelfCount === 0) this.tintClickSelfCount = 1
+          this.tintClickSelf({layerX: 0.9, target: {offsetWidth: 1}})
+          break
+        case 'ArrowUp':
+          // Up pressed
+          this.player.setState('muted', false)
+          break
+        case 'ArrowDown':
+          // Down pressed
+          this.player.setState('muted', true)
+          break
+      }
     }
   },
   mounted () {
@@ -232,12 +255,18 @@ export default {
     // if (this.$q.platform.is.desktop) {
     //   window.addEventListener('mousemove', this.tintMousemove)
     // }
+    if (this.options.mode === 'editor') {
+      window.addEventListener('keydown', this.onKeydown)
+    }
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
     // if (this.$q.platform.is.desktop) {
     //   window.removeEventListener('mousemove', this.tintMousemove)
     // }
+    if (this.options.mode === 'editor') {
+      window.removeEventListener('keydown', this.onKeydown)
+    }
   }
 }
 </script>
