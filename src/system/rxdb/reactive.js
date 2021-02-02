@@ -406,10 +406,13 @@ class Group {
       let listItems = []
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
+         let mangoQuery = rxQuery.mangoQuery
+         assert(mangoQuery, '!mangoQuery')
          let rxDocs = await rxQuery.exec()
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          this.reactiveGroup.totalCount = listItems.length
+         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
          this.reactiveGroup.itemPrimaryKey = 'id'
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
@@ -419,11 +422,13 @@ class Group {
             prevPageToken,
             currentPageToken
          } = rxDoc.toJSON().cached.data
+         let mangoQuery = rxDoc.props.mangoQuery
+         assert(mangoQuery, '!mangoQuery')
          listItems = items
          this.reactiveGroup.totalCount = totalCount
-         assert(rxDoc.props.mangoQuery, '!mangoQuery')
-         assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-         switch (rxDoc.props.mangoQuery.selector.rxCollectionEnum) {
+         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
+         assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+         switch (mangoQuery.selector.rxCollectionEnum) {
             case RxCollectionEnum.LST_SPHERE_ITEMS:
             case RxCollectionEnum.LST_SEARCH:
             case RxCollectionEnum.LST_SUBSCRIBERS:
@@ -434,16 +439,18 @@ class Group {
                this.reactiveGroup.itemPrimaryKey = 'id' // эвенты
                break
             default:
-               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + rxDoc.props.mangoQuery.selector.rxCollectionEnum)
+               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       } else if (array) {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
+         this.reactiveGroup.itemType = 'ITEM' // todo определять тип итемов внутри!
          if (listItems.length) {
             if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
             else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
+      assert(this.reactiveGroup.itemType.in('GROUP', 'ITEM'), 'bad itemType')
       assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
       assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
       let page = {
@@ -460,10 +467,6 @@ class Group {
          this.reactiveGroup.pages.unshift(page)
       } else {
          this.reactiveGroup.pages.push(page)
-      }
-      if (listItems.length) {
-         if (listItems[0].items) this.reactiveGroup.itemType = 'GROUP'
-         else this.reactiveGroup.itemType = 'ITEM'
       }
       if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
@@ -538,7 +541,7 @@ class Group {
                figuresAbsolute,
                thumbUrl
             } = nextGroup
-            if (!items) {
+            if (!items || !totalCount) {
                logD('asdfasdfsadfsadf')
             }
             assert(items && totalCount >= 0, '!nextItem.items')
