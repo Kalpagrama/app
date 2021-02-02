@@ -58,7 +58,7 @@ export default {
       muted: true,
       events: {},
       figure: null,
-      figureFocused: false,
+      figureFocused: null,
       figureOffset: null,
       figures: [],
       points: [],

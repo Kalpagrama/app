@@ -136,8 +136,8 @@ export default {
       immediate: true,
       handler (to, from) {
         if (!this.itemsRes) return
-        if (this.scrollHeight - to < 1000) this.next()
-        if (to < 1000) this.prev()
+        if (this.scrollHeight - to < 2000) this.next()
+        if (to < 2000) this.prev()
       }
     }
   },

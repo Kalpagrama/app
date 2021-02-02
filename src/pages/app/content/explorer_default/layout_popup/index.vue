@@ -21,7 +21,7 @@ div(
   //- header node editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     node-editor-popup(
-      v-if="player && player.figure"
+      v-if="player && player.figure && $q.screen.xs"
       :player="player" :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
       :style=`{
@@ -68,11 +68,15 @@ div(
             ).row.full-width.q-pa-sm
             q-btn(round flat color="white" icon="west")
             .col
-      //- template(v-slot:tint-bar=`{tintFocused}`)
+      template(v-slot:tint-bar=`{tintFocused}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-editor-popup(
-            v-if="player && player.figure"
-            :player="player" :contentKalpa="contentKalpa")
+            v-if="player && player.figure && $q.screen.gt.xs"
+            :player="player" :contentKalpa="contentKalpa"
+            :background="'rgba(30,30,30,0.6)'"
+            :style=`{
+              //- position: 'absolute', zIndex: 2000, top: '0px',
+            }`).q-pt-sm.q-px-sm
   //- footer
   div(:style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
     div(
@@ -97,7 +101,7 @@ div(
           zIndex: 1000,
           borderRadius: '10px 10px 0 0',
         }`).b-40
-      node-editor(
+      //- node-editor(
         v-if="player && player.figure"
         :player="player"
         :contentKalpa="contentKalpa"
@@ -173,6 +177,13 @@ export default {
     }
   },
   watch: {
+    'player.figure': {
+      handler (to, from) {
+        if (to) {
+          this.pageId = null
+        }
+      }
+    }
   },
   methods: {
     pageIdChange (pageId) {

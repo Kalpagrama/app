@@ -1,5 +1,6 @@
 <template lang="pug">
 div(
+  accessKey="figure-wrapper"
   :style=`{
     position: 'absolute', zIndex: 2200,
     top: '-2px',
@@ -30,6 +31,15 @@ div(
         fontSize: '10px',
       }`
       ) {{$time(player.figure[1].t-player.figure[0].t)}}
+  //- header, play
+  //- div(
+    :style=`{
+      position: 'absolute', zIndex: 2001,
+      top: '-36px',
+      height: '36px',
+    }`
+    ).row.full-width.bg-red
+    q-btn(round flat dense color="white" icon="play_arrow")
   //- drag indicator icon left
   div(
     :style=`{
@@ -46,7 +56,10 @@ div(
       :size="pointDraggingIndex === 0 ? '18px' : '14px'")
   //- drag handle left
   div(
+    @click.stop.self="pointClick(0)"
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
+    :class=`{
+    }`
     :style=`{
       position: 'absolute', zIndex: 2010,
       top: '-10px',
@@ -56,6 +69,34 @@ div(
       cursor: 'grabbing',
     }`
     ).row
+  //- drag actions
+  div(
+    v-if="player.figureFocused === 0"
+    :style=`{
+      position: 'absolute', zIndex: 2020,
+      left: '-36px',
+      bottom: '-40px',
+    }`).row
+    q-btn(
+      @click.stop="figureForward(0,false)"
+      round flat dense color="white" icon="keyboard_arrow_left")
+    q-btn(
+      @click.stop="figureForward(0,true)"
+      round flat dense color="white" icon="keyboard_arrow_right")
+  //- drag anchor
+  div(
+    v-if="player.figureFocused === 0"
+    :class=`{
+    }`
+    :style=`{
+      position: 'absolute', zIndex: 2020,
+      top: '-38px',
+      left: -18+'px',
+    }`
+    ).row.items-end.content-end
+    q-btn(
+      @click="player.setState('figureFocused', null)"
+      round flat dense color="white" icon="push_pin")
   //- drag indicator icon right
   div(
     :style=`{
@@ -72,7 +113,10 @@ div(
       :size="pointDraggingIndex === 1 ? '18px' : '14px'")
   //- drag handle right
   div(
+    @click.stop.self="pointClick(1)"
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
+    :class=`{
+    }`
     :style=`{
       position: 'absolute', zIndex: 2020,
       top: '-10px',
@@ -82,6 +126,34 @@ div(
       cursor: 'grabbing',
     }`
     ).row
+  //- drag actions
+  div(
+    v-if="player.figureFocused === 1"
+    :style=`{
+      position: 'absolute', zIndex: 2020,
+      right: '-36px',
+      bottom: '-40px',
+    }`).row
+    q-btn(
+      @click.stop="figureForward(1,false)"
+      round flat dense color="white" icon="keyboard_arrow_left")
+    q-btn(
+      @click.stop="figureForward(1,true)"
+      round flat dense color="white" icon="keyboard_arrow_right")
+  //- drag anchor
+  div(
+    v-if="player.figureFocused === 1"
+    :class=`{
+    }`
+    :style=`{
+      position: 'absolute', zIndex: 2020,
+      top: '-38px',
+      right: -18+'px',
+    }`
+    ).row.items-end.content-end
+    q-btn(
+      @click="player.setState('figureFocused', null)"
+      round flat dense color="white" icon="push_pin")
 </template>
 
 <script>
@@ -92,14 +164,71 @@ export default {
     return {
       pointDragging: false,
       pointDraggingIndex: -1,
+      // pointClicked: null,
+      figureForwardTimer: null,
     }
   },
   methods: {
+    async figureForward (pointIndex, goingForward) {
+      // this.$log('figureForward', pointIndex, goingForward)
+      // this.player.pause()
+      let t = this.player.figure[pointIndex].t
+      // add tick of 0.1 to t of figure
+      if (goingForward) t += 0.1
+      else t -= 0.1
+      // check t > 0 and t < duration
+      if (t < 0) t = 0
+      if (t > this.player.duration) t = this.player.duration
+      // this.$log('t', t)
+      this.$set(this.player.figure[pointIndex], 't', t)
+      this.player.setCurrentTime(t)
+      // check timer ? clear timeout
+      if (this.figureForwardTimer) {
+        clearTimeout(this.figureForwardTimer)
+        this.figureForwardTimer = null
+      }
+      // no timer ? its first click !
+      else {
+        this.$log('figureForward FIRST')
+      }
+      // wait for the end..
+      this.figureForwardTimer = setTimeout(async () => {
+        this.$log('figureForward FINAL')
+        // this.player.setState('figureFocused', true)
+        // if (pointIndex === 0) {
+        //   // do nothing ? focus and play
+        //   // this.player.play()
+        // }
+        // if (pointIndex === 1) {
+        //   // play last 3 sec if possible ?
+        //   // or from the start...
+        //   let t = this.player.figure[1].t - 3
+        //   if (t < this.player.figure[0].t) {
+        //     t = this.player.figure[0].t
+        //   }
+        //   await this.$wait(300)
+        //   this.player.setCurrentTime(t)
+        //   // this.player.play()
+        // }
+      }, 700)
+    },
+    pointClick (pointIndex) {
+      this.$log('pointClick', pointIndex)
+      // this.pointClicked = pointIndex
+      if (this.player.figureFocused === pointIndex) {
+        this.player.setState('figureFocused', null)
+      }
+      else {
+        this.player.setState('figureFocused', pointIndex)
+        this.player.setCurrentTime(this.player.figure[pointIndex].t)
+      }
+    },
     async pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
       // first
       if (e.isFirst) {
         this.$emit('first')
+        this.pointClicked = null
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.player.pause()
