@@ -8,6 +8,7 @@
     :color="bookmark ? activeColor : inactiveColor"
     :icon="bookmark ? 'bookmark' : 'bookmark_outline'"
     :loading="loading")
+    q-tooltip(dense dark) Добавить в закладки
     //- :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
     //- q-badge(floating transparent)
     //- q-icon(

@@ -21,7 +21,8 @@
       .row.full-width
         .row.items-center.content-center
           kalpa-share(type="node" :item="node")
-            q-btn(round flat color="grey-9")
+            //- q-tooltip(dense dark) Поделиться
+            //- q-btn(round flat color="grey-9")
               q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
@@ -35,6 +36,7 @@
           q-btn(
             round flat color="grey-9"
             :to="'/node/'+node.oid")
+            q-tooltip(dense dark) Микроядра
             q-icon(name="workspaces" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
@@ -51,6 +53,7 @@
             small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
           q-btn(round flat color="grey-9")
+            q-tooltip(dense dark) Связи
             q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col
