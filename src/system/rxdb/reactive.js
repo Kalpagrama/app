@@ -380,23 +380,21 @@ class Group {
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
             logD(f, 'List::rxDoc changed. try to change this.listItems')
             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            let page = this.reactiveGroup.pages.find(pg => pg.id === change.id)
-            assert(page, '!page')
-            page.listItems = change.cached.data.items // изменились итемы страницы
-
+            await this.upsertPaginationPage(rxDoc, 'top', change.id, false)
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-               startFullFil = 0
-               endFullFil = 11
+               endFullFil = startFullFil = 0
             }
             let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
             await this.fulfill(nextItems, 'whole')
+            let thiz = this
+            logD('thiz', thiz)
          })
       }
    }
 
-   async addPaginationPage (rxQueryOrRxDocOrArray, position) {
-      const f = this.addPaginationPage
+   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, pageId = null, subscribe = true) {
+      const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
       assert(position.in('top', 'bottom'), 'bad position')
       let rxQuery, rxDoc, array
@@ -427,21 +425,6 @@ class Group {
          assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
          switch (rxDoc.props.mangoQuery.selector.rxCollectionEnum) {
             case RxCollectionEnum.LST_SPHERE_ITEMS:
-               // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
-               assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
-               for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
-                  assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
-                  if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
-                     let indx = listItems.findIndex(el => el.oid === oidObject)
-                     if (indx === -1 && type === 'OBJECT_CREATED') {
-                        listItems.push({ oid: oidObject }) // если нет такого - создадим
-                     } else if (indx >= 0 && type === 'OBJECT_DELETED') {
-                        listItems.splice(indx, 1) // удалим
-                     }
-                  }
-               }
-               this.reactiveGroup.itemPrimaryKey = 'oid'
-               break
             case RxCollectionEnum.LST_SEARCH:
             case RxCollectionEnum.LST_SUBSCRIBERS:
             case RxCollectionEnum.LST_SUBSCRIPTIONS:
@@ -470,7 +453,10 @@ class Group {
          prevPageToken: rxDoc ? rxDoc.cached.data.prevPageToken : null,
          currentPageToken: rxDoc ? rxDoc.cached.data.currentPageToken : null
       }
-      if (position === 'top') {
+      if (pageId) {
+         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.id === pageId)
+         if (pageIndx >= 0) this.reactiveGroup.pages.splice(pageIndx, 1, page)
+      } else if (position === 'top') {
          this.reactiveGroup.pages.unshift(page)
       } else {
          this.reactiveGroup.pages.push(page)
@@ -479,7 +465,7 @@ class Group {
          if (listItems[0].items) this.reactiveGroup.itemType = 'GROUP'
          else this.reactiveGroup.itemType = 'ITEM'
       }
-      this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
+      if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
 
    async refresh () {
@@ -534,6 +520,7 @@ class Group {
       return { startFullFil, endFullFil }
    }
 
+   // заполнить итоговый массив
    async fulfill (nextItems, position) {
       assert(position.in('top', 'bottom', 'whole'), 'bad position')
       // let isGroupedList = (items) => items.length && items[0].items
@@ -564,7 +551,7 @@ class Group {
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
             Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
             Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
-            await group.addPaginationPage(items, 'bottom')
+            await group.upsertPaginationPage(items, 'bottom')
             await group.next(3) // сразу грузим по 3 ядра в группе
             return group.reactiveGroup
          }
@@ -684,7 +671,7 @@ class Group {
          // todo при указанных fromId и fromT - при необходимости сгенерировать токен (например когда переехали в конец контента)
          if (pageToken) {
             let rxDocPagination = await this.paginateFunc(pageToken, count * 2)
-            await this.addPaginationPage(rxDocPagination, 'bottom')
+            await this.upsertPaginationPage(rxDocPagination, 'bottom')
             let range = this.fulFilledRange() // новые значения для fulfilled области
             startFullFil = range.startFullFil
             endFullFil = range.endFullFil
@@ -727,7 +714,7 @@ class Group {
          // запросим данные с сервера (вверх)
          if (this.reactiveGroup.pages.length && this.reactiveGroup.pages[0].prevPageToken) {
             let rxDocPagination = await this.paginateFunc(this.reactiveGroup.pages[0].prevPageToken, count * 2)
-            await this.addPaginationPage(rxDocPagination, 'top')
+            await this.upsertPaginationPage(rxDocPagination, 'top')
             let range = this.fulFilledRange() // новые значения для fulfilled области
             startFullFil = range.startFullFil
             endFullFil = range.endFullFil
@@ -765,7 +752,7 @@ class ReactiveListWithPaginationFactory {
          assert(mangoQuery, '!mangoQuery')
          let groupId = JSON.stringify(mangoQuery)
          this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
-         await this.group.addPaginationPage(rxQueryOrRxDoc, 'top')
+         await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'top')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
       }
       assert(rxQueryOrRxDoc.reactiveListHolderMaster.group, '!this.group!')
