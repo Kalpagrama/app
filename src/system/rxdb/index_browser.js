@@ -600,6 +600,9 @@ class RxDBWrapper {
                            let fulfilled = reactiveListFulFilled.find(itemFull => itemFull.oid === topObject.oid)
                            if (fulfilled) return fulfilled
                         }
+                        if (!topObject.oid) {
+                           logD('asdasdasdasdasd')
+                        }
                         return this.get(RxCollectionEnum.OBJ, topObject.oid, { clientFirst: true })
                            .then(populatedObject => {
                               let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
@@ -724,7 +727,7 @@ class RxDBWrapper {
       const t1 = performance.now()
       // logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
-         assert(idOrRawId)
+         assert(idOrRawId, 'idOrRawId!')
          if (idOrRawId.includes('::')) {
             id = idOrRawId
          } else {

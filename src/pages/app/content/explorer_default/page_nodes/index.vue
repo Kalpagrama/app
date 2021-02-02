@@ -30,8 +30,8 @@ div(
                 span.text-white {{ group.totalCount }}
               //- .row.full-width
               .row.full-height.items-center.content-center
-                span.text-white.text-bold.q-mr-sm {{ $time(group.figuresAbsolute[0].t) }} -
-                span.text-white.text-bold {{ $time(group.figuresAbsolute[1].t) }}
+                span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute.length) + '–' : 'весь контент' }}
+                span.text-white.text-bold {{ group.figuresAbsolute.length ? $time(group.figuresAbsolute[1].t) : '' }}
               .col
               span.text-white.text-bold {{ group.totalCount }}
             div(

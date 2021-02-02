@@ -43,6 +43,8 @@ class Lists {
       return blackLists
    }
 
+   // список последних созданных/удаленных сущностей и сферы на которые они попали
+   // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
    // то мы можем запросить сферу до того как объект будет на нее помещен
    static async getObjectsWithRelatedSpheres () {
       let objectsWithRelatedSpheres = await rxdb.get(RxCollectionEnum.META, 'objectsWithRelatedSpheres')
@@ -51,9 +53,6 @@ class Lists {
       assert(objectsWithRelatedSpheres && Array.isArray(objectsWithRelatedSpheres), 'bad objectsWithRelatedSpheres')
       return objectsWithRelatedSpheres
    }
-
-   // список последних созданных/удаленных сущностей и сферы на которые они попали
-   // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
 
    static isElementBlacklisted (el, blackLists) {
       assert(blackLists && blackLists.blackListObjectOids && blackLists.blackListAuthorOids, 'bad blackLists')
@@ -91,6 +90,22 @@ class Lists {
       }
       let rxDoc = await this.cache.get(id, fetchFunc)
       if (!rxDoc) throw new Error('объект не найден')
+
+      // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
+      assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
+      for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
+         assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
+         if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
+            await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oidObject })
+            // let indx = listItems.findIndex(el => el.oid === oidObject)
+            // if (indx === -1 && type === 'OBJECT_CREATED') {
+            //    listItems.push({ oid: oidObject }) // если нет такого - создадим
+            // } else if (indx >= 0 && type === 'OBJECT_DELETED') {
+            //    listItems.splice(indx, 1) // удалим
+            // }
+         }
+      }
+
       return rxDoc
    }
 
@@ -121,6 +136,130 @@ class Lists {
          //    reactiveItem.count -= countDiff
          //    reactiveItem.totalCount -= countDiff
          // }
+      }
+   }
+
+   async addRemoveObjectToRxDoc(type, rxDoc, object){
+      const f = this.addRemoveObjectToRxDoc
+      let mangoQuery = rxDoc.props.mangoQuery
+      let contentOid = rxDoc.props.oid
+      logD('apply to rxdoc', rxDoc.id, mangoQuery)
+      let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+      let foundGroup
+      if (!mangoQuery.selector.groupByContentLocation) { // список без группировки
+         foundGroup = reactiveItem
+      } else { // список c группировкой
+         // для списка с группировкой нужен полный объект (нужны фигуры!) А через эвенты к нам прилетают неполные объекты object
+         let objectFull = await rxdb.get(RxCollectionEnum.LOCAL, null, { id: makeId(RxCollectionEnum.OBJ, object.oid) })
+
+         if (objectFull) {
+            let intersects = (figuresAbsoluteLeft, figuresAbsoluteRight) => { // содержит ли диапазон фигуру
+               assert(Array.isArray(figuresAbsoluteLeft) && Array.isArray(figuresAbsoluteRight), 'bad figuresAbsolute!')
+               if (!figuresAbsoluteLeft.length || !figuresAbsoluteRight.length) return true // [] - это контент целиком
+               let polygonInresects = (figureLeft, figureRight) => { // пересечение полигогнов
+                  if (!figureLeft.points.length && !figureRight.points.length) return true
+                  logE('TODO polygonInresects')
+                  return false
+               }
+               let epubCfiIntersects = (figureLeft, figureRight) => { // пересечение куков книги
+                  if (!figureLeft.epubCfi && !figureRight.epubCfi) return true
+                  logE('TODO epubCfiInresects')
+                  return false
+               }
+               for (let i = 0; i < figuresAbsoluteLeft.length; i++) {
+                  let figureLeftStart = figuresAbsoluteLeft[i]
+                  let figureLeftEnd = figuresAbsoluteLeft[i + 1] || figureLeftStart // иногда в массиве только 1 элемент
+                  for (let j = 0; j < figuresAbsoluteRight.length; j++) {
+                     let figureRightStart = figuresAbsoluteRight[j]
+                     let figureRightEnd = figuresAbsoluteRight[j + 1] || figureRightStart // иногда в массиве только 1 элемент
+                     // a.start <= b.end AND a.end >= b.start
+                     let leftStartT = figureLeftStart.t || -1
+                     let leftEndT = figureLeftEnd.t || -1
+                     let rightStartT = figureRightStart.t || -1
+                     let rightEndT = figureRightEnd.t || -1
+                     let tCheck = leftStartT <= rightEndT && leftEndT >= rightStartT
+                     let polygonCheck =
+                        polygonInresects(figureLeftStart, figureRightStart) ||
+                        polygonInresects(figureLeftStart, figureRightEnd) ||
+                        polygonInresects(figureLeftEnd, figureRightStart) ||
+                        polygonInresects(figureLeftEnd, figureRightEnd)
+                     let epubCfiCheck =
+                        epubCfiIntersects(figureLeftStart, figureRightStart) ||
+                        epubCfiIntersects(figureLeftStart, figureRightEnd) ||
+                        epubCfiIntersects(figureLeftEnd, figureRightStart) ||
+                        epubCfiIntersects(figureLeftEnd, figureRightEnd)
+                     if (tCheck && polygonCheck && epubCfiCheck) return true
+                  }
+               }
+               return false
+            }
+            // перебрать все группы из имеющихся и найти первую, подходящую под FiguresAbsolute
+            if (reactiveItem.items.length === 0){
+               // создадим первую группу руками
+               let group = {
+                  items: [],
+                  totalCount: 0,
+                  nextPageToken: null,
+                  prevPageToken: null,
+                  currentPageToken: null,
+                  figuresAbsolute: [], // весь контент
+                  thumbUrl: null
+               }
+               reactiveItem.items.splice(0, 0, group)
+            }
+            for (let group of reactiveItem.items) {
+               let groupFiguresAbsolute = group.figuresAbsolute
+               assert(groupFiguresAbsolute, '!group.figuresAbsolute')
+               // вернет все области контента, задествованные на этом ядре
+               let findObjectFigures = (objectFull, contentOid) => {
+                  let res = []
+                  for (let item of objectFull.items) {
+                     if (item.type === 'COMPOSITION') {
+                        assert(item.layers && item.layers.length, '!item.layers')
+                        for (let layer of item.layers) {
+                           if (layer.contentOid === contentOid) res.push(layer.figuresAbsolute)
+                        }
+                     } else if (item.type === 'NODE') {
+                        res.push(...findObjectFigures(item, contentOid))
+                     } else if (item.type.in('VIDEO', 'BOOK', 'IMAGE')) {
+                        if (item.oid === contentOid) res.push([])
+                     } else {
+                        throw new Error('bad item!: ' + JSON.stringify(item))
+                     }
+                  }
+                  return res
+               }
+               let objectFiguresAbsoluteList = findObjectFigures(objectFull, contentOid)
+               for (let objectFiguresAbsolute of objectFiguresAbsoluteList) {
+                  assert(objectFiguresAbsolute, '!objectFiguresAbsolute')
+                  if (intersects(groupFiguresAbsolute, objectFiguresAbsolute)) {
+                     foundGroup = group
+                     break // берем первую подходящую
+                  }
+               }
+               if (foundGroup) break
+            }
+         } else {
+            // если объекта в кэше нет - ничего не поделать! мы не знаем в какю группу его включить!
+            // todo поставить ttl = zero на этом списке
+         }
+      }
+      if (foundGroup) {
+         assert(foundGroup.items, '!foundGroup.items')
+         assert(foundGroup.totalCount >= 0, 'foundGroup.totalCount >= 0')
+         let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
+         if (type === 'OBJECT_CREATED') {
+            if (indx === -1) {
+               foundGroup.items.splice(0, 0, { oid: object.oid })
+               foundGroup.totalCount++
+            }
+         } else if (type === 'OBJECT_DELETED') {
+            if (indx >= 0) {
+               logD(f, 'delete object from list', indx)
+               foundGroup.items.splice(indx, 1)
+               foundGroup.totalCount--
+            }
+         }
       }
    }
 
@@ -156,113 +295,7 @@ class Lists {
       }
       logD(f, 'finded lists: ', rxDocs)
       for (let rxDoc of rxDocs) {
-         let mangoQuery = rxDoc.props.mangoQuery
-         let contentOid = rxDoc.props.oid
-         logD('apply to rxdoc', rxDoc.id, mangoQuery)
-         let reactiveItem = getReactiveDoc(rxDoc).getPayload()
-         let foundGroup
-         if (!mangoQuery.selector.groupByContentLocation) { // список без группировки
-            foundGroup = reactiveItem
-         } else { // список c группировкой
-            // для списка с группировкой нужен полный объект (нужны фигуры!) А через эвенты к нам прилетают неполные объекты object
-            let objectFull = await rxdb.get(RxCollectionEnum.LOCAL, null, { id: makeId(RxCollectionEnum.OBJ, object.oid) })
-
-            if (objectFull) {
-               let intersects = (figuresAbsoluteLeft, figuresAbsoluteRight) => { // содержит ли диапазон фигуру
-                  assert(Array.isArray(figuresAbsoluteLeft) && Array.isArray(figuresAbsoluteRight), 'bad figuresAbsolute!')
-                  if (!figuresAbsoluteLeft.length || !figuresAbsoluteRight.length) return true // [] - это контент целиком
-                  let polygonInresects = (figureLeft, figureRight) => { // пересечение полигогнов
-                     if (!figureLeft.points.length && !figureRight.points.length) return true
-                     logE('TODO polygonInresects')
-                     return false
-                  }
-                  let epubCfiIntersects = (figureLeft, figureRight) => { // пересечение куков книги
-                     if (!figureLeft.epubCfi && !figureRight.epubCfi) return true
-                     logE('TODO epubCfiInresects')
-                     return false
-                  }
-                  for (let i = 0; i < figuresAbsoluteLeft.length; i++) {
-                     let figureLeftStart = figuresAbsoluteLeft[i]
-                     let figureLeftEnd = figuresAbsoluteLeft[i + 1] || figureLeftStart // иногда в массиве только 1 элемент
-                     for (let j = 0; j < figuresAbsoluteRight.length; j++) {
-                        let figureRightStart = figuresAbsoluteRight[j]
-                        let figureRightEnd = figuresAbsoluteRight[j + 1] || figureRightStart // иногда в массиве только 1 элемент
-                        // a.start <= b.end AND a.end >= b.start
-                        let leftStartT = figureLeftStart.t || -1
-                        let leftEndT = figureLeftEnd.t || -1
-                        let rightStartT = figureRightStart.t || -1
-                        let rightEndT = figureRightEnd.t || -1
-                        let tCheck = leftStartT <= rightEndT && leftEndT >= rightStartT
-                        let polygonCheck =
-                           polygonInresects(figureLeftStart, figureRightStart) ||
-                           polygonInresects(figureLeftStart, figureRightEnd) ||
-                           polygonInresects(figureLeftEnd, figureRightStart) ||
-                           polygonInresects(figureLeftEnd, figureRightEnd)
-                        let epubCfiCheck =
-                           epubCfiIntersects(figureLeftStart, figureRightStart) ||
-                           epubCfiIntersects(figureLeftStart, figureRightEnd) ||
-                           epubCfiIntersects(figureLeftEnd, figureRightStart) ||
-                           epubCfiIntersects(figureLeftEnd, figureRightEnd)
-                        if (tCheck && polygonCheck && epubCfiCheck) return true
-                     }
-                  }
-                  return false
-               }
-               // перебрать все группы из имеющихся и найти первую, подходящую под FiguresAbsolute
-               for (let group of reactiveItem.items) {
-                  let groupFiguresAbsolute = group.figuresAbsolute
-                  assert(groupFiguresAbsolute, '!group.figuresAbsolute')
-                  // вернет все области контента, задествованные на этом ядре
-                  let findObjectFigures = (objectFull, contentOid) => {
-                     let res = []
-                     for (let item of objectFull.items) {
-                        if (item.type === 'COMPOSITION') {
-                           assert(item.layers && item.layers.length, '!item.layers')
-                           for (let layer of item.layers) {
-                              if (layer.contentOid === contentOid) res.push(layer.figuresAbsolute)
-                           }
-                        } else if (item.type === 'NODE') {
-                           res.push(...findObjectFigures(item, contentOid))
-                        } else if (item.type.in('VIDEO', 'BOOK', 'IMAGE')) {
-                           if (item.oid === contentOid) res.push([])
-                        } else {
-                           throw new Error('bad item!: ' + JSON.stringify(item))
-                        }
-                     }
-                     return res
-                  }
-                  let objectFiguresAbsoluteList = findObjectFigures(objectFull, contentOid)
-                  for (let objectFiguresAbsolute of objectFiguresAbsoluteList) {
-                     assert(objectFiguresAbsolute, '!objectFiguresAbsolute')
-                     if (intersects(groupFiguresAbsolute, objectFiguresAbsolute)) {
-                        foundGroup = group
-                        break // берем первую подходящую
-                     }
-                  }
-                  if (foundGroup) break
-               }
-            } else {
-               // если объекта в кэше нет - ничего не поделать! мы не знаем в какю группу его включить!
-               // todo поставить ttl = zero на этом списке
-            }
-         }
-         if (foundGroup) {
-            assert(foundGroup.items, '!foundGroup.items')
-            assert(foundGroup.totalCount >= 0, 'foundGroup.totalCount >= 0')
-            let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
-            if (type === 'OBJECT_CREATED') {
-               if (indx === -1) {
-                  foundGroup.items.splice(0, 0, { oid: object.oid })
-                  foundGroup.totalCount++
-               }
-            } else if (type === 'OBJECT_DELETED') {
-               if (indx >= 0) {
-                  logD(f, 'delete object from list', indx)
-                  foundGroup.items.splice(indx, 1)
-                  foundGroup.totalCount--
-               }
-            }
-         }
+         await this.addRemoveObjectToRxDoc(type, rxDoc, object)
       }
    }
 
