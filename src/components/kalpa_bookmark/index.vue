@@ -87,7 +87,8 @@ export default {
           this.$router.push('/auth')
           return
         }
-        await this.$wait(500)
+        await this.$systemUtils.vibrate(500)
+        // await this.$wait(500)
         let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
         this.$log('start [bookmark]', bookmark)
         if (bookmark) {
