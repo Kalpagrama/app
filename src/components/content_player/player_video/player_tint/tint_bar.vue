@@ -116,7 +116,9 @@ div(
                 @first="zoomWorking = true, figureEditing = true"
                 @final="zoomWorking = false, figureEditing = false")
             //- clusters
-            tint-bar-clusters(v-bind="$props" v-if="player.clusters.length > 0")
+            tint-bar-clusters(
+              v-if="player.clusters.length > 0 && zoomed !== true"
+              v-bind="$props")
             //- currentTime
             //- v-if="true || !zoomWrapperScrolling"
             transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")

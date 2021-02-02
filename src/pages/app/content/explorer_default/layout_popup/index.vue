@@ -161,7 +161,7 @@ export default {
           sortStrategy: 'AGE',
           groupByContentLocation: true
         },
-        populateObjects: true,
+        populateObjects: false,
       }
       return res
     }
