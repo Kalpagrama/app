@@ -111,9 +111,6 @@ export default {
         this.nodePublishing = false
         // kill player figure, it will destroy node editor
         this.player.setState('figure', null)
-        if (!this.isMini) {
-          this.$emit('toggle')
-        }
       }
       catch (e) {
         this.$log('nodePublish error', e)
