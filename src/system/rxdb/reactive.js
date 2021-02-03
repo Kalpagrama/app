@@ -427,7 +427,10 @@ class Group {
          assert(mangoQuery, '!mangoQuery')
          listItems = items
          for (let item of listItems) { // для групп
-            if (item.figuresAbsolute) item.id = JSON.stringify(item.figuresAbsolute)
+            if (item.__typename === 'Group') {
+               assert(item.figuresAbsolute, '!item.figuresAbsolute')
+               item.id = JSON.stringify(item.figuresAbsolute)
+            }
          }
          this.reactiveGroup.totalCount = totalCount
          this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
@@ -636,6 +639,9 @@ class Group {
                await firstItem.gotoCurrent()
             }
          }
+      } else {
+         let nextItems = this.loadedItems().slice(0, count)
+         await this.fulfill(nextItems, 'whole')
       }
       return indxFrom
    }
