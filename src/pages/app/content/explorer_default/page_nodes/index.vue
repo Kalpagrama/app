@@ -130,7 +130,7 @@ export default {
       }
     },
     async next () {
-      this.$log('next')
+      this.$log('next!')
       if (this.itemsRes && this.itemsRes.hasNext) {
         await this.itemsRes.next()
       }

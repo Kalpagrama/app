@@ -92,20 +92,21 @@ class Lists {
       if (!rxDoc) throw new Error('объект не найден')
 
       // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
-      assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
-      for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
-         assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
-         if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
-            await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oidObject })
-            // let indx = listItems.findIndex(el => el.oid === oidObject)
-            // if (indx === -1 && type === 'OBJECT_CREATED') {
-            //    listItems.push({ oid: oidObject }) // если нет такого - создадим
-            // } else if (indx >= 0 && type === 'OBJECT_DELETED') {
-            //    listItems.splice(indx, 1) // удалим
-            // }
+      if (rxDoc.props.mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SPHERE_ITEMS) {
+         assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
+         for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
+            assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
+            if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
+               await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oidObject })
+               // let indx = listItems.findIndex(el => el.oid === oidObject)
+               // if (indx === -1 && type === 'OBJECT_CREATED') {
+               //    listItems.push({ oid: oidObject }) // если нет такого - создадим
+               // } else if (indx >= 0 && type === 'OBJECT_DELETED') {
+               //    listItems.splice(indx, 1) // удалим
+               // }
+            }
          }
       }
-
       return rxDoc
    }
 
@@ -139,7 +140,7 @@ class Lists {
       }
    }
 
-   async addRemoveObjectToRxDoc(type, rxDoc, object){
+   async addRemoveObjectToRxDoc (type, rxDoc, object) {
       const f = this.addRemoveObjectToRxDoc
       let mangoQuery = rxDoc.props.mangoQuery
       let contentOid = rxDoc.props.oid
@@ -194,7 +195,7 @@ class Lists {
                return false
             }
             // перебрать все группы из имеющихся и найти первую, подходящую под FiguresAbsolute
-            if (reactiveItem.items.length === 0){
+            if (reactiveItem.items.length === 0) {
                // создадим первую группу руками
                let group = {
                   items: [],
