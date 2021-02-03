@@ -796,10 +796,11 @@ class RxDBWrapper {
 
    async remove (id) {
       assert(this.created, 'cant remove! !this.created')
+      alert('delete!!!!!!' + id)
       const f = this.remove
       const t1 = performance.now()
       try {
-         await this.removeMutex.lock()
+         await this.removeMutex.lock('rxdb::remove')
          logD(f, 'start')
          let collection = getRxCollectionEnumFromId(id)
          if (collection in WsCollectionEnum) {
