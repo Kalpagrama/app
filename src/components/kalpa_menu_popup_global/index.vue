@@ -7,7 +7,7 @@
 <template lang="pug">
 q-btn(
   flat no-caps
-  :color="'grey-7'"
+  :color="color"
   :style=`{maxWidth: '60px'}`)
   user-avatar(
     :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
@@ -73,6 +73,12 @@ q-btn(
 <script>
 export default {
   name: 'kalpaMenuPopupGlobal',
+  props: {
+    color: {
+      type: String,
+      default: 'grey-7'
+    }
+  },
   data () {
     return {
     }

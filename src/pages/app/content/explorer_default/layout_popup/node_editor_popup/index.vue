@@ -59,6 +59,17 @@ export default {
     }
   },
   methods: {
+  },
+  created () {
+    this.$log('created')
+    let nodeDraft = this.$store.state.ui.nodeDraft
+    this.$log('nodeDraft', nodeDraft)
+    if (nodeDraft) {
+      // remove from store...
+      this.$store.commit('ui/stateSet', ['nodeDraft', null])
+      // set here...
+      this.node = JSON.parse(JSON.stringify(nodeDraft))
+    }
   }
 }
 </script>

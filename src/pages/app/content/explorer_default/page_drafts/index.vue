@@ -5,10 +5,12 @@ div(
     paddingTop: '0px',
   }`
   ).row.full-width.items-start.content-start.justify-center
+  //- body
   div(:style=`{maxWidth: 600+'px'}`).row.full-width
     slot
+    //- header: stats, actions
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-grey-7.text-bold.q-ml-sm Заметки {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
+      span.text-white.text-bold.q-ml-sm Заметки {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
       .col
       q-btn(
         @click="drop()"
@@ -19,46 +21,44 @@ div(
       q-btn(
         @click="next()"
         outline color="white" no-caps dense) Next
-      //- q-btn(
-        round flat color="grey-7" icon="tune")
       kalpa-menu-actions(
-        icon="tune" color="grey-7"
+        icon="tune" color="white"
         :actions="itemsActions")
+    //- body
     div(
       v-if="itemsRes"
       ).row.full-width.q-px-md
-      div(
-        v-for="(i,ii) in items" :key="ii"
-        :style=`{
-          minHeight: '40px',
-        }`
-        ).row.full-width.items-center.content-center.q-mb-sm
-        //- node name
-        .row.full-width
-          span.text-white {{ i.name }}
-        //- figure footer
-        .row.full-width
-          small(
-            v-if="contentKalpa.type === 'VIDEO'"
-            ).text-grey-7.q-mr-xs {{ $time(i.items[0].layers[0].figuresAbsolute[0].t) }}
-          .col
-          small.text-grey-7 {{ $date(i.createdAt) }}
+      draft-item(
+        v-for="(i,ii) in items" :key="i.id"
+        :item="i" :itemIndex="ii"
+        @set-selected="itemsSelectedKey = i.id"
+        :isSelected="itemsSelectedKey === i.id"
+        :player="player" :contentKalpa="contentKalpa")
+      //- add draft now, only for video content
+      //- draft-current-time(
+        v-if="contentKalpa.type === 'VIDEO'"
+        :contentKalpa="contentKalpa"
+        :player="player"
+        @focused="itemsSelectedKey = null")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import groupItem from '../page_nodes/group_item.vue'
+
+import draftItem from './draft_item.vue'
+import draftCurrentTime from './draft_current_time.vue'
 
 export default {
   name: 'pageDrafts',
-  props: ['contentKalpa', 'player', 'node'],
+  props: ['contentKalpa', 'player'],
   components: {
-    groupItem
+    draftItem,
+    draftCurrentTime,
   },
   data () {
     return {
       searchString: '',
-      nodes: [],
+      itemsSelectedKey: null,
       itemsRes: null,
       itemsSortBy: 'FIGURE', // FIGURE, CREATED_AT, UPDATED_AT, NAME, LENGTH
     }
@@ -136,49 +136,6 @@ export default {
       this.$log('drop')
       this.itemsRes.setProperty('currentId', null)
       await this.itemsRes.gotoCurrent()
-    },
-    nodeActions (n) {
-      return {
-        edit: {
-          name: 'Редактировать',
-          cb: () => {
-            this.nodeClick(n)
-          }
-        },
-        delete: {
-          name: 'Удалить',
-          color: 'red',
-          cb: async () => {
-            if (confirm('Удалить?')) {
-              this.$log('draftDelete', n)
-              await n.remove(true)
-            }
-          }
-        }
-      }
-    },
-    nodeClick (n, ni) {
-      this.$log('nodeClick', n, ni)
-      this.$emit('node', n)
-    },
-    nodesUpdated (nodes) {
-      this.$log('nodesUpdated', nodes)
-      this.nodes = [...nodes].sort((a, b) => {
-        return a.items[0].layers[0].figuresAbsolute[0].t - b.items[0].layers[0].figuresAbsolute[0].t
-      })
-      let figures = nodes.reduce((acc, node) => {
-        node.items.map(i => {
-          if (i.layers) {
-            if (i.layers[0].contentOid === this.contentKalpa.oid) {
-              let figureInput = i.layers[0].figuresAbsolute[0]
-              acc.push([figureInput])
-            }
-          }
-        })
-        return acc
-      }, [])
-      this.figures = figures
-      this.player.setState('points', figures)
     }
   },
   async mounted () {

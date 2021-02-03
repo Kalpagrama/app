@@ -14,9 +14,8 @@ div(
       right: '0px',
       top: ($q.screen.height-350)/2+'px',
       width: '70px',
-      borderRadius: '10px 0 0 10px',
     }`
-    ).row.b-40
+    ).row
     div(
       v-if="player && pageId"
       :style=`{
