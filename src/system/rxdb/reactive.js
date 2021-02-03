@@ -759,19 +759,22 @@ class Group {
 
 class ReactiveListWithPaginationFactory {
    async create (rxQueryOrRxDoc, populateFunc = null, paginateFunc = null, propsReactive = {}) {
+      let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
+      assert(mangoQuery, '!mangoQuery')
+      let groupId = JSON.stringify(mangoQuery) + (populateFunc ? 'populate' : '')
+      // на один rxQueryOrRxDoc может быть создано несколько  reactiveGroup (в зависимости от populateFunc)
+      rxQueryOrRxDoc.reactiveListHolderMaster = rxQueryOrRxDoc.reactiveListHolderMaster || {}
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
-      if (rxQueryOrRxDoc.reactiveListHolderMaster) {
+      if (rxQueryOrRxDoc.reactiveListHolderMaster[groupId]) {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
-         let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
-         assert(mangoQuery, '!mangoQuery')
-         let groupId = JSON.stringify(mangoQuery) + populateFunc ? 'populate' : ''
+
          this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'top')
-         rxQueryOrRxDoc.reactiveListHolderMaster = this
+         rxQueryOrRxDoc.reactiveListHolderMaster[groupId] = this
       }
-      assert(rxQueryOrRxDoc.reactiveListHolderMaster.group, '!this.group!')
-      let group = rxQueryOrRxDoc.reactiveListHolderMaster.group
+      assert(rxQueryOrRxDoc.reactiveListHolderMaster[groupId].group, '!this.group!')
+      let group = rxQueryOrRxDoc.reactiveListHolderMaster[groupId].group
       return group.reactiveGroup
    }
 }

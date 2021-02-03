@@ -30,8 +30,8 @@ div(
                 v-if="group.figuresAbsolute.length"
                 ).row.full-width.q-pa-sm
                 .row.full-height.items-center.content-center
-                  span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute.length) + '–' : 'весь контент' }}
-                  span.text-white.text-bold {{ group.figuresAbsolute.length ? $time(group.figuresAbsolute[1].t) : '' }}
+                  span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute[0].t) + '–' : 'весь контент' }}
+                  span.text-white.text-bold {{ group.figuresAbsolute.length > 1 ? $time(group.figuresAbsolute[1].t) : '' }}
                 .col
                 span.text-white.text-bold {{ group.totalCount }}
             div(
@@ -99,6 +99,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
+    this.$log('itemsRes', this.itemsRes)
     // 140449542704336959
     // this.itemsRes.setProperty('currentId', '129603228739309613')
     // this.itemsRes.setProperty('currentId', null)
