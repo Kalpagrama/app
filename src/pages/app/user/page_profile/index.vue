@@ -6,10 +6,7 @@ q-page(
   }`
   ).row.full-width.items-start.content-start.justify-center
   slot(name="prepend")
-  //- q-page-sticky(
-    expand position="top"
-    :style=`{zIndex: 2000}`).row.full-width.justify-center.b-30
-  //- div(
+  div(
     :style=`{
       position: 'sticky', top: '0px',
       zIndex: 2000,

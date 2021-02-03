@@ -18,7 +18,10 @@ div(
   //- middle spinner
   q-spinner(
     v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_ && tintSpinnerCanShow"
-    color="white" size="50px")
+    color="white" size="50px"
+    :style=`{
+      pointerEvents: 'none',
+    }`)
   //- actions
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-btn(

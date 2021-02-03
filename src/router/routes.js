@@ -150,6 +150,16 @@ const routes = [
             component: () => import('pages/app/workspace/index.vue'),
          },
          {
+            name: 'workspace.watch-later',
+            path: 'workspace/watch-later',
+            component: () => import('pages/app/workspace/page_watch_later/index.vue')
+         },
+         {
+            name: 'workspace.history',
+            path: 'workspace/history',
+            component: () => import('pages/app/workspace/page_history/index.vue')
+         },
+         {
             name: 'workspace.bookmarks',
             path: 'workspace/bookmarks',
             component: () => import('pages/app/workspace/page_bookmarks/index.vue')

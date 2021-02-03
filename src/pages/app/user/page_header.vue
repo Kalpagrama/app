@@ -77,13 +77,13 @@
           router-link(
             :to=`{params: {tab: 'following'}}`
             ).row.items-end.content-end
-            span.text-white.q-mr-xs {{ user.subscriptions.length }}
+            span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
             small.text-grey-7.q-mr-md Подписки
           //- followers
           router-link(
             :to=`{params: {tab: 'followers'}}`
             ).row.items-end.content-end
-            span.text-white.q-mr-xs {{ user.subscribers.length }}
+            span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
             small.text-grey-7 Подписчики
 </template>
 

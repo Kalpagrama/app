@@ -8,28 +8,28 @@
     ).row.full-width
     //- header
     router-link(
-      to="/workspace/bookmarks"
+      to="/workspace/watch-later"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="bookmark_outline" color="white" size="24px").q-mr-sm
+      q-icon(name="watch_later" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold Закладки
-    kalpa-loader(
+        span.text-white.text-bold Смотреть позже
+    //- kalpa-loader(
       @items="bookmarksUpdated"
       :immediate="true"
       :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="!bookmarks").row.full-width.no-wrap.q-pa-sm
+      div(v-if="true").row.full-width.no-wrap.q-pa-sm
         div(
-          v-for="n in 10" :key="n"
+          v-for="n in 7" :key="n"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
           }`
           ).row.b-50.q-mr-sm
       //- bookmarks loaded
-      div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
+      //- div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
         router-link(
           v-for="b in bookmarks" :key="b.oid"
           :to="'/content/'+b.oid"
@@ -64,7 +64,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'widgetBookmarks',
+  name: 'widgetWatchLater',
   data () {
     return {
       bookmarks: null,
@@ -72,25 +72,25 @@ export default {
     }
   },
   computed: {
-    query () {
-      let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_ANY,
-          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
-        },
-        limit: 10,
-        sort: [{createdAt: 'desc'}]
-      }
-      return res
-    }
+    // query () {
+    //   let res = {
+    //     selector: {
+    //       rxCollectionEnum: RxCollectionEnum.WS_ANY,
+    //       type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
+    //     },
+    //     limit: 10,
+    //     sort: [{createdAt: 'desc'}]
+    //   }
+    //   return res
+    // }
   },
   methods: {
-    bookmarksUpdated (bookmarks) {
-      this.$log('bookmarksUpdated', bookmarks)
-      if (bookmarks) {
-        this.bookmarks = bookmarks
-      }
-    }
+    // bookmarksUpdated (bookmarks) {
+    //   this.$log('bookmarksUpdated', bookmarks)
+    //   if (bookmarks) {
+    //     this.bookmarks = bookmarks
+    //   }
+    // }
   }
 }
 </script>

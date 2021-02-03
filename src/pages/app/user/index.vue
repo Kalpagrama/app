@@ -3,7 +3,7 @@ q-layout(view="hHh Lpr lff")
   //- q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
   q-page-container(v-if="user")
     router-view(:user="user" :key="user.oid")
-      //- template(v-slot:prepend)
+      template(v-slot:prepend)
         page-header(:user="user")
 </template>
 
