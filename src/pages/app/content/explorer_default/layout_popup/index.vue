@@ -31,7 +31,7 @@ div(
         :contentKalpa="contentKalpa"
         :player="player"
         :query="query"
-        :height="$q.screen.height-10"
+        :height="$q.screen.height"
         :style=`{
           background: 'rgba(0,0,0,0.5)',
         }`)
@@ -39,7 +39,7 @@ div(
   div(
     v-if="player && !player.figure"
     :style=`{
-      paddingTop: pageId ? contentHeight+'px' : '0px',
+      paddingTop: pageId ? contentHeightComputed+'px' : '0px',
     }`
     ).row.full-width
     component(
@@ -48,7 +48,7 @@ div(
       :contentKalpa="contentKalpa"
       :player="player"
       :query="query"
-      :height="$q.screen.height-70")
+      :height="$q.screen.height-contentHeightComputed")
   //- header node editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     node-editor-popup(

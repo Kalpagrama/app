@@ -1,9 +1,10 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.justify-center
   div(
     :style=`{
       background: 'rgb(35,35,35)',
       borderRadius: '10px',
+      maxWidth: 600+'px',
     }`
     ).row.full-width.q-pa-md
     .row.full-width.justify-center.q-py-md
@@ -56,14 +57,15 @@
           }`).full-width
           span.text-grey-6 Создать
   //- create
-  .row.full-width.q-pa-md
-    q-btn(
-      outline color="grey-8" no-caps
-      :to="'/workspace/create/'"
-      :style=`{
-        height: '60px',
-      }`).full-width
-      span.text-grey-6 Создать
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pa-md
+      q-btn(
+        outline color="grey-8" no-caps
+        :to="'/workspace/create/'"
+        :style=`{
+          height: '60px',
+        }`).full-width
+        span.text-grey-6 Создать
 </template>
 
 <script>

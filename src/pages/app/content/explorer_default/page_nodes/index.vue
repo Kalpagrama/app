@@ -4,90 +4,98 @@ div(
     height: height+'px',
   }`
   ).column.full-width
+  //- group before
+  .row.full-width.justify-center
+    div(
+      :style=`{
+        maxWidth: 600+'px',
+      }`
+      ).row.full-width.q-pa-xs
+      q-btn(
+        @click="prev()"
+        outline dense color="white" no-caps).q-mr-sm Prev
+      q-btn(
+        @click="drop()"
+        outline dense color="red" no-caps).q-mr-sm Drop
+      q-btn(
+        @click="next()"
+        outline dense color="white" no-caps).q-mr-sm Next
   .col.full-width.scroll
-    div(:style=`{marginBottom: '300px',}`).row.full-width.justify-center.q-px-md
-      div(
-        v-if="itemsRes"
+    .row.full-width.items-start.content-start.justify-center
+      list-feed(
+        ref="list-feed"
+        :query="query"
+        itemKey="id"
         :style=`{
-          //- maxWidth: $store.state.ui.pageWidth+'px',
           maxWidth: 600+'px',
-        }`
-        ).row.full-width.items-start.content-start.q-pt-sm
-        //- group before
-        .row.full-width.q-pa-xs
-          q-btn(
-            @click="prev()"
-            outline dense color="white" no-caps).q-mr-sm Prev
-          q-btn(
-            @click="drop()"
-            outline dense color="red" no-caps).q-mr-sm Drop
-          q-btn(
-            @click="next()"
-            outline dense color="white" no-caps).q-mr-sm Next
-        //- group
-        div(
-          v-for="(group,groupIndex) in itemsRes.items" :key="groupIndex"
-          :style=`{
-            background: 'rgb(35,35,35, 0.5)',
-            borderRadius: '20px',
-          }`
-          ).row.full-width.q-pb-sm.q-mb-sm
-          //- group header
-          .row.full-width.q-py-sm.q-px-md
-            div(
-              v-if="contentKalpa.type === 'VIDEO'"
-              ).row.full-width
+          marginBottom: '300px',
+        }`)
+        //- template(v-slot:prepend)
+        template(v-slot:item=`{item: group,itemIndex,isActive,isVisible}`)
+          //- group
+          div(
+            :style=`{
+              background: 'rgb(35,35,35, 0.5)',
+              borderRadius: '20px',
+            }`
+            ).row.full-width.items-start.content-start.q-pb-sm.q-mb-sm
+            //- group header
+            .row.full-width.q-py-sm.q-px-md
               div(
-                v-if="group.figuresAbsolute.length"
-                ).row.full-width.q-pa-sm
-                .row.full-height.items-center.content-center
-                  span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute[0].t) + '–' : 'весь контент' }}
-                  span.text-white.text-bold {{ group.figuresAbsolute.length > 1 ? $time(group.figuresAbsolute[1].t) : '' }}
-                .col
-                span.text-white.text-bold {{ group.totalCount }}
-            div(
-              v-else
-              ).row.full-width
-              span.text-white Группа: {{groupIndex+1}}
-          .row.full-width
-            //- prev
-            .row.full-width.q-px-sm
-              q-btn(
-                v-if="group.hasPrev"
-                @click="group.prev()"
-                flat no-caps dense color="grey-6"
-                ).full-width Up
-            //- items
-            group-item(
-              v-for="(item,itemIndex) in group.items" :key="item.oid"
-              :item="item.populatedObject"
-              :player="player"
-              :contentKalpa="contentKalpa"
-              :isSelected="itemSelectedOid === item.oid"
-              @set-current="setCurrentItem(item)"
-              @set-selected="setSelectedItem(item)").q-mb-xs
-            //- next
-            .row.full-width.q-px-sm
-              q-btn(
-                v-if="group.hasNext"
-                @click="group.next()"
-                flat no-caps dense color="grey-6"
-                align="left"
-                :style=`{
-                  paddingLeft: '12px'
-                }`
-                ).full-width Еще {{ group.totalCount-group.items.length }}
-        //- group after
-        div().row.full-width.q-pa-xs
-          q-btn(
-            @click="prev()"
-            outline dense color="white" no-caps).q-mr-sm Prev
-          q-btn(
-            @click="drop()"
-            outline dense color="red" no-caps).q-mr-sm Drop
-          q-btn(
-            @click="next()"
-            outline dense color="white" no-caps).q-mr-sm Next
+                v-if="contentKalpa.type === 'VIDEO'"
+                ).row.full-width
+                div(
+                  v-if="group.figuresAbsolute.length"
+                  ).row.full-width.q-pa-sm
+                  .row.full-height.items-center.content-center
+                    span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute[0].t) + '–' : 'весь контент' }}
+                    span.text-white.text-bold {{ group.figuresAbsolute.length > 1 ? $time(group.figuresAbsolute[1].t) : '' }}
+                  .col
+                  span.text-white.text-bold {{ group.totalCount }}
+              div(
+                v-else
+                ).row.full-width
+                span.text-white Группа: {{itemIndex+1}}
+            .row.full-width
+              //- prev
+              .row.full-width.q-px-sm
+                q-btn(
+                  v-if="group.hasPrev"
+                  @click="group.prev()"
+                  flat no-caps dense color="grey-6"
+                  ).full-width Наверх
+              //- items
+              group-item(
+                v-for="(item,itemIndex) in group.items" :key="item.oid"
+                :item="item.populatedObject"
+                :player="player"
+                :contentKalpa="contentKalpa"
+                :isSelected="itemSelectedOid === item.oid"
+                @set-current="setCurrentItem(item)"
+                @set-selected="setSelectedItem(item)").q-mb-xs
+              //- next
+              .row.full-width.q-px-sm
+                q-btn(
+                  v-if="group.hasNext"
+                  @click="group.next()"
+                  flat no-caps dense color="grey-6"
+                  align="left"
+                  :style=`{
+                    paddingLeft: '12px'
+                  }`
+                  ).full-width Еще {{ group.totalCount-group.items.length }}
+        template(v-slot:append)
+          //- group after
+          div().row.full-width.q-pa-xs
+            q-btn(
+              @click="prev()"
+              outline dense color="white" no-caps).q-mr-sm Prev
+            q-btn(
+              @click="drop()"
+              outline dense color="red" no-caps).q-mr-sm Drop
+            q-btn(
+              @click="next()"
+              outline dense color="white" no-caps).q-mr-sm Next
 </template>
 
 <script>
@@ -102,7 +110,7 @@ export default {
   },
   data () {
     return {
-      itemsRes: null,
+      // itemsRes: null,
       itemSelectedOid: null,
     }
   },
@@ -125,25 +133,29 @@ export default {
   methods: {
     async prev () {
       this.$log('prev')
-      if (this.itemsRes && this.itemsRes.hasPrev) {
-        await this.itemsRes.prev()
+      let itemsRes = this.$refs['list-feed'].itemsRes
+      if (itemsRes && itemsRes.hasPrev) {
+        await itemsRes.prev()
       }
     },
     async next () {
       this.$log('next!')
-      if (this.itemsRes && this.itemsRes.hasNext) {
-        await this.itemsRes.next()
+      let itemsRes = this.$refs['list-feed'].itemsRes
+      if (itemsRes && itemsRes.hasNext) {
+        await itemsRes.next()
       }
     },
     async drop () {
       this.$log('drop')
       // this.itemsRes.setProperty('currentId', null)
-      await this.itemsRes.gotoStart()
+      let itemsRes = this.$refs['list-feed'].itemsRes
+      await itemsRes.gotoStart()
     },
     async setCurrentItem (item) {
       this.$log('setCurrentItem', item.oid)
-      this.itemsRes.setProperty('currentId', item.oid)
-      await this.itemsRes.gotoCurrent()
+      let itemsRes = this.$refs['list-feed'].itemsRes
+      itemsRes.setProperty('currentId', item.oid)
+      await itemsRes.gotoCurrent()
     },
     async setSelectedItem (item) {
       this.$log('setSelected', item.oid)
@@ -152,8 +164,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.itemsRes = await this.$rxdb.find(this.query, true)
-    // this.$log('itemsRes', this.itemsRes)
+    await this.$wait(1000)
     let nodeOid = this.$store.state.ui.nodeOnContent
     this.$log('nodeOid', nodeOid)
     if (nodeOid) {

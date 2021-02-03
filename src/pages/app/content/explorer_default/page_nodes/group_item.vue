@@ -46,6 +46,15 @@
           //- figure info
           div(v-if="itemFigure && contentKalpa.type === 'VIDEO'").row.full-width
             small.text-grey-6.q-mr-xs {{ $time(itemFigure[0].t) }}
+      //- joint thumbUrl of another item!
+      img(
+        v-if="item.type === 'JOINT' && itemCompositionJoint"
+        draggable="false"
+        :src="itemCompositionJoint.thumbUrl"
+        :style=`{
+          height: '40px',
+          borderRadius: '10px',
+        }`)
     //- selected
     div(
       v-if="isSelected"
@@ -105,6 +114,23 @@ export default {
         return composition
       }
       else return null
+    },
+    itemCompositionJoint () {
+      if (this.item.type === 'JOINT') {
+        let composition = null
+        this.item.items.map(i => {
+          if (i.type === 'COMPOSITION' && i.layers[0] && i.layers[0].contentOid !== this.contentKalpa.oid) {
+            composition = i
+          }
+          if (i.type === 'NODE' && i.items[0] && i.items[0].layers[0] && i.items[0].layers[0].contentOid !== this.contentKalpa.oid) {
+            composition = i.items[0]
+          }
+        })
+        return composition
+      }
+      else {
+        return null
+      }
     },
     itemFigure () {
       if (this.itemComposition) {

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+.row.full-width
   //- debug top
   div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '50px'}`).row.bg-red.text-white
     small.full-width scrollTop: {{scrollTop}}
@@ -20,7 +20,7 @@
     ).row.full-width.items-start.content-start
     //- q-resize-observer(@resize="onResize")
     //- prepend slot
-    slot(name="prepend")
+    //- slot(name="prepend")
     //- prev loading
     //- div(
       v-if="itemsPreving"
@@ -44,7 +44,7 @@
           rootMargin: rootMargin
         }
       }`
-      ).row.full-width.items-start.content-start.q-mb-xl
+      ).row.full-width.items-start.content-start
       slot(
         name="item"
         :item="item"

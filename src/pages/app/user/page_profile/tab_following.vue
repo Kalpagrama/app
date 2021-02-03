@@ -6,7 +6,7 @@
 
 <template lang="pug">
 q-page(:style=`{paddingTop: '16px', paddingBottom: '200px', minHeight: '100vh'}`).row.full-width.justify-center
-  div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-start.content-start
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     kalpa-loader(
       :immediate="true"
       :query="mangoQuery" :limit="1000" v-slot=`{items,next}`)
@@ -20,7 +20,7 @@ q-page(:style=`{paddingTop: '16px', paddingBottom: '200px', minHeight: '100vh'}`
             borderRadius: '10px',
             overflow: 'hidden'
           }`
-          ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
+          ).row.items-center.content-center.q-px-md.cursor-pointer.subscription.b-40.q-mb-sm.q-mr-sm
           div(
             v-if="s.type === 'USER'"
             @click="subscriptionClick(s)"

@@ -47,20 +47,26 @@ q-layout(
           maxWidth: $store.state.ui.pageWidth+'px',
         }`).row.full-width.items-start.content-start
         //- .col-xs-12.col-sm-5
+        widget-watch-later.q-mb-sm
+        widget-history.q-mb-sm
         widget-bookmarks.q-mb-md
         //- .col-xs-12.col-sm-7
         widget-upload
 </template>
 
 <script>
+import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetBookmarks from './widget_bookmarks/index.vue'
 import widgetUpload from './widget_upload/index.vue'
+import widgetHistory from './widget_history/index.vue'
 
 export default {
   name: 'wsIndex',
   components: {
+    widgetWatchLater,
     widgetBookmarks,
     widgetUpload,
+    widgetHistory,
   },
   data () {
     return {
