@@ -312,8 +312,10 @@ class Group {
                gotoCurrent: this.gotoCurrent.bind(this),
                gotoStart: this.gotoStart.bind(this),
                gotoEnd: this.gotoEnd.bind(this),
-               next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
-               prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               next: this.next.bind(this),
+               prev: this.prev.bind(this),
+               nextDebounced: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               prevDebounced: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
                hasPrev: false,
                setProperty: this.setProperty.bind(this),
@@ -424,6 +426,9 @@ class Group {
          let mangoQuery = rxDoc.props.mangoQuery
          assert(mangoQuery, '!mangoQuery')
          listItems = items
+         for (let item of listItems) { // для групп
+            if (item.figuresAbsolute) item.id = JSON.stringify(item.figuresAbsolute)
+         }
          this.reactiveGroup.totalCount = totalCount
          this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
          assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
@@ -532,6 +537,7 @@ class Group {
       if (this.reactiveGroup.itemType === 'GROUP') {
          let makeNextGroup = async (nextGroup) => {
             let {
+               id,
                items,
                totalCount,
                nextPageToken,
@@ -540,12 +546,13 @@ class Group {
                figuresAbsolute,
                thumbUrl
             } = nextGroup
+            assert(id, '!id')
             if (!items || !totalCount) {
                logD('asdfasdfsadfsadf')
             }
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
-            let groupId = figuresAbsolute ? JSON.stringify(figuresAbsolute) : null
+            let groupId = id // figuresAbsolute ? JSON.stringify(figuresAbsolute) : null
             Vue.set(this.propsReactive, '')
             let group = new Group(groupId, this.populateFunc, null, this.propsReactive)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
@@ -624,7 +631,7 @@ class Group {
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')
             let firstItem = this.reactiveGroup.items[0]
-            if (firstItem && this.reactiveGroup.itemType === 'GROUP'){
+            if (firstItem && this.reactiveGroup.itemType === 'GROUP') {
                firstItem.setProperty('currentId', fromId)
                await firstItem.gotoCurrent()
             }
