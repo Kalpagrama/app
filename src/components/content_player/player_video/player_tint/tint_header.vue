@@ -34,7 +34,7 @@ div(
 <script>
 export default {
   name: 'tintHeader',
-  props: ['player', 'contentKalpa', 'isFocused'],
+  props: ['player', 'contentKalpa', 'options', 'isFocused'],
   computed: {
     contentLink () {
       return '/content/' + this.contentKalpa.oid
@@ -43,7 +43,9 @@ export default {
   methods: {
     contentClick () {
       this.$log('contentClick')
-      // this.$store.commit('ui/stateSet', ['nodeOnContent'])
+      if (this.options.nodeOid) {
+        this.$store.commit('ui/stateSet', ['nodeOnContent', this.options.nodeOid])
+      }
     },
   }
 }

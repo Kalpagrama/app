@@ -8,49 +8,41 @@ div(
   div(:style=`{maxWidth: 600+'px'}`).row.full-width
     slot
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-grey-7.text-bold.q-ml-sm Заметки - {{ itemsRes ? itemsRes.totalCount : '' }}
+      span.text-grey-7.text-bold.q-ml-sm Заметки {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
+      .col
       q-btn(
+        @click="drop()"
+        outline color="red" no-caps dense) Drop
+      q-btn(
+        @click="prev()"
+        outline color="white" no-caps dense) Prev
+      q-btn(
+        @click="next()"
+        outline color="white" no-caps dense) Next
+      //- q-btn(
         round flat color="grey-7" icon="tune")
+      kalpa-menu-actions(
+        icon="tune" color="grey-7"
+        :actions="itemsActions")
     div(
       v-if="itemsRes"
-      ).row.full-width.q-px-sm.br
+      ).row.full-width.q-px-md
       div(
-        v-for="(i,ii) in itemsRes.items" :key="ii"
+        v-for="(i,ii) in items" :key="ii"
         :style=`{
           minHeight: '40px',
         }`
-        ).row.full-width.items-center.content-center.q-pb-xs
+        ).row.full-width.items-center.content-center.q-mb-sm
         //- node name
         .row.full-width
           span.text-white {{ i.name }}
-        //- figure info
-        div(v-if="contentKalpa.type === 'VIDEO'").row.full-width
-          small.text-grey-6.q-mr-xs {{ $time(i.items[0].layers[0].figuresAbsolute[0].t) }}
-      //- div(
-        ).row.full-width.q-mb-sm.br
-        small.text-white {{ i.name }}
-      //- kalpa-loader(
-        :immediate="true"
-        :query="query" :limit="1000"
-        @items="nodesUpdated"
-        v-slot=`{items,next,nexting}`)
-      //- div(
-        v-for="(n,ni) in nodes" :key="n.id"
-        :style=`{
-          minHeight: '50px',
-          background: 'rgb(35,35,35)',
-          borderRadius: '10px',
-        }`
-        ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
-        div(
-          @click="nodeClick(n,ni)"
-          ).col.cursor-pointer
-          .row.full-width.q-pa-sm
-            span.text-white {{ n.name }}
-            .row.full-width
-              small.text-grey-8 {{ $time(n.items[0].layers[0].figuresAbsolute[0].t) }}
-        .row.full-height.items-center.content-center
-          kalpa-menu-actions(:actions="nodeActions(n)")
+        //- figure footer
+        .row.full-width
+          small(
+            v-if="contentKalpa.type === 'VIDEO'"
+            ).text-grey-7.q-mr-xs {{ $time(i.items[0].layers[0].figuresAbsolute[0].t) }}
+          .col
+          small.text-grey-7 {{ $date(i.createdAt) }}
 </template>
 
 <script>
@@ -68,9 +60,45 @@ export default {
       searchString: '',
       nodes: [],
       itemsRes: null,
+      itemsSortBy: 'FIGURE', // FIGURE, CREATED_AT, UPDATED_AT, NAME, LENGTH
     }
   },
   computed: {
+    items () {
+      if (!this.itemsRes) return []
+      let items = this.itemsRes.items
+      return items.sort((a, b) => {
+        if (this.itemsSortBy === 'FIGURE') {
+          return a.items[0].layers[0].figuresAbsolute[0].t - b.items[0].layers[0].figuresAbsolute[0].t
+        }
+        if (this.itemsSortBy === 'CREATED_AT') {
+          return a.createdAt - b.createdAt
+        }
+        else {
+          return a.createdAt - b.createdAt
+        }
+      })
+    },
+    itemsActions () {
+      return {
+        sortByFigure: {
+          name: 'Sort by figure',
+          cb: () => {
+            this.$log('sortByFigure')
+            this.itemsSortBy = 'FIGURE'
+          }
+        },
+        sortByCreatedAt: {
+          name: 'Sort by creation date',
+          cb: () => {
+            this.$log('sortByCreatedAt')
+            this.itemsSortBy = 'CREATED_AT'
+          }
+        },
+        // deleteAll: {}
+        // publishAll: {}
+      }
+    },
     query () {
       let res = {
         selector: {
@@ -92,6 +120,23 @@ export default {
     }
   },
   methods: {
+    async prev () {
+      this.$log('prev')
+      if (this.itemsRes && this.itemsRes.hasPrev) {
+        await this.itemsRes.prev()
+      }
+    },
+    async next () {
+      this.$log('next')
+      if (this.itemsRes && this.itemsRes.hasNext) {
+        await this.itemsRes.next()
+      }
+    },
+    async drop () {
+      this.$log('drop')
+      this.itemsRes.setProperty('currentId', null)
+      await this.itemsRes.gotoCurrent()
+    },
     nodeActions (n) {
       return {
         edit: {

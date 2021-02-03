@@ -46,6 +46,7 @@ div(
           showHeader: true,
           showFooter: false,
           mode: 'feed',
+          nodeOid: item.oid,
         }`
         :styles="styles")
     template(v-slot:wrapper)
@@ -72,6 +73,7 @@ div(
       showBar: false,
       footerOverlay: true,
       mode: 'feed',
+      nodeOid: oid,
     }`)
   div(
     v-else-if="item.__typename === 'Sphere'"
@@ -126,7 +128,7 @@ div(
 <script>
 export default {
   name: 'nodeFeed__nodeItemsItem',
-  props: ['item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
+  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
   components: {
   },
   data () {

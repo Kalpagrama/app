@@ -4,6 +4,38 @@ div(
     position: 'relative',
     minHeight: '100vh'
   }`).row.full-width.bg-black
+  //- right shit
+  nav-desktop(
+    v-if="$q.screen.width >= 1200"
+    :pageId="pageId"
+    @pageId="pageIdChange"
+    :style=`{
+      position: 'fixed', zIndex: 1020,
+      right: '0px',
+      top: ($q.screen.height-350)/2+'px',
+      width: '70px',
+      borderRadius: '10px 0 0 10px',
+    }`
+    ).row.b-40
+    div(
+      v-if="player && pageId"
+      :style=`{
+        position: 'absolute', zIndex: 1010,
+        top: -($q.screen.height-350)/2+'px',
+        height: $q.screen.height-10+'px',
+        left: '-500px', width: '500px',
+        //- paddingRight: '70px',
+      }`).row
+      component(
+        :is="`page-${pageId}`"
+        :node="node"
+        :contentKalpa="contentKalpa"
+        :player="player"
+        :query="query"
+        :height="$q.screen.height-10"
+        :style=`{
+          background: 'rgba(0,0,0,0.5)',
+        }`)
   //- body
   div(
     v-if="player && !player.figure"
@@ -32,7 +64,8 @@ div(
     :style=`{
       position: 'fixed', zIndex: 10,
       top: 0+'px',
-      height: pageId ? contentHeight+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
+      //- height: pageId ? contentHeight+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
+      height: 'calc('+ contentHeightComputed +'px - env(safe-area-inset-bottom))'
     }`).row.full-width
     content-player(
       @player="player = $event"
@@ -78,7 +111,7 @@ div(
           borderRadius: '10px 10px 0 0',
         }`).b-40
       nav-mobile(
-        v-if="player && !player.figure"
+        v-if="player && !player.figure && $q.screen.width < 1200"
         @pageId="pageIdChange"
         :pageId="pageId"
         :style=`{
@@ -101,6 +134,7 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from '../nav_mobile.vue'
+import navDesktop from './nav_desktop.vue'
 import contentPlayer from 'components/content_player/index.vue'
 
 import pageNodes from '../page_nodes/index.vue'
@@ -117,6 +151,7 @@ export default {
   props: ['contentKalpa', 'query'],
   components: {
     navMobile,
+    navDesktop,
     contentPlayer,
     pageNodes,
     pageDrafts,
@@ -135,6 +170,14 @@ export default {
     }
   },
   computed: {
+    contentHeightComputed () {
+      if (this.$q.screen.width >= 1200) {
+        return this.$q.screen.height
+      }
+      else {
+        return this.pageId ? this.contentHeight : this.$q.screen.height - 70
+      }
+    },
     contentHeight () {
       let height = this.contentKalpa.thumbHeight
       let width = this.contentKalpa.thumbWidth
@@ -167,6 +210,21 @@ export default {
     }
   },
   watch: {
+    pageId: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('pageId TO', to)
+        if (to) {
+          // tween contentHeight ?
+        }
+        else {
+          let nodeOid = this.$store.state.ui.nodeOnContent
+          if (nodeOid) {
+            this.pageId = 'nodes'
+          }
+        }
+      }
+    },
     'player.figure': {
       handler (to, from) {
         if (to) {
