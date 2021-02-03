@@ -312,9 +312,8 @@ class Group {
                gotoCurrent: this.gotoCurrent.bind(this),
                gotoStart: this.gotoStart.bind(this),
                gotoEnd: this.gotoEnd.bind(this),
-
-               next: this.next.bind(this),
-               prev: this.prev.bind(this),
+               next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
                hasPrev: false,
                setProperty: this.setProperty.bind(this),
@@ -562,20 +561,11 @@ class Group {
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
             nextItems = await this.populateFunc(nextItems, [], this.reactiveGroup.items)
-            // logD('nextItems= ', nextItems)
          }
       }
-
       let blackLists = await Lists.getBlackLists()
       let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-      // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
       this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
-
-      // if (this.reactiveGroup.items.length > 24) {
-      //    alert('splice!!! 24')
-      //    this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length - 24,)
-      // } // отрезаем начало
-
       this.updateReactiveGroup()
    }
 
@@ -628,7 +618,7 @@ class Group {
             }
             return indx
          }
-         let indxFrom = findItemIndex(allItems, fromId)
+         indxFrom = findItemIndex(allItems, fromId)
          if (indxFrom >= 0) {
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
@@ -704,10 +694,10 @@ class Group {
       // }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      // максимум 20 элементов (если больше - то отрезаем верх)
-      // if (this.reactiveGroup.items.length - 20 > 0) alert('cut begin of list!')
-      this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 20))
       await this.fulfill(nextItems, 'bottom')
+      // максимум 36 элементов (если больше - то отрезаем верх)
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
+      this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    async prev (count) {
@@ -739,10 +729,11 @@ class Group {
       let fulfillFrom = Math.max(startFullFil - count, 0) // начиная с какого индекса грузить
       let fulfillTo = startFullFil === -1 ? GROUP_BATCH_SZ : startFullFil // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      // максимум 20 элементов (если больше - то отрезаем низ)
-      // if (this.reactiveGroup.items.length - 20 > 0) alert('cut end of list!')
-      this.reactiveGroup.items.splice(20, this.reactiveGroup.items.length)
+
       await this.fulfill(nextItems, 'top')
+      // максимум 36 элементов (если больше - то отрезаем низ)
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
+      this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    setProperty (name, value) {
