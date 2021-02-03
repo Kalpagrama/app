@@ -13,6 +13,14 @@ div(
           maxWidth: 600+'px',
         }`
         ).row.full-width.items-start.content-start.q-pt-sm
+        //- group before
+        .row.full-width.q-pa-xs
+          q-btn(
+            @click="prev()"
+            outline dense color="white" no-caps).q-mr-sm Prev
+          q-btn(
+            @click="drop()"
+            outline dense color="red" no-caps).q-mr-sm Drop
         //- group
         div(
           v-for="(group,groupIndex) in itemsRes.items" :key="groupIndex"
@@ -63,6 +71,11 @@ div(
                   paddingLeft: '12px'
                 }`
                 ).full-width Еще {{ group.totalCount-group.items.length }}
+        //- group after
+        div().row.full-width.q-pa-xs
+          q-btn(
+            @click="next()"
+            outline dense color="white" no-caps).q-mr-sm Next
 </template>
 
 <script>
@@ -96,14 +109,35 @@ export default {
       return res
     }
   },
+  methods: {
+    async prev () {
+      this.$log('prev')
+      if (this.itemsRes && this.itemsRes.hasPrev) {
+        await this.itemsRes.prev()
+      }
+    },
+    async next () {
+      this.$log('next')
+      if (this.itemsRes && this.itemsRes.hasNext) {
+        await this.itemsRes.next()
+      }
+    },
+    async drop () {
+      this.$log('drop')
+      this.itemsRes.setProperty('currentId', null)
+      await this.itemsRes.gotoCurrent()
+    },
+  },
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
-    this.$log('itemsRes', this.itemsRes)
-    // 140449542704336959
-    // this.itemsRes.setProperty('currentId', '129603228739309613')
-    // this.itemsRes.setProperty('currentId', null)
-    // await this.itemsRes.gotoCurrent()
+    // this.$log('itemsRes', this.itemsRes)
+    let nodeOid = this.$store.state.ui.nodeOnContent
+    this.$log('nodeOid', nodeOid)
+    if (nodeOid) {
+      this.itemsRes.setProperty('currentId', nodeOid)
+      await this.itemsRes.gotoCurrent()
+    }
   }
 }
 </script>

@@ -167,6 +167,21 @@ export default {
     }
   },
   watch: {
+    pageId: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('pageId TO', to)
+        if (to) {
+          // tween contentHeight ?
+        }
+        else {
+          let nodeOid = this.$store.state.ui.nodeOnContent
+          if (nodeOid) {
+            this.pageId = 'nodes'
+          }
+        }
+      }
+    },
     'player.figure': {
       handler (to, from) {
         if (to) {
