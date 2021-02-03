@@ -4,6 +4,7 @@
   div(:style=`{position: 'fixed', right: '0px', top: '50px'}`).row.bg-red.text-white
     small.full-width scrollTop: {{scrollTop}}
     small.full-width scrollHeight: {{scrollHeight}}
+    q-btn(outline color="white" dense no-caps @click="itemsRes.gotoStart()") Go to start
   q-spinner(
     v-if="!itemsRes"
     size="50px" color="green")
