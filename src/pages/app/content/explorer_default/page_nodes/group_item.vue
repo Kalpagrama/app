@@ -20,6 +20,7 @@
       }`
       ).row.full-width.item
       img(
+        v-if="itemComposition"
         draggable="false"
         :src="itemComposition.thumbUrl"
         :style=`{
@@ -42,16 +43,19 @@
         round flat dense color="white" icon="replay")
       .col
       q-btn(
+        @click="$emit('set-current')"
+        outline dense color="white" no-caps) Cut here
+      q-btn(
         round flat dense color="white" icon="launch")
 </template>
 
 <script>
 export default {
   name: 'groupItem',
-  props: ['player', 'contentKalpa', 'item'],
+  props: ['player', 'contentKalpa', 'item', 'isSelected'],
   data () {
     return {
-      isSelected: false,
+      // isSelected: false,
     }
   },
   computed: {
@@ -98,7 +102,8 @@ export default {
   methods: {
     itemClick () {
       this.$log('itemClick')
-      this.isSelected = !this.isSelected
+      // this.isSelected = !this.isSelected
+      this.$emit('set-selected')
       if (this.itemFigure) {
         if (this.contentKalpa.type === 'VIDEO') {
           this.player.setCurrentTime(this.itemFigure[0].t)

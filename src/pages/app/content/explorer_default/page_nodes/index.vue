@@ -59,7 +59,10 @@ div(
               v-for="(item,itemIndex) in group.items" :key="item.oid"
               :item="item.populatedObject"
               :player="player"
-              :contentKalpa="contentKalpa").q-mb-xs
+              :contentKalpa="contentKalpa"
+              :isSelected="itemSelectedOid === item.oid"
+              @set-current="setCurrentItem(item)"
+              @set-selected="setSelectedItem(item)").q-mb-xs
             //- next
             .row.full-width.q-px-sm
               q-btn(
@@ -91,6 +94,7 @@ export default {
   data () {
     return {
       itemsRes: null,
+      itemSelectedOid: null,
     }
   },
   computed: {
@@ -127,6 +131,15 @@ export default {
       this.itemsRes.setProperty('currentId', null)
       await this.itemsRes.gotoCurrent()
     },
+    async setCurrentItem (item) {
+      this.$log('setCurrentItem', item.oid)
+      this.itemsRes.setProperty('currentId', item.oid)
+      await this.itemsRes.gotoCurrent()
+    },
+    async setSelectedItem (item) {
+      this.$log('setSelected', item.oid)
+      this.itemSelectedOid = item.oid
+    },
   },
   async mounted () {
     this.$log('mounted')
@@ -135,8 +148,9 @@ export default {
     let nodeOid = this.$store.state.ui.nodeOnContent
     this.$log('nodeOid', nodeOid)
     if (nodeOid) {
-      this.itemsRes.setProperty('currentId', nodeOid)
-      await this.itemsRes.gotoCurrent()
+      await this.setCurrentItem({oid: nodeOid})
+      await this.setSelectedItem({oid: nodeOid})
+      this.$store.commit('ui/stateSet', ['nodeOnContent', null])
     }
   }
 }
