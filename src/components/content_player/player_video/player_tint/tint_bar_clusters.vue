@@ -1,5 +1,12 @@
 <template lang="pug">
-div
+div(
+  :style=`{
+    position: 'absolute', zIndex: 1000,
+    pointerEvents: 'none',
+    borderRadius: '10px',
+    overflow: 'hidden',
+  }`
+  ).row.fit
   //- figures
   //- div(
     v-for="(f,fi) in player.figures" :key="fi"

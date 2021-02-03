@@ -136,7 +136,14 @@ export default {
   },
   computed: {
     contentHeight () {
-      return 300
+      let height = this.contentKalpa.thumbHeight
+      let width = this.contentKalpa.thumbWidth
+      if (height && width) {
+        return Math.max(height, 250)
+      }
+      else {
+        return 300
+      }
     },
     editorHeightMin () {
       return 70
@@ -154,7 +161,7 @@ export default {
           sortStrategy: 'AGE',
           groupByContentLocation: true
         },
-        populateObjects: true,
+        populateObjects: false,
       }
       return res
     }

@@ -53,11 +53,14 @@ q-layout(
 </template>
 
 <script>
+import widgetBookmarks from './widget_bookmarks/index.vue'
+import widgetUpload from './widget_upload/index.vue'
+
 export default {
   name: 'wsIndex',
   components: {
-    widgetBookmarks: () => import('./widget_bookmarks/index.vue'),
-    widgetUpload: () => import('./widget_upload/index.vue')
+    widgetBookmarks,
+    widgetUpload,
   },
   data () {
     return {

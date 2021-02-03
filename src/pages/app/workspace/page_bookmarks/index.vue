@@ -1,6 +1,18 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
+  q-dialog(
+    v-model="bookmarkEditorShow"
+    :full-width="$q.screen.xs"
+    :full-height="$q.screen.xs"
+    :maximized="$q.screen.xs"
+    :square="$q.screen.xs"
+    @hide="bookmarkSelected = null")
+    //- .row.bg-red
+      small.text-white {{bookmarkSelected}}
+    bookmark-editor(
+      :bookmark="bookmarkSelected"
+      @close="bookmarkEditorShow = false, bookmarkSelected = null")
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -52,11 +64,10 @@ q-layout(
                 maxWidth: $store.state.ui.pageWidth+'px',
               }`
               ).row.full-width.items-start.content-start
-              //- item-content()
-              component(
-                v-for="(b,bi) in items" :key="b.oid"
-                :is="'item-content'"
-                :bookmark="b"
+              bookmark-item(
+                v-for="(bookmark, bookmarkIndex) in items" :key="bookmark.oid"
+                :bookmark="bookmark"
+                @bookmark="bookmarkSelectHandle"
                 ).q-mb-sm
       q-page-sticky(
         expand position="top-left" :offset="[0, 0]").row.full-width.q-px-md.b-30
@@ -73,14 +84,20 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import bookmarkItem from './bookmark_item.vue'
+import bookmarkEditor from './bookmark_editor.vue'
+
 export default {
   name: 'workspace_bookmarks',
   components: {
-    itemContent: () => import('./item_content.vue'),
+    bookmarkItem,
+    bookmarkEditor,
   },
   data () {
     return {
       pageId: 'content',
+      bookmarkSelected: null,
+      bookmarkEditorShow: false,
     }
   },
   computed: {
@@ -93,7 +110,7 @@ export default {
         {id: 'content', name: 'Контент'},
         {id: 'nodes', name: 'Ядра'},
         {id: 'joints', name: 'Связи'},
-        {id: 'people', name: 'Люди'},
+        // {id: 'people', name: 'Люди'},
         {id: 'spheres', name: 'Сферы'}
       ]
     },
@@ -121,6 +138,13 @@ export default {
       }
       // else if ()
       return res
+    }
+  },
+  methods: {
+    bookmarkSelectHandle (bookmark) {
+      this.$log('bookmarkSelectHandle', bookmark)
+      this.bookmarkSelected = bookmark
+      this.bookmarkEditorShow = true
     }
   }
 }

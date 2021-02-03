@@ -4,6 +4,36 @@ div(
     background: 'rgb(35,35,35)',
     borderRadius: '10px',
   }`
+  ).row.full-width.items-start.content-start
+  .col
+    router-link(
+      :to="bookmarkMeta.link"
+      ).row.full-width.items-start.content-start.cursor-pointer
+      img(
+        v-if="!thumbUrlErrored"
+        @error="thumbUrlErrorHandle"
+        draggable="false"
+        :src="bookmark.thumbUrl"
+        :style=`{
+          height: '50px',
+          minWidth: '90px',
+          maxWidth: '90px',
+          borderRadius: '10px',
+          objectFit: 'contain',
+        }`).b-40.q-mt-sm.q-ml-sm.q-mb-sm
+      .col
+        .row.full-width.items-start.content-start.q-px-sm.q-pt-xs
+          span.text-white {{ bookmark.name }}
+          .row.full-width
+            small.text-grey-8 {{ bookmarkMeta.type }}
+  q-btn(
+    @click="$emit('bookmark', bookmark)"
+    round flat color="grey-8" icon="more_vert")
+//- div(
+  :style=`{
+    background: 'rgb(35,35,35)',
+    borderRadius: '10px',
+  }`
   ).row.full-width
   router-link(
     v-if="bookmarkMeta"

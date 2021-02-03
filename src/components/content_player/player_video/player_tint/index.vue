@@ -1,10 +1,8 @@
 <template lang="pug">
 div(
-  ref="tint-wrapper"
   @click.self="tintClickSelf"
   :style=`{
     position: 'absolute', zIndex: 200,
-    //- background: options.mode === 'editor' ? 'none' : 'rgba(0,0,0,'+tintBackgroundOpacity+')',
     borderRadius: '10px',
     overflow: 'hidden',
   }`
@@ -17,12 +15,17 @@ div(
       v-show="options.showHeader"
       v-bind="$props"
       :isFocused="tintFocused")
-  //- middle
-  //- spinner for loading
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="none")
+  //- middle spinner
   q-spinner(
-    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_"
+    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_ && tintSpinnerCanShow"
     color="white" size="50px")
+  //- actions
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-btn(
+      v-if="player && player.playing_ && options.mode === 'feed' && !player.playing && tintSpinnerCanShow"
+      round flat color="white"
+      :style=`{pointerEvents: 'none',}`)
+      q-icon(name="play_arrow" size="50px")
   //- tick left
   transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
     div(
@@ -53,13 +56,6 @@ div(
       ).row.items-center.content-center.justify-center
       span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
       q-icon(name="fast_forward" color="white" size="20px").q-ml-xs
-  //- actions
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="player && player.playing_ && options.mode === 'feed' && !player.playing"
-      round flat color="white"
-      :style=`{pointerEvents: 'none',}`)
-      q-icon(name="play_arrow" size="50px")
   //- footer feed
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -82,7 +78,6 @@ div(
         bottom: '0px',
         background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
         borderRadius: '0 0 10px 10px',
-        //- opacity: $store.state.ui.userTyping ? 0 : 1,
       }`
       ).row.full-width.justify-center.q-pa-md
       slot(name="tint-bar" :tintFocused="tintFocused")
@@ -114,6 +109,7 @@ export default {
       tintClickSelfTimeout: null,
       tintClickSelfCount: 0,
       tintClickSelfCountShow: false,
+      tintSpinnerCanShow: false,
     }
   },
   computed: {
@@ -136,9 +132,7 @@ export default {
   methods: {
     tintClickSelf (e) {
       // this.$log('tintClickSelf', this.tintClickSelfCount)
-      // this.tintClickSelfTimeout
       this.tintClickSelfCount += 1
-      // this.tintClickSelfCountShow = true
       if (this.tintClickSelfTimeout) {
         clearTimeout(this.tintClickSelfTimeout)
         this.tintClickSelfTimeout = null
@@ -194,38 +188,6 @@ export default {
         this.player.setCurrentTime(t)
       }
     },
-    tintMouseenter () {
-      this.$log('tintMouseenter')
-      if (this.$q.platform.is.desktop) {}
-      // this.tintFocused = !this.tintFocused
-    },
-    tintMouseleave () {},
-    tintMousemove (e) {
-      // this.$log('tintMousemove', e)
-      if (this.options.mode === 'editor') return
-      let x = e.clientX
-      let y = e.clientY
-      let rect = this.$refs['tint-wrapper'].getBoundingClientRect()
-      let xTintMin = rect.left
-      let xTintMax = rect.right
-      let yTintMin = rect.top
-      let yTintMax = rect.bottom
-      if (this.tintMousemoveTimeout) {
-        clearTimeout(this.tintMousemoveTimeout)
-        this.tintMousemoveTimeout = null
-      }
-      this.tintMousemoveTimeout = setTimeout(() => {
-        this.tintFocused = false
-      }, 1000)
-      // get in rect
-      // this.$log({x, y, xTintMin, xTintMax, yTintMin, yTintMax})
-      if (x >= xTintMin && x <= xTintMax && y >= yTintMin && y <= yTintMax) {
-        this.tintFocused = true
-      }
-      else {
-        // this.tintFocused = false
-      }
-    },
     onKeydown (e) {
       // this.$log('onKeydown', e)
       switch (e.key) {
@@ -248,22 +210,23 @@ export default {
           this.player.setState('muted', true)
           break
       }
+    },
+    onInterval () {
+      this.$log('onInterval')
+      this.tintLiveMs += 100
+      if (this.tintLiveMs > 10000) clearInterval(this.tintInterval)
     }
   },
-  mounted () {
+  async mounted () {
     // this.$log('mounted')
-    // if (this.$q.platform.is.desktop) {
-    //   window.addEventListener('mousemove', this.tintMousemove)
-    // }
     if (this.options.mode === 'editor') {
       window.addEventListener('keydown', this.onKeydown)
     }
+    await this.$wait(2000)
+    this.tintSpinnerCanShow = true
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
-    // if (this.$q.platform.is.desktop) {
-    //   window.removeEventListener('mousemove', this.tintMousemove)
-    // }
     if (this.options.mode === 'editor') {
       window.removeEventListener('keydown', this.onKeydown)
     }

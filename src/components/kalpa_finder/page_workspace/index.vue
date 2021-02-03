@@ -67,7 +67,7 @@ export default {
         {id: 'node', name: 'Ядра', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
         {id: 'joint', name: 'Связи', selector: {wsItemType: 'WS_BOOKMARK', type: 'JOINT'}},
         {id: 'sphere', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}},
-        {id: 'user', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
+        // {id: 'user', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
       ].filter(v => {
         if (this.page) return this.page.views.includes(v.id)
         else return true
