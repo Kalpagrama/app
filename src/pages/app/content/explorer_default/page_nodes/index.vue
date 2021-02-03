@@ -128,8 +128,8 @@ export default {
     },
     async drop () {
       this.$log('drop')
-      this.itemsRes.setProperty('currentId', null)
-      await this.itemsRes.gotoCurrent()
+      // this.itemsRes.setProperty('currentId', null)
+      await this.itemsRes.gotoStart()
     },
     async setCurrentItem (item) {
       this.$log('setCurrentItem', item.oid)

@@ -14,7 +14,9 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 const FindCollectionEnum = Object.freeze({
    WS: 'WS',
    OBJECTS: 'OBJECTS',
-   EVENTS: 'EVENTS'
+   EVENTS: 'EVENTS',
+   SUBSCRIPTIONS: 'SUBSCRIPTIONS',
+   SUBSCRIBERS: 'SUBSCRIBERS'
 })
 
 class ListsApi {
@@ -72,11 +74,13 @@ class ListsApi {
             break
          case RxCollectionEnum.LST_SUBSCRIBERS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere)
+            assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
+            res = await ListsApi.find(FindCollectionEnum.SUBSCRIBERS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SUBSCRIPTIONS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere)
+            assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
+            res = await ListsApi.find(FindCollectionEnum.SUBSCRIPTIONS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SEARCH:
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
@@ -157,35 +161,35 @@ class ListsApi {
       return await apiCall(f, cb)
    }
 
-   static async userSubscriptions (oid) {
-      let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
-      assert(user && user.subscriptions, '!user')
-      assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
-      return {
-         items: user.subscriptions,
-         totalCount: user.subscriptions.length,
-         nextPageToken: null,
-         currentPageToken: null,
-         prevPageToken: null
-      }
-   }
-
-   // внимание ! вернет НЕ реактивный элемент!!!
-   static async objSubscribers (oid) {
-      const f = ListsApi.objSubscribers
-      logD(f, 'start')
-      let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, { clientFirst: false }) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
-      assert(obj, '!obj')
-      let subscribers = obj.subscribers || [] // внимание ! не реактивно!!!!
-      assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')
-      return {
-         items: subscribers,
-         totalCount: subscribers.length,
-         nextPageToken: null,
-         currentPageToken: null,
-         prevPageToken: null
-      }
-   }
+   // static async userSubscriptions (oid) {
+   //    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
+   //    assert(user && user.subscriptions, '!user')
+   //    assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
+   //    return {
+   //       items: user.subscriptions,
+   //       totalCount: user.subscriptions.length,
+   //       nextPageToken: null,
+   //       currentPageToken: null,
+   //       prevPageToken: null
+   //    }
+   // }
+   //
+   // // внимание ! вернет НЕ реактивный элемент!!!
+   // static async objSubscribers (oid) {
+   //    const f = ListsApi.objSubscribers
+   //    logD(f, 'start')
+   //    let obj = await rxdb.get(RxCollectionEnum.OBJ, oid, { clientFirst: false }) // clientFirst: false - из-за того, что при создании ядра - в кэш помещается dummyNode
+   //    assert(obj, '!obj')
+   //    let subscribers = obj.subscribers || [] // внимание ! не реактивно!!!!
+   //    assert(Array.isArray(subscribers), '!Array.isArray(obj.subscribers)')
+   //    return {
+   //       items: subscribers,
+   //       totalCount: subscribers.length,
+   //       nextPageToken: null,
+   //       currentPageToken: null,
+   //       prevPageToken: null
+   //    }
+   // }
 }
 
 export { ListsApi }

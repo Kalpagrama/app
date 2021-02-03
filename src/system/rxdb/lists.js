@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
-import { RxCollectionEnum, LstCollectionEnum } from 'src/system/rxdb/common'
+import { RxCollectionEnum, LstCollectionEnum, checkMangoCond } from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { EpubCFI } from 'epubjs'
@@ -283,8 +283,14 @@ class Lists {
          selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
             'props.oid': { $in: relatedSphereOids },
-            'props.mangoQuery.selector.objectTypeEnum.$in': { $in: [object.type] }
+            // 'props.mangoQuery.selector.objectTypeEnum.$in': { $in: [object.type] }
          }
+      })
+      rxDocs = rxDocs.filter(rxDoc => {
+         assert(rxDoc.props.mangoQuery, '!mangoQuery')
+         assert(object.type, '!event.object.type')
+         if (rxDoc.props.mangoQuery.selector.objectTypeEnum && !checkMangoCond(rxDoc.props.mangoQuery.selector.objectTypeEnum, object.type)) return false
+         return true
       })
       if (type === 'OBJECT_DELETED') { // удаленный объект может быть на домашней странице
          let rxDocsFeed = await Lists.cache.find({
@@ -321,6 +327,12 @@ class Lists {
                   'props.oid': event.subject.oid
                }
             })
+            rxDocsSubscriptions = rxDocsSubscriptions.filter(rxDoc => {
+               assert(rxDoc.props.mangoQuery, '!mangoQuery')
+               assert(event.object.type, '!event.object.type')
+               if (rxDoc.props.mangoQuery.selector.objectTypeEnum && !checkMangoCond(rxDoc.props.mangoQuery.selector.objectTypeEnum, event.object.type)) return false
+               return true
+            })
             // меняем списки
             for (let rxDoc of rxDocsSubscribers) {
                let reactiveItem = getReactiveDoc(rxDoc).getPayload()
@@ -353,6 +365,12 @@ class Lists {
                   'props.oid': event.subject.oid
                }
             })
+            rxDocsSubscriptions = rxDocsSubscriptions.filter(rxDoc => {
+               assert(rxDoc.props.mangoQuery, '!mangoQuery')
+               assert(event.object.type, '!event.object.type')
+               if (rxDoc.props.mangoQuery.selector.objectTypeEnum && !checkMangoCond(rxDoc.props.mangoQuery.selector.objectTypeEnum, event.object.type)) return false
+               return true
+            })
             // меняем списки
             for (let rxDoc of rxDocsSubscribers) {
                let reactiveItem = getReactiveDoc(rxDoc).getPayload()
@@ -381,45 +399,6 @@ class Lists {
             assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')
             // добавим на все сферы (event.relatedSphereOids)
             await this.addRemoveObjectToLists(event.type, event.relatedSphereOids, event.object)
-            //
-            // let rxDocs = await this.cache.find({
-            //   selector: {
-            //     'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-            //     'props.oid': { $in: event.relatedSphereOids },
-            //     'props.mangoQuery.selector.objectTypeEnum.$in': {$in: [event.object.type]}
-            //   }
-            // })
-            // if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
-            //   let rxDocsFeed = await this.cache.find({
-            //     selector: {
-            //       'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
-            //     }
-            //   })
-            //   rxDocs = [...rxDocs, ...rxDocsFeed]
-            // }
-            // logD(f, 'finded lists: ', rxDocs)
-            // for (let rxDoc of rxDocs) {
-            //   logD('apply event to rxdoc', rxDoc.toJSON())
-            //   let reactiveItem = getReactiveDoc(rxDoc).getPayload()
-            //   assert(reactiveItem.items, '!reactiveItem.items')
-            //   assert(event.object, '!event.object')
-            //   let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
-            //   if (event.type === 'OBJECT_CREATED') {
-            //     if (indx === -1) {
-            //       logD(f, 'add created object to begin of list.', event.object)
-            //       reactiveItem.items.splice(0, 0, event.object)
-            //       reactiveItem.count++
-            //       reactiveItem.totalCount++
-            //     }
-            //   } else if (event.type === 'OBJECT_DELETED') {
-            //     if (indx >= 0) {
-            //       logD(f, 'delete object from list', indx)
-            //       reactiveItem.items.splice(indx, 1)
-            //       reactiveItem.count--
-            //       reactiveItem.totalCount--
-            //     }
-            //   }
-            // }
             break
          }
          case 'VOTED': {

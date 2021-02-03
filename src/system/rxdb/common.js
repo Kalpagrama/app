@@ -66,6 +66,25 @@ function rxdbOperationProxy (collection, operation, ...params) {
    }
 }
 
+// для работы вне rxdb (такая же ф-я не сервере - синхронить!)
+function checkMangoCond (mangoCond, value) {
+   if (typeof mangoCond === 'string' || typeof mangoCond === 'boolean') return mangoCond === value
+   assert(typeof mangoCond === 'object')
+   if (mangoCond.$eq) return mangoCond.$eq === value
+   else if (mangoCond.$ne) return mangoCond.$ne !== value
+   else if (mangoCond._dollar_ne) return mangoCond._dollar_ne !== value
+   else if (mangoCond.$gt) return value > mangoCond.$gt
+   else if (mangoCond.$gte) return value >= mangoCond.$gte
+   else if (mangoCond.$lt) return value < mangoCond.$lt
+   else if (mangoCond.$lte) return value <= mangoCond.$lte
+   else if (mangoCond.$in) return mangoCond.$in.includes(value)
+   else if (mangoCond._dollar_in) return mangoCond._dollar_in.includes(value)
+   else if (mangoCond.$nin) return !mangoCond.$nin.includes(value)
+   else if (mangoCond._dollar_nin) return !mangoCond._dollar_nin.includes(value)
+   else if (mangoCond.$and) return mangoCond.$and.reduce((accumulator, nestedMangoCond) => accumulator && checkMangoCond(nestedMangoCond, value), true)
+   else throw new Error(`bad mangoCond ${mangoCond}`)
+}
+
 async function rxdbOperationProxyExec (collection, operation, ...params) {
    assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
    const f = rxdbOperationProxyExec
@@ -103,6 +122,7 @@ export {
    WsCollectionEnum,
    LstCollectionEnum,
    RxCollectionEnum,
+   checkMangoCond,
    rxdbOperationProxy,
    rxdbOperationProxyExec
 }
