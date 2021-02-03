@@ -305,7 +305,7 @@ class Group {
             reactiveGroup: {
                id,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
-               items: [], // кусочек от this.pages
+               items: [], // кусочек от this.pages (для каждого item вызывается populate)
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
@@ -406,10 +406,13 @@ class Group {
       let listItems = []
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
+         let mangoQuery = rxQuery.mangoQuery
+         assert(mangoQuery, '!mangoQuery')
          let rxDocs = await rxQuery.exec()
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
          listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
          this.reactiveGroup.totalCount = listItems.length
+         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
          this.reactiveGroup.itemPrimaryKey = 'id'
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
@@ -419,11 +422,13 @@ class Group {
             prevPageToken,
             currentPageToken
          } = rxDoc.toJSON().cached.data
+         let mangoQuery = rxDoc.props.mangoQuery
+         assert(mangoQuery, '!mangoQuery')
          listItems = items
          this.reactiveGroup.totalCount = totalCount
-         assert(rxDoc.props.mangoQuery, '!mangoQuery')
-         assert(rxDoc.props.mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-         switch (rxDoc.props.mangoQuery.selector.rxCollectionEnum) {
+         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
+         assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+         switch (mangoQuery.selector.rxCollectionEnum) {
             case RxCollectionEnum.LST_SPHERE_ITEMS:
             case RxCollectionEnum.LST_SEARCH:
             case RxCollectionEnum.LST_SUBSCRIBERS:
@@ -434,16 +439,18 @@ class Group {
                this.reactiveGroup.itemPrimaryKey = 'id' // эвенты
                break
             default:
-               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + rxDoc.props.mangoQuery.selector.rxCollectionEnum)
+               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       } else if (array) {
          listItems = array
          this.reactiveGroup.totalCount = listItems.length
+         this.reactiveGroup.itemType = 'ITEM' // todo определять тип итемов внутри!
          if (listItems.length) {
             if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
             else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
          } else this.reactiveGroup.itemPrimaryKey = 'unknown'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
+      assert(this.reactiveGroup.itemType.in('GROUP', 'ITEM'), 'bad itemType')
       assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
       assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
       let page = {
@@ -460,10 +467,6 @@ class Group {
          this.reactiveGroup.pages.unshift(page)
       } else {
          this.reactiveGroup.pages.push(page)
-      }
-      if (listItems.length) {
-         if (listItems[0].items) this.reactiveGroup.itemType = 'GROUP'
-         else this.reactiveGroup.itemType = 'ITEM'
       }
       if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
@@ -538,7 +541,7 @@ class Group {
                figuresAbsolute,
                thumbUrl
             } = nextGroup
-            if (!items) {
+            if (!items || !totalCount) {
                logD('asdfasdfsadfsadf')
             }
             assert(items && totalCount >= 0, '!nextItem.items')
@@ -609,20 +612,32 @@ class Group {
       let fromId = this.getProperty('currentId')
       if (fromId) {
          let allItems = this.loadedItems()
-         let indxFrom = allItems.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === fromId)
-         if (indxFrom === -1) { // на этом уровне fromId не найден
-            if (this.reactiveGroup.itemType === 'GROUP') { // внутри нас группы
-               for (let i = 0; i < allItems.length; i++) {
-                  let reactiveGroup = allItems[i]
-                  let subgroupIndx = await reactiveGroup.gotoCurrent()
-                  if (subgroupIndx >= 0) indxFrom = i // искомый элемент в этой подгруппе
+         // найдет элемент в списке (поиск идет вглубь)
+         let findItemIndex = (items, id) => {
+            let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
+            if (indx === -1) { // на этом уровне fromId не найден (идем вглубь)
+               for (let i = 0; i < items.length; i++) {
+                  let subitems = items[i].items
+                  if (subitems) {
+                     if (findItemIndex(subitems, id) >= 0) {
+                        indx = i
+                        break
+                     }
+                  }
                }
             }
+            return indx
          }
+         let indxFrom = findItemIndex(allItems, fromId)
          if (indxFrom >= 0) {
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')
+            let firstItem = this.reactiveGroup.items[0]
+            if (firstItem && this.reactiveGroup.itemType === 'GROUP'){
+               firstItem.setProperty('currentId', fromId)
+               await firstItem.gotoCurrent()
+            }
          }
       }
       return indxFrom
@@ -750,7 +765,7 @@ class ReactiveListWithPaginationFactory {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
          let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
          assert(mangoQuery, '!mangoQuery')
-         let groupId = JSON.stringify(mangoQuery)
+         let groupId = JSON.stringify(mangoQuery) + populateFunc ? 'populate' : ''
          this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'top')
          rxQueryOrRxDoc.reactiveListHolderMaster = this
@@ -758,15 +773,6 @@ class ReactiveListWithPaginationFactory {
       assert(rxQueryOrRxDoc.reactiveListHolderMaster.group, '!this.group!')
       let group = rxQueryOrRxDoc.reactiveListHolderMaster.group
       return group.reactiveGroup
-      // return {
-      //    totalCount: group.totalCount,
-      //    next: group.next.bind(group),
-      //    prev: group.prev.bind(group),
-      //    hasNext: group.hasNext.bind(group),
-      //    hasPrev: group.hasPrev.bind(group),
-      //    saveCurrentPos: group.saveCurrentPos.bind(group),
-      //    refresh: group.refresh.bind(group)
-      // }
    }
 }
 

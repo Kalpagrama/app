@@ -100,7 +100,8 @@ export default {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
     // 140449542704336959
-    // this.itemsRes.setProperty('currentId', '140449542704336959')
+    // this.itemsRes.setProperty('currentId', '129603228739309613')
+    // this.itemsRes.setProperty('currentId', null)
     // await this.itemsRes.gotoCurrent()
   }
 }
