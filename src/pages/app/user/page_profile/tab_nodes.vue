@@ -6,7 +6,7 @@ div(
     height: '500px',
   }`
   ).column
-  .col.full-width.scroll.br
+  .col.full-width.scroll
     list-feed(
       :query="query")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)

@@ -8,7 +8,9 @@
 <template lang="pug">
 .row.full-width.q-px-md
   q-dialog(
-    v-model="isOpened")
+    v-model="isOpened"
+    :maximized="$q.screen.xs"
+    :full-width="$q.screen.xs")
     node-feed(
       :isActive="true"
       :isVisible="true"
@@ -79,7 +81,7 @@ export default {
       }
       else if (this.item.type === 'JOINT') {
         if (this.item.vertices[0] === 'ESSENCE') return this.item.name
-        else if (this.item.vertices[0] === 'ASSOCIATIVE') return 'Похожие'
+        else if (this.item.vertices[0] === 'ASSOCIATIVE') return 'Ассоциация'
         else return this.$nodeItemType(this.item.vertices[0]).name + ' - ' + this.$nodeItemType(this.item.vertices[1]).name
       }
       else {

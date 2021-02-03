@@ -21,6 +21,7 @@ export default {
   // data exchanges
   nodeCategories: [],
   nodeOnContent: null,
+  nodeDraft: null,
   // other
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},

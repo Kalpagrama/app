@@ -94,13 +94,22 @@ export default {
         this.$log('nodePublish start')
         this.nodePublishing = true
         await this.$wait(1000)
+        // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))
         nodeInput.items[0] = this.compositionCreate()
-        // nodeInput.shit...
+        this.$log('nodeInput', nodeInput)
+        // create node, publish this shit
         let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$emit('nodePublished', createdNode)
         // this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
+        // delete draft if it is a draft, man
+        if (nodeInput.wsItemType === 'WS_NODE') {
+          // await this.node.remove(true)
+          await this.$rxdb.remove(this.node.id)
+        }
+        // done
         this.nodePublishing = false
+        // kill player figure, it will destroy node editor
         this.player.setState('figure', null)
         if (!this.isMini) {
           this.$emit('toggle')
@@ -114,24 +123,34 @@ export default {
     },
     async nodeDelete () {
       this.$log('nodeDelete')
-      this.player.events.emit('figure-delete')
-      // if (!this.isMini) {
-      //   this.$emit('toggle')
-      // }
-      // this.player.setState('figure', null)
+      // delete draft ?
+      if (this.node.wsItemType === 'WS_NODE') {
+        if (!confirm('Удалить?')) return
+        // await this.node.remove(true)
+        await this.$rxdb.remove(this.node.id)
+      }
+      // save draft ?
+      else {
+        this.player.events.emit('figure-delete')
+      }
     },
     async playerFigureDeleteHandle (e) {
       this.$log('playerFigureDeleteHandle', e)
-      if (confirm('Сохранить в черновики ?')) {
-        // do staff
-        let nodeInput = JSON.parse(JSON.stringify(this.node))
-        nodeInput.items[0] = this.compositionCreate()
-        let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-        this.$log('nodeSaved', nodeSaved)
+      if (this.node.wsItemType === 'WS_NODE') {
         this.player.setState('figure', null)
       }
       else {
-        this.player.setState('figure', null)
+        if (confirm('Сохранить в черновики ?')) {
+          // do staff
+          let nodeInput = JSON.parse(JSON.stringify(this.node))
+          nodeInput.items[0] = this.compositionCreate()
+          let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+          this.$log('nodeSaved', nodeSaved)
+          this.player.setState('figure', null)
+        }
+        else {
+          this.player.setState('figure', null)
+        }
       }
     },
     playerFigureCreateHandle (e) {

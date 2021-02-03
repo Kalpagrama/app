@@ -12,6 +12,7 @@ div(
         v-model="item.name"
         dark dense borderless
         type="textarea" autogrow
+        placeholder="Создать на текущей секунде"
         @focus="itemFocused"
         ).full-width
     div(
@@ -20,42 +21,47 @@ div(
       }`
       ).row.items-center.content-center.justify-center
       q-btn(
-        v-if="isSelected"
+        v-if="isFocused && item.name.length > 0"
         @click="itemEdit()"
-        round flat color="white" icon="edit")
+        round flat color="green" icon="check")
   //- footer: meta, and timestamp
   .row.full-width.items-start.content-start
     small(
       v-if="contentKalpa.type === 'VIDEO'"
-      ).text-grey-7.q-mr-xs {{ $time(item.items[0].layers[0].figuresAbsolute[0].t) }}
+      ).text-grey-7.q-mr-xs {{ $time(player.currentTime) }}
     .col
-    small.text-grey-7 {{ $date(item.createdAt) }}
+    small.text-grey-7 {{ $date(isNow) }}
 </template>
 
 <script>
 export default {
-  name: 'draftItem',
-  props: ['item', 'itemIndex', 'player', 'contentKalpa', 'isSelected'],
+  name: 'draftCurrentTime',
+  props: ['contentKalpa', 'player'],
   data () {
     return {
+      isFocused: false,
+      isNow: null,
+      item: {
+        name: ''
+      }
     }
-  },
-  watch: {
   },
   methods: {
     itemFocused () {
       this.$log('itemFocused')
-      this.$emit('set-selected')
-      if (this.contentKalpa.type === 'VIDEO') {
-        let t = this.item.items[0].layers[0].figuresAbsolute[0].t
-        this.player.setCurrentTime(t)
-      }
+      this.isFocused = true
+      this.$emit('focused')
     },
-    itemEdit () {
+    async itemEdit () {
       this.$log('itemEdit')
-      this.$store.commit('ui/stateSet', ['nodeDraft', this.item])
-      this.player.setState('figure', this.item.items[0].layers[0].figuresAbsolute)
+      // create draft and edit this shit ?
+      // or just create draft
+      // let nodeInput = {name: '', category: 'FUN'}
     }
   },
+  mounted () {
+    this.$log('mounted')
+    this.isNow = Date.now()
+  }
 }
 </script>

@@ -1,13 +1,17 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- debug top
-  div(:style=`{position: 'fixed', right: '0px', top: '50px'}`).row.bg-red.text-white
+  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '50px'}`).row.bg-red.text-white
     small.full-width scrollTop: {{scrollTop}}
     small.full-width scrollHeight: {{scrollHeight}}
     q-btn(outline color="white" dense no-caps @click="itemsRes.gotoStart()") Go to start
-  q-spinner(
-    v-if="!itemsRes"
-    size="50px" color="green")
+  div(
+    v-if="scrollTarget && !itemsRes"
+    :style=`{
+      paddingTop: ((scrollTarget.clientHeight || scrollTarget.innerHeight)/2)-25+'px',
+    }`
+    ).row.full-width.justify-center
+    q-spinner(size="50px" color="green")
   div(
     v-if="itemsRes"
     :style=`{
@@ -36,7 +40,7 @@
         throttle: 200,
         callback: indexMiddleHandler,
         intersection: {
-          root: scrollTarget,
+          root: scrollTarget ? scrollTarget.clientHeight ? scrollTarget : null : null,
           rootMargin: rootMargin
         }
       }`
@@ -287,7 +291,7 @@ export default {
   },
   async mounted () {
     this.scrollTarget = getScrollTarget(this.$el)
-    this.$log('mounted')
+    this.$log('mounted', this.scrollTarget)
     this.scrollOn()
     this.scrollUpdate()
     // this.prev()
