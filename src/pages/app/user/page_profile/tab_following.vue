@@ -67,6 +67,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
           oidSphere: this.sphereOid,
+          objectTypeEnum: {$in: ['USER']}
         },
         populateObjects: false,
       }

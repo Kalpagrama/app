@@ -4,6 +4,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStora
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import { LstCollectionEnum } from 'src/system/rxdb/common'
 import { apiCall } from 'src/api/index'
+import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -91,14 +92,16 @@ class UserApi {
     const f = UserApi.isSubscribed
     logD(f, 'start', oid)
     const t1 = performance.now()
-    let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
+    let currentUserOid = rxdb.getCurrentUser().oid // localStorage.getItem('k_user_oid')
+    assert(oid === currentUserOid, 'разрешено только для текущего юзера')
     let { items } = await rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,
-        oidSphere: oid
-      }
+        oidSphere: oid,
+        objectTypeEnum: {$in: ['USER']}
+      },
+      populateObjects: false,
     })
-    let currentUserOid = rxdb.getCurrentUser().oid // localStorage.getItem('k_user_oid')
     let res = items.find(item => item.oid === currentUserOid) ? true : false
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
     return res
