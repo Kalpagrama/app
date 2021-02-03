@@ -5,7 +5,7 @@ div(
     maxWidth: $q.screen.xs ? '100%' : '400px',
     borderRadius: $q.screen.xs ? '0px' : '10px',
   }`
-  ).column.full-width.items-start.content-start.b-30.q-pa-md.br
+  ).column.full-width.items-start.content-start.b-30.q-pa-md
   .col.full-width.scroll
     //- thumbUrl(s) and close btn
     .row.full-width.items-start.content-start
