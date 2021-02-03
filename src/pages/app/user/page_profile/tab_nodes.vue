@@ -1,5 +1,5 @@
 <template lang="pug">
-div(
+//- div(
   :style=`{
     position: 'relative',
     width: '500px',
@@ -14,7 +14,7 @@ div(
           :node="item.populatedObject"
           :isActive="isActive"
           :isVisible="isVisible")
-//- list-feed(
+list-feed(
   :query="query")
   template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
     node-feed(
