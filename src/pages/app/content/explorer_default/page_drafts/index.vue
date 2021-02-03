@@ -27,33 +27,21 @@ div(
     div(
       v-if="itemsRes"
       ).row.full-width.q-px-md
-      div(
-        v-for="(i,ii) in items" :key="ii"
-        :style=`{
-          minHeight: '40px',
-        }`
-        ).row.full-width.items-center.content-center.q-mb-sm
-        //- node name
-        .row.full-width
-          span.text-white {{ i.name }}
-        //- figure footer
-        .row.full-width
-          small(
-            v-if="contentKalpa.type === 'VIDEO'"
-            ).text-grey-7.q-mr-xs {{ $time(i.items[0].layers[0].figuresAbsolute[0].t) }}
-          .col
-          small.text-grey-7 {{ $date(i.createdAt) }}
+      draft-item(
+        v-for="(i,ii) in items" :key="i.id"
+        :item="i" :itemIndex="ii"
+        :player="player" :contentKalpa="contentKalpa")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import groupItem from '../page_nodes/group_item.vue'
+import draftItem from './draft_item.vue'
 
 export default {
   name: 'pageDrafts',
   props: ['contentKalpa', 'player', 'node'],
   components: {
-    groupItem
+    draftItem
   },
   data () {
     return {

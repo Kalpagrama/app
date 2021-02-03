@@ -21,6 +21,9 @@ div(
           q-btn(
             @click="drop()"
             outline dense color="red" no-caps).q-mr-sm Drop
+          q-btn(
+            @click="next()"
+            outline dense color="white" no-caps).q-mr-sm Next
         //- group
         div(
           v-for="(group,groupIndex) in itemsRes.items" :key="groupIndex"
@@ -76,6 +79,12 @@ div(
                 ).full-width Еще {{ group.totalCount-group.items.length }}
         //- group after
         div().row.full-width.q-pa-xs
+          q-btn(
+            @click="prev()"
+            outline dense color="white" no-caps).q-mr-sm Prev
+          q-btn(
+            @click="drop()"
+            outline dense color="red" no-caps).q-mr-sm Drop
           q-btn(
             @click="next()"
             outline dense color="white" no-caps).q-mr-sm Next

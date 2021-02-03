@@ -33,7 +33,7 @@ export default {
     visualViewportOnResize (e) {
       // this.$log('visualViewportOnResize', e)
       const viewport = window.visualViewport
-      this.$log('viewport', viewport)
+      // this.$log('viewport', viewport)
       this.$store.commit('ui/stateSet', ['viewportOffsetTop', viewport.offsetTop])
     }
   },

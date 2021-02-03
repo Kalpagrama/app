@@ -76,7 +76,7 @@ div(
       position: 'absolute', zIndex: 2020,
       left: '-36px',
       bottom: '-40px',
-    }`).row
+    }`).row.no-wrap
     q-btn(
       @click.stop="figureForward(0,false)"
       round flat dense color="white" icon="keyboard_arrow_left")
@@ -133,7 +133,7 @@ div(
       position: 'absolute', zIndex: 2020,
       right: '-36px',
       bottom: '-40px',
-    }`).row
+    }`).row.no-wrap
     q-btn(
       @click.stop="figureForward(1,false)"
       round flat dense color="white" icon="keyboard_arrow_left")

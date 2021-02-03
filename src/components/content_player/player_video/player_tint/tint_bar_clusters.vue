@@ -30,7 +30,7 @@ div(
       height: '100%',
       pointerEvents: 'none',
       overflow: 'hidden',
-      background: 'rgba(255,255,255,'+((cluster.totalCount/clustersTotalCount)+0.1)+')',
+      background: 'rgba(255,255,255,'+clusterOpacity(cluster)+')',
       borderRadius: clusterBorderRadius(clusterIndex),
     }`
     ).row.items-center.content-center.justify-center
@@ -67,6 +67,11 @@ export default {
       else {
         return '0px'
       }
+    },
+    clusterOpacity (cluster) {
+      // ((cluster.totalCount/clustersTotalCount)+0.1)
+      let r = cluster.totalCount / this.clustersTotalCount
+      return Math.min(r, 0.6)
     }
   }
 }

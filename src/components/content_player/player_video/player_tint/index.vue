@@ -190,6 +190,7 @@ export default {
     },
     onKeydown (e) {
       // this.$log('onKeydown', e)
+      if (this.$store.state.ui.userTyping) return
       switch (e.key) {
         case 'ArrowLeft':
           // Left pressed

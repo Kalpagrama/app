@@ -1,5 +1,20 @@
 <template lang="pug">
-list-feed(
+div(
+  :style=`{
+    position: 'relative',
+    width: '500px',
+    height: '500px',
+  }`
+  ).column
+  .col.full-width.scroll.br
+    list-feed(
+      :query="query")
+      template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+        node-feed(
+          :node="item.populatedObject"
+          :isActive="isActive"
+          :isVisible="isVisible")
+//- list-feed(
   :query="query")
   template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
     node-feed(

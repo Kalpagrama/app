@@ -7,6 +7,16 @@
 
 <template lang="pug">
 .row.full-width.q-px-md
+  q-dialog(
+    v-model="isOpened")
+    node-feed(
+      :isActive="true"
+      :isVisible="true"
+      :node="item"
+      :style=`{
+        background: 'rgba(30,30,30,0.5)',
+        borderRadius: '10px',
+      }`)
   div(
     :style=`{
       background: isSelected ? 'rgb(30,30,30)' : 'none',
@@ -24,7 +34,7 @@
         draggable="false"
         :src="itemComposition.thumbUrl"
         :style=`{
-          height: '26px',
+          height: '40px',
           borderRadius: '10px',
         }`)
       .col.q-pl-sm
@@ -40,12 +50,15 @@
       :style=`{}`
       ).row.full-width.q-pa-xs
       q-btn(
+        v-if="contentKalpa.type === 'VIDEO'"
+        @click="itemReplay()"
         round flat dense color="white" icon="replay")
       .col
       q-btn(
         @click="$emit('set-current')"
         outline dense color="white" no-caps) Cut here
       q-btn(
+        @click="itemOpen()"
         round flat dense color="white" icon="launch")
 </template>
 
@@ -56,6 +69,7 @@ export default {
   data () {
     return {
       // isSelected: false,
+      isOpened: false,
     }
   },
   computed: {
@@ -100,6 +114,20 @@ export default {
     }
   },
   methods: {
+    itemOpen () {
+      this.$log('itemOpen')
+      if (this.contentKalpa.type === 'VIDEO') {
+        this.player.pause()
+      }
+      this.isOpened = true
+    },
+    itemReplay () {
+      this.$log('itemrReplay')
+      if (this.contentKalpa.type === 'VIDEO') {
+        this.player.setCurrentTime(this.itemFigure[0].t)
+        this.player.play()
+      }
+    },
     itemClick () {
       this.$log('itemClick')
       // this.isSelected = !this.isSelected

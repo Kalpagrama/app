@@ -2,6 +2,8 @@
 div(
   :style=`{
     width: '70px',
+    background: 'rgba(30,30,30,0.5)',
+    borderRadius: '20px 0 0 20px',
   }`
   ).row.items-start.content-start.justify-center
   slot
