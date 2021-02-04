@@ -11,6 +11,7 @@ import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
 import { rxdbOperationProxy } from 'src/system/rxdb/common'
+import { Notify } from 'quasar'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)

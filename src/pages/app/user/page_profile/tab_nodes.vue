@@ -15,7 +15,10 @@
           :isActive="isActive"
           :isVisible="isVisible")
 list-feed(
-  :query="query")
+  :query="query"
+  :itemStyles=`{
+    paddingBottom: '50px',
+  }`)
   template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
     node-feed(
       :node="item.populatedObject"

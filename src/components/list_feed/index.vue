@@ -63,7 +63,7 @@
         .row.full-width
           small.text-white scrollTop: {{ scrollTop }}, scrollHeight: {{ scrollHeight }},
     //- next loading
-    div(
+    //- div(
       v-if="itemsNexting"
       :style=`{
         height: '60px',
@@ -128,13 +128,17 @@ export default {
           this.itemsRes = null
         }
         this.itemsRes = await this.$rxdb.find(to, true)
-        let currentId = this.itemsRes.getProperty('currentId')
-        if (currentId) {
-          this.$log('currentId', currentId)
-          let itemMeta = this.itemsRes.getProperty('itemMeta')
-          if (itemMeta) {
-          }
-        }
+        // this.$nextTick(() => {
+        //   this.prev()
+        // })
+        // this.prev()
+        // let currentId = this.itemsRes.getProperty('currentId')
+        // if (currentId) {
+        //   this.$log('currentId', currentId)
+        //   let itemMeta = this.itemsRes.getProperty('itemMeta')
+        //   if (itemMeta) {
+        //   }
+        // }
       }
     },
     'itemsRes.items': {
@@ -149,22 +153,36 @@ export default {
         this.itemsResFirstKey = to[0][this.itemKey]
         // call this no on first load
         if (this.itemsResInited) {
-          if (isReversed) {
-            this.$nextTick(() => {
-              this.$log('REVERSED REVERSED COMPENSATION')
-              this.scrollUpdate()
-              // let itemMeta = this.itemsRes.getProperty('itemMeta')
-              // this.$log('itemMeta', itemMeta)
-              const heightAfter = this.scrollHeight
-              const heightDifference = heightAfter - scrollHeightOld
-              // this.$log({scrollHeightOld, heightAfter, scrollTopOld, heightDifference})
-              // compute scroll position when ?
-              setScrollPosition(this.scrollTarget, scrollTopOld + heightDifference)
-              this.scrollUpdate()
-              this.prev()
-            })
-          }
+          // if (isReversed) {
+          //   this.$nextTick(() => {
+          //     this.$log('REVERSED REVERSED COMPENSATION')
+          //     // this.scrollUpdate()
+          //     let itemMeta = this.itemsRes.getProperty('itemMeta')
+          //     let itemRef = this.$refs[`item-${itemMeta.key}`]
+          //     const heightAfter = this.scrollHeight
+          //     const heightDifference = heightAfter - scrollHeightOld
+          //     // this.$log({scrollHeightOld, heightAfter, scrollTopOld, heightDifference})
+          //     // compute scroll position when ?
+          //     setScrollPosition(this.scrollTarget, scrollTopOld + heightDifference)
+          //     // this.scrollUpdate()
+          //     // this.prev()
+          //   })
+          // }
+          this.$nextTick(() => {
+            this.$log('COMPENSATION')
+            // this.scrollUpdate()
+            let itemMeta = this.itemsRes.getProperty('itemMeta')
+            this.$log('itemMeta', itemMeta)
+            this.$log('itemMeta', itemMeta.key)
+            let itemRef = this.$refs[`item-${itemMeta.key}`][0]
+            this.$log('itemRef', itemRef)
+            this.$log('itemRef.offsetTop', itemRef.offsetTop)
+            setScrollPosition(this.scrollTarget, itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop)
+          })
         }
+        // this.$nextTick(() => {
+        //   this.prev()
+        // })
         // first load done
         this.itemsResInited = true
       }
@@ -240,41 +258,17 @@ export default {
       await this.itemsRes.gotoCurrent(null)
     },
     getScrollTop () {
-      // if (this.root) {
-      //   return this.root.scrollTop
-      // }
-      // else {
-      //   return window.pageYOffset
-      // }
       return getScrollPosition(this.scrollTarget)
     },
     getScrollHeight () {
-      // if (this.root) {
-      //   return this.root.scrollHeight
-      // }
-      // else {
-      //   return document.body.scrollHeight
-      // }
       return getScrollHeight(this.scrollTarget)
     },
     scrollOn () {
       this.$log('scrollOn')
-      // if (this.root) {
-      //   this.root.addEventListener('scroll', this.scrollUpdate)
-      // }
-      // else {
-      //   window.addEventListener('scroll', this.scrollUpdate)
-      // }
       this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
     },
     scrollOff () {
       this.$log('scrollOff')
-      // if (this.root) {
-      //   this.root.removeEventListener('scroll', this.scrollUpdate)
-      // }
-      // else {
-      //   window.removeEventListener('scroll', this.scrollUpdate)
-      // }
       this.scrollTarget.removeEventListener('scroll', this.scrollUpdate)
     },
     scrollUpdate (e) {
@@ -294,9 +288,8 @@ export default {
     this.$log('mounted', this.scrollTarget)
     this.scrollOn()
     this.scrollUpdate()
-    // this.prev()
-    // await this.$wait(500)
-    // if (this.itemsRes) this.prev()
+    await this.$wait(500)
+    this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
