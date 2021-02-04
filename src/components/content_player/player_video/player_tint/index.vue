@@ -214,6 +214,10 @@ export default {
           this.player.setState('muted', true)
           break
       }
+      if (e.code === 'Space') {
+        if (this.player.playing) this.player.pause()
+        else this.player.play()
+      }
     },
     onInterval () {
       this.$log('onInterval')

@@ -2,6 +2,9 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.q-pt-sm
     list-feed(
+      :itemStyles=`{
+        paddingBottom: '50px',
+      }`
       :query="queryFeedItems" :itemKey="'id'")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
         node-feed(

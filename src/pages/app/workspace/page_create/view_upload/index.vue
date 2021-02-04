@@ -45,7 +45,7 @@
       v-if="file"
       ).row.full-width
       component(
-        :is="'from-'+file.type.split('/')[0]"
+        :is="'from-'+fileType"
         :file="file"
         :fileSrc="fileSrc")
 </template>
@@ -65,6 +65,7 @@ export default {
   data () {
     return {
       file: null,
+      // fileType: null,
       fileSrc: null,
     }
   },
@@ -72,6 +73,15 @@ export default {
     accept () {
       return 'image/*, video/*, application/epub+zip'
     },
+    fileType () {
+      let t = this.file.type.split('/')[0]
+      if (t === 'application') {
+        return 'book'
+      }
+      else {
+        return t
+      }
+    }
   },
   methods: {
     start () {
@@ -82,6 +92,7 @@ export default {
       this.$log('fileChanged', e)
       // this.$emit('file', e.target.files[0])
       this.file = e.target.files[0]
+      // this.fileType = this.file
       this.fileSrc = URL.createObjectURL(this.file)
       this.$emit('started')
       // contentFile && contentFile.type.split('/')[0] === 'image'

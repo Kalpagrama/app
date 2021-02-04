@@ -22,6 +22,9 @@ q-page(
               q-spinner-dots(v-show="nexting" color="green" size="50px")
       list-feed(
         v-if="sphereOid"
+        :itemStyles=`{
+          paddingBottom: '50px',
+        }`
         :query="query")
         template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
           node-feed(

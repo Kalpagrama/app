@@ -127,7 +127,7 @@ export default {
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         this.$log('bookmark', bookmark)
         // subscribe to this bookmark
-        // if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
+        if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       }
       // go to this content...
       this.$router.push('/content/' + contentKalpa.oid)

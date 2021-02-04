@@ -93,7 +93,7 @@ class UserApi {
     logD(f, 'start', oid)
     const t1 = performance.now()
     let currentUserOid = rxdb.getCurrentUser().oid // localStorage.getItem('k_user_oid')
-    assert(oid === currentUserOid, 'разрешено только для текущего юзера')
+    // assert(oid === currentUserOid, 'разрешено только для текущего юзера')
     let { items } = await rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,

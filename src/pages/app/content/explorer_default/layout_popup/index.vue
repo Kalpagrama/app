@@ -20,8 +20,8 @@ div(
       v-if="player && pageId"
       :style=`{
         position: 'absolute', zIndex: 1010,
-        top: -($q.screen.height-350)/2+'px',
-        height: $q.screen.height-10+'px',
+        top: -(($q.screen.height-350)/2)+60+'px',
+        height: $q.screen.height-190+'px',
         left: '-500px', width: '500px',
         //- paddingRight: '70px',
       }`).row
@@ -31,9 +31,9 @@ div(
         :contentKalpa="contentKalpa"
         :player="player"
         :query="query"
-        :height="$q.screen.height"
+        :height="$q.screen.height-190"
         :style=`{
-          background: 'rgba(0,0,0,0.5)',
+          //- background: 'rgba(0,0,0,0.5)',
         }`)
   //- body
   div(
