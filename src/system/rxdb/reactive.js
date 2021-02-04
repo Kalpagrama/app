@@ -642,7 +642,6 @@ class Group {
 
    // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
    findIndx (currentId, findInDeep = true) {
-      assert(currentId, '!currentId')
       let indxFrom = -1
       let findItemIndex = (items, id) => {
          let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
@@ -659,8 +658,7 @@ class Group {
          }
          return indx
       }
-      let allItems = this.loadedItems()
-      indxFrom = findItemIndex(allItems, currentId)
+      if (!currentId)indxFrom = findItemIndex(this.loadedItems(), currentId)
       return indxFrom
    }
 
@@ -823,13 +821,17 @@ class Group {
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
       if (name === 'currentId') {
          let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
-         assert(localIndx >= 0, 'bad localIndx')
-         let { page, pageStartIndxLocal } = this.findPage(localIndx)
-         assert(page)
-         this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(localIndx) : -1) // индекс с учетом серверной пагинации
+         this.setProperty('currentAbsoluteIndx', this.getAbsoluteIndex(localIndx)) // индекс с учетом серверной пагинации
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
-         this.setProperty('currentPageToken', page.currentPageToken)
-         this.setProperty('currentPageSize', page.currentPageSize)
+         if (localIndx >= 0) {
+            let { page, pageStartIndxLocal } = this.findPage(localIndx)
+            assert(page)
+            this.setProperty('currentPageToken', page.currentPageToken)
+            this.setProperty('currentPageSize', page.currentPageSize)
+         } else {
+            this.setProperty('currentPageToken', null)
+            this.setProperty('currentPageSize', null)
+         }
       }
    }
 
