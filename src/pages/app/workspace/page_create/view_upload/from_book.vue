@@ -23,7 +23,7 @@ export default {
       let bookmarkInput = {
         type: 'BOOK',
         oid: contentKalpa.oid,
-        name: '',
+        name: contentKalpa.name,
         thumbUrl: contentKalpa.thumbUrl,
         isSubscribed: true
       }

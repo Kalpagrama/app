@@ -111,6 +111,8 @@ div(
         }`).b-40
       nav-mobile(
         v-if="player && !player.figure && $q.screen.width < 1200"
+        :contentKalpa="contentKalpa"
+        :player="player"
         @pageId="pageIdChange"
         :pageId="pageId"
         :style=`{

@@ -1,10 +1,13 @@
 <template lang="pug">
 .row.full-width
   //- debug top
-  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '50px'}`).row.bg-red.text-white
-    small.full-width scrollTop: {{scrollTop}}
-    small.full-width scrollHeight: {{scrollHeight}}
+  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
+    .row.full-width
+      small scrollTop: {{scrollTop}}, scrollHeight: {{scrollHeight}}
     q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
+    q-btn(outline color="white" dense no-caps @click="prev()") Prev
+    q-btn(outline color="white" dense no-caps @click="next()") Next
+  //- loading spinner state
   div(
     v-if="scrollTarget && !itemsRes"
     :style=`{
@@ -12,15 +15,15 @@
     }`
     ).row.full-width.justify-center
     q-spinner(size="50px" color="green")
+  //- wrapper
   div(
     v-if="itemsRes"
     :style=`{
       position: 'relative',
     }`
     ).row.full-width.items-start.content-start
-    //- q-resize-observer(@resize="onResize")
     //- prepend slot
-    //- slot(name="prepend")
+    slot(name="prepend")
     //- prev loading
     div(
       v-if="itemsPreving"
@@ -30,6 +33,7 @@
       }`
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="50px")
+    //- wrapper item
     div(
       v-for="(item, itemIndex) in itemsRes.items" :key="item[itemKey]"
       :ref="`item-${item[itemKey]}`"
@@ -52,17 +56,6 @@
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === itemMiddleKey"
         :isVisible="true")
-      //- footer debug
-      //- .row.full-width
-        q-btn(@click="positionSave()" dense no-caps color="green" outline) Save position
-        q-btn(@click="positionDrop()" dense no-caps color="red" outline) Drop position
-        q-btn(@click="prev()" dense no-caps color="red" outline) Prev
-        q-btn(@click="next()" dense no-caps color="red" outline) Next
-        q-btn(@click="cutHere(item[itemKey])" dense no-caps color='white' outline) Cut here
-        .row.full-width
-          small.text-white itemKey: {{ item[itemKey] }}
-        .row.full-width
-          small.text-white scrollTop: {{ scrollTop }}, scrollHeight: {{ scrollHeight }},
     //- next loading
     div(
       v-if="itemsNexting"
@@ -83,17 +76,10 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 export default {
   name: 'listFeed',
   props: {
-    root: {
-      type: Object,
-    },
     rootMargin: {type: String, default () { return '-50% 0px' }},
     query: {
       type: Object,
       required: true,
-    },
-    itemKey: {
-      type: String,
-      default: 'oid'
     },
     itemStyles: {
       type: Object,
@@ -119,6 +105,9 @@ export default {
     }
   },
   computed: {
+    itemKey () {
+      return this.itemsRes ? this.itemsRes.itemPrimaryKey : null
+    }
   },
   watch: {
     query: {
@@ -131,46 +120,12 @@ export default {
         }
         this.itemsRes = await this.$rxdb.find(to, true)
         this.$log('itemsRes DONE DONE DONE')
-        // this.$nextTick(() => {
-        //   this.prev()
-        // })
-        // this.prev()
-        // let currentId = this.itemsRes.getProperty('currentId')
-        // if (currentId) {
-        //   this.$log('currentId', currentId)
-        //   let itemMeta = this.itemsRes.getProperty('itemMeta')
-        //   if (itemMeta) {
-        //   }
-        // }
       }
     },
     'itemsRes.items': {
       async handler (to, from) {
         this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
-        // save old scroll height
-        let scrollHeightOld = this.scrollHeight
-        let scrollTopOld = this.scrollTop
-        // where items changed ? at top or at bottom ?
-        let isReversed = this.itemsResFirstKey !== to[0][this.itemKey]
-        // set last first key...
-        this.itemsResFirstKey = to[0][this.itemKey]
-        // call this no on first load
         if (this.itemsResInited) {
-          // if (isReversed) {
-          //   this.$nextTick(() => {
-          //     this.$log('REVERSED REVERSED COMPENSATION')
-          //     // this.scrollUpdate()
-          //     let itemMeta = this.itemsRes.getProperty('itemMeta')
-          //     let itemRef = this.$refs[`item-${itemMeta.key}`]
-          //     const heightAfter = this.scrollHeight
-          //     const heightDifference = heightAfter - scrollHeightOld
-          //     // this.$log({scrollHeightOld, heightAfter, scrollTopOld, heightDifference})
-          //     // compute scroll position when ?
-          //     setScrollPosition(this.scrollTarget, scrollTopOld + heightDifference)
-          //     // this.scrollUpdate()
-          //     // this.prev()
-          //   })
-          // }
           this.$nextTick(() => {
             this.$log('COMPENSATION')
             // this.scrollUpdate()
@@ -188,8 +143,6 @@ export default {
         }
         // first load done
         this.itemsResInited = true
-        // await this.$wait(500)
-        // this.prev()
       }
     },
     scrollTop: {
@@ -213,7 +166,6 @@ export default {
       }
     },
     async next () {
-      this.$log('next')
       if (this.itemsRes.hasNext && !this.itemsNexting) {
         this.$log('next next next')
         this.$q.notify({message: 'next next next', position: 'right', type: 'positive'})
@@ -258,9 +210,6 @@ export default {
     },
     async positionDrop () {
       this.$log('positionDrop')
-      // this.itemsRes.setProperty('currentId', null)
-      // this.itemsRes.setProperty('itemMeta', null)
-      // await this.itemsRes.gotoCurrent(null)
       await this.itemsRes.gotoStart()
       setScrollPosition(this.scrollTarget, 0)
     },
@@ -282,12 +231,7 @@ export default {
       // this.$log('scrollUpdate')
       this.scrollTop = this.getScrollTop()
       this.scrollHeight = this.getScrollHeight()
-    },
-    onResize (e) {
-      // this.$log('onResize')
-      this.scrollTop = this.getScrollTop()
-      this.scrollHeight = this.getScrollHeight()
-      // this.$log('onResize DONE', this.scrollHeight)
+      // TODO: positionSave with throttle on scrolling, to return the same position...
     }
   },
   async mounted () {
@@ -295,13 +239,10 @@ export default {
     this.$log('mounted')
     this.scrollOn()
     this.scrollUpdate()
-    // await this.$wait(500)
-    // this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.scrollOff()
-    // this.positionSave()
   }
 }
 </script>

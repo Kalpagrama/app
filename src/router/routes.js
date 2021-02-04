@@ -132,16 +132,9 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'notifications',
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
-            children: [
-               {
-                  name: 'notifications',
-                  path: '',
-                  component: () => import('pages/app/notifications/view_index.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
-               }
-            ],
             meta: { roleMinimal: 'MEMBER' }
          },
          {

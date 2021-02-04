@@ -26,6 +26,9 @@
       flat icon="adjust" no-caps
       :color="pageId === 'nodes' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
+      q-badge(
+        v-if="countNodesShow"
+        floating transparent color="red") {{ contentKalpa.countStat.countNodes }}
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     q-btn(
@@ -45,6 +48,11 @@ export default {
   props: ['pageId', 'contentKalpa'],
   data () {
     return {
+    }
+  },
+  computed: {
+    countNodesShow () {
+      return this.contentKalpa.countStat.countNodes > 0
     }
   }
 }

@@ -22,7 +22,7 @@ div(
       position: 'relative',
       maxHeight: '100%',
     }`
-    ).row.full-width.scroll.q-pa-sm
+    ).row.full-width.scroll.q-pt-xl.q-px-sm
     p.text-white.text-caption {{ name }}
 </template>
 
