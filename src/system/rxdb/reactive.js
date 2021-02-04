@@ -707,9 +707,6 @@ class Group {
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'bottom')
-      // максимум 36 элементов (если больше - то отрезаем верх)
-      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
-      // this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    async prev (count) {
@@ -743,9 +740,6 @@ class Group {
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
 
       await this.fulfill(nextItems, 'top')
-      // максимум 36 элементов (если больше - то отрезаем низ)
-      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
-      // this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    setProperty (name, value) {
