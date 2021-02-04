@@ -5,12 +5,6 @@ div(
     position: 'relative',
   }`
   ).row.full-width
-  kalpa-loader(
-    v-if="row.oid"
-    :immediate="true"
-    :query="jointsQuery" :limit="12"
-    @items="jointsUpdated"
-    v-slot=`{items, next, nexting}`)
   //- row joints  helpers
   div(
     v-if="!isPinned"

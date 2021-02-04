@@ -3,7 +3,7 @@ q-page(
   :style=`{
     paddingTop: '40px',
   }`)
-  kalpa-loader(
+  //- kalpa-loader(
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     .row.full-width.bg-red

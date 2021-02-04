@@ -11,16 +11,11 @@
     router-link(
       :to="'/links/'+node.oid"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
+      q-icon(name="fas fa-link" color="grey-9" size="24px")
       .col
         span.text-white.text-bold Связи
       //- q-icon(name="bookmark_outline" color="white" size="24px")
       //- q-btn(round flat dense color="grey-9")
-      q-icon(name="fas fa-link" color="grey-9" size="24px")
-    kalpa-loader(
-      :immediate="true"
-      :query="jointsQuery" :limit="12"
-      @items="jointsUpdated"
-      v-slot=`{items, next, nexting}`)
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- joints mockup
@@ -96,6 +91,12 @@ export default {
       this.$log('jointsUpdated', joints)
       this.joints = joints
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

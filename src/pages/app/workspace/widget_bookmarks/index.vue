@@ -13,25 +13,21 @@
       q-icon(name="bookmark_outline" color="white" size="24px").q-mr-sm
       .col
         span.text-white.text-bold Закладки
-    kalpa-loader(
-      @items="bookmarksUpdated"
-      :immediate="true"
-      :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="!bookmarks").row.full-width.no-wrap.q-pa-sm
+      div(v-if="!bookmarksRes").row.full-width.no-wrap.q-pa-sm
         div(
           v-for="n in 10" :key="n"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
           }`
-          ).row.b-50.q-mr-sm
+          ).row.b-40.q-mr-sm
       //- bookmarks loaded
-      div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
+      div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
         router-link(
-          v-for="b in bookmarks" :key="b.oid"
+          v-for="b in bookmarksRes.items" :key="b.oid"
           :to="'/content/'+b.oid"
           :style=`{
             height: '50px', width: '58px', minWidth: '58px',
@@ -41,7 +37,7 @@
             :style=`{
               borderRadius: '10px',
             }`
-            ).row.fit.b-50
+            ).row.fit.b-40
             img(
               v-if="!bookmarksErrored.includes(b.oid)"
               draggable="false"
@@ -67,7 +63,8 @@ export default {
   name: 'widgetBookmarks',
   data () {
     return {
-      bookmarks: null,
+      bookmarksRes: null,
+      // bookmarks: null,
       bookmarksErrored: []
     }
   },
@@ -85,12 +82,13 @@ export default {
     }
   },
   methods: {
-    bookmarksUpdated (bookmarks) {
-      this.$log('bookmarksUpdated', bookmarks)
-      if (bookmarks) {
-        this.bookmarks = bookmarks
-      }
-    }
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.bookmarksRes = await this.$rxdb.find(this.query, true)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

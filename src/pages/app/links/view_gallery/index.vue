@@ -68,7 +68,7 @@
         ).row.full-width.b-30
         joint-current(
           :item="item"
-          :joint="joint"
+          :joint="joint.populatedObject"
           :height="$q.screen.height-headerHeight"
           :style=`{
           }`

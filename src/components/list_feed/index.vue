@@ -86,6 +86,12 @@ export default {
       default () {
         return {}
       }
+    },
+    positionSaving: {
+      type: Boolean,
+      default () {
+        return true
+      }
     }
   },
   data () {
@@ -182,6 +188,7 @@ export default {
     },
     indexMiddleHandler (isVisible, entry, i) {
       if (isVisible) {
+        if (!this.positionSaving) return
         this.itemMiddleKey = entry.target.accessKey
         this.positionSave()
       }

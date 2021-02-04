@@ -20,12 +20,12 @@ import userAvatar from 'components/user_avatar/index.vue'
 import kalpaBookmark from 'components/kalpa_bookmark/index.vue'
 import kalpaShare from 'components/kalpa_share/index.vue'
 import kalpaLogo from 'components/kalpa_logo/index.vue'
-import kalpaLoader from 'components/kalpa_loader/index.vue'
+// import kalpaLoader from 'components/kalpa_loader/index.vue'
 import kalpaMenuActions from 'components/kalpa_menu_actions/index.vue'
 import kalpaMenuPopupGlobal from 'components/kalpa_menu_popup_global/index.vue'
 import nodeFeed from 'components/node_feed/index.vue'
 import composition from 'components/composition/index.vue'
-import listMiddle from 'components/list_middle/index.vue'
+// import listMiddle from 'components/list_middle/index.vue'
 import listFeed from 'components/list_feed/index.vue'
 
 // image editors
@@ -150,7 +150,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('composition', composition)
     // Vue.component('jointFeed', jointFeed)
     // lists
-    Vue.component('listMiddle', listMiddle)
+    // Vue.component('listMiddle', listMiddle)
     Vue.component('listFeed', listFeed)
     // Vue.component('listSlider', listSlider)
     // Vue.component('listHorizontal', listHorizontal)
@@ -159,7 +159,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaBookmark', kalpaBookmark)
     Vue.component('kalpaShare', kalpaShare)
     Vue.component('kalpaLogo', kalpaLogo)
-    Vue.component('kalpaLoader', kalpaLoader)
+    // Vue.component('kalpaLoader', kalpaLoader)
     Vue.component('kalpaMenuActions', kalpaMenuActions)
     Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
 

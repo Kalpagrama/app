@@ -69,18 +69,6 @@ const routes = [
             meta: { roleMinimal: 'MEMBER' }
          },
          {
-            path: 'user/:oid',
-            component: () => import('pages/app/user/index.vue'),
-            children: [
-               {
-                  path: ':tab?',
-                  name: 'user',
-                  component: () => import('pages/app/user/page_profile/index.vue')
-               }
-            ],
-            meta: { roleMinimal: 'GUEST' }
-         },
-         {
             name: 'node',
             path: 'node/:oid',
             component: () => import('pages/app/node/index.vue'),
@@ -99,23 +87,14 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            path: 'user/:oid/:page?',
+            component: () => import('pages/app/user/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'sphere',
             path: 'sphere/:oid/:page?',
             component: () => import('pages/app/sphere/index.vue'),
-            children: [
-               {
-                  name: 'sphere.nodes',
-                  path: 'nodes',
-                  component: () => import('pages/app/sphere/page_nodes/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               },
-               {
-                  name: 'sphere.spheres',
-                  path: 'spheres',
-                  component: () => import('pages/app/sphere/page_spheres/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
-               }
-            ],
             meta: { roleMinimal: 'GUEST' }
          },
          {

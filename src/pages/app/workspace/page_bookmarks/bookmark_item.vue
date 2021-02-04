@@ -1,6 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
+    minHeight: '50px',
     background: 'rgb(35,35,35)',
     borderRadius: '10px',
   }`
@@ -8,9 +9,12 @@ div(
   .col
     router-link(
       :to="bookmarkMeta.link"
+      :style=`{
+        minHeight: '50px',
+      }`
       ).row.full-width.items-start.content-start.cursor-pointer
       img(
-        v-if="!thumbUrlErrored"
+        v-if="bookmark.type !== 'SPHERE' && !thumbUrlErrored"
         @error="thumbUrlErrorHandle"
         draggable="false"
         :src="bookmark.thumbUrl"
@@ -21,67 +25,22 @@ div(
           borderRadius: '10px',
           objectFit: 'contain',
         }`).b-40.q-mt-sm.q-ml-sm.q-mb-sm
+      div(
+        v-else
+        :style=`{
+          height: '50px',
+          width: '50px',
+        }`
+        ).row.items-center.content-center.justify-center
+        q-icon(name="blur_on" color="white" size="30px")
       .col
-        .row.full-width.items-start.content-start.q-px-sm.q-pt-xs
+        div(:style=`{minHeight: '50px',}`).row.full-width.items-center.content-center.q-px-sm
           span.text-white {{ bookmark.name }}
           .row.full-width
             small.text-grey-8 {{ bookmarkMeta.type }}
   q-btn(
     @click="$emit('bookmark', bookmark)"
-    round flat color="grey-8" icon="more_vert")
-//- div(
-  :style=`{
-    background: 'rgb(35,35,35)',
-    borderRadius: '10px',
-  }`
-  ).row.full-width
-  router-link(
-    v-if="bookmarkMeta"
-    :to="bookmarkMeta.link"
-    :style=`{
-      minHeight: '60px',
-    }`
-    ).col
-    .row.full-width.items-center.content-center
-      div(
-        v-if="bookmark.type !== 'SPHERE'"
-        ).row.full-height.items-center.content-center
-        img(
-          v-if="!thumbUrlErrored"
-          draggable="false"
-          :src="bookmark.thumbUrl"
-          :style=`{
-            height: '50px',
-            borderRadius: '10px',
-          }`
-          @error="thumbUrlErrorHandle").b-50
-        div(
-          v-if="thumbUrlErrored"
-          :style=`{
-            height: '50px',
-            width: '50px',
-          }`
-          ).row
-      q-icon(
-        v-if="bookmark.type === 'SPHERE'"
-        name="blur_on" color="white" size="30px"
-        ).q-pa-sm
-      .col
-      small.text-grey-8 {{ $date(bookmark.createdAt) }}
-    //- details
-    div(
-      :style=`{
-        minHeight: '60px',
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm
-      span.text-white {{ bookmarkMeta.name }}
-      div(
-        v-if="bookmarkMeta.type"
-        ).row.full-width
-        span.text-grey-8 {{ bookmarkMeta.type }}
-  //- right: actions
-  .row.full-height.items-start.content-start.q-pt-sm.q-pr-sm
-    kalpa-menu-actions(:actions="actions" icon="more_vert" color="grey-8" :dense="true")
+    round flat color="grey-8" icon="more_vert").q-mt-xs.q-mr-xs
 </template>
 
 <script>

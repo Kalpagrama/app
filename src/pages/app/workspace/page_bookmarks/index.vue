@@ -8,8 +8,6 @@ q-layout(
     :maximized="$q.screen.xs"
     :square="$q.screen.xs"
     @hide="bookmarkSelected = null")
-    //- .row.bg-red
-      small.text-white {{bookmarkSelected}}
     bookmark-editor(
       :bookmark="bookmarkSelected"
       @close="bookmarkEditorShow = false, bookmarkSelected = null")
@@ -25,19 +23,8 @@ q-layout(
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col.full-height
             .row.fit.items-center.content-center.justify-center
-              //- q-icon(name="bookmark_outline" size="24px").q-mr-xs
               span(:style=`{fontSize: '18px'}`).text-white.text-bold Закладки
-          q-btn(round flat color="white" icon="search")
-        //- tabs
-        //- .row.full-width.q-px-sm
-          q-tabs(
-            v-model="pageId"
-            switch-indicator no-caps dense
-            active-color="green"
-            ).full-width
-            q-tab(
-              v-for="(p,pi) in pages" :key="p.id"
-              :name="p.id" :label="p.name")
+          q-btn(round flat color="white" icon="more_vert")
   q-page-container
     q-page(
       :style=`{
@@ -56,16 +43,14 @@ q-layout(
             minHeight: '70vh',
           }`
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          kalpa-loader(
-            :immediate="true"
-            :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
-            div(
-              :style=`{
-                maxWidth: $store.state.ui.pageWidth+'px',
-              }`
-              ).row.full-width.items-start.content-start
+          list-feed(
+            :query="query"
+            :positionSaving="false"
+            :style=`{
+              maxWidth: $store.state.ui.pageWidth+'px',
+            }`)
+            template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
               bookmark-item(
-                v-for="(bookmark, bookmarkIndex) in items" :key="bookmark.oid"
                 :bookmark="bookmark"
                 @bookmark="bookmarkSelectHandle"
                 ).q-mb-sm
@@ -103,14 +88,9 @@ export default {
   computed: {
     pages () {
       return [
-        // {id: 'video', name: 'Видео'},
-        // {id: 'image', name: 'Картинки'},
-        // {id: 'audio', name: 'Аудио'},
-        // {id: 'book', name: 'Книги'},
-        {id: 'content', name: 'Контент'},
+        {id: 'content', name: 'Медиа'},
         {id: 'nodes', name: 'Ядра'},
         {id: 'joints', name: 'Связи'},
-        // {id: 'people', name: 'Люди'},
         {id: 'spheres', name: 'Сферы'}
       ]
     },
@@ -130,13 +110,9 @@ export default {
       else if (this.pageId === 'joints') {
         res.selector.type = {$in: ['JOINT']}
       }
-      else if (this.pageId === 'people') {
-        res.selector.type = {$in: ['USER']}
-      }
       else if (this.pageId === 'spheres') {
         res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
       }
-      // else if ()
       return res
     }
   },

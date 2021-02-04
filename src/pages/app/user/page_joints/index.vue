@@ -2,11 +2,14 @@
 list-feed(
   :query="query"
   :itemStyles=`{
-    paddingBottom: '50px',
+    paddingBottom: '70px',
+  }`
+  :style=`{
   }`)
-  template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
     node-feed(
       :node="item.populatedObject"
+      :showAuthorAlways="true"
       :isActive="isActive"
       :isVisible="isVisible")
 </template>
@@ -15,27 +18,21 @@ list-feed(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'user_pageProfile_tabNodes',
-  components: {
-  },
+  name: 'pageJoints',
   props: ['user'],
-  data () {
-    return {
-    }
-  },
   computed: {
     query () {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.user.oid,
           oidAuthor: {$eq: this.user.oid},
           sortStrategy: 'AGE',
         },
         populateObjects: true,
       }
-    }
+    },
   }
 }
 </script>

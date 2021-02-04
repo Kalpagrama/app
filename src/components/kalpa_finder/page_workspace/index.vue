@@ -19,7 +19,7 @@ q-page(
               'b-40': viewId === v.id
             }`
             :style=`{}`).q-mr-xs.q-px-xs {{ v.name }}
-  kalpa-loader(
+  //- kalpa-loader(
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     div(

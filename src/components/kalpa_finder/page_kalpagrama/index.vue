@@ -25,7 +25,7 @@ q-page(
             }`
             :style=`{}`).q-mr-xs.q-px-xs {{ t.name }}
   //- body
-  kalpa-loader(
+  //- kalpa-loader(
     v-if="searchString.length > 3"
     :immediate="true"
     :query="query" :limit="1000" v-slot=`{items,next,nexting}`)

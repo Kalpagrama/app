@@ -13,10 +13,6 @@
       q-icon(name="watch_later" color="white" size="24px").q-mr-sm
       .col
         span.text-white.text-bold Смотреть позже
-    //- kalpa-loader(
-      @items="bookmarksUpdated"
-      :immediate="true"
-      :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
@@ -27,7 +23,7 @@
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
           }`
-          ).row.b-50.q-mr-sm
+          ).row.b-40.q-mr-sm
       //- bookmarks loaded
       //- div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
         router-link(
@@ -85,12 +81,6 @@ export default {
     // }
   },
   methods: {
-    // bookmarksUpdated (bookmarks) {
-    //   this.$log('bookmarksUpdated', bookmarks)
-    //   if (bookmarks) {
-    //     this.bookmarks = bookmarks
-    //   }
-    // }
   }
 }
 </script>

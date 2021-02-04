@@ -29,7 +29,7 @@ div(
       }`
       ).row.full-width.items-center.content-center.q-pa-xs
       q-btn(
-        v-if="node.rateUser !== null"
+        v-if="showAuthorAlways || node.rateUser !== null"
         :to="'/user/'+node.author.oid"
         round flat color="white" no-caps
         :style=`{
@@ -141,9 +141,6 @@ export default {
     nodeItem,
     nodeItems,
     nodeActions,
-    // nodeItem: () => import('./node_item.vue'),
-    // nodeItems: () => import('./node_items.vue'),
-    // nodeActions: () => import('components/node/node_actions.vue')
   },
   props: {
     node: {type: Object},
@@ -151,6 +148,7 @@ export default {
     isVisible: {type: Boolean},
     showHeader: {type: Boolean, default: true},
     showName: {type: Boolean, default: true},
+    showAuthorAlways: {type: Boolean, default: false},
     showActions: {type: Boolean, default: true},
     showSpheres: {type: Boolean, default: true},
     showSpheresAlways: {type: Boolean, default: false},

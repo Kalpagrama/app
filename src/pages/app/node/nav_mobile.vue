@@ -17,14 +17,15 @@ div(
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Назад
-    q-btn(
+    .col
+    //- q-btn(
       @click="$emit('pageId', 'inside')"
       flat icon="workspaces" no-caps
       :color="pageId === 'inside' ? 'green' : 'grey-7'"
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Микроядра
-    q-btn(
+    //- q-btn(
       @click="$emit('pageId', 'names')"
       flat icon="blur_circular" no-caps
       :color="pageId === 'names' ? 'green' : 'grey-7'"

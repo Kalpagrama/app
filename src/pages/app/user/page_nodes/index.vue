@@ -1,19 +1,25 @@
 <template lang="pug">
-.row.full-width.justify-center.q-py-xl
-  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-    span.text-grey-6 Нет подборок
+list-feed(
+  :query="query"
+  :itemStyles=`{
+    paddingBottom: '50px',
+  }`
+  :style=`{
+  }`)
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+    node-feed(
+      :node="item.populatedObject"
+      :showAuthorAlways="true"
+      :isActive="isActive"
+      :isVisible="isVisible")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp_user_tabCollections',
+  name: 'pageNodes',
   props: ['user'],
-  data () {
-    return {
-    }
-  },
   computed: {
     query () {
       return {
