@@ -663,7 +663,7 @@ class Group {
          }
          return indx
       }
-      if (!currentId)indxFrom = findItemIndex(this.loadedItems(), currentId)
+      if (currentId)indxFrom = findItemIndex(this.loadedItems(), currentId)
       return indxFrom
    }
 
