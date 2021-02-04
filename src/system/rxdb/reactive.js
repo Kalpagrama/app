@@ -332,6 +332,25 @@ class Group {
       this.updateReactiveGroup = () => {
          this.reactiveGroup.hasNext = this.hasNext()
          this.reactiveGroup.hasPrev = this.hasPrev()
+
+         // пытаемся понять - не добавилось ли сверху или снизу элементов
+         let currentId = this.getProperty('currentId')
+         if (currentId) {
+            let currentAbsoluteIndx = this.getAbsoluteIndex(this.findIndx(currentId))
+            let currentTotalCount = this.reactiveGroup.totalCount
+            let currentAbsoluteIndxSaved = this.getProperty('currentAbsoluteIndx')
+            let currentTotalCountSaved = this.getProperty('currentTotalCount')
+            if (currentAbsoluteIndx >= 0 && currentAbsoluteIndxSaved) {
+               let topDiff = currentAbsoluteIndx - currentAbsoluteIndxSaved // добавилось / удалилось сверху
+               this.reactiveGroup.newItemsBelow = Math.max(topDiff, 0)
+               let bottomDif = (currentTotalCount - currentTotalCountSaved) - topDiff
+               this.reactiveGroup.newItemsAbove = Math.max(bottomDif, 0)
+            }
+         }
+         // this.getAbsoluteIndex(this.findIndx(value)
+         // this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(this.findIndx(value)) : -1) // индекс с учетом серверной пагинации
+         // this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
+         let currentAbsoluteIndx
       }
    }
 
@@ -491,8 +510,13 @@ class Group {
          if (pageIndx >= 0) this.reactiveGroup.pages.splice(pageIndx, 1, page)
       } else if (position === 'top') { // добавить сверху
          this.reactiveGroup.pages.unshift(page)
+         assert(page.currentPageToken, '!currentPageToken')
+         assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'BACKWARD', ' bad currentPageToken1')
+         // поправить indx для pages сверху и снизу
       } else if (position === 'bottom') { // добавить снизу
          this.reactiveGroup.pages.push(page)
+         assert(page.currentPageToken, '!currentPageToken')
+         assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'FORWARD', ' bad currentPageToken2')
       } else if (position === 'whole') {
          assert(this.reactiveGroup.pages.length === 0, 'this.reactiveGroup.pages.let > 0')
          this.reactiveGroup.pages.push(page)
@@ -618,7 +642,6 @@ class Group {
    // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
    findIndx (currentId, findInDeep = true) {
       assert(currentId, '!currentId')
-      let allItems = this.loadedItems()
       let indxFrom = -1
       let findItemIndex = (items, id) => {
          let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
@@ -635,8 +658,38 @@ class Group {
          }
          return indx
       }
+      let allItems = this.loadedItems()
       indxFrom = findItemIndex(allItems, currentId)
       return indxFrom
+   }
+
+   // индекс с учетом серверной пагинации (localIndex - индекс в загруженных страницах)
+   getAbsoluteIndex (localIndex) {
+      if (!(localIndex >= 0)) return -1
+      let findPageByLocalIndex = (localIndex) => {
+         let pageStartIndxLocal = 0
+         for (let page of this.reactiveGroup.pages) {
+            if (localIndex < pageStartIndxLocal + page.pageItems.length) return { page, pageStartIndxLocal }
+            pageStartIndxLocal += page.pageItems.length
+         }
+         return {}
+      }
+      let { page, pageStartIndxLocal } = findPageByLocalIndex(localIndex)
+      assert(page && pageStartIndxLocal >= 0, '!page && pageStartIndxLocal >= 0')
+      assert(localIndex - pageStartIndxLocal >= 0 && localIndex - pageStartIndxLocal < page.pageItems.length, 'bad pageStartIndxLocal (localIndex - pageStartIndxLocal - это индекс внутри блока)')
+      let pageStartIndexAbsolute = 0
+      if (page.currentPageToken) {
+         assert(page.currentPageToken.direction && page.currentPageToken.indx >= 0, 'bad currentPageToken')
+         if (page.currentPageToken.direction === 'FORWARD') {
+            pageStartIndexAbsolute = page.currentPageToken.indx
+         } else if (page.currentPageToken.direction === 'BACKWARD') {
+            // page.currentPageToken.indx - это последний индекс в блоке
+            pageStartIndexAbsolute = page.currentPageToken.indx - (page.pageItems.length - 1)
+         }
+      }
+      assert(pageStartIndexAbsolute >= 0)
+      let absoluteIndex = pageStartIndexAbsolute + (localIndex - pageStartIndxLocal)
+      assert(absoluteIndex >= 0, 'bad absoluteIndex')
    }
 
    // обрежет список сферху и начнет с этого элемента
@@ -767,7 +820,9 @@ class Group {
       groupData[name] = value
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
       if (name === 'currentId') {
-         this.setProperty('currentIndx', value ? this.findIndx(value) : -1)
+         let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
+         assert(localIndx >= 0, 'bad localIndx')
+         this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(localIndx) : -1) // индекс с учетом серверной пагинации
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
       }
    }
