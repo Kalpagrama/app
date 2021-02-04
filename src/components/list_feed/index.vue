@@ -15,7 +15,7 @@
   div(
     v-if="itemsRes"
     :style=`{
-      //- position: 'relative',
+      position: 'relative',
     }`
     ).row.full-width.items-start.content-start
     //- q-resize-observer(@resize="onResize")
@@ -25,6 +25,7 @@
     div(
       v-if="itemsPreving"
       :style=`{
+        position: 'absolute', top: '0px', zIndex: 10000,
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
@@ -66,6 +67,7 @@
     div(
       v-if="itemsNexting"
       :style=`{
+        position: 'absolute', bottom: '0px', zIndex: 10000,
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
@@ -128,6 +130,7 @@ export default {
           this.itemsRes = null
         }
         this.itemsRes = await this.$rxdb.find(to, true)
+        this.$log('itemsRes DONE DONE DONE')
         // this.$nextTick(() => {
         //   this.prev()
         // })
@@ -172,19 +175,21 @@ export default {
             this.$log('COMPENSATION')
             // this.scrollUpdate()
             let itemMeta = this.itemsRes.getProperty('itemMeta')
-            this.$log('itemMeta', itemMeta)
-            this.$log('itemMeta', itemMeta.key)
-            let itemRef = this.$refs[`item-${itemMeta.key}`][0]
-            this.$log('itemRef', itemRef)
-            this.$log('itemRef.offsetTop', itemRef.offsetTop)
-            setScrollPosition(this.scrollTarget, itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop)
+            if (itemMeta) {
+              // this.$log('itemMeta', itemMeta)
+              this.$log('itemMeta', itemMeta.key)
+              let itemRef = this.$refs[`item-${itemMeta.key}`][0]
+              // this.$log('itemRef', itemRef)
+              this.$log('itemRef.offsetTop', itemRef.offsetTop)
+              setScrollPosition(this.scrollTarget, itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop)
+              // this.prev()
+            }
           })
         }
-        // this.$nextTick(() => {
-        //   this.prev()
-        // })
         // first load done
         this.itemsResInited = true
+        // await this.$wait(500)
+        // this.prev()
       }
     },
     scrollTop: {
@@ -287,11 +292,11 @@ export default {
   },
   async mounted () {
     this.scrollTarget = getScrollTarget(this.$el)
-    this.$log('mounted', this.scrollTarget)
+    this.$log('mounted')
     this.scrollOn()
     this.scrollUpdate()
-    await this.$wait(500)
-    this.prev()
+    // await this.$wait(500)
+    // this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

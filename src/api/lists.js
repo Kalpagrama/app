@@ -74,12 +74,12 @@ class ListsApi {
             break
          case RxCollectionEnum.LST_SUBSCRIBERS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
+            // assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
             res = await ListsApi.find(FindCollectionEnum.SUBSCRIBERS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SUBSCRIPTIONS:
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-            assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
+            // assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
             res = await ListsApi.find(FindCollectionEnum.SUBSCRIPTIONS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SEARCH:
