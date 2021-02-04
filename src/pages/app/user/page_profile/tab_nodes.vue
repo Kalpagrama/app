@@ -1,19 +1,4 @@
 <template lang="pug">
-//- div(
-  :style=`{
-    position: 'relative',
-    width: '500px',
-    height: '500px',
-  }`
-  ).column
-  .col.full-width.scroll
-    list-feed(
-      :query="query")
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-        node-feed(
-          :node="item.populatedObject"
-          :isActive="isActive"
-          :isVisible="isVisible")
 list-feed(
   :query="query"
   :itemStyles=`{

@@ -15,7 +15,13 @@ q-layout(view="hHh Lpr lff")
               ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
           q-btn(round flat color="grey-8" icon="more_vert")
   q-page-container
-    router-view
+    q-page
+      list-feed(
+        :query="query"
+        :itemStyles=`{
+          paddingBottom: '50px',
+        }`)
+    //- router-view
     //- iframe(
       src="https://doc.clickup.com/p/h/2cve9-15/42d6a6e8f899a3b"
       frameBorder="0"
@@ -25,11 +31,27 @@ q-layout(view="hHh Lpr lff")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
-  name: 'notifications',
+  name: 'pageApp__notifications',
   data () {
     return {
     }
-  }
+  },
+  computed: {
+    sphereOid () {
+      return this.$store.getters.currentUser() ? this.$store.getters.currentUser().oid : null
+    },
+    query () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_FEED,
+          oidSphere: this.sphereOid
+        },
+        populateObjects: false,
+      }
+    }
+  },
 }
 </script>

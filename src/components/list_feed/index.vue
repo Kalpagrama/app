@@ -213,7 +213,6 @@ export default {
       }
     },
     async next () {
-      this.$log('next')
       if (this.itemsRes.hasNext && !this.itemsNexting) {
         this.$log('next next next')
         this.$q.notify({message: 'next next next', position: 'right', type: 'positive'})
