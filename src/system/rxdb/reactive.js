@@ -318,6 +318,8 @@ class Group {
                prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
                hasPrev: false,
+               newItemsBelow: 0, // в списке появились новые элементы выше
+               newItemsAbove: 0, // в списке появились новые элементы ниже
                setProperty: this.setProperty.bind(this),
                getProperty: this.getProperty.bind(this),
                refresh: this.refresh.bind(this)
@@ -575,7 +577,21 @@ class Group {
       }
       let blackLists = await Lists.getBlackLists()
       let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-      this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
+
+      // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
+
+      let itemsCopy = this.reactiveGroup.items.slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
+      itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
+
+      // максимум 36 элементов (если больше - то отрезаем верх или низ)
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+      if (position === 'top') {
+         itemsCopy.splice(36, itemsCopy.length)
+      } else if (position === 'bottom') {
+         itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
+      }
+      this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
+
       this.updateReactiveGroup()
    }
 
@@ -692,8 +708,8 @@ class Group {
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'bottom')
       // максимум 36 элементов (если больше - то отрезаем верх)
-      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
-      this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+      // this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    async prev (count) {
@@ -729,7 +745,7 @@ class Group {
       await this.fulfill(nextItems, 'top')
       // максимум 36 элементов (если больше - то отрезаем низ)
       // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
-      this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
+      // this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    setProperty (name, value) {
