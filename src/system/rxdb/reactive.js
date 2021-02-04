@@ -748,7 +748,7 @@ class Group {
       groupData[name] = value
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
       if (name === 'currentId'){
-         this.setProperty('currentIndx', this.findIndx(value))
+         this.setProperty('currentIndx', value ? this.findIndx(value) : -1)
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
       }
    }
