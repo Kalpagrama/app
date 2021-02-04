@@ -4,7 +4,7 @@
   div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '50px'}`).row.bg-red.text-white
     small.full-width scrollTop: {{scrollTop}}
     small.full-width scrollHeight: {{scrollHeight}}
-    q-btn(outline color="white" dense no-caps @click="itemsRes.gotoStart()") Go to start
+    q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
   div(
     v-if="scrollTarget && !itemsRes"
     :style=`{
