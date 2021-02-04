@@ -1,6 +1,6 @@
 <style lang="sass">
 .rotating
-  animation: rotation 1s infinite linear
+  animation: rotation 20s infinite linear
 @keyframes rotation
   from
     transform: rotate(0deg)
@@ -36,7 +36,7 @@ div(
       name="loop"
       size="26px"
       :class=`{
-        //- 'rotating': isLooping,
+        'rotating': isLooping,
       }`)
 </template>
 
