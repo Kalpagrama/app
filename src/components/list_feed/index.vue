@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- debug top
-  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
+  //- div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
     .row.full-width
       small scrollTop: {{scrollTop}}, scrollHeight: {{scrollHeight}}
     q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
