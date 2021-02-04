@@ -22,7 +22,7 @@
     //- prepend slot
     //- slot(name="prepend")
     //- prev loading
-    //- div(
+    div(
       v-if="itemsPreving"
       :style=`{
         height: '60px',
@@ -63,7 +63,7 @@
         .row.full-width
           small.text-white scrollTop: {{ scrollTop }}, scrollHeight: {{ scrollHeight }},
     //- next loading
-    //- div(
+    div(
       v-if="itemsNexting"
       :style=`{
         height: '60px',
@@ -253,9 +253,11 @@ export default {
     },
     async positionDrop () {
       this.$log('positionDrop')
-      this.itemsRes.setProperty('currentId', null)
-      this.itemsRes.setProperty('itemMeta', null)
-      await this.itemsRes.gotoCurrent(null)
+      // this.itemsRes.setProperty('currentId', null)
+      // this.itemsRes.setProperty('itemMeta', null)
+      // await this.itemsRes.gotoCurrent(null)
+      await this.itemsRes.gotoStart()
+      setScrollPosition(this.scrollTarget, 0)
     },
     getScrollTop () {
       return getScrollPosition(this.scrollTarget)
