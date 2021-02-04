@@ -126,7 +126,7 @@ class Lists {
          }
       })
       for (let rxDoc of rxDocs) {
-         let findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc, null)
+         let findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc)
          await findResult.refresh()
          // let reactiveItem = getReactiveDoc(rxDoc).getPayload()
          // let newItems = reactiveItem.items.filter(el => !this.isElementBlacklisted(el, blackLists))

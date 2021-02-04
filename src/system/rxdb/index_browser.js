@@ -10,7 +10,7 @@ import {
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, isRxQuery, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -561,7 +561,6 @@ class RxDBWrapper {
          // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
-            // mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
             if (rxCollectionEnum in WsCollectionEnum) {
@@ -630,13 +629,10 @@ class RxDBWrapper {
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
+               let listId = JSON.stringify(mangoQuery) // populate в запросе влияет на результат (запросы с и без populate -это разные списки)
                let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery)) // до удаления populateObjects
                let populateObjects = mangoQuery.populateObjects
-               delete mangoQuery.populateObjects // мешает нормальному кэшированию
-               mangoQuery.pagination = {
-                  pageSize: mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000,
-                  pageToken: null
-               }
+               delete mangoQuery.populateObjects // мешает нормальному кэшированию в rxdb
                let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
                   fetchFunc: async () => {
                      return {
@@ -645,14 +641,20 @@ class RxDBWrapper {
                      }
                   }
                })
-               if (propsReactive.currentPageToken && propsReactive.currentPageSize) {
+               if (propsReactive[listId] && propsReactive[listId].currentPageToken && propsReactive[listId].currentPageSize) {
+                  mangoQuery.pagination = { // c запомненной позиции
+                     pageSize: propsReactive[listId].currentPageSize,
+                     pageToken: propsReactive[listId].currentPageToken
+                  }
+               } else { // сначала
                   mangoQuery.pagination = {
-                     pageSize: propsReactive.currentPageSize,
-                     pageToken: propsReactive.currentPageToken
+                     pageSize: mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000,
+                     pageToken: null
                   }
                }
+
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }

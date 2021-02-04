@@ -503,7 +503,8 @@ class Group {
          pageId,
          nextPageToken,
          prevPageToken,
-         currentPageToken
+         currentPageToken,
+         currentPageSize: Math.max(pageItems.length, GROUP_BATCH_SZ)
       }
       if (updatedPageId) { // обновить страницу
          let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
@@ -663,18 +664,19 @@ class Group {
       return indxFrom
    }
 
+   findPage (localIndex) {
+      let pageStartIndxLocal = 0
+      for (let page of this.reactiveGroup.pages) {
+         if (localIndex < pageStartIndxLocal + page.pageItems.length) return { page, pageStartIndxLocal }
+         pageStartIndxLocal += page.pageItems.length
+      }
+      return {}
+   }
+
    // индекс с учетом серверной пагинации (localIndex - индекс в загруженных страницах)
    getAbsoluteIndex (localIndex) {
       if (!(localIndex >= 0)) return -1
-      let findPageByLocalIndex = (localIndex) => {
-         let pageStartIndxLocal = 0
-         for (let page of this.reactiveGroup.pages) {
-            if (localIndex < pageStartIndxLocal + page.pageItems.length) return { page, pageStartIndxLocal }
-            pageStartIndxLocal += page.pageItems.length
-         }
-         return {}
-      }
-      let { page, pageStartIndxLocal } = findPageByLocalIndex(localIndex)
+      let { page, pageStartIndxLocal } = this.findPage(localIndex)
       assert(page && pageStartIndxLocal >= 0, '!page && pageStartIndxLocal >= 0')
       assert(localIndex - pageStartIndxLocal >= 0 && localIndex - pageStartIndxLocal < page.pageItems.length, 'bad pageStartIndxLocal (localIndex - pageStartIndxLocal - это индекс внутри блока)')
       let pageStartIndexAbsolute = 0
@@ -822,8 +824,12 @@ class Group {
       if (name === 'currentId') {
          let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
          assert(localIndx >= 0, 'bad localIndx')
+         let { page, pageStartIndxLocal } = this.findPage(localIndx)
+         assert(page)
          this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(localIndx) : -1) // индекс с учетом серверной пагинации
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
+         this.setProperty('currentPageToken', page.currentPageToken)
+         this.setProperty('currentPageSize', page.currentPageSize)
       }
    }
 
@@ -834,23 +840,22 @@ class Group {
 }
 
 class ReactiveListWithPaginationFactory {
-   async create (rxQueryOrRxDoc, populateFunc = null, paginateFunc = null, propsReactive = {}) {
-      let mangoQuery = isRxQuery(rxQueryOrRxDoc) ? rxQueryOrRxDoc.mangoQuery : rxQueryOrRxDoc.props.mangoQuery
-      assert(mangoQuery, '!mangoQuery')
-      let groupId = JSON.stringify(mangoQuery) + (populateFunc ? 'populate' : '')
-      // на один rxQueryOrRxDoc может быть создано несколько  reactiveGroup (в зависимости от populateFunc)
+   async create (rxQueryOrRxDoc, listId = null, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       rxQueryOrRxDoc.reactiveListHolderMaster = rxQueryOrRxDoc.reactiveListHolderMaster || {}
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
-      if (rxQueryOrRxDoc.reactiveListHolderMaster[groupId]) {
+      if (!listId) listId = isRxDocument(rxQueryOrRxDoc) ? rxQueryOrRxDoc.id : JSON.stringify(rxQueryOrRxDoc.mangoQuery)
+      assert(listId, '!listId')
+      // на один rxQueryOrRxDoc может быть создано несколько  reactiveGroup (в зависимости от populateFunc)
+      if (rxQueryOrRxDoc.reactiveListHolderMaster[listId]) {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
-         this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
+         this.group = new Group(listId, populateFunc, paginateFunc, propsReactive)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'whole')
-         rxQueryOrRxDoc.reactiveListHolderMaster[groupId] = this
+         rxQueryOrRxDoc.reactiveListHolderMaster[listId] = this
       }
-      assert(rxQueryOrRxDoc.reactiveListHolderMaster[groupId].group, '!this.group!')
-      let group = rxQueryOrRxDoc.reactiveListHolderMaster[groupId].group
+      assert(rxQueryOrRxDoc.reactiveListHolderMaster[listId].group, '!this.group!')
+      let group = rxQueryOrRxDoc.reactiveListHolderMaster[listId].group
       return group.reactiveGroup
    }
 }
