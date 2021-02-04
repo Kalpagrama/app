@@ -313,12 +313,14 @@ class Group {
                gotoCurrent: this.gotoCurrent.bind(this),
                gotoStart: this.gotoStart.bind(this),
                gotoEnd: this.gotoEnd.bind(this),
-               next: this.next.bind(this),
-               prev: this.prev.bind(this),
-               nextDebounced: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
-               prevDebounced: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               // next: this.next.bind(this),
+               // prev: this.prev.bind(this),
+               next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
                hasPrev: false,
+               newItemsBelow: 0, // в списке появились новые элементы выше
+               newItemsAbove: 0, // в списке появились новые элементы ниже
                setProperty: this.setProperty.bind(this),
                getProperty: this.getProperty.bind(this),
                refresh: this.refresh.bind(this)
@@ -576,30 +578,47 @@ class Group {
       }
       let blackLists = await Lists.getBlackLists()
       let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
-      this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered)
+
+      // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
+
+      let itemsCopy = this.reactiveGroup.items.slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
+      itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
+
+      // максимум 36 элементов (если больше - то отрезаем верх или низ)
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+      if (position === 'top') {
+         itemsCopy.splice(36, itemsCopy.length)
+      } else if (position === 'bottom') {
+         itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
+      }
+      this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
+
       this.updateReactiveGroup()
    }
 
-   // async gotoCurrent () {
-   //    const f = this.gotoCurrent
-   //    logD(f, 'start')
-   //    let count
-   //    if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-   //    else count = this.loadedLen() // выдаем все элементы разом
-   //
-   //    let fulfillFrom = 0
-   //    let fromId
-   //    if (this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-   //       fromId = this.getProperty('currentId')
-   //    }
-   //    if (fromId) {
-   //       let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
-   //       if (indxFrom >= 0) fulfillFrom = indxFrom
-   //    }
-   //    let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
-   //    let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-   //    await this.fulfill(nextItems, 'whole')
-   // }
+   // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
+   findIndx(currentId, findInDeep = true){
+      assert(currentId, '!currentId')
+      let allItems = this.loadedItems()
+      let indxFrom = -1
+      let findItemIndex = (items, id) => {
+         let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
+         if (indx === -1 && findInDeep) { // на этом уровне currentId не найден (идем вглубь)
+            for (let i = 0; i < items.length; i++) {
+               let subitems = items[i].items
+               if (subitems) {
+                  if (findItemIndex(subitems, id) >= 0) {
+                     indx = i
+                     break
+                  }
+               }
+            }
+         }
+         return indx
+      }
+      indxFrom = findItemIndex(allItems, currentId)
+      return indxFrom
+   }
 
    // обрежет список сферху и начнет с этого элемента
    async gotoCurrent () {
@@ -608,35 +627,16 @@ class Group {
       let count
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом
-
-      let indxFrom = -1
-      let fromId = this.getProperty('currentId')
-      if (fromId) {
-         let allItems = this.loadedItems()
-         // найдет элемент в списке (поиск идет вглубь)
-         let findItemIndex = (items, id) => {
-            let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
-            if (indx === -1) { // на этом уровне fromId не найден (идем вглубь)
-               for (let i = 0; i < items.length; i++) {
-                  let subitems = items[i].items
-                  if (subitems) {
-                     if (findItemIndex(subitems, id) >= 0) {
-                        indx = i
-                        break
-                     }
-                  }
-               }
-            }
-            return indx
-         }
-         indxFrom = findItemIndex(allItems, fromId)
+      let currentId = this.getProperty('currentId')
+      if (currentId) {
+         let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')
             let firstItem = this.reactiveGroup.items[0]
             if (firstItem && this.reactiveGroup.itemType === 'GROUP') {
-               firstItem.setProperty('currentId', fromId)
+               firstItem.setProperty('currentId', currentId)
                await firstItem.gotoCurrent()
             }
          }
@@ -644,7 +644,6 @@ class Group {
          let nextItems = this.loadedItems().slice(0, count)
          await this.fulfill(nextItems, 'whole')
       }
-      return indxFrom
    }
 
    async gotoStart () {
@@ -710,11 +709,8 @@ class Group {
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'bottom')
       // максимум 36 элементов (если больше - то отрезаем верх)
-      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
-      if (!this.reactiveGroup.id.includes('WS_BOOKMARK')) {
-         Notify.create({type: 'negative', message: 'Next cuts'})
-      }
-      this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
+      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+      // this.reactiveGroup.items.splice(0, Math.max(0, this.reactiveGroup.items.length - 36)) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    async prev (count) {
@@ -750,16 +746,17 @@ class Group {
       await this.fulfill(nextItems, 'top')
       // максимум 36 элементов (если больше - то отрезаем низ)
       // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выпольнятся очень долго!
-      if (!this.reactiveGroup.id.includes('WS_BOOKMARK')) {
-         Notify.create({type: 'negative', message: 'Prev cuts'})
-      }
-      this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
+      // this.reactiveGroup.items.splice(36, this.reactiveGroup.items.length) // после fulfill (иначе сгенерится событие об изменении списка до того как сработает fulfill(компоненты следят за списком и могут вызывать prev/next по мере изменения списка))
    }
 
    setProperty (name, value) {
       let groupData = this.propsReactive[this.reactiveGroup.id] || {}
       groupData[name] = value
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
+      if (name === 'currentId'){
+         this.setProperty('currentIndx', this.findIndx(value))
+         this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
+      }
    }
 
    getProperty (name) {
