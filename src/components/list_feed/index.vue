@@ -4,7 +4,7 @@
   div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '50px'}`).row.bg-red.text-white
     small.full-width scrollTop: {{scrollTop}}
     small.full-width scrollHeight: {{scrollHeight}}
-    q-btn(outline color="white" dense no-caps @click="itemsRes.gotoStart()") Go to start
+    q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
   div(
     v-if="scrollTarget && !itemsRes"
     :style=`{
@@ -22,7 +22,7 @@
     //- prepend slot
     //- slot(name="prepend")
     //- prev loading
-    //- div(
+    div(
       v-if="itemsPreving"
       :style=`{
         height: '60px',
@@ -63,7 +63,7 @@
         .row.full-width
           small.text-white scrollTop: {{ scrollTop }}, scrollHeight: {{ scrollHeight }},
     //- next loading
-    //- div(
+    div(
       v-if="itemsNexting"
       :style=`{
         height: '60px',
@@ -253,9 +253,11 @@ export default {
     },
     async positionDrop () {
       this.$log('positionDrop')
-      this.itemsRes.setProperty('currentId', null)
-      this.itemsRes.setProperty('itemMeta', null)
-      await this.itemsRes.gotoCurrent(null)
+      // this.itemsRes.setProperty('currentId', null)
+      // this.itemsRes.setProperty('itemMeta', null)
+      // await this.itemsRes.gotoCurrent(null)
+      await this.itemsRes.gotoStart()
+      setScrollPosition(this.scrollTarget, 0)
     },
     getScrollTop () {
       return getScrollPosition(this.scrollTarget)
