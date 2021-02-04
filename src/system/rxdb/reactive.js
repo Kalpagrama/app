@@ -463,20 +463,25 @@ class Group {
                item.id = JSON.stringify(item.figuresAbsolute)
             }
          }
-         itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
-         // itemPrimaryKey
-         switch (mangoQuery.selector.rxCollectionEnum) {
-            case RxCollectionEnum.LST_SPHERE_ITEMS:
-            case RxCollectionEnum.LST_SEARCH:
-            case RxCollectionEnum.LST_SUBSCRIBERS:
-            case RxCollectionEnum.LST_SUBSCRIPTIONS:
-               itemPrimaryKey = 'oid'
-               break
-            case RxCollectionEnum.LST_FEED:
-               itemPrimaryKey = 'id' // эвенты
-               break
-            default:
-               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
+         if (mangoQuery.selector.groupByContentLocation) {
+            itemType = 'GROUP'
+            itemPrimaryKey = 'id'
+         } else {
+            itemType = 'ITEM'
+            // itemPrimaryKey
+            switch (mangoQuery.selector.rxCollectionEnum) {
+               case RxCollectionEnum.LST_SPHERE_ITEMS:
+               case RxCollectionEnum.LST_SEARCH:
+               case RxCollectionEnum.LST_SUBSCRIBERS:
+               case RxCollectionEnum.LST_SUBSCRIPTIONS:
+                  itemPrimaryKey = 'oid'
+                  break
+               case RxCollectionEnum.LST_FEED:
+                  itemPrimaryKey = 'id' // эвенты
+                  break
+               default:
+                  throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
+            }
          }
       } else if (array) {
          pageId = 'custom array'
