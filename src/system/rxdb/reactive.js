@@ -12,6 +12,7 @@ import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
 import { rxdbOperationProxy } from 'src/system/rxdb/common'
 import { Notify } from 'quasar'
+import { matNextWeek } from '@quasar/extras/material-icons'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -331,6 +332,25 @@ class Group {
       this.updateReactiveGroup = () => {
          this.reactiveGroup.hasNext = this.hasNext()
          this.reactiveGroup.hasPrev = this.hasPrev()
+
+         // пытаемся понять - не добавилось ли сверху или снизу элементов
+         let currentId = this.getProperty('currentId')
+         if (currentId) {
+            let currentAbsoluteIndx = this.getAbsoluteIndex(this.findIndx(currentId))
+            let currentTotalCount = this.reactiveGroup.totalCount
+            let currentAbsoluteIndxSaved = this.getProperty('currentAbsoluteIndx')
+            let currentTotalCountSaved = this.getProperty('currentTotalCount')
+            if (currentAbsoluteIndx >= 0 && currentAbsoluteIndxSaved) {
+               let topDiff = currentAbsoluteIndx - currentAbsoluteIndxSaved // добавилось / удалилось сверху
+               this.reactiveGroup.newItemsBelow = Math.max(topDiff, 0)
+               let bottomDif = (currentTotalCount - currentTotalCountSaved) - topDiff
+               this.reactiveGroup.newItemsAbove = Math.max(bottomDif, 0)
+            }
+         }
+         // this.getAbsoluteIndex(this.findIndx(value)
+         // this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(this.findIndx(value)) : -1) // индекс с учетом серверной пагинации
+         // this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
+         let currentAbsoluteIndx
       }
    }
 
@@ -354,9 +374,9 @@ class Group {
             // logD(f, 'rxQuery changed 1', results)
             if (this.loadedLen() === results.length) {
                let arrayChanged = false
-               let listItems = this.loadedItems()
+               let allItems = this.loadedItems()
                for (let i = 0; i < results.length; i++) {
-                  if (results[i].id !== listItems[i].id) {
+                  if (results[i][this.reactiveGroup.itemPrimaryKey] !== allItems[i][this.reactiveGroup.itemPrimaryKey]) {
                      arrayChanged = true
                      break
                   }
@@ -364,13 +384,12 @@ class Group {
                if (!arrayChanged) return // если список не изменился - просто выходим
             }
             // logD(f, 'rxQuery changed 2', results)
-            let listItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
-
+            let pageItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
+            assert(this.reactiveGroup.pages.length === 1, 'this.reactiveGroup.pages.len != 1')
             let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
             assert(page, '!page')
-            page.listItems = listItemsNew // изменились итемы страницы
-            this.reactiveGroup.totalCount = listItemsNew.length
-
+            page.pageItems = pageItemsNew // изменились итемы страницы
+            this.reactiveGroup.totalCount = pageItemsNew.length
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                startFullFil = 0
@@ -380,11 +399,11 @@ class Group {
             await this.fulfill(nextItems, 'whole')
          })
       } else if (rxDoc) {
-         // в список быди добавлены элементы(например при подписке)
+         // в список были добавлены элементы(например при подписке)
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
-            logD(f, 'List::rxDoc changed. try to change this.listItems')
+            logD(f, 'List::rxDoc changed. try to change this.pageItems')
             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            await this.upsertPaginationPage(rxDoc, 'top', change.id, false)
+            await this.upsertPaginationPage(rxDoc, null, change.id, false)
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                endFullFil = startFullFil = 0
@@ -397,87 +416,111 @@ class Group {
       }
    }
 
-   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, pageId = null, subscribe = true) {
+   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, updatedPageId = null, subscribe = true) {
       const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
-      assert(position.in('top', 'bottom'), 'bad position')
+      assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
       else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
       else if (Array.isArray(rxQueryOrRxDocOrArray)) array = rxQueryOrRxDocOrArray
       else throw new Error('bad rxQueryOrRxDocOrArray')
       assert(rxQuery || rxDoc || array, '!this.rxQuery || this.rxDoc')
-      let listItems = []
+      let totalCount, itemType, itemPrimaryKey // данные списка
+      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
          let mangoQuery = rxQuery.mangoQuery
          assert(mangoQuery, '!mangoQuery')
          let rxDocs = await rxQuery.exec()
          assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-         listItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
-         this.reactiveGroup.totalCount = listItems.length
-         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
-         this.reactiveGroup.itemPrimaryKey = 'id'
+         pageId = JSON.stringify(mangoQuery)
+         pageItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
+         totalCount = pageItems.length
+         itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
+         itemPrimaryKey = 'id'
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
          let {
             items,
-            totalCount,
-            nextPageToken,
-            prevPageToken,
-            currentPageToken
+            totalCount: totalCount_,
+            nextPageToken: nextPageToken_,
+            prevPageToken: prevPageToken_,
+            currentPageToken: currentPageToken_
          } = rxDoc.toJSON().cached.data
          let mangoQuery = rxDoc.props.mangoQuery
          assert(mangoQuery, '!mangoQuery')
-         listItems = items
-         for (let item of listItems) { // для групп
+         assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+         pageId = rxDoc.id
+         pageItems = items
+         totalCount = totalCount_
+         nextPageToken = nextPageToken_
+         prevPageToken = prevPageToken_
+         currentPageToken = currentPageToken_
+         // для групп - назначаем id для каждой группы
+         for (let item of pageItems) {
             if (item.__typename === 'Group') {
                assert(item.figuresAbsolute, '!item.figuresAbsolute')
                item.id = JSON.stringify(item.figuresAbsolute)
             }
          }
-         this.reactiveGroup.totalCount = totalCount
-         this.reactiveGroup.itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
-         assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+         itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
+         // itemPrimaryKey
          switch (mangoQuery.selector.rxCollectionEnum) {
             case RxCollectionEnum.LST_SPHERE_ITEMS:
             case RxCollectionEnum.LST_SEARCH:
             case RxCollectionEnum.LST_SUBSCRIBERS:
             case RxCollectionEnum.LST_SUBSCRIPTIONS:
-               this.reactiveGroup.itemPrimaryKey = 'oid'
+               itemPrimaryKey = 'oid'
                break
             case RxCollectionEnum.LST_FEED:
-               this.reactiveGroup.itemPrimaryKey = 'id' // эвенты
+               itemPrimaryKey = 'id' // эвенты
                break
             default:
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       } else if (array) {
-         listItems = array
-         this.reactiveGroup.totalCount = listItems.length
-         this.reactiveGroup.itemType = 'ITEM' // todo определять тип итемов внутри!
-         if (listItems.length) {
-            if (listItems[0].oid) this.reactiveGroup.itemPrimaryKey = 'oid'
-            else if (listItems[0].id) this.reactiveGroup.itemPrimaryKey = 'id'
-         } else this.reactiveGroup.itemPrimaryKey = 'unknown'
+         pageId = 'custom array'
+         pageItems = array
+         totalCount = pageItems.length
+         itemType = 'ITEM' // todo определять тип итемов внутри (возможно позже там могут быть и группы)
+         if (pageItems.length) {
+            if (pageItems[0].oid) itemPrimaryKey = 'oid'
+            else if (pageItems[0].id) itemPrimaryKey = 'id'
+         } else itemPrimaryKey = 'unknown'
       } else throw new Error('bad rxQueryOrRxDocOrArray')
-      assert(this.reactiveGroup.itemType.in('GROUP', 'ITEM'), 'bad itemType')
-      assert(listItems && Array.isArray(listItems), 'Array.isArray(listItems)')
-      assert(this.reactiveGroup.itemPrimaryKey, '!this.reactiveGroup.itemPrimaryKey')
+      assert(pageId, '!pageId')
+      assert(totalCount >= 0, '!totalCount')
+      assert(itemType && itemType.in('GROUP', 'ITEM'), 'bad itemType')
+      assert(itemPrimaryKey, '!itemPrimaryKey')
+      assert(pageItems && Array.isArray(pageItems), 'Array.isArray(pageItems)')
+
+      // обновляем данные списка в сответствии с уточненными данными
+      this.reactiveGroup.totalCount = totalCount
+      this.reactiveGroup.itemType = itemType
+      this.reactiveGroup.itemPrimaryKey = itemPrimaryKey
       let page = {
-         listItems,
-         id: rxDoc ? rxDoc.id : null,
-         nextPageToken: rxDoc ? rxDoc.cached.data.nextPageToken : null,
-         prevPageToken: rxDoc ? rxDoc.cached.data.prevPageToken : null,
-         currentPageToken: rxDoc ? rxDoc.cached.data.currentPageToken : null
+         pageItems,
+         pageId,
+         nextPageToken,
+         prevPageToken,
+         currentPageToken
       }
-      if (pageId) {
-         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.id === pageId)
+      if (updatedPageId) { // обновить страницу
+         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
          if (pageIndx >= 0) this.reactiveGroup.pages.splice(pageIndx, 1, page)
-      } else if (position === 'top') {
+      } else if (position === 'top') { // добавить сверху
          this.reactiveGroup.pages.unshift(page)
-      } else {
+         assert(page.currentPageToken, '!currentPageToken')
+         assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'BACKWARD', ' bad currentPageToken1')
+         // поправить indx для pages сверху и снизу
+      } else if (position === 'bottom') { // добавить снизу
          this.reactiveGroup.pages.push(page)
-      }
+         assert(page.currentPageToken, '!currentPageToken')
+         assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'FORWARD', ' bad currentPageToken2')
+      } else if (position === 'whole') {
+         assert(this.reactiveGroup.pages.length === 0, 'this.reactiveGroup.pages.let > 0')
+         this.reactiveGroup.pages.push(page)
+      } else throw new Error('bad position' + position)
       if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
 
@@ -488,14 +531,14 @@ class Group {
    loadedLen () {
       let len = 0
       for (let page of this.reactiveGroup.pages) {
-         len += page.listItems.length
+         len += page.pageItems.length
       }
       return len
    }
 
    loadedItems () {
       let res = []
-      for (let page of this.reactiveGroup.pages) res.push(...page.listItems)
+      for (let page of this.reactiveGroup.pages) res.push(...page.pageItems)
       return res
    }
 
@@ -566,7 +609,7 @@ class Group {
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
             Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
             Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
-            await group.upsertPaginationPage(items, 'bottom')
+            await group.upsertPaginationPage(items, 'whole')
             await group.next(3) // сразу грузим по 3 ядра в группе
             return group.reactiveGroup
          }
@@ -597,9 +640,8 @@ class Group {
    }
 
    // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
-   findIndx(currentId, findInDeep = true){
+   findIndx (currentId, findInDeep = true) {
       assert(currentId, '!currentId')
-      let allItems = this.loadedItems()
       let indxFrom = -1
       let findItemIndex = (items, id) => {
          let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
@@ -616,8 +658,38 @@ class Group {
          }
          return indx
       }
+      let allItems = this.loadedItems()
       indxFrom = findItemIndex(allItems, currentId)
       return indxFrom
+   }
+
+   // индекс с учетом серверной пагинации (localIndex - индекс в загруженных страницах)
+   getAbsoluteIndex (localIndex) {
+      if (!(localIndex >= 0)) return -1
+      let findPageByLocalIndex = (localIndex) => {
+         let pageStartIndxLocal = 0
+         for (let page of this.reactiveGroup.pages) {
+            if (localIndex < pageStartIndxLocal + page.pageItems.length) return { page, pageStartIndxLocal }
+            pageStartIndxLocal += page.pageItems.length
+         }
+         return {}
+      }
+      let { page, pageStartIndxLocal } = findPageByLocalIndex(localIndex)
+      assert(page && pageStartIndxLocal >= 0, '!page && pageStartIndxLocal >= 0')
+      assert(localIndex - pageStartIndxLocal >= 0 && localIndex - pageStartIndxLocal < page.pageItems.length, 'bad pageStartIndxLocal (localIndex - pageStartIndxLocal - это индекс внутри блока)')
+      let pageStartIndexAbsolute = 0
+      if (page.currentPageToken) {
+         assert(page.currentPageToken.direction && page.currentPageToken.indx >= 0, 'bad currentPageToken')
+         if (page.currentPageToken.direction === 'FORWARD') {
+            pageStartIndexAbsolute = page.currentPageToken.indx
+         } else if (page.currentPageToken.direction === 'BACKWARD') {
+            // page.currentPageToken.indx - это последний индекс в блоке
+            pageStartIndexAbsolute = page.currentPageToken.indx - (page.pageItems.length - 1)
+         }
+      }
+      assert(pageStartIndexAbsolute >= 0)
+      let absoluteIndex = pageStartIndexAbsolute + (localIndex - pageStartIndxLocal)
+      assert(absoluteIndex >= 0, 'bad absoluteIndex')
    }
 
    // обрежет список сферху и начнет с этого элемента
@@ -747,8 +819,10 @@ class Group {
       let groupData = this.propsReactive[this.reactiveGroup.id] || {}
       groupData[name] = value
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
-      if (name === 'currentId'){
-         this.setProperty('currentIndx', value ? this.findIndx(value) : -1)
+      if (name === 'currentId') {
+         let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
+         assert(localIndx >= 0, 'bad localIndx')
+         this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(localIndx) : -1) // индекс с учетом серверной пагинации
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
       }
    }
@@ -772,7 +846,7 @@ class ReactiveListWithPaginationFactory {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
          this.group = new Group(groupId, populateFunc, paginateFunc, propsReactive)
-         await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'top')
+         await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'whole')
          rxQueryOrRxDoc.reactiveListHolderMaster[groupId] = this
       }
       assert(rxQueryOrRxDoc.reactiveListHolderMaster[groupId].group, '!this.group!')
