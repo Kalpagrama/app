@@ -37,18 +37,6 @@ export default {
     }
   },
   watch: {
-    // currentUser: {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('currentUser TO', to)
-    //     if (to.profile.status) {
-    //       this.locked = true
-    //       this.status = to.profile.status
-    //       this.locked = false
-    //     }
-    //   }
-    // },
     status: {
       handler (to, from) {
         if (this.locked) return

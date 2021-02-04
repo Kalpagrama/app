@@ -28,7 +28,7 @@
       :style=`{maxWidth: '60px'}`)
       q-badge(
         v-if="countNodesShow"
-        floating transparent color="red") {{ contentKalpa.countStat.countNodes }}
+        floating transparent color="grey-9") {{ contentKalpa.countStat.countNodes }}
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Ядра
     q-btn(
