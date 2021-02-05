@@ -49,7 +49,7 @@ class ListsApi {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   static async getList (mangoQuery) {
+   static async getList (mangoQuery){
       const f = ListsApi.getList
       logD(f, 'start')
       const t1 = performance.now()

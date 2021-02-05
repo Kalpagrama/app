@@ -204,7 +204,8 @@ class Lists {
                   prevPageToken: null,
                   currentPageToken: null,
                   figuresAbsolute: [], // весь контент
-                  thumbUrl: null
+                  thumbUrl: null,
+                  __typename: 'Group' // чтобы реактивнй список мог понять что это группа
                }
                reactiveItem.items.splice(0, 0, group)
             }
@@ -282,7 +283,7 @@ class Lists {
       let rxDocs = await Lists.cache.find({
          selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
-            'props.oid': { $in: relatedSphereOids },
+            'props.oid': { $in: relatedSphereOids }
             // 'props.mangoQuery.selector.objectTypeEnum.$in': { $in: [object.type] }
          }
       })
