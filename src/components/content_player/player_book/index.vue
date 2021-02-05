@@ -6,21 +6,33 @@ div(
     height: '100%',
   }`
   ).column.full-width.bg-black
+  //-  fictive/invisible input for emit/on/off events with native html element events
+  input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
   //- figure editor...
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="figure"
       :style=`{
         position: 'absolute', zIndex: 1000,
-        bottom: '50px',
-        width: '200px',
-        left: 'calc(50% - 100px)',
-        borderRadius: '10px',
+        bottom: '80px',
       }`
-      ).row.bg-black.q-pa-sm.br
-      q-btn(round flat color="red" icon="delete_outline" @click="figure = null")
-      .col
-      q-btn(round flat color="white" icon="edit")
+      ).row.full-width.justify-center
+      slot(name="tint-bar" :tintFocused="true")
+      div(
+        v-if="figure"
+        :style=`{
+          width: '200px',
+          borderRadius: '20px',
+          background: 'rgba(30,30,30,0.5)',
+        }`
+        ).row.items-center.content-center.q-pa-md
+        div(:style=`{width: '20px',height: '20px',borderRadius: '50%'}`).bg-red.q-mr-sm
+        div(:style=`{width: '20px',height: '20px',borderRadius: '50%'}`).bg-green.q-mr-sm
+        div(:style=`{width: '20px',height: '20px',borderRadius: '50%'}`).bg-blue
+        .col
+        q-btn(round flat color="white" icon="keyboard_arrow_left")
+        q-btn(round flat color="white" icon="keyboard_arrow_right")
+  //- table of contents...
   div(
     v-if="tableOfContents === true"
     :id="bookMenu"
@@ -43,6 +55,7 @@ div(
           no-caps
           ).row.full-width.scroll
           span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
+  //- body book area
   div(
     :style=`{
       position: 'relative',
@@ -58,6 +71,7 @@ div(
       ).row.fit
     //- div(
       :style=`{}`)
+  //- footer
   .row.full-width.justify-center
     input(v-if = "true" v-model="cfi" width="300").row.full-width
     q-btn(v-if = "true" round flat color="white" icon="check" @click='goToCfi')
@@ -138,6 +152,7 @@ export default {
   },
   data () {
     return {
+      name: '',
       book: null,
       rendition: null,
       section: null,
@@ -156,6 +171,7 @@ export default {
       tableOfContents: false,
       cfi: 'epubcfi(/6/12[id83]!/4/2/2[id2]/12,/1:0,/1:263)',
       figure: null,
+      events: {}
     }
   },
   watch: {
@@ -172,6 +188,7 @@ export default {
   methods: {
     setState (key, val) {
       this.$log('setState', key, val)
+      this[key] = val
     },
     onResize (e) {
       this.$log('onResize', e)
@@ -578,7 +595,7 @@ export default {
     await this.book.ready // book ready
     this.ready = true
 
-    this.$emit('player', this)
+    // this.$emit('player', this)
     // долгая операция
     this.locations = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
 
@@ -589,6 +606,18 @@ export default {
   },
   created () {
     this.$log('created')
+    this.events = {
+      on: (event, cb) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.addEventListener(event, cb)
+      },
+      off: (event, cb) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.removeEventListener(event, cb)
+      },
+      emit: (event, val) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.dispatchEvent(new CustomEvent(event, {detail: val}))
+      }
+    }
+    this.$emit('player', this)
     // window.addEventListener('keyup', this.keyListener)
   },
   beforeDestroy () {

@@ -1,161 +1,91 @@
 <template lang="pug">
-.row.full-width.justify-center
-  //- header
-  div(
+q-layout(view="hHh Lpr lff")
+  q-footer(
+    v-if="!joint && !jointCreating"
+    reveal
     :style=`{
-      position: 'fixed', zIndex: 2000,
-      top: '0px',
-    }`
-    ).row.full-width.justify-center
-    div(
-      :style=`{
-        position: 'relative',
-        maxWidth: $store.state.ui.pageWidth+'px',
-      }`
-      ).row.full-width.items-start.content-start.q-pt-xs.q-px-xs
-      q-resize-observer(@resize="onResizeHeader" :debounce="300")
-      node-items-item(
-        :item="item"
-        :itemOpened="false"
-        :itemActive="true")
-  //- footer
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="!joint && !jointCreating"
-      :style=`{
-        position: 'fixed', zIndex: 1000,
-        bottom: '0px',
-      }`
-      ).row.full-width.justify-center
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }`)
+    .row.full-width.items-center.content-center.justify-center.q-pa-sm
       div(
         :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          //- height: '70px',
-          borderRadius: '10px 10px 0 0',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }`
-        ).row.full-width.b-40
-        div().row.full-width.justify-between.q-pa-sm
-          q-btn(
-            @click="$routerKalpa.back()"
-            flat color="grey-7" icon="west" no-caps
-            :style=`{maxWidth: '60px'}`)
-            .row.full-width.justify-center
-              small Назад
+          background: 'rgb(40,40,40)',
+          borderRadius: '20px',
+          maxWidth: '400px',
+        }`).row.full-width.justify-between.q-pa-sm
+          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           q-btn(
             @click="jointCreating = true"
-            flat icon="add" no-caps
-            :color="'green'"
-            :style=`{maxWidth: '60px'}`)
-            .row.full-width.justify-center
-              small(:style=`{whiteSpace: 'nowrap'}`) Добавить связь
-          kalpa-menu-popup-global
-  //- joint current
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="joint"
+            color="green" icon="add"
+            :style=`{
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+            }`)
+          q-btn(round flat color="white" icon="more_vert")
+  q-page-container
+    q-page(
       :style=`{
-        position: 'fixed', zIndex: 1000,
-        top: headerHeight+'px',
-        height: $q.screen.height-headerHeight+'px',
+        paddingTop: 'calc(8px + env(safe-area-inset-top))',
+        paddingBottom: '300px',
       }`
-      ).row.full-width.justify-center
+      ).row.full-width.justify-center.q-px-sm
       div(
         :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }`
-        ).row.full-width.b-30
-        joint-current(
-          :item="item"
-          :joint="joint.populatedObject"
-          :height="$q.screen.height-headerHeight"
-          :style=`{
-          }`
-          @close="joint = null").b-30
-  //- joint creator
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="jointCreating"
-      :style=`{
-        position: 'fixed', zIndex: 1000,
-        top: headerHeight+'px',
-        height: $q.screen.height-headerHeight+'px',
-      }`
-      ).row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }`
-        ).row.full-width.b-30
-        joint-creator(
-          :item="item"
-          :height="$q.screen.height-headerHeight"
-          :style=`{
-          }`
-          @close="jointCreating = false").b-30
-  //- page
-  div(
-    :style=`{
-      position: 'relative',
-      paddingTop: headerHeight+'px',
-      paddingBottom: $q.screen.height-headerHeight+'px',
-      opacity: (joint || jointCreating) ? 0 : 1,
-    }`
-    ).row.full-width.justify-center
-    //- page
-    div(
-      :style=`{
-        position: 'relative',
-        maxWidth: $store.state.ui.pageWidth+'px',
-      }`
-      ).row.full-width.q-px-xs
-      //- header joint name
-      div(
-        :style=`{
-          position: 'relative',
-          overflow: 'hidden',
-          minHeight: '60px',
-          textAlign: 'center',
-        }`
-        ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-        span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm Связи
-        span().text-grey-6.text-bold - {{ item.countStat.countJoints }}
-        q-icon(
-          name="fas fa-link" size="80px"
-          :style=`{
-            color: 'rgb(38,38,38)',
-            position: 'absolute', zIndex: 200,
-            top: '-10px',
-            //- left: 'calc(50% - 40px)',
-            left: '8px',
-          }`)
-        //- q-btn(
-          @click="$emit('close')"
-          round flat color="grey-6" icon="clear"
-          :style=`{
-            position: 'absolute', zIndex: 200,
-            top: '8px', right: '8px',
-          }`)
-      joints-gallery(
-        :oid="item.oid"
-        :height="$q.screen.height-headerHeight"
-        @joint="joint = $event"
-        @create="jointCreating = true")
+          maxWidth: 600+'px',
+        }`).row.full-width.items-start.content-start
+        //- current item... TODO: height ???
+        div(:style=`{position: 'relative'}`).row.full-width
+          node-items-item(
+            :item="item"
+            :itemOpened="false"
+            :itemActive="true"
+            :styles=`{
+              height: '300px',
+            }`)
+        //- gallery
+        div(v-if="!joint && !jointCreating").row.full-width.q-mb-xl
+          joints-gallery(
+            :item="item" :oid="item.oid"
+            :height="$q.screen.height-headerHeight"
+            @joint="joint = $event"
+            @create="jointCreating = true")
+        //- current
+        div(v-if="joint").row.full-width
+          joint-current(
+            :item="item"
+            :joint="joint.populatedObject"
+            :height="$q.screen.height-headerHeight"
+            :style=`{
+            }`
+            @create="joint = null, jointCreating = true"
+            @close="joint = null").b-30
+        //- creating
+        div(v-if="jointCreating").row.full-width.q-mb-xl
+          joint-creator(
+            :item="item"
+            :height="$q.screen.height-headerHeight"
+            :style=`{
+            }`
+            @close="jointCreating = false").b-30
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import jointCreator from './joint_creator/index.vue'
+import jointCurrent from './joint_current/index.vue'
+import jointsGallery from './joints_gallery/index.vue'
+import nodeItemsItem from 'components/node_feed/node_items_item.vue'
+
 export default {
   name: 'viewGallery',
   props: ['item'],
   components: {
-    jointCreator: () => import('./joint_creator/index.vue'),
-    jointCurrent: () => import('./joint_current/index.vue'),
-    jointsGallery: () => import('./joints_gallery/index.vue'),
-    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
+    jointCreator,
+    jointCurrent,
+    jointsGallery,
+    nodeItemsItem,
   },
   data () {
     return {

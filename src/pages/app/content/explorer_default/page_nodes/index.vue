@@ -5,7 +5,7 @@ div(
   }`
   ).column.full-width
   //- group before
-  .row.full-width.justify-center
+  //- .row.full-width.justify-center
     div(
       :style=`{
         maxWidth: 600+'px',
@@ -86,7 +86,7 @@ div(
                   ).full-width Еще {{ group.totalCount-group.items.length }}
         template(v-slot:append)
           //- group after
-          div().row.full-width.q-pa-xs
+          //- div().row.full-width.q-pa-xs
             q-btn(
               @click="prev()"
               outline dense color="white" no-caps).q-mr-sm Prev
@@ -164,13 +164,16 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(1000)
+    await this.$wait(500)
     let nodeOid = this.$store.state.ui.nodeOnContent
     this.$log('nodeOid', nodeOid)
     if (nodeOid) {
+      // this.$emit('pageId', 'nodes')
+      await this.$wait(500)
       await this.setCurrentItem({oid: nodeOid})
       await this.setSelectedItem({oid: nodeOid})
       this.$store.commit('ui/stateSet', ['nodeOnContent', null])
+      // this.$emit('pageId', 'nodes')
     }
   }
 }

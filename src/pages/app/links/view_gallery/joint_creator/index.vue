@@ -3,38 +3,6 @@ div(
   :style=`{
   }`
   ).row.full-width.items-start.content-start.q-px-xs.b-30
-  //- itemFinder
-  //- q-dialog(
-    v-model="itemFinderShow"
-    position="bottom" maximized)
-    kalpa-finder(
-      @contentKalpa="itemFound"
-      :pages=`{
-        nodes: {views: ['all']},
-        workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
-        kalpagrama: {views: ['all', 'users', 'nodes']},
-        gif: {views: ['all']},
-        web: {views: ['all', 'image', 'video',]}
-      }`
-      :style=`{
-        //- maxWidth: $store.state.ui.pageWidth+'px',
-        height: $q.screen.height+'px',
-      }`).b-30
-      template(v-slot:header)
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-              height: '60px',
-            }`
-            ).row.full-width.items-center.content-center
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
-            .col
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
-      template(v-slot:tint=`{item}`)
-        div(
-          @click="itemFound(item)"
-          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
   //- header joint name, always?
   div(
     :style=`{
@@ -110,12 +78,11 @@ div(
       name="fas fa-link" size="80px"
       :style=`{
         color: 'rgb(38,38,38)',
-        position: 'absolute', zIndex: 200,
+        position: 'absolute', zIndex: 20000,
         top: '-10px',
-        //- left: 'calc(50% - 40px)',
         left: '8px',
       }`)
-    q-btn(
+    //- q-btn(
       @click="stepBack()"
       round flat color="grey-6" icon="clear"
       :style=`{
@@ -123,86 +90,78 @@ div(
         top: '8px', right: '8px',
       }`)
   //- finder
-  div(
+  view-finder(
     v-if="viewId === 'finder'"
-    :style=`{
-      position: 'relative',
-    }`
-    ).row.full-width
-    kalpa-finder(
-      @contentKalpa="itemFound"
-      :pages=`{
-        nodes: {views: ['all']},
-        workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
-        kalpagrama: {views: ['all', 'users', 'nodes']},
-        gif: {views: ['all']},
-        web: {views: ['all', 'image', 'video',]}
-      }`
-      :style=`{
-        //- maxWidth: $store.state.ui.pageWidth+'px',
-        //- height: $q.screen.height+'px',
-        //- height: '400px',
-        height: height-62+'px',
-      }`).b-30
-      //- template(v-slot:header)
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-              height: '60px',
-            }`
-            ).row.full-width.items-center.content-center
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
-            .col
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
-      template(v-slot:tint=`{item}`)
-        div(
-          @click="itemFound(item)"
-          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
-  //- editor
+    @item="itemFound")
   //- add
   div(
     v-if="viewId === null"
-    ).row.full-width
-    q-btn(
-      @click="viewId = 'finder'"
-      flat color="green" icon="add" size="xl"
+    :style=`{
+      position: 'relative',
+      paddingBottom: '50%',
+    }`).row.full-width
+    div(
       :style=`{
-        //- height: '400px',
-        height: height-64+'px',
+        position: 'absolute', zIndex: 100,
+      }`).row.fit
+      q-btn(
+        @click="viewId = 'finder'"
+        flat color="green" icon="add" size="xl"
+        ).fit.b-50
+    //- menu
+    div(
+      :style=`{
+        position: 'fixed', zIndex: 1000, left: '0px', bottom: '0px',
+        paddingBottom: 'calc(8px + env(safe-area-inset-bottom))',
       }`
-      ).full-width.b-50
+      ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-pt-sm
+      div(
+        :style=`{
+          background: 'rgb(40,40,40)',
+          borderRadius: '20px',
+          maxWidth: '400px',
+          minHeight: '66px',
+        }`
+        ).row.full-width.q-pa-sm
+        q-btn(
+          @click="stepBack()"
+          round flat color='white' icon="west")
   //- editor
   div(
     v-if="viewId === 'editor'"
     ).row.full-width.items-start.content-start
-    //- img(
-      :src="joint.items[1].thumbUrl"
-      :style=`{
-        borderRadius: '10px',
-        maxHeight: height-64-60+'px',
-        objectFit: 'contain',
-      }`
-      ).full-width
     node-items-item(
       :item="joint.items[1]"
       :itemOpened="false"
-      :itemActive="true")
+      :itemActive="true"
+      :styles=`{
+        height: '300px',
+        objectFit: 'contain',
+      }`)
     //- small.text-white {{ joint.items[1] }}
-    .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      q-btn(
-        @click="itemEdit"
-        round flat color='white' icon="edit")
-      //- .col
-      q-btn(
-        @click="publish()"
-        color="green" outline no-caps
-        :loading="publishing")
-        span Добавить
-      //- .col
-      q-btn(
-        @click="itemDelete"
-        round flat color='red' icon="delete_outline")
+    div(
+      :style=`{
+        position: 'fixed', zIndex: 1000, left: '0px', bottom: '0px',
+        paddingBottom: 'calc(8px + env(safe-area-inset-bottom))',
+      }`
+      ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-pt-sm
+      div(
+        :style=`{
+          background: 'rgb(40,40,40)',
+          borderRadius: '20px',
+          maxWidth: '400px',
+          minHeight: '66px',
+        }`
+        ).row.full-width.q-pa-sm
+        q-btn(
+          @click="itemDelete"
+          round flat color='white' icon="west")
+        .col
+        q-btn(
+          @click="publish()"
+          color="green" flat no-caps
+          :loading="publishing")
+          span Опубликовать
 </template>
 
 <script>
@@ -210,14 +169,17 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
-import kalpaFinder from 'components/kalpa_finder/index.vue'
+// import kalpaFinder from 'components/kalpa_finder/index.vue'
+import viewFinder from './view_finder.vue'
+import nodeItemsItem from 'components/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointCreator',
   props: ['item', 'height'],
   components: {
-    kalpaFinder,
-    nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
+    // kalpaFinder,
+    viewFinder,
+    nodeItemsItem,
   },
   data () {
     return {

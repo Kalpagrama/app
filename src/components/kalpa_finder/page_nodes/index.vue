@@ -1,40 +1,30 @@
 <template lang="pug">
-q-page(
-  :style=`{
-    paddingTop: '8px',
-  }`).row.full-width.justify-center.q-px-sm
-  //- kalpa-loader(
-    :immediate="true"
-    :query="query" :limit="12" v-slot=`{items,next,nexting}`)
+list-feed(
+  :query="query"
+  :positionSaving="false"
+  :itemStyles=`{
+    paddingBottom: '8px',
+  }`)
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
     div(
       :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
+        position: 'relative',
+        background: 'rgb(35,35,35)',
+        borderRadius: '10px',
       }`
-      ).row.full-width.items-start.content-start
-      q-infinite-scroll(@load="next" :offset="$q.screen.height")
-      div(
-        v-for="(i, ii) in items" :key="ii"
+      ).row.full-width.items-center.content-center.cursor-pointer
+      slot(name="tint" :item="item.populatedObject")
+      img(
+        :src="item.populatedObject.items[0].thumbUrl"
         :style=`{
-          position: 'relative',
-          background: 'rgb(35,35,35)',
+          width: '50px',
+          height: '50px',
           borderRadius: '10px',
-        }`
-        ).row.full-width.items-center.content-center.cursor-pointer.q-mb-sm
-        //- template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="i.populatedObject")
-        img(
-          :src="i.populatedObject.items[0].thumbUrl"
-          :style=`{
-            width: '50px',
-            height: '50px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-          }`)
-        .col
-          .row.fit.items-center.content-center.q-pa-sm
-            span.text-white {{ i.populatedObject.name }}
-      div(:style=`{height: '50px'}`).row.full-width.justify-center
-        q-spinner-dots(v-show="nexting" color="green" size="50px")
+          objectFit: 'cover',
+        }`)
+      .col
+        .row.fit.items-center.content-center.q-pa-sm
+          span.text-white {{ item.populatedObject.name }}
 </template>
 
 <script>

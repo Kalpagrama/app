@@ -1,12 +1,18 @@
 <template lang="pug">
-.row.full-width.items-center.content-center.justify-between.q-pt-md.q-px-md.q-pb-sm
-  q-btn(round flat color="red" icon="delete_outline" @click="nodeDelete()")
+.row.full-width.items-center.content-center.justify-between.q-pt-md.q-px-xs.q-pb-sm
+  q-btn(
+    v-if="(node.name.length > 0 || node.spheres.length > 0)"
+    round flat color="red" icon="delete_outline" @click="nodeDelete()")
   .col
   q-btn(
+    v-if="!node.wsItemType && (node.name.length > 0 || node.spheres.length > 0)"
+    @click="nodeSave()"
+    flat color="grey-5" no-caps) Сохранить
+  q-btn(
+    v-if="node.name.length > 0"
     @click="nodePublish()"
     flat color="green" no-caps
-    :loading="nodePublishing"
-    ) Опубликовать
+    :loading="nodePublishing") Опубликовать
 </template>
 
 <script>
@@ -88,7 +94,12 @@ export default {
     },
     async nodeSave () {
       this.$log('nodeSave')
-      this.$emit('nodeSaved')
+      let nodeInput = JSON.parse(JSON.stringify(this.node))
+      nodeInput.items[0] = this.compositionCreate()
+      let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeSaved', nodeSaved)
+      this.player.setState('figure', null)
+      // this.$emit('nodeSaved')
     },
     async nodePublish () {
       try {
@@ -154,6 +165,7 @@ export default {
       // save draft ?
       else {
         this.player.events.emit('figure-delete')
+        // this.player.setState('figure', null)
       }
     },
     async playerFigureDeleteHandle (e) {
@@ -162,17 +174,18 @@ export default {
         this.player.setState('figure', null)
       }
       else {
-        if (confirm('Сохранить в черновики ?')) {
-          // do staff
-          let nodeInput = JSON.parse(JSON.stringify(this.node))
-          nodeInput.items[0] = this.compositionCreate()
-          let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-          this.$log('nodeSaved', nodeSaved)
-          this.player.setState('figure', null)
-        }
-        else {
-          this.player.setState('figure', null)
-        }
+        // if (confirm('Сохранить в черновики ?')) {
+        //   // do staff
+        //   let nodeInput = JSON.parse(JSON.stringify(this.node))
+        //   nodeInput.items[0] = this.compositionCreate()
+        //   let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+        //   this.$log('nodeSaved', nodeSaved)
+        //   this.player.setState('figure', null)
+        // }
+        // else {
+        //   this.player.setState('figure', null)
+        // }
+        this.player.setState('figure', null)
       }
     },
     playerFigureCreateHandle (e) {

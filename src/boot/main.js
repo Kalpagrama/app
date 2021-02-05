@@ -20,6 +20,7 @@ import userAvatar from 'components/user_avatar/index.vue'
 import kalpaBookmark from 'components/kalpa_bookmark/index.vue'
 import kalpaShare from 'components/kalpa_share/index.vue'
 import kalpaLogo from 'components/kalpa_logo/index.vue'
+import kalpaFinder from 'components/kalpa_finder/index.vue'
 // import kalpaLoader from 'components/kalpa_loader/index.vue'
 import kalpaMenuActions from 'components/kalpa_menu_actions/index.vue'
 import kalpaMenuPopupGlobal from 'components/kalpa_menu_popup_global/index.vue'
@@ -159,7 +160,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaBookmark', kalpaBookmark)
     Vue.component('kalpaShare', kalpaShare)
     Vue.component('kalpaLogo', kalpaLogo)
-    // Vue.component('kalpaLoader', kalpaLoader)
+    Vue.component('kalpaFinder', kalpaFinder)
     Vue.component('kalpaMenuActions', kalpaMenuActions)
     Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
 

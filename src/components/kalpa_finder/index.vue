@@ -1,11 +1,12 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  container).b-30
-  q-header(reveal).b-30
+  container)
+  q-header(reveal)
     div(
       :style=`{
-        paddingTop: 'env(safe-area-inset-top)',
+        //- paddingTop: 'env(safe-area-inset-top)',
+        //- background: 'rgb(35,35,35)',
       }`
       ).row.full-width.justify-center.q-px-sm.b-30
       slot(name="header")
@@ -35,14 +36,17 @@ q-layout(
             maxWidth: $store.state.ui.pageWidth+'px',
           }`)
   q-page-container
-    component(
-      v-bind="$props"
-      :is="`page-${pageId}`"
-      :searchString="searchStringLocal"
-      :page="page"
-      :style=`{}`)
-      template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="item")
+    q-page.row.full-width.justify-center.q-pa-sm
+      component(
+        v-bind="$props"
+        :is="`page-${pageId}`"
+        :searchString="searchStringLocal"
+        :page="page"
+        :style=`{
+          maxWidth: 600+'px',
+        }`)
+        template(v-slot:tint=`{item}`)
+          slot(name="tint" :item="item")
 </template>
 
 <script>

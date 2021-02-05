@@ -1,8 +1,24 @@
 <template lang="pug">
-q-page(
+div(
   :style=`{
     paddingTop: '40px',
-  }`).row.full-width.justify-center
+  }`
+  ).row.full-width
+  list-feed(
+    :query="query"
+    :positionSaving="false"
+    :itemStyles=`{
+      paddingBottom: '8px',
+    }`)
+    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      item(
+        @click.native="$emit('item', item)"
+        :item="item"
+        :style=`{
+        }`
+        ).q-mb-sm
+        template(v-slot:tint=`{item}`)
+          slot(name="tint" :item="item")
   q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000}`).b-30
@@ -19,34 +35,18 @@ q-page(
               'b-40': viewId === v.id
             }`
             :style=`{}`).q-mr-xs.q-px-xs {{ v.name }}
-  //- kalpa-loader(
-    :immediate="true"
-    :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px'
-      }`
-      ).row.full-width.items-start.content-start.q-pa-sm
-      item(
-        v-for="(item,ii) in items" :key="ii"
-        @click.native="$emit('item', item)"
-        :item="item"
-        :style=`{
-        }`
-        ).q-mb-sm
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
+import item from './item.vue'
 
 export default {
   name: 'kalpaFinder_pageWorkspace',
   props: ['searchString', 'page'],
   components: {
-    item: () => import('./item.vue')
+    item,
   },
   data () {
     return {

@@ -1,29 +1,46 @@
 <template lang="pug">
-list-feed(
-  :query="query"
-  :itemStyles=`{
-    //- paddingBottom: '70px',
-  }`
-  :style=`{
-    //- maxWidth: $store.state.ui.pageWidth+'px',
-  }`)
-  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-    joint-item(
-      :joint="item.populatedObject"
-      :oid="oid"
-      @open="$emit('joint', j)")
-  template(v-slot:empty)
-    div(
+.row.full-width.q-px-xs
+  //- header
+  div(
+    :style=`{
+      position: 'relative',
+      minHeight: '60px',
+      textAlign: 'center',
+    }`
+    ).row.full-width.items-center.content-center.justify-center.q-pa-sm
+    span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm Связи
+    span().text-grey-6.text-bold - {{ item.countStat.countJoints }}
+    q-icon(
+      name="fas fa-link" size="80px"
       :style=`{
-        marginTop: '100px',
-      }`
-      ).row.full-width.justify-center
-      span.text-grey-6 Связей пока нет
-      .row.full-width.justify-center.q-py-md
-        q-btn(
-          @click="$emit('create')"
-          color="green" outline no-caps size="lg")
-          span Добавить связь
+        color: 'rgb(38,38,38)',
+        position: 'absolute', zIndex: 200,
+        top: '-10px',
+        left: '8px',
+      }`)
+  //- body
+  div(
+    v-if="jointsRes"
+    :style=`{
+    }`
+    ).row.full-width.q-pa-xs
+    //- gallery
+    div(v-if="jointsRes.items.length > 0").row.full-width
+      joint-item(
+        v-for="(item,itemIndex) in jointsRes.items" :key="item.oid"
+        :joint="item.populatedObject"
+        :oid="oid"
+        @open="$emit('joint', item)")
+    //- no joints, create one
+    div(v-if="jointsRes.items.length === 0").row.full-width.justify-center
+      div(
+        :style=`{
+          marginTop: '140px',
+        }`
+        ).row.full-width.justify-center
+        span(:style=`{fontSize: '18px',}`).text-grey-6 Связей пока нет :(
+        .row.full-width.justify-center.q-pt-sm
+          span.text-grey-6 Будьте первым, нажмите плюсик внизу ↓
 </template>
 
 <script>
@@ -33,12 +50,13 @@ import jointItem from './joint_item.vue'
 
 export default {
   name: 'jointsGallery',
-  props: ['oid'],
+  props: ['oid', 'item'],
   components: {
     jointItem,
   },
   data () {
     return {
+      jointsRes: null,
     }
   },
   computed: {
@@ -55,6 +73,12 @@ export default {
     }
   },
   methods: {
+  },
+  async mounted () {
+    this.jointsRes = await this.$rxdb.find(this.query, true)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
