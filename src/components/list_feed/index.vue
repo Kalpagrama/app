@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- debug top
-  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
+  //- div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
     .row.full-width
       small scrollTop: {{scrollTop}}, scrollHeight: {{scrollHeight}}
     q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
@@ -133,16 +133,20 @@ export default {
         this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
         if (this.itemsResInited) {
           this.$nextTick(() => {
-            this.$log('COMPENSATION')
+            this.$log('CION start')
             // this.scrollUpdate()
             let itemMeta = this.itemsRes.getProperty('itemMeta')
             if (itemMeta) {
               // this.$log('itemMeta', itemMeta)
-              this.$log('itemMeta', itemMeta.key)
+              this.$log('CION itemMeta', itemMeta.key)
               let itemRef = this.$refs[`item-${itemMeta.key}`][0]
-              // this.$log('itemRef', itemRef)
-              this.$log('itemRef.offsetTop', itemRef.offsetTop)
-              this.$q.notify({type: 'positive', position: 'left', message: itemRef.offsetTop})
+              this.$log('CION itemRef', itemRef)
+              this.$log('CION itemRef.offsetTop', itemRef.offsetTop)
+              this.$log('CION this.scrollTarget', this.scrollTarget)
+              this.$log('CION this.itemRef.offsetTop', itemRef.offsetTop)
+              this.$log('CION this.itemMeta.offsetTop', itemMeta.offsetTop)
+              this.$log('CION this.scrollTop', this.scrollTop)
+              // this.$q.notify({type: 'positive', position: 'left', message: itemRef.offsetTop})
               setScrollPosition(this.scrollTarget, itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop)
               // this.prev()
             }
@@ -165,7 +169,7 @@ export default {
     async prev () {
       if (this.itemsRes.hasPrev && !this.itemsPreving) {
         this.$log('prev prev prev')
-        this.$q.notify({message: 'prev prev prev', position: 'right', type: 'positive'})
+        // this.$q.notify({message: 'prev prev prev', position: 'right', type: 'positive'})
         this.itemsPreving = true
         await this.itemsRes.prev()
         await this.$wait(300)
@@ -175,7 +179,7 @@ export default {
     async next () {
       if (this.itemsRes.hasNext && !this.itemsNexting) {
         this.$log('next next next')
-        this.$q.notify({message: 'next next next', position: 'right', type: 'positive'})
+        // this.$q.notify({message: 'next next next', position: 'right', type: 'positive'})
         this.itemsNexting = true
         await this.itemsRes.next()
         await this.$wait(300)
@@ -198,6 +202,7 @@ export default {
     positionSave () {
       this.$log('positionSave')
       let [itemRef] = this.$refs[`item-${this.itemMiddleKey}`]
+      this.$log('itemRef', itemRef)
       if (itemRef) {
         let itemRect = itemRef.getBoundingClientRect()
         this.itemsRes.setProperty('currentId', this.itemMiddleKey)
@@ -213,7 +218,12 @@ export default {
           scrollHeight: this.scrollHeight,
           scrollTop: this.scrollTop
         }
+        // this.$q.notify({type: 'positive', position: 'top', message: 'itemRef.offsetTop::' + itemRef.offsetTop})
+        this.$log('itemMeta', itemMetaInput)
         this.itemsRes.setProperty('itemMeta', itemMetaInput)
+      }
+      else {
+        alert('no itemRef !!!')
       }
     },
     async positionDrop () {

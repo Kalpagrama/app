@@ -87,6 +87,7 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'user',
             path: 'user/:oid/:page?',
             component: () => import('pages/app/user/index.vue'),
             meta: { roleMinimal: 'GUEST' }

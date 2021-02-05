@@ -3,7 +3,7 @@ q-layout(view="hHh Lpr lff")
   q-header(reveal)
     div(v-if="user").row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        //- page-header(:user="user")
+        page-header(:user="user")
         div(
           :style=`{
             position: 'sticky', top: '0px',
@@ -63,7 +63,7 @@ export default {
   computed: {
     tabs () {
       return [
-        {id: 'collections', name: 'Коллекции', icon: 'folder_special', count: 11},
+        // {id: 'collections', name: 'Коллекции', icon: 'folder_special', count: 11},
         {id: 'nodes', name: 'Ядра', icon: 'panorama_fish_eye', count: 356},
         {id: 'joints', name: 'Связи', icon: 'panorama_fish_eye', count: 356},
         {id: 'votes', name: this.$t('Votes', 'Голоса'), icon: 'adjust', count: 12},
