@@ -38,7 +38,7 @@ q-layout(view="lHh lpR lFf")
         ).row.full-width.b-40
         kalpa-menu-mobile
   q-page-container
-    router-view
+    router-view(v-if="$store.state.ui.nodeCategories.length > 0")
 </template>
 
 <script>
@@ -57,8 +57,8 @@ export default {
     return {
     }
   },
-  async mounted () {
-    this.$log('mounted')
+  async created () {
+    this.$log('created')
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },

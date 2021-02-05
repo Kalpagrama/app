@@ -15,6 +15,7 @@ q-layout(view="hHh Lpr lff")
               placeholder="Поиск"
               flat borderless dark
               icon="search"
+              :debounce="500"
               :style=`{}`
               :input-style=`{
                 color: 'white',
