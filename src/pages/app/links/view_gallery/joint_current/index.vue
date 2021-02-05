@@ -7,35 +7,36 @@ div(
   div(
     :style=`{
       position: 'relative',
-      overflow: 'hidden',
+      //- overflow: 'hidden',
       minHeight: '60px',
       textAlign: 'center',
       paddingLeft: '60px', paddingRight: '60px',
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-    span(v-if="joint.vertices[0] === 'ESSENCE'").text-white {{ joint.name }}
-    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white Ассоциация
+    span(v-if="joint.vertices[0] === 'ESSENCE'").text-white.text-bold {{ joint.name }}
+    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold Ассоциация
     div(v-else).row.full-width
       .row.full-width.justify-center
-        span.text-white {{ $nodeItemType(joint.vertices[itemIndex === 1 ? 0 : 1]).name }}
+        span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex === 1 ? 0 : 1]).name }}
       .row.full-width.justify-center
-        span.text-white {{ $nodeItemType(joint.vertices[itemIndex]).name }}
+        span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex]).name }}
     q-icon(
       name="fas fa-link" size="80px"
       :style=`{
         color: 'rgb(38,38,38)',
-        position: 'absolute', zIndex: 200,
+        position: 'absolute', zIndex: 20000,
         top: '-10px',
         //- left: 'calc(50% - 40px)',
         left: '8px',
       }`)
-    q-btn(
+    //- q-btn(
       @click="$emit('close')"
       round flat color="grey-6" icon="clear"
       :style=`{
         position: 'absolute', zIndex: 200,
         top: '8px', right: '8px',
       }`)
+  //- body
   node-feed(
     :node="joint"
     :isActive="true"
@@ -49,32 +50,49 @@ div(
           position: 'relative',
         }`
         ).row.full-width.items-start.content-start
-        q-btn(
-          v-if="true"
-          round flat color="green" icon="fas fa-link"
-          :to="'/links/'+joint.items[itemIndex].oid"
-          :style=`{
-            position: 'absolute', zIndex: 1000,
-            right: '8px',
-            top: 'calc(50% - 20px)',
-          }`)
         node-items-item(
           :item="joint.items[itemIndex]"
           :itemOpened="false"
-          :itemActive="true")
+          :itemActive="true"
+          :styles=`{
+            height: '300px',
+            objectFit: 'contain',
+          }`)
+  //- footer
+  div(
+    :style=`{
+      position: 'fixed', bottom: '0px', left: '0px', zIndex: 1000,
+      paddingBottom: 'calc(8px + env(safe-area-inset-bottom))'
+    }`
+    ).row.full-width.items-center.content-center.justify-center.q-px-sm.q-pt-sm
+    div(
+      :style=`{
+        background: 'rgb(40,40,40)',
+        borderRadius: '20px',
+        maxWidth: '400px',
+      }`).row.full-width.justify-between.q-pa-sm
+        q-btn(round flat color="white" icon="west" @click="$emit('close')")
+        q-btn(
+          @click="$emit('create')"
+          color="green" icon="add"
+          :style=`{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+          }`)
+        q-btn(
+          :to="'/links/'+joint.items[itemIndex].oid"
+          round flat color="green" icon="fas fa-link")
 </template>
 
 <script>
-import nodeFeed from 'components/node_feed/index.vue'
 import nodeItemsItem from 'components/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointCurrent',
-  props: ['item', 'joint', 'height'],
+  props: ['item', 'joint'],
   components: {
-    nodeFeed,
     nodeItemsItem,
-    // nodeItemsItem: () => import('components/node_feed/node_items_item.vue'),
   },
   data () {
     return {

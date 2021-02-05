@@ -18,7 +18,7 @@ div(
           maxWidth: 600+'px',
         }`).row.full-width.items-start.content-start
         //- header
-        .row.full-width.q-pt-md.q-px-md
+        .row.full-width.q-pt-sm.q-px-md
           .row.full-width.items-center.content-center
             .col.q-pa-sm
               span.text-white.text-bold {{ contentKalpa.name }}

@@ -73,6 +73,7 @@ div(
       position: 'absolute', zIndex: 1000, bottom: '8px',
     }`
     ).row.full-width.justify-center
+    slot(name="tint-bar" :tintFocused="true")
     div(
       :style=`{
         maxWidth: '300px',

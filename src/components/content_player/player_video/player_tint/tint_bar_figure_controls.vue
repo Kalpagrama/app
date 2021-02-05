@@ -55,7 +55,7 @@ export default {
         if (this.player.figureFocused) {
         }
         this.$log('player.currentTime TO', to)
-        if (to >= this.player.figure[1].t + 0.1) {
+        if (to >= this.player.figure[1].t + 0) {
           this.$log('to >= this.end', to, this.player.figure[1].t)
           // this.$q.notify({type: 'negative', position: 'top', message: 'to >= this.end' + to + ' / ' + this.player.figure[1].t})
           // this.player.setCurrentTime(this.player.figure[0].t)
@@ -67,9 +67,9 @@ export default {
             this.player.pause()
           }
         }
-        if (to < this.player.figure[0].t - 0.1) {
+        if (to < this.player.figure[0].t - 0.5) {
           this.$log('to < this.start', to, this.player.figure[0].t)
-          // this.$q.notify({type: 'negative', position: 'top', message: 'to < this.start' + to + ' / ' + this.player.figure[0].t})
+          this.$q.notify({type: 'negative', position: 'top', message: 'to < this.start' + to + ' / ' + this.player.figure[0].t})
           this.player.setCurrentTime(this.player.figure[0].t)
           // this.player.pause()
           // this.figureReplay()

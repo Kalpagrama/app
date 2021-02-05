@@ -12,15 +12,15 @@ div(
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
       span.text-white.text-bold.q-ml-sm Заметки {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
       .col
-      q-btn(
-        @click="drop()"
-        outline color="red" no-caps dense) Drop
-      q-btn(
-        @click="prev()"
-        outline color="white" no-caps dense) Prev
-      q-btn(
-        @click="next()"
-        outline color="white" no-caps dense) Next
+      //- q-btn(
+      //-   @click="drop()"
+      //-   outline color="red" no-caps dense) Drop
+      //- q-btn(
+      //-   @click="prev()"
+      //-   outline color="white" no-caps dense) Prev
+      //- q-btn(
+      //-   @click="next()"
+      //-   outline color="white" no-caps dense) Next
       kalpa-menu-actions(
         icon="tune" color="white"
         :actions="itemsActions")

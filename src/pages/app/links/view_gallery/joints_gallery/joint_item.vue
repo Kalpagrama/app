@@ -26,6 +26,7 @@ div(
         :style=`{
           objectFit: 'cover',
           borderRadius: '10px',
+          userSelect: 'none',
         }`
         ).fit
       //- tint

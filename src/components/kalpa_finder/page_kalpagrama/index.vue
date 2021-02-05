@@ -79,11 +79,12 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'VIDEO', name: 'Видео', selector: {types: ['VIDEO']}},
-        {id: 'IMAGE', name: 'Картинки', selector: {types: ['IMAGE']}},
+        // {id: 'VIDEO', name: 'Видео', selector: {types: ['VIDEO']}},
+        // {id: 'IMAGE', name: 'Картинки', selector: {types: ['IMAGE']}},
+        {id: 'CONTENT', name: 'Медиа', selector: {types: ['VIDEO', 'IMAGE', 'BOOK']}},
         {id: 'NODE', name: 'Ядра', selector: {types: ['NODE']}},
         {id: 'JOINT', name: 'Связи', selector: {types: ['JOINT']}},
-        {id: 'USER', name: 'Люди', selector: {types: ['USER']}},
+        // {id: 'USER', name: 'Люди', selector: {types: ['USER']}},
         {id: 'SPHERE', name: 'Сферы', selector: {types: ['WORD', 'SENTENCE']}}
       ].filter(t => {
         if (this.kalpaTypes) return this.kalpaTypes.includes(t.id)

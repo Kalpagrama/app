@@ -4,7 +4,7 @@ div(
     position: 'relative',
     minHeight: '100vh'
   }`).row.full-width.bg-black
-  //- right shit
+  //- body desktop
   nav-desktop(
     v-if="$q.screen.width >= 1200"
     :pageId="pageId"
@@ -35,9 +35,9 @@ div(
         :style=`{
           //- background: 'rgba(0,0,0,0.5)',
         }`)
-  //- body
+  //- body mobile
   div(
-    v-if="player && !player.figure"
+    v-if="player && !player.figure && $q.screen.width < 1200"
     :style=`{
       paddingTop: pageId ? contentHeightComputed+'px' : '0px',
     }`
@@ -48,22 +48,22 @@ div(
       :contentKalpa="contentKalpa"
       :player="player"
       :query="query"
-      :height="$q.screen.height-contentHeightComputed")
-  //- header node editor
+      :height="$q.screen.height-contentHeightComputed"
+      @pageId="pageId = $event")
+  //- node editor mobile
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     node-editor-popup(
-      v-if="player && player.figure && $q.screen.xs"
+      v-if="player && player.figure && $q.screen.width < 1200"
       :player="player" :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px',
       }`).q-pt-sm.q-px-sm
-  //- header
+  //- body fixed for all
   div(
     :style=`{
       position: 'fixed', zIndex: 10,
       top: 0+'px',
-      //- height: pageId ? contentHeight+'px' : 'calc('+($q.screen.height-70)+'px - env(safe-area-inset-bottom))',
       height: 'calc('+ contentHeightComputed +'px - env(safe-area-inset-bottom))'
     }`).row.full-width
     content-player(
@@ -92,41 +92,24 @@ div(
             :background="'rgba(30,30,30,0.6)'"
             :style=`{
             }`).q-pt-sm.q-px-sm
-  //- footer
-  div(:style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
+  //- footer mobile
+  div(
+    v-if="$q.screen.width < 1200"
+    :style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
     div(
       :style=`{
-        //- maxWidth: $store.state.ui.pageWidth+'px',
         maxWidth: 600+'px',
         paddingBottom: 'env(safe-area-inset-bottom)',
         borderRadius: '10px 10px 0 0',
       }`).row.full-width.b-40
-      //- nav-mobile(
-        v-if="player"
-        @pageId="pageIdChange"
-        :pageId="pageId"
-        :style=`{
-          zIndex: 1000,
-          borderRadius: '10px 10px 0 0',
-        }`).b-40
       nav-mobile(
-        v-if="player && !player.figure && $q.screen.width < 1200"
+        v-if="player && !player.figure"
         :contentKalpa="contentKalpa"
         :player="player"
         @pageId="pageIdChange"
         :pageId="pageId"
         :style=`{
           zIndex: 1000,
-          borderRadius: '10px 10px 0 0',
-        }`).b-40
-      //- node-editor(
-        v-if="player && player.figure"
-        :player="player"
-        :contentKalpa="contentKalpa"
-        @toggle="editorHeight === 70 ? editorHeight = 200 : editorHeight = 70"
-        :isOpened="editorHeight === 200"
-        :style=`{
-          height: editorHeight+'px',
           borderRadius: '10px 10px 0 0',
         }`).b-40
 </template>

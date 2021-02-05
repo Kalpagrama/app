@@ -2,7 +2,8 @@
 component(
   v-if="item"
   :is="`view-${viewId}`"
-  :item="item")
+  :item="item"
+  :key="item.oid")
 </template>
 
 <script>
@@ -42,13 +43,10 @@ export default {
   mounted () {
     // this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
-    // document.body.style.background = 'black !important'
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
-    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }
 }
 </script>

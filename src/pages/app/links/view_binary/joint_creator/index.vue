@@ -5,7 +5,7 @@ div(
   }`
   ).row.full-width
   //- itemFinder
-  q-dialog(
+  //- q-dialog(
     v-model="itemFinderShow"
     position="bottom" maximized)
     kalpa-finder(
