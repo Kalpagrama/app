@@ -12,6 +12,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
+import { UserApi } from 'src/api/user'
 
 export default {
   name: 'nodeEditorActions',
@@ -92,23 +93,47 @@ export default {
     async nodePublish () {
       try {
         this.$log('nodePublish start')
+        // ---
+        // loading
         this.nodePublishing = true
         await this.$wait(1000)
+        // ---
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))
         nodeInput.items[0] = this.compositionCreate()
         this.$log('nodeInput', nodeInput)
+        // ---
         // create node, publish this shit
         let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$emit('nodePublished', createdNode)
         // this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
+        // ---
         // delete draft if it is a draft, man
         if (nodeInput.wsItemType === 'WS_NODE') {
           // await this.node.remove(true)
           await this.$rxdb.remove(this.node.id)
         }
+        // ---
+        // add content to bookmarks if all is good...
+        let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+        if (bookmark) {
+          // revive ?
+        }
+        else {
+          let bookmarkInput = {
+            type: this.contentKalpa.type,
+            oid: this.contentKalpa.oid,
+            name: this.contentKalpa.name,
+            thumbUrl: this.contentKalpa.thumbUrl,
+            isSubscribed: true
+          }
+          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+          if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
+        }
+        // ---
         // done
         this.nodePublishing = false
+        // ---
         // kill player figure, it will destroy node editor
         this.player.setState('figure', null)
       }
