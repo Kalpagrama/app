@@ -5,27 +5,32 @@
 </style>
 
 <template lang="pug">
-list-feed(
-  :query="query"
-  :itemStyles=`{
-    paddingBottom: '70px',
-  }`
-  :style=`{
-  }`)
-  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-    div(
-      v-if="item.type === 'USER'"
-      @click="$router.push('/user/'+item.oid)"
-      ).row.fit.items-center.content-center
-      img(
-        draggable="false"
-        :src="item.thumbUrl"
+.row.full-width.q-px-sm
+  list-feed(
+    :query="query"
+    :itemStyles=`{
+      paddingBottom: '8px',
+    }`
+    :style=`{
+    }`)
+    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      div(
+        v-if="item.type === 'USER'"
+        @click="$router.push('/user/'+item.oid)"
         :style=`{
-          width: '30px',
-          height: '30px',
-          borderRadius: '50%',
-        }`).q-mr-sm
-      span.text-white {{ teim.name }}
+          background: 'rgb(35,35,35)',
+          borderRadius: '10px',
+        }`
+        ).row.fit.items-center.content-center.q-pa-sm
+        img(
+          draggable="false"
+          :src="item.thumbUrl"
+          :style=`{
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+          }`).q-mr-sm
+        span.text-white {{ item.name }}
 </template>
 
 <script>

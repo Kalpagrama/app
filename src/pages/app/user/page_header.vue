@@ -75,13 +75,13 @@
             small.text-grey-7.q-mr-md Рейтинг
           //- following
           router-link(
-            :to=`{params: {tab: 'following'}}`
+            :to=`{params: {page: 'following'}}`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
             small.text-grey-7.q-mr-md Подписки
           //- followers
           router-link(
-            :to=`{params: {tab: 'followers'}}`
+            :to=`{params: {page: 'followers'}}`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
             small.text-grey-7 Подписчики
