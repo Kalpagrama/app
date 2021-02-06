@@ -29,7 +29,8 @@ div(
         :style=`{
           maxWidth: 600+'px',
           marginBottom: '300px',
-        }`)
+        }`
+        @ready="listFeedReady")
         //- template(v-slot:prepend)
         template(v-slot:item=`{item: group,itemIndex,isActive,isVisible}`)
           //- group
@@ -153,28 +154,34 @@ export default {
     },
     async setCurrentItem (item) {
       this.$log('setCurrentItem', item.oid)
-      let itemsRes = this.$refs['list-feed'].itemsRes
-      itemsRes.setProperty('currentId', item.oid)
-      await itemsRes.gotoCurrent()
+      let listFeedRef = this.$refs['list-feed']
+      if (listFeedRef) {
+        let itemsRes = listFeedRef.itemsRes
+        if (itemsRes) {
+          itemsRes.setProperty('currentId', item.oid)
+          await itemsRes.gotoCurrent()
+        }
+      }
     },
     async setSelectedItem (item) {
       this.$log('setSelected', item.oid)
       this.itemSelectedOid = item.oid
     },
+    async listFeedReady () {
+      this.$log('listFeedReady')
+      let nodeOid = this.$store.state.ui.nodeOnContent
+      if (nodeOid) {
+        await this.setCurrentItem({oid: nodeOid})
+        await this.setSelectedItem({oid: nodeOid})
+        this.$store.commit('ui/stateSet', ['nodeOnContent', null])
+      }
+    }
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(500)
-    let nodeOid = this.$store.state.ui.nodeOnContent
-    this.$log('nodeOid', nodeOid)
-    if (nodeOid) {
-      // this.$emit('pageId', 'nodes')
-      await this.$wait(500)
-      await this.setCurrentItem({oid: nodeOid})
-      await this.setSelectedItem({oid: nodeOid})
-      this.$store.commit('ui/stateSet', ['nodeOnContent', null])
-      // this.$emit('pageId', 'nodes')
-    }
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

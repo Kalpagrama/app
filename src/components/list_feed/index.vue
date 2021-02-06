@@ -152,6 +152,9 @@ export default {
             }
           })
         }
+        else {
+          this.$emit('ready')
+        }
         // first load done
         this.itemsResInited = true
       }
@@ -195,6 +198,10 @@ export default {
       if (isVisible) {
         if (!this.positionSaving) return
         this.itemMiddleKey = entry.target.accessKey
+        // prevent feed position save glitch
+        // let itemMeta = this.itemsRes.getProperty('itemMeta')
+        // if (itemMeta && !this.itemsResInited) return
+        // position save
         this.positionSave()
       }
       // TODO: handle -1
