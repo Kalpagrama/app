@@ -296,7 +296,7 @@ class ReactiveDocFactory {
 const GROUP_BATCH_SZ = 12
 
 class Group {
-   constructor (id, populateFunc = null, paginateFunc = null, propsReactive = {}) {
+   constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       assert(id && typeof id === 'string')
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
@@ -306,6 +306,7 @@ class Group {
          data: {
             reactiveGroup: {
                id,
+               name,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
                items: [], // кусочек от this.pages (для каждого item вызывается populate)
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
@@ -592,7 +593,8 @@ class Group {
       if (this.reactiveGroup.itemType === 'GROUP') {
          let makeNextGroup = async (nextGroup) => {
             let {
-               id,
+               id: groupId,
+               name: groupName,
                items,
                totalCount,
                nextPageToken,
@@ -601,15 +603,15 @@ class Group {
                figuresAbsolute,
                thumbUrl
             } = nextGroup
-            assert(id, '!id')
-            if (!items || !totalCount) {
-               logD('asdfasdfsadfsadf')
-            }
+            assert(groupId, '!groupId')
+            assert(groupName, '!groupName')
+            // if (!items || !totalCount) {
+            //    logD('asdfasdfsadfsadf')
+            // }
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
-            let groupId = id // figuresAbsolute ? JSON.stringify(figuresAbsolute) : null
             Vue.set(this.propsReactive, '')
-            let group = new Group(groupId, this.populateFunc, null, this.propsReactive)
+            let group = new Group(groupId, groupName, this.populateFunc, null, this.propsReactive)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
             Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
@@ -857,7 +859,7 @@ class ReactiveListWithPaginationFactory {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
-         this.group = new Group(listId, populateFunc, paginateFunc, propsReactive)
+         this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'whole')
          rxQueryOrRxDoc.reactiveListHolderMaster[listId] = this
       }

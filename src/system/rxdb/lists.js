@@ -301,7 +301,7 @@ class Lists {
          })
          rxDocs = [...rxDocs, ...rxDocsFeed]
       }
-      logD(f, 'finded lists: ', rxDocs)
+      logD(f, 'finded lists: ', rxDocs.map(rxDoc => rxDoc.id))
       for (let rxDoc of rxDocs) {
          await this.addRemoveObjectToRxDoc(type, rxDoc, object)
       }

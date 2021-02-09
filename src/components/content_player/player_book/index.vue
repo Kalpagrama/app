@@ -135,7 +135,7 @@ export default {
     theme: {
       type: String,
       required: true,
-      default: 'night'
+      default: 'beige'
     },
     progress: {
       type: Number,

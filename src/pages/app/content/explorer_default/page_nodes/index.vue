@@ -42,21 +42,8 @@ div(
             ).row.full-width.items-start.content-start.q-pb-sm.q-mb-sm
             //- group header
             .row.full-width.q-py-sm.q-px-md
-              div(
-                v-if="contentKalpa.type === 'VIDEO'"
-                ).row.full-width
-                div(
-                  v-if="group.figuresAbsolute.length"
-                  ).row.full-width.q-pa-sm
-                  .row.full-height.items-center.content-center
-                    span.text-white.text-bold {{group.figuresAbsolute.length ? $time(group.figuresAbsolute[0].t) + '–' : 'весь контент' }}
-                    span.text-white.text-bold {{ group.figuresAbsolute.length > 1 ? $time(group.figuresAbsolute[1].t) : '' }}
-                  .col
-                  span.text-white.text-bold {{ group.totalCount }}
-              div(
-                v-else
-                ).row.full-width
-                span.text-white Группа: {{itemIndex+1}}
+              div().row.full-width
+                span.text-white.text-bold {{group.name}}
             .row.full-width
               //- prev
               .row.full-width.q-px-sm

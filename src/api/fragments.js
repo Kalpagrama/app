@@ -160,6 +160,9 @@ const figureFragment = gql`
       }
       epubCfi
       epubCfiText
+      epubChapterId
+      epubTocId
+      epubHref
   }
 `
 
@@ -392,6 +395,7 @@ const topObjectFragment = gql`${figureFragment}
 `
 const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFragment}
     fragment groupFragment on Group {
+        name
         figuresAbsolute{...figureFragment}
         groupThumbUrl: thumbUrl(preferWidth: 50)
         totalCount
