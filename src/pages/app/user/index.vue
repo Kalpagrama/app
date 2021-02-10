@@ -1,8 +1,8 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    div(v-if="user").row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    .row.full-width.justify-center
+      div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         page-header(:user="user")
         div(
           :style=`{

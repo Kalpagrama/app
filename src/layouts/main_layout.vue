@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="lHh lpR lFf")
-  q-drawer(
+  //- q-drawer(
     v-if="$q.screen.lt.md"
     side="left" no-swipe-open
     :value="$store.state.ui.mobileMenuShow"

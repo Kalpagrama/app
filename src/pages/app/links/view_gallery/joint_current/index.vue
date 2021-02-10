@@ -70,7 +70,7 @@ div(
         background: 'rgb(40,40,40)',
         borderRadius: '20px',
         maxWidth: '400px',
-      }`).row.full-width.justify-between.q-pa-sm
+      }`).row.full-width.items-center.content-center.justify-between.q-pa-sm
         q-btn(round flat color="white" icon="west" @click="$emit('close')")
         q-btn(
           @click="$emit('create')"
