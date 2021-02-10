@@ -1,7 +1,13 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
-import { RxCollectionEnum, LstCollectionEnum, checkMangoCond } from 'src/system/rxdb/common'
+import {
+   RxCollectionEnum,
+   LstCollectionEnum,
+   checkMangoCond,
+   getChapterIdFromCfi,
+   getTocIdFromCfi
+} from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { EpubCFI } from 'epubjs'
@@ -94,18 +100,21 @@ class Lists {
       // на тот случай, что события о создании объекта пришли раньше того, как объект был помещен в ленты
       if (rxDoc.props.mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_SPHERE_ITEMS) {
          assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
-         for (let { type, relatedSphereOids, oidObject } of await Lists.getObjectsWithRelatedSpheres()) {
+         let objectsWithRelatedSpheres = await Lists.getObjectsWithRelatedSpheres()
+         let processedOids = []
+         for (let { type, relatedSphereOids, oidObject } of objectsWithRelatedSpheres) {
             assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
             if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
                await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oidObject })
-               // let indx = listItems.findIndex(el => el.oid === oidObject)
-               // if (indx === -1 && type === 'OBJECT_CREATED') {
-               //    listItems.push({ oid: oidObject }) // если нет такого - создадим
-               // } else if (indx >= 0 && type === 'OBJECT_DELETED') {
-               //    listItems.splice(indx, 1) // удалим
-               // }
+               processedOids.push(oidObject)
             }
          }
+         // удаляем из списка те, что добавились в ленты
+         objectsWithRelatedSpheres = objectsWithRelatedSpheres.filter(item => !processedOids.includes(item.oidObject))
+         await rxdb.set(RxCollectionEnum.META, {
+            id: 'objectsWithRelatedSpheres',
+            valueString: JSON.stringify(objectsWithRelatedSpheres)
+         })
       }
       return rxDoc
    }
@@ -147,6 +156,7 @@ class Lists {
       logD('apply to rxdoc', rxDoc.id, mangoQuery)
       let reactiveItem = getReactiveDoc(rxDoc).getPayload()
       let foundGroup
+      let objectFiguresAbsoluteList = []
       if (!mangoQuery.selector.groupByContentLocation) { // список без группировки
          foundGroup = reactiveItem
       } else { // список c группировкой
@@ -162,9 +172,18 @@ class Lists {
                   logE('TODO polygonInresects')
                   return false
                }
-               let epubCfiIntersects = (figureLeft, figureRight) => { // пересечение куков книги
+               let epubCfiIntersects = (figureLeft, figureRight) => { // пересечение куcков книги
                   if (!figureLeft.epubCfi && !figureRight.epubCfi) return true
-                  logE('TODO epubCfiInresects')
+                  if (figureLeft.epubChapterId && figureRight.epubCfi) {
+                     let tocIdRight = getTocIdFromCfi(figureRight.epubCfi) || ''
+                     let tocIdLeft = figureLeft.epubTocId || ''
+                     return getChapterIdFromCfi(figureRight.epubCfi) === figureLeft.epubChapterId && tocIdRight === tocIdLeft
+                  } else if (figureRight.epubChapterId && figureLeft.epubCfi) {
+                     let tocIdRight = figureRight.epubTocId || ''
+                     let tocIdLeft = getTocIdFromCfi(figureLeft.epubCfi) || ''
+                     return getChapterIdFromCfi(figureLeft.epubCfi) === figureRight.epubChapterId && tocIdRight === tocIdLeft
+                  }
+                  logE('TODO epubCfiInresects сделать реальную имплементацию пересечения epubCfi!!!')
                   return false
                }
                for (let i = 0; i < figuresAbsoluteLeft.length; i++) {
@@ -198,6 +217,7 @@ class Lists {
             if (reactiveItem.items.length === 0) {
                // создадим первую группу руками
                let group = {
+                  name: 'whole',
                   items: [],
                   totalCount: 0,
                   nextPageToken: null,
@@ -214,6 +234,8 @@ class Lists {
                assert(groupFiguresAbsolute, '!group.figuresAbsolute')
                // вернет все области контента, задествованные на этом ядре
                let findObjectFigures = (objectFull, contentOid) => {
+                  assert(objectFull.type.in('NODE', 'JOINT'), 'bad type essence')
+                  assert(objectFull.items, '!essence items')
                   let res = []
                   for (let item of objectFull.items) {
                      if (item.type === 'COMPOSITION') {
@@ -221,17 +243,18 @@ class Lists {
                         for (let layer of item.layers) {
                            if (layer.contentOid === contentOid) res.push(layer.figuresAbsolute)
                         }
-                     } else if (item.type === 'NODE') {
-                        res.push(...findObjectFigures(item, contentOid))
-                     } else if (item.type.in('VIDEO', 'BOOK', 'IMAGE')) {
-                        if (item.oid === contentOid) res.push([])
-                     } else {
+                     } else if (item.type.in('NODE', 'JOINT')) {
+                        res.push(...findObjectFigures(item, contentOid)) // рекурсивно идем внутрь
+                     } else if (item.oid === contentOid) {
+                        res.push([]) // весь контент
+                     }
+                     else {
                         throw new Error('bad item!: ' + JSON.stringify(item))
                      }
                   }
                   return res
                }
-               let objectFiguresAbsoluteList = findObjectFigures(objectFull, contentOid)
+               objectFiguresAbsoluteList = findObjectFigures(objectFull, contentOid)
                for (let objectFiguresAbsolute of objectFiguresAbsoluteList) {
                   assert(objectFiguresAbsolute, '!objectFiguresAbsolute')
                   if (intersects(groupFiguresAbsolute, objectFiguresAbsolute)) {
@@ -249,10 +272,11 @@ class Lists {
       if (foundGroup) {
          assert(foundGroup.items, '!foundGroup.items')
          assert(foundGroup.totalCount >= 0, 'foundGroup.totalCount >= 0')
+         // { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes }
          let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
-               foundGroup.items.splice(0, 0, { oid: object.oid })
+               foundGroup.items.splice(0, 0, { oid: object.oid, figuresAbsoluteList: objectFiguresAbsoluteList })
                foundGroup.totalCount++
             }
          } else if (type === 'OBJECT_DELETED') {

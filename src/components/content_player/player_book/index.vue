@@ -91,6 +91,7 @@ import {Book, EpubCFI} from 'epubjs'
 import debounce from 'lodash/debounce'
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 
 export default {
   name: 'contentPlayer_book',
@@ -170,7 +171,7 @@ export default {
       lastAnnotation: null, // текущее выделение
       figure: null, // текущее выделение TODO почему называется figure, а не figuresAbsolute???
       events: {},
-      chapterWithNodes: [] // главы, в которых отображены ядра
+      findRes: null // список всех ядер на контенте
     }
   },
   watch: {
@@ -512,27 +513,39 @@ export default {
         // }
       }
     },
-    async showAllNodes(сhapterId) {
-      if (this.chapterWithNodes.includes(сhapterId)) return
-      this.chapterWithNodes.push(сhapterId)
-      let findRes = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-          // objectTypeEnum: { $in: ['NODE'] },
-          oidSphere: this.contentKalpa.oid,
-          sortStrategy: 'AGE',
-          groupByContentLocation: true
-        },
-        populateObjects: false,
-      })
-      this.$log('allNodes', findRes)
-      for (let group of findRes.items) {
+    async showAllNodesForCurrentLocation() {
+      let currentLocation = await this.rendition.currentLocation()
+      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
+      let tocId = getTocIdFromCfi(currentLocation.start.cfi)
+      if (!this.findRes){
+        this.findRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+            objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+            // objectTypeEnum: { $in: ['NODE'] },
+            oidSphere: this.contentKalpa.oid,
+            sortStrategy: 'AGE',
+            groupByContentLocation: true
+          },
+          populateObjects: false,
+        })
+        // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
+        this.$watch('findRes.items', async (newVal, oldVal) => {
+          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          await this.showAllNodesForCurrentLocation()
+        }, {
+          immediate: false
+        })
+      }
+      // this.$log('allNodes', this.findRes)
+      for (let group of this.findRes.items) {
         let {epubChapterId, epubTocId, epubHref} = group.figuresAbsolute[0]
-        if (сhapterId !== epubChapterId) continue
+        tocId = tocId || epubTocId
+        if (chapterId !== epubChapterId && tocId !== epubTocId) continue
         for (let item of group.items) {
           let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
           for (let figuresAbsolute of figuresAbsoluteList) {
+            this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
             this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, {}, async (e) => {
               this.$logE('highlight clicked', item)
             }, undefined, {
@@ -622,8 +635,9 @@ export default {
           if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
           this.contentBookmark.meta.currentCfi = location.start.cfi
         }
-        let chapterId = location.start.cfi.match(/epubcfi\(.*\[(.*)\]!/)[1]
-        await this.showAllNodes(chapterId)
+        // let chapterId = getChapterIdFromCfi(location.start.cfi)
+        // let tocId = getTocIdFromCfi(location.start.cfi)
+        await this.showAllNodesForCurrentLocation()
       })
     }
 

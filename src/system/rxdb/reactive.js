@@ -461,9 +461,15 @@ class Group {
          for (let item of pageItems) {
             if (item.__typename === 'Group') {
                assert(item.figuresAbsolute, '!item.figuresAbsolute')
+               assert(item.items, '!group.items')
                item.id = JSON.stringify(item.figuresAbsolute)
             }
          }
+         // не показываем пустые группы
+         pageItems = pageItems.filter(item => {
+            if (item.__typename === 'Group' && !item.items.length) return false
+            return true
+         })
          if (mangoQuery.selector.groupByContentLocation) {
             itemType = 'GROUP'
             itemPrimaryKey = 'id'
@@ -618,7 +624,7 @@ class Group {
             Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
             Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
             await group.upsertPaginationPage(items, 'whole')
-            await group.next(3) // сразу грузим по 3 ядра в группе
+            await group.next(this.populateFunc ? 3 : null) // сразу грузим по 3 ядра в группе (исли нужны полные сущности)
             return group.reactiveGroup
          }
          nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))

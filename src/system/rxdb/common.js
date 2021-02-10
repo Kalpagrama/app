@@ -85,6 +85,18 @@ function checkMangoCond (mangoCond, value) {
    else throw new Error(`bad mangoCond ${mangoCond}`)
 }
 
+function getChapterIdFromCfi (epubCfi) {
+   let chapterId = epubCfi.match(/(?<=epubcfi\(.*\[).*(?=\]!)/)[0]
+   assert(chapterId)
+   return chapterId
+}
+
+function getTocIdFromCfi (epubCfi) {
+   let chapterId = epubCfi.match(/(?<=epubcfi\(.*!.*\[).*(?=\])/)[0]
+   assert(chapterId)
+   return chapterId
+}
+
 async function rxdbOperationProxyExec (collection, operation, ...params) {
    assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
    const f = rxdbOperationProxyExec
@@ -124,5 +136,7 @@ export {
    RxCollectionEnum,
    checkMangoCond,
    rxdbOperationProxy,
-   rxdbOperationProxyExec
+   rxdbOperationProxyExec,
+   getChapterIdFromCfi,
+   getTocIdFromCfi
 }
