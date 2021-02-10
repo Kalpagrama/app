@@ -4,7 +4,7 @@ list-feed(
   :itemStyles=`{
     paddingBottom: '50px',
   }`)
-  template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
     node-feed(
       :node="item.populatedObject"
       :isActive="isActive"

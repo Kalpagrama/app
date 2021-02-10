@@ -18,6 +18,11 @@
         top: '-10px',
         left: '8px',
       }`)
+  //- debug
+  //- .row.full-width
+    q-btn(no-caps outline @click="jointsRes.gotoStart()") To start
+    q-btn(no-caps outline @click="jointsRes.prev()") Prev
+    q-btn(no-caps outline @click="jointsRes.next()") Next
   //- body
   div(
     v-if="jointsRes"
@@ -69,6 +74,16 @@ export default {
           sortStrategy: 'AGE',
         },
         populateObjects: true,
+      }
+    }
+  },
+  watch: {
+    'jointsRes.hasPrev': {
+      handler (to, from) {
+        this.$log('jointsRes.hasPrev TO', to)
+        if (to === true) {
+          this.jointsRes.gotoStart()
+        }
       }
     }
   },

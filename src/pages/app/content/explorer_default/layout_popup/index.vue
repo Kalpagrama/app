@@ -16,14 +16,18 @@ div(
       width: '70px',
     }`
     ).row
+  transition(enter-active-class="animated slideInRight" leave-active-class="animated slideInRight")
     div(
-      v-if="player && pageId"
+      v-if="$q.screen.width >= 1200 && player && pageId"
       :style=`{
         position: 'absolute', zIndex: 1010,
-        top: -(($q.screen.height-350)/2)+60+'px',
-        height: $q.screen.height-190+'px',
-        left: '-500px', width: '500px',
-        //- paddingRight: '70px',
+        top: 70+'px', right: '0px',
+        height: $q.screen.height-200+'px',
+        width: '578px',
+        paddingRight: '78px',
+        borderRadius: '20px 0 0 20px',
+        overflow: 'hidden',
+        background: 'rgb(30,30,30,0.5)',
       }`).row
       component(
         :is="`page-${pageId}`"

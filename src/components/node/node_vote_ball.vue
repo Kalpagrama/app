@@ -3,6 +3,9 @@ div(
   :style=`{
     position: 'relative',
     width: '40px',
+    minWidth: '40px', maxWidth: '40px',
+    height: '40px',
+    minHeight: '40px', maxHeight: '40px',
   }`
   ).row.items-center.content-center.justify-center
   //- btn start...
@@ -10,8 +13,10 @@ div(
     :style=`{
       position: 'relative',
       width: '34px', height: '34px',
+      minWidth: '34px', maxWidth: '34px',
+      minHeight: '34px', maxHeight: '34px',
       borderRadius: '50%',
-      transform: 'blur(10px)',
+      //- transform: 'blur(10px)',
     }`
     ).row.items-center.content-center.justify-center.cursor-pointer
     //- rainbow circle
@@ -37,7 +42,7 @@ div(
         width: '70%', minWidth: '70%', maxWidth: '70%',
         height: '70%', minHeight: '70%', maxHeight: '70%',
         borderRadius: '50%',
-        padding: '4px',
+        padding: '4px 4px',
         opacity: showRateMax ? 1 : 0,
       }`
       ).row.items-center.content-center.justify-center.b-30

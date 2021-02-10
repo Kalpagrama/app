@@ -132,6 +132,7 @@ export default {
       async handler (to, from) {
         this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
         if (this.itemsResInited) {
+          // await this.$wait(500)
           this.$nextTick(() => {
             this.$log('CION start')
             // this.scrollUpdate()
@@ -147,16 +148,19 @@ export default {
               this.$log('CION this.itemMeta.offsetTop', itemMeta.offsetTop)
               this.$log('CION this.scrollTop', this.scrollTop)
               // this.$q.notify({type: 'positive', position: 'left', message: itemRef.offsetTop})
-              setScrollPosition(this.scrollTarget, itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop)
-              // this.prev()
+              let scrollPosition = itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop
+              this.$log('CION scrollPosition', scrollPosition)
+              setScrollPosition(this.scrollTarget, scrollPosition)
             }
           })
         }
         else {
           this.$emit('ready')
+          // this.scrollUpdate()
         }
         // first load done
         this.itemsResInited = true
+        // this.scrollUpdate()
       }
     },
     scrollTop: {
