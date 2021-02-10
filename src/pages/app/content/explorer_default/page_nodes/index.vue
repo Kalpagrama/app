@@ -36,7 +36,7 @@ div(
           //- group
           div(
             :style=`{
-              background: 'rgb(35,35,35, 0.5)',
+              background: 'rgb(35,35,35, 0.8)',
               borderRadius: '20px',
             }`
             ).row.full-width.items-start.content-start.q-pb-sm.q-mb-sm
