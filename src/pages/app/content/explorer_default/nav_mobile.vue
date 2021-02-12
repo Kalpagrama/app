@@ -7,13 +7,21 @@
       maxWidth: 600+'px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
+    ).row.full-width.items-center.content-center.justify-between.b-40.q-px-xs
     q-btn(
       @click="$routerKalpa.back()"
       flat color="grey-7" icon="west" no-caps
       :style=`{maxWidth: '60px'}`)
       .row.full-width.justify-center
         small Назад
+    q-btn(
+      v-if="contentKalpa.type === 'BOOK'"
+      @click="$emit('pageId', 'toc')"
+      flat icon="toc" no-caps
+      :color="pageId === 'drafts' ? 'green' : 'grey-7'"
+      :style=`{maxWidth: '60px'}`)
+      .row.full-width.justify-center
+        small Главы
     q-btn(
       @click="$emit('pageId', 'drafts')"
       flat icon="filter_tilt_shift" no-caps

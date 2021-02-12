@@ -1,93 +1,93 @@
 <template lang="pug">
-div(
-  :style=`{
+  div(
+    :style=`{
     position: 'relative',
     //- ...styles,
     height: '100%',
   }`
   ).column.full-width.bg-black
-  //-  fictive/invisible input for emit/on/off events with native html element events
-  input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
-  //- figure editor...
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="lastAnnotation"
-      :style=`{
+    //-  fictive/invisible input for emit/on/off events with native html element events
+    input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
+    //- figure editor...
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="lastAnnotation"
+        :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '80px',
       }`
       ).row.full-width.justify-center
-      slot(name="tint-bar" :tintFocused="true")
-      div(
-        v-if="lastAnnotation"
-        :style=`{
+        slot(name="tint-bar" :tintFocused="true")
+        div(
+          v-if="lastAnnotation"
+          :style=`{
           width: '300px',
           borderRadius: '20px',
           background: 'rgba(30,30,30,0.8)',
         }`
         ).row.items-center.content-center.q-pa-md
-        q-btn(round flat color="red" icon="lens" @click="updateLastAnnotation('red')")
-        q-btn(round flat color="green" icon="lens" @click="updateLastAnnotation('green')")
-        q-btn(round flat color="blue" icon="lens" @click="updateLastAnnotation('blue')")
-        .col
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateLastAnnotation(null, null, -1)")
-        q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateLastAnnotation(null, null, 1)")
-        q-btn(v-if="!figure" @click='showNodeInputForm' round flat dense color="green" icon="add_circle_outline")
-        q-btn(v-if="figure" @click='hideNodeInputForm' round flat dense color="white" icon="clear")
-  //- table of contents...
-  div(
-    v-if="tableOfContents === true"
-    :id="bookMenu"
-    :style=`{
+          q-btn(round flat color="red" icon="lens" @click="createColorNodeBookmark('red')")
+          q-btn(round flat color="green" icon="lens" @click="createColorNodeBookmark('green')")
+          q-btn(round flat color="purple" icon="lens" @click="createColorNodeBookmark('purple')")
+          .col
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateLastAnnotation(null, null, -1)")
+          q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateLastAnnotation(null, null, 1)")
+          q-btn(v-if="!figure" @click='showNodeInputForm' round flat dense color="green" icon="add_circle_outline")
+          q-btn(v-if="figure" @click='hideNodeInputForm' round flat dense color="white" icon="clear")
+    //- table of contents...
+    div(
+      v-if="tableOfContents === true"
+      :id="bookMenu"
+      :style=`{
       position: 'absolute', zIndex: 1000, top: '0px',
       borderRadius: '10px',
       height: 'calc(100% - 120px)',
     }`
     ).column.full-width.b-40
-    .col.full-width.scroll
-      q-btn(
-        v-for="chapter in toc" :key="chapter.href"
-        @click="chapter.go()"
-        no-caps
-        ).row.full-width.scroll
-        span(:style=`{fontSize: '18px', color: 'red', userSelect: 'none'}`).text-bold {{ chapter.label }}
+      .col.full-width.scroll
         q-btn(
-          v-for="subchapter in chapter.subitems" :key="subchapter.href"
-          @click="subchapter.go()"
+          v-for="chapter in toc" :key="chapter.href"
+          @click="chapter.go()"
           no-caps
+        ).row.full-width.scroll
+          span(:style=`{fontSize: '18px', color: 'red', userSelect: 'none'}`).text-bold {{ chapter.label }}
+          q-btn(
+            v-for="subchapter in chapter.subitems" :key="subchapter.href"
+            @click="subchapter.go()"
+            no-caps
           ).row.full-width.scroll
-          span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
-  //- body book area
-  div(
-    :style=`{
+            span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
+    //- body book area
+    div(
+      :style=`{
       position: 'relative',
       borderRadius: '0 0 10px 10px',
     }`).col.full-width
-    q-resize-observer(@resize="onResize" :debounce="300")
-    div(
-      :id="bookArea"
-      :style=`{
+      q-resize-observer(@resize="onResize" :debounce="300")
+      div(
+        :id="bookArea"
+        :style=`{
         borderRadius: '0 0 10px 10px',
         overflow: 'hidden'
       }`
       ).row.fit
-    //- div(
-      :style=`{}`)
-  //- footer
-  .row.full-width.justify-center
-    //- input(v-if = "true" v-model="cfi" width="300").row.full-width
-    //- q-btn(v-if = "true" round flat color="white" icon="check" @click='goToCfi')
-    q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
-    q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
-    q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-    q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
-    //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
-    //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
+    .row.full-width.justify-center
+      div(
+        v-if="false"
+        )
+          input(v-model="cfi" width="300").row.full-width
+          q-btn(round flat color="white" icon="check" @click="goToCfiDebug(cfi)")
+          q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
+          q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
+          q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
+          q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
+          //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
+          //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
 
 <script>
-import {Book, EpubCFI} from 'epubjs'
+import { Book, EpubCFI } from 'epubjs'
 import debounce from 'lodash/debounce'
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -98,7 +98,7 @@ export default {
   props: {
     contentKalpa: {
       type: Object,
-      required: true,
+      required: true
     },
     url: {
       type: String,
@@ -142,7 +142,7 @@ export default {
     },
     progress: {
       type: Number,
-      required: true,
+      required: true
     },
     bookArea: {
       type: String,
@@ -171,7 +171,8 @@ export default {
       lastAnnotation: null, // текущее выделение
       figure: null, // текущее выделение TODO почему называется figure, а не figuresAbsolute???
       events: {},
-      findRes: null // список всех ядер на контенте
+      findNodesRes: null, // список всех ядер на контенте
+      findDraftsRes: null // список всех черновиков на контенте
     }
   },
   watch: {
@@ -203,6 +204,24 @@ export default {
       this.rendition.themes.select(theme)
       document.body.style.background = this.themes[theme].body.background
     },
+    setFontSize (size) {
+      this.rendition.themes.fontSize(size + '%')
+    },
+    resizeToScreenSize () {
+      this.updateScreenSizeInfo()
+      this.rendition.resize(this.width, this.height)
+    },
+    updateScreenSizeInfo () {
+      this.width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+      this.height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - this.contentBookModify
+    },
+    keyListener (e) {
+      if (e.code === 'ArrowRight') {
+        this.goToPrevPage()
+      } else if (e.code === 'ArrowLeft') {
+        this.goToPrevPage()
+      }
+    },
     async goToFirstPage () {
       await this.goToPercent(0)
     },
@@ -215,75 +234,46 @@ export default {
     async goToNextPage () {
       await this.rendition.next()
     },
-    goToPercent (value) {
+    async goToCfi (epubCfi) {
+      this.$log('goToCfi', epubCfi)
+      await this.rendition.display(epubCfi)
+    },
+    async goToCfiDebug (epubCfi) {
+      this.$log('goToCfi', epubCfi)
+      await this.rendition.display(epubCfi)
+      await this.makeLastAnnotation(epubCfi, 'red', '0.5')
+    },
+    async savePosition (epubCfi) {
+      if (this.contentBookmark) { // save position
+        if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
+        this.contentBookmark.meta.currentCfi = epubCfi
+      }
+    },
+    async restorePosition () {
+      // go to saved position (хранится внутри закладки)
+      let { items: [bookmark] } = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          oid: this.contentKalpa.oid
+        }
+      })
+      this.contentBookmark = bookmark
+      if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) await this.goToCfi(this.contentBookmark.meta.currentCfi)
+      else await this.goToCfi()
+    },
+    async goToPercent (value) {
       const percentage = value / 100
-      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : 0
-      this.rendition.display(target)
-      if (percentage === 1) this.goToNextPage()
+      const target = percentage > 0 ? this.book.locations.cfiFromPercentage(percentage) : null
+      await this.goToCfi(target)
+      if (percentage === 1) await this.goToNextPage()
     },
-    async goToCfi (cfi) {
-      this.$log('goToCfi', cfi)
-      this.rendition.annotations.highlight(cfi, {})
-      // let loc = await this.rendition.currentLocation()
-      // this.$log('loc=', loc)
-      // this.$log('loc start=', loc.start.cfi)
-      // this.$log('loc end=', loc.end.cfi)
-      await this.rendition.display(cfi)
-    },
-    async showTableOfContents () {
+    showTableOfContents () {
       this.tableOfContents = !this.tableOfContents
     },
-    setFontSize (size) {
-      this.rendition.themes.fontSize(size + '%')
-    },
-    updateScreenSizeInfo () {
-      this.width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-      this.height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - this.contentBookModify
-    },
-    resizeToScreenSize () {
-      this.updateScreenSizeInfo()
-      this.rendition.resize(this.width, this.height)
-    },
-    keyListener (e) {
-      if (e.code === 'ArrowRight') {
-        this.goToPrevPage()
-      } else if (e.code === 'ArrowLeft') {
-        this.goToPrevPage()
-      }
-    },
-    async highLight(cfiRange){
-      await this.rendition.display(cfiRange)
-      this.rendition.annotations.highlight(cfiRange, {})
-    },
-    clearLastAnnotation(){
-      if (this.lastAnnotation) {
-        this.rendition.annotations.remove(this.lastAnnotation.cfiRange, 'highlight')
-      }
-      this.lastAnnotation = null
+    hideNodeInputForm () {
       this.figure = null
     },
-    async updateLastAnnotation(color, startOffset, endOffset) {
-     assert(this.lastAnnotation, '!this.lastAnnotation')
-      let cfiRange = this.lastAnnotation.cfiRange
-      color = color || this.lastAnnotation.styles.fill
-      if (endOffset) {
-        cfiRange = cfiRange.replace(/(?<=epubcfi\(.*,.*,\/.*:).*(?=\))/, function(a, b){
-          return parseInt(a) + endOffset
-        })
-      }
-      this.clearLastAnnotation() // удалим старую и нарисуем новую
-      this.makeLastAnnotation(cfiRange, color, '0.3')
-    },
-    makeLastAnnotation(cfiRange, color, opacity){
-      this.lastAnnotation = this.rendition.annotations.highlight(cfiRange, {}, async (e) => {
-        this.$logE('highlight clicked', cfiRange)
-      }, undefined, {
-        fill: color,
-        'fill-opacity': opacity,
-        'mix-blend-mode': 'multiply',
-      })
-    },
-    async showNodeInputForm(){
+    async showNodeInputForm () {
       assert(this.lastAnnotation.cfiRange, 'bad this.lastAnnotation.cfiRange!')
       let range = await this.book.getRange(this.lastAnnotation.cfiRange)
       this.figure = [
@@ -292,22 +282,190 @@ export default {
           epubCfiText: range.toString(),
           points: [],
           t: null
-        },
+        }
       ]
     },
-    hideNodeInputForm(){
+    clearLastAnnotation () {
+      if (this.lastAnnotation) {
+        this.rendition.annotations.remove(this.lastAnnotation.cfiRange, 'highlight')
+      }
+      this.lastAnnotation = null
       this.figure = null
     },
+    updateLastAnnotation (color, startOffset, endOffset) {
+      assert(this.lastAnnotation, '!this.lastAnnotation')
+      let cfiRange = this.lastAnnotation.cfiRange
+      color = color || this.lastAnnotation.styles.fill
+      if (endOffset) {
+        cfiRange = cfiRange.replace(/(?<=epubcfi\(.*,.*,\/.*:).*(?=\))/, function (a, b) {
+          return parseInt(a) + endOffset
+        })
+      }
+      this.clearLastAnnotation() // удалим старую и нарисуем новую
+      this.makeLastAnnotation(cfiRange, color, '0.3')
+    },
+    makeLastAnnotation (cfiRange, color, opacity) {
+      this.lastAnnotation = this.rendition.annotations.highlight(cfiRange, {}, async (e) => {
+        this.$logE('highlight clicked', cfiRange)
+      }, undefined, {
+        fill: color,
+        'fill-opacity': opacity,
+        'mix-blend-mode': 'multiply'
+      })
+    },
+    async showAllNodesForCurrentLocation () {
+      let currentLocation = await this.rendition.currentLocation()
+      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
+      let tocId = getTocIdFromCfi(currentLocation.start.cfi)
+      let href = currentLocation.start.href
+      if (!this.findNodesRes) {
+        this.findNodesRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+            objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+            // objectTypeEnum: { $in: ['NODE'] },
+            oidSphere: this.contentKalpa.oid,
+            sortStrategy: 'AGE',
+            groupByContentLocation: true
+          },
+          populateObjects: false
+        })
+        // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
+        this.$watch('findNodesRes.items', async (newVal, oldVal) => {
+          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          await this.showAllNodesForCurrentLocation()
+        }, {
+          immediate: false,
+          deep: false
+        })
+      }
+      // this.$log('allNodes', this.findNodesRes)
+      for (let group of this.findNodesRes.items) {
+        let { epubChapterId, epubTocId, epubHref } = group.figuresAbsolute[0]
+        tocId = tocId || epubTocId
+        if (chapterId !== epubChapterId && tocId !== epubTocId) continue
+        for (let item of group.items) {
+          let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
+          for (let figuresAbsolute of figuresAbsoluteList) {
+            this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
+            this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, { item }, async (e) => {
+              this.$logE('highlight clicked', item)
+              await this.showNodeInList(item.oid)
+            }, undefined, {
+              fill: '#8000FF',
+              'fill-opacity': '0.5',
+              'mix-blend-mode': 'multiply'
+            })
+          }
+        }
+      }
+    },
+    async showAllDraftsForCurrentLocation () {
+      let currentLocation = await this.rendition.currentLocation()
+      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
+      let tocId = getTocIdFromCfi(currentLocation.start.cfi)
+      let href = currentLocation.start.href
+      if (!this.findDraftsRes) {
+        this.findDraftsRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.WS_NODE,
+            'items.0.layers.0.contentOid': this.contentKalpa.oid
+          }
+        })
+        // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
+        this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
+          this.$log('showAllDraftsForCurrentLocation', newVal)
+          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          await this.showAllDraftsForCurrentLocation()
+        }, {
+          immediate: false,
+          deep: false
+        })
+      }
+      for (let draft of this.findDraftsRes.items) {
+        let { name, items, color } = draft
+        color = color || 'grey'
+        let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
+        assert(draftEpubCfi, '!draftEpubCfi')
+        let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
+        let draftTocId = getTocIdFromCfi(draftEpubCfi) || tocId
+        if (chapterId !== draftChapterId && tocId !== draftTocId) continue
+
+        this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
+        this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
+          this.$logE('highlight clicked', draft)
+          await this.showDraftInList(draft.id)
+        }, undefined, {
+          fill: color,
+          'fill-opacity': '0.5',
+          'mix-blend-mode': 'multiply',
+          stroke: 'black',
+          'stroke-width': '1',
+          'stroke-dasharray': '3'
+        })
+      }
+    },
+    async createColorNodeBookmark (color = 'green') {
+      assert(this.lastAnnotation && this.lastAnnotation.cfiRange, 'bad lastAnnotation') // делаем черновик из текущего выделения
+      let nodeInput = {
+        name: '',
+        layout: 'HORIZONTAL',
+        items: [{
+          layers: [{
+            contentOid: this.contentKalpa.oid,
+            figuresAbsolute: [{ points: [], epubCfi: this.lastAnnotation.cfiRange }]
+          }]
+        }],
+        vertices: [],
+        spheres: [],
+        category: 'FUN',
+        color
+      }
+      let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      await this.updateLastAnnotation(color)
+    },
+    // todo showNodeInList - сделать реализацию
+    async showNodeInList (oid) {
+      // TODO показать список ядер и сфокусироваться на этом ядре
+      alert('todo')
+    },
+    async showDraftInList (id) {
+      // TODO показать список заметок и сфокусироваться на этой заметке
+      alert('todo')
+    },
+    async showItem (item) { // blink node
+      if (item.populatedObject) item = item.populatedObject
+      assert(item.items && item.items.length, '!items1')
+      assert(item.items[0].layers, '!items2')
+      assert(item.items[0].layers[0], '!items3')
+      assert(item.items[0].layers[0].figuresAbsolute, '!items4')
+      let figuresAbsolute = item.items[0].layers[0].figuresAbsolute
+
+      const blink = (count = 0) => {
+        let timeout = count ? 300 : 0
+        setTimeout(() => {
+          if (count % 2) {
+            this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'underline') // если такая уже есть - удалим
+          } else {
+            this.rendition.annotations.underline(figuresAbsolute[0].epubCfi)
+          }
+          if (count < 5) blink(++count)
+        }, timeout)
+      }
+      await this.goToCfi(figuresAbsolute[0].epubCfi)
+      blink()
+    },
+
     async prepareToc () {
       let { toc } = await this.book.loaded.navigation
       this.toc = toc
       const populateToc = (toc) => {
-        for (let chapter of toc){
+        for (let chapter of toc) {
           // this.$log('chapter=', chapter)
-          chapter.go = () => {
-            alert('go ' + chapter.label)
+          chapter.go = async () => {
             this.tableOfContents = false
-            this.rendition.display(chapter.href)
+            await this.goToCfi(chapter.href)
+            await this.goToCfi(chapter.href) // почему-то первый вызов пролистывается ниже
             // let section = await this.book.section(chapter.href)
           }
           if (chapter.subitems) populateToc(chapter.subitems)
@@ -315,7 +473,7 @@ export default {
       }
       populateToc(this.toc)
     },
-    async prepareParagraphs () {
+    async prepareParagraphs (location) {
       const makeRangeCfi = (a, b) => {
         const CFI = new EpubCFI()
         const start = CFI.parse(a)
@@ -365,15 +523,15 @@ export default {
         // список наимельчайших глав
         let getLowestChapters = (chapter) => {
           let res = []
-          if (chapter.subitems && chapter.subitems.length){
-            for (let subchapter of chapter.subitems){
+          if (chapter.subitems && chapter.subitems.length) {
+            for (let subchapter of chapter.subitems) {
               res.push(...getLowestChapters(subchapter))
             }
           } else res.push(chapter)
           return res
         }
         let chapters = [] // список всех глав (если в главе есть подглавы, то выводятся ТОЛЬКО подглавы)
-        for (let chapter of this.toc){
+        for (let chapter of this.toc) {
           chapters.push(...getLowestChapters(chapter))
         }
         let innerChapterIndexes = []
@@ -400,7 +558,7 @@ export default {
         //   }
         // }
         // ищем те главы, начала которых попали непосредственно в диапазон
-        for (let i = 0; i < chapters.length; i++){
+        for (let i = 0; i < chapters.length; i++) {
           assert(chapters[i].href, '!href')
           let section = this.book.spine.get(chapters[i].href)
           let contents = await section.load(this.book.load.bind(this.book))
@@ -412,7 +570,7 @@ export default {
           }
         }
         // добавим главы, НАЧИНАЮЩИЕСЯ слева и справа от диапазона
-        for (let i = 1; i < chapters.length; i++){
+        for (let i = 1; i < chapters.length; i++) {
           let prevSection = this.book.spine.get(chapters[i - 1].href)
           let nextSection = this.book.spine.get(chapters[i].href)
           let contentsPrev = await prevSection.load(this.book.load.bind(this.book))
@@ -436,7 +594,7 @@ export default {
           }
         }
         let result = []
-        for (let i of innerChapterIndexes){
+        for (let i of innerChapterIndexes) {
           let chapter = chapters[i]
           // todo  надо получить chapter rangeCFI и отсечь те, что не пересекаются с cfiStart, cfiEnd
           // let sectionChapter = await this.book.section(chapter.href)
@@ -464,12 +622,11 @@ export default {
       }
       // получить все абзацы для озвучки
       {
-        let currentLoc = await this.rendition.currentLocation()
         let sectionLocation = await this.book.section(location.start.href)
         let contentsLocation = await sectionLocation.load(this.book.load.bind(this.book))
         let cfiBase = new EpubCFI(location.start.cfi)
         let paragraphsLocation = findAllParagraphs(sectionLocation.document)
-        for (let i = 1; i < paragraphsLocation.length; i++){
+        for (let i = 1; i < paragraphsLocation.length; i++) {
           let start = paragraphsLocation[i - 1]
           let end = paragraphsLocation[i]
           let range = document.createRange();
@@ -513,50 +670,6 @@ export default {
         // }
       }
     },
-    async showAllNodesForCurrentLocation() {
-      let currentLocation = await this.rendition.currentLocation()
-      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
-      let tocId = getTocIdFromCfi(currentLocation.start.cfi)
-      if (!this.findRes){
-        this.findRes = await this.$rxdb.find({
-          selector: {
-            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-            objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-            // objectTypeEnum: { $in: ['NODE'] },
-            oidSphere: this.contentKalpa.oid,
-            sortStrategy: 'AGE',
-            groupByContentLocation: true
-          },
-          populateObjects: false,
-        })
-        // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
-        this.$watch('findRes.items', async (newVal, oldVal) => {
-          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
-          await this.showAllNodesForCurrentLocation()
-        }, {
-          immediate: false
-        })
-      }
-      // this.$log('allNodes', this.findRes)
-      for (let group of this.findRes.items) {
-        let {epubChapterId, epubTocId, epubHref} = group.figuresAbsolute[0]
-        tocId = tocId || epubTocId
-        if (chapterId !== epubChapterId && tocId !== epubTocId) continue
-        for (let item of group.items) {
-          let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
-          for (let figuresAbsolute of figuresAbsoluteList) {
-            this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
-            this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, {}, async (e) => {
-              this.$logE('highlight clicked', item)
-            }, undefined, {
-              fill: '#8000FF',
-              'fill-opacity': '0.5',
-              'mix-blend-mode': 'multiply',
-            })
-          }
-        }
-      }
-    }
   },
   async mounted () {
     this.$log('mounted')
@@ -567,11 +680,18 @@ export default {
 
     this.$emit('toc', this.toc)
 
-    { // initReader
+    // initReader
+    {
       this.rendition = this.book.renderTo(this.bookArea, {
-        contained: true,
-        height: this.height,
-        width: this.width
+        // contained: true,
+        // height: this.height,
+        // width: this.width
+        manager: 'continuous',
+        flow: 'scrolled',
+        // flow: 'scrolled-doc',
+        width: '100%',
+        height: '100%' // this.height
+        // flow: 'scrolled-doc'
       })
       this.registerThemes()
       this.setTheme(this.theme)
@@ -580,13 +700,12 @@ export default {
         '::selection': {
           background: 'rgba(200,200,200, 0.3)',
           color: 'black'
-        },
+        }
         // 'epubjs-hl': {
         //   background: 'rgba(200,200,200, 0.3)',
         //   color: 'black'
         // }
       });
-      this.rendition.display()
       this.rendition.on('selected', async (cfiRange, contents) => {
         this.$log('selected', cfiRange)
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
@@ -597,14 +716,21 @@ export default {
         // }
         // contents.window.getSelection().removeAllRanges();
       })
-      this.rendition.on('rendered', (section, iframe) => {
+      this.rendition.on('rendered', async (section, iframe) => {
+        this.$log('rendered section', section)
+        { // подгружаем соседние секции. Иначе при быстром скроллировании вверх - баг (отскакивает вниз на несколько глав)
+          // await this.rendition.next()
+          // await this.rendition.prev()
+        }
+
         iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
-          this.$wait(300).then(async () => {
+          this.$wait(200).then(async () => {
             this.$log('mouseup')
             this.clearLastAnnotation() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
-            if (this.cfiRangeSelectInProgress){ // закончим выделение
-              this.makeLastAnnotation(this.cfiRangeSelectInProgress, 'green', '0.3')
+            if (this.cfiRangeSelectInProgress) { // закончим выделение
+              this.makeLastAnnotation(this.cfiRangeSelectInProgress, 'black', '0.3')
+              await this.savePosition(this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
             }
           })
@@ -622,36 +748,29 @@ export default {
         this.$emit('click')
       })
       this.rendition.on('relocated', async (location) => {
-        this.$log('relocated to', location.start.cfi)
         // percentageFromCfi нормально НЕ работает пока не сработал this.book.locations.generate()
         const percent = this.book.locations.percentageFromCfi(location.start.cfi)
         const percentage = percent * 100
         this.progressValue = percentage
-        this.$emit('relocated')
         // let cfiLoc = this.book.locations.cfiFromLocation(location.start.index)
         // this.$log('relocated cfiLoc = ', cfiLoc)
-        this.$log('relocated (progress) = ', percentage)
-        if (this.contentBookmark){ // save position
-          if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
-          this.contentBookmark.meta.currentCfi = location.start.cfi
-        }
-        // let chapterId = getChapterIdFromCfi(location.start.cfi)
-        // let tocId = getTocIdFromCfi(location.start.cfi)
+        this.$log('relocated to (progress) = ', percentage, location.start.cfi)
+        await this.savePosition(location.start.cfi)
         await this.showAllNodesForCurrentLocation()
+        await this.showAllDraftsForCurrentLocation()
+        // await this.prepareParagraphs(location)
       })
     }
 
-    // go to saved position (хранится внутри закладки)
-    let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
-    this.contentBookmark = bookmark
-    if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) this.rendition.display(this.contentBookmark.meta.currentCfi)
-
     await this.book.ready // book ready
     this.ready = true
+    await this.restorePosition()
+
+    // await this.goToCfi('ch1-3.xhtml#id3')
 
     // this.$emit('player', this)
     // долгая операция
-    this.locations = await this.book.locations.generate() // нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
+    this.locations = this.book.locations.generate().catch(err => this.$log('err on this.book.locations.generate', err)) // (долгая операция) нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
 
     // window.addEventListener('resize', debounce(() => {
     //   this.resizeToScreenSize()
@@ -668,7 +787,7 @@ export default {
         if (this.$refs.nameInput) this.$refs.nameInput.removeEventListener(event, cb)
       },
       emit: (event, val) => {
-        if (this.$refs.nameInput) this.$refs.nameInput.dispatchEvent(new CustomEvent(event, {detail: val}))
+        if (this.$refs.nameInput) this.$refs.nameInput.dispatchEvent(new CustomEvent(event, { detail: val }))
       }
     }
     this.$emit('player', this)

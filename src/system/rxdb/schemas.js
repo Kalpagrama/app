@@ -61,6 +61,9 @@ export const wsSchemaItem = {
       type: 'integer',
       default: 0
     },
+    color: {
+      type: 'string'
+    },
     // ---- node ----
     contentOids: {
       type: 'array',
@@ -110,9 +113,6 @@ export const wsSchemaItem = {
       type: 'object'
     },
     // ---- collection ----
-    color: {
-      type: 'string'
-    },
     bookmarks: { // список id букмарков в этой коллекции
       type: 'array',
       uniqueItems: true,

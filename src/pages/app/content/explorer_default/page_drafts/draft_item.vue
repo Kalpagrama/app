@@ -7,6 +7,7 @@ div(
   ).row.full-width.items-center.content-center.q-mb-sm
   //- header: name and edit btn
   .row.full-width
+    q-btn(v-if="item.color" round flat :color="item.color" icon="lens" @click="showOnContent")
     .col
       q-input(
         v-model="item.name"
@@ -55,6 +56,9 @@ export default {
       this.$log('itemEdit')
       this.$store.commit('ui/stateSet', ['nodeDraft', this.item])
       this.player.setState('figure', this.item.items[0].layers[0].figuresAbsolute)
+    },
+    async showOnContent () {
+      await this.player.showItem(this.item)
     }
   },
 }

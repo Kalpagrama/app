@@ -8,6 +8,7 @@ div(
   nav-desktop(
     v-if="$q.screen.width >= 1200"
     :pageId="pageId"
+    :contentKalpa="contentKalpa"
     @pageId="pageIdChange"
     :style=`{
       position: 'fixed', zIndex: 1020,
@@ -203,6 +204,9 @@ export default {
       handler (to, from) {
         this.$log('pageId TO', to)
         if (to) {
+          if (to === 'toc'){
+            this.player.showTableOfContents()
+          }
           // tween contentHeight ?
         }
         else {

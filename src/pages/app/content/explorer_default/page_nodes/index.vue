@@ -153,6 +153,7 @@ export default {
     async setSelectedItem (item) {
       this.$log('setSelected', item.oid)
       this.itemSelectedOid = item.oid
+      await this.player.showItem(item)
     },
     async listFeedReady () {
       this.$log('listFeedReady')

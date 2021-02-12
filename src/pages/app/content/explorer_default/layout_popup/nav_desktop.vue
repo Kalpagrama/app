@@ -14,6 +14,15 @@ div(
     .row.full-width.justify-center
       small Назад
   q-btn(
+    v-if="contentKalpa.type === 'BOOK'"
+    @click="$emit('pageId', 'toc')"
+    flat no-caps
+    :color="pageId === 'details' ? 'green' : 'grey-2'"
+    :style=`{minHeight: '70px'}`).full-width
+    q-icon(name="toc" size="19px").q-mb-xs
+    .row.full-width.justify-center
+      small Главы
+  q-btn(
     @click="$emit('pageId', 'drafts')"
     flat icon="filter_tilt_shift" no-caps
     :color="pageId === 'drafts' ? 'green' : 'grey-2'"
@@ -46,6 +55,6 @@ div(
 <script>
 export default {
   name: 'navDesktop',
-  props: ['pageId'],
+  props: ['pageId', 'contentKalpa'],
 }
 </script>

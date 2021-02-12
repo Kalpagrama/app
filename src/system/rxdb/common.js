@@ -92,9 +92,9 @@ function getChapterIdFromCfi (epubCfi) {
 }
 
 function getTocIdFromCfi (epubCfi) {
-   let chapterId = epubCfi.match(/(?<=epubcfi\(.*!.*\[).*(?=\])/)[0]
-   assert(chapterId)
-   return chapterId
+   let match = epubCfi.match(/(?<=epubcfi\(.*!.*\[).*(?=\])/)
+   let tocId = match ? match[0] : null
+   return tocId
 }
 
 async function rxdbOperationProxyExec (collection, operation, ...params) {

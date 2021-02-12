@@ -382,7 +382,9 @@ class Group {
                      break
                   }
                }
-               if (!arrayChanged) return // если список не изменился - просто выходим
+               if (!arrayChanged) {
+                  return
+               } // если список не изменился - просто выходим
             }
             // logD(f, 'rxQuery changed 2', results)
             let pageItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
@@ -391,12 +393,15 @@ class Group {
             assert(page, '!page')
             page.pageItems = pageItemsNew // изменились итемы страницы
             this.reactiveGroup.totalCount = pageItemsNew.length
-            let { startFullFil, endFullFil } = this.fulFilledRange()
-            if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-               startFullFil = 0
-               endFullFil = 11
+            let nextItems = pageItemsNew
+            if (this.populateFunc){
+               let { startFullFil, endFullFil } = this.fulFilledRange()
+               if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
+                  startFullFil = 0
+                  endFullFil = 11
+               }
+               nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
             }
-            let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
             await this.fulfill(nextItems, 'whole')
          })
       } else if (rxDoc) {
@@ -725,15 +730,15 @@ class Group {
                await firstItem.gotoCurrent()
             }
          }
-      } else {
-         let nextItems = this.loadedItems().slice(0, count)
-         await this.fulfill(nextItems, 'whole')
       }
    }
 
    async gotoStart () {
-      this.setProperty('currentId', null)
-      await this.gotoCurrent()
+      let count
+      if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
+      else count = this.loadedLen() // выдаем все элементы разом
+      let nextItems = this.loadedItems().slice(0, count)
+      await this.fulfill(nextItems, 'whole')
    }
 
    async gotoEnd () {
