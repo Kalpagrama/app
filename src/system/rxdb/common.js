@@ -28,7 +28,8 @@ const LstCollectionEnum = Object.freeze({
    LST_FEED: 'LST_FEED',
    LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
    LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
-   LST_SEARCH: 'LST_SEARCH'
+   LST_SEARCH: 'LST_SEARCH',
+   LST_CONTENT_CUTS: 'LST_CONTENT_CUTS',
 })
 
 const RxCollectionEnum = Object.freeze({
@@ -86,8 +87,8 @@ function checkMangoCond (mangoCond, value) {
 }
 
 function getChapterIdFromCfi (epubCfi) {
-   let chapterId = epubCfi.match(/(?<=epubcfi\(.*\[).*(?=\]!)/)[0]
-   assert(chapterId)
+   let match = epubCfi.match(/(?<=epubcfi\(.*\[).*(?=\]!)/)
+   let chapterId = match ? match[0] : null
    return chapterId
 }
 

@@ -16,7 +16,8 @@ const FindCollectionEnum = Object.freeze({
    OBJECTS: 'OBJECTS',
    EVENTS: 'EVENTS',
    SUBSCRIPTIONS: 'SUBSCRIPTIONS',
-   SUBSCRIBERS: 'SUBSCRIBERS'
+   SUBSCRIBERS: 'SUBSCRIBERS',
+   CUTS: 'CUTS',
 })
 
 class ListsApi {
@@ -84,6 +85,10 @@ class ListsApi {
             break
          case RxCollectionEnum.LST_SEARCH:
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
+            break
+         case RxCollectionEnum.LST_CONTENT_CUTS:
+            assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+            res = await ListsApi.find(FindCollectionEnum.CUTS, mangoQuery, pagination)
             break
          default:
             throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)

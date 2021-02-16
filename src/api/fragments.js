@@ -402,16 +402,26 @@ const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFr
         items{...topObjectFragment ...objectShortFragment}
     }
 `
+const contentCutFragment = gql`
+    fragment contentCutFragment on ContentCut {
+        cutId
+        url
+        duration
+        epubCfi
+        epubCfiText
+        params
+    }
+`
 
 const findResultFragment = gql`
-    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment}
+    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment} ${contentCutFragment}
     fragment findResultFragment on FindResult {
         totalCount
         nextPageToken
         currentPageToken
         prevPageToken
         ... on EventFindResult { events: items {...eventFragment} }
-        ... on ObjectsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment} }
+        ... on ItemsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment ...contentCutFragment} }
         ... on WSFindResult { items }
     }
 `
@@ -426,7 +436,8 @@ const fragments = {
    objectShortStatFragment,
    essenceFragment,
    sphereFragment,
-   findResultFragment
+   findResultFragment,
+   contentCutFragment
 }
 
 export {

@@ -8,10 +8,10 @@
   ).column.full-width.bg-black
     //-  fictive/invisible input for emit/on/off events with native html element events
     input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
-    //- figure editor...
+    //- figure editor + audioplayer
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
-        v-if="lastAnnotation"
+        v-if="true"
         :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '80px',
@@ -19,13 +19,32 @@
       ).row.full-width.justify-center
         slot(name="tint-bar" :tintFocused="true")
         div(
-          v-if="lastAnnotation"
+          v-if="audioPlayer.audio"
+          :style=`{
+          width: '320px',
+          borderRadius: '20px',
+          background: 'white',
+        }`
+        ).row.items-center.content-center.q-pa-md
+          div().row.full-width.justify-center
+            q-btn(round flat color="green" icon="skip_previous" @click="nextAudio(-1)")
+            q-btn(round flat color="green" icon="replay_5" @click="seekAudio(-5)")
+            q-btn(round flat color="green" :icon="audioPlayer.isPlaying ? 'pause' : 'play_arrow'" @click="audioPlayer.isPlaying ? pauseAudio() : playAudio()")
+            q-btn(round flat color="green" icon="forward_5" @click="seekAudio(5)")
+            q-btn(round flat color="green" icon="skip_next" @click="nextAudio(1)")
+            q-btn(round flat color="green" icon="close" @click="destroyAudio()")
+          div().row.full-width.justify-center
+            q-select(outlined v-model="audioPlayer.system" :options="audioPlayer.systems" label="system")
+            q-select(outlined v-model="audioPlayer.voice" :options="audioPlayer.voices[audioPlayer.system]" label="voice")
+        div(
+          v-if="(lastAnnotation && !audioPlayer.audio)"
           :style=`{
           width: '300px',
           borderRadius: '20px',
           background: 'rgba(30,30,30,0.8)',
         }`
         ).row.items-center.content-center.q-pa-md
+          q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
           q-btn(round flat color="red" icon="lens" @click="createColorNodeBookmark('red')")
           q-btn(round flat color="green" icon="lens" @click="createColorNodeBookmark('green')")
           q-btn(round flat color="purple" icon="lens" @click="createColorNodeBookmark('purple')")
@@ -74,16 +93,16 @@
     .row.full-width.justify-center
       div(
         v-if="false"
-        )
-          input(v-model="cfi" width="300").row.full-width
-          q-btn(round flat color="white" icon="check" @click="goToCfiDebug(cfi)")
-          q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
-          q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
-          q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-          q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
-          //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
-          //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
+      )
+        input(v-model="cfi" width="300").row.full-width
+        q-btn(round flat color="white" icon="check" @click="goToCfiDebug(cfi)")
+        q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
+        q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
+        q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
+        q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
+        //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
+        //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
 
 <script>
@@ -92,6 +111,7 @@ import debounce from 'lodash/debounce'
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'contentPlayer_book',
@@ -172,7 +192,22 @@ export default {
       figure: null, // текущее выделение TODO почему называется figure, а не figuresAbsolute???
       events: {},
       findNodesRes: null, // список всех ядер на контенте
-      findDraftsRes: null // список всех черновиков на контенте
+      findDraftsRes: null, // список всех черновиков на контенте
+      audioPlayer: {
+        system: 'google',
+        voice: 'ru-RU-Standard-D',
+        systems: ['google', 'yandex'],
+        voices: {
+          yandex: ['zahar', 'oksana', 'jane', 'omazh', 'ermil', 'alena', 'filipp'],
+          google: ['ru-RU-Standard-D', 'ru-RU-Standard-A', 'ru-RU-Standard-B', 'ru-RU-Standard-C', 'ru-RU-Standard-E']
+        },
+        audio: null,
+        isPlaying: false,
+        currentSectionHref: null, // текущая секция книги(обычно глава) (Данные подгружаются для каждой главы отдельно)
+        paragraphs: [], // [{epubCfi, epubCfiText}] список абзацев (для озвучки)
+        currentParagraphIndx: -1, // проигрываемый абзац
+        findCutsRes: [] // озвученные куски книги
+      }
     }
   },
   watch: {
@@ -184,11 +219,16 @@ export default {
     },
     progressValue (val) {
       this.$emit('update:progress', val)
+    },
+    'audioPlayer.system': {
+      handler (to, from) {
+        if (to) this.audioPlayer.voice = this.audioPlayer.voices[to][0]
+      }
     }
   },
   methods: {
     setState (key, val) {
-      this.$log('setState', key, val)
+      // this.$log('setState', key, val)
       this[key] = val
     },
     onResize (e) {
@@ -241,10 +281,17 @@ export default {
     async goToCfiDebug (epubCfi) {
       this.$log('goToCfi', epubCfi)
       await this.rendition.display(epubCfi)
-      await this.makeLastAnnotation(epubCfi, 'red', '0.5')
+      this.rendition.annotations.highlight(epubCfi, {}, async (e) => {
+        this.$logE('highlight clicked', epubCfi)
+      }, undefined, {
+        fill: 'red',
+        'fill-opacity': '0.5',
+        'mix-blend-mode': 'multiply'
+      })
     },
     async savePosition (epubCfi) {
       if (this.contentBookmark) { // save position
+        this.$log('savePosition: ', epubCfi)
         if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
         this.contentBookmark.meta.currentCfi = epubCfi
       }
@@ -258,8 +305,10 @@ export default {
         }
       })
       this.contentBookmark = bookmark
-      if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) await this.goToCfi(this.contentBookmark.meta.currentCfi)
-      else await this.goToCfi()
+      let cfi = null
+      if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) cfi = this.contentBookmark.meta.currentCfi
+      await this.goToCfi(cfi)
+      await this.goToCfi(cfi) // epubjs глючит и не переключается с первого раза
     },
     async goToPercent (value) {
       const percentage = value / 100
@@ -336,7 +385,7 @@ export default {
           await this.showAllNodesForCurrentLocation()
         }, {
           immediate: false,
-          deep: false
+          deep: true
         })
       }
       // this.$log('allNodes', this.findNodesRes)
@@ -352,7 +401,7 @@ export default {
               this.$logE('highlight clicked', item)
               await this.showNodeInList(item.oid)
             }, undefined, {
-              fill: '#8000FF',
+              fill: 'indigo',
               'fill-opacity': '0.5',
               'mix-blend-mode': 'multiply'
             })
@@ -473,7 +522,7 @@ export default {
       }
       populateToc(this.toc)
     },
-    async prepareParagraphs (location) {
+    async prepareAudioPlayer (location) {
       const makeRangeCfi = (a, b) => {
         const CFI = new EpubCFI()
         const start = CFI.parse(a)
@@ -611,65 +660,168 @@ export default {
         }
         return result
       }
-      const findAllParagraphs = (el) => {
+      // let chapters = await getChapters(location.start.cfi, location.end.cfi)
+      // for (let chapter of chapters){
+      //   this.$log(chapter)
+      //   let sectionChapter = await this.book.section(chapter.href)
+      //   this.$log(chapter, sectionChapter)
+      //   let section = sectionChapter
+      //   let contents = await section.load(this.book.load.bind(this.book))
+      //   let cfiBase = new EpubCFI(section.cfiFromElement(section.document.firstElementChild))
+      //   this.$log('section.document:', section.document)
+      //   let paragraphs = findAllParagraphs(section.document)
+      //   for (let i = 1; i < paragraphs.length; i++){
+      //     let start = paragraphs[i - 1]
+      //     let end = paragraphs[i]
+      //     let range = document.createRange();
+      //     range.setStart(start, 0);
+      //     range.setEnd(end, 0);
+      //     let cfiParagraph = new EpubCFI(range, cfiBase.base)
+      //     this.$log('chapter Paragraph=', range.toString())
+      //     this.$log('chapter cfiParagraph=', cfiParagraph.toString())
+      //   }
+      // }
+      const findParagraphDomElements = (el) => {
+        // let res = []
+        // if (el.children.length > 1 && el.tagName !== 'head' && el.tagName !== 'html') {
+        //   res.push(...el.children)
+        // } else if (el.children.length && el.tagName !== 'head') {
+        //   for (let child of el.children) res.push(...findAllParagraphs(child))
+        // }
+        // return res
         let res = []
-        if (el.children.length > 1 && el.tagName !== 'head' && el.tagName !== 'html') {
-          res.push(...el.children)
-        } else if (el.children.length && el.tagName !== 'head') {
-          for (let child of el.children) res.push(...findAllParagraphs(child))
+        if (el.tagName !== 'head') {
+          if (el.children.length) {
+            for (let child of el.children) res.push(...findParagraphDomElements(child))
+          } else {
+            res.push(el)
+          }
         }
         return res
       }
-      // получить все абзацы для озвучки
-      {
-        let sectionLocation = await this.book.section(location.start.href)
-        let contentsLocation = await sectionLocation.load(this.book.load.bind(this.book))
-        let cfiBase = new EpubCFI(location.start.cfi)
-        let paragraphsLocation = findAllParagraphs(sectionLocation.document)
-        for (let i = 1; i < paragraphsLocation.length; i++) {
-          let start = paragraphsLocation[i - 1]
-          let end = paragraphsLocation[i]
-          let range = document.createRange();
-          range.setStart(start, 0);
-          range.setEnd(end, 0);
-          let cfiParagraph = new EpubCFI(range, cfiBase.base)
-          this.$log('chapter range=', range)
-          this.$log('chapter range.visible=', range.startContainer.visible)
-          this.$log('chapter Paragraph=', range.toString())
-          this.$log('chapter cfiParagraph=', cfiParagraph.toString())
-          // start.addEventListener('click', (ev) => {
-          //   ev.preventDefault();
-          //   console.error(ev)
-          //   alert('contextmenu2')
-          //   // ev.preventDefault()
-          //   return false;
-          // })
-          // this.rendition.annotations.highlight(cfiParagraph.toString(), {})
-        }
 
-        // let chapters = await getChapters(location.start.cfi, location.end.cfi)
-        // for (let chapter of chapters){
-        //   this.$log(chapter)
-        //   let sectionChapter = await this.book.section(chapter.href)
-        //   this.$log(chapter, sectionChapter)
-        //   let section = sectionChapter
-        //   let contents = await section.load(this.book.load.bind(this.book))
-        //   let cfiBase = new EpubCFI(section.cfiFromElement(section.document.firstElementChild))
-        //   this.$log('section.document:', section.document)
-        //   let paragraphs = findAllParagraphs(section.document)
-        //   for (let i = 1; i < paragraphs.length; i++){
-        //     let start = paragraphs[i - 1]
-        //     let end = paragraphs[i]
-        //     let range = document.createRange();
-        //     range.setStart(start, 0);
-        //     range.setEnd(end, 0);
-        //     let cfiParagraph = new EpubCFI(range, cfiBase.base)
-        //     this.$log('chapter Paragraph=', range.toString())
-        //     this.$log('chapter cfiParagraph=', cfiParagraph.toString())
-        //   }
-        // }
+      // получить все абзацы для озвучки
+      let section = await this.book.section(location.start.href)
+      if (this.audioPlayer.currentSectionHref !== section.href) {
+        this.pauseAudio()
+        this.audioPlayer.audio = null
+        this.audioPlayer.isPlaying = false
+        this.audioPlayer.paragraphs = []
+        this.audioPlayer.currentParagraphIndx = -1
+        this.audioPlayer.findCutsRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_CONTENT_CUTS,
+            oidSphere: this.contentKalpa.oid
+          }
+        })
+        this.audioPlayer.currentSectionHref = section.href
+
+        let contents = await section.load(this.book.load.bind(this.book))
+        let paragraphElements = findParagraphDomElements(section.document) // все параграфы данного документа
+        let cfiBase = new EpubCFI(location.start.cfi)
+        for (let i = 1; i < paragraphElements.length; i++) {
+          let prevElement = paragraphElements[i - 1]
+          let nextElement = paragraphElements[i]
+          let range = document.createRange();
+          range.setStart(prevElement, 0);
+          range.setEnd(nextElement, 0);
+          let epubCfi = (new EpubCFI(range, cfiBase.base)).toString()
+          let epubCfiText = range.toString()
+          let cuts = this.audioPlayer.findCutsRes.items.filter(item => item.epubCfi === epubCfi) // может быть несколько вар-тов с разной озвучкой
+          this.audioPlayer.paragraphs.push({ epubCfi, epubCfiText, cuts })
+        }
       }
     },
+
+    highlightCurrentParagraphAudio (currentParagraph) {
+      if (this.audioPlayer.currentParagraphIndx >= 0) { // удалим старое выделение
+        let oldParagraph = this.audioPlayer.paragraphs[this.audioPlayer.currentParagraphIndx]
+        this.rendition.annotations.remove(oldParagraph.epubCfi, 'highlight')
+      }
+      if (currentParagraph) {
+        this.audioPlayer.currentParagraphIndx = this.audioPlayer.paragraphs.findIndex(p => p.epubCfi === currentParagraph.epubCfi)
+        this.rendition.annotations.highlight(currentParagraph.epubCfi, {}, async (e) => {
+          this.$logE('highlight clicked', currentParagraph.epubCfi)
+        }, undefined, {
+          fill: 'green',
+          'fill-opacity': '0.5',
+          'mix-blend-mode': 'multiply'
+        })
+        this.goToCfi(currentParagraph.epubCfi)
+      } else this.audioPlayer.currentParagraphIndx = -1
+    },
+    async playAudio () {
+      this.audioPlayer.isPlaying = true
+      if (this.audioPlayer.audio) { // играем текущий
+        this.audioPlayer.audio.play()
+      } else {
+        await this.nextAudio(1)
+      }
+    },
+    pauseAudio () {
+      this.audioPlayer.isPlaying = false
+      if (this.audioPlayer.audio) this.audioPlayer.audio.pause()
+    },
+    seekAudio (sec) {
+      if (this.audioPlayer.audio) this.audioPlayer.audio.currentTime += sec
+    },
+    async nextAudio (step = 1, fromCurrentSelection = false) {
+      let currentParagraph
+      if (fromCurrentSelection) { // ищем параграф, пересекающийся с выделением
+        assert(this.lastAnnotation.cfiRange, '!!bad this.lastAnnotation.cfiRange!')
+        for (let { epubCfi, epubCfiText, cuts } of this.audioPlayer.paragraphs) {
+          let paragraphCfiStart, paragraphCfiEnd, selectedCfiStart, selectedCfiEnd
+          paragraphCfiStart = new EpubCFI(epubCfi)
+          paragraphCfiStart.collapse(true)
+          paragraphCfiEnd = new EpubCFI(epubCfi)
+          paragraphCfiEnd.collapse(false)
+          selectedCfiStart = new EpubCFI(this.lastAnnotation.cfiRange)
+          selectedCfiStart.collapse(true)
+          selectedCfiEnd = new EpubCFI(this.lastAnnotation.cfiRange)
+          selectedCfiEnd.collapse(false)
+          // a.start <= b.end AND a.end >= b.start
+          let one = (new EpubCFI()).compare(paragraphCfiStart, selectedCfiEnd) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+          let two = (new EpubCFI()).compare(paragraphCfiEnd, selectedCfiStart) // First is earlier = -1, Second is earlier = 1, They are equal = 0
+          if (one <= 0 && two >= 1) { // пересекаются
+            currentParagraph = { epubCfi, epubCfiText, cuts }
+            break
+          }
+        }
+        if (!currentParagraph) return await this.nextAudio(0) // проиграем сначала
+        this.clearLastAnnotation()
+      } else { // играем след параграф
+        currentParagraph = this.audioPlayer.paragraphs[Math.max(0, this.audioPlayer.currentParagraphIndx + step)]
+      }
+      this.highlightCurrentParagraphAudio(currentParagraph)
+      if (currentParagraph) {
+        let currentCut = currentParagraph.cuts.find(c => c.params.system === this.audioPlayer.system && c.params.voice === this.audioPlayer.voice)
+        if (!this.audioPlayer.nextInternal) {
+          this.audioPlayer.nextInternal = debounce(async (currentCut, currentParagraph) => {
+            if (!currentCut) { // просим сервер создать новый кат
+              currentCut = await ContentApi.contentCutCreate(this.contentKalpa.oid, currentParagraph.epubCfi, currentParagraph.epubCfiText, {
+                system: this.audioPlayer.system,
+                voice: this.audioPlayer.voice
+              })
+              currentParagraph.cuts.push(currentCut)
+            }
+            this.pauseAudio()
+            this.audioPlayer.audio = new Audio(currentCut.url)
+            this.audioPlayer.audio.addEventListener('ended', async (event) => {
+              if (this.audioPlayer.isPlaying) {
+                await this.nextAudio(1)
+              }
+            })
+            await this.playAudio()
+          }, 1000)
+        }
+        this.audioPlayer.nextInternal(currentCut, currentParagraph)
+      }
+    },
+    destroyAudio () {
+      this.pauseAudio()
+      this.highlightCurrentParagraphAudio(null)
+      this.audioPlayer.audio = null
+    }
   },
   async mounted () {
     this.$log('mounted')
@@ -705,7 +857,7 @@ export default {
         //   background: 'rgba(200,200,200, 0.3)',
         //   color: 'black'
         // }
-      });
+      })
       this.rendition.on('selected', async (cfiRange, contents) => {
         this.$log('selected', cfiRange)
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
@@ -717,65 +869,73 @@ export default {
         // contents.window.getSelection().removeAllRanges();
       })
       this.rendition.on('rendered', async (section, iframe) => {
-        this.$log('rendered section', section)
+        // this.$log('rendered section', section)
         { // подгружаем соседние секции. Иначе при быстром скроллировании вверх - баг (отскакивает вниз на несколько глав)
           // await this.rendition.next()
           // await this.rendition.prev()
         }
 
-        iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
+        const completeSelection = () => {
+          this.clearLastAnnotation() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
-          this.$wait(200).then(async () => {
+          this.$wait(300).then(async () => {
             this.$log('mouseup')
-            this.clearLastAnnotation() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
             if (this.cfiRangeSelectInProgress) { // закончим выделение
               this.makeLastAnnotation(this.cfiRangeSelectInProgress, 'black', '0.3')
-              await this.savePosition(this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
             }
           })
+        }
+        iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
+          this.$log('mouseup', ev)
+          completeSelection()
         })
-        // iframe.document.documentElement.addEventListener('contextmenu', (ev) => {
-        //   ev.preventDefault();
-        //   console.error(ev)
-        //   alert('contextmenu')
-        //   // ev.preventDefault()
-        //   return false;
+
+        // на телефонах mouseup не выстреливает при выделении (опираемся на contextmenu)
+        iframe.document.documentElement.addEventListener('contextmenu', (ev) => {
+          this.$log('contextmenu', ev)
+            ev.preventDefault()
+            completeSelection()
+            return false;
+        })
+        // iframe.document.documentElement.addEventListener('click', (ev, ev1) => {
+        //   alert('click')
         // })
       })
       this.rendition.on('keyup', this.keyListener)
-      this.rendition.on('click', () => {
-        this.$emit('click')
+      this.rendition.on('click', (ev) => {
+        // this.$log('asdfsadfsadf', ev)
       })
       this.rendition.on('relocated', async (location) => {
-        // percentageFromCfi нормально НЕ работает пока не сработал this.book.locations.generate()
-        const percent = this.book.locations.percentageFromCfi(location.start.cfi)
-        const percentage = percent * 100
-        this.progressValue = percentage
-        // let cfiLoc = this.book.locations.cfiFromLocation(location.start.index)
-        // this.$log('relocated cfiLoc = ', cfiLoc)
-        this.$log('relocated to (progress) = ', percentage, location.start.cfi)
         await this.savePosition(location.start.cfi)
-        await this.showAllNodesForCurrentLocation()
-        await this.showAllDraftsForCurrentLocation()
-        // await this.prepareParagraphs(location)
+        // relocated вызывается слишком часто (например при промотке или при вызове this.rendition.display...)
+        if (!this.debouncedUpdateBookContent) {
+          this.debouncedUpdateBookContent = debounce(async (location) => {
+            this.$log('debouncedUpdateBookContent ', location.start.cfi)
+            // percentageFromCfi нормально НЕ работает пока не сработал this.book.locations.generate()
+            const percent = this.book.locations.percentageFromCfi(location.start.cfi)
+            const percentage = percent * 100
+            this.progressValue = percentage
+            // let cfiLoc = this.book.locations.cfiFromLocation(location.start.index)
+            // this.$log('relocated cfiLoc = ', cfiLoc)
+            await this.showAllNodesForCurrentLocation()
+            await this.showAllDraftsForCurrentLocation()
+            await this.prepareAudioPlayer(location)
+          }, 500)
+        }
+        this.debouncedUpdateBookContent(location)
       })
+      // долгая операция
+      this.locations = this.book.locations.generate().then(() => {
+        // todo можно отрисовать прогресс !
+      }).catch(err => this.$log('err on this.book.locations.generate', err)) // (долгая операция) нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
+      // window.addEventListener('resize', debounce(() => {
+      //   this.resizeToScreenSize()
+      // }, 250))
+      // this.updateScreenSizeInfo()
     }
-
     await this.book.ready // book ready
-    this.ready = true
     await this.restorePosition()
-
-    // await this.goToCfi('ch1-3.xhtml#id3')
-
-    // this.$emit('player', this)
-    // долгая операция
-    this.locations = this.book.locations.generate().catch(err => this.$log('err on this.book.locations.generate', err)) // (долгая операция) нужно для того чтобы прогресс нормально считался (без этого вызова percentageFromCfi не работает)
-
-    // window.addEventListener('resize', debounce(() => {
-    //   this.resizeToScreenSize()
-    // }, 250))
-    // this.updateScreenSizeInfo()
   },
   created () {
     this.$log('created')

@@ -491,6 +491,9 @@ class Group {
                case RxCollectionEnum.LST_FEED:
                   itemPrimaryKey = 'id' // эвенты
                   break
+               case RxCollectionEnum.LST_CONTENT_CUTS:
+                  itemPrimaryKey = 'cutId'
+                  break
                default:
                   throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
             }

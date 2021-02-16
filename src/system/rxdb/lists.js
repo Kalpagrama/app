@@ -154,11 +154,11 @@ class Lists {
       let mangoQuery = rxDoc.props.mangoQuery
       let contentOid = rxDoc.props.oid
       logD('apply to rxdoc', rxDoc.id, mangoQuery)
-      let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+      let reactiveDoc = getReactiveDoc(rxDoc).getPayload()
       let foundGroup
       let objectFiguresAbsoluteList = []
       if (!mangoQuery.selector.groupByContentLocation) { // список без группировки
-         foundGroup = reactiveItem
+         foundGroup = reactiveDoc
       } else { // список c группировкой
          // для списка с группировкой нужен полный объект (нужны фигуры!) А через эвенты к нам прилетают неполные объекты object
          let objectFull = await rxdb.get(RxCollectionEnum.LOCAL, null, { id: makeId(RxCollectionEnum.OBJ, object.oid) })
@@ -175,12 +175,14 @@ class Lists {
                let epubCfiIntersects = (figureLeft, figureRight) => { // пересечение куcков книги
                   if (!figureLeft.epubCfi && !figureRight.epubCfi) return true
                   if (figureLeft.epubChapterId && figureRight.epubCfi) {
-                     let tocIdRight = getTocIdFromCfi(figureRight.epubCfi) || ''
                      let tocIdLeft = figureLeft.epubTocId || ''
+                     let tocIdRight = getTocIdFromCfi(figureRight.epubCfi) || tocIdLeft // если в epubCfi не указана глава
+                     // eslint-disable-next-line eqeqeq
                      return getChapterIdFromCfi(figureRight.epubCfi) === figureLeft.epubChapterId && tocIdRight === tocIdLeft
                   } else if (figureRight.epubChapterId && figureLeft.epubCfi) {
                      let tocIdRight = figureRight.epubTocId || ''
-                     let tocIdLeft = getTocIdFromCfi(figureLeft.epubCfi) || ''
+                     let tocIdLeft = getTocIdFromCfi(figureLeft.epubCfi) || tocIdRight // если в epubCfi не указана глава
+                     // eslint-disable-next-line eqeqeq
                      return getChapterIdFromCfi(figureLeft.epubCfi) === figureRight.epubChapterId && tocIdRight === tocIdLeft
                   }
                   logE('TODO epubCfiInresects сделать реальную имплементацию пересечения epubCfi!!!')
@@ -214,7 +216,7 @@ class Lists {
                return false
             }
             // перебрать все группы из имеющихся и найти первую, подходящую под FiguresAbsolute
-            if (reactiveItem.items.length === 0) {
+            if (reactiveDoc.items.length === 0) {
                // создадим первую группу руками
                let group = {
                   name: 'whole',
@@ -227,9 +229,9 @@ class Lists {
                   thumbUrl: null,
                   __typename: 'Group' // чтобы реактивнй список мог понять что это группа
                }
-               reactiveItem.items.splice(0, 0, group)
+               reactiveDoc.items.splice(0, 0, group)
             }
-            for (let group of reactiveItem.items) {
+            for (let group of reactiveDoc.items) {
                let groupFiguresAbsolute = group.figuresAbsolute
                assert(groupFiguresAbsolute, '!group.figuresAbsolute')
                // вернет все области контента, задествованные на этом ядре
@@ -328,6 +330,32 @@ class Lists {
       logD(f, 'finded lists: ', rxDocs.map(rxDoc => rxDoc.id))
       for (let rxDoc of rxDocs) {
          await this.addRemoveObjectToRxDoc(type, rxDoc, object)
+      }
+   }
+
+   async addCutToContent (contentOid, contentCut) {
+      assert(contentOid && contentCut, 'contentOid && contentCut')
+      const f = this.addRemoveCutToContent
+      logD(f, 'start', contentCut)
+
+      // добавим на все сферы (relatedSphereOids)
+      let rxDocs = await Lists.cache.find({
+         selector: {
+            'props.rxCollectionEnum': LstCollectionEnum.LST_CONTENT_CUTS,
+            'props.oid': { $in: [contentOid] }
+         }
+      })
+      logD(f, 'finded rxDoc lists: ', rxDocs.map(rxDoc => rxDoc.id))
+      for (let rxDoc of rxDocs) {
+         let reactiveDoc = getReactiveDoc(rxDoc).getPayload()
+         assert(reactiveDoc.items, '!reactiveDoc.items')
+         assert(reactiveDoc.totalCount >= 0, 'reactiveDoc.totalCount >= 0')
+         // { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes }
+         let indx = reactiveDoc.items.findIndex(el => el.cutId === contentCut.cutId)
+         if (indx === -1) {
+            reactiveDoc.items.splice(0, 0, contentCut)
+            reactiveDoc.totalCount++
+         }
       }
    }
 
