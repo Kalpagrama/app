@@ -49,8 +49,8 @@
           q-btn(round flat color="green" icon="lens" @click="createColorNodeBookmark('green')")
           q-btn(round flat color="purple" icon="lens" @click="createColorNodeBookmark('purple')")
           .col
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateLastAnnotation(null, null, -1)")
-          q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateLastAnnotation(null, null, 1)")
+          //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateLastAnnotation(null, null, -1)")
+          //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateLastAnnotation(null, null, 1)")
           q-btn(v-if="!figure" @click='showNodeInputForm' round flat dense color="green" icon="add_circle_outline")
           q-btn(v-if="figure" @click='hideNodeInputForm' round flat dense color="white" icon="clear")
     //- table of contents...
@@ -77,30 +77,17 @@
           ).row.full-width.scroll
             span(:style=`{fontSize: '18px', color: 'green', userSelect: 'none'}`).text-bold {{ subchapter.label }}
     //- body book area
-    div(
-      :style=`{
-      position: 'relative',
-      borderRadius: '0 0 10px 10px',
-    }`).col.full-width
+    div(:style=`{ position: 'relative', borderRadius: '0 0 10px 10px',}`).col.full-width
       q-resize-observer(@resize="onResize" :debounce="300")
-      div(
-        :id="bookArea"
-        :style=`{
-        borderRadius: '0 0 10px 10px',
-        overflow: 'hidden'
-      }`
-      ).row.fit
-    .row.full-width.justify-center
-      div(
-        v-if="false"
-      )
-        input(v-model="cfi" width="300").row.full-width
-        q-btn(round flat color="white" icon="check" @click="goToCfiDebug(cfi)")
-        q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
-        q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
-        q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-        q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
+      div(class="scrolled" :id="bookArea" :style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.fit
+    div(v-if="true").row.full-width.justify-center
+      input(v-model="cfi" width="500").row.full-width
+      q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
+      q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
+      q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
+      q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
+      q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
         //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
         //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
@@ -112,6 +99,20 @@ import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
+
+class Cfi {
+  static makeRangeCfi (elStart, elEnd, cfiBase) {
+    cfiBase = new EpubCFI(cfiBase)
+    let cfiStart = new EpubCFI(elStart, cfiBase.base)
+    let cfiEnd = new EpubCFI(elEnd, cfiBase.base)
+    console.log(elStart)
+    console.dir(elStart)
+    console.log(elEnd)
+    console.dir(elEnd)
+    console.log(cfiBase.toString(), cfiStart.toString(), cfiEnd.toString())
+    console.log(cfiBase, cfiStart, cfiEnd)
+  }
+}
 
 export default {
   name: 'contentPlayer_book',
@@ -342,16 +343,18 @@ export default {
       this.figure = null
     },
     updateLastAnnotation (color, startOffset, endOffset) {
-      assert(this.lastAnnotation, '!this.lastAnnotation')
-      let cfiRange = this.lastAnnotation.cfiRange
-      color = color || this.lastAnnotation.styles.fill
-      if (endOffset) {
-        cfiRange = cfiRange.replace(/(?<=epubcfi\(.*,.*,\/.*:).*(?=\))/, function (a, b) {
-          return parseInt(a) + endOffset
-        })
-      }
-      this.clearLastAnnotation() // удалим старую и нарисуем новую
-      this.makeLastAnnotation(cfiRange, color, '0.3')
+      // safari не поддерживает Lookbehind!!! Пока отключаем. Если потребуется - сделать без регулярки
+
+      // assert(this.lastAnnotation, '!this.lastAnnotation')
+      // let cfiRange = this.lastAnnotation.cfiRange
+      // color = color || this.lastAnnotation.styles.fill
+      // if (endOffset) {
+      //   cfiRange = cfiRange.replace(/(?<=epubcfi\(.*,.*,\/.*:).*(?=\))/, function (a, b) {
+      //     return parseInt(a) + endOffset
+      //   })
+      // }
+      // this.clearLastAnnotation() // удалим старую и нарисуем новую
+      // this.makeLastAnnotation(cfiRange, color, '0.3')
     },
     makeLastAnnotation (cfiRange, color, opacity) {
       this.lastAnnotation = this.rendition.annotations.highlight(cfiRange, {}, async (e) => {
@@ -391,20 +394,21 @@ export default {
       // this.$log('allNodes', this.findNodesRes)
       for (let group of this.findNodesRes.items) {
         let { epubChapterId, epubTocId, epubHref } = group.figuresAbsolute[0]
-        tocId = tocId || epubTocId
-        if (chapterId !== epubChapterId && tocId !== epubTocId) continue
-        for (let item of group.items) {
-          let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
-          for (let figuresAbsolute of figuresAbsoluteList) {
-            this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
-            this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, { item }, async (e) => {
-              this.$logE('highlight clicked', item)
-              await this.showNodeInList(item.oid)
-            }, undefined, {
-              fill: 'indigo',
-              'fill-opacity': '0.5',
-              'mix-blend-mode': 'multiply'
-            })
+        epubTocId = epubTocId || ''
+        if (chapterId === epubChapterId && epubTocId === (tocId || epubTocId)) {
+          for (let item of group.items) {
+            let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
+            for (let figuresAbsolute of figuresAbsoluteList) {
+              this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
+              this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, { item }, async (e) => {
+                this.$logE('highlight clicked', item)
+                await this.showNodeInList(item.oid)
+              }, undefined, {
+                fill: 'indigo',
+                'fill-opacity': '0.5',
+                'mix-blend-mode': 'multiply'
+              })
+            }
           }
         }
       }
@@ -437,21 +441,21 @@ export default {
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
         assert(draftEpubCfi, '!draftEpubCfi')
         let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
-        let draftTocId = getTocIdFromCfi(draftEpubCfi) || tocId
-        if (chapterId !== draftChapterId && tocId !== draftTocId) continue
-
-        this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
-        this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
-          this.$logE('highlight clicked', draft)
-          await this.showDraftInList(draft.id)
-        }, undefined, {
-          fill: color,
-          'fill-opacity': '0.5',
-          'mix-blend-mode': 'multiply',
-          stroke: 'black',
-          'stroke-width': '1',
-          'stroke-dasharray': '3'
-        })
+        let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
+        if (chapterId === draftChapterId && draftTocId === (tocId || draftTocId)) {
+          this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
+          this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
+            this.$logE('highlight clicked', draft)
+            await this.showDraftInList(draft.id)
+          }, undefined, {
+            fill: color,
+            'fill-opacity': '0.5',
+            'mix-blend-mode': 'multiply',
+            stroke: 'black',
+            'stroke-width': '1',
+            'stroke-dasharray': '3'
+          })
+        }
       }
     },
     async createColorNodeBookmark (color = 'green') {
@@ -681,7 +685,7 @@ export default {
       //     this.$log('chapter cfiParagraph=', cfiParagraph.toString())
       //   }
       // }
-      const findParagraphDomElements = (el) => {
+      const findParagraphDomElements = (el, deep = 0) => {
         // let res = []
         // if (el.children.length > 1 && el.tagName !== 'head' && el.tagName !== 'html') {
         //   res.push(...el.children)
@@ -691,15 +695,21 @@ export default {
         // return res
         let res = []
         if (el.tagName !== 'head') {
-          if (el.children.length) {
-            for (let child of el.children) res.push(...findParagraphDomElements(child))
+          // console.dir(el)
+          // console.log(el)
+          let childrenTextLen = 0
+          for (let child of el.children) {
+            childrenTextLen += child.textContent ? child.textContent.length : 0
+          }
+          let ratio = el.textContent && childrenTextLen ? (childrenTextLen / el.textContent.length) : 0
+          if (!el.textContent || ratio > 0.8) { // если есть дети и весь текст в детях - разбиваем
+            for (let child of el.children) res.push(...findParagraphDomElements(child, ++deep))
           } else {
-            res.push(el)
+            if (el.textContent) res.push(el)
           }
         }
         return res
       }
-
       // получить все абзацы для озвучки
       let section = await this.book.section(location.start.href)
       if (this.audioPlayer.currentSectionHref !== section.href) {
@@ -717,16 +727,47 @@ export default {
         this.audioPlayer.currentSectionHref = section.href
 
         let contents = await section.load(this.book.load.bind(this.book))
+        this.$logD('section.document', section.document)
         let paragraphElements = findParagraphDomElements(section.document) // все параграфы данного документа
+        // for (let el of paragraphElements) console.dir(el)
         let cfiBase = new EpubCFI(location.start.cfi)
-        for (let i = 1; i < paragraphElements.length; i++) {
-          let prevElement = paragraphElements[i - 1]
-          let nextElement = paragraphElements[i]
+        for (let i = 0; i < paragraphElements.length; i++) {
+          let startElement = paragraphElements[i]
+          let epubCfiText = startElement.textContent
+          let endElement = startElement
+          // если следующий абзац - короткий - соединяем его с текущим в один большой параграф (только если общий родитель - иначе получается кривой epubCfi)
+          while (i < paragraphElements.length - 1 &&
+          // endElement.parentNode === paragraphElements[i + 1].parentNode &&
+          paragraphElements[i + 1].textContent.length < 88 &&
+          epubCfiText.length < 1000) {
+            endElement = paragraphElements[++i]
+            epubCfiText += '\n' + endElement.textContent
+          }
+
+          // this.$logD('startElement', startElement)
+          // this.$logD('endElement', endElement)
+          // this.$logD('nextElement', paragraphElements[i + 1])
+
           let range = document.createRange();
-          range.setStart(prevElement, 0);
-          range.setEnd(nextElement, 0);
+          range.setStart(startElement, 0);
+          if (i < paragraphElements.length - 1) { // так надо для формирования epubCfi
+            range.setEnd(paragraphElements[i + 1], 0)
+            // range.setEndBefore(paragraphElements[i + 1])
+          } else {
+            range.setEndAfter(endElement) // epubCfi будет кривой (но ничего не поделать...)
+          }
           let epubCfi = (new EpubCFI(range, cfiBase.base)).toString()
-          let epubCfiText = range.toString()
+
+          // console.dir(startElement)
+          // console.dir(endElement)
+          // console.dir(paragraphElements[i + 1])
+          // console.dir(range)
+          // this.$logD('epubCfi=', epubCfi)
+
+          // this.$logD('range.toString()=', range.toString())
+          this.$logD('epubCfiText', epubCfiText)
+          this.$logD('epubCfi=', epubCfi)
+          if (startElement.parentNode !== endElement.parentNode) Cfi.makeRangeCfi(startElement, endElement, location.start.cfi)
           let cuts = this.audioPlayer.findCutsRes.items.filter(item => item.epubCfi === epubCfi) // может быть несколько вар-тов с разной озвучкой
           this.audioPlayer.paragraphs.push({ epubCfi, epubCfiText, cuts })
         }
@@ -835,16 +876,14 @@ export default {
     // initReader
     {
       this.rendition = this.book.renderTo(this.bookArea, {
-        // contained: true,
-        // height: this.height,
-        // width: this.width
-        manager: 'continuous',
-        flow: 'scrolled',
-        // flow: 'scrolled-doc',
-        width: '100%',
-        height: '100%' // this.height
-        // flow: 'scrolled-doc'
-      })
+            // manager: 'continuous',
+            // flow: 'scrolled',
+            flow: 'scrolled-doc',
+            // flow: 'paginated',
+            width: '100%',
+            height: '100%' // this.height
+          }
+      )
       this.registerThemes()
       this.setTheme(this.theme)
       this.setFontSize(this.fontSize)
@@ -859,7 +898,7 @@ export default {
         // }
       })
       this.rendition.on('selected', async (cfiRange, contents) => {
-        this.$log('selected', cfiRange)
+        this.$log('selected', cfiRange, contents)
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // let range = await this.book.getRange(cfiRange)
         // if (range) {
@@ -894,9 +933,9 @@ export default {
         // на телефонах mouseup не выстреливает при выделении (опираемся на contextmenu)
         iframe.document.documentElement.addEventListener('contextmenu', (ev) => {
           this.$log('contextmenu', ev)
-            ev.preventDefault()
-            completeSelection()
-            return false;
+          ev.preventDefault()
+          completeSelection()
+          return false;
         })
         // iframe.document.documentElement.addEventListener('click', (ev, ev1) => {
         //   alert('click')

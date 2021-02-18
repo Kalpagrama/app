@@ -29,7 +29,7 @@ const LstCollectionEnum = Object.freeze({
    LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
    LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
    LST_SEARCH: 'LST_SEARCH',
-   LST_CONTENT_CUTS: 'LST_CONTENT_CUTS',
+   LST_CONTENT_CUTS: 'LST_CONTENT_CUTS'
 })
 
 const RxCollectionEnum = Object.freeze({
@@ -87,15 +87,39 @@ function checkMangoCond (mangoCond, value) {
 }
 
 function getChapterIdFromCfi (epubCfi) {
-   let match = epubCfi.match(/(?<=epubcfi\(.*\[).*(?=\]!)/)
-   let chapterId = match ? match[0] : null
-   return chapterId
+   // safari не поддерживает Lookbehind!!!
+   // let match // = epubCfi.match(/(?<=epubcfi\(.*\[).*(?=\]!)/)
+   // let chapterId = match ? match[0] : null
+   // return chapterId
+   // 'epubcfi(/6/14[chap05ref]!/4[body01]/10/2/1:3)'
+   let start = -1
+   let values = []
+   while (++start < epubCfi.length) {
+      start = epubCfi.indexOf('[', start)
+      let end = epubCfi.indexOf(']', start)
+      if (start >= 0 && end >= 0) {
+         values.push(epubCfi.substring(start + 1, end))
+      } else break
+   }
+   return values[0]
 }
 
 function getTocIdFromCfi (epubCfi) {
-   let match = epubCfi.match(/(?<=epubcfi\(.*!.*\[).*(?=\])/)
-   let tocId = match ? match[0] : null
-   return tocId
+   // safari не поддерживает Lookbehind!!!
+   // let match // = epubCfi.match(/(?<=epubcfi\(.*!.*\[).*(?=\])/)
+   // let tocId = match ? match[0] : null
+   // return tocId
+   // 'epubcfi(/6/14[chap05ref]!/4[body01]/10/2/1:3)'
+   let start = -1
+   let values = []
+   while (++start < epubCfi.length) {
+      start = epubCfi.indexOf('[', start)
+      let end = epubCfi.indexOf(']', start)
+      if (start >= 0 && end >= 0) {
+         values.push(epubCfi.substring(start + 1, end))
+      } else break
+   }
+   return values[1]
 }
 
 async function rxdbOperationProxyExec (collection, operation, ...params) {
