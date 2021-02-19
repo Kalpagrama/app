@@ -81,13 +81,11 @@
       q-resize-observer(@resize="onResize" :debounce="300")
       div(class="scrolled" :id="bookArea" :style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.fit
     div(v-if="true").row.full-width.justify-center
-      input(v-model="cfi" width="500").row.full-width
-      q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
+      //input(v-model="cfi" width="500").row.full-width
+      //q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
       q-btn(round flat color="white" icon="menu" @click='showTableOfContents')
-      q-btn(round flat color="white" icon="first_page" @click='goToFirstPage')
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click='goToPrevPage')
       q-btn(round flat color="white" icon="keyboard_arrow_right" @click='goToNextPage')
-      q-btn(round flat color="white" icon="last_page" @click='goToLastPage')
         //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
         //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
@@ -99,20 +97,6 @@ import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
-
-class Cfi {
-  static makeRangeCfi (elStart, elEnd, cfiBase) {
-    cfiBase = new EpubCFI(cfiBase)
-    let cfiStart = new EpubCFI(elStart, cfiBase.base)
-    let cfiEnd = new EpubCFI(elEnd, cfiBase.base)
-    console.log(elStart)
-    console.dir(elStart)
-    console.log(elEnd)
-    console.dir(elEnd)
-    console.log(cfiBase.toString(), cfiStart.toString(), cfiEnd.toString())
-    console.log(cfiBase, cfiStart, cfiEnd)
-  }
-}
 
 export default {
   name: 'contentPlayer_book',
@@ -277,7 +261,8 @@ export default {
     },
     async goToCfi (epubCfi) {
       this.$log('goToCfi', epubCfi)
-      await this.rendition.display(epubCfi)
+      if (epubCfi) await this.rendition.display(epubCfi)
+      else await this.rendition.display()
     },
     async goToCfiDebug (epubCfi) {
       this.$log('goToCfi', epubCfi)
@@ -395,7 +380,7 @@ export default {
       for (let group of this.findNodesRes.items) {
         let { epubChapterId, epubTocId, epubHref } = group.figuresAbsolute[0]
         epubTocId = epubTocId || ''
-        if (chapterId === epubChapterId && epubTocId === (tocId || epubTocId)) {
+        if (chapterId === epubChapterId /* && epubTocId === (tocId || epubTocId) */) {
           for (let item of group.items) {
             let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
             for (let figuresAbsolute of figuresAbsoluteList) {
@@ -442,7 +427,7 @@ export default {
         assert(draftEpubCfi, '!draftEpubCfi')
         let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
         let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
-        if (chapterId === draftChapterId && draftTocId === (tocId || draftTocId)) {
+        if (chapterId === draftChapterId /* && draftTocId === (tocId || draftTocId) */) {
           this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
           this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
             this.$logE('highlight clicked', draft)
@@ -727,7 +712,7 @@ export default {
         this.audioPlayer.currentSectionHref = section.href
 
         let contents = await section.load(this.book.load.bind(this.book))
-        this.$logD('section.document', section.document)
+        // this.$logD('section.document', section.document)
         let paragraphElements = findParagraphDomElements(section.document) // все параграфы данного документа
         // for (let el of paragraphElements) console.dir(el)
         let cfiBase = new EpubCFI(location.start.cfi)
@@ -737,25 +722,24 @@ export default {
           let endElement = startElement
           // если следующий абзац - короткий - соединяем его с текущим в один большой параграф (только если общий родитель - иначе получается кривой epubCfi)
           while (i < paragraphElements.length - 1 &&
-          // endElement.parentNode === paragraphElements[i + 1].parentNode &&
+          endElement.parentNode === paragraphElements[i + 1].parentNode &&
           paragraphElements[i + 1].textContent.length < 88 &&
-          epubCfiText.length < 1000) {
+          epubCfiText.length < 888) {
             endElement = paragraphElements[++i]
             epubCfiText += '\n' + endElement.textContent
           }
 
-          // this.$logD('startElement', startElement)
-          // this.$logD('endElement', endElement)
-          // this.$logD('nextElement', paragraphElements[i + 1])
-
           let range = document.createRange();
           range.setStart(startElement, 0);
-          if (i < paragraphElements.length - 1) { // так надо для формирования epubCfi
-            range.setEnd(paragraphElements[i + 1], 0)
-            // range.setEndBefore(paragraphElements[i + 1])
-          } else {
-            range.setEndAfter(endElement) // epubCfi будет кривой (но ничего не поделать...)
-          }
+          // range.setEnd(endElement.nextSibling, 0)
+          range.setEnd(paragraphElements[i + 1] ? paragraphElements[i + 1] : endElement, 0)
+
+          // if (i < paragraphElements.length - 1) { // так надо для формирования epubCfi
+          //   range.setEnd(paragraphElements[i + 1], 0)
+          //   // range.setEndBefore(paragraphElements[i + 1])
+          // } else {
+          //   range.setEndAfter(endElement) // epubCfi будет кривой (но ничего не поделать...)
+          // }
           let epubCfi = (new EpubCFI(range, cfiBase.base)).toString()
 
           // console.dir(startElement)
@@ -764,10 +748,15 @@ export default {
           // console.dir(range)
           // this.$logD('epubCfi=', epubCfi)
 
-          // this.$logD('range.toString()=', range.toString())
+          // this.$logD('startElement', startElement)
+          // this.$logD('endElement', endElement)
+          // this.$logD('nextElement', paragraphElements[i + 1])
+          // console.dir(range.startContainer)
+          // console.dir(range.endContainer)
+          // console.log(range.startContainer)
+          // console.log(range.endContainer)
           this.$logD('epubCfiText', epubCfiText)
           this.$logD('epubCfi=', epubCfi)
-          if (startElement.parentNode !== endElement.parentNode) Cfi.makeRangeCfi(startElement, endElement, location.start.cfi)
           let cuts = this.audioPlayer.findCutsRes.items.filter(item => item.epubCfi === epubCfi) // может быть несколько вар-тов с разной озвучкой
           this.audioPlayer.paragraphs.push({ epubCfi, epubCfiText, cuts })
         }

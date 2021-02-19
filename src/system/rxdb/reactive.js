@@ -593,7 +593,7 @@ class Group {
       let endFullFil = findEnd()
       if (startFullFil === -1) assert(endFullFil === -1, 'endFullFil === -1')
       if (endFullFil === -1) assert(startFullFil === -1, 'startFullFil === -1')
-      assert(endFullFil >= startFullFil, 'logic error end < start' + startFullFil + ':' + endFullFil)
+      assert(endFullFil >= startFullFil, 'logic error end < start' + startFullFil + ':' + endFullFil + '::' + this.reactiveGroup.id)
       return { startFullFil, endFullFil }
    }
 

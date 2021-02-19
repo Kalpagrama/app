@@ -221,6 +221,7 @@ export default {
       handler (to, from) {
         if (to) {
           this.pageId = null
+          this.$store.commit('ui/stateSet', ['nodeOnContent', null]) // иначе меню с ядрами висит и мешает (PPV)
         }
       }
     }
@@ -230,6 +231,7 @@ export default {
       this.$log('pageIdChange', pageId)
       if (this.pageId === pageId) {
         this.pageId = null
+        this.$store.commit('ui/stateSet', ['nodeOnContent', null]) // иначе меню с ядрами висит и мешает (PPV)
       }
       else {
         this.pageId = pageId

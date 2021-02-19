@@ -58,7 +58,7 @@ export default {
       this.player.setState('figure', this.item.items[0].layers[0].figuresAbsolute)
     },
     async showOnContent () {
-      await this.player.showItem(this.item)
+      await this.player.showItem(this.item) // (PPV) показать ядро на контенте
     }
   },
 }
