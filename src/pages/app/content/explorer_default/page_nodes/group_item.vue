@@ -65,7 +65,7 @@
         @click="itemReplay()"
         round flat dense color="white" icon="replay")
       .col
-      q-btn(
+      //- q-btn(
         @click="$emit('set-current')"
         outline dense color="white" no-caps) Cut here
       q-btn(

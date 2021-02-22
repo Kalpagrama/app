@@ -22,6 +22,7 @@ export default {
   nodeCategories: [],
   nodeOnContent: null,
   nodeDraft: null,
+  nodeCreating: false,
   // other
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},

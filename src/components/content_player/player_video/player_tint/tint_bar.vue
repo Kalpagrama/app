@@ -134,7 +134,7 @@ div(
                 ).row.bg-red
             //- currentTime hover percent
             div(
-              v-if="currentTimeHoverPercent"
+              v-if="!zoomed && currentTimeHoverPercent"
               :style=`{
                 position: 'absolute', zIndex: 2001,
                 top: '-14px',
@@ -146,7 +146,7 @@ div(
               //- small.text-white {{ currentTimeHoverPercent }}
             //- currentTime hover line
             div(
-              v-if="currentTimeHoverPercent"
+              v-if="!zoomed && currentTimeHoverPercent"
               :style=`{
                 position: 'absolute', zIndex: 2000,
                 left: currentTimeHoverPercent+'%',
@@ -200,7 +200,7 @@ div(
   //- footer: actions
   div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center.justify-between
     //- figure actions
-    //- tint-bar-figure-actions(
+    tint-bar-figure-actions(
       v-if="player && player.figure"
       v-bind="$props")
     //- default actions
@@ -514,6 +514,7 @@ export default {
       }
       this.zoomWrapperScrolling = true
       this.zoomWrapperScrollingTimer = setTimeout(() => {
+        this.figureEditing = false
         this.zoomWrapperScrolling = false
       }, 500)
       // whos first?
@@ -528,19 +529,28 @@ export default {
       if (t < 0) t = 0
       if (t > this.player.duration) t = this.player.duration
       // this.$log({scrollWidth: scrollWidth, scrollLeft: scrollLeft, t: t})
-      this.player.setCurrentTime(t)
-      // set figure borders
+      // setCurrentTime only in figure...
       if (!this.player.figure) return
-      if (this.player.figureFocused === 0) {
-        this.player.figure[0].t = t
-      }
-      else if (this.player.figureFocused === 1) {
-        this.player.figure[1].t = t
+      if (t >= this.player.figure[0].t && t <= this.player.figure[1].t) {
+        this.player.setCurrentTime(t)
+        this.figureEditing = false
       }
       else {
-        if (t < this.player.figure[0].t) this.player.figure[0].t = t
-        if (t > this.player.figure[1].t) this.player.figure[1].t = t
+        this.figureEditing = true
       }
+      // this.player.setCurrentTime(t)
+      // set figure borders
+      // if (!this.player.figure) return
+      // if (this.player.figureFocused === 0) {
+      //   this.player.figure[0].t = t
+      // }
+      // else if (this.player.figureFocused === 1) {
+      //   this.player.figure[1].t = t
+      // }
+      // else {
+      //   if (t < this.player.figure[0].t) this.player.figure[0].t = t
+      //   if (t > this.player.figure[1].t) this.player.figure[1].t = t
+      // }
     },
     zoomWrapperOnPan (e) {},
     async zoomIn () {
@@ -632,28 +642,28 @@ export default {
       // if (e.target.accessKey !== 'minutes-wrapper') return
       if (this.player.figureFocused !== null) this.player.setState('figureFocused', null)
       if (e.target.accessKey === 'minutes-wrapper') {
-        let left = e.layerX
-        let width = e.target.clientWidth
-        this.$log({left, width})
-        // this.zoomPercent = left / width
-        // this.zoomed = !this.zoomed
-        let t = (left / width) * this.player.duration
-        this.$log('t', t)
-        this.player.setCurrentTime(t)
-        if (!this.player.figure) return
-        if (t < this.player.figure[0].t) this.player.figure[0].t = t
-        if (t > this.player.figure[1].t) this.player.figure[1].t = t
-        let ref = this.$refs['minutes-wrapper']
-        let {width: widthMinutes} = ref.getBoundingClientRect()
-        // let scrollLeft = (left / width) * this.width
-        let scrollLeft = (t / this.player.duration) * widthMinutes
-        this.zoomWorking = true
-        this.$tween.to(this.$refs['zoom-wrapper'], 0.3, {
-          scrollLeft: scrollLeft,
-          onComplete: () => {
-            this.zoomWorking = false
-          }
-        })
+        // let left = e.layerX
+        // let width = e.target.clientWidth
+        // this.$log({left, width})
+        // // this.zoomPercent = left / width
+        // // this.zoomed = !this.zoomed
+        // let t = (left / width) * this.player.duration
+        // this.$log('t', t)
+        // this.player.setCurrentTime(t)
+        // if (!this.player.figure) return
+        // if (t < this.player.figure[0].t) this.player.figure[0].t = t
+        // if (t > this.player.figure[1].t) this.player.figure[1].t = t
+        // let ref = this.$refs['minutes-wrapper']
+        // let {width: widthMinutes} = ref.getBoundingClientRect()
+        // // let scrollLeft = (left / width) * this.width
+        // let scrollLeft = (t / this.player.duration) * widthMinutes
+        // this.zoomWorking = true
+        // this.$tween.to(this.$refs['zoom-wrapper'], 0.3, {
+        //   scrollLeft: scrollLeft,
+        //   onComplete: () => {
+        //     this.zoomWorking = false
+        //   }
+        // })
       }
       if (e.target.accessKey === 'figure-wrapper') {
         let left = e.layerX

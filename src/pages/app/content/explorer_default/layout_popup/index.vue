@@ -17,7 +17,7 @@ div(
       width: '70px',
     }`
     ).row
-  transition(enter-active-class="animated slideInRight" leave-active-class="animated slideInRight")
+  transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
     div(
       v-if="$q.screen.width >= 1200 && player && pageId"
       :style=`{
@@ -58,7 +58,7 @@ div(
   //- node editor mobile
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     node-editor-popup(
-      v-if="player && player.figure && $q.screen.width < 1200"
+      v-if="player && $q.screen.width < 1200"
       :player="player" :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
       :style=`{
@@ -92,7 +92,7 @@ div(
       template(v-slot:tint-bar=`{tintFocused}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-editor-popup(
-            v-if="player && player.figure && $q.screen.gt.xs"
+            v-if="player && $q.screen.gt.xs"
             :player="player" :contentKalpa="contentKalpa"
             :background="'rgba(30,30,30,0.6)'"
             :style=`{

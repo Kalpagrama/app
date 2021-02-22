@@ -5,13 +5,23 @@ div(
     position: 'absolute', zIndex: 2200,
     top: '-2px',
     height: 'calc(100% + 4px)',
-    borderTop: '2px solid rgb(76,175,79)',
-    borderBottom: '2px solid rgb(76,175,79)',
-    borderRight: '8px solid rgb(76,175,79)',
-    borderLeft: '8px solid rgb(76,175,79)',
+    borderTop: '2px solid '+borderColor,
+    borderBottom: '2px solid '+borderColor,
+    borderRight: '8px solid '+borderColor,
+    borderLeft: '8px solid '+borderColor,
     borderRadius: '3px',
   }`
   ).row
+  div(
+    v-if="!canPublish"
+    :style=`{
+      position: 'absolute', zIndex: 23300,
+      pointerEvents: 'none',
+      //- opacity: 0.8,
+      background: 'rgba(255,0,0,0.5)',
+    }`
+    ).row.fit.items-center.content-center.justify-center
+    small.text-white Максимум 1 минута
   //- figure duration hint reminder max 60sec...
   //- div(
     :style=`{
@@ -55,8 +65,8 @@ div(
       name="more_vert" color="white"
       :size="pointDraggingIndex === 0 ? '18px' : '14px'")
   //- drag handle left
+  //- @click.stop.self="pointClick(0)"
   div(
-    @click.stop.self="pointClick(0)"
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
     :class=`{
     }`
@@ -70,7 +80,7 @@ div(
     }`
     ).row
   //- drag actions
-  div(
+  //- div(
     v-if="player.figureFocused === 0"
     :style=`{
       position: 'absolute', zIndex: 2020,
@@ -84,7 +94,7 @@ div(
       @click.stop="figureForward(0,true)"
       round flat dense color="white" icon="keyboard_arrow_right")
   //- drag anchor
-  div(
+  //- div(
     v-if="player.figureFocused === 0"
     :class=`{
     }`
@@ -112,8 +122,8 @@ div(
       name="more_vert" color="white"
       :size="pointDraggingIndex === 1 ? '18px' : '14px'")
   //- drag handle right
+  //- @click.stop.self="pointClick(1)"
   div(
-    @click.stop.self="pointClick(1)"
     v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
     :class=`{
     }`
@@ -127,7 +137,7 @@ div(
     }`
     ).row
   //- drag actions
-  div(
+  //- div(
     v-if="player.figureFocused === 1"
     :style=`{
       position: 'absolute', zIndex: 2020,
@@ -141,7 +151,7 @@ div(
       @click.stop="figureForward(1,true)"
       round flat dense color="white" icon="keyboard_arrow_right")
   //- drag anchor
-  div(
+  //- div(
     v-if="player.figureFocused === 1"
     :class=`{
     }`
@@ -166,6 +176,24 @@ export default {
       pointDraggingIndex: -1,
       // pointClicked: null,
       figureForwardTimer: null,
+    }
+  },
+  computed: {
+    canPublish () {
+      return this.player.figure[1].t - this.player.figure[0].t <= 60
+    },
+    borderColor () {
+      if (this.player.figure) {
+        if (this.player.figure[1].t - this.player.figure[0].t > 60) {
+          return 'red'
+        }
+        else {
+          return 'rgb(76,175,79)'
+        }
+      }
+      else {
+        return 'rgb(76,175,79)'
+      }
     }
   },
   methods: {

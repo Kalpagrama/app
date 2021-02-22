@@ -1,17 +1,20 @@
 <template lang="pug">
 .row.full-width.items-center.content-center.justify-between.q-pt-md.q-px-xs.q-pb-sm
+  //- v-if="(node.name.length > 0 || node.spheres.length > 0)"
   q-btn(
-    v-if="(node.name.length > 0 || node.spheres.length > 0)"
     round flat color="red" icon="delete_outline" @click="nodeDelete()")
   .col
+  //-  && (node.name.length > 0 || node.spheres.length > 0)
   q-btn(
-    v-if="!node.wsItemType && (node.name.length > 0 || node.spheres.length > 0)"
+    v-if="!node.wsItemType"
     @click="nodeSave()"
     flat color="grey-5" no-caps) Сохранить
+  //- v-if="true || node.name.length > 0"
   q-btn(
-    v-if="node.name.length > 0"
     @click="nodePublish()"
-    flat color="green" no-caps
+    flat  no-caps
+    :color="canPublish ? 'green' : 'red'"
+    :disable="!canPublish"
     :loading="nodePublishing") Опубликовать
 </template>
 
@@ -27,6 +30,21 @@ export default {
     return {
       nodePublishing: false,
     }
+  },
+  computed: {
+    canPublish () {
+      if (this.contentKalpa.type === 'VIDEO') {
+        if (this.player.figure[1].t - this.player.figure[0].t <= 60) {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        return true
+      }
+    },
   },
   methods: {
     compositionCreate () {
@@ -115,9 +133,10 @@ export default {
         this.$log('nodeInput', nodeInput)
         // ---
         // create node, publish this shit
-        let createdNode = await ObjectCreateApi.essenceCreate(nodeInput)
-        this.$emit('nodePublished', createdNode)
-        // this.$q.notify({type: 'positive', message: 'Node published ' + createdNode.oid})
+        let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
+        this.$emit('nodeCreating', nodeCreating)
+        this.$store.commit('ui/stateSet', ['nodeCreating', true])
+        // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
         // ---
         // delete draft if it is a draft, man
         if (nodeInput.wsItemType === 'WS_NODE') {
@@ -147,6 +166,9 @@ export default {
         // ---
         // kill player figure, it will destroy node editor
         this.player.setState('figure', null)
+        // ---
+        // where to wait for the progress of node creating ?
+        // here ?
       }
       catch (e) {
         this.$log('nodePublish error', e)
