@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- debug top
-  //- div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
+  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',}`).row.bg-red.text-white
     .row.full-width
       small scrollTop: {{scrollTop}}, scrollHeight: {{scrollHeight}}
     q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
@@ -42,7 +42,7 @@
         ...itemStyles,
       }`
       v-observe-visibility=`{
-        throttle: 200,
+        throttle: 300,
         callback: indexMiddleHandler,
         intersection: {
           root: scrollTarget ? scrollTarget.clientHeight ? scrollTarget : null : null,
@@ -132,35 +132,13 @@ export default {
       async handler (to, from) {
         this.$log('itemsRes.items', to ? to.length : 0, from ? from.length : 0)
         if (this.itemsResInited) {
-          // await this.$wait(500)
-          this.$nextTick(() => {
-            this.$log('*** NEXT TICK NEXT TICK CION start ***')
-            // this.scrollUpdate()
-            let itemMeta = this.itemsRes.getProperty('itemMeta')
-            if (itemMeta) {
-              // this.$log('itemMeta', itemMeta)
-              this.$log('CION itemMeta', itemMeta.key)
-              let itemRef = this.$refs[`item-${itemMeta.key}`][0]
-              this.$log('CION itemRef', itemRef)
-              this.$log('CION itemRef.offsetTop', itemRef.offsetTop)
-              this.$log('CION this.scrollTarget', this.scrollTarget)
-              this.$log('CION this.itemRef.offsetTop', itemRef.offsetTop)
-              this.$log('CION this.itemMeta.offsetTop', itemMeta.offsetTop)
-              this.$log('CION this.scrollTop', this.scrollTop)
-              // this.$q.notify({type: 'positive', position: 'left', message: itemRef.offsetTop})
-              let scrollPosition = itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop
-              this.$log('CION scrollPosition', scrollPosition)
-              setScrollPosition(this.scrollTarget, scrollPosition)
-            }
-          })
+          this.scrollPreserve1()
         }
         else {
           this.$emit('ready')
-          // this.scrollUpdate()
         }
         // first load done
         this.itemsResInited = true
-        // this.scrollUpdate()
       }
     },
     scrollTop: {
@@ -173,6 +151,29 @@ export default {
     }
   },
   methods: {
+    scrollPreserve1 () {
+      this.$log('scrollPreserve1')
+      this.$nextTick(async () => {
+        this.$log('*** NEXT TICK NEXT TICK CION start ***')
+        let itemMeta = this.itemsRes.getProperty('itemMeta')
+        if (itemMeta) {
+          // this.$log('itemMeta', itemMeta)
+          // this.$log('CION itemMeta', itemMeta.key)
+          let itemRef = this.$refs[`item-${itemMeta.key}`][0]
+          // this.$log('CION itemRef', itemRef)
+          // this.$log('CION itemRef.offsetTop', itemRef.offsetTop)
+          // this.$log('CION this.scrollTarget', this.scrollTarget)
+          // this.$log('CION this.itemRef.offsetTop', itemRef.offsetTop)
+          // this.$log('CION this.itemMeta.offsetTop', itemMeta.offsetTop)
+          // this.$log('CION this.scrollTop', this.scrollTop)
+          // this.$q.notify({type: 'positive', position: 'left', message: itemRef.offsetTop})
+          // let scrollPosition = itemRef.offsetTop - itemMeta.offsetTop + this.scrollTop
+          let scrollPosition = itemRef.offsetTop + this.scrollTop
+          // this.$log('CION scrollPosition', scrollPosition)
+          setScrollPosition(this.scrollTarget, scrollPosition)
+        }
+      })
+    },
     async prev () {
       if (this.itemsRes.hasPrev && !this.itemsPreving) {
         this.$log('prev prev prev')
@@ -201,6 +202,7 @@ export default {
     indexMiddleHandler (isVisible, entry, i) {
       if (isVisible) {
         if (!this.positionSaving) return
+        if (!this.itemsResInited) return
         this.itemMiddleKey = entry.target.accessKey
         // prevent feed position save glitch
         // let itemMeta = this.itemsRes.getProperty('itemMeta')
