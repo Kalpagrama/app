@@ -67,10 +67,10 @@
     //- share start btn
     q-btn(
       round flat no-caps
-      :color="'grey-9'"
+      :color="color"
       :loading="loading")
       q-tooltip(dense dark) Поделиться
-      q-icon(name="logout" color="grey-9" size="23px").rotate-270
+      q-icon(name="logout" size="23px").rotate-270
 </template>
 
 <script>

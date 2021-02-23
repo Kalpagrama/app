@@ -36,14 +36,14 @@ div(
           //- group
           div(
             :style=`{
-              background: 'rgb(35,35,35, 0.8)',
-              borderRadius: '20px',
+              //- background: 'rgb(35,35,35,0.5)',
+              borderRadius: '10px',
             }`
             ).row.full-width.items-start.content-start.q-pb-sm.q-mb-sm
             //- group header
             .row.full-width.q-py-sm.q-px-md
-              div().row.full-width
-                span.text-white.text-bold {{group.name}}
+              div().row.full-width.q-px-sm
+                small.text-grey-6 {{ group.name }}
             .row.full-width
               //- prev
               .row.full-width.q-px-sm
@@ -143,9 +143,11 @@ export default {
       this.$log('setCurrentItem', item.oid)
       let listFeedRef = this.$refs['list-feed']
       if (listFeedRef) {
+        this.$log('setCurrentItem listFeedRef', listFeedRef)
         let itemsRes = listFeedRef.itemsRes
         if (itemsRes) {
-          itemsRes.setProperty('currentId', item.oid)
+          this.$log('setCurrentItem itemsRes', itemsRes)
+          await itemsRes.setProperty('currentId', item.oid)
           await itemsRes.gotoCurrent()
         }
       }
@@ -154,6 +156,9 @@ export default {
       this.$log('setSelected', item.oid)
       this.itemSelectedOid = item.oid
       if (this.player.showItem) await this.player.showItem(item) // (PPV) показать ядро на контенте
+      if (this.contentKalpa.type === 'VIDEO') {
+        this.player.play()
+      }
     },
     async listFeedReady () {
       this.$log('listFeedReady')

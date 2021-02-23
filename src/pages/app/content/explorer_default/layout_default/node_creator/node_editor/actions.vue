@@ -2,6 +2,7 @@
 .row.full-width.items-center.content-center.justify-between.q-pt-md.q-px-xs.q-pb-sm
   //- v-if="(node.name.length > 0 || node.spheres.length > 0)"
   q-btn(
+    v-if="node.wsItemType"
     round flat color="red" icon="delete_outline" @click="nodeDelete()")
   .col
   //-  && (node.name.length > 0 || node.spheres.length > 0)
@@ -134,7 +135,7 @@ export default {
         // ---
         // create node, publish this shit
         let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
-        this.$emit('nodeCreating', nodeCreating)
+        this.$emit('published', nodeCreating)
         this.$store.commit('ui/stateSet', ['nodeCreating', true])
         // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
         // ---

@@ -134,7 +134,7 @@ export default {
         if (this.itemsResInited) {
           // await this.$wait(500)
           this.$nextTick(() => {
-            this.$log('CION start')
+            this.$log('*** NEXT TICK NEXT TICK CION start ***')
             // this.scrollUpdate()
             let itemMeta = this.itemsRes.getProperty('itemMeta')
             if (itemMeta) {

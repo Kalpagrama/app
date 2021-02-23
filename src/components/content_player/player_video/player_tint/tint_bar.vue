@@ -536,6 +536,12 @@ export default {
         this.figureEditing = false
       }
       else {
+        if (t < this.player.figure[0].t) {
+          this.player.setCurrentTime(this.player.figure[0].t)
+        }
+        if (t > this.player.figure[1].t) {
+          this.player.setCurrentTime(this.player.figure[1].t)
+        }
         this.figureEditing = true
       }
       // this.player.setCurrentTime(t)
