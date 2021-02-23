@@ -688,7 +688,7 @@ class Group {
 
       // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
 
-      let itemsCopy = this.reactiveGroup.items.slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
+      let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
       itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
 
       // максимум 36 элементов (если больше - то отрезаем верх или низ)
@@ -698,7 +698,7 @@ class Group {
       } else if (position === 'bottom') {
          itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
       }
-      this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
+      // this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
 
       this.updateReactiveGroup()
    }
