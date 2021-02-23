@@ -355,6 +355,119 @@ class Group {
       }
    }
 
+   static async getGroupPropertiesQuery (rxQuery) {
+      assert(rxQuery && isRxQuery(rxQuery), '!rxQuery')
+      let totalCount, itemType, itemPrimaryKey // данные списка
+      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
+      assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
+      let mangoQuery = rxQuery.mangoQuery
+      assert(mangoQuery, '!mangoQuery')
+      let rxDocs = await rxQuery.exec()
+      assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
+      pageId = JSON.stringify(mangoQuery)
+      pageItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
+      totalCount = pageItems.length
+      itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
+      itemPrimaryKey = 'id'
+      return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
+   }
+
+   static getGroupPropertiesRxDoc (rxDoc) {
+      assert(rxDoc && isRxDocument(rxDoc), '!rxDoc')
+      let totalCount, itemType, itemPrimaryKey // данные списка
+      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
+      let {
+         items,
+         totalCount: totalCount_,
+         nextPageToken: nextPageToken_,
+         prevPageToken: prevPageToken_,
+         currentPageToken: currentPageToken_
+      } = rxDoc.toJSON().cached.data
+      let mangoQuery = rxDoc.props.mangoQuery
+      assert(mangoQuery, '!mangoQuery')
+      assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
+      pageId = rxDoc.id
+      pageItems = items
+      totalCount = totalCount_
+      nextPageToken = nextPageToken_
+      prevPageToken = prevPageToken_
+      currentPageToken = currentPageToken_
+      // для групп - назначаем id для каждой группы
+      for (let item of pageItems) {
+         if (item.__typename === 'Group') {
+            assert(item.figuresAbsolute, '!item.figuresAbsolute')
+            assert(item.items, '!group.items')
+            item.id = JSON.stringify(item.figuresAbsolute)
+         }
+      }
+      // не показываем пустые группы
+      pageItems = pageItems.filter(item => {
+         if (item.__typename === 'Group' && !item.items.length) return false
+         return true
+      })
+      if (mangoQuery.selector.groupByContentLocation) {
+         itemType = 'GROUP'
+         itemPrimaryKey = 'id'
+      } else {
+         itemType = 'ITEM'
+         // itemPrimaryKey
+         switch (mangoQuery.selector.rxCollectionEnum) {
+            case RxCollectionEnum.LST_SPHERE_ITEMS:
+            case RxCollectionEnum.LST_SEARCH:
+            case RxCollectionEnum.LST_SUBSCRIBERS:
+            case RxCollectionEnum.LST_SUBSCRIPTIONS:
+               itemPrimaryKey = 'oid'
+               break
+            case RxCollectionEnum.LST_FEED:
+               itemPrimaryKey = 'id' // эвенты
+               break
+            case RxCollectionEnum.LST_CONTENT_CUTS:
+               itemPrimaryKey = 'cutId'
+               break
+            default:
+               throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
+         }
+      }
+      return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
+   }
+
+   static getGroupPropertiesArray (array) {
+      assert(array && Array.isArray(array), '!array')
+      let totalCount, itemType, itemPrimaryKey // данные списка
+      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
+      pageId = 'custom array'
+      pageItems = array
+      totalCount = pageItems.length
+      itemType = 'ITEM' // todo определять тип итемов внутри (возможно позже там могут быть и группы)
+      const detectArrItemPrimaryKey = (items) => {
+         assert(items, 'detectArrItemPrimaryKey::!items')
+         if (pageItems.length) {
+            if (pageItems[0].oid) return 'oid'
+            else if (pageItems[0].id) return 'id'
+         } else return 'unknown'
+      }
+      itemPrimaryKey = detectArrItemPrimaryKey(pageItems)
+      return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
+   }
+
+   static async getGroupProperties (rxQueryOrRxDocOrArray) {
+      let rxQuery, rxDoc, array
+      if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
+      else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
+      else if (Array.isArray(rxQueryOrRxDocOrArray)) array = rxQueryOrRxDocOrArray
+      else throw new Error('bad rxQueryOrRxDocOrArray')
+      assert(rxQuery || rxDoc || array, '!this.rxQuery || this.rxDoc')
+      let totalCount, itemType, itemPrimaryKey // данные списка
+      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
+      if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
+         return await Group.getGroupPropertiesQuery(rxQuery)
+      } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
+         return Group.getGroupPropertiesRxDoc(rxDoc)
+      } else if (array) {
+         return Group.getGroupPropertiesArray(array)
+      } else throw new Error('bad rxQueryOrRxDocOrArray')
+   }
+
    // подписаться на обновления rxDoc
    rxQuerySubscribe (rxQueryOrRxDocOrArray) {
       const f = this.rxQuerySubscribe
@@ -394,7 +507,7 @@ class Group {
             page.pageItems = pageItemsNew // изменились итемы страницы
             this.reactiveGroup.totalCount = pageItemsNew.length
             let nextItems = pageItemsNew
-            if (this.populateFunc){
+            if (this.populateFunc) {
                let { startFullFil, endFullFil } = this.fulFilledRange()
                if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                   startFullFil = 0
@@ -426,88 +539,16 @@ class Group {
       const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
       assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
-      let rxQuery, rxDoc, array
-      if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
-      else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
-      else if (Array.isArray(rxQueryOrRxDocOrArray)) array = rxQueryOrRxDocOrArray
-      else throw new Error('bad rxQueryOrRxDocOrArray')
-      assert(rxQuery || rxDoc || array, '!this.rxQuery || this.rxDoc')
-      let totalCount, itemType, itemPrimaryKey // данные списка
-      let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
-      if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
-         assert(rxQuery.collection.name === 'ws_items', '!this.rxQuery.collection.name === ws_items')
-         let mangoQuery = rxQuery.mangoQuery
-         assert(mangoQuery, '!mangoQuery')
-         let rxDocs = await rxQuery.exec()
-         assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-         pageId = JSON.stringify(mangoQuery)
-         pageItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
-         totalCount = pageItems.length
-         itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
-         itemPrimaryKey = 'id'
-      } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
-         let {
-            items,
-            totalCount: totalCount_,
-            nextPageToken: nextPageToken_,
-            prevPageToken: prevPageToken_,
-            currentPageToken: currentPageToken_
-         } = rxDoc.toJSON().cached.data
-         let mangoQuery = rxDoc.props.mangoQuery
-         assert(mangoQuery, '!mangoQuery')
-         assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-         pageId = rxDoc.id
-         pageItems = items
-         totalCount = totalCount_
-         nextPageToken = nextPageToken_
-         prevPageToken = prevPageToken_
-         currentPageToken = currentPageToken_
-         // для групп - назначаем id для каждой группы
-         for (let item of pageItems) {
-            if (item.__typename === 'Group') {
-               assert(item.figuresAbsolute, '!item.figuresAbsolute')
-               assert(item.items, '!group.items')
-               item.id = JSON.stringify(item.figuresAbsolute)
-            }
-         }
-         // не показываем пустые группы
-         pageItems = pageItems.filter(item => {
-            if (item.__typename === 'Group' && !item.items.length) return false
-            return true
-         })
-         if (mangoQuery.selector.groupByContentLocation) {
-            itemType = 'GROUP'
-            itemPrimaryKey = 'id'
-         } else {
-            itemType = 'ITEM'
-            // itemPrimaryKey
-            switch (mangoQuery.selector.rxCollectionEnum) {
-               case RxCollectionEnum.LST_SPHERE_ITEMS:
-               case RxCollectionEnum.LST_SEARCH:
-               case RxCollectionEnum.LST_SUBSCRIBERS:
-               case RxCollectionEnum.LST_SUBSCRIPTIONS:
-                  itemPrimaryKey = 'oid'
-                  break
-               case RxCollectionEnum.LST_FEED:
-                  itemPrimaryKey = 'id' // эвенты
-                  break
-               case RxCollectionEnum.LST_CONTENT_CUTS:
-                  itemPrimaryKey = 'cutId'
-                  break
-               default:
-                  throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
-            }
-         }
-      } else if (array) {
-         pageId = 'custom array'
-         pageItems = array
-         totalCount = pageItems.length
-         itemType = 'ITEM' // todo определять тип итемов внутри (возможно позже там могут быть и группы)
-         if (pageItems.length) {
-            if (pageItems[0].oid) itemPrimaryKey = 'oid'
-            else if (pageItems[0].id) itemPrimaryKey = 'id'
-         } else itemPrimaryKey = 'unknown'
-      } else throw new Error('bad rxQueryOrRxDocOrArray')
+      let {
+         totalCount,
+         itemType,
+         itemPrimaryKey,
+         pageId,
+         pageItems,
+         nextPageToken,
+         prevPageToken,
+         currentPageToken
+      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray)
       assert(pageId, '!pageId')
       assert(totalCount >= 0, '!totalCount')
       assert(itemType && itemType.in('GROUP', 'ITEM'), 'bad itemType')
@@ -519,6 +560,7 @@ class Group {
       this.reactiveGroup.itemType = itemType
       this.reactiveGroup.itemPrimaryKey = itemPrimaryKey
       let page = {
+         itemPrimaryKey,
          pageItems,
          pageId,
          nextPageToken,
@@ -664,13 +706,14 @@ class Group {
    // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
    findIndx (currentId, findInDeep = true) {
       let indxFrom = -1
-      let findItemIndex = (items, id) => {
-         let indx = items.findIndex(item => item[this.reactiveGroup.itemPrimaryKey] === id)
+      let findItemIndex = (items, itemPrimaryKey, id) => {
+         let indx = items.findIndex(item => item[itemPrimaryKey] === id)
          if (indx === -1 && findInDeep) { // на этом уровне currentId не найден (идем вглубь)
             for (let i = 0; i < items.length; i++) {
                let subitems = items[i].items
                if (subitems) {
-                  if (findItemIndex(subitems, id) >= 0) {
+                  let { itemPrimaryKey } = Group.getGroupPropertiesArray(subitems)
+                  if (findItemIndex(subitems, itemPrimaryKey, id) >= 0) {
                      indx = i
                      break
                   }
@@ -679,7 +722,7 @@ class Group {
          }
          return indx
       }
-      if (currentId)indxFrom = findItemIndex(this.loadedItems(), currentId)
+      if (currentId) indxFrom = findItemIndex(this.loadedItems(), this.reactiveGroup.itemPrimaryKey, currentId)
       return indxFrom
    }
 

@@ -41,32 +41,6 @@ const RxCollectionEnum = Object.freeze({
    META: 'META'
 })
 
-// return promise
-function rxdbOperationProxy (collection, operation, ...params) {
-   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
-   const f = rxdbOperationProxy
-   logDT(f, collection.name, operation)
-   const t1 = performance.now()
-   switch (operation) {
-      case 'remove':
-         return collection.remove(...params)
-      case 'destroy':
-         return collection.destroy(...params)
-      case 'findOne':
-         return collection.findOne(...params)
-      case 'find':
-         return collection.find(...params)
-      case 'atomicUpsert':
-         return collection.atomicUpsert(...params)
-      case 'findByIds':
-         return collection.findByIds(...params)
-      case 'bulkInsert':
-         return collection.bulkInsert(...params)
-      default:
-         throw operation + ' not impl'
-   }
-}
-
 // для работы вне rxdb (такая же ф-я не сервере - синхронить!)
 function checkMangoCond (mangoCond, value) {
    if (typeof mangoCond === 'string' || typeof mangoCond === 'boolean') return mangoCond === value
@@ -120,6 +94,31 @@ function getTocIdFromCfi (epubCfi) {
       } else break
    }
    return values[1]
+}
+
+function rxdbOperationProxy (collection, operation, ...params) {
+   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
+   const f = rxdbOperationProxy
+   logDT(f, collection.name, operation)
+   const t1 = performance.now()
+   switch (operation) {
+      case 'remove':
+         return collection.remove(...params)
+      case 'destroy':
+         return collection.destroy(...params)
+      case 'findOne':
+         return collection.findOne(...params)
+      case 'find':
+         return collection.find(...params)
+      case 'atomicUpsert':
+         return collection.atomicUpsert(...params)
+      case 'findByIds':
+         return collection.findByIds(...params)
+      case 'bulkInsert':
+         return collection.bulkInsert(...params)
+      default:
+         throw operation + ' not impl'
+   }
 }
 
 async function rxdbOperationProxyExec (collection, operation, ...params) {

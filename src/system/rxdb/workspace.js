@@ -105,7 +105,11 @@ class Workspace {
                      }
                   })
                   if (deletedDocs.length === 0) { // только если не удален
-                     await rxdbOperationProxyExec(this.db.ws_changes, 'atomicUpsert', { id, operation, rev: plainData.rev })
+                     await rxdbOperationProxyExec(this.db.ws_changes, 'atomicUpsert', {
+                        id,
+                        operation,
+                        rev: plainData.rev
+                     })
                   }
                }
             }
@@ -243,11 +247,11 @@ class Workspace {
                if (wsServer[wsItemTypeEnum]) itemsServer.push(...wsServer[wsItemTypeEnum])
             }
             for (let itemServer of itemsServer) itemServer.hasChanges = false
+            let itemsLocal = await rxdbOperationProxyExec(this.db.ws_items, 'find')
             let newItems = []
             let outdatedItems = []
             let extraItems = []
             if (wsVersionLocal === wsServer.ver) {
-               let itemsLocal = await rxdbOperationProxyExec(this.db.ws_items, 'find')
                let unsavedIds = new Set((await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(item => item.id))
 
                // есть на сервере, но нет у нас (эти надо вставить!)
@@ -264,12 +268,15 @@ class Workspace {
                }).filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
                // logD(f, 'merge ws.(newItems, outdatedItems, extraItems):', newItems, outdatedItems, extraItems)
             } else { // на сервере совсем другая мастерская. Берем только ее (свои изменения убиваем)
-               await rxdbOperationProxy(this.db.ws_items, 'find').remove() // удаялем все локальные! на сервере - другая мастерская
+               extraItems = itemsLocal // удаялем все локальные! на сервере - другая мастерская
                newItems = itemsServer
+            }
+            if (extraItems.length) { // удаляем те, которых нет на сервере
+               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
+               await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
             }
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
             for (let outdated of outdatedItems) await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', outdated)
-            if (extraItems.length) await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove() // удаялем те, которых нет на сервере
             await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
@@ -651,7 +658,7 @@ class Workspace {
             // удалить себя(коллекцию) из всех bookmarks
             assert(reactiveCollection.bookmarks, '!reactiveCollection.bookmarks')
             if (permanent) {
-               let {items: bookmarks} = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
+               let { items: bookmarks } = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
                for (let bm of bookmarks) {
                   bm.collections = bm.collections.filter(id => id !== reactiveCollection.id)
                }
@@ -663,7 +670,7 @@ class Workspace {
             // удалить себя(букмарк) из всех коллекций
             assert(reactiveBookmark.collections, '!removedItem.collections')
             if (permanent && reactiveBookmark.collections && reactiveBookmark.collections.length > 0) {
-               let {items: collections} = await rxdb.find({
+               let { items: collections } = await rxdb.find({
                   selector: {
                      rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
                      id: { $in: reactiveBookmark.collections }
