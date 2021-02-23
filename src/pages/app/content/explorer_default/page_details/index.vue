@@ -22,27 +22,27 @@ div(
           .row.full-width.items-center.content-center
             .col.q-pa-sm
               span.text-white.text-bold {{ contentKalpa.name }}
-            kalpa-menu-actions(icon="more_vert" :title="contentKalpa.name" :actions="actions")
+            kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
           .row.full-width.items-end.content-end.q-pt-xs.q-px-sm
-            span.text-grey-7.q-mr-xs Просмотры: {{ contentKalpa.countStat.countViews }}
+            span.text-grey-3.q-mr-xs Просмотры: {{ contentKalpa.countStat.countViews }}
           .row.full-width.q-px-sm.q-pt-sm
-            span.text-grey-7.q-mr-xs Добавлен: {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
+            span.text-grey-3.q-mr-xs Добавлен: {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
         //- actions
         .row.full-width.items-center.content-center.q-px-sm
           div(
             v-if="contentKalpa.contentSource !== 'KALPA'"
             ).row.full-height.items-center.content-center.q-pl-md
-              span.text-grey-7 Источник:
+              span.text-grey-3 Источник:
               q-btn(
                 @click="gotToOriginal"
                 align="left"
-                flat color="grey-9" no-caps
+                flat color="grey-3" no-caps
                 :style=`{
                 }`)
                 q-icon(name="fab fa-youtube" color="red" size="30px")
-                span(:style=`{fontSize: '16px'}`).text-grey-4.text-bold.q-ml-sm YouTube
+                span(:style=`{fontSize: '16px'}`).text-grey-3.text-bold.q-ml-sm YouTube
           .col
-          kalpa-share(type="content" :item="contentKalpa")
+          kalpa-share(type="content" color="grey-2" :item="contentKalpa")
           kalpa-bookmark(
             v-if="contentKalpa"
             :oid="contentKalpa.oid"
@@ -50,12 +50,12 @@ div(
             :name="contentKalpa.name"
             :thumbUrl="contentKalpa.thumbUrl"
             :isActive="true"
-            inactiveColor="grey-9"
+            inactiveColor="grey-3"
             :fields=`{contentType: contentKalpa.type}`
             @bookmark="$event => $emit('bookmark', $event)").q-mr-sm
         //- similar content
-        .row.full-width.q-pl-lg.q-py-xs
-          span.text-grey-7 Рекомендации:
+        .row.full-width.q-pl-lg.q-pb-sm
+          span.text-grey-3 Рекомендации:
         div(
           :style=`{
             marginBottom: '300px',
@@ -68,7 +68,7 @@ div(
               position: 'relative',
               minHeight: '50px',
               borderRadius: '10px',
-              background: 'rgb(20,20,20)',
+              background: 'rgba(30,30,30,0.5)',
             }`
             ).row.full-width.items-start.content-start.q-mb-sm.cursor-pointer.content-wrapper
             //- loading

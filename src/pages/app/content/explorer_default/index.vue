@@ -8,21 +8,21 @@ component(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import layoutDefault from './layout_default/index.vue'
 import layoutFixed from './layout_fixed/index.vue'
-import layoutPopup from './layout_popup/index.vue'
 import layoutNode from './layout_node/index.vue'
 
 export default {
   name: 'explorerDefault',
   props: ['contentKalpa', 'query'],
   components: {
+    layoutDefault,
     layoutFixed,
-    layoutPopup,
     layoutNode,
   },
   data () {
     return {
-      layoutId: 'popup', // node, popup, fixed
+      layoutId: 'default', // default, fixed, node
     }
   },
   computed: {

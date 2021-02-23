@@ -260,6 +260,7 @@ export default {
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.player.pause()
+        this.player.events.emit('figure-forward-start')
       }
       // work
       let tNow = this.player.figure[index].t
@@ -270,6 +271,16 @@ export default {
       this.player.figure[index].t = t
       // final
       if (e.isFinal) {
+        // after dragging start playing
+        if (index === 0) {
+          this.player.play()
+        }
+        if (index === 1) {
+          let t = this.player.currentTime - 2
+          if (t > this.player.figure[0].t) this.player.setCurrentTime(t)
+          else this.player.setCurrentTime(this.player.figure[0].t)
+          this.player.play()
+        }
         this.pointDragging = false
         this.pointDraggingIndex = -1
         await this.$wait(300)

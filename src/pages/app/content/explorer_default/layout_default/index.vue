@@ -12,23 +12,24 @@ div(
     @pageId="pageIdChange"
     :style=`{
       position: 'fixed', zIndex: 1020,
-      right: '0px',
+      left: '0px',
       top: ($q.screen.height-350)/2+'px',
       width: '70px',
     }`
     ).row
-  transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+  transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
     div(
       v-if="$q.screen.width >= 1200 && player && pageId"
       :style=`{
         position: 'absolute', zIndex: 1010,
-        top: 70+'px', right: '0px',
+        top: 70+'px', left: '0px',
         height: $q.screen.height-200+'px',
         width: '578px',
-        paddingRight: '78px',
-        borderRadius: '20px 0 0 20px',
+        paddingLeft: '78px',
+        //- borderRadius: '20px 0 0 20px',
+        borderRadius: '10px',
         overflow: 'hidden',
-        background: 'rgb(30,30,30,0.5)',
+        background: 'rgb(30,30,30,0.8)',
       }`).row
       component(
         :is="`page-${pageId}`"
@@ -57,9 +58,10 @@ div(
       @pageId="pageId = $event")
   //- node editor mobile
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    node-editor-popup(
+    node-creator(
       v-if="player && $q.screen.width < 1200"
-      :player="player" :contentKalpa="contentKalpa"
+      :player="player"
+      :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px',
@@ -91,9 +93,10 @@ div(
       //- template(v-slot:tint=`{tintFocused}`)
       template(v-slot:tint-bar=`{tintFocused}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-editor-popup(
+          node-creator(
             v-if="player && $q.screen.gt.xs"
-            :player="player" :contentKalpa="contentKalpa"
+            :player="player"
+            :contentKalpa="contentKalpa"
             :background="'rgba(30,30,30,0.6)'"
             :style=`{
             }`).q-pt-sm.q-px-sm
@@ -132,8 +135,7 @@ import pageDetails from '../page_details/index.vue'
 import pageCreator from '../page_creator/index.vue'
 import pageNode from '../page_node/index.vue'
 
-import nodeEditor from './node_editor/index.vue'
-import nodeEditorPopup from './node_editor_popup/index.vue'
+import nodeCreator from './node_creator/index.vue'
 
 export default {
   name: 'layoutPopup',
@@ -147,8 +149,7 @@ export default {
     pageDetails,
     pageCreator,
     pageNode,
-    nodeEditor,
-    nodeEditorPopup,
+    nodeCreator,
   },
   data () {
     return {

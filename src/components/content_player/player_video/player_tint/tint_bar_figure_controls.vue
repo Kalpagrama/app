@@ -88,7 +88,26 @@ export default {
     figureRefresh () {
       this.$log('figureRefresh')
       this.player.setCurrentTime(this.player.figure[0].t)
+      this.player.play()
+    },
+    figureForwardStartHandle () {
+      this.$log('figureForwardStartHandle')
+      this.isLooping = false
+    },
+    figureForwardEndHandle () {
+      this.$log('figureForwardEndHandle')
+      // this.isLooping = true
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.player.events.on('figure-forward-start', this.figureForwardStartHandle)
+    this.player.events.on('figure-forward-end', this.figureForwardEndHandle)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.player.events.off('figure-forward-start', this.figureForwardStartHandle)
+    this.player.events.off('figure-forward-end', this.figureForwardEndHandle)
   }
 }
 </script>

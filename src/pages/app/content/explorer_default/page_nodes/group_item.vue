@@ -9,28 +9,41 @@
 .row.full-width.q-px-md
   q-dialog(
     v-model="isOpened"
-    :maximized="$q.screen.xs"
-    :full-width="$q.screen.xs")
-    node-feed(
-      :isActive="true"
-      :isVisible="true"
-      :node="item"
+    :maximized="true"
+    :full-width="true"
+    :contentStyle=`{
+      //- backgroundColor: 'rgba(0,0,0,0.7)',
+    }`)
+    div(
+      @click.self="isOpened = false"
       :style=`{
-        background: 'rgba(30,30,30,0.5)',
-        borderRadius: '10px',
-      }`)
+        //- background: 'rgba(0,0,0,0.7)',
+      }`
+      ).row.fit.items-center.content-center.justify-center
+      node-feed(
+        :isActive="true"
+        :isVisible="true"
+        :node="item"
+        :style=`{
+          //- background: 'rgba(30,30,30,0.5)',
+          //- borderRadius: '10px',
+          maxWidth: 600+'px',
+        }`)
   div(
     :style=`{
-      background: isSelected ? 'rgb(30,30,30)' : 'none',
+      background: isSelected ? 'rgb(60,60,60)' : 'none',
       borderRadius: '10px',
     }`
     ).row.full-width
     div(
       @click="itemClick"
+      :class=`{
+        'item': !isSelected,
+      }`
       :style=`{
         borderRadius: '10px',
       }`
-      ).row.full-width.item
+      ).row.full-width
       img(
         v-if="itemComposition"
         draggable="false"

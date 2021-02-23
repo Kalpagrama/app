@@ -106,6 +106,7 @@ export default {
       if (t > this.player.duration) t = this.player.duration
       // this.$log('t', t)
       this.$set(this.player.figure[pointIndex], 't', t)
+      this.player.events.emit('figure-forward-start')
       this.player.setCurrentTime(t)
       // check timer ? clear timeout
       if (this.figureForwardTimer) {
@@ -120,6 +121,7 @@ export default {
       this.figureForwardTimer = setTimeout(async () => {
         this.$log('figureForward FINAL')
         this.player.setState('figureFocused', true)
+        this.player.events.emit('figure-forward-end')
         if (pointIndex === 0) {
           // do nothing ? focus and play
           this.player.play()
