@@ -698,6 +698,13 @@ class Group {
       } else if (position === 'bottom') {
          itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
       }
+      // setTimeout(() => {
+      //    if (position === 'top') {
+      //       itemsCopy.splice(36, itemsCopy.length)
+      //    } else if (position === 'bottom') {
+      //       itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
+      //    }
+      // }, 1000)
       // this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
 
       this.updateReactiveGroup()

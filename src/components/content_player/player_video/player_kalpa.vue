@@ -48,6 +48,7 @@ export default {
       player: null,
       playing: false,
       currentTime: 0,
+      currentTimeRaw: 0,
       duration: 0,
       muted: true,
       events: {},
@@ -111,6 +112,7 @@ export default {
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
       if (this.$refs.videoRef) {
+        this.currentTimeRaw = this.$refs.videoRef.currentTime
         if (this.figureOffset) {
           this.currentTime = this.$refs.videoRef.currentTime - this.figureOffset[0].t
           // handle currentTime here ?
