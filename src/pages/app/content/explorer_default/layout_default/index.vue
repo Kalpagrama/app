@@ -6,7 +6,7 @@ div(
   }`).row.full-width.bg-black
   //- body desktop
   nav-desktop(
-    v-if="$q.screen.width >= 1200"
+    v-if="$q.screen.gt.md"
     :pageId="pageId"
     :contentKalpa="contentKalpa"
     @pageId="pageIdChange"
@@ -19,7 +19,7 @@ div(
     ).row
   transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
     div(
-      v-if="$q.screen.width >= 1200 && player && pageId"
+      v-if="$q.screen.gt.md && player && pageId"
       :style=`{
         position: 'absolute', zIndex: 1010,
         top: 70+'px', left: '0px',
@@ -43,7 +43,7 @@ div(
         }`)
   //- body mobile
   div(
-    v-if="player && !player.figure && $q.screen.width < 1200"
+    v-if="player && !player.figure && $q.screen.lt.md"
     :style=`{
       paddingTop: pageId ? contentHeightComputed+'px' : '0px',
     }`
@@ -59,7 +59,7 @@ div(
   //- node editor mobile
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     node-creator(
-      v-if="player && $q.screen.width < 1200"
+      v-if="player && $q.screen.lt.md"
       :player="player"
       :contentKalpa="contentKalpa"
       :background="'rgba(30,30,30,0.95)'"
@@ -94,7 +94,7 @@ div(
       template(v-slot:tint-bar=`{tintFocused}`)
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-creator(
-            v-if="player && $q.screen.gt.xs"
+            v-if="player && $q.screen.gt.md"
             :player="player"
             :contentKalpa="contentKalpa"
             :background="'rgba(30,30,30,0.6)'"
@@ -102,7 +102,7 @@ div(
             }`).q-pt-sm.q-px-sm
   //- footer mobile
   div(
-    v-if="$q.screen.width < 1200"
+    v-if="$q.screen.lt.lg"
     :style=`{position: 'fixed', zIndex: 100, bottom: '0px',}`).row.full-width.justify-center
     div(
       :style=`{
@@ -161,7 +161,7 @@ export default {
   },
   computed: {
     contentHeightComputed () {
-      if (this.$q.screen.width >= 1200) {
+      if (this.$q.screen.gt.md) {
         return this.$q.screen.height
       }
       else {

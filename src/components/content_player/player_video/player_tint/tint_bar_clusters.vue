@@ -23,6 +23,7 @@ div(
     ).row
   div(
     v-for="(cluster,clusterIndex) in player.clusters" :key="clusterIndex"
+    v-if="cluster.figuresAbsolute.length > 0"
     :style=`{
       position: 'absolute', zIndex: 1000+clusterIndex,
       left: (cluster.figuresAbsolute[0].t/player.duration)*100+'%',

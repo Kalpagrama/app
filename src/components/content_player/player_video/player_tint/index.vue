@@ -11,7 +11,7 @@ div(
   //- header
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     tint-header(
-      v-if="player && player.duration"
+      v-if="player && player.duration && showHeaderLocal"
       v-show="options.showHeader"
       v-bind="$props"
       :isFocused="tintFocused")
@@ -113,6 +113,7 @@ export default {
       tintClickSelfCount: 0,
       tintClickSelfCountShow: false,
       tintSpinnerCanShow: false,
+      showHeaderLocal: false,
     }
   },
   computed: {
@@ -230,8 +231,12 @@ export default {
     if (this.options.mode === 'editor') {
       window.addEventListener('keydown', this.onKeydown)
     }
-    await this.$wait(2000)
-    this.tintSpinnerCanShow = true
+    this.$wait(1000).then(() => {
+      this.showHeaderLocal = true
+    })
+    this.$wait(2000).then(() => {
+      this.tintSpinnerCanShow = true
+    })
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

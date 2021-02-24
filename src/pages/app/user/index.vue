@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  q-header(reveal)
+  //- q-header(reveal)
     .row.full-width.justify-center
       div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         page-header(:user="user")

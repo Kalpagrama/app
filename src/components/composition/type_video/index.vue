@@ -19,7 +19,8 @@ div(
       userSelect: 'none',
       height: styles.height,
       objectFit: styles.objectFit,
-      opacity: previewOpacity,
+      //- opacity: previewOpacity,
+      opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
     }`
     ).full-width
   //- video wrapper
@@ -56,6 +57,7 @@ div(
     :styles="styles"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
+      opacity: videoOpacity,
     }`).fit
 </template>
 
@@ -106,6 +108,19 @@ export default {
       }
       else {
         return null
+      }
+    },
+    videoOpacity () {
+      if (this.figureOffset && this.player) {
+        if (this.player.currentTimeRaw >= this.figureOffset[0].t + 0.05 && this.player.currentTimeRaw < this.figureOffset[1].t - 0.05) {
+          return 1
+        }
+        else {
+          return 0
+        }
+      }
+      else {
+        return 1
       }
     }
   },
