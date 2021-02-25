@@ -15,6 +15,7 @@ div(
       q-btn(outline color="white" dense no-caps @click="prev()") Prev
       q-btn(outline color="white" dense no-caps @click="next()") Next
       q-btn(outline color="white" dense no-caps @click="positionHere()") Here
+      q-btn(outline color="white" dense no-caps @click="positionDebug()") Cofee
   //- loading spinner state
   div(
     v-if="scrollTarget && !itemsRes"
@@ -79,6 +80,7 @@ div(
 
 <script>
 import { scroll } from 'quasar'
+import { RxCollectionEnum } from 'src/system/rxdb'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
 export default {
@@ -239,6 +241,10 @@ export default {
       this.positionSave(this.itemMiddleKey)
       this.itemsRes.gotoCurrent()
     },
+    positionDebug (key) {
+      this.itemsRes.setProperty('currentId', '142363647983880232')
+      this.itemsRes.gotoCurrent()
+    },
     itemMiddleHandler (isVisible, entry, i) {
       if (!this.positionSaving) return
       // if (this.itemMiddleHandlerCount === 0 && this.itemMiddle && this.itemMiddle.key !== entry.target.accessKey) {
@@ -254,7 +260,8 @@ export default {
       // TODO: handle -1
     },
     positionSave (key) {
-      this.$log('positionSave')
+      let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
+      this.$log('positionSave', objIndx, objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found', key)
       this.itemMiddleKey = key
       this.itemMiddleRef = this.$refs[`item-${key}`][0]
       this.itemMetaLifeTime = Date.now()
@@ -295,6 +302,7 @@ export default {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
+    // todo попробовать убрать wait
     this.$wait(600).then(() => {
       this.scrollUpdate()
       this.prev()

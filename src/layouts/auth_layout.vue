@@ -46,7 +46,7 @@ export default {
           //   needInvite: true,
           //   needConfirm: false,
           // }
-          console.log({loginType, userId, userExist, needInvite, needConfirm, token})
+          // console.log({loginType, userId, userExist, needInvite, needConfirm, token})
           let code
           if (needInvite) {
             // go to invite code...

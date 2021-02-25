@@ -117,8 +117,9 @@ class EventApi {
          EventApi.subscription = observerEvent.subscribe({
             next: async ({ data: { event } }) => {
                logD('EVENT received', event)
-               if (event.type === 'NOTICE' && event.typeNotice === 'CONFIRM_CODE'){
-                  let {result, failReason, oid} = await AuthApi.userAuthenticate(event.message, null)
+               if (event.type === 'NOTICE' && event.typeNotice === 'SESSION_CONFIRMED'){
+                  // сессия подтверждена (например перешли по ссылке подтверждения с почты)
+                  let {result, failReason, oid} = await AuthApi.userAuthenticate(null, null)
                   if (result === false) throw new Error(`Error on userAuthenticate: ${failReason}`)
                   else {
                      notify('info', 'Welcome to KALPAGRAMA!')

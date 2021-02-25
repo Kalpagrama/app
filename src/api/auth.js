@@ -113,16 +113,18 @@ class AuthApi {
          }
       }
       try {
-         return await apiCall(f, cb)
-      } finally {
-         if (!token || token === localStorage.getItem('k_token')) {
-            await systemReset(true, true, false, true) // вне cb (иначе дедлок)
-         }
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         await apiCall(f, cb)
+      } catch (err) {
+         logE('err on logout', err)
+         return await systemReset(true, true, true, true) // вне cb (иначе дедлок)
       }
+      if (!token || token === localStorage.getItem('k_token')) {
+         await systemReset(true, true, false, true) // вне cb (иначе дедлок)
+      }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   static async userIdentify (userId_, forceSendConfirmation = false) {
+   static async userIdentify (userId_, masterToken = null, forceSendConfirmation = false) {
       const f = AuthApi.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
@@ -145,8 +147,8 @@ class AuthApi {
          } = await apollo.clients.auth.query({
             query: gql`
                 ${fragments.dummyUserFragment}
-                query  ($userId: String, $forceSendConfirmation: Boolean){
-                    userIdentify(userId: $userId, forceSendConfirmation: $forceSendConfirmation){
+                query  ($userId: String, $forceSendConfirmation: Boolean, $masterToken: String){
+                    userIdentify(userId: $userId, forceSendConfirmation: $forceSendConfirmation, masterToken: $masterToken){
                         userId
                         loginType
                         userExist
@@ -163,6 +165,7 @@ class AuthApi {
             `,
             variables: {
                userId: userId_,
+               masterToken,
                forceSendConfirmation
             }
          })

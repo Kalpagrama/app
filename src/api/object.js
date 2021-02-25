@@ -121,7 +121,12 @@ class ObjectApi {
          logD(f, `complete: ${Math.floor(performance.now() - t1)}/${Math.floor(performance.now() - t2)} msec`, oids.length)
          return objectList
       }
-      return await apiCall(f, cb)
+      try {
+         return await apiCall(f, cb)
+      } catch (err){
+         logD('err on objectList', err)
+         throw err
+      }
    }
 
    static async objectFull (oid) {
