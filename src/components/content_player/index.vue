@@ -8,6 +8,8 @@ component(
     slot(name="tint" :tintFocused="tintFocused")
   template(v-slot:tint-bar=`{tintFocused}`)
     slot(name="tint-bar" :tintFocused="tintFocused")
+  template(v-slot:footer)
+    slot(name="footer")
 </template>
 
 <script>

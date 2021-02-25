@@ -36,7 +36,6 @@ div(
         :node="node"
         :contentKalpa="contentKalpa"
         :player="player"
-        :query="query"
         :height="$q.screen.height-190"
         :style=`{
           //- background: 'rgba(0,0,0,0.5)',
@@ -53,7 +52,6 @@ div(
       :node="node"
       :contentKalpa="contentKalpa"
       :player="player"
-      :query="query"
       :height="$q.screen.height-contentHeightComputed"
       @pageId="pageId = $event")
   //- node editor mobile
@@ -72,12 +70,13 @@ div(
       position: 'fixed', zIndex: 10,
       top: 0+'px',
       height: 'calc('+ contentHeightComputed +'px - env(safe-area-inset-bottom))'
-    }`).row.full-width
+    }`).row.full-width.justify-center
     content-player(
       @player="player = $event"
       :contentKalpa="contentKalpa"
       :style=`{
         height: '100%',
+        //- maxWidth: 600+'px',
       }`
       :options=`{
         showHeader: false,

@@ -7,19 +7,22 @@
 <template lang="pug">
 q-btn(
   flat no-caps
+  :round="isRound"
   :color="color"
-  :style=`{maxWidth: '60px'}`)
+  :style=`{
+    ...styles,
+  }`)
   user-avatar(
     :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
     :style=`{
       borderRadius: '50%',
     }`)
-  .row.full-width.justify-center
-    small Меню
+  div(v-if="showLabel").row.full-width.justify-center
+    span.text-white Меню
   q-menu(
     anchor="top right" self="bottom right" dark
     :max-height="$q.screen.height+'px'"
-    :offset="[0,16]"
+    :offset="[0,8]"
     )
     //- :offset="[16,16]"
     div(:style=`{width: '300px',}`).row.shadow-20
@@ -77,6 +80,20 @@ export default {
     color: {
       type: String,
       default: 'grey-7'
+    },
+    isRound: {
+      type: Boolean,
+      default: false,
+    },
+    showLabel: {
+      type: Boolean,
+      default: true
+    },
+    styles: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   data () {

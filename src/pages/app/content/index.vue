@@ -1,44 +1,31 @@
 <template lang="pug">
-explorer-default(
+component(
   v-if="contentKalpa"
-  :key="contentKalpa.oid"
-  :contentKalpa="contentKalpa"
-  :query="query")
-//- component(
-  v-if="contentKalpa"
-  :is="explorerComponent[contentKalpa.type]"
-  :key="contentKalpa.oid"
-  :contentKalpa="contentKalpa"
-  :query="query")
+  :is="'layout-'+layoutId"
+  :contentKalpa="contentKalpa")
 </template>
 
 <script>
 import { ObjectApi } from 'src/api/object'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import explorerDefault from './explorer_default/index.vue'
-// import explorerBook from './explorer_book/index.vue'
-// import explorerVideo from './explorer/index.vue'
-// import explorerImage from './explorer/index.vue'
+import layoutDefault from './layout_default/index.vue'
+import layoutVideo from './layout_video/index.vue'
+import layoutImage from './layout_image/index.vue'
+import layoutBook from './layout_book/index.vue'
 
 export default {
-  name: 'contentExplorer',
+  name: 'pageApp_content',
+  props: ['oid'],
   components: {
-    explorerDefault,
-    // explorerBook,
-    // explorerVideo,
-    // explorerImage
+    layoutDefault,
+    layoutVideo,
+    layoutImage,
+    layoutBook,
   },
-  props: ['oid', 'query'],
   data () {
     return {
       contentKalpa: null,
-      explorerComponent: {
-        VIDEO: 'explorer-video',
-        IMAGE: 'explorer-video',
-        BOOK: 'explorer-book',
-        WEB: 'explorer-web',
-      },
       isActiveStart: 0
     }
   },
@@ -49,32 +36,36 @@ export default {
       async handler (to, from) {
         this.$log('oid TO', to)
         if (to) {
-          // this.contentKalpa = null
-          // await this.$wait(250)
           this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
+          this.isActiveStart = Date.now()
         }
       }
     }
   },
+  computed: {
+    layoutId () {
+      if (this.contentKalpa.type === 'VIDEO') return 'video'
+      else if (this.contentKalpa.type === 'BOOK') return 'book'
+      else if (this.contentKalpa.type === 'IMAGE') return 'image'
+      else return 'default'
+    }
+  },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.oid)
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
-    // handle views stats
-    this.isActiveStart = Date.now()
   },
   async beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     // handle views stats
-    if (this.isActiveStart){
+    if (this.isActiveStart > 0) {
       let statValue = Date.now() - this.isActiveStart
       this.$log('statValue', statValue)
       let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
       this.$log('statValue stat', stat)
-      this.isActiveStart = 0
     }
   }
 }

@@ -10,29 +10,17 @@ div(
       height: '70px',
       borderRadius: '10px 10px 0 0',
     }`
-    ).row.full-width.items-center.content-center.justify-between.b-40.q-px-sm
+    ).row.full-width.items-center.content-center.justify-between.b-40
     q-btn(
       @click="$routerKalpa.back()"
-      flat color="grey-7" icon="west" no-caps
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Назад
+      flat color="white" icon="west" no-caps
+      :style=`{
+        width: '70px',
+        height: '70px',
+      }`)
+      span Назад
     .col
-    //- q-btn(
-      @click="$emit('pageId', 'inside')"
-      flat icon="workspaces" no-caps
-      :color="pageId === 'inside' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Микроядра
-    //- q-btn(
-      @click="$emit('pageId', 'names')"
-      flat icon="blur_circular" no-caps
-      :color="pageId === 'names' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
-      .row.full-width.justify-center
-        small Смыслы
-    kalpa-menu-popup-global
+    kalpa-menu-popup-global(:styles=`{width: '70px', height: '70px',}`)
 </template>
 
 <script>

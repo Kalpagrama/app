@@ -21,6 +21,7 @@ div(
       borderRadius: borderRadius,
       ...styles,
     }`).row.full-width.items-start.content-start
+    slot(name="wrapper-inside")
     //- HEADER: author, createdAt, actions, date, views
     div(
       v-if="showHeader && node.oid"
@@ -160,7 +161,8 @@ export default {
     orderActions: {type: Number, default: 3},
     itemsStyles: { type: Array, default () { return [{}, {}] } },
     styles: {type: Object},
-    borderRadius: {type: String, default: '10px'}
+    borderRadius: {type: String, default: '10px'},
+    actionsColor: {type: String, default: 'grey-9'}
   },
   data () {
     return {

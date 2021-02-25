@@ -4,7 +4,7 @@ div(
   }`
   ).row.full-width
   //- debug top
-  div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',opacity: 0.8}`).row.bg-green.text-white.q-pa-xs
+  //- div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',opacity: 0.8}`).row.bg-green.text-white.q-pa-xs
     .row.full-width
       small.full-width scrollTop: {{scrollTop}}
       small.full-width scrollHeight: {{scrollHeight}}
