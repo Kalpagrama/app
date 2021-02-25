@@ -10,7 +10,10 @@
         height: '40px',
       }`
       ).row.full-width
-      q-btn.full-width.bg-red Player timeline !
+      q-btn(
+        @click="isOpened ? $emit('hide') : $emit('open')"
+        flat color="white" no-caps
+        ).full-width {{ isOpened  ? 'Свернуть' : 'Открыть' }}
   q-btn(
     @click="$emit('close')"
     round flat color="white" icon="clear")
@@ -19,7 +22,7 @@
 <script>
 export default {
   name: 'playerVideo',
-  props: ['player', 'contentKalpa', 'node'],
+  props: ['player', 'contentKalpa', 'node', 'isOpened'],
   computed: {
   },
   methods: {

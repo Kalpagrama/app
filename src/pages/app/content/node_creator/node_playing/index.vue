@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center
+.row.full-width.justify-center.q-pb-sm
   node-feed(
     v-if="node"
     :node="node"
@@ -10,6 +10,8 @@
     :showItems="isOpened"
     :style=`{
       maxWidth: 600+'px',
+      background: 'rgba(30,30,30,0.9)',
+      borderRadius: '10px',
     }`)
     template(v-slot:wrapper-inside)
       div(
@@ -20,12 +22,15 @@
         }`
         ).row.fit.cursor-pointer
     template(v-slot:footer)
-      div(:style=`{order: 100}`).row.full-width.br
+      div(:style=`{order: 100}`).row.full-width.q-pa-xs
         player-video(
           v-if="contentKalpa.type === 'VIDEO'"
           :player="player"
           :contentKalpa="contentKalpa"
           :node="node"
+          :isOpened="isOpened"
+          @open="nodeOpen()"
+          @hide="isOpened = false"
           @close="nodeClose()")
 </template>
 
