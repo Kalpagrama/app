@@ -115,8 +115,7 @@ div(
               whiteSpace: 'nowrap',
             }`
             ).text-grey-4.q-mx-sm {{ s.name }}
-  //- FOOTER: slot, actions
-  slot(name="footer")
+  //- FOOTER: actions, slot
   node-actions(
     v-if="showActions && node.oid"
     :node="node"
@@ -125,6 +124,7 @@ div(
     :style=`{
       order: orderActions,
     }`)
+  slot(name="footer")
 </template>
 
 <script>

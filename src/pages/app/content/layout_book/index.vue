@@ -80,7 +80,7 @@ import pageDrafts from '../page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
-import nodeCreator from '../layout_video/node_creator/index.vue'
+import nodeCreator from '../node_creator/index.vue'
 
 export default {
   name: 'layoutBook',

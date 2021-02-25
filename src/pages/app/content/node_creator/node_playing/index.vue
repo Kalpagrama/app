@@ -20,9 +20,12 @@
         }`
         ).row.fit.cursor-pointer
     template(v-slot:footer)
-      .row.full-width
+      div(:style=`{order: 100}`).row.full-width.br
         player-video(
           v-if="contentKalpa.type === 'VIDEO'"
+          :player="player"
+          :contentKalpa="contentKalpa"
+          :node="node"
           @close="nodeClose()")
 </template>
 
