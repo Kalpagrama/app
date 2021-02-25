@@ -15,7 +15,7 @@ div(
       q-btn(outline color="white" dense no-caps @click="prev()") Prev
       q-btn(outline color="white" dense no-caps @click="next()") Next
       q-btn(outline color="white" dense no-caps @click="positionHere()") Here
-      q-btn(outline color="white" dense no-caps @click="positionDebug()") Cofee
+      q-btn(outline color="white" dense no-caps @click="positionDebug('142363647983880232')") Cofee
   //- loading spinner state
   div(
     v-if="scrollTarget && !itemsRes"
@@ -142,7 +142,7 @@ export default {
       async handler (to, from) {
         this.$log('query TO')
         if (this.itemsRes) {
-          this.positionDrop()
+          await this.positionDrop()
           this.itemsRes = null
         }
         this.itemsRes = await this.$rxdb.find(to, true)
@@ -152,11 +152,18 @@ export default {
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('§§§§§ itemsRes.items', to ? to.length : 0, from ? from.length : 0)
+        this.$log('itemsRes.items changed from =', from ? from.map(item => item.name) : '[]')
+        this.$log('itemsRes.items changed to = ', to ? to.map(item => item.name) : '[]')
+        this.$log('itemsRes.items changed this.itemsResInited = ', this.itemsResInited)
+        let itemMiddle = this.itemsRes.getProperty('itemMiddle')
+        this.$log('itemsRes.items changed itemMiddle = ', itemMiddle)
+        // если мы ушли с ленты, а потом пришли, то itemMiddle еще не установлен
+        if (itemMiddle) this.updateItemMiddle(itemMiddle.key)
+        await this.scrollPreserve()
+
         if (this.itemsResInited) {
-          this.scrollPreserve()
-        }
-        else {
+
+        } else {
           this.$emit('ready')
           // this.$nextTick(() => {
           //   this.prev()
@@ -186,10 +193,10 @@ export default {
       }
     },
     '$store.state.ui.listFeedNeedDrop': {
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('$store.state.ui.listFeedNeedDrop TO', to)
         if (to) {
-          this.positionDrop()
+          await this.positionDrop()
           this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
         }
       }
@@ -202,17 +209,16 @@ export default {
   },
   methods: {
     async scrollPreserve () {
-      this.$log('***** scrollPreserve start')
-      if (!this.itemMiddleRef) return
-      // if (this.itemsPreving || this.itemsNexting) return
-      let scrollDelta = this.itemMiddle ? this.itemMiddle.top : 0
-      this.$log('scrollPreserve scrollDelta', scrollDelta)
+      // this.$log('***** scrollPreserve start')
       this.$nextTick(async () => {
-        this.$log('scrollPreserve nextTick')
-        // let scrollPosition = this.itemMiddleRef.offsetTop
+        this.$log('scrollPreserve nextTick', !!this.itemMiddleRef)
+        if (!this.itemMiddleRef) return
+        // if (this.itemsPreving || this.itemsNexting) return
+        let scrollDelta = this.itemMiddle ? this.itemMiddle.top : 0
         let scrollPosition = this.itemMiddleRef.offsetTop - scrollDelta
+        // let scrollPosition = this.itemMiddleRef.offsetTop
         setScrollPosition(this.scrollTarget, scrollPosition)
-        this.$log('***** scrollPreserve done')
+        this.$log(`scrollPreserve done scrollDelta=${scrollDelta}  scrollPosition=${scrollPosition}`)
       })
     },
     async prev () {
@@ -238,12 +244,14 @@ export default {
     positionHere (key) {
       this.$log('positionHere')
       // this.itemsRes.setProperty('currentId', key)
-      this.positionSave(this.itemMiddleKey)
+      this.updateItemMiddle(this.itemMiddleKey)
       this.itemsRes.gotoCurrent()
     },
-    positionDebug (key) {
-      this.itemsRes.setProperty('currentId', '142363647983880232')
-      this.itemsRes.gotoCurrent()
+    async positionDebug (key) {
+      this.itemsRes.setProperty('currentId', key)
+      await this.itemsRes.gotoCurrent()
+      this.updateItemMiddle(key)
+      await this.scrollPreserve()
     },
     itemMiddleHandler (isVisible, entry, i) {
       if (!this.positionSaving) return
@@ -253,15 +261,16 @@ export default {
       // }
       // this.itemMiddleHandlerCount += 1
       if (isVisible) {
-        this.positionSave(entry.target.accessKey)
+        this.updateItemMiddle(entry.target.accessKey)
       }
       else {
       }
       // TODO: handle -1
     },
-    positionSave (key) {
+    // назначит элемент с ключом "key" - опорным (при измении списка - лента остается на опорном элементе)
+    updateItemMiddle (key) {
       let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
-      this.$log('positionSave', objIndx, objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found', key)
+      this.$log('updateItemMiddle', objIndx, objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found', key)
       this.itemMiddleKey = key
       this.itemMiddleRef = this.$refs[`item-${key}`][0]
       this.itemMetaLifeTime = Date.now()
@@ -302,11 +311,12 @@ export default {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
-    // todo попробовать убрать wait
-    this.$wait(600).then(() => {
-      this.scrollUpdate()
-      this.prev()
-    })
+    // this.$wait(600).then(async () => {
+    //   this.scrollUpdate()
+    //   await this.prev()
+    // })
+    this.scrollUpdate()
+    await this.prev()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
