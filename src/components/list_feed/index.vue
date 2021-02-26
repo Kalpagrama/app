@@ -186,7 +186,7 @@ export default {
       }
     },
     setItemMiddleKey(key, ignoreOffset = false) {
-      this.itemsRes.setProperty('currentId', key) // сохраняем до отрисовки(иначе не сработает positionDebug (если элемент отсутствует в старых данных))
+      if (this.positionSaving) this.itemsRes.setProperty('currentId', key) // сохраняем до отрисовки(иначе не сработает positionDebug (если элемент отсутствует в старых данных))
       const updateItemMiddle = (key) => {
         if (key) {
           let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
@@ -218,7 +218,8 @@ export default {
         } else this.itemMiddle = null
       }
       // if positionSaving is true, $nextTick updateItemMiddle...
-      if (this.positionSaving) this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
+      // if (this.positionSaving)
+      this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
     },
     // подмотает скролл до itemMiddle
     async scrollToItemMiddle () {
@@ -226,6 +227,10 @@ export default {
         if (this.itemMiddle) {
           this.$log('try scroll to itemMiddle', this.itemMiddle.name)
           let scrollOffset = this.itemMiddle.top // сместит ядро на запомненное место
+          // get top position of scrollTarget if it is not window!
+          let scrollOffsetScrollTarget = this.scrollTarget.getBoundingClientRect().top
+          this.$log('*** scrollOffsetScrollTarget ***', scrollOffsetScrollTarget)
+          scrollOffset -= scrollOffsetScrollTarget
           let scrollPosition = this.itemMiddle.ref.offsetTop - scrollOffset
           // let scrollPosition = this.itemMiddle.ref.offsetTop
           setScrollPosition(this.scrollTarget, scrollPosition)

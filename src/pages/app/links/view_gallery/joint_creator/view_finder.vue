@@ -5,7 +5,7 @@ div(
     //- background: 'rgb(35,35,35)',
     //- borderRadius: '10px',
   }`
-  ).row.full-width.br
+  ).row.full-width
   kalpa-finder(
     @contentKalpa="itemFound"
     :pages=`{
