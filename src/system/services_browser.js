@@ -224,7 +224,7 @@ async function resetLocalStorage () {
    try {
       await mutexGlobal.lock('system::resetLocalStorage')
       let keysForRemove = []
-      for (let key in localStorage){
+      for (let key in localStorage) {
          if (key.startsWith('k_') && key !== 'k_global_lock') keysForRemove.push(key)
       }
       for (let key of keysForRemove) localStorage.removeItem(key)
@@ -293,10 +293,24 @@ async function systemInit () {
          // alert(' systemInit 2 ')
          if (!localStorage.getItem('k_token')) {
             // alert(' systemInit 3 ')
-            const { userExist, userId, needInvite, needConfirm, dummyUser, loginType } = await AuthApi.userIdentify(null)
+            const {
+               userExist,
+               userId,
+               needInvite,
+               needConfirm,
+               dummyUser,
+               loginType
+            } = await AuthApi.userIdentify(null)
             logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
             if (needConfirm === false && dummyUser) {
                await rxdb.initGlobal({ dummyUser })
+            }
+         } else {
+            // есть k_token, но нет userOid
+            try { // если токен уже подтвержден, то userAuthenticate сработает нормально
+               await AuthApi.userAuthenticate(null)
+            } catch (err) {
+               logW('не удалось войти по токену', localStorage.getItem('k_token'))
             }
          }
       }

@@ -97,7 +97,7 @@ function getTocIdFromCfi (epubCfi) {
 }
 
 function rxdbOperationProxy (collection, operation, ...params) {
-   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
+   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params1 : ' + JSON.stringify({isRxCollection: isRxCollection(collection), operation}))
    const f = rxdbOperationProxy
    logDT(f, collection.name, operation)
    const t1 = performance.now()
@@ -122,7 +122,7 @@ function rxdbOperationProxy (collection, operation, ...params) {
 }
 
 async function rxdbOperationProxyExec (collection, operation, ...params) {
-   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params')
+   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params2 : ' + JSON.stringify({isRxCollection: isRxCollection(collection), operation}))
    const f = rxdbOperationProxyExec
    // logDT(f, collection.name, operation)
    const t1 = performance.now()

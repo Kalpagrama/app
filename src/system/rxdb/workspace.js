@@ -69,7 +69,7 @@ class Workspace {
    async updateCollections (operation) {
       assert(operation.in('create', 'delete', 'recreate'))
       const f = this.updateCollections
-      logD(f, 'start')
+      logD(f, 'start', operation)
       const t1 = performance.now()
       try {
          await this.lock('ws::updateCollections')

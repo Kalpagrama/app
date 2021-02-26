@@ -270,7 +270,7 @@ class Objects {
          return result
       }
       const f = this.get
-      // logD(f, 'start')
+      logD(f, 'start', id)
       let rxDoc = await this.cache.get(id, priority >= 0 ? fetchFunc : null, clientFirst, force, onFetchFunc)
       if (!rxDoc) return null // см "queued item was evicted legally"
       assert(rxDoc.cached, '!rxDoc.cached')

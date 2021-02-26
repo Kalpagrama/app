@@ -157,7 +157,7 @@ export default {
         //   loginType: 'EMAIL',
         //   hasPermanentPassword: true,
         // }
-        console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
+        // console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
         if (loginType !== 'EMAIL') throw new Error('Only emails...')
         this.userId = userId
         if (hasPermanentPassword) {

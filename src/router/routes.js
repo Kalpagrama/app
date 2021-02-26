@@ -1,6 +1,6 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
-import { systemInit } from 'src/system/services'
+import { systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 
@@ -19,7 +19,7 @@ const routes = [
       redirect: '/auth/sign-in',
       component: () => import('layouts/auth_layout.vue'),
       children: [
-         { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
+         { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') }
       ],
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
@@ -120,7 +120,7 @@ const routes = [
          {
             name: 'workspace',
             path: 'workspace',
-            component: () => import('pages/app/workspace/index.vue'),
+            component: () => import('pages/app/workspace/index.vue')
          },
          {
             name: 'workspace.watch-later',
@@ -153,6 +153,13 @@ const routes = [
          if (to.query.originalUrl) { // редирект на полную версию (после успешного входа перейдет на этот url)
             logD('redirect command received!', to.query.originalUrl)
             sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
+         }
+         if (to.query.masterToken) {
+            logD('clone session!', to.query.masterToken)
+            if (localStorage.getItem('k_token') !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
+               await AuthApi.userIdentify(null, to.query.masterToken)
+               await AuthApi.userAuthenticate(null)
+            }
          }
          logD('router :: try systemInit...')
          // alert(' /root router :: try systemInit... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))

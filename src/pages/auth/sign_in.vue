@@ -119,7 +119,7 @@ export default {
         // check email
         if (this.email.length === 0) throw new Error('Login is empty!')
         let {userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword} = await AuthApi.userIdentify(this.email)
-        console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
+        // console.log({userExist, userId, needInvite, needConfirm, loginType, hasPermanentPassword})
         // do stuff
         if (hasPermanentPassword) {
           this.hasPermanentPassword = hasPermanentPassword
