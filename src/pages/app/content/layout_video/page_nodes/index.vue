@@ -25,13 +25,14 @@ page-nodes-root(
       @click="nodeClick(item)"
       :style=`{
       }`
-      ).row.full-width.q-px-md.q-mb-md.node.q-py-sm
+      ).row.full-width.q-px-md.node.q-mb-md
       .row.full-width
         div(
           :style=`{
             borderRadius: '10px',
+            background: 'rgba(35,35,35,0.5)',
           }`
-          ).row.full-width.q-pa-sm.b-40
+          ).row.full-width
           //- small.text-grey-4 {{ getText(item) }}
           img(
             draggable="false"

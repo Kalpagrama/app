@@ -19,6 +19,17 @@ div(
           overflow: 'hidden',
         }`
         ).row.fit
+        //- node editor mobile
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="player && $q.screen.lt.lg"
+            :style=`{
+              position: 'absolute', zIndex: 10000, top: '0px',
+            }`
+            ).row.full-width.q-pa-sm
+            node-creator(
+              :player="player"
+              :contentKalpa="contentKalpa")
         //- pages
         transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
           div(
@@ -37,7 +48,7 @@ div(
               }`
               @close="pageId = null")
         //- node creator
-        div(
+        //- div(
           v-if="player && player.figure && !pageId"
           :style=`{
             position: 'absolute', zIndex: 1000, bottom: '40px',
@@ -67,21 +78,9 @@ div(
           ).full-width.bg-black
           template(v-slot:tint-bar=`{tintFocused}`)
             node-creator(
+              v-if="player && $q.screen.gt.md"
               :player="player"
               :contentKalpa="contentKalpa")
-            //- .row.full-width.justify-center.q-py-sm
-              div(
-                :style=`{
-                  maxWidth: 600+'px',
-                  height: '100px',
-                  borderRadius: '20px',
-                  background: 'rgba(30,30,30,0.5)',
-                }`
-                ).row.full-width
-                .row.full-width.items-center.content-center.justify-center.q-pa-md
-                  span(:style=`{fontSize: '18px',}`).text-white.text-bold kas dlkasldk malksd malksm dalkm
-                .row.full-width.justify-center.q-pa-sm
-                  span(v-for="n in 5" :key="n").text-white.q-mr-sm #sphere {{ n }}
   //- footer
   nav-bottom(
     v-show="footerShow"

@@ -75,6 +75,7 @@ module.exports = {
         'prefer-const': 0,
         'no-lone-blocks': 0,
         'brace-style': 0,
-        'no-async-promise-executor': 0
+        'no-async-promise-executor': 0,
+        'dot-notation': 0,
     }
 }

@@ -36,6 +36,7 @@
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
           v-if="p.id === 'trends' ? true : !isGuest"
+          @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
           :to="{name: p.id}"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id
@@ -54,6 +55,7 @@
         //- user
         router-link(
           v-if="!isGuest"
+          @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
           :to="'/user/'+$store.getters.currentUser().oid"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid

@@ -1,15 +1,16 @@
 <template lang="pug">
 div(
   :style=`{
-    paddingBottom: 'env(safe-area-inset-bottom)',
+    //- paddingBottom: 'env(safe-area-inset-bottom)',
   }`
   ).row.full-width.justify-center
   div(
     :style=`{
       maxWidth: 650+'px',
-      height: navHeight+'px',
+      //- height: navHeight+'px',
       background: 'rgba(40,40,40,1)',
       borderRadius: '10px 10px 0 0',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }`
     ).row.full-width.justify-between
     //- back
@@ -62,6 +63,10 @@ export default {
       if (this.$q.screen.width > 350) return 70
       else return 50
     }
-  }
+  },
+  messages: [
+    {id: 'm1', name: 'hello', author: {id: 'a1', name: 'Oleg'}},
+    {id: 'm2', name: 'Bye', author: {id: 'a2', name: 'Mike'}}
+  ]
 }
 </script>

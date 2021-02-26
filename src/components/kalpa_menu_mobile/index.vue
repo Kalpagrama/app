@@ -9,6 +9,7 @@
     }`
     ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
       :to="'/trends'"
       :color="'grey-7'"
@@ -32,6 +33,7 @@
     }`
     ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"
       :to="'/feeds/all'"
       :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
@@ -42,6 +44,7 @@
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
       :to="'/trends'"
       :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
@@ -54,6 +57,7 @@
       :color="'green'"
       :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="notifications_none"
       :to="'/notifications/'"
       :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"

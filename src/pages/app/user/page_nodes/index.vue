@@ -6,6 +6,8 @@ list-feed(
   }`
   :style=`{
   }`)
+  template(v-slot:prepend)
+    slot(name="prepend")
   template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
     node-feed(
       :node="item.populatedObject"
