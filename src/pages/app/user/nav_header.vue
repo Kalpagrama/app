@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.b-30.q-px-sm.q-pt-sm
+.row.full-width.justify-center.b-30.q-pt-sm
   //- user thumbUrl cover ?
   div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     div(

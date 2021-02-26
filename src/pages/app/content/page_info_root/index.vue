@@ -7,28 +7,34 @@
 <template lang="pug">
 div(
   :style=`{
-    height: height+'px',
+    ...styles,
   }`
-  ).column.full-width
+  ).column.fit
   .col.full-width.scroll
     .row.full-width.justify-center
       div(
         :style=`{
-          //- maxWidth: $store.state.ui.pageWidth+'px',
-          maxWidth: 600+'px',
         }`).row.full-width.items-start.content-start
         //- header
-        .row.full-width.q-pt-sm.q-px-md
-          .row.full-width.items-center.content-center
-            .col.q-pa-sm
-              span.text-white.text-bold {{ contentKalpa.name }}
+        .row.full-width
+          .row.full-width.q-pa-md
+            span.text-white.text-bold {{ contentKalpa.name }}
+          .row.full-width.items-center.content-center.q-px-md
+            small.text-grey-3.q-mr-xs Просмотры: {{ contentKalpa.countStat.countViews }}
+            small.text-grey-3.q-mr-xs • {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
+            .col
+            kalpa-share(type="content" color="grey-2" :item="contentKalpa")
+            kalpa-bookmark(
+              v-if="contentKalpa"
+              :oid="contentKalpa.oid"
+              :type="contentKalpa.type"
+              :name="contentKalpa.name"
+              :thumbUrl="contentKalpa.thumbUrl"
+              :isActive="true"
+              inactiveColor="grey-3"
+              :fields=`{contentType: contentKalpa.type}`
+              @bookmark="$event => $emit('bookmark', $event)")
             kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
-          .row.full-width.items-end.content-end.q-pt-xs.q-px-sm
-            span.text-grey-3.q-mr-xs Просмотры: {{ contentKalpa.countStat.countViews }}
-          .row.full-width.q-px-sm.q-pt-sm
-            span.text-grey-3.q-mr-xs Добавлен: {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
-        //- actions
-        .row.full-width.items-center.content-center.q-px-sm
           div(
             v-if="contentKalpa.contentSource !== 'KALPA'"
             ).row.full-height.items-center.content-center.q-pl-md
@@ -41,20 +47,8 @@ div(
                 }`)
                 q-icon(name="fab fa-youtube" color="red" size="30px")
                 span(:style=`{fontSize: '16px'}`).text-grey-3.text-bold.q-ml-sm YouTube
-          .col
-          kalpa-share(type="content" color="grey-2" :item="contentKalpa")
-          kalpa-bookmark(
-            v-if="contentKalpa"
-            :oid="contentKalpa.oid"
-            :type="contentKalpa.type"
-            :name="contentKalpa.name"
-            :thumbUrl="contentKalpa.thumbUrl"
-            :isActive="true"
-            inactiveColor="grey-3"
-            :fields=`{contentType: contentKalpa.type}`
-            @bookmark="$event => $emit('bookmark', $event)").q-mr-sm
-        //- similar content
-        .row.full-width.q-pl-lg.q-pb-sm
+        //- related content
+        //- .row.full-width.q-px-md
           span.text-grey-3 Рекомендации:
         div(
           :style=`{
@@ -108,7 +102,16 @@ import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'pageDetails',
-  props: ['contentKalpa', 'player', 'height'],
+  props: {
+    contentKalpa: {type: Object, required: true},
+    player: {type: Object, required: true},
+    styles: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
+  },
   data () {
     return {
       relatedContentLoading: null,

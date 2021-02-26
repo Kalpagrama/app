@@ -6,20 +6,25 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between.b-40.q-px-xs.q-pb-xs.q-pt-sm
+    ).row.full-width.justify-between.b-40.q-px-xs
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
       :to="'/trends'"
       :color="'grey-7'"
-      :style=`{maxWidth: '60px'}`)
+      :style=`{
+        width: size+'px',
+        height: size+'px'
+      }`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Поиск
     q-btn(
       :to="'/auth'"
       flat color="white" no-caps
       :style=`{
-        height: '44px',
+        height: size+'px',
       }`).q-px-md.q-mt-xs.b-50
       span.text-white Войти
     //- kalpa-menu-popup-global
@@ -29,41 +34,63 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
+    ).row.full-width.justify-between.b-40
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"
       :to="'/feeds/all'"
-      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
+      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'white'"
       :style=`{
-        width: '60px',
+        width: size+'px',
+        height: size+'px',
       }`
       ).row.items-center.content-center.justify-center
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`).text-grey-7 Лента
+        small(:style=`{whiteSpace: 'nowrap'}`) Лента
     q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
       :to="'/trends'"
-      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
+      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'white'"
+      :style=`{
+        width: size+'px',
+        height: size+'px',
+      }`)
       .row.full-width.justify-center
         small(:style=`{whiteSpace: 'nowrap'}`) Поиск
+    //- workspace
+    div(
+      :style=`{
+        width: size+'px',
+        height: size+'px',
+      }`
+      ).row.items-center.content-center.justify-center
+      q-btn(
+        round no-caps icon="construction"
+        :to="'/workspace'"
+        :color="'green'"
+        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
     q-btn(
-      round no-caps icon="construction"
-      :to="'/workspace'"
-      :color="'green'"
-      :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-    q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="notifications_none"
       :to="'/notifications/'"
-      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
-      :style=`{maxWidth: '60px'}`)
+      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'white'"
+      :style=`{
+        width: size+'px',
+        height: size+'px',
+      }`)
       //- TODO: handle new notifications...
       //- q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
         //- small Активность
         small Уведомления
-    kalpa-menu-popup-global
+    kalpa-menu-popup-global(
+      :styles=`{
+        width: size+'px',
+        height: size+'px',
+      }`)
 </template>
 
 <script>
@@ -79,6 +106,10 @@ export default {
   computed: {
     isGuest () {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
+    },
+    size () {
+      if (this.$q.screen.width > 350) return 70
+      else return 50
     }
   },
   methods: {

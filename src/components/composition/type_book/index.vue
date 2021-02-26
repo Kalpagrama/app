@@ -7,6 +7,7 @@ div(
   ).row.fit.items-center.content-center.justify-center.q-px-md.b-40
   //- context
   q-btn(
+    @click="contextClick"
     :to="'/content/'+composition.layers[0].contentOid"
     round flat color="white" no-caps icon="select_all"
     :style=`{
@@ -52,6 +53,12 @@ export default {
     }
   },
   methods: {
+    contextClick () {
+      this.$log('contextClick')
+      if (this.options.nodeOid) {
+        this.$store.commit('ui/stateSet', ['nodeOnContent', this.options.nodeOid])
+      }
+    }
   },
   mounted () {
     // this.$log('mounted')

@@ -4,6 +4,12 @@ div(
     ...styles,
   }`
   ).column.full-width
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 3000, right: '0px',
+    }`
+    ).row.text-white.bg-green
+    small {{ figureOffset }}
   player-tint(
     v-if="player"
     v-bind="$props"
@@ -26,6 +32,7 @@ div(
         zIndex: 100,
         top: 0,
         ...styles,
+        opacity: videoOpacity,
       }`
       :styles="styles"
       @player="playerCreated")
@@ -57,6 +64,34 @@ export default {
       playerComponent: {
         YOUTUBE: 'player-youtube',
         KALPA: 'player-kalpa',
+      }
+    }
+  },
+  computed: {
+    figureOffset () {
+      let arr = this.contentKalpa.url.split('#t=')
+      if (arr.length > 1) {
+        let [start, end] = arr[1].split(',')
+        return [
+          {t: parseFloat(start)},
+          {t: parseFloat(end)},
+        ]
+      }
+      else {
+        return null
+      }
+    },
+    videoOpacity () {
+      if (this.figureOffset && this.player) {
+        if (this.player.currentTimeRaw >= this.figureOffset[0].t + 0.05 && this.player.currentTimeRaw < this.figureOffset[1].t - 0.05) {
+          return 1
+        }
+        else {
+          return 0
+        }
+      }
+      else {
+        return 1
       }
     }
   },

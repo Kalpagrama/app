@@ -1,5 +1,8 @@
 <template lang="pug">
-h1.text-white rating
+.row.full-width
+  template(v-slot:prepend)
+    slot(name="prepend")
+  h1.text-white rating
 </template>
 
 <script>

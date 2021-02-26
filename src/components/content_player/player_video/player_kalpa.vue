@@ -62,6 +62,7 @@ export default {
       canplay: false,
       playing_: false,
       clusters: [],
+      nodePlaying: null,
     }
   },
   methods: {

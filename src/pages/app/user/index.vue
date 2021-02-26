@@ -1,26 +1,11 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  //- q-header(reveal)
-    .row.full-width.justify-center
-      div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        page-header(:user="user")
-        div(
-          :style=`{
-            position: 'sticky', top: '0px',
-            zIndex: 2000,
-            transform: 'translate3d(0,0,100px)',
-          }`
-          ).row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-px-md
-            q-tabs(
-              no-caps active-color="green" align="justify"
-              stretch :breakpoint="100" inline-label
-              :switch-indicator="true").full-width.text-grey-8
-              //- t.name +' '+ t.count
-              q-route-tab(
-                v-for="t in tabs" :key="t.id"
-                inline-label
-                :to="t.id" :name="t.id" :label="t.name").q-px-sm
+q-layout(view="hHh Lpr lff" @scroll="onScroll")
+  nav-tabs(
+    v-if="user && scrollPosition > 265"
+    :tabs="tabs"
+    :style=`{
+      position: 'fixed', zIndex: 1000, top: '0px',
+    }`)
   q-page-container
     q-page.row.full-width.justify-center
       component(
@@ -30,13 +15,18 @@ q-layout(view="hHh Lpr lff")
         :style=`{
           maxWidth: $store.state.ui.pageWidth+'px',
         }`)
+        template(v-slot:prepend)
+          div(v-if="user" :style=`{height: '320px',}`).row.full-width
+            nav-header(:user="user")
+            nav-tabs(:tabs="tabs")
 </template>
 
 <script>
 import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import pageHeader from './page_header.vue'
+import navHeader from './nav_header.vue'
+import navTabs from './nav_tabs.vue'
 
 import pageNodes from './page_nodes/index.vue'
 import pageJoints from './page_joints/index.vue'
@@ -47,7 +37,8 @@ import pageFollowers from './page_followers/index.vue'
 export default {
   name: 'pageApp__user',
   components: {
-    pageHeader,
+    navHeader,
+    navTabs,
     pageNodes,
     pageJoints,
     pageVotes,
@@ -57,6 +48,7 @@ export default {
   data () {
     return {
       user: null,
+      scrollPosition: 0,
       // pageId: 'nodes',
     }
   },
@@ -81,6 +73,12 @@ export default {
           }
         }
       }
+    }
+  },
+  methods: {
+    onScroll (e) {
+      // this.$log('onScroll', e.position)
+      this.scrollPosition = e.position
     }
   },
   mounted () {

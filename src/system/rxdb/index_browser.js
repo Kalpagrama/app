@@ -798,7 +798,7 @@ class RxDBWrapper {
 
    async remove (id) {
       assert(this.created, 'cant remove! !this.created')
-      alert('delete!!!!!!' + id)
+      // alert('delete!!!!!!' + id)
       const f = this.remove
       const t1 = performance.now()
       try {

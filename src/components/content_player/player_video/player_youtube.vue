@@ -64,6 +64,8 @@ export default {
       points: [],
       isFullscreen: false,
       clusters: [],
+      playingCount: 0,
+      nodePlaying: null,
     }
   },
   watch: {
@@ -123,6 +125,7 @@ export default {
       else {
         this.duration = this.contentKalpa.duration
       }
+      this.$emit('player', this)
     },
     timeupdateHandle (e) {
       // this.$log('timeupdateHandle', e)
@@ -131,6 +134,7 @@ export default {
     playHandle (e) {
       this.$log('playHandle', this.playing)
       this.playing = true
+      this.playingCount += 1
     },
     pauseHandle (e) {
       this.$log('pauseHandle', this.playing)
@@ -168,7 +172,7 @@ export default {
               if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
             }
           }
-          this.$emit('player', this)
+          // this.$emit('player', this)
           this.player.play()
         },
         error: async (mediaElement, originalNode, instance) => {

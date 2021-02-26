@@ -16,6 +16,7 @@ div(
     }`
     ).full-width
   q-btn(
+    @click="contextClick"
     :to="'/content/'+composition.layers[0].contentOid"
     round flat color="white" no-caps icon="select_all"
     :style=`{
@@ -36,6 +37,14 @@ export default {
     isMini: {type: Boolean},
     options: {type: Object},
     styles: {type: Object, default: {}},
+  },
+  methods: {
+    contextClick () {
+      this.$log('contextClick')
+      if (this.options.nodeOid) {
+        this.$store.commit('ui/stateSet', ['nodeOnContent', this.options.nodeOid])
+      }
+    }
   }
 }
 </script>

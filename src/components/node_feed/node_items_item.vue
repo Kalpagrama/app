@@ -110,8 +110,8 @@ div(
     div(
       :class=`{
       }`
-      ).row.full-width.no-wrap.items-center.content-center.justify-center
-      q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs
+      ).row.full-width.no-wrap.items-center.content-center.justify-start
+      q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs.q-ml-md
       small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ itemMeta.name }}
     //- .row.full-width.justify-center
       router-link(

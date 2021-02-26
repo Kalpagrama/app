@@ -153,7 +153,8 @@ export default {
       mode: 'move',
       url: null,
       figure: null,
-      figureEditing: null
+      figureEditing: null,
+      nodePlaying: null,
     }
   },
   watch: {

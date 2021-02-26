@@ -111,6 +111,7 @@ export default {
       scrollTop: 0, // расстояние от начала скролла до верха экрана
       scrollHeight: 0,
       scrollTarget: null,
+      scrollPreserveCount: 0,
     }
   },
   computed: {
@@ -160,7 +161,17 @@ export default {
       handler (to, from) {
         this.$log('scrollHeight TO', to)
       }
-    }
+    },
+    '$store.state.ui.listFeedNeedDrop': {
+      deep: true,
+      handler (to, from) {
+        this.$log('$store.state.ui.listFeedNeedDrop TO', to)
+        if (to) {
+          this.positionDrop()
+          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+        }
+      }
+    },
   },
   methods: {
     itemMiddleHandler (isVisible, entry, i) {
@@ -168,7 +179,7 @@ export default {
         this.setItemMiddleKey(entry.target.accessKey)
       }
     },
-    setItemMiddleKey(key, ignoreOffset = false){
+    setItemMiddleKey(key, ignoreOffset = false) {
       this.itemsRes.setProperty('currentId', key) // сохраняем до отрисовки(иначе не сработает positionDebug (если элемент отсутствует в старых данных))
       const updateItemMiddle = (key) => {
         if (key) {
@@ -200,6 +211,7 @@ export default {
           }
         } else this.itemMiddle = null
       }
+      // TODO: positionSaving
       this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
     },
     // подмотает скролл до itemMiddle
