@@ -228,9 +228,11 @@ export default {
           this.$log('try scroll to itemMiddle', this.itemMiddle.name)
           let scrollOffset = this.itemMiddle.top // сместит ядро на запомненное место
           // get top position of scrollTarget if it is not window!
-          let scrollOffsetScrollTarget = this.scrollTarget.getBoundingClientRect().top
-          this.$log('*** scrollOffsetScrollTarget ***', scrollOffsetScrollTarget)
-          scrollOffset -= scrollOffsetScrollTarget
+          if (this.scrollTarget.clientHeight) {
+            let scrollOffsetScrollTarget = this.scrollTarget.getBoundingClientRect().top
+            this.$log('*** scrollOffsetScrollTarget ***', scrollOffsetScrollTarget)
+            scrollOffset -= scrollOffsetScrollTarget
+          }
           let scrollPosition = this.itemMiddle.ref.offsetTop - scrollOffset
           // let scrollPosition = this.itemMiddle.ref.offsetTop
           setScrollPosition(this.scrollTarget, scrollPosition)
