@@ -49,18 +49,19 @@ div(
           nodeOid: item.oid,
         }`
         :styles="styles")
-    //- template(v-slot:wrapper)
+    template(v-slot:wrapper)
       div(
         @click="$emit('open')"
+        v-if="itemOpenedHandle"
         v-show="!itemOpened"
         :style=`{
           position: 'absolute', zIndex: 300, bottom: '-0.8px',
           //- background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 10px 10px',
           minHeight: '30%',
-          opacity: 0.5,
+          //- opacity: 0.5,
         }`
-        ).row.full-width.justify-center.cursor-pointer.bg-red
+        ).row.full-width.justify-center.cursor-pointer
   //- COMPOSITION
   composition(
     v-else-if="item && item.__typename === 'Composition'"
@@ -120,7 +121,7 @@ div(
 <script>
 export default {
   name: 'nodeFeed__nodeItemsItem',
-  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'styles'],
+  props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'itemOpenedHandle', 'styles'],
   components: {
   },
   data () {

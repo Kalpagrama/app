@@ -24,7 +24,9 @@ div(
         :node="player.nodePlaying"
         :style=`{
           maxWidth: 600+'px',
-        }`)
+          background: 'rgba(30,30,30,0.9)',
+          borderRadius: '10px',
+        }`).q-pb-sm
   q-btn(
     @click="nodeRefresh()"
     round flat color="white" icon="refresh")

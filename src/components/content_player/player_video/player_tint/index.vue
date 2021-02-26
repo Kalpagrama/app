@@ -119,12 +119,13 @@ export default {
   computed: {
     showTintBar () {
       if (this.player) {
-        if (this.player.figure || this.player.nodePlaying) {
-          return true
-        }
-        else {
-          return this.tintFocused
-        }
+        // if (this.player.figure || this.player.nodePlaying) {
+        //   return true
+        // }
+        // else {
+        //   return this.tintFocused
+        // }
+        return true
       }
       else {
         return this.tintFocused
@@ -161,18 +162,25 @@ export default {
             }
           }
           if (this.options.mode === 'editor') {
-            if (this.player.figure || this.player.nodePlaying) {
-              this.tintFocused = true
-              if (this.player.playing) {
-                this.player.pause()
-              }
-              else {
-                this.player.play()
-              }
+            this.tintFocused = true
+            if (this.player.playing) {
+              this.player.pause()
             }
             else {
-              this.tintFocused = !this.tintFocused
+              this.player.play()
             }
+            // if (this.player.figure || this.player.nodePlaying) {
+            //   this.tintFocused = true
+            //   if (this.player.playing) {
+            //     this.player.pause()
+            //   }
+            //   else {
+            //     this.player.play()
+            //   }
+            // }
+            // else {
+            //   this.tintFocused = !this.tintFocused
+            // }
           }
         }
         await this.$wait(300)

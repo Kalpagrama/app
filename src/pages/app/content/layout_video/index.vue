@@ -169,6 +169,9 @@ export default {
           this.player.pause()
           // TODO: nodePlaying ?, figure?
         }
+        else {
+          this.player.play()
+        }
       }
     },
   },
