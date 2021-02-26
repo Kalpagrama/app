@@ -1,16 +1,5 @@
 <template lang="pug">
 q-layout(view="lHh lpR lFf")
-  //- q-drawer(
-    v-if="$q.screen.lt.md"
-    side="left" no-swipe-open
-    :value="$store.state.ui.mobileMenuShow"
-    behavior="mobile"
-    :width="$q.screen.width - 74"
-    @before-hide="$store.commit('ui/stateSet', ['mobileMenuShow', false])")
-    kalpa-menu(
-      :mini="false"
-      :style=`{borderRadius: '0 10px 10px 0'}`
-      ).full-height.b-40.q-pt-md.q-px-sm
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
@@ -26,17 +15,8 @@ q-layout(view="lHh lpR lFf")
         }`).fit
   //- mobile menu navigation
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-footer(
-      v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow"
-      :style=`{
-      }`)
-      div(
-        :style=`{
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          //- paddingBottom: '30px',
-        }`
-        ).row.full-width.b-40
-        kalpa-menu-mobile
+    q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
+      kalpa-menu-mobile
   q-page-container
     router-view(v-if="$store.state.ui.nodeCategories.length > 0")
 </template>

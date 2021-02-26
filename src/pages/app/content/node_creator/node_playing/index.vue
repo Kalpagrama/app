@@ -10,7 +10,7 @@
     :showItems="isOpened"
     :style=`{
       maxWidth: 600+'px',
-      background: 'rgba(30,30,30,0.9)',
+      background: 'rgba(30,30,30,0.95)',
       borderRadius: '10px',
     }`)
     template(v-slot:wrapper-inside)
@@ -23,8 +23,8 @@
         ).row.fit.cursor-pointer
     template(v-slot:footer)
       div(:style=`{order: 100}`).row.full-width.q-pa-xs
+        //- v-if="true || contentKalpa.type === 'VIDEO'"
         player-video(
-          v-if="contentKalpa.type === 'VIDEO'"
           :player="player"
           :contentKalpa="contentKalpa"
           :node="node"

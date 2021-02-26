@@ -38,11 +38,11 @@ div(
               @close="pageId = null")
         //- node creator
         div(
-          v-if="player && player.figure && !pageId"
+          v-if="player && !pageId"
           :style=`{
             position: 'absolute', zIndex: 1000, bottom: '40px',
           }`
-          ).row.full-width.q-pb-sm
+          ).row.full-width.q-px-sm.q-pb-sm
           node-creator(
             :player="player"
             :contentKalpa="contentKalpa")
@@ -113,6 +113,7 @@ export default {
         let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
         this.$log('playerReady: node found, show node in book...')
         await this.player.showItem(node)
+        this.player.setState('nodePlaying', node)
       }
     }
   },

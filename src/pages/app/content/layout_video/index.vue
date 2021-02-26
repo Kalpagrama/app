@@ -22,10 +22,17 @@ div(
         //- node editor mobile
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
-            v-if="player && $q.screen.lt.lg"
-            :style=`{
-              position: 'absolute', zIndex: 10000, top: '0px',
-            }`
+            v-if="player && (player.nodePlaying ? true : $q.screen.lt.lg)"
+            :style=`
+              player.nodePlaying ?
+                {
+                  position: 'absolute', zIndex: 10000, bottom: '0px',
+                }
+                :
+                {
+                  position: 'absolute', zIndex: 10000, top: '0px',
+                }
+              `
             ).row.full-width.q-pa-sm
             node-creator(
               :player="player"
@@ -47,16 +54,6 @@ div(
               :style=`{
               }`
               @close="pageId = null")
-        //- node creator
-        //- div(
-          v-if="player && player.figure && !pageId"
-          :style=`{
-            position: 'absolute', zIndex: 1000, bottom: '40px',
-          }`
-          ).row.full-width.q-pb-sm
-          node-creator(
-            :player="player"
-            :contentKalpa="contentKalpa")
         //- player
         content-player(
           @player="playerReady"
@@ -80,7 +77,7 @@ div(
             node-creator(
               v-if="player && $q.screen.gt.md"
               :player="player"
-              :contentKalpa="contentKalpa")
+              :contentKalpa="contentKalpa").br
   //- footer
   nav-bottom(
     v-show="footerShow"

@@ -20,26 +20,10 @@ div(
       height: styles.height,
       objectFit: styles.objectFit,
       //- opacity: previewOpacity,
-      opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
+      //- opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
     }`
     ).full-width
   //- video wrapper
-  //- video(
-    v-if="isActive && isVisible"
-    @click="isActive = !isActive"
-    @loadeddata="videoLoaded"
-    autoplay loop
-    preload="metadata"
-    :muted="false"
-    :poster="composition.thumbUrl"
-    :key="compositionKey"
-    :src="isActive ? composition.url : 'null'"
-    :style=`{
-      height: styles.height,
-      objectFit: styles.objectFit,
-      position: 'absolute', zIndex: 100, top: '0px',
-    }`
-    ).full-width.br
   content-player(
     v-if="isActive && isVisible"
     @player="playerCreated"
@@ -57,7 +41,7 @@ div(
     :styles="styles"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      opacity: videoOpacity,
+      //- opacity: videoOpacity,
     }`).fit
 </template>
 
@@ -110,19 +94,6 @@ export default {
         return null
       }
     },
-    videoOpacity () {
-      if (this.figureOffset && this.player) {
-        if (this.player.currentTimeRaw >= this.figureOffset[0].t + 0.05 && this.player.currentTimeRaw < this.figureOffset[1].t - 0.05) {
-          return 1
-        }
-        else {
-          return 0
-        }
-      }
-      else {
-        return 1
-      }
-    }
   },
   watch: {
     isActive: {

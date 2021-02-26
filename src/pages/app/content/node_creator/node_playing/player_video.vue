@@ -28,9 +28,11 @@ export default {
   methods: {
     nodeVideoRefresh () {
       this.$log('nodeVideoRefresh')
-      let t = this.node.items[0].layers[0].figuresAbsolute[0].t
-      this.player.setCurrentTime(t)
-      this.player.play()
+      if (this.contentKalpa.type === 'VIDEO') {
+        let t = this.node.items[0].layers[0].figuresAbsolute[0].t
+        this.player.setCurrentTime(t)
+        this.player.play()
+      }
     }
   }
 }

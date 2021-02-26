@@ -191,6 +191,7 @@ export default {
       findDraftsRes: null, // список всех черновиков на контенте
       showNodeOid: null,
       showDraftId: null,
+      nodePlaying: null,
     }
   },
   watch: {

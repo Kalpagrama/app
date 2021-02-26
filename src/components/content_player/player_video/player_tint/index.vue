@@ -123,7 +123,12 @@ export default {
           return true
         }
         else {
-          return this.tintFocused
+          if (this.player.nodePlaying) {
+            return false
+          }
+          else {
+            return this.tintFocused
+          }
         }
       }
       else {
