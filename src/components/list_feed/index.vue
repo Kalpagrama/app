@@ -140,7 +140,7 @@ export default {
       async handler (to, from) {
         this.$log('itemsRes.items changed to = ', to ? to.map(item => item.name) : '[]')
         if (!this.itemMiddle && this.itemsRes.getProperty('currentId')){
-          // иногда setItemMiddleKey не рабатывает вхолостую тк в момент вызова нет данных(массив еще не обновился). Вызываем после обновления массива
+          // иногда setItemMiddleKey рабатывает вхолостую тк в момент вызова нет данных(массив еще не обновился). Вызываем после обновления массива
           this.$log('set itemMiddle manually!')
           this.setItemMiddleKey(this.itemsRes.getProperty('currentId'), true)
         }
