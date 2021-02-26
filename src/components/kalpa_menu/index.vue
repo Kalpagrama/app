@@ -56,7 +56,7 @@
         router-link(
           v-if="!isGuest"
           @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
-          :to="'/user/'+$store.getters.currentUser().oid"
+          :to="'/user/'+$store.getters.currentUser().oid+'/nodes'"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`

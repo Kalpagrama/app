@@ -20,40 +20,16 @@ div(
         }`
         ).row.fit
         //- node editor mobile
-        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
-            v-if="player && (player.nodePlaying ? true : $q.screen.lt.lg)"
-            :style=`
-              player.nodePlaying ?
-                {
-                  position: 'absolute', zIndex: 10000, bottom: '100px',
-                }
-                :
-                {
-                  position: 'absolute', zIndex: 10000, top: '0px',
-                }
-              `
+            v-if="player && $q.screen.lt.lg"
+            :style=`{
+              position: 'absolute', zIndex: 10000, top: '0px',
+            }`
             ).row.full-width.q-pa-sm
             node-creator(
               :player="player"
               :contentKalpa="contentKalpa")
-        //- pages
-        //- transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
-          div(
-            v-if="pageId && player && !player.figure"
-            :style=`{
-              position: 'absolute', top: '0px', left: '0px', zIndex: 900,
-              background: 'rgba(30,30,30,0.98)',
-              borderRadius: '8px',
-            }`
-            ).row.fit
-            component(
-              :is="`page-${pageId}`"
-              :contentKalpa="contentKalpa"
-              :player="player"
-              :style=`{
-              }`
-              @close="pageId = null")
         //- pages desktop
         transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
@@ -98,9 +74,8 @@ div(
           }`
           ).full-width.bg-black
           template(v-slot:tint-bar=`{tintFocused}`)
-            //- $q.screen.gt.md
             node-creator(
-              v-if="player && !pageId && true"
+              v-if="player && !pageId && $q.screen.gt.md"
               :player="player"
               :contentKalpa="contentKalpa")
   //- footer

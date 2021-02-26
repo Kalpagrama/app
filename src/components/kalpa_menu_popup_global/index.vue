@@ -60,7 +60,8 @@ q-btn(
             ).text-white {{ p.name }}
       //- footer
       router-link(
-        :to="'/user/'+$store.getters.currentUser().oid"
+        @click="footerClick"
+        :to="'/user/'+$store.getters.currentUser().oid+'/nodes'"
         :style=`{
           borderRadius: '10px',
         }`
@@ -109,6 +110,11 @@ export default {
         {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'settings', name: 'Настройки', icon: 'settings'},
       ]
+    }
+  },
+  methods: {
+    footerClick () {
+      this.$log('footerClick')
     }
   }
 }
