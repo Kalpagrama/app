@@ -48,8 +48,8 @@ div(
           mode: 'feed',
           nodeOid: item.oid,
         }`
-        :styles="styles").bg
-    template(v-slot:wrapper)
+        :styles="styles")
+    //- template(v-slot:wrapper)
       div(
         @click="$emit('open')"
         v-show="!itemOpened"
@@ -58,8 +58,9 @@ div(
           //- background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%)',
           borderRadius: '0 0 10px 10px',
           minHeight: '30%',
+          opacity: 0.5,
         }`
-        ).row.full-width.justify-center.cursor-pointer
+        ).row.full-width.justify-center.cursor-pointer.bg-red
   //- COMPOSITION
   composition(
     v-else-if="item && item.__typename === 'Composition'"
@@ -107,23 +108,13 @@ div(
       borderRadius: '0 0 10px 10px',
       minHeight: '40px',
     }`
-    ).row.full-width.items-center.content-center.scroll.scroll-clear.br
+    ).row.full-width.items-center.content-center.scroll.scroll-clear
     div(
       :class=`{
       }`
       ).row.full-width.no-wrap.items-center.content-center.justify-start
       q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs.q-ml-md
       small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ itemMeta.name }}
-    //- .row.full-width.justify-center
-      router-link(
-        :to="itemMeta.link"
-        :style=`{
-          textAlign: 'center',
-        }`
-        ).row.items-center.content-center.br
-        q-icon(:name="itemMeta.icon" size="14px" color="white").q-mr-xs
-        .col
-          small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ itemMeta.name }}
 </template>
 
 <script>

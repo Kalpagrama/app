@@ -37,18 +37,11 @@ q-layout(view="hHh Lpr lff")
         }`).row.full-width.items-start.content-start.q-pa-md.b-40
         //- current item... TODO: height ???
         div(:style=`{position: 'relative'}`).row.full-width
-          //- img(
-            :src="item.thumbUrl"
-            :style=`{
-              borderRadius: '10px',
-            }`
-            ).full-width.br
           node-items-item(
             :item="item"
             :itemOpened="false"
             :itemActive="true"
             :styles=`{
-              //- height: '300px',
             }`)
         //- gallery
         div(v-if="!joint && !jointCreating").row.full-width
@@ -66,7 +59,7 @@ q-layout(view="hHh Lpr lff")
             :style=`{
             }`
             @create="joint = null, jointCreating = true"
-            @close="joint = null").b-30
+            @close="joint = null")
         //- creating
         div(v-if="jointCreating").row.full-width.q-mb-xl
           joint-creator(
@@ -74,7 +67,7 @@ q-layout(view="hHh Lpr lff")
             :height="$q.screen.height-headerHeight"
             :style=`{
             }`
-            @close="jointCreating = false").b-30
+            @close="jointCreating = false")
 </template>
 
 <script>

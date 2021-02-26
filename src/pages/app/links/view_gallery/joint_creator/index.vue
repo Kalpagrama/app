@@ -1,30 +1,27 @@
 <template lang="pug">
-div(
-  :style=`{
-  }`
-  ).row.full-width.items-start.content-start.b-30.bg
+.row.full-width.items-start.content-start
   //- header joint name, always?
   div(
     :style=`{
       position: 'relative',
-      //- overflow: 'hidden',
       minHeight: '60px',
       textAlign: 'center',
-      //- paddingLeft: '70px', paddingRight: '70px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-btn(
-      @click="nameToggle()"
+      @click="verticesSwap()"
       round flat
       icon="multiple_stop"
-      :color="joint.vertices[0] === 'ESSENCE' ? 'white' : 'green'"
+      color="green"
       :style=`{
         borderRadius: '50%',
         overflow: 'hidden',
+        opacity: ['ESSENCE', 'ASSOCIATIVE'].includes(joint.vertices[0]) ? 0 : 1,
       }`).q-ml-sm.rotate-90
     div(:style=`{position: 'relative',}`).col
+      //- vertices pairs selector
       div(
-        v-if="showVertices"
+        v-if="verticesPairsShow"
         :style=`{
           position: 'absolute', zIndex: 10000,
           transform: 'translate3d(0,0,1000px)',
@@ -33,13 +30,15 @@ div(
         }`
         ).row.full-width.items-start.cotent-start.q-pa-sm.b-60
         q-btn(
-          v-for="(v,vi) in vertices" :key="vi"
-          @click="vertexClick(v)"
+          v-for="(pair,pairIndex) in verticesPairs" :key="pairIndex"
+          @click="verticesPairClick(pair)"
           flat dense color="white" no-caps
           :style=`{
-            height: '30px',
+            height: '40px',
+            borderRadius: '20px',
           }`
-          ).row.full-width {{ v.name }}
+          ).row.full-width {{ pair.name }}
+      //- essence input
       q-input(
         v-if="joint.vertices[0] === 'ESSENCE'"
         v-model="joint.name"
@@ -49,17 +48,18 @@ div(
         :rows="1"
         :input-style=`{
           textAlign: 'center',
+          //- fontWeight: 'bold',
           paddingTop: '18px',
-          paddingBottom: '18px',
-          paddingLeft: '50px',
-          paddingRight: '50px',
-          //- minHeight: '60px',
+          paddingBottom: '8px',
+          paddingLeft: '8px',
+          paddingRight: '8px',
+          minHeight: '60px',
         }`
         :style=`{
           zIndex: 300,
-          //- textAlign: 'center'
         }`
-        ).full-width
+        ).fit.items-center.content-center
+      //- render value of vertices
       span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white Ассоциация
       div(v-else).row.full-width
         .row.full-width.justify-center
@@ -67,28 +67,13 @@ div(
         .row.full-width.justify-center
           span.text-white {{ $nodeItemType(joint.vertices[1]).name }}
     q-btn(
-      @click="showVertices = !showVertices"
+      @click="verticesPairsShow = !verticesPairsShow"
       round flat color="white"
-      :icon="showVertices ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+      :icon="verticesPairsShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
       :style=`{
         borderRadius: '50%',
-        opacity: joint.vertices[0] === 'ESSENCE' ? 0 : 1,
+        //- opacity: joint.vertices[0] === 'ESSENCE' ? 0 : 1,
       }`).q-mr-sm
-    //- q-icon(
-      name="fas fa-link" size="80px"
-      :style=`{
-        color: 'rgb(38,38,38)',
-        position: 'absolute', zIndex: 20000,
-        top: '-10px',
-        left: '8px',
-      }`)
-    //- q-btn(
-      @click="stepBack()"
-      round flat color="grey-6" icon="clear"
-      :style=`{
-        position: 'absolute', zIndex: 400,
-        top: '8px', right: '8px',
-      }`)
   //- finder
   view-finder(
     v-if="viewId === 'finder'"
@@ -108,7 +93,7 @@ div(
         @click="viewId = 'finder'"
         flat color="green" icon="add" size="xl"
         ).fit.b-50
-    //- menu
+    //- menu pult
     div(
       :style=`{
         position: 'fixed', zIndex: 1000, left: '0px', bottom: '0px',
@@ -135,10 +120,8 @@ div(
       :itemOpened="false"
       :itemActive="true"
       :styles=`{
-        //- height: '300px',
-        //- objectFit: 'contain',
       }`)
-    //- small.text-white {{ joint.items[1] }}
+    //- menu pult
     div(
       :style=`{
         position: 'fixed', zIndex: 1000, left: '0px', bottom: '0px',
@@ -169,7 +152,6 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
-// import kalpaFinder from 'components/kalpa_finder/index.vue'
 import viewFinder from './view_finder.vue'
 import nodeItemsItem from 'components/node_feed/node_items_item.vue'
 
@@ -177,13 +159,12 @@ export default {
   name: 'jointCreator',
   props: ['item', 'height'],
   components: {
-    // kalpaFinder,
     viewFinder,
     nodeItemsItem,
   },
   data () {
     return {
-      viewId: null, // finder
+      viewId: null, // add, finder, editor
       joint: {
         name: '',
         layout: 'HORIZONTAL',
@@ -193,34 +174,23 @@ export default {
         category: 'FUN',
       },
       publishing: false,
-      showVertices: false,
-      // itemFinderShow: false,
+      verticesPairsShow: false,
     }
   },
   computed: {
-    vertices () {
-      return this.$nodeItemTypes
+    verticesPairs () {
+      return this.$nodeItemTypesPairs
     }
   },
   methods: {
-    vertexClick (v) {
-      this.$log('vertexClick')
-      // this.joint.name = ''
-      this.joint.vertices = [v.id, v.pair]
-      this.showVertices = false
+    verticesPairClick (pair) {
+      this.$log('vertexPairClick', pair)
+      this.joint.vertices = pair.id
+      this.verticesPairsShow = false
     },
-    nameToggle () {
-      this.$log('nameToggle')
-      if (this.joint.vertices[0] === 'ESSENCE') {
-        this.joint.name = ''
-        this.joint.vertices = ['ASSOCIATIVE', 'ASSOCIATIVE']
-      }
-      else {
-        this.joint.vertices = ['ESSENCE', 'ESSENCE']
-      }
-    },
-    itemEdit () {
-      this.$log('itemEdit')
+    verticesSwap () {
+      this.$log('vertexesSwap')
+      this.joint.vertices.reverse()
     },
     itemDelete () {
       this.$log('itemDelete')
