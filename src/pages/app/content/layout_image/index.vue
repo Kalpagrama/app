@@ -20,7 +20,7 @@ div(
         }`
         ).row.fit
         //- pages
-        transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
+        transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
             v-if="pageId && player && !player.figure"
             :style=`{

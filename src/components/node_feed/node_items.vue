@@ -63,6 +63,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
           :itemActive="isActive && itemActive === ii"
           :itemStyles="itemsStyles[ii]"
           :itemOpened="itemOpened === ii"
+          :itemOpenedHandle="true"
           :stylesName=`{}`
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
