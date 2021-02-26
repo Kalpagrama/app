@@ -6,15 +6,16 @@ div(
   //- debug top
   div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',opacity: 0.8}`).row.bg-green.text-white.q-pa-xs
     .row.full-width
+      small.full-width itemMiddle.name: {{itemMiddle ? itemMiddle.name : null}}
+      small.full-width itemMiddle.top: {{ itemMiddle ? itemMiddle.top : 0 }}
       small.full-width scrollTop: {{scrollTop}}
       small.full-width scrollHeight: {{scrollHeight}}
       small.full-width scrollPaginationOffset: {{scrollPaginationOffset}}
-      small.full-width itemMiddle.top: {{ itemMiddle ? itemMiddle.top : 0 }}
     .row.full-width
       q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
       q-btn(outline color="white" dense no-caps @click="prev()") Prev
       q-btn(outline color="white" dense no-caps @click="next()") Next
-      q-btn(outline color="white" dense no-caps @click="positionHere()") Here
+      q-btn(outline color="white" dense no-caps @click="positionDebug()") Here
       q-btn(outline color="white" dense no-caps @click="positionDebug('142363647983880232')") Cofee
   //- loading spinner state
   div(
@@ -35,7 +36,7 @@ div(
     slot(name="prepend")
     //- prev loading
     div(
-      v-if="itemsPreving"
+      v-if="prevInProgress"
       :style=`{
         position: 'absolute', top: '0px', zIndex: 10000,
         height: '60px',
@@ -63,11 +64,11 @@ div(
         name="item"
         :item="item"
         :itemIndex="itemIndex"
-        :isActive="item[itemKey] === itemMiddleKey"
+        :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="true")
     //- next loading
     div(
-      v-if="itemsNexting"
+      v-if="nextInProgress"
       :style=`{
         position: 'absolute', bottom: '0px', zIndex: 10000,
         height: '60px',
@@ -96,30 +97,18 @@ export default {
       default () {
         return {}
       }
-    },
-    positionSaving: {
-      type: Boolean,
-      default () {
-        return true
-      }
     }
   },
   data () {
     return {
-      // item middle
-      itemMiddle: null,
-      itemMiddleRef: null,
-      itemMiddleRect: null,
-      itemMiddleKey: null,
-      itemMiddleHandlerCount: 0,
+      itemMiddle: null, // положение активного ядра на экране(заполняется после отрисовки)
       // items
       itemsRes: null,
-      itemsResInited: false,
       // prev, next
-      itemsPreving: false,
-      itemsNexting: false,
+      prevInProgress: false, // идет загрузка данных вверху списка
+      nextInProgress: false, // идет загрузка данных внизу списка
       // scroll data
-      scrollTop: 0,
+      scrollTop: 0, // расстояние от начала скролла до верха экрана
       scrollHeight: 0,
       scrollTarget: null,
     }
@@ -141,36 +130,21 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('query TO')
-        if (this.itemsRes) {
-          await this.positionDrop()
-          this.itemsRes = null
-        }
+        if (this.itemsRes) this.setItemMiddleKey(null)
         this.itemsRes = await this.$rxdb.find(to, true)
-        this.itemMiddle = this.itemsRes.getProperty('itemMiddle')
+        this.$emit('ready')
         this.$log('===== itemsRes created')
       }
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items changed from =', from ? from.map(item => item.name) : '[]')
         this.$log('itemsRes.items changed to = ', to ? to.map(item => item.name) : '[]')
-        this.$log('itemsRes.items changed this.itemsResInited = ', this.itemsResInited)
-        let itemMiddle = this.itemsRes.getProperty('itemMiddle')
-        this.$log('itemsRes.items changed itemMiddle = ', itemMiddle)
-        // если мы ушли с ленты, а потом пришли, то itemMiddle еще не установлен
-        if (itemMiddle) this.updateItemMiddle(itemMiddle.key)
-        await this.scrollPreserve()
-
-        if (this.itemsResInited) {
-
-        } else {
-          this.$emit('ready')
-          // this.$nextTick(() => {
-          //   this.prev()
-          // })
+        if (!this.itemMiddle && this.itemsRes.getProperty('currentId')){
+          // иногда setItemMiddleKey не рабатывает вхолостую тк в момент вызова нет данных(массив еще не обновился). Вызываем после обновления массива
+          this.$log('set itemMiddle manually!')
+          this.setItemMiddleKey(this.itemsRes.getProperty('currentId'), true)
         }
-        // first load done
-        this.itemsResInited = true
+        await this.scrollToItemMiddle()
       }
     },
     scrollTop: {
@@ -179,127 +153,97 @@ export default {
         if (!this.itemsRes) return
         if (this.scrollHeight - to < this.scrollPaginationOffset) await this.next()
         if (to < this.scrollPaginationOffset) await this.prev()
-        let scrollDelta = to - from
-        // this.$log('scrollDelta', scrollDelta)
-        if (this.itemMiddle) {
-          if (Math.abs(scrollDelta) > 100) return
-          this.itemMiddle.top -= scrollDelta
-        }
+        if (this.itemMiddle) this.itemMiddle.top = this.itemMiddle.ref.offsetTop - this.scrollTop
       }
     },
     scrollHeight: {
       handler (to, from) {
         this.$log('scrollHeight TO', to)
       }
-    },
-    '$store.state.ui.listFeedNeedDrop': {
-      async handler (to, from) {
-        this.$log('$store.state.ui.listFeedNeedDrop TO', to)
-        if (to) {
-          await this.positionDrop()
-          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
-        }
-      }
-    },
-    // 'itemMiddle.top': {
-    //   handler (to, from) {
-    //     this.$log('itemMiddle.top TO/from', to, from)
-    //   }
-    // }
+    }
   },
   methods: {
-    async scrollPreserve () {
-      // this.$log('***** scrollPreserve start')
+    itemMiddleHandler (isVisible, entry, i) {
+      if (isVisible) {
+        this.setItemMiddleKey(entry.target.accessKey)
+      }
+    },
+    setItemMiddleKey(key, ignoreOffset = false){
+      this.itemsRes.setProperty('currentId', key) // сохраняем до отрисовки(иначе не сработает positionDebug (если элемент отсутствует в старых данных))
+      const updateItemMiddle = (key) => {
+        if (key) {
+          let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
+          let objName = objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found'
+          let itemMiddleRef
+          if (this.$refs[`item-${key}`] && this.$refs[`item-${key}`][0]) {
+            itemMiddleRef = this.$refs[`item-${key}`][0]
+            let itemMiddleRect = itemMiddleRef.getBoundingClientRect()
+            this.itemMiddle = {
+              key: key,
+              name: objName,
+              ref: itemMiddleRef,
+              // dimensions
+              top: ignoreOffset ? 0 : itemMiddleRect.top, // расстояние от верха экрана до отрисованного middle (может быть отрицательным)
+              bottom: itemMiddleRect.bottom,
+              left: itemMiddleRect.left,
+              right: itemMiddleRect.right,
+              width: itemMiddleRect.width,
+              height: itemMiddleRect.height,
+              // scroll data
+              offsetTop: itemMiddleRect.offsetTop,
+              scrollTop: getScrollPosition(this.scrollTarget),
+              scrollHeight: getScrollHeight(this.scrollTarget),
+            }
+            this.$log('set ItemMiddle: ', this.itemMiddle.name)
+          } else {
+            this.$log(`set ItemMiddle. not found! active itemMiddle: ${this.itemMiddle ? this.itemMiddle.name : 'null'}`)
+          }
+        } else this.itemMiddle = null
+      }
+      this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
+    },
+    // подмотает скролл до itemMiddle
+    async scrollToItemMiddle () {
       this.$nextTick(async () => {
-        this.$log('scrollPreserve nextTick', !!this.itemMiddleRef)
-        if (!this.itemMiddleRef) return
-        // if (this.itemsPreving || this.itemsNexting) return
-        let scrollDelta = this.itemMiddle ? this.itemMiddle.top : 0
-        let scrollPosition = this.itemMiddleRef.offsetTop - scrollDelta
-        // let scrollPosition = this.itemMiddleRef.offsetTop
-        setScrollPosition(this.scrollTarget, scrollPosition)
-        this.$log(`scrollPreserve done scrollDelta=${scrollDelta}  scrollPosition=${scrollPosition}`)
+        if (this.itemMiddle) {
+          this.$log('try scroll to itemMiddle', this.itemMiddle.name)
+          let scrollOffset = this.itemMiddle.top // сместит ядро на запомненное место
+          let scrollPosition = this.itemMiddle.ref.offsetTop - scrollOffset
+          // let scrollPosition = this.itemMiddle.ref.offsetTop
+          setScrollPosition(this.scrollTarget, scrollPosition)
+          this.$log(`scroll to ItemMiddle ${this.itemMiddle.name} done scrollDelta=${scrollOffset}  scrollPosition=${scrollPosition}`)
+        } else {
+          setScrollPosition(this.scrollTarget, 0)
+          this.$log('scroll to ItemMiddle fail. itemMiddle not found. goto top')
+        }
       })
     },
     async prev () {
-      if (this.itemsRes && this.itemsRes.hasPrev && !this.itemsPreving) {
-        if (this.itemsNexting) return
+      if (this.itemsRes && this.itemsRes.hasPrev && !this.prevInProgress) {
+        if (this.nextInProgress) return
         this.$log('----- prev prev prev')
-        this.itemsPreving = true
+        this.prevInProgress = true
         await this.itemsRes.prev()
-        await this.$wait(300)
-        this.itemsPreving = false
+        this.prevInProgress = false
       }
     },
     async next () {
-      if (this.itemsRes && this.itemsRes.hasNext && !this.itemsNexting) {
-        if (this.itemsPreving) return
+      if (this.itemsRes && this.itemsRes.hasNext && !this.nextInProgress) {
+        if (this.prevInProgress) return
         this.$log('----- next next next')
-        this.itemsNexting = true
+        this.nextInProgress = true
         await this.itemsRes.next()
-        await this.$wait(300)
-        this.itemsNexting = false
+        this.nextInProgress = false
       }
-    },
-    positionHere (key) {
-      this.$log('positionHere')
-      // this.itemsRes.setProperty('currentId', key)
-      this.updateItemMiddle(this.itemMiddleKey)
-      this.itemsRes.gotoCurrent()
     },
     async positionDebug (key) {
-      this.itemsRes.setProperty('currentId', key)
+      this.setItemMiddleKey(null)
+      this.setItemMiddleKey(key, true)
       await this.itemsRes.gotoCurrent()
-      this.updateItemMiddle(key)
-      await this.scrollPreserve()
-    },
-    itemMiddleHandler (isVisible, entry, i) {
-      if (!this.positionSaving) return
-      // if (this.itemMiddleHandlerCount === 0 && this.itemMiddle && this.itemMiddle.key !== entry.target.accessKey) {
-      //   alert('Dont save...')
-      //   return
-      // }
-      // this.itemMiddleHandlerCount += 1
-      if (isVisible) {
-        this.updateItemMiddle(entry.target.accessKey)
-      }
-      else {
-      }
-      // TODO: handle -1
-    },
-    // назначит элемент с ключом "key" - опорным (при измении списка - лента остается на опорном элементе)
-    updateItemMiddle (key) {
-      let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
-      this.$log('updateItemMiddle', objIndx, objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found', key)
-      this.itemMiddleKey = key
-      this.itemMiddleRef = this.$refs[`item-${key}`][0]
-      this.itemMetaLifeTime = Date.now()
-      this.itemMetaLifeScroll = getScrollPosition(this.scrollTarget)
-      if (!this.itemMiddleRef) return
-      this.itemMiddleRect = this.itemMiddleRef.getBoundingClientRect()
-      this.itemMiddle = {
-        key: key,
-        // dimensions
-        top: this.itemMiddleRect.top,
-        bottom: this.itemMiddleRect.bottom,
-        left: this.itemMiddleRect.left,
-        right: this.itemMiddleRect.right,
-        width: this.itemMiddleRect.width,
-        height: this.itemMiddleRect.height,
-        // scroll data
-        offsetTop: this.itemMiddleRect.offsetTop,
-        scrollTop: getScrollPosition(this.scrollTarget),
-        scrollHeight: getScrollHeight(this.scrollTarget),
-      }
-      this.itemsRes.setProperty('currentId', key)
-      this.itemsRes.setProperty('itemMiddle', this.itemMiddle)
     },
     async positionDrop () {
-      this.$log('positionDrop')
-      setScrollPosition(this.scrollTarget, 0, 1)
-      await this.$wait(500)
-      this.itemsRes.gotoStart()
-      this.itemsRes.setProperty('itemMiddle', null)
+      this.setItemMiddleKey(null)
+      await this.itemsRes.gotoStart()
     },
     scrollUpdate (e) {
       // this.$log('scrollUpdate')
@@ -311,10 +255,6 @@ export default {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
-    // this.$wait(600).then(async () => {
-    //   this.scrollUpdate()
-    //   await this.prev()
-    // })
     this.scrollUpdate()
     await this.prev()
   },
