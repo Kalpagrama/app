@@ -23,7 +23,6 @@ export default {
   nodeOnContent: null,
   nodeDraft: null,
   nodeCreating: false,
-  listFeedNeedDrop: false,
   // other
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},
