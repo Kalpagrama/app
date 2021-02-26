@@ -1,8 +1,5 @@
 <template lang="pug">
-div(
-  :style=`{
-  }`
-  ).row.full-width.items-start.content-start.bg
+.row.full-width.items-start.content-start
   //- header joint name
   div(
     :style=`{
@@ -12,7 +9,7 @@ div(
       textAlign: 'center',
       //- paddingLeft: '60px', paddingRight: '60px',
     }`
-    ).row.full-width.items-center.content-center.justify-center.q-pa-sm.br
+    ).row.full-width.items-center.content-center.justify-center.q-pa-sm
     span(v-if="joint.vertices[0] === 'ESSENCE'").text-white.text-bold {{ joint.name }}
     span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold Ассоциация
     div(v-else).row.full-width
@@ -55,15 +52,7 @@ div(
           :itemOpened="false"
           :itemActive="true"
           :styles=`{
-            //- height: '300px',
-            //- objectFit: 'contain',
           }`)
-  //- img(
-    :src="joint.items[itemIndex].thumbUrl"
-    :style=`{
-      borderRadius: '10px',
-    }`
-    ).full-width
   //- footer
   div(
     :style=`{

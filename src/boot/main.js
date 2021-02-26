@@ -130,12 +130,23 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       {id: 'QUESTION', name: 'Вопрос', pair: 'ANSWER'},
       {id: 'ANSWER', name: 'Ответ', pair: 'QUESTION'},
     ]
+    const nodeItemTypesPairs = [
+      {id: ['ESSENCE', 'ESSENCE'], name: 'Указать суть'},
+      {id: ['ASSOCIATIVE', 'ASSOCIATIVE'], name: 'Ассоциация'},
+      {id: ['CAUSE', 'EFFECT'], name: 'Причина - Следствие'},
+      {id: ['PROBLEM', 'SOLUTION'], name: 'Проблема - Решение'},
+      {id: ['FROM', 'TO'], name: 'До - После'},
+      {id: ['FAKE', 'DISPROOF'], name: 'Фейк - Опровержение'},
+      {id: ['FACT', 'PROOF'], name: 'Факт - Подтверждение'},
+      {id: ['QUESTION', 'ANSWER'], name: 'Вопрос - Ответ'},
+    ]
     const nodeItemType = (type) => {
       // console.log('nodeItemType:type', type)
       return nodeItemTypes.find(t => t.id === type)
     }
     Vue.prototype.$nodeItemTypes = nodeItemTypes
     Vue.prototype.$nodeItemType = nodeItemType
+    Vue.prototype.$nodeItemTypesPairs = nodeItemTypesPairs
     // node rate meta
     const rateMeta = [
       {name: EventApi.verbalizeRate(0.2), value: 0, valueMin: -1, valueMax: 0.2, color: 'rgba(255,26,5,1)', colorBackground: 'rgba(255,26,5,0.5)', order: 5},
