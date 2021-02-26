@@ -4,7 +4,8 @@ div(
     ...styles,
   }`
   ).column.full-width
-  div(
+  //- debug figureOffset
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 3000, right: '0px',
     }`

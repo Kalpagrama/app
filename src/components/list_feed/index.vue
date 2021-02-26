@@ -97,6 +97,12 @@ export default {
       default () {
         return {}
       }
+    },
+    positionSaving: {
+      type: Boolean,
+      default () {
+        return true
+      }
     }
   },
   data () {
@@ -211,8 +217,8 @@ export default {
           }
         } else this.itemMiddle = null
       }
-      // TODO: positionSaving
-      this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
+      // if positionSaving is true, $nextTick updateItemMiddle...
+      if (this.positionSaving) this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
     },
     // подмотает скролл до itemMiddle
     async scrollToItemMiddle () {

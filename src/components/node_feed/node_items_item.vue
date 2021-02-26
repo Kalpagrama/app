@@ -48,7 +48,7 @@ div(
           mode: 'feed',
           nodeOid: item.oid,
         }`
-        :styles="styles")
+        :styles="styles").bg
     template(v-slot:wrapper)
       div(
         @click="$emit('open')"
@@ -95,10 +95,11 @@ div(
     }`
     ).fit.b-30
   //- itemMeta
-  div(
+  router-link(
     v-if="itemMeta"
     v-show="!itemOpened"
     ref="item-meta"
+    :to="itemMeta.link"
     :style=`{
       position: 'absolute', zIndex: 200,
       bottom: '-1px', right: '0px', left: '0px',
@@ -106,7 +107,7 @@ div(
       borderRadius: '0 0 10px 10px',
       minHeight: '40px',
     }`
-    ).row.full-width.items-center.content-center.scroll.scroll-clear
+    ).row.full-width.items-center.content-center.scroll.scroll-clear.br
     div(
       :class=`{
       }`

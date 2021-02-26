@@ -123,12 +123,13 @@ export default {
           return true
         }
         else {
-          if (this.player.nodePlaying) {
-            return false
-          }
-          else {
-            return this.tintFocused
-          }
+          return this.tintFocused
+          // if (this.player.nodePlaying) {
+          //   return false
+          // }
+          // else {
+          //   return this.tintFocused
+          // }
         }
       }
       else {

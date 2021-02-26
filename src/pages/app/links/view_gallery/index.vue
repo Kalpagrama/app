@@ -32,19 +32,26 @@ q-layout(view="hHh Lpr lff")
       ).row.full-width.justify-center.q-px-sm
       div(
         :style=`{
-          maxWidth: 600+'px',
-        }`).row.full-width.items-start.content-start
+          maxWidth: 640+'px',
+          borderRadius: '10px',
+        }`).row.full-width.items-start.content-start.q-pa-md.b-40
         //- current item... TODO: height ???
         div(:style=`{position: 'relative'}`).row.full-width
+          //- img(
+            :src="item.thumbUrl"
+            :style=`{
+              borderRadius: '10px',
+            }`
+            ).full-width.br
           node-items-item(
             :item="item"
             :itemOpened="false"
             :itemActive="true"
             :styles=`{
-              height: '300px',
+              //- height: '300px',
             }`)
         //- gallery
-        div(v-if="!joint && !jointCreating").row.full-width.q-mb-xl
+        div(v-if="!joint && !jointCreating").row.full-width
           joints-gallery(
             :item="item" :oid="item.oid"
             :height="$q.screen.height-headerHeight"

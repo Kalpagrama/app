@@ -20,13 +20,13 @@ div(
         }`
         ).row.fit
         //- node editor mobile
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
             v-if="player && (player.nodePlaying ? true : $q.screen.lt.lg)"
             :style=`
               player.nodePlaying ?
                 {
-                  position: 'absolute', zIndex: 10000, bottom: '0px',
+                  position: 'absolute', zIndex: 10000, bottom: '100px',
                 }
                 :
                 {
@@ -38,7 +38,7 @@ div(
               :player="player"
               :contentKalpa="contentKalpa")
         //- pages
-        transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
+        //- transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
           div(
             v-if="pageId && player && !player.figure"
             :style=`{
@@ -54,6 +54,30 @@ div(
               :style=`{
               }`
               @close="pageId = null")
+        //- pages desktop
+        transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+          div(
+            v-if="pageId && player"
+            @click.self="pageId = null"
+            :style=`{
+              position: 'absolute', zIndex: 900, top: '0px',
+            }`
+            ).row.fit.items-end.content-end.justify-center
+            div(
+              :style=`{
+                maxWidth: 650+'px',
+                maxHeight: 'calc(100% - 60px)',
+                background: 'rgba(30,30,30,0.95)',
+                borderRadius: '8px',
+              }`
+              ).row.fit
+              component(
+                :is="`page-${pageId}`"
+                :contentKalpa="contentKalpa"
+                :player="player"
+                :style=`{
+                }`
+                @close="pageId = null")
         //- player
         content-player(
           @player="playerReady"
@@ -74,10 +98,11 @@ div(
           }`
           ).full-width.bg-black
           template(v-slot:tint-bar=`{tintFocused}`)
+            //- $q.screen.gt.md
             node-creator(
-              v-if="player && $q.screen.gt.md"
+              v-if="player && !pageId && true"
               :player="player"
-              :contentKalpa="contentKalpa").br
+              :contentKalpa="contentKalpa")
   //- footer
   nav-bottom(
     v-show="footerShow"
@@ -115,6 +140,20 @@ export default {
     }
   },
   computed: {
+    queryClusters () {
+      let res = {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          // objectTypeEnum: { $in: ['NODE'] },
+          oidSphere: this.contentKalpa.oid,
+          sortStrategy: 'AGE',
+          groupByContentLocation: true
+        },
+        populateObjects: false,
+      }
+      return res
+    }
   },
   watch: {
     'player.playingCount': {
@@ -123,7 +162,15 @@ export default {
           await this.nodePlay()
         }
       }
-    }
+    },
+    pageId: {
+      handler (to, from) {
+        if (to) {
+          this.player.pause()
+          // TODO: nodePlaying ?, figure?
+        }
+      }
+    },
   },
   methods: {
     async playerReady (player) {
@@ -146,8 +193,11 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
+    this.$log('clustersRes', this.clustersRes)
+    this.player.setState('clusters', this.clustersRes.items)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

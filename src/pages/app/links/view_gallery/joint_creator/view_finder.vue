@@ -5,15 +5,16 @@ div(
     //- background: 'rgb(35,35,35)',
     //- borderRadius: '10px',
   }`
-  ).row.full-width
+  ).row.full-width.br
   kalpa-finder(
     @contentKalpa="itemFound"
     :pages=`{
       nodes: {views: ['all']},
-      workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
-      kalpagrama: {views: ['all', 'users', 'nodes']},
-      gif: {views: ['all']},
-      web: {views: ['all', 'image', 'video',]}
+      //- workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
+      workspace: {views: ['node']},
+      //- kalpagrama: {views: ['all', 'users', 'nodes']},
+      //- gif: {views: ['all']},
+      //- web: {views: ['all', 'image', 'video',]}
     }`
     :style=`{
       height: '500px',

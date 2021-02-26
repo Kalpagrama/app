@@ -3,8 +3,9 @@ div(
   :style=`{
   }`
   :class=`{
-    'col-4': $q.screen.lt.md,
-    'col-3': $q.screen.gt.sm,
+    'col-4': true,
+    //- 'col-4': $q.screen.lt.md,
+    //- 'col-3': $q.screen.gt.sm,
     //- 'col-6': $q.screen.xs,
   }`
   ).q-pa-xs

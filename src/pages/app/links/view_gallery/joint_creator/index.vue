@@ -2,7 +2,7 @@
 div(
   :style=`{
   }`
-  ).row.full-width.items-start.content-start.q-px-xs.b-30
+  ).row.full-width.items-start.content-start.b-30.bg
   //- header joint name, always?
   div(
     :style=`{
@@ -10,7 +10,7 @@ div(
       //- overflow: 'hidden',
       minHeight: '60px',
       textAlign: 'center',
-      paddingLeft: '70px', paddingRight: '70px',
+      //- paddingLeft: '70px', paddingRight: '70px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-btn(
@@ -74,7 +74,7 @@ div(
         borderRadius: '50%',
         opacity: joint.vertices[0] === 'ESSENCE' ? 0 : 1,
       }`).q-mr-sm
-    q-icon(
+    //- q-icon(
       name="fas fa-link" size="80px"
       :style=`{
         color: 'rgb(38,38,38)',
@@ -135,8 +135,8 @@ div(
       :itemOpened="false"
       :itemActive="true"
       :styles=`{
-        height: '300px',
-        objectFit: 'contain',
+        //- height: '300px',
+        //- objectFit: 'contain',
       }`)
     //- small.text-white {{ joint.items[1] }}
     div(
