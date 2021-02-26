@@ -2,6 +2,7 @@
 component(
   v-if="contentKalpa"
   :is="'layout-'+layoutId"
+  :key="oid"
   :contentKalpa="contentKalpa")
 </template>
 

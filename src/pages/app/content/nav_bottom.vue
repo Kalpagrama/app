@@ -54,8 +54,8 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'nodes', icon: 'adjust', name: 'Ядра'},
         {id: 'drafts', icon: 'filter_tilt_shift', name: 'Заметки'},
+        {id: 'nodes', icon: 'adjust', name: 'Ядра'},
         {id: 'info', icon: 'fas fa-info', name: 'Инфо'}
       ]
     },

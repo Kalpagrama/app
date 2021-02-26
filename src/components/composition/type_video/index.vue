@@ -18,7 +18,8 @@ div(
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
-      objectFit: styles.objectFit,
+      //- objectFit: styles.objectFit,
+      objectFit: 'cover',
       //- opacity: previewOpacity,
       //- opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
     }`

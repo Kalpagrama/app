@@ -4,6 +4,12 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
+  //- player.nodePlaying
+  tint-bar-node-playing(
+    v-if="player && player.nodePlaying && !player.figure"
+    :player="player"
+    :contentKalpa="contentKalpa"
+    :options="options")
   //- bar
   div(
     :style=`{
@@ -103,6 +109,21 @@ div(
                 position: 'absolute', zIndex: 3000,
               }`
               ).row.fit
+            //- node playing
+            div(
+              v-if="!zoomed && player.nodePlaying"
+              :style=`{
+                position: 'absolute', zIndex: 3000,
+                top: '-2px',
+                left: (player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t/player.duration)*100+'%',
+                width: ((player.nodePlaying.items[0].layers[0].figuresAbsolute[1].t-player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
+                height: 'calc(100% + 4px)',
+                border: '2px solid rgb(76,175,79)',
+                borderRadius: '2px',
+                background: 'rgba(76,175,79,0.5)',
+                pointerEvents: 'none',
+              }`
+              ).row
             //- figure editor
             transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
               tint-bar-figure(
@@ -211,12 +232,14 @@ div(
         height: '50px',
       }`
       ).row.full-width.items-center.content-center.q-px-md
+      //- left
       q-btn(
         v-if="options.mode === 'editor'"
         @click="player.setState('muted', !player.muted)"
         round flat dense
         :color="player.muted ? 'red' : 'white'"
         :icon="player.muted ? 'volume_off' : 'volume_up'")
+      //- middle controls
       div(
         v-if="player && !player.figure"
         :style=`{
@@ -237,17 +260,25 @@ div(
         q-btn(
           @click="tapClick(1)"
           round flat dense  color="white" icon="forward_5" :size="actionsSize").col
+      //- middle figure
       tint-bar-figure-controls(
         v-if="player && player.figure"
         :player="player" :contentKalpa="contentKalpa")
       .col
+      //- create player.figure
       q-btn(
-        v-if="player && !player.figure && options.mode === 'editor'"
+        v-if="player && !player.figure && options.mode === 'editor' && !player.nodePlaying"
         @click="figureCreate()"
         round flat dense color="green" icon="add_circle_outline")
+      //- destroy player.figure
       q-btn(
-        v-if="player && player.figure && options.mode === 'editor'"
+        v-if="player && player.figure && options.mode === 'editor' && !player.nodePlaying"
         @click="figureDelete()"
+        round flat dense color="white" icon="clear")
+      //- destroy player.nodePlaying
+      q-btn(
+        v-if="player && player.nodePlaying && options.mode === 'editor'"
+        @click="player.setState('nodePlaying', null)"
         round flat dense color="white" icon="clear")
 </template>
 
@@ -257,6 +288,7 @@ import tintBarFigureActions from './tint_bar_figure_actions.vue'
 import tintBarFigureControls from './tint_bar_figure_controls.vue'
 import tintBarFigurePlayer from './tint_bar_figure_player.vue'
 import tintBarClusters from './tint_bar_clusters.vue'
+import tintBarNodePlaying from './tint_bar_node_playing.vue'
 
 export default {
   name: 'tintBar',
@@ -267,6 +299,7 @@ export default {
     tintBarFigureControls,
     tintBarFigurePlayer,
     tintBarClusters,
+    tintBarNodePlaying,
   },
   data () {
     return {
