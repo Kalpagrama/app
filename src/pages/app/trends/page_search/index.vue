@@ -7,7 +7,7 @@ q-page(
   //- body
   list-feed(
     :query="query"
-    :positionSaving="false"
+    :itemMiddlePersist="false"
     :itemStyles=`{
       paddingBottom: '8px',
     }`

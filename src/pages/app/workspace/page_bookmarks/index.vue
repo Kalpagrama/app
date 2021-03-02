@@ -45,7 +45,7 @@ q-layout(
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
           list-feed(
             :query="query"
-            :positionSaving="false"
+            :itemMiddlePersist="false"
             :style=`{
               maxWidth: $store.state.ui.pageWidth+'px',
             }`)

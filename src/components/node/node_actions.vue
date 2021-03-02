@@ -15,7 +15,7 @@
       position: 'relative',
       height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-start.contnet-start.q-pt-sm
+    }`).row.full-width.items-start.contnet-start.q-pt-sm.q-px-lg
     //- share
     .col
       .row.full-width
@@ -72,7 +72,7 @@
       div(
         v-if="voteStarted"
         :style=`{
-          position: 'absolute', top: '0px', zIndex: 900,
+          position: 'absolute', top: '0px', zIndex: 900, left: '0px',
           height: '50px',
         }`
         ).row.full-width.b-30
@@ -80,7 +80,7 @@
       div(
         v-if="voteStarted"
         :style=`{
-          position: 'absolute', top: '0px', zIndex: 1000,
+          position: 'absolute', top: '0px', zIndex: 1000, left: '0px',
           height: '50px',
         }`
         ).row.full-width.items-center.content-center.justify-center

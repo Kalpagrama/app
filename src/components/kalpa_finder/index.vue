@@ -1,5 +1,23 @@
 <template lang="pug">
-q-layout(
+.column.full-width
+  .col.full-width.scroll
+    div(
+      :style=`{
+        position: 'sticky', top: '0px', zIndex: 1000,
+      }`
+      ).row.full-width.q-pa-sm.b-40
+      span.text-white Ядра
+    component(
+      v-bind="$props"
+      :is="`page-${pageId}`"
+      :searchString="searchStringLocal"
+      :page="page"
+      :style=`{
+        maxWidth: 600+'px',
+      }`)
+      template(v-slot:tint=`{item}`)
+        slot(name="tint" :item="item")
+//- q-layout(
   view="hHh Lpr lff"
   container)
   q-header(reveal)

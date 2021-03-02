@@ -6,7 +6,7 @@ div(
   ).row.full-width
   list-feed(
     :query="query"
-    :positionSaving="false"
+    :itemMiddlePersist="true"
     :itemStyles=`{
       paddingBottom: '8px',
     }`)

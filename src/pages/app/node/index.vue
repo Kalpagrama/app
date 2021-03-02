@@ -1,19 +1,12 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
+  q-header(reveal)
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-md.b-30
+        q-icon(name="adjust" color="white" size="30px").q-mr-sm
+        h1.text-white.text-bold Ядро
   q-footer(reveal)
-    div(
-      v-if="pageId"
-      :style=`{
-        height: pageHeight+'px',
-        //- marginBottom: '-10px',
-      }`).row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          borderRadius: '10px 10px 0 0',
-        }`
-        ).row.full-width.b-40
     nav-mobile(
       :pageId="pageId"
       @pageId="pageIdChange")
@@ -27,34 +20,41 @@ q-layout(
         div(
           v-if="node"
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
-          node-feed(
-            :node="node"
-            :isActive="true"
-            :isVisible="true")
-          //- .row.full-width.q-pt-lg
-            widget-joints(v-if="node" :node="node")
+          //- node wrapper
+          div(
+            v-observe-visibility=`{
+              throttle: 150,
+              callback: nodeVisibilityCallback,
+              intersection: {
+                //- root: scrollTargetIsWindow ? null : scrollTarget,
+                //- rootMargin: '-50% 0px'
+              }
+            }`
+            ).row.full-width.q-px-sm
+            node-feed(
+              :node="node"
+              :isActive="nodeIsVisible"
+              :isVisible="nodeIsVisible")
+          .row.full-width.q-pt-lg.q-px-xs
+            page-joints(:node="node")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from './nav_mobile.vue'
-import widgetJoints from './widget_joints/index.vue'
-
-// import pageInside from './page_inside/index.vue'
-// import pageNames from './page_names/index.vue'
+import pageJoints from './page_joints/index.vue'
 
 export default {
   name: 'pageApp_node',
   components: {
     navMobile,
-    widgetJoints,
-    // pageInside,
-    // pageNames,
+    pageJoints,
   },
   data () {
     return {
       node: null,
+      nodeIsVisible: true,
     }
   },
   computed: {
@@ -72,6 +72,10 @@ export default {
     },
   },
   methods: {
+    nodeVisibilityCallback (isVisible, entry) {
+      this.$log('nodeVisibilityCallback')
+      this.nodeIsVisible = isVisible
+    }
   },
   mounted () {
     this.$log('mounted')
