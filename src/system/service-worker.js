@@ -1,5 +1,5 @@
 /* eslint-disable */
-const swVer = 2
+const swVer = 4
 const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4

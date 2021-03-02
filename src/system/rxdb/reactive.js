@@ -308,6 +308,7 @@ class Group {
                id,
                name,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
+               itemsMaxLen: 36, // максимальная длина ленты (при превышении - обрезается снизу или сверху)
                items: [], // кусочек от this.pages (для каждого item вызывается populate)
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
@@ -635,8 +636,13 @@ class Group {
       let endFullFil = findEnd()
       if (startFullFil === -1) assert(endFullFil === -1, 'endFullFil === -1')
       if (endFullFil === -1) assert(startFullFil === -1, 'startFullFil === -1')
-      assert(endFullFil >= startFullFil, 'logic error end < start' + startFullFil + ':' + endFullFil + '::' + this.reactiveGroup.id)
-      return { startFullFil, endFullFil }
+      // assert(endFullFil >= startFullFil, 'logic error end < start' + startFullFil + ':' + endFullFil + '::' + this.reactiveGroup.id)
+      if (endFullFil >= startFullFil) { // такое возможно, если список сильно изменился (например, он обновился после того как протух в кэше)
+         return { startFullFil, endFullFil }
+      } else {
+         logE('logic error end < start' + startFullFil + ':' + endFullFil + '::' + this.reactiveGroup.id) // todo иногда случается... ХЗ что это...
+         return {startFullFil: Math.min(startFullFil, endFullFil), endFullFil: Math.min(startFullFil, endFullFil)}
+      }
    }
 
    // заполнить итоговый массив
@@ -691,18 +697,18 @@ class Group {
       let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
       itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
 
-      // максимум 36 элементов (если больше - то отрезаем верх или низ)
+      // максимум this.reactiveGroup.itemsMaxLen элементов (если больше - то отрезаем верх или низ)
       // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
       if (position === 'top') {
-         itemsCopy.splice(36, itemsCopy.length)
+         itemsCopy.splice(this.reactiveGroup.itemsMaxLen, itemsCopy.length)
       } else if (position === 'bottom') {
-         itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
+         itemsCopy.splice(0, Math.max(0, itemsCopy.length - this.reactiveGroup.itemsMaxLen))
       }
       // setTimeout(() => {
       //    if (position === 'top') {
-      //       itemsCopy.splice(36, itemsCopy.length)
+      //       itemsCopy.splice(this.reactiveGroup.itemsMaxLen, itemsCopy.length)
       //    } else if (position === 'bottom') {
-      //       itemsCopy.splice(0, Math.max(0, itemsCopy.length - 36))
+      //       itemsCopy.splice(0, Math.max(0, itemsCopy.length - this.reactiveGroup.itemsMaxLen))
       //    }
       // }, 1000)
       // this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
@@ -809,9 +815,10 @@ class Group {
       return startFullFil > 0 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[0].prevPageToken
    }
 
-   async next (count) {
+   async next (count, itemsMaxLen = 36) {
       const f = this.next
       logD(f, 'start')
+      this.reactiveGroup.itemsMaxLen = Math.max(Math.min(itemsMaxLen || 0, 100), 10)
       // if (!this.reactiveGroup.id.includes('WS_BOOKMARK')) {
       //    logD('asdasdasasds')
       // }
@@ -853,10 +860,11 @@ class Group {
       await this.fulfill(nextItems, 'bottom')
    }
 
-   async prev (count) {
+   async prev (count, itemsMaxLen = 36) {
       const f = this.prev
       // return
       // // eslint-disable-next-line no-unreachable
+      this.reactiveGroup.itemsMaxLen = Math.max(Math.min(itemsMaxLen || 0, 100), 10)
       logD(f, 'start')
       if (this.populateFunc && count > GROUP_BATCH_SZ) {
          logW('next allow only 12 with populate')
