@@ -12,7 +12,7 @@ div(
       borderRadius: '10px 10px 0 0',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between
+    ).row.full-width.justify-between.q-pt-sm
     //- back
     q-btn(
       @click="$routerKalpa.back()"

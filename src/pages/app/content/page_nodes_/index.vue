@@ -25,7 +25,7 @@ div(
       list-feed(
         ref="list-feed"
         :query="query"
-        :positionSaving="false"
+        :itemMiddlePersist="false"
         :style=`{
           maxWidth: 600+'px',
           marginBottom: '300px',

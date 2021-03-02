@@ -7,6 +7,7 @@ div(
   ).row.full-width.items-start.content-start
   slot
   img(
+    draggable="false"
     :src="composition.url"
     :style=`{
       borderRadius: '10px',

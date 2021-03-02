@@ -2,92 +2,94 @@
 div(
   :style=`{
   }`
-  ).row.full-width
-  //- debug top
-  //- div(:style=`{position: 'fixed', zIndex: 999999, right: '0px', top: '30%',maxWidth: '200px',opacity: 0.8}`).row.bg-green.text-white.q-pa-xs
-    .row.full-width
-      small.full-width itemMiddle.name: {{itemMiddle ? itemMiddle.name : null}}
-      small.full-width itemMiddle.top: {{ itemMiddle ? itemMiddle.top : 0 }}
-      small.full-width scrollTop: {{scrollTop}}
-      small.full-width scrollHeight: {{scrollHeight}}
-      small.full-width scrollPaginationOffset: {{scrollPaginationOffset}}
-    .row.full-width
-      q-btn(outline color="white" dense no-caps @click="positionDrop()") Go to start
-      q-btn(outline color="white" dense no-caps @click="prev()") Prev
-      q-btn(outline color="white" dense no-caps @click="next()") Next
-      q-btn(outline color="white" dense no-caps @click="positionDebug()") Here
-      q-btn(outline color="white" dense no-caps @click="positionDebug('142363647983880232')") Cofee
-  //- loading spinner state
-  div(
-    v-if="scrollTarget && !itemsRes"
+  ).row.full-width.items-start.content-start
+  q-resize-observer(@resize="scrollHeightResized")
+  //- debug
+  //- div(
     :style=`{
-      paddingTop: ((scrollTarget.clientHeight || scrollTarget.innerHeight)/2)-25+'px',
+      //- position: scrollTargetIsWindow ? 'fixed' : 'absolute',
+      position: 'fixed',
+      zIndex: 1000, top: '0px',
+      opacity: 0.6,
     }`
-    ).row.full-width.justify-center
+    ).row.bg-green.text-white.q-pa-sm
+    small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
+    small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
+    small.full-width scrollTop: {{ scrollTop }}
+    small.full-width scrollBottom: {{ scrollBottom }}
+    small.full-width scrollHeight: {{ scrollHeight }}
+    small(v-if="itemsRes").full-width itemsRes.items: {{ itemsRes.items.length }}
+    div(v-if="itemMiddle").row.full-width
+      small.full-width itemMiddle.top: {{ itemMiddle.top }}
+    small(:class=`{'text-red': scrollTopChanging}`).full-width scrollTopChanging: {{ scrollTopChanging }}
+    small(:class=`{'text-red': scrollHeightChanging}`).full-width scrollHeightChanging: {{ scrollHeightChanging }}
+    .row.full-width
+      q-btn(flat dense color="white" no-caps @click="prev()") Prev
+      q-btn(flat dense color="red" no-caps @click="next()") Next
+      q-btn(flat dense color="orange" no-caps @click="positionDrop()") To start!
+      q-btn(flat dense color="blue" no-caps @click="positionStartHere()") Start here!
+      q-btn(flat dense color="white" no-caps @click="showHeader = !showHeader") {{showHeader ? 'Hide header' : 'Show header'}}
+  //- loading start, no itemsRes
+  div(
+    v-if="!itemsRes"
+    :style=`{
+      height: scrollTargetHeight+'px',
+    }`
+    ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
-  //- wrapper
+  //- header
+  //- div(
+    v-if="showHeader"
+    :style=`{
+      height: '240px',
+    }`
+    ).row.full-width.items-center.content-center.justify-center.bg-red
+    h1.text-white HEADER
+  slot(name="prepend")
+  //- got itemsRes and some items
   div(
     v-if="itemsRes"
     :style=`{
-      position: 'relative',
     }`
     ).row.full-width.items-start.content-start
-    //- prepend slot
-    slot(name="prepend")
-    //- prev loading
+    //- item wrapper
     div(
-      v-if="prevInProgress"
-      :style=`{
-        position: 'absolute', top: '0px', zIndex: 10000,
-        height: '60px',
-      }`
-      ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
-    //- wrapper item
-    div(
-      v-for="(item, itemIndex) in itemsRes.items" :key="item[itemKey]"
+      v-for="(item, itemIndex) in itemsRes.items"
+      :key="item[itemKey]"
       :ref="`item-${item[itemKey]}`"
-      :accessKey="item[itemKey]"
+      :accessKey="`${item[itemKey]}-${itemIndex}`"
       :style=`{
         ...itemStyles,
+        //- paddingBottom: '50px',
       }`
       v-observe-visibility=`{
-        throttle: 300,
+        throttle: 150,
         callback: itemMiddleHandler,
         intersection: {
-          root: scrollTarget ? scrollTarget.clientHeight ? scrollTarget : null : null,
+          root: scrollTargetIsWindow ? null : scrollTarget,
           rootMargin: rootMargin
         }
       }`
-      ).row.full-width.items-start.content-start
+      ).row.full-width
+      //- item slot
       slot(
         name="item"
         :item="item"
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="true")
-    //- next loading
-    div(
-      v-if="nextInProgress"
-      :style=`{
-        position: 'absolute', bottom: '0px', zIndex: 10000,
-        height: '60px',
-      }`
-      ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
-    //- append slot
-    slot(name="append")
+  slot(name="append")
 </template>
 
 <script>
 import { scroll } from 'quasar'
-import { RxCollectionEnum } from 'src/system/rxdb'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
 export default {
   name: 'listFeed',
   props: {
     rootMargin: {type: String, default () { return '-50% 0px' }},
+    // rootMargin: {type: String, default () { return '-40% 0px' }},
     query: {
       type: Object,
       required: true,
@@ -98,7 +100,7 @@ export default {
         return {}
       }
     },
-    positionSaving: {
+    itemMiddlePersist: {
       type: Boolean,
       default () {
         return true
@@ -107,65 +109,57 @@ export default {
   },
   data () {
     return {
-      itemMiddle: null, // положение активного ядра на экране(заполняется после отрисовки)
+      showHeader: false,
+      // scrollTarget
+      scrollTarget: null,
+      scrollTargetHeight: 0,
+      scrollTargetWidth: 0,
+      // scrollTop
+      scrollTop: 0,
+      scrollTopTimeout: null,
+      scrollTopChanging: false,
+      // scrollBottom
+      scrollBottom: 0,
+      // scrollHeight
+      scrollHeight: 0,
+      scrollHeightTimeout: null,
+      scrollHeightChanging: false,
       // items
       itemsRes: null,
-      // prev, next
-      prevInProgress: false, // идет загрузка данных вверху списка
-      nextInProgress: false, // идет загрузка данных внизу списка
-      // scroll data
-      scrollTop: 0, // расстояние от начала скролла до верха экрана
-      scrollHeight: 0,
-      scrollTarget: null,
-      scrollPreserveCount: 0,
+      itemsResStatus: null,
+      // item
+      itemMiddle: null,
     }
   },
   computed: {
     itemKey () {
-      return this.itemsRes ? this.itemsRes.itemPrimaryKey : null
+      return this.itemsRes?.itemPrimaryKey
     },
-    scrollTargetHeight () {
-      return this.scrollTarget ? (this.scrollTarget.clientHeight || this.scrollTarget.innerHeight) : this.$q.screen.height
+    scrollTargetIsWindow () {
+      return this.scrollTarget === window
     },
-    scrollPaginationOffset () {
-      // return this.scrollTargetHeight
-      return this.scrollTargetHeight * 2
+    paginationBufferHeight () {
+      // return this.scrollTargetHeight * 2
+      return this.scrollTargetHeight
     }
   },
   watch: {
     query: {
       immediate: true,
       async handler (to, from) {
-        this.$log('query TO')
-        if (this.itemsRes) this.setItemMiddleKey(null)
         this.itemsRes = await this.$rxdb.find(to, true)
-        this.$emit('ready')
-        this.$log('===== itemsRes created')
       }
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items changed to = ', to ? to.map(item => item.name) : '[]')
-        if (!this.itemMiddle && this.itemsRes.getProperty('currentId')){
-          // иногда setItemMiddleKey рабатывает вхолостую тк в момент вызова нет данных(массив еще не обновился). Вызываем после обновления массива
-          this.$log('set itemMiddle manually!')
-          this.setItemMiddleKey(this.itemsRes.getProperty('currentId'), true)
-        }
-        await this.scrollToItemMiddle()
-      }
-    },
-    scrollTop: {
-      // immediate: true,
-      async handler (to, from) {
-        if (!this.itemsRes) return
-        if (this.scrollHeight - to < this.scrollPaginationOffset) await this.next()
-        if (to < this.scrollPaginationOffset) await this.prev()
-        if (this.itemMiddle) this.itemMiddle.top = this.itemMiddle.ref.offsetTop - this.scrollTop
-      }
-    },
-    scrollHeight: {
-      handler (to, from) {
-        this.$log('scrollHeight TO', to)
+        this.$log('itemsRes.items TO', to.length)
+        this.$nextTick(() => {
+          this.$log('itemsRes.items $nextTick')
+          if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
+            this.itemMiddleSet(this.itemsRes.getProperty('currentId'), 0, false)
+          }
+          this.itemMiddleScrollIntoView()
+        })
       }
     },
     '$store.state.ui.listFeedNeedDrop': {
@@ -178,114 +172,183 @@ export default {
         }
       }
     },
+    scrollTop: {
+      async handler (to, from) {
+        // this.$log('scrollTop To/From:', to, from)
+
+        // update itemMiddle.top position
+        if (this.itemMiddle) {
+          let top = this.itemMiddle.ref.getBoundingClientRect().top
+          if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
+          this.itemMiddle.top = top
+        }
+
+        // wait for the end
+        if (this.scrollTopTimeout) {
+          clearTimeout(this.scrollTopTimeout)
+          this.scrollTopTimeout = null
+        }
+        if (!this.scrollTopChanging) this.$log('scrollTop START')
+        this.scrollTopChanging = true
+        this.scrollTopTimeout = setTimeout(async () => {
+          this.scrollTopChanging = false
+
+          // END of scrollTopChanging
+          this.$log('scrollTop END')
+          if (this.scrollTop < this.paginationBufferHeight) await this.prev()
+          if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+        }, 600)
+      }
+    },
+    scrollHeight: {
+      async handler (to, from) {
+        // this.$log('scrollHeight To/From:', to, from)
+
+        // wait for the end
+        if (this.scrollHeightTimeout) {
+          clearTimeout(this.scrollHeightTimeout)
+          this.scrollHeightTimeout = null
+        }
+        if (!this.scrollHeightChanging) this.$log('scrollHeight START')
+        this.scrollHeightChanging = true
+        this.scrollHeightTimeout = setTimeout(() => {
+          this.scrollHeightChanging = false
+
+          // END of scrollHeightChanging
+          this.$log('scrollHeight END')
+          this.itemMiddleScrollIntoView()
+        }, 600)
+      }
+    },
   },
   methods: {
-    itemMiddleHandler (isVisible, entry, i) {
+    itemMiddleScrollIntoView () {
+      this.$log('imsiv start')
+      if (this.itemMiddle) {
+        this.$log('imsiv ref', this.itemMiddle.ref)
+        let top = this.itemMiddle.top
+        // this.itemMiddle.ref.scrollIntoView()
+        // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - top)
+        let offsetTop = this.itemMiddle.ref.offsetTop
+        this.$log('imsiv offsetTop', offsetTop)
+        let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
+        this.$log('imsiv offsetTopScrollTarget', offsetTopScrollTarget)
+        setScrollPosition(this.scrollTarget, offsetTop - offsetTopScrollTarget - top)
+        this.$log('imsiv done')
+      }
+      else {
+        this.$log('imsiv itemMiddle NOT FOUND, failed, go to TOP')
+        setScrollPosition(this.scrollTarget, 0)
+      }
+    },
+    itemMiddleHandler (isVisible, entry) {
       if (isVisible) {
-        this.setItemMiddleKey(entry.target.accessKey)
+        if (this.scrollHeightChanging) return
+        let [key, idxSting] = entry.target.accessKey.split('-')
+        this.itemMiddleSet(key, parseInt(idxSting))
       }
     },
-    setItemMiddleKey(key, ignoreOffset = false) {
-      if (this.positionSaving) this.itemsRes.setProperty('currentId', key) // сохраняем до отрисовки(иначе не сработает positionDebug (если элемент отсутствует в старых данных))
-      const updateItemMiddle = (key) => {
-        if (key) {
-          let objIndx = this.itemsRes.items.findIndex(item => item[this.itemsRes.itemPrimaryKey] === key)
-          let objName = objIndx >= 0 ? this.itemsRes.items[objIndx].name : 'not found'
-          let itemMiddleRef
-          if (this.$refs[`item-${key}`] && this.$refs[`item-${key}`][0]) {
-            itemMiddleRef = this.$refs[`item-${key}`][0]
-            let itemMiddleRect = itemMiddleRef.getBoundingClientRect()
-            this.itemMiddle = {
-              key: key,
-              name: objName,
-              ref: itemMiddleRef,
-              // dimensions
-              top: ignoreOffset ? 0 : itemMiddleRect.top, // расстояние от верха экрана до отрисованного middle (может быть отрицательным)
-              bottom: itemMiddleRect.bottom,
-              left: itemMiddleRect.left,
-              right: itemMiddleRect.right,
-              width: itemMiddleRect.width,
-              height: itemMiddleRect.height,
-              // scroll data
-              offsetTop: itemMiddleRect.offsetTop,
-              scrollTop: getScrollPosition(this.scrollTarget),
-              scrollHeight: getScrollHeight(this.scrollTarget),
-            }
-            this.$log('set ItemMiddle: ', this.itemMiddle.name)
-          } else {
-            this.$log(`set ItemMiddle. not found! active itemMiddle: ${this.itemMiddle ? this.itemMiddle.name : 'null'}`)
+    itemMiddleSet (key, idx, useTop = true) {
+      this.$log('ims', key, idx, useTop)
+      if (key) {
+        if (this.itemMiddlePersist) this.itemsRes.setProperty('currentId', key)
+        let item = this.itemsRes.items[idx]
+        this.$log('ims item.name', item?.name)
+        let itemRef = this.$refs[`item-${key}`]
+        if (itemRef && itemRef[0]) {
+          itemRef = itemRef[0]
+          let top = itemRef.getBoundingClientRect().top
+          if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
+          this.itemMiddle = {
+            key: key,
+            name: item?.name,
+            ref: itemRef,
+            top: top,
+            item: item
           }
-        } else this.itemMiddle = null
-      }
-      // if positionSaving is true, $nextTick updateItemMiddle...
-      // if (this.positionSaving)
-      this.$nextTick(() => updateItemMiddle(key)) // вызываем после отрисовки элементов
-    },
-    // подмотает скролл до itemMiddle
-    async scrollToItemMiddle () {
-      this.$nextTick(async () => {
-        if (this.itemMiddle) {
-          this.$log('try scroll to itemMiddle', this.itemMiddle.name)
-          let scrollOffset = this.itemMiddle.top // сместит ядро на запомненное место
-          // get top position of scrollTarget if it is not window!
-          if (this.scrollTarget.clientHeight) {
-            let scrollOffsetScrollTarget = this.scrollTarget.getBoundingClientRect().top
-            this.$log('*** scrollOffsetScrollTarget ***', scrollOffsetScrollTarget)
-            scrollOffset -= scrollOffsetScrollTarget
-          }
-          let scrollPosition = this.itemMiddle.ref.offsetTop - scrollOffset
-          // let scrollPosition = this.itemMiddle.ref.offsetTop
-          setScrollPosition(this.scrollTarget, scrollPosition)
-          this.$log(`scroll to ItemMiddle ${this.itemMiddle.name} done scrollDelta=${scrollOffset}  scrollPosition=${scrollPosition}`)
-        } else {
-          setScrollPosition(this.scrollTarget, 0)
-          this.$log('scroll to ItemMiddle fail. itemMiddle not found. goto top')
         }
-      })
-    },
-    async prev () {
-      if (this.itemsRes && this.itemsRes.hasPrev && !this.prevInProgress) {
-        if (this.nextInProgress) return
-        this.$log('----- prev prev prev')
-        this.prevInProgress = true
-        await this.itemsRes.prev()
-        this.prevInProgress = false
+        else {
+          this.$log('ims itemRef NOT FOUND', key, idx, item?.name)
+        }
+      }
+      else {
+        this.itemMiddle = null
       }
     },
-    async next () {
-      if (this.itemsRes && this.itemsRes.hasNext && !this.nextInProgress) {
-        if (this.prevInProgress) return
-        this.$log('----- next next next')
-        this.nextInProgress = true
-        await this.itemsRes.next()
-        this.nextInProgress = false
-      }
-    },
-    async positionDebug (key) {
-      this.setItemMiddleKey(null)
-      this.setItemMiddleKey(key, true)
+    async positionStartHere (key, idx) {
+      this.$log('positionStartHere', key, idx)
+      this.itemMiddleSet(null)
+      this.itemMiddleSet(key, idx)
       await this.itemsRes.gotoCurrent()
     },
     async positionDrop () {
-      this.setItemMiddleKey(null)
+      this.itemMiddleSet(null)
       await this.itemsRes.gotoStart()
     },
+    async prev () {
+      this.$log('prev')
+      if (!this.itemsRes) return
+      if (!this.itemsRes.hasPrev) return
+      if (this.itemsResStatus) return
+      this.itemsResStatus = 'PREV'
+      this.$log('prev start')
+      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      await this.itemsRes.prev()
+      this.$log('prev done')
+      this.itemsResStatus = null
+    },
+    async next () {
+      this.$log('next')
+      if (!this.itemsRes) return
+      if (!this.itemsRes.hasPrev) return
+      if (this.itemsResStatus) return
+      this.itemsResStatus = 'NEXT'
+      this.$log('next start')
+      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      await this.itemsRes.next()
+      this.$log('next done')
+      this.itemsResStatus = null
+    },
     scrollUpdate (e) {
-      // this.$log('scrollUpdate')
       this.scrollTop = getScrollPosition(this.scrollTarget)
       this.scrollHeight = getScrollHeight(this.scrollTarget)
+      this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
+      // if (this.itemMiddle) {
+      //   this.$log('itemMiddle.ref.offsetTop 1', this.itemMiddle.ref.offsetTop)
+      //   this.$log('itemMiddle.ref.offsetTop 2', this.$refs['item-' + this.itemMiddle.key][0].offsetTop)
+      // }
+    },
+    scrollHeightResized (e) {
+      this.$log('scrollHeightResized', e.height)
+      if (!this.scrollTarget) return
+      this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
+      this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
+      this.scrollHeight = e.height
+      this.scrollUpdate()
+      // this.scrollTargetHeight = e.height
+      // this.scrollTargetWidth = e.width
     }
   },
-  async mounted () {
+  mounted () {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
-    this.scrollUpdate()
-    await this.prev()
+    this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
+    this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
+    this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
+    // this.$nextTick(() => {
+    //   this.scrollUpdate()
+    //   this.scrollResized()
+    // })
+    // this.$wait(1000).then(() => {
+    //   this.scrollUpdate()
+    //   this.prev()
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.scrollTarget.removeEventListener('scroll', this.scrollUpdate)
+    this.scrollTarget.removeEventListener('resize', this.scrollHeightResized)
   }
 }
 </script>

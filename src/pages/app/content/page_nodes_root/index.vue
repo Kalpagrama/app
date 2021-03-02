@@ -7,7 +7,7 @@
       list-feed(
         ref="list-feed"
         :query="query"
-        :positionSaving="false"
+        :itemMiddlePersist="false"
         :style=`{
           maxWidth: 650+'px',
           marginBottom: '100px',

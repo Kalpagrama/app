@@ -9,9 +9,9 @@ div(
   ).row.full-width.items-start.content-start
   slot
   //- preview
+  //- loading="lazy"
   img(
     draggable="false"
-    loading="lazy"
     :key="compositionKey"
     :src="composition.thumbUrl"
     :style=`{

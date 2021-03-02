@@ -59,19 +59,26 @@ div(
       ).row.items-center.content-center.justify-center
       span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
       q-icon(name="fast_forward" color="white" size="20px").q-ml-xs
-  //- footer feed
+  //- footer feed: timeline
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="player && player.duration && options.mode === 'feed' && !isMini"
       :style=`{
-        position: 'absolute', zIndex: 1000,
+        position: 'absolute', zIndex: 3000,
         bottom: '0px',
         borderRadius: '0 0 10px 10px',
         userSelect: 'none',
-        pointerEvents: 'none',
+        //- pointerEvents: 'none',
       }`
-      ).row.full-width.justify-start.q-pa-md
+      ).row.full-width.items-center.content-center.justify-between.q-pa-sm
       small(:style=`{borderRadius: '8px', background: 'rgba(0,0,0,0.7)'}`).text-white.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
+      q-btn(
+        @click="player.setState('muted', !player.muted)"
+        round flat dense color="white" size="sm"
+        :icon="player.muted ? 'volume_off' : 'volume_up'"
+        :style=`{
+          background: 'rgba(0,0,0,0.7)',
+        }`)
   //- footer editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -213,6 +220,7 @@ export default {
     },
     onKeydown (e) {
       // this.$log('onKeydown', e)
+      e.preventDefault()
       if (this.$store.state.ui.userTyping) return
       switch (e.key) {
         case 'ArrowLeft':
@@ -234,7 +242,9 @@ export default {
           this.player.setState('muted', true)
           break
       }
+      // play/pause
       if (e.code === 'Space') {
+        // e.preventDefault()
         if (this.player.playing) this.player.pause()
         else this.player.play()
       }

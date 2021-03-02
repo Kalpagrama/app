@@ -1,30 +1,86 @@
 <template lang="pug">
-list-feed(
-  :query="query"
-  :positionSaving="false"
-  :itemStyles=`{
-    paddingBottom: '8px',
-  }`)
-  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-    div(
+div().row.full-width
+  //- div(
+    :style=`{
+      position: 'sticky', top: '0px', zIndex: 1000,
+    }`
+    ).row.full-width.bg-red
+    span.text-white Header
+  list-feed(
+    :query="query"
+    :itemMiddlePersist="true"
+    :itemStyles=`{
+      paddingBottom: '16px',
+    }`)
+    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      div(
+        :style=`{
+          position: 'relative',
+          height: '120px',
+          borderRadius: '10px',
+        }`
+        ).row.full-width
+        slot(name="tint" :item="item.populatedObject")
+        img(
+          :src="item.populatedObject.items[0].thumbUrl"
+          :style=`{
+            objectFit: 'cover',
+            borderRadius: '10px',
+          }`
+          ).fit
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 10,
+            //- background: 'linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%)',
+            background: 'linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 100%)',
+            borderRadius: '10px',
+          }`
+          ).row.fit.items-end.content-end.q-pa-md
+          transition(enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
+            div(
+              v-if="isActive"
+              :style=`{
+                position: 'absolute', zIndex: 11, top: '0px', left: '0px',
+              }`
+              ).row.full-width.q-pa-md
+              q-icon(name="select_all" color="white").q-mr-sm
+              small.text-grey-4 {{ item.populatedObject.items[0].layers[0].contentName }}
+          span.text-white {{ item.populatedObject.name }}
+    //- div(
+      :class=`{
+        'b-70': isActive,
+      }`
       :style=`{
         position: 'relative',
-        background: 'rgb(35,35,35)',
+        background: 'rgb(45,45,45)',
+        //- height: '80px',
         borderRadius: '10px',
       }`
-      ).row.full-width.items-center.content-center.cursor-pointer
+      ).row.full-width.items-start.content-start.cursor-pointer
       slot(name="tint" :item="item.populatedObject")
-      img(
-        :src="item.populatedObject.items[0].thumbUrl"
+      div(
         :style=`{
-          width: '50px',
-          height: '50px',
+          position: 'relative',
+          height: '80px',
           borderRadius: '10px',
-          objectFit: 'cover',
-        }`)
-      .col
-        .row.fit.items-center.content-center.q-pa-sm
-          span.text-white {{ item.populatedObject.name }}
+        }`
+        ).row.full-width.items-start.content-start.b-50
+        img(
+          :src="item.populatedObject.items[0].thumbUrl"
+          :style=`{
+            height: '80px',
+            maxWidth: '160px',
+            borderRadius: '10px',
+            objectFit: 'cover',
+          }`)
+        .col.full-height
+          .row.fit.items-between.content-between.q-pa-sm
+            //- q-icon(name="select_all" color="white").q-mr-sm
+            //- small.text-grey-4 {{ item.populatedObject.items[0].layers[0].contentName }}
+            .row.full-width.justify-end
+              small.text-grey-4 {{ $date(item.populatedObject.createdAt, 'DD.MM.YYYY') }}
+      .row.full-width.q-pa-md
+        span.text-white {{ item.populatedObject.name }}
 </template>
 
 <script>
