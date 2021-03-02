@@ -12,13 +12,6 @@ div(
       ).row
       span.q-mr-sm -
       span {{ itemsRes ? itemsRes.totalCount : '' }}
-  joints-slider(
-    v-if="itemsSliderShow"
-    :oid="node.oid"
-    :joint="itemsSliderJoint"
-    :style=`{
-      position: 'absolute', zIndex: 1000, top: '-70px',
-    }`)
   div(
     v-for="(joint, jointIndex) in itemsRes.items"
     :key="joint[itemsRes.itemPrimaryKey]"
@@ -76,12 +69,14 @@ export default {
   methods: {
     jointClick (joint) {
       this.$log('jointClick', joint)
-      this.$router.push(`/joint/${joint.oid}?oid=${this.node.oid}`)
+      this.$router.push(`/joint/${this.node.oid}?oid=${joint.oid}`)
     },
   },
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
+    await this.itemsRes.setProperty('currentId', null)
+    await this.itemsRes.gotoStart()
   }
 }
 </script>

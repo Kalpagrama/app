@@ -1,30 +1,37 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- q-header
-  //- tint
-  //- div(
+  div(
     :style=`{
-      position: 'fixed', zIndex: 1000, top: '0px', left: '0px',
-      background: 'linear-gradient(90deg, rgba(30,30,30,0.5) 0%, rgba(30,30,30,0) 100%)',
-      pointerEvents: 'none',
-      minHeight: '100vh',
-      width: '30%',
+      position: 'fixed', zIndex: 2000, bottom: '0px',
     }`
-    ).row.br
-  //- div(
+    ).row.full-width.justify-center
+    div(
+      :style=`{
+        maxWidth: rowItemWidth+'px',
+      }`
+      ).row.full-width.q-px-sm.q-pb-md
+      .col
+      q-btn(
+        v-if="!jointCreatorShow"
+        @click="jointCreateStart()"
+        round color="green" icon="add"
+        :style=`{borderRadius: '50%',}`)
+      q-btn(
+        v-if="jointCreatorShow"
+        @click="jointCreateCancel()"
+        round color="white" icon="clear" flat
+        :style=`{borderRadius: '50%',}`)
+  //- joint-creator(
+    v-if="jointCreatorShow"
+    :item="jointItem"
     :style=`{
-      position: 'fixed', zIndex: 1000, top: '0px', right: '0px',
-      background: 'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(30,30,30,0.5) 100%)',
-      pointerEvents: 'none',
-      minHeight: '100vh',
-      width: '30%',
-    }`
-    ).row.br
+      position: 'fixed', zIndex: 1000,
+      top: jointCreatorTop+'px',
+    }`)
   q-page-container
     q-page(
-      v-if="joint"
+      v-if="jointItem"
       :style=`{
-        //- paddingTop: '8px',
         paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
         paddingBottom: '600px'
       }`).row.full-width.justify-center
@@ -33,36 +40,54 @@ q-layout(view="hHh Lpr lff")
         div(:style=`{maxWidth: 500+'px'}`).row.full-width
           q-resize-observer(@resize="rowItemWidth = $event.width")
           joint-item(
-            :item="joint.items.find(j => j.oid === jointItemPinnedOid)"
+            :item="jointItem"
             :itemActive="true")
       //- dynamic items
       .row.full-width
+        //- v-show="rowActiveKey === rowIndex+row.oid"
+        //- v-if="rowActiveKey === rowIndex+row.oid"
         joints-row(
           v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
+          :ref="`row-${rowIndex+row.oid}`"
           :row="row"
-          :rowActive="rowActiveIndex === rowIndex"
+          :rowActive="rowActiveKey === rowIndex+row.oid"
+          :rowPaused="jointCreatorShow"
           :rowItemWidth="rowItemWidth"
-          @joint-visible="joinsRowJointVisibleCallback")
+          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
+          transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+            joint-creator(
+              v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"
+              :item="jointItem"
+              :maxWidth="rowItemWidth"
+              :style=`{
+                position: 'absolute', zIndex: 1000, top: '0px',
+              }`
+              @created="jointCreated")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import jointsRow from './joints_row/index.vue'
 import jointItem from './joints_row/joint_item.vue'
+import jointCreator from './joint_creator/index.vue'
 
 export default {
   name: 'pageApp_joint',
   components: {
     jointsRow,
-    jointItem
+    jointItem,
+    jointCreator,
   },
   data () {
     return {
       joint: null,
+      jointItem: null,
       jointItemPinnedOid: null,
       rows: [],
-      rowActiveIndex: 0,
-      rowItemWidth: 0
+      rowActiveKey: null,
+      rowItemWidth: 0,
+      jointCreatorShow: false,
+      jointCreatorTop: 0,
     }
   },
   computed: {
@@ -72,29 +97,65 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        if (to) {
-          // this.$log('$route.params.oid TO', to)
-          this.joint = await this.$rxdb.get(RxCollectionEnum.OBJ, to.params.oid)
-          this.jointItemPinnedOid = to.query.oid
-          // let itemBottom = this.joint.items.find(j => j.oid !== to.query.oid)
+        if (to && !from) {
+          // this.$log('$route TO', to)
+          this.jointItemPinnedOid = to.params.oid
+          this.jointItem = await this.$rxdb.get(RxCollectionEnum.OBJ, to.params.oid)
           let rowInput = {
-            oid: to.query.oid,
-            oidsHidden: []
+            oid: to.params.oid,
+            oidsHidden: [],
+            jointFrom: to.query.oid,
           }
           this.rows.push(rowInput)
+          this.rowActiveKey = '0' + to.params.oid
+        }
+        // handle another switch
+        if (to && from) {
+          this.$log('$route TO', to.params.oid, to.query.oid)
         }
       }
     },
   },
   methods: {
-    async joinsRowJointVisibleCallback (joint, oid) {
-      this.$log('joinsRowJointVisibleCallback', joint, oid)
+    jointCreateStart () {
+      this.$log('jointCreateStart')
+      // get rowActiveIndex position of top
+      // move there ?
+      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+      if (rowRef && rowRef[0]) {
+        rowRef = rowRef[0].$el
+        this.$log('rowRef', rowRef)
+        let top = rowRef.getBoundingClientRect().top
+        this.jointCreatorTop = top
+        this.jointCreatorShow = true
+      }
+    },
+    jointCreateCancel () {
+      this.$log('jointCreateCancel')
+      this.jointCreatorShow = false
+    },
+    async jointCreated (joint) {
+      this.$log('jointCreated', joint)
+      // go to current row and go
+      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+      if (rowRef && rowRef[0]) {
+        rowRef = rowRef[0]
+        this.$log('jointCreated rowRef', rowRef)
+        await rowRef.jointsRes.setProperty('currentId', joint.oid)
+        await rowRef.jointsRes.gotoCurrent()
+      }
+      this.jointCreatorShow = false
+    },
+    async joinsRowJointVisibleCallback (joint, oid, row, rowIndex) {
+      // this.$log('joinsRowJointVisibleCallback', joint, oid, row, rowIndex)
+      this.$router.push({query: {oid: joint.oid}})
       // add row for this ?
       let rowInput = {
         oid: oid,
         oidsHidden: [
           joint.oid,
-        ]
+        ],
+        jointFrom: null,
       }
       if (this.rows.length > 1) {
         this.$delete(this.rows, this.rows.length - 1)

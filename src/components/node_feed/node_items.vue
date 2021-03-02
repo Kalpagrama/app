@@ -1,9 +1,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.content-end
-  //- link btn: to go to /links mode
+  //- link btn: to go to /joint mode
   q-btn(
     flat color="green" icon="fas fa-link" size="lg"
-    :to="'/links/'+node.items[0].oid+'?joint='+node.oid"
+    :to="`/joint/${node.items[0].oid}?oid=${node.oid}`"
     :style=`{
       position: 'absolute', zIndex: 1000,
       left: 'calc(50% - 30px)',

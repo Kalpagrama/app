@@ -14,7 +14,7 @@ div().row.full-width.items-start.content-start
       position: 'absolute', zIndex: 100, top: '0px',
     }`
     ).row.full-width.q-pa-sm
-    span.text-white {{ itemVertex.name }}
+    span.text-white.q-ml-xs {{ itemVertex.name }}
   //- footer
   div(
     :style=`{
@@ -26,7 +26,7 @@ div().row.full-width.items-start.content-start
       :style=`{
         overflow: 'hidden',
       }`
-      ).row.full-width.items-center.content-center.no-wrap
+      ).row.full-width.items-center.content-center.no-wrap.q-px-xs
       q-icon(name="adjust" color="white").q-mr-sm
       span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ item.name }}
   //- tint

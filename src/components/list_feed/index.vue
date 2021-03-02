@@ -5,7 +5,7 @@ div(
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  div(
+  //- div(
     :style=`{
       //- position: scrollTargetIsWindow ? 'fixed' : 'absolute',
       position: 'fixed',
@@ -334,6 +334,8 @@ export default {
     this.scrollTarget = getScrollTarget(this.$el)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
     this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
+    this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
+    this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
     // this.$nextTick(() => {
     //   this.scrollUpdate()
     //   this.scrollResized()

@@ -36,7 +36,7 @@
       borderRadius: '10px 10px 0 0',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between.b-40
+    ).row.full-width.justify-between.b-40.q-pt-sm
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"

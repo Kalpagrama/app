@@ -2,7 +2,7 @@
 q-layout(
   view="hHh Lpr lff").b-30
   q-header(reveal)
-    .row.full-width.justify-center
+    .row.full-width.justify-center.q-pt-sm
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-md.b-30
         q-icon(name="adjust" color="white" size="30px").q-mr-sm
         h1.text-white.text-bold Ядро
@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     nodeVisibilityCallback (isVisible, entry) {
-      this.$log('nodeVisibilityCallback')
+      this.$log('nodeVisibilityCallback', isVisible)
       this.nodeIsVisible = isVisible
     }
   },

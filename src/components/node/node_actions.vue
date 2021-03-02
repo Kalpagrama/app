@@ -45,7 +45,7 @@
     //- joints/links/chains
     router-link(
       v-if="node.items.length === 1"
-      :to="'/links/'+node.oid"
+      :to="'/joint/'+node.oid"
       ).col
       .row.full-width
         .col

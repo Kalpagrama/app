@@ -1,12 +1,35 @@
 <template lang="pug">
 .column.full-width
+  //- header
+  .row.full-width
+    //- searchString
+    .row.full-width.q-px-sm
+      q-input(
+        v-model="searchString"
+        borderless dark
+        placeholder="Найти элемент для связи"
+        :input-style=`{
+          paddingLeft: '10px',
+        }`
+        :style=`{
+          borderRadius: '10px',
+        }`
+        ).full-width.b-40
+    //- pages
+    div().row.full-width.justify-center
+      div(
+        v-if="pagesShow"
+        :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-sm
+        q-tabs(
+          v-model="pageId" no-caps
+          dense active-color="green"
+          aling="left"
+          ).text-grey-6
+          q-tab(
+            v-for="p in pagesFiltered" :key="p.id"
+            :name="p.id" :label="p.name")
+  //- body
   .col.full-width.scroll
-    div(
-      :style=`{
-        position: 'sticky', top: '0px', zIndex: 1000,
-      }`
-      ).row.full-width.q-pa-sm.b-40
-      span.text-white Ядра
     component(
       v-bind="$props"
       :is="`page-${pageId}`"
@@ -17,54 +40,6 @@
       }`)
       template(v-slot:tint=`{item}`)
         slot(name="tint" :item="item")
-//- q-layout(
-  view="hHh Lpr lff"
-  container)
-  q-header(reveal)
-    div(
-      :style=`{
-        //- paddingTop: 'env(safe-area-inset-top)',
-        //- background: 'rgb(35,35,35)',
-      }`
-      ).row.full-width.justify-center.q-px-sm.b-30
-      slot(name="header")
-      //- pages
-      div().row.full-width.justify-center
-        //- q-btn(rounnd flat dense color="white" icon="construction")
-        .col
-          div(
-            v-if="pagesShow"
-            :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-sm
-            q-tabs(
-              v-model="pageId" no-caps
-              dense active-color="green"
-              aling="left"
-              ).text-grey-6
-              q-tab(
-                v-for="p in pagesFiltered" :key="p.id"
-                :name="p.id" :label="p.name")
-      //- search
-      div(
-        v-if="!searchString"
-        ).row.full-width.justify-center
-        //- ws-search(
-          @searchString="searchStringLocal = $event"
-          @contentKalpa="contentKalpaFound"
-          :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-          }`)
-  q-page-container
-    q-page.row.full-width.justify-center.q-pa-sm
-      component(
-        v-bind="$props"
-        :is="`page-${pageId}`"
-        :searchString="searchStringLocal"
-        :page="page"
-        :style=`{
-          maxWidth: 600+'px',
-        }`)
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
 </template>
 
 <script>

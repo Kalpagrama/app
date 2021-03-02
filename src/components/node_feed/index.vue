@@ -182,8 +182,7 @@ export default {
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
-        return '/links/' + this.node.items[0].oid + '?joint=' + this.node.oid
-        // return '/node/' + this.node.oid
+        return `/joint/${this.node.items[0].oid}?oid=${this.node.oid}`
       }
       else {
         return '/node/' + this.node.oid
