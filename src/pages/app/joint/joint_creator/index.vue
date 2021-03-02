@@ -2,7 +2,7 @@
 div(
   :style=`{
   }`
-  ).row.full-width.items-start.content-start.justify-center
+  ).row.full-width.items-start.content-start.justify-center.b-30
   div(
     :style=`{
       maxWidth: maxWidth+'px',
