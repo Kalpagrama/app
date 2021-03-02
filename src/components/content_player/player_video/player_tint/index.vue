@@ -220,7 +220,7 @@ export default {
     },
     onKeydown (e) {
       // this.$log('onKeydown', e)
-      e.preventDefault()
+      // e.preventDefault()
       if (this.$store.state.ui.userTyping) return
       switch (e.key) {
         case 'ArrowLeft':
@@ -244,7 +244,7 @@ export default {
       }
       // play/pause
       if (e.code === 'Space') {
-        // e.preventDefault()
+        e.preventDefault()
         if (this.player.playing) this.player.pause()
         else this.player.play()
       }

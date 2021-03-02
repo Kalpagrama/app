@@ -178,7 +178,6 @@ export default {
           // if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
           //   this.itemMiddleSet(this.itemsRes.getProperty('currentId'), 0, false)
           // }
-          // this.itemMiddleScrollIntoView()
           this.jointMakeVisible({oid: this.jointVisibleOid}, false)
         })
       }
@@ -198,11 +197,11 @@ export default {
           this.jointsRes.gotoStart()
         }
         // make visible joint [0] ?
-        this.$nextTick(() => {
-          if (this.jointsRes.items.length > 0) {
-            this.jointMakeVisible(this.jointsRes.items[0], false)
-          }
-        })
+        // this.$nextTick(() => {
+        //   if (this.jointsRes.items.length > 0) {
+        //     this.jointMakeVisible(this.jointsRes.items[0], false)
+        //   }
+        // })
       }
     },
     jointsWrapperWidth: {
@@ -211,7 +210,9 @@ export default {
           clearTimeout(this.jointsWrapperWidthTimeout)
           this.jointsWrapperWidthTimeout = null
         }
-        if (!this.jointsWrapperWidthChanging) this.$log('jointsWrapperWidth START')
+        if (!this.jointsWrapperWidthChanging) {
+          this.$log('jointsWrapperWidth START')
+        }
         this.jointsWrapperWidthChanging = true
         this.jointsWrapperWidthTimeout = setTimeout(() => {
           this.jointsWrapperWidthChanging = false
@@ -230,14 +231,14 @@ export default {
         this.$log('jointVisibilityCallback', isVisible)
         this.jointVisibilityCallbackCount += 1
         let [key, idx] = entry.target.accessKey.split('-')
-        this.$log('key', key)
-        this.$log('idx', idx)
+        // this.$log('key', key)
+        // this.$log('idx', idx)
         idx = parseInt(idx)
         this.jointVisibleOid = key
         // emit active joint up
         if (this.rowActive) {
           let joint = this.jointsRes.items[idx]
-          this.$log('joint.oid', joint.oid)
+          // this.$log('joint.oid', joint.oid)
           if (joint) {
             let itemOid = joint.populatedObject.items.find(i => i.oid !== this.row.oid).oid
             this.$emit('joint-visible', joint.populatedObject, itemOid)
@@ -255,9 +256,6 @@ export default {
             this.jointsResMove(false)
           }
         }
-        // this.$nextTick(() => {
-        //   c()
-        // })
         jointsResMoveMaybe()
       }
     },

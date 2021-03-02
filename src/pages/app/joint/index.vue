@@ -44,10 +44,10 @@ q-layout(view="hHh Lpr lff")
             :itemActive="true")
       //- dynamic items
       .row.full-width
-        //- v-show="rowActiveKey === rowIndex+row.oid"
-        //- v-if="rowActiveKey === rowIndex+row.oid"
         joints-row(
           v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
+          v-if="rowActiveKey === rowIndex+row.oid"
+          v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
           :ref="`row-${rowIndex+row.oid}`"
           :row="row"
           :rowActive="rowActiveKey === rowIndex+row.oid"
