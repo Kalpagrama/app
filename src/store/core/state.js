@@ -12,6 +12,8 @@ export default {
    logLevelSentry: LogLevelEnum.CRITICAL,
    logDbgFilter: 'any', // gui | system | any
    logFormat: {time: false, moduleName: true, funcName: true},
+   logRocket: false,
+   logRocketSessionUrl: null,
    logDbgModulesBlackList: [
       LogSystemModulesEnum.SYSTEM,
       LogSystemModulesEnum.TEST,
