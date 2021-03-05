@@ -10,12 +10,14 @@ q-layout(view="hHh Lpr lff")
         maxWidth: rowItemWidth-2+'px',
         borderRadius: '10px 10px 0 0',
       }`
-      ).row.full-width.items-center.content-center.q-px-sm.q-pb-md.b-40.q-pt-sm
+      ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.b-40.q-pt-sm
       q-btn(
         v-if="!jointCreatorShow"
         @click="$routerKalpa.back()"
-        round flat color="grey-6" icon="west"
-        :style=`{borderRadius: '50%',}`)
+        flat color="white" icon="west" no-caps stack
+        :style=`{
+          width: '70px', height: '70px',
+        }`) Назад
       .col
       //- q-btn(
         v-if="!jointCreatorShow"
@@ -29,23 +31,19 @@ q-layout(view="hHh Lpr lff")
         v-if="!jointCreatorShow"
         @click="jointCreateStart()"
         round color="green" icon="add"
-        :style=`{borderRadius: '50%',}`)
+        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
       q-btn(
         v-if="jointCreatorShow"
         @click="jointCreateCancel()"
         round color="white" icon="clear" flat
-        :style=`{borderRadius: '50%',}`)
+        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
       .col
       kalpa-menu-popup-global(
         v-if="!jointCreatorShow"
-        :showLabel="false")
-  //- joint-creator(
-    v-if="jointCreatorShow"
-    :item="jointItem"
-    :style=`{
-      position: 'fixed', zIndex: 1000,
-      top: jointCreatorTop+'px',
-    }`)
+        :showLabel="true"
+        :style=`{
+          width: '70px', height: '70px',
+        }`)
   q-page-container
     q-page(
       v-if="jointItem"
@@ -58,10 +56,6 @@ q-layout(view="hHh Lpr lff")
         div(
           :style=`{
             maxWidth: 500+'px',
-            //- borderLeft: jointChanging ? 'none' : '1px solid rgb(76,175,80)',
-            //- borderTop: jointChanging ? 'none' :  '1px solid rgb(76,175,80)',
-            //- borderRight: jointChanging ? 'none' :  '1px solid rgb(76,175,80)',
-            //- borderRadius: jointChanging ? 'none' :  '10px 10px 0px 0px',
           }`).row.full-width
           q-resize-observer(@resize="rowItemWidth = $event.width")
           joint-item(
@@ -69,6 +63,13 @@ q-layout(view="hHh Lpr lff")
             :item="jointItem"
             :itemActive="true"
             :itemIndependent="true")
+            node-feed(
+              v-if="jointActive"
+              :node="jointActive"
+              :showItems="false"
+              :showActions="false"
+              :showName="false"
+              :showAuthorAlways="false")
       //- dynamic items
       .row.full-width
         //- v-if="rowActiveKey === rowIndex+row.oid"
@@ -87,7 +88,7 @@ q-layout(view="hHh Lpr lff")
           @next="rowsNext()"
           @joint-change-start="jointChanging = true"
           @joint-change-end="jointChanging = false"
-          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)").br
+          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
           transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             joint-creator(
               v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"
@@ -123,6 +124,7 @@ export default {
       jointCreatorShow: false,
       jointCreatorTop: 0,
       jointChanging: false,
+      jointActive: null,
     }
   },
   computed: {
@@ -213,6 +215,7 @@ export default {
       if (this.$route.query.oid !== joint.oid) {
         this.$router.replace({query: {oid: joint.oid}})
       }
+      this.jointActive = joint
       // add row for this ?
       let rowInput = {
         oid: oid,

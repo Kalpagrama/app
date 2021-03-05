@@ -10,6 +10,7 @@ div(
     borderRadius: itemIndependent ? '10px 10px 0px 0px' : '0px 0px 10px 10px',
   }`
   ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
+  slot
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="itemActive && !itemIndependent"
@@ -154,6 +155,7 @@ div(
         :isVisible="false"
         :showName="false"
         :showItems="false"
+        :showHeader="false"
         :style=`{
           zIndex: 100,
         }`)
