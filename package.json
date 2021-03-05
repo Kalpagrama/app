@@ -1,6 +1,6 @@
 {
   "name": "kalpagrama",
-  "version": "3.2.178",
+  "version": "3.2.195",
   "description": "Kalpagrama application",
   "productName": "Kalpagrama",
   "cordovaId": "app.kalpa",
@@ -50,6 +50,7 @@
     "i18next": "^19.0.1",
     "i18next-browser-languagedetector": "^6.0.1",
     "lodash": "^4.17.15",
+    "logrocket": "^1.0.14",
     "lru-cache": "^6.0.0",
     "mediaelement": "^4.2.14",
     "pouchdb-adapter-idb": "^7.2.2",
