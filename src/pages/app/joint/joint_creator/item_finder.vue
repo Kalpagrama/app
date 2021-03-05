@@ -10,7 +10,7 @@ kalpa-finder(
     //- web: {views: ['all', 'image', 'video',]}
   }`
   :style=`{
-    height: '500px',
+    height: '550px',
   }`)
   template(v-slot:tint=`{item}`)
     div(

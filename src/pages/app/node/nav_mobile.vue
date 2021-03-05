@@ -21,7 +21,7 @@ div(
       }`)
       span Назад
     //- .col
-    q-btn(
+    //- q-btn(
       flat color="green" icon="add" no-caps stack
       :style=`{
         //- width: '70px',

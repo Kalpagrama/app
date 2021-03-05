@@ -1,5 +1,5 @@
 <template lang="pug">
-div().row.full-width
+div().row.full-width.q-px-sm
   //- div(
     :style=`{
       position: 'sticky', top: '0px', zIndex: 1000,

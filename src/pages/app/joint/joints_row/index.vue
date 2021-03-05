@@ -10,7 +10,7 @@ div(
   div(
     v-if="jointsRes && jointsRes.items.length > 0 && rowActive"
     :style=`{
-      position: 'absolute', zIndex: 100, top: '0px',
+      position: 'absolute', zIndex: 200, top: '0px',
     }`
     ).row.full-width.justify-center
     div(
@@ -27,7 +27,8 @@ div(
         ).col.q-px-xs
         div(
           :class=`{
-            'bg-green': jointVisibleOid === joint.oid,
+            //- 'bg-green': jointVisibleOid === joint.oid,
+            'b-100': jointVisibleOid === joint.oid,
             'b-50': jointVisibleOid !== joint.oid,
           }`
           :style=`{
@@ -38,24 +39,27 @@ div(
   div(
     v-if="jointsRes && rowActive"
     :style=`{
-      position: 'absolute', zIndex: 3000, top: '0px',
+      position: 'absolute', zIndex: 3000, top: '-4px',
       opacity: 0.1,
     }`
-    ).row.bg-green.q-px-sm
-    q-btn(
-      @click="jointsResMove(false)"
-      flat no-caps :color="jointsRes.hasPrev ? 'white' : 'red'") Prev
-    q-btn(
-      @click="jointsResMove(true)"
-      flat no-caps :color="jointsRes.hasNext ? 'white' : 'red'") Next
-    q-btn(
-      @click="jointsResToStart()"
-      flat no-caps) To Start
-    q-btn(
-      @click="jointsResStartHere()"
-      flat no-caps) Start here
-    .row.full-width
-      small(:class=`{'text-red': jointsWrapperWidthChanging, 'text-white': !jointsWrapperWidthChanging}`) jointsWrapperWidthChanging: {{jointsWrapperWidthChanging}}
+    ).row.full-width.justify-center
+    div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-px-sm
+      q-btn(
+        @click="jointsResToStart()"
+        flat no-caps dense color="white") To Start
+      q-btn(
+        @click="jointsResMove(false)"
+        flat no-caps dense
+        :disabled="!jointsRes.hasPrev"
+        :color="jointsRes.hasPrev ? 'white' : 'red'") Prev
+      q-btn(
+        @click="jointsResMove(true)"
+        flat no-caps dense
+        :disabled="!jointsRes.hasPrev"
+        :color="jointsRes.hasNext ? 'white' : 'red'") Next
+      q-btn(
+        @click="jointsResStartHere()"
+        flat no-caps dense color="white") Start here
   div(
     ref="scroll-wrapper"
     :style=`{
@@ -107,6 +111,7 @@ div(
           small.full-width jointIndex: {{ jointIndex }}
           small.full-width joint.oid: {{ joint.oid }}
           small.full-width item.oid: {{ joint.populatedObject.items.find(i => i.oid !== row.oid).oid }}
+        //- tint
         div(
           v-if="jointVisibleOid !== joint.oid"
           @click="jointMakeVisible(joint)"
@@ -128,17 +133,38 @@ div(
         :style=`{
           width: paddingLeftRight+'px',
         }`)
+  //- next row
+  div(@click="$emit('next')").row.full-width.justify-center
+    div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.q-pa-lg
+      widget-bookmarks()
+    //- div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.q-px-xl.br
+      .col.q-pr-xs
+        q-btn(
+          outline color="grey-8" no-caps
+          :style=`{
+            height: '100px',
+          }`
+          ).full-width Up
+      .col.q-pl-xs
+        q-btn(
+          outline color="grey-8" no-caps
+          :style=`{
+            height: '100px',
+          }`
+          ).full-width Down
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import jointItem from './joint_item.vue'
+import widgetBookmarks from 'pages/app/workspace/widget_bookmarks/index.vue'
 
 export default {
   name: 'jointsRow',
   props: ['row', 'rowActive', 'rowPaused', 'rowItemWidth'],
   components: {
     jointItem,
+    widgetBookmarks,
   },
   data () {
     return {
@@ -172,6 +198,7 @@ export default {
   watch: {
     'jointsRes.items': {
       async handler (to, from) {
+        if (!this.jointVisibleOid) return
         this.$log('jointsRes.items TO', to.length)
         this.$nextTick(() => {
           this.$log('jointsRes.items $nextTick')
@@ -220,6 +247,7 @@ export default {
           // END of jointsWrapperWidthChanging
           this.$log('jointsWrapperWidth END')
           this.jointMakeVisible({oid: this.jointVisibleOid}, false)
+          this.jointsResMoveMaybe()
         }, 600)
       }
     }
@@ -244,24 +272,24 @@ export default {
             this.$emit('joint-visible', joint.populatedObject, itemOid)
           }
         }
-        // go prev/next here
-        // if (this.jointVisibilityCallbackCount > 0)
-        const jointsResMoveMaybe = () => {
-          this.$log('*** jointsResMoveMaybe ***')
-          if (idx <= 1 && this.jointsRes.hasPrev) {
-            // await this.jointsRes.prev()
-            this.jointsResMove(true)
-          }
-          if (idx >= this.jointsRes.items.length - 1 && this.jointsRes.hasNext) {
-            this.jointsResMove(false)
-          }
-        }
-        jointsResMoveMaybe()
+        this.jointsResMoveMaybe()
       }
     },
-    jointMakeVisible (joint, useTween = true) {
+    jointMakeVisible (joint, useTween = true, direction) {
       this.$log('jointMakeVisible START', joint)
-      let jointRef = this.$refs[`joint-${joint.oid}`]
+      let jointRef
+      // handle direction
+      if (direction) {
+        // get idx of left or right joint...
+        let idx = this.jointsRes.items.findIndex(j => j.oid === this.jointVisibleOid)
+        if (direction === 'right') idx += 1
+        if (direction === 'left') idx -= 1
+        if (this.jointsRes.items[idx]) jointRef = this.$refs[`joint-${this.jointsRes.items[idx].oid}`]
+      }
+      else {
+        jointRef = this.$refs[`joint-${joint.oid}`]
+      }
+      // check and go
       if (jointRef && jointRef[0]) {
         jointRef = jointRef[0]
         this.$log('jointMakeVisible', jointRef.offsetLeft)
@@ -271,6 +299,7 @@ export default {
         // })
         // tween to visible item
         if (useTween) {
+          this.$emit('joint-change-start')
           this.$tween.to(
             this.scrollWrapperRef,
             0.3,
@@ -278,6 +307,7 @@ export default {
               scrollLeft: jointRef.offsetLeft - this.paddingLeftRight,
               onComplete: () => {
                 this.$log('jointMakeVisible DONE')
+                this.$emit('joint-change-end')
               }
             }
           )
@@ -289,6 +319,22 @@ export default {
       }
       else {
         this.$log('jointMakeVisible jointRef NOT FOUND!')
+      }
+    },
+    async jointsResMoveMaybe () {
+      this.$log('*** jointsResMoveMaybe')
+      if (!this.jointsRes) return
+      // hello
+      let idx = this.jointsRes.items.findIndex(j => j.oid === this.jointVisibleOid)
+      this.$log('*** jointsResMoveMaybe idx', idx)
+      // check idx
+      if (idx <= 1 && this.jointsRes.hasPrev) {
+        // await this.jointsRes.prev()
+        this.jointsResMove(false)
+      }
+      if (idx >= this.jointsRes.items.length - 1 && this.jointsRes.hasNext) {
+        // await this.jointsRes.next()
+        this.jointsResMove(true)
       }
     },
     async jointsResMove (isNext) {

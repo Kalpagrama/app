@@ -1,27 +1,40 @@
 <template lang="pug">
 div(
   :style=`{
+    //- position: 'relative',
   }`
   ).row.full-width.items-start.content-start.justify-center.b-30
   div(
     :style=`{
+      position: 'relative',
       maxWidth: maxWidth+'px',
-      minHeight: 600+'px',
+      minHeight: 624+'px',
     }`
     ).row.full-width.items-start.content-start.b-30
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 100, top: '0px', left: '0px',
+        pointerEvents: 'none',
+        borderLeft: '1px dashed rgb(40,40,40)',
+        borderBottom: '1px dashed rgb(40,40,40)',
+        borderRight: '1px dashed rgb(40,40,40)',
+        borderRadius: '0px 0px 10px 10px',
+      }`
+      ).row.fit
     vertex-editor(:joint="joint")
     //- item finder
-    item-finder(
-      v-if="!joint.items[1]"
-      :joint="joint"
-      @item="itemFound")
+    div(v-if="!joint.items[1]").row.full-width
+      item-finder(
+        :joint="joint"
+        @item="itemFound")
     //- item found: viewer
     div(
       v-if="joint.items[1]"
       ).row.full-width
       joint-item(
         :item="joint.items[1]"
-        :itemActive="true")
+        :itemActive="true"
+        :itemIndependent="true")
       .row.full-width.justify-center.q-py-md.q-px-xl
         .row.full-width.justify-center
           q-btn(

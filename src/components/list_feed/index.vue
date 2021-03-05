@@ -217,6 +217,11 @@ export default {
           // END of scrollHeightChanging
           this.$log('scrollHeight END')
           this.itemMiddleScrollIntoView()
+          // handle prev..
+          if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
+            // alert('Initial prev...')
+            // this.prev()
+          }
         }, 600)
       }
     },
@@ -292,7 +297,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
-      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      // this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
       await this.itemsRes.prev()
       this.$log('prev done')
       this.itemsResStatus = null
@@ -304,7 +309,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
-      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      // this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
       await this.itemsRes.next()
       this.$log('next done')
       this.itemsResStatus = null
