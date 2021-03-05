@@ -182,7 +182,7 @@ export default {
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
-        return `/joint/${this.node.items[0].oid}?oid=${this.node.oid}`
+        return `/graph/${this.node.items[0].oid}?oid=${this.node.oid}`
       }
       else {
         return '/node/' + this.node.oid

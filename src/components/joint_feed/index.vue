@@ -39,7 +39,7 @@
       }`).row.full-width
       q-btn(
         flat color="green" icon="fas fa-link" size="lg"
-        :to="'/links/'+joint.items[0].oid"
+        :to="'/joint/'+joint.items[0].oid"
         :style=`{
           position: 'absolute', zIndex: 1000,
           left: 'calc(50% - 30px)',
@@ -91,7 +91,7 @@
               }`)
     //- vertices
     router-link(
-      :to="'/links/'+joint.items[0].oid+'?with='+joint.items[1].oid"
+      :to="'/graph/'+joint.items[0].oid+'?with='+joint.items[1].oid"
       :style=`{
         height: '60px',
       }`

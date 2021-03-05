@@ -3,7 +3,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
   //- link btn: to go to /joint mode
   q-btn(
     flat color="green" icon="fas fa-link" size="lg"
-    :to="`/joint/${node.items[0].oid}?oid=${node.oid}`"
+    :to="`/graph/${node.items[0].oid}?oid=${node.oid}`"
     :style=`{
       position: 'absolute', zIndex: 1000,
       left: 'calc(50% - 30px)',

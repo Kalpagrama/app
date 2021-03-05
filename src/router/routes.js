@@ -75,17 +75,35 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'node-render',
+            path: 'node-render/:oid',
+            component: () => import('pages/app/node_render/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'joint',
             path: 'joint/:oid',
             component: () => import('pages/app/joint/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'links',
-            path: 'links/:oid',
-            component: () => import('pages/app/links/index.vue'),
+            name: 'joint-render',
+            path: 'joint-render/:oid',
+            component: () => import('pages/app/joint_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
+         {
+            name: 'graph',
+            path: 'graph/:oid',
+            component: () => import('pages/app/graph/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         // {
+         //    name: 'links',
+         //    path: 'links/:oid',
+         //    component: () => import('pages/app/links/index.vue'),
+         //    meta: { roleMinimal: 'GUEST' }
+         // },
          {
             name: 'user',
             path: 'user/:oid/:page?',
@@ -93,9 +111,21 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'user-render',
+            path: 'user-render/:oid/:page?',
+            component: () => import('pages/app/user_render/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'sphere',
             path: 'sphere/:oid/:page?',
             component: () => import('pages/app/sphere/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
+            name: 'sphere-render',
+            path: 'sphere-render/:oid/:page?',
+            component: () => import('pages/app/sphere_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -109,6 +139,13 @@ const routes = [
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid }),
             component: () => import('src/pages/app/content/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
+            name: 'content-render',
+            path: 'content-render/:oid',
+            props: (route) => ({ oid: route.params.oid }),
+            component: () => import('src/pages/app/content_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {

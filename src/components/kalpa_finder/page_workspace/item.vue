@@ -95,7 +95,7 @@ export default {
     itemLink () {
       let itemLinkMap = {
         NODE: '/node/',
-        JOINT: '/node/',
+        JOINT: '/joint/',
         USER: '/user/',
         SPHERE: '/sphere/',
         VIDEO: '/content/',
