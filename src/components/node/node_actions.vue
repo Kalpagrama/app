@@ -42,10 +42,10 @@
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countComments || '' }}
     node-vote-ball(:node="node" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
-    //- joints/links/chains
+    //- joints/chains
     router-link(
       v-if="node.items.length === 1"
-      :to="'/joint/'+node.oid"
+      :to="'/graph/'+node.oid"
       ).col
       .row.full-width
         .col

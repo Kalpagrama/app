@@ -135,8 +135,9 @@ div(
         }`)
   //- next row
   div(@click="$emit('next')").row.full-width.justify-center
-    div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.q-pa-lg
-      widget-bookmarks()
+    div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-pa-lg
+      h1.text-white Another links...
+      //- widget-bookmarks()
     //- div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.q-px-xl.br
       .col.q-pr-xs
         q-btn(

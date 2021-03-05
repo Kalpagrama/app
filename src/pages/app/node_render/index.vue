@@ -1,21 +1,19 @@
 <template lang="pug">
-.row.full-width.justify-center
+div(
+  v-if="ndoe"
+  ).row.full-width.justify-center
   node-feed(
-    v-if="node"
     :node="node"
     :isActive="true"
     :isVisible="true"
-    :showActions="false"
-    :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-    }`)
+    :showActions="false")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageAppJoint',
+  name: 'pageAppNodeRender',
   data () {
     return {
       node: null,
@@ -33,5 +31,13 @@ export default {
       }
     },
   },
+  created () {
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+  },
+  beforeDestroy () {
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+  }
 }
 </script>

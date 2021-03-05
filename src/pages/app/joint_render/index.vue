@@ -5,17 +5,14 @@
     :node="node"
     :isActive="true"
     :isVisible="true"
-    :showActions="false"
-    :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-    }`)
+    :showActions="false")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageAppJoint',
+  name: 'pageAppJointRender',
   data () {
     return {
       node: null,
@@ -33,5 +30,13 @@ export default {
       }
     },
   },
+  created () {
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+  },
+  beforeDestroy () {
+    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+  }
 }
 </script>
