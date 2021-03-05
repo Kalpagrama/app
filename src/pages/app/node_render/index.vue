@@ -4,8 +4,9 @@ div(
   ).row.full-width.justify-center
   node-feed(
     :node="node"
-    :isActive="true"
-    :isVisible="true"
+    :isActive="false"
+    :isVisible="false"
+    :showAuthorAlways="true"
     :showActions="false")
 </template>
 

@@ -1,10 +1,11 @@
 <template lang="pug">
-.row.full-width.justify-center
+div(
+  v-if="node"
+  ).row.full-width.justify-center
   node-feed(
-    v-if="node"
     :node="node"
-    :isActive="true"
-    :isVisible="true"
+    :isActive="false"
+    :isVisible="false"
     :showActions="false"
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',

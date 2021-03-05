@@ -5,6 +5,7 @@
     :node="node"
     :isActive="true"
     :isVisible="true"
+    :showAuthorAlways="true"
     :showActions="false")
 </template>
 
