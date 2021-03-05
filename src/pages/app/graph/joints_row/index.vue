@@ -126,6 +126,7 @@ div(
           :item="joint.populatedObject.items.find(i => i.oid !== row.oid)"
           :itemIndex="joint.populatedObject.items.findIndex(i => i.oid !== row.oid)"
           :itemActive="rowActive && !rowPaused && jointVisibleOid === joint.oid"
+          :rowActive="rowActive"
           :style=`{
           }`)
       //- margin right div
@@ -134,9 +135,11 @@ div(
           width: paddingLeftRight+'px',
         }`)
   //- next row
-  div(@click="$emit('next')").row.full-width.justify-center
+  //- div(
+    v-if="rowActive"
+    @click="$emit('next')").row.full-width.justify-center
     div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-pa-lg
-      h1.text-white Another links...
+      //- h1.text-white Another links...
       //- widget-bookmarks()
     //- div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.q-px-xl.br
       .col.q-pr-xs

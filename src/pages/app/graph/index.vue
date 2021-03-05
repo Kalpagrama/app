@@ -74,17 +74,19 @@ q-layout(view="hHh Lpr lff")
         //- v-if="rowActiveKey === rowIndex+row.oid"
         joints-row(
           v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
-          v-if="rowActiveKey === rowIndex+row.oid"
           v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
           :ref="`row-${rowIndex+row.oid}`"
           :row="row"
           :rowActive="rowActiveKey === rowIndex+row.oid"
           :rowPaused="jointCreatorShow"
-          :rowItemWidth="rowItemWidth"
+          :rowItemWidth="rowActiveKey === rowIndex+row.oid ? rowItemWidth : rowItemWidth/2"
+          :style=`{
+            //- transform: rowActiveKey === rowIndex+row.oid ? 'none' : 'scale(0.5)',
+          }`
           @next="rowsNext()"
           @joint-change-start="jointChanging = true"
           @joint-change-end="jointChanging = false"
-          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
+          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)").br
           transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             joint-creator(
               v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"

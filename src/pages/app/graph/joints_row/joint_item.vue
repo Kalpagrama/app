@@ -27,7 +27,7 @@ div(
       ).row.fit
   //- vertices
   div(
-    v-if="joint"
+    v-if="joint && rowActive"
     :style=`{height: '70px'}`
     ).row.full-width
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -172,7 +172,7 @@ div(
 <script>
 export default {
   name: 'jointItemsRow_item',
-  props: ['joint', 'item', 'itemIndex', 'itemActive', 'itemIndependent'],
+  props: ['joint', 'item', 'itemIndex', 'itemActive', 'itemIndependent', 'rowActive'],
   data () {
     return {
       itemActiveLocal: false,
