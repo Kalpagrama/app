@@ -4,13 +4,12 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.full-width.items-start.content-start.justify-center
-  img(
-    :src="sphere.thumbUrl"
-    :style=`{
-      borderRadius: '10px',
-    }`
-    ).full-width
+  ).row.full-width.items-start.content-start.justify-center.q-py-xl
+  q-icon(name="blur_on" size="200px" color="white")
+  .row.full-width.justify-center.q-py-lg
+    span(:style=`{
+      fontSize: '30px',
+    }`).text-white.text-bold {{ sphere.name }}
 </template>
 
 <script>
