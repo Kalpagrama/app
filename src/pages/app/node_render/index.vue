@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  v-if="ndoe"
+  v-if="node"
   ).row.full-width.justify-center
   node-feed(
     :node="node"

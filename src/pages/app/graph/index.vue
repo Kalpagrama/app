@@ -80,11 +80,14 @@ q-layout(view="hHh Lpr lff")
           :row="row"
           :rowActive="rowActiveKey === rowIndex+row.oid"
           :rowPaused="jointCreatorShow"
-          :rowItemWidth="rowItemWidth"
+          :rowItemWidth="rowActiveKey === rowIndex+row.oid ? rowItemWidth : rowItemWidth/2"
+          :style=`{
+            //- transform: rowActiveKey === rowIndex+row.oid ? 'none' : 'scale(0.5)',
+          }`
           @next="rowsNext()"
           @joint-change-start="jointChanging = true"
           @joint-change-end="jointChanging = false"
-          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
+          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)").br
           transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             joint-creator(
               v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"
