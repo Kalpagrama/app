@@ -74,6 +74,7 @@ q-layout(view="hHh Lpr lff")
         //- v-if="rowActiveKey === rowIndex+row.oid"
         joints-row(
           v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
+          v-if="rowActiveKey === rowIndex+row.oid"
           v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
           :ref="`row-${rowIndex+row.oid}`"
           :row="row"
