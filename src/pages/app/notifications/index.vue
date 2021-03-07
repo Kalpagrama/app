@@ -16,7 +16,28 @@ q-layout(view="hHh Lpr lff")
           .col
           q-btn(round flat color="grey-8" icon="more_vert")
   q-page-container
-    q-page.row.full-width.justify-center.q-pt-sm.q-px-sm
+    q-page(
+      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+      :style=`{
+        height: '80vh',
+      }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
+        .row.full-width.justify-center
+          q-icon(name="login" color="grey-8" size="100px")
+        div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+          span.text-white Вы увидите список уведомлений.
+        .row.full-width.justify-center.q-pt-md
+          q-btn(
+            outline color="white" no-caps
+            :to="'/auth/sign-in'"
+            :style=`{
+              height: '50px',
+            }`)
+            h1.text-white Войти в аккаунт
+    q-page(
+      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+      ).row.full-width.justify-center.q-pt-sm.q-px-sm
       list-feed(
         v-if="sphereOid"
         :query="query"

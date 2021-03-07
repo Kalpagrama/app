@@ -303,16 +303,24 @@ export default {
     },
     async showNodeInputForm () {
       this.$log('showNodeInputForm')
-      assert(this.lastAnnotation.cfiRange, 'bad this.lastAnnotation.cfiRange!')
-      let range = await this.book.getRange(this.lastAnnotation.cfiRange)
-      this.figure = [
-        {
-          epubCfi: this.lastAnnotation.cfiRange,
-          epubCfiText: range.toString(),
-          points: [],
-          t: null
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы создать ядро, войдите в аккаунт.'
         }
-      ]
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        assert(this.lastAnnotation.cfiRange, 'bad this.lastAnnotation.cfiRange!')
+        let range = await this.book.getRange(this.lastAnnotation.cfiRange)
+        this.figure = [
+          {
+            epubCfi: this.lastAnnotation.cfiRange,
+            epubCfiText: range.toString(),
+            points: [],
+            t: null
+          }
+        ]
+      }
     },
     clearLastAnnotation () {
       this.$log('clearLastAnnotation')

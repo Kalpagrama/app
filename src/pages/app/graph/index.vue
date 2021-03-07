@@ -182,15 +182,23 @@ export default {
     },
     jointCreateStart () {
       this.$log('jointCreateStart')
-      // get rowActiveIndex position of top
-      // move there ?
-      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
-      if (rowRef && rowRef[0]) {
-        rowRef = rowRef[0].$el
-        this.$log('rowRef', rowRef)
-        let top = rowRef.getBoundingClientRect().top
-        this.jointCreatorTop = top
-        this.jointCreatorShow = true
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы создать связь, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        // get rowActiveIndex position of top
+        // move there ?
+        let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+        if (rowRef && rowRef[0]) {
+          rowRef = rowRef[0].$el
+          this.$log('rowRef', rowRef)
+          let top = rowRef.getBoundingClientRect().top
+          this.jointCreatorTop = top
+          this.jointCreatorShow = true
+        }
       }
     },
     jointCreateCancel () {

@@ -30,7 +30,7 @@ div(
       q-btn(flat dense color="blue" no-caps @click="positionStartHere()") Start here!
       q-btn(flat dense color="white" no-caps @click="showHeader = !showHeader") {{showHeader ? 'Hide header' : 'Show header'}}
   //- loading start, no itemsRes
-  div(
+  //- div(
     v-if="!itemsRes"
     :style=`{
       height: scrollTargetHeight+'px',
@@ -305,7 +305,7 @@ export default {
     async next () {
       this.$log('next')
       if (!this.itemsRes) return
-      if (!this.itemsRes.hasPrev) return
+      if (!this.itemsRes.hasNext) return
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')

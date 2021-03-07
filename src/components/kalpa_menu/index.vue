@@ -33,9 +33,9 @@
         borderRadius: '10px', overflow: 'hidden'
       }`
       ).column.full-width.q-pt-sm
+        //- v-if="p.id === 'trends' ? true : !isGuest"
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
-          v-if="p.id === 'trends' ? true : !isGuest"
           @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
           :to="{name: p.id}"
           :class=`{

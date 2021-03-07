@@ -119,24 +119,28 @@ export default {
   },
   computed: {
     actions () {
-      return {
+      let res = {
         copyUrl: {
           name: 'Скопировать ссылку',
           cb: () => {
             this.$log('copyUrl')
           }
         },
-        hide: {
-          name: 'Скрыть',
-          cb: () => {},
-        },
-        // report: {
-        //   name: 'Пожаловаться',
-        //   cb: () => {
-        //     this.$log('contentReport...')
-        //   }
-        // }
       }
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        return res
+      }
+      res.hide = {
+        name: 'Скрыть',
+        cb: () => {},
+      }
+      res.report = {
+        name: 'Пожаловаться',
+        cb: () => {
+          this.$log('contentReport...')
+        }
+      }
+      return res
     },
   },
   methods: {
@@ -155,12 +159,20 @@ export default {
     },
     async relatedContentClick (content, contentIndex) {
       this.$log('relatedContentClick', content)
-      this.relatedContentLoading = contentIndex
-      let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal)
-      this.relatedContentLoading = null
-      await this.$wait(300)
-      if (contentKalpa) {
-        this.$router.push('/content/' + contentKalpa.oid)
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы перейти на похожий контент, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        this.relatedContentLoading = contentIndex
+        let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal)
+        this.relatedContentLoading = null
+        await this.$wait(300)
+        if (contentKalpa) {
+          this.$router.push('/content/' + contentKalpa.oid)
+        }
       }
     }
   }

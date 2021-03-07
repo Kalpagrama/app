@@ -14,14 +14,40 @@ q-layout(view="hHh Lpr lff")
             no-caps dense active-color="green" align="left" switch-indicator).text-grey-8
             q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
   q-page-container
-    router-view
+    q-page(
+      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+      :style=`{
+        height: '80vh',
+      }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
+        .row.full-width.justify-center
+          q-icon(name="login" color="grey-8" size="100px")
+        div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+          span.text-white Вы сможете настроить аккаунт, установить аватар и заполнить информацию о себе.
+        .row.full-width.justify-center.q-py-md
+          q-btn(
+            outline color="white" no-caps
+            :to="'/auth/sign-in'"
+            :style=`{
+              height: '50px',
+            }`)
+            h1.text-white Войти в аккаунт
+        .row.full-width.justify-center.q-pt-md
+          kalpa-docs(:style=`{maxWidth: '300px'}`)
+    router-view(
+      v-if="$store.getters.currentUser().profile.role !== 'GUEST'")
 </template>
 
 <script>
 import { AuthApi } from 'src/api/auth'
+import kalpaDocs from 'components/kalpa_docs/index.vue'
 
 export default {
   name: 'pageApp_settings',
+  components: {
+    kalpaDocs
+  },
   data () {
     return {
     }

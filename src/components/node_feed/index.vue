@@ -212,6 +212,9 @@ export default {
           }
         }
       }
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        return res
+      }
       if (this.nodeIsMine) {
         res.delete = {
           // name: i18n.t('Delete', 'Удалить'),

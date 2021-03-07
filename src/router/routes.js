@@ -63,10 +63,10 @@ const routes = [
                   name: 'settings.account',
                   path: 'account',
                   component: () => import('pages/app/settings/view_account/index.vue'),
-                  meta: { roleMinimal: 'MEMBER' }
+                  meta: { roleMinimal: 'GUEST' }
                }
             ],
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'node',
@@ -152,32 +152,37 @@ const routes = [
             name: 'notifications',
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'workspace',
             path: 'workspace',
-            component: () => import('pages/app/workspace/index.vue')
+            component: () => import('pages/app/workspace/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'workspace.watch-later',
             path: 'workspace/watch-later',
-            component: () => import('pages/app/workspace/page_watch_later/index.vue')
+            component: () => import('pages/app/workspace/page_watch_later/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'workspace.history',
             path: 'workspace/history',
-            component: () => import('pages/app/workspace/page_history/index.vue')
+            component: () => import('pages/app/workspace/page_history/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'workspace.bookmarks',
             path: 'workspace/bookmarks',
-            component: () => import('pages/app/workspace/page_bookmarks/index.vue')
+            component: () => import('pages/app/workspace/page_bookmarks/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'workspace.create',
             path: 'workspace/create',
-            component: () => import('pages/app/workspace/page_create/index.vue')
+            component: () => import('pages/app/workspace/page_create/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'fallback',

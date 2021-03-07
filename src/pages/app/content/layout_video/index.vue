@@ -179,6 +179,8 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.player.setState('nodePlaying', null)
+    this.$store.commit('ui/stateSet', ['nodeOnContent', null])
   }
 }
 </script>

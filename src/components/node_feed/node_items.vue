@@ -26,6 +26,10 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
   //- items left/right
   div(
     v-for="(item, ii) in node.items" :key="ii"
+    :class=`{
+      'q-pr-xs': ii === 0,
+      'q-pl-xs': ii === 1,
+    }`
     :style=`{
       position: 'relative',
     }`
@@ -34,7 +38,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
       :style=`{
         position: 'relative',
         paddingBottom: '100%',
-        transform: itemOpened === ii ? 'none' : ii === 0 ? 'perspective(1000px) rotateY(8deg) translate3d(0,0,-10px)' : 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-10px)',
+        //- transform: itemOpened === ii ? 'none' : ii === 0 ? 'perspective(1000px) rotateY(8deg) translate3d(0,0,-10px)' : 'perspective(1000px) rotateY(-8deg) translate3d(0,0,-10px)',
         //- zIndex: 10,
       }`
       ).row.full-width
