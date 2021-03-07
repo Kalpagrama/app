@@ -4,9 +4,8 @@ div(
   ).row.full-width.justify-center
   node-feed(
     :node="node"
-    :isActive="false"
-    :isVisible="false"
-    :showActions="false"
+    :isActive="true"
+    :isVisible="true"
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
     }`)
