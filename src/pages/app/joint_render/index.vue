@@ -3,8 +3,8 @@
   node-feed(
     v-if="node"
     :node="node"
-    :isActive="true"
-    :isVisible="true"
+    :isActive="false"
+    :isVisible="false"
     :showAuthorAlways="true"
     :showActions="false")
 </template>

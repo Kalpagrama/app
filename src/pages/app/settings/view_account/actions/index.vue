@@ -42,7 +42,7 @@
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import { initLogRocket, window } from 'src/system/log'
+import { initLogRocket, LogLevelEnum, window } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
 
 export default {
@@ -70,6 +70,7 @@ export default {
           this.$store.commit('core/stateSet', ['logDbgFilter', 'any'])
           this.$store.commit('core/stateSet', ['logDbgModulesBlackList', []])
           this.$store.commit('core/stateSet', ['logFormat', {time: true, moduleName: true, funcName: true}])
+          this.$store.commit('core/stateSet', ['logLevel', LogLevelEnum.DEBUG])
           await initLogRocket(this.$rxdb.getCurrentUser().oid, this.$rxdb.getCurrentUser().username, this.$rxdb.getCurrentUser().profile.email, description, this.$store)
         }
       } else {
