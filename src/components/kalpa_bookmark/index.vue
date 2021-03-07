@@ -82,41 +82,44 @@ export default {
     async start () {
       try {
         this.$log('start')
-        this.loading = true
         if (this.$store.getters.currentUser().profile.role === 'GUEST') {
-          // TODO: remeber his bookmark Intension
-          this.$router.push('/auth')
-          return
-        }
-        await this.$systemUtils.vibrate(500)
-        // await this.$wait(500)
-        let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
-        this.$log('start [bookmark]', bookmark)
-        if (bookmark) {
-          this.$log('bookmark DELETE')
-          await bookmark.remove(true)
-          if (!await UserApi.isSubscribed(this.oid)) await UserApi.unSubscribe(this.oid)
-          bookmark = null
+          let authGuard = {
+            message: 'Чтобы добавить в закладки, войдите в аккаунт.'
+          }
+          this.$store.commit('ui/stateSet', ['authGuard', authGuard])
         }
         else {
-          this.$log('bookmark CREATE')
-          // TODO: where to handle bookmarkInput create?
-          let bookmarkInput = {
-            type: this.type,
-            oid: this.oid,
-            name: this.name,
-            thumbUrl: this.thumbUrl,
-            ...this.fields || {},
-            isSubscribed: true
+          this.loading = true
+          await this.$systemUtils.vibrate(500)
+          // await this.$wait(500)
+          let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
+          this.$log('start [bookmark]', bookmark)
+          if (bookmark) {
+            this.$log('bookmark DELETE')
+            await bookmark.remove(true)
+            if (!await UserApi.isSubscribed(this.oid)) await UserApi.unSubscribe(this.oid)
+            bookmark = null
           }
-          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-          // subscribe to this oid...
-          if (!await UserApi.isSubscribed(this.oid)) await UserApi.subscribe(this.oid)
+          else {
+            this.$log('bookmark CREATE')
+            // TODO: where to handle bookmarkInput create?
+            let bookmarkInput = {
+              type: this.type,
+              oid: this.oid,
+              name: this.name,
+              thumbUrl: this.thumbUrl,
+              ...this.fields || {},
+              isSubscribed: true
+            }
+            bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+            // subscribe to this oid...
+            if (!await UserApi.isSubscribed(this.oid)) await UserApi.subscribe(this.oid)
+          }
+          this.$log('start done')
+          this.bookmark = bookmark
+          this.loading = false
+          // this.showDialog = true
         }
-        this.$log('start done')
-        this.bookmark = bookmark
-        this.loading = false
-        // this.showDialog = true
       }
       catch (e) {
         this.$log('start error', e)

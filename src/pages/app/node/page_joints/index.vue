@@ -69,7 +69,7 @@ export default {
   methods: {
     jointClick (joint) {
       this.$log('jointClick', joint)
-      this.$router.push(`/joint/${this.node.oid}?oid=${joint.oid}`)
+      this.$router.push(`/graph/${this.node.oid}?oid=${joint.oid}`)
     },
   },
   async mounted () {

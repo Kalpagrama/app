@@ -89,7 +89,7 @@ div(
         color="green" no-caps) Crop
       .col
       q-btn(
-        @click="cropping = !cropping"
+        @click="croppingStart"
         round flat dense
         :color="cropping ? 'white' : 'green'"
         :icon="cropping ? 'clear' : 'add_circle_outline'")
@@ -172,6 +172,18 @@ export default {
     }
   },
   methods: {
+    croppingStart () {
+      this.$log('croppingStart')
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы создать ядро, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        this.cropping = !this.cropping
+      }
+    },
     setState (key, val) {
       this.$log('setState', key, val)
       this[key] = val

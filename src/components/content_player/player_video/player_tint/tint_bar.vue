@@ -502,11 +502,19 @@ export default {
     },
     figureCreate () {
       this.$log('figureCreate')
-      let start = this.player.currentTime
-      let end = start + 30 > this.player.duration ? this.player.duration : start + 30
-      let figure = [{t: start, points: []}, {t: end, points: []}]
-      this.player.setState('figure', figure)
-      this.player.events.emit('figure-create')
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы создать ядро, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        let start = this.player.currentTime
+        let end = start + 30 > this.player.duration ? this.player.duration : start + 30
+        let figure = [{t: start, points: []}, {t: end, points: []}]
+        this.player.setState('figure', figure)
+        this.player.events.emit('figure-create')
+      }
     },
     figureDelete () {
       this.$log('figureDelete')

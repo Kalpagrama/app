@@ -13,10 +13,19 @@ q-btn(
     ...styles,
   }`)
   user-avatar(
+    v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
     :url="$store.getters.currentUser().profile.photoUrl" :width="24" :height="24"
     :style=`{
       borderRadius: '50%',
     }`)
+  div(
+    v-else
+    :style=`{
+      width: '24px',
+      height: '24px',
+      borderRadius: '50%',
+    }`
+    ).b-60
   div(v-if="showLabel").row.full-width.justify-center
     span.text-white Меню
   q-menu(
@@ -58,8 +67,23 @@ q-btn(
               textDecotation: 'none',
             }`
             ).text-white {{ p.name }}
-      //- footer
+      //- footer GUEST
       router-link(
+        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+        @click="footerClick"
+        :to="'/auth/sign-in'"
+        :style=`{
+          borderRadius: '10px',
+        }`
+        ).row.full-width.items-center.content-center.q-pa-sm.menu-item
+        div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+          q-icon(name="login" color="white" size="40px")
+        .col
+          .row.fit.items-center.content-center
+            span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold Войти
+      //- footer USER
+      router-link(
+        v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
         @click="footerClick"
         :to="'/user/'+$store.getters.currentUser().oid+'/nodes'"
         :style=`{
@@ -67,10 +91,29 @@ q-btn(
         }`
         ).row.full-width.items-center.content-center.q-pa-sm.menu-item
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+          user-avatar(
+            v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+            :url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+          div(
+            v-else
+            :style=`{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+            }`
+            ).b-60
         .col.full-heigh
           .row.fit.items-center.content-center
-            span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+            span(
+              v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+              :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+            div(
+              v-else
+              :style=`{
+                height: '24px',
+                borderRadius: '10px'
+              }`
+              ).full-width.b-60
             //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
 </template>
 

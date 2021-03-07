@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff").b-30
-  q-drawer(
+  //- q-drawer(
     side="right"
     v-model="menuOpened")
     div(
@@ -38,6 +38,28 @@ q-layout(
             round flat color="white" icon="more_vert")
   q-page-container
     q-page(
+      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+      :style=`{
+        height: '80vh',
+      }`
+      ).row.full-width.justify-center
+      div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
+        .row.full-width.justify-center
+          q-icon(name="login" color="grey-8" size="100px")
+        div(
+          :style=`{textAlign: 'center'}`
+          ).row.full-width.justify-center
+          span.text-white Вы сможете добавлять медиа контент по ссылке с YouTube, просматривать свои закладки, загружать файлы с устройства.
+        .row.full-width.justify-center.q-pt-md
+          q-btn(
+            outline color="white" no-caps
+            :to="'/auth/sign-in'"
+            :style=`{
+              height: '50px',
+            }`)
+            h1.text-white Войти в аккаунт
+    q-page(
+      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
       :style=`{
         paddingTop: '16px',
       }`

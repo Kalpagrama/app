@@ -1,14 +1,14 @@
 <template lang="pug">
 .row.full-width.justify-center
   //- menu for guests
-  div(
+  //- div(
     v-if="isGuest"
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between.b-40.q-px-xs
+    ).row.full-width.items-center.content-center.justify-between.b-50.q-px-xs.br
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
@@ -30,13 +30,13 @@
     //- kalpa-menu-popup-global
   //- menu for users
   div(
-    v-if="!isGuest"
+    v-if="true || !isGuest"
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }`
-    ).row.full-width.justify-between.b-40.q-pt-sm
+    ).row.full-width.justify-between.b-50.q-pt-sm
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"

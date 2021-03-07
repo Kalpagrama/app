@@ -8,7 +8,7 @@ q-layout(
   q-page-container
     q-page(:style=`{}`)
       div(
-        @click="$router.replace('/auth').catch(e => e)"
+        @click="$router.push('/trends')"
         :style=`{
           height: '280px', overflow: 'hidden',
         }`).row.full-width.items-center.content-center.justify-center.b-30

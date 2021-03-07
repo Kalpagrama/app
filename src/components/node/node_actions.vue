@@ -15,7 +15,7 @@
       position: 'relative',
       height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-start.contnet-start.q-pt-sm.q-px-lg
+    }`).row.full-width.items-start.contnet-start.q-pt-sm
     //- share
     .col
       .row.full-width
@@ -74,8 +74,9 @@
         :style=`{
           position: 'absolute', top: '0px', zIndex: 900, left: '0px',
           height: '50px',
+          //- background: 'rgb(35,35,35)',
         }`
-        ).row.full-width.b-30
+        ).row.full-width
     transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
       div(
         v-if="voteStarted"
@@ -179,11 +180,19 @@ export default {
   methods: {
     nodeVoteBallClick () {
       this.$log('nodeVoteBallClick')
-      if (this.node.rateUser || this.node.author.oid === this.$store.getters.currentUser().oid) {
-        this.voteStatsShow = true
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        this.voteStarted = true
+        if (this.node.rateUser || this.node.author.oid === this.$store.getters.currentUser().oid) {
+          this.voteStatsShow = true
+        }
+        else {
+          this.voteStarted = true
+        }
       }
     },
     async voteAgain () {

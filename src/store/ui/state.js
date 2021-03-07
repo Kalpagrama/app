@@ -24,6 +24,7 @@ export default {
   nodeDraft: null,
   nodeCreating: false,
   listFeedNeedDrop: false,
+  authGuard: null,
   // other
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},

@@ -6,7 +6,25 @@ div(
   }`
   ).row.full-width.items-start.content-start.justify-center
   //- body
-  div(:style=`{maxWidth: 600+'px'}`).row.full-width
+  div(
+    v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+    :style=`{maxWidth: 600+'px', minHeight: '500px',}`
+    ).row.full-width.items-center.content-center
+    .row.full-width.justify-center
+      q-icon(name="login" color="grey-8" size="100px")
+    div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+      span.text-white Чтобы делать заметки на контенте, войдите в аккаунт.
+    .row.full-width.justify-center.q-pt-md
+      q-btn(
+        outline color="white" no-caps
+        :to="'/auth/sign-in'"
+        :style=`{
+          height: '50px',
+        }`)
+        h1.text-white Войти в аккаунт
+  div(
+    v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+    :style=`{maxWidth: 600+'px'}`).row.full-width
     slot
     //- header: stats, actions
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
