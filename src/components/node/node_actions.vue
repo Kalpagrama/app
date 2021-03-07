@@ -74,6 +74,7 @@
         :style=`{
           position: 'absolute', top: '0px', zIndex: 900, left: '0px',
           height: '50px',
+          background: nodeBackgroundColor,
           //- background: 'rgb(35,35,35)',
         }`
         ).row.full-width
@@ -138,6 +139,8 @@ export default {
   name: 'nodeActions',
   props: {
     node: {type: Object, required: true},
+    nodeBackgroundColor: {type: String},
+    nodeActionsColor: {type: String},
     isActive: {type: Boolean},
     isVisible: {type: Boolean}
   },
