@@ -36,7 +36,7 @@ div(
           }`
           ).row.fit
   //- debug row
-  div(
+  //- div(
     v-if="jointsRes && rowActive"
     :style=`{
       position: 'absolute', zIndex: 3000, top: '-4px',

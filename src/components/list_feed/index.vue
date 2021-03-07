@@ -29,15 +29,16 @@ div(
       q-btn(flat dense color="orange" no-caps @click="positionDrop()") To start!
       q-btn(flat dense color="blue" no-caps @click="positionStartHere()") Start here!
       q-btn(flat dense color="white" no-caps @click="showHeader = !showHeader") {{showHeader ? 'Hide header' : 'Show header'}}
+  slot(name="prepend")
   //- loading start, no itemsRes
-  //- div(
+  div(
     v-if="!itemsRes"
     :style=`{
       height: scrollTargetHeight+'px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
-  //- header
+  //- header for debug
   //- div(
     v-if="showHeader"
     :style=`{
@@ -45,13 +46,22 @@ div(
     }`
     ).row.full-width.items-center.content-center.justify-center.bg-red
     h1.text-white HEADER
-  slot(name="prepend")
   //- got itemsRes and some items
   div(
     v-if="itemsRes"
     :style=`{
+      position: 'relative',
     }`
     ).row.full-width.items-start.content-start
+    //- prev loading
+    div(
+      v-if="itemsResStatus === 'PREV'"
+      :style=`{
+        position: 'absolute', top: '0px', zIndex: 10000,
+        height: '60px',
+      }`
+      ).row.full-width.items-center.content-center.justify-center
+      q-spinner-dots(color="green" size="50px")
     //- item wrapper
     div(
       v-for="(item, itemIndex) in itemsRes.items"
@@ -78,6 +88,15 @@ div(
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="true")
+    //- next loading
+    div(
+      v-if="itemsResStatus === 'NEXT'"
+      :style=`{
+        position: 'absolute', top: '0px', zIndex: 10000,
+        height: '60px',
+      }`
+      ).row.full-width.items-center.content-center.justify-center
+      q-spinner-dots(color="green" size="50px")
   slot(name="append")
 </template>
 

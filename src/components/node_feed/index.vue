@@ -119,6 +119,8 @@ div(
   node-actions(
     v-if="showActions && node.oid"
     :node="node"
+    :nodeBackgroundColor="nodeBackgroundColor"
+    :nodeActionsColor="nodeActionsColor"
     :isActive="isActive"
     :isVisible="isVisible"
     :style=`{
@@ -145,6 +147,8 @@ export default {
   },
   props: {
     node: {type: Object},
+    nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
+    nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
     isActive: {type: Boolean},
     isVisible: {type: Boolean},
     showHeader: {type: Boolean, default: true},
