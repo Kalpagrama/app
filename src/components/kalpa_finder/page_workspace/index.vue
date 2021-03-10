@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    paddingTop: '40px',
+    //- paddingTop: '40px',
   }`
   ).row.full-width
   list-feed(
@@ -10,6 +10,17 @@ div(
     :itemStyles=`{
       paddingBottom: '8px',
     }`)
+    template(v-slot:prepend)
+      .row.full-width.q-pb-sm
+        q-btn(
+          @click="viewId = v.id"
+          v-for="(v,ii) in views" :key="v.id"
+          flat no-caps dense
+          :color="viewId === v.id ? 'green' : 'grey-7'"
+          :class=`{
+            'b-40': viewId === v.id
+          }`
+          :style=`{}`).q-mr-xs.q-px-xs {{ v.name }}
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
       item(
         @click.native="$emit('item', item)"
@@ -19,22 +30,13 @@ div(
         ).q-mb-sm
         template(v-slot:tint=`{item}`)
           slot(name="tint" :item="item")
-  q-page-sticky(
+  //- q-page-sticky(
     expand position="top"
     :style=`{zIndex: 1000}`).b-30
     //- types
     .row.full-width.justify-center.q-px-sm
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start.scroll.q-py-xs
         .row.items-center.content-center.no-wrap
-          q-btn(
-            @click="viewId = v.id"
-            v-for="(v,ii) in views" :key="v.id"
-            flat no-caps dense
-            :color="viewId === v.id ? 'green' : 'grey-7'"
-            :class=`{
-              'b-40': viewId === v.id
-            }`
-            :style=`{}`).q-mr-xs.q-px-xs {{ v.name }}
 </template>
 
 <script>
@@ -61,9 +63,10 @@ export default {
     },
     views () {
       return [
-        {id: 'video', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
-        {id: 'book', name: 'Книги', selector: {wsItemType: 'WS_BOOKMARK', type: 'BOOK'}},
-        {id: 'image', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
+        // {id: 'video', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
+        // {id: 'book', name: 'Книги', selector: {wsItemType: 'WS_BOOKMARK', type: 'BOOK'}},
+        // {id: 'image', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
+        {id: 'media', name: 'Медиа', selector: {wsItemType: 'WS_BOOKMARK', type: {$in: ['IMAGE', 'VIDEO', 'BOOK']}}},
         {id: 'node', name: 'Ядра', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
         {id: 'joint', name: 'Связи', selector: {wsItemType: 'WS_BOOKMARK', type: 'JOINT'}},
         {id: 'sphere', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}},

@@ -61,7 +61,7 @@ q-layout(view="hHh Lpr lff")
           joint-item(
             :key="jointItem.oid"
             :item="jointItem"
-            :itemActive="true"
+            :itemActive="!jointCreatorFocused"
             :itemIndependent="true")
             node-feed(
               v-if="jointActive"
@@ -97,7 +97,9 @@ q-layout(view="hHh Lpr lff")
               :style=`{
                 position: 'absolute', zIndex: 1000, top: '0px',
               }`
-              @created="jointCreated")
+              @created="jointCreated"
+              @focused="jointCreatorFocused = true"
+              @blurred="jointCreatorFocused = false")
 </template>
 
 <script>
@@ -125,6 +127,7 @@ export default {
       jointCreatorTop: 0,
       jointChanging: false,
       jointActive: null,
+      jointCreatorFocused: false,
     }
   },
   computed: {

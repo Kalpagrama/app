@@ -1,21 +1,17 @@
 <template lang="pug">
 kalpa-finder(
-  @contentKalpa="itemFound"
+  @contentKalpa="$emit('item', $event)"
+  @close="$emit('close')"
   :pages=`{
     nodes: {views: ['all']},
-    //- workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
     workspace: {views: ['node']},
-    //- kalpagrama: {views: ['all', 'users', 'nodes']},
-    //- gif: {views: ['all']},
-    //- web: {views: ['all', 'image', 'video',]}
   }`
   :style=`{
-    //- height: '550px',
     height: $q.screen.height+'px',
-  }`).b-30
+  }`).b-30.bg
   template(v-slot:tint=`{item}`)
     div(
-      @click="itemFound(item)"
+      @click="$emit('item', item)"
       :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
 </template>
 
@@ -29,11 +25,6 @@ export default {
     }
   },
   methods: {
-    itemFound (item) {
-      this.$log('itemFound', item)
-      // this.joint.items[1] = item
-      this.$emit('item', item)
-    }
   }
 }
 </script>

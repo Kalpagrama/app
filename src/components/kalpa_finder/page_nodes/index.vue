@@ -1,5 +1,5 @@
 <template lang="pug">
-div().row.full-width.q-px-sm
+div().row.full-width
   //- div(
     :style=`{
       position: 'sticky', top: '0px', zIndex: 1000,
@@ -8,12 +8,34 @@ div().row.full-width.q-px-sm
     span.text-white Header
   list-feed(
     :query="query"
+    :itemsMax="100"
     :itemMiddlePersist="true"
     :itemStyles=`{
       paddingBottom: '16px',
     }`).br
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
       div(
+        :style=`{
+          position: 'relative',
+          borderRadius: '10px',
+        }`
+        ).row.full-width.b-40
+        slot(name="tint" :item="item.populatedObject")
+        .row.full-width
+          img(
+            draggable="false"
+            :src="item.populatedObject.thumbUrl"
+            :style=`{
+              height: '50px',
+              borderRadius: '10px',
+            }`)
+          .col
+            .row.full-width.items-center.content-center.justify-end.q-pa-sm
+              small.text-grey-6.q-mr-sm {{ $date(item.populatedObject.createdAt, 'DD.MM.YYYY') }}
+              q-btn(round flat dense color="grey-6" icon="more_vert")
+        .row.full-width.q-pa-sm
+          span.text-white {{ item.populatedObject.name }}
+      //- div(
         :style=`{
           position: 'relative',
           height: '120px',
@@ -46,41 +68,7 @@ div().row.full-width.q-px-sm
               q-icon(name="select_all" color="white").q-mr-sm
               small.text-grey-4 {{ item.populatedObject.items[0].layers[0].contentName }}
           span.text-white {{ item.populatedObject.name }}
-    //- div(
-      :class=`{
-        'b-70': isActive,
-      }`
-      :style=`{
-        position: 'relative',
-        background: 'rgb(45,45,45)',
-        //- height: '80px',
-        borderRadius: '10px',
-      }`
-      ).row.full-width.items-start.content-start.cursor-pointer
-      slot(name="tint" :item="item.populatedObject")
-      div(
-        :style=`{
-          position: 'relative',
-          height: '80px',
-          borderRadius: '10px',
-        }`
-        ).row.full-width.items-start.content-start.b-50
-        img(
-          :src="item.populatedObject.items[0].thumbUrl"
-          :style=`{
-            height: '80px',
-            maxWidth: '160px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-          }`)
-        .col.full-height
-          .row.fit.items-between.content-between.q-pa-sm
-            //- q-icon(name="select_all" color="white").q-mr-sm
-            //- small.text-grey-4 {{ item.populatedObject.items[0].layers[0].contentName }}
-            .row.full-width.justify-end
-              small.text-grey-4 {{ $date(item.populatedObject.createdAt, 'DD.MM.YYYY') }}
-      .row.full-width.q-pa-md
-        span.text-white {{ item.populatedObject.name }}
+          //- $date(item.populatedObject.createdAt, 'DD.MM.YYYY')
 </template>
 
 <script>

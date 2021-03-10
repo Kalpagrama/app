@@ -5,12 +5,12 @@ div(
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  div(
+  //- div(
     :style=`{
       //- position: scrollTargetIsWindow ? 'fixed' : 'absolute',
       position: 'fixed',
       zIndex: 1000, top: '0px',
-      opacity: 0.6,
+      opacity: 0.1,
     }`
     ).row.bg-green.text-white.q-pa-sm
     small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
@@ -29,6 +29,68 @@ div(
       q-btn(flat dense color="orange" no-caps @click="positionDrop()") To start!
       q-btn(flat dense color="blue" no-caps @click="positionStartHere()") Start here!
       q-btn(flat dense color="white" no-caps @click="showHeader = !showHeader") {{showHeader ? 'Hide header' : 'Show header'}}
+  //- debug pretty
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="debugPosition"
+      :style=`{
+        position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
+      }`
+      ).row.q-pa-sm
+      //- details
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
+          overflow: 'hidden',
+        }`
+        ).q-pa-sm
+        transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+          div(
+            v-if="itemsRes && debugOpened"
+            :style=`{
+              borderRadius: '10px',
+              whiteSpace: 'nowrap'
+            }`
+            ).row.text-white.bg-green.q-pa-sm.bg
+            small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
+            small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
+            small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
+            small.full-width scrollTop: {{ scrollTop }}
+            small.full-width scrollBottom: {{ scrollBottom }}
+            small.full-width scrollHeight: {{ scrollHeight }}
+            small.full-width itemsRes.items: {{ itemsRes.items.length }}
+      //- default
+      div(
+        v-if="itemsRes"
+        :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
+        q-btn(
+          @click="debugOpened = !debugOpened"
+          :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
+          round flat dense color="white" ).full-width
+          //- q-tooltip Дебаг вкл/выкл
+        q-btn(
+          @click="positionDrop()"
+          round flat dense color="white" icon="vertical_align_top").full-width
+          q-tooltip В начало
+        q-btn(
+          @click="prev()"
+          :loading="itemsResStatus === 'PREV'"
+          :color="itemsRes.hasPrev ? 'white' : 'red'"
+          :disabled="!itemsRes.hasPrev"
+          round flat dense  icon="north").full-width
+          q-tooltip Назад
+        q-btn(
+          @click="positionStartHere()"
+          round flat dense color="white").full-width
+          q-icon(name="flip").rotate-270
+          q-tooltip Начать с текущего
+        q-btn(
+          @click="next()"
+          :loading="itemsResStatus === 'NEXT'"
+          :color="itemsRes.hasNext ? 'white' : 'red'"
+          :disabled="!itemsRes.hasNext"
+          round flat dense  icon="south").full-width
+          q-tooltip Вперед
   slot(name="prepend")
   //- loading start, no itemsRes
   div(
@@ -124,10 +186,24 @@ export default {
       default () {
         return true
       }
+    },
+    itemsPerPage: {
+      type: Number,
+      default () {
+        return 12
+      }
+    },
+    itemsMax: {
+      type: Number,
+      default () {
+        return 36
+      }
     }
   },
   data () {
     return {
+      // debug
+      debugOpened: false,
       showHeader: false,
       // scrollTarget
       scrollTarget: null,
@@ -151,6 +227,21 @@ export default {
     }
   },
   computed: {
+    debugPosition () {
+      if (!this.scrollTarget) return null
+      if (this.scrollTargetIsWindow) {
+        return {
+          top: 40 + '%',
+          right: 0 + 'px'
+        }
+      }
+      else {
+        return {
+          top: 400 + 'px',
+          right: '0px'
+        }
+      }
+    },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },
@@ -318,8 +409,8 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
-      // this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
-      await this.itemsRes.prev()
+      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      await this.itemsRes.prev(this.itemsPerPage, this.itemsMax)
       this.$log('prev done')
       this.itemsResStatus = null
     },
@@ -330,8 +421,8 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
-      // this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
-      await this.itemsRes.next()
+      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      await this.itemsRes.next(this.itemsPerPage, this.itemsMax)
       this.$log('next done')
       this.itemsResStatus = null
     },

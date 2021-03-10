@@ -5,7 +5,8 @@ div(
   }`
   ).row.full-width.items-start.content-start.justify-center.b-30
   q-dialog(
-    v-model="itemFinderShow")
+    v-model="itemFinderShow"
+    :maximized="true")
     item-finder(
       :joint="joint"
       @item="itemFound"
@@ -101,10 +102,23 @@ export default {
       itemFinderShow: false,
     }
   },
+  watch: {
+    itemFinderShow: {
+      handler (to, from) {
+        if (to) {
+          this.$emit('focused')
+        }
+        else {
+          this.$emit('blurred')
+        }
+      }
+    }
+  },
   methods: {
     itemFound (item) {
       this.$log('itemFound', item)
       // this.joint.items[1] = item
+      this.itemFinderShow = false
       this.$set(this.joint.items, 1, item)
     },
     itemDelete () {
