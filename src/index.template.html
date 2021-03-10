@@ -89,7 +89,7 @@
             }, 60 * 1000)
             const kalpaLoadingInterval = setInterval(() => {
                 console.count('kalpaLoadingInterval')
-               if (!KALPA_LOAD_DOM) {
+               if (!window.KALPA_LOAD_DOM) {
                   if (window.KALPA_LOAD_SW) {
                      document.getElementById('kalpa-loading-text').innerHTML = 'Первичная установка приложения...'
                   } else {
