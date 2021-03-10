@@ -71,26 +71,26 @@ div(
         q-btn(
           @click="positionDrop()"
           round flat dense color="white" icon="vertical_align_top").full-width
-          q-tooltip В начало
+          //- q-tooltip В начало
         q-btn(
           @click="prev()"
           :loading="itemsResStatus === 'PREV'"
           :color="itemsRes.hasPrev ? 'white' : 'red'"
           :disabled="!itemsRes.hasPrev"
           round flat dense  icon="north").full-width
-          q-tooltip Назад
+          //- q-tooltip Назад
         q-btn(
           @click="positionStartHere()"
           round flat dense color="white").full-width
           q-icon(name="flip").rotate-270
-          q-tooltip Начать с текущего
+          //- q-tooltip Начать с текущего
         q-btn(
           @click="next()"
           :loading="itemsResStatus === 'NEXT'"
           :color="itemsRes.hasNext ? 'white' : 'red'"
           :disabled="!itemsRes.hasNext"
           round flat dense  icon="south").full-width
-          q-tooltip Вперед
+          //- q-tooltip Вперед
   slot(name="prepend")
   //- loading start, no itemsRes
   div(
