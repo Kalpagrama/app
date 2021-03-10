@@ -98,12 +98,6 @@ const routes = [
             component: () => import('pages/app/graph/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
-         // {
-         //    name: 'links',
-         //    path: 'links/:oid',
-         //    component: () => import('pages/app/links/index.vue'),
-         //    meta: { roleMinimal: 'GUEST' }
-         // },
          {
             name: 'user',
             path: 'user/:oid/:page?',

@@ -24,7 +24,7 @@ div(
       :isMini="false"
       :styles=`{
         height: '100%',
-        objectFit: 'contain',
+        objectFit: 'cover',
       }`
       :options=`{
         loop: true,

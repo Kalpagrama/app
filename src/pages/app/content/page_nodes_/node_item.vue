@@ -179,7 +179,7 @@ export default {
     },
     itemLink () {
       if (this.node.items.length === 1) return '/node/' + this.node.oid
-      else if (this.node.items.length === 2) return '/links/' + this.node.items[this.contentItemIndex].oid
+      else if (this.node.items.length === 2) return '/graph/' + this.node.items[this.contentItemIndex].oid
       else return '/'
     }
   },

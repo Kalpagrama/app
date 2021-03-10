@@ -38,12 +38,65 @@
         <!-- iPad Pro 12.9" -->
         <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="icons/apple-launch-2048x2732.png">
 
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap&subset=cyrillic"
-            rel="stylesheet">
-        <!-- <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap&subset=cyrillic" rel="stylesheet">
+        <style>
+            #kalpa-loading {
+                position: fixed;
+                z-index: 10000;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                height: 100vh;
+                width: 100%;
+                background: rgb(30,30,30);
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                align-content: center;
+            }
+            .kalpa-loading-text {
+                font-family: Arial, sans-serif !important;
+                font-size: 20px !important;
+                font-weight: 300 !important;
+                line-height: 1 !important;
+            }
+            .loader {
+                border: 4px solid rgb(60,60,60);
+                border-top: 4px solid rgb(76,175,80);
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                animation: spin 2s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
     </head>
     <body>
-        <!-- <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
+        <script>
+            setTimeout(() => {
+                window.KALPA_LOADED = true
+            }, 1000)
+            const kalpaLoadingInterval = setInterval(() => {
+                console.count('kalpaLoadingInterval')
+                if (window.KALPA_LOADED) {
+                    let kalpaLoading = document.getElementById('kalpa-loading')
+                    kalpaLoading.style.display = 'none'
+                    clearInterval(kalpaLoadingInterval)
+                }
+            }, 100)
+        </script>
+        <div id="kalpa-loading">
+            <div class="loader"></div>
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; padding: 10px">
+                <span class="kalpa-loading-text" style="color: white">Приложение устанавливается...</span>
+            </div>
+        </div>
         <div id="q-app"></div>
     </body>
 </html>

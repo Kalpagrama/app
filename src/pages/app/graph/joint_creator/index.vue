@@ -4,11 +4,17 @@ div(
     //- position: 'relative',
   }`
   ).row.full-width.items-start.content-start.justify-center.b-30
+  q-dialog(
+    v-model="itemFinderShow")
+    item-finder(
+      :joint="joint"
+      @item="itemFound"
+      @close="itemFinderShow = false")
   div(
     :style=`{
       position: 'relative',
       maxWidth: maxWidth+'px',
-      minHeight: 624+'px',
+      minHeight: 500+'px',
     }`
     ).row.full-width.items-start.content-start.b-30
     div(
@@ -23,8 +29,15 @@ div(
       ).row.fit
     vertex-editor(:joint="joint")
     //- item finder
-    div(v-if="!joint.items[1]").row.full-width
-      item-finder(
+    div(v-if="!joint.items[1]").row.full-width.q-pa-sm
+      q-btn(
+        @click="itemFinderShow = true"
+        flat color="white" no-caps icon="add" size="md" stack
+        :style=`{
+          minHeight: '300px',
+        }`
+        ).full-width.b-40 Выбрать элемент для связи
+      //- item-finder(
         :joint="joint"
         @item="itemFound")
     //- item found: viewer
@@ -85,6 +98,7 @@ export default {
         category: 'FUN',
       },
       jointPublishing: false,
+      itemFinderShow: false,
     }
   },
   methods: {

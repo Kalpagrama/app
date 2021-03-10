@@ -10,8 +10,9 @@ kalpa-finder(
     //- web: {views: ['all', 'image', 'video',]}
   }`
   :style=`{
-    height: '550px',
-  }`)
+    //- height: '550px',
+    height: $q.screen.height+'px',
+  }`).b-30
   template(v-slot:tint=`{item}`)
     div(
       @click="itemFound(item)"

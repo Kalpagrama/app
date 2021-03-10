@@ -5,7 +5,7 @@ div(
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  //- div(
+  div(
     :style=`{
       //- position: scrollTargetIsWindow ? 'fixed' : 'absolute',
       position: 'fixed',
@@ -183,6 +183,7 @@ export default {
     },
     '$store.state.ui.listFeedNeedDrop': {
       deep: true,
+      // immediate: true,
       handler (to, from) {
         this.$log('$store.state.ui.listFeedNeedDrop TO', to)
         if (to) {
@@ -306,6 +307,7 @@ export default {
       await this.itemsRes.gotoCurrent()
     },
     async positionDrop () {
+      this.$log('positionDrop')
       this.itemMiddleSet(null)
       await this.itemsRes.gotoStart()
     },

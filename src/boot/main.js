@@ -29,6 +29,7 @@ import composition from 'components/composition/index.vue'
 // import listMiddle from 'components/list_middle/index.vue'
 import listFeed from 'components/list_feed/index.vue'
 import kalpaTree from 'components/kalpa_tree/index.vue'
+import kalpaWelcome from 'components/kalpa_welcome/index.vue'
 
 // image editors
 // https://github.com/Norserium/vue-advanced-cropper
@@ -176,6 +177,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaMenuActions', kalpaMenuActions)
     Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
     Vue.component('kalpaTree', kalpaTree)
+    Vue.component('kalpaWelcome', kalpaWelcome)
 
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {

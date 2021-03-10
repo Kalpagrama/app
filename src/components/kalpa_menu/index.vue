@@ -53,10 +53,9 @@
             v-if="!mini"
             :style=`{fontSize: '18px'}`).text-bold.text-white {{ p.name }}
         //- user
-        router-link(
+        div(
           v-if="!isGuest"
-          @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
-          :to="'/user/'+$store.getters.currentUser().oid+'/nodes'"
+          @click="goTo('/user/'+$store.getters.currentUser().oid+'/nodes')"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`
@@ -190,6 +189,11 @@ export default {
     }
   },
   methods: {
+    goTo (to) {
+      this.$log('goTo')
+      this.$router.push(to)
+      this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+    },
     async logout () {
       await AuthApi.logout()
       await this.$router.replace('/auth')
