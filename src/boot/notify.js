@@ -1,5 +1,5 @@
 import { Notify } from 'quasar'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 
@@ -8,6 +8,9 @@ let notify = null
 
 export default async ({ Vue }) => {
   try {
+    const f = {nameExtra: 'boot::notify'}
+    logD(f, 'start')
+    const t1 = performance.now()
     notify = (type, message = '', payload = {}) => {
       switch (type) {
         case 'info': {
@@ -46,6 +49,7 @@ export default async ({ Vue }) => {
       }
     }
     Vue.prototype.$notify = notify
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logE(err)
   }

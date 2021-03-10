@@ -103,11 +103,8 @@ export default {
       try {
         this.$log('passwordNewSet start')
         this.passwordNewSetLoading = true
-        if (this.passwordCurrent.length === 0 || this.passwordCurrent.length < 4) {
-          throw new Error('Слишком короткий пароль !')
-        }
-        if (this.passwordNew.length === 0 || this.passwordNew.length < 4) {
-          throw new Error('Слишком короткий пароль !')
+        if (this.passwordNew.length === 0) {
+          throw new Error('Пустой пароль !')
         }
         if (this.passwordNew !== this.passwordNewConfirm) {
           throw new Error('Пароли не совпадают!')

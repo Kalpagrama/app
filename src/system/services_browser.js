@@ -281,6 +281,7 @@ async function systemInit () {
    if (await rxdb.isInitializedGlobal()) {
       logD(f, 'skip systemInit')
       // alert('skip systemInit')
+      window.KALPA_LOAD_COMPLETE = true
       return
    } // уже войдено!
    try {
@@ -331,6 +332,7 @@ async function systemInit () {
          setSyncEventStorageValue('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
       }
       // alert(' systemInit 7 ')
+      window.KALPA_LOAD_COMPLETE = true
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)

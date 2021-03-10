@@ -39,7 +39,9 @@ async function initPWA (store) {
          logD('try navigator.serviceWorker.register service-worker.js', Date.now())
          // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
          registration = await navigator.serviceWorker.register('/service-worker.js')
-         // let sw = registration.installing || registration.active
+         if (!registration.active){
+            window.KALPA_LOAD_SW = true
+         }
          for (let sw of [registration.installing, registration.waiting, registration.active]) {
             if (sw) {
                // установить фильтр логирования

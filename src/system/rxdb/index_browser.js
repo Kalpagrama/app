@@ -9,7 +9,7 @@ import {
 } from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, initLogRocket, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { addRxPlugin, createRxDatabase, isRxQuery, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
@@ -358,9 +358,7 @@ class RxDBWrapper {
             return currentUser
          }
          this.initialized = true
-
          // this.createTestDb()
-
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE('cant init rxdb. err = ', err)
@@ -686,7 +684,7 @@ class RxDBWrapper {
       assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
       const t1 = performance.now()
-      // logD(f, 'start')
+      logD(f, 'start')
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       let rawId = getRawIdFromId(id)
       let rxDoc
@@ -727,7 +725,7 @@ class RxDBWrapper {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
-      // logD(f, 'start', rxCollectionEnum, idOrRawId)
+      logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
          assert(idOrRawId, 'idOrRawId!')
          if (idOrRawId.includes('::')) {
@@ -772,7 +770,7 @@ class RxDBWrapper {
       // notice! блокировать нельзя тк возможен дедлок! вызывается ws.set, а он ждет synchro, а она ждет rxdb.set
       assert(beforeCreate || this.created, 'cant set! !this.created')
       const f = this.set
-      // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
+      logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
       assert(data, '!data')
       // assert(!data.wsItemType, '!!data.wsItemType') // передается отдельно от item
