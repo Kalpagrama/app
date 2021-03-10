@@ -69,7 +69,7 @@ class GqlQueries {
    async get (id, clientFirst, force, onFetchFunc = null, params = null) {
       let fetchFunc = GqlQueries.getFetchFunc(id, params)
 
-      // logD('objects::get start')
+      logD('objects::get start')
       let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
       if (!rxDoc) return null // см "queued item was evicted legally"
       assert(rxDoc.cached, '!rxDoc.cached')

@@ -684,7 +684,7 @@ class RxDBWrapper {
       assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
       const t1 = performance.now()
-      // logD(f, 'start')
+      logD(f, 'start')
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       let rawId = getRawIdFromId(id)
       let rxDoc
@@ -725,7 +725,7 @@ class RxDBWrapper {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
-      // logD(f, 'start', rxCollectionEnum, idOrRawId)
+      logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
          assert(idOrRawId, 'idOrRawId!')
          if (idOrRawId.includes('::')) {
@@ -770,7 +770,7 @@ class RxDBWrapper {
       // notice! блокировать нельзя тк возможен дедлок! вызывается ws.set, а он ждет synchro, а она ждет rxdb.set
       assert(beforeCreate || this.created, 'cant set! !this.created')
       const f = this.set
-      // logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
+      logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
       const t1 = performance.now()
       assert(data, '!data')
       // assert(!data.wsItemType, '!!data.wsItemType') // передается отдельно от item

@@ -53,6 +53,12 @@ export default {
       }
     }
   },
+  async beforeCreate () {
+    this.$log('beforeCreate')
+  },
+  async beforeMount () {
+    this.$log('beforeMount')
+  },
   async created () {
     this.$log('created')
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')

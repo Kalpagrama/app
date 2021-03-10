@@ -80,25 +80,34 @@
     <body>
         <script>
            document.addEventListener("DOMContentLoaded", () => {
-              console.log('DOMContentLoaded')
-              window.KALPA_LOADED = true
+              window.KALPA_LOAD_DOM = true
+              document.getElementById('kalpa-loading-text').innerHTML = 'Настройка приложения...'
            })
             setTimeout(() => { // предохранитель
-                window.KALPA_LOADED = true
+                console.error('kalpaLoadingInterval too long! break it!!!!')
+                window.KALPA_LOAD_COMPLETE = true
             }, 60 * 1000)
             const kalpaLoadingInterval = setInterval(() => {
                 console.count('kalpaLoadingInterval')
-                if (window.KALPA_LOADED) {
+               if (!KALPA_LOAD_DOM) {
+                  if (window.KALPA_LOAD_SW) {
+                     document.getElementById('kalpa-loading-text').innerHTML = 'Первичная установка приложения...'
+                  } else {
+                     document.getElementById('kalpa-loading-text').innerHTML = 'Загрузка приложения...'
+                  }
+               }
+               // document.getElementById('kalpa-loading-text').innerHTML = 'asdasdasdasd'
+                if (window.KALPA_LOAD_COMPLETE) {
                     let kalpaLoading = document.getElementById('kalpa-loading')
                     kalpaLoading.style.display = 'none'
                     clearInterval(kalpaLoadingInterval)
                 }
-            }, 100)
+            }, 200)
         </script>
         <div id="kalpa-loading">
             <div class="loader"></div>
             <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; padding: 10px">
-                <span class="kalpa-loading-text" style="color: white">Приложение устанавливается...</span>
+                <span id="kalpa-loading-text" class="kalpa-loading-text" style="color: white">Загрузка...</span>
             </div>
         </div>
         <div id="q-app"></div>

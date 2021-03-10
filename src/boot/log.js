@@ -1,9 +1,12 @@
 import 'src/system/utils'
-import { initLogger } from 'src/system/log'
+import { initLogger, performance } from 'src/system/log'
 
 export default async ({ Vue, store, app, ssrContext }) => {
    try {
       let { logD, logI, logW, logE, logC } = await initLogger(store, ssrContext)
+      const f = { nameExtra: 'boot::log' }
+      logD(f, 'start')
+      const t1 = performance.now()
       Vue.prototype.$log = Vue.prototype.$logD = logD
       Vue.prototype.$logI = logI
       Vue.prototype.$logW = logW
@@ -25,6 +28,7 @@ export default async ({ Vue, store, app, ssrContext }) => {
       Vue.config.warnHandler = function (msg, vm, trace) {
          // logW(`Vue.config.warnHandler: ${msg}\nTrace: ${trace}`)
       }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       console.error('error on boot::log', err)
    }
