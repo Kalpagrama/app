@@ -1,35 +1,13 @@
 <template lang="pug">
 div(
   :style=`{
+    //- paddingTop: '100px',
+    //- paddingTop: scrollTargetHeight+'px',
+    //- paddingBottom: scrollTargetHeight+'px',
   }`
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  //- div(
-    :style=`{
-      //- position: scrollTargetIsWindow ? 'fixed' : 'absolute',
-      position: 'fixed',
-      zIndex: 1000, top: '0px',
-      opacity: 0.1,
-    }`
-    ).row.bg-green.text-white.q-pa-sm
-    small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
-    small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
-    small.full-width scrollTop: {{ scrollTop }}
-    small.full-width scrollBottom: {{ scrollBottom }}
-    small.full-width scrollHeight: {{ scrollHeight }}
-    small(v-if="itemsRes").full-width itemsRes.items: {{ itemsRes.items.length }}
-    div(v-if="itemMiddle").row.full-width
-      small.full-width itemMiddle.top: {{ itemMiddle.top }}
-    small(:class=`{'text-red': scrollTopChanging}`).full-width scrollTopChanging: {{ scrollTopChanging }}
-    small(:class=`{'text-red': scrollHeightChanging}`).full-width scrollHeightChanging: {{ scrollHeightChanging }}
-    .row.full-width
-      q-btn(flat dense color="white" no-caps @click="prev()") Prev
-      q-btn(flat dense color="red" no-caps @click="next()") Next
-      q-btn(flat dense color="orange" no-caps @click="positionDrop()") To start!
-      q-btn(flat dense color="blue" no-caps @click="positionStartHere()") Start here!
-      q-btn(flat dense color="white" no-caps @click="showHeader = !showHeader") {{showHeader ? 'Hide header' : 'Show header'}}
-  //- debug pretty
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="debugPosition"
@@ -55,10 +33,26 @@ div(
             small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
             small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
             small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
-            small.full-width scrollTop: {{ scrollTop }}
+            small(:class=`{'bg-red': scrollTopChanging}`).full-width scrollTop: {{ scrollTop }}
             small.full-width scrollBottom: {{ scrollBottom }}
-            small.full-width scrollHeight: {{ scrollHeight }}
+            small(:class=`{'bg-red-3': scrollHeightChanging}`).full-width scrollHeight: {{ scrollHeight }}
             small.full-width itemsRes.items: {{ itemsRes.items.length }}
+            small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
+            q-btn(
+              @click="prependShow = !prependShow"
+              outline dense no-caps align="left" size="sm"
+              :color="prependShow ? 'red' : 'white'"
+              ).full-width.q-mb-xs {{ prependShow ? 'Hide prepend' : 'Show prepend' }}
+            q-btn(
+              @click="appendShow = !appendShow"
+              outline dense no-caps  align="left" size="sm"
+              :color="appendShow ? 'red' : 'white'"
+              ).full-width.q-mb-xs {{ appendShow ? 'Hide append' : 'Show append' }}
+            q-btn(
+              @click="itemMiddleGetPosition"
+              outline dense no-caps align="lef" size="sm"
+              color="purple"
+              ).full-width.q-mb-xs itemMiddle position?
       //- default
       div(
         v-if="itemsRes"
@@ -80,6 +74,9 @@ div(
           round flat dense  icon="north").full-width
           //- q-tooltip Назад
         q-btn(
+          @click="itemMiddleScrollIntoView('BTN')"
+          round flat dense color="white" icon="adjust").full-width
+        q-btn(
           @click="positionStartHere()"
           round flat dense color="white").full-width
           q-icon(name="flip").rotate-270
@@ -92,6 +89,17 @@ div(
           round flat dense  icon="south").full-width
           //- q-tooltip Вперед
   slot(name="prepend")
+  //- div(
+    :style=`{
+      height: '100px',
+    }`
+    ).row.full-width.bg-red
+  div(
+    v-if="prependShow"
+    :style=`{
+      height: '340px',
+    }`
+    ).row.full-width
   //- loading start, no itemsRes
   div(
     v-if="!itemsRes"
@@ -100,17 +108,10 @@ div(
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
-  //- header for debug
-  //- div(
-    v-if="showHeader"
-    :style=`{
-      height: '240px',
-    }`
-    ).row.full-width.items-center.content-center.justify-center.bg-red
-    h1.text-white HEADER
   //- got itemsRes and some items
   div(
     v-if="itemsRes"
+    ref="items-res-wrapper"
     :style=`{
       position: 'relative',
     }`
@@ -132,7 +133,6 @@ div(
       :accessKey="`${item[itemKey]}-${itemIndex}`"
       :style=`{
         ...itemStyles,
-        //- paddingBottom: '50px',
       }`
       v-observe-visibility=`{
         throttle: 150,
@@ -160,11 +160,18 @@ div(
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="50px")
   slot(name="append")
+  div(
+    v-if="appendShow"
+    :style=`{
+      height: '340px',
+    }`
+    ).row.full-width
 </template>
 
 <script>
 import { scroll } from 'quasar'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
   name: 'listFeed',
@@ -204,6 +211,8 @@ export default {
     return {
       // debug
       debugOpened: false,
+      prependShow: false,
+      appendShow: false,
       showHeader: false,
       // scrollTarget
       scrollTarget: null,
@@ -237,8 +246,8 @@ export default {
       }
       else {
         return {
-          top: 400 + 'px',
-          right: '0px'
+          top: 40 + '%',
+          right: 0 + 'px'
         }
       }
     },
@@ -249,7 +258,6 @@ export default {
       return this.scrollTarget === window
     },
     paginationBufferHeight () {
-      // return this.scrollTargetHeight * 2
       return this.scrollTargetHeight
     }
   },
@@ -263,23 +271,25 @@ export default {
     'itemsRes.items': {
       async handler (to, from) {
         this.$log('itemsRes.items TO', to.length)
+        this.itemMiddleScrollIntoView('itemsRes.items WATCHER')
         this.$nextTick(() => {
           this.$log('itemsRes.items $nextTick')
           if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
             this.itemMiddleSet(this.itemsRes.getProperty('currentId'), 0, false)
           }
-          this.itemMiddleScrollIntoView()
+          this.itemMiddleScrollIntoView('itemsRes.items WATCHER $nextTick')
         })
       }
     },
+    // watch it to drop position, and scrollToTop
     '$store.state.ui.listFeedNeedDrop': {
       deep: true,
       // immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('$store.state.ui.listFeedNeedDrop TO', to)
         if (to) {
-          this.positionDrop()
           this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+          await this.positionDrop()
         }
       }
     },
@@ -288,11 +298,7 @@ export default {
         // this.$log('scrollTop To/From:', to, from)
 
         // update itemMiddle.top position
-        if (this.itemMiddle) {
-          let top = this.itemMiddle.ref.getBoundingClientRect().top
-          if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
-          this.itemMiddle.top = top
-        }
+        this.itemMiddleTopUpdate()
 
         // wait for the end
         if (this.scrollTopTimeout) {
@@ -302,10 +308,9 @@ export default {
         if (!this.scrollTopChanging) this.$log('scrollTop START')
         this.scrollTopChanging = true
         this.scrollTopTimeout = setTimeout(async () => {
-          this.scrollTopChanging = false
-
           // END of scrollTopChanging
           this.$log('scrollTop END')
+          this.scrollTopChanging = false
           if (this.scrollTop < this.paginationBufferHeight) await this.prev()
           if (this.scrollBottom < this.paginationBufferHeight) await this.next()
         }, 600)
@@ -316,40 +321,93 @@ export default {
         // this.$log('scrollHeight To/From:', to, from)
 
         // wait for the end
+        if (!this.scrollHeightChanging) this.$log('scrollHeight START')
         if (this.scrollHeightTimeout) {
           clearTimeout(this.scrollHeightTimeout)
           this.scrollHeightTimeout = null
+          this.itemMiddleScrollIntoView('scrollHeight IN')
         }
-        if (!this.scrollHeightChanging) this.$log('scrollHeight START')
         this.scrollHeightChanging = true
         this.scrollHeightTimeout = setTimeout(() => {
           this.scrollHeightChanging = false
 
           // END of scrollHeightChanging
           this.$log('scrollHeight END')
-          this.itemMiddleScrollIntoView()
+          this.itemMiddleScrollIntoView('scrollHeight END')
           // handle prev..
           if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
             // alert('Initial prev...')
             // this.prev()
           }
-        }, 600)
+        }, 2000)
       }
     },
   },
   methods: {
-    itemMiddleScrollIntoView () {
-      this.$log('imsiv start')
+    itemMiddleGetPosition () {
+      this.$log('itemMiddleGetPosition')
+      if (!this.itemMiddle) return
+      let itemMiddleOffsetTop = this.itemMiddle.ref.offsetTop
+      let itemMiddleOffsetParent = this.itemMiddle.ref.offsetParent
+      let itemMiddleRect = this.itemMiddle.ref.getBoundingClientRect()
+      this.$log('itemMiddle', {itemMiddleOffsetTop, itemMiddleOffsetParent, itemMiddleRect})
+      let itemsResWrapperRef = this.$refs['items-res-wrapper']
+      let itemsResWrapperRect = itemsResWrapperRef.getBoundingClientRect()
+      let itemsResWrapperOffsetTop = itemsResWrapperRef.offsetTop
+      let itemsResWrapperOffsetParent = itemsResWrapperRef.offsetParent
+      this.$log('itemsResWrapper', {itemsResWrapperRect, itemsResWrapperOffsetTop, itemsResWrapperOffsetParent})
+      // let scrollTarget
+    },
+    itemMiddleTopUpdate () {
+      if (!this.itemMiddle) return
+      // if (this.scrollHeightChanging) return
+      let top = this.itemMiddle.ref.getBoundingClientRect().top
+      if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
+      this.$log('itemMiddleTopUpdate', top)
+      this.itemMiddle.top = top
+    },
+    itemMiddleScrollIntoView (from) {
+      this.$log('imsiv start', from)
+      const scrollWithScrollIntoView = async () => {
+        if (this.scrollTargetIsWindow) {
+          // just scroll to item
+          this.itemMiddle.ref.scrollIntoView()
+          // add itemMiddle.top position
+          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+        }
+        else {
+          // get window scrollTop before
+          let windowScrollTopBefore = getScrollPosition(window)
+          this.$log('windowScrollTopBefore', windowScrollTopBefore)
+          // block scrolles
+          // disableBodyScroll(this.scrollTarget)
+          // await this.$wait(300)
+          // scrollTo item
+          this.itemMiddle.ref.scrollIntoView()
+          // unblock scrolles
+          // enableBodyScroll(this.scrollTarget)
+          // get window scrollTop before
+          let windowScrollTopAfter = getScrollPosition(window)
+          this.$log('windowScrollTopAfter', windowScrollTopAfter)
+          // return window scrollTop if
+          setScrollPosition(window, windowScrollTopBefore)
+          // add itemMiddle.top position
+          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+        }
+      }
+      const scrollWithOffsetTop = () => {
+          let offsetTop = this.itemMiddle.ref.offsetTop
+          this.$log('imsiv offsetTop', offsetTop)
+          let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
+          this.$log('imsiv offsetTopScrollTarget', offsetTopScrollTarget)
+          let top = this.itemMiddle.top
+          this.$log('imsiv top', top)
+          let scrollPosition = offsetTop - offsetTopScrollTarget - top
+          this.$log('imsiv scrollPosition', scrollPosition)
+          setScrollPosition(this.scrollTarget, scrollPosition)
+      }
       if (this.itemMiddle) {
-        this.$log('imsiv ref', this.itemMiddle.ref)
-        let top = this.itemMiddle.top
-        // this.itemMiddle.ref.scrollIntoView()
-        // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - top)
-        let offsetTop = this.itemMiddle.ref.offsetTop
-        this.$log('imsiv offsetTop', offsetTop)
-        let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
-        this.$log('imsiv offsetTopScrollTarget', offsetTopScrollTarget)
-        setScrollPosition(this.scrollTarget, offsetTop - offsetTopScrollTarget - top)
+        scrollWithScrollIntoView()
         this.$log('imsiv done')
       }
       else {
@@ -373,15 +431,14 @@ export default {
         let itemRef = this.$refs[`item-${key}`]
         if (itemRef && itemRef[0]) {
           itemRef = itemRef[0]
-          let top = itemRef.getBoundingClientRect().top
-          if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
           this.itemMiddle = {
             key: key,
             name: item?.name,
             ref: itemRef,
-            top: top,
+            top: 0,
             item: item
           }
+          this.itemMiddleTopUpdate()
         }
         else {
           this.$log('ims itemRef NOT FOUND', key, idx, item?.name)
@@ -401,6 +458,7 @@ export default {
       this.$log('positionDrop')
       this.itemMiddleSet(null)
       await this.itemsRes.gotoStart()
+      setScrollPosition(this.scrollTarget, 0)
     },
     async prev () {
       this.$log('prev')
@@ -430,10 +488,6 @@ export default {
       this.scrollTop = getScrollPosition(this.scrollTarget)
       this.scrollHeight = getScrollHeight(this.scrollTarget)
       this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
-      // if (this.itemMiddle) {
-      //   this.$log('itemMiddle.ref.offsetTop 1', this.itemMiddle.ref.offsetTop)
-      //   this.$log('itemMiddle.ref.offsetTop 2', this.$refs['item-' + this.itemMiddle.key][0].offsetTop)
-      // }
     },
     scrollHeightResized (e) {
       this.$log('scrollHeightResized', e.height)
@@ -442,8 +496,6 @@ export default {
       this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
       this.scrollHeight = e.height
       this.scrollUpdate()
-      // this.scrollTargetHeight = e.height
-      // this.scrollTargetWidth = e.width
     }
   },
   mounted () {
@@ -453,14 +505,6 @@ export default {
     this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
     this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
-    // this.$nextTick(() => {
-    //   this.scrollUpdate()
-    //   this.scrollResized()
-    // })
-    // this.$wait(1000).then(() => {
-    //   this.scrollUpdate()
-    //   this.prev()
-    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

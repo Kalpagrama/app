@@ -12,6 +12,8 @@ q-layout(
         //- welcome, nodes
         .row.full-width.justify-center.q-pt-md
           kalpa-logo(:width="220" :height="220" :style=`{pointEvents: 'none'}`)
+        //- video
+        section-video
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
           div(
             :style=`{
@@ -184,84 +186,25 @@ q-layout(
                   borderRadius: '10px',
                   background: 'rgb(35,35,35)',
                 }`).q-mr-sm
-        //- video
-        div(
-          :style=`{
-            position: 'relative',
-            height: contentHeight ? 'auto' : contentHeight+'px',
-            marginBottom: '500px',
-          }`
-          v-observe-visibility=`{
-            throttle: 150,
-            callback: contentIsVisibleCallback,
-            }`
-          ).row.full-width.items-start.content-start
-          q-resize-observer(@resize="contentHeightCallback")
-          img(
-            v-if="true || !contentIsVisible"
-            src="https://thumbs-yandexdev.kalpa.store/m0/60/155408298210803763_600_thumb.jpg?rev=3"
-            :style=`{
-              borderRadius: '10px',
-              overflow: 'hidden',
-            }`
-            ).full-width
-          content-player(
-            v-if="contentIsVisible"
-            :contentKalpa=`{
-              oid: '154412738355970078',
-              name: 'Кальпаграма',
-              url: 'https://www.youtube.com/embed/DuqUaOtQ76o',
-              type: 'VIDEO',
-              contentSource: 'YOUTUBE',
-              contentProvider: 'YOUTUBE',
-            }`
-            :isActive="false"
-            :isVisible="true"
-            :isMini="false"
-            :options=`{
-              mode: 'feed',
-              footerOverlay: true,
-              showBar: false,
-              showHeader: false,
-            }`
-            :styles=`{
-              height: '100%',
-              objectFit: 'contain',
-            }`
-            :style=`{
-              position: 'absolute', zIndex: 100, top: '0px',
-            }`).fit
 </template>
 
 <script>
-import contentPlayer from 'components/content_player/index.vue'
+import sectionVideo from './section_video.vue'
 
 export default {
   name: 'pageApp_about',
   components: {
-    contentPlayer,
+    sectionVideo,
     nodeVoteBall: () => import('components/node/node_vote_ball.vue')
   },
   data () {
     return {
-      contentHeight: null,
-      contentIsVisible: false,
     }
   },
   computed: {
     width () {
       return Math.min(400, this.$store.state.ui.pageWidth - 16, this.$q.screen.width)
     },
-  },
-  methods: {
-    contentIsVisibleCallback (isVisible, entry) {
-      this.$log('contentIsVisibleCallback', isVisible)
-      this.contentIsVisible = isVisible
-    },
-    contentHeightCallback (e) {
-      this.$log('contentHeightCallback', e.height)
-      if (!this.contentHeight && e.height > 0) this.contentHeight = e.height
-    }
   }
 }
 </script>

@@ -9,7 +9,7 @@ div(
   ).row.fit.items-center.content-center.justify-center
   slot(name="tint" :tintFocused="tintFocused")
   //- header
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     tint-header(
       v-if="player && player.duration && showHeaderLocal"
       v-show="options.showHeader"
@@ -60,7 +60,7 @@ div(
       span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
       q-icon(name="fast_forward" color="white" size="20px").q-ml-xs
   //- footer feed: timeline
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="player && player.duration && options.mode === 'feed' && !isMini"
       :style=`{
@@ -79,6 +79,42 @@ div(
         :style=`{
           background: 'rgba(0,0,0,0.7)',
         }`)
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="options.mode === 'feed' && !isMini"
+      :style=`{
+        position: 'absolute', zIndex: 3000,
+        bottom: '0px',
+        borderRadius: '0 0 10px 10px',
+        userSelect: 'none',
+      }`
+      ).row.full-width.items-center.content-center.q-pa-sm
+      div(
+        @click="contextClick()"
+        :style=`{
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '10px',
+        }`
+        ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
+        q-icon(name="select_all" color="white" size="16px").q-ma-xs
+        span.text-white Источник
+        //- span.text-white {{contentKalpa.name.slice(0,40) }}
+      .col
+      div(
+        v-if="player && player.duration"
+        :style=`{
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '10px',
+        }`
+        ).row.items-center.content-center.q-pa-xs
+        small(:style=`{borderRadius: '8px'}`).text-white.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
+        q-btn(
+          @click="player.setState('muted', !player.muted)"
+          round flat dense size="sm"
+          :color="player.muted ? 'red' : 'white'"
+          :icon="player.muted ? 'volume_off' : 'volume_up'"
+          :style=`{
+          }`)
   //- footer editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -142,6 +178,13 @@ export default {
   watch: {
   },
   methods: {
+    contextClick () {
+      this.$log('contextClick')
+      if (this.options.nodeOid) {
+        this.$store.commit('ui/stateSet', ['nodeOnContent', this.options.nodeOid])
+      }
+      this.$router.push('/content/' + this.contentKalpa.oid)
+    },
     tintClickSelf (e) {
       // this.$log('tintClickSelf', this.tintClickSelfCount)
       this.tintClickSelfCount += 1
