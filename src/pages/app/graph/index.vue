@@ -7,7 +7,7 @@ q-layout(view="hHh Lpr lff")
     ).row.full-width.justify-center
     div(
       :style=`{
-        maxWidth: rowItemWidth-2+'px',
+        maxWidth: rowItemWidth+16+'px',
         borderRadius: '10px 10px 0 0',
       }`
       ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.b-40.q-pt-sm

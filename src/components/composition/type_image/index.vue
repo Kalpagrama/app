@@ -16,7 +16,28 @@ div(
       objectFit: styles.objectFit,
     }`
     ).full-width
-  q-btn(
+  //- footer
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="!isMini"
+      :style=`{
+        position: 'absolute', zIndex: 3000,
+        bottom: '0px',
+        borderRadius: '0 0 10px 10px',
+        userSelect: 'none',
+      }`
+      ).row.full-width.items-center.content-center.q-pa-sm
+      div(
+        @click="contextClick()"
+        :style=`{
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '10px',
+        }`
+        ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
+        q-icon(name="select_all" color="white" size="16px").q-ma-xs
+        span.text-white Источник
+        //- span.text-white {{ composition.layers[0].contentName }}
+  //- q-btn(
     @click="contextClick"
     :to="'/content/'+composition.layers[0].contentOid"
     round flat color="white" no-caps icon="select_all"
@@ -45,6 +66,7 @@ export default {
       if (this.options.nodeOid) {
         this.$store.commit('ui/stateSet', ['nodeOnContent', this.options.nodeOid])
       }
+      this.$router.push('/content/' + this.composition.layers[0].contentOid)
     }
   }
 }

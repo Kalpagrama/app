@@ -363,7 +363,7 @@ export default {
       // if (this.scrollHeightChanging) return
       let top = this.itemMiddle.ref.getBoundingClientRect().top
       if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
-      this.$log('itemMiddleTopUpdate', top)
+      // this.$log('itemMiddleTopUpdate', top)
       this.itemMiddle.top = top
     },
     itemMiddleScrollIntoView (from) {
@@ -467,7 +467,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
-      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      // this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
       await this.itemsRes.prev(this.itemsPerPage, this.itemsMax)
       this.$log('prev done')
       this.itemsResStatus = null
@@ -479,7 +479,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
-      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      // this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
       await this.itemsRes.next(this.itemsPerPage, this.itemsMax)
       this.$log('next done')
       this.itemsResStatus = null
