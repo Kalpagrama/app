@@ -1,25 +1,17 @@
 <template lang="pug">
-.column.full-width
+div(
+  @click.self="$emit('close')"
+  ).column.full-width
   //- header
-  .row.full-width
-    //- searchString
-    .row.full-width.q-px-sm
-      q-input(
-        v-model="searchString"
-        borderless dark
-        placeholder="Найти элемент для связи"
-        :input-style=`{
-          paddingLeft: '10px',
-        }`
-        :style=`{
-          borderRadius: '10px',
-        }`
-        ).full-width.b-40
-    //- pages
-    div().row.full-width.justify-center
-      div(
-        v-if="pagesShow"
-        :style=`{marginBottom: '-2px', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pl-sm
+  .row.full-width.justify-center.q-px-sm
+    div(:style=`{maxWidth: 600+'px'}`).row.full-width
+      //- title
+      .row.full-width.items-center.content-center.q-pa-sm
+        .col
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
+        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+      //- tabs
+      .row.full-width.q-px-sm
         q-tabs(
           v-model="pageId" no-caps
           dense active-color="green"
@@ -28,18 +20,33 @@
           q-tab(
             v-for="p in pagesFiltered" :key="p.id"
             :name="p.id" :label="p.name")
+      //- input
+      q-input(
+        v-model="searchString"
+        borderless dark
+        placeholder="Поиск"
+        :input-style=`{
+          paddingLeft: '10px',
+        }`
+        :style=`{
+          borderRadius: '10px',
+        }`
+        ).full-width.b-40
   //- body
-  .col.full-width.scroll
-    component(
-      v-bind="$props"
-      :is="`page-${pageId}`"
-      :searchString="searchStringLocal"
-      :page="page"
-      :style=`{
-        maxWidth: 600+'px',
-      }`)
-      template(v-slot:tint=`{item}`)
-        slot(name="tint" :item="item")
+  div(
+    @click.self="$emit('close')"
+    ).col.full-width.scroll
+    .row.full-width.justify-center.q-pa-sm
+      component(
+        v-bind="$props"
+        :is="`page-${pageId}`"
+        :searchString="searchStringLocal"
+        :page="page"
+        :style=`{
+          maxWidth: 600+'px',
+        }`)
+        template(v-slot:tint=`{item}`)
+          slot(name="tint" :item="item")
 </template>
 
 <script>
@@ -54,10 +61,13 @@ export default {
     pagesShow: {type: Boolean, default: true},
     pages: {type: Object},
     searchString: {type: String},
+    title: {
+      type: String,
+      default: 'Выбрать элемент для связи'
+    }
   },
   components: {
-    // wsSearch: () => import('components/ws_search/index.vue'),
-    pageContent: () => import('./page_content/index.vue'),
+    // pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
     pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
     pageNodes: () => import('./page_nodes/index.vue'),
@@ -77,8 +87,8 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'nodes', name: 'Ядра', component: 'page-nodes'},
-        {id: 'workspace', name: 'Закладки', component: 'page-workspace'},
+        {id: 'nodes', name: 'Мои ядра', component: 'page-nodes'},
+        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
         {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
         {id: 'content', name: 'Загрузки', component: 'page-content'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},

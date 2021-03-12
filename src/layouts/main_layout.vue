@@ -2,7 +2,10 @@
 q-layout(view="lHh lpR lFf")
   q-dialog(
     v-model="authGuardShow")
-    kalpa-auth-guard(@close="authGuardShow = false")
+    kalpa-auth-guard(@close="authGuardShow = null")
+  q-dialog(
+    v-model="kalpaWelcomeShow" :maximized="true")
+    kalpa-welcome(@click="kalpaWelcomeShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
@@ -49,7 +52,15 @@ export default {
       },
       set (val) {
         this.$log('authGuardShow', val)
-        this.$store.commit('ui/stateSet', ['authGuard', null])
+        this.$store.commit('ui/stateSet', ['authGuard', val])
+      }
+    },
+    kalpaWelcomeShow: {
+      get () {
+        return this.$store.state.ui.kalpaWelcome !== null
+      },
+      set (val) {
+        this.$store.commit('ui/stateSet', ['kalpaWelcome', null])
       }
     }
   },

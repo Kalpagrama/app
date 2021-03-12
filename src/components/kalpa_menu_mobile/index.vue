@@ -34,9 +34,9 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px 10px 0 0',
-      paddingBottom: 'env(safe-area-inset-bottom)',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
-    ).row.full-width.justify-between.b-50.q-pt-sm
+    ).row.full-width.justify-between.b-50.q-px-sm.q-pt-sm
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"
@@ -48,7 +48,7 @@
       }`
       ).row.items-center.content-center.justify-center
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Лента
+        span(:style=`{whiteSpace: 'nowrap'}`) Лента
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
@@ -59,7 +59,7 @@
         height: size+'px',
       }`)
       .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Поиск
+        span(:style=`{whiteSpace: 'nowrap'}`) Поиск
     //- workspace
     div(
       :style=`{
@@ -84,8 +84,8 @@
       //- TODO: handle new notifications...
       //- q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
-        //- small Активность
-        small Уведомления
+        span Активность
+        //- span Уведомления
     kalpa-menu-popup-global(
       :styles=`{
         width: size+'px',
@@ -108,7 +108,7 @@ export default {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
     },
     size () {
-      if (this.$q.screen.width > 350) return 70
+      if (this.$q.screen.width > 350) return 60
       else return 50
     }
   },

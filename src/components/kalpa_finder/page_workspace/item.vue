@@ -102,7 +102,7 @@ export default {
         IMAGE: '/content/',
         BOOK: '/content/'
       }
-      // TODO: handle /links/?joint= ...
+      // TODO: handle /joint/?joint= ...
       return itemLinkMap[this.item.type] + this.item.oid
     }
   },

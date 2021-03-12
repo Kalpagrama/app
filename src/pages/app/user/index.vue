@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff" @scroll="onScroll")
-  nav-tabs(
+  //- nav-tabs(
     v-if="user && scrollPosition > 265"
     :tabs="tabs"
     :style=`{

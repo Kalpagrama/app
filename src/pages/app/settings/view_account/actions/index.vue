@@ -14,12 +14,20 @@
       ).full-width.b-40.q-mb-sm
       span Обратная связь
     q-btn(
+      @click="showKalpaWelcome()"
+      flat color="grey-6" no-caps
+      :style=`{
+        height: '50px',
+      }`
+      ).full-width.b-40.q-mb-md
+      span Показать обучение
+    q-btn(
       @click="refresh()"
       flat color="grey-6" no-caps
       :style=`{
         height: '50px',
       }`
-      ).full-width.b-40
+      ).full-width.b-40.q-mb-md
       span Очистить кэш
     q-btn(
       @click="setDebugOutput()"
@@ -36,7 +44,7 @@
       :style=`{
         height: '50px',
       }`
-      ).full-width.q-my-md
+      ).full-width.q-myb-md
       span Выйти
 </template>
 
@@ -53,6 +61,10 @@ export default {
     }
   },
   methods: {
+    showKalpaWelcome () {
+      this.$log('showKalpaWelcome')
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {mode: 'slides-only'}])
+    },
     async logout () {
       await AuthApi.logout()
       await this.$router.replace('/auth')

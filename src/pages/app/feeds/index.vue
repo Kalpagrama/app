@@ -1,4 +1,20 @@
 <template lang="pug">
+//- div(
+  :style=`{
+    height: $q.screen.height+'px',
+    //- paddingTop: '200px',
+  }`
+  ).row.full-wdith.items-start.content-start.justify-center
+  div().row.full-width.items-start.content-start.text-white.bg
+    div(v-for="n in 4" :key="n" :style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-center.br {{ n }}
+  div(
+    :style=`{
+      height: '600px',
+      maxWidth: '400px',
+    }`
+    ).column.full-width
+    .col.full-width.scroll
+      feed(:feed="feed")
 q-layout(view="hHh Lpr lff")
   //- q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
     .row.full-width.justify-center.b-30.q-py-sm.q-px-sm
