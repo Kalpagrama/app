@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  :container="isContainer").b-30.bg
+  :container="isContainer").b-30
   //- bookmark editor
   q-dialog(
     v-model="bookmarkEditorShow"
@@ -36,7 +36,7 @@ q-layout(
       :style=`{
         paddingTop: '40px',
         paddingBottom: '100px',
-      }`).br
+      }`)
       //- swipeable tabs
       q-tab-panels(
         v-model="pageId"
@@ -108,10 +108,10 @@ export default {
     // },
     pages () {
       let pages = [
-        {id: 'content', name: 'Медиа'},
-        {id: 'nodes', name: 'Ядра'},
-        {id: 'joints', name: 'Связи'},
-        {id: 'spheres', name: 'Сферы'}
+        {id: 'content', name: this.$tt('Media')},
+        {id: 'nodes', name: this.$tt('Nodes')},
+        {id: 'joints', name: this.$tt('Joints')},
+        {id: 'spheres', name: this.$tt('Spheres')}
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages

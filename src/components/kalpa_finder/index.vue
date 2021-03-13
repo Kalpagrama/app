@@ -5,30 +5,40 @@ div(
   }`
   ).column.full-width
   //- header
-  .row.full-width.justify-center.q-px-sm
+  .row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidthMedi+'px'}`).row.full-width
       //- title
       .row.full-width.items-center.content-center.q-pa-sm
-        .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle }}
+        .col.q-pl-sm
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
       //- tabs
-      .row.full-width.q-px-sm
-        q-tabs(
-          v-model="pageId" no-caps
-          dense active-color="green"
-          aling="left"
-          ).text-grey-6
-          q-tab(
-            v-for="p in pagesFiltered" :key="p.id"
-            :name="p.id" :label="p.name")
+      .row.full-width.items-center.content-center.q-px-sm.q-py-xs
+        .row.q-pl-sm
+          span.text-white.q-mr-sm {{$tt('From')}}:
+        .col
+          .row.full-width.scroll
+            .row.full-width.items-center.content-center.no-wrap
+              q-btn(
+                v-for="p in pagesFiltered" :key="p.id"
+                flat no-caps dense
+                :color="p.id === pageId ? 'green' : 'white'"
+                :class=`{
+                  'b-40': p.id === pageId,
+                }`
+                :style=`{
+                  whiteSpace: 'nowrap',
+                }`
+                @click="pageId = p.id"
+                ).q-mr-sm.q-px-sm {{ p.name }}
+              div(:style=`{width: '100px',minWidth: '100px',}`).row
       //- input
       q-input(
         v-model="searchString"
         borderless dark
-        placeholder="Поиск"
+        :placeholder="$tt('Search')"
         :input-style=`{
-          paddingLeft: '10px',
+          paddingLeft: '16px',
         }`
         :style=`{
           borderRadius: '10px',
@@ -68,7 +78,7 @@ export default {
     searchString: {type: String},
     headerTitle: {
       type: String,
-      default: 'Выбрать элемент для связи'
+      // default: 'Выбрать элемент для связи'
     }
   },
   components: {
@@ -85,15 +95,19 @@ export default {
     }
   },
   computed: {
+    headerTitle_ () {
+      if (this.headerTitle) return this.headerTitle
+      else return this.$tt('Find your item')
+    },
     page () {
       if (this.pageId) return this.pages[this.pageId]
       else return null
     },
     pagesFiltered () {
       return [
-        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
-        {id: 'search', name: 'Поиск', component: 'page-search'},
-        {id: 'nodes', name: 'Мои ядра', component: 'page-nodes'},
+        {id: 'workspace', name: 'Workspace', component: 'page-workspace'},
+        {id: 'search', name: 'Search', component: 'page-search'},
+        {id: 'nodes', name: 'My Nodes', component: 'page-nodes'},
         {id: 'web', name: 'Web', component: 'page-web'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
       ].filter(p => {

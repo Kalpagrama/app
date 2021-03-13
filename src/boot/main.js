@@ -110,6 +110,9 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
+    Vue.prototype.$tt = function (val) {
+      return val
+    }
     const nodeItemTypes = [
       {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
       {id: 'ASSOCIATIVE', name: 'Ассоциация', pair: 'ASSOCIATIVE'},

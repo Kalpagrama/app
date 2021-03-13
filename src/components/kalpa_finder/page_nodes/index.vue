@@ -1,5 +1,5 @@
 <template lang="pug">
-div().row.full-width.q-px-sm
+div().row.full-width.q-px-sm.q-pt-sm
   //- div(
     :style=`{
       position: 'sticky', top: '0px', zIndex: 1000,
@@ -12,7 +12,7 @@ div().row.full-width.q-px-sm
     :itemMiddlePersist="true"
     :itemStyles=`{
       paddingBottom: '16px',
-    }`).br
+    }`)
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
       div(
         :style=`{

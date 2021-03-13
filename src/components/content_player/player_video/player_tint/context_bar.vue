@@ -14,7 +14,7 @@ div(
       height: contentKalpaFullHeight+'px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-between.content-between
+    ).row.full-width.items-start.content-start
     div(
       v-if="contentKalpaFull"
       ).row.full-width.items-start.content-start.q-pa-sm
@@ -26,22 +26,23 @@ div(
         }`)
       .col.q-pl-sm.text-white
         .row.full-width
-          small.full-width Подписчиков: {{ contentKalpaFull.countStat.countSubscribers }}
-          small.full-width Просмотров: {{ contentKalpaFull.countStat.countViews }}
-          small.full-width Связей: {{ contentKalpaFull.countStat.countJoints }}
-          small.full-width Ядер: {{ contentKalpaFull.countStat.countNodes }}
+          small.full-width {{ $tt('Subscribers') }}: {{ contentKalpaFull.countStat.countSubscribers }}
+          small.full-width {{ $tt('Views') }}: {{ contentKalpaFull.countStat.countViews }}
+          small.full-width {{ $tt('Links') }}: {{ contentKalpaFull.countStat.countJoints }}
+          small.full-width {{ $tt('Nodes') }}: {{ contentKalpaFull.countStat.countNodes }}
     //- go to context btn
     div(
       v-if="contentKalpaFull"
-      :style=`{order: -1}`
+      :style=`{order: 1}`
       ).row.full-width.q-px-sm.q-pt-sm
       q-btn(
         @click="contextGo()"
-        outline no-caps color="white"
+        outline no-caps color="white" icon-right="launch"
         :style=`{
           height: '50px',
         }`
-        ).full-width Смотреть в контексте
+        )
+        span.text-bold.q-mr-sm {{ $tt('Watch in context') }}
     //- related content!
     //- .row.full-width
       .row.full-width.q-px-md.q-py-xs
@@ -71,7 +72,7 @@ div(
         q-icon(name="select_all" color="grey-4" size="16px").q-ma-xs
         .col.scroll
           .row.full-width.items-center.content-center.no-wrap
-            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{contentKalpa.name }}
+            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ contentKalpa.name }}
     div(
       v-if="player && player.duration"
       :style=`{

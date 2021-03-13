@@ -2,7 +2,7 @@
 div(
   v-if="itemsRes"
   :style=`{
-    paddingBottom: '300px',
+    //- paddingBottom: '300px',
     borderTop: itemsRes.totalCount > 0 ? '2px solid rgb(50,50,50)' : 'none',
   }`
   ).row.full-width.items-start.content-start

@@ -47,13 +47,14 @@ div(
     v-if="sphereNodes"
     ).row.full-width.scroll
     .row.full-width.items-start.content-start.justify-center
-      .row.full-width.justify-center.no-wrap
+      .row.full-width.items-start.content-start.justify-center.no-wrap
         div(
           v-for="(node,nodeIndex) in sphereNodes.items" :key="node.oid"
           :style=`{
             position: 'relative',
             maxWidth: $store.state.ui.pageWidth+'px',
             //- minWidth: $store.state.ui.pageWidth+'px',
+            paddingBottom: $q.screen.height/2+'px',
           }`
           ).row.full-width.items-start.content-start
           //- item wrapper
@@ -74,10 +75,11 @@ div(
             :oid="node.populatedObject.oid"
             @loaded="itemLinksLoaded = true"
             @empty="itemLinksEmpty = true")
+          //- item links empty!
           div(
             v-if="itemLinksEmpty"
-            ).row.full-width
-            h1.text-white Empty
+            ).row.full-width.items-center.content-center.justify-center.q-pa-xl
+            span.text-white No links here, be first one!
 </template>
 
 <script>
