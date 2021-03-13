@@ -42,7 +42,7 @@ div(
           height: '50px',
         }`
         ).full-width Смотреть в контексте
-    //- related content
+    //- related content!
     //- .row.full-width
       .row.full-width.q-px-md.q-py-xs
         small.text-white Похожее:
