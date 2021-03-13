@@ -1,5 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
+  q-footer(v-if="$q.screen.lt.md")
+    kalpa-menu-mobile
   q-header(
     reveal
     :style=`{

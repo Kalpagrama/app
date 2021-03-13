@@ -21,7 +21,7 @@ import kalpaBookmark from 'components/kalpa_bookmark/index.vue'
 import kalpaShare from 'components/kalpa_share/index.vue'
 import kalpaLogo from 'components/kalpa_logo/index.vue'
 import kalpaFinder from 'components/kalpa_finder/index.vue'
-// import kalpaLoader from 'components/kalpa_loader/index.vue'
+import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
 import kalpaMenuActions from 'components/kalpa_menu_actions/index.vue'
 import kalpaMenuPopupGlobal from 'components/kalpa_menu_popup_global/index.vue'
 import nodeFeed from 'components/node_feed/index.vue'
@@ -174,6 +174,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaShare', kalpaShare)
     Vue.component('kalpaLogo', kalpaLogo)
     Vue.component('kalpaFinder', kalpaFinder)
+    Vue.component('kalpaMenuMobile', kalpaMenuMobile)
     Vue.component('kalpaMenuActions', kalpaMenuActions)
     Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
     Vue.component('kalpaTree', kalpaTree)

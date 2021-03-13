@@ -15,6 +15,8 @@ q-layout(view="hHh Lpr lff")
             ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
           .col
           q-btn(round flat color="grey-8" icon="more_vert")
+  q-footer(v-if="$q.screen.lt.md")
+    kalpa-menu-mobile
   q-page-container
     q-page(
       v-if="$store.getters.currentUser().profile.role === 'GUEST'"

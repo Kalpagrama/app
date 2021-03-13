@@ -5,16 +5,26 @@ div(
     position: 'relative',
   }`
   ).row.full-width
+  //- item creator
+  q-dialog(
+    v-model="itemCreatorShow"
+    :maximized="true"
+    position="bottom")
+    item-creator(
+      @close="itemCreatorShow = false")
   //- create btn
-  q-btn(
-    round color="green" icon="add_link" size="lg"
-    :style=`{
-      position: 'fixed', zIndex: 10000,
-      right: '30px',
-      bottom: '30px',
-      //- bottom: 'calc(env(safe-area-inset-bottom) + 10px)',
-      borderRadius: '50%',
-    }`)
+  transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="!itemCreatorShow"
+      round color="green" icon="add_link" size="lg"
+      :style=`{
+        position: 'fixed', zIndex: 10000,
+        right: '30px',
+        bottom: '30px',
+        //- bottom: 'calc(env(safe-area-inset-bottom) + 10px)',
+        borderRadius: '50%',
+      }`
+      @click="itemCreatorShow = true")
   //- header
   //- sphere + spheres close
   .row.full-width.justify-center
@@ -73,11 +83,13 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import itemLinks from './item_links/index.vue'
+import itemCreator from './item_creator/index.vue'
 
 export default {
   name: 'pageApp_sphereFull',
   components: {
     itemLinks,
+    itemCreator,
   },
   data () {
     return {
@@ -87,6 +99,7 @@ export default {
       itemLinksLoaded: false,
       itemLinksEmpty: false,
       nodeIsVisible: false,
+      itemCreatorShow: false,
     }
   },
   computed: {

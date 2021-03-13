@@ -31,14 +31,13 @@ q-layout(view="lHh lpR lFf")
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import kalpaMenu from 'components/kalpa_menu/index.vue'
-import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
 import kalpaAuthGuard from 'components/kalpa_auth_guard/index.vue'
 
 export default {
   name: 'mainLayout',
   components: {
     kalpaMenu,
-    kalpaMenuMobile,
+    // kalpaMenuMobile,
     kalpaAuthGuard
   },
   data () {

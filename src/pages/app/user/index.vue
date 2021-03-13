@@ -2,21 +2,14 @@
 q-layout(
   view="hHh lpR fFf"
   @scroll="onScroll")
-  //- nav-tabs(
-    v-if="user && scrollPosition > 265"
-    :tabs="tabs"
-    :style=`{
-      position: 'fixed', zIndex: 1000, top: '0px',
-    }`)
   q-header(
     v-if="user && scrollTop > 300"
     reveal)
     nav-tabs(:tabs="tabs")
+  q-footer(v-if="$q.screen.lt.md")
+    kalpa-menu-mobile
   q-page-container
     q-page(
-      :style=`{
-        //- paddingTop: '300px',
-      }`
       ).row.full-width.justify-center
       component(
         v-if="user"
