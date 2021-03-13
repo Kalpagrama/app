@@ -20,7 +20,7 @@ q-layout(view="lHh lpR lFf")
           maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
         }`).fit
   //- mobile menu navigation
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container

@@ -1,7 +1,10 @@
 <template lang="pug">
 .row.full-width.items-center.content-center.q-pa-sm
   q-btn(
-    round flat dense color="grey-8" icon="bookmark_outline")
+    round flat dense color="grey-9" icon="bookmark_outline").q-mr-sm
+  q-btn(
+    round flat dense color="grey-9")
+    q-icon(name="logout").rotate-270
   .col
   vote-ball(
     :node="node"

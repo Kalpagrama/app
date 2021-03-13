@@ -26,9 +26,9 @@ div(
       q-btn(
         round flat color="white" icon="west"
         @click="$routerKalpa.back()")
-      .col
-        .row.full-width.justify-center.q-pt-sm
-          span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ sphere.name }}
+      .col.full-height
+        .row.full-width.justify-center
+          span(:style=`{fontSize: '22px',}`).text-white.text-bold {{ sphere.name }}
       q-btn(
         round flat color="white" icon="more_vert"
         @click="sphereActionsShow = true")
