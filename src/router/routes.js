@@ -117,6 +117,12 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'sphere-full',
+            path: 'sphere-full/:oid',
+            component: () => import('pages/app/sphere_full/index'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'sphere-render',
             path: 'sphere-render/:oid/:page?',
             component: () => import('pages/app/sphere_render/index.vue'),

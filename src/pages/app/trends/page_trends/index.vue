@@ -3,7 +3,7 @@ q-page(
   :style=`{
     paddingTop: '50px',
   }`)
-  .row.full-width.items-start.content-start.justify-center.q-px-sm
+  .row.full-width.items-start.content-start.justify-center
     div(
       :class=`{
       }`

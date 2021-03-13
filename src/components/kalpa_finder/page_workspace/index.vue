@@ -1,54 +1,28 @@
 <template lang="pug">
-div(
+page-bookmarks(
+  :isContainer="true"
+  :useHeader="false"
+  :pagesFilter="pagesFilter"
   :style=`{
-    //- paddingTop: '40px',
+    height: height+'px',
   }`
-  ).row.full-width
-  list-feed(
-    :query="query"
-    :itemMiddlePersist="true"
-    :itemStyles=`{
-      paddingBottom: '8px',
-    }`)
-    template(v-slot:prepend)
-      .row.full-width.q-pb-sm
-        q-btn(
-          @click="viewId = v.id"
-          v-for="(v,ii) in views" :key="v.id"
-          flat no-caps dense
-          :color="viewId === v.id ? 'green' : 'grey-7'"
-          :class=`{
-            'b-40': viewId === v.id
-          }`
-          :style=`{}`).q-mr-xs.q-px-xs {{ v.name }}
-    template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      item(
-        @click.native="$emit('item', item)"
-        :item="item"
-        :style=`{
-        }`
-        ).q-mb-sm
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
-  //- q-page-sticky(
-    expand position="top"
-    :style=`{zIndex: 1000}`).b-30
-    //- types
-    .row.full-width.justify-center.q-px-sm
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start.scroll.q-py-xs
-        .row.items-center.content-center.no-wrap
+  mode="select"
+  @bookmark="$emit('item', $event)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
-import item from './item.vue'
+
+import pageBookmarks from 'pages/app/workspace/page_bookmarks/index.vue'
+import bookmarkListItem from 'components/bookmark/bookmark_list_item.vue'
 
 export default {
   name: 'kalpaFinder_pageWorkspace',
-  props: ['searchString', 'page'],
+  props: ['searchString', 'page', 'height'],
   components: {
-    item,
+    pageBookmarks,
+    bookmarkListItem,
   },
   data () {
     return {
@@ -63,14 +37,11 @@ export default {
     },
     views () {
       return [
-        // {id: 'video', name: 'Видео', selector: {wsItemType: 'WS_BOOKMARK', type: 'VIDEO'}},
-        // {id: 'book', name: 'Книги', selector: {wsItemType: 'WS_BOOKMARK', type: 'BOOK'}},
-        // {id: 'image', name: 'Картинки', selector: {wsItemType: 'WS_BOOKMARK', type: 'IMAGE'}},
         {id: 'media', name: 'Медиа', selector: {wsItemType: 'WS_BOOKMARK', type: {$in: ['IMAGE', 'VIDEO', 'BOOK']}}},
         {id: 'node', name: 'Ядра', selector: {wsItemType: 'WS_BOOKMARK', type: 'NODE'}},
         {id: 'joint', name: 'Связи', selector: {wsItemType: 'WS_BOOKMARK', type: 'JOINT'}},
         {id: 'sphere', name: 'Сферы', selector: {wsItemType: 'WS_BOOKMARK', type: 'SPHERE'}},
-        // {id: 'user', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
+        {id: 'user', name: 'Люди', selector: {wsItemType: 'WS_BOOKMARK', type: 'USER'}},
       ].filter(v => {
         if (this.page) return this.page.views.includes(v.id)
         else return true
@@ -100,6 +71,9 @@ export default {
   },
   // watch: {},
   methods: {
+    // pagesFilter (pages) {
+    //   return pages.filter(p => )
+    // },
   },
   created () {
     this.$log('created')

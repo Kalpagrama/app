@@ -89,7 +89,13 @@ div(
         }`
         ).text-white {{ nodeName }}
     //- SPHERES
-    div(
+    node-spheres(
+      v-if="showSpheres && node.spheres.length > 0"
+      :node="node"
+      :style=`{
+        order: orderSpheres,
+      }`)
+    //- div(
       v-if="showSpheres && node.spheres.length > 0"
       :style=`{
         order: orderSpheres,
@@ -136,7 +142,8 @@ import { i18n } from 'src/boot/i18n'
 
 import nodeItem from './node_item.vue'
 import nodeItems from './node_items.vue'
-import nodeActions from 'components/node/node_actions.vue'
+import nodeActions from 'components/node/node_actions/index.vue'
+import nodeSpheres from 'components/node/node_spheres/index.vue'
 
 export default {
   name: 'nodeFeed',
@@ -144,6 +151,7 @@ export default {
     nodeItem,
     nodeItems,
     nodeActions,
+    nodeSpheres,
   },
   props: {
     node: {type: Object},
@@ -189,7 +197,8 @@ export default {
         return `/graph/${this.node.items[0].oid}?oid=${this.node.oid}`
       }
       else {
-        return '/node/' + this.node.oid
+        // return '/node/' + this.node.oid
+        return '/sphere-full/' + this.node.sphereFromName.oid
       }
     },
     category () {

@@ -84,12 +84,40 @@ div(
       v-if="options.mode === 'feed' && !isMini"
       :style=`{
         position: 'absolute', zIndex: 3000,
+        left: '0px',
         bottom: '0px',
-        borderRadius: '0 0 10px 10px',
+        //- borderRadius: '0 0 8px 8px',
+        borderRadius: '10px',
         userSelect: 'none',
+        background: 'rgba(0,0,0,0.5)',
+        paddingLeft: '12px',
+        paddingRight: '12px',
       }`
-      ).row.full-width.items-center.content-center.q-pa-sm
+      ).row.full-width.items-center.content-center
       div(
+        @click="contextClick()"
+        :style=`{
+          overflow: 'hidden',
+        }`
+        ).col
+        .row.full-width.items-center.content-center
+          q-icon(name="select_all" color="grey-4" size="16px").q-ma-xs
+          small.text-grey-4 {{contentKalpa.name.slice(0,40) }}
+      div(
+        v-if="player && player.duration"
+        :style=`{
+        }`
+        ).row.items-center.content-center.q-pa-xs
+        small(:style=`{borderRadius: '8px'}`).text-grey-4.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
+        q-btn(
+          @click="player.setState('muted', !player.muted)"
+          round flat dense size="sm"
+          :color="player.muted ? 'red' : 'white'"
+          :icon="player.muted ? 'volume_off' : 'volume_up'"
+          :style=`{
+          }`)
+      //- div(
+        v-if="options.showContext"
         @click="contextClick()"
         :style=`{
           background: 'rgba(0,0,0,0.5)',
@@ -97,7 +125,28 @@ div(
         }`
         ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
         q-icon(name="select_all" color="white" size="16px").q-ma-xs
-        span.text-white Источник
+        //- small.text-white Контекст
+        small.text-white {{contentKalpa.name.slice(0,40) }}
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="options.mode === 'feed' && !isMini"
+      :style=`{
+        position: 'absolute', zIndex: 3000,
+        bottom: '0px',
+        borderRadius: '0 0 10px 10px',
+        userSelect: 'none',
+      }`
+      ).row.full-width.items-center.content-center.q-pa-sm
+      div(
+        v-if="options.showContext"
+        @click="contextClick()"
+        :style=`{
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '10px',
+        }`
+        ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
+        q-icon(name="select_all" color="white" size="16px").q-ma-xs
+        span.text-white Контекст
         //- span.text-white {{contentKalpa.name.slice(0,40) }}
       .col
       div(

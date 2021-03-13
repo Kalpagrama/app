@@ -1,5 +1,5 @@
 <template lang="pug">
-div().row.full-width
+div().row.full-width.q-px-sm
   //- div(
     :style=`{
       position: 'sticky', top: '0px', zIndex: 1000,
@@ -76,7 +76,13 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageNodes',
-  props: ['searchString'],
+  // props: ['searchString'],
+  props: {
+    searchString: {
+      type: String,
+      // default: 'tool'
+    }
+  },
   data () {
     return {
     }
@@ -108,10 +114,10 @@ export default {
       //   // res.selector = {...res.selector, ...this.types}
       // }
       // add name filter
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
-      }
+      // if (this.searchString.length > 0) {
+      //   let nameRegExp = new RegExp(this.searchString, 'i')
+      //   res.selector.name = {$regex: nameRegExp}
+      // }
       return res
     },
   }

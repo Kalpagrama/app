@@ -18,10 +18,22 @@
           position: 'absolute', zIndex: 10,
         }`
         ).row.fit
+        //- ===
+        //- idle
+        img(
+          v-if="['idle', 'essence'].includes(stage)"
+          draggable="false"
+          :src="fileSrc"
+          :style=`{
+            objectFit: 'cover',
+            borderRadius: '10px',
+          }`).fit
+        //- ===
+        //- editing
         image-cropper(
-          v-if="!src"
+          v-if="stage === 'editing'"
           ref="imageCropper"
-          :src="src || fileSrc"
+          :src="fileSrc"
           :options=`{
             background: false,
             background: 'rgb(35,35,35)',
@@ -34,33 +46,66 @@
             overflow: 'hidden',
           }`
           ).fit
-        img(
-          v-if="src"
-          :src="src"
+        //- ===
+        //- essence
+        div(
+          v-if="stage === 'essence'"
           :style=`{
-            objectFit: 'contain',
-            background: 'rgb(35,35,35)',
-            borderRadius: '10px',
+            position: 'absolute', zIndex: 2000, bottom: '0px',
           }`
-          ).fit
+          ).row.full-width.justify-center.q-pa-sm
+          node-editor(
+            :contentKalpa="contentKalpa"
+            :player=`{
+              figure: figure,
+            }`
+            :style=`{
+              maxWidth: 400+'px',
+            }`)
+    //- ===
     //- footer
     div(
       :style=`{
       }`
-      ).row.full-width.q-pa-sm
+      ).row.full-width.q-py-sm
       div(
-        v-if="!src"
-        ).row.full-width
-        q-btn(flat dense color="white" no-caps @click="$emit('delete')") Назад
-        .col
-        q-btn(flat dense color="white" no-caps @click="crop()") Далее
-      div(
-        v-else
-        ).row.full-width.items-center.content-center.q-pa-sm
-        q-btn(flat dense color="white" no-caps @click="backToCropper()") Назад
-        .col
-        q-btn(flat desne color="green" no-caps icon-right="check" @click="uploadContent()")
-          span.q-mr-md Зарузить
+        :style=`{
+          borderRadius: '10px',
+        }`
+        ).row.full-width.justify-between.b-40.q-pa-sm
+        //- idle
+        template(v-if="stage === 'idle'")
+          q-btn(
+            @click="$emit('delete')"
+            flat no-caps color="red") Отмена
+          q-btn(
+            @click="stage = 'editing'"
+            :disabled="true"
+            flat no-caps color="white")
+            span.q-mr-sm Редактировать
+          q-btn(
+            @click="stage = 'essence'"
+            :disabled="true"
+            flat no-caps color="white") Создать ядро
+          q-btn(
+            @click="uploadContent()"
+            flat no-caps color="green") Загрузить
+        //- editing
+        template(v-if="stage === 'editing'")
+          q-btn(
+            @click="stage = 'idle'"
+            flat no-caps color="red") Отмена
+          q-btn(
+            @click="stage = 'idle'"
+            flat no-caps color="green") Done
+        //- essence
+        template(v-if="stage === 'essence'")
+          q-btn(
+            @click="stage = 'idle'"
+            flat no-caps color="red") Отмена
+          //- q-btn(
+            @click="nodePublish()"
+            flat no-caps color="green") Опубликов
 </template>
 
 <script>
@@ -69,16 +114,22 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
 
+import nodeEditor from 'pages/app/content/node_creator/node_editor/index.vue'
+
 export default {
   name: 'fromImage',
   props: ['file', 'fileSrc'],
   components: {
     imageCropper,
+    nodeEditor,
   },
   data () {
     return {
+      essence: '',
       src: null,
       srcBlob: null,
+      stage: 'idle', // idle, editing, essence, (uploading, publishing, loading)
+      figure: [{t: null, points: []}]
     }
   },
   computed: {
@@ -103,10 +154,10 @@ export default {
     async uploadContent () {
       this.$log('uploadContent')
       // check confirm
-      let confirmed = confirm(this.uploadContentConfirmMessage)
-      if (!confirmed) return
+      // let confirmed = confirm(this.uploadContentConfirmMessage)
+      // if (!confirmed) return
       // get contentKalpa by file
-      let contentKalpa = await ContentApi.contentCreateFromFile(this.srcBlob)
+      let contentKalpa = await ContentApi.contentCreateFromFile(this.file)
       this.$log('contentKalpa', contentKalpa)
       // check bookmark with contentKalpa.oid
       let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
@@ -131,6 +182,9 @@ export default {
       }
       // go to this content...
       this.$router.push('/content/' + contentKalpa.oid)
+    },
+    nodePublish () {
+      this.$log('nodePublish')
     }
   }
 }

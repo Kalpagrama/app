@@ -28,7 +28,7 @@
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countStat.countShares || '' }}
     //- micronodes/comments
-    div(
+    //- div(
       v-if="node.items.length === 1"
       ).col
       .row.full-width
@@ -43,7 +43,7 @@
             small.text-grey-9 {{ node.countComments || '' }}
     node-vote-ball(:node="node" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
     //- joints/chains
-    router-link(
+    //- router-link(
       v-if="node.items.length === 1"
       :to="'/graph/'+node.oid"
       ).col

@@ -12,6 +12,7 @@
     }`
     ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
     slot
+    //- frame
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="itemActive && !itemIndependent"
@@ -27,6 +28,7 @@
           //- borderRadius: '0px 0px 10px 10px',
         }`
         ).row.fit
+    //- ===
     //- vertices
     div(
       v-if="joint && rowActive"
@@ -77,6 +79,7 @@
               span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex === 0 ? 1 : 0]).name }}
             .row.full-width.justify-center
               span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex]).name }}
+    //- ===
     //- node
     node-feed(
       v-if="item.type === 'NODE'"
@@ -88,10 +91,28 @@
       :style=`{
         zIndex: 200,
       }`)
+    //- ===
+    //- composition
+    composition(
+      v-else-if="item.__typename === 'Composition'"
+      :composition="item"
+      :isActive="itemActive"
+      :isVisible="itemActive"
+      :isMini="false"
+      :styles=`{}`
+      :options=`{
+        loop: true,
+        //- nodeOid: node.oid,
+        footerOverlay: true,
+        showBar: false,
+        showHeader: true,
+        showFooter: true,
+        mode: 'feed',
+      }`)
+    //- TODO: sphere
+    //- TODO: user
+    //- ===
     //- content
-    //- sphere
-    //- user
-    //- fallback preview
     div(
       v-else-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
       :style=`{
@@ -99,25 +120,37 @@
         zIndex: 200,
       }`
       ).row.full-width
-      router-link(
-        :to="'/content/'+item.oid"
+      div(
         :style=`{
           position: 'absolute', zIndex: 200,
           bottom: '0px',
           overflow: 'hidden',
         }`
-        ).row.full-width.items-center.content-center.justify-center.no-wrap.q-pa-sm
-        q-icon(name="select_all" color="white" size="30px")
-        .col
-          span.text-white.text-bold {{ item.name }}
+        ).row.full-width.items-center.content-center.justify-start.q-pa-sm
+        //- slot(name="context")
+        div(
+          :style=`{
+            background: 'rgba(0,0,0,0.5)',
+            borderRadius: '10px',
+          }`
+          ).row.items-center.content-center.q-pa-sm
+          slot(name="context")
+          router-link(
+            :to="'/content/'+item.oid"
+            ).row.items-center.content-center
+            q-icon(name="select_all" color="white" size="18px").q-mr-xs
+            .col
+              span.text-white.text-bold {{ item.name }}
       img(
         :src="item.thumbUrl"
         :style=`{
           borderRadius: '10px',
           //- maxHeight: '500px',
+          objectFit: 'contain',
         }`
         ).full-width
-    //- other
+    //- ===
+    //- fallback preview
     div(
       v-else
       :style=`{
@@ -131,6 +164,7 @@
           maxHeight: '500px',
         }`
         ).full-width
+    //- ===
     //- actions
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -150,6 +184,7 @@
           :style=`{
             zIndex: 100,
           }`)
+  //- ===
   //- next items
   div(
     v-if="itemActive && jointsRes && !itemIndependent"

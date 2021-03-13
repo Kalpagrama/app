@@ -1,14 +1,16 @@
 <template lang="pug">
 div(
-  @click.self="$emit('close')"
+  :style=`{
+    height: height+'px',
+  }`
   ).column.full-width
   //- header
   .row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: 600+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageWidthMedi+'px'}`).row.full-width
       //- title
       .row.full-width.items-center.content-center.q-pa-sm
         .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
       //- tabs
       .row.full-width.q-px-sm
@@ -32,21 +34,20 @@ div(
           borderRadius: '10px',
         }`
         ).full-width.b-40
-  //- body
+  //- bodys
   div(
-    @click.self="$emit('close')"
     ).col.full-width.scroll
-    .row.full-width.justify-center.q-pa-sm
+    .row.full-width.justify-center
       component(
         v-bind="$props"
         :is="`page-${pageId}`"
+        :height="height-150"
         :searchString="searchStringLocal"
         :page="page"
         :style=`{
-          maxWidth: 600+'px',
-        }`)
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
+          maxWidth: $store.state.ui.pageWidthMedi+'px',
+        }`
+        @item="$emit('item', $event)")
 </template>
 
 <script>
@@ -56,20 +57,23 @@ import { UserApi } from 'src/api/user'
 export default {
   name: 'kalpaFinder',
   props: {
+    height: {
+      type: Number,
+      required: true,
+    },
     pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
     pages: {type: Object},
     searchString: {type: String},
-    title: {
+    headerTitle: {
       type: String,
       default: 'Выбрать элемент для связи'
     }
   },
   components: {
-    // pageContent: () => import('./page_content/index.vue'),
     pageWorkspace: () => import('./page_workspace/index.vue'),
-    pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
+    pageSearch: () => import('./page_search/index.vue'),
     pageNodes: () => import('./page_nodes/index.vue'),
     pageWeb: () => import('./page_web/index.vue'),
     pageGif: () => import('./page_gif/index.vue'),
@@ -87,12 +91,11 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'nodes', name: 'Мои ядра', component: 'page-nodes'},
         {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
-        {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
-        {id: 'content', name: 'Загрузки', component: 'page-content'},
+        {id: 'search', name: 'Поиск', component: 'page-search'},
+        {id: 'nodes', name: 'Мои ядра', component: 'page-nodes'},
+        {id: 'web', name: 'Web', component: 'page-web'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
-        // {id: 'web', name: 'Web', component: 'page-web'},
       ].filter(p => {
         if (this.pages) {
           return this.pages[p.id]

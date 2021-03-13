@@ -55,7 +55,12 @@ div(
 <script>
 export default {
   name: 'bookmarkEditor',
-  props: ['bookmark'],
+  props: {
+    bookmark: {
+      type: Object,
+      required: true,
+    }
+  },
   data () {
     return {
     }

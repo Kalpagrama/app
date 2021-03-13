@@ -420,6 +420,7 @@ export default {
       }
     },
     'player.figure': {
+      immediate: true,
       async handler (to, from) {
         this.$log('player.figure TO', to)
         if (to) {

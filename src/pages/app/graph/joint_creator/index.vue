@@ -4,13 +4,36 @@ div(
     //- position: 'relative',
   }`
   ).row.full-width.items-start.content-start.justify-center.b-30
+  //- item finder
   q-dialog(
+    @hide="$emit('blurred')"
     v-model="itemFinderShow"
+    position="bottom"
     :maximized="true")
-    item-finder(
-      :joint="joint"
+    kalpa-finder(
+      :height="$q.screen.height"
+      :pages=`{
+        nodes: {views: ['all']},
+        workspace: {views: ['node', 'media']},
+        search: {views: ['default']},
+        gif: {views: ['popular']},
+      }`
       @item="itemFound"
-      @close="itemFinderShow = false")
+      @close="itemFinderShow = false"
+      ).b-30
+  //- item editor
+  q-dialog(
+    @hide="$emit('blurred')"
+    v-model="itemEditorShow"
+    position="bottom"
+    :maximized="true")
+    item-editor(
+      v-if="joint.items[1]"
+      :joint="joint"
+      :item="joint.items[1]"
+      @remove="itemRemove"
+      @close="itemEditorShow = false")
+  //- what?
   div(
     :style=`{
       position: 'relative',
@@ -18,6 +41,7 @@ div(
       minHeight: 500+'px',
     }`
     ).row.full-width.items-start.content-start.b-30
+    //- frame ???
     div(
       :style=`{
         position: 'absolute', zIndex: 100, top: '0px', left: '0px',
@@ -29,46 +53,62 @@ div(
       }`
       ).row.fit
     vertex-editor(:joint="joint")
-    //- item finder
+    //- item finder start
     div(v-if="!joint.items[1]").row.full-width.q-pa-sm
       q-btn(
         @click="itemFinderShow = true"
-        flat color="white" no-caps icon="add" size="md" stack
+        flat color="white" no-caps icon="add" size="lg" stack
         :style=`{
           minHeight: '300px',
         }`
-        ).full-width.b-40 Выбрать элемент для связи
-      //- item-finder(
-        :joint="joint"
-        @item="itemFound")
+        ).full-width.b-40
+        span(:style=`{fontSize: '18px'}`) Выбрать элемент для связи
     //- item found: viewer
     div(
       v-if="joint.items[1]"
+      :style=`{
+        position: 'relative',
+      }`
       ).row.full-width
-      joint-item(
+      item-preview(:item="joint.items[1]")
+      //- joint-item(
         :item="joint.items[1]"
         :itemActive="true"
         :itemIndependent="true")
-      .row.full-width.justify-center.q-py-md.q-px-xl
+        template(v-slot:context)
+          //- content fragmenter
+          div(
+            v-if="['VIDEO'].includes(joint.items[1].type)"
+            :style=`{
+            }`
+            ).row.full-width.q-pb-sm
+            q-btn(
+              @click="contentFragmentStart()"
+              outline no-caps color="green" dense
+              ).q-px-sm Выделить фрагмент
+      //- footer actions
+      div(
+        :style=`{
+          marginBottom: '300px',
+        }`
+        ).row.full-width.justify-center.q-py-md.q-px-sm
         .row.full-width.justify-center
           q-btn(
-            @click="jointPublish"
-            color="green" no-caps
-            :loading="jointPublishing"
+            flat color="white" icon="edit"
             :style=`{
-              height: '60px',
-              maxWidth: '300px',
-            }`).full-width
-            span.text-bold Добавить связь
-        .row.full-width.justify-center.q-pt-sm
-          q-btn(
-            @click="itemDelete"
-            outline color="red-6" no-caps
-            :style=`{
-              height: '40px',
-              maxWidth: '300px',
-            }`).full-width
-            span.text-bold Изменть элемент
+              width: '50px',
+              height: '50px',
+            }`
+            @click="itemEditorShow = true")
+          .col.q-pl-sm
+            q-btn(
+              @click="jointPublish"
+              color="green" no-caps
+              :loading="jointPublishing"
+              :style=`{
+                height: '50px',
+              }`).full-width
+              span.text-bold Опубликовать
 </template>
 
 <script>
@@ -77,16 +117,19 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
 import vertexEditor from './vertex_editor.vue'
-import itemFinder from './item_finder.vue'
-import jointItem from '../joints_row/joint_item.vue'
+// import jointItem from '../joints_row/joint_item.vue'
+import itemEditor from './item_editor/index.vue'
+import itemPreview from './item_preview/index.vue'
 
 export default {
   name: 'jointCreator',
   props: ['item', 'maxWidth'],
   components: {
     vertexEditor,
-    itemFinder,
-    jointItem,
+    // jointItem,
+    // contentFragmenter,
+    itemEditor,
+    itemPreview,
   },
   data () {
     return {
@@ -100,6 +143,8 @@ export default {
       },
       jointPublishing: false,
       itemFinderShow: false,
+      // contentFragmenterShow: false,
+      itemEditorShow: false,
     }
   },
   watch: {
@@ -117,13 +162,14 @@ export default {
   methods: {
     itemFound (item) {
       this.$log('itemFound', item)
-      // this.joint.items[1] = item
-      this.itemFinderShow = false
       this.$set(this.joint.items, 1, item)
+      // this.itemEditorShow = true
+      this.itemFinderShow = false
     },
-    itemDelete () {
-      this.$log('itemDelete')
+    itemRemove () {
+      this.$log('itemRemove')
       this.$delete(this.joint.items, 1)
+      this.itemEditorShow = false
     },
     async jointPublish () {
       try {
@@ -144,10 +190,13 @@ export default {
         }
         // handle GIF
         if (jointInput.items[1].type === 'GIF' && !jointInput.items[1].oid) {
+          this.$log('jointPublish GIF processing...')
           let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
+          this.$log('jointPublish contentKalpa', contentKalpa)
           jointInput.items[1].oid = contentKalpa.oid
         }
         // create...
+        this.$log('jointInput', jointInput)
         let jointCreated = await ObjectCreateApi.essenceCreate(jointInput)
         this.$log('jointPublish jointCreated', jointCreated)
         // done? emit? close?
@@ -160,10 +209,6 @@ export default {
         this.jointPublishing = false
       }
     },
-  },
-  mounted () {
-    this.$log('mounted')
-    // this.joint.items[0] = this.item
   }
 }
 </script>

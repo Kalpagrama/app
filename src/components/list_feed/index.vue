@@ -64,7 +64,9 @@ div(
           //- q-tooltip Дебаг вкл/выкл
         q-btn(
           @click="positionDrop()"
-          round flat dense color="white" icon="vertical_align_top").full-width
+          :color="itemsRes.hasPrev ? 'white' : 'red'"
+          :disabled="!itemsRes.hasPrev"
+          round flat dense icon="vertical_align_top").full-width
           //- q-tooltip В начало
         q-btn(
           @click="prev()"
@@ -104,7 +106,7 @@ div(
   div(
     v-if="!itemsRes"
     :style=`{
-      height: scrollTargetHeight+'px',
+      height: scrollTargetHeight/2+'px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
@@ -124,7 +126,7 @@ div(
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
+      q-spinner-dots(color="green" size="60px")
     //- item wrapper
     div(
       v-for="(item, itemIndex) in itemsRes.items"
@@ -154,11 +156,11 @@ div(
     div(
       v-if="itemsResStatus === 'NEXT'"
       :style=`{
-        position: 'absolute', top: '0px', zIndex: 10000,
+        position: 'absolute', bottom: '0px', zIndex: 10000,
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
+      q-spinner-dots(color="green" size="60px")
   slot(name="append")
   div(
     v-if="appendShow"
@@ -333,7 +335,7 @@ export default {
 
           // END of scrollHeightChanging
           this.$log('scrollHeight END')
-          this.itemMiddleScrollIntoView('scrollHeight END')
+          // this.itemMiddleScrollIntoView('scrollHeight END')
           // handle prev..
           if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
             // alert('Initial prev...')

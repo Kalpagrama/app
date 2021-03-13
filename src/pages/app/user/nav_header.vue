@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width.justify-center.b-30.q-pt-sm
-  //- user thumbUrl cover ?
+.row.full-width.justify-center.b-30
+  //- TODO: user thumbUrl cover ?
   div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     div(
       :style=`{
@@ -12,67 +12,69 @@
         :src="user.profile.photoUrl"
         :style=`{
           objectFit: 'cover',
-          borderRadius: '10px',
         }`
         ).fit
-      q-btn(
-        @click="$router.back()"
-        round flat color="white" icon="west"
+      div(
         :style=`{
-          position: 'absolute', zIndex: 200, top: '8px', left: '8px',
-        }`)
-      kalpa-menu-actions(
-        :title="user.name"
-        :actions="actions" icon="more_vert"
-        color="white"
-        :style=`{
-          position: 'absolute', zIndex: 200, top: '8px', right: '8px',
-        }`).q-mr-xs
+          position: 'absolute', zIndex: 200, top: '0px',
+          paddingTop: 'calc(8px + env(safe-area-inset-top))',
+        }`
+        ).row.full-width.justify-between.q-px-sm
+        q-btn(
+          @click="$router.back()"
+          round flat color="white" icon="west"
+          )
+        kalpa-menu-actions(
+          :title="user.name"
+          :actions="actions" icon="more_vert"
+          color="white"
+          )
       div(
         :style=`{
           position: 'absolute', bottom: '0px', zIndex: 90, transform: 'translate3d(0,0,0)', height: '100%',
           background: 'rgba(0,0,0,0.5)',
           overflow: 'hidden', pointerEvents: 'none',
-          borderRadius: '10px',
         }`).row.full-width
     //- header
     div(
       :style=`{
         position: 'relative', zIndex: 100,
         minHeight: '60px',
-        borderRadius: '10px',
-        marginTop: '-20px',
+        borderRadius: '20px',
+        marginTop: '-30px',
         paddingTop: '0px',
       }`
       ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
       //- header: back, avatar, name, rating
-      div(:style=`{height: '60px',}`).row.full-width.items-center.content-center.justify-between
+      div(:style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-between
         user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
         .col
           span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
           .row.full-width.q-px-sm
-            //- small(:style=`{lineHeight: 0.9}`).text-grey-4 @{{ user.username || user.oid }}
+            small(:style=`{lineHeight: 0.9}`).text-grey-4 @username
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
             v-if="followingConfirmed && !itsMe"
             @click="followingToggle()"
             outline no-caps
-            :color="following ? 'red' : 'green'")
+            :color="following ? 'red' : 'green'"
+            :style=`{
+              borderRadius: '30px',
+            }`)
             span {{ following ? 'Отписаться' : 'Подписаться' }}
       //- about user
-      .row.full-width.q-px-sm.q-pb-sm
+      .row.full-width.q-px-sm
         div(
           v-if="user.profile.status"
           ).row.full-width
           p.text-grey-2 {{ user.profile.status }}
-        //- stat fields, TODO: add countSubsribers, countSubsriptions, countWeight...
+        //- stat fields
         .row.full-width.q-pb-sm
           //- weight
-          //- :to="'/user/'+$store.getters.currentUser().oid"
           div(
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.weightVal }}
-            small.text-grey-7.q-mr-md Рейтинг
+            small.text-grey-7.q-mr-md K
           //- following
           router-link(
             :to=`{params: {page: 'following'}}`

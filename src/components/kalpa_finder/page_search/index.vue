@@ -24,41 +24,6 @@ q-page(
               'b-40': type && type.id === t.id
             }`
             :style=`{}`).q-mr-xs.q-px-xs {{ t.name }}
-  //- body
-  //- kalpa-loader(
-    v-if="searchString.length > 3"
-    :immediate="true"
-    :query="query" :limit="1000" v-slot=`{items,next,nexting}`)
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
-      }`
-      ).row.full-width.items-start.content-start.q-pa-sm
-      router-link(
-        v-for="(item,ii) in items" :key="ii"
-        :to="itemLink(item)"
-        :style=`{
-          borderRadius: '10px',
-          background: 'rgb(35,35,35)',
-        }`
-        ).row.full-width.q-mb-sm.cursor-pointer
-        div(
-          :style=`{
-            background: 'rgb(33,33,33)',
-            borderRadius: '10px',
-          }`
-          ).row.items-start.content-start
-          img(
-            :src="item.thumbUrl"
-            :style=`{
-              height: '50px',
-              borderRadius: '10px',
-            }`)
-        .col
-          .row.full-width.items-center.content-center.q-pa-sm
-            span.text-white {{ item.name }}
-            .row.full-width
-              small.text-grey-6 {{ item.type }}
 </template>
 
 <script>

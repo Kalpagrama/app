@@ -35,8 +35,8 @@ q-layout(view="hHh Lpr lff")
       q-btn(
         v-if="jointCreatorShow"
         @click="jointCreateCancel()"
-        round color="white" icon="clear" flat
-        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+        flat no-caps color="white"
+        :style=`{height: '50px', borderRadius: '50%',}`) Отмена
       .col
       kalpa-menu-popup-global(
         v-if="!jointCreatorShow"

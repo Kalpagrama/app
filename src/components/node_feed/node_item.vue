@@ -33,6 +33,7 @@ div(
         showBar: false,
         showHeader: true,
         showFooter: true,
+        showContext: true,
         mode: 'feed',
       }`)
 //- composition(

@@ -1,13 +1,23 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff" @scroll="onScroll")
+q-layout(
+  view="hHh lpR fFf"
+  @scroll="onScroll")
   //- nav-tabs(
     v-if="user && scrollPosition > 265"
     :tabs="tabs"
     :style=`{
       position: 'fixed', zIndex: 1000, top: '0px',
     }`)
+  q-header(
+    v-if="user && scrollTop > 300"
+    reveal)
+    nav-tabs(:tabs="tabs")
   q-page-container
-    q-page.row.full-width.justify-center
+    q-page(
+      :style=`{
+        //- paddingTop: '300px',
+      }`
+      ).row.full-width.justify-center
       component(
         v-if="user"
         :is="`page-${$route.params.page}`"
@@ -16,7 +26,7 @@ q-layout(view="hHh Lpr lff" @scroll="onScroll")
           maxWidth: $store.state.ui.pageWidth+'px',
         }`)
         template(v-slot:prepend)
-          div(v-if="user" :style=`{height: '320px',}`).row.full-width
+          div(v-if="user").row.full-width
             nav-header(:user="user")
             nav-tabs(:tabs="tabs")
 </template>
@@ -48,8 +58,7 @@ export default {
   data () {
     return {
       user: null,
-      scrollPosition: 0,
-      // pageId: 'nodes',
+      scrollTop: 0,
     }
   },
   computed: {
@@ -78,7 +87,7 @@ export default {
   methods: {
     onScroll (e) {
       // this.$log('onScroll', e.position)
-      this.scrollPosition = e.position
+      this.scrollTop = e.position
     }
   },
   mounted () {
