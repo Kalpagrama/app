@@ -4,7 +4,7 @@ q-layout(
   container
   :style=`{
     height: $q.screen.height+'px',
-  }`).b-30.br
+  }`).b-30
   //- item creator
   q-dialog(
     v-model="itemCreatorShow"

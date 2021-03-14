@@ -4,7 +4,7 @@ q-layout(
   container
   :style=`{
     height: $q.screen.height+'px',
-  }`).b-30.br
+  }`).b-30
   q-header(reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width

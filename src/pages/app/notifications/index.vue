@@ -4,7 +4,7 @@ q-layout(
   container
   :style=`{
     height: $q.screen.height+'px',
-  }`).b-30.br
+  }`).b-30
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width

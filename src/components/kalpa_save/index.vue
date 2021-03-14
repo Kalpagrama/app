@@ -17,13 +17,16 @@ q-btn(
       :style=`{
         position: 'relative',
         borderRadius: '20px 20px 0 0',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
       }`
       ).row.full-width.q-px-sm.q-pt-sm.b-40
       q-btn(
         flat no-caps color="white" align="left"
+        :style=`{
+          height: '50px',
+        }`
         @click="saveBookmark()"
-        ).full-width
+        ).full-width.q-mb-md
         span.text-white {{ $tt('Save to collection') }}
   //- edit bookmark...
   q-dialog(
@@ -67,8 +70,9 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('isActive TO', to)
-        // is we got this bookmark
-        this.bookmark = await this.getBookmark()
+        if (to) {
+          this.bookmark = await this.getBookmark()
+        }
       }
     }
   },

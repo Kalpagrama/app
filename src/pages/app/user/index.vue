@@ -5,7 +5,7 @@ q-layout(
   :style=`{
     height: $q.screen.height+'px',
   }`
-  @scroll="onScroll").b-30.br
+  @scroll="onScroll").b-30
   q-header(
     v-if="user && scrollTop > 300"
     reveal)

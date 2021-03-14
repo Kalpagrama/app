@@ -4,38 +4,32 @@ div(
     position: 'relative',
     overflow: 'hidden',
   }`
-  ).row.full-width.items-center.content-center.q-pa-sm
-  //- actions
-  kalpa-menu-actions(
-    :title="node.name"
-    :actions="actions" icon="more_vert"
-    :style=`{
-      position: 'absolute', top: '8px', left: '18px', zIndex: 100,
-    }`)
-  div().col
+  ).row.full-width.items-center.content-center.justify-between.q-pa-sm
+  //- div().col
   //- wrapper of 3 main actions
-  div(:style=`{marginLeft: '-6px',}`).row
-    //- share
-    .row.items-center.content-center.q-px-sm
-      small(:style=`{marginRight: '-8px',}`).text-grey-9 12
-      q-btn(
-        round flat color="grey-9")
-        q-icon(name="logout").rotate-270
-    //- save
-    .row.items-center.content-center.q-px-sm
-      small(:style=`{marginRight: '-8px',}`).text-grey-9 12
-      kalpa-save(
-        color="grey-9"
-        :dense="false"
-        :item="node"
-        :isActive="isActive")
-    //- discuss link
-    .row.items-center.content-center.q-px-sm
-      small(:style=`{marginRight: '-8px',}`).text-grey-9 12
-      q-btn(
-        round flat color="grey-9")
-        q-icon(name="fas fa-link" size="20px")
-  div().col
+  //- div(:style=`{marginLeft: '-6px',}`).row
+  //- share
+  .row.items-center.content-center.q-px-sm
+    q-btn(
+      round flat color="grey-9")
+      q-icon(name="logout").rotate-270
+    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews - 1 }}
+  //- save
+  .row.items-center.content-center.q-px-sm
+    kalpa-save(
+      color="grey-9"
+      :dense="false"
+      :item="node"
+      :isActive="isActive")
+    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews }}
+  //- discuss link
+  .row.items-center.content-center.q-px-sm
+    q-btn(
+      round flat color="grey-9")
+      q-icon(name="fas fa-link" size="20px")
+    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countJoints }}
+  .row.items-center.content-center.q-px-sm
+    div(:style=`{width: '42px',}`)
   //- vote
   div(
     :class=`{
@@ -63,9 +57,16 @@ div(
       ).row.items-center.content-center
       .row.items-center.content-center
         .row.full-width.justify-end
-          div(:style=`{width: '10px', height: '10px', borderRadius: '5px',}`).bg-purple
+          div(
+            v-if="node.rateUser !== null"
+            :style=`{
+              width: '10px', height: '10px', borderRadius: '5px',
+              background: $rateMeta.find(r => node.rateUser >= r.valueMin && node.rateUser < r.valueMax).color,
+            }`)
         .row.full-width.justify-end
-          small(:style=`{lineHeight: 1.5}`).text-white 1M
+          small(
+            v-if="node.rateUser !== null"
+            :style=`{lineHeight: 1.5,marginRight: '2px'}`).text-white {{ node.countVotes }}
       vote-ball(
         :node="node"
         @click.native="votesShow = true")
@@ -79,8 +80,6 @@ div(
 </template>
 
 <script>
-import { ObjectApi } from 'src/api/object'
-
 import voteBall from './vote_ball.vue'
 import voteOptions from './vote_options.vue'
 
@@ -114,50 +113,6 @@ export default {
     },
   },
   computed: {
-    actions () {
-      let res = {
-        copyLink: {
-          name: this.$tt('Copy Link'),
-          cb: async () => {
-            this.$log('copyLink')
-            // TODO: handle copy link...
-          }
-        }
-      }
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
-        return res
-      }
-      if (this.nodeIsMine) {
-        res.delete = {
-          // name: i18n.t('Delete', 'Удалить'),
-          name: this.$tt('Delete'),
-          color: 'red',
-          cb: async () => {
-            this.$log('nodeDelete...')
-            await ObjectApi.unPublish(this.node.oid)
-          }
-        }
-      }
-      else {
-        res.hide = {
-          name: this.$tt('Hide'),
-          color: 'white',
-          cb: async () => {
-            this.$log('hide...')
-            await this.$rxdb.hideObjectOrSource(this.node.oid, null)
-          }
-        }
-        res.report = {
-          name: this.$tt('Report'),
-          color: 'red',
-          cb: () => {
-            this.$log('report...')
-            let reason = prompt(this.$tt('Why?'))
-          }
-        }
-      }
-      return res
-    }
   }
 }
 </script>

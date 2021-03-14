@@ -16,11 +16,10 @@ div(
         height: '34px',
         background: r.colorBackground,
         borderRadius: getRadius(ri),
-        //- overflow: 'hidden',
       }`
       @click="vote(r.value)"
-      ).row.items-center.content-center.q-px-sm
-      small(:style=`{whiteSpace: 'nowrap'}`).text-white {{ r.name }}
+      ).row.items-center.content-center.q-px-sm.cursor-pointer
+      small(:style=`{whiteSpace: 'nowrap',pointerEvents: 'none'}`).text-white {{ r.name }}
       div(
         v-if="voteVoting === r.value"
         :style=`{
@@ -53,7 +52,7 @@ export default {
       try {
         this.$log('vote', val)
         this.voteVoting = val
-        await this.$wait(1500)
+        // await this.$wait(1500)
         let res = await ObjectApi.vote(this.node.oid, val)
         this.$log('vote done', res)
         this.voteVoting = null

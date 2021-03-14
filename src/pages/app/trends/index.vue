@@ -4,7 +4,7 @@ q-layout(
   container
   :style=`{
     height: $q.screen.height+'px',
-  }`).b-30.br
+  }`).b-30
   q-footer(v-if="$q.screen.lt.md")
     kalpa-menu-mobile
   q-header(
@@ -19,9 +19,9 @@ q-layout(
           .col
             q-input(
               v-model="searchString"
-              placeholder="Поиск"
               flat borderless dark
               icon="search"
+              :placeholder="$tt('Type here to search...')"
               :debounce="500"
               :style=`{}`
               :input-style=`{
