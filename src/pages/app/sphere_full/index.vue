@@ -1,10 +1,10 @@
 <template lang="pug">
-div(
-  v-if="sphere"
+q-layout(
+  view="hHh lpR fFf"
+  container
   :style=`{
-    position: 'relative',
-  }`
-  ).row.full-width
+    height: $q.screen.height+'px',
+  }`).b-30.br
   //- item creator
   q-dialog(
     v-model="itemCreatorShow"
@@ -25,61 +25,63 @@ div(
         borderRadius: '50%',
       }`
       @click="itemCreatorShow = true")
-  //- header
-  //- sphere + spheres close
-  .row.full-width.justify-center
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
-      }`
-      ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-      q-btn(
-        round flat color="white" icon="west"
-        @click="$routerKalpa.back()")
-      .col.full-height
-        .row.full-width.justify-center
-          span(:style=`{fontSize: '22px',}`).text-white.text-bold {{ sphere.name }}
-      q-btn(
-        round flat color="white" icon="more_vert"
-        @click="sphereActionsShow = true")
-  //- fragments slider
-  div(
-    v-if="sphereNodes"
-    ).row.full-width.scroll
-    .row.full-width.items-start.content-start.justify-center
-      .row.full-width.items-start.content-start.justify-center.no-wrap
+  q-page-container
+    q-page(v-if="sphere")
+      //- header
+      //- sphere + spheres close
+      .row.full-width.justify-center
         div(
-          v-for="(node,nodeIndex) in sphereNodes.items" :key="node.oid"
           :style=`{
-            position: 'relative',
             maxWidth: $store.state.ui.pageWidth+'px',
-            //- minWidth: $store.state.ui.pageWidth+'px',
-            paddingBottom: $q.screen.height/2+'px',
           }`
-          ).row.full-width.items-start.content-start
-          //- item wrapper
-          div(
-            v-observe-visibility=`{
-              throttle: 150,
-              callback: nodeVisibilityCallback
-            }`
-            ).row.full-width.items-start.content-start
-            node-feed(
-              :node="node.populatedObject"
-              :isActive="nodeIsVisible"
-              :isVisible="nodeIsVisible"
-              :showName="false"
-              )
-          //- item links
-          item-links(
-            :oid="node.populatedObject.oid"
-            @loaded="itemLinksLoaded = true"
-            @empty="itemLinksEmpty = true")
-          //- item links empty!
-          div(
-            v-if="itemLinksEmpty"
-            ).row.full-width.items-center.content-center.justify-center.q-pa-xl
-            span.text-white No links here, be first one!
+          ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+          q-btn(
+            round flat color="white" icon="west"
+            @click="$routerKalpa.back()")
+          .col.full-height
+            .row.full-width.justify-center
+              span(:style=`{fontSize: '22px',}`).text-white.text-bold {{ sphere.name }}
+          q-btn(
+            round flat color="white" icon="more_vert"
+            @click="sphereActionsShow = true")
+      //- fragments slider
+      div(
+        v-if="sphereNodes"
+        ).row.full-width.scroll
+        .row.full-width.items-start.content-start.justify-center
+          .row.full-width.items-start.content-start.justify-center.no-wrap
+            div(
+              v-for="(node,nodeIndex) in sphereNodes.items" :key="node.oid"
+              :style=`{
+                position: 'relative',
+                maxWidth: $store.state.ui.pageWidth+'px',
+                //- minWidth: $store.state.ui.pageWidth+'px',
+                paddingBottom: $q.screen.height/2+'px',
+              }`
+              ).row.full-width.items-start.content-start
+              //- item wrapper
+              div(
+                v-observe-visibility=`{
+                  throttle: 150,
+                  callback: nodeVisibilityCallback
+                }`
+                ).row.full-width.items-start.content-start
+                node-feed(
+                  :node="node.populatedObject"
+                  :isActive="nodeIsVisible"
+                  :isVisible="nodeIsVisible"
+                  :showName="false"
+                  )
+              //- item links
+              item-links(
+                :oid="node.populatedObject.oid"
+                @loaded="itemLinksLoaded = true"
+                @empty="itemLinksEmpty = true")
+              //- item links empty!
+              div(
+                v-if="itemLinksEmpty"
+                ).row.full-width.items-center.content-center.justify-center.q-pa-xl
+                span.text-white No links here, be first one!
 </template>
 
 <script>

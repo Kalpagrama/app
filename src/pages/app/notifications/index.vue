@@ -1,5 +1,10 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(
+  view="hHh lpR fFf"
+  container
+  :style=`{
+    height: $q.screen.height+'px',
+  }`).b-30.br
   q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)',}`).b-30
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -9,12 +14,14 @@ q-layout(view="hHh Lpr lff")
           }`
           ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
           q-icon(name="notifications_none" color="white" size="30px").q-mx-sm
-          .col
-          span(
-            :style=`{fontSize: '18px', userSelect: 'none'}`
-            ).text-bold.text-white {{$t('pageApp_notifications_title', 'Уведомления')}}
-          .col
-          q-btn(round flat color="grey-8" icon="more_vert")
+          div(
+            @click="headerClick()"
+            ).col
+            .row.full-width.items-center.content-center.justify-center
+              span(
+                :style=`{fontSize: '18px', userSelect: 'none'}`
+                ).text-bold.text-white {{$tt('Activity')}}
+          q-btn(round flat color="white" icon="more_vert")
   q-footer(v-if="$q.screen.lt.md")
     kalpa-menu-mobile
   q-page-container
@@ -82,6 +89,11 @@ export default {
         },
         populateObjects: false,
       }
+    }
+  },
+  methods: {
+    headerClick () {
+      this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
     }
   },
 }

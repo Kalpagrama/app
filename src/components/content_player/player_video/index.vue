@@ -12,7 +12,6 @@ div(
     ).row.text-white.bg-green
     small {{ figureOffset }}
   player-tint(
-    v-if="player"
     v-bind="$props"
     :player="player")
     template(v-slot:tint-bar=`{tintFocused}`)

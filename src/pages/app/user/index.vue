@@ -1,7 +1,11 @@
 <template lang="pug">
 q-layout(
   view="hHh lpR fFf"
-  @scroll="onScroll")
+  container
+  :style=`{
+    height: $q.screen.height+'px',
+  }`
+  @scroll="onScroll").b-30.br
   q-header(
     v-if="user && scrollTop > 300"
     reveal)

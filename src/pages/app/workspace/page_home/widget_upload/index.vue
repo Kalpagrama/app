@@ -8,14 +8,14 @@
     }`
     ).row.full-width.q-pa-md
     .row.full-width.justify-center.q-py-md
-      span(:style=`{fontSize: '18px',}`).text-white.text-bold Добавить по ссылке
+      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$tt('Add by Link')}}
     div(
       :style=`{borderRadius: '10px',}`
       ).row.full-width.b-40
       q-input(
         v-model="url"
         color="green"
-        placeholder="Вставьте сслыку"
+        :placeholder="$tt('Enter link here')"
         :dark="urlInputFocused"
         :loading="urlLoading"
         :debounce="500"
@@ -34,28 +34,7 @@
         @blur="urlInputFocused = false"
         ).full-width.text-white.b-40
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-md
-      small.text-grey-5 Можно брать из YouTube, Vimeo, Twitter, Instagram.
-      //- small.text-grey-5
-  //- from device
-  //- .row.full-width
-    //- .row.full-width.q-pt-sm.q-px-md
-      //- to="/workspace/create"
-      //- TODO: upload from device !
-      div(:class=`{'q-pr-xs': $q.screen.gt.xs, 'q-mb-sm': $q.screen.xs}`).col-xs-12.col-sm-6
-        q-btn(
-          outline color="grey-8" no-caps
-          :style=`{
-            height: '60px',
-          }`).full-width
-          span.text-grey-6 Загрузить с устройства
-      div(:class=`{'q-pl-xs': $q.screen.gt.xs}`).col-xs-12.col-sm-6
-        q-btn(
-          outline color="grey-8" no-caps
-          :to="'/workspace/create/'"
-          :style=`{
-            height: '60px',
-          }`).full-width
-          span.text-grey-6 Создать
+      small.text-grey-5 {{$tt('You can add from YouTube, Instagram, Vimeo etc')}}
   //- create
   .row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pa-md
@@ -65,7 +44,7 @@
         :style=`{
           height: '60px',
         }`).full-width
-        span.text-grey-6 Создать
+        span.text-grey-6 {{$tt('Create')}}
 </template>
 
 <script>

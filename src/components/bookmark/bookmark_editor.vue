@@ -1,68 +1,86 @@
 <template lang="pug">
 div(
   :style=`{
-    minHeight: '500px',
-    maxWidth: $q.screen.xs ? '100%' : '400px',
-    borderRadius: $q.screen.xs ? '0px' : '10px',
+    position: 'relative',
+    borderRadius: '20px 20px 0 0',
   }`
-  ).column.full-width.items-start.content-start.b-30.q-pa-md
-  .col.full-width.scroll
-    //- thumbUrl(s) and close btn
-    .row.full-width.items-start.content-start
+  ).row.full-width.b-50
+  //- body
+  div(
+    :style=`{
+      zIndex: 10,
+      background: 'rgba(0,0,0,0.5)',
+      borderRadius: '20px 20px 0 0',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+    }`
+    ).row.full-width.q-px-md.q-pt-md
+    .row.full-width
       img(
-        draggable="false"
         :src="bookmark.thumbUrl"
         :style=`{
-          height: '100px',
-          maxWidth: '200px',
+          height: '60px',
+          maxWidth: '180px',
+          objectFit: 'contain',
           borderRadius: '10px',
-        }`)
+        }`).b-50
       .col
-      q-btn(
-        @click="$emit('close')"
-        round flat color="grey-8" icon="clear")
+        div(:style=`{marginTop: '-10px'}`).row.full-width.justify-end
+          q-btn(
+            round flat color="white"
+            :style=`{
+              height: '70px',
+              width: '70px',
+            }`
+            @click="bookmarkLaunch()"
+            )
+            q-icon(name="launch" size="78px")
     //- name and type
-    .row.full-width.q-pa-sm
-      span.text-white {{ bookmark.name }}
+    .row.full-width.q-py-xs.q-px-sm
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ bookmark.name }}
       .row.full-width
-        small.text-grey-7 {{ bookmarkMeta.type }}
+        small.text-grey-8 {{bookmark.type}} {{$date(bookmark.createdAt)}}
+    //- collections
+    .row.full-width.q-py-xs.q-px-sm
       .row.full-width
-        small.text-grey-7.q-mr-xs Добавлено: {{ $date(bookmark.createdAt, 'DD.MM.YYYY') }}
-      .row.full-width.q-py-xs.q-mt-md
-        q-btn(
-          :to="bookmarkMeta.link"
-          flat dense color="grey-7" icon="launch" no-caps
+        span.text-white {{$tt('Collections:')}}
+      .row.full-width
+        div(
+          v-for="(c,ci) in bookmark.collections" :key="ci"
           :style=`{
-            marginLeft: '-8px',
-          }`)
-          span.q-mx-xs Перейти
-      .row.full-width.q-py-xs
-        q-btn(
-          @click="bookmarkSubscribeToggle()"
-          flat color="red" dense no-caps icon="notifications_off"
-          :style=`{
-            marginLeft: '-8px',
-          }`)
-          span.q-mx-xs Не получать уведомления
-  //- footer: delete
-  .row.full-width.justify-start
-    q-btn(
-      @click="bookmarkDelete()"
-      flat dense color="red" no-caps
-      ).q-px-sm Удалить закладку
+            borderRadius: '10px',
+          }`
+          ).row.q-px-sm.q-py-xs.q-mr-sm.b-40
+          span.text-white {{ c }}
+    //- isSubscribed
+    .row.full-width.items-center.content-center.q-py-xs
+      q-toggle(
+        v-model="bookmark.isSubscribed"
+        dark
+        :label="$tt('Receive updates')"
+        :style=`{color: 'white'}`
+        color="green").full-width
+    //- delete
+    .row.full-width.q-mt-xl
+      q-btn(
+        outline no-caps color="red"
+        :loading="bookmarkDeleting"
+        :style=`{
+          height: '50px',
+        }`
+        @click="bookmarkDelete()"
+        ).full-width
+        span {{ $tt('Delete bookmark') }}
 </template>
 
 <script>
 export default {
   name: 'bookmarkEditor',
   props: {
-    bookmark: {
-      type: Object,
-      required: true,
-    }
+    bookmark: {type: Object, required: true},
   },
   data () {
     return {
+      bookmarkDeleting: false,
     }
   },
   computed: {
@@ -117,18 +135,18 @@ export default {
     },
   },
   methods: {
-    bookmarkSubscribeToggle () {
-      this.$log('bookmarkSubscribeToggle')
-      // this.following = await UserApi.isSubscribed(to.oid)
-    },
-    async bookmarkDelete () {
-      this.$log('bookmarkDelete')
-      await this.bookmark.remove(true)
-      this.$emit('close')
-    },
     bookmarkLaunch () {
       this.$log('bookmarkLaunch')
       this.$router.push(this.bookmarkMeta.link)
+    },
+    async bookmarkDelete () {
+      this.$log('bookmarkDelete start')
+      this.bookmarkDeleting = true
+      await this.$wait(1000)
+      await this.bookmark.remove(true)
+      this.bookmarkDeleting = false
+      this.$log('bookmarkDelete done')
+      this.$emit('deleted')
     },
   }
 }

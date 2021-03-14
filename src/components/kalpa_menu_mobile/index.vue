@@ -3,33 +3,33 @@
   div(
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
-      borderRadius: '10px 10px 0 0',
+      borderRadius: '20px 20px 0 0',
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
-    ).row.full-width.justify-between.b-40.q-px-sm.q-pt-sm
+    ).row.full-width.justify-between.b-50.q-px-sm.q-pt-sm
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"
       :to="'/feeds/all'"
-      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'white'"
+      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`
       ).row.items-center.content-center.justify-center
       .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) Лента
+        span(:style=`{whiteSpace: 'nowrap'}`) {{$tt('Feed')}}
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat icon="search" no-caps
       :to="'/trends'"
-      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'white'"
+      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
       .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) Поиск
+        span(:style=`{whiteSpace: 'nowrap'}`) {{$tt('Search')}}
     //- workspace
     div(
       :style=`{
@@ -46,17 +46,18 @@
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="notifications_none"
       :to="'/notifications/'"
-      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'white'"
+      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
       //- TODO: handle new notifications...
-      //- q-badge(color="red" floating transparent) •
+      q-badge(color="red" floating transparent) •
       .row.full-width.justify-center
-        span Активность
+        span {{$tt('Activity')}}
         //- span Уведомления
     kalpa-menu-popup-global(
+      color="grey-7"
       :styles=`{
         width: size+'px',
         height: size+'px',

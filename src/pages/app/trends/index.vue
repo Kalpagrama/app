@@ -1,5 +1,10 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(
+  view="hHh lpR fFf"
+  container
+  :style=`{
+    height: $q.screen.height+'px',
+  }`).b-30.br
   q-footer(v-if="$q.screen.lt.md")
     kalpa-menu-mobile
   q-header(

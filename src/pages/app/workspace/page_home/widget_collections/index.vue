@@ -8,27 +8,27 @@
     ).row.full-width
     //- header
     router-link(
-      to="/workspace/history"
+      to="/workspace/collections"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="history" color="white" size="24px").q-mr-sm
+      q-icon(name="bookmark_outline" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold История
+        span.text-white.text-bold {{$tt('Collections')}}
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="true").row.full-width.no-wrap.q-pa-sm
+      div(v-if="!collectionsRes").row.full-width.no-wrap.q-pa-sm
         div(
-          v-for="n in 8" :key="n"
+          v-for="n in 10" :key="n"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
           }`
           ).row.b-40.q-mr-sm
       //- bookmarks loaded
-      //- div(v-if="bookmarks").row.full-width.no-wrap.q-pa-sm
+      div(v-if="collectionsRes").row.full-width.no-wrap.q-pa-sm
         router-link(
-          v-for="b in bookmarks" :key="b.oid"
-          :to="'/content/'+b.oid"
+          v-for="(c,ci) in collectionsRes.items" :key="b.id"
+          :to="'/collection/'+c.id"
           :style=`{
             height: '50px', width: '58px', minWidth: '58px',
           }`
@@ -37,18 +37,17 @@
             :style=`{
               borderRadius: '10px',
             }`
-            ).row.fit.b-50
+            ).row.fit.b-40
             img(
-              v-if="!bookmarksErrored.includes(b.oid)"
               draggable="false"
-              :src="b.thumbUrl"
+              :src="c.thumbUrl"
               :style=`{
                 objectFit: 'cover',
                 borderRadius: '10px',
               }`
               @error="bookmarksErrored.push(b.oid)"
               ).fit
-            div(
+            //- div(
               v-else
               :style=`{
                 borderRadius: '10px',
@@ -60,27 +59,27 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'widgetHistory',
+  name: 'widgetCollections',
   data () {
     return {
-      bookmarks: null,
-      bookmarksErrored: []
+      collectionsRes: null,
     }
   },
   computed: {
-    // query () {
-    //   let res = {
-    //     selector: {
-    //       rxCollectionEnum: RxCollectionEnum.WS_ANY,
-    //       type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
-    //     },
-    //     limit: 10,
-    //     sort: [{createdAt: 'desc'}]
-    //   }
-    //   return res
-    // }
+    query () {
+      let res = {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
+        },
+        limit: 10,
+        sort: [{createdAt: 'desc'}]
+      }
+      return res
+    }
   },
-  methods: {
+  async mounted () {
+    this.$log('myComponent mounted')
+    this.collectionsRes = await this.$rxdb.find(this.query, true)
   }
 }
 </script>

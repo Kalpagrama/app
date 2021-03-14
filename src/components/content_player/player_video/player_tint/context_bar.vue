@@ -10,11 +10,17 @@ div(
   }`
   ).row.full-width.items-end.content-end
   div(
+    @click.self="contextMiniClick()"
     :style=`{
       height: contentKalpaFullHeight+'px',
       overflow: 'hidden',
+      order: 10,
     }`
     ).row.full-width.items-start.content-start
+    div(
+      v-if="!contentKalpaFull"
+      ).row.fit.items-center.content-center.justify-center
+      q-spinner(size="50px" color="green")
     div(
       v-if="contentKalpaFull"
       ).row.full-width.items-start.content-start.q-pa-sm
@@ -34,7 +40,7 @@ div(
     div(
       v-if="contentKalpaFull"
       :style=`{order: 1}`
-      ).row.full-width.q-px-sm.q-pt-sm
+      ).row.q-px-sm.q-pt-sm
       q-btn(
         @click="contextGo()"
         outline no-caps color="white" icon-right="launch"
@@ -120,8 +126,8 @@ export default {
   methods: {
     async contextMiniClick () {
       this.$log('contextMiniClick')
-      this.contentKalpaFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentKalpa.oid)
       this.isOpened = !this.isOpened
+      this.contentKalpaFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentKalpa.oid)
     },
     contextGo () {
       this.$log('contentGo')

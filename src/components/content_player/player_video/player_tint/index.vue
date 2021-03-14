@@ -11,7 +11,7 @@ div(
   slot(name="tint" :tintFocused="tintFocused")
   //- middle spinner
   q-spinner(
-    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_ && tintSpinnerCanShow"
+    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && player && !player.playing_ && tintSpinnerCanShow"
     color="white" size="50px"
     :style=`{
       pointerEvents: 'none',
@@ -56,13 +56,13 @@ div(
   //- footer: context
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     context-bar(
-      v-if="options.mode === 'feed' && !isMini"
+      v-if="options.mode === 'feed'"
       :contentKalpa="contentKalpa"
       :player="player"
       :height="tintHeight"
       :nodeOid="options.nodeOid")
   //- footer editor
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="player && player.duration && options.mode === 'editor' && showTintBar"
       :style=`{

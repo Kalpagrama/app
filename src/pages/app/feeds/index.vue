@@ -1,32 +1,10 @@
 <template lang="pug">
-//- div(
+q-layout(
+  view="hHh lpR fFf"
+  container
   :style=`{
     height: $q.screen.height+'px',
-    //- paddingTop: '200px',
-  }`
-  ).row.full-wdith.items-start.content-start.justify-center
-  div().row.full-width.items-start.content-start.text-white.bg
-    div(v-for="n in 4" :key="n" :style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-center.br {{ n }}
-  div(
-    :style=`{
-      height: '600px',
-      maxWidth: '400px',
-    }`
-    ).column.full-width
-    .col.full-width.scroll
-      feed(:feed="feed")
-q-layout(view="hHh Lpr lff")
-  //- q-header(reveal :style=`{paddingTop: 'env(safe-area-inset-top)'}`).b-30
-    .row.full-width.justify-center.b-30.q-py-sm.q-px-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        div(:style=`{height: '60px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.q-pl-sm.q-pr-sm.b-40
-          //- q-icon(name="home" color="white" size="30px").q-mx-sm
-          div(:style=`{width: '30px', height: '30px',}`).row.items-center.content-center.justify-center.q-mr-sm
-            kalpa-logo(:width="23" :height="23" :style=`{pointEvents: 'none'}`)
-          span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Лента
-          .col
-          q-btn(round flat color="grey-8" icon="more_vert")
+  }`).b-30.br
   q-footer(v-if="$q.screen.lt.md")
     kalpa-menu-mobile
   q-page-container

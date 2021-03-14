@@ -308,6 +308,10 @@ export default {
           this.scrollTopTimeout = null
         }
         if (!this.scrollTopChanging) this.$log('scrollTop START')
+        // handle prev/next...
+        // if (to < this.paginationBufferHeight) await this.prev()
+        // if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+        // changing...
         this.scrollTopChanging = true
         this.scrollTopTimeout = setTimeout(async () => {
           // END of scrollTopChanging
@@ -341,7 +345,7 @@ export default {
             // alert('Initial prev...')
             // this.prev()
           }
-        }, 2000)
+        }, 600)
       }
     },
   },
@@ -419,7 +423,7 @@ export default {
     },
     itemMiddleHandler (isVisible, entry) {
       if (isVisible) {
-        if (this.scrollHeightChanging) return
+        // if (this.scrollHeightChanging) return
         let [key, idxSting] = entry.target.accessKey.split('-')
         this.itemMiddleSet(key, parseInt(idxSting))
       }
