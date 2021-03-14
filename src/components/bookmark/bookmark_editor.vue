@@ -4,12 +4,12 @@ div(
     position: 'relative',
     borderRadius: '20px 20px 0 0',
   }`
-  ).row.full-width.b-50
+  ).row.full-width.b-40
   //- body
   div(
     :style=`{
       zIndex: 10,
-      background: 'rgba(0,0,0,0.5)',
+      //- background: 'rgba(0,0,0,0.5)',
       borderRadius: '20px 20px 0 0',
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`

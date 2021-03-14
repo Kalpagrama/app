@@ -8,7 +8,7 @@ div(
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="debugPosition"
       :style=`{
@@ -91,11 +91,6 @@ div(
           round flat dense  icon="south").full-width
           //- q-tooltip Вперед
   slot(name="prepend")
-  //- div(
-    :style=`{
-      height: '100px',
-    }`
-    ).row.full-width.bg-red
   div(
     v-if="prependShow"
     :style=`{
@@ -179,7 +174,6 @@ export default {
   name: 'listFeed',
   props: {
     rootMargin: {type: String, default () { return '-50% 0px' }},
-    // rootMargin: {type: String, default () { return '-40% 0px' }},
     query: {
       type: Object,
       required: true,
