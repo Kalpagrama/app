@@ -162,14 +162,14 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import jointItem from './joint_item.vue'
-import widgetBookmarks from 'pages/app/workspace/widget_bookmarks/index.vue'
+// import widgetBookmarks from 'pages/app/workspace/widget_bookmarks/index.vue'
 
 export default {
   name: 'jointsRow',
   props: ['row', 'rowActive', 'rowPaused', 'rowItemWidth'],
   components: {
     jointItem,
-    widgetBookmarks,
+    // widgetBookmarks,
   },
   data () {
     return {
