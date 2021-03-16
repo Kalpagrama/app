@@ -28,7 +28,11 @@ q-btn(
       height: '24px', minHeight: '24px', maxHeight: '24px',
       borderRadius: '50%',
     }`).b-50
-  div(v-if="showLabel").row.full-width.justify-center
+  div(
+    v-if="showLabel"
+    :style=`{
+      marginTop: '-6px',
+    }`).row.full-width.justify-center
     span {{$tt('Menu')}}
 </template>
 

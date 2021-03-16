@@ -37,11 +37,13 @@ div(
   .row.items-center.content-center.justify-end.q-pt-xs
     small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
     .row.full-width.items-center.content-center.justify-end
-      q-icon(name="visibility" color="grey-9").q-mr-xs
+      q-icon(name="visibility" color="grey-8").q-mr-xs
       small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ node.countStat.countViews }}
   kalpa-menu-actions(
-    :title="node.name"
-    :actions="actions" icon="more_vert")
+    icon="more_vert"
+    color="grey-8"
+    :headerText="$tt('Node')"
+    :actions="actions")
 </template>
 
 <script>
@@ -58,6 +60,25 @@ export default {
           cb: async () => {
             this.$log('copyLink')
             // TODO: handle copy link...
+          }
+        },
+        goThreads: {
+          name: this.$tt('Go threads'),
+          cb: async () => {
+            this.$log('goThreads')
+            this.$router.push('/sphere-threads/' + this.node.sphereFromName.oid)
+          }
+        },
+        goGraph: {
+          name: this.$tt('Go graph'),
+          cb: async () => {
+            this.$log('goGraph')
+            if (this.node.items.length === 1) {
+              this.$router.push(`/graph/${this.node.oid}`)
+            }
+            else {
+              this.$router.push(`/graph/${this.node.items[0].oid}?oid=${this.node.oid}`)
+            }
           }
         }
       }

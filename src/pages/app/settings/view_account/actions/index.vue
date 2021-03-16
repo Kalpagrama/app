@@ -63,7 +63,7 @@ export default {
   methods: {
     showKalpaWelcome () {
       this.$log('showKalpaWelcome')
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
     },
     async logout () {
       await AuthApi.logout()

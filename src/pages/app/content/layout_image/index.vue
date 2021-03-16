@@ -19,25 +19,38 @@ div(
           overflow: 'hidden',
         }`
         ).row.fit
+        //- node editor mobile
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="player && $q.screen.lt.lg"
+            :style=`{
+              position: 'absolute', zIndex: 10000, top: '0px',
+            }`
+            ).row.full-width.q-pa-sm
+            node-creator(
+              :player="player"
+              :contentKalpa="contentKalpa")
         //- pages
         transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
             v-if="pageId && player && !player.figure"
             :style=`{
               position: 'absolute', top: '0px', left: '0px', zIndex: 900,
-              background: 'rgba(30,30,30,0.98)',
+              //- background: 'rgba(30,30,30,0.98)',
               borderRadius: '8px',
             }`
-            ).row.fit
+            ).row.fit.justify-center
             component(
               :is="`page-${pageId}`"
               :contentKalpa="contentKalpa"
               :player="player"
               :style=`{
+                maxWidth: 650+'px',
+                background: 'rgba(30,30,30,0.98)',
               }`
               @close="pageId = null")
         //- node creator
-        div(
+        //- div(
           v-if="player && !pageId"
           :style=`{
             position: 'absolute', zIndex: 10000, bottom: '0px',
@@ -59,6 +72,11 @@ div(
             height: '100%',
           }`
           ).full-width
+          template(v-slot:tint-bar=`{tintFocused}`)
+            node-creator(
+              v-if="player && !pageId && $q.screen.gt.md"
+              :player="player"
+              :contentKalpa="contentKalpa")
           template(v-slot:footer)
             q-btn(
               @click="footerShow = !footerShow"

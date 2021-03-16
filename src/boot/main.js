@@ -14,6 +14,7 @@ import { EventApi } from 'src/api/event'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 // import 'tiptap/src/style.css'
+const contentful = require('contentful')
 
 // import global components
 import userAvatar from 'components/user_avatar/index.vue'
@@ -76,6 +77,15 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         emoji: false,
       },
     })
+    // use default environment config for convenience
+    // these will be set via `env` property in nuxt.config.js
+    const contentfulConfig = {
+      space: 'f0vpl39owsy8',
+      accessToken: 'dt4poXVl2-veCdWkW_v02gsZWxBwe-JHZSw2T394kQQ'
+    }
+    const contentfulClient = contentful.createClient(contentfulConfig)
+    Vue.prototype.$contentful = contentfulClient
+
     Vue.use(VueMasonry)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$routerKalpa = new Proxy(VueRouter, {

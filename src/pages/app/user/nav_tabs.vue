@@ -19,7 +19,16 @@
 <script>
 export default {
   name: 'navTabs',
-  props: ['tabs'],
+  computed: {
+    tabs () {
+      return [
+        {id: 'collections', name: this.$tt('Collections'), icon: 'folder_special'},
+        {id: 'nodes', name: this.$tt('Nodes'), icon: 'panorama_fish_eye'},
+        {id: 'joints', name: this.$tt('Joints'), icon: 'panorama_fish_eye'},
+        {id: 'votes', name: this.$tt('Votes'), icon: 'adjust'},
+      ]
+    },
+  },
   methods: {
     tabClick (t) {
       this.$log('tabClick', t)

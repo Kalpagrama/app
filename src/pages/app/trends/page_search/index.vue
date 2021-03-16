@@ -3,7 +3,7 @@ q-page(
   :style=`{
     paddingTop: '50px',
   }`
-  ).row.full-width.justify-center
+  ).row.full-width.justify-center.q-px-sm
   //- body
   list-feed(
     :query="query"

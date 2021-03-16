@@ -14,19 +14,8 @@ div(
     ...styles,
   }`
   ).row.full-width
-  //- img(
-    v-if="contentKalpa.url"
-    draggable="false"
-    :src="contentKalpa.url"
-    :style=`{
-      //- objectFit: 'contain',
-      objectFit: 'cover',
-      borderRadius: '10px',
-    }`
-    ).fit
-  //- player-tint(
-    :contentKalpa="contentKalpa")
-  div(
+  //- preview your crop...
+  //- div(
     v-if="figure"
     :style=`{
       position: 'absolute', zIndex: 1000,
@@ -72,13 +61,13 @@ div(
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '8px',
     }`
-    ).row.full-width.justify-center
+    ).row.full-width.justify-center.q-px-sm
     slot(name="tint-bar" :tintFocused="true")
     div(
       :style=`{
         maxWidth: '300px',
         borderRadius: '20px',
-        background: 'rgba(30,30,30,0.5)',
+        background: 'rgba(40,40,40,0.9)',
       }`
       ).row.full-width.q-pa-sm
       q-btn(round flat dense color="white" icon="refresh" @click="player.reset()")
@@ -89,45 +78,17 @@ div(
         color="green" no-caps) Crop
       .col
       q-btn(
+        v-if="!figure"
         @click="croppingStart"
         round flat dense
         :color="cropping ? 'white' : 'green'"
         :icon="cropping ? 'clear' : 'add_circle_outline'")
-  //- publish
-  //- div(
-    v-if="url"
-    :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '50px',
-    }`
-    ).row.full-width.justify-center
-    div(
-      :style=`{
-        maxWidth: '500px',
-      }`
-      ).row.full-width
-      img(
-        draggable="false"
-        :src="url"
-        :style=`{
-          //- maxWidth: '500px',
-          borderRadius: '10px',
-        }`
-        ).full-width.br
-      .row.full-width
-        q-btn(
-          @click="cropping = false"
-          color="green" no-caps
-          ) Publish
-  //- img(
-    draggable="false"
-    :src="contentKalpa.url"
-    :style=`{
-      borderRadius: '10px',
-      objectFit: 'contain',
-      background: 'rgb(35,35,35)',
-      ...styles
-    }`
-    ).full-width
+      q-btn(
+        v-if="figure"
+        @click="figure = null"
+        round flat dense
+        color="white"
+        icon="clear")
 </template>
 
 <script>
@@ -181,7 +142,19 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        this.cropping = !this.cropping
+        // this.cropping = !this.cropping
+        // TODO: go to the essence...
+        this.figure = [
+          {
+            t: null,
+            points: [
+              {x: 0, y: 0},
+              {x: 100, y: 0},
+              {x: 100, y: 100},
+              {x: 0, y: 100}
+            ]
+          }
+        ]
       }
     },
     setState (key, val) {
@@ -211,12 +184,6 @@ export default {
       let w = e.detail.width / imageWidth
       let h = e.detail.height / imageHeight
       // this.$log({imageWidth, imageHeight, x, y, w, h})
-      // this.figureEditing = [
-      //   {t: null, points: [{x: x, y: y}]},
-      //   {t: null, points: [{x: x + w, y: y}]},
-      //   {t: null, points: [{x: x + w, y: y + h}]},
-      //   {t: null, points: [{x: x, y: y + h}]}
-      // ]
       this.figureEditing = [
         {
           t: null,

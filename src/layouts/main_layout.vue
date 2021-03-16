@@ -5,7 +5,9 @@ q-layout(view="lHh lpR lFf")
     kalpa-auth-guard(@close="authGuardShow = null")
   q-dialog(
     v-model="kalpaWelcomeShow" :maximized="true")
-    kalpa-welcome(@click="kalpaWelcomeShow = null")
+    kalpa-welcome(
+      :config="$store.state.ui.kalpaWelcome"
+      @close="kalpaWelcomeShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"

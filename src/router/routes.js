@@ -99,10 +99,46 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'user',
-            path: 'user/:oid/:page?',
+            path: 'user/:oid',
             component: () => import('pages/app/user/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            children: [
+               {
+                  name: 'user.home',
+                  path: '',
+                  redirect: 'nodes',
+               },
+               {
+                  name: 'user.collections',
+                  path: 'collections',
+                  component: () => import('pages/app/user/page_collections/index.vue'),
+               },
+               {
+                  name: 'user.nodes',
+                  path: 'nodes',
+                  component: () => import('pages/app/user/page_nodes/index.vue'),
+               },
+               {
+                  name: 'user.joints',
+                  path: 'joints',
+                  component: () => import('pages/app/user/page_joints/index.vue'),
+               },
+               {
+                  name: 'user.votes',
+                  path: 'votes',
+                  component: () => import('pages/app/user/page_votes/index.vue'),
+               },
+               {
+                  name: 'user.following',
+                  path: 'following',
+                  component: () => import('pages/app/user/page_following/index.vue'),
+               },
+               {
+                  name: 'user.followers',
+                  path: 'followers',
+                  component: () => import('pages/app/user/page_followers/index.vue'),
+               }
+            ]
          },
          {
             name: 'user-render',
@@ -117,8 +153,8 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'sphere-full',
-            path: 'sphere-full/:oid',
+            name: 'sphere-threads',
+            path: 'sphere-threads/:oid',
             component: () => import('pages/app/sphere_full/index'),
             meta: { roleMinimal: 'GUEST' }
          },

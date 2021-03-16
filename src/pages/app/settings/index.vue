@@ -63,7 +63,7 @@ export default {
   },
   methods: {
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
     this.$log('currentUser', this.$store.getters.currentUser())
   }

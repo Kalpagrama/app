@@ -1,82 +1,90 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative',
     overflow: 'hidden',
   }`
-  ).row.full-width.items-center.content-center.justify-between.q-pa-sm
-  //- div().col
-  //- wrapper of 3 main actions
-  //- div(:style=`{marginLeft: '-6px',}`).row
-  //- share
-  .row.items-center.content-center.q-px-sm
-    q-btn(
-      round flat color="grey-9")
-      q-icon(name="logout").rotate-270
-    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews - 1 }}
-  //- save
-  .row.items-center.content-center.q-px-sm
-    kalpa-save(
-      color="grey-9"
-      :dense="false"
-      :item="node"
-      :isActive="isActive")
-    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews }}
-  //- discuss link
-  .row.items-center.content-center.q-px-sm
-    q-btn(
-      round flat color="grey-9")
-      q-icon(name="fas fa-link" size="20px")
-    small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countJoints }}
-  .row.items-center.content-center.q-px-sm
-    div(:style=`{width: '42px',}`)
-  //- vote
+  ).row.full-width.justify-center
   div(
-    :class=`{
-      'full-width': votesShow,
-    }`
     :style=`{
-      position: 'absolute', top: '8px', right: '18px', zIndex: 100,
+      position: 'relative',
+      maxWidth: 500+'px',
     }`
-    ).row.justify-end
-    .col
-      transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
-        vote-options(
-          v-if="votesShow"
-          :node="node"
-          @voted="votesShow = false")
-    q-btn(
-      v-if="votesShow"
-      flat color="white" icon="clear"
-      @click="votesShow = false"
-      :style=`{
-        width: '40px', height: '40px',
-      }`)
+    ).row.full-width.items-center.content-center.justify-between.q-pa-sm
+    //- div().col
+    //- wrapper of 3 main actions
+    //- div(:style=`{marginLeft: '-6px',}`).row
+    //- share
+    .row.items-center.content-center.q-px-sm
+      kalpa-share(type="node" :item="node" :headerText="$tt('Share')")
+      //- q-btn(
+        round flat color="grey-9")
+        q-icon(name="logout").rotate-270
+      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews - 1 }}
+    //- save
+    .row.items-center.content-center.q-px-sm
+      kalpa-save(
+        color="grey-9"
+        :dense="false"
+        :item="node"
+        :isActive="isActive")
+      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews }}
+    //- discuss link
+    .row.items-center.content-center.q-px-sm
+      q-btn(
+        v-if="node.items.length === 1"
+        :to="'/graph/'+node.oid"
+        round flat color="grey-9")
+        q-icon(name="fas fa-link" size="20px")
+      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countJoints }}
+    .row.items-center.content-center.q-px-sm
+      div(:style=`{width: '42px',}`)
+    //- vote
     div(
-      v-if="!votesShow"
-      ).row.items-center.content-center
-      .row.items-center.content-center
-        .row.full-width.justify-end
-          div(
-            v-if="node.rateUser !== null"
-            :style=`{
-              width: '10px', height: '10px', borderRadius: '5px',
-              background: $rateMeta.find(r => node.rateUser >= r.valueMin && node.rateUser < r.valueMax).color,
-            }`)
-        .row.full-width.justify-end
-          small(
-            v-if="node.rateUser !== null"
-            :style=`{lineHeight: 1.5,marginRight: '2px'}`).text-white {{ node.countVotes }}
-      vote-ball(
-        :node="node"
-        @click.native="votesShow = true")
-  //- vote description
-  div(:style=`{height: '20px'}`).row.full-width
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
+      :class=`{
+        'full-width': votesShow,
+      }`
+      :style=`{
+        position: 'absolute', top: '8px', right: '18px', zIndex: 100,
+      }`
+      ).row.justify-end
+      .col
+        transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+          vote-options(
+            v-if="votesShow"
+            :node="node"
+            @voted="votesShow = false")
+      q-btn(
         v-if="votesShow"
-        ).row.full-width.justify-center
-        small.text-white Насколько близко к сути ?
+        flat color="white" icon="clear"
+        @click="votesShow = false"
+        :style=`{
+          width: '40px', height: '40px',
+        }`)
+      div(
+        v-if="!votesShow"
+        ).row.items-center.content-center
+        .row.items-center.content-center
+          .row.full-width.justify-end
+            div(
+              v-if="node.rateUser !== null"
+              :style=`{
+                width: '10px', height: '10px', borderRadius: '5px',
+                background: $rateMeta.find(r => node.rateUser >= r.valueMin && node.rateUser < r.valueMax).color,
+              }`)
+          .row.full-width.justify-end
+            small(
+              v-if="node.rateUser !== null"
+              :style=`{lineHeight: 1.5,marginRight: '2px'}`).text-white {{ node.countVotes }}
+        vote-ball(
+          :node="node"
+          @click.native="votesShow = true")
+    //- vote description
+    div(:style=`{height: '20px'}`).row.full-width
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(
+          v-if="votesShow"
+          ).row.full-width.justify-center
+          small.text-white Насколько близко к сути ?
 </template>
 
 <script>

@@ -73,7 +73,7 @@ div(
     ).row.full-width.items-center.content-center
     div(
       @click="contextMiniClick()"
-      ).col
+      ).col.cursor-pointer
       .row.full-width.items-center.content-center.no-wrap
         q-icon(name="select_all" color="grey-4" size="16px").q-ma-xs
         .col.scroll

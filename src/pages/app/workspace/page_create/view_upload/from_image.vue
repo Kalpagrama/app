@@ -25,9 +25,9 @@
           draggable="false"
           :src="fileSrc"
           :style=`{
-            objectFit: 'cover',
+            objectFit: 'contain',
             borderRadius: '10px',
-          }`).fit
+          }`).fit.b-50
         //- ===
         //- editing
         image-cropper(

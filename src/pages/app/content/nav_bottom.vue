@@ -1,33 +1,27 @@
 <template lang="pug">
-div(
-  :style=`{
-    //- paddingBottom: 'env(safe-area-inset-bottom)',
-  }`
-  ).row.full-width.justify-center
+.row.full-width.justify-center
   div(
     :style=`{
       maxWidth: 650+'px',
-      //- height: navHeight+'px',
-      background: 'rgba(40,40,40,1)',
-      borderRadius: '10px 10px 0 0',
-      paddingBottom: 'env(safe-area-inset-bottom)',
+      borderRadius: '20px 20px 0 0',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
-    ).row.full-width.justify-between.q-pt-sm
+    ).row.full-width.justify-between.b-50.q-pt-sm.q-px-sm
     //- back
     q-btn(
       @click="$routerKalpa.back()"
-      flat color="white" icon="west" no-caps
+      flat color="grey-7" icon="west" no-caps
       :style=`{
         width: navHeight+'px',
         height: navHeight+'px',
       }`)
-      span Назад
+      span {{$tt('Back')}}
     //- pages
     q-btn(
       v-for="(p,pi) in pages" :key="p.id"
       @click="pageId === p.id ? $emit('pageId', null) : $emit('pageId', p.id)"
       flat no-caps
-      :color="p.id === pageId ? 'green' : 'white'"
+      :color="p.id === pageId ? 'green' : 'grey-7'"
       :icon="p.icon"
       :style=`{
         width: navHeight+'px',
@@ -36,6 +30,7 @@ div(
       span {{ p.name }}
     //- menu
     kalpa-menu-popup-global(
+      color="grey-7"
       :showLabel="true" :isRound="true"
       :styles=`{
         width: navHeight+'px',
@@ -54,9 +49,9 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'drafts', icon: 'filter_tilt_shift', name: 'Заметки'},
-        {id: 'nodes', icon: 'adjust', name: 'Ядра'},
-        {id: 'info', icon: 'fas fa-info', name: 'Инфо'}
+        {id: 'drafts', icon: 'filter_tilt_shift', name: this.$tt('Drafts')},
+        {id: 'nodes', icon: 'adjust', name: this.$tt('Nodes')},
+        {id: 'info', icon: 'fas fa-info', name: this.$tt('Info')}
       ]
     },
     navHeight () {

@@ -138,8 +138,8 @@ export default {
         return `/graph/${this.node.items[0].oid}?oid=${this.node.oid}`
       }
       else {
-        // return '/node/' + this.node.oid
-        return '/sphere-full/' + this.node.sphereFromName.oid
+        return '/node/' + this.node.oid
+        // return '/sphere-full/' + this.node.sphereFromName.oid
       }
     },
     category () {
