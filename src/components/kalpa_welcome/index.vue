@@ -62,6 +62,8 @@ div(
 </template>
 
 <script>
+import { ObjectApi } from 'src/api/object'
+
 export default {
   name: 'kalpaWelcome',
   props: {
@@ -112,13 +114,17 @@ export default {
     // get docs
     const {items: [doc]} = await this.$contentful.getEntries({
       content_type: 'tutorial',
-      'fields.id': 'main',
+      'fields.id': this.config.id,
     })
     this.$log('doc', doc)
     this.doc = doc
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$log('beforeDestroy')
+    // set tutorial main gone
+    if (this.config.id === 'main') {
+      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', false)
+    }
   }
 }
 </script>

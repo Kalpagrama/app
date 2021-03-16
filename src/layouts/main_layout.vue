@@ -4,7 +4,8 @@ q-layout(view="lHh lpR lFf")
     v-model="authGuardShow")
     kalpa-auth-guard(@close="authGuardShow = null")
   q-dialog(
-    v-model="kalpaWelcomeShow" :maximized="true")
+    v-model="kalpaWelcomeShow" :maximized="true"
+    @hide="kalpaWelcomeShown")
     kalpa-welcome(
       :config="$store.state.ui.kalpaWelcome"
       @close="kalpaWelcomeShow = null")
@@ -65,6 +66,11 @@ export default {
       }
     }
   },
+  methods: {
+     async kalpaWelcomeShown () {
+      this.$log('kalpaWelcomeShown')
+    },
+  },
   async beforeCreate () {
     this.$log('beforeCreate')
   },
@@ -75,6 +81,15 @@ export default {
     this.$log('created')
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
+    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      // do nothing ?
+    }
+    else {
+      // check tutorial
+      if (this.$store.getters.currentUser().profile.tutorial) {
+        this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+      }
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
