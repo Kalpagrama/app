@@ -267,7 +267,7 @@ div(
       .col
       //- create player.figure
       q-btn(
-        v-if="player && !player.figure && options.mode === 'editor' && !player.nodePlaying"
+        v-if="player && !player.figure && options.mode === 'editor'"
         @click="figureCreate()"
         round flat dense color="green" icon="add_circle_outline")
       //- destroy player.figure
@@ -276,10 +276,10 @@ div(
         @click="figureDelete()"
         round flat dense color="white" icon="clear")
       //- destroy player.nodePlaying
-      q-btn(
+      //- q-btn(
         v-if="player && player.nodePlaying && options.mode === 'editor'"
         @click="player.setState('nodePlaying', null)"
-        round flat dense color="white" icon="clear")
+        round flat dense color="white" icon="clear").br
 </template>
 
 <script>
@@ -510,6 +510,8 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
+        // remove nodePlaying
+        this.player.setState('nodePlaying', null)
         let start = this.player.currentTime
         let end = start + 30 > this.player.duration ? this.player.duration : start + 30
         let figure = [{t: start, points: []}, {t: end, points: []}]

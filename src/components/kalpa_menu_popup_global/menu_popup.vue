@@ -59,8 +59,9 @@ q-menu(
     //- footer USER
     router-link(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+      v-close-popup
       @click="footerClick"
-      :to="'/user/'+$store.getters.currentUser().oid+'/nodes'"
+      :to="'/user/'+$store.getters.currentUser().oid"
       :style=`{
         borderRadius: '10px',
       }`
