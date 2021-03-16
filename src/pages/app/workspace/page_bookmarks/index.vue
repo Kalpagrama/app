@@ -16,10 +16,12 @@ q-layout(
   //- header
   q-header(
     v-if="useHeader"
-    reveal).br
+    reveal)
     .row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        slot(name="header")
         div(
+          v-if="!$slots.header"
           :style=`{
             height: '60px',
             borderRadius: '10px',

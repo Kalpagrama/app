@@ -8,7 +8,7 @@ div(
   ).row.full-width.items-start.content-start
   q-resize-observer(@resize="scrollHeightResized")
   //- debug
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="debugPosition"
       :style=`{

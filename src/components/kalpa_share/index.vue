@@ -24,9 +24,9 @@ q-btn(
         .col
         q-btn(round flat color="white" icon="clear" v-close-popup)
       //- body
-      .row.full-width.items-start.content-start
+      .row.full-width.items-start.content-start.q-mb-xl
         //- copy link
-        .row.full-width.q-pa-md.q-mb-xl
+        .row.full-width.q-pa-md
           div(
             :style=`{
               position: 'relative', zIndex: 100,
@@ -38,7 +38,17 @@ q-btn(
               ).full-width
               template(v-slot:append)
                 q-btn(color="green" flat no-caps @click="shareLinkCopy()")
-                  span.text-bold {{$t('Copy', 'Скопировать')}}
+                  span.text-bold {{$tt('Copy', 'Скопировать')}}
+        //- copy link
+        .row.full-width.q-pa-md
+          q-btn(
+            @click="itemRepost()"
+            outline no-caps color="green"
+            :style=`{
+              height: '50px',
+            }`
+            ).full-width
+            span {{$tt('Make a repost')}}
 </template>
 
 <script>
@@ -69,6 +79,10 @@ export default {
     }
   },
   methods: {
+    itemRepost () {
+      this.$log('itemRepost')
+      this.$q.notify({type: 'negative', position: 'bottom', message: this.$tt('Not implemented yet!')})
+    },
     async shareStart () {
       this.$log('shareStart', Platform.is)
       // eslint-disable-next-line no-unreachable
