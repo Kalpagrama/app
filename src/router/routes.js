@@ -155,7 +155,7 @@ const routes = [
          {
             name: 'sphere-threads',
             path: 'sphere-threads/:oid',
-            component: () => import('pages/app/sphere_full/index'),
+            component: () => import('pages/app/sphere_threads/index'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
