@@ -1,8 +1,9 @@
 <template lang="pug">
 .row.full-width.q-px-sm.q-py-xs
   .row.full-width.scroll
-    div(
+    router-link(
       v-for="(s,si) in node.spheres" :key="si"
+      :to="'/sphere/'+s.oid"
       :style=`{
         marginLeft: '2px',
         whiteSpace: 'nowrap',
