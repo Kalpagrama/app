@@ -4,6 +4,14 @@ div(
     overflow: 'hidden',
   }`
   ).row.full-width.justify-center
+  q-dialog(
+    v-model="voteStatsShow"
+    position="bottom")
+    vote-stats(
+      :node="node"
+      :style=`{}`
+      @voteAgain="voteAgain"
+      @close="voteStatsShow = false")
   div(
     :style=`{
       position: 'relative',
@@ -77,7 +85,7 @@ div(
               :style=`{lineHeight: 1.5,marginRight: '2px'}`).text-white {{ node.countVotes }}
         vote-ball(
           :node="node"
-          @click.native="votesShow = true")
+          @click.native="voteStart()")
     //- vote description
     div(:style=`{height: '20px'}`).row.full-width
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -90,6 +98,7 @@ div(
 <script>
 import voteBall from './vote_ball.vue'
 import voteOptions from './vote_options.vue'
+import voteStats from './vote_stats.vue'
 
 export default {
   name: 'nodeActionsRight',
@@ -97,10 +106,12 @@ export default {
   components: {
     voteBall,
     voteOptions,
+    voteStats
   },
   data () {
     return {
       votesShow: false,
+      voteStatsShow: false,
     }
   },
   watch: {
@@ -116,11 +127,32 @@ export default {
     }
   },
   methods: {
-    voteBallClick () {
+    voteStart () {
+      this.$log('voteStart')
+      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+        let authGuard = {
+          message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
+      }
+      else {
+        // shot stats if user has voted already
+        if (this.node.rateUser || (this.node.author.oid === this.$store.getters.currentUser().oid)) {
+          this.voteStatsShow = true
+        }
+        // show votes to vote...
+        else {
+          this.votesShow = true
+        }
+      }
+    },
+    async voteAgain () {
+      this.$log('voteAgain')
+      if (this.node.author.oid === this.$store.getters.currentUser().oid) return
+      this.voteStatsShow = false
+      await this.$wait(200)
       this.votesShow = true
     },
-  },
-  computed: {
   }
 }
 </script>
