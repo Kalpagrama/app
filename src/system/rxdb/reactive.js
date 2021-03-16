@@ -793,6 +793,11 @@ class Group {
    }
 
    async gotoStart () {
+      if (this.paginateFunc){
+         this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length)
+         let rxDocPagination = await this.paginateFunc(null, GROUP_BATCH_SZ * 2)
+         await this.upsertPaginationPage(rxDocPagination, 'whole')
+      }
       let count
       if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
       else count = this.loadedLen() // выдаем все элементы разом

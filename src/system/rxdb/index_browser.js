@@ -621,7 +621,7 @@ class RxDBWrapper {
                   return populatedItems.filter(obj => !!obj)
                }
                let paginateFunc = async (pageToken, pageSize) => {
-                  assert(pageToken && pageSize, 'bad pagination params')
+                  assert(pageSize, 'bad pagination params')
                   let paginationMangoQuery = cloneDeep(mangoQuery)
                   paginationMangoQuery.pagination = { pageSize, pageToken }
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
