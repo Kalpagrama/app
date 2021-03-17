@@ -1,7 +1,8 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  :container="isContainer").b-30
+  :container="isContainer"
+  ).b-30
   //- bookmark editor
   q-dialog(
     v-model="bookmarkEditorShow"

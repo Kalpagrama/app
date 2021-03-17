@@ -1,5 +1,7 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(
+  view="hHh Lpr lff"
+  :container="false")
   q-footer(
     v-if="!joint && !jointCreating"
     reveal

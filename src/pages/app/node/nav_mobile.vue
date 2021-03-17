@@ -7,14 +7,13 @@ div(
   div(
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-      //- height: '70px',
-      borderRadius: '10px 10px 0 0',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+      borderRadius: '20px 20px 0 0',
     }`
-    ).row.full-width.items-center.content-center.justify-between.b-40.q-pt-sm
+    ).row.full-width.items-center.content-center.justify-between.b-50.q-pt-sm.q-px-sm
     q-btn(
       @click="$routerKalpa.back()"
-      flat color="white" icon="west" no-caps
+      flat color="grey-7" icon="west" no-caps
       :style=`{
         width: '70px',
         height: '70px',
@@ -29,7 +28,9 @@ div(
       }`).col
       span(:style=`{whiteSpace: 'nowrap'}`).q-mt-sm Добавить связь
     //- .col
-    kalpa-menu-popup-global(:styles=`{width: '70px', height: '70px',}`)
+    kalpa-menu-popup-global(
+      color="grey-7"
+      :styles=`{width: '70px', height: '70px',}`)
 </template>
 
 <script>

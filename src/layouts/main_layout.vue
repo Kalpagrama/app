@@ -1,5 +1,7 @@
 <template lang="pug">
-q-layout(view="lHh lpR lFf")
+q-layout(
+  view="lHh lpR lFf"
+  :container="false")
   q-dialog(
     v-model="authGuardShow")
     kalpa-auth-guard(@close="authGuardShow = null")
@@ -86,7 +88,7 @@ export default {
     }
     else {
       // check tutorial
-      if (this.$store.getters.currentUser().profile.tutorial) {
+      if (this.$store.getters.currentUser().profile.tutorial.main === false) {
         this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
       }
     }

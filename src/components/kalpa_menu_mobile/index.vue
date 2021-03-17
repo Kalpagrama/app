@@ -15,21 +15,18 @@
       :style=`{
         width: size+'px',
         height: size+'px',
-      }`
-      ).row.items-center.content-center.justify-center
-      .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) {{$tt('Feed')}}
+      }`)
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Feed')}}
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
-      flat icon="search" no-caps
+      flat no-caps icon="search"
       :to="'/trends'"
       :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
-      .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) {{$tt('Search')}}
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Search')}}
     //- workspace
     div(
       :style=`{
@@ -41,7 +38,7 @@
         round no-caps icon="construction"
         :to="'/workspace'"
         :color="'green'"
-        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+        :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="notifications_none"
@@ -51,11 +48,8 @@
         width: size+'px',
         height: size+'px',
       }`)
-      //- TODO: handle new notifications...
       q-badge(color="red" floating transparent) •
-      .row.full-width.justify-center
-        span {{$tt('Activity')}}
-        //- span Уведомления
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Activity')}}
     kalpa-menu-popup-global(
       color="grey-7"
       :styles=`{
@@ -79,8 +73,8 @@ export default {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
     },
     size () {
-      if (this.$q.screen.width > 350) return 60
-      else return 50
+      if (this.$q.screen.width > 350) return 46
+      else return 46
     }
   },
   methods: {

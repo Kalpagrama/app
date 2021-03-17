@@ -1,10 +1,5 @@
 <template lang="pug">
-q-page(
-  :style=`{
-    paddingTop: '50px',
-  }`
-  ).row.full-width.justify-center.q-px-sm
-  //- body
+.row.full-width.q-pa-sm
   list-feed(
     :query="query"
     :itemMiddlePersist="false"
@@ -43,19 +38,6 @@ q-page(
               span.text-white {{ item.name }}
               .row.full-width
                 small.text-grey-8 {{ itemMetaMap[item.type].name }}
-  //- tabs with types...
-  q-page-sticky(
-    expand position="top"
-    :style=`{
-      zIndex: 1000,
-    }`).b-30
-    .row.full-width.justify-center.b-30
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md
-        q-tabs(
-          v-model="tabId"
-          dense no-caps active-color="green" switch-indicator
-          ).full-width.text-grey-8
-          q-tab(v-for="t in tabs" :key="t.id" :name="t.id" :label="t.name" dense)
 </template>
 
 <script>
@@ -73,31 +55,19 @@ export default {
     }
   },
   computed: {
-    tabs () {
-      return [
-        {id: 'content', name: 'Медиа', types: ['VIDEO', 'IMAGE', 'BOOK']},
-        {id: 'nodes', name: 'Ядра', types: ['NODE']},
-        {id: 'joints', name: 'Связи', types: ['JOINT']},
-        {id: 'spheres', name: 'Сферы', types: ['WORD', 'SENTENCE']},
-        {id: 'users', name: 'Люди', types: ['USER']}
-      ]
-    },
-    tab () {
-      return this.tabs.find(t => t.id === this.tabId)
-    },
     query () {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
-          // objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK']},
+          objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'USER']},
           querySearch: this.searchString,
         },
         populateObjects: false,
         limit: 100
       }
-      if (this.tab) {
-        res.selector.objectTypeEnum = {$in: this.tab.types}
-      }
+      // if (this.tab) {
+      //   res.selector.objectTypeEnum = {$in: this.tab.types}
+      // }
       return res
     },
     itemMetaMap () {

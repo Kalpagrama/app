@@ -7,7 +7,7 @@
       maxWidth: 600+'px',
     }`
     ).row.full-width.q-pa-md
-    .row.full-width.justify-center.q-py-md
+    .row.full-width.justify-center.q-pb-md
       span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$tt('Add by Link')}}
     div(
       :style=`{borderRadius: '10px',}`
@@ -37,12 +37,12 @@
       small.text-grey-5 {{$tt('You can add from YouTube, Instagram, Vimeo etc')}}
   //- create
   .row.full-width.justify-center
-    div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pa-md
+    div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pt-sm.q-px-md
       q-btn(
         outline color="grey-8" no-caps
         :to="'/workspace/create/'"
         :style=`{
-          height: '60px',
+          height: '50px',
         }`).full-width
         span.text-grey-6 {{$tt('Create')}}
 </template>

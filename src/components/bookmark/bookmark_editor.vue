@@ -43,9 +43,11 @@ div(
     .row.full-width.q-py-xs.q-px-sm
       .row.full-width
         span.text-white {{$tt('Collections:')}}
-      .row.full-width
+      div(
+        v-if="bookmarkCollectionsRes"
+        ).row.full-width
         div(
-          v-for="(c,ci) in bookmark.collections" :key="ci"
+          v-for="(c,ci) in bookmarkCollectionsRes.items" :key="ci"
           :style=`{
             borderRadius: '10px',
           }`
@@ -73,6 +75,8 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'bookmarkEditor',
   props: {
@@ -81,6 +85,7 @@ export default {
   data () {
     return {
       bookmarkDeleting: false,
+      bookmarkCollectionsRes: null,
     }
   },
   computed: {
@@ -133,6 +138,17 @@ export default {
         }
       }
     },
+    bookmarkCollectionsQuery () {
+      let res = {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
+          id: {$in: this.bookmark.collections}
+        },
+        // limit: 10,
+        sort: [{createdAt: 'desc'}]
+      }
+      return res
+    }
   },
   methods: {
     bookmarkLaunch () {
@@ -148,6 +164,11 @@ export default {
       this.$log('bookmarkDelete done')
       this.$emit('deleted')
     },
+  },
+  async mounted () {
+    this.$log('mounted')
+    // get bookmarkCollections [full,full] filter by id $in: []
+    this.bookmarkCollectionsRes = await this.$rxdb.find(this.bookmarkCollectionsQuery, true)
   }
 }
 </script>

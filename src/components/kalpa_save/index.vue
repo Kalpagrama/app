@@ -32,8 +32,7 @@ q-btn(
   q-dialog(
     v-if="isActive && bookmark"
     v-model="bookmarkEditorDialogShow"
-    position="bottom"
-    )
+    position="bottom")
     bookmark-editor(
       v-if="isActive && bookmark"
       :bookmark="bookmark"

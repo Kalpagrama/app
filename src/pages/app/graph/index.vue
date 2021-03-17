@@ -1,5 +1,7 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(
+  view="hHh Lpr lff"
+  :container="false")
   div(
     :style=`{
       position: 'fixed', zIndex: 2000, bottom: '0px',

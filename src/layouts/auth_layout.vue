@@ -2,6 +2,7 @@
 <template lang="pug">
 q-layout(
   view="hHh lpR fFf"
+  :container="false"
   :style=`{
     paddingTop: 'env(safe-area-inset-top)',
   }`)

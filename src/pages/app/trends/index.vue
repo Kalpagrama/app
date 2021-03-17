@@ -1,17 +1,9 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  container
-  :style=`{
-    height: $q.screen.height+'px',
-  }`).b-30
-  q-footer(v-if="$q.screen.lt.md")
+kalpa-layout
+  template(v-slot:footer)
     kalpa-menu-mobile
-  q-header(
-    reveal
-    :style=`{
-      paddingTop: 'env(safe-area-inset-top)',
-    }`).b-30
+  template(v-slot:body)
+    //- header
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
@@ -37,7 +29,8 @@ q-layout(
                   v-if="searchString.length > 0"
                   @click="searchString = ''"
                   round flat dense color="white" icon="clear").q-mr-sm
-  q-page-container
+    div(:style=`{position: 'sticky', zIndex: 1000, top: '0px',}`).row.full-width
+      page-trends-nav-tabs(v-if="pageId === 'trends'")
     component(
       :is="`page-${pageId}`"
       :oid="$route.params.oid"
@@ -48,11 +41,16 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import pageTrends from './page_trends/index.vue'
+import pageTrendsNavTabs from './page_trends/nav_tabs.vue'
+import pageSearch from './page_search/index.vue'
+
 export default {
   name: 'pageApp_trends',
   components: {
-    pageTrends: () => import('./page_trends/index.vue'),
-    pageSearch: () => import('./page_search/index.vue'),
+    pageTrends,
+    pageTrendsNavTabs,
+    pageSearch,
   },
   data () {
     return {
@@ -75,7 +73,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    document.body.style.background = 'rgb(30,30,30)'
   }
 }
 </script>

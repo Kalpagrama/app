@@ -1,3 +1,9 @@
+<style lang="sass" scoped>
+.sphere-item
+  &:hover
+    color: rgb(76,175,79) !important
+</style>
+
 <template lang="pug">
 .row.full-width.q-px-sm.q-py-xs
   .row.full-width.scroll
@@ -8,7 +14,7 @@
         marginLeft: '2px',
         whiteSpace: 'nowrap',
       }`
-      ).row.items-center.content-center.text-grey-7.no-wrap.q-mr-sm
+      ).row.items-center.content-center.text-grey-7.no-wrap.q-mr-sm.sphere-item
       //- q-icon(
         name="blur_on"
         color="grey-7"

@@ -31,9 +31,9 @@ q-btn(
   div(
     v-if="showLabel"
     :style=`{
-      marginTop: '-6px',
+      marginTop: '-4px',
     }`).row.full-width.justify-center
-    span {{$tt('Menu')}}
+    small {{$tt('Menu')}}
 </template>
 
 <script>

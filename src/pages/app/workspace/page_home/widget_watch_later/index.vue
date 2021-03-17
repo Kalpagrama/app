@@ -12,7 +12,7 @@
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="watch_later" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold Смотреть позже
+        span.text-white.text-bold Watch later
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup

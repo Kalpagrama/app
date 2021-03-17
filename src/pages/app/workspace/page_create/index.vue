@@ -1,21 +1,28 @@
 <template lang="pug">
-q-layout(
+kalpa-layout()
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      .row.full-width.justify-center.q-pa-sm
+        div(
+          :style=`{
+            height: '60px',
+            maxWidth: $store.state.ui.pageWidth+'px',
+            background: 'rgb(40,40,40)',
+            borderRadius: '10px',
+          }`
+          ).row.full-width.items-center.content-center.q-pa-sm
+          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+          .col
+            .row.fit.items-center.content-center.justify-center.q-pa-sm
+              span(:style=`{fontSize: '18px',}`).text-white.text-bold Сотворить
+          q-btn(round flat color="white" icon="more_vert")
+      .row.full-width
+        component(
+          :is="'view-'+pageId"
+          @started="pageStarted = true")
+//- q-layout(
   view="hHh Lpr lff")
   q-header()
-    .row.full-width.justify-center.q-pa-sm
-      div(
-        :style=`{
-          height: '60px',
-          maxWidth: $store.state.ui.pageWidth+'px',
-          background: 'rgb(40,40,40)',
-          borderRadius: '10px',
-        }`
-        ).row.full-width.items-center.content-center.q-pa-sm
-        q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-        .col
-          .row.fit.items-center.content-center.justify-center.q-pa-sm
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold Сотворить
-        q-btn(round flat color="white" icon="more_vert")
   q-page-container
     q-page
       component(

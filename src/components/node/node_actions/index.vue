@@ -1,9 +1,20 @@
 <template lang="pug">
 div(
   :style=`{
+    position: 'relative',
     overflow: 'hidden',
   }`
   ).row.full-width.justify-center
+  //- tint
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 300,
+    }`
+    ).row.fit.items-center.content-center.b-30.q-px-xl
+    q-btn(
+      push no-caps color="green"
+      ).full-width Go inside
+  //- vote stats
   q-dialog(
     v-model="voteStatsShow"
     position="bottom")
@@ -38,12 +49,15 @@ div(
       small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews }}
     //- discuss link
     .row.items-center.content-center.q-px-sm
-      q-btn(
+      //- q-btn(
         v-if="node.items.length === 1"
         :to="'/graph/'+node.oid"
         round flat color="grey-9")
-        q-icon(name="fas fa-link" size="20px")
-      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countJoints }}
+        q-icon(name="far fa-comment" size="24px" :style=`{transform: 'scaleX(-1)'}`)
+      q-btn(
+        round flat color="grey-9")
+        q-icon(name="logout" ).rotate-90
+      small(:style=`{marginLeft: '-4px',}`).text-grey-9 {{ node.countStat.countJoints }}
     .row.items-center.content-center.q-px-sm
       div(:style=`{width: '42px',}`)
     //- vote

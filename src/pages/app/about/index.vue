@@ -1,6 +1,8 @@
 <template lang="pug">
 q-layout(
-  view="hHh Lpr lff").b-30
+  view="hHh Lpr lff"
+  :container="false"
+  ).b-30
   q-page-container
     q-page.row.full-width.justify-center
       div(

@@ -76,6 +76,12 @@ export default {
     return {
       slide: 'welcome',
       doc: null,
+      tutorialInitial: {
+        main: false,
+        content: false,
+        node: false,
+        joint: false
+      }
     }
   },
   computed: {
@@ -87,6 +93,9 @@ export default {
           url: s.fields.file.url,
         }
       })
+    },
+    tutorial () {
+      return this.$store.getters.currentUser().profile.tutorial
     }
   },
   watch: {
@@ -121,10 +130,12 @@ export default {
   },
   async beforeDestroy () {
     this.$log('beforeDestroy')
-    // set tutorial main gone
-    if (this.config.id === 'main') {
-      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', false)
+    if (typeof this.tutorial !== 'object') {
+      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', this.tutorialInitial)
     }
+    // set tutorial main gone
+    let tutorialInput = {[this.config.id]: true, ...this.tutorialInitial}
+    await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
   }
 }
 </script>

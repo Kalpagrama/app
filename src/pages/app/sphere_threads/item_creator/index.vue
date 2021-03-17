@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(
-  container
   view="lHh lpR lFf"
+  :container="false"
   :style=`{
     height: $q.screen.height+'px',
   }`

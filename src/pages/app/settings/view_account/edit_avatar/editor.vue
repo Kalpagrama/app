@@ -1,7 +1,8 @@
 <template lang="pug">
 q-layout(
   view="lHh lpR lFf"
-  container).b-30
+  :container="false"
+  ).b-30
   q-header.b-30
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-center.content-center.q-pa-sm
