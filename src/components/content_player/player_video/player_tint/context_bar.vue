@@ -9,6 +9,7 @@ div(
     background: 'rgba(0,0,0,0.5)',
   }`
   ).row.full-width.items-end.content-end
+  //- content full info
   div(
     @click.self="contextMiniClick()"
     :style=`{
@@ -40,30 +41,16 @@ div(
     div(
       v-if="contentKalpaFull"
       :style=`{order: 1}`
-      ).row.q-px-sm.q-pt-sm
+      ).row.q-px-sm
       q-btn(
         @click="contextGo()"
         outline no-caps color="white" icon-right="launch"
         :style=`{
-          height: '50px',
+          height: '40px',
         }`
         )
         span.text-bold.q-mr-sm {{ $tt('Watch in context') }}
-    //- related content!
-    //- .row.full-width
-      .row.full-width.q-px-md.q-py-xs
-        small.text-white Похожее:
-      .row.full-width.q-pl-sm.scroll
-        .row.full-width.no-wrap
-          div(
-            v-for="(r,ri) in contentKalpaFull.relatedContent" :key="ri"
-            ).row.q-mr-sm.q-mb-sm
-            img(
-              :src="r.thumbUrl"
-              :style=`{
-                borderRadius: '10px',
-                height: '40px',
-              }`)
+  //- content mini
   div(
     :style=`{
       height: '30px',
@@ -78,7 +65,7 @@ div(
         q-icon(name="select_all" color="grey-4" size="16px").q-ma-xs
         .col.scroll
           .row.full-width.items-center.content-center.no-wrap
-            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ contentKalpa.name }}
+            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ isOpened ? contentKalpa.name : $tt('Context') }}
     div(
       v-if="player && player.duration"
       :style=`{
