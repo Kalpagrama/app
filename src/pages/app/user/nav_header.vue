@@ -61,7 +61,7 @@
             :style=`{
               borderRadius: '30px',
             }`)
-            span {{ following ? 'Отписаться' : 'Подписаться' }}
+            span {{ following ? $tt('Unfollow') : $tt('Follow') }}
       //- about user
       .row.full-width.q-px-sm
         div(
@@ -74,19 +74,19 @@
           div(
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.weightVal }}
-            small.text-grey-7.q-mr-md K
+            small.text-grey-7.q-mr-md R
           //- following
           router-link(
-            :to=`{params: {page: 'following'}}`
+            :to=`'following'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
-            small.text-grey-7.q-mr-md Подписки
+            small.text-grey-7.q-mr-md {{$tt('Following')}}
           //- followers
           router-link(
-            :to=`{params: {page: 'followers'}}`
+            :to=`'followers'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
-            small.text-grey-7 Подписчики
+            small.text-grey-7 {{$tt('Followers')}}
 </template>
 
 <script>

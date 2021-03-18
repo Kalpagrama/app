@@ -1,13 +1,4 @@
 <template lang="pug">
-//- div(
-  :style=`{
-    position: 'relative',
-    aspectRatio: 1,
-  }`
-  ).row.full-width.bg
-  img(
-    :src="node.items[0].thumbUrl"
-    ).full-width.br
 div(
   :style=`{
     position: 'relative',
@@ -36,25 +27,6 @@ div(
         showContext: true,
         mode: 'feed',
       }`)
-//- composition(
-  :composition="node.items[0]"
-  :isVisible="isVisible"
-  :isActive="isActive"
-  :isMini="false"
-  :styles=`{
-    height: '100%',
-    objectFit: 'cover',
-    //- objectFit: 'contain',
-  }`
-  :options=`{
-    loop: true,
-    nodeOid: node.oid,
-    footerOverlay: true,
-    showBar: false,
-    showHeader: true,
-    showFooter: true,
-    context: 'feed',
-  }`)
 </template>
 
 <script>

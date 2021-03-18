@@ -39,15 +39,9 @@ div(
       maxWidth: 500+'px',
     }`
     ).row.full-width.items-center.content-center.justify-between.q-pa-sm
-    //- div().col
-    //- wrapper of 3 main actions
-    //- div(:style=`{marginLeft: '-6px',}`).row
     //- share
     .row.items-center.content-center.q-px-sm
       kalpa-share(type="node" :item="node" :headerText="$tt('Share')")
-      //- q-btn(
-        round flat color="grey-9")
-        q-icon(name="logout").rotate-270
       small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countShares }},
     //- save
     .row.items-center.content-center.q-px-sm
@@ -57,22 +51,12 @@ div(
         :item="node"
         :isActive="isActive")
       small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews }}
-    //- discuss link
+    //- graph link
     .row.items-center.content-center.q-px-sm
-      //- q-btn(
-        v-if="node.items.length === 1"
-        :to="'/graph/'+node.oid"
-        round flat color="grey-9")
-        q-icon(name="far fa-comment" size="24px" :style=`{transform: 'scaleX(-1)'}`)
       q-btn(
-        :to="'/node/'+node.oid"
+        :to="graphLink"
         round flat color="grey-9")
-        //- q-icon(name="logout" ).rotate-90
-        kalpa-logo(
-          :class="{'rotating-slow': isActive}"
-          :width="24"
-          :height="24"
-          )
+        q-icon(name="fas fa-link" size="24px")
       small(:style=`{marginLeft: '-4px',}`).text-grey-9 {{ node.countStat.countJoints }}
     .row.items-center.content-center.q-px-sm
       div(:style=`{width: '42px',}`)
@@ -142,6 +126,16 @@ export default {
     return {
       votesShow: false,
       voteStatsShow: false,
+    }
+  },
+  computed: {
+    graphLink () {
+      if (this.node.items.length === 1) {
+        return '/graph/' + this.node.oid
+      }
+      else {
+        return '/graph/' + this.node.items[0].oid + '?oid=' + this.node.oid
+      }
     }
   },
   watch: {

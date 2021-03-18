@@ -17,13 +17,14 @@ kalpa-layout(
         }`)
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
           div(
+            @click="$emit('item', item.populatedObject)"
             :style=`{
               position: 'relative',
               borderRadius: '10px',
               background: 'rgb(35,35,35)',
             }`
             ).row.full-width
-            slot(name="tint" :item="item.populatedObject")
+            //- slot(name="tint" :item="item.populatedObject")
             .row.full-width
               img(
                 draggable="false"

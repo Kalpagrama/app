@@ -267,6 +267,8 @@ export default {
       let tDelta = this.convert(e.delta.x)
       let t = tNow + tDelta
       // this.$log('pointDrag t', t)
+      // handle <0 and  >duration case
+      if (t <= 0 || t >= this.player.duration) return
       this.player.setCurrentTime(t)
       this.player.figure[index].t = t
       // final

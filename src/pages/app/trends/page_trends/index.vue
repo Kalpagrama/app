@@ -37,8 +37,8 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          // objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          // objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE',
         },

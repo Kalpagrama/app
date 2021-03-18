@@ -52,6 +52,7 @@ div(
     :style=`{
       maxHeight: 'calc(100% - 48px)',
       overflow: textContainerOverflowHidden ? 'hidden' : 'scroll',
+      //- paddingTop: '50px',
     }`
     ).row.fit.items-start.content-start.q-px-md.q-pt-md
     div(

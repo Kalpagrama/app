@@ -81,7 +81,7 @@ div(
 <script>
 import nodeItem from './node_item.vue'
 import nodeItems from './node_items.vue'
-import nodeActions from 'components/node/node_actions/index.vue'
+import nodeActions from 'components/node/node_actions.vue'
 import nodeSpheres from 'components/node/node_spheres/index.vue'
 import nodeHeader from 'components/node/node_header/index.vue'
 

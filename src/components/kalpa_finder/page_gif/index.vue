@@ -15,8 +15,9 @@ kalpa-layout(
                 position: 'relative',
                 borderRadius: '10px', overflow: 'hidden',
               }`
+              @click="$emit('item', {oid: null, type: 'GIF', thumbUrl: gif.media[0]['tinygif']['url'], url: gif.media[0]['gif']['url']})"
               ).row.full-width.items-start.content-start.q-mb-sm
-              slot(
+              //- slot(
                 name="tint"
                 :item=`{
                   oid: null,

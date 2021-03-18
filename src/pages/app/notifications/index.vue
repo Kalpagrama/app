@@ -42,6 +42,9 @@ kalpa-layout
         list-feed(
           v-if="$store.getters.currentUser().profile.role !== 'GUEST' && sphereOid"
           :query="query"
+          itemsPerPage="24"
+          :itemMiddlePersist="false"
+          :itemsMax="100"
           :itemStyles=`{
             paddingBottom: '8px',
           }`

@@ -155,7 +155,7 @@ div(
                 ).row.bg-red
             //- currentTime hover percent
             div(
-              v-if="!zoomed && currentTimeHoverPercent"
+              v-if="!zoomed && currentTimeHoverPercent && $q.screen.gt.sm"
               :style=`{
                 position: 'absolute', zIndex: 2001,
                 top: '-14px',
@@ -167,7 +167,7 @@ div(
               //- small.text-white {{ currentTimeHoverPercent }}
             //- currentTime hover line
             div(
-              v-if="!zoomed && currentTimeHoverPercent"
+              v-if="!zoomed && currentTimeHoverPercent && $q.screen.gt.sm"
               :style=`{
                 position: 'absolute', zIndex: 2000,
                 left: currentTimeHoverPercent+'%',

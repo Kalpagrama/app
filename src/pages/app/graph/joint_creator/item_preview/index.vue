@@ -44,9 +44,12 @@
   //- else
   div(
     v-else
-    :style=`{}`
+    :style=`{
+      minHeight: '100px',
+    }`
     ).row.full-width.items-start.content-start
     img(
+      draggable="false"
       :src="item.thumbUrl"
       :style=`{
         borderRadius: '10px',

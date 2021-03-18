@@ -48,6 +48,11 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
+import pageWorkspace from './page_workspace/index.vue'
+import pageNodes from './page_nodes/index.vue'
+import pageSearch from './page_search/index.vue'
+import pageGif from './page_gif/index.vue'
+
 export default {
   name: 'kalpaFinder',
   props: {
@@ -66,11 +71,10 @@ export default {
     }
   },
   components: {
-    pageWorkspace: () => import('./page_workspace/index.vue'),
-    pageSearch: () => import('./page_search/index.vue'),
-    pageNodes: () => import('./page_nodes/index.vue'),
-    pageWeb: () => import('./page_web/index.vue'),
-    pageGif: () => import('./page_gif/index.vue'),
+    pageWorkspace,
+    pageSearch,
+    pageNodes,
+    pageGif,
   },
   data () {
     return {
