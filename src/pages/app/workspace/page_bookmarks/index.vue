@@ -116,6 +116,7 @@ export default {
   computed: {
     pages () {
       let pages = [
+        {id: 'collections', name: this.$tt('Collections')},
         {id: 'content', name: this.$tt('Media')},
         {id: 'nodes', name: this.$tt('Nodes')},
         {id: 'joints', name: this.$tt('Joints')},

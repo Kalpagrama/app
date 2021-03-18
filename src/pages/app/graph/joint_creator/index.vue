@@ -1,9 +1,5 @@
 <template lang="pug">
-div(
-  :style=`{
-    //- position: 'relative',
-  }`
-  ).row.full-width.items-start.content-start.justify-center.b-30
+.row.full-width.items-start.content-start.justify-center.b-30
   //- item finder
   q-dialog(
     @hide="$emit('blurred')"
@@ -33,29 +29,20 @@ div(
       :item="joint.items[1]"
       @remove="itemRemove"
       @close="itemEditorShow = false")
-  //- what?
-  .row.full-width.justify-center.q-px-sm
+  //- body
+  div(:style=`{paddingBottom: '300px',}`).row.full-width.justify-center.q-px-sm
     div(
       :style=`{
         position: 'relative',
         maxWidth: maxWidth+'px',
-        //- minHeight: 500+'px',
+        background: 'rgb(33,33,33)',
+        borderRadius: '0 0 10px 10px',
       }`
-      ).row.full-width.items-start.content-start.b-30
-      //- frame ???
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 100, top: '0px', left: '0px',
-          pointerEvents: 'none',
-          borderLeft: '1px dashed rgb(40,40,40)',
-          borderBottom: '1px dashed rgb(40,40,40)',
-          borderRight: '1px dashed rgb(40,40,40)',
-          borderRadius: '0px 0px 10px 10px',
-        }`
-        ).row.fit
+      ).row.full-width.items-start.content-start
       vertex-editor(:joint="joint")
-      //- item finder start
-      div(v-if="!joint.items[1]").row.full-width.q-px-sm.q-pb-sm
+      //- item finder start btn
+      div(
+        v-if="!joint.items[1]").row.full-width.q-px-sm.q-pb-sm
         q-btn(
           @click="itemFinderShow = true"
           flat color="white" no-caps icon="add" size="lg" stack
@@ -72,44 +59,34 @@ div(
         }`
         ).row.full-width.q-px-sm.q-pb-sm
         item-preview(:item="joint.items[1]")
-        //- joint-item(
-          :item="joint.items[1]"
-          :itemActive="true"
-          :itemIndependent="true")
-          template(v-slot:context)
-            //- content fragmenter
-            div(
-              v-if="['VIDEO'].includes(joint.items[1].type)"
-              :style=`{
-              }`
-              ).row.full-width.q-pb-sm
-              q-btn(
-                @click="contentFragmentStart()"
-                outline no-caps color="green" dense
-                ).q-px-sm Выделить фрагмент
-        //- footer actions
-        div(
-          :style=`{
-            marginBottom: '300px',
-          }`
-          ).row.full-width.justify-center.q-py-md.q-px-sm
-          .row.full-width.justify-center
+        //- item actions
+        .row.full-width.justify-center.q-pt-md.q-pb-sm
+          //- item remove
+          q-btn(
+            flat color="red" icon="delete_outline"
+            :style=`{
+              width: '50px',
+              height: '50px',
+            }`
+            @click="itemRemove()")
+          //- item publish
+          .col.q-px-sm
             q-btn(
-              flat color="white" icon="edit"
+              @click="jointPublish"
+              color="green" no-caps
+              :loading="jointPublishing"
               :style=`{
-                width: '50px',
                 height: '50px',
-              }`
-              @click="itemEditorShow = true")
-            .col.q-pl-sm
-              q-btn(
-                @click="jointPublish"
-                color="green" no-caps
-                :loading="jointPublishing"
-                :style=`{
-                  height: '50px',
-                }`).full-width
-                span.text-bold Опубликовать
+              }`).full-width
+              span.text-bold Опубликовать
+          //- item edit
+          q-btn(
+            flat color="white" icon="edit"
+            :style=`{
+              width: '50px',
+              height: '50px',
+            }`
+            @click="itemEditorShow = true")
 </template>
 
 <script>

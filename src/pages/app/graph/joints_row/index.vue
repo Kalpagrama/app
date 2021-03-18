@@ -134,28 +134,6 @@ div(
         :style=`{
           width: paddingLeftRight+'px',
         }`)
-  //- next row
-  //- div(
-    v-if="rowActive"
-    @click="$emit('next')").row.full-width.justify-center
-    div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-pa-lg
-      //- h1.text-white Another links...
-      //- widget-bookmarks()
-    //- div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.q-px-xl.br
-      .col.q-pr-xs
-        q-btn(
-          outline color="grey-8" no-caps
-          :style=`{
-            height: '100px',
-          }`
-          ).full-width Up
-      .col.q-pl-xs
-        q-btn(
-          outline color="grey-8" no-caps
-          :style=`{
-            height: '100px',
-          }`
-          ).full-width Down
 </template>
 
 <script>

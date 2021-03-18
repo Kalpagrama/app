@@ -88,9 +88,9 @@ export default {
     }
     else {
       // check tutorial
-      if (this.$store.getters.currentUser().profile.tutorial.main === false) {
-        this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
-      }
+      // if (this.$store.getters.currentUser().profile.tutorial.main === false) {
+      //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+      // }
     }
   },
   beforeDestroy () {

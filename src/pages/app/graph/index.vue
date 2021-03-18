@@ -12,24 +12,17 @@ kalpa-layout()
         q-btn(
           v-if="!jointCreatorShow"
           @click="$routerKalpa.back()"
-          flat color="grey-7" icon="west" no-caps stack
+          flat color="grey-7" icon="west" no-caps
           :style=`{
-            width: '70px', height: '70px',
-          }`) {{$tt('Back')}}
+            width: '46px', height: '46px',
+          }`)
+          small {{$tt('Back')}}
         .col
-        //- q-btn(
-          v-if="!jointCreatorShow"
-          flat no-caps color="white" @click="rowsPrev()") Вверх
-        //- q-btn(
-          v-if="!jointCreatorShow"
-          flat no-caps color="white" @click="rowsNext()")
-          span.text-bold Next
-        //- .col
         q-btn(
           v-if="!jointCreatorShow"
           @click="jointCreateStart()"
           round color="green" icon="add"
-          :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+          :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
         q-btn(
           v-if="jointCreatorShow"
           @click="jointCreateCancel()"
@@ -38,10 +31,9 @@ kalpa-layout()
         .col
         kalpa-menu-popup-global(
           v-if="!jointCreatorShow"
-          :showLabel="true"
           color="grey-7"
           :style=`{
-            width: '70px', height: '70px',
+            width: '46px', height: '46px',
           }`)
   template(v-slot:body)
     .row.full-width.items-start.content-start
@@ -49,9 +41,9 @@ kalpa-layout()
         v-if="jointItem"
         :style=`{
           paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
-          paddingBottom: '600px'
+          //- paddingBottom: '600px'
         }`).row.full-width.justify-center
-        //- starting item
+        //- pinned top item
         .row.full-width.justify-center.q-px-sm
           div(
             :style=`{
@@ -101,6 +93,7 @@ kalpa-layout()
                 @created="jointCreated"
                 @focused="jointCreatorFocused = true"
                 @blurred="jointCreatorFocused = false")
+        //- div(:style=`{height: '300px'}`).row.full-width.br
 </template>
 
 <script>

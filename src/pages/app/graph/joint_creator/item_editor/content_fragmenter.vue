@@ -9,7 +9,7 @@ kalpa-layout().b-30
             q-btn(
               round flat color="white" icon="west"
               @click="$emit('close')").q-mr-sm
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выделение фрагмента
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Pick fragment')}}
 //- div(
   @click.self="$emit('close')"
   :style=`{

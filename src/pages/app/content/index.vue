@@ -56,18 +56,34 @@ export default {
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // check tutorial
+    let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    if (!userTutorials.content_first) {
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])
+    }
+    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      // do nothing ?
+    }
+    else {
+      // do something ?
+    }
   },
   async beforeDestroy () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
-    // handle views stats
-    if (this.isActiveStart > 0) {
-      let statValue = Date.now() - this.isActiveStart
-      this.$log('statValue', statValue)
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') return
-      let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
-      this.$log('statValue stat', stat)
+    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      // do nothing ?
+    }
+    else {
+      // handle views stats
+      if (this.isActiveStart > 0) {
+        let statValue = Date.now() - this.isActiveStart
+        this.$log('statValue', statValue)
+        if (this.$store.getters.currentUser().profile.role === 'GUEST') return
+        let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
+        this.$log('statValue stat', stat)
+      }
     }
   }
 }

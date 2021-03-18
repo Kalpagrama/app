@@ -14,14 +14,15 @@ kalpa-layout().b-30
           @composition="contentFragmentDone"
           @close="contentFragmenterShow = false")
       //- body
-      .row.full-width.justify-center.q-px-sm.br
+      .row.full-width.justify-center.q-px-sm
         div(:style=`{maxWidth: 500+'px'}`).row.full-width
           //- header
           .row.full-width.items-center.content-center.q-pa-sm
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Item editor')}}
+            .col
             q-btn(
-              round flat color="white" icon="west"
-              @click="$emit('close')").q-mr-sm
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор элемента связи
+              round flat color="white" icon="clear"
+              @click="$emit('close')")
           //- item
           item-preview(:item="item")
           //- node actions

@@ -5,10 +5,10 @@ div(
     position: 'relative',
     //- width: $q.screen.width+'px',
     //- minWidth: 500+'px',
-    maxWidth: 500+'px',
-    //- height: $q.screen.height+'px',
+    //- maxWidth: 500+'px',
+    height: $q.screen.height+'px',
   }`
-  ).column.items-center.content-center.justify-center
+  ).column.full-width.items-center.content-center.justify-center.b-30
   //- header
   div(
     :style=`{
@@ -47,9 +47,9 @@ div(
       :name="s.id"
       :style=`{
         userSelect: 'none',
-        background: 'rgb(25,25,25)',
+        //- background: 'rgb(25,25,25)',
       }`
-      ).row.fit.items-center.content-center.justify-center
+      ).row.fit.items-center.content-center.justify-center.b-30
       img(
         draggable="false"
         :src="s.url"

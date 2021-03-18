@@ -1,16 +1,12 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- node
-  div(
+  type-node(
     v-if="item.type === 'NODE'"
-    ).row.full-width
-    node-feed(
-      :node="item"
-      :isActive="true"
-      :isVisible="true")
+    :item="item")
   //- content
   div(
-    v-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
+    v-else-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
     ).row.full-width.items-start.content-start
     div(
       :style=`{
@@ -56,15 +52,17 @@
         borderRadius: '10px',
       }`
       ).full-width
-    small.text-white {{ item }}
+    //- small.text-white {{ item }}
 </template>
 
 <script>
+import typeNode from './type_node.vue'
 import typeVideo from './type_video.vue'
 
 export default {
   name: 'itemPreview',
   components: {
+    typeNode,
     typeVideo,
   },
   props: ['item'],
