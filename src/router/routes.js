@@ -198,7 +198,7 @@ const routes = [
             meta: { roleMinimal: 'GUEST' },
             children: [
                {
-                  name: 'workspace.home',
+                  name: 'workspace',
                   path: '',
                   component: () => import('pages/app/workspace/page_home/index.vue'),
                },

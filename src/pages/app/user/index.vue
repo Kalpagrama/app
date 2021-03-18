@@ -1,5 +1,22 @@
 <template lang="pug">
-q-layout(
+kalpa-layout
+  template(v-slot:header=`{scrollTop}`)
+    nav-tabs(:user="user" v-if="scrollTop > 226")
+  template(v-slot:footer)
+    kalpa-menu-mobile
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      div(
+        v-if="user"
+        ).row.full-width.items-start.content-start.justify-center
+        nav-header(:user="user")
+        nav-tabs(:user="user")
+        router-view(
+          :user="user"
+          :style=`{
+            maxWidth: $store.state.ui.pageWidth+'px',
+          }`)
+//- q-layout(
   view="hHh lpR fFf"
   :container="false"
   :style=`{

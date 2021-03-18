@@ -14,12 +14,22 @@ div(
       :style=`{
         position: 'relative',
         height: '34px',
+        //- width: '70px',
+        //- width: 'auto',
+        minWidth: '70px',
+        maxWidth: '70px',
         background: r.colorBackground,
         borderRadius: getRadius(ri),
+        textAlign: 'center',
       }`
       @click="vote(r.value)"
-      ).row.items-center.content-center.q-px-sm.cursor-pointer
-      small(:style=`{whiteSpace: 'nowrap',pointerEvents: 'none'}`).text-white {{ r.name }}
+      ).row.items-center.content-center.justify-center.q-px-sm.cursor-pointer
+      small(
+        :style=`{
+          //- whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          lineHeight: 1,
+        }`).text-white {{ r.name }}
       div(
         v-if="voteVoting === r.value"
         :style=`{

@@ -6,14 +6,18 @@ div(
   }`
   ).column.full-width
   //- header
-  .row.full-width
-    slot(name="header")
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 1000, top: '0px',
+    }`
+    ).row.full-width
+    slot(name="header" :scrollTop="scrollTop")
   //- body
   div(
     ref="body-wrapper"
     :style=`{
       position: 'relative',
-      paddingBottom: '200px',
+      paddingBottom: '500px',
     }`
     @scroll="onScroll"
     ).col.full-width.scroll

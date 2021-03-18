@@ -63,7 +63,7 @@
             height: '60px', borderRadius: '10px', overflow: 'hidden',
             //- maxWidth: '210px',
           }`
-          ).row.full-width.items-center.content-center.menu-item
+          ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
             user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
           div(v-if="!mini").col.full-height

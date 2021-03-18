@@ -1,3 +1,13 @@
+<style lang="sass">
+.rotating-slow
+  animation: rotation 15s infinite linear
+@keyframes rotation
+  from
+    transform: rotate(0deg)
+  to
+    transform: rotate(-359deg)
+</style>
+
 <template lang="pug">
 div(
   :style=`{
@@ -6,7 +16,7 @@ div(
   }`
   ).row.full-width.justify-center
   //- tint
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 300,
     }`
@@ -55,8 +65,14 @@ div(
         round flat color="grey-9")
         q-icon(name="far fa-comment" size="24px" :style=`{transform: 'scaleX(-1)'}`)
       q-btn(
+        :to="'/node/'+node.oid"
         round flat color="grey-9")
-        q-icon(name="logout" ).rotate-90
+        //- q-icon(name="logout" ).rotate-90
+        kalpa-logo(
+          :class="{'rotating-slow': isActive}"
+          :width="24"
+          :height="24"
+          )
       small(:style=`{marginLeft: '-4px',}`).text-grey-9 {{ node.countStat.countJoints }}
     .row.items-center.content-center.q-px-sm
       div(:style=`{width: '42px',}`)

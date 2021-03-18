@@ -16,10 +16,47 @@ div(
         span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$tt('Vote stats')}}
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+      //- header rates selector
+      .row.full-width.items-start.content-start.justify-center.q-px-sm
+        div(
+          :style=`{
+            maxWidth: 500+'px',
+            minHeight: '54px',
+          }`
+          ).row.full-width
+          div(
+            :style=`{
+              minHeight: '20px',
+            }`
+            ).row.full-width
+            div(
+              :style=`{
+                borderRadius: '10px',
+                overflow: 'hidden',
+              }`
+              ).row.fit.items-center.content-center
+              div(
+                v-for="(r,ri) in $rateMeta" :key="r.value"
+                @click="rateId === r.value ? rateId = null : rateId = r.value"
+                :style=`{
+                  background: r.colorBackground,
+                  borderRadius: r.value === rateId ? '10px' : rateRadius(ri),
+                  minHeight: r.value === rateId ? '40px' : '20px',
+                  maxHeight: r.value === rateId ? '40px' : '20px',
+                }`
+                ).col.full-height
+                div(
+                  ).row.fit.items-center.content-center.justify-center.cursor-pointer
+                  small(
+                    :style=`{
+                      fontSize: '8.5px', pointerEvents: 'none', userSelect: 'none',
+                      whiteSpace: 'nowrap'
+                    }`).text-white {{ r.name }} {{r.value}}
       //- body
       div(
         :style=`{
-          maxHeight: '500px',
+          minHeight: '440px',
+          maxHeight: '440px',
         }`
         ).row.full-width.items-start.content-start.q-px-sm.scroll
         router-link(
@@ -33,7 +70,7 @@ div(
             q-btn(
               flat color="white" dense no-caps)
               user-avatar(:url="v.thumbUrl" :width="28" :height="28")
-              span.text-grey-4.q-ml-sm {{ v.name }}
+              span.text-grey-4.q-ml-sm {{ v.name }} {{v.rate}}
             .col
             small.text-grey-8.q-mr-sm {{ $date(v.date, 'DD.MM.YYYY') }}
             div(
@@ -80,18 +117,34 @@ export default {
     }
   },
   computed: {
+    rateInfo () {
+      return this.$rateMeta.find(r => r.value === this.rateId)
+    },
     voters () {
       if (!this.stats) return []
       // return votes filtered by selected rateId
-      if (this.rateId) {
+      if (this.rateInfo) {
         return this.stats.votes.filter(v => {
-          let rate = this.$rateMeta.find(r => r.value === this.rateId)
-          return v.rate >= rate.valueMin && v.rate < rate.valueMax
+          return v.rate >= this.rateInfo.valueMin && v.rate < this.rateInfo.valueMax
         })
+        // return this.stats.votes
       }
       // return all the voters
       else {
         return this.stats.votes
+      }
+    }
+  },
+  methods: {
+    rateRadius (ri) {
+      if (ri === 0) {
+        return '10px 0 0 10px'
+      }
+      else if (ri === this.$rateMeta.length - 1) {
+        return '0 10px 10px 0'
+      }
+      else {
+        return ''
       }
     }
   },
