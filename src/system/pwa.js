@@ -19,7 +19,7 @@ const forceUpdatePWA = true // обновлять приложение без р
 
 async function initPWA (store) {
    const f = initPWA
-   logD(f, 'start')
+   logD(f, 'initPWA start')
    const t1 = performance.now()
    window.addEventListener('beforeinstallprompt', (e) => {
       // Prevent the mini-info bar from appearing.
@@ -36,12 +36,12 @@ async function initPWA (store) {
    if ('serviceWorker' in navigator && !registration) {
       // init sw
       {
-         logD('try navigator.serviceWorker.register service-worker.js', Date.now())
+         logD('try navigator.serviceWorker.register service-worker.js. controller=', navigator.serviceWorker.controller)
+         if (navigator.serviceWorker.controller) window.KALPA_LOAD_SW_STATUS = 'active'
+         else window.KALPA_LOAD_SW_STATUS = 'not_installed'
          // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
          registration = await navigator.serviceWorker.register('/service-worker.js')
-         if (!registration.active){
-            window.KALPA_LOAD_SW = true
-         }
+         logD('navigator.serviceWorker.register service-worker.js OK!')
          for (let sw of [registration.installing, registration.waiting, registration.active]) {
             if (sw) {
                // установить фильтр логирования

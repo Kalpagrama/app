@@ -314,7 +314,7 @@ class Objects {
                acc += val.count
                return acc
             }, 0)
-            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countVotes', countVotes, true)
+            await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), 'countStat.countVotes', countVotes, true)
             // добавим голос пользователя в статистику
             await updateRxDocPayload(makeId(RxCollectionEnum.GQL_QUERY, 'objectStat', { oid: event.object.oid }), 'votes', votes => {
                logD('updateRxDocPayload objectStat TODO! обновить статистику голосованния', votes)
