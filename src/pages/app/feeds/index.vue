@@ -1,38 +1,34 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  :container="false"
-  :style=`{
-    height: $q.screen.height+'px',
-  }`).b-30
-  q-footer(v-if="$q.screen.lt.md")
-    kalpa-menu-mobile
-  q-page-container
-    q-page(
-      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-      :style=`{
-        height: '80vh',
-      }`
-      ).row.full-width.justify-center
-      div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-        .row.full-width.justify-center
-          q-icon(name="login" color="grey-8" size="100px")
-        div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-          span.text-white Вы увидите свою домашнюю ленту.
-        .row.full-width.justify-center.q-pt-md
-          q-btn(
-            outline color="white" no-caps
-            :to="'/auth/sign-in'"
-            :style=`{
-              height: '50px',
-            }`)
-            h1.text-white Войти в аккаунт
-    q-page(
-      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
-      :style=`{
-        //- paddingTop: '8px', paddingBottom: '200px',
-      }`)
-      feed(:feed="feed")
+kalpa-layout()
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      div(
+        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+        :style=`{
+          height: '80vh',
+        }`
+        ).row.full-width.justify-center
+        div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
+          .row.full-width.justify-center
+            q-icon(name="login" color="grey-8" size="100px")
+          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+            span.text-white Вы увидите свою домашнюю ленту.
+          .row.full-width.justify-center.q-pt-md
+            q-btn(
+              outline color="white" no-caps
+              :to="'/auth/sign-in'"
+              :style=`{
+                height: '50px',
+              }`)
+              h1.text-white Войти в аккаунт
+      div(
+        v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+        :style=`{
+          paddingTop: '8px',
+        }`).row.full-width.justify-center
+        feed(:feed="feed")
 </template>
 
 <script>

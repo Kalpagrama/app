@@ -3,7 +3,7 @@ kalpa-layout
   template(v-slot:header=`{scrollTop}`)
     nav-tabs(:user="user" v-if="scrollTop > 226")
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.gt.md")
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start
       div(
