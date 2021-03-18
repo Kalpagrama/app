@@ -1,5 +1,10 @@
 <template lang="pug">
-q-page(
+kalpa-layout(
+  :height="height"
+  )
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+//- q-page(
   :style=`{
     paddingTop: '40px',
   }`).row.full-width.justify-center
@@ -32,7 +37,7 @@ import { UserApi } from 'src/api/user'
 
 export default {
   name: 'kalpaFinder_pageKalpagrama',
-  props: ['searchString', 'kalpaTypes'],
+  props: ['height'],
   components: {
     // item: () => import('./item.vue')
   },

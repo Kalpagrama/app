@@ -123,11 +123,30 @@ div(
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="60px")
     //- item wrapper
+    //- div(
+      v-for="(n,ni) in 100" :key="ni"
+      :accessKey="ni"
+      :class=`{
+        'bg-red': itemMiddleIndex === ni,
+      }`
+      v-observe-visibility=`{
+        throttle: 150,
+        callback: itemMiddleHandlerTest,
+        intersection: {
+          root: scrollTargetIsWindow ? null : scrollTarget,
+          rootMargin: rootMargin,
+          //- threshold: 0.9,
+        }
+      }`
+      ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
       :ref="`item-${item[itemKey]}`"
       :accessKey="`${item[itemKey]}-${itemIndex}`"
+      :class=`{
+        //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
+      }`
       :style=`{
         ...itemStyles,
       }`
@@ -136,7 +155,8 @@ div(
         callback: itemMiddleHandler,
         intersection: {
           root: scrollTargetIsWindow ? null : scrollTarget,
-          rootMargin: rootMargin
+          rootMargin: rootMargin,
+          //- threshold: 0.9,
         }
       }`
       ).row.full-width
@@ -168,7 +188,7 @@ div(
 <script>
 import { scroll } from 'quasar'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
   name: 'listFeed',
@@ -229,6 +249,7 @@ export default {
       itemsResStatus: null,
       // item
       itemMiddle: null,
+      itemMiddleIndex: null,
     }
   },
   computed: {
@@ -344,6 +365,13 @@ export default {
     },
   },
   methods: {
+    itemMiddleHandlerTest (isVisible, entry) {
+      if (isVisible) {
+        this.$log('scrollTarget', this.scrollTarget)
+        this.$log('itemMiddleHandlerTest', isVisible, entry.target.accessKey)
+        this.itemMiddleIndex = parseInt(entry.target.accessKey)
+      }
+    },
     itemMiddleGetPosition () {
       this.$log('itemMiddleGetPosition')
       if (!this.itemMiddle) return
@@ -417,6 +445,7 @@ export default {
     },
     itemMiddleHandler (isVisible, entry) {
       if (isVisible) {
+        this.$log('isVisible', entry.target.accessKey)
         // if (this.scrollHeightChanging) return
         let [key, idxSting] = entry.target.accessKey.split('-')
         this.itemMiddleSet(key, parseInt(idxSting))
@@ -501,6 +530,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
+    this.$log('this.scrollTarget', this.scrollTarget)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
     this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight

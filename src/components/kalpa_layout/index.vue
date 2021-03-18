@@ -17,7 +17,7 @@ div(
     ref="body-wrapper"
     :style=`{
       position: 'relative',
-      paddingBottom: '500px',
+      //- paddingBottom: '500px',
     }`
     @scroll="onScroll"
     ).col.full-width.scroll

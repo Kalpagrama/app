@@ -51,7 +51,7 @@ div(
                     :style=`{
                       fontSize: '8.5px', pointerEvents: 'none', userSelect: 'none',
                       whiteSpace: 'nowrap'
-                    }`).text-white {{ r.name }} {{r.value}}
+                    }`).text-white {{ r.name }}
       //- body
       div(
         :style=`{
@@ -70,7 +70,7 @@ div(
             q-btn(
               flat color="white" dense no-caps)
               user-avatar(:url="v.thumbUrl" :width="28" :height="28")
-              span.text-grey-4.q-ml-sm {{ v.name }} {{v.rate}}
+              span.text-grey-4.q-ml-sm {{ v.name }}
             .col
             small.text-grey-8.q-mr-sm {{ $date(v.date, 'DD.MM.YYYY') }}
             div(

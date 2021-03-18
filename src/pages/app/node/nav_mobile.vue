@@ -15,8 +15,8 @@ div(
       @click="$routerKalpa.back()"
       flat color="grey-7" icon="west" no-caps
       :style=`{
-        width: '70px',
-        height: '70px',
+        width: '46px',
+        height: '46px',
       }`)
       span Назад
     //- .col
@@ -30,7 +30,7 @@ div(
     //- .col
     kalpa-menu-popup-global(
       color="grey-7"
-      :styles=`{width: '70px', height: '70px',}`)
+      :styles=`{width: '46px', height: '46px',}`)
 </template>
 
 <script>

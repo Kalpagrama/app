@@ -1,5 +1,39 @@
 <template lang="pug">
-q-page(
+kalpa-layout(
+  :height="height"
+  )
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        div(v-if="viewId === 'search'").row.full-width.items-start.content-start
+          masonry(
+            :cols="3"
+            :gutter="{default: 6}").full-width.items-start.content-start
+            div(
+              v-for="(gif, gi) in gifs" :key="gif.id"
+              :style=`{
+                position: 'relative',
+                borderRadius: '10px', overflow: 'hidden',
+              }`
+              ).row.full-width.items-start.content-start.q-mb-sm
+              slot(
+                name="tint"
+                :item=`{
+                  oid: null,
+                  type: 'GIF',
+                  thumbUrl: gif.media[0]['tinygif']['url'],
+                  url: gif.media[0]['gif']['url']
+                }`
+                :itemKey="gif.id")
+              //- img
+              img(
+                :src="gif.media[0]['tinygif']['url']"
+                draggable="false"
+                :style=`{
+                  pointerEvents: 'none',
+                }`
+                ).full-width
+//- q-page(
   :style=`{
     paddingTop: '8px',
     paddingBottom: '0px',
@@ -30,40 +64,12 @@ q-page(
       //- div(v-if="viewId === 'bookmarked'").row.full-width.items-start.content-start.justify-center
         h6.text-white Your favorite GIFs will be here soon :)
       //- search
-      div(v-if="viewId === 'search'").row.full-width.items-start.content-start
-        masonry(
-          :cols="3"
-          :gutter="{default: 6}").full-width.items-start.content-start
-          div(
-            v-for="(gif, gi) in gifs" :key="gif.id"
-            :style=`{
-              position: 'relative',
-              borderRadius: '10px', overflow: 'hidden',
-            }`
-            ).row.full-width.items-start.content-start.q-mb-sm
-            slot(
-              name="tint"
-              :item=`{
-                oid: null,
-                type: 'GIF',
-                thumbUrl: gif.media[0]['tinygif']['url'],
-                url: gif.media[0]['gif']['url']
-              }`
-              :itemKey="gif.id")
-            //- img
-            img(
-              :src="gif.media[0]['tinygif']['url']"
-              draggable="false"
-              :style=`{
-                pointerEvents: 'none',
-              }`
-              ).full-width
 </template>
 
 <script>
 export default {
   name: 'kalpaFinder_pageGif',
-  props: ['searchString'],
+  props: ['height'],
   data () {
     return {
       tenorSearch: '',

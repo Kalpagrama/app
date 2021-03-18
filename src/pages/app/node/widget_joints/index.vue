@@ -9,17 +9,17 @@
     ).row.full-width
     //- header
     router-link(
-      :to="'/joint/'+node.oid"
+      :to="'/graph/'+node.oid"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="fas fa-link" color="grey-9" size="24px")
+      q-icon(name="fas fa-link" color="white" size="24px").q-mr-sm
       .col
         span.text-white.text-bold Связи
       //- q-icon(name="bookmark_outline" color="white" size="24px")
       //- q-btn(round flat dense color="grey-9")
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
-      //- joints mockup
-      div(v-if="!joints").row.full-width.no-wrap.q-pa-sm
+      //- joints loading
+      div(v-if="!jointsRes").row.full-width.no-wrap.q-pa-sm
         div(
           v-for="n in 5" :key="n"
           :style=`{
@@ -27,11 +27,12 @@
             borderRadius: '10px',
           }`
           ).row.b-40.q-mr-sm
-      //- joints loaded
-      div(v-if="joints && joints.length > 0").row.full-width.no-wrap.q-pa-sm
+      //- joints
+      div(v-if="jointsRes && jointsRes.items.length > 0").row.full-width.no-wrap.q-pa-sm
         router-link(
-          v-for="j in joints" :key="j.populatedObject.oid"
-          :to="'/joint/'+node.oid"
+          v-for="j in jointsRes.items"
+          :key="j.populatedObject.oid"
+          :to="'/graph/'+node.oid+'?oid='+j.oid"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
@@ -45,17 +46,15 @@
               borderRadius: '10px',
             }`
             ).fit
-      //- no joints, create one
-      div(
-        v-if="joints && joints.length === 0"
-        ).row.full-width
+      //- joints empty
+      div(v-if="jointsRes && jointsRes.items.length === 0").row.full-width.no-wrap.q-pa-sm
         q-btn(
-          :to="'/joint/'+node.oid"
-          flat no-caps color="grey-5" align="left"
+          flat no-caps color="white" align="left"
           :style=`{
             height: '50px',
           }`
-          ).full-width Add some links
+          ).full-width
+          span {{$tt('No joints, create one')}}
 </template>
 
 <script>
@@ -66,15 +65,11 @@ export default {
   props: ['node'],
   data () {
     return {
-      joints: null
+      jointsRes: null
     }
   },
   computed: {
-    jointsCount () {
-      if (this.joints.length > 0) return ' - ' + this.joints.length
-      else return ''
-    },
-    jointsQuery () {
+    query () {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -87,13 +82,10 @@ export default {
     }
   },
   methods: {
-    jointsUpdated (joints) {
-      this.$log('jointsUpdated', joints)
-      this.joints = joints
-    }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+     this.jointsRes = await this.$rxdb.find(this.query, true)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

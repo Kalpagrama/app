@@ -1,7 +1,7 @@
 <template lang="pug">
 kalpa-layout
   template(v-slot:footer)
-    kalpa-menu-mobile
+    kalpa-menu-mobile(v-if="$q.screen.gt.md")
   template(v-slot:body)
     //- header
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm

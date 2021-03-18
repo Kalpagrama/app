@@ -201,6 +201,7 @@ export default {
           // handle views
           let statValue = Date.now() - this.isActiveStart
           this.$log('statValue', statValue)
+          if (this.$store.getters.currentUser().profile.role === 'GUEST') return
           let stat = await ObjectApi.updateStat(this.node.oid, 'VIEWED_TIME', statValue)
           this.isActiveStart = 0
         }

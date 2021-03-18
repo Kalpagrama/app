@@ -7,14 +7,14 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.q-pt-sm.b-30
+      .row.full-width.justify-center.b-30
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-md
           q-icon(name="adjust" color="white" size="30px").q-mr-sm
           h1.text-white.text-bold Ядро
       //- body
       div(
         :style=`{
-          paddingTop: '8px',
+          //- paddingTop: '8px',
           paddingBottom: '200px',
         }`).row.full-width.justify-center.b-30
           div(
@@ -35,8 +35,8 @@ kalpa-layout()
                 :node="node"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
-            .row.full-width.q-pt-lg.q-px-xs.bg
-              widjet-joints(:node="node")
+            .row.full-width.q-pt-lg.q-px-xs
+              widget-joints(:node="node")
 </template>
 
 <script>

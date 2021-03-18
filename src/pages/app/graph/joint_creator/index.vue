@@ -34,81 +34,82 @@ div(
       @remove="itemRemove"
       @close="itemEditorShow = false")
   //- what?
-  div(
-    :style=`{
-      position: 'relative',
-      maxWidth: maxWidth+'px',
-      minHeight: 500+'px',
-    }`
-    ).row.full-width.items-start.content-start.b-30
-    //- frame ???
+  .row.full-width.justify-center.q-px-sm
     div(
-      :style=`{
-        position: 'absolute', zIndex: 100, top: '0px', left: '0px',
-        pointerEvents: 'none',
-        borderLeft: '1px dashed rgb(40,40,40)',
-        borderBottom: '1px dashed rgb(40,40,40)',
-        borderRight: '1px dashed rgb(40,40,40)',
-        borderRadius: '0px 0px 10px 10px',
-      }`
-      ).row.fit
-    vertex-editor(:joint="joint")
-    //- item finder start
-    div(v-if="!joint.items[1]").row.full-width.q-pa-sm
-      q-btn(
-        @click="itemFinderShow = true"
-        flat color="white" no-caps icon="add" size="lg" stack
-        :style=`{
-          minHeight: '300px',
-        }`
-        ).full-width.b-40
-        span(:style=`{fontSize: '18px'}`) Выбрать элемент для связи
-    //- item found: viewer
-    div(
-      v-if="joint.items[1]"
       :style=`{
         position: 'relative',
+        maxWidth: maxWidth+'px',
+        //- minHeight: 500+'px',
       }`
-      ).row.full-width
-      item-preview(:item="joint.items[1]")
-      //- joint-item(
-        :item="joint.items[1]"
-        :itemActive="true"
-        :itemIndependent="true")
-        template(v-slot:context)
-          //- content fragmenter
-          div(
-            v-if="['VIDEO'].includes(joint.items[1].type)"
-            :style=`{
-            }`
-            ).row.full-width.q-pb-sm
-            q-btn(
-              @click="contentFragmentStart()"
-              outline no-caps color="green" dense
-              ).q-px-sm Выделить фрагмент
-      //- footer actions
+      ).row.full-width.items-start.content-start.b-30
+      //- frame ???
       div(
         :style=`{
-          marginBottom: '300px',
+          position: 'absolute', zIndex: 100, top: '0px', left: '0px',
+          pointerEvents: 'none',
+          borderLeft: '1px dashed rgb(40,40,40)',
+          borderBottom: '1px dashed rgb(40,40,40)',
+          borderRight: '1px dashed rgb(40,40,40)',
+          borderRadius: '0px 0px 10px 10px',
         }`
-        ).row.full-width.justify-center.q-py-md.q-px-sm
-        .row.full-width.justify-center
-          q-btn(
-            flat color="white" icon="edit"
-            :style=`{
-              width: '50px',
-              height: '50px',
-            }`
-            @click="itemEditorShow = true")
-          .col.q-pl-sm
-            q-btn(
-              @click="jointPublish"
-              color="green" no-caps
-              :loading="jointPublishing"
+        ).row.fit
+      vertex-editor(:joint="joint")
+      //- item finder start
+      div(v-if="!joint.items[1]").row.full-width.q-px-sm.q-pb-sm
+        q-btn(
+          @click="itemFinderShow = true"
+          flat color="white" no-caps icon="add" size="lg" stack
+          :style=`{
+            minHeight: '300px',
+          }`
+          ).full-width.b-40
+          span(:style=`{fontSize: '18px'}`) {{$tt('Pick element to join')}}
+      //- item found: viewer
+      div(
+        v-if="joint.items[1]"
+        :style=`{
+          position: 'relative',
+        }`
+        ).row.full-width.q-px-sm.q-pb-sm
+        item-preview(:item="joint.items[1]")
+        //- joint-item(
+          :item="joint.items[1]"
+          :itemActive="true"
+          :itemIndependent="true")
+          template(v-slot:context)
+            //- content fragmenter
+            div(
+              v-if="['VIDEO'].includes(joint.items[1].type)"
               :style=`{
+              }`
+              ).row.full-width.q-pb-sm
+              q-btn(
+                @click="contentFragmentStart()"
+                outline no-caps color="green" dense
+                ).q-px-sm Выделить фрагмент
+        //- footer actions
+        div(
+          :style=`{
+            marginBottom: '300px',
+          }`
+          ).row.full-width.justify-center.q-py-md.q-px-sm
+          .row.full-width.justify-center
+            q-btn(
+              flat color="white" icon="edit"
+              :style=`{
+                width: '50px',
                 height: '50px',
-              }`).full-width
-              span.text-bold Опубликовать
+              }`
+              @click="itemEditorShow = true")
+            .col.q-pl-sm
+              q-btn(
+                @click="jointPublish"
+                color="green" no-caps
+                :loading="jointPublishing"
+                :style=`{
+                  height: '50px',
+                }`).full-width
+                span.text-bold Опубликовать
 </template>
 
 <script>

@@ -219,6 +219,10 @@ export default {
       async handler (to, from) {
         this.$log('row TO', to)
         this.jointsRes = await this.$rxdb.find(this.query, true)
+        // check empty to create from the start
+        if (this.jointsRes.totalCount === 0) {
+          this.$emit('empty')
+        }
         // start from some joint or from start...
         if (to.jointFrom) {
           this.jointsRes.setProperty('currentId', to.jointFrom)

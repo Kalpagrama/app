@@ -1,13 +1,16 @@
 <template lang="pug">
 div(
   :style=`{
-    height: height+'px',
+    height: $q.screen.height+'px',
   }`
-  ).column.full-width
-  //- header
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageWidthMedi+'px'}`).row.full-width
-      //- title
+  ).row.full-widith
+  div(
+    :style=`{
+      height: '100px',
+    }`
+    ).row.full-width.items-start.content-start.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      //- header
       .row.full-width.items-center.content-center.q-pa-sm
         .col.q-pl-sm
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
@@ -32,32 +35,13 @@ div(
                 @click="pageId = p.id"
                 ).q-mr-sm.q-px-sm {{ p.name }}
               div(:style=`{width: '100px',minWidth: '100px',}`).row
-      //- input
-      q-input(
-        v-model="searchString"
-        borderless dark
-        :placeholder="$tt('Search')"
-        :input-style=`{
-          paddingLeft: '16px',
-        }`
-        :style=`{
-          borderRadius: '10px',
-        }`
-        ).full-width.b-40
-  //- bodys
-  div(
-    ).col.full-width.scroll
-    .row.full-width.justify-center
-      component(
-        v-bind="$props"
-        :is="`page-${pageId}`"
-        :height="height-150"
-        :searchString="searchStringLocal"
-        :page="page"
-        :style=`{
-          maxWidth: $store.state.ui.pageWidthMedi+'px',
-        }`
-        @item="$emit('item', $event)")
+  component(
+    v-bind="$props"
+    :is="`page-${pageId}`"
+    :height="$q.screen.height-100"
+    :searchString="searchStringLocal"
+    :page="page"
+    @item="$emit('item', $event)")
 </template>
 
 <script>
@@ -106,18 +90,10 @@ export default {
     pagesFiltered () {
       return [
         {id: 'workspace', name: 'Workspace', component: 'page-workspace'},
-        {id: 'search', name: 'Search', component: 'page-search'},
         {id: 'nodes', name: 'My Nodes', component: 'page-nodes'},
-        {id: 'web', name: 'Web', component: 'page-web'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
-      ].filter(p => {
-        if (this.pages) {
-          return this.pages[p.id]
-        }
-        else {
-          return true
-        }
-      })
+        // {id: 'search', name: 'Search', component: 'page-search'},
+      ]
     }
   },
   watch: {

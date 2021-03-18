@@ -48,7 +48,7 @@ div(
       //- q-btn(
         round flat color="grey-9")
         q-icon(name="logout").rotate-270
-      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countViews - 1 }}
+      small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countShares }},
     //- save
     .row.items-center.content-center.q-px-sm
       kalpa-save(

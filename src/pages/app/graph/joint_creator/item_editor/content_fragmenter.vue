@@ -1,16 +1,21 @@
 <template lang="pug">
-div(
+kalpa-layout().b-30
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: 500+'px'}`).row.full-width
+          //- header
+          .row.full-width.items-center.content-center.q-pa-sm
+            q-btn(
+              round flat color="white" icon="west"
+              @click="$emit('close')").q-mr-sm
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold Выделение фрагмента
+//- div(
   @click.self="$emit('close')"
   :style=`{
     height: $q.screen.height+'px',
   }`
   ).column.full-width.b-30
-  //- header
-  .row.full-width.items-center.content-center.q-pa-sm
-    q-btn(
-      round flat color="white" icon="west"
-      @click="$emit('close')").q-mr-sm
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold Выделение фрагмента
   .col.full-width
     div(
       :style=`{

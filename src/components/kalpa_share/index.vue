@@ -6,12 +6,12 @@ q-btn(
   @click="shareStart")
   //- q-tooltip(dense dark) {{$tt('Share')}}
   q-icon(name="logout" size="23px").rotate-270
-  q-popup-proxy(
-    cover anchor="top right" self="top right" dark
-    max-width="200px"
+  q-dialog(
+    v-model="shareDialogOpened"
     position="bottom")
     div(
       :style=`{
+        position: 'relative',
         borderRadius: '20px 20px 0 0',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }`
@@ -85,15 +85,21 @@ export default {
     },
     async shareStart () {
       this.$log('shareStart', Platform.is)
-      // eslint-disable-next-line no-unreachable
-      if (Platform.is.desktop) {
-        this.shareLink = makeRoutePath(this.item, true)
-        this.shareDialogOpened = true
-      }
-      else {
-        await this.$systemUtils.shareOut(this.item)
-      }
+      this.shareLink = makeRoutePath(this.item, true)
+      this.shareDialogOpened = true
+      // // eslint-disable-next-line no-unreachable
+      // if (Platform.is.desktop) {
+      //   this.shareLink = makeRoutePath(this.item, true)
+      //   this.shareDialogOpened = true
+      // }
+      // else {
+      //   await this.$systemUtils.shareOut(this.item)
+      // }
       this.$emit('done')
+    },
+    async shareNative () {
+      this.$log('shareNative')
+      await this.$systemUtils.shareOut(this.item)
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
