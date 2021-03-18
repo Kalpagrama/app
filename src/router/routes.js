@@ -24,6 +24,7 @@ const routes = [
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
+         window.KALPA_LOAD_COMPLETE = true // чтобы крутилка не показывалась
          if (localStorage.getItem('k_user_oid')) {
             logD('user is Auth! goto /root')
             return next('/')
