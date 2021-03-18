@@ -22,34 +22,6 @@ div(
     }`
     ).row.fit.items-center.content-center.justify-center
     small.text-white Максимум 1 минута
-  //- figure duration hint reminder max 60sec...
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 100, top: '-18px',
-      height: '10px',
-      pointerEvents: 'none',
-    }`
-    ).row.full-width.justify-center
-    small(
-      :class=`{
-        'text-red': player.figure[1].t-player.figure[0].t > 60,
-        'text-grey-7': player.figure[1].t-player.figure[0].t <= 60
-        }`
-      :style=`{
-        userSelect: 'none',
-        pointerEvents: 'none',
-        fontSize: '10px',
-      }`
-      ) {{$time(player.figure[1].t-player.figure[0].t)}}
-  //- header, play
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 2001,
-      top: '-36px',
-      height: '36px',
-    }`
-    ).row.full-width.bg-red
-    q-btn(round flat dense color="white" icon="play_arrow")
   //- drag indicator icon left
   div(
     :style=`{
@@ -79,34 +51,6 @@ div(
       cursor: 'grabbing',
     }`
     ).row
-  //- drag actions
-  //- div(
-    v-if="player.figureFocused === 0"
-    :style=`{
-      position: 'absolute', zIndex: 2020,
-      left: '-36px',
-      bottom: '-40px',
-    }`).row.no-wrap
-    q-btn(
-      @click.stop="figureForward(0,false)"
-      round flat dense color="white" icon="keyboard_arrow_left")
-    q-btn(
-      @click.stop="figureForward(0,true)"
-      round flat dense color="white" icon="keyboard_arrow_right")
-  //- drag anchor
-  //- div(
-    v-if="player.figureFocused === 0"
-    :class=`{
-    }`
-    :style=`{
-      position: 'absolute', zIndex: 2020,
-      top: '-38px',
-      left: -18+'px',
-    }`
-    ).row.items-end.content-end
-    q-btn(
-      @click="player.setState('figureFocused', null)"
-      round flat dense color="white" icon="push_pin")
   //- drag indicator icon right
   div(
     :style=`{
@@ -136,34 +80,6 @@ div(
       cursor: 'grabbing',
     }`
     ).row
-  //- drag actions
-  //- div(
-    v-if="player.figureFocused === 1"
-    :style=`{
-      position: 'absolute', zIndex: 2020,
-      right: '-36px',
-      bottom: '-40px',
-    }`).row.no-wrap
-    q-btn(
-      @click.stop="figureForward(1,false)"
-      round flat dense color="white" icon="keyboard_arrow_left")
-    q-btn(
-      @click.stop="figureForward(1,true)"
-      round flat dense color="white" icon="keyboard_arrow_right")
-  //- drag anchor
-  //- div(
-    v-if="player.figureFocused === 1"
-    :class=`{
-    }`
-    :style=`{
-      position: 'absolute', zIndex: 2020,
-      top: '-38px',
-      right: -18+'px',
-    }`
-    ).row.items-end.content-end
-    q-btn(
-      @click="player.setState('figureFocused', null)"
-      round flat dense color="white" icon="push_pin")
 </template>
 
 <script>
@@ -222,22 +138,6 @@ export default {
       // wait for the end..
       this.figureForwardTimer = setTimeout(async () => {
         this.$log('figureForward FINAL')
-        // this.player.setState('figureFocused', true)
-        // if (pointIndex === 0) {
-        //   // do nothing ? focus and play
-        //   // this.player.play()
-        // }
-        // if (pointIndex === 1) {
-        //   // play last 3 sec if possible ?
-        //   // or from the start...
-        //   let t = this.player.figure[1].t - 3
-        //   if (t < this.player.figure[0].t) {
-        //     t = this.player.figure[0].t
-        //   }
-        //   await this.$wait(300)
-        //   this.player.setCurrentTime(t)
-        //   // this.player.play()
-        // }
       }, 700)
     },
     pointClick (pointIndex) {
