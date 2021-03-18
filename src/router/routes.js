@@ -100,10 +100,46 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'user',
-            path: 'user/:oid/:page?',
+            path: 'user/:oid',
             component: () => import('pages/app/user/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            children: [
+               {
+                  name: 'user.home',
+                  path: '',
+                  redirect: 'nodes',
+               },
+               {
+                  name: 'user.collections',
+                  path: 'collections',
+                  component: () => import('pages/app/user/page_collections/index.vue'),
+               },
+               {
+                  name: 'user.nodes',
+                  path: 'nodes',
+                  component: () => import('pages/app/user/page_nodes/index.vue'),
+               },
+               {
+                  name: 'user.joints',
+                  path: 'joints',
+                  component: () => import('pages/app/user/page_joints/index.vue'),
+               },
+               {
+                  name: 'user.votes',
+                  path: 'votes',
+                  component: () => import('pages/app/user/page_votes/index.vue'),
+               },
+               {
+                  name: 'user.following',
+                  path: 'following',
+                  component: () => import('pages/app/user/page_following/index.vue'),
+               },
+               {
+                  name: 'user.followers',
+                  path: 'followers',
+                  component: () => import('pages/app/user/page_followers/index.vue'),
+               }
+            ]
          },
          {
             name: 'user-render',
@@ -115,6 +151,12 @@ const routes = [
             name: 'sphere',
             path: 'sphere/:oid/:page?',
             component: () => import('pages/app/sphere/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
+            name: 'sphere-threads',
+            path: 'sphere-threads/:oid',
+            component: () => import('pages/app/sphere_threads/index'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -143,41 +185,45 @@ const routes = [
             component: () => import('src/pages/app/content_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
+         // notifications
          {
             name: 'notifications',
             path: 'notifications',
             component: () => import('pages/app/notifications/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
+         // workspace
          {
-            name: 'workspace',
             path: 'workspace',
             component: () => import('pages/app/workspace/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
-         },
-         {
-            name: 'workspace.watch-later',
-            path: 'workspace/watch-later',
-            component: () => import('pages/app/workspace/page_watch_later/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.history',
-            path: 'workspace/history',
-            component: () => import('pages/app/workspace/page_history/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.bookmarks',
-            path: 'workspace/bookmarks',
-            component: () => import('pages/app/workspace/page_bookmarks/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
-         },
-         {
-            name: 'workspace.create',
-            path: 'workspace/create',
-            component: () => import('pages/app/workspace/page_create/index.vue'),
-            meta: { roleMinimal: 'MEMBER' }
+            meta: { roleMinimal: 'GUEST' },
+            children: [
+               {
+                  name: 'workspace',
+                  path: '',
+                  component: () => import('pages/app/workspace/page_home/index.vue'),
+               },
+               {
+                  name: 'workspace.collections',
+                  path: 'collections',
+                  component: () => import('pages/app/workspace/page_collections/index.vue'),
+               },
+               {
+                  name: 'workspace.collection',
+                  path: 'collection/:id',
+                  component: () => import('pages/app/workspace/page_collection/index.vue'),
+               },
+               {
+                  name: 'workspace.bookmarks',
+                  path: 'bookmarks',
+                  component: () => import('pages/app/workspace/page_bookmarks/index.vue'),
+               },
+               {
+                  name: 'workspace.create',
+                  path: 'create',
+                  component: () => import('pages/app/workspace/page_create/index.vue'),
+               }
+            ]
          },
          {
             name: 'fallback',

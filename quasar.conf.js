@@ -26,13 +26,16 @@ module.exports = function (ctx) {
          'apollo',
          'system',
          'main',
+         'components',
+         'helpers',
          'filters'
       ],
 
       // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
       css: [
-         'fonts.variables.styl',
-         'app.styl'
+         // 'quasar.variables.sass',
+         'fonts.variables.sass',
+         'app.sass'
       ],
 
       animations: 'all',

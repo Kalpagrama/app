@@ -5,19 +5,31 @@ q-btn(
     marginTop: '6px', zIndex: 3000,
   }`
   ).q-ml-sm.q-mt-xs.q-mr-sm {{ nodeCategory ? nodeCategory.label : 'Категория' }}
-  q-menu(
+  q-popup-proxy(
     fit cover dark
     max-width="180px"
     anchor="top left"
+    position="bottom"
     ).full-width
-    div(:style=`{zIndex: 5000,}`).row.full-width.q-pa-sm
-      q-btn(
-        v-for="(c,ci) in options" :key="ci"
-        v-close-popup
-        @click="categoryClick(c.value)"
-        flat color="white" dense no-caps
-        align="left"
-        ).full-width {{ c.label }}
+    div(
+      :style=`{
+        zIndex: 5000,
+        borderRadius: '20px 20px 0 0',
+      }`).row.full-width.q-pa-sm.b-40
+      //- header
+      .row.full-width.q-pa-md
+        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$tt('Pick category')}}
+        .col
+        q-btn(round flat color="white" icon="clear" v-close-popup)
+      //- body
+      .row.full-width.items-start.content-start
+        q-btn(
+          v-for="(c,ci) in options" :key="ci"
+          v-close-popup
+          @click="categoryClick(c.value)"
+          flat color="white" no-caps
+          align="left"
+          ).full-width {{ c.label }}
 </template>
 
 <script>

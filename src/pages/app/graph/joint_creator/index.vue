@@ -1,74 +1,92 @@
 <template lang="pug">
-div(
-  :style=`{
-    //- position: 'relative',
-  }`
-  ).row.full-width.items-start.content-start.justify-center.b-30
+.row.full-width.items-start.content-start.justify-center.b-30
+  //- item finder
   q-dialog(
+    @hide="$emit('blurred')"
     v-model="itemFinderShow"
+    position="bottom"
     :maximized="true")
-    item-finder(
-      :joint="joint"
+    kalpa-finder(
+      :height="$q.screen.height"
+      :pages=`{
+        nodes: {views: ['all']},
+        workspace: {views: ['node', 'media']},
+        search: {views: ['default']},
+        gif: {views: ['popular']},
+      }`
       @item="itemFound"
-      @close="itemFinderShow = false")
-  div(
-    :style=`{
-      position: 'relative',
-      maxWidth: maxWidth+'px',
-      minHeight: 500+'px',
-    }`
-    ).row.full-width.items-start.content-start.b-30
+      @close="itemFinderShow = false"
+      ).b-30
+  //- item editor
+  q-dialog(
+    @hide="$emit('blurred')"
+    v-model="itemEditorShow"
+    position="bottom"
+    :maximized="true")
+    item-editor(
+      v-if="joint.items[1]"
+      :joint="joint"
+      :item="joint.items[1]"
+      @remove="itemRemove"
+      @close="itemEditorShow = false")
+  //- body
+  div(:style=`{paddingBottom: '300px',}`).row.full-width.justify-center.q-px-sm
     div(
       :style=`{
-        position: 'absolute', zIndex: 100, top: '0px', left: '0px',
-        pointerEvents: 'none',
-        borderLeft: '1px dashed rgb(40,40,40)',
-        borderBottom: '1px dashed rgb(40,40,40)',
-        borderRight: '1px dashed rgb(40,40,40)',
-        borderRadius: '0px 0px 10px 10px',
+        position: 'relative',
+        maxWidth: maxWidth+'px',
+        background: 'rgb(33,33,33)',
+        borderRadius: '0 0 10px 10px',
       }`
-      ).row.fit
-    vertex-editor(:joint="joint")
-    //- item finder
-    div(v-if="!joint.items[1]").row.full-width.q-pa-sm
-      q-btn(
-        @click="itemFinderShow = true"
-        flat color="white" no-caps icon="add" size="md" stack
+      ).row.full-width.items-start.content-start
+      vertex-editor(:joint="joint")
+      //- item finder start btn
+      div(
+        v-if="!joint.items[1]").row.full-width.q-px-sm.q-pb-sm
+        q-btn(
+          @click="itemFinderShow = true"
+          flat color="white" no-caps icon="add" size="lg" stack
+          :style=`{
+            minHeight: '300px',
+          }`
+          ).full-width.b-40
+          span(:style=`{fontSize: '18px'}`) {{$tt('Pick element to join')}}
+      //- item found: viewer
+      div(
+        v-if="joint.items[1]"
         :style=`{
-          minHeight: '300px',
+          position: 'relative',
         }`
-        ).full-width.b-40 Выбрать элемент для связи
-      //- item-finder(
-        :joint="joint"
-        @item="itemFound")
-    //- item found: viewer
-    div(
-      v-if="joint.items[1]"
-      ).row.full-width
-      joint-item(
-        :item="joint.items[1]"
-        :itemActive="true"
-        :itemIndependent="true")
-      .row.full-width.justify-center.q-py-md.q-px-xl
-        .row.full-width.justify-center
+        ).row.full-width.q-px-sm.q-pb-sm
+        item-preview(:item="joint.items[1]")
+        //- item actions
+        .row.full-width.justify-center.q-pt-md.q-pb-sm
+          //- item remove
           q-btn(
-            @click="jointPublish"
-            color="green" no-caps
-            :loading="jointPublishing"
+            flat color="red" icon="delete_outline"
             :style=`{
-              height: '60px',
-              maxWidth: '300px',
-            }`).full-width
-            span.text-bold Добавить связь
-        .row.full-width.justify-center.q-pt-sm
+              width: '50px',
+              height: '50px',
+            }`
+            @click="itemRemove()")
+          //- item publish
+          .col.q-px-sm
+            q-btn(
+              @click="jointPublish"
+              color="green" no-caps
+              :loading="jointPublishing"
+              :style=`{
+                height: '50px',
+              }`).full-width
+              span.text-bold Опубликовать
+          //- item edit
           q-btn(
-            @click="itemDelete"
-            outline color="red-6" no-caps
+            flat color="white" icon="edit"
             :style=`{
-              height: '40px',
-              maxWidth: '300px',
-            }`).full-width
-            span.text-bold Изменть элемент
+              width: '50px',
+              height: '50px',
+            }`
+            @click="itemEditorShow = true")
 </template>
 
 <script>
@@ -77,16 +95,19 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
 import vertexEditor from './vertex_editor.vue'
-import itemFinder from './item_finder.vue'
-import jointItem from '../joints_row/joint_item.vue'
+// import jointItem from '../joints_row/joint_item.vue'
+import itemEditor from './item_editor/index.vue'
+import itemPreview from './item_preview/index.vue'
 
 export default {
   name: 'jointCreator',
   props: ['item', 'maxWidth'],
   components: {
     vertexEditor,
-    itemFinder,
-    jointItem,
+    // jointItem,
+    // contentFragmenter,
+    itemEditor,
+    itemPreview,
   },
   data () {
     return {
@@ -100,6 +121,8 @@ export default {
       },
       jointPublishing: false,
       itemFinderShow: false,
+      // contentFragmenterShow: false,
+      itemEditorShow: false,
     }
   },
   watch: {
@@ -117,13 +140,14 @@ export default {
   methods: {
     itemFound (item) {
       this.$log('itemFound', item)
-      // this.joint.items[1] = item
-      this.itemFinderShow = false
       this.$set(this.joint.items, 1, item)
+      // this.itemEditorShow = true
+      this.itemFinderShow = false
     },
-    itemDelete () {
-      this.$log('itemDelete')
+    itemRemove () {
+      this.$log('itemRemove')
       this.$delete(this.joint.items, 1)
+      this.itemEditorShow = false
     },
     async jointPublish () {
       try {
@@ -144,10 +168,13 @@ export default {
         }
         // handle GIF
         if (jointInput.items[1].type === 'GIF' && !jointInput.items[1].oid) {
+          this.$log('jointPublish GIF processing...')
           let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
+          this.$log('jointPublish contentKalpa', contentKalpa)
           jointInput.items[1].oid = contentKalpa.oid
         }
         // create...
+        this.$log('jointInput', jointInput)
         let jointCreated = await ObjectCreateApi.essenceCreate(jointInput)
         this.$log('jointPublish jointCreated', jointCreated)
         // done? emit? close?
@@ -160,10 +187,6 @@ export default {
         this.jointPublishing = false
       }
     },
-  },
-  mounted () {
-    this.$log('mounted')
-    // this.joint.items[0] = this.item
   }
 }
 </script>

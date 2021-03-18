@@ -36,7 +36,7 @@ div(
           }`
           ).row.fit
   //- debug row
-  //- div(
+  div(
     v-if="jointsRes && rowActive"
     :style=`{
       position: 'absolute', zIndex: 3000, top: '-4px',
@@ -134,41 +134,20 @@ div(
         :style=`{
           width: paddingLeftRight+'px',
         }`)
-  //- next row
-  //- div(
-    v-if="rowActive"
-    @click="$emit('next')").row.full-width.justify-center
-    div(:style=`{pointerEvents: 'none',maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-pa-lg
-      //- h1.text-white Another links...
-      //- widget-bookmarks()
-    //- div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.q-px-xl.br
-      .col.q-pr-xs
-        q-btn(
-          outline color="grey-8" no-caps
-          :style=`{
-            height: '100px',
-          }`
-          ).full-width Up
-      .col.q-pl-xs
-        q-btn(
-          outline color="grey-8" no-caps
-          :style=`{
-            height: '100px',
-          }`
-          ).full-width Down
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import jointItem from './joint_item.vue'
-import widgetBookmarks from 'pages/app/workspace/widget_bookmarks/index.vue'
+// import widgetBookmarks from 'pages/app/workspace/widget_bookmarks/index.vue'
 
 export default {
   name: 'jointsRow',
   props: ['row', 'rowActive', 'rowPaused', 'rowItemWidth'],
   components: {
     jointItem,
-    widgetBookmarks,
+    // widgetBookmarks,
   },
   data () {
     return {
@@ -218,6 +197,10 @@ export default {
       async handler (to, from) {
         this.$log('row TO', to)
         this.jointsRes = await this.$rxdb.find(this.query, true)
+        // check empty to create from the start
+        if (this.jointsRes.totalCount === 0) {
+          this.$emit('empty')
+        }
         // start from some joint or from start...
         if (to.jointFrom) {
           this.jointsRes.setProperty('currentId', to.jointFrom)

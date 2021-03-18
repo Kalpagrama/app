@@ -1,5 +1,6 @@
 <template lang="pug">
 div(
+  ref="tint-wrapper"
   @click.self="tintClickSelf"
   :style=`{
     position: 'absolute', zIndex: 200,
@@ -8,16 +9,9 @@ div(
   }`
   ).row.fit.items-center.content-center.justify-center
   slot(name="tint" :tintFocused="tintFocused")
-  //- header
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    tint-header(
-      v-if="player && player.duration && showHeaderLocal"
-      v-show="options.showHeader"
-      v-bind="$props"
-      :isFocused="tintFocused")
   //- middle spinner
   q-spinner(
-    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && !player.playing_ && tintSpinnerCanShow"
+    v-if="contentKalpa.contentProvider !== 'YOUTUBE' && player && !player.playing_ && tintSpinnerCanShow"
     color="white" size="50px"
     :style=`{
       pointerEvents: 'none',
@@ -59,62 +53,14 @@ div(
       ).row.items-center.content-center.justify-center
       span(:style=`{userSelect: 'none'}`).text-white {{ $time(tintClickSelfCount * 5) }}
       q-icon(name="fast_forward" color="white" size="20px").q-ml-xs
-  //- footer feed: timeline
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="player && player.duration && options.mode === 'feed' && !isMini"
-      :style=`{
-        position: 'absolute', zIndex: 3000,
-        bottom: '0px',
-        borderRadius: '0 0 10px 10px',
-        userSelect: 'none',
-        //- pointerEvents: 'none',
-      }`
-      ).row.full-width.items-center.content-center.justify-between.q-pa-sm
-      small(:style=`{borderRadius: '8px', background: 'rgba(0,0,0,0.7)'}`).text-white.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
-      q-btn(
-        @click="player.setState('muted', !player.muted)"
-        round flat dense color="white" size="sm"
-        :icon="player.muted ? 'volume_off' : 'volume_up'"
-        :style=`{
-          background: 'rgba(0,0,0,0.7)',
-        }`)
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="options.mode === 'feed' && !isMini"
-      :style=`{
-        position: 'absolute', zIndex: 3000,
-        bottom: '0px',
-        borderRadius: '0 0 10px 10px',
-        userSelect: 'none',
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm
-      div(
-        @click="contextClick()"
-        :style=`{
-          background: 'rgba(0,0,0,0.5)',
-          borderRadius: '10px',
-        }`
-        ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
-        q-icon(name="select_all" color="white" size="16px").q-ma-xs
-        span.text-white Источник
-        //- span.text-white {{contentKalpa.name.slice(0,40) }}
-      .col
-      div(
-        v-if="player && player.duration"
-        :style=`{
-          background: 'rgba(0,0,0,0.5)',
-          borderRadius: '10px',
-        }`
-        ).row.items-center.content-center.q-pa-xs
-        small(:style=`{borderRadius: '8px'}`).text-white.q-py-xs.q-px-sm {{$time(player.currentTime)}} / {{$time(player.duration)}}
-        q-btn(
-          @click="player.setState('muted', !player.muted)"
-          round flat dense size="sm"
-          :color="player.muted ? 'red' : 'white'"
-          :icon="player.muted ? 'volume_off' : 'volume_up'"
-          :style=`{
-          }`)
+  //- footer: context
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    context-bar(
+      v-if="options.mode === 'feed'"
+      :contentKalpa="contentKalpa"
+      :player="player"
+      :height="tintHeight"
+      :nodeOid="options.nodeOid")
   //- footer editor
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -139,6 +85,7 @@ div(
 <script>
 import tintBar from './tint_bar.vue'
 import tintHeader from './tint_header.vue'
+import contextBar from './context_bar.vue'
 
 export default {
   name: 'playerTint',
@@ -146,9 +93,12 @@ export default {
   components: {
     tintBar,
     tintHeader,
+    contextBar,
   },
   data () {
     return {
+      tintHeight: 0,
+      tintWidth: 0,
       tintBackgroundOpacity: 0,
       tintFocused: false,
       tintMousemoveTimeout: null,
@@ -308,6 +258,10 @@ export default {
     })
     this.$wait(2000).then(() => {
       this.tintSpinnerCanShow = true
+    })
+    this.$nextTick(() => {
+      this.tintHeight = this.$refs['tint-wrapper'].clientHeight
+      this.tintWidth = this.$refs['tint-wrapper'].clientWidth
     })
   },
   beforeDestroy () {

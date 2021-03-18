@@ -64,7 +64,9 @@ div(
           //- q-tooltip Дебаг вкл/выкл
         q-btn(
           @click="positionDrop()"
-          round flat dense color="white" icon="vertical_align_top").full-width
+          :color="itemsRes.hasPrev ? 'white' : 'red'"
+          :disabled="!itemsRes.hasPrev"
+          round flat dense icon="vertical_align_top").full-width
           //- q-tooltip В начало
         q-btn(
           @click="prev()"
@@ -89,11 +91,6 @@ div(
           round flat dense  icon="south").full-width
           //- q-tooltip Вперед
   slot(name="prepend")
-  //- div(
-    :style=`{
-      height: '100px',
-    }`
-    ).row.full-width.bg-red
   div(
     v-if="prependShow"
     :style=`{
@@ -104,7 +101,7 @@ div(
   div(
     v-if="!itemsRes"
     :style=`{
-      height: scrollTargetHeight+'px',
+      height: scrollTargetHeight/2+'px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
@@ -124,13 +121,32 @@ div(
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
+      q-spinner-dots(color="green" size="60px")
     //- item wrapper
+    //- div(
+      v-for="(n,ni) in 100" :key="ni"
+      :accessKey="ni"
+      :class=`{
+        'bg-red': itemMiddleIndex === ni,
+      }`
+      v-observe-visibility=`{
+        throttle: 150,
+        callback: itemMiddleHandlerTest,
+        intersection: {
+          root: scrollTargetIsWindow ? null : scrollTarget,
+          rootMargin: rootMargin,
+          //- threshold: 0.9,
+        }
+      }`
+      ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
       :ref="`item-${item[itemKey]}`"
       :accessKey="`${item[itemKey]}-${itemIndex}`"
+      :class=`{
+        //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
+      }`
       :style=`{
         ...itemStyles,
       }`
@@ -139,7 +155,8 @@ div(
         callback: itemMiddleHandler,
         intersection: {
           root: scrollTargetIsWindow ? null : scrollTarget,
-          rootMargin: rootMargin
+          rootMargin: rootMargin,
+          //- threshold: 0.9,
         }
       }`
       ).row.full-width
@@ -154,11 +171,11 @@ div(
     div(
       v-if="itemsResStatus === 'NEXT'"
       :style=`{
-        position: 'absolute', top: '0px', zIndex: 10000,
+        position: 'absolute', bottom: '0px', zIndex: 10000,
         height: '60px',
       }`
       ).row.full-width.items-center.content-center.justify-center
-      q-spinner-dots(color="green" size="50px")
+      q-spinner-dots(color="green" size="60px")
   slot(name="append")
   div(
     v-if="appendShow"
@@ -171,13 +188,12 @@ div(
 <script>
 import { scroll } from 'quasar'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
   name: 'listFeed',
   props: {
     rootMargin: {type: String, default () { return '-50% 0px' }},
-    // rootMargin: {type: String, default () { return '-40% 0px' }},
     query: {
       type: Object,
       required: true,
@@ -233,6 +249,7 @@ export default {
       itemsResStatus: null,
       // item
       itemMiddle: null,
+      itemMiddleIndex: null,
     }
   },
   computed: {
@@ -306,6 +323,10 @@ export default {
           this.scrollTopTimeout = null
         }
         if (!this.scrollTopChanging) this.$log('scrollTop START')
+        // handle prev/next...
+        // if (to < this.paginationBufferHeight) await this.prev()
+        // if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+        // changing...
         this.scrollTopChanging = true
         this.scrollTopTimeout = setTimeout(async () => {
           // END of scrollTopChanging
@@ -333,17 +354,24 @@ export default {
 
           // END of scrollHeightChanging
           this.$log('scrollHeight END')
-          this.itemMiddleScrollIntoView('scrollHeight END')
+          // this.itemMiddleScrollIntoView('scrollHeight END')
           // handle prev..
           if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
             // alert('Initial prev...')
             // this.prev()
           }
-        }, 2000)
+        }, 600)
       }
     },
   },
   methods: {
+    itemMiddleHandlerTest (isVisible, entry) {
+      if (isVisible) {
+        this.$log('scrollTarget', this.scrollTarget)
+        this.$log('itemMiddleHandlerTest', isVisible, entry.target.accessKey)
+        this.itemMiddleIndex = parseInt(entry.target.accessKey)
+      }
+    },
     itemMiddleGetPosition () {
       this.$log('itemMiddleGetPosition')
       if (!this.itemMiddle) return
@@ -417,7 +445,8 @@ export default {
     },
     itemMiddleHandler (isVisible, entry) {
       if (isVisible) {
-        if (this.scrollHeightChanging) return
+        this.$log('isVisible', entry.target.accessKey)
+        // if (this.scrollHeightChanging) return
         let [key, idxSting] = entry.target.accessKey.split('-')
         this.itemMiddleSet(key, parseInt(idxSting))
       }
@@ -501,6 +530,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.scrollTarget = getScrollTarget(this.$el)
+    this.$log('this.scrollTarget', this.scrollTarget)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
     this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight

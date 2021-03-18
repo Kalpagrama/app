@@ -4,15 +4,15 @@ div(
   :style=`{
     position: 'relative',
     //- width: $q.screen.width+'px',
-    minWidth: 500+'px',
-    maxWidth: 500+'px',
-    //- height: $q.screen.height+'px',
+    //- minWidth: 500+'px',
+    //- maxWidth: 500+'px',
+    height: $q.screen.height+'px',
   }`
-  ).column.items-center.content-center.justify-center.bg
+  ).column.full-width.items-center.content-center.justify-center.b-30
   //- header
   div(
     :style=`{
-      position: 'absolute', zIndex: 100, top: '0px',
+      position: 'absolute', zIndex: 200, top: '0px',
     }`
     ).row.full-width.q-pa-sm
     .col
@@ -24,14 +24,14 @@ div(
       position: 'absolute', zIndex: 100, top: '0px', left: '0px',
       width: '30%',
     }`
-    ).row.full-height.br
+    ).row.full-height
   div(
     @click="next()"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px', right: '0px',
       width: '30%',
     }`
-    ).row.full-height.br
+    ).row.full-height
   //- body
   q-carousel(
     ref="slides-carousel"
@@ -39,35 +39,73 @@ div(
     transition-prev="slide-right"
     transition-next="slide-left"
     swipeable animated navigation arrows
+    infinite
+    :autoplay="5000"
     control-color="white").fit
     q-carousel-slide(
       v-for="(s,si) in slides" :key="s.id"
       :name="s.id"
-      ).row.fit.items-center.content-center.justify-center.b-30.br
-      small.text-white {{ s.body }}
+      :style=`{
+        userSelect: 'none',
+        //- background: 'rgb(25,25,25)',
+      }`
+      ).row.fit.items-center.content-center.justify-center.b-30
+      img(
+        draggable="false"
+        :src="s.url"
+        :style=`{
+          objectFit: 'contain',
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }`
+        ).fit
 </template>
 
 <script>
+import { ObjectApi } from 'src/api/object'
+
 export default {
   name: 'kalpaWelcome',
   props: {
-    mode: {
-      type: String, default: 'standalone'
+    config: {
+      type: Object,
+      required: true,
     }
   },
   data () {
     return {
       slide: 'welcome',
-      slides: [
-        {
-          id: 'welcome',
-          body: 'welcome home alabama'
-        },
-        {
-          id: 'feed',
-          body: 'On feeds you can do anything...'
+      doc: null,
+      tutorialInitial: {
+        main: false,
+        content: false,
+        node: false,
+        joint: false
+      }
+    }
+  },
+  computed: {
+    slides () {
+      if (!this.doc) return []
+      return this.doc.fields.slides.map(s => {
+        return {
+          id: s.sys.id,
+          url: s.fields.file.url,
         }
-      ]
+      })
+    },
+    tutorial () {
+      return this.$store.getters.currentUser().profile.tutorial
+    }
+  },
+  watch: {
+    slides: {
+      immediate: true,
+      handler (to, from) {
+        if (to && to[0]) {
+          this.slide = to[0].id
+        }
+      }
     }
   },
   methods: {
@@ -80,12 +118,24 @@ export default {
       this.$refs['slides-carousel'].next()
     },
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    // if mode standalone, add last slide as settings...
+    // get docs
+    const {items: [doc]} = await this.$contentful.getEntries({
+      content_type: 'tutorial',
+      'fields.id': this.config.id,
+    })
+    this.$log('doc', doc)
+    this.doc = doc
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$log('beforeDestroy')
+    if (typeof this.tutorial !== 'object') {
+      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', this.tutorialInitial)
+    }
+    // set tutorial main gone
+    let tutorialInput = {[this.config.id]: true, ...this.tutorialInitial}
+    await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
   }
 }
 </script>

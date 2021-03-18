@@ -1,105 +1,99 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
-  div(
-    :style=`{
-      position: 'fixed', zIndex: 2000, bottom: '0px',
-    }`
-    ).row.full-width.justify-center
-    div(
-      :style=`{
-        maxWidth: rowItemWidth+16+'px',
-        borderRadius: '10px 10px 0 0',
-      }`
-      ).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.b-40.q-pt-sm
-      q-btn(
-        v-if="!jointCreatorShow"
-        @click="$routerKalpa.back()"
-        flat color="white" icon="west" no-caps stack
+kalpa-layout()
+  template(v-slot:footer)
+    .row.full-width.justify-center
+      div(
         :style=`{
-          width: '70px', height: '70px',
-        }`) Назад
-      .col
-      //- q-btn(
-        v-if="!jointCreatorShow"
-        flat no-caps color="white" @click="rowsPrev()") Вверх
-      //- q-btn(
-        v-if="!jointCreatorShow"
-        flat no-caps color="white" @click="rowsNext()")
-        span.text-bold Next
-      //- .col
-      q-btn(
-        v-if="!jointCreatorShow"
-        @click="jointCreateStart()"
-        round color="green" icon="add"
-        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-      q-btn(
-        v-if="jointCreatorShow"
-        @click="jointCreateCancel()"
-        round color="white" icon="clear" flat
-        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
-      .col
-      kalpa-menu-popup-global(
-        v-if="!jointCreatorShow"
-        :showLabel="true"
+          maxWidth: rowItemWidth+16+'px',
+          borderRadius: '20px 20px 0 0',
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.b-50.q-pt-sm
+        q-btn(
+          v-if="!jointCreatorShow"
+          @click="$routerKalpa.back()"
+          flat color="grey-7" icon="west" no-caps
+          :style=`{
+            width: '46px', height: '46px',
+          }`)
+          small {{$tt('Back')}}
+        .col
+        q-btn(
+          v-if="!jointCreatorShow"
+          @click="jointCreateStart()"
+          round color="green" icon="add"
+          :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
+        q-btn(
+          v-if="jointCreatorShow"
+          @click="jointCreateCancel()"
+          flat no-caps color="white"
+          :style=`{height: '50px',}`) {{$tt('Cancel')}}
+        .col
+        kalpa-menu-popup-global(
+          v-if="!jointCreatorShow"
+          color="grey-7"
+          :style=`{
+            width: '46px', height: '46px',
+          }`)
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      div(
+        v-if="jointItem"
         :style=`{
-          width: '70px', height: '70px',
-        }`)
-  q-page-container
-    q-page(
-      v-if="jointItem"
-      :style=`{
-        paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
-        paddingBottom: '600px'
-      }`).row.full-width.justify-center
-      //- starting item
-      .row.full-width.justify-center.q-px-sm
-        div(
-          :style=`{
-            maxWidth: 500+'px',
-          }`).row.full-width
-          q-resize-observer(@resize="rowItemWidth = $event.width")
-          joint-item(
-            :key="jointItem.oid"
-            :item="jointItem"
-            :itemActive="!jointCreatorFocused"
-            :itemIndependent="true")
-            node-feed(
-              v-if="jointActive"
-              :node="jointActive"
-              :showItems="false"
-              :showActions="false"
-              :showName="false"
-              :showAuthorAlways="false")
-      //- dynamic items
-      .row.full-width
-        //- v-if="rowActiveKey === rowIndex+row.oid"
-        joints-row(
-          v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
-          v-if="rowActiveKey === rowIndex+row.oid"
-          v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
-          :ref="`row-${rowIndex+row.oid}`"
-          :row="row"
-          :rowActive="rowActiveKey === rowIndex+row.oid"
-          :rowPaused="jointCreatorShow"
-          :rowItemWidth="rowActiveKey === rowIndex+row.oid ? rowItemWidth : rowItemWidth/2"
-          :style=`{
-            //- transform: rowActiveKey === rowIndex+row.oid ? 'none' : 'scale(0.5)',
-          }`
-          @next="rowsNext()"
-          @joint-change-start="jointChanging = true"
-          @joint-change-end="jointChanging = false"
-          @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
-          transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-            joint-creator(
-              v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"
+          paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
+          //- paddingBottom: '600px'
+        }`).row.full-width.justify-center
+        //- pinned top item
+        .row.full-width.justify-center.q-px-sm
+          div(
+            :style=`{
+              maxWidth: 500+'px',
+            }`).row.full-width
+            q-resize-observer(@resize="rowItemWidth = $event.width")
+            joint-item(
+              :key="jointItem.oid"
               :item="jointItem"
-              :maxWidth="rowItemWidth"
-              :style=`{
-                position: 'absolute', zIndex: 1000, top: '0px',
-              }`
-              @created="jointCreated"
-              @focused="jointCreatorFocused = true"
-              @blurred="jointCreatorFocused = false")
+              :itemActive="!jointCreatorFocused"
+              :itemIndependent="true")
+              node-feed(
+                v-if="jointActive"
+                :node="jointActive"
+                :showItems="false"
+                :showActions="false"
+                :showName="false"
+                :showAuthorAlways="false")
+        //- dynamic items
+        .row.full-width.q-mb-xl
+          //- v-if="rowActiveKey === rowIndex+row.oid"
+          joints-row(
+            v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
+            v-if="rowActiveKey === rowIndex+row.oid"
+            v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
+            :ref="`row-${rowIndex+row.oid}`"
+            :row="row"
+            :rowActive="rowActiveKey === rowIndex+row.oid"
+            :rowPaused="jointCreatorShow"
+            :rowItemWidth="rowActiveKey === rowIndex+row.oid ? rowItemWidth : rowItemWidth/2"
+            :style=`{
+              //- transform: rowActiveKey === rowIndex+row.oid ? 'none' : 'scale(0.5)',
+            }`
+            @next="rowsNext()"
+            @empty="jointCreateStart()"
+            @joint-change-start="jointChanging = true"
+            @joint-change-end="jointChanging = false"
+            @joint-visible="(...args) => joinsRowJointVisibleCallback(...args, row, rowIndex)")
+            transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+              joint-creator(
+                v-if="jointCreatorShow && rowActiveKey === rowIndex+row.oid"
+                :item="jointItem"
+                :maxWidth="rowItemWidth"
+                :style=`{
+                  position: 'absolute', zIndex: 1000, top: '0px',
+                }`
+                @created="jointCreated"
+                @focused="jointCreatorFocused = true"
+                @blurred="jointCreatorFocused = false")
+        //- div(:style=`{height: '300px'}`).row.full-width.br
 </template>
 
 <script>

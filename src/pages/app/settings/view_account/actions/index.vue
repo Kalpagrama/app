@@ -2,7 +2,7 @@
 .row.full-width.q-pa-sm
   //- header
   .row.full-width.q-px-sm.q-py-sm
-    span.text-white.text-bold Действия
+    span.text-white.text-bold {{$tt('Actions')}}
   //- body
   .row.full-width
     //- q-btn(
@@ -19,25 +19,25 @@
       :style=`{
         height: '50px',
       }`
-      ).full-width.b-40.q-mb-md
-      span Показать обучение
+      ).full-width.b-40.q-mb-sm
+      span {{$tt('Show tutorial')}}
     q-btn(
       @click="refresh()"
       flat color="grey-6" no-caps
       :style=`{
         height: '50px',
       }`
-      ).full-width.b-40.q-mb-md
-      span Очистить кэш
+      ).full-width.b-40.q-mb-sm
+      span {{$tt('Clear cache')}}
     q-btn(
       @click="setDebugOutput()"
       flat color="grey-6" no-caps
       :style=`{
-              height: '50px',
-            }`
-      ).full-width.b-40.q-my-md
-      span(v-if="!$store.state.core.logRocket") сообщить об ошибке
-      span(v-if="$store.state.core.logRocket").text-yellow закончить запись ошибки
+        height: '50px',
+      }`
+      ).full-width.b-40.q-mb-md
+      span(v-if="!$store.state.core.logRocket") {{$tt('Report an error')}}
+      span(v-if="$store.state.core.logRocket").text-yellow {{$tt('Stop error logging')}}
     q-btn(
       @click="logout()"
       outline color="red" no-caps
@@ -45,7 +45,7 @@
         height: '50px',
       }`
       ).full-width.q-myb-md
-      span Выйти
+      span {{$tt('Logout')}}
 </template>
 
 <script>
@@ -63,7 +63,7 @@ export default {
   methods: {
     showKalpaWelcome () {
       this.$log('showKalpaWelcome')
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
     },
     async logout () {
       await AuthApi.logout()

@@ -154,6 +154,10 @@ export default {
     async playerReady (player) {
       this.$log('playerReady')
       this.player = player
+      // Handle player.autoplay
+      this.$nextTick(() => {
+        this.player.play()
+      })
     },
     async nodePlay () {
       this.$log('nodePlay')

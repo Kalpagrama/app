@@ -1,78 +1,80 @@
 <template lang="pug">
 div(
-  @click.self="$emit('close')"
-  ).column.full-width
-  //- header
-  .row.full-width.justify-center.q-px-sm
-    div(:style=`{maxWidth: 600+'px'}`).row.full-width
-      //- title
+  :style=`{
+    height: $q.screen.height+'px',
+  }`
+  ).row.full-widith
+  div(
+    :style=`{
+      height: '100px',
+    }`
+    ).row.full-width.items-start.content-start.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      //- header
       .row.full-width.items-center.content-center.q-pa-sm
-        .col
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ title }}
+        .col.q-pl-sm
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
       //- tabs
-      .row.full-width.q-px-sm
-        q-tabs(
-          v-model="pageId" no-caps
-          dense active-color="green"
-          aling="left"
-          ).text-grey-6
-          q-tab(
-            v-for="p in pagesFiltered" :key="p.id"
-            :name="p.id" :label="p.name")
-      //- input
-      q-input(
-        v-model="searchString"
-        borderless dark
-        placeholder="Поиск"
-        :input-style=`{
-          paddingLeft: '10px',
-        }`
-        :style=`{
-          borderRadius: '10px',
-        }`
-        ).full-width.b-40
-  //- body
-  div(
-    @click.self="$emit('close')"
-    ).col.full-width.scroll
-    .row.full-width.justify-center.q-pa-sm
-      component(
-        v-bind="$props"
-        :is="`page-${pageId}`"
-        :searchString="searchStringLocal"
-        :page="page"
-        :style=`{
-          maxWidth: 600+'px',
-        }`)
-        template(v-slot:tint=`{item}`)
-          slot(name="tint" :item="item")
+      .row.full-width.items-center.content-center.q-px-sm.q-py-xs
+        .row.q-pl-sm
+          span.text-white.q-mr-sm {{$tt('From')}}:
+        .col
+          .row.full-width.scroll
+            .row.full-width.items-center.content-center.no-wrap
+              q-btn(
+                v-for="p in pagesFiltered" :key="p.id"
+                flat no-caps dense
+                :color="p.id === pageId ? 'green' : 'white'"
+                :class=`{
+                  'b-40': p.id === pageId,
+                }`
+                :style=`{
+                  whiteSpace: 'nowrap',
+                }`
+                @click="pageId = p.id"
+                ).q-mr-sm.q-px-sm {{ p.name }}
+              div(:style=`{width: '100px',minWidth: '100px',}`).row
+  component(
+    v-bind="$props"
+    :is="`page-${pageId}`"
+    :height="$q.screen.height-100"
+    :searchString="searchStringLocal"
+    :page="page"
+    @item="$emit('item', $event)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
+import pageWorkspace from './page_workspace/index.vue'
+import pageNodes from './page_nodes/index.vue'
+import pageSearch from './page_search/index.vue'
+import pageGif from './page_gif/index.vue'
+
 export default {
   name: 'kalpaFinder',
   props: {
+    height: {
+      type: Number,
+      required: true,
+    },
     pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
     pages: {type: Object},
     searchString: {type: String},
-    title: {
+    headerTitle: {
       type: String,
-      default: 'Выбрать элемент для связи'
+      // default: 'Выбрать элемент для связи'
     }
   },
   components: {
-    // pageContent: () => import('./page_content/index.vue'),
-    pageWorkspace: () => import('./page_workspace/index.vue'),
-    pageKalpagrama: () => import('./page_kalpagrama/index.vue'),
-    pageNodes: () => import('./page_nodes/index.vue'),
-    pageWeb: () => import('./page_web/index.vue'),
-    pageGif: () => import('./page_gif/index.vue'),
+    pageWorkspace,
+    pageSearch,
+    pageNodes,
+    pageGif,
   },
   data () {
     return {
@@ -81,26 +83,21 @@ export default {
     }
   },
   computed: {
+    headerTitle_ () {
+      if (this.headerTitle) return this.headerTitle
+      else return this.$tt('Find your item')
+    },
     page () {
       if (this.pageId) return this.pages[this.pageId]
       else return null
     },
     pagesFiltered () {
       return [
-        {id: 'nodes', name: 'Мои ядра', component: 'page-nodes'},
-        {id: 'workspace', name: 'Мастерская', component: 'page-workspace'},
-        {id: 'kalpagrama', name: 'Поиск', component: 'page-kalpagrama'},
-        {id: 'content', name: 'Загрузки', component: 'page-content'},
+        {id: 'workspace', name: 'Workspace', component: 'page-workspace'},
+        {id: 'nodes', name: 'My Nodes', component: 'page-nodes'},
         {id: 'gif', name: 'Gif', component: 'page-gif'},
-        // {id: 'web', name: 'Web', component: 'page-web'},
-      ].filter(p => {
-        if (this.pages) {
-          return this.pages[p.id]
-        }
-        else {
-          return true
-        }
-      })
+        // {id: 'search', name: 'Search', component: 'page-search'},
+      ]
     }
   },
   watch: {

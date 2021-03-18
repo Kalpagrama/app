@@ -1,30 +1,43 @@
 <template lang="pug">
 q-btn(round flat :icon="icon" :color="color" :dense="dense")
   //- maximized position="bottom" dark
-  q-menu(
+  q-popup-proxy(
     cover anchor="top right" self="top right" dark
-    max-width="200px")
+    max-width="200px"
+    position="bottom")
     div(
       :style=`{
+        borderRadius: '20px 20px 0 0',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }`
-      ).row.full-width.items-start.content-start
-      q-btn(
-        @click="a.cb()"
-        v-for="(a,akey) in actions" :key="akey"
-        v-close-popup
-        flat no-caps dense
-        :color="a.color || 'white'"
-        :style=`{
-        }`
-        ).full-width
-        span {{ a.name }}
+      ).row.full-width.items-start.content-start.b-40
+      //- header
+      div(
+        v-if="headerText"
+        ).row.full-width.items-center.content-center.q-pa-md
+        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{ headerText }}
+        .col
+        q-btn(round flat color="white" icon="clear" v-close-popup)
+      //- body
+      .row.full-width.items-start.content-start.q-mb-xl
+        q-btn(
+          @click="a.cb()"
+          v-for="(a,akey) in actions" :key="akey"
+          v-close-popup
+          flat no-caps
+          :color="a.color || 'white'"
+          :style=`{
+            height: '50px',
+          }`
+          ).full-width
+          span {{ a.name }}
 </template>
 
 <script>
 export default {
   name: 'kalpaMenuActions',
   props: {
-    title: {
+    headerText: {
       type: String,
     },
     actions: {

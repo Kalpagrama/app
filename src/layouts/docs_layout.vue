@@ -5,7 +5,9 @@ a
 </style>
 
 <template lang="pug">
-q-layout(view="lHh lpR lFf")
+q-layout(
+  view="lHh lpR lFf"
+  :container="false")
   q-drawer(
     v-model="docsDrawerOpened"
     behavior="mobile"

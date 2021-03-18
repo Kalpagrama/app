@@ -1,11 +1,16 @@
 <template lang="pug">
-q-layout(view="lHh lpR lFf")
+q-layout(
+  view="lHh lpR lFf"
+  :container="false")
   q-dialog(
     v-model="authGuardShow")
     kalpa-auth-guard(@close="authGuardShow = null")
   q-dialog(
-    v-model="kalpaWelcomeShow" :maximized="true")
-    kalpa-welcome(@click="kalpaWelcomeShow = null")
+    v-model="kalpaWelcomeShow" :maximized="true"
+    @hide="kalpaWelcomeShown")
+    kalpa-welcome(
+      :config="$store.state.ui.kalpaWelcome"
+      @close="kalpaWelcomeShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
@@ -20,7 +25,7 @@ q-layout(view="lHh lpR lFf")
           maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
         }`).fit
   //- mobile menu navigation
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container
@@ -31,14 +36,13 @@ q-layout(view="lHh lpR lFf")
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import kalpaMenu from 'components/kalpa_menu/index.vue'
-import kalpaMenuMobile from 'components/kalpa_menu_mobile/index.vue'
 import kalpaAuthGuard from 'components/kalpa_auth_guard/index.vue'
 
 export default {
   name: 'mainLayout',
   components: {
     kalpaMenu,
-    kalpaMenuMobile,
+    // kalpaMenuMobile,
     kalpaAuthGuard
   },
   data () {
@@ -64,16 +68,30 @@ export default {
       }
     }
   },
-  // async beforeCreate () {
-  //   this.$log('beforeCreate')
-  // },
-  // async beforeMount () {
-  //   this.$log('beforeMount')
-  // },
+  methods: {
+     async kalpaWelcomeShown () {
+      this.$log('kalpaWelcomeShown')
+    },
+  },
+  async beforeCreate () {
+    this.$log('beforeCreate')
+  },
+  async beforeMount () {
+    this.$log('beforeMount')
+  },
   async created () {
     this.$log('created')
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
+    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      // do nothing ?
+    }
+    else {
+      // check tutorial
+      // if (this.$store.getters.currentUser().profile.tutorial.main === false) {
+      //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+      // }
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

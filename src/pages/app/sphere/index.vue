@@ -1,5 +1,7 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf")
+q-layout(
+  view="hHh lpR fFf"
+  :container="false")
   q-header(reveal height-hint="200")
     page-header(v-if="sphere" :sphere="sphere")
     //- div(

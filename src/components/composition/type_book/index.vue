@@ -40,9 +40,9 @@ div(
       v-if="textContainerOverflowHidden"
       @click="textContainerOverflowToggle"
       :style=`{
-        position: 'absolute', zIndex: 10, bottom: '40px', left: '0px',
+        position: 'absolute', zIndex: 10, bottom: '0px', left: '0px',
         height: '50%',
-        background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(0,0,0,0) 100%)',
+        background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
         borderRadius: '0px 0px 10px 10px',
       }`
       ).row.full-width.cursor-pointer
@@ -52,6 +52,7 @@ div(
     :style=`{
       maxHeight: 'calc(100% - 48px)',
       overflow: textContainerOverflowHidden ? 'hidden' : 'scroll',
+      //- paddingTop: '50px',
     }`
     ).row.fit.items-start.content-start.q-px-md.q-pt-md
     div(

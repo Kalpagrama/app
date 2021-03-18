@@ -20,7 +20,7 @@
     .col
       .row.full-width
         .row.items-center.content-center
-          kalpa-share(type="node" :item="node")
+          kalpa-share(type="node" :item="node" :headerText="$tt('Share')")
             //- q-tooltip(dense dark) Поделиться
             //- q-btn(round flat color="grey-9")
               q-icon(name="logout" size="23px").rotate-270
@@ -62,9 +62,8 @@
           .row.fit.items-center.content-center.justify-end
             small.text-grey-9 {{ node.countBookmarks || '' }}
         .row.items-center.content-center
-          kalpa-bookmark(
-            :oid="node.oid" :type="node.type" :name="node.name"
-            :thumbUrl="node.thumbUrl" :isActive="isActive" inactiveColor="grey-9")
+          kalpa-save(
+            :item="node" :isActive="isActive" inactiveColor="grey-9")
     //- ======
     //- VOTING:
     //- vote bar
@@ -133,7 +132,7 @@
 import { ObjectApi } from 'src/api/object'
 
 import nodeVoteBall from './node_vote_ball.vue'
-import nodeVoteStats from './node_vote_stats.vue'
+import nodeVoteStats from './node_actions/vote_stats.vue'
 
 export default {
   name: 'nodeActions',

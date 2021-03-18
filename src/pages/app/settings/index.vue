@@ -1,5 +1,13 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(
+  view="hHh lpR fFf"
+  :container="false"
+  :style=`{
+    height: $q.screen.height+'px',
+  }`
+  ).b-30
+  q-footer(v-if="$q.screen.lt.md")
+    kalpa-menu-mobile
   q-header(reveal)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -63,7 +71,7 @@ export default {
   },
   methods: {
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
     this.$log('currentUser', this.$store.getters.currentUser())
   }

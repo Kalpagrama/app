@@ -111,6 +111,26 @@ export default {
       // WEB
       return composition
     },
+    async contentBookmarkSave () {
+      this.$log('contentBookmarkSave')
+      // ---
+      // add content to bookmarks if all is good...
+      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
+      if (bookmark) {
+        // revive ?
+      }
+      else {
+        let bookmarkInput = {
+          type: this.contentKalpa.type,
+          oid: this.contentKalpa.oid,
+          name: this.contentKalpa.name,
+          thumbUrl: this.contentKalpa.thumbUrl,
+          isSubscribed: true
+        }
+        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
+      }
+    },
     async nodeSave () {
       this.$log('nodeSave')
       let nodeInput = JSON.parse(JSON.stringify(this.node))
@@ -118,6 +138,8 @@ export default {
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeSaved', nodeSaved)
       this.player.setState('figure', null)
+      // save content bookmark to "all" collection
+      await this.contentBookmarkSave()
       // this.$emit('nodeSaved')
     },
     async nodePublish () {
@@ -131,6 +153,9 @@ export default {
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))
         nodeInput.items[0] = this.compositionCreate()
+        if (nodeInput.name.length === 0) {
+          throw new Error(this.$tt('Empty essence !'))
+        }
         this.$log('nodeInput', nodeInput)
         // ---
         // create node, publish this shit
@@ -144,23 +169,8 @@ export default {
           // await this.node.remove(true)
           await this.$rxdb.remove(this.node.id)
         }
-        // ---
-        // add content to bookmarks if all is good...
-        let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.contentKalpa.oid}})
-        if (bookmark) {
-          // revive ?
-        }
-        else {
-          let bookmarkInput = {
-            type: this.contentKalpa.type,
-            oid: this.contentKalpa.oid,
-            name: this.contentKalpa.name,
-            thumbUrl: this.contentKalpa.thumbUrl,
-            isSubscribed: true
-          }
-          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-          if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
-        }
+        // save content bookmark to "all" collection
+        await this.contentBookmarkSave()
         // ---
         // done
         this.nodePublishing = false

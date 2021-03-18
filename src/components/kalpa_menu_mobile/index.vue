@@ -1,39 +1,9 @@
 <template lang="pug">
 .row.full-width.justify-center
-  //- menu for guests
-  //- div(
-    v-if="isGuest"
-    :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-      borderRadius: '10px 10px 0 0',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }`
-    ).row.full-width.items-center.content-center.justify-between.b-50.q-px-xs.br
-    q-btn(
-      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
-      flat icon="search" no-caps
-      :to="'/trends'"
-      :color="'grey-7'"
-      :style=`{
-        width: size+'px',
-        height: size+'px'
-      }`)
-      .row.full-width.justify-center
-        small(:style=`{whiteSpace: 'nowrap'}`) Поиск
-    q-btn(
-      :to="'/auth'"
-      flat color="white" no-caps
-      :style=`{
-        height: size+'px',
-      }`).q-px-md.q-mt-xs.b-50
-      span.text-white Войти
-    //- kalpa-menu-popup-global
-  //- menu for users
   div(
-    v-if="true || !isGuest"
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
-      borderRadius: '10px 10px 0 0',
+      borderRadius: '20px 20px 0 0',
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
     ).row.full-width.justify-between.b-50.q-px-sm.q-pt-sm
@@ -41,25 +11,22 @@
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="view_agenda"
       :to="'/feeds/all'"
-      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'white'"
-      :style=`{
-        width: size+'px',
-        height: size+'px',
-      }`
-      ).row.items-center.content-center.justify-center
-      .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) Лента
-    q-btn(
-      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
-      flat icon="search" no-caps
-      :to="'/trends'"
-      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'white'"
+      :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
-      .row.full-width.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`) Поиск
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Feed')}}
+    q-btn(
+      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+      flat no-caps icon="search"
+      :to="'/trends'"
+      :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
+      :style=`{
+        width: size+'px',
+        height: size+'px',
+      }`)
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Search')}}
     //- workspace
     div(
       :style=`{
@@ -71,22 +38,20 @@
         round no-caps icon="construction"
         :to="'/workspace'"
         :color="'green'"
-        :style=`{width: '50px', height: '50px', borderRadius: '50%',}`)
+        :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="notifications_none"
       :to="'/notifications/'"
-      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'white'"
+      :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
-      //- TODO: handle new notifications...
-      //- q-badge(color="red" floating transparent) •
-      .row.full-width.justify-center
-        span Активность
-        //- span Уведомления
+      q-badge(color="red" floating transparent) •
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Activity')}}
     kalpa-menu-popup-global(
+      color="grey-7"
       :styles=`{
         width: size+'px',
         height: size+'px',
@@ -108,8 +73,8 @@ export default {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
     },
     size () {
-      if (this.$q.screen.width > 350) return 60
-      else return 50
+      if (this.$q.screen.width > 350) return 46
+      else return 46
     }
   },
   methods: {
