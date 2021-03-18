@@ -36,9 +36,11 @@ const objectFragment = gql`${objectShortFragment}
     subscribers {...objectShortFragment}
     rev
     countStat{
+      countVotes
       countViews
       countJoints
       countNodes
+      countBookmarks
       countShares
       countRemakes
       countSubscribers
@@ -241,7 +243,6 @@ const essenceFragmentLeaf = gql`
     weight
     rateStat {percent, weight, count}
     rateUser
-    countVotes
     author {
       oid
       type
@@ -275,7 +276,6 @@ const essenceFragment = gql`
     weight
     rateStat {percent, weight, count}
     rateUser
-    countVotes
     author {
       oid
       type

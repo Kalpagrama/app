@@ -73,7 +73,7 @@ div(
         top: '9px', right: '-39px',
       }`
       ).row.full-width.justify-start
-      small.text-grey-9 {{ node.countVotes }}
+      small.text-grey-9 {{ node.countStat.countVotes }}
     //- voteName
     div(
       v-if="showRateName"
