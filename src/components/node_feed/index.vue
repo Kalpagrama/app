@@ -152,9 +152,6 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
-    },
-    nodeIsMine () {
-      return this.node.author.oid === this.$store.getters.currentUser().oid
     }
   },
   mounted () {

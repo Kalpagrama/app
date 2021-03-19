@@ -53,6 +53,9 @@ export default {
   name: 'nodeHeader',
   props: ['node', 'showAuthorAlways'],
   computed: {
+    nodeIsMine () {
+      return this.node.author.oid === this.$store.getters.currentUser().oid
+    },
     actions () {
       let res = {
         copyLink: {

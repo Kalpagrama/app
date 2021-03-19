@@ -1,14 +1,6 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  :container="false"
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  ).b-30
-  q-footer(v-if="$q.screen.lt.md")
-    kalpa-menu-mobile
-  q-header(reveal)
+kalpa-layout()
+  template(v-slot:header)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
@@ -16,35 +8,30 @@ q-layout(
           q-icon(name="settings" color="white" size="30px").q-mx-sm
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
-        //- .row.full-width.q-px-md
-          q-tabs(
-            :value="$route.name" @input="$router.push({name: $event})"
-            no-caps dense active-color="green" align="left" switch-indicator).text-grey-8
-            q-tab(v-for="v in views" :key="v.id" :name="v.id" :label="v.name")
-  q-page-container
-    q-page(
-      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-      :style=`{
-        height: '80vh',
-      }`
-      ).row.full-width.justify-center
-      div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-        .row.full-width.justify-center
-          q-icon(name="login" color="grey-8" size="100px")
-        div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-          span.text-white Вы сможете настроить аккаунт, установить аватар и заполнить информацию о себе.
-        .row.full-width.justify-center.q-py-md
-          q-btn(
-            outline color="white" no-caps
-            :to="'/auth/sign-in'"
-            :style=`{
-              height: '50px',
-            }`)
-            h1.text-white Войти в аккаунт
-        .row.full-width.justify-center.q-pt-md
-          kalpa-docs(:style=`{maxWidth: '300px'}`)
-    router-view(
-      v-if="$store.getters.currentUser().profile.role !== 'GUEST'")
+  template(v-slot:body)
+    div(:style=`{paddingTop: '70px',}`).row.full-width.items-start.content-start.justify-center
+      //- guest
+      div(
+        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+        ).row.full-width.justify-center
+        div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
+          .row.full-width.justify-center
+            q-icon(name="login" color="grey-8" size="100px")
+          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
+            span.text-white Вы сможете настроить аккаунт, установить аватар и заполнить информацию о себе.
+          .row.full-width.justify-center.q-py-md
+            q-btn(
+              outline color="white" no-caps
+              :to="'/auth/sign-in'"
+              :style=`{
+                height: '50px',
+              }`)
+              h1.text-white Войти в аккаунт
+          .row.full-width.justify-center.q-pt-md
+            kalpa-docs(:style=`{maxWidth: '300px'}`)
+      //- user
+      router-view(
+        v-if="$store.getters.currentUser().profile.role !== 'GUEST'")
 </template>
 
 <script>
