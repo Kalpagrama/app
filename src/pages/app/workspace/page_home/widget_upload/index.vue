@@ -4,7 +4,7 @@
     :style=`{
       background: 'rgb(35,35,35)',
       borderRadius: '10px',
-      maxWidth: 600+'px',
+      maxWidth: $store.state.ui.pageWidth+'px',
     }`
     ).row.full-width.q-pa-md
     .row.full-width.justify-center.q-pb-md
@@ -36,8 +36,8 @@
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-md
       small.text-grey-5 {{$tt('You can add from YouTube, Instagram, Vimeo etc')}}
   //- create
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: 600+'px',}`).row.full-width.q-pt-sm.q-px-md
+  .row.full-width.justify-center.q-px-md
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-pt-sm
       q-btn(
         outline color="grey-8" no-caps
         :to="'/workspace/create/'"

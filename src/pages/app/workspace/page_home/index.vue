@@ -56,10 +56,11 @@ kalpa-layout
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
           }`).row.full-width.items-start.content-start
-          widget-collections().q-mb-sm
-          widget-watch-later.q-mb-sm
-          widget-history.q-mb-sm
-          widget-upload().q-mb-sm
+          widget-upload().q-mb-md
+          .row.full-width.q-px-md
+            widget-collections().q-mb-sm
+            widget-watch-later.q-mb-sm
+            widget-history.q-mb-sm
 </template>
 
 <script>

@@ -39,7 +39,8 @@ q-btn(
               template(v-slot:append)
                 q-btn(color="green" flat no-caps @click="shareLinkCopy()")
                   span.text-bold {{$tt('Copy', 'Скопировать')}}
-        //- copy link
+        //- TODO: add links twitter and other socials
+        //- item repost
         .row.full-width.q-pa-md
           q-btn(
             @click="itemRepost()"
@@ -49,6 +50,15 @@ q-btn(
             }`
             ).full-width
             span {{$tt('Make a repost')}}
+        //- share native
+        div(
+          v-if="$q.platform.is.mobile"
+          ).row.full-width
+          q-btn(
+            outline no-caps color="green"
+            @click="shareNative()"
+            )
+            span {{$$t('Share via')}}
 </template>
 
 <script>
@@ -83,23 +93,15 @@ export default {
       this.$log('itemRepost')
       this.$q.notify({type: 'negative', position: 'bottom', message: this.$tt('Not implemented yet!')})
     },
+    async shareNative () {
+      this.$log('shareNative')
+      await this.$systemUtils.shareOut(this.item)
+    },
     async shareStart () {
       this.$log('shareStart', Platform.is)
       this.shareLink = makeRoutePath(this.item, true)
       this.shareDialogOpened = true
-      // // eslint-disable-next-line no-unreachable
-      // if (Platform.is.desktop) {
-      //   this.shareLink = makeRoutePath(this.item, true)
-      //   this.shareDialogOpened = true
-      // }
-      // else {
-      //   await this.$systemUtils.shareOut(this.item)
-      // }
-      this.$emit('done')
-    },
-    async shareNative () {
-      this.$log('shareNative')
-      await this.$systemUtils.shareOut(this.item)
+      // this.$emit('done')
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')

@@ -62,13 +62,13 @@ export default {
             // TODO: handle copy link...
           }
         },
-        goThreads: {
-          name: this.$tt('Go threads'),
-          cb: async () => {
-            this.$log('goThreads')
-            this.$router.push('/sphere-threads/' + this.node.sphereFromName.oid)
-          }
-        },
+        // goThreads: {
+        //   name: this.$tt('Go threads'),
+        //   cb: async () => {
+        //     this.$log('goThreads')
+        //     this.$router.push('/sphere-threads/' + this.node.sphereFromName.oid)
+        //   }
+        // },
         goGraph: {
           name: this.$tt('Go graph'),
           cb: async () => {

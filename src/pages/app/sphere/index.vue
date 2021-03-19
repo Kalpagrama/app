@@ -1,27 +1,14 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  :container="false")
-  q-header(reveal height-hint="200")
-    page-header(v-if="sphere" :sphere="sphere")
-    //- div(
-    //-   :style=`{
-    //-     position: 'sticky', top: '0px',
-    //-     zIndex: 2000,
-    //-   }`
-    //-   ).row.full-width.justify-center.b-30.text-grey-6
-    //- q-tabs(
-      active-color="green" switch-indicator no-caps
-      ).full-width
-      q-route-tab(
-        v-for="(t,ti) in tabs" :key="t.id"
-        :to="{params: {page: t.id}}" :name="t.id" :label="t.name")
-  q-page-container
-    q-page(
-      :style=`{
-        paddingTop: '8px',
-      }`
-      ).row.full-width.justify-center
+kalpa-layout()
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+      //- q-tabs(
+        active-color="green" switch-indicator no-caps
+        ).full-width
+        q-route-tab(
+          v-for="(t,ti) in tabs" :key="t.id"
+          :to="{params: {page: t.id}}" :name="t.id" :label="t.name")
+      page-header(v-if="sphere" :sphere="sphere").q-mb-sm
       component(
         v-if="sphere"
         :is="`page-${$route.params.page}`"

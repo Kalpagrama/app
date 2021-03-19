@@ -24,7 +24,7 @@
     content-player(
       v-if="contentIsVisible"
       :contentKalpa=`{
-        oid: '154412738355970078',
+        oid: contentOid,
         name: 'Кальпаграма',
         url: 'https://www.youtube.com/embed/DuqUaOtQ76o',
         type: 'VIDEO',
@@ -61,6 +61,12 @@ export default {
     return {
       contentHeight: null,
       contentIsVisible: false,
+    }
+  },
+  computed: {
+    contentOid () {
+      const hostname = window.location.hostname
+      return hostname === 'localhost' ? '155408298210803763' : '154412738355970078'
     }
   },
   methods: {
