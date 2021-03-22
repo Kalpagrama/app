@@ -15,6 +15,7 @@
       q-input(
         v-model="url"
         color="green"
+        type="text" inputmode="url"
         :placeholder="$tt('Enter link here')"
         :dark="urlInputFocused"
         :loading="urlLoading"

@@ -43,15 +43,15 @@ export default {
   methods: {
     onScroll (e) {
       // this.$log('onScroll', e)
-      this.$refs.kalpaLogo.style.transform = 'rotate(' + window.pageYOffset / 2 + 'deg)'
+      // this.$refs.kalpaLogo.style.transform = 'rotate(' + window.pageYOffset / 2 + 'deg)'
     },
   },
   mounted () {
     // this.$log('mounted')
-    window.addEventListener('scroll', this.onScroll)
+    // window.addEventListener('scroll', this.onScroll)
   },
   beforeDestroy () {
-    window.removeEventListener('scroll', this.onScroll)
+    // window.removeEventListener('scroll', this.onScroll)
   }
 }
 </script>
