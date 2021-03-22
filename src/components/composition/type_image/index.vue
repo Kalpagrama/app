@@ -8,7 +8,7 @@ div(
   slot
   img(
     draggable="false"
-    :src="composition.url"
+    :src="url"
     :style=`{
       borderRadius: '10px',
       background: 'rgb(40,40,40)',
@@ -47,6 +47,9 @@ div(
 </template>
 
 <script>
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
+
 export default {
   name: 'typeImage',
   components: {
@@ -59,6 +62,12 @@ export default {
     isMini: {type: Boolean},
     options: {type: Object},
     styles: {type: Object, default: {}},
+  },
+  computed: {
+    url () {
+      assert(this.composition.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      return ContentApi.urlSelect(this.composition.urlWithFormats)
+    }
   },
   methods: {
     contextClick () {

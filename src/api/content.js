@@ -9,6 +9,36 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
+const BookUploadFormatEnum = Object.freeze({
+   EPUB: 'epub'
+})
+const VideoUploadFormatEnum = Object.freeze({
+   SD144: '144p',
+   SD240: '240p',
+   SD360: '360p',
+   SD480: '480p',
+   HD720: '720p',
+   HD1080: '1080p'
+})
+const ImageUploadFormatEnum = Object.freeze({
+   W50: '50',
+   W600: '600',
+   W1024: '1024',
+   W1920: '1920',
+   SNIPPET: 'snippet',
+   VK: 'vkSnippet',
+   TW: 'twSnippet',
+   FB: 'fbSnippet',
+   TG: 'tgSnippet'
+})
+const UploadFormatEnum = Object.freeze({
+   DEFAULT: 'default',
+   ...BookUploadFormatEnum,
+   ...VideoUploadFormatEnum,
+   ...ImageUploadFormatEnum
+
+})
+
 class ContentApi {
    static async contentCreateFromUrl (url, youtubeUpload = false) {
       const f = ContentApi.contentCreateFromUrl
@@ -74,11 +104,11 @@ class ContentApi {
          assert(contentOid && epubCfi && epubCfiText, 'bad params')
          let { data: { contentCutCreate } } = await apollo.clients.upload.mutate({
             mutation: gql` ${fragments.contentCutFragment}
-                mutation ($contentOid: OID!, $epubCfi: String!, $epubCfiText: String!, $params: RawJSON) {
-                    contentCutCreate(contentOid: $contentOid, epubCfi: $epubCfi, epubCfiText: $epubCfiText, params: $params) {
-                       ... contentCutFragment
-                    }
+            mutation ($contentOid: OID!, $epubCfi: String!, $epubCfiText: String!, $params: RawJSON) {
+                contentCutCreate(contentOid: $contentOid, epubCfi: $epubCfi, epubCfiText: $epubCfiText, params: $params) {
+                    ... contentCutFragment
                 }
+            }
             `,
             variables: { contentOid, epubCfi, epubCfiText, params }
          })
@@ -87,6 +117,29 @@ class ContentApi {
          return contentCutCreate
       }
       return await apiCall(f, cb)
+   }
+
+   // выберет подходящий формат в зависимости от скорости сети
+   static urlSelect (urlWithFormats) {
+      // todo опираться на реальную скорость инета (можно расчитать в сервисворкере)
+      assert(urlWithFormats, 'urlWithFormats is null!!')
+      if (!urlWithFormats.length) return null
+      let urls = urlWithFormats.reduce((acc, val) => {
+         acc[val.format] = val.url
+         return acc
+      }, {})
+      if (urls[VideoUploadFormatEnum.HD720]) return urls[VideoUploadFormatEnum.HD720]
+      if (urls[VideoUploadFormatEnum.SD480]) return urls[VideoUploadFormatEnum.SD480]
+      if (urls[VideoUploadFormatEnum.SD360]) return urls[VideoUploadFormatEnum.SD360]
+      if (urls[VideoUploadFormatEnum.SD240]) return urls[VideoUploadFormatEnum.SD240]
+      if (urls[VideoUploadFormatEnum.SD144]) return urls[VideoUploadFormatEnum.SD144]
+      if (urls[BookUploadFormatEnum.EPUB]) return urls[BookUploadFormatEnum.EPUB]
+      if (urls[ImageUploadFormatEnum.W1920]) return urls[ImageUploadFormatEnum.W1920]
+      if (urls[ImageUploadFormatEnum.W1024]) return urls[ImageUploadFormatEnum.W1024]
+      if (urls[ImageUploadFormatEnum.W600]) return urls[ImageUploadFormatEnum.W600]
+      if (urls[ImageUploadFormatEnum.W50]) return urls[ImageUploadFormatEnum.W50]
+
+      return urlWithFormats[0].url // вернем первый попавшийся
    }
 }
 

@@ -13,6 +13,7 @@ import { Lists } from 'src/system/rxdb/lists'
 import { rxdbOperationProxy } from 'src/system/rxdb/common'
 import { Notify } from 'quasar'
 import { matNextWeek } from '@quasar/extras/material-icons'
+import { ContentApi } from 'src/api/content'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -641,7 +642,7 @@ class Group {
          return { startFullFil, endFullFil }
       } else {
          logE('logic error end < start' + startFullFil + ':' + endFullFil + '::' + this.reactiveGroup.id) // todo иногда случается... ХЗ что это...
-         return {startFullFil: Math.min(startFullFil, endFullFil), endFullFil: Math.min(startFullFil, endFullFil)}
+         return { startFullFil: Math.min(startFullFil, endFullFil), endFullFil: Math.min(startFullFil, endFullFil) }
       }
    }
 
@@ -793,7 +794,7 @@ class Group {
    }
 
    async gotoStart () {
-      if (this.paginateFunc){
+      if (this.paginateFunc) {
          this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length)
          let rxDocPagination = await this.paginateFunc(null, GROUP_BATCH_SZ * 2)
          await this.upsertPaginationPage(rxDocPagination, 'whole')

@@ -30,6 +30,7 @@ import debounce from 'lodash/debounce'
 import { AuthApi } from 'src/api/auth'
 import { ObjectApi } from 'src/api/object'
 import { wait } from 'src/system/utils'
+import { ContentApi } from 'src/api/content'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
@@ -181,10 +182,10 @@ class RxDBWrapper {
       let f = this.createTestDb
       let tmpObj
       const findCycle = async () => {
-         for (let obj of allObjects){
+         for (let obj of allObjects) {
             let t = performance.now()
             let id = RxCollectionEnum.OBJ + '::' + obj.oid + '::' + JSON.stringify({})
-            let finded1 = await collection.find({selector: {'cached.data.name': obj.name}}).exec()
+            let finded1 = await collection.find({ selector: { 'cached.data.name': obj.name } }).exec()
             let finded2 = await collection.findOne(id).exec()
             logDT(f, `find complete: ${Math.floor(performance.now() - t)} msec`, finded1.length, finded2 ? 1 : 0)
             // await wait(5)
@@ -220,7 +221,7 @@ class RxDBWrapper {
          let { success, error } = collection.bulkInsert(inserted) // оставшиеся вставляем
       }
       // findCycle()
-      for (let prefix = 0; prefix < 1; prefix++){
+      for (let prefix = 0; prefix < 1; prefix++) {
          let curr = 0
          while (curr <= allObjects.length) {
             let t = performance.now()
@@ -727,7 +728,10 @@ class RxDBWrapper {
       const t1 = performance.now()
       logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
-         assert(idOrRawId, 'idOrRawId!')
+         if (!idOrRawId) {
+            logD('asdasdasd')
+         }
+         assert(idOrRawId, 'idOrRawId!' + JSON.stringify({ rxCollectionEnum, idOrRawId, id }))
          if (idOrRawId.includes('::')) {
             id = idOrRawId
          } else {
@@ -762,7 +766,19 @@ class RxDBWrapper {
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
-      return reactiveDoc.getPayload()
+      let reactiveObject = reactiveDoc.getPayload()
+      const populate = async (obj) => {
+         if (obj.type.in('NODE', 'JOINT')) {
+            assert(obj.itemsShort)
+            let promises = obj.itemsShort.map(objShort => {
+               return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+            })
+            obj.items = await Promise.all(promises)
+            logD('obj.items=', obj.items)
+         }
+      }
+      if (rxCollectionEnum === RxCollectionEnum.OBJ) await populate(reactiveObject)
+      return reactiveObject
    }
 
    // actualAge - актуально только для кэша
@@ -785,7 +801,10 @@ class RxDBWrapper {
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
-         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', { id: data.id, valueString: data.valueString })
+         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
+            id: data.id,
+            valueString: data.valueString
+         })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
       }

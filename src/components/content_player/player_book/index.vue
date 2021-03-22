@@ -205,6 +205,12 @@ export default {
       this.$emit('update:progress', val)
     },
   },
+  computed: {
+    url () {
+      assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      return ContentApi.urlSelect(this.contentKalpa.urlWithFormats)
+    }
+  },
   methods: {
     setState (key, val) {
       // this.$log('setState', key, val)
@@ -542,7 +548,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     // init
-    this.book = new Book(this.contentKalpa.url, {})
+    this.book = new Book(this.url, {})
     // book navigation ready
     await this.prepareToc()
     // this.$emit('toc', this.toc)

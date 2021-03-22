@@ -123,7 +123,7 @@ const sphereFragment = gql`${objectFragment}
 const videoFragment = gql`${objectFragment}
   fragment videoFragment on Video {
     ...objectFragment
-    url
+    urlWithFormats{ format url }
     urlOriginal
     duration
     strips
@@ -138,7 +138,7 @@ const videoFragment = gql`${objectFragment}
 const bookFragment = gql`${objectFragment}
   fragment bookFragment on Book {
     ...objectFragment
-    url
+    urlWithFormats{ format url }
     contentProvider
     contentSource
   }
@@ -146,7 +146,7 @@ const bookFragment = gql`${objectFragment}
 const imageFragment = gql`${objectFragment}
   fragment imageFragment on Image {
     ...objectFragment
-    url
+    urlWithFormats{ format url }
     urlOriginal
     contentProvider
     contentSource
@@ -229,45 +229,45 @@ const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragm
     }
     operation{... operationFragment}
     outputType
-    url
+    urlWithFormats{ format url }
     contentSource
   }
 `
-const essenceFragmentLeaf = gql`
-  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
-  fragment essenceFragmentLeaf on Essence {
-    ...objectFragment
-    relatedSphereOids  
-    sphereFromName{...objectShortFragment}
-    rate
-    weight
-    rateStat {percent, weight, count}
-    rateUser
-    author {
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 50)
-    }
-    spheres {
-      oid
-      name
-    }
-    category
-    layout
-    items {
-        ...on Video {...videoFragment}
-        ...on Book {...bookFragment}
-        ...on Image {...imageFragment}
-        ...on Sphere {... sphereFragment}
-        ...on User {... userFragment}
-        ...on Composition {...compositionFragment}
-    }
-    vertices
-  }
-`
+// const essenceFragmentLeaf = gql`
+//   ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+//   fragment essenceFragmentLeaf on Essence {
+//     ...objectFragment
+//     relatedSphereOids
+//     sphereFromName{...objectShortFragment}
+//     rate
+//     weight
+//     rateStat {percent, weight, count}
+//     rateUser
+//     author {
+//       oid
+//       type
+//       name
+//       thumbUrl(preferWidth: 50)
+//     }
+//     spheres {
+//       oid
+//       name
+//     }
+//     category
+//     layout
+//     items {
+//         ...on Video {...videoFragment}
+//         ...on Book {...bookFragment}
+//         ...on Image {...imageFragment}
+//         ...on Sphere {... sphereFragment}
+//         ...on User {... userFragment}
+//         ...on Composition {...compositionFragment}
+//     }
+//     vertices
+//   }
+// `
 const essenceFragment = gql`
-  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragmentLeaf} ${sphereFragment} ${userFragment} ${compositionFragment}
+  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
   fragment essenceFragment on Essence {
     ...objectFragment
     relatedSphereOids
@@ -288,15 +288,18 @@ const essenceFragment = gql`
     }
     category
     layout
-    items {
-        ...on Video {...videoFragment}
-        ...on Book {...bookFragment}
-        ...on Image {...imageFragment}
-        ...on Essence {...essenceFragmentLeaf}
-        ...on Sphere {... sphereFragment}
-        ...on User {... userFragment}
-        ...on Composition {...compositionFragment}
-    }
+#    items {
+#        ...on Video {...videoFragment}
+#        ...on Book {...bookFragment}
+#        ...on Image {...imageFragment}
+#        ...on Essence {...essenceFragmentLeaf}
+#        ...on Sphere {... sphereFragment}
+#        ...on User {... userFragment}
+#        ...on Composition {...compositionFragment}
+#    }
+      itemsShort {
+          ...objectShortFragment
+      }
     vertices
   }
 `
@@ -405,7 +408,8 @@ const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFr
 const contentCutFragment = gql`
     fragment contentCutFragment on ContentCut {
         cutId
-        url
+#        url
+        urlWithFormats{ format url }
         duration
         epubCfi
         epubCfiText
