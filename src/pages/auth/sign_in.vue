@@ -1,10 +1,9 @@
 <template lang="pug">
 div.row.full-width.items-start.content-start.justify-center
-  div(
-    :style=`{
-      maxWidth: '400px',
-    }`
-    ).row.full-width.items-start.content-start.q-pa-lg
+  div().row.full-width.justify-center
+    kalpa-logo(
+      :width="200"
+      :height="200").q-mb-md
     q-input(
       v-model="email"
       borderless dark

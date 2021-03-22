@@ -19,8 +19,8 @@ const routes = [
       redirect: '/auth/sign-in',
       component: () => import('layouts/auth_layout.vue'),
       children: [
-         { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/home.vue') },
-         // { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in.vue') }
+         // { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/home.vue') },
+         { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in.vue') }
       ],
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))

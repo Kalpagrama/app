@@ -4,7 +4,7 @@ kalpa-layout().b-30
     .row.full-width.items-start.content-start
       //- header
       .row.full-width.justify-center
-        div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-center.content-center.q-pa-sm.br
+        div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-center.content-center.q-pa-sm
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Item editor')}}
           .col
           q-btn(

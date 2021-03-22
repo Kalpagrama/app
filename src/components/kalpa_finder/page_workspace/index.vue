@@ -2,6 +2,7 @@
 page-bookmarks(
   :useHeader="false"
   :height="height"
+  :pagesFilter="pagesFilter"
   mode="select"
   @bookmark="$emit('item', $event)")
 </template>
@@ -15,5 +16,12 @@ export default {
   components: {
     pageBookmarks,
   },
+  methods: {
+    pagesFilter (pages) {
+      return pages.filter(p => {
+        return p.id !== 'joints'
+      })
+    }
+  }
 }
 </script>

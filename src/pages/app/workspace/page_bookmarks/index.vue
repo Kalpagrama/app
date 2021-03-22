@@ -100,6 +100,7 @@ export default {
     height: {type: Number},
     useHeader: {type: Boolean, default: true},
     mode: {type: String},
+    pagesFilter: {type: Function},
   },
   components: {
     bookmarkListItem,
@@ -122,7 +123,8 @@ export default {
         {id: 'joints', name: this.$tt('Joints')},
         {id: 'spheres', name: this.$tt('Spheres')}
       ]
-      return pages
+      if (this.pagesFilter) return this.pagesFilter(pages)
+      else return pages
     },
     query () {
       let res = {

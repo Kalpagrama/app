@@ -22,7 +22,7 @@ kalpa-layout().b-30
           overflow: 'hidden',
         }`
         ).row.full-width
-        div(:style=`{width: 'calc(50% + 15px)'}`).row
+        div(:style=`{width: 'calc(50% + 15px)',}`).row
           div(:style=`{position: 'relative', paddingBottom: '100%',}`).row.full-width
             div(:style=`{position: 'absolute',}`).row.fit.items-center.content-center
               img(

@@ -67,13 +67,13 @@ kalpa-layout()
           //- v-if="rowActiveKey === rowIndex+row.oid"
           joints-row(
             v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
-            v-if="rowActiveKey === rowIndex+row.oid"
+            v-if="rowItemWidth > 0 && rowActiveKey === rowIndex+row.oid"
             v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
             :ref="`row-${rowIndex+row.oid}`"
             :row="row"
             :rowActive="rowActiveKey === rowIndex+row.oid"
             :rowPaused="jointCreatorShow"
-            :rowItemWidth="rowActiveKey === rowIndex+row.oid ? rowItemWidth : rowItemWidth/2"
+            :rowItemWidth="rowItemWidth"
             :style=`{
               //- transform: rowActiveKey === rowIndex+row.oid ? 'none' : 'scale(0.5)',
             }`
