@@ -424,7 +424,9 @@ export default {
       async handler (to, from) {
         this.$log('player.figure TO', to)
         if (to) {
-          this.zoomIn()
+          this.$nextTick(() => {
+            this.zoomIn()
+          })
           this.$tween.to(this, 0.5, {
             heightBar: this.heightBarMax,
             heightWrapper: this.heightWrapperMax,

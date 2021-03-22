@@ -16,7 +16,8 @@ kalpa-layout(
           maxWidth: $store.state.ui.pageWidth+'px',
         }`)
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-          div(
+          list-item(:bookmark="item")
+          //- div(
             @click="$emit('item', item.populatedObject)"
             :style=`{
               position: 'relative',
@@ -77,9 +78,13 @@ kalpa-layout(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import listItem from 'components/bookmark/bookmark_list_item.vue'
 
 export default {
   name: 'kalpaFinder_pageNodes',
+  components: {
+    listItem
+  },
   props: ['height'],
   data () {
     return {

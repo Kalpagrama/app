@@ -355,10 +355,10 @@ export default {
           // END of scrollHeightChanging
           this.$log('scrollHeight END')
           // this.itemMiddleScrollIntoView('scrollHeight END')
-          // handle prev..
+          // handle AUTO prev
           if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
-            // alert('Initial prev...')
-            // this.prev()
+            // alert('AUTO prev')
+            this.prev()
           }
         }, 600)
       }

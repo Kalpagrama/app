@@ -141,8 +141,11 @@ export default {
     itemFound (item) {
       this.$log('itemFound', item)
       this.$set(this.joint.items, 1, item)
-      // this.itemEditorShow = true
       this.itemFinderShow = false
+      // if content type is video
+      if (item.type === 'VIDEO') {
+        this.itemEditorShow = true
+      }
     },
     itemRemove () {
       this.$log('itemRemove')

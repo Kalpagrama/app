@@ -33,12 +33,12 @@ div(
   div(
     @click="nodeLaunch()"
     ).col.cursor-pointer
-    .row.full-width.justify-center
+    div(
+      :style=`{
+        textAlign: 'center'
+      }`
+      ).row.full-width.justify-center
       h1(:style=`{pointerEvents: 'none'}`).text-white {{ player.nodePlaying.name }}
-  //- q-btn(
-    @click="nodeLaunch()"
-    :loading="!nodeCreated"
-    round flat color="white" icon="launch")
   q-btn(
     round flat color="red" icon="clear"
     @click="player.setState('nodePlaying', null)")

@@ -4,12 +4,17 @@ router-view
 
 <script>
 export default {
-  mounted () {
-    this.$log('mounted')
+  name: 'workspace',
+  created () {
+    this.$log('created')
     let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    if (!userTutorials.content_first) {
+    this.$log('userTutorials', userTutorials)
+    if (!userTutorials.workspace_first) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', mode: 'slides-only'}])
     }
+  },
+  mounted () {
+    this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

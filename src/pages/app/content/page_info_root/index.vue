@@ -35,6 +35,10 @@ div(
               :fields=`{contentType: contentKalpa.type}`
               @bookmark="$event => $emit('bookmark', $event)")
             kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
+            //- tutorial
+            q-btn(
+              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])"
+              round flat color="white" icon="fas fa-info")
           div(
             v-if="contentKalpa.contentSource !== 'KALPA'"
             ).row.full-height.items-center.content-center.q-pl-md

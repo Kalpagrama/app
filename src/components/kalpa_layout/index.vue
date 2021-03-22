@@ -11,7 +11,7 @@ div(
       position: 'absolute', zIndex: 1000, top: '0px',
     }`
     ).row.full-width
-    slot(name="header" :scrollTop="scrollTop")
+    slot(name="header" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
   //- body
   div(
     ref="body-wrapper"
@@ -21,14 +21,14 @@ div(
     }`
     @scroll="onScroll"
     ).col.full-width.scroll
-    slot(name="body")
+    slot(name="body" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
   //- footer
   div(
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '0px',
     }`
     ).row.full-width
-    slot(name="footer")
+    slot(name="footer" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
 </template>
 
 <script>

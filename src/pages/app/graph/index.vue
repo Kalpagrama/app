@@ -233,6 +233,7 @@ export default {
       this.rows.splice(this.rows.length, 1, rowInput)
     },
     onKeydown (e) {
+      if (this.$store.state.ui.userTyping) return
       this.$log('onKeydown', e)
       // up and down
       if (['ArrowDown', 'ArrowUp'].includes(e.key)) {

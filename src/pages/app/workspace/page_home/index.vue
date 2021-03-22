@@ -1,9 +1,9 @@
 <template lang="pug">
 kalpa-layout
   template(v-slot:footer)
-    kalpa-menu-mobile
+    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
   template(v-slot:body)
-    .row.full-width.items-start.content-start
+    div(:style=`{paddingBottom: '600px',}`).row.full-width.items-start.content-start
       //- header
       .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -18,11 +18,10 @@ kalpa-layout
             .col
               .row.fit.items-center.content-center.justify-center
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Workspace')}}
-            //- q-btn(
-              @click="menuOpened = true"
-              round flat color="white" icon="menu")
+            //- tutorial
             q-btn(
-              round flat color="white" icon="more_vert")
+              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', mode: 'slides-only'}])"
+              round flat color="white" icon="fas fa-info")
       //- guest
       div(
         v-if="$store.getters.currentUser().profile.role === 'GUEST'"

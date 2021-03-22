@@ -1,5 +1,7 @@
 <template lang="pug">
 kalpa-layout()
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
   template(v-slot:header)
     .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -9,7 +11,7 @@ kalpa-layout()
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
   template(v-slot:body)
-    div(:style=`{paddingTop: '70px',}`).row.full-width.items-start.content-start.justify-center
+    div(:style=`{paddingTop: '70px',paddingBottom: '600px'}`).row.full-width.items-start.content-start.justify-center
       //- guest
       div(
         v-if="$store.getters.currentUser().profile.role === 'GUEST'"

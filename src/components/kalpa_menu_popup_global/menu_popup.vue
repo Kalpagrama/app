@@ -55,7 +55,7 @@ q-menu(
         q-icon(name="login" color="white" size="40px")
       .col
         .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold Войти
+          span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$tt('Login')}}
     //- footer USER
     router-link(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"

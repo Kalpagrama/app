@@ -1,35 +1,15 @@
 <template lang="pug">
-kalpa-layout().b-30
+kalpa-layout(
+  :height="height"
+  ).bg-black
   template(v-slot:body)
-    .row.full-width.items-start.content-start
-      .row.full-width.justify-center
-        div(:style=`{maxWidth: 500+'px'}`).row.full-width
-          //- header
-          .row.full-width.items-center.content-center.q-pa-sm
-            q-btn(
-              round flat color="white" icon="west"
-              @click="$emit('close')").q-mr-sm
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Pick fragment')}}
-//- div(
-  @click.self="$emit('close')"
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  ).column.full-width.b-30
-  .col.full-width
-    div(
-      :style=`{
-        position: 'relative',
-      }`
-      ).row.fit.items-start.content-start.justify-center
-      //- video
+    div(:style=`{position: 'relative',}`).row.fit.items-start.content-start.justify-center
       content-player(
         v-if="contentKalpa"
         @player="playerReady"
         :contentKalpa="contentKalpa"
         :style=`{
           height: '100%',
-          //- maxWidth: 600+'px',
         }`
         :options=`{
           showHeader: false,
@@ -50,12 +30,16 @@ kalpa-layout().b-30
               :style=`{
                 maxWidth: 600+'px',
               }`
-              ).row.full-width
+              ).row.full-width.items-center.content-center.q-px-md
+              span.text-white.text-bold Выдели фрагмент
               .col
               q-btn(
-                @click="videoReady"
+                @click="fragmentUpdate"
                 no-caps color="green"
                 ) Готово
+              //- .col
+              //- q-btn(
+                round flat color="red" icon="clear")
 </template>
 
 <script>
@@ -63,11 +47,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'contentFragmenter',
+  name: 'videoFragmenter',
   components: {
     contentPlayer
   },
-  props: ['oid', 'figures'],
+  props: ['oid', 'figures', 'height'],
   data () {
     return {
       contentKalpa: null,
@@ -86,10 +70,17 @@ export default {
     playerReady (player) {
       this.$log('playerReady', player)
       this.player = player
+      this.player.events.on('figure-delete', () => {
+        this.$log('player figure-delete')
+        this.player.setState('figure', null)
+      })
       if (this.figures) this.player.setState('figure', this.figures)
+      this.$nextTick(() => {
+        this.player.play()
+      })
     },
-    videoReady () {
-      this.$log('videoReady')
+    fragmentUpdate () {
+      this.$log('fragmentUpdate')
       let compositionInput = {
         id: Date.now().toString(),
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -107,9 +98,7 @@ export default {
         __typename: 'Composition',
       }
       this.$emit('composition', compositionInput)
-    },
-    imageReady () {},
-    bookReady () {},
+    }
   }
 }
 </script>

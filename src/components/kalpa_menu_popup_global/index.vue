@@ -27,7 +27,8 @@ q-btn(
       width: '24px', minWidth: '24px', maxWidth: '24px',
       height: '24px', minHeight: '24px', maxHeight: '24px',
       borderRadius: '50%',
-    }`).b-50
+    }`).row.items-center.content-center.justify-center
+    q-icon(name="menu" color="grey-7" size="24px")
   div(
     v-if="showLabel"
     :style=`{

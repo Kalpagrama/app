@@ -51,16 +51,19 @@ export default {
       else return 'default'
     }
   },
+  created () {
+    this.$log('created')
+    let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    this.$log('userTutorials', userTutorials)
+    if (!userTutorials.workspace_first) {
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])
+    }
+  },
   mounted () {
     this.$log('mounted', this.oid)
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
-    // check tutorial
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    if (!userTutorials.content_first) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])
-    }
     if (this.$store.getters.currentUser().profile.role === 'GUEST') {
       // do nothing ?
     }

@@ -1,6 +1,5 @@
 <template lang="pug">
-q-page(
-  :style=`{}`).row.full-width.items-start.content-start.justify-center
+div.row.full-width.items-start.content-start.justify-center
   div(
     :style=`{
       maxWidth: '400px',

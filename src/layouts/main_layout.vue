@@ -83,14 +83,15 @@ export default {
     this.$log('created')
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
+    let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    this.$log('userTutorials', userTutorials)
+    if (!userTutorials.workspace_first) {
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+    }
     if (this.$store.getters.currentUser().profile.role === 'GUEST') {
       // do nothing ?
     }
     else {
-      // check tutorial
-      // if (this.$store.getters.currentUser().profile.tutorial.main === false) {
-      //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
-      // }
     }
   },
   beforeDestroy () {

@@ -4,13 +4,26 @@ div(id="q-app")
 </template>
 
 <script>
+import { scroll } from 'quasar'
+const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
+
 export default {
   name: 'App',
   methods: {
     handleFocusin (e) {
       // this.$log('handleFocusin', e)
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
+      if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email') {
         this.$store.commit('ui/stateSet', ['userTyping', true])
+        if (this.$q.platform.is.mobile) {
+          const top = e.target.getBoundingClientRect().top
+          if (top < this.$q.screen.height / 3) return
+          this.$q.notify({position: 'right', message: 'Scroll into view'})
+          e.target.scrollIntoView()
+          // e.target.scrollIntoView({behavior: 'smooth'})
+          const scrollTarget = getScrollTarget(e.target)
+          const scrollPosition = getScrollPosition(scrollTarget)
+          setScrollPosition(scrollTarget, scrollPosition - 90)
+        }
       }
     },
     handleFocusout (e) {
