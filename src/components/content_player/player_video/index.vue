@@ -42,6 +42,8 @@ div(
 import playerYoutube from './player_youtube.vue'
 import playerKalpa from './player_kalpa.vue'
 import playerTint from './player_tint/index.vue'
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'contentPlayer_video',
@@ -68,8 +70,13 @@ export default {
     }
   },
   computed: {
+    url () {
+      // assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      let url = this.contentKalpa.url || ContentApi.urlSelect(this.contentKalpa.urlWithFormats) || this.contentKalpa.urlOriginal
+      return url
+    },
     figureOffset () {
-      let arr = this.contentKalpa.url.split('#t=')
+      let arr = this.url.split('#t=')
       if (arr.length > 1) {
         let [start, end] = arr[1].split(',')
         return [

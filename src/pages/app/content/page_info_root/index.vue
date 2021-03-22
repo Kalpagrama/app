@@ -103,6 +103,7 @@ div(
 <script>
 import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
+import * as assert from 'assert'
 
 export default {
   name: 'pageDetails',
@@ -122,6 +123,10 @@ export default {
     }
   },
   computed: {
+    url () {
+      assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      return ContentApi.urlSelect(this.contentKalpa.urlWithFormats)
+    },
     actions () {
       let res = {
         copyUrl: {
@@ -152,10 +157,10 @@ export default {
       this.$log('gotToOriginal')
       // TODO: urlOriginal...
       if (this.contentKalpa.contentSource === 'YOUTUBE') {
-        let arr = this.contentKalpa.url.split('/')
+        let arr = this.url.split('/')
         let isEmbed = arr[arr.length - 2] === 'embed'
         if (isEmbed) openURL(`https://www.youtube.com/watch?v=${arr[arr.length - 1]}`)
-        else openURL(this.contentKalpa.url)
+        else openURL(this.url)
       }
       else {
         return ''

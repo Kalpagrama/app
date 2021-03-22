@@ -25,10 +25,12 @@ div(
     @play="playHandle"
     @playing="playingHandle"
     @pause="pauseHandle").full-width
-    source(:src="contentKalpa.url")
+    source(:src="url")
 </template>
 
 <script>
+import { ContentApi } from 'src/api/content'
+
 export default {
   name: 'playerVideo__playerKalpa',
   props: {
@@ -63,6 +65,13 @@ export default {
       playing_: false,
       clusters: [],
       nodePlaying: null,
+    }
+  },
+  computed: {
+    url () {
+      // assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      let url = this.contentKalpa.url || ContentApi.urlSelect(this.contentKalpa.urlWithFormats) || this.contentKalpa.urlOriginal
+      return url
     }
   },
   methods: {

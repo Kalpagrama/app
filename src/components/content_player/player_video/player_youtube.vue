@@ -28,7 +28,7 @@ iframe[id$="_youtube_iframe"]
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center
   video(
     ref="videoRef"
-    :src="contentKalpa.url"
+    :src="url"
     type="video/youtube"
     :playsinline="true"
     :autoplay="true"
@@ -43,6 +43,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
 <script>
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'playerVideo__playerYoutube',
@@ -92,6 +93,13 @@ export default {
             })
         }
       }
+    }
+  },
+  computed: {
+    url () {
+      // assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      let url = this.contentKalpa.url || this.contentKalpa.urlOriginal
+      return url
     }
   },
   methods: {

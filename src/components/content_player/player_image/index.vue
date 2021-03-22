@@ -23,7 +23,7 @@ div(
     ).row.fit.items-start.content-start.b-30.br
     img(
       @click="url = null"
-      :src="url"
+      :src="urlCropped"
       :style=`{
         objectFit: 'contain',
         background: 'rgb(35,35,35)',
@@ -31,9 +31,9 @@ div(
       }`
       ).fit.bg
   image-cropper(
-    v-if="contentKalpa.url"
+    v-if="url"
     ref="imageCropper"
-    :src="contentKalpa.url"
+    :src="url"
     :options=`{
       viewMode: 2,
       dragMode: 'move',
@@ -94,6 +94,8 @@ div(
 <script>
 import playerTint from './player_tint.vue'
 import imageCropper from 'components/image_cropper/index.vue'
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'contentPlayer_image',
@@ -112,7 +114,7 @@ export default {
       player: null,
       cropping: false,
       mode: 'move',
-      url: null,
+      urlCropped: null,
       figure: null,
       figureEditing: null,
       nodePlaying: null,
@@ -130,6 +132,12 @@ export default {
           this.player.clear()
         }
       }
+    }
+  },
+  computed: {
+    url () {
+      assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      return ContentApi.urlSelect(this.contentKalpa.urlWithFormats)
     }
   },
   methods: {
@@ -168,8 +176,8 @@ export default {
       this.$log('imageCrop')
       // TODO: get data...
       this.player.getCroppedCanvas().toBlob(async (blob) => {
-        this.url = URL.createObjectURL(blob)
-        this.$log('url', this.url)
+        this.urlCropped = URL.createObjectURL(blob)
+        this.$log('urlCropped', this.urlCropped)
         this.cropping = false
         // this.figure = [{t: null, points: []}]
         this.figure = this.figureEditing
@@ -216,7 +224,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (this.url) URL.revokeObjectURL(this.url)
+    if (this.urlCropped) URL.revokeObjectURL(this.urlCropped)
   }
 }
 </script>

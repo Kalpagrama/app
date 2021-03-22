@@ -132,7 +132,7 @@ export default {
               currentParagraph.cuts.push(currentCut)
             }
             this.pauseAudio()
-            this.audioPlayer.audio = new Audio(currentCut.url)
+            this.audioPlayer.audio = new Audio(currentCut.urlWithFormats.length ? currentCut.urlWithFormats[0].url : null)
             this.audioPlayer.audio.addEventListener('ended', async (event) => {
               if (this.audioPlayer.isPlaying) {
                 await this.nextAudio(1)

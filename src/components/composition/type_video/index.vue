@@ -31,7 +31,7 @@ div(
     :contentKalpa=`{
       oid: composition.layers[0].contentOid,
       name: composition.layers[0].contentName || 'Контекст',
-      url: composition.url,
+      url: url,
       type: 'VIDEO',
       contentSource: 'KALPA',
     }`
@@ -48,6 +48,8 @@ div(
 
 <script>
 import contentPlayer from 'components/content_player/index.vue'
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'typeVideo',
@@ -69,6 +71,10 @@ export default {
     }
   },
   computed: {
+    url () {
+      assert(this.composition.urlWithFormats, '!this.contentKalpa.urlWithFormats')
+      return ContentApi.urlSelect(this.composition.urlWithFormats)
+    },
     previewOpacity () {
       if (this.player) {
         if (this.player.duration) {
@@ -83,7 +89,7 @@ export default {
       }
     },
     figureOffset () {
-      let arr = this.composition.url.split('#t=')
+      let arr = this.url.split('#t=')
       if (arr.length > 1) {
         let [start, end] = arr[1].split(',')
         return [

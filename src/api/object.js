@@ -8,6 +8,7 @@ import { apiCall } from 'src/api/index'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import throttle from 'lodash/throttle'
 import { ObjectCreateApi } from 'src/api/object_create'
+import { ContentApi } from 'src/api/content'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -43,7 +44,7 @@ const updateStatThrottled = throttle(async () => {
          return updateStat
       }
       let res = await apiCall(f, cb)
-      for (let {oid, key, valueInt} of statAccumulator){
+      for (let { oid, key, valueInt } of statAccumulator) {
          switch (key) {
             case StatKeyEnum.REMADE:
                await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, oid), 'countRemakes', countRemakes => countRemakes + 1, false)
@@ -60,12 +61,11 @@ const updateStatThrottled = throttle(async () => {
          }
       }
       return res
-   }
-   finally {
+   } finally {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec ${statAccumulator.length}`)
       statAccumulator = []
    }
-}, 1000 * 30, {leading: false}) // шлем не чаще чем раз в 30 сек
+}, 1000 * 30, { leading: false }) // шлем не чаще чем раз в 30 сек
 
 class ObjectApi {
    static fileToDataUrl (file) {
@@ -123,7 +123,7 @@ class ObjectApi {
       }
       try {
          return await apiCall(f, cb)
-      } catch (err){
+      } catch (err) {
          logD('err on objectList', err)
          throw err
       }
@@ -153,7 +153,8 @@ class ObjectApi {
 
    static async update (oid, path, newValue) {
       const f = ObjectApi.update
-      logD(f, 'start')
+      logD(f, 'start', oid)
+      if (!oid) return //  TODO пытается обновить profile без пользователя (когда не вошли)
       const t1 = performance.now()
       const cb = async () => {
          let objFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
@@ -309,7 +310,7 @@ class ObjectApi {
       assert(oid, '!oid')
       assert(key in StatKeyEnum, '!key in StatKeyEnum')
       assert(typeof valueInt === 'number')
-      statAccumulator.push({oid, key, valueInt})
+      statAccumulator.push({ oid, key, valueInt })
       updateStatThrottled()
       return true
    }
