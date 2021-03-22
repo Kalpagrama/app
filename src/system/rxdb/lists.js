@@ -331,6 +331,7 @@ class Lists {
       for (let rxDoc of rxDocs) {
          await this.addRemoveObjectToRxDoc(type, rxDoc, object)
       }
+      logD(f, 'complete')
    }
 
    async addCutToContent (contentOid, contentCut) {

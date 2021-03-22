@@ -74,6 +74,14 @@ export default {
       return url
     }
   },
+  watch: {
+    url: {
+      handler (to, from) {
+        this.$log('change video url to', to)
+        this.$refs.videoRef.setAttribute('src', to)
+      }
+    },
+  },
   methods: {
     setState (key, val) {
       // this.$log('setState', key, val)

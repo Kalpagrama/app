@@ -237,17 +237,14 @@ class ObjectCreateApi {
             }
          })
          let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'day' })
-
-         assert(reactiveEssence.relatedSphereOids)
-         await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence)
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-
-         assert(store, '!store')
-         // let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: reactiveEssence.oid, progress: 1 }
-         // store.commit('core/processEvent', fakeProgressEvent) // эвент с сервера может придти после создания ядра (а нам необходимо чтобы в state эта инфа уже была)
          return reactiveEssence
       }
-      return await apiCall(f, cb)
+      let reactiveEssence = await apiCall(f, cb)
+      assert(reactiveEssence.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence) // вне cb (иначе - дедлок)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      assert(store, '!store')
+      return reactiveEssence
    }
 
    static makeJointInput (joint) {

@@ -122,8 +122,10 @@ class ContentApi {
    // выберет подходящий формат в зависимости от скорости сети
    static urlSelect (urlWithFormats) {
       // todo опираться на реальную скорость инета (можно расчитать в сервисворкере)
+      const f = ContentApi.urlSelect
+      logD(f, 'start', urlWithFormats)
       assert(urlWithFormats, 'urlWithFormats is null!!')
-      if (!urlWithFormats.length) return null
+      if (!urlWithFormats || !urlWithFormats.length) return null
       let urls = urlWithFormats.reduce((acc, val) => {
          acc[val.format] = val.url
          return acc

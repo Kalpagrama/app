@@ -728,9 +728,6 @@ class RxDBWrapper {
       const t1 = performance.now()
       logD(f, 'start', rxCollectionEnum, idOrRawId)
       if (!id) {
-         if (!idOrRawId) {
-            logD('asdasdasd')
-         }
          assert(idOrRawId, 'idOrRawId!' + JSON.stringify({ rxCollectionEnum, idOrRawId, id }))
          if (idOrRawId.includes('::')) {
             id = idOrRawId
