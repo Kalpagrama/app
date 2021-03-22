@@ -1,6 +1,6 @@
 <template lang="pug">
 kalpa-layout(
-  :height="height")
+  :height="_height")
   template(v-slot:header)
     div(
       v-if="useHeader"
@@ -20,7 +20,7 @@ kalpa-layout(
               span(:style=`{fontSize: '18px'}`).text-white.text-bold Закладки
           q-btn(round flat color="white" icon="more_vert")
   template(v-slot:body)
-    .row.full-width.items-start.content-start
+    div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
       //- bookmark editor
       q-dialog(
         v-model="bookmarkEditorShow"
@@ -115,6 +115,9 @@ export default {
     }
   },
   computed: {
+    _height () {
+      return this.height || this.$q.screen.height
+    },
     pages () {
       let pages = [
         {id: 'collections', name: this.$tt('Collections')},

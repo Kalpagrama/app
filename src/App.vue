@@ -11,8 +11,8 @@ export default {
   name: 'App',
   methods: {
     handleFocusin (e) {
-      // this.$log('handleFocusin', e)
-      if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email') {
+      this.$log('handleFocusin', e)
+      if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email' || e.target.type === 'password') {
         this.$store.commit('ui/stateSet', ['userTyping', true])
         if (this.$q.platform.is.mobile) {
           const top = e.target.getBoundingClientRect().top
@@ -27,7 +27,7 @@ export default {
       }
     },
     handleFocusout (e) {
-      // this.$log('handleFocusout', e)
+      this.$log('handleFocusout', e)
       if (e.target.type === 'text' || e.target.type === 'textarea') {
         this.$store.commit('ui/stateSet', ['userTyping', false])
       }

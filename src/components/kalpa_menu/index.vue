@@ -23,9 +23,9 @@
       div(v-if="!mini").col
         div(
           ).row.fit.items-center.content-center.cursor-pointer
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpagrama', 'Кальпаграма')}}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Kalpagrama')}}
           .row.full-width
-            small.text-grey-4 {{$t('kalpaMenu_title', 'Продвигай суть!')}}
+            small.text-grey-4 {{$tt('Connect the dots')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -84,7 +84,7 @@
           ).full-width.items-center.content-center
           span(
             v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md Войти
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md {{$tt('Login')}}
         //- div(
           v-if="!isGuest"
           ).row.full-width.items-center.content-center.q-mt-sm
@@ -137,11 +137,11 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'feeds', name: 'Лента', icon: 'view_agenda'},
-        {id: 'trends', name: 'Поиск', icon: 'search'},
-        {id: 'workspace', name: 'Мастерская', icon: 'construction'},
-        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'settings', name: 'Настройки', icon: 'settings'},
+        {id: 'feeds', name: this.$tt('Feed'), icon: 'view_agenda'},
+        {id: 'trends', name: this.$tt('Search'), icon: 'search'},
+        {id: 'workspace', name: this.$tt('Workspace'), icon: 'construction'},
+        {id: 'notifications', name: this.$tt('Activity'), icon: 'notifications_none'},
+        {id: 'settings', name: this.$tt('Settings'), icon: 'settings'},
       ]
     }
   },
@@ -152,7 +152,7 @@ export default {
     actions () {
       let res = {
         refresh: {
-          name: 'Обновить',
+          name: this.$tt('Обновить'),
           cb: async () => {
             await this.$systemUtils.vibrate(200)
             await this.$systemUtils.reset()
@@ -161,7 +161,7 @@ export default {
       }
       if (this.isGuest) {
         res.login = {
-          name: 'Войти',
+          name: this.$tt('Войти'),
           cb: async () => {
             this.$log('action:login')
             this.$router.push('/auth')
@@ -170,14 +170,14 @@ export default {
       }
       else {
         res.settings = {
-          name: 'Настройки',
+          name: this.$tt('Настройки'),
           cb: async () => {
             this.$log('action:settings')
             this.$router.push('/settings')
           }
         }
         res.logout = {
-          name: 'Выйти',
+          name: this.$tt('Выйти'),
           cb: async () => {
             this.$log('action:logout')
             await AuthApi.logout()

@@ -58,7 +58,7 @@ q-btn(
             outline no-caps color="green"
             @click="shareNative()"
             )
-            span {{$$t('Share via')}}
+            span {{ $tt('Share via') }}
 </template>
 
 <script>

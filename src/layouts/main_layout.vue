@@ -85,7 +85,8 @@ export default {
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
     let userTutorials = this.$store.getters.currentUser().profile.tutorial
     this.$log('userTutorials', userTutorials)
-    if (!userTutorials.workspace_first) {
+    this.$log('userTutorials', userTutorials.main)
+    if (userTutorials.main === false) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
     }
     if (this.$store.getters.currentUser().profile.role === 'GUEST') {

@@ -55,7 +55,7 @@ export default {
     this.$log('created')
     let userTutorials = this.$store.getters.currentUser().profile.tutorial
     this.$log('userTutorials', userTutorials)
-    if (!userTutorials.workspace_first) {
+    if (!userTutorials.content_first) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])
     }
   },
