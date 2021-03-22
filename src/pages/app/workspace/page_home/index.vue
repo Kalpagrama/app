@@ -57,7 +57,7 @@ kalpa-layout
           }`).row.full-width.items-start.content-start
           widget-upload().q-mb-md
           .row.full-width.q-px-md
-            widget-collections().q-mb-sm
+            widget-bookmarks().q-mb-sm
             widget-watch-later.q-mb-sm
             widget-history.q-mb-sm
 </template>

@@ -12,16 +12,6 @@ div(
     position: 'relative',
   }`
   ).row.full-width.items-start.content-start
-  //- auth
-  q-btn(
-    v-if="emailSent"
-    flat dense no-caps color="red"
-    :style=`{
-      position: 'absolute', zIndex: 100, top: '-20px', left: '-8px',
-      //- height: '40px',
-    }`
-    @click="reset()")
-    span(:style=`{fontSize: '20px'}`) {{ $tt('Reset') }}
   //- header
   .row.full-width.q-pb-lg.q-pt-sm
     span(:style=`{fontSize: '22px',}`).text-white.text-bold {{$tt('Welcome to kalpagrama')}}
@@ -104,6 +94,14 @@ div(
       ).full-width.q-mt-md
       span(:style=`{fontSize: '22px'}`).text-bold {{ $tt('Login') }}
     //- reset
+    .row.full-width.q-pa-xs
+      q-btn(
+        v-if="emailSent"
+        flat dense no-caps color="red"
+        :style=`{
+        }`
+        @click="reset()")
+        span(:style=`{fontSize: '14px'}`) {{ $tt('Reset form') }}
 </template>
 
 <script>

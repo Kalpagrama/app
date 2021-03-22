@@ -8,7 +8,7 @@ div(
   //- header
   div(
     :style=`{
-      position: 'absolute', zIndex: 1000, top: '0px',
+      position: 'absolute', zIndex: 2000, top: '0px',
     }`
     ).row.full-width
     slot(name="header" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
