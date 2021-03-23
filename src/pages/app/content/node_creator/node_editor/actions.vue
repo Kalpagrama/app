@@ -154,7 +154,7 @@ export default {
         let nodeInput = JSON.parse(JSON.stringify(this.node))
         nodeInput.items[0] = this.compositionCreate()
         if (nodeInput.name.length === 0) {
-          throw new Error(this.$tt('Empty essence !'))
+          throw new Error(this.$t('Empty essence !'))
         }
         this.$log('nodeInput', nodeInput)
         // ---

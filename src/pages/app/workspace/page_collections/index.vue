@@ -11,7 +11,7 @@ kalpa-layout()
             round flat color="white" icon="west"
             @click="$routerKalpa.back()"
             ).q-mr-sm
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ $tt('Collections') }}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ $t('Collections') }}
     .row.full-width.bg
       h1(v-if="collectionsRes").text-white collectionsRes.items
 </template>

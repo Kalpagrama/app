@@ -61,7 +61,7 @@
             :style=`{
               borderRadius: '30px',
             }`)
-            span {{ following ? $tt('Unfollow') : $tt('Follow') }}
+            span {{ following ? $t('Unfollow') : $t('Follow') }}
       //- about user
       .row.full-width.q-px-sm
         div(
@@ -80,13 +80,13 @@
             :to=`'following'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
-            small.text-grey-7.q-mr-md {{$tt('Following')}}
+            small.text-grey-7.q-mr-md {{$t('Following')}}
           //- followers
           router-link(
             :to=`'followers'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
-            small.text-grey-7 {{$tt('Followers')}}
+            small.text-grey-7 {{$t('Followers')}}
 </template>
 
 <script>

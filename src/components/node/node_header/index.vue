@@ -42,7 +42,7 @@ div(
   kalpa-menu-actions(
     icon="more_vert"
     color="grey-8"
-    :headerText="$tt('Node')"
+    :headerText="$t('Node')"
     :actions="actions")
 </template>
 
@@ -59,21 +59,21 @@ export default {
     actions () {
       let res = {
         copyLink: {
-          name: this.$tt('Copy Link'),
+          name: this.$t('Copy Link'),
           cb: async () => {
             this.$log('copyLink')
             // TODO: handle copy link...
           }
         },
         // goThreads: {
-        //   name: this.$tt('Go threads'),
+        //   name: this.$t('Go threads'),
         //   cb: async () => {
         //     this.$log('goThreads')
         //     this.$router.push('/sphere-threads/' + this.node.sphereFromName.oid)
         //   }
         // },
         goGraph: {
-          name: this.$tt('Go graph'),
+          name: this.$t('Go graph'),
           cb: async () => {
             this.$log('goGraph')
             if (this.node.items.length === 1) {
@@ -91,7 +91,7 @@ export default {
       if (this.nodeIsMine) {
         res.delete = {
           // name: i18n.t('Delete', 'Удалить'),
-          name: this.$tt('Delete'),
+          name: this.$t('Delete'),
           color: 'red',
           cb: async () => {
             this.$log('nodeDelete...')
@@ -101,7 +101,7 @@ export default {
       }
       else {
         res.hide = {
-          name: this.$tt('Hide'),
+          name: this.$t('Hide'),
           color: 'white',
           cb: async () => {
             this.$log('hide...')
@@ -109,11 +109,11 @@ export default {
           }
         }
         res.report = {
-          name: this.$tt('Report'),
+          name: this.$t('Report'),
           color: 'red',
           cb: () => {
             this.$log('report...')
-            let reason = prompt(this.$tt('Why?'))
+            let reason = prompt(this.$t('Why?'))
           }
         }
       }

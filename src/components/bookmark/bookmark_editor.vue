@@ -42,7 +42,7 @@ div(
     //- collections
     .row.full-width.q-py-xs.q-px-sm
       .row.full-width
-        span.text-white {{$tt('Collections:')}}
+        span.text-white {{$t('Collections:')}}
       div(
         v-if="bookmarkCollectionsRes"
         ).row.full-width
@@ -58,7 +58,7 @@ div(
       q-toggle(
         v-model="bookmark.isSubscribed"
         dark
-        :label="$tt('Receive updates')"
+        :label="$t('Receive updates')"
         :style=`{color: 'white'}`
         color="green").full-width
     //- delete
@@ -71,7 +71,7 @@ div(
         }`
         @click="bookmarkDelete()"
         ).full-width
-        span {{ $tt('Delete bookmark') }}
+        span {{ $t('Delete bookmark') }}
 </template>
 
 <script>

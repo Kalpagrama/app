@@ -37,7 +37,7 @@ div(
             kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
             //- tutorial
             q-btn(
-              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])"
+              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: false, useProfileEditor: false}])"
               round flat color="white" icon="fas fa-info")
           div(
             v-if="contentKalpa.contentSource !== 'KALPA'"

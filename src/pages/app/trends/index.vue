@@ -13,7 +13,7 @@ kalpa-layout
               v-model="searchString"
               flat borderless dark
               icon="search"
-              :placeholder="$tt('Type here to search...')"
+              :placeholder="$t('Type here to search...')"
               :debounce="500"
               :style=`{}`
               :input-style=`{

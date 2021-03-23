@@ -262,7 +262,7 @@ export default {
     })
     // HACK: Spinner hack
     let i = setInterval(() => {
-      if (this.isActive && this.player && this.player.playing_) {
+      if (this.isActive && this.player && !this.player.playing_) {
         this.$log('Spinner hack player.play()')
         this.player.play()
       }

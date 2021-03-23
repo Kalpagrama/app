@@ -18,7 +18,7 @@ q-btn(
       }`).row.full-width.q-pa-sm.b-40
       //- header
       .row.full-width.q-pa-md
-        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$tt('Pick category')}}
+        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$t('Pick category')}}
         .col
         q-btn(round flat color="white" icon="clear" v-close-popup)
       //- body

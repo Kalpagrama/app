@@ -18,7 +18,7 @@ div(
       //- tabs
       .row.full-width.items-center.content-center.q-px-sm.q-py-xs
         .row.q-pl-sm
-          span.text-white.q-mr-sm {{$tt('From')}}:
+          span.text-white.q-mr-sm {{$t('From')}}:
         .col
           .row.full-width.scroll
             .row.full-width.items-center.content-center.no-wrap
@@ -85,7 +85,7 @@ export default {
   computed: {
     headerTitle_ () {
       if (this.headerTitle) return this.headerTitle
-      else return this.$tt('Find your item')
+      else return this.$t('Find your item')
     },
     page () {
       if (this.pageId) return this.pages[this.pageId]

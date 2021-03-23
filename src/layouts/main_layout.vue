@@ -87,7 +87,7 @@ export default {
     this.$log('userTutorials', userTutorials)
     this.$log('userTutorials', userTutorials.main)
     if (userTutorials.main === false) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
     }
     if (this.$store.getters.currentUser().profile.role === 'GUEST') {
       // do nothing ?

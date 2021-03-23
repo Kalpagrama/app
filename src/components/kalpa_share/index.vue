@@ -4,7 +4,7 @@ q-btn(
   :color="color"
   :loading="loading"
   @click="shareStart")
-  //- q-tooltip(dense dark) {{$tt('Share')}}
+  //- q-tooltip(dense dark) {{$t('Share')}}
   q-icon(name="logout" size="23px").rotate-270
   q-dialog(
     v-model="shareDialogOpened"
@@ -38,7 +38,7 @@ q-btn(
               ).full-width
               template(v-slot:append)
                 q-btn(color="green" flat no-caps @click="shareLinkCopy()")
-                  span.text-bold {{$tt('Copy', 'Скопировать')}}
+                  span.text-bold {{$t('Copy', 'Скопировать')}}
         //- TODO: add links twitter and other socials
         //- item repost
         .row.full-width.q-pa-md
@@ -49,7 +49,7 @@ q-btn(
               height: '50px',
             }`
             ).full-width
-            span {{$tt('Make a repost')}}
+            span {{$t('Make a repost')}}
         //- share native
         div(
           v-if="$q.platform.is.mobile"
@@ -58,7 +58,7 @@ q-btn(
             outline no-caps color="green"
             @click="shareNative()"
             )
-            span {{ $tt('Share via') }}
+            span {{ $t('Share via') }}
 </template>
 
 <script>
@@ -91,7 +91,7 @@ export default {
   methods: {
     itemRepost () {
       this.$log('itemRepost')
-      this.$q.notify({type: 'negative', position: 'bottom', message: this.$tt('Not implemented yet!')})
+      this.$q.notify({type: 'negative', position: 'bottom', message: this.$t('Not implemented yet!')})
     },
     async shareNative () {
       this.$log('shareNative')

@@ -17,9 +17,9 @@ q-menu(
       div(v-if="!mini").col
         div(
           ).row.fit.items-center.content-center.cursor-pointer
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Kalpagrama')}}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama')}}
           .row.full-width
-            small.text-grey-4 {{$tt('Connect the dots')}}
+            small.text-grey-4 {{$t('Connect the dots')}}
     //- body
     div(
       :style=`{
@@ -55,7 +55,7 @@ q-menu(
         q-icon(name="login" color="white" size="40px")
       .col
         .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$tt('Login')}}
+          span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
     router-link(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
@@ -99,11 +99,11 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$tt('Feed'), icon: 'view_agenda'},
-        {id: 'trends', name: this.$tt('Search'), icon: 'search'},
-        {id: 'workspace', name: this.$tt('Workspace'), icon: 'construction'},
-        {id: 'notifications', name: this.$tt('Activity'), icon: 'notifications_none'},
-        {id: 'settings', name: this.$tt('Settings'), icon: 'settings'},
+        {id: 'feeds', name: this.$t('Feed'), icon: 'view_agenda'},
+        {id: 'trends', name: this.$t('Search'), icon: 'search'},
+        {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
+        {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},
+        {id: 'settings', name: this.$t('Settings'), icon: 'settings'},
       ]
     }
   },

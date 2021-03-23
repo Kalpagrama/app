@@ -5,7 +5,7 @@ kalpa-layout().b-30
       //- header
       .row.full-width.justify-center
         div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-center.content-center.q-pa-sm
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Item editor')}}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Item editor')}}
           .col
           q-btn(
             round flat color="white" icon="clear"

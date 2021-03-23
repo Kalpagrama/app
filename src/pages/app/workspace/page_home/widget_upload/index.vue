@@ -8,7 +8,7 @@
     }`
     ).row.full-width.q-pa-md
     .row.full-width.justify-center.q-pb-md
-      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$tt('Add by Link')}}
+      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Add by Link')}}
     div(
       :style=`{borderRadius: '10px',}`
       ).row.full-width.b-40
@@ -16,7 +16,7 @@
         v-model="url"
         color="green"
         type="text" inputmode="url"
-        :placeholder="$tt('Enter link here')"
+        :placeholder="$t('Enter link here')"
         :dark="urlInputFocused"
         :loading="urlLoading"
         :debounce="500"
@@ -35,7 +35,7 @@
         @blur="urlInputFocused = false"
         ).full-width.text-white.b-40
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-md
-      small.text-grey-5 {{$tt('You can add from YouTube, Instagram, Vimeo etc')}}
+      small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
   //- create
   .row.full-width.justify-center.q-px-md
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-pt-sm
@@ -45,7 +45,7 @@
         :style=`{
           height: '50px',
         }`).full-width
-        span.text-grey-6 {{$tt('Create')}}
+        span.text-grey-6 {{$t('Create')}}
 </template>
 
 <script>

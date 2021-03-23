@@ -13,7 +13,7 @@ div(
       ).row.full-width.items-start.content-start.q-pb-xl
       //- header
       .row.full-width.q-pa-md
-        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$tt('Vote stats')}}
+        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{$t('Vote stats')}}
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
       //- header rates selector
@@ -100,7 +100,7 @@ div(
               height: '50px',
               background: 'rgb(45,45,45)',
             }`).full-width
-            span.q-ml-sm {{$tt('Revote')}}
+            span.q-ml-sm {{$t('Revote')}}
 </template>
 
 <script>

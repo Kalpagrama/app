@@ -16,7 +16,7 @@
         width: size+'px',
         height: size+'px',
       }`)
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Feed')}}
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Feed')}}
     q-btn(
       @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
       flat no-caps icon="search"
@@ -26,7 +26,7 @@
         width: size+'px',
         height: size+'px',
       }`)
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Search')}}
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Search')}}
     //- workspace
     div(
       :style=`{
@@ -49,7 +49,7 @@
         height: size+'px',
       }`)
       q-badge(color="red" floating transparent) •
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$tt('Activity')}}
+      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Activity')}}
     kalpa-menu-popup-global(
       color="grey-7"
       :styles=`{

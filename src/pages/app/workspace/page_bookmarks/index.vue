@@ -39,7 +39,7 @@ kalpa-layout(
           q-input(
             v-model="searchString"
             borderless dark
-            :placeholder="$tt('Search')"
+            :placeholder="$t('Search')"
             :input-style=`{
               padding: '16px',
               background: 'rgb(40,40,40)',
@@ -120,11 +120,11 @@ export default {
     },
     pages () {
       let pages = [
-        {id: 'collections', name: this.$tt('Collections')},
-        {id: 'content', name: this.$tt('Media')},
-        {id: 'nodes', name: this.$tt('Nodes')},
-        {id: 'joints', name: this.$tt('Joints')},
-        {id: 'spheres', name: this.$tt('Spheres')}
+        {id: 'collections', name: this.$t('Collections')},
+        {id: 'content', name: this.$t('Media')},
+        {id: 'nodes', name: this.$t('Nodes')},
+        {id: 'joints', name: this.$t('Joints')},
+        {id: 'spheres', name: this.$t('Spheres')}
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages

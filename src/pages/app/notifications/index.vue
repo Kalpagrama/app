@@ -19,7 +19,7 @@ kalpa-layout
               .row.full-width.items-center.content-center.justify-center
                 span(
                   :style=`{fontSize: '18px', userSelect: 'none'}`
-                  ).text-bold.text-white {{$tt('Activity')}}
+                  ).text-bold.text-white {{$t('Activity')}}
             q-btn(round flat color="white" icon="more_vert")
       .row.full-width.justify-center.q-pt-sm.q-px-sm
         //- guest

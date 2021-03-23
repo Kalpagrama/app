@@ -56,7 +56,7 @@ export default {
     let userTutorials = this.$store.getters.currentUser().profile.tutorial
     this.$log('userTutorials', userTutorials)
     if (!userTutorials.content_first) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: false}])
     }
   },
   mounted () {
