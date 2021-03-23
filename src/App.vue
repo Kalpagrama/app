@@ -11,20 +11,30 @@ export default {
   name: 'App',
   methods: {
     handleFocusin (e) {
-      this.$log('handleFocusin', e)
-      if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email' || e.target.type === 'password') {
-        this.$store.commit('ui/stateSet', ['userTyping', true])
-        if (this.$q.platform.is.mobile) {
-          const top = e.target.getBoundingClientRect().top
-          if (top < this.$q.screen.height / 3) return
-          this.$q.notify({position: 'right', message: 'Scroll into view'})
-          e.target.scrollIntoView()
-          // e.target.scrollIntoView({behavior: 'smooth'})
-          const scrollTarget = getScrollTarget(e.target)
-          const scrollPosition = getScrollPosition(scrollTarget)
-          setScrollPosition(scrollTarget, scrollPosition - 90)
+      const job = () => {
+        this.$log('handleFocusin', e)
+        if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email' || e.target.type === 'password') {
+          this.$store.commit('ui/stateSet', ['userTyping', true])
+          if (this.$q.platform.is.mobile) {
+            const top = e.target.getBoundingClientRect().top
+            if (top < this.$q.screen.height / 4) return
+            // this.$q.notify({position: 'right', message: 'Scroll into view: ' + top})
+            const scrollTarget = getScrollTarget(e.target)
+            e.target.scrollIntoView()
+            let i = setInterval(() => {
+              e.target.scrollIntoView()
+              const scrollPosition = getScrollPosition(scrollTarget)
+              setScrollPosition(scrollTarget, scrollPosition - 90)
+            }, 0)
+            this.$wait(600).then(() => {
+              clearInterval(i)
+            })
+          }
         }
       }
+      setTimeout(() => {
+        job()
+      }, 0)
     },
     handleFocusout (e) {
       this.$log('handleFocusout', e)

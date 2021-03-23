@@ -253,12 +253,24 @@ export default {
     if (this.options.mode === 'editor') {
       window.addEventListener('keydown', this.onKeydown)
     }
+    // Delayed shows
     this.$wait(1000).then(() => {
       this.showHeaderLocal = true
     })
     this.$wait(2000).then(() => {
       this.tintSpinnerCanShow = true
     })
+    // HACK: Spinner hack
+    let i = setInterval(() => {
+      if (this.isActive && this.player && this.player.playing_) {
+        this.$log('Spinner hack player.play()')
+        this.player.play()
+      }
+    }, 500)
+    setTimeout(() => {
+      clearTimeout(i)
+    }, 4000)
+    // Tint dimensions
     this.$nextTick(() => {
       this.tintHeight = this.$refs['tint-wrapper'].clientHeight
       this.tintWidth = this.$refs['tint-wrapper'].clientWidth

@@ -20,27 +20,34 @@ kalpa-layout().b-30
         q-btn(outline no-caps color="white").full-width.q-mb-sm Указать другой смысл
       //- content VIDEO
       div(
-        v-if="['VIDEO'].includes(item.type)"
+        v-else-if="['VIDEO'].includes(item.type)"
         ).row.full-width
         video-fragmenter(
           :oid="item.oid"
           :figures="null"
           :height="$q.screen.height-60"
-          @composition="contentFragmentDone"
-          @close="contentFragmenterShow = false")
+          @composition="contentFragmentDone")
       //- content BOOK
       div(
-        v-if="['BOOK'].includes(item.type)"
-        ).row.full-width.q-pa-sm
-        item-preview(:item="item")
+        v-else-if="['BOOK'].includes(item.type)"
+        ).row.full-width
+        book-fragmenter(
+          :oid="item.oid"
+          :figures="null"
+          :height="$q.screen.height-60"
+          @composition="contentFragmentDone")
       //- content IMAGE
       div(
-        v-if="['IMAGE'].includes(item.type)"
-        ).row.full-width.q-pa-sm
-        item-preview(:item="item")
+        v-else-if="['IMAGE'].includes(item.type)"
+        ).row.full-width.justify-center
+        item-preview(
+          :item="item"
+          :style=`{
+            maxWidth: 500+'px',
+          }`)
       //- composition actions
       div(
-        v-if="item.__typename === 'Composition'"
+        v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
         ).row.full-width
         video-fragmenter(
           :oid="item.layers[0].contentOid"
@@ -49,7 +56,9 @@ kalpa-layout().b-30
           @composition="contentFragmentDone"
           @close="contentFragmenterShow = false")
       //- for all
-      .row.full-width.q-pa-sm
+      div(
+        v-else
+        ).row.full-width.q-pa-sm
         q-btn(
           outline no-caps color="green"
           :style=`{
@@ -67,12 +76,16 @@ kalpa-layout().b-30
 <script>
 import itemPreview from '../item_preview/index.vue'
 import videoFragmenter from './video_fragmenter.vue'
+import bookFragmenter from './book_fragmenter.vue'
+import imageFragmenter from './image_fragmenter.vue'
 
 export default {
   name: 'itemEditor',
   components: {
     itemPreview,
     videoFragmenter,
+    bookFragmenter,
+    imageFragmenter,
   },
   props: ['joint', 'item'],
   data () {

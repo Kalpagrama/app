@@ -144,7 +144,7 @@ export default {
       this.canplay = true
     },
     playingHandle (e) {
-      // this.$log('playingHandle', e)
+      this.$log('playingHandle', e)
       this.playing_ = true
     },
     playHandle (e) {

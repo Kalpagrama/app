@@ -36,7 +36,7 @@
         //- v-if="p.id === 'trends' ? true : !isGuest"
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
-          @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+          @click.native="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
           :to="{name: p.id}"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id

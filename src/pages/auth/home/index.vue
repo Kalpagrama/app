@@ -85,8 +85,8 @@ kalpa-layout().b-30
         }`
         ).row.fit.row.fit.items-center.content-center.justify-center
         kalpa-logo(
-          :width="300"
-          :height="300"
+          :width="200"
+          :height="200"
           :style=`{
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
           }`).q-mb-md
@@ -107,7 +107,8 @@ kalpa-layout().b-30
           position: 'relative', zIndex: 100, transform: 'translate3d(0,0,0)',
           marginTop: '50vh',
           borderRadius: getRadius(scrollTop, scrollHeight),
-          height: '1000px',
+          minHeight: $q.screen.height+'px',
+          maxHeight: $q.screen.height+'px',
         }`
         ).row.full-width.items-start.content-start.b-80.q-pt-lg.q-px-xl
         auth-flow(:onSuccess="onSuccess")

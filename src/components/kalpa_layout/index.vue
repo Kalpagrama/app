@@ -11,6 +11,7 @@ div(
       position: 'absolute', zIndex: 2000, top: '0px',
     }`
     ).row.full-width
+    //- small.text-white.bg-red {{ scrollTop }}
     slot(name="header" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
   //- body
   div(
