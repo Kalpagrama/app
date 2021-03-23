@@ -29,11 +29,11 @@ export default {
     }
   },
   watch: {
-    node: {
-      deep: true,
+    'node.uploadStage': {
+      deep: false,
       handler (to, from) {
-        this.$log('node TO', to.uploadStage, to.uploadStageProgress)
-        if (to.uploadStage === 'COMPLETE' && to.uploadStageProgress === 100) {
+        this.$logW('node TO', to)
+        if (to === 'COMPLETE') {
           if (!this.isHidden) this.$emit('created')
           this.$q.notify({
             type: 'positive',
@@ -44,7 +44,7 @@ export default {
                 label: 'Перейти',
                 color: 'white',
                 handler: () => {
-                  this.$router.push(`/node/${to.oid}`)
+                  this.$router.push(`/node/${this.node.oid}`)
                 }
               }
             ]

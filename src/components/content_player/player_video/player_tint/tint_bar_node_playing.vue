@@ -70,12 +70,12 @@ export default {
         else this.player.play()
       }
     },
-    'player.nodePlaying': {
-      deep: true,
+    'player.nodePlaying.uploadStage': {
+      deep: false,
       handler (to, from) {
         if (!this.nodeCreating) return
-        this.$log('player.nodePlaying TO', to.uploadStage, to.uploadStageProgress)
-        if (to.uploadStage === 'COMPLETE' && to.uploadStageProgress === 100) {
+        this.$logW('player.nodePlaying TO', to)
+        if (to === 'COMPLETE') {
           // if (!this.isHidden) this.$emit('created')
           this.nodeShow = true
           this.nodeCreated = true
@@ -89,7 +89,7 @@ export default {
                 color: 'white',
                 icon: 'launch',
                 handler: () => {
-                  this.$router.push(`/node/${to.oid}`)
+                  this.$router.push(`/node/${this.player.nodePlaying.oid}`)
                 }
               }
             ]

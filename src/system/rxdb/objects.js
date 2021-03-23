@@ -280,7 +280,7 @@ class Objects {
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start', event.object.type, event.path, event.value)
+      logD(f, 'start', event.object.type, event.path, event.value, event)
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
