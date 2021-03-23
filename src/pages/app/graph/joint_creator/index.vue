@@ -142,8 +142,8 @@ export default {
       this.$log('itemFound', item)
       this.$set(this.joint.items, 1, item)
       this.itemFinderShow = false
-      // if content type is video
-      if (item.type === 'VIDEO') {
+      // if content type is video or book
+      if (['VIDEO', 'BOOK'].includes(item.type)) {
         this.itemEditorShow = true
       }
     },

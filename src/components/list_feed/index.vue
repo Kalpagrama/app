@@ -148,6 +148,7 @@ div(
         //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
       }`
       :style=`{
+        position: 'relative',
         ...itemStyles,
       }`
       v-observe-visibility=`{
@@ -160,6 +161,11 @@ div(
         }
       }`
       ).row.full-width
+      //- div(
+        v-if="item[itemKey] !== (itemMiddle ? itemMiddle.key : undefined)"
+        @click="itemMiddleHandler(true, {target: {accessKey: `${item[itemKey]}-${itemIndex}`}}), itemMiddleScrollIntoView('template')"
+        :style=`{position: 'absolute', background: 'rgba(0,0,0,0.5)',borderRadius: '10px',}`
+        ).row.fit.br
       //- item slot
       slot(
         name="item"
