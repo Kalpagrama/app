@@ -20,6 +20,7 @@ import {
 } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import axios from 'axios'
+import { systemReset } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
@@ -90,15 +91,15 @@ export default async ({ Vue, store, app }) => {
          if (networkError) {
             logE('gql network error', networkError)
             if (networkError.message === 'bad auth token!') {
-               // alert('error on gql request2: ' + JSON.stringify(networkError))
-               AuthApi.logout(null)
-                  .then(() => {
-                     window.location.reload()
-                  })
-                  .catch(err => {
-                     logE('AuthApi.logout error', err)
-                     window.location.reload()
-                  })
+               // AuthApi.logout(null)
+               //    .then(() => {
+               //       window.location.reload()
+               //    })
+               //    .catch(err => {
+               //       logE('AuthApi.logout error', err)
+               //       window.location.reload()
+               //    })
+               systemReset(true, true, true, true)
             }
          }
       })
@@ -110,7 +111,11 @@ export default async ({ Vue, store, app }) => {
             }
          }
          if (networkError) {
-            logE('gql network error', networkError)
+            logE('gql network error ws', networkError)
+            if (networkError.message === 'bad auth token!') {
+               // alert('error on gql request2: ' + JSON.stringify(networkError))
+               systemReset(true, true, true, true)
+            }
          }
       })
 
