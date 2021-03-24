@@ -16,7 +16,7 @@
         width: size+'px',
         height: size+'px',
       }`)
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Feed')}}
+      small(:style=`{marginTop: '-2px', whiteSpace: 'nowrap'}`) {{$t('Feed')}}
     //- trends
     q-btn(
       @click="$go('/trends')"
@@ -26,7 +26,7 @@
         width: size+'px',
         height: size+'px',
       }`)
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Search')}}
+      small(:style=`{marginTop: '-2px', whiteSpace: 'nowrap'}`) {{$t('Search')}}
     //- workspace
     div(
       :style=`{

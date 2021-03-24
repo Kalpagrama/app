@@ -17,15 +17,15 @@ q-btn(
     v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
     :src="$store.getters.currentUser().profile.photoUrl"
     :style=`{
-      width: '24px', minWidth: '24px', maxWidth: '24px',
-      height: '24px', minHeight: '24px', maxHeight: '24px',
+      width: size, minWidth: size, maxWidth: size,
+      height: size, minHeight: size, maxHeight: size,
       borderRadius: '50%',
     }`)
   div(
     v-else
     :style=`{
-      width: '24px', minWidth: '24px', maxWidth: '24px',
-      height: '24px', minHeight: '24px', maxHeight: '24px',
+      width: size, minWidth: size, maxWidth: size,
+      height: size, minHeight: size, maxHeight: size,
       borderRadius: '50%',
     }`).row.items-center.content-center.justify-center
     q-icon(name="menu" color="grey-7" size="24px")
@@ -67,6 +67,7 @@ export default {
   },
   data () {
     return {
+      size: '20px',
     }
   },
   computed: {

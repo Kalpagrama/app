@@ -8,6 +8,7 @@ q-menu(
     //- header
     div(
       @click="$go('/about')"
+      v-close-popup
       :style=`{borderRadius: '10px',}`
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item.cursor-pointer
       div(
@@ -58,7 +59,7 @@ q-menu(
         .row.fit.items-center.content-center
           span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
-    router-link(
+    div(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
       v-close-popup
       @click="$go('/user/'+$store.getters.currentUser().oid)"
