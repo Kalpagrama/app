@@ -34,7 +34,8 @@ div(
                 :style=`{
                   fontSize: '16px'
                 }`)
-                span.text-bold.text-grey-3 {{ 'Go to original:' }}
+                //- span.text-bold.text-grey-3 {{ 'Go to original' }}
+                span.text-bold.text-grey-3 {{ $t('Go to original') }}
                 //- handle youtube
                 q-icon(
                   v-if="contentKalpa.contentProvider === 'YOUTUBE'"

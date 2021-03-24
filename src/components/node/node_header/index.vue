@@ -21,7 +21,7 @@ div(
     .col
       .row.items-center.content-center.q-px-sm.q-mb-xs
         span.text-grey-4 {{ node.author.name }}
-        .row.full-width
+        //- .row.full-width
           small(:style=`{lineHeight: 0.5}`).text-grey-6 @username
   div(
     v-else

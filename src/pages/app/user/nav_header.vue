@@ -50,7 +50,7 @@
         user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
         .col
           span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
-          .row.full-width.q-px-sm
+          //- .row.full-width.q-px-sm
             small(:style=`{lineHeight: 0.9}`).text-grey-4 @username
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
