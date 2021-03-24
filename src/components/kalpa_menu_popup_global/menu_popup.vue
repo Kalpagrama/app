@@ -6,10 +6,10 @@ q-menu(
   //- :offset="[16,16]"
   div(:style=`{width: '300px',}`).row.shadow-20
     //- header
-    router-link(
-      :to="'/about'"
+    div(
+      @click="$go('/about')"
       :style=`{borderRadius: '10px',}`
-      ).row.full-width.items-center.content-center.q-pa-sm.menu-item
+      ).row.full-width.items-center.content-center.q-pa-sm.menu-item.cursor-pointer
       div(
         :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
         ).row.items-center.content-center.justify-center.cursor-pointer
@@ -27,15 +27,16 @@ q-menu(
         paddingRight: '14px',
       }`
       ).row.full-width.items-start.content-start.q-py-sm
-      router-link(
+      div(
+        @click="$go('/'+p.id)"
         v-for="(p,pi) in pages" :key="p"
-        :to="'/'+p.id"
+        v-close-popup
         :style=`{
           height: '50px',
           background: 'rgb(33,33,33)',
           borderRadius: '10px',
         }`
-        ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm
+        ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm.cursor-pointer
         q-icon(:name="p.icon" size="24px" color="white" :style=`{marginRight: '18px'}`).q-ml-xs
         span(
           :style=`{
@@ -43,10 +44,10 @@ q-menu(
           }`
           ).text-white {{ p.name }}
     //- footer GUEST
-    router-link(
+    div(
       v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-      @click="footerClick"
-      :to="'/auth/sign-in'"
+      v-close-popup
+      @click="$go('/auth/sign-in')"
       :style=`{
         borderRadius: '10px',
       }`
@@ -60,8 +61,7 @@ q-menu(
     router-link(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
       v-close-popup
-      @click="footerClick"
-      :to="'/user/'+$store.getters.currentUser().oid"
+      @click="$go('/user/'+$store.getters.currentUser().oid)"
       :style=`{
         borderRadius: '10px',
       }`

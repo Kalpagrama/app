@@ -12,8 +12,8 @@
     ).row.full-width.items-center.content-center
     //- home
     //- :to="isGuest ? '/trends' : '/feeds/all'"
-    router-link(
-      :to="'/about'"
+    div(
+      @click="$go('/about')"
       :style=`{borderRadius: '10px',}`
       ).row.full-width
       div(
@@ -34,10 +34,9 @@
       }`
       ).column.full-width.q-pt-sm
         //- pages
-        router-link(
+        div(
           v-for="(p,pi) in pages" :key="p.id"
-          @click.native="goTo({name: p.id})"
-          :to="{name: p.id}"
+          @click="$go({name: p.id})"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id
           }`
@@ -46,7 +45,7 @@
             borderRadius: '10px', overflow: 'hidden',
             //- maxWidth: '210px',
           }`
-          ).row.full-width.items-center.menu-item.q-mb-sm
+          ).row.full-width.items-center.menu-item.q-mb-sm.cursor-pointer
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="30px" :name="p.icon" :color="p.color || 'white'")
           span(
@@ -55,7 +54,7 @@
         //- user
         div(
           v-if="!isGuest"
-          @click="goTo('/user/'+$store.getters.currentUser().oid)"
+          @click="$go('/user/'+$store.getters.currentUser().oid)"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`
@@ -73,9 +72,9 @@
         //- login for GUEST
         q-btn(
           v-if="isGuest"
+          @click="$go('/auth')"
           color="green" no-caps icon="login"
           :align="mini ? 'center' : 'left'"
-          :to="'/auth'"
           :style=`{
             height: '60px',
             paddingLeft: '0px'
@@ -101,8 +100,6 @@
 </template>
 
 <script>
-import { AuthApi } from 'src/api/auth'
-
 import kalpaDocs from 'components/kalpa_docs/index.vue'
 
 export default {
@@ -127,7 +124,6 @@ export default {
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},
         {id: 'settings', name: this.$t('Settings'), icon: 'settings'},
       ],
-      goToCurrent: null,
     }
   },
   computed: {
@@ -136,30 +132,6 @@ export default {
     }
   },
   methods: {
-    goTo (to) {
-      this.$log('goTo', to)
-      if (this.goToCurrent === to) {
-        this.$log('goTo DUPLICATE ROUTE, refresh listFeed')
-        this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
-        // Handle if there is no listFeed component to set back to false...
-        this.$wait(1000).then(() => {
-          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
-        })
-      }
-      else {
-        this.$log('goTo NEW ROUTE')
-        this.goToCurrent = to
-        this.$router.push(to).catch(e => e)
-      }
-    },
-    async logout () {
-      await AuthApi.logout()
-      await this.$router.replace('/auth')
-    },
-    async refresh () {
-      await this.$systemUtils.vibrate(200)
-      await this.$systemUtils.reset()
-    }
   }
 }
 </script>

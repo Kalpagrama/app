@@ -7,20 +7,20 @@
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
     ).row.full-width.justify-between.b-50.q-px-sm.q-pt-sm
+    //- feed
     q-btn(
-      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+      @click="$go('/feeds/all')"
       flat no-caps icon="view_agenda"
-      :to="'/feeds/all'"
       :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
         height: size+'px',
       }`)
       small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Feed')}}
+    //- trends
     q-btn(
-      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+      @click="$go('/trends')"
       flat no-caps icon="search"
-      :to="'/trends'"
       :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
@@ -35,14 +35,14 @@
       }`
       ).row.items-center.content-center.justify-center
       q-btn(
+        @click="$go('/workspace')"
         round no-caps icon="construction"
-        :to="'/workspace'"
         :color="'green'"
         :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
+    //- notifications
     q-btn(
-      @click="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+      @click="$go('/notifications')"
       flat no-caps icon="notifications_none"
-      :to="'/notifications/'"
       :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
@@ -50,6 +50,7 @@
       }`)
       q-badge(color="red" floating transparent) •
       small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Activity')}}
+    //- menu
     kalpa-menu-popup-global(
       color="grey-7"
       :styles=`{
@@ -62,7 +63,6 @@
 export default {
   name: 'kalpaMenuMobile',
   components: {
-    anvil: () => import('components/kalpa_icons/anvil.vue')
   },
   data () {
     return {
@@ -78,16 +78,6 @@ export default {
     }
   },
   methods: {
-    profileClick () {
-      this.$log('profileClick')
-      // :to="'/user/'+$store.getters.currentUser().oid"
-      if (this.$route.name.split('.')[0] === 'user' && this.$route.params.oid === this.$store.getters.currentUser().oid) {
-        this.$store.commit('ui/stateSet', ['mobileMenuShow', !this.$store.state.ui.mobileMenuShow])
-      }
-      else {
-        this.$router.push('/user/' + this.$store.getters.currentUser().oid)
-      }
-    }
   }
 }
 </script>

@@ -12,7 +12,7 @@ export default {
   methods: {
     handleFocusin (e) {
       const job = () => {
-        this.$log('handleFocusin', e)
+        // this.$log('handleFocusin', e)
         if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email' || e.target.type === 'password') {
           this.$store.commit('ui/stateSet', ['userTyping', true])
           if (this.$q.platform.is.mobile) {
@@ -37,8 +37,8 @@ export default {
       }, 0)
     },
     handleFocusout (e) {
-      this.$log('handleFocusout', e)
-      if (e.target.type === 'text' || e.target.type === 'textarea') {
+      // this.$log('handleFocusout', e)
+      if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'email' || e.target.type === 'password') {
         this.$store.commit('ui/stateSet', ['userTyping', false])
       }
     },
