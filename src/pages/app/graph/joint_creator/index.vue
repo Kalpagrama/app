@@ -2,7 +2,6 @@
 .row.full-width.items-start.content-start.justify-center.b-30
   //- item finder
   q-dialog(
-    @hide="$emit('blurred')"
     v-model="itemFinderShow"
     position="bottom"
     :maximized="true")
@@ -19,7 +18,6 @@
       ).b-30
   //- item editor
   q-dialog(
-    @hide="$emit('blurred')"
     v-model="itemEditorShow"
     position="bottom"
     :maximized="true")
@@ -121,13 +119,18 @@ export default {
       },
       jointPublishing: false,
       itemFinderShow: false,
-      // contentFragmenterShow: false,
       itemEditorShow: false,
     }
   },
+  computed: {
+    isFocused () {
+      return this.itemFinderShow || this.itemEditorShow
+    }
+  },
   watch: {
-    itemFinderShow: {
+    isFocused: {
       handler (to, from) {
+        this.$log('isFocused WATСHER', to, from)
         if (to) {
           this.$emit('focused')
         }
@@ -138,7 +141,7 @@ export default {
     }
   },
   methods: {
-    itemFound (item) {
+    async itemFound (item) {
       this.$log('itemFound', item)
       this.$set(this.joint.items, 1, item)
       this.itemFinderShow = false
@@ -190,6 +193,12 @@ export default {
         this.jointPublishing = false
       }
     },
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
