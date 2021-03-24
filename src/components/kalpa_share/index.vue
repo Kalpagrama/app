@@ -38,7 +38,7 @@ q-btn(
               ).full-width
               template(v-slot:append)
                 q-btn(color="green" flat no-caps @click="shareLinkCopy()")
-                  span.text-bold {{$t('Copy', 'Скопировать')}}
+                  span.text-bold {{$t('Copy')}}
         //- TODO: add links twitter and other socials
         //- item repost
         .row.full-width.q-pa-md

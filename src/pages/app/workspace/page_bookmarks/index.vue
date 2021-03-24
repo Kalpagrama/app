@@ -17,7 +17,7 @@ kalpa-layout(
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col.full-height
             .row.fit.items-center.content-center.justify-center
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold Закладки
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Bookmarks')}}
           q-btn(round flat color="white" icon="more_vert")
   template(v-slot:body)
     div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start

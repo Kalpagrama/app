@@ -9,7 +9,7 @@ div(
   div(
     :style=`{position: 'relative',}`
     ).row.full-width.justify-center.q-pt-md.q-pb-sm
-    span(:style=`{fontSize: '18px',}`).text-white.text-bold Статистика голосов
+    span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Votes stats')}}
     q-btn(
       @click="$emit('close')"
       round flat color="white" icon="clear"
@@ -104,7 +104,7 @@ div(
           height: '50px',
           background: 'rgb(35,35,35)',
         }`).full-width
-        span.q-ml-sm Переголосовать
+        span.q-ml-sm {{$t('Revote')}}
 </template>
 
 <script>

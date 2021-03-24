@@ -5,7 +5,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
         .row.full-width.q-pa-md
           .row.full-width.justify-center.q-py-md.q-px-sm
-            span(:style=`{fontSize: '18px'}`).text-bold.text-white {{$t('auth Sign in with email', 'Войти через почту')}}
+            span(:style=`{fontSize: '18px'}`).text-bold.text-white {{$t('Login with email')}}
           //- form
           .full-width.q-py-md
             //- email
@@ -14,7 +14,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="email"
-                :placeholder="$t('auth_Enter email', 'Введите почту')"
+                :placeholder="$t('Enter email')"
                 autocomplete="username"
                 filled dark color="white" name="username"
                 type="email" required
@@ -28,7 +28,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
               ).row.full-width.items-center.content-center.q-mb-xs
               q-input(
                 v-model="password"
-                :placeholder="$t('auth_Enter password', 'Введите пароль')"
+                :placeholder="$t('Enter password')"
                 autocomplete="current-password"
                 type="password" required name="password"
                 filled dark color="white"

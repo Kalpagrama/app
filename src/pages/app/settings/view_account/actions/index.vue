@@ -12,7 +12,7 @@
         height: '50px',
       }`
       ).full-width.b-40.q-mb-sm
-      span Обратная связь
+      span {{$t('Feedback')}}
     //- show main tutorial
     q-btn(
       @click="showKalpaWelcome()"

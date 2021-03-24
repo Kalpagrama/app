@@ -20,7 +20,7 @@ kalpa-layout()
           .row.full-width.justify-center
             q-icon(name="login" color="grey-8" size="100px")
           div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white Вы сможете настроить аккаунт, установить аватар и заполнить информацию о себе.
+            span.text-white {{$t('You can edit your profile')}}
           .row.full-width.justify-center.q-py-md
             q-btn(
               outline color="white" no-caps
@@ -28,7 +28,7 @@ kalpa-layout()
               :style=`{
                 height: '50px',
               }`)
-              h1.text-white Войти в аккаунт
+              h1.text-white {{$t('Login')}}
           .row.full-width.justify-center.q-pt-md
             kalpa-docs(:style=`{maxWidth: '300px'}`)
       //- user

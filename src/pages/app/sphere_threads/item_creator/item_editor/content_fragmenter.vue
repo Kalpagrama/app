@@ -7,7 +7,7 @@ div(
   ).column.full-width.b-30
   //- header
   .row.full-width.items-center.content-center.q-pa-sm
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm Выделение фрагмента
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm {{$t('Pick fragment')}}
     .col
     q-btn(
       round flat color="white" icon="clear"

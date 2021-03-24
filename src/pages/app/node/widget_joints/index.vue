@@ -13,7 +13,7 @@
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="fas fa-link" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold Связи
+        span.text-white.text-bold {{$t('Joints')}}
       //- q-icon(name="bookmark_outline" color="white" size="24px")
       //- q-btn(round flat dense color="grey-9")
     //- scrolled bookmarks preview max 10...

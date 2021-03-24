@@ -35,7 +35,7 @@ kalpa-layout
           div(
             :style=`{textAlign: 'center'}`
             ).row.full-width.justify-center
-            span.text-white Вы сможете добавлять медиа контент по ссылке с YouTube, просматривать свои закладки, загружать файлы с устройства.
+            span.text-white {{$('You will be able to add YouTube videos by URL, add bookmarks, and upload files!')}}
           .row.full-width.justify-center.q-pt-md
             q-btn(
               outline color="white" no-caps
@@ -43,7 +43,7 @@ kalpa-layout
               :style=`{
                 height: '50px',
               }`)
-              h1.text-white Войти в аккаунт
+              h1.text-white {{$('Login')}}
       //- user
       div(
         v-if="$store.getters.currentUser().profile.role !== 'GUEST'"

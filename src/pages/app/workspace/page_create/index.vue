@@ -14,7 +14,7 @@ kalpa-layout()
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col
             .row.fit.items-center.content-center.justify-center.q-pa-sm
-              span(:style=`{fontSize: '18px',}`).text-white.text-bold Сотворить
+              span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Create')}}
           q-btn(round flat color="white" icon="more_vert")
       .row.full-width
         component(

@@ -31,12 +31,12 @@ kalpa-layout(
                 maxWidth: 600+'px',
               }`
               ).row.full-width.items-center.content-center.q-px-md
-              span.text-white.text-bold Выдели фрагмент
+              span.text-white.text-bold {{$t('Pick fragment')}}
               .col
               q-btn(
                 @click="fragmentUpdate"
                 no-caps color="green"
-                ) Готово
+                ) {{$t('Ready')}}
               //- .col
               //- q-btn(
                 round flat color="red" icon="clear")

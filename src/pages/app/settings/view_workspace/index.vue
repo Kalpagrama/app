@@ -20,7 +20,7 @@ q-page
       .row.full-width.q-pa-sm
         q-btn(
           color="red" no-caps @click="wsClear()")
-          span.text-bold {{$t('delete_my_workspace', 'Удалить мою мастерскую')}}
+          span.text-bold {{$t('Delete my workspace')}}
 </template>
 
 <script>

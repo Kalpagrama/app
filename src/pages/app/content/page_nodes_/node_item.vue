@@ -49,7 +49,7 @@ div(
           v-else
           ).row.full-width.items-center.content-center.q-px-sm
           span(v-if="node.vertices[0] !== 'ASSOCIATIVE'").text-white {{ $nodeItemType(node.vertices[contentItemIndex]).name }} - {{ $nodeItemType(node.vertices[contentItemIndex === 1 ? 0 : 1]).name }}
-          span(v-else).text-white Ассоциация
+          span(v-else).text-white {{$t('Association')}}
           img(
             v-if="true"
             draggable="false"

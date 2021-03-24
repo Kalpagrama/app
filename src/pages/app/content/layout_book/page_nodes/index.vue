@@ -11,7 +11,7 @@ page-nodes-root(
   :player="player")
   template(v-slot:header)
     .row.full-width.items-center.content-center.q-py-md.q-px-lg
-      span.text-white.text-bold Ядра
+      span.text-white.text-bold {{$t('Nodes')}}
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   template(v-slot:item=`{item,isSelected}`)

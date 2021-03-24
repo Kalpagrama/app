@@ -20,7 +20,7 @@ div(
       :style=`{
         height: '50px',
       }`)
-      h1.text-white Войти в аккаунт
+      h1.text-white {{$t('Login')}}
 </template>
 
 <script>

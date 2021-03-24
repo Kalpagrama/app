@@ -58,7 +58,7 @@ div(
       }`
       ).fit.items-center.content-center
     //- render value of vertices
-    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold Ассоциация
+    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold {{$t('Association')}}
     div(v-else).row.full-width
       .row.full-width.justify-center
         span.text-white.text-bold {{ $nodeItemType(joint.vertices[0]).name }}

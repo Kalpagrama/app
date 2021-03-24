@@ -6,7 +6,7 @@ div(
   }`
   ).row.full-width
   .row.full-width.q-px-md.q-py-sm.text-white.text-bold
-    span.q-mr-sm Связи
+    span.q-mr-sm {{$t('Joints')}}
     div(
       v-if="itemsRes && itemsRes.totalCount > 0"
       ).row

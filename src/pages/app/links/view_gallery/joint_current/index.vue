@@ -11,7 +11,7 @@
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
     span(v-if="joint.vertices[0] === 'ESSENCE'").text-white.text-bold {{ joint.name }}
-    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold Ассоциация
+    span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white.text-bold {{$t('Association')}}
     div(v-else).row.full-width
       .row.full-width.justify-center
         span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex === 1 ? 0 : 1]).name }}

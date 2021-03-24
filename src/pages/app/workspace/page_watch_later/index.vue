@@ -14,7 +14,7 @@ q-layout(
           .col.full-height
             .row.fit.items-center.content-center.justify-center
               //- q-icon(name="bookmark_outline" size="24px").q-mr-xs
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold Смотреть позже
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Watch later')}}
           q-btn(round flat color="white" icon="search")
 </template>
 

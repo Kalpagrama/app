@@ -35,7 +35,7 @@ div(
         }`
         ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
         q-icon(name="select_all" color="white" size="16px").q-ma-xs
-        span.text-white Контекст
+        span.text-white {{$t('Context')}}
         //- span.text-white {{ composition.layers[0].contentName }}
   //- q-btn(
     @click="contextClick"

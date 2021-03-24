@@ -34,7 +34,7 @@ div.row.full-width.items-start.content-start.justify-center
           height: '60px',
         }`
         ).full-width.q-my-lg
-        span.text-white.text-bold Далее
+        span.text-white.text-bold {{$t('Next')}}
       .row.full-width.justify-center.q-py-sm
         kalpa-docs(
           title="Продолжая, вы соглашаетесь с:  "

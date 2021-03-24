@@ -31,7 +31,7 @@ div(
             ).row.full-width.items-center.content-center
             q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
             .col
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold Выбрать связь
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Pick joint')}}
       template(v-slot:tint=`{item}`)
         div(
           @click="itemFound(item)"
@@ -91,7 +91,7 @@ div(
             }`
             ).fit
           div(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").row.fit.items-center.content-center.justify-center
-            span.text-white Ассоциация
+            span.text-white {{$t('Association')}}
           div(v-else).row.full-width.items-center.content-center.justify-center
             div(v-for="n in name" :key="n").row.full-width.justify-center
               span.text-white {{ n }}
@@ -129,7 +129,7 @@ div(
               color="green" no-caps
               :loading="publishing"
               ).full-width
-              span.text-white.text-bold Publish
+              span.text-white.text-bold {{$t('Publish')}}
           q-btn(
             v-if="joint.items[1]"
             @click="itemDelete(1)"

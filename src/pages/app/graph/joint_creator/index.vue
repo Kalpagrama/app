@@ -76,7 +76,7 @@
               :style=`{
                 height: '50px',
               }`).full-width
-              span.text-bold Опубликовать
+              span.text-bold {{$t('Publish')}}
           //- item edit
           q-btn(
             flat color="white" icon="edit"

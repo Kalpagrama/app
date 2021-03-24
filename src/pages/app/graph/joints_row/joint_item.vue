@@ -67,7 +67,7 @@
               textAlign: 'center',
             }`
             ).row.fit.items-center.contnet-center.justify-center
-            span.text-white.text-bold Ассоциация
+            span.text-white.text-bold {{$t('Association')}}
           //- all the other vertex types
           div(
             v-else
@@ -200,7 +200,7 @@
       router-link(
         :to="'/graph/'+item.oid"
         ).row.full-width.q-pa-md
-        span.text-white Связи: {{ jointsRes.totalCount - 1 }}
+        span.text-white {{$t('Joints:')}} {{ jointsRes.totalCount - 1 }}
       .row.full-width.scroll.q-px-sm.q-pb-sm
         router-link(
           v-for="(i,ii) in jointsRes.items" :key="i.oid"

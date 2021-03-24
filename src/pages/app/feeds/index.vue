@@ -14,7 +14,7 @@ kalpa-layout()
           .row.full-width.justify-center
             q-icon(name="login" color="grey-8" size="100px")
           div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white Вы увидите свою домашнюю ленту.
+            span.text-white {{$t('You will see your home feed')}}
           .row.full-width.justify-center.q-pt-md
             q-btn(
               outline color="white" no-caps
@@ -22,7 +22,7 @@ kalpa-layout()
               :style=`{
                 height: '50px',
               }`)
-              h1.text-white Войти в аккаунт
+              h1.text-white {{$t('Login')}}
       div(
         v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
         :style=`{

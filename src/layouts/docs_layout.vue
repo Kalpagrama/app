@@ -18,7 +18,7 @@ q-layout(
       }`
     ).column.full-width.window-height.b-30
       div(:style=`{height: '60px',}`).row.full-width.items-center.content-center.q-pa-md
-        span(:style=`{fontSize: '20px',}`).text-white.text-bold Оглавление
+        span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Chapters')}}
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-pa-sm
           router-link(
@@ -36,7 +36,7 @@ q-layout(
         ).row.full-width.items-center.content-center.b-40.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$routerKalpa.back()")
         .col
-          span(:style=`{fontSize: '20px'}`).text-bold Документы
+          span(:style=`{fontSize: '20px'}`).text-bold {{$t('Documents')}}
         q-btn(
           @click="docsDrawerOpened = true"
           round flat color="white" icon="list")
