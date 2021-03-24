@@ -21,6 +21,7 @@ const VideoUploadFormatEnum = Object.freeze({
    HD1080: '1080p'
 })
 const ImageUploadFormatEnum = Object.freeze({
+   GIF: 'gif',
    W50: '50',
    W600: '600',
    W1024: '1024',
@@ -130,6 +131,7 @@ class ContentApi {
          acc[val.format] = val.url
          return acc
       }, {})
+      if (urls[ImageUploadFormatEnum.GIF]) return urls[ImageUploadFormatEnum.GIF]
       if (urls[VideoUploadFormatEnum.HD720]) return urls[VideoUploadFormatEnum.HD720]
       if (urls[VideoUploadFormatEnum.SD480]) return urls[VideoUploadFormatEnum.SD480]
       if (urls[VideoUploadFormatEnum.SD360]) return urls[VideoUploadFormatEnum.SD360]
