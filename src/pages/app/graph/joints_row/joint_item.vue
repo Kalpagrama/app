@@ -142,7 +142,7 @@
             .col
               span.text-white.text-bold {{ item.name }}
       img(
-        :src="item.thumbUrl"
+        :src="url"
         :style=`{
           borderRadius: '10px',
           //- maxHeight: '500px',
@@ -230,6 +230,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'jointItemsRow_item',
@@ -241,6 +242,7 @@ export default {
     }
   },
   computed: {
+    url () { return ContentApi.urlSelect(this.item) },
     query () {
       return {
         selector: {

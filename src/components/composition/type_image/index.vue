@@ -64,10 +64,7 @@ export default {
     styles: {type: Object, default: {}},
   },
   computed: {
-    url () {
-      assert(this.composition.urlWithFormats, '!this.contentKalpa.urlWithFormats')
-      return ContentApi.urlSelect(this.composition.urlWithFormats)
-    }
+    url () { return ContentApi.urlSelect(this.composition) }
   },
   methods: {
     contextClick () {

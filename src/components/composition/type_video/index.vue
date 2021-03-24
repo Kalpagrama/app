@@ -71,10 +71,7 @@ export default {
     }
   },
   computed: {
-    url () {
-      assert(this.composition.urlWithFormats, '!this.contentKalpa.urlWithFormats')
-      return ContentApi.urlSelect(this.composition.urlWithFormats)
-    },
+    url () { return ContentApi.urlSelect(this.composition) },
     previewOpacity () {
       if (this.player) {
         if (this.player.duration) {

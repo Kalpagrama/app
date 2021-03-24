@@ -131,10 +131,7 @@ export default {
     }
   },
   computed: {
-    url () {
-      assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
-      return ContentApi.urlSelect(this.contentKalpa.urlWithFormats)
-    },
+    url () { return ContentApi.urlSelect(this.contentKalpa) },
     actions () {
       let res = {
         copyUrl: {

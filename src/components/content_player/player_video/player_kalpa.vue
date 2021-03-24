@@ -68,11 +68,7 @@ export default {
     }
   },
   computed: {
-    url () {
-      // assert(this.contentKalpa.urlWithFormats, '!this.contentKalpa.urlWithFormats')
-      let url = this.contentKalpa.url || ContentApi.urlSelect(this.contentKalpa.urlWithFormats) || this.contentKalpa.urlOriginal
-      return url
-    }
+    url () { return ContentApi.urlSelect(this.contentKalpa) }
   },
   watch: {
     url: {

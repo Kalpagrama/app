@@ -15,7 +15,7 @@
       }`
       ).row.full-width.items-start.content-start
       img(
-        :src="item.thumbUrl"
+        :src="url"
         :style=`{
           borderRadius: '10px',
         }`
@@ -61,6 +61,8 @@
 <script>
 import typeNode from './type_node.vue'
 import typeVideo from './type_video.vue'
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'itemPreview',
@@ -72,6 +74,9 @@ export default {
   data () {
     return {
     }
+  },
+  computed: {
+    url () { return ContentApi.urlSelect(this.composition) }
   },
   methods: {
   }

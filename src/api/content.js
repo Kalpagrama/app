@@ -121,7 +121,8 @@ class ContentApi {
    }
 
    // выберет подходящий формат в зависимости от скорости сети
-   static urlSelect (urlWithFormats) {
+   // eslint-disable-next-line camelcase
+   static urlSelect_internal (urlWithFormats) {
       // todo опираться на реальную скорость инета (можно расчитать в сервисворкере)
       const f = ContentApi.urlSelect
       logD(f, 'start', urlWithFormats)
@@ -144,6 +145,14 @@ class ContentApi {
       if (urls[ImageUploadFormatEnum.W50]) return urls[ImageUploadFormatEnum.W50]
 
       return urlWithFormats[0].url // вернем первый попавшийся
+   }
+
+   static urlSelect (object) {
+      let url = object.url
+      if (!url && object.urlWithFormats) url = ContentApi.urlSelect_internal(object.urlWithFormats)
+      if (!url) url = object.urlOriginal
+      if (!url) url = object.thumbUrl
+      return url
    }
 }
 
