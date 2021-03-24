@@ -37,7 +37,7 @@ kalpa-layout().b-30
                   :width="200"
                   :height="200").q-mb-md
                 .row.full-width.justify-center
-                  span(:style=`{fontSize: '30px',}`).text-white КАЛЬПАГРАМА
+                  span(:style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
               //- tint
               div(
                 :style=`{
@@ -91,7 +91,7 @@ kalpa-layout().b-30
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
           }`).q-mb-md
         .row.full-width.justify-center
-          span(:style=`{fontSize: '30px',}`).text-white КАЛЬПАГРАМА
+          span(:style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
       //- tint
       div(
         :style=`{

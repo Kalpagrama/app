@@ -8,7 +8,7 @@
       textAlign: 'center',
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
-    span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm Связи
+    span(:style=`{zIndex: 300,}`).text-white.text-bold.q-mr-sm {{$t('Joints')}}
     span().text-grey-6.text-bold - {{ item.countStat.countJoints }}
     //- q-icon(
       name="fas fa-link" size="80px"
@@ -43,9 +43,9 @@
           marginTop: '140px',
         }`
         ).row.full-width.justify-center
-        span(:style=`{fontSize: '18px',}`).text-grey-6 Связей пока нет :(
+        span(:style=`{fontSize: '18px',}`).text-grey-6 {{$t('No joints yet, be the first one!')}}
         .row.full-width.justify-center.q-pt-sm
-          span.text-grey-6 Будьте первым, нажмите плюсик внизу ↓
+          span.text-grey-6 {{$t('Be first, click a button ↓')}}
 </template>
 
 <script>

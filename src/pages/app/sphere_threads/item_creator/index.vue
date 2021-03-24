@@ -84,7 +84,7 @@ q-layout(
               textAlign: 'center',
             }`
             ).row.full-width.justify-center.q-pa-md
-            small.text-grey-5 Consider to Add item, for people to better understand you and cos its fun!
+            small.text-grey-5 {{$t('Consider to Add item, for people to better understand you and cos its fun!')}}
         div(
           v-if="item"
           ).row.full-width.q-pa-sm

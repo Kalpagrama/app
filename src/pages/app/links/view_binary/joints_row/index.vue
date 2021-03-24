@@ -62,7 +62,7 @@ div(
   div(
     v-if="jointsLoaded && joints.length === 0"
     ).row.fit.items-center.content-center.justify-center
-    span.text-white No links yet, create one!
+    span.text-white {{$t('No links yet, create one!')}}
   //- row joints wrapper
   div(
     v-if="row.oid"

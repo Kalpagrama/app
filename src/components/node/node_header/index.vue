@@ -19,8 +19,13 @@ div(
         borderRadius: '50%',
       }`)
     .col
-      .row.items-center.content-center.q-px-sm.q-mb-xs
-        span.text-grey-4 {{ node.author.name }}
+      div(
+        :style=`{
+          maxWidth: '200px',
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.q-mb-xs.scroll
+        .row.full-width.no-wrap
+          span(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ node.author.name }}
         //- .row.full-width
           small(:style=`{lineHeight: 0.5}`).text-grey-6 @username
   div(

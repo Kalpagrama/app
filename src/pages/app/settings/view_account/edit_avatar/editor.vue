@@ -7,11 +7,11 @@ q-layout(
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-center.content-center.q-pa-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор аватара
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Avatar editor')}}
   q-footer.b-30
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-sm
-        q-btn(color="green" no-caps @click="save()").full-width Сохранить
+        q-btn(color="green" no-caps @click="save()").full-width {{$t('Save')}}
   q-page-container
     q-page().row.full-width.justify-center
       div(

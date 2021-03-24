@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- .row.full-width
-    span.text-bold.text-white Почта и пароль
+    span.text-bold.text-white {{$t('Email and password')}}
   .row.full-width.items-center.content-center.q-px-sm.q-py-sm
     .row.full-width.q-px-xs
       span(

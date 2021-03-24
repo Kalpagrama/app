@@ -21,7 +21,7 @@ div(
             span(:style=`{fontSize: '22px',}`).text-white.text-bold {{ contentKalpa.name }}
           //- stats
           .row.full-width.q-px-lg.q-pb-sm
-            span.text-grey-3.q-mr-xs Просмотры: {{ contentKalpa.countStat.countViews }}
+            span.text-grey-3.q-mr-xs {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
             span.text-grey-3.q-mr-xs • {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
           //- origin
           div(

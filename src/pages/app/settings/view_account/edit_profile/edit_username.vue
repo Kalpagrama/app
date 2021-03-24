@@ -9,7 +9,7 @@
   .row.full-width.q-px-sm
     q-btn(
       @click="editing = true"
-      flat dense color="grey-6" no-caps size="sm") Изменить никнейм
+      flat dense color="grey-6" no-caps size="sm") {{('Change username')}}
   //- .row.full-width.q-px-sm.q-py-xs
     small.text-white Username
   //- q-input(

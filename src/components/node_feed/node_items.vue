@@ -88,7 +88,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
             :style=`{
               height: '50px',
             }`).q-px-md
-            span Свернуть
+            span {{$t('Hide')}}
     //- tint to make item active...
     div(
       v-if="itemActive !== ii"

@@ -18,7 +18,7 @@ div(
         width: '46px',
         height: '46px',
       }`)
-      span Назад
+      span {{$t('Back')}}
     //- .col
     //- q-btn(
       flat color="green" icon="add" no-caps stack
@@ -26,7 +26,7 @@ div(
         //- width: '70px',
         height: '70px',
       }`).col
-      span(:style=`{whiteSpace: 'nowrap'}`).q-mt-sm Добавить связь
+      span(:style=`{whiteSpace: 'nowrap'}`).q-mt-sm {{$t('Add joint')}}
     //- .col
     kalpa-menu-popup-global(
       color="grey-7"

@@ -13,7 +13,7 @@ div(
     .row.full-width.justify-center
       q-icon(name="login" color="grey-8" size="100px")
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-      span.text-white Чтобы делать заметки на контенте, войдите в аккаунт.
+      span.text-white {{$t('To create drafts, login')}}
     .row.full-width.justify-center.q-pt-md
       q-btn(
         outline color="white" no-caps
@@ -21,14 +21,14 @@ div(
         :style=`{
           height: '50px',
         }`)
-        h1.text-white Войти в аккаунт
+        h1.text-white {{$t('Login')}}
   div(
     v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
     :style=`{maxWidth: 600+'px'}`).row.full-width
     slot
     //- header: stats, actions
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-white.text-bold.q-ml-sm Заметки {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
+      span.text-white.text-bold.q-ml-sm {{$t('Drafts')}} {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
       .col
       //- q-btn(
       //-   @click="drop()"

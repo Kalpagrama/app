@@ -77,32 +77,32 @@
         template(v-if="stage === 'idle'")
           q-btn(
             @click="$emit('delete')"
-            flat no-caps color="red") Отмена
+            flat no-caps color="red") {{$t('Cancel')}}
           q-btn(
             @click="stage = 'editing'"
             :disabled="true"
             flat no-caps color="white")
-            span.q-mr-sm Редактировать
+            span.q-mr-sm {{$t('Edit')}}
           q-btn(
             @click="stage = 'essence'"
             :disabled="true"
-            flat no-caps color="white") Создать ядро
+            flat no-caps color="white") {{$t('Create node')}}
           q-btn(
             @click="uploadContent()"
-            flat no-caps color="green") Загрузить
+            flat no-caps color="green") {{$('Upload')}}
         //- editing
         template(v-if="stage === 'editing'")
           q-btn(
             @click="stage = 'idle'"
-            flat no-caps color="red") Отмена
+            flat no-caps color="red") {{$t('Cancel')}}
           q-btn(
             @click="stage = 'idle'"
-            flat no-caps color="green") Done
+            flat no-caps color="green") {{$t('Done')}}
         //- essence
         template(v-if="stage === 'essence'")
           q-btn(
             @click="stage = 'idle'"
-            flat no-caps color="red") Отмена
+            flat no-caps color="red") {{$t('Cancel')}}
           //- q-btn(
             @click="nodePublish()"
             flat no-caps color="green") Опубликов

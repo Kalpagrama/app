@@ -31,7 +31,7 @@
                 //- height: $q.screen.height/2+'px',
               }`
               ).b-40
-              span.text-white Загрузить с устройства
+              span.text-white {{$t('Upload from device')}}
           input(
             ref="fileInput"
             type="file"

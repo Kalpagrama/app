@@ -11,7 +11,7 @@ div(
     }`
     ).row.full-width.items-center.content-center.justify-start.q-px-sm
     .col.q-px-sm
-      span().text-grey-7.text-bold.q-mr-xs Ядра
+      span().text-grey-7.text-bold.q-mr-xs {{$t('Nodes')}}
       span(v-if="itemsLoaded").text-grey-7.text-bold - {{ itemsLocal.length }}
     q-btn(
       round flat color="grey-7" icon="tune")

@@ -10,13 +10,13 @@
     }`
     ).row.full-width.items-center.content-center.justify-center.q-pa-sm
     .row.full-width.justify-center.q-py-sm
-      span.text-white Ядро создается
+      span.text-white {{$t('Node is creating')}}
     q-spinner(size="50px" color="white")
     .row.full-width.justify-center.q-py-sm
       q-btn(
         @click="isHidden = true"
         flat color="white" no-caps)
-        span Продолжить в фоне
+        span {{$t('Continue in background')}}
 </template>
 
 <script>

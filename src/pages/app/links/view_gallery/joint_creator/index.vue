@@ -60,7 +60,7 @@
         }`
         ).fit.items-center.content-center
       //- render value of vertices
-      span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white Ассоциация
+      span(v-else-if="joint.vertices[0] === 'ASSOCIATIVE'").text-white {{$t('Association')}}
       div(v-else).row.full-width
         .row.full-width.justify-center
           span.text-white {{ $nodeItemType(joint.vertices[0]).name }}
@@ -144,7 +144,7 @@
           @click="publish()"
           color="green" flat no-caps
           :loading="publishing")
-          span Опубликовать
+          span {{$t('Publish')}}
 </template>
 
 <script>

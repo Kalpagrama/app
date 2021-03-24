@@ -23,11 +23,30 @@ kalpa-layout(
           objectFit: 'contain',
         }`
         ).full-width.bg-black
+        //- template(v-slot:tint-bar=`{tintFocused}`)
+          div(
+            v-if="player && player.figure"
+            ).row.full-width.justify-center.q-pb-xs
+            div(
+              :style=`{
+                maxWidth: 600+'px',
+              }`
+              ).row.full-width.items-center.content-center.q-px-md
+              span.text-white.text-bold Выдели фрагмент
+              .col
+              q-btn(
+                @click="fragmentUpdate"
+                no-caps color="green"
+                ) Готово
+              //- .col
+              //- q-btn(
+                round flat color="red" icon="clear")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
+// import figureEditor from 'components/figure_editor.vue'
 
 export default {
   name: 'bookFragmenter',

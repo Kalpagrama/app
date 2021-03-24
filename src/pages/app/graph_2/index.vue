@@ -28,7 +28,7 @@ div(
           height: '60px',
           width: '60px',
         }`)
-        span Назад
+        span {{$t('Back')}}
       q-btn(
         flat color="white" no-caps stack
         :style=`{
@@ -44,7 +44,7 @@ div(
             minWidth: '30px',
             borderRadius: '50%',
           }`)
-        span(:style=`{whiteSpace: 'nowrap'}`) Добавить связь
+        span(:style=`{whiteSpace: 'nowrap'}`) {{$t('Add joint')}}
       kalpa-menu-popup-global(
         :style=`{
           height: '60px',

@@ -27,7 +27,7 @@ div(
       .row.full-width
         small.text-grey-7 {{ bookmarkMeta.type }}
       .row.full-width
-        small.text-grey-7.q-mr-xs Добавлено: {{ $date(bookmark.createdAt, 'DD.MM.YYYY') }}
+        small.text-grey-7.q-mr-xs {{$t('Добавлено:')}} {{ $date(bookmark.createdAt, 'DD.MM.YYYY') }}
       .row.full-width.q-py-xs.q-mt-md
         q-btn(
           :to="bookmarkMeta.link"
@@ -43,13 +43,13 @@ div(
           :style=`{
             marginLeft: '-8px',
           }`)
-          span.q-mx-xs Не получать уведомления
+          span.q-mx-xs {{$t('Не получать уведомления')}}
   //- footer: delete
   .row.full-width.justify-start
     q-btn(
       @click="bookmarkDelete()"
       flat dense color="red" no-caps
-      ).q-px-sm Удалить закладку
+      ).q-px-sm {{$t('Удалить закладку')}}
 </template>
 
 <script>
