@@ -34,7 +34,7 @@ q-btn(
     :style=`{
       //- marginTop: '-4px',
     }`).row.full-width.justify-center
-    small {{$tt('Menu')}}
+    small {{$t('Menu')}}
 </template>
 
 <script>

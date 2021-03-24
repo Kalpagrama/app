@@ -2,7 +2,7 @@
 .row.full-width.q-pa-sm
   //- header
   .row.full-width.q-px-sm.q-py-sm
-    span.text-white.text-bold {{$tt('Actions')}}
+    span.text-white.text-bold {{$t('Actions')}}
   //- body
   .row.full-width
     //- q-btn(
@@ -13,6 +13,7 @@
       }`
       ).full-width.b-40.q-mb-sm
       span Обратная связь
+    //- show main tutorial
     q-btn(
       @click="showKalpaWelcome()"
       flat color="grey-6" no-caps
@@ -20,7 +21,8 @@
         height: '50px',
       }`
       ).full-width.b-40.q-mb-sm
-      span {{$tt('Show tutorial')}}
+      span {{$t('Show tutorial')}}
+    //- cache clear
     q-btn(
       @click="refresh()"
       flat color="grey-6" no-caps
@@ -28,7 +30,21 @@
         height: '50px',
       }`
       ).full-width.b-40.q-mb-sm
-      span {{$tt('Clear cache')}}
+      span {{$t('Clear cache')}}
+    //- toggle debug
+    q-btn(
+      @click="$store.commit('ui/stateSet', ['useDebug', !$store.state.ui.useDebug])"
+      flat  no-caps
+      :color="$store.state.ui.useDebug ? 'red' : 'grey-6'"
+      :style=`{
+        height: '50px',
+      }`
+      ).full-width.b-40.q-mb-sm
+      span(
+        :class=`{
+        }`
+        ) {{$store.state.ui.useDebug ? $t('Disable debug') : $t('Enable debug') }}
+    //- show report?
     q-btn(
       @click="setDebugOutput()"
       flat color="grey-6" no-caps
@@ -36,8 +52,9 @@
         height: '50px',
       }`
       ).full-width.b-40.q-mb-md
-      span(v-if="!$store.state.core.logRocket") {{$tt('Report an error')}}
-      span(v-if="$store.state.core.logRocket").text-yellow {{$tt('Stop error logging')}}
+      span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
+      span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
+    //- logout
     q-btn(
       @click="logout()"
       outline color="red" no-caps
@@ -45,7 +62,7 @@
         height: '50px',
       }`
       ).full-width.q-myb-md
-      span {{$tt('Logout')}}
+      span {{$t('Logout')}}
 </template>
 
 <script>
@@ -63,7 +80,7 @@ export default {
   methods: {
     showKalpaWelcome () {
       this.$log('showKalpaWelcome')
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: false, useProfileEditor: false}])
     },
     async logout () {
       await AuthApi.logout()

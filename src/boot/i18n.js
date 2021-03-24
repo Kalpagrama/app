@@ -61,6 +61,10 @@ export default async ({ Vue, store, app }) => {
 
     // t = i18next.t
     // Vue.prototype.$t = t
+    // Vue.prototype.$t = function (val) {
+    //   // return val
+    //   return i18next.t(val, val)
+    // }
     i18next.on('missingKey', function (lngs, namespace, key, res) {
       // logE('translate is missing', lngs, namespace, key, res)
     })

@@ -47,7 +47,7 @@ q-layout(
             height: '40px',
           }`
           ).full-width
-          span.text-bold {{ $tt('Publish') }}
+          span.text-bold {{ $t('Publish') }}
   q-page-container
     q-page
       .row.full-width.q-pa-sm
@@ -77,7 +77,7 @@ q-layout(
             }`
             @click="itemFinderShow = true"
             ).full-width
-            span {{ $tt('Add item') }}
+            span {{ $t('Add item') }}
           //- description, what to do and why u need to add item...
           div(
             :style=`{
@@ -101,7 +101,7 @@ q-layout(
                 @click="itemEdit()"
                 outline no-caps color="white"
                 ).full-width
-                span {{ $tt('Edit') }}
+                span {{ $t('Edit') }}
 </template>
 
 <script>

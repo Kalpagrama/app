@@ -20,7 +20,7 @@
     .col
       .row.full-width
         .row.items-center.content-center
-          kalpa-share(type="node" :item="node" :headerText="$tt('Share')")
+          kalpa-share(type="node" :item="node" :headerText="$t('Share')")
             //- q-tooltip(dense dark) Поделиться
             //- q-btn(round flat color="grey-9")
               q-icon(name="logout" size="23px").rotate-270

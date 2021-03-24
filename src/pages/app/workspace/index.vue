@@ -11,7 +11,7 @@ export default {
     this.$log('userTutorials', userTutorials)
     this.$log('userTutorials.workspace_first', userTutorials.workspace_first)
     if (userTutorials.workspace_first === false) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', mode: 'slides-only'}])
+      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: true, useProfileEditor: false}])
     }
   },
   mounted () {

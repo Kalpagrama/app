@@ -11,7 +11,7 @@ kalpa-layout()
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
   template(v-slot:body)
-    div(:style=`{paddingTop: '70px',paddingBottom: '600px'}`).row.full-width.items-start.content-start.justify-center
+    div(:style=`{paddingTop: '70px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-center
       //- guest
       div(
         v-if="$store.getters.currentUser().profile.role === 'GUEST'"

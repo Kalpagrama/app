@@ -3,62 +3,110 @@ div(
   @click.self="$emit('close')"
   :style=`{
     position: 'relative',
-    //- width: $q.screen.width+'px',
-    //- minWidth: 500+'px',
-    //- maxWidth: 500+'px',
     height: $q.screen.height+'px',
   }`
-  ).column.full-width.items-center.content-center.justify-center.b-30
-  //- header
-  div(
-    :style=`{
-      position: 'absolute', zIndex: 200, top: '0px',
-    }`
-    ).row.full-width.q-pa-sm
-    .col
-    q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  //- left/right next/prev
-  div(
-    @click="prev()"
-    :style=`{
-      position: 'absolute', zIndex: 100, top: '0px', left: '0px',
-      width: '30%',
-    }`
-    ).row.full-height
-  div(
-    @click="next()"
-    :style=`{
-      position: 'absolute', zIndex: 100, top: '0px', right: '0px',
-      width: '30%',
-    }`
-    ).row.full-height
-  //- body
-  q-carousel(
-    ref="slides-carousel"
-    v-model="slide"
-    transition-prev="slide-right"
-    transition-next="slide-left"
-    swipeable animated navigation arrows
-    infinite
-    :autoplay="5000"
-    control-color="white").fit
-    q-carousel-slide(
-      v-for="(s,si) in slides" :key="s.id"
-      :name="s.id"
+  ).column.full-width.items-center.content-center.justify-center
+  //- tint
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="isMounted"
       :style=`{
-        userSelect: 'none',
-        //- background: 'rgb(25,25,25)',
+        position: 'absolute', zIndex: -1,
+        background: 'rgba(30,30,30,0.8)',
       }`
-      ).row.fit.items-center.content-center.justify-center.b-30
-      img(
-        draggable="false"
-        :src="s.url"
+      @click.self="$emit('close')"
+      ).row.fit
+  //- preload images
+  div(v-if="slides.length > 0").row.full-width
+    div(
+      v-for="(s,si) in slides" :key="si"
+      :style="{position: 'absolute', zIndex: -1, backgroundImage: `url(${s.url})`}")
+  //- mini mode
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="!showTutorial && doc"
+      :style=`{
+        width: '300px',
+        height: '300px',
+        borderRadius: '10px',
+      }`
+      ).row.items-between.content-between.q-pa-sm.b-40
+      .row.full-width
+        .row.full-width.q-pa-md
+          span(:style=`{fontSize: '22px'}`).text-white.text-bold {{ doc.fields.name }}
+        .row.full-width.q-px-md
+          div(v-html="doc.fields.description.content[0].content[0].value").text-white
+      q-btn(
+        flat color="grey-8" no-caps
+        @click="$emit('close')")
+        span {{ $t('Skip') }}
+      q-btn(
+        color="green" no-caps
+        @click="showTutorial = true").col
+        span.text-bold {{ $t('Start') }}
+  //- header
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="showTutorial"
+      :style=`{
+        position: 'absolute', zIndex: 200, top: '0px',
+      }`
+      ).row.full-width.q-pa-sm
+      .col
+      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+  //- left/right next/prev
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="showTutorial"
+      @click="prev()"
+      :style=`{
+        position: 'absolute', zIndex: 100, top: '0px', left: '0px',
+        width: '30%',
+      }`
+      ).row.full-height
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="showTutorial"
+      @click="next()"
+      :style=`{
+        position: 'absolute', zIndex: 100, top: '0px', right: '0px',
+        width: '30%',
+      }`
+      ).row.full-height
+  //- body
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-carousel(
+      v-if="showTutorial"
+      ref="slides-carousel"
+      v-model="slide"
+      transition-prev="slide-right"
+      transition-next="slide-left"
+      swipeable animated navigation arrows
+      infinite
+      :autoplay="10000"
+      control-color="white"
+      :style=`{
+        position: 'absolute',
+        zIndex: 10,
+      }`).fit
+      q-carousel-slide(
+        v-for="(s,si) in slides" :key="s.id"
+        :name="s.id"
         :style=`{
-          objectFit: 'contain',
-          pointerEvents: 'none',
+          position: 'relative',
+          zIndex: 10,
           userSelect: 'none',
         }`
-        ).fit
+        ).row.fit.items-center.content-center.justify-center.b-30
+        img(
+          draggable="false"
+          :src="s.url"
+          :style=`{
+            objectFit: 'contain',
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }`
+          ).fit
 </template>
 
 <script>
@@ -74,6 +122,8 @@ export default {
   },
   data () {
     return {
+      isMounted: false,
+      showTutorial: false,
       slide: 'welcome',
       doc: null,
       tutorialInitial: {
@@ -102,6 +152,17 @@ export default {
     }
   },
   watch: {
+    config: {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          this.$log('config TO', to)
+          this.doc = await this.getDoc(to.id)
+          if (!to.useIntro) this.showTutorial = true
+        }
+      }
+    },
     slides: {
       immediate: true,
       handler (to, from) {
@@ -112,6 +173,13 @@ export default {
     }
   },
   methods: {
+    async getDoc (id) {
+      const {items: [doc]} = await this.$contentful.getEntries({
+        content_type: 'tutorial',
+        'fields.id': id,
+      })
+      return doc
+    },
     prev () {
       this.$log('prev')
       this.$refs['slides-carousel'].previous()
@@ -123,13 +191,10 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // get docs
-    const {items: [doc]} = await this.$contentful.getEntries({
-      content_type: 'tutorial',
-      'fields.id': this.config.id,
+    await this.$wait(500)
+    this.$nextTick(() => {
+      this.isMounted = true
     })
-    this.$log('doc', doc)
-    this.doc = doc
   },
   async beforeDestroy () {
     this.$log('beforeDestroy')

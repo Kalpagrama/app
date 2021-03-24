@@ -107,11 +107,11 @@ export default {
     },
     play () {
       // this.$log('play')
-      this.$refs.videoRef.play()
+      if (this.$refs.videoRef) this.$refs.videoRef.play()
     },
     pause () {
       // this.$log('pause')
-      this.$refs.videoRef.pause()
+      if (this.$refs.videoRef) this.$refs.videoRef.pause()
     },
     loadeddataHandle (e) {
       // this.$log('loadeddataHandle', e)

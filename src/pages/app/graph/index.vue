@@ -16,7 +16,7 @@ kalpa-layout()
           :style=`{
             width: '46px', height: '46px',
           }`)
-          small {{$tt('Back')}}
+          small {{$t('Back')}}
         .col
         q-btn(
           v-if="!jointCreatorShow"
@@ -27,7 +27,7 @@ kalpa-layout()
           v-if="jointCreatorShow"
           @click="jointCreateCancel()"
           flat no-caps color="white"
-          :style=`{height: '50px',}`) {{$tt('Cancel')}}
+          :style=`{height: '50px',}`) {{$t('Cancel')}}
         .col
         kalpa-menu-popup-global(
           v-if="!jointCreatorShow"

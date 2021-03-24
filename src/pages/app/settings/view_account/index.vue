@@ -1,8 +1,8 @@
 <template lang="pug">
-q-page(
+div(
   :style=`{
     paddingTop: '16px',
-    paddingBottom: '100px',
+    paddingBottom: '16px',
   }`
   ).row.full-width.justify-center
   //- body

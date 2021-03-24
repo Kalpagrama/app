@@ -20,7 +20,7 @@ q-layout(
   //- header
   q-header()
     .row.full-width.items-center.content-center.q-pa-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm {{$tt('Item editor')}}
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold.q-ml-sm {{$t('Item editor')}}
       .col
       q-btn(
         round flat color="white" icon="clear"
@@ -38,7 +38,7 @@ q-layout(
           height: '50px',
         }`
         @click="$emit('close')").full-width
-        span.text-bold {{$tt('Ready')}}
+        span.text-bold {{$t('Ready')}}
   //- page
   q-page-container
     q-page
@@ -55,7 +55,7 @@ q-layout(
         ).row.full-width.q-pa-sm
         q-btn(
           outline no-caps color="white"
-          @click="contentFragmentStart").full-width.q-mb-sm {{$tt('Fragment it')}}
+          @click="contentFragmentStart").full-width.q-mb-sm {{$t('Fragment it')}}
       //- composition actions
       div(
         v-if="item.__typename === 'Composition'"

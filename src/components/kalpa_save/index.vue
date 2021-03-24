@@ -27,7 +27,7 @@ q-btn(
         }`
         @click="saveBookmark()"
         ).full-width.q-mb-md
-        span.text-white {{ $tt('Save to collection') }}
+        span.text-white {{ $t('Save to collection') }}
   //- edit bookmark...
   q-dialog(
     v-if="isActive && bookmark"
@@ -79,7 +79,7 @@ export default {
     async getBookmark () {
       this.$log('getBookmark', this.item.oid)
       if (!this.item.oid) {
-        this.$q.notify({type: 'negative', position: 'bottom', message: this.$tt('Cant save this item :(')})
+        this.$q.notify({type: 'negative', position: 'bottom', message: this.$t('Cant save this item :(')})
         return
       }
       let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.item.oid}})

@@ -99,9 +99,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
-    Vue.prototype.$tt = function (val) {
-      return val
-    }
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

@@ -54,7 +54,7 @@
             height: '50px',
           }`
           ).full-width
-          span {{$tt('No joints, create one')}}
+          span {{$t('No joints, create one')}}
 </template>
 
 <script>

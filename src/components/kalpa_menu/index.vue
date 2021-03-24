@@ -23,9 +23,9 @@
       div(v-if="!mini").col
         div(
           ).row.fit.items-center.content-center.cursor-pointer
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Kalpagrama')}}
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama')}}
           .row.full-width
-            small.text-grey-4 {{$tt('Connect the dots')}}
+            small.text-grey-4 {{$t('Connect the dots')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -33,10 +33,10 @@
         borderRadius: '10px', overflow: 'hidden'
       }`
       ).column.full-width.q-pt-sm
-        //- v-if="p.id === 'trends' ? true : !isGuest"
+        //- pages
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
-          @click.native="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+          @click.native="goTo({name: p.id})"
           :to="{name: p.id}"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id
@@ -55,7 +55,7 @@
         //- user
         div(
           v-if="!isGuest"
-          @click="goTo('/user/'+$store.getters.currentUser().oid+'/nodes')"
+          @click="goTo('/user/'+$store.getters.currentUser().oid)"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`
@@ -84,23 +84,7 @@
           ).full-width.items-center.content-center
           span(
             v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md {{$tt('Login')}}
-        //- div(
-          v-if="!isGuest"
-          ).row.full-width.items-center.content-center.q-mt-sm
-          q-btn(
-            :to="isGuest ? '/auth' : '/workspace'"
-            color="green" no-caps size="lg"
-            icon="construction"
-            :align="mini ? 'center' : 'left'"
-            :style=`{
-              height: '60px',
-              paddingLeft: '0px',
-              maxWidth: '200px',
-            }`).full-width.menu-item
-            span(
-              v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Мастерская
+            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md {{$t('Login')}}
         //- docs
         .row.full-width.q-mt-sm
           kalpa-docs(
@@ -137,62 +121,36 @@ export default {
   data () {
     return {
       pages: [
-        {id: 'feeds', name: this.$tt('Feed'), icon: 'view_agenda'},
-        {id: 'trends', name: this.$tt('Search'), icon: 'search'},
-        {id: 'workspace', name: this.$tt('Workspace'), icon: 'construction'},
-        {id: 'notifications', name: this.$tt('Activity'), icon: 'notifications_none'},
-        {id: 'settings', name: this.$tt('Settings'), icon: 'settings'},
-      ]
+        {id: 'feeds', name: this.$t('Feed'), icon: 'view_agenda'},
+        {id: 'trends', name: this.$t('Search'), icon: 'search'},
+        {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
+        {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},
+        {id: 'settings', name: this.$t('Settings'), icon: 'settings'},
+      ],
+      goToCurrent: null,
     }
   },
   computed: {
     isGuest () {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
-    },
-    actions () {
-      let res = {
-        refresh: {
-          name: this.$tt('Обновить'),
-          cb: async () => {
-            await this.$systemUtils.vibrate(200)
-            await this.$systemUtils.reset()
-          }
-        }
-      }
-      if (this.isGuest) {
-        res.login = {
-          name: this.$tt('Войти'),
-          cb: async () => {
-            this.$log('action:login')
-            this.$router.push('/auth')
-          }
-        }
-      }
-      else {
-        res.settings = {
-          name: this.$tt('Настройки'),
-          cb: async () => {
-            this.$log('action:settings')
-            this.$router.push('/settings')
-          }
-        }
-        res.logout = {
-          name: this.$tt('Выйти'),
-          cb: async () => {
-            this.$log('action:logout')
-            await AuthApi.logout()
-            await this.$router.replace('/auth')
-          }
-        }
-      }
-      return res
     }
   },
   methods: {
     goTo (to) {
-      this.$log('goTo')
-      this.$router.push(to)
-      this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+      this.$log('goTo', to)
+      if (this.goToCurrent === to) {
+        this.$log('goTo DUPLICATE ROUTE, refresh listFeed')
+        this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+        // Handle if there is no listFeed component to set back to false...
+        this.$wait(1000).then(() => {
+          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+        })
+      }
+      else {
+        this.$log('goTo NEW ROUTE')
+        this.goToCurrent = to
+        this.$router.push(to).catch(e => e)
+      }
     },
     async logout () {
       await AuthApi.logout()

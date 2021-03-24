@@ -50,7 +50,7 @@
             minHeight: '300px',
           }`
           ).full-width.b-40
-          span(:style=`{fontSize: '18px'}`) {{$tt('Pick element to join')}}
+          span(:style=`{fontSize: '18px'}`) {{$t('Pick element to join')}}
       //- item found: viewer
       div(
         v-if="joint.items[1]"

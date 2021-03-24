@@ -33,10 +33,10 @@ div(
         }`)
       .col.q-pl-sm.text-white
         .row.full-width
-          small.full-width {{ $tt('Subscribers') }}: {{ contentKalpaFull.countStat.countSubscribers }}
-          small.full-width {{ $tt('Views') }}: {{ contentKalpaFull.countStat.countViews }}
-          small.full-width {{ $tt('Links') }}: {{ contentKalpaFull.countStat.countJoints }}
-          small.full-width {{ $tt('Nodes') }}: {{ contentKalpaFull.countStat.countNodes }}
+          small.full-width {{ $t('Subscribers') }}: {{ contentKalpaFull.countStat.countSubscribers }}
+          small.full-width {{ $t('Views') }}: {{ contentKalpaFull.countStat.countViews }}
+          small.full-width {{ $t('Links') }}: {{ contentKalpaFull.countStat.countJoints }}
+          small.full-width {{ $t('Nodes') }}: {{ contentKalpaFull.countStat.countNodes }}
     //- go to context btn
     div(
       v-if="contentKalpaFull"
@@ -49,7 +49,7 @@ div(
           height: '40px',
         }`
         )
-        span.text-bold.q-mr-sm {{ $tt('Watch in context') }}
+        span.text-bold.q-mr-sm {{ $t('Watch in context') }}
   //- content mini
   div(
     :style=`{
@@ -65,7 +65,7 @@ div(
         q-icon(name="select_all" color="grey-4" size="16px").q-ma-xs
         .col.scroll
           .row.full-width.items-center.content-center.no-wrap
-            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ isOpened ? contentKalpa.name : $tt('Context') }}
+            small(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ isOpened ? contentKalpa.name : $t('Context') }}
     div(
       v-if="player && player.duration"
       :style=`{

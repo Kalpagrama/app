@@ -41,7 +41,7 @@ div(
     ).row.full-width.items-center.content-center.justify-between.q-pa-sm
     //- share
     .row.items-center.content-center.q-px-sm
-      kalpa-share(type="node" :item="node" :headerText="$tt('Share')")
+      kalpa-share(type="node" :item="node" :headerText="$t('Share')")
       small(:style=`{marginLeft: '-8px',}`).text-grey-9 {{ node.countStat.countShares }},
     //- save
     .row.items-center.content-center.q-px-sm

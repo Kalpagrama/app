@@ -4,6 +4,7 @@
   edit-name(:currentUser="currentUser").q-mb-sm
   edit-status(:currentUser="currentUser")
   edit-email(:currentUser="currentUser")
+  edit-lang(:currentUser="currentUser")
 </template>
 
 <script>
@@ -11,6 +12,7 @@ import editUsername from './edit_username.vue'
 import editName from './edit_name.vue'
 import editStatus from './edit_status.vue'
 import editEmail from './edit_email.vue'
+import editLang from './edit_lang.vue'
 
 export default {
   name: 'editProfile',
@@ -20,6 +22,7 @@ export default {
     editName,
     editStatus,
     editEmail,
+    editLang
   },
   data () {
     return {}

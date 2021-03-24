@@ -15,7 +15,7 @@
         width: navHeight+'px',
         height: navHeight+'px',
       }`)
-      span {{$tt('Back')}}
+      span {{$t('Back')}}
     //- pages
     q-btn(
       v-for="(p,pi) in pages" :key="p.id"
@@ -49,9 +49,9 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'drafts', icon: 'filter_tilt_shift', name: this.$tt('Drafts')},
-        {id: 'nodes', icon: 'adjust', name: this.$tt('Nodes')},
-        {id: 'info', icon: 'fas fa-info', name: this.$tt('Info')}
+        {id: 'drafts', icon: 'filter_tilt_shift', name: this.$t('Drafts')},
+        {id: 'nodes', icon: 'adjust', name: this.$t('Nodes')},
+        {id: 'info', icon: 'fas fa-info', name: this.$t('Info')}
       ]
     },
     navHeight () {

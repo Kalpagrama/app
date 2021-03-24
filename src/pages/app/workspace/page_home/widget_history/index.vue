@@ -12,7 +12,7 @@
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="history" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold {{$tt('History')}}
+        span.text-white.text-bold {{$t('History')}}
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup

@@ -14,7 +14,7 @@ div(
   ).row.full-width.items-start.content-start
   //- header
   .row.full-width.q-pb-lg.q-pt-sm
-    span(:style=`{fontSize: '22px',}`).text-white.text-bold {{$tt('Welcome to kalpagrama')}}
+    span(:style=`{fontSize: '22px',}`).text-white.text-bold {{$t('Welcome to kalpagrama')}}
   //- email
   q-input(
     v-model="email"
@@ -22,7 +22,7 @@ div(
     type="email" inputmode="email"
     autocomplete="username" name="username"
     autocorrect="off" autocapitalize="on"
-    :placeholder="$tt('Enter your email')"
+    :placeholder="$t('Enter your email')"
     :input-style=`{
       padding: '16px',
       fontSize: '22px',
@@ -47,14 +47,14 @@ div(
       }`
       @click="emailSend()"
       ).full-width
-      span(:style=`{fontSize: '20px',}`).text-bold {{$tt('Next')}}
+      span(:style=`{fontSize: '20px',}`).text-bold {{$t('Next')}}
   //- email sent
   div(
     v-if="emailSent").row.full-width.q-pt-lg
     //- header, description
     .row.full-width.justify-start.q-py-xs.q-px-sm
-      span(v-if="needConfirm").text-white {{$tt('We sent you one time code, enter it')}}
-      span(v-if="hasPermanentPassword").text-white {{$tt('Enter your permanent password')}}
+      span(v-if="needConfirm").text-white {{$t('We sent you one time code, enter it')}}
+      span(v-if="hasPermanentPassword").text-white {{$t('Enter your permanent password')}}
     //- password input
     q-input(
       v-model="password"
@@ -92,7 +92,7 @@ div(
       }`
       @click="passwordSend()"
       ).full-width.q-mt-md
-      span(:style=`{fontSize: '22px'}`).text-bold {{ $tt('Login') }}
+      span(:style=`{fontSize: '22px'}`).text-bold {{ $t('Login') }}
     //- reset
     .row.full-width.q-pa-xs
       q-btn(
@@ -101,7 +101,7 @@ div(
         :style=`{
         }`
         @click="reset()")
-        span(:style=`{fontSize: '14px'}`) {{ $tt('Reset form') }}
+        span(:style=`{fontSize: '14px'}`) {{ $t('Reset form') }}
 </template>
 
 <script>

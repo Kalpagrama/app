@@ -17,10 +17,10 @@ kalpa-layout
               round flat color="white" icon="construction")
             .col
               .row.fit.items-center.content-center.justify-center
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$tt('Workspace')}}
+                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Workspace')}}
             //- tutorial
             q-btn(
-              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', mode: 'slides-only'}])"
+              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
               round flat color="white" icon="fas fa-info")
       //- guest
       div(
