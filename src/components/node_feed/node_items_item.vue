@@ -89,7 +89,7 @@ div(
   //- fallback image
   img(
     v-else-if="item"
-    :src="item.thumbUrl"
+    :src="url"
     :style=`{
       borderRadius: '10px',
       borderRadius: '10px',
@@ -119,6 +119,8 @@ div(
 </template>
 
 <script>
+import { ContentApi } from 'src/api/content'
+
 export default {
   name: 'nodeFeed__nodeItemsItem',
   props: ['oid', 'item', 'itemIndex', 'itemActive', 'itemOpened', 'itemOpenedHandle', 'styles'],
@@ -129,6 +131,7 @@ export default {
     }
   },
   computed: {
+    url () { return ContentApi.urlSelect(this.item) },
     itemMeta () {
       // node
       if (this.item.type === 'NODE') {
