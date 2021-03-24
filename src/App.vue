@@ -9,6 +9,17 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 
 export default {
   name: 'App',
+  // watch: {
+  //   '$route.fullPath': {
+  //     handler (to, from) {
+  //       if (to && from) {
+  //         if (to.split('/')[0] !== from.split('/')[0]) {
+  //           this.$goDrop()
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     handleFocusin (e) {
       const job = () => {

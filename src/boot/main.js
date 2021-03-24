@@ -113,6 +113,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
         this.$wait(1000).then(() => {
           this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
         })
+        this.$router.push(to).catch(e => e)
       }
       else {
         this.$log('$go FRESH', to, goLast)
@@ -120,6 +121,10 @@ export default async ({ Vue, store, router: VueRouter }) => {
         this.$router.push(to).catch(e => e)
       }
     }
+    // Vue.prototype.$goDrop = function () {
+    //   console.log('$goDrop')
+    //   goLast = null
+    // }
   } catch (err) {
     logC(err)
     throw err
