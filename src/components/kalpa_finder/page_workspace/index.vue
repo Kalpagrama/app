@@ -19,7 +19,8 @@ export default {
   methods: {
     pagesFilter (pages) {
       return pages.filter(p => {
-        return p.id !== 'joints'
+        // return p.id !== 'joints'
+        return !['joints', 'spheres'].includes(p.id)
       })
     }
   }
