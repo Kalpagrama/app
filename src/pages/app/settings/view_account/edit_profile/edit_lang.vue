@@ -25,6 +25,7 @@
 
 <script>
 import { ObjectApi } from 'src/api/object'
+import i18next from 'i18next'
 
 export default {
   name: 'editLang',
@@ -46,7 +47,7 @@ export default {
     async langSet (l) {
       this.$log('langSet', l)
       await ObjectApi.update(this.currentUser.oid, 'profile.lang', l.id)
-      this.$i18n.locale = l.id
+      await i18next.changeLanguage(l.id)
     },
   },
   mounted () {
