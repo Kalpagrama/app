@@ -158,6 +158,10 @@ export default {
       this.$nextTick(() => {
         this.player.play()
       })
+      // Get player clusters
+      this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
+      this.$log('clustersRes', this.clustersRes)
+      this.player.setState('clusters', this.clustersRes.items)
     },
     async nodePlay () {
       this.$log('nodePlay')
@@ -177,9 +181,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
-    this.$log('clustersRes', this.clustersRes)
-    this.player.setState('clusters', this.clustersRes.items)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

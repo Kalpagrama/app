@@ -693,14 +693,24 @@ export default {
       this.$log('minutesWrapperClick', e.target.accessKey)
       // if (e.target.accessKey !== 'minutes-wrapper') return
       if (this.player.figureFocused !== null) this.player.setState('figureFocused', null)
-      if (e.target.accessKey === 'minutes-wrapper') {
-        // let left = e.layerX
-        // let width = e.target.clientWidth
-        // this.$log({left, width})
-        // // this.zoomPercent = left / width
-        // // this.zoomed = !this.zoomed
-        // let t = (left / width) * this.player.duration
-        // this.$log('t', t)
+      if (e.target.accessKey === 'minutes-wrapper-tint') {
+        let left = e.layerX
+        let width = e.target.clientWidth
+        this.$log('minutesWrapperClick', {left, width})
+        // this.zoomPercent = left / width
+        // this.zoomed = !this.zoomed
+        let t = (left / width) * this.player.duration
+        this.$log('t', t)
+        // Handle outside click when nodePlaying
+        if (this.player.nodePlaying) {
+          let figures = this.player.nodePlaying.items[0].layers[0].figuresAbsolute
+          if (t < figures[0].t || t > figures[1].t) {
+            // Destroy nodePlaying
+            // alert('Destroy nodePlaying here...')
+            this.player.setState('nodePlaying', null)
+            this.player.setCurrentTime(t)
+          }
+        }
         // this.player.setCurrentTime(t)
         // if (!this.player.figure) return
         // if (t < this.player.figure[0].t) this.player.figure[0].t = t
