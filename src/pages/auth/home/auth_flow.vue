@@ -83,10 +83,9 @@ div(
         flat dense no-caps color="white") {{ passwordShow ? 'Hide password' : 'Show password' }}
     //- password send
     q-btn(
-      v-if="password.length >= 4"
       no-caps color="green"
       :loading="passwordSending"
-      :disable="password.length < 5"
+      :disable="password.length < 4"
       :style=`{
         height: '60px',
       }`
