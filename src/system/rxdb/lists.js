@@ -250,9 +250,6 @@ class Lists {
                      } else if (item.oid === contentOid) {
                         res.push([]) // весь контент
                      }
-                     else {
-                        throw new Error('bad item!: ' + JSON.stringify(item))
-                     }
                   }
                   return res
                }

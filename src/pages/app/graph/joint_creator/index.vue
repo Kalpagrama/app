@@ -177,6 +177,8 @@ export default {
           this.$log('jointPublish GIF processing...')
           let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
           this.$log('jointPublish contentKalpa', contentKalpa)
+          // throw new Error('sdfsdfsdf')
+          // eslint-disable-next-line no-unreachable
           jointInput.items[1].oid = contentKalpa.oid
         }
         // create...

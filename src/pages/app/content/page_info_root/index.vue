@@ -163,10 +163,10 @@ export default {
     goOriginal () {
       this.$log('goOriginal')
       if (this.contentKalpa.contentSource === 'YOUTUBE') {
-        let arr = this.url.split('/')
+        let arr = this.contentKalpa.urlOriginal.split('/')
         let isEmbed = arr[arr.length - 2] === 'embed'
         if (isEmbed) openURL(`https://www.youtube.com/watch?v=${arr[arr.length - 1]}`)
-        else openURL(this.url)
+        else openURL(this.contentKalpa.urlOriginal)
       }
       else {
         return ''
