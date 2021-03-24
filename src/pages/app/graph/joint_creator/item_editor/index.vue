@@ -17,7 +17,15 @@ kalpa-layout().b-30
         v-if="item.type === 'NODE'"
         ).row.full-width
         item-preview(:item="item")
-        q-btn(outline no-caps color="white").full-width.q-mb-sm Указать другой смысл
+        .row.full-width.q-py-lg.q-px-sm
+          q-btn(
+            outline no-caps color="grey-6"
+            :disable="true"
+            :style=`{
+              height: '50px',
+            }`
+            ).full-width.q-mb-sm
+            span {{$t('Change essence')}}
       //- content VIDEO
       div(
         v-else-if="['VIDEO'].includes(item.type)"

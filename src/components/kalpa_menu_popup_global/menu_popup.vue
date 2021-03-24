@@ -91,7 +91,7 @@ q-menu(
               borderRadius: '10px'
             }`
             ).full-width.b-60
-          small.text-grey-4.full-width @username
+          //- small.text-grey-4.full-width @username
 </template>
 
 <script>
