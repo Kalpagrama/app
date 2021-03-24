@@ -80,13 +80,22 @@
             :to=`'following'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
-            small.text-grey-7.q-mr-md {{$t('Following')}}
+            small(
+              :class=`{
+                'text-grey-7': $route.name !== 'user.following',
+                'text-green': $route.name === 'user.following',
+              }`
+            ).q-mr-md {{$t('Following')}}
           //- followers
           router-link(
             :to=`'followers'`
             ).row.items-end.content-end
             span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
-            small.text-grey-7 {{$t('Followers')}}
+            small(
+              :class=`{
+                'text-grey-7': $route.name !== 'user.followers',
+                'text-green': $route.name === 'user.followers',
+              }`) {{$t('Followers')}}
 </template>
 
 <script>

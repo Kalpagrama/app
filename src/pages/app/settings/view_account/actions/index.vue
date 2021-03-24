@@ -13,6 +13,7 @@
       }`
       ).full-width.b-40.q-mb-sm
       span Обратная связь
+    //- show main tutorial
     q-btn(
       @click="showKalpaWelcome()"
       flat color="grey-6" no-caps
@@ -21,6 +22,7 @@
       }`
       ).full-width.b-40.q-mb-sm
       span {{$t('Show tutorial')}}
+    //- cache clear
     q-btn(
       @click="refresh()"
       flat color="grey-6" no-caps
@@ -29,6 +31,20 @@
       }`
       ).full-width.b-40.q-mb-sm
       span {{$t('Clear cache')}}
+    //- toggle debug
+    q-btn(
+      @click="$store.commit('ui/stateSet', ['useDebug', !$store.state.ui.useDebug])"
+      flat  no-caps
+      :color="$store.state.ui.useDebug ? 'red' : 'grey-6'"
+      :style=`{
+        height: '50px',
+      }`
+      ).full-width.b-40.q-mb-sm
+      span(
+        :class=`{
+        }`
+        ) {{$store.state.ui.useDebug ? $t('Disable debug') : $t('Enable debug') }}
+    //- show report?
     q-btn(
       @click="setDebugOutput()"
       flat color="grey-6" no-caps
@@ -38,6 +54,7 @@
       ).full-width.b-40.q-mb-md
       span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
       span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
+    //- logout
     q-btn(
       @click="logout()"
       outline color="red" no-caps

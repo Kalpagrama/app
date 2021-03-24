@@ -6,7 +6,7 @@
     flat
     :style=`{
       borderRadius: '10px',
-    }`).b-40
+    }`).b-40.full-width
     q-btn(
       v-for="l in langs" :key="l.id"
       flat no-caps
@@ -15,7 +15,7 @@
         height: '50px',
         borderRadius: '10px',
       }`
-      @click="langSet(l)")
+      @click="langSet(l)").col
       span(
         :class=`{
           'text-bold': l.id === lang,

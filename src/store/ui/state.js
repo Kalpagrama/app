@@ -28,6 +28,8 @@ export default {
   nodeCreating: false,
   listFeedNeedDrop: false,
   authGuard: null,
+  // debug
+  useDebug: false,
   // other
   docs: [
     {id: 'terms', name: 'Пользовательское соглашение'},

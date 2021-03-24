@@ -2,11 +2,11 @@
 .row.full-width
   //- .row.full-width
     span.text-bold.text-white Почта и пароль
-  .row.full-width.items-center.content-center.q-px-md.q-py-sm
+  .row.full-width.items-center.content-center.q-px-sm.q-py-sm
     .row.full-width.q-px-xs
       span(
         :style=`{
-          fontSize: '20px',
+          fontSize: '24px',
         }`).text-white.text-bold {{ email || 'user@mail.com' }}
     //- .row.full-width
       q-btn(
@@ -14,21 +14,28 @@
         flat dense color="grey-6" no-caps size="sm") Изменить почту
   .row.full-width
     //- change or create password call to action btns
-    div(v-if="!passwordChanging && !passwordCreating").row.full-width.q-px-md
+    div(v-if="!passwordChanging && !passwordCreating").row.full-width.q-px-sm
       q-btn(
         v-if="currentUser.settings.hasPermanentPassword"
         @click="passwordChanging = true, passwordCreating = true"
-        flat dense color="grey-6" no-caps size="sm") Изменить пароль
+        flat color="grey-6" no-caps size="sm") {{$t('Change email')}}
+      q-btn(
+        v-if="currentUser.settings.hasPermanentPassword"
+        @click="passwordChanging = true, passwordCreating = true"
+        flat color="grey-6" no-caps size="sm") {{$t('Change password')}}
       q-btn(
         v-if="!currentUser.settings.hasPermanentPassword"
         @click="passwordCreating = true"
-        flat dense color="grey-6" no-caps size="sm") Задать постоянный пароль
+        flat color="grey-6" no-caps size="sm") {{$t('Set password')}}
+      q-btn(
+        v-if="currentUser.settings.hasPermanentPassword"
+        flat color="red" no-caps size="sm") {{$t('Remove password')}}
     //- change password
     div(v-if="passwordChanging").row.full-width
       q-input(
         v-model="passwordCurrent"
         borderless dark color="white"
-        placeholder="Текущий пароль"
+        :placeholder="$t('Current password')"
         type="password" autocomplete="new-password"
         :input-style=`{
           background: 'rgb(45,45,45)',
@@ -41,7 +48,7 @@
       q-input(
         v-model="passwordNew"
         borderless dark color="white"
-        placeholder="Новый пароль"
+        :placeholder="$t('New password')"
         type="password" autocomplete="new-password"
         :input-style=`{
           background: 'rgb(45,45,45)',
@@ -52,7 +59,7 @@
       q-input(
         v-model="passwordNewConfirm"
         borderless dark color="white"
-        placeholder="Подтвердите пароль"
+        :placeholder="$t('Confirm password')"
         type="password" autocomplete="new-password"
         :input-style=`{
           background: 'rgb(45,45,45)',
@@ -66,13 +73,13 @@
         q-btn(
           @click="clear()"
           flat color="grey-8" no-caps)
-          span Отмена
+          span {{$t('Cancel')}}
         q-btn(
           @click="passwordNewSet()"
           flat color="green" no-caps
           :loading="passwordNewSetLoading"
           ).col.q-ml-sm
-          span Отправить
+          span {{$t('Confirm')}}
 </template>
 
 <script>
@@ -104,16 +111,16 @@ export default {
         this.$log('passwordNewSet start')
         this.passwordNewSetLoading = true
         if (this.passwordNew.length === 0) {
-          throw new Error('Пустой пароль !')
+          throw new Error(this.$t('Empty password!'))
         }
         if (this.passwordNew !== this.passwordNewConfirm) {
-          throw new Error('Пароли не совпадают!')
+          throw new Error(this.$t('Passwords do not match!'))
         }
         // do stuff
         let res = await AuthApi.setPermanentPassword(this.passwordCurrent, this.passwordNew)
         if (res === true) {
           this.clear()
-          this.$q.notify({type: 'positive', position: 'top', message: 'Пароль установлен!'})
+          this.$q.notify({type: 'positive', position: 'top', message: this.$t('Passowd has been set!')})
         }
         this.$log('passwordNewSet res', res)
         this.$log('passwordNewSet done')

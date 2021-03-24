@@ -33,10 +33,10 @@
         borderRadius: '10px', overflow: 'hidden'
       }`
       ).column.full-width.q-pt-sm
-        //- v-if="p.id === 'trends' ? true : !isGuest"
+        //- pages
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
-          @click.native="$store.commit('ui/stateSet', ['listFeedNeedDrop', true])"
+          @click.native="goTo({name: p.id})"
           :to="{name: p.id}"
           :class=`{
             'b-40': $route.path.split('/')[1] === p.id
@@ -55,7 +55,7 @@
         //- user
         div(
           v-if="!isGuest"
-          @click="goTo('/user/'+$store.getters.currentUser().oid+'/nodes')"
+          @click="goTo('/user/'+$store.getters.currentUser().oid)"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`
@@ -85,22 +85,6 @@
           span(
             v-if="!mini"
             :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md {{$t('Login')}}
-        //- div(
-          v-if="!isGuest"
-          ).row.full-width.items-center.content-center.q-mt-sm
-          q-btn(
-            :to="isGuest ? '/auth' : '/workspace'"
-            color="green" no-caps size="lg"
-            icon="construction"
-            :align="mini ? 'center' : 'left'"
-            :style=`{
-              height: '60px',
-              paddingLeft: '0px',
-              maxWidth: '200px',
-            }`).full-width.menu-item
-            span(
-              v-if="!mini"
-              :style=`{fontSize: '18px'}`).text-bold.q-ml-sm Мастерская
         //- docs
         .row.full-width.q-mt-sm
           kalpa-docs(
@@ -142,57 +126,31 @@ export default {
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},
         {id: 'settings', name: this.$t('Settings'), icon: 'settings'},
-      ]
+      ],
+      goToCurrent: null,
     }
   },
   computed: {
     isGuest () {
       return this.$store.getters.currentUser().profile.role === 'GUEST'
-    },
-    actions () {
-      let res = {
-        refresh: {
-          name: this.$t('Обновить'),
-          cb: async () => {
-            await this.$systemUtils.vibrate(200)
-            await this.$systemUtils.reset()
-          }
-        }
-      }
-      if (this.isGuest) {
-        res.login = {
-          name: this.$t('Войти'),
-          cb: async () => {
-            this.$log('action:login')
-            this.$router.push('/auth')
-          }
-        }
-      }
-      else {
-        res.settings = {
-          name: this.$t('Настройки'),
-          cb: async () => {
-            this.$log('action:settings')
-            this.$router.push('/settings')
-          }
-        }
-        res.logout = {
-          name: this.$t('Выйти'),
-          cb: async () => {
-            this.$log('action:logout')
-            await AuthApi.logout()
-            await this.$router.replace('/auth')
-          }
-        }
-      }
-      return res
     }
   },
   methods: {
     goTo (to) {
-      this.$log('goTo')
-      this.$router.push(to)
-      this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+      this.$log('goTo', to)
+      if (this.goToCurrent === to) {
+        this.$log('goTo DUPLICATE ROUTE, refresh listFeed')
+        this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+        // Handle if there is no listFeed component to set back to false...
+        this.$wait(1000).then(() => {
+          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+        })
+      }
+      else {
+        this.$log('goTo NEW ROUTE')
+        this.goToCurrent = to
+        this.$router.push(to).catch(e => e)
+      }
     },
     async logout () {
       await AuthApi.logout()

@@ -10,7 +10,7 @@ div(
   //- debug
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="debugPosition"
+      v-if="debugPosition && $store.state.ui.useDebug"
       :style=`{
         position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
       }`
