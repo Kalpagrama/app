@@ -38,7 +38,7 @@ module.exports = {
     ],
     defaultLng: 'en',
     defaultNs: 'translation',
-    defaultValue: '__STRING_NOT_TRANSLATED__',
+    // defaultValue: '__STRING_NOT_TRANSLATED__',
     resource: {
       loadPath: 'src/i18n/{{ns}}_{{lng}}.json',
       savePath: 'src/i18n/{{ns}}_{{lng}}.json',
@@ -58,13 +58,18 @@ module.exports = {
     const content = fs.readFileSync(file.path, enc)
     let count = 0
 
-    parser.parseFuncFromString(content, { list: ['i18next._', 'i18next.__'] }, (key, options) => {
-      parser.set(key, Object.assign({}, options, {
-        nsSeparator: false,
-        keySeparator: false
-      }))
-      ++count
+    parser.parseFuncFromString(content, function(key, options) {
+      options.defaultValue = key; // use key as the value
+      parser.set(key, options);
     })
+
+    // parser.parseFuncFromString(content, { list: ['i18next._', 'i18next.__'] }, (key, options) => {
+    //   parser.set(key, Object.assign({}, options, {
+    //     nsSeparator: false,
+    //     keySeparator: false
+    //   }))
+    //   ++count
+    // })
 
     if (count > 0) {
       console.log(`i18next-scanner: count=${chalk.cyan(count)}, file=${chalk.yellow(JSON.stringify(file.relative))}`)

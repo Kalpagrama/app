@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { ObjectApi } from 'src/api/object'
+
 export default {
   name: 'editLang',
   props: ['currentUser'],
@@ -41,9 +43,10 @@ export default {
     }
   },
   methods: {
-    langSet (l) {
+    async langSet (l) {
       this.$log('langSet', l)
-      // TODO: edit
+      await ObjectApi.update(this.currentUser.oid, 'profile.lang', l.id)
+      this.$i18n.locale = l.id
     },
   },
   mounted () {

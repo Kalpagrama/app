@@ -103,6 +103,7 @@ export default async ({ Vue, store, app }) => {
             }
          }
       })
+
       const errLinkWs = onError(({ operation, response, graphQLErrors, networkError }) => {
          // для ошибок ws не делаем логаут/релоад (поскольку оно работает асинхронно)
          if (graphQLErrors) {
