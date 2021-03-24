@@ -9,6 +9,7 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
 import VueShowdown from 'vue-showdown'
+import { isEqual } from 'lodash'
 
 // import Vue from 'vue'
 import VueVirtualScroller from 'vue-virtual-scroller'
@@ -45,7 +46,7 @@ const time = (sec, addSeconds = true) => {
   return result
 }
 
-export default async ({ Vue, store: storeVue, router: VueRouter }) => {
+export default async ({ Vue, store, router: VueRouter }) => {
   try {
     const f = {nameExtra: 'boot::main'}
     logD(f, 'start')
@@ -100,6 +101,25 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       }
     }
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+
+    // App go, last position, and feeds refresh...
+    let goLast = null
+    Vue.prototype.$go = function (to) {
+      if (isEqual(goLast, to)) {
+        console.log('$go DUPLICATE')
+        console.log('$go listFeedNeedDrop')
+        this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+        // Handle if there is no listFeed component to set back to false...
+        this.$wait(1000).then(() => {
+          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+        })
+      }
+      else {
+        this.$log('$go FRESH', to, goLast)
+        goLast = to
+        this.$router.push(to).catch(e => e)
+      }
+    }
   } catch (err) {
     logC(err)
     throw err
