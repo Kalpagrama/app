@@ -5,7 +5,7 @@ div(
   }`
   ).row.full-width.q-px-xs
   .row.full-width.q-pl-sm
-    small.text-grey-6 Выберите имя
+    small.text-grey-6 {{$t('Pick name')}}
   q-input(
     v-model="name"
     dark color="white"
