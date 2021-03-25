@@ -299,6 +299,7 @@ const GROUP_BATCH_SZ = 12
 class Group {
    constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       assert(id && typeof id === 'string')
+      this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы)
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
@@ -374,7 +375,7 @@ class Group {
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesRxDoc (rxDoc) {
+   static getGroupPropertiesRxDoc (rxDoc, debugUniqueOids = new Set()) {
       assert(rxDoc && isRxDocument(rxDoc), '!rxDoc')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -430,10 +431,17 @@ class Group {
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       }
+      // TODO!!! убрать debugUniqueOids (поправить задваивание)
+      pageItems = pageItems.filter(item => {
+         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item.name)
+         let res = !debugUniqueOids.has(item[itemPrimaryKey])
+         debugUniqueOids.add(item[itemPrimaryKey])
+         return res
+      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesArray (array) {
+   static getGroupPropertiesArray (array, debugUniqueOids = new Set()) {
       assert(array && Array.isArray(array), '!array')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -449,10 +457,18 @@ class Group {
          } else return 'unknown'
       }
       itemPrimaryKey = detectArrItemPrimaryKey(pageItems)
+
+      // TODO!!! убрать debugUniqueOids (поправить задваивание)
+      pageItems = pageItems.filter(item => {
+         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
+         let res = !debugUniqueOids.has(item[itemPrimaryKey])
+         debugUniqueOids.add(item[itemPrimaryKey])
+         return res
+      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static async getGroupProperties (rxQueryOrRxDocOrArray) {
+   static async getGroupProperties (rxQueryOrRxDocOrArray, debugUniqueOids = new Set()) {
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
       else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
@@ -464,9 +480,9 @@ class Group {
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          return await Group.getGroupPropertiesQuery(rxQuery)
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
-         return Group.getGroupPropertiesRxDoc(rxDoc)
+         return Group.getGroupPropertiesRxDoc(rxDoc, debugUniqueOids)
       } else if (array) {
-         return Group.getGroupPropertiesArray(array)
+         return Group.getGroupPropertiesArray(array, debugUniqueOids)
       } else throw new Error('bad rxQueryOrRxDocOrArray')
    }
 
@@ -550,7 +566,7 @@ class Group {
          nextPageToken,
          prevPageToken,
          currentPageToken
-      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray)
+      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray, this.debugUniqueOids)
       assert(pageId, '!pageId')
       assert(totalCount >= 0, '!totalCount')
       assert(itemType && itemType.in('GROUP', 'ITEM'), 'bad itemType')
@@ -691,10 +707,9 @@ class Group {
          }
       }
       let blackLists = await Lists.getBlackLists()
-      let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+      let filtered = nextItems.filter(item => !Lists.isElementBlacklisted(item, blackLists))
 
       // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
-
       let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
       itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
 
