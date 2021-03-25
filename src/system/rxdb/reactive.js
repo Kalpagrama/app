@@ -557,6 +557,10 @@ class Group {
       const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
       assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
+      if (position === 'whole') {
+         this.debugUniqueOids.clear()
+         assert(this.reactiveGroup.pages.length === 0, 'whole можно вставлять только если нет и одной страницы!!!')
+      }
       let {
          totalCount,
          itemType,
