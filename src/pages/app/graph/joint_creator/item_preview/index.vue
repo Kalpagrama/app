@@ -30,10 +30,14 @@
     type-video(
       v-if="item.outputType === 'VIDEO'"
       :item="item")
+    type-book(
+      v-if="item.outputType === 'BOOK'"
+      :item="item")
     div(
       v-else
       ).row.full-width.items-start.content-start
       img(
+        draggable="false"
         :src="item.thumbUrl"
         :style=`{
           borderRadius: '10px',
@@ -61,6 +65,7 @@
 <script>
 import typeNode from './type_node.vue'
 import typeVideo from './type_video.vue'
+import typeBook from './type_book.vue'
 import assert from 'assert'
 import { ContentApi } from 'src/api/content'
 
@@ -69,6 +74,7 @@ export default {
   components: {
     typeNode,
     typeVideo,
+    typeBook,
   },
   props: ['item'],
   data () {

@@ -3,7 +3,7 @@ kalpa-layout().b-30
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center
+      //- .row.full-width.justify-center
         div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-center.content-center.q-pa-sm
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Item editor')}}
           .col
@@ -33,7 +33,8 @@ kalpa-layout().b-30
         video-fragmenter(
           :oid="item.oid"
           :figures="null"
-          :height="$q.screen.height-60"
+          :height="$q.screen.height-0"
+          :fromComposition="false"
           @composition="contentFragmentDone")
       //- content BOOK
       div(
@@ -42,7 +43,7 @@ kalpa-layout().b-30
         book-fragmenter(
           :oid="item.oid"
           :figures="null"
-          :height="$q.screen.height-60"
+          :height="$q.screen.height-0"
           @composition="contentFragmentDone")
       //- content IMAGE
       div(
@@ -60,7 +61,8 @@ kalpa-layout().b-30
         video-fragmenter(
           :oid="item.layers[0].contentOid"
           :figures="item.layers[0].figuresAbsolute"
-          :height="$q.screen.height-60"
+          :height="$q.screen.height-0"
+          :fromComposition="true"
           @composition="contentFragmentDone"
           @close="contentFragmenterShow = false")
       //- for all

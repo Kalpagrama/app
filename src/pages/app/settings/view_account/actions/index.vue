@@ -45,7 +45,7 @@
         }`
         ) {{$store.state.ui.useDebug ? $t('Disable debug') : $t('Enable debug') }}
     //- show report?
-    q-btn(
+    //- q-btn(
       @click="setDebugOutput()"
       flat color="grey-6" no-caps
       :style=`{
@@ -54,6 +54,14 @@
       ).full-width.b-40.q-mb-md
       span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
       span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
+    //- chat
+    q-btn(
+      @click="toggleChat()"
+      outline color="green" no-caps
+      :style=`{
+        height: '50px',
+      }`).full-width.q-mb-md
+      span {{$t('Chat with us')}}
     //- logout
     q-btn(
       @click="logout()"
@@ -78,6 +86,19 @@ export default {
     }
   },
   methods: {
+    async toggleChat () {
+      this.$log('toggleChat')
+      // window.Chatra()
+      // if (!window.Chatra) return
+      // window.ChatraSetup = {
+      //     disabledOnMobile: true,
+      //     // startHidden: false
+      // }
+      // await this.$wait(500)
+      let el = document.getElementById('chatra')
+      el.style.display = 'block'
+      window.Chatra('openChat', true)
+    },
     showKalpaWelcome () {
       this.$log('showKalpaWelcome')
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: false, useProfileEditor: false}])
@@ -114,6 +135,15 @@ export default {
         }
       }
     },
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    // window.ChatraSetup = {
+    //     disabledOnMobile: true
+    // }
   }
 }
 </script>

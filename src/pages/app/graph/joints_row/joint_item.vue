@@ -142,6 +142,7 @@
             .col
               span.text-white.text-bold {{ item.name }}
       img(
+        draggable="false"
         :src="url"
         :style=`{
           borderRadius: '10px',
@@ -158,6 +159,7 @@
       }`
       ).row.full-width.items-start.content-start
       img(
+        draggable="false"
         :src="item.thumbUrl"
         :style=`{
           borderRadius: '10px',

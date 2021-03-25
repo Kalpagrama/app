@@ -23,30 +23,48 @@ kalpa-layout(
           objectFit: 'contain',
         }`
         ).full-width.bg-black
-        //- template(v-slot:tint-bar=`{tintFocused}`)
+        template(v-slot:tint-bar=`{tintFocused}`)
           div(
-            v-if="player && player.figure"
-            ).row.full-width.justify-center.q-pb-xs
+            v-if="player"
+            ).row.full-width.justify-center.q-pb-xs.q-px-md
             div(
               :style=`{
                 maxWidth: 600+'px',
+                background: 'rgba(30,30,30,0.9)',
+                borderRadius: '30px',
               }`
-              ).row.full-width.items-center.content-center.q-px-md
-              span.text-white.text-bold Выдели фрагмент
-              .col
-              q-btn(
-                @click="fragmentUpdate"
-                no-caps color="green"
-                ) Готово
-              //- .col
-              //- q-btn(
-                round flat color="red" icon="clear")
+              ).row.full-width.items-center.content-center
+              //- top
+              .row.full-width.q-pa-md
+                span(:style=`{fontSize: '22px'}`).text-white.text-bold.q-ml-sm {{$t('Pick fragment')}}
+              //- center
+              .row.full-width.items-start.content-start.q-px-md
+                .col.q-pr-lg
+                  p.text-white.q-ml-sm {{$t('Why pick fragment on looong video is important! You need to concentrate and to communicate better')}}
+              //- bottom
+              .row.full-width.q-pb-sm.q-px-md
+                q-btn(
+                  v-if="fromComposition"
+                  @click="$emit('close')"
+                  flat no-caps color="red"
+                  :style=`{
+                    borderRadius: '40px',
+                  }`
+                  ).q-mr-sm {{$t('Close')}}
+                .col
+                q-btn(
+                  @click="fragmentUpdate"
+                  no-caps color="green"
+                  :disable="!player.figure"
+                  :style=`{
+                    borderRadius: '40px',
+                  }`
+                  ).q-px-sm {{$t('Ready')}}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
-// import figureEditor from 'components/figure_editor.vue'
 
 export default {
   name: 'bookFragmenter',
@@ -72,34 +90,27 @@ export default {
     playerReady (player) {
       this.$log('playerReady', player)
       this.player = player
-      // this.player.events.on('figure-delete', () => {
-      //   this.$log('player figure-delete')
-      //   this.player.setState('figure', null)
-      // })
-      // if (this.figures) this.player.setState('figure', this.figures)
-      // this.$nextTick(() => {
-      //   this.player.play()
-      // })
     },
     fragmentUpdate () {
       this.$log('fragmentUpdate')
-      // let compositionInput = {
-      //   id: Date.now().toString(),
-      //   thumbUrl: this.contentKalpa.thumbUrl,
-      //   thumbHeight: this.contentKalpa.thumbHeight,
-      //   thumbWidth: this.contentKalpa.thumbWidth,
-      //   outputType: 'BOOK',
-      //   layers: [
-      //     {
-      //       id: Date.now().toString(),
-      //       contentOid: this.contentKalpa.oid,
-      //       figuresAbsolute: this.player.figure
-      //     },
-      //   ],
-      //   operation: { items: null, operations: null, type: 'CONCAT'},
-      //   __typename: 'Composition',
-      // }
-      // this.$emit('composition', compositionInput)
+      let compositionInput = {
+        id: Date.now().toString(),
+        thumbUrl: this.contentKalpa.thumbUrl,
+        thumbHeight: this.contentKalpa.thumbHeight,
+        thumbWidth: this.contentKalpa.thumbWidth,
+        outputType: 'BOOK',
+        layers: [
+          {
+            id: Date.now().toString(),
+            contentOid: this.contentKalpa.oid,
+            contentName: this.contentKalpa.name,
+            figuresAbsolute: this.player.figure
+          },
+        ],
+        operation: { items: null, operations: null, type: 'CONCAT'},
+        __typename: 'Composition',
+      }
+      this.$emit('composition', compositionInput)
     }
   }
 }

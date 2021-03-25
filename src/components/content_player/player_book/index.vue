@@ -19,7 +19,7 @@ div(
   //- figure editor + audioplayer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="!figure"
+      v-if="true"
       :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '80px',
@@ -28,7 +28,7 @@ div(
       slot(name="tint-bar" :tintFocused="true")
       //- (lastAnnotation && !audioPlayer.audio)
       div(
-        v-if="lastAnnotation"
+        v-if="!figure && lastAnnotation"
         :style=`{
           width: '300px',
           borderRadius: '20px',

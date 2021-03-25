@@ -16,15 +16,18 @@
   //- .row.full-width.q-px-md
     span.text-bold.text-white {{ $t('Avatar', 'Аватар') }}
   //- preview & actions
-  .row.full-width.q-py-sm
+  .row.full-width.justify-center.q-py-sm
     div(
       :style=`{
-        maxWidth: '200px',
+        maxWidth: avatarSize+'px',
       }`
       ).row.full-width.items-start.content-start
       //- preview
       div(
-        :style=`{width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden',}`
+        :style=`{
+          width: avatarSize+'px', minWidth: avatarSize+'px',
+          height: avatarSize+'px', minHeight: avatarSize+'px',
+          borderRadius: '50%', overflow: 'hidden',}`
         ).row.items-center.content-center.justify-center.b-70
         //- q-btn(
           v-if="!avatarUrl"
@@ -66,6 +69,16 @@ export default {
     return {
       avatarUrl: null,
       avatarEditorOpened: false,
+    }
+  },
+  computed: {
+    avatarSize () {
+      if (this.$q.screen.width < 500) {
+        return this.$q.screen.width - 50
+      }
+      else {
+        return 200
+      }
     }
   },
   methods: {

@@ -9,17 +9,6 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 
 export default {
   name: 'App',
-  // watch: {
-  //   '$route.fullPath': {
-  //     handler (to, from) {
-  //       if (to && from) {
-  //         if (to.split('/')[0] !== from.split('/')[0]) {
-  //           this.$goDrop()
-  //         }
-  //       }
-  //     }
-  //   }
-  // },
   methods: {
     handleFocusin (e) {
       const job = () => {
@@ -70,6 +59,8 @@ export default {
       // this.$log('viewport', viewport)
       this.$store.commit('ui/stateSet', ['viewportOffsetTop', viewport.offsetTop])
     }
+  },
+  created () {
   },
   mounted () {
     // this.$log('mounted')
