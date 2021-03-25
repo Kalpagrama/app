@@ -1,8 +1,11 @@
 <template lang="pug">
-.row.full-width.q-pa-sm
+.row.full-width.justify-center.q-pa-sm
+  //- small.text-white {{ query }}
   list-feed(
     :query="query"
+    :itemsPerPage="24"
     :itemMiddlePersist="false"
+    :itemsMax="100"
     :itemStyles=`{
       paddingBottom: '8px',
     }`
@@ -10,8 +13,37 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`)
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      .row.full-width
-        router-link(
+      div(
+        :style=`{
+          background: 'rgb(35,35,35)',
+          borderRadius: '10px',
+        }`
+        ).row.full-width.items-start.content-start
+        img(
+          v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+          draggable="false"
+          :src="item.thumbUrl"
+          :style=`{
+            height: '50px',
+            minWidth: '89px',
+            borderRadius: '10px',
+            objectFit: 'contain',
+          }`).b-50
+        div(
+          v-else
+          :style=`{width: '50px', height: '50px',}`
+          ).row.items-center.content-center.justify-center
+          q-icon(name="blur_on" size="30px" color="white")
+        .col.full-height
+          .row.fit.items-between.content-between.q-pa-sm
+            .row.full-width
+              span.text-white {{ item.name }}
+            .row.full-width
+              small.text-grey-8 {{ item.type }}
+      //- .row.full-width
+        .row.full-width {{ item.oid }}
+        small.text-white {{ item.type }}
+        //- router-link(
           :to="itemLink(item)"
           :style=`{
             background: 'rgb(35,35,35)',
@@ -113,9 +145,10 @@ export default {
   },
   methods: {
     itemLink (item) {
-      this.$log('itemLink', item)
+      // this.$log('itemLink', item)
       if (item.wsItemType) {
-        confirm('Open in workspace?')
+        // confirm('Open in workspace?')
+        return '/trends'
       }
       else {
         return this.itemMetaMap[item.type].link + item.oid
