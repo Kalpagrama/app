@@ -299,6 +299,7 @@ const GROUP_BATCH_SZ = 12
 class Group {
    constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       assert(id && typeof id === 'string')
+      this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы)
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
@@ -691,10 +692,14 @@ class Group {
          }
       }
       let blackLists = await Lists.getBlackLists()
-      let filtered = nextItems.filter(obj => !Lists.isElementBlacklisted(obj, blackLists))
+      // TODO!!! убрать debugUniqueOids (поправить задваивание)
+      let filtered = nextItems.filter(item => {
+         if (this.debugUniqueOids.has(item[this.reactiveGroup.itemPrimaryKey])) logE('duplicate found!!!', item[this.reactiveGroup.itemPrimaryKey], item)
+         return !Lists.isElementBlacklisted(item, blackLists) && !this.debugUniqueOids.has(item[this.reactiveGroup.itemPrimaryKey])
+      })
+      nextItems.forEach(item => this.debugUniqueOids.add(item[this.reactiveGroup.itemPrimaryKey]))
 
       // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
-
       let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
       itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
 
