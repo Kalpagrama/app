@@ -24,7 +24,7 @@ kalpa-layout
               round flat color="white" icon="fas fa-info")
       //- guest
       div(
-        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+        v-if="$store.getters.isGuest"
         :style=`{
           height: '80vh',
         }`
@@ -46,7 +46,7 @@ kalpa-layout
               h1.text-white {{$('Login')}}
       //- user
       div(
-        v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+        v-else
         :style=`{
           paddingTop: '8px',
         }`

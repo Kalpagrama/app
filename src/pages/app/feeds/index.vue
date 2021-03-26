@@ -5,7 +5,7 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start
       div(
-        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+        v-if="$store.getters.isGuest"
         :style=`{
           height: '80vh',
         }`
@@ -18,13 +18,14 @@ kalpa-layout()
           .row.full-width.justify-center.q-pt-md
             q-btn(
               outline color="white" no-caps
-              :to="'/auth/sign-in'"
               :style=`{
                 height: '50px',
-              }`)
+              }`
+              @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
+            )
               h1.text-white {{$t('Login')}}
       div(
-        v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+        v-else
         :style=`{
           paddingTop: '8px',
         }`).row.full-width.justify-center

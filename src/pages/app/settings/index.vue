@@ -11,39 +11,20 @@ kalpa-layout()
           .col
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
   template(v-slot:body)
-    div(:style=`{paddingTop: '70px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-center
-      //- guest
-      div(
-        v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-        ).row.full-width.justify-center
-        div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-          .row.full-width.justify-center
-            q-icon(name="login" color="grey-8" size="100px")
-          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white {{$t('You can edit your profile')}}
-          .row.full-width.justify-center.q-py-md
-            q-btn(
-              outline color="white" no-caps
-              :to="'/auth/sign-in'"
-              :style=`{
-                height: '50px',
-              }`)
-              h1.text-white {{$t('Login')}}
-          .row.full-width.justify-center.q-pt-md
-            kalpa-docs(:style=`{maxWidth: '300px'}`)
-      //- user
+    .row.full-width.items-start.content-start.justify-center
+      view-guest(
+        v-if="$store.getters.isGuest")
       router-view(
-        v-if="$store.getters.currentUser().profile.role !== 'GUEST'")
+        v-else)
 </template>
 
 <script>
-import { AuthApi } from 'src/api/auth'
-import kalpaDocs from 'components/kalpa_docs/index.vue'
+import viewGuest from './view_guest/index.vue'
 
 export default {
   name: 'pageApp_settings',
   components: {
-    kalpaDocs
+    viewGuest
   },
   data () {
     return {
@@ -62,7 +43,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$log('currentUser', this.$store.getters.currentUser())
   }
 }
 </script>

@@ -7,7 +7,7 @@ div(
   ).row.full-width.items-start.content-start.justify-center
   //- body
   div(
-    v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+    v-if="$store.getters.isGuest"
     :style=`{maxWidth: 600+'px', minHeight: '500px',}`
     ).row.full-width.items-center.content-center
     .row.full-width.justify-center
@@ -17,13 +17,14 @@ div(
     .row.full-width.justify-center.q-pt-md
       q-btn(
         outline color="white" no-caps
-        :to="'/auth/sign-in'"
         :style=`{
           height: '50px',
-        }`)
+        }`
+        @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
+      )
         h1.text-white {{$t('Login')}}
   div(
-    v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+    v-else
     :style=`{maxWidth: 600+'px'}`).row.full-width
     slot
     //- header: stats, actions

@@ -28,6 +28,9 @@ const store = new Vuex.Store({
          assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
          assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
          return rxdb.getCurrentUser()
+      },
+      isGuest: (state, getters) => {
+         return getters.currentUser().profile.role === 'GUEST'
       }
    }
 })

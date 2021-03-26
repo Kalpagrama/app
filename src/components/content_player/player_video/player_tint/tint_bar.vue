@@ -505,7 +505,7 @@ export default {
     },
     figureCreate () {
       this.$log('figureCreate')
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы создать ядро, войдите в аккаунт.'
         }

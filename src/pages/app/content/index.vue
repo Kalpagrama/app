@@ -64,7 +64,7 @@ export default {
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
-    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+    if (this.$store.getters.isGuest) {
       // do nothing ?
     }
     else {
@@ -75,7 +75,7 @@ export default {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
-    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+    if (this.$store.getters.isGuest) {
       // do nothing ?
     }
     else {
@@ -83,7 +83,6 @@ export default {
       if (this.isActiveStart > 0) {
         let statValue = Date.now() - this.isActiveStart
         this.$log('statValue', statValue)
-        if (this.$store.getters.currentUser().profile.role === 'GUEST') return
         let stat = await ObjectApi.updateStat(this.oid, 'VIEWED_TIME', statValue)
         this.$log('statValue stat', stat)
       }

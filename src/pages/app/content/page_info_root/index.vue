@@ -141,7 +141,7 @@ export default {
           }
         },
       }
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      if (this.$store.getters.isGuest) {
         return res
       }
       res.hide = {
@@ -172,7 +172,7 @@ export default {
     },
     async relatedContentClick (content, contentIndex) {
       this.$log('relatedContentClick', content)
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы перейти на похожий контент, войдите в аккаунт.'
         }
