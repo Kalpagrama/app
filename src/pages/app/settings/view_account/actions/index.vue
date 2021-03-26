@@ -66,6 +66,7 @@
     q-btn(
       @click="logout()"
       outline color="red" no-caps
+      :loading="loggingOut"
       :style=`{
         height: '50px',
       }`
@@ -83,6 +84,7 @@ export default {
   data () {
     return {
       feedbackOpened: false,
+      loggingOut: false,
     }
   },
   methods: {
@@ -104,6 +106,8 @@ export default {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: false, useProfileEditor: false}])
     },
     async logout () {
+      this.$log('logout')
+      this.loggingOut = true
       await AuthApi.logout()
       await this.$router.replace('/auth')
     },

@@ -55,12 +55,13 @@ export default {
   }
 }
 </script>
+
 <style lang="stylus" scoped>
 svg {
   cursor:crosshair
-  -moz-box-shadow: 0px 0px 5px #888
-  -webkit-box-shadow: 0px 0px 5px #888;
-  box-shadow: 0px 0px 5px #888;
+  -moz-box-shadow: 0px 0px 3px #888
+  -webkit-box-shadow: 0px 0px 3px #888;
+  box-shadow: 0px 0px 3px #888;
   border-radius: 50%;
 }
 </style>

@@ -2,7 +2,7 @@
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill
-  -webkit-box-shadow: 0 0 0 1000px rgb(70,70,70) inset !important
+  -webkit-box-shadow: 0 0 0 1000px rgb(50,50,50) inset !important
   -webkit-text-fill-color: white !important
 </style>
 
@@ -14,7 +14,7 @@ div(
   ).row.full-width.items-start.content-start
   //- header
   .row.full-width.q-pb-lg.q-pt-sm
-    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome to kalpagrama')}}
+    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome, login with email')}}
   //- email
   q-input(
     v-model="email"
@@ -29,8 +29,9 @@ div(
       fontWeight: 'bold',
       textAlign: 'center',
       color: 'white',
-      background: 'rgb(70,70,70)',
+      background: 'rgb(60,60,60)',
       borderRadius: '10px',
+      border: '2px solid rgb(90,90,90)',
     }`
     @keyup.enter="emailSend()"
     ).full-width
@@ -71,6 +72,7 @@ div(
         color: 'white',
         background: 'rgb(70,70,70)',
         borderRadius: '10px',
+        //- border: '2px solid rgb(50,50,50)',
       }`
       @keyup.enter="passwordSend()"
       ).full-width
@@ -101,6 +103,11 @@ div(
         }`
         @click="reset()")
         span(:style=`{fontSize: '14px'}`) {{ $t('Reset form') }}
+  .row.full-width.q-pa-md.text-grey-6
+    kalpa-docs(
+      :title="$t('If you proceed, you agree with our terms')"
+      titleColor="grey-2"
+      docColor="grey-6")
 </template>
 
 <script>

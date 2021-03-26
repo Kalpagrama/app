@@ -28,12 +28,9 @@ div(
 </template>
 
 <script>
-import kalpaDocs from 'components/kalpa_docs/index.vue'
-
 export default {
   name: 'pageApp_settigns_viewAccount',
   components: {
-    kalpaDocs,
     editAvatar: () => import('./edit_avatar/index.vue'),
     editProfile: () => import('./edit_profile/index.vue'),
     actions: () => import('./actions/index.vue'),

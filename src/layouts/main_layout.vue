@@ -85,7 +85,7 @@ export default {
     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
     this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
     this.$ym('APP_MOUNTED')
   },

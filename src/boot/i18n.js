@@ -67,6 +67,7 @@ export default async ({ Vue, store, app }) => {
     // }
     i18next.on('missingKey', function (lngs, namespace, key, res) {
       logE('translate is missing', lngs, namespace, key, res)
+      return res
     })
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {

@@ -13,6 +13,6 @@ export default {
     videoActive,
     videoAlways,
   },
-  props: ['composition', 'isActive'],
+  props: ['composition', 'isActive', 'isVisible'],
 }
 </script>

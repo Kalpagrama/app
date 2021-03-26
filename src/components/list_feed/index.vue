@@ -174,7 +174,7 @@ div(
         :item="item"
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
-        :isVisible="true")
+        :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
     //- next loading
     div(
       v-if="itemsResStatus === 'NEXT'"
@@ -340,8 +340,8 @@ export default {
           // END of scrollTopChanging
           this.$log('scrollTop END')
           this.scrollTopChanging = false
-          if (this.scrollTop < this.paginationBufferHeight) await this.prev()
-          if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+          // if (this.scrollTop < this.paginationBufferHeight) await this.prev()
+          // if (this.scrollBottom < this.paginationBufferHeight) await this.next()
         }, 600)
       }
     },
@@ -470,6 +470,7 @@ export default {
           itemRef = itemRef[0]
           this.itemMiddle = {
             key: key,
+            idx: idx,
             name: item?.name,
             ref: itemRef,
             top: 0,
@@ -504,7 +505,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
-      // this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
       await this.itemsRes.prev(this.itemsPerPage, this.itemsMax)
       this.$log('prev done')
       this.itemsResStatus = null
@@ -516,7 +517,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
-      // this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
       await this.itemsRes.next(this.itemsPerPage, this.itemsMax)
       this.$log('next done')
       this.itemsResStatus = null

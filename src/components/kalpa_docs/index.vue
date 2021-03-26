@@ -5,7 +5,8 @@
 </style>
 
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
+.row.full-width.text-grey-4.q-px-sm
+//- .row.full-width.items-start.content-start.justify-center
   //- header
   div(
     v-if="title"
@@ -27,25 +28,46 @@
 </template>
 
 <script>
+import RichTextRenderer from 'contentful-rich-text-vue-renderer'
+
 export default {
   name: 'kalpaDocs',
+  components: {
+    RichTextRenderer
+  },
   props: {
     title: {
       type: String
     },
-    styles: {type: Object, default: {}}
+    titleColor: {
+      type: String,
+      default: 'white',
+    },
+    docColor: {
+      type: String,
+      default: 'white'
+    },
   },
   data () {
     return {
+      doc: null,
+      // docs: []
     }
   },
-  computed: {
-    docs () {
-      return this.$store.state.ui.docs.filter(d => {
-        // TODO: filter with lang...
-        return true
+  methods: {
+    async getDocs () {
+      const {items: [doc]} = await this.$contentful.getEntries({
+        content_type: 'docs_pack',
+        'fields.id': 'kalpa_app_rus',
       })
-    }
+      return doc
+    },
+  },
+  async mounted () {
+    this.$log('created')
+    let doc = await this.getDocs()
+    this.$log('doc', doc)
+    this.doc = doc.fields.docs[0].fields.body
   }
 }
 </script>

@@ -4,6 +4,9 @@ import { systemInit, systemReset } from 'src/system/services'
 import assert from 'assert'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 
+// components
+// import settingsDocs from 'pages/app/settings/view_docs/index.vue'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 
@@ -65,7 +68,13 @@ const routes = [
                   name: 'settings.account',
                   path: 'account',
                   component: () => import('pages/app/settings/view_account/index.vue'),
-                  meta: { roleMinimal: 'GUEST' }
+                  // meta: { roleMinimal: 'GUEST' }
+               },
+               {
+                  name: 'settings.docs',
+                  path: 'docs',
+                  // component: settingsDocs,
+                  component: () => import('pages/app/settings/view_docs/index.vue')
                }
             ],
             meta: { roleMinimal: 'GUEST' }

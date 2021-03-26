@@ -20,15 +20,15 @@ export default {
             if (top < this.$q.screen.height / 4) return
             // this.$q.notify({position: 'right', message: 'Scroll into view: ' + top})
             const scrollTarget = getScrollTarget(e.target)
-            e.target.scrollIntoView()
-            let i = setInterval(() => {
-              e.target.scrollIntoView()
-              const scrollPosition = getScrollPosition(scrollTarget)
-              setScrollPosition(scrollTarget, scrollPosition - 90)
-            }, 0)
-            this.$wait(600).then(() => {
-              clearInterval(i)
-            })
+            // e.target.scrollIntoView()
+            // let i = setInterval(() => {
+            //   e.target.scrollIntoView()
+            //   const scrollPosition = getScrollPosition(scrollTarget)
+            //   setScrollPosition(scrollTarget, scrollPosition - 90)
+            // }, 0)
+            // this.$wait(600).then(() => {
+            //   clearInterval(i)
+            // })
           }
         }
       }

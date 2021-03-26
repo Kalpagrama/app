@@ -15,7 +15,13 @@ div(
   from-video(
     v-if="composition.outputType === 'VIDEO'"
     :composition="composition"
-    :isActive="isActive")
+    :isActive="isActive"
+    :isVisible="isVisible")
+  from-book(
+    v-else-if="composition.outputType === 'BOOK'"
+    :composition="composition"
+    :isActive="isActive"
+    :isVisible="isVisible")
   div(
     v-else
     :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
@@ -30,11 +36,13 @@ div(
 
 <script>
 import fromVideo from './from_video/index.vue'
+import fromBook from './from_book/index.vue'
 
 export default {
   name: 'composition',
   components: {
     fromVideo,
+    fromBook,
   },
   props: [
     'compositionKey',
@@ -57,16 +65,21 @@ export default {
   },
   computed: {
     paddingBottom () {
-      let width = this.composition.thumbWidth
-      let height = this.composition.thumbHeight
-      let r = height / width * 100
-      if (r > 100) {
-        r = 100
+      if (this.composition.outputType === 'BOOK') {
+        return 56.25
       }
-      if (r < 30) {
-        r = 30
+      else {
+        let width = this.composition.thumbWidth
+        let height = this.composition.thumbHeight
+        let r = height / width * 100
+        if (r > 100) {
+          r = 100
+        }
+        if (r < 30) {
+          r = 30
+        }
+        return r
       }
-      return r
     }
   },
   watch: {

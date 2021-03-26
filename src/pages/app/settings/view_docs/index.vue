@@ -1,55 +1,83 @@
-<style lang="sass">
-a
-  color: rgb(76,175,79)
-  font-weight: bold
-</style>
-
-<template>
-  <q-page class="row full-width justify-center">
-    <div
-      class="row full-width items-start content-start text-white q-pa-sm"
-      :style="{maxWidth: $store.state.ui.pageWidth+'px'}">
-      <q-expansion-item
-        v-for="(d,di) in docsFiltered" :key="di"
-        expand-separator
-        :label="d.name"
-        :style="{width: '100%',}" >
-        <VueShowdown
-          flavor="github"
-          :markdown="docs[d.doc]"
-          :options="{ emoji: true }"
-          :style="{width: '100%',}" />
-      </q-expansion-item>
-    </div>
-  </q-page>
+<template lang="pug">
+.row.full-width.justify-center.q-pa-sm
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    div(
+      :style=`{
+        width: '200px',
+        height: $q.screen.height-90+'px',
+      }`
+      ).column
+      .col.full-width.scroll
+        .row.full-width.items-start.content-start
+          div(
+            v-for="(d,di) in docs" :key="d.id"
+            flat no-caps color="white" align="left"
+            :class=`{
+              'b-50': doc ? doc.id === d.id : false,
+              'b-35': doc ? doc.id !== d.id : false,
+            }`
+            :style=`{
+              textAlign: 'start',
+              borderRadius: '10px',
+            }`
+            @click="docClick(d,di)"
+            ).row.full-width.justify-start.q-pa-sm.cursor-pointer.q-mb-sm
+            span(:style=`{userSelect: 'none'}`).text-white {{ d.name }}
+    .col
+      div(
+        :style=`{
+          height: $q.screen.height-90+'px',
+        }`
+        ).column.full-width
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start.q-pa-md.text-white
+            RichTextRenderer(
+              v-if="doc"
+              :document="doc.body")
 </template>
 
 <script>
-import termsRu from 'assets/docs/terms_ru.md'
-import dmcaRu from 'assets/docs/dmca_ru.md'
-import policyRu from 'assets/docs/policy_ru.md'
+import RichTextRenderer from 'contentful-rich-text-vue-renderer'
 
 export default {
-  name: 'pageApp_settings_viewDocs',
+  name: 'viewDocs',
+  components: {
+    RichTextRenderer
+  },
   data () {
     return {
-      docs: {
-        termsRu,
-        dmcaRu,
-        policyRu,
-      }
+      docs_pack: null,
+      docs: [],
+      doc: null,
     }
   },
-  computed: {
-    docsFiltered () {
-      return [
-        {name: 'Пользовательское соглашение', doc: 'termsRu'},
-        {name: 'DMCA (Регламент рассмотрения заявлений правообладателей)', doc: 'dmcaRu'},
-        {name: 'Политика конфиденциальности Kalpagrama', doc: 'policyRu'},
-      ].filter(d => {
-        // TODO: check lang and ?
-        return true
+  methods: {
+    async getDocsPack () {
+      this.$log('getDocs')
+      const {items: [doc]} = await this.$contentful.getEntries({
+        content_type: 'docs_pack',
+        'fields.id': 'kalpa_app_rus',
       })
+      return doc
+    },
+    docClick (d, di) {
+      this.$log('docClick', d, di)
+      this.doc = d
+    }
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.docs_pack = await this.getDocsPack()
+    this.$log('docs_pack', this.docs_pack)
+    this.docs = this.docs_pack.fields.docs.map(d => {
+      return {
+        id: d.sys.id,
+        name: d.fields.name,
+        body: d.fields.body
+      }
+    })
+    if (this.docs.length > 0) {
+      this.doc = this.docs[0]
     }
   }
 }

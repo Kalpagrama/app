@@ -91,19 +91,19 @@ kalpa-layout(
         @click="$emit('close')"
         :style=`{
           position: 'fixed', zIndex: 3, top: '0px',
-          maxHeight: '55vh',
+          maxHeight: '20vh',
         }`
         ).row.fit.row.fit.items-center.content-center.justify-center
         kalpa-logo(
-          :width="200"
-          :height="200"
+          :width="100"
+          :height="100"
           :style=`{
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
-          }`).q-mb-md
+          }`).rotating-slow.q-mb-xs
         .row.full-width.justify-center
           span(
-            :style=`{fontSize: '30px',}`
-            ).text-white {{$t('Kalpagrama')}}
+            :style=`{fontSize: '22px',}`
+            ).text-white.text-bold {{$t('Kalpagrama')}}
       //- tint
       div(
         @click="$emit('close')"
@@ -118,7 +118,7 @@ kalpa-layout(
         @click.self="() => {}"
         :style=`{
           position: 'relative', zIndex: 100, transform: 'translate3d(0,0,0)',
-          marginTop: '50vh',
+          marginTop: '20vh',
           borderRadius: getRadius(scrollTop, scrollHeight),
           minHeight: $q.screen.height+'px',
           maxHeight: $q.screen.height+'px',
