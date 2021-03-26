@@ -1,55 +1,64 @@
 <template lang="pug">
-kalpa-layout().b-30
+kalpa-layout(
+  :style=`{
+    background: 'rgba(30,30,30,'+backgroundOpacity+')'
+  }`
+)
   template(v-slot:body=`{scrollTop}`)
     //- desktop layout
-    div(
-      v-if="$q.screen.width > 768"
-      :style=`{
-        position: 'relative',
-      }`).row.fit.items-center.content-center.justify-center.q-px-lg
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
+        v-if="isReady && $q.screen.width > 768"
         :style=`{
           position: 'relative',
-          maxWidth: '800px',
-          borderRadius: '30px',
-          overflow: 'hidden',
         }`
-        ).row.full-width
-        div(:style=`{width: 'calc(50% + 15px)',}`).row
-          div(:style=`{position: 'relative', paddingBottom: '100%',}`).row.full-width
-            div(:style=`{position: 'absolute',}`).row.fit.items-center.content-center
-              img(
-                draggable="false"
-                :src="'/images/space.png'"
-                :style=`{
-                  objectFit: 'cover',
-                  //- maxHeight: '50vh'
-                }`
-                ).fit
-              //- logo
-              div(
-                :style=`{
-                  position: 'absolute', zIndex: 3, top: '0px',
-                  //- maxHeight: '55vh',
-                }`
-                ).row.fit.row.fit.items-center.content-center.justify-center
-                kalpa-logo(
-                  :width="200"
-                  :height="200").q-mb-md
-                .row.full-width.justify-center
-                  span(:style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
-              //- tint
-              div(
-                :style=`{
-                  position: 'absolute', zIndex: 2, top: '0px',
-                  background: 'rgba(0,0,0,0.5)',
-                  //- maxHeight: '100vh',
-                }`
-                ).row.fit.items-center.content-center.justify-center
-        div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, top: '0px', right: '0px',}`)
-          div(:style=`{position: 'relative', paddingBottom: '100%'}`).row.full-width
-            div(:style=`{position: 'absolute',borderRadius: '30px',}`).row.fit.b-80.q-pt-lg.q-px-xl
-              auth-flow(:onSuccess="onSuccess")
+        @click.self="close()"
+        ).row.fit.items-center.content-center.justify-center.q-px-lg
+        div(
+          :style=`{
+            position: 'relative',
+            maxWidth: '900px',
+            borderRadius: '30px',
+            overflow: 'hidden',
+          }`
+          ).row.full-width
+          div(:style=`{width: 'calc(50% + 15px)',}`).row
+            div(:style=`{position: 'relative', paddingBottom: '100%',}`).row.full-width
+              div(:style=`{position: 'absolute',}`).row.fit.items-center.content-center
+                img(
+                  draggable="false"
+                  :src="'/images/space.png'"
+                  :style=`{
+                    objectFit: 'cover',
+                    //- maxHeight: '50vh'
+                  }`
+                  ).fit
+                //- logo
+                div(
+                  :style=`{
+                    position: 'absolute', zIndex: 3, top: '0px',
+                    //- maxHeight: '55vh',
+                  }`
+                  ).row.fit.row.fit.items-center.content-center.justify-center
+                  kalpa-logo(
+                    :width="200"
+                    :height="200").q-mb-md.rotating-slow
+                  .row.full-width.justify-center
+                    router-link(
+                      :to="'/trends'"
+                      :style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
+                //- tint
+                div(
+                  :style=`{
+                    position: 'absolute', zIndex: 2, top: '0px',
+                    background: 'rgba(0,0,0,0.5)',
+                    //- maxHeight: '100vh',
+                  }`
+                  ).row.fit.items-center.content-center.justify-center
+          div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, top: '0px', right: '0px',}`)
+            div(:style=`{position: 'relative', paddingBottom: '100%'}`).row.full-width
+              div(:style=`{position: 'absolute',borderRadius: '30px',}`).row.fit.b-80.q-pt-lg.q-px-xl
+                auth-flow(:onSuccess="onSuccess")
     //- mobile layout
     div(
       v-if="$q.screen.width <= 768"
@@ -91,7 +100,10 @@ kalpa-layout().b-30
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
           }`).q-mb-md
         .row.full-width.justify-center
-          span(:style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
+          router-link(
+            :to="'/trends'"
+            :style=`{fontSize: '30px',}`
+            ).text-white {{$t('Kalpagrama')}}
       //- tint
       div(
         :style=`{
@@ -115,7 +127,6 @@ kalpa-layout().b-30
 </template>
 
 <script>
-
 import authFlow from './auth_flow.vue'
 
 export default {
@@ -124,12 +135,40 @@ export default {
     authFlow,
   },
   props: ['onSuccess'],
+  data () {
+    return {
+      isReady: true,
+      backgroundOpacity: 0,
+    }
+  },
   methods: {
     getRadius (scrollTop, scrollHeight) {
       let r = 30
       // let r = 30 * (1 - (scrollTop / (this.$q.screen.height / 2)))
       return `${r}px ${r}px 0 0`
     },
+    close () {
+      this.$log('close START')
+      this.$tween.to(
+        this,
+        0.3,
+        {
+          backgroundOpacity: 0,
+          onComplete: () => {
+            this.$log('close DONE')
+          }
+        })
+      this.$wait(150).then(() => {
+        this.$emit('close')
+      })
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$tween.to(this, 0.5, {backgroundOpacity: 1})
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

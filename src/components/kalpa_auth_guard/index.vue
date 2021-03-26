@@ -1,34 +1,27 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    zIndex: 9999999,
-    height: '500px',
-  }`
-  ).row.full-width.items-center.content-center.b-30.q-pa-lg
-  div(:style=`{position: 'absolute',zIndex: 100, left: '0px', top: '0px',}`).row.full-width.q-pa-sm
-    .col
-    q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  .row.full-width.justify-center
-    q-icon(name="login" color="grey-8" size="100px")
-  div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-     span.text-white {{ authGuard.message }}
-  .row.full-width.justify-center.q-pt-md
-    q-btn(
-      outline color="white" no-caps
-      :to="'/auth/sign-in'"
-      :style=`{
-        height: '50px',
-      }`)
-      h1.text-white {{$t('Login')}}
+page-auth(
+  :onSuccess="onSuccess"
+  @close="$emit('close')"
+)
 </template>
 
 <script>
+import pageAuth from 'pages/auth/home/index.vue'
+
 export default {
   name: 'kalpaAuthGuard',
+  components: {
+    pageAuth,
+  },
   computed: {
     authGuard () {
       return this.$store.state.ui.authGuard
+    }
+  },
+  methods: {
+    onSuccess () {
+      this.$log('onSuccess')
+      this.$emit('close')
     }
   }
 }

@@ -18,17 +18,17 @@ export default {
           if (this.$q.platform.is.mobile) {
             const top = e.target.getBoundingClientRect().top
             if (top < this.$q.screen.height / 4) return
-            // this.$q.notify({position: 'right', message: 'Scroll into view: ' + top})
+            this.$q.notify({position: 'right', message: 'Scroll into view: ' + top})
             const scrollTarget = getScrollTarget(e.target)
             e.target.scrollIntoView()
-            let i = setInterval(() => {
-              e.target.scrollIntoView()
-              const scrollPosition = getScrollPosition(scrollTarget)
-              setScrollPosition(scrollTarget, scrollPosition - 90)
-            }, 0)
-            this.$wait(600).then(() => {
-              clearInterval(i)
-            })
+            // let i = setInterval(() => {
+            //   e.target.scrollIntoView()
+            //   const scrollPosition = getScrollPosition(scrollTarget)
+            //   setScrollPosition(scrollTarget, scrollPosition - 90)
+            // }, 0)
+            // this.$wait(600).then(() => {
+            //   clearInterval(i)
+            // })
           }
         }
       }
@@ -44,8 +44,8 @@ export default {
     },
     onResize (e) {
       // this.$log('onResize', e)
-      this.$store.commit('ui/stateSet', ['viewportHeight', e.height])
-      this.$store.commit('ui/stateSet', ['viewportWidth', e.width])
+      // this.$store.commit('ui/stateSet', ['viewportHeight', e.height])
+      // this.$store.commit('ui/stateSet', ['viewportWidth', e.width])
       if (this.width > this.height) {
         this.$store.commit('ui/stateSet', ['pageVertical', false])
       }
@@ -56,7 +56,9 @@ export default {
     visualViewportOnResize (e) {
       // this.$log('visualViewportOnResize', e)
       const viewport = window.visualViewport
-      // this.$log('viewport', viewport)
+      this.$log('viewport', viewport)
+      this.$store.commit('ui/stateSet', ['viewportHeight', viewport.height])
+      this.$store.commit('ui/stateSet', ['viewportWidth', viewport.width])
       this.$store.commit('ui/stateSet', ['viewportOffsetTop', viewport.offsetTop])
     }
   },
@@ -67,6 +69,8 @@ export default {
     window.addEventListener('focusin', this.handleFocusin)
     window.addEventListener('focusout', this.handleFocusout)
     window.visualViewport.addEventListener('resize', this.visualViewportOnResize)
+    this.$store.commit('ui/stateSet', ['viewportHeight', window.visualViewport.height])
+    this.$store.commit('ui/stateSet', ['viewportWidth', window.visualViewport.width])
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

@@ -77,18 +77,18 @@ export default {
         //     this.$router.push('/sphere-threads/' + this.node.sphereFromName.oid)
         //   }
         // },
-        goGraph: {
-          name: this.$t('Go graph'),
-          cb: async () => {
-            this.$log('goGraph')
-            if (this.node.items.length === 1) {
-              this.$router.push(`/graph/${this.node.oid}`)
-            }
-            else {
-              this.$router.push(`/graph/${this.node.items[0].oid}?oid=${this.node.oid}`)
-            }
-          }
-        }
+        // goGraph: {
+        //   name: this.$t('Go graph'),
+        //   cb: async () => {
+        //     this.$log('goGraph')
+        //     if (this.node.items.length === 1) {
+        //       this.$router.push(`/graph/${this.node.oid}`)
+        //     }
+        //     else {
+        //       this.$router.push(`/graph/${this.node.items[0].oid}?oid=${this.node.oid}`)
+        //     }
+        //   }
+        // }
       }
       if (this.$store.getters.currentUser().profile.role === 'GUEST') {
         return res

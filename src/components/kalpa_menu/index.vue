@@ -1,5 +1,6 @@
 <style lang="sass">
 .menu-item
+  cursor: pointer
   &:hover
     background: rgb(40,40,40)
 </style>
@@ -10,8 +11,6 @@
   div(
     :style=`{borderRadius: '10px',}`
     ).row.full-width.items-center.content-center
-    //- home
-    //- :to="isGuest ? '/trends' : '/feeds/all'"
     div(
       @click="$go('/about')"
       :style=`{borderRadius: '10px',}`
@@ -43,9 +42,8 @@
           :style=`{
             height: $q.screen.width > 600 ? '60px' : '60px',
             borderRadius: '10px', overflow: 'hidden',
-            //- maxWidth: '210px',
           }`
-          ).row.full-width.items-center.menu-item.q-mb-sm.cursor-pointer
+          ).row.full-width.items-center.menu-item.q-mb-sm
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="30px" :name="p.icon" :color="p.color || 'white'")
           span(
@@ -59,8 +57,9 @@
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
           }`
           :style=`{
-            height: '60px', borderRadius: '10px', overflow: 'hidden',
-            //- maxWidth: '210px',
+            height: '60px',
+            borderRadius: '10px',
+            overflow: 'hidden',
           }`
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -70,20 +69,26 @@
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
               //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
         //- login for GUEST
-        q-btn(
+        div(
           v-if="isGuest"
-          @click="$go('/auth')"
-          color="green" no-caps icon="login"
-          :align="mini ? 'center' : 'left'"
+          @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
           :style=`{
             height: '60px',
-            paddingLeft: '0px'
-            //- maxWidth: '210px',
+            borderRadius: '10px',
+            overflow: 'hidden'
           }`
-          ).full-width.items-center.content-center
-          span(
-            v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white.q-ml-md {{$t('Login')}}
+          ).row.full-width.items-cener.content-center.menu-item
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+            div(
+              :style=`{
+                height: '40px', width: '40px',
+                minWidth: '40px', minHeight: '40px',
+                maxWidth: '40px', maxHeight: '40px',
+                borderRadius: '50%',
+              }`).row.b-50
+          div(v-if="!mini").col.full-height
+            .row.fit.items-center.content-center
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
         //- docs
         .row.full-width.q-mt-sm
           kalpa-docs(

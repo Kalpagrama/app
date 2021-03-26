@@ -3,11 +3,14 @@ q-layout(
   view="lHh lpR lFf"
   :container="false")
   q-dialog(
-    v-model="authGuardShow")
+    v-model="authGuardShow"
+    maximized
+    position="bottom")
     kalpa-auth-guard(@close="authGuardShow = null")
   q-dialog(
-    v-model="kalpaWelcomeShow" :maximized="true"
-    @hide="kalpaWelcomeShown")
+    v-model="kalpaWelcomeShow"
+    maximized
+    position="bottom")
     kalpa-welcome(
       :config="$store.state.ui.kalpaWelcome"
       @close="kalpaWelcomeShow = null")
@@ -55,8 +58,7 @@ export default {
         return this.$store.state.ui.authGuard !== null
       },
       set (val) {
-        this.$log('authGuardShow', val)
-        this.$store.commit('ui/stateSet', ['authGuard', val])
+        this.$store.commit('ui/stateSet', ['authGuard', null])
       }
     },
     kalpaWelcomeShow: {
@@ -69,31 +71,19 @@ export default {
     }
   },
   methods: {
-     async kalpaWelcomeShown () {
-      this.$log('kalpaWelcomeShown')
-    },
-  },
-  async beforeCreate () {
-    this.$log('beforeCreate')
-  },
-  async beforeMount () {
-    this.$log('beforeMount')
   },
   async created () {
     this.$log('created')
-    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
-    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
+    // Check tutorials
     let userTutorials = this.$store.getters.currentUser().profile.tutorial
     this.$log('userTutorials', userTutorials)
     this.$log('userTutorials', userTutorials.main)
     if (userTutorials.main === false) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
     }
-    if (this.$store.getters.currentUser().profile.role === 'GUEST') {
-      // do nothing ?
-    }
-    else {
-    }
+    // Node categories
+    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -82,7 +82,7 @@ export default {
     }
   },
   computed: {
-    url () { return ContentApi.urlSelect(this.composition) }
+    url () { return ContentApi.urlSelect(this.item) }
   },
   methods: {
   }
