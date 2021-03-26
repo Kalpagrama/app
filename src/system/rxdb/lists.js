@@ -9,7 +9,7 @@ import {
    getTocIdFromCfi
 } from 'src/system/rxdb/common'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
-import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { EpubCFI } from 'epubjs'
 import { makeId } from 'src/system/rxdb/index'
 
@@ -137,7 +137,7 @@ class Lists {
       for (let rxDoc of rxDocs) {
          let findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc)
          await findResult.refresh()
-         // let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+         // let reactiveItem = getReactive(rxDoc).getPayload()
          // let newItems = reactiveItem.items.filter(el => !this.isElementBlacklisted(el, blackLists))
          // let countDiff = reactiveItem.items.length - newItems.length
          // assert(countDiff >= 0, 'countDiff >= 0')
@@ -154,7 +154,7 @@ class Lists {
       let mangoQuery = rxDoc.props.mangoQuery
       let contentOid = rxDoc.props.oid
       logD('apply to rxdoc', rxDoc.id, mangoQuery)
-      let reactiveDoc = getReactiveDoc(rxDoc).getPayload()
+      let reactiveDoc = getReactive(rxDoc).getPayload()
       let foundGroup
       let objectFiguresAbsoluteList = []
       if (!mangoQuery.selector.groupByContentLocation) { // список без группировки
@@ -345,7 +345,7 @@ class Lists {
       })
       logD(f, 'finded rxDoc lists: ', rxDocs.map(rxDoc => rxDoc.id))
       for (let rxDoc of rxDocs) {
-         let reactiveDoc = getReactiveDoc(rxDoc).getPayload()
+         let reactiveDoc = getReactive(rxDoc).getPayload()
          assert(reactiveDoc.items, '!reactiveDoc.items')
          assert(reactiveDoc.totalCount >= 0, 'reactiveDoc.totalCount >= 0')
          // { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes }
@@ -386,14 +386,14 @@ class Lists {
             })
             // меняем списки
             for (let rxDoc of rxDocsSubscribers) {
-               let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+               let reactiveItem = getReactive(rxDoc).getPayload()
                assert(reactiveItem.items, '!reactiveItem.items')
                logD(f, 'add subscriber to list')
                reactiveItem.items.push(event.subject)
                reactiveItem.totalCount++
             }
             for (let rxDoc of rxDocsSubscriptions) {
-               let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+               let reactiveItem = getReactive(rxDoc).getPayload()
                assert(reactiveItem.items, '!reactiveItem.items')
                logD(f, 'add subscription to list')
                reactiveItem.items.push(event.object)
@@ -424,7 +424,7 @@ class Lists {
             })
             // меняем списки
             for (let rxDoc of rxDocsSubscribers) {
-               let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+               let reactiveItem = getReactive(rxDoc).getPayload()
                assert(reactiveItem.items, '!reactiveItem.items')
                let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
                if (indx >= 0) {
@@ -434,7 +434,7 @@ class Lists {
                }
             }
             for (let rxDoc of rxDocsSubscriptions) {
-               let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+               let reactiveItem = getReactive(rxDoc).getPayload()
                assert(reactiveItem.items, '!reactiveItem.items')
                let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
                if (indx >= 0) {
@@ -465,7 +465,7 @@ class Lists {
                })
                logD(f, 'find voted nodes complete', rxDocs)
                for (let rxDoc of rxDocs) {
-                  let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+                  let reactiveItem = getReactive(rxDoc).getPayload()
                   assert(reactiveItem.items, '!reactiveItem.items')
                   assert(event.object, '!event.object')
                   let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)

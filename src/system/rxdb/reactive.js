@@ -19,9 +19,9 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
-function getReactiveDoc (rxDoc) {
-   let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
-   return reactiveDocFactory.getReactiveDoc()
+function getReactive (rxDocOrObject) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
+   return reactiveDocFactory.getReactive()
 }
 
 // все изменения rxDoc - только через эту ф-ю!!! Иначе - возможны гонки (из-за debounce)
@@ -43,7 +43,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
    }
    if (rxDoc) {
       let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
-      let reactiveDoc = reactiveDocFactory.getReactiveDoc()
+      let reactiveDoc = reactiveDocFactory.getReactive()
       try {
          reactiveDocFactory.setDebouncedSave(debouncedSave)
          reactiveDocFactory.setSynchro(synchro)
@@ -66,6 +66,28 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
+class ReactiveObjFactory {
+   constructor (object) {
+      assert(typeof object === 'object')
+      this.vm = new Vue({
+         data: {
+            reactiveData: {},
+            rev: 1
+         }
+      })
+      this.getReactive = () => {
+         assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
+         return this.vm.reactiveData.doc
+      }
+      this.setReactiveDoc = (plainData) => {
+         assert(typeof plainData === 'object', 'typeof payload === \'object\'')
+         const reactiveDoc = plainData
+         Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+      }
+      this.setReactiveDoc(object)
+   }
+}
+
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
    constructor (rxDoc) {
@@ -77,7 +99,7 @@ class ReactiveDocFactory {
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
       if (rxDoc.reactiveItemHolderMaster) {
-         this.getReactiveDoc = rxDoc.reactiveItemHolderMaster.getReactiveDoc
+         this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
          // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
          // this.reactiveDocUnsubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocUnsubscribe
@@ -100,7 +122,7 @@ class ReactiveDocFactory {
          })
          this.debouncedSave = true
          this.synchro = true
-         this.getReactiveDoc = () => {
+         this.getReactive = () => {
             assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
             return this.vm.reactiveData.doc
          }
@@ -229,7 +251,7 @@ class ReactiveDocFactory {
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveDocSubscribe())
             this.reactiveDocUnsubscribe()
-            ReactiveDocFactory.mergeReactive(this.getReactiveDoc(), changePlainDoc)
+            ReactiveDocFactory.mergeReactive(this.getReactive(), changePlainDoc)
             this.setRev(changePlainDoc._rev)
             // logD(f, 'reactiveDoc changed stop')
          } finally {
@@ -262,7 +284,7 @@ class ReactiveDocFactory {
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
                   logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
-                     let newData = JSON.parse(JSON.stringify(this.getReactiveDoc())) // убираем реактивную хрень
+                     let newData = JSON.parse(JSON.stringify(this.getReactive())) // убираем реактивную хрень
                      newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
                      if (synchro && this.itemType === 'wsItem') newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                      return newData
@@ -367,15 +389,16 @@ class Group {
       assert(mangoQuery, '!mangoQuery')
       let rxDocs = await rxQuery.exec()
       assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-      pageId = JSON.stringify(mangoQuery)
-      pageItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
+      // не включаем pagination.pageSize (могут быть 2 страницы с разными pageSize)!
+      pageId = JSON.stringify(mangoQuery.selector) + '::pageToken=' + (mangoQuery.pagination ? JSON.stringify(mangoQuery.pagination.pageToken) : 'empty')
+      pageItems = rxDocs.map(rxDoc => getReactive(rxDoc))
       totalCount = pageItems.length
       itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
       itemPrimaryKey = 'id'
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesRxDoc (rxDoc, debugUniqueOids = new Set()) {
+   static getGroupPropertiesRxDoc (rxDoc) {
       assert(rxDoc && isRxDocument(rxDoc), '!rxDoc')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -389,7 +412,8 @@ class Group {
       let mangoQuery = rxDoc.props.mangoQuery
       assert(mangoQuery, '!mangoQuery')
       assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-      pageId = rxDoc.id
+      // не включаем pagination.pageSize (могут быть 2 страницы с разными pageSize)!
+      pageId = JSON.stringify(mangoQuery.selector) + '::pageToken=' + (mangoQuery.pagination ? JSON.stringify(mangoQuery.pagination.pageToken) : 'empty')
       pageItems = items
       totalCount = totalCount_
       nextPageToken = nextPageToken_
@@ -431,17 +455,10 @@ class Group {
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       }
-      // TODO!!! убрать debugUniqueOids (поправить задваивание)
-      pageItems = pageItems.filter(item => {
-         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item.name)
-         let res = !debugUniqueOids.has(item[itemPrimaryKey])
-         debugUniqueOids.add(item[itemPrimaryKey])
-         return res
-      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesArray (array, debugUniqueOids = new Set()) {
+   static getGroupPropertiesArray (array) {
       assert(array && Array.isArray(array), '!array')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -457,18 +474,10 @@ class Group {
          } else return 'unknown'
       }
       itemPrimaryKey = detectArrItemPrimaryKey(pageItems)
-
-      // TODO!!! убрать debugUniqueOids (поправить задваивание)
-      pageItems = pageItems.filter(item => {
-         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
-         let res = !debugUniqueOids.has(item[itemPrimaryKey])
-         debugUniqueOids.add(item[itemPrimaryKey])
-         return res
-      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static async getGroupProperties (rxQueryOrRxDocOrArray, debugUniqueOids = new Set()) {
+   static async getGroupProperties (rxQueryOrRxDocOrArray) {
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
       else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
@@ -480,9 +489,9 @@ class Group {
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          return await Group.getGroupPropertiesQuery(rxQuery)
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
-         return Group.getGroupPropertiesRxDoc(rxDoc, debugUniqueOids)
+         return Group.getGroupPropertiesRxDoc(rxDoc)
       } else if (array) {
-         return Group.getGroupPropertiesArray(array, debugUniqueOids)
+         return Group.getGroupPropertiesArray(array)
       } else throw new Error('bad rxQueryOrRxDocOrArray')
    }
 
@@ -518,7 +527,7 @@ class Group {
                } // если список не изменился - просто выходим
             }
             // logD(f, 'rxQuery changed 2', results)
-            let pageItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
+            let pageItemsNew = results.map(rxDoc => getReactive(rxDoc).getPayload())
             assert(this.reactiveGroup.pages.length === 1, 'this.reactiveGroup.pages.len != 1')
             let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
             assert(page, '!page')
@@ -540,7 +549,7 @@ class Group {
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
             logD(f, 'List::rxDoc changed. try to change this.pageItems')
             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            await this.upsertPaginationPage(rxDoc, null, change.id, false)
+            await this.upsertPaginationPage(rxDoc, 'replace', false)
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                endFullFil = startFullFil = 0
@@ -553,14 +562,10 @@ class Group {
       }
    }
 
-   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, updatedPageId = null, subscribe = true) {
+   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, subscribe = true) {
       const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
-      assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
-      if (position === 'whole') {
-         this.debugUniqueOids.clear()
-         assert(this.reactiveGroup.pages.length === 0, 'whole можно вставлять только если нет и одной страницы!!!')
-      }
+      assert(position.in('top', 'bottom', 'whole', 'replace'), 'bad position')
       let {
          totalCount,
          itemType,
@@ -570,13 +575,34 @@ class Group {
          nextPageToken,
          prevPageToken,
          currentPageToken
-      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray, this.debugUniqueOids)
+      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray)
       assert(pageId, '!pageId')
       assert(totalCount >= 0, '!totalCount')
       assert(itemType && itemType.in('GROUP', 'ITEM'), 'bad itemType')
       assert(itemPrimaryKey, '!itemPrimaryKey')
       assert(pageItems && Array.isArray(pageItems), 'Array.isArray(pageItems)')
 
+      { // исключаем дубликаты
+         // TODO!!! убрать debugUniqueOids??? (или пусть будет???) (поправить задваивание на сервере!!!!)
+         if (position === 'whole') {
+            this.debugUniqueOids.clear()
+         } else if (position === 'replace') {
+            let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === pageId)
+            if (pageIndx >= 0) {
+               let page = this.reactiveGroup.pages[pageIndx]
+               for (let item of page.pageItems) {
+                  this.debugUniqueOids.delete(item[page.itemPrimaryKey]) // удаляем старые
+               }
+            }
+         }
+         if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()// на всякий случай
+         pageItems = pageItems.filter(item => {
+            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
+            let res = !this.debugUniqueOids.has(item[itemPrimaryKey])
+            this.debugUniqueOids.add(item[itemPrimaryKey])
+            return res
+         })
+      }
       // обновляем данные списка в сответствии с уточненными данными
       this.reactiveGroup.totalCount = totalCount
       this.reactiveGroup.itemType = itemType
@@ -590,9 +616,10 @@ class Group {
          currentPageToken,
          currentPageSize: Math.max(pageItems.length, GROUP_BATCH_SZ)
       }
-      if (updatedPageId) { // обновить страницу
-         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
+      if (position === 'replace') { // обновить страницу
+         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === page.pageId)
          if (pageIndx >= 0) this.reactiveGroup.pages.splice(pageIndx, 1, page)
+         else logE('page for upldate not found!!!!', page, this.reactiveGroup.pages)
       } else if (position === 'top') { // добавить сверху
          this.reactiveGroup.pages.unshift(page)
          assert(page.currentPageToken, '!currentPageToken')
@@ -603,8 +630,7 @@ class Group {
          assert(page.currentPageToken, '!currentPageToken')
          assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'FORWARD', ' bad currentPageToken2')
       } else if (position === 'whole') {
-         assert(this.reactiveGroup.pages.length === 0, 'this.reactiveGroup.pages.let > 0')
-         this.reactiveGroup.pages.push(page)
+         this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length, page)
       } else throw new Error('bad position' + position)
       if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
@@ -815,7 +841,7 @@ class Group {
    async gotoStart () {
       if (this.paginateFunc) {
          this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length)
-         let rxDocPagination = await this.paginateFunc(null, GROUP_BATCH_SZ * 2)
+         let rxDocPagination = await this.paginateFunc()
          await this.upsertPaginationPage(rxDocPagination, 'whole')
       }
       let count
@@ -966,4 +992,4 @@ class ReactiveListWithPaginationFactory {
    }
 }
 
-export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactiveDoc, updateRxDocPayload }
+export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactive, updateRxDocPayload }

@@ -5,7 +5,7 @@ import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
-import { getReactiveDoc } from 'src/system/rxdb/reactive'
+import { getReactive } from 'src/system/rxdb/reactive'
 import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
@@ -51,7 +51,7 @@ class Event {
             })
             logD(f, 'found LST_FEED: ', rxDocsFeed)
             for (let rxDoc of rxDocsFeed) {
-               let reactiveItem = getReactiveDoc(rxDoc).getPayload()
+               let reactiveItem = getReactive(rxDoc).getPayload()
                assert(reactiveItem.items, '!reactiveItem.items')
                // logD(f, `add event to begin of list (${reactiveItem.items.length})`, reactiveItem)
                reactiveItem.items.splice(0, 0, event)

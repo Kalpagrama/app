@@ -111,7 +111,7 @@ class RxDBDummy {
          let { items, totalCount, nextPageToken, currentPageToken, prevPageToken } = await ListApi.getList(mangoQuery)
          let totalItems = items
          findResult.next = async (count) => {
-            if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 16 (12 + побочные запросы)
+            if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 36 (12 + побочные запросы)
             if (!count && findResult.nextIndex === 0) { // autoNext
                if (populateObjects) count = 12 // дорогая операция
                else count = totalItems.length // выдаем все элементы разом

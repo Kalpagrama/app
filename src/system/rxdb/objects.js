@@ -14,7 +14,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
 const QUEUE_MAX_SZ = 88 // макимальное число сущностей в очереди на запрос
-const BATCH_SZ = 16 // сколько за раз запрашивать с сервера
+const BATCH_SZ = 36 // сколько за раз запрашивать с сервера
 class QueryAccumulator {
    constructor () {
       this.queueMaster = []
@@ -257,7 +257,7 @@ class Objects {
 
    // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
    // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 16 штук. Последние запрошенные - в первую очередь
+   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 36 штук. Последние запрошенные - в первую очередь
    // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
    // priority -1 - если есть - вернет из кэша (с сервера запрашивать не будет)
    async get (id, notEvict, priority, clientFirst, force, onFetchFunc = null) {
