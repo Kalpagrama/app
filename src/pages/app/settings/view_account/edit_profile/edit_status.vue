@@ -5,7 +5,7 @@ div(
   }`
   ).row.full-width.q-px-xs
   .row.full-width.q-pl-sm
-    small.text-grey-6 {{$t('Status(tell about you)')}}
+    small.text-grey-6 {{$t('Status (tell about you)')}}
   q-input(
     v-model="status"
     type="textarea" autogrow dark color="white"

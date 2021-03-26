@@ -12,9 +12,14 @@
       q-btn(
         @click="editing = true"
         flat dense color="grey-6" no-caps size="sm") Изменить почту
-  .row.full-width
+  .row.full-width.q-px-sm
     //- change or create password call to action btns
-    div(v-if="!passwordChanging && !passwordCreating").row.full-width.q-px-sm
+    div(
+      v-if="!passwordChanging && !passwordCreating"
+      :style=`{
+        background: 'rgb(40,40,40)',
+        borderRadius: '10px',
+      }`).row.full-width.q-pa-sm
       q-btn(
         v-if="currentUser.settings.hasPermanentPassword"
         @click="passwordChanging = true, passwordCreating = true"

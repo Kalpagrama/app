@@ -101,7 +101,9 @@ div(
   div(
     v-if="!itemsRes"
     :style=`{
-      height: scrollTargetHeight/2+'px',
+      position: 'absolute', zIndex: 10, top: '0px',
+      height:scrollTargetHeight+'px',
+      //- height: scrollTargetHeight/2+'px',
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
