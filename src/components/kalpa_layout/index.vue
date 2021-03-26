@@ -1,34 +1,41 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative',
+    //- position: 'relative',
+    position: 'fixed', zIndex: 10, top: '0px', left: '0px', right: '0px',
     height: _height+'px',
+    maxHeight: $store.state.ui.viewportHeight+'px',
   }`
-  ).column.full-width
+  ).column.full-width.br
   //- header
   div(
     :style=`{
       position: 'absolute', zIndex: 2000, top: '0px',
     }`
-    ).row.full-width
+    ).row.full-width.bg
+    q-resize-observer(@resize="headerHeight = $event.height")
     //- small.text-white.bg-red {{ scrollTop }}
     slot(name="header" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
   //- body
   div(
     ref="body-wrapper"
+    v-touch-pan.mouse="onPan"
     :style=`{
       position: 'relative',
       //- paddingBottom: '500px',
     }`
     @scroll="onScroll"
     ).col.full-width.scroll
+    div(:style=`{height: headerHeight+8+'px'}`).row.full-width.br
     slot(name="body" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
+    div(:style=`{height: footerHeight+8+'px'}`).row.full-width.br
   //- footer
   div(
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '0px',
     }`
-    ).row.full-width
+    ).row.full-width.bg
+    q-resize-observer(@resize="footerHeight = $event.height")
     slot(name="footer" :scrollTop="scrollTop" :scrollHeight="scrollHeight")
 </template>
 
@@ -49,6 +56,8 @@ export default {
       scrollHeight: 0,
       scrollWidth: 0,
       bodyHeight: 0,
+      headerHeight: 0,
+      footerHeight: 0,
     }
   },
   computed: {
@@ -63,6 +72,11 @@ export default {
       this.scrollWidth = e.target.scrollWidth
       this.scrollHeight = e.target.scrollHeight
       this.bodyHeight = e.target.clientHeight
+    },
+    onPan (e) {
+      this.$log('onPan', e)
+      this.$q.notify({position: 'top', message: 'onPan'})
+      // this.footerHeight += e.delta.y
     }
   },
   mounted () {

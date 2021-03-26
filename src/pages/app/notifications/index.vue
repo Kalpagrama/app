@@ -1,5 +1,39 @@
 <template lang="pug">
-kalpa-layout
+kalpa-layout()
+  template(v-slot:header)
+    .row.full-width.justify-center.b-30
+      q-input(
+        v-model="searchString"
+        dark borderless
+        placeholder="Type something..."
+        :style=`{
+          padding: '10px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          fontWeight: 'bold',
+          fontSize: '20px',
+        }`).full-width
+  template(v-slot:footer)
+    .row.full-width.justify-center.b-30
+      q-input(
+        v-model="searchString"
+        dark borderless
+        placeholder="Type something..."
+        :style=`{
+          padding: '10px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          fontWeight: 'bold',
+          fontSize: '20px',
+        }`).full-width
+      .row.full-width
+        q-btn(round color="green" size='xl')
+  template(v-slot:body)
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
+        div(v-for="i in 100" :key="i").row.full-width.q-pa-md.text-red
+          .row.full-width {{ i }}
+          .row.full-width
+            small.text-grey-6 {{ $store.state.ui.viewportHeight }} / {{ $store.state.ui.viewportOffsetTop }}
+//- kalpa-layout
   template(v-slot:footer)
     kalpa-menu-mobile
   template(v-slot:body)
@@ -70,6 +104,7 @@ export default {
   },
   data () {
     return {
+      searchString: ''
     }
   },
   computed: {
