@@ -45,7 +45,7 @@ q-menu(
           }`
           ).text-white {{ p.name }}
     //- footer GUEST
-    div(
+    //- div(
       v-if="$store.getters.currentUser().profile.role === 'GUEST'"
       v-close-popup
       @click="$go('/auth/sign-in')"
@@ -58,6 +58,26 @@ q-menu(
       .col
         .row.fit.items-center.content-center
           span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Login')}}
+    div(
+      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+      @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
+      :style=`{
+        height: '60px',
+        borderRadius: '10px',
+        overflow: 'hidden'
+      }`
+      ).row.full-width.items-cener.content-center.menu-item
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center.q-ml-sm
+        div(
+          :style=`{
+            height: '40px', width: '40px',
+            minWidth: '40px', minHeight: '40px',
+            maxWidth: '40px', maxHeight: '40px',
+            borderRadius: '50%',
+          }`).row.b-50
+      div(v-if="!mini").col.full-height
+        .row.fit.items-center.content-center
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
     div(
       v-if="$store.getters.currentUser().profile.role !== 'GUEST'"

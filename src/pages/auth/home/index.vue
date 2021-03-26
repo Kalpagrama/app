@@ -30,7 +30,6 @@ kalpa-layout(
                   :src="'/images/space.png'"
                   :style=`{
                     objectFit: 'cover',
-                    //- maxHeight: '50vh'
                   }`
                   ).fit
                 //- logo
@@ -65,6 +64,7 @@ kalpa-layout(
       @click="() => {}"
       :style=`{position: 'relative',}`).row.full-width.items-start.content-start
       div(
+        @click="$emit('close')"
         :style=`{
           position: 'fixed',  zIndex: 1, top: '0px',
         }`
@@ -88,6 +88,7 @@ kalpa-layout(
           ).fit
       //- logo
       div(
+        @click="$emit('close')"
         :style=`{
           position: 'fixed', zIndex: 3, top: '0px',
           maxHeight: '55vh',
@@ -100,12 +101,12 @@ kalpa-layout(
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
           }`).q-mb-md
         .row.full-width.justify-center
-          router-link(
-            :to="'/trends'"
+          span(
             :style=`{fontSize: '30px',}`
             ).text-white {{$t('Kalpagrama')}}
       //- tint
       div(
+        @click="$emit('close')"
         :style=`{
           position: 'fixed', zIndex: 2, top: '0px',
           background: 'rgba(0,0,0,0.6)',
