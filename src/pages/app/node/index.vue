@@ -36,7 +36,8 @@ kalpa-layout()
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              widget-joints(:node="node")
+              page-joints(:node="node")
+              //- widget-joints(:node="node")
 </template>
 
 <script>
@@ -44,12 +45,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
+import pageJoints from './page_joints/index.vue'
 
 export default {
   name: 'pageApp_node',
   components: {
     navMobile,
     widgetJoints,
+    pageJoints,
   },
   data () {
     return {

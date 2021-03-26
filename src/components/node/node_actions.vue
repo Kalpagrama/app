@@ -36,7 +36,7 @@
           q-btn(
             round flat color="grey-9"
             :to="'/node/'+node.oid")
-            q-tooltip(dense dark) Микроядра
+            //- q-tooltip(dense dark) Микроядра
             q-icon(name="workspaces" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
@@ -53,7 +53,7 @@
             small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
           q-btn(round flat color="grey-9")
-            q-tooltip(dense dark) Связи
+            //- q-tooltip(dense dark) Связи
             q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col

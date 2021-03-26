@@ -1,90 +1,36 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
-  //- node
-  type-node(
-    v-if="item.type === 'NODE'"
-    :item="item")
-  //- content
-  div(
-    v-else-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
-    ).row.full-width.items-start.content-start
-    div(
-      :style=`{
-        background: 'rgb(35,35,35)',
-        borderRadius: '10px',
-      }`
-      ).row.full-width.items-start.content-start
-      img(
-        :src="url"
-        :style=`{
-          borderRadius: '10px',
-        }`
-        ).full-width
-      .row.full-width.items-center.content-center.no-wrap.q-pa-sm
-        q-icon(name="select_all" color="white" size="36px").q-mr-sm
-        span(:style=`{lineHeight: 1.2}`).text-white {{ item.name }}
-  //- composition
-  div(
-    v-else-if="item.__typename === 'Composition'"
-    ).row.full-width.items-start.content-start
-    type-video(
-      v-if="item.outputType === 'VIDEO'"
-      :item="item")
-    type-book(
-      v-if="item.outputType === 'BOOK'"
-      :item="item")
-    div(
-      v-else
-      ).row.full-width.items-start.content-start
-      img(
-        draggable="false"
-        :src="item.thumbUrl"
-        :style=`{
-          borderRadius: '10px',
-        }`
-        ).full-width
-      .row.full-width
-        small.text-white {{ item }}
-  //- else
-  div(
-    v-else
-    :style=`{
-      minHeight: '100px',
-    }`
-    ).row.full-width.items-start.content-start
-    img(
-      draggable="false"
-      :src="item.thumbUrl"
-      :style=`{
-        borderRadius: '10px',
-      }`
-      ).full-width
-    //- small.text-white {{ item }}
+component(
+  :is="itemComponent"
+  :item="item"
+  :isActive="isActive")
 </template>
 
 <script>
-import typeNode from './type_node.vue'
-import typeVideo from './type_video.vue'
 import typeBook from './type_book.vue'
-import assert from 'assert'
-import { ContentApi } from 'src/api/content'
+import typeImage from './type_image.vue'
+import typeVideo from './type_video.vue'
+import typeNode from './type_node.vue'
+import typeContent from './type_content.vue'
 
 export default {
   name: 'itemPreview',
   components: {
-    typeNode,
-    typeVideo,
     typeBook,
+    typeImage,
+    typeVideo,
+    typeNode,
+    typeContent,
   },
-  props: ['item'],
-  data () {
-    return {
-    }
-  },
+  props: ['item', 'isActive'],
   computed: {
-    url () { return ContentApi.urlSelect(this.item) }
-  },
-  methods: {
+    itemComponent () {
+      if (this.item.type === 'NODE') return 'type-node'
+      else if (['VIDEO', 'IMAGE', 'BOOK', 'GIF'].includes(this.item.type)) return 'type-content'
+      else if (this.item.__typename === 'Composition' && this.item.outputType === 'VIDEO') return 'type-video'
+      else if (this.item.__typename === 'Composition' && this.item.outputType === 'IMAGE') return 'type-image'
+      else if (this.item.__typename === 'Composition' && this.item.outputType === 'BOOK') return 'type-book'
+      else return null
+    }
   }
 }
 </script>

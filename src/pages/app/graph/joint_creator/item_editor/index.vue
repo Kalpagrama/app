@@ -22,59 +22,49 @@ kalpa-layout().b-30
       //- user
       //- ===
       //- content VIDEO
-      div(
+      composer-video(
         v-else-if="['VIDEO'].includes(item.type)"
-        ).row.full-width
-        composer-video(
-          :oid="item.oid"
-          :figures="null"
-          :height="$q.screen.height-0"
-          :fromComposition="false"
-          @composition="contentComposed('VIDEO', $event)"
-          @close="contentClosed('VIDEO')")
+        :oid="item.oid"
+        :figures="null"
+        :height="$q.screen.height-0"
+        :fromComposition="false"
+        @composition="contentComposed('VIDEO', $event)"
+        @close="contentClosed('VIDEO')")
       //- content BOOK
-      div(
+      composer-book(
         v-else-if="['BOOK'].includes(item.type)"
-        ).row.full-width
-        composer-book(
-          :oid="item.oid"
-          :figures="null"
-          :height="$q.screen.height-0"
-          @composition="contentComposed('BOOK', $event)"
-          @close="contetnClosed('BOOK')")
+        :oid="item.oid"
+        :figures="null"
+        :height="$q.screen.height-0"
+        @composition="contentComposed('BOOK', $event)"
+        @close="contetnClosed('BOOK')")
       //- content IMAGE
-      div(
+      composer-image(
         v-else-if="['IMAGE'].includes(item.type)"
-        ).row.full-width.justify-center
-        composer-image(
-          :oid="item.oid"
-          :figures="null"
-          :height="$q.screen.height-0"
-          @composition="contentComposed('BOOK', $event)"
-          @close="contetnClosed('BOOK')")
+        :oid="item.oid"
+        :figures="null"
+        :height="$q.screen.height-0"
+        @composition="contentComposed('BOOK', $event)"
+        @close="contetnClosed('BOOK')")
       //- ===
       //- composition VIDEO
-      div(
+      composer-video(
         v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
-        ).row.full-width
-        composer_video(
-          :oid="item.layers[0].contentOid"
-          :figures="item.layers[0].figuresAbsolute"
-          :height="$q.screen.height-0"
-          :fromComposition="true"
-          @composition="compositionChanged('VIDEO', $event)"
-          @close="compositionClosed('VIDEO')")
+        :oid="item.layers[0].contentOid"
+        :figures="item.layers[0].figuresAbsolute"
+        :height="$q.screen.height-0"
+        :fromComposition="true"
+        @composition="compositionChanged('VIDEO', $event)"
+        @close="compositionClosed('VIDEO')")
       //- composition BOOK
-      div(
+      composer-book(
         v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
-        ).row.full-width
-        composer_book(
-          :oid="item.layers[0].contentOid"
-          :figures="item.layers[0].figuresAbsolute"
-          :height="$q.screen.height"
-          :fromComposition="true"
-          @composition="compositionChanged('BOOK', $event)"
-          @close="compositionClosed('BOOK')")
+        :oid="item.layers[0].contentOid"
+        :figures="item.layers[0].figuresAbsolute"
+        :height="$q.screen.height"
+        :fromComposition="true"
+        @composition="compositionChanged('BOOK', $event)"
+        @close="compositionClosed('BOOK')")
       //- composition AUDIO
 </template>
 
@@ -120,7 +110,7 @@ export default {
       this.$log('contentClosed')
       // its bad? delete it? cos videos and books are too looong
       if (['VIDEO', 'BOOK'].includes(type)) {
-        this.$delete(this.joint.item, 1)
+        this.$delete(this.joint.items, 1)
         this.$emit('close')
       }
       else {

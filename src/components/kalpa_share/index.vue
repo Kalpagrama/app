@@ -53,11 +53,14 @@ q-btn(
         //- share native
         div(
           v-if="$q.platform.is.mobile"
-          ).row.full-width
+          ).row.full-width.q-px-md
           q-btn(
             outline no-caps color="green"
+            :style=`{
+              height: '50px',
+            }`
             @click="shareNative()"
-            )
+            ).full-width
             span {{ $t('Share via') }}
 </template>
 

@@ -101,7 +101,7 @@ div(
   div(
     v-if="!itemsRes"
     :style=`{
-      position: 'absolute', zIndex: 10, top: '0px',
+      position: 'absolute', zIndex: 10, top: '0px', left: '0px',
       height:scrollTargetHeight+'px',
       //- height: scrollTargetHeight/2+'px',
     }`

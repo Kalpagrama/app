@@ -1,5 +1,5 @@
 <template lang="pug">
-div(
+//- div(
   :style=`{
     position: 'relative',
     paddingBottom: Math.round(ratio*100)+'%',
@@ -7,7 +7,7 @@ div(
   }`
   ).row.full-width
   div(:style=`{position: 'absolute', zIndex: 100, top: 0}`).row.fit
-    composition(
+composition(
       :compositionKey="node.oid"
       :composition="node.items[0]"
       :isVisible="isVisible"

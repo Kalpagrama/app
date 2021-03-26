@@ -5,35 +5,13 @@ div(
     borderRadius: '10px',
   }`
   ).row.fit.items-start.content-start.justify-center.b-40
+  q-resize-observer(@resize="height = $event.height")
   //- footer
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="!isMini"
-      :style=`{
-        position: 'absolute', zIndex: 3000,
-        bottom: '0px',
-        borderRadius: '0 0 10px 10px',
-        userSelect: 'none',
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm
-      div(
-        @click="contextClick()"
-        :style=`{
-          background: 'rgba(0,0,0,0.1)',
-          borderRadius: '10px',
-        }`
-        ).row.items-center.content-center.q-py-xs.q-px-sm.cursor-pointer
-        q-icon(name="select_all" color="white" size="16px").q-ma-xs
-        span.text-white {{$t('Context')}}
-        //- span.text-white {{ composition.layers[0].contentName }}
-      .col
-      q-btn(
-        v-if="textMoreShow && !textContainerOverflowHidden"
-        round flat no-caps color="grey-6"
-        :icon="textContainerOverflowHidden ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"
-        @click="textContainerOverflowToggle"
-        )
-        //- span {{ textContainerOverflowHidden ? $t('Read') : $t('Hide') }}
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    context-bar(
+      v-if="isActive"
+      :contentKalpa=`{oid: composition.layers[0].contentOid, name: composition.layers[0].contentName}`
+      :height="height")
   //- footer gradient
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
@@ -62,8 +40,13 @@ div(
 </template>
 
 <script>
+import contextBar from './context_bar.vue'
+
 export default {
   name: 'typeBook',
+  components: {
+    contextBar,
+  },
   props: {
     compositionKey: {type: String},
     composition: {type: Object, required: true},
@@ -79,6 +62,7 @@ export default {
       textContainerOverflowHidden: true,
       textWrapperRef: null,
       textMoreShow: false,
+      height: 0,
     }
   },
   computed: {

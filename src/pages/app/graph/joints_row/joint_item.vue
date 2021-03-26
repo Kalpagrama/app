@@ -13,7 +13,7 @@
     ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
     slot
     //- frame
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="itemActive && !itemIndependent"
         :style=`{
@@ -93,22 +93,30 @@
       }`)
     //- ===
     //- composition
-    composition(
+    div(
       v-else-if="item.__typename === 'Composition'"
-      :composition="item"
-      :isActive="itemActive"
-      :isVisible="itemActive"
-      :isMini="false"
-      :styles=`{}`
-      :options=`{
-        loop: true,
-        //- nodeOid: node.oid,
-        footerOverlay: true,
-        showBar: false,
-        showHeader: true,
-        showFooter: true,
-        mode: 'feed',
-      }`)
+      :style=`{
+        position: 'relative',
+      }`
+      ).row.full-width
+      composition(
+        :composition="item"
+        :isActive="itemActive"
+        :isVisible="itemActive"
+        :isMini="false"
+        :styles=`{}`
+        :options=`{
+          loop: true,
+          //- nodeOid: node.oid,
+          footerOverlay: true,
+          showBar: false,
+          showHeader: true,
+          showFooter: true,
+          mode: 'feed',
+        }`
+        :style=`{
+          minHeight: 200+'px',
+        }`)
     //- TODO: sphere
     //- TODO: user
     //- ===
@@ -126,21 +134,21 @@
           bottom: '0px',
           overflow: 'hidden',
         }`
-        ).row.full-width.items-center.content-center.justify-start.q-pa-sm
+        ).row.full-width.items-center.content-center
         //- slot(name="context")
         div(
           :style=`{
             background: 'rgba(0,0,0,0.5)',
             borderRadius: '10px',
           }`
-          ).row.items-center.content-center.q-pa-sm
+          ).row.full-width.items-center.content-center.q-px-md.q-py-xs
           slot(name="context")
           router-link(
             :to="'/content/'+item.oid"
-            ).row.items-center.content-center
+            ).row.full-width.items-center.content-center
             q-icon(name="select_all" color="white" size="18px").q-mr-xs
             .col
-              span.text-white.text-bold {{ item.name }}
+              span.text-white.text-bold {{ $t('Context') }}
       img(
         draggable="false"
         :src="url"
@@ -201,9 +209,12 @@
       ).row.full-width
       router-link(
         :to="'/graph/'+item.oid"
-        ).row.full-width.q-pa-md
-        span.text-white {{$t('Joints:')}} {{ jointsRes.totalCount - 1 }}
-      .row.full-width.scroll.q-px-sm.q-pb-sm
+        ).row.full-width.items-center.content-center.q-pa-md
+        q-icon(name="fas fa-link" color="white" size="24px").q-mr-sm
+        span.text-white {{$t('Links:')}} {{ jointsRes.totalCount }}
+      div(
+        v-if="jointsRes && jointsRes.items.length > 0"
+        ).row.full-width.scroll.q-px-sm.q-pb-sm
         router-link(
           v-for="(i,ii) in jointsRes.items" :key="i.oid"
           v-if="i.oid !== joint.oid"

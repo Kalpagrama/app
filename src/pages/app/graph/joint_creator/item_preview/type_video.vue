@@ -46,7 +46,7 @@ export default {
   components: {
     contentPlayer
   },
-  props: ['item'],
+  props: ['item', 'isActive'],
   data () {
     return {
       contentKalpa: null,
@@ -74,12 +74,25 @@ export default {
         if (to < this.start) this.player.setCurrentTime(this.start)
         if (to > this.end) this.player.setCurrentTime(this.start)
       }
+    },
+    isActive: {
+      handler (to, from) {
+        this.$log('isActive', to)
+        if (!this.player) return
+        if (to) {
+          this.player.play()
+        }
+        else {
+          this.player.pause()
+        }
+      }
     }
   },
   methods: {
     playerReady (player) {
       this.$log('playerReady', player)
       this.player = player
+      if (!this.isActive) this.player.pause()
       // this.player.setState('figureOffset', this.item.layers[0].figuresAbsolute)
     }
   }

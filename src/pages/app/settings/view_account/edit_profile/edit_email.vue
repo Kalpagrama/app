@@ -22,18 +22,19 @@
       }`).row.full-width.q-pa-sm
       q-btn(
         v-if="currentUser.settings.hasPermanentPassword"
-        @click="passwordChanging = true, passwordCreating = true"
+        @click="() => {}"
         flat color="grey-6" no-caps size="sm") {{$t('Change email')}}
       q-btn(
         v-if="currentUser.settings.hasPermanentPassword"
-        @click="passwordChanging = true, passwordCreating = true"
+        @click="() => {}"
         flat color="grey-6" no-caps size="sm") {{$t('Change password')}}
       q-btn(
         v-if="!currentUser.settings.hasPermanentPassword"
-        @click="passwordCreating = true"
+        @click="() => {}"
         flat color="grey-6" no-caps size="sm") {{$t('Set password')}}
       q-btn(
         v-if="currentUser.settings.hasPermanentPassword"
+        @click="() => {}"
         flat color="red" no-caps size="sm") {{$t('Remove password')}}
     //- change password
     div(v-if="passwordChanging").row.full-width

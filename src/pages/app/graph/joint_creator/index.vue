@@ -1,5 +1,9 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center.b-30
+div(
+  :style=`{
+    height: $q.screen.height+'px',
+  }`
+  ).row.full-width.items-start.content-start.justify-center.b-30
   //- item finder
   q-dialog(
     v-model="itemFinderShow"
@@ -28,7 +32,7 @@
       @remove="itemRemove"
       @close="itemEditorShow = false")
   //- body
-  div(:style=`{paddingBottom: '300px',}`).row.full-width.justify-center.q-px-sm
+  .row.full-width.justify-center.q-px-sm
     div(
       :style=`{
         position: 'relative',
@@ -38,7 +42,7 @@
       }`
       ).row.full-width.items-start.content-start
       vertex-editor(:joint="joint")
-      //- item finder start btn
+      //- item ADD btn, opend itemFinder
       div(
         v-if="!joint.items[1]").row.full-width.q-px-sm.q-pb-sm
         q-btn(
@@ -49,17 +53,19 @@
           }`
           ).full-width.b-40
           span(:style=`{fontSize: '18px'}`) {{$t('Pick element to join')}}
-      //- item found: viewer
+      //- item PREVIEW
       div(
         v-if="joint.items[1]"
         :style=`{
           position: 'relative',
         }`
         ).row.full-width.q-px-sm.q-pb-sm
-        item-preview(:item="joint.items[1]")
-        //- item actions
+        item-preview(
+          :item="joint.items[1]"
+          :isActive="!isFocused")
+        //- Actions
         .row.full-width.justify-center.q-pt-md.q-pb-sm
-          //- item remove
+          //- Remove
           q-btn(
             flat color="red" icon="delete_outline"
             :style=`{
@@ -67,7 +73,7 @@
               height: '50px',
             }`
             @click="itemRemove()")
-          //- item publish
+          //- Publish
           .col.q-px-sm
             q-btn(
               @click="jointPublish"
@@ -77,7 +83,7 @@
                 height: '50px',
               }`).full-width
               span.text-bold {{$t('Publish')}}
-          //- item edit
+          //- Edit
           q-btn(
             flat color="white" icon="edit"
             :style=`{
@@ -93,7 +99,6 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
 import vertexEditor from './vertex_editor.vue'
-// import jointItem from '../joints_row/joint_item.vue'
 import itemEditor from './item_editor/index.vue'
 import itemPreview from './item_preview/index.vue'
 
@@ -102,8 +107,6 @@ export default {
   props: ['item', 'maxWidth'],
   components: {
     vertexEditor,
-    // jointItem,
-    // contentFragmenter,
     itemEditor,
     itemPreview,
   },

@@ -1,10 +1,20 @@
 <template lang="pug">
-node-feed(
-  v-if="node"
-  :node="node"
-  :isActive="true"
-  :isVisible="true"
-  :showActions="false")
+.row.full-width
+  div(
+    v-if="!node"
+    :style=`{
+      minHeight: '200px',
+      background: 'rgb(40,40,40)',
+      borderRadius: '10px',
+    }`
+    ).row.full-width.items-center.content-center.justify-center
+    q-spinner(size="50px" color="green")
+  node-feed(
+    v-if="node"
+    :node="node"
+    :isActive="isActive"
+    :isVisible="isActive"
+    :showActions="false")
 </template>
 
 <script>
@@ -12,7 +22,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'typeNode',
-  props: ['item'],
+  props: ['item', 'isActive'],
   data () {
     return {
       node: null,
