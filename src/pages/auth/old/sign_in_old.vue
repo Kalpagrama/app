@@ -106,7 +106,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
 <script>
 import { AuthApi } from 'src/api/auth'
 
-import withSocials from './with_socials.vue'
+import withSocials from '../old/with_socials.vue'
 import kalpaDocs from 'components/kalpa_docs/index.vue'
 
 export default {

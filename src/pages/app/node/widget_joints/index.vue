@@ -50,6 +50,7 @@
       div(v-if="jointsRes && jointsRes.items.length === 0").row.full-width.no-wrap.q-pa-sm
         q-btn(
           flat no-caps color="white" align="left"
+          :to="'/graph/'+node.oid"
           :style=`{
             height: '50px',
           }`

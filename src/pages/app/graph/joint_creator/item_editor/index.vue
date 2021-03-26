@@ -2,17 +2,8 @@
 kalpa-layout().b-30
   template(v-slot:body)
     .row.full-width.items-start.content-start
-      //- header
-      //- .row.full-width.justify-center
-        div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-center.content-center.q-pa-sm
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Item editor')}}
-          .col
-          q-btn(
-            round flat color="white" icon="clear"
-            @click="$emit('close')")
-      //- item
-      //- item-preview(:item="item")
-      //- node actions
+      //- ====
+      //- node
       div(
         v-if="item.type === 'NODE'"
         ).row.full-width
@@ -26,101 +17,130 @@ kalpa-layout().b-30
             }`
             ).full-width.q-mb-sm
             span {{$t('Change essence')}}
+      //- joint
+      //- sphere
+      //- user
+      //- ===
       //- content VIDEO
       div(
         v-else-if="['VIDEO'].includes(item.type)"
         ).row.full-width
-        video-fragmenter(
+        composer-video(
           :oid="item.oid"
           :figures="null"
           :height="$q.screen.height-0"
           :fromComposition="false"
-          @composition="contentFragmentDone")
+          @composition="contentComposed('VIDEO', $event)"
+          @close="contentClosed('VIDEO')")
       //- content BOOK
       div(
         v-else-if="['BOOK'].includes(item.type)"
         ).row.full-width
-        book-fragmenter(
+        composer-book(
           :oid="item.oid"
           :figures="null"
           :height="$q.screen.height-0"
-          @composition="contentFragmentDone")
+          @composition="contentComposed('BOOK', $event)"
+          @close="contetnClosed('BOOK')")
       //- content IMAGE
       div(
         v-else-if="['IMAGE'].includes(item.type)"
         ).row.full-width.justify-center
-        item-preview(
-          :item="item"
-          :style=`{
-            maxWidth: 500+'px',
-          }`)
-      //- composition actions
+        composer-image(
+          :oid="item.oid"
+          :figures="null"
+          :height="$q.screen.height-0"
+          @composition="contentComposed('BOOK', $event)"
+          @close="contetnClosed('BOOK')")
+      //- ===
+      //- composition VIDEO
       div(
         v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
         ).row.full-width
-        video-fragmenter(
+        composer_video(
           :oid="item.layers[0].contentOid"
           :figures="item.layers[0].figuresAbsolute"
           :height="$q.screen.height-0"
           :fromComposition="true"
-          @composition="contentFragmentDone"
-          @close="contentFragmenterShow = false")
-      //- for all
+          @composition="compositionChanged('VIDEO', $event)"
+          @close="compositionClosed('VIDEO')")
+      //- composition BOOK
       div(
-        v-else
-        ).row.full-width.q-pa-sm
-        q-btn(
-          outline no-caps color="green"
-          :style=`{
-            height: '50px',
-          }`
-          @click="$emit('close')").full-width.q-mb-sm Готово
-        q-btn(
-          outline no-caps color="red"
-          :style=`{
-            //- height: '50px',
-          }`
-          @click="$emit('remove')").full-width.q-mb-sm Удалить
+        v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
+        ).row.full-width
+        composer_book(
+          :oid="item.layers[0].contentOid"
+          :figures="item.layers[0].figuresAbsolute"
+          :height="$q.screen.height"
+          :fromComposition="true"
+          @composition="compositionChanged('BOOK', $event)"
+          @close="compositionClosed('BOOK')")
+      //- composition AUDIO
 </template>
 
 <script>
-import itemPreview from '../item_preview/index.vue'
-import videoFragmenter from './video_fragmenter.vue'
-import bookFragmenter from './book_fragmenter.vue'
-import imageFragmenter from './image_fragmenter.vue'
+import composerBook from './composer_book.vue'
+import composerImage from './composer_image.vue'
+import composerVideo from './composer_video.vue'
+// import composerAudio from './composer_audio.vue'
 
 export default {
   name: 'itemEditor',
   components: {
-    itemPreview,
-    videoFragmenter,
-    bookFragmenter,
-    imageFragmenter,
+    composerBook,
+    composerImage,
+    composerVideo,
+    // composerAudio,
   },
   props: ['joint', 'item'],
   data () {
     return {
       content: null,
       composition: null,
-      contentFragmenterShow: false,
     }
   },
   methods: {
-    contentFragmentStart () {
-      this.$log('contentFragmentStart')
-      this.contentFragmenterShow = true
-    },
-    contentFragmentDone (composition) {
-      this.$log('contentFragmentDone', composition)
-      this.content = JSON.parse(JSON.stringify(this.item))
-      this.contentFragmenterShow = false
+    // Composition
+    compositionChanged (type, composition) {
+      this.$log('compositionChanged', composition)
       this.$set(this.joint.items, 1, composition)
       this.$emit('close')
     },
-    compositionToContent () {
-      this.$log('compositionToContent')
-      this.$set(this.joint.items, 1, this.content)
+    compositionClosed (type) {
+      this.$log('compositionClosed')
+      this.$emit('close')
     },
+    // Content
+    contentComposed (type, composition) {
+      this.$log('contentComposed', composition)
+      this.$set(this.joint.items, 1, composition)
+      this.$emit('close')
+    },
+    contentClosed (type) {
+      this.$log('contentClosed')
+      // its bad? delete it? cos videos and books are too looong
+      if (['VIDEO', 'BOOK'].includes(type)) {
+        this.$delete(this.joint.item, 1)
+        this.$emit('close')
+      }
+      else {
+        this.$emit('close')
+      }
+    },
+    // Transforms
   },
+  created () {
+    this.$log('created')
+    // TODO save first composition version, to Redo the shit
+    // if (this.item.__typename === 'Composition') {
+    //   this.composition = JSON.parse(JSON.stringify(this.item))
+    // }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+  }
 }
 </script>

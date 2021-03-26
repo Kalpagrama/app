@@ -43,7 +43,7 @@ kalpa-layout(
               //- bottom
               .row.full-width.q-pb-sm.q-px-md
                 q-btn(
-                  v-if="fromComposition"
+                  v-if="true"
                   @click="$emit('close')"
                   flat no-caps color="red"
                   :style=`{
@@ -52,7 +52,7 @@ kalpa-layout(
                   ).q-mr-sm {{$t('Close')}}
                 .col
                 q-btn(
-                  @click="fragmentUpdate"
+                  @click="compositionUpdate"
                   no-caps color="green"
                   :disable="!player.figure"
                   :style=`{
@@ -66,7 +66,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'videoFragmenter',
+  name: 'composerVideo',
   components: {
     contentPlayer
   },
@@ -98,8 +98,8 @@ export default {
         this.player.play()
       })
     },
-    fragmentUpdate () {
-      this.$log('fragmentUpdate')
+    compositionUpdate () {
+      this.$log('compositionUpdate')
       let compositionInput = {
         id: Date.now().toString(),
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -110,12 +110,14 @@ export default {
           {
             id: Date.now().toString(),
             contentOid: this.contentKalpa.oid,
+            contentName: this.contentKalpa.name,
             figuresAbsolute: this.player.figure
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
         __typename: 'Composition',
       }
+      this.$log('compositionUpdate', compositionInput)
       this.$emit('composition', compositionInput)
     }
   }

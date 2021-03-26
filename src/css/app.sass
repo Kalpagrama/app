@@ -1,9 +1,9 @@
 *
   touch-action: manipulation
 html, body
-  position: relative
   font-family: 'Open Sans', sans-serif
   background: rgb(30,30,30) !important
+  position: relative
   overflow: hidden !important
   touch-action: none
   height: 100%
@@ -15,6 +15,14 @@ html, body
   height: 0px !important
 .scroll-clear::-webkit-scrollbar
   display: none // Safari and Chrome
+
+.rotating-slow
+  animation: rotation 15s infinite linear
+@keyframes rotation
+  from
+    transform: rotate(0deg)
+  to
+    transform: rotate(-359deg)
 
 // quasar styles
 .q-field--outlined .q-field__control

@@ -108,7 +108,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'content',
+      pageId: 'nodes',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       searchString: '',
@@ -120,7 +120,7 @@ export default {
     },
     pages () {
       let pages = [
-        {id: 'collections', name: this.$t('Collections')},
+        // {id: 'collections', name: this.$t('Collections')},
         {id: 'content', name: this.$t('Media')},
         {id: 'nodes', name: this.$t('Nodes')},
         {id: 'joints', name: this.$t('Joints')},
@@ -136,6 +136,7 @@ export default {
         },
         sort: [{createdAt: 'desc'}]
       }
+      // Get types
       if (this.pageId === 'content') {
         res.selector.type = {$in: ['IMAGE', 'VIDEO', 'BOOK']}
       }
@@ -147,6 +148,11 @@ export default {
       }
       else if (this.pageId === 'spheres') {
         res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
+      }
+      // Search by name
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
       }
       return res
     }

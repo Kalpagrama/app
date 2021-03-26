@@ -44,7 +44,7 @@ kalpa-layout(
               //- bottom
               .row.full-width.q-pb-sm.q-px-md
                 q-btn(
-                  v-if="fromComposition"
+                  v-if="true"
                   @click="$emit('close')"
                   flat no-caps color="red"
                   :style=`{
@@ -67,7 +67,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 export default {
-  name: 'bookFragmenter',
+  name: 'composerBook',
   props: ['oid', 'figures', 'height'],
   components: {
     contentPlayer

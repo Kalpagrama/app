@@ -14,7 +14,7 @@ div(
   ).row.full-width.items-start.content-start
   //- header
   .row.full-width.q-pb-lg.q-pt-sm
-    span(:style=`{fontSize: '22px',}`).text-white.text-bold {{$t('Welcome to kalpagrama')}}
+    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome to kalpagrama')}}
   //- email
   q-input(
     v-model="email"
@@ -172,9 +172,9 @@ export default {
         // this.$tween.to(this.$refs['wrapper-mobile'], 5, {height: 2000})
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password, null)
         if (result === false) throw new Error(`Error: ${failReason}`)
-        await this.$router.replace('/')
         this.$log('passwordSend done')
         this.passwordSending = false
+        this.finish()
       }
       catch (e) {
         this.$log('passwordSend error', e)
@@ -182,6 +182,16 @@ export default {
         this.passwordSending = false
       }
     },
+    async finish () {
+      this.$log('finish')
+      // Call callback if provided...
+      if (this.onSuccess) {
+        this.onSuccess()
+      }
+      else {
+        await this.$router.replace('/')
+      }
+    }
   },
 }
 </script>

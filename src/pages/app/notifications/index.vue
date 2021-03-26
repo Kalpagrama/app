@@ -1,5 +1,5 @@
 <template lang="pug">
-kalpa-layout()
+//- kalpa-layout()
   template(v-slot:header)
     .row.full-width.justify-center.b-30
       q-input(
@@ -33,9 +33,9 @@ kalpa-layout()
           .row.full-width {{ i }}
           .row.full-width
             small.text-grey-6 {{ $store.state.ui.viewportHeight }} / {{ $store.state.ui.viewportOffsetTop }}
-//- kalpa-layout
+kalpa-layout
   template(v-slot:footer)
-    kalpa-menu-mobile
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
