@@ -86,6 +86,7 @@ let adapter = 'idb'
 // let adapter = 'memory'
 
 let currentUser
+
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -555,6 +556,7 @@ class RxDBWrapper {
          if (!findResult) {
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+            let defaultPageSize = mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
@@ -615,9 +617,9 @@ class RxDBWrapper {
                   return populatedItems.filter(obj => !!obj)
                }
                let paginateFunc = async (pageToken, pageSize) => {
-                  assert(pageSize, 'bad pagination params')
+                  pageSize = defaultPageSize || defaultPageSize
                   let paginationMangoQuery = cloneDeep(mangoQuery)
-                  paginationMangoQuery.pagination = { pageSize, pageToken }
+                  paginationMangoQuery.pagination = { pageSize, pageToken: pageToken || null }
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
@@ -640,7 +642,7 @@ class RxDBWrapper {
                   }
                } else { // сначала
                   mangoQuery.pagination = {
-                     pageSize: mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000,
+                     pageSize: defaultPageSize,
                      pageToken: null
                   }
                }

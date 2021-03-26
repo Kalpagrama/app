@@ -841,7 +841,7 @@ class Group {
    async gotoStart () {
       if (this.paginateFunc) {
          this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length)
-         let rxDocPagination = await this.paginateFunc(null, GROUP_BATCH_SZ * 2)
+         let rxDocPagination = await this.paginateFunc()
          await this.upsertPaginationPage(rxDocPagination, 'whole')
       }
       let count
