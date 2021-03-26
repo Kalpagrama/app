@@ -316,7 +316,7 @@ class ReactiveDocFactory {
 }
 
 // группа (может содержать элементы либо другие группы)
-export const GROUP_BATCH_SZ = 12 // сервер работает пачками по 24 (12 + побочные запросы)
+export const GROUP_BATCH_SZ = 11 // сервер работает пачками по 55 (11 джойнтов - это 55 объектов(в джоинте 2 ядра и в каждом - 1 композиция))
 
 class Group {
    constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {

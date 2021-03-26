@@ -587,7 +587,6 @@ class RxDBWrapper {
                      })
                      populatedItems = await Promise.all(promises)
                   } else {
-                     let internalObjectPromises = [] // внутренние объекты ядра и джоинтов (запрашиваем сразу чтобы не ждать второго запроса)
                      let promises = itemsForPopulate.map(topObject => {
                         // logD('topObject=', topObject)
                         if (reactiveListFulFilled) {
@@ -595,24 +594,17 @@ class RxDBWrapper {
                            if (fulfilled) return fulfilled
                         }
                         assert(topObject.oid)
-                        if (topObject.type === 'NODE') {
-                           assert(topObject.internalItemOids && topObject.internalItemOids.length, 'topObject.internalItemOids && topObject.internalItemOids.length')
-                           internalObjectPromises.push(this.get(RxCollectionEnum.OBJ, topObject.internalItemOids[0], { clientFirst: true }))
-                        } else if (topObject.type === 'JOINT') {
-                           assert(topObject.internalItemOids && topObject.internalItemOids.length >= 2, 'topObject.internalItemOids && topObject.internalItemOids.length >= 2')
-                           internalObjectPromises.push(this.get(RxCollectionEnum.OBJ, topObject.internalItemOids[0], { clientFirst: true }))
-                           internalObjectPromises.push(this.get(RxCollectionEnum.OBJ, topObject.internalItemOids[1], { clientFirst: true }))
-                           if (topObject.internalItemOids[2]) internalObjectPromises.push(this.get(RxCollectionEnum.OBJ, topObject.internalItemOids[2], { clientFirst: true }))
-                           if (topObject.internalItemOids[3]) internalObjectPromises.push(this.get(RxCollectionEnum.OBJ, topObject.internalItemOids[3], { clientFirst: true }))
-                        }
                         return this.get(RxCollectionEnum.OBJ, topObject.oid, { clientFirst: true })
                            .then(populatedObject => {
                               let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
                               topObjectCopy.populatedObject = populatedObject
                               return topObjectCopy
-                              // return populatedObject
                            })
                      })
+                     let internalObjectPromises = [] // внутренние объекты ядра и джоинтов (запрашиваем с упреждением чтобы все уместилось в 1 запрос на бэкенд)
+                     for (let topObject of itemsForPopulate) {
+                        internalObjectPromises.push(...topObject.internalItemOids.map(oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true })))
+                     }
 
                      populatedItems = await Promise.all(promises)
                      await Promise.all(internalObjectPromises)

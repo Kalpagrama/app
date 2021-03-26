@@ -386,7 +386,6 @@ const objectFullFragment = gql`
 const topObjectFragment = gql`${figureFragment}
     fragment topObjectFragment on TopObject {
         oid
-        type
         name
         countVotes
         weight
