@@ -14,7 +14,7 @@ q-btn(
   }`)
   menu-popup()
   img(
-    v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+    v-if="!$store.getters.isGuest"
     :src="$store.getters.currentUser().profile.photoUrl"
     :style=`{
       width: size, minWidth: size, maxWidth: size,

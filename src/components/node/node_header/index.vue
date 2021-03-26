@@ -5,6 +5,7 @@ div(
     order: orderHeader,
   }`
   ).row.full-width.items-center.content-center
+  //- user VOTED
   q-btn(
     v-if="showAuthorAlways || node.rateUser !== null"
     :to="'/user/'+node.author.oid"
@@ -28,6 +29,7 @@ div(
           span(:style=`{whiteSpace: 'nowrap'}`).text-grey-4 {{ node.author.name }}
         //- .row.full-width
           small(:style=`{lineHeight: 0.5}`).text-grey-6 @username
+  //- user NOT voted
   div(
     v-else
     :style=`{
@@ -37,11 +39,13 @@ div(
     div(:style=`{width: '24px',minWidth: '24px',height: '24px',minHeight: '24px',borderRadius: '50%',}`).b-40.q-mr-sm
     .col
       div(:style=`{width: '100px', minWidth: '100px', height: '14px', borderRadius: '10px'}`).b-40
-      div(:style=`{width: '70px', minWidth: '70px', height: '10px', borderRadius: '10px',marginTop:'3px'}`).b-40
+      //- div(:style=`{width: '70px', minWidth: '70px', height: '10px', borderRadius: '10px',marginTop:'3px'}`).b-40
   .col
-  .row.items-center.content-center.justify-end.q-pt-xs
+  .row.items-center.content-center.justify-end
+    small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ node.countStat.countViews }}
+    q-icon(name="visibility" size="10px" color="grey-8").q-mx-xs
     small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ $date(node.createdAt, 'DD.MM.YYYY') }}
-    .row.full-width.items-center.content-center.justify-end
+    //- .row.full-width.items-center.content-center.justify-end
       q-icon(name="visibility" color="grey-8").q-mr-xs
       small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ node.countStat.countViews }}
   kalpa-menu-actions(
@@ -90,7 +94,7 @@ export default {
         //   }
         // }
       }
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      if (this.$store.getters.isGuest) {
         return res
       }
       if (this.nodeIsMine) {

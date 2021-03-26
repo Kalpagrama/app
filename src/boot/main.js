@@ -125,6 +125,19 @@ export default async ({ Vue, store, router: VueRouter }) => {
     //   console.log('$goDrop')
     //   goLast = null
     // }
+    Vue.prototype.$ym = function (target, payload) {
+      if (!window.ym) return
+      window.ym(
+        window.yaCounterId,
+        'reachGoal',
+        target,
+        {
+          from: this.$options.name,
+          user: store.getters.currentUser(),
+          ...payload
+        }
+      )
+    }
   } catch (err) {
     logC(err)
     throw err

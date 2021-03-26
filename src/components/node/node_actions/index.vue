@@ -146,7 +146,7 @@ export default {
   methods: {
     voteStart () {
       this.$log('voteStart')
-      if (this.$store.getters.currentUser().profile.role === 'GUEST') {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
         }

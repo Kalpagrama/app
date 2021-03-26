@@ -45,28 +45,16 @@ q-menu(
           }`
           ).text-white {{ p.name }}
     //- footer GUEST
-    //- div(
-      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
-      v-close-popup
-      @click="$go('/auth/sign-in')"
-      :style=`{
-        borderRadius: '10px',
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm.menu-item
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-icon(name="login" color="white" size="40px")
-      .col
-        .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Login')}}
     div(
-      v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+      v-if="$store.getters.isGuest"
+      v-close-popup
       @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
       :style=`{
         height: '60px',
         borderRadius: '10px',
         overflow: 'hidden'
       }`
-      ).row.full-width.items-cener.content-center.menu-item
+      ).row.full-width.items-cener.content-center.menu-item.q-mb-sm
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center.q-ml-sm
         div(
           :style=`{
@@ -80,7 +68,7 @@ q-menu(
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
     div(
-      v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
+      v-if="!$store.getters.isGuest"
       v-close-popup
       @click="$go('/user/'+$store.getters.currentUser().oid)"
       :style=`{
@@ -89,28 +77,11 @@ q-menu(
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(
-          v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
           :url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
-        div(
-          v-else
-          :style=`{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-          }`
-          ).b-60
       .col.full-heigh
         .row.fit.items-center.content-center
           span(
-            v-if="$store.getters.currentUser().profile.role !== 'GUEST'"
             :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-          div(
-            v-else
-            :style=`{
-              height: '24px',
-              borderRadius: '10px'
-            }`
-            ).full-width.b-60
           //- small.text-grey-4.full-width @username
 </template>
 

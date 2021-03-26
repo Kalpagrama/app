@@ -69,9 +69,6 @@ export default {
     }
   },
   computed: {
-    isGuest () {
-      return this.$store.getters.currentUser().profile.role === 'GUEST'
-    },
     size () {
       if (this.$q.screen.width > 350) return 46
       else return 46

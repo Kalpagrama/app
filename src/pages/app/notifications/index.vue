@@ -58,7 +58,7 @@ kalpa-layout
       .row.full-width.justify-center.q-pt-sm.q-px-sm
         //- guest
         div(
-          v-if="$store.getters.currentUser().profile.role === 'GUEST'"
+          v-if="$store.getters.isGuest"
           :style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
           .row.full-width.justify-center
             q-icon(name="login" color="grey-8" size="100px")
@@ -67,14 +67,15 @@ kalpa-layout
           .row.full-width.justify-center.q-pt-md
             q-btn(
               outline color="white" no-caps
-              :to="'/auth/sign-in'"
               :style=`{
                 height: '50px',
-              }`)
+              }`
+              @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
+            )
               h1.text-white {{$t('Login')}}
         //- user
         list-feed(
-          v-if="$store.getters.currentUser().profile.role !== 'GUEST' && sphereOid"
+          v-if="!$store.getters.isGuest && sphereOid"
           :query="query"
           itemsPerPage="24"
           :itemMiddlePersist="false"
