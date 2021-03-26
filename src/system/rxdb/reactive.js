@@ -67,7 +67,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor(object) {
+   constructor (object) {
       assert(typeof object === 'object')
       this.vm = new Vue({
          data: {
@@ -87,6 +87,7 @@ class ReactiveObjFactory {
       this.setReactiveDoc(object)
    }
 }
+
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
    constructor (rxDoc) {
@@ -388,7 +389,8 @@ class Group {
       assert(mangoQuery, '!mangoQuery')
       let rxDocs = await rxQuery.exec()
       assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
-      pageId = JSON.stringify(mangoQuery)
+      // не включаем pagination.pageSize (могут быть 2 страницы с разными pageSize)!
+      pageId = JSON.stringify(mangoQuery.selector) + '::pageToken=' + (mangoQuery.pagination ? JSON.stringify(mangoQuery.pagination.pageToken) : 'empty')
       pageItems = rxDocs.map(rxDoc => getReactive(rxDoc))
       totalCount = pageItems.length
       itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
@@ -396,7 +398,7 @@ class Group {
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesRxDoc (rxDoc, debugUniqueOids = new Set()) {
+   static getGroupPropertiesRxDoc (rxDoc) {
       assert(rxDoc && isRxDocument(rxDoc), '!rxDoc')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -410,7 +412,8 @@ class Group {
       let mangoQuery = rxDoc.props.mangoQuery
       assert(mangoQuery, '!mangoQuery')
       assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
-      pageId = rxDoc.id
+      // не включаем pagination.pageSize (могут быть 2 страницы с разными pageSize)!
+      pageId = JSON.stringify(mangoQuery.selector) + '::pageToken=' + (mangoQuery.pagination ? JSON.stringify(mangoQuery.pagination.pageToken) : 'empty')
       pageItems = items
       totalCount = totalCount_
       nextPageToken = nextPageToken_
@@ -455,7 +458,7 @@ class Group {
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static getGroupPropertiesArray (array, debugUniqueOids = new Set()) {
+   static getGroupPropertiesArray (array) {
       assert(array && Array.isArray(array), '!array')
       let totalCount, itemType, itemPrimaryKey // данные списка
       let pageId, pageItems, nextPageToken, prevPageToken, currentPageToken // данные текущей страницы
@@ -546,7 +549,7 @@ class Group {
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
             logD(f, 'List::rxDoc changed. try to change this.pageItems')
             assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            await this.upsertPaginationPage(rxDoc, null, change.id, false)
+            await this.upsertPaginationPage(rxDoc, 'replace', false)
             let { startFullFil, endFullFil } = this.fulFilledRange()
             if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                endFullFil = startFullFil = 0
@@ -559,13 +562,10 @@ class Group {
       }
    }
 
-   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, updatedPageId = null, subscribe = true) {
+   async upsertPaginationPage (rxQueryOrRxDocOrArray, position, subscribe = true) {
       const f = this.upsertPaginationPage
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
-      assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
-      if (position === 'whole') {
-         assert(this.reactiveGroup.pages.length === 0, 'whole можно вставлять только если нет и одной страницы!!!')
-      }
+      assert(position.in('top', 'bottom', 'whole', 'replace'), 'bad position')
       let {
          totalCount,
          itemType,
@@ -582,18 +582,20 @@ class Group {
       assert(itemPrimaryKey, '!itemPrimaryKey')
       assert(pageItems && Array.isArray(pageItems), 'Array.isArray(pageItems)')
 
-      {
+      { // исключаем дубликаты
          // TODO!!! убрать debugUniqueOids??? (или пусть будет???) (поправить задваивание на сервере!!!!)
-         if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()
-         if (updatedPageId) {
-            let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
+         if (position === 'whole') {
+            this.debugUniqueOids.clear()
+         } else if (position === 'replace') {
+            let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === pageId)
             if (pageIndx >= 0) {
                let page = this.reactiveGroup.pages[pageIndx]
-               for (let item of page.pageItems){
-                  this.debugUniqueOids.delete(item[page.itemPrimaryKey])
+               for (let item of page.pageItems) {
+                  this.debugUniqueOids.delete(item[page.itemPrimaryKey]) // удаляем старые
                }
             }
          }
+         if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()// на всякий случай
          pageItems = pageItems.filter(item => {
             if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
             let res = !this.debugUniqueOids.has(item[itemPrimaryKey])
@@ -601,7 +603,6 @@ class Group {
             return res
          })
       }
-
       // обновляем данные списка в сответствии с уточненными данными
       this.reactiveGroup.totalCount = totalCount
       this.reactiveGroup.itemType = itemType
@@ -615,9 +616,10 @@ class Group {
          currentPageToken,
          currentPageSize: Math.max(pageItems.length, GROUP_BATCH_SZ)
       }
-      if (updatedPageId) { // обновить страницу
-         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
+      if (position === 'replace') { // обновить страницу
+         let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === page.pageId)
          if (pageIndx >= 0) this.reactiveGroup.pages.splice(pageIndx, 1, page)
+         else logE('page for upldate not found!!!!', page, this.reactiveGroup.pages)
       } else if (position === 'top') { // добавить сверху
          this.reactiveGroup.pages.unshift(page)
          assert(page.currentPageToken, '!currentPageToken')
@@ -628,8 +630,7 @@ class Group {
          assert(page.currentPageToken, '!currentPageToken')
          assert(page.currentPageToken.indx >= 0 && page.currentPageToken.direction === 'FORWARD', ' bad currentPageToken2')
       } else if (position === 'whole') {
-         assert(this.reactiveGroup.pages.length === 0, 'this.reactiveGroup.pages.let > 0')
-         this.reactiveGroup.pages.push(page)
+         this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length, page)
       } else throw new Error('bad position' + position)
       if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
    }
