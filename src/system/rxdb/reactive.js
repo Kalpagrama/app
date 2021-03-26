@@ -19,9 +19,9 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
-function getReactiveDoc (rxDoc) {
-   let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
-   return reactiveDocFactory.getReactiveDoc()
+function getReactive (rxDocOrObject) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
+   return reactiveDocFactory.getReactive()
 }
 
 // все изменения rxDoc - только через эту ф-ю!!! Иначе - возможны гонки (из-за debounce)
@@ -43,7 +43,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
    }
    if (rxDoc) {
       let reactiveDocFactory = new ReactiveDocFactory(rxDoc)
-      let reactiveDoc = reactiveDocFactory.getReactiveDoc()
+      let reactiveDoc = reactiveDocFactory.getReactive()
       try {
          reactiveDocFactory.setDebouncedSave(debouncedSave)
          reactiveDocFactory.setSynchro(synchro)
@@ -66,6 +66,27 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
+class ReactiveObjFactory {
+   constructor(object) {
+      assert(typeof object === 'object')
+      this.vm = new Vue({
+         data: {
+            reactiveData: {},
+            rev: 1
+         }
+      })
+      this.getReactive = () => {
+         assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
+         return this.vm.reactiveData.doc
+      }
+      this.setReactiveDoc = (plainData) => {
+         assert(typeof plainData === 'object', 'typeof payload === \'object\'')
+         const reactiveDoc = plainData
+         Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+      }
+      this.setReactiveDoc(object)
+   }
+}
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
    constructor (rxDoc) {
@@ -77,7 +98,7 @@ class ReactiveDocFactory {
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
       if (rxDoc.reactiveItemHolderMaster) {
-         this.getReactiveDoc = rxDoc.reactiveItemHolderMaster.getReactiveDoc
+         this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
          // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
          // this.reactiveDocUnsubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocUnsubscribe
@@ -100,7 +121,7 @@ class ReactiveDocFactory {
          })
          this.debouncedSave = true
          this.synchro = true
-         this.getReactiveDoc = () => {
+         this.getReactive = () => {
             assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
             return this.vm.reactiveData.doc
          }
@@ -229,7 +250,7 @@ class ReactiveDocFactory {
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveDocSubscribe())
             this.reactiveDocUnsubscribe()
-            ReactiveDocFactory.mergeReactive(this.getReactiveDoc(), changePlainDoc)
+            ReactiveDocFactory.mergeReactive(this.getReactive(), changePlainDoc)
             this.setRev(changePlainDoc._rev)
             // logD(f, 'reactiveDoc changed stop')
          } finally {
@@ -262,7 +283,7 @@ class ReactiveDocFactory {
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
                   logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
-                     let newData = JSON.parse(JSON.stringify(this.getReactiveDoc())) // убираем реактивную хрень
+                     let newData = JSON.parse(JSON.stringify(this.getReactive())) // убираем реактивную хрень
                      newData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
                      if (synchro && this.itemType === 'wsItem') newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                      return newData
@@ -368,7 +389,7 @@ class Group {
       let rxDocs = await rxQuery.exec()
       assert(rxDocs && Array.isArray(rxDocs), '!rxDoc && Array.isArray(rxDoc)')
       pageId = JSON.stringify(mangoQuery)
-      pageItems = rxDocs.map(rxDoc => getReactiveDoc(rxDoc))
+      pageItems = rxDocs.map(rxDoc => getReactive(rxDoc))
       totalCount = pageItems.length
       itemType = mangoQuery.selector.groupByContentLocation ? 'GROUP' : 'ITEM'
       itemPrimaryKey = 'id'
@@ -518,7 +539,7 @@ class Group {
                } // если список не изменился - просто выходим
             }
             // logD(f, 'rxQuery changed 2', results)
-            let pageItemsNew = results.map(rxDoc => getReactiveDoc(rxDoc).getPayload())
+            let pageItemsNew = results.map(rxDoc => getReactive(rxDoc).getPayload())
             assert(this.reactiveGroup.pages.length === 1, 'this.reactiveGroup.pages.len != 1')
             let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
             assert(page, '!page')
@@ -966,4 +987,4 @@ class ReactiveListWithPaginationFactory {
    }
 }
 
-export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactiveDoc, updateRxDocPayload }
+export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactive, updateRxDocPayload }

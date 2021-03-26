@@ -17,7 +17,12 @@ import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
-import { getReactiveDoc, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
+import {
+   getReactive,
+   ReactiveDocFactory,
+   ReactiveListWithPaginationFactory,
+   updateRxDocPayload
+} from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
@@ -80,6 +85,7 @@ let adapter = 'idb'
 // let adapter = memdown
 // let adapter = 'memory'
 
+let currentUser
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -321,9 +327,9 @@ class RxDBWrapper {
          let { userOid, dummyUser } = authUser
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
-         let currentUser
+         // let currentUser
          if (userOid) {
-            currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
+            let currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
@@ -331,26 +337,13 @@ class RxDBWrapper {
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                }
             })
+            if (currentUser) ReactiveDocFactory.mergeReactive(currentUser, currentUserDb)
+            else currentUser = currentUserDb
             assert(currentUser, '!currentUser!!!!')// должен быть в rxdb после init
             this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
-            // assert(!dummyUser.oid)
-            // dummyUser.oid = 'dummyUser_oid_' + Date.now()
-            // let fetchCurrentUserFunc = async () => {
-            //    return {
-            //       notEvict: true, // живет вечно
-            //       item: dummyUser,
-            //       actualAge: 'infinity' // dummyUser не устаревает
-            //    }
-            // }
-            // assert(dummyUser.oid, 'dummyUser.oid')
-            // currentUser = await this.get(RxCollectionEnum.OBJ, dummyUser.oid, {
-            //    fetchFunc: fetchCurrentUserFunc,
-            //    force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-            //    clientFirst: false // обязательно брать из fetchFunc
-            // })
-            currentUser = dummyUser
+            currentUser = getReactive(dummyUser)
             assert(currentUser, '!currentUser (dummyUser)!!') // должен быть в rxdb после init
          }
 
@@ -759,7 +752,7 @@ class RxDBWrapper {
             beforeCreate
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactiveDoc(rxDoc)
+         reactiveDoc = getReactive(rxDoc)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
@@ -807,7 +800,7 @@ class RxDBWrapper {
       }
       if (!rxDoc) return null
       // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      return getReactiveDoc(rxDoc).getPayload()
+      return getReactive(rxDoc).getPayload()
    }
 
    async remove (id) {
@@ -859,5 +852,5 @@ const rxdbWrapper = new RxDBWrapper()
 export {
    rxdbWrapper,
    rxdbWrapper as rxdb,
-   getReactiveDoc
+   getReactive
 }
