@@ -4212,6 +4212,49 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "UrlWithFormat",
+        "description": null,
+        "fields": [
+          {
+            "name": "format",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "INTERFACE",
         "name": "Object",
         "description": "контент, ядро или цепочка, фрагмент и др.",
@@ -4746,16 +4789,24 @@
             "deprecationReason": null
           },
           {
-            "name": "url",
-            "description": "итоговый  файл. Сейчас === null (вместо этого надо играть катсы по отдельности)",
+            "name": "urlWithFormats",
+            "description": "файлы для проигрывания в разных кач-вах",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -5581,6 +5632,30 @@
                   "ofType": {
                     "kind": "INTERFACE",
                     "name": "Object",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "itemsShort",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
                     "ofType": null
                   }
                 }
@@ -7160,16 +7235,24 @@
             "deprecationReason": null
           },
           {
-            "name": "url",
-            "description": "ссылка на картинку",
+            "name": "urlWithFormats",
+            "description": "файлы картинки в разных кач-вах",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -7492,16 +7575,24 @@
             "deprecationReason": null
           },
           {
-            "name": "url",
-            "description": "ссылка на видео",
+            "name": "urlWithFormats",
+            "description": "файлы видео в разных кач-вах",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -7935,16 +8026,24 @@
             "deprecationReason": null
           },
           {
-            "name": "url",
-            "description": "ссылка на книгу",
+            "name": "urlWithFormats",
+            "description": "файлы книги в разных форматах",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -8974,7 +9073,7 @@
       {
         "kind": "ENUM",
         "name": "SortStrategyEnum",
-        "description": "HOT - наверху быстрорастущие; ESSENTIALLY - наверху близкие к сути; AGE - наверху - свежие; RELATING_TO_TIME - HOT, пересортированные по расположению на контенте",
+        "description": "HOT - наверху быстрорастущие; ESSENTIALLY - наверху близкие к сути; AGE - наверху - свежие; RELATING_TO_TIME - HOT, пересортированные по расположению на контенте; ACTIVITY - вверху те, на которых много активности",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -8999,6 +9098,12 @@
           },
           {
             "name": "RELATING_TO_TIME",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ACTIVITY",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -9412,6 +9517,22 @@
             "deprecationReason": null
           },
           {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ObjectTypeEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": null,
             "args": [],
@@ -9583,16 +9704,24 @@
             "deprecationReason": null
           },
           {
-            "name": "url",
+            "name": "urlWithFormats",
             "description": "ссылка на файл",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,

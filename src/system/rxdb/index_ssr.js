@@ -5,7 +5,7 @@ import { getRawIdFromId, getRxCollectionEnumFromId, makeId, rxdb } from 'src/sys
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { AuthApi } from 'src/api/auth'
 import cloneDeep from 'lodash/cloneDeep'
-import { ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
+import { ReactiveListWithPaginationFactory, GROUP_BATCH_SZ } from 'src/system/rxdb/reactive'
 import { ListsApi as ListApi } from 'src/api/lists'
 import { ObjectApi } from 'src/api/object'
 
@@ -111,9 +111,9 @@ class RxDBDummy {
          let { items, totalCount, nextPageToken, currentPageToken, prevPageToken } = await ListApi.getList(mangoQuery)
          let totalItems = items
          findResult.next = async (count) => {
-            if (populateObjects) assert(count <= 12, 'count <= 12! value =' + count) // сервер работает пачками по 36 (12 + побочные запросы)
+            if (populateObjects) assert(count <= GROUP_BATCH_SZ, `count <= ${GROUP_BATCH_SZ}! value =` + count)
             if (!count && findResult.nextIndex === 0) { // autoNext
-               if (populateObjects) count = 12 // дорогая операция
+               if (populateObjects) count = GROUP_BATCH_SZ // дорогая операция
                else count = totalItems.length // выдаем все элементы разом
             }
             findResult.nextPageIndex = findResult.nextIndex + count
@@ -122,7 +122,7 @@ class RxDBDummy {
             findResult.nextIndex = findResult.nextIndex + count
             let nextItems = totalItems.slice(fromIndex, findResult.nextIndex)
             let prefetchItems = []
-            if (count < 12) prefetchItems = totalItems.slice(findResult.nextIndex, findResult.nextIndex + 4) // упреждпющее чтение
+            if (count < GROUP_BATCH_SZ) prefetchItems = totalItems.slice(findResult.nextIndex, findResult.nextIndex + 4) // упреждпющее чтение
             if (populateObjects) nextItems = await populateFunc(nextItems, prefetchItems) // запрашиваем полные сущности
             findResult.splice(findResult.length, 0, ...nextItems)
             return findResult.nextIndex < totalItems.length

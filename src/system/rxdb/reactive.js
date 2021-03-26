@@ -316,7 +316,7 @@ class ReactiveDocFactory {
 }
 
 // группа (может содержать элементы либо другие группы)
-const GROUP_BATCH_SZ = 12
+export const GROUP_BATCH_SZ = 12 // сервер работает пачками по 24 (12 + побочные запросы)
 
 class Group {
    constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
@@ -874,9 +874,8 @@ class Group {
       //    logD('asdasdasasds')
       // }
       if (this.populateFunc && count > GROUP_BATCH_SZ) {
-         logW(f, 'next allow only 12 with populate')
-         // assert(count <= 12, 'count <= 12! value =' + count)
-         count = GROUP_BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
+         logW(f, `next allow only ${GROUP_BATCH_SZ} with populate`)
+         count = GROUP_BATCH_SZ
       }
       if (!count && this.reactiveGroup.items.length === 0) { // autoNext
          if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
@@ -918,8 +917,8 @@ class Group {
       this.reactiveGroup.itemsMaxLen = Math.max(Math.min(itemsMaxLen || 0, 100), 10)
       logD(f, 'start')
       if (this.populateFunc && count > GROUP_BATCH_SZ) {
-         logW('next allow only 12 with populate')
-         count = GROUP_BATCH_SZ // сервер работает пачками по 16 (12 + побочные запросы)
+         logW(`next allow only ${GROUP_BATCH_SZ} with populate`)
+         count = GROUP_BATCH_SZ
       }
       if (!count && this.reactiveGroup.items.length === 0) { // autoNext
          if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция

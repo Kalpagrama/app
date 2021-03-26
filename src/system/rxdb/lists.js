@@ -271,7 +271,7 @@ class Lists {
       if (foundGroup) {
          assert(foundGroup.items, '!foundGroup.items')
          assert(foundGroup.totalCount >= 0, 'foundGroup.totalCount >= 0')
-         // { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes }
+         // { oid, name, vertexType, figuresAbsoluteList, internalItemOids, rate, weight, countVotes }
          let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
@@ -348,7 +348,7 @@ class Lists {
          let reactiveDoc = getReactive(rxDoc).getPayload()
          assert(reactiveDoc.items, '!reactiveDoc.items')
          assert(reactiveDoc.totalCount >= 0, 'reactiveDoc.totalCount >= 0')
-         // { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes }
+         // { oid, name, vertexType, figuresAbsoluteList, internalItemOids, rate, weight, countVotes }
          let indx = reactiveDoc.items.findIndex(el => el.cutId === contentCut.cutId)
          if (indx === -1) {
             reactiveDoc.items.splice(0, 0, contentCut)
