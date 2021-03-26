@@ -25,7 +25,7 @@ div(
     :placeholder="$t('Enter your email')"
     :input-style=`{
       padding: '16px',
-      fontSize: '22px',
+      fontSize: '18px',
       fontWeight: 'bold',
       textAlign: 'center',
       color: 'white',
@@ -47,7 +47,7 @@ div(
       }`
       @click="emailSend()"
       ).full-width
-      span(:style=`{fontSize: '20px',}`).text-bold {{$t('Next')}}
+      span(:style=`{fontSize: '18px',}`).text-bold {{$t('Next')}}
   //- email sent
   div(
     v-if="emailSent").row.full-width.q-pt-lg
@@ -65,7 +65,7 @@ div(
       :disable="false"
       :input-style=`{
         padding: '16px',
-        fontSize: '22px',
+        fontSize: '18px',
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'white',
@@ -91,7 +91,7 @@ div(
       }`
       @click="passwordSend()"
       ).full-width.q-mt-md
-      span(:style=`{fontSize: '22px'}`).text-bold {{ $t('Login') }}
+      span(:style=`{fontSize: '18px'}`).text-bold {{ $t('Login') }}
     //- reset
     .row.full-width.q-pa-xs
       q-btn(
