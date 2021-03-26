@@ -452,13 +452,6 @@ class Group {
                throw new Error('bad rxDoc.props.mangoQuery.selector.rxCollectionEnum: ' + mangoQuery.selector.rxCollectionEnum)
          }
       }
-      // TODO!!! убрать debugUniqueOids (поправить задваивание)
-      pageItems = pageItems.filter(item => {
-         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item.name)
-         let res = !debugUniqueOids.has(item[itemPrimaryKey])
-         debugUniqueOids.add(item[itemPrimaryKey])
-         return res
-      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
@@ -478,18 +471,10 @@ class Group {
          } else return 'unknown'
       }
       itemPrimaryKey = detectArrItemPrimaryKey(pageItems)
-
-      // TODO!!! убрать debugUniqueOids (поправить задваивание)
-      pageItems = pageItems.filter(item => {
-         if (debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
-         let res = !debugUniqueOids.has(item[itemPrimaryKey])
-         debugUniqueOids.add(item[itemPrimaryKey])
-         return res
-      })
       return { pageId, pageItems, totalCount, itemType, itemPrimaryKey, nextPageToken, prevPageToken, currentPageToken }
    }
 
-   static async getGroupProperties (rxQueryOrRxDocOrArray, debugUniqueOids = new Set()) {
+   static async getGroupProperties (rxQueryOrRxDocOrArray) {
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) rxQuery = rxQueryOrRxDocOrArray
       else if (isRxDocument(rxQueryOrRxDocOrArray)) rxDoc = rxQueryOrRxDocOrArray
@@ -501,9 +486,9 @@ class Group {
       if (rxQuery) { // мастерская (элементы в списке [WS_ITEM])
          return await Group.getGroupPropertiesQuery(rxQuery)
       } else if (rxDoc) { // лента полученная с сервера {items, count, totalCount}
-         return Group.getGroupPropertiesRxDoc(rxDoc, debugUniqueOids)
+         return Group.getGroupPropertiesRxDoc(rxDoc)
       } else if (array) {
-         return Group.getGroupPropertiesArray(array, debugUniqueOids)
+         return Group.getGroupPropertiesArray(array)
       } else throw new Error('bad rxQueryOrRxDocOrArray')
    }
 
@@ -579,7 +564,6 @@ class Group {
       assert(isRxQuery(rxQueryOrRxDocOrArray) || isRxDocument(rxQueryOrRxDocOrArray) || Array.isArray(rxQueryOrRxDocOrArray), 'bad rxQueryOrRxDocOrArray')
       assert((!position && updatedPageId) || position.in('top', 'bottom', 'whole'), 'bad position')
       if (position === 'whole') {
-         this.debugUniqueOids.clear()
          assert(this.reactiveGroup.pages.length === 0, 'whole можно вставлять только если нет и одной страницы!!!')
       }
       let {
@@ -591,12 +575,32 @@ class Group {
          nextPageToken,
          prevPageToken,
          currentPageToken
-      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray, this.debugUniqueOids)
+      } = await Group.getGroupProperties(rxQueryOrRxDocOrArray)
       assert(pageId, '!pageId')
       assert(totalCount >= 0, '!totalCount')
       assert(itemType && itemType.in('GROUP', 'ITEM'), 'bad itemType')
       assert(itemPrimaryKey, '!itemPrimaryKey')
       assert(pageItems && Array.isArray(pageItems), 'Array.isArray(pageItems)')
+
+      {
+         // TODO!!! убрать debugUniqueOids??? (или пусть будет???) (поправить задваивание на сервере!!!!)
+         if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()
+         if (updatedPageId) {
+            let pageIndx = this.reactiveGroup.pages.findIndex(pg => pg.pageId === updatedPageId)
+            if (pageIndx >= 0) {
+               let page = this.reactiveGroup.pages[pageIndx]
+               for (let item of page.pageItems){
+                  this.debugUniqueOids.delete(item[page.itemPrimaryKey])
+               }
+            }
+         }
+         pageItems = pageItems.filter(item => {
+            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
+            let res = !this.debugUniqueOids.has(item[itemPrimaryKey])
+            this.debugUniqueOids.add(item[itemPrimaryKey])
+            return res
+         })
+      }
 
       // обновляем данные списка в сответствии с уточненными данными
       this.reactiveGroup.totalCount = totalCount
