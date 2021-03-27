@@ -9,7 +9,7 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
 import VueShowdown from 'vue-showdown'
-import { isEqual } from 'lodash'
+import isEqual from 'lodash/isEqual'
 
 // import Vue from 'vue'
 import VueVirtualScroller from 'vue-virtual-scroller'

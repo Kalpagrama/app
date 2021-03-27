@@ -33,7 +33,7 @@ div(
       name: composition.layers[0].contentName || 'Контекст',
       url: url,
       type: 'VIDEO',
-      contentSource: 'KALPA',
+      // contentSource: 'KALPA',
     }`
     :isActive="isActive"
     :isVisible="isVisible"

@@ -123,13 +123,12 @@ const sphereFragment = gql`${objectFragment}
 const videoFragment = gql`${objectFragment}
   fragment videoFragment on Video {
     ...objectFragment
+    contentProvider
     urlWithFormats{ format url }
     urlOriginal
     duration
     strips
-    contentProvider
-    contentSource
-    contentProvider
+#    contentSource
     relatedContent
     subtitlesRus: subtitles(lang: RUS)
     subtitlesEng: subtitles(lang: ENG)
@@ -138,18 +137,18 @@ const videoFragment = gql`${objectFragment}
 const bookFragment = gql`${objectFragment}
   fragment bookFragment on Book {
     ...objectFragment
-    urlWithFormats{ format url }
     contentProvider
-    contentSource
+    urlWithFormats{ format url }
+#    contentSource
   }
 `
 const imageFragment = gql`${objectFragment}
   fragment imageFragment on Image {
     ...objectFragment
+    contentProvider
     urlWithFormats{ format url }
     urlOriginal
-    contentProvider
-    contentSource
+#    contentSource
   }
 `
 
@@ -230,7 +229,7 @@ const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragm
     operation{... operationFragment}
     outputType
     urlWithFormats{ format url }
-    contentSource
+#    contentSource
   }
 `
 // const essenceFragmentLeaf = gql`

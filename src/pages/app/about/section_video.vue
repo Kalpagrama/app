@@ -28,7 +28,7 @@
         name: 'Кальпаграма',
         url: 'https://www.youtube.com/embed/DuqUaOtQ76o',
         type: 'VIDEO',
-        contentSource: 'YOUTUBE',
+        // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',
       }`
       :isActive="false"
