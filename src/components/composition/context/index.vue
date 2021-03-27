@@ -1,9 +1,10 @@
 <template lang="pug">
 div(
   :style=`{
-    height: heightMax === 0 ? 'calc('+heightMax+'% + 28px)' : 'calc('+heightMax+'% + 28px)',
+    //- height: heightMax === 0 ? 'calc('+heightMax+'% + 28px)' : 'calc('+heightMax+'% + 28px)',
+    height: heightMax+'%',
     minHeight: '27px',
-    background: 'rgba(0,0,0,0.9)',
+    background: 'rgba(0,0,0,0.8)',
     borderRadius: '10px',
   }`
   ).column.full-width.items-end.content-end.justify-end
@@ -56,21 +57,41 @@ div(
             @click="goContext()"
             ).full-width
             span.text-white {{ $t('Watch in context')}}
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="isActive"
         transition-show="jump-down"
         :style=`{
           height: '28px',
-          background: 'rgb(0,0,0)',
+          //- background: 'rgb(0,0,0)',
           borderRadius: '10px',
           paddingLeft: '14px',
         }`
-        @click="miniClick()"
         ).row.full-width.items-center.content-center.cursor-pointer
-        q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
-        //- small.text-grey-4 {{composition.layers[0].contentName}}
-        small.text-grey-4 {{$t('Context')}}
+        div(
+          @click="miniClick()"
+          ).col
+          .row.full-width.items-center.content-center
+          q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
+          //- small.text-grey-4 {{composition.layers[0].contentName}}
+          small.text-grey-4 {{$t('Context')}}
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="composition.outputType === 'VIDEO' && player"
+            ).row.items-center.content-center.q-px-xs
+            q-btn(
+              round flat
+              :color="'white'"
+              :icon="'replay'" size="xs"
+              @click="player.replay()").q-px-md
+            small.text-white {{ $time(player.currentTime) }}
+            small.text-white.q-mx-xs :
+            small.text-white {{ $time(player.duration) }}
+            q-btn(
+              round flat
+              :color="player.muted ? 'red' : 'white'"
+              :icon="player.muted ? 'volume_off' : 'volume_up'" size="xs"
+              @click="player.mutedToggle()").q-px-md
 </template>
 
 <script>
@@ -78,7 +99,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'context',
-  props: ['composition', 'isActive', 'isVisible', 'nodeOid', 'width', 'height'],
+  props: ['composition', 'isActive', 'isVisible', 'nodeOid', 'width', 'height', 'player'],
   data () {
     return {
       heightMax: 0,

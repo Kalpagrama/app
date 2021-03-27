@@ -106,7 +106,8 @@ div(
       //- height: scrollTargetHeight/2+'px',
     }`
     ).row.full-width.items-center.content-center.justify-center
-    q-spinner(size="50px" color="green")
+    //- q-spinner(size="50px" color="green")
+    q-spinner-dots(color="green" size="60px")
   //- got itemsRes and some items
   div(
     v-if="itemsRes"
@@ -452,11 +453,18 @@ export default {
       }
     },
     itemMiddleHandler (isVisible, entry) {
+      let [key, idxSting] = entry.target.accessKey.split('-')
       if (isVisible) {
         this.$log('isVisible', entry.target.accessKey)
         // if (this.scrollHeightChanging) return
-        let [key, idxSting] = entry.target.accessKey.split('-')
+        // let [key, idxSting] = entry.target.accessKey.split('-')
         this.itemMiddleSet(key, parseInt(idxSting))
+      }
+      else {
+        if (this.itemMiddle && this.itemMiddle.key === key) {
+          this.itemMiddle = null
+          this.$log('itemMiddle HIDE HIDE HIDE HIDE HIDE')
+        }
       }
     },
     itemMiddleSet (key, idx, useTop = true) {
@@ -505,7 +513,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
-      this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
+      if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
       await this.itemsRes.prev(this.itemsPerPage, this.itemsMax)
       this.$log('prev done')
       this.itemsResStatus = null
@@ -517,7 +525,7 @@ export default {
       if (this.itemsResStatus) return
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
-      this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
+      if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
       await this.itemsRes.next(this.itemsPerPage, this.itemsMax)
       this.$log('next done')
       this.itemsResStatus = null

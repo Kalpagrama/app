@@ -19,16 +19,6 @@ div(
       //- overflow: 'hidden',
     }`
     ).row.full-width.bg-black
-    context(
-      :nodeOid="nodeOid"
-      :composition="composition"
-      :isActive="isActive"
-      :isVisible="isVisible"
-      :height="height"
-      :width="width"
-      :style=`{
-        position: 'absolute', zIndex: 200, bottom: '-28px', left: '0px', right: '0px',
-      }`)
     from-video(
       v-if="composition.outputType === 'VIDEO'"
       :composition="composition"
@@ -37,6 +27,18 @@ div(
       :objectFit="isSquare ? 'cover' : null"
       :height="height"
       :width="width")
+      template(v-slot:footer=`{player}`)
+        context(
+          :nodeOid="nodeOid"
+          :composition="composition"
+          :isActive="isActive"
+          :isVisible="isVisible"
+          :height="height"
+          :width="width"
+          :player="player"
+          :style=`{
+            position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
+          }`)
     from-book(
       v-else-if="composition.outputType === 'BOOK'"
       :composition="composition"
@@ -55,7 +57,7 @@ div(
           borderRadius: '10px',
         }`
         ).fit
-  div(:style=`{height: '28px'}`).row.full-width
+  //- div(:style=`{height: '28px'}`).row.full-width
 </template>
 
 <script>
@@ -108,8 +110,8 @@ export default {
         if (r > 100) {
           r = 100
         }
-        if (r < 30) {
-          r = 30
+        if (r < 56.25) {
+          r = 56.25
         }
         return r
       }

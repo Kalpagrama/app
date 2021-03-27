@@ -3,7 +3,9 @@ div(
   :class=`{
     //- 'br': isVisible || isActive,
   }`
-  :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
+  :style=`{
+    position: 'absolute', zIndex: 10,
+  }`).row.fit.items-start.content-start
   //- div(
     :style=`{
       position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
@@ -12,14 +14,23 @@ div(
     ).row.full-with.bg-red.text-white.bg
     small.full-width currentTime: {{currentTime}}
     small.full-width urlMeta: {{urlMeta}}
+  slot(name="footer" :player="player")
+  div(
+    v-if="isActive && !currentTimeChanged"
+    :style=`{
+      position: 'absolute', zIndex: 101, top: '0px',
+      opacity: 0.5,
+    }`
+    ).row.fit.items-center.content-center.justify-center
+    q-spinner(color="white" size="50px")
   img(
-    v-show="!currentTimeChanged"
+    v-if="!currentTimeChanged"
     :src="composition.thumbUrl"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
-      opacity: 0.5,
+      opacity: currentTimeChanged ? 0 : 1,
     }`
     ).fit
   //- :poster="composition.thumbUrl"
@@ -53,6 +64,7 @@ export default {
     return {
       currentTime: null,
       currentTimeChanged: false,
+      player: null,
     }
   },
   computed: {
@@ -66,9 +78,15 @@ export default {
       ]
     },
     videoShow () {
-      // return this.isActive
+      // if (this.$q.platform.is.ios) {
+      //   return this.isActive || this.isVisible
+      // }
+      // else {
+      //   return this.isActive
+      // }
       // let currentTimeRight = currentTime
-      return this.isActive || this.isVisible
+      // return this.isActive || this.isVisible
+      return this.isActive
     },
   },
   watch: {
@@ -80,6 +98,8 @@ export default {
         }
         else {
           this.$refs['player-video'].pause()
+          this.$refs['player-video'].src = ''
+          this.$refs['player-video'].load()
           this.currentTimeChanged = false
         }
       }
@@ -88,32 +108,93 @@ export default {
       handler (to, from) {
         if (to && from) {
           this.currentTimeChanged = true
+          if (to > this.urlMeta[1].t) {
+            this.replay()
+          }
         }
       }
     }
   },
   methods: {
     videoClick (e) {
-      // this.$log('videoClick', e)
-      if (e.target.muted) {
+      this.$log('videoClick', e)
+      // if (e.target.muted) {
+      //   e.target.muted = false
+      // }
+      // else {
+      //   let width = e.target.clientWidth
+      //   let left = e.layerX
+      //   this.$log('videoClick', {width, left})
+      //   if (left / width > 0.5) {
+      //     if (e.target.paused) e.target.play()
+      //     else e.target.pause()
+      //   }
+      //   else {
+      //     this.videoRestart(e)
+      //   }
+      // }
+      if (e.target.muted && localStorage.getItem('k_sound')) {
         e.target.muted = false
       }
       else {
-        let width = e.target.clientWidth
-        let left = e.layerX
-        this.$log('videoClick', {width, left})
-        if (left / width > 0.5) {
-          if (e.target.paused) e.target.play()
-          else e.target.pause()
+        if (e.target.paused) e.target.play()
+        else e.target.pause()
+      }
+    },
+    replay () {
+      this.$log('replay')
+      if (this.$refs['player-video']) {
+        this.$refs['player-video'].currentTime = this.urlMeta[0].t
+        this.$refs['player-video'].play()
+      }
+    },
+    mutedToggle () {
+      this.$log('mutedToggle')
+      if (this.$refs['player-video']) {
+        if (this.$refs['player-video'].muted) {
+          localStorage.setItem('k_sound', 'on')
         }
         else {
-          this.videoRestart(e)
+          localStorage.removeItem('k_sound')
         }
+        this.$refs['player-video'].muted = !this.$refs['player-video'].muted
+        this.player.muted = !this.player.muted
+      }
+    },
+    setCurrentTime (t) {
+      this.$log('setCurrentTime')
+      if (this.$refs['player-video']) {
+        this.$refs['player-video'] = t + this.urlMeta[0].t
       }
     },
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
       this.currentTime = e.target.currentTime
+      if (this.player) {
+        this.player.muted = e.target.muted
+        this.player.duration = this.urlMeta[1].t - this.urlMeta[0].t
+        this.player.currentTime = e.target.currentTime - this.urlMeta[0].t
+      }
+      else {
+        this.player = {
+          play () {
+            e.target.play()
+          },
+          pause () {
+            e.target.pause()
+          },
+          setCurrentTime: this.setCurrentTime,
+          mutedToggle: this.mutedToggle,
+          replay: this.replay,
+          muted: e.target.muted,
+          duration: this.urlMeta[1].t - this.urlMeta[0].t,
+          currentTime: e.target.currentTime - this.urlMeta[0].t
+        }
+      }
+      if (localStorage.getItem('k_sound') && this.$q.platform.is.desktop) {
+        e.target.muted = false
+        this.player.muted = false
+      }
     },
     videoRestart (e) {
       this.$log('videoRestart', e)
@@ -128,6 +209,13 @@ export default {
       //   e.target.currentTime = this.urlMeta[0].t
       //   e.target.play()
       // }
+    }
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    if (this.$refs['player-video']) {
+      this.$refs['player-video'].src = ''
+      this.$refs['player-video'].load()
     }
   }
 }

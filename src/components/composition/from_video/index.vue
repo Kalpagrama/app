@@ -1,6 +1,8 @@
 <template lang="pug">
 //- component(is="video-active" v-bind="$props")
 component(is="video-always" v-bind="$props")
+  template(v-slot:footer=`{player}`)
+    slot(name="footer" :player="player")
 </template>
 
 <script>
