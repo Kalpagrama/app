@@ -14,7 +14,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
 const QUEUE_MAX_SZ = 88 // макимальное число сущностей в очереди на запрос
-const BATCH_SZ = 36 // сколько за раз запрашивать с сервера
+const BATCH_SZ = 55 // сколько за раз запрашивать с сервера
 class QueryAccumulator {
    constructor () {
       this.queueMaster = []
