@@ -4,7 +4,7 @@ div(
     //- 'br': isVisible || isActive,
   }`
   :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
-  div(
+  //- div(
     :style=`{
       position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
       opacity: 0.8,

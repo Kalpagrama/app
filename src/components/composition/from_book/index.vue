@@ -6,7 +6,7 @@ div(
   }`
   ).column.fit
   //- Debug
-  //- div(:style=`{position: 'absolute',zIndex: 100,top: '0px',left: '0px',borderRadius: '10px',}`).row.full-width.text-white.bg-red.q-pa-sm
+  div(:style=`{position: 'absolute',zIndex: 100,top: '0px',left: '0px',borderRadius: '10px',}`).row.full-width.text-white.bg-red.q-pa-sm
     small.full-width heightWrapper: {{ heightWrapper }}
     small.full-width heightP: {{ heightP }}
   //- Footer here...
@@ -22,15 +22,15 @@ div(
         'items-center': !isOverflowed,
         'content-center': !isOverflowed,
       }`
-      ).row.fit.q-pa-md
+      ).row.fit.q-px-md
       //- Paragraph wrapper
       div(
         ref="p-wrapper"
         :style=`{}`
-        ).row.full-wdith
+        ).row.full-width.q-pt-md.q-pb-lg
         p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
-        p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
-        p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
+        //- p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
+        //- p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
 </template>
 
 <script>

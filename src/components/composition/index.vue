@@ -12,6 +12,13 @@ div(
     overflow: 'hidden',
   }`
   ).row.full-width.bg-black
+  context(
+    :composition="composition"
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :style=`{
+      position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px',
+    }`)
   from-video(
     v-if="composition.outputType === 'VIDEO'"
     :composition="composition"
@@ -35,12 +42,14 @@ div(
 </template>
 
 <script>
+import context from './context/index.vue'
 import fromVideo from './from_video/index.vue'
 import fromBook from './from_book/index.vue'
 
 export default {
   name: 'composition',
   components: {
+    context,
     fromVideo,
     fromBook,
   },

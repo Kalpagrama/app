@@ -1,8 +1,8 @@
 <template lang="pug">
 div(
   :style=`{
-    //- position: 'relative',
-    position: 'fixed', zIndex: 10, top: '0px', left: '0px', right: '0px', bottom: '0px',
+    position: 'relative',
+    //- position: 'fixed', zIndex: 10, top: '0px', left: '0px', right: '0px', bottom: '0px',
     height: _height+'px',
     //- maxHeight: $store.state.ui.viewportHeight+'px',
   }`
