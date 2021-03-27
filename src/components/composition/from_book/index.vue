@@ -6,7 +6,7 @@ div(
   }`
   ).column.fit
   //- Debug
-  div(:style=`{position: 'absolute',zIndex: 100,top: '0px',left: '0px',borderRadius: '10px',}`).row.full-width.text-white.bg-red.q-pa-sm
+  //- div(:style=`{position: 'absolute',zIndex: 100,top: '0px',left: '0px',borderRadius: '10px',opacity:0.5,}`).row.full-width.text-white.bg-red.q-pa-sm
     small.full-width heightWrapper: {{ heightWrapper }}
     small.full-width heightP: {{ heightP }}
   //- Footer here...
@@ -26,9 +26,11 @@ div(
       //- Paragraph wrapper
       div(
         ref="p-wrapper"
-        :style=`{}`
+        :style=`{
+          fontSize: fontSize+'px',
+        }`
         ).row.full-width.q-pt-md.q-pb-lg
-        p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
+        p.text-white {{ epubCfiText }}
         //- p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
         //- p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
 </template>
@@ -45,7 +47,30 @@ export default {
   },
   computed: {
     isOverflowed () {
-      return this.heightWrapper - 40 <= this.heightP
+      return this.heightWrapper <= this.heightP
+    },
+    epubCfiText () {
+      return this.composition.layers[0].figuresAbsolute[0].epubCfiText
+    },
+    epubCfiTextLength () {
+      return this.epubCfiText.length
+    },
+    fontSize () {
+      let l = this.epubCfiTextLength
+      if (this.$q.screen.width > 768) {
+        if (l < 100) return 36
+        else if (l < 140) return 32
+        else if (l < 180) return 28
+        else if (l < 220) return 24
+        else return 14
+      }
+      else {
+        if (l < 100) return 22
+        else if (l < 140) return 20
+        else if (l < 180) return 18
+        else if (l < 220) return 16
+        else return 14
+      }
     }
   },
   mounted () {

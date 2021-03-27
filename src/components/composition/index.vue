@@ -5,40 +5,47 @@
   slot
 div(
   :style=`{
-    position: 'relative',
-    paddingBottom: paddingBottom+'%',
-    background: 'rgb(40,40,40)',
     borderRadius: '10px',
     overflow: 'hidden',
   }`
   ).row.full-width.bg-black
-  context(
-    :composition="composition"
-    :isActive="isActive"
-    :isVisible="isVisible"
-    :style=`{
-      position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px',
-    }`)
-  from-video(
-    v-if="composition.outputType === 'VIDEO'"
-    :composition="composition"
-    :isActive="isActive"
-    :isVisible="isVisible")
-  from-book(
-    v-else-if="composition.outputType === 'BOOK'"
-    :composition="composition"
-    :isActive="isActive"
-    :isVisible="isVisible")
   div(
-    v-else
-    :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
-    img(
-      :src="composition.thumbUrl"
+    :style=`{
+      position: 'relative',
+      paddingBottom: paddingBottom+'%',
+      background: 'rgb(40,40,40)',
+      borderRadius: '10px',
+      //- overflow: 'hidden',
+    }`
+    ).row.full-width.bg-black
+    context(
+      :composition="composition"
+      :isActive="isActive"
+      :isVisible="isVisible"
       :style=`{
-        objectFit: 'contain',
-        borderRadius: '10px',
-      }`
-      ).fit
+        position: 'absolute', zIndex: 200, bottom: '-28px', left: '0px', right: '0px',
+      }`)
+    from-video(
+      v-if="composition.outputType === 'VIDEO'"
+      :composition="composition"
+      :isActive="isActive"
+      :isVisible="isVisible")
+    from-book(
+      v-else-if="composition.outputType === 'BOOK'"
+      :composition="composition"
+      :isActive="isActive"
+      :isVisible="isVisible")
+    div(
+      v-else
+      :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
+      img(
+        :src="composition.thumbUrl"
+        :style=`{
+          objectFit: 'contain',
+          borderRadius: '10px',
+        }`
+        ).fit
+  div(:style=`{height: '28px'}`).row.full-width
 </template>
 
 <script>

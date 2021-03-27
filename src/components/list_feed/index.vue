@@ -332,8 +332,8 @@ export default {
         }
         if (!this.scrollTopChanging) this.$log('scrollTop START')
         // handle prev/next...
-        // if (to < this.paginationBufferHeight) await this.prev()
-        // if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+        if (to < this.paginationBufferHeight) await this.prev()
+        if (this.scrollBottom < this.paginationBufferHeight) await this.next()
         // changing...
         this.scrollTopChanging = true
         this.scrollTopTimeout = setTimeout(async () => {

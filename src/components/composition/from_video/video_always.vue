@@ -19,9 +19,9 @@ div(
       position: 'absolute', zIndex: 100, top: '0px',
       objectFit: 'contain',
       borderRadius: '10px',
-      opacity: 0.9,
+      opacity: 0.5,
     }`
-    ).fit.br
+    ).fit
   video(
     v-if="videoShow"
     ref="player-video"
@@ -72,6 +72,7 @@ export default {
   watch: {
     isActive: {
       handler (to, from) {
+        if (!this.$refs['player-video']) return
         if (to) {
           this.$refs['player-video'].play()
         }
@@ -108,7 +109,7 @@ export default {
       }
     },
     videoTimeupdate (e) {
-      this.$log('videoTimeupdate', e)
+      // this.$log('videoTimeupdate', e)
       this.currentTime = e.target.currentTime
     },
     videoRestart (e) {

@@ -27,16 +27,10 @@ export default {
   nodeDraft: null,
   nodeCreating: false,
   listFeedNeedDrop: false,
-  authGuard: null,
   // debug
   useDebug: false,
-  // other
-  docs: [
-    {id: 'terms', name: 'Пользовательское соглашение'},
-    {id: 'policy', name: 'Политика конфиденциальности'},
-    {id: 'dmca', name: 'DMCA (Регламент рассмотрения заявлений правообладателей)'},
-  ],
   kalpaWelcome: null,
+  authGuard: null,
   bookmarkTypes: [
     {
       id: 'content',
