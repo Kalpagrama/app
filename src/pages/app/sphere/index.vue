@@ -1,13 +1,9 @@
 <template lang="pug">
 kalpa-layout()
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
-      //- q-tabs(
-        active-color="green" switch-indicator no-caps
-        ).full-width
-        q-route-tab(
-          v-for="(t,ti) in tabs" :key="t.id"
-          :to="{params: {page: t.id}}" :name="t.id" :label="t.name")
       page-header(v-if="sphere" :sphere="sphere").q-mb-sm
       component(
         v-if="sphere"

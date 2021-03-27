@@ -12,7 +12,7 @@ div(
       v-if="isMounted"
       :style=`{
         position: 'absolute', zIndex: -1,
-        background: 'rgba(30,30,30,0.8)',
+        background: 'rgba(20,20,20,0.8)',
       }`
       @click.self="$emit('close')"
       ).row.fit
@@ -44,69 +44,50 @@ div(
         color="green" no-caps
         @click="showTutorial = true").col
         span.text-bold {{ $t('Start') }}
-  //- header
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="showTutorial"
-      :style=`{
-        position: 'absolute', zIndex: 200, top: '0px',
-      }`
-      ).row.full-width.q-pa-sm
-      .col
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  //- left/right next/prev
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="showTutorial"
-      @click="prev()"
-      :style=`{
-        position: 'absolute', zIndex: 100, top: '0px', left: '0px',
-        width: '30%',
-      }`
-      ).row.full-height
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="showTutorial"
-      @click="next()"
-      :style=`{
-        position: 'absolute', zIndex: 100, top: '0px', right: '0px',
-        width: '30%',
-      }`
-      ).row.full-height
   //- body
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-carousel(
-      v-if="showTutorial"
-      ref="slides-carousel"
-      v-model="slide"
-      transition-prev="slide-right"
-      transition-next="slide-left"
-      swipeable animated navigation arrows
-      infinite
-      :autoplay="10000"
-      control-color="white"
-      :style=`{
-        position: 'absolute',
-        zIndex: 10,
-      }`).fit
-      q-carousel-slide(
-        v-for="(s,si) in slides" :key="s.id"
-        :name="s.id"
+  div(:style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      q-carousel(
+        v-if="showTutorial"
+        ref="slides-carousel"
+        v-model="slide"
+        transition-prev="slide-right"
+        transition-next="slide-left"
+        swipeable animated navigation arrows
+        infinite
+        :autoplay="10000"
+        control-color="white"
         :style=`{
-          position: 'relative',
+          position: 'absolute',
           zIndex: 10,
-          userSelect: 'none',
-        }`
-        ).row.fit.items-center.content-center.justify-center.b-30
-        img(
-          draggable="false"
-          :src="s.url"
+        }`).fit
+        q-carousel-slide(
+          v-for="(s,si) in slides" :key="s.id"
+          :name="s.id"
           :style=`{
-            objectFit: 'contain',
-            pointerEvents: 'none',
+            position: 'relative',
+            zIndex: 10,
             userSelect: 'none',
           }`
-          ).fit
+          ).row.fit.items-center.content-center.justify-center.b-30
+          img(
+            draggable="false"
+            :src="s.url"
+            :style=`{
+              objectFit: 'contain',
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }`
+            ).fit
+  .row.full-width.justify-center.q-pa-sm
+    q-btn(
+      flat color="white" no-caps
+      :style=`{
+        height: '50px',
+        maxWidth: '300px',
+      }`
+      @click="$emit('close')")
+      span {{$t('Close')}}
 </template>
 
 <script>

@@ -13,8 +13,8 @@
             v-for="(d,di) in docs" :key="d.id"
             flat no-caps color="white" align="left"
             :class=`{
-              'b-50': doc ? doc.id === d.id : false,
-              'b-35': doc ? doc.id !== d.id : false,
+              'b-40': doc ? doc.id === d.id : false,
+              //- 'b-35': doc ? doc.id !== d.id : false,
             }`
             :style=`{
               textAlign: 'start',
@@ -46,39 +46,47 @@ export default {
   },
   data () {
     return {
-      docs_pack: null,
       docs: [],
       doc: null,
     }
   },
+  watch: {
+    '$route.query.docId': {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        if (this.docs.length === 0) await this.getDocs()
+        if (to) {
+          this.doc = this.docs.find(d => d.id === to)
+        }
+        else {
+          this.$router.push({query: {docId: this.docs[0].id}})
+        }
+      }
+    }
+  },
   methods: {
-    async getDocsPack () {
+    async getDocs () {
       this.$log('getDocs')
       const {items: [doc]} = await this.$contentful.getEntries({
         content_type: 'docs_pack',
         'fields.id': 'kalpa_app_rus',
       })
-      return doc
+      this.docs = doc.fields.docs.map(d => {
+        return {
+          id: d.sys.id,
+          name: d.fields.name,
+          body: d.fields.body
+        }
+      })
     },
     docClick (d, di) {
       this.$log('docClick', d, di)
-      this.doc = d
+      this.$router.push({query: {docId: d.id}})
     }
   },
   async mounted () {
     this.$log('mounted')
-    this.docs_pack = await this.getDocsPack()
-    this.$log('docs_pack', this.docs_pack)
-    this.docs = this.docs_pack.fields.docs.map(d => {
-      return {
-        id: d.sys.id,
-        name: d.fields.name,
-        body: d.fields.body
-      }
-    })
-    if (this.docs.length > 0) {
-      this.doc = this.docs[0]
-    }
   }
 }
 </script>

@@ -17,28 +17,30 @@ div(
     :src="composition.thumbUrl"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      objectFit: 'contain',
+      objectFit: objectFit || 'contain',
       borderRadius: '10px',
       opacity: 0.5,
     }`
     ).fit
+  //- :poster="composition.thumbUrl"
   video(
     v-if="videoShow"
     ref="player-video"
-    :src="url"
-    :poster="composition.thumbUrl"
+    type="video/mp4"
+    preload="metadata"
     :autoplay="isActive"
     :loop="true"
     :muted="true"
     :playsinline="true"
     :style=`{
-      objectFit: 'contain',
+      objectFit: objectFit || 'contain',
       borderRadius: '10px',
     }`
     @click="videoClick"
     @pause="videoPaused"
     @timeupdate="videoTimeupdate"
     ).fit
+    source(:src="url")
 </template>
 
 <script>
@@ -46,7 +48,7 @@ import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'videoAlways',
-  props: ['composition', 'isActive', 'isVisible'],
+  props: ['composition', 'isActive', 'isVisible', 'objectFit'],
   data () {
     return {
       currentTime: null,
@@ -78,6 +80,7 @@ export default {
         }
         else {
           this.$refs['player-video'].pause()
+          this.currentTimeChanged = false
         }
       }
     },

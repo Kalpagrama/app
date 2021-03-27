@@ -31,10 +31,12 @@ div(
       }`)
     //- ITEMS: one or two
     slot(name="items")
-    node-item(
+    composition(
       v-if="showItems && !$slots.items && node.items.length === 1"
-      v-bind="$props"
-      @itemActive="$emit('itemActive', $event)")
+      :composition="node.items[0]"
+      :isVisible="isVisible"
+      :isActive="isActive"
+      :nodeOid="node.oid")
     node-items(
       v-if="showItems && !$slots.items && node.items.length === 2"
       v-bind="$props"
@@ -79,8 +81,8 @@ div(
 </template>
 
 <script>
-import nodeItem from './node_item.vue'
-import nodeItems from './node_items.vue'
+// import nodeItems from './node_items.vue'
+import nodeItems from 'components/node/node_items/index.vue'
 import nodeActions from 'components/node/node_actions.vue'
 import nodeSpheres from 'components/node/node_spheres/index.vue'
 import nodeHeader from 'components/node/node_header/index.vue'
@@ -88,7 +90,6 @@ import nodeHeader from 'components/node/node_header/index.vue'
 export default {
   name: 'nodeFeed',
   components: {
-    nodeItem,
     nodeItems,
     nodeActions,
     nodeSpheres,

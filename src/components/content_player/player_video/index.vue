@@ -25,7 +25,7 @@ div(
     }`
     ).col.full-width
     component(
-      :is="playerComponent[contentKalpa.contentSource]"
+      :is="playerComponent"
       :contentKalpa="contentKalpa"
       :style=`{
         position: 'absolute',
@@ -63,14 +63,18 @@ export default {
   data () {
     return {
       player: null,
-      playerComponent: {
-        YOUTUBE: 'player-youtube',
-        KALPA: 'player-kalpa',
-      }
+      // playerComponent: {
+      //   YOUTUBE: 'player-youtube',
+      //   KALPA: 'player-kalpa',
+      // }
     }
   },
   computed: {
     url () { return ContentApi.urlSelect(this.contentKalpa) },
+    playerComponent() {
+      if (this.url.includes('youtu')) return 'player-youtube' // контент не выкачан - показываем плеер ютуба
+      else return 'player-kalpa' // есть выкачаннный контент
+    },
     figureOffset () {
       let arr = this.url.split('#t=')
       if (arr.length > 1) {

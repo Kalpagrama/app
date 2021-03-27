@@ -4,29 +4,48 @@ div(
   q-dialog(
     v-model="nodeShow"
     :maximized="true"
-    :full-width="true"
+    position="bottom"
     :contentStyle=`{
       //- backgroundColor: 'rgba(0,0,0,0.7)',
     }`)
     div(
       @click.self="nodeShow = false"
       :style=`{
+        height: $q.screen.height+'px',
         //- background: 'rgba(0,0,0,0.7)',
       }`
-      ).row.fit.items-center.content-center.justify-center
+      ).row.full-width.items-start.content-start.justify-center
       div(
-        v-if="nodeCreating"
-        :style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
-        h1(:style=`{fontSize: '36px',}`).text-white.text-bold Ядро создано 🎉
+        :style=`{
+          minHeight: '60px',
+        }`
+        ).row.full-width
+        div(
+          v-if="nodeCreating"
+          :style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
+          h1(:style=`{fontSize: '36px',}`).text-white.text-bold Ядро создано 🎉
       node-feed(
         :isActive="true"
         :isVisible="true"
         :node="player.nodePlaying"
         :style=`{
           maxWidth: 600+'px',
-          background: 'rgba(30,30,30,0.9)',
+          background: 'rgba(20,20,20,0.95)',
           borderRadius: '10px',
         }`).q-pb-sm
+      .row.full-width.justify-center
+        div(
+          :style=`{
+            maxWidth: 400+'px',
+          }`
+          ).row.full-width.q-pa-sm
+          q-btn(
+            outline no-caps color="white"
+            :style=`{
+              height: '50px',
+            }`
+            ).full-width
+            span.text-bold {{$t('Copy link')}}
   q-btn(
     @click="nodeRefresh()"
     round flat color="white" icon="refresh")

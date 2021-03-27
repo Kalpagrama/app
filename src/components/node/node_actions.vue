@@ -35,9 +35,9 @@
         .row.items-center.content-center
           q-btn(
             round flat color="grey-9"
-            :to="'/node/'+node.oid")
+            @click="contextGo()")
             //- q-tooltip(dense dark) Микроядра
-            q-icon(name="workspaces" size="22px")
+            q-icon(name="select_all" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countComments || '' }}
@@ -180,6 +180,11 @@ export default {
     }
   },
   methods: {
+    contextGo () {
+      this.$log('contextGo')
+      this.$store.commit('ui/stateSet', ['nodeOnContent', this.node.oid])
+      this.$router.push('/content/' + this.node.items[0].layers[0].contentOid)
+    },
     nodeVoteBallClick () {
       this.$log('nodeVoteBallClick')
       if (this.$store.getters.isGuest) {

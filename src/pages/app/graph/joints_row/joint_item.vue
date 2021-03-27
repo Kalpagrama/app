@@ -210,23 +210,24 @@
       router-link(
         :to="'/graph/'+item.oid"
         ).row.full-width.items-center.content-center.q-pa-md
-        q-icon(name="fas fa-link" color="white" size="24px").q-mr-sm
-        span.text-white {{$t('Links:')}} {{ jointsRes.totalCount }}
+        q-icon(name="fas fa-link" color="white" size="24px").q-mr-md
+        span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('Links')}} {{ jointsRes.totalCount }}
       div(
         v-if="jointsRes && jointsRes.items.length > 0"
         ).row.full-width.scroll.q-px-sm.q-pb-sm
-        router-link(
-          v-for="(i,ii) in jointsRes.items" :key="i.oid"
-          v-if="i.oid !== joint.oid"
-          :to="'/graph/'+item.oid+'?oid='+i.oid"
-          ).row.q-pr-xs
-          img(
-            draggable="false"
-            :src="i.populatedObject.items.find(j => j.oid !== item.oid).thumbUrl"
-            :style=`{
-              height: '50px',
-              borderRadius: '10px',
-            }`)
+        .row.no-wrap
+          router-link(
+            v-for="(i,ii) in jointsRes.items" :key="i.oid"
+            v-if="i.oid !== joint.oid"
+            :to="'/graph/'+item.oid+'?oid='+i.oid"
+            ).row.q-pr-sm
+            img(
+              draggable="false"
+              :src="i.populatedObject.items.find(j => j.oid !== item.oid).thumbUrl"
+              :style=`{
+                height: '50px',
+                borderRadius: '10px',
+              }`)
     //- no joints
     //- div(
       v-if="jointsRes.totalCount"

@@ -1,14 +1,14 @@
 <template lang="pug">
 div(
   :style=`{
-    height: height === 0 ? 'calc('+height+'% + 27px)' : 'calc('+height+'% + 29px)',
+    height: heightMax === 0 ? 'calc('+heightMax+'% + 28px)' : 'calc('+heightMax+'% + 28px)',
     minHeight: '27px',
     background: 'rgba(0,0,0,0.9)',
     borderRadius: '10px',
   }`
-  ).column.full-width.items-end.content-end
+  ).column.full-width.items-end.content-end.justify-end
     div(
-      v-show="height > 0"
+      v-show="heightMax > 0"
       :style=`{overflow: 'hidden',}`
       ).col.full-width
       div(
@@ -16,65 +16,52 @@ div(
         :style=`{overflow: 'hidden',}`
         @click.self="miniClick()"
         ).row.fit.items-start.content-start.q-pa-sm
-        .row.full-width.q-pa-md
+        .row.full-width.q-px-md.q-py-sm
           span(
+            :class=`{
+              //- 'q-my-lg': $q.screen.width > 768,
+            }`
             :style=`{
-              fontSize: '1rem',
+              fontSize: width > 300 ? '18px' : '12px',
             }`
           ).text-white.text-bold {{ contentKalpa.name }}
-        .row.full-width.q-px-md
-          img(
-            :src="contentKalpa.thumbUrl"
+        div(v-if="width > 300").row.full-width.q-px-md
+          router-link(
+            :to="'/content/'+contentKalpa.oid"
             :style=`{
-              height: '50px',
               borderRadius: '10px',
             }`
-          )
-          .col.q-pl-sm
-            div(
+            ).row.full-width.b-35.q-pa-xs
+            img(
+              :src="contentKalpa.thumbUrl"
               :style=`{
+                //- height: $q.screen.width > 768 ? '100px' : '50px',
                 height: '50px',
                 borderRadius: '10px',
-              }`).row.items-center.content-center.q-px-md.b-40
-              span(:style=`{fontSize: '18px',}`).text-white.text-bold {{contentKalpa.countStat.countNodes}} Nodes
-        //- img(
-          draggable="false"
-          :src="contentKalpa.thumbUrl"
-          :style=`{
-            borderRadius: '10px',
-            width: '40%',
-            //- maxWidth: '40%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-          }`
-          ).b-40
-        //- .col
-          .row.full-width.q-px-sm
-            span(
-              :style=`{
-                fontSize: '1rem',
-              }`
-            ).text-white.text-bold {{ contentKalpa.name }}
-            .row.full-width.text-white.q-py-sm
-              small.full-width {{ $t('Subscribers') }}: {{ contentKalpa.countStat.countSubscribers }}
-              small.full-width {{ $t('Views') }}: {{ contentKalpa.countStat.countViews }}
-              small.full-width {{ $t('Links') }}: {{ contentKalpa.countStat.countJoints }}
-              small.full-width {{ $t('Nodes') }}: {{ contentKalpa.countStat.countNodes }}
-            .row.full-width
-              q-btn(
-                outline no-caps color="white" icon="launch"
-                :style=`{
-                  height: '50px',
-                  maxWidth: '300px',
-                }`
-                ).full-width
-                span {{$t('Watch in context')}}
+              }`).q-mr-sm
+            .col
+              div(:style=`{minHeight: '50px',}`).row.full-width.items-center.justify-end
+                .row.items-center.content-center.q-pr-md
+                  span(:style=`{fontSize: '24px',lineHeight: 1}`).text-white.text-bold {{contentKalpa.countStat.countNodes}}
+                  span(:style=`{fontSize: '16px',}`).text-white.text-bold.q-ml-sm Nodes
+                //- .row.items-center.content-center.q-px-md
+                  span(:style=`{fontSize: '24px',lineHeight: 1}`).text-white.text-bold {{contentKalpa.countStat.countViews}}
+                  span(:style=`{fontSize: '16px',}`).text-white.text-bold.q-ml-sm Views
+        .row.full-width.q-px-md.q-pt-sm
+          q-btn(
+            outline no-caps color="white"
+            :style=`{
+              minHeight: '50px',
+            }`
+            @click="goContext()"
+            ).full-width
+            span.text-white {{ $t('Watch in context')}}
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="isActive"
         transition-show="jump-down"
         :style=`{
-          height: '27px',
+          height: '28px',
           background: 'rgb(0,0,0)',
           borderRadius: '10px',
           paddingLeft: '14px',
@@ -91,10 +78,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'context',
-  props: ['composition', 'isActive', 'isVisible'],
+  props: ['composition', 'isActive', 'isVisible', 'nodeOid', 'width', 'height'],
   data () {
     return {
-      height: 0,
+      heightMax: 0,
       contentKalpa: null,
     }
   },
@@ -108,7 +95,7 @@ export default {
           })
         }
         else {
-          this.$tween.to(this, 0.3, {height: 0})
+          this.$tween.to(this, 0.3, {heightMax: 0})
         }
       }
     }
@@ -117,7 +104,7 @@ export default {
     miniClick () {
       this.$log('miniClick')
       if (!this.contentKalap) this.getContent()
-      this.$tween.to(this, 0.3, {height: this.height === 100 ? 0 : 100})
+      this.$tween.to(this, 0.3, {heightMax: this.heightMax === 100 ? 0 : 100})
     },
     async getContent () {
       this.$log('getContent')
@@ -127,6 +114,11 @@ export default {
       this.$log('goContent')
       this.$router.push('/content/' + this.composition.layers[0].contentOid)
     },
+    goContext () {
+      this.$log('goContext')
+      if (this.nodeOid) this.$store.commit('ui/stateSet', ['nodeOnContent', this.nodeOid])
+      this.$router.push('/content/' + this.composition.layers[0].contentOid)
+    }
   }
 }
 </script>

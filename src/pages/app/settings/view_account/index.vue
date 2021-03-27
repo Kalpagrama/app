@@ -17,13 +17,11 @@ div(
       .col-xs-12.col-sm-8.q-px-sm
         edit-profile(:currentUser="currentUser")
         actions(:currentUser="currentUser")
-        .row.full-width.q-px-sm
-          .row.full-width.q-px-sm.q-py-xs
-            small.text-grey-8 Правовые документы:
-          kalpa-docs
-          .row.full-width.q-pl-sm.q-py-xs
+        .row.full-width.q-pa-sm
+          kalpa-docs()
+          .row.full-width.q-py-lg.q-px-sm
             small(
-              :style=`{userSelect: 'none', marginLeft: '0px'}`
+              :style=`{userSelect: 'none'}`
               ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 

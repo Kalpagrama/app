@@ -2,15 +2,26 @@
 kalpa-layout()
   template(v-slot:footer)
     nav-mobile(
+      v-if="$q.screen.lt.md"
       :pageId="pageId"
       @pageId="pageIdChange")
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.b-30
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pa-md
-          q-icon(name="adjust" color="white" size="30px").q-mr-sm
+      .row.full-width.justify-center.b-30.q-pa-sm
+        div(
+          :style=`{
+            maxWidth: $store.state.ui.pageWidth+'px',
+            borderRadius: '10px',
+          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
+          q-icon(name="adjust" color="white" size="30px").q-ml-sm
+          .col
           h1.text-white.text-bold {{$t('Node')}}
+          .col
+          //- tutorial
+          q-btn(
+            @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
+            round flat color="white" icon="fas fa-info")
       //- body
       div(
         :style=`{
@@ -30,7 +41,7 @@ kalpa-layout()
                   //- rootMargin: '-50% 0px'
                 }
               }`
-              ).row.full-width.q-px-sm
+              ).row.full-width
               node-feed(
                 :node="node"
                 :isActive="nodeIsVisible"

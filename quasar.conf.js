@@ -95,7 +95,7 @@ module.exports = function (ctx) {
             'AddressbarColor',
             'AppVisibility',
             'Dialog',
-            // 'LoadingBar',
+            'LoadingBar',
             'Loading'
          ]
       },

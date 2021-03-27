@@ -13,7 +13,8 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`)
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      div(
+      router-link(
+        :to="itemLink(item)"
         :style=`{
           background: 'rgb(35,35,35)',
           borderRadius: '10px',

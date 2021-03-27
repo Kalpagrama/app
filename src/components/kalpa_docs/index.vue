@@ -1,39 +1,35 @@
 <style lang="sass">
 .doc-item
   &:hover
-    color: white !important
+    color: green !important
 </style>
 
 <template lang="pug">
-.row.full-width.text-grey-4.q-px-sm
-//- .row.full-width.items-start.content-start.justify-center
-  //- header
-  div(
-    v-if="title"
-    ).row.full-width.justify-center.q-py-sm
-    small.text-grey-9 {{ title }}
-  //- body
-  div(
-    :style=`{
-      ...styles,
+.row.full-width.q-px-sm
+  router-link(
+    v-for="(d,di) in docs" :key="d.id"
+    flat no-caps color="white" align="left"
+    :to=`{
+      path: '/settings/docs',
+      query: {
+        docId: d.id,
+      }
     }`
-    ).row.full-width.items-start.content-start.justify-center.q-px-sm
-    router-link(
-      v-for="(d,di) in docs" :key="di"
-      :to="'/docs/'+d.id"
-      :style=`{
-      }`
-      ).row.full-width.justify-start
-      small.text-grey-9.doc-item {{ d.name }}
+    :class=`{
+    }`
+    :style=`{
+      textAlign: 'start',
+      borderRadius: '10px',
+    }`
+    @click="docClick(d,di)"
+    ).row.full-width.doc-item
+    small(:class=`[docColor]`) {{ d.name }}
 </template>
 
 <script>
-import RichTextRenderer from 'contentful-rich-text-vue-renderer'
-
 export default {
   name: 'kalpaDocs',
   components: {
-    RichTextRenderer
   },
   props: {
     title: {
@@ -41,21 +37,22 @@ export default {
     },
     titleColor: {
       type: String,
-      default: 'white',
+      default: 'text-grey-9',
     },
     docColor: {
       type: String,
-      default: 'white'
+      default: 'text-grey-9'
     },
   },
   data () {
     return {
-      doc: null,
-      // docs: []
+      docsPack: null,
+      docs: null,
     }
   },
   methods: {
-    async getDocs () {
+    async getDocsPack () {
+      this.$log('getDocs')
       const {items: [doc]} = await this.$contentful.getEntries({
         content_type: 'docs_pack',
         'fields.id': 'kalpa_app_rus',
@@ -64,10 +61,16 @@ export default {
     },
   },
   async mounted () {
-    this.$log('created')
-    let doc = await this.getDocs()
-    this.$log('doc', doc)
-    this.doc = doc.fields.docs[0].fields.body
+    this.$log('mounted')
+    this.docsPack = await this.getDocsPack()
+    this.$log('docsPack', this.docsPack)
+    this.docs = this.docsPack.fields.docs.map(d => {
+      return {
+        id: d.sys.id,
+        name: d.fields.name,
+        body: d.fields.body
+      }
+    })
   }
 }
 </script>

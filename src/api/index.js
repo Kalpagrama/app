@@ -1,8 +1,9 @@
-// import { LoadingBar } from 'quasar'
+import { LoadingBar } from 'quasar'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { notify } from 'src/boot/notify'
+import store from 'src/store'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -10,11 +11,11 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 const apiMutex = new MutexLocal('apiMutex')
 
-// LoadingBar.setDefaults({
-//    color: 'green',
-//    size: '4px',
-//    position: 'top'
-// })
+LoadingBar.setDefaults({
+   color: 'green',
+   size: '4px',
+   position: 'top'
+})
 
 async function apiCall (func, cb, serialize = true) {
    assert(func && typeof func === 'function' && typeof cb === 'function')
@@ -23,7 +24,7 @@ async function apiCall (func, cb, serialize = true) {
    const t1 = performance.now()
    let t2 = performance.now()
    try {
-      // LoadingBar.start()
+      if (store && store.state.ui.useDebug) LoadingBar.start()
       if (serialize) await apiMutex.lock(func.nameExtra || func.name)
       t2 = performance.now()
       let result = await cb()
@@ -37,7 +38,7 @@ async function apiCall (func, cb, serialize = true) {
       throw err
    } finally {
       if (serialize) apiMutex.release()
-      // LoadingBar.stop()
+      if (store && store.state.ui.useDebug) LoadingBar.stop()
    }
 }
 
