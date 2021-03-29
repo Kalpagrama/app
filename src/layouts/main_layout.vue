@@ -81,9 +81,9 @@ export default {
     if (userTutorials.main === false) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
     }
-    // Node categories
-    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
-    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
+    // // Node categories
+    // let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
+    // this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   async mounted () {
     this.$log('mounted')

@@ -186,6 +186,7 @@ export default {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum 5 spheres!')})
         return
       }
+      if (this.sphere.length === 0) return
       // do stuff
       this.node.spheres.push({name: this.sphere})
       this.sphere = ''

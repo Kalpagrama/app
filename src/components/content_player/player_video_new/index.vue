@@ -208,7 +208,7 @@ export default {
       }
       else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
-          this.duration = this.player_.duration
+          this.duration = this.$refs.videoRef.duration
         }
       }
       // Loaded!
@@ -238,10 +238,16 @@ export default {
       if (this.playerType === 'player-youtube') {
         this.playing = false
       }
+      else if (this.playerType === 'player-kalpa') {
+        this.playing = false
+      }
     },
     videoPlaying (e) {
       this.$log('videoPlaying', e)
       if (this.playerType === 'player-youtube') {
+        this.playing = true
+      }
+      else if (this.playerType === 'player-kalpa') {
         this.playing = true
       }
     },

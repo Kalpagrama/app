@@ -182,13 +182,13 @@ div(
                 width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
                 minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
                 //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
-                borderLeft: (mi !== 0 && (minWidthMin > 40 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none',
+                borderLeft: (mi !== 0 && (minWidthMin > 20 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none',
                 pointerEvents: 'none',
                 overflow: 'hidden',
               }`
               ).row
               small(
-                v-if="zoomed ? true : minWidthMin > 50"
+                v-if="zoomed ? true : minWidthMin > 30"
                 :style=`{
                   fontSize: '8px',
                   marginLeft: mi === 0 ? '8px' : '4px',
