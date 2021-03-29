@@ -275,7 +275,7 @@ class Lists {
          let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
-               foundGroup.items.splice(0, 0, { oid: object.oid, figuresAbsoluteList: objectFiguresAbsoluteList })
+               foundGroup.items.splice(0, 0, { oid: object.oid, figuresAbsoluteList: objectFiguresAbsoluteList, internalItemOids: [] })
                foundGroup.totalCount++
             }
          } else if (type === 'OBJECT_DELETED') {
