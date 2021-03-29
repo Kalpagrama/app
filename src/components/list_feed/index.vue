@@ -222,7 +222,7 @@ export default {
     itemsPerPage: {
       type: Number,
       default () {
-        return 12
+        return 11
       }
     },
     itemsMax: {

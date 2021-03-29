@@ -50,7 +50,7 @@ div(
     @click="videoClick"
     @pause="videoPaused"
     @timeupdate="videoTimeupdate"
-    ).fit.br
+    ).fit
     source(:src="url")
 </template>
 

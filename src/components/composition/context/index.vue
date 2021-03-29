@@ -127,12 +127,13 @@ export default {
   computed: {
     contentKalpaActivity () {
       if (this.contentKalpa) {
+        //  + this.contentKalpa.relatedContent.length
         return Object.values(this.contentKalpa.countStat).reduce((acc, val) => {
           if (Number.isInteger(val)) {
             acc += val
           }
           return acc
-        }, 0) + this.contentKalpa.relatedContent.length
+        }, 0)
       }
       else {
         return null
