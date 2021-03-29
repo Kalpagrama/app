@@ -11,22 +11,22 @@ div(
   }`
   ).column.fit
   .col.full-width.scroll
-    .row.full-width.justify-center
+    .row.full-width.justify-center.q-px-md
       div(
         :style=`{
         }`).row.full-width.items-start.content-start
         //- header
         .row.full-width
-          .row.full-width.q-px-lg.q-py-md
-            span(:style=`{fontSize: '22px',}`).text-white.text-bold {{ contentKalpa.name }}
+          .row.full-width.q-py-md
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ contentKalpa.name }}
           //- stats
-          .row.full-width.q-px-lg.q-pb-sm
+          .row.full-width.q-pb-sm
             span.text-grey-3.q-mr-xs {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
             span.text-grey-3.q-mr-xs • {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
           //- origin
           div(
             v-if="contentKalpa.contentProvider !== 'KALPA'"
-            ).row.full-width.items-center.content-center.q-pl-md
+            ).row.full-width.items-center.content-center
               q-btn(
                 @click="goOriginal"
                 align="left"
@@ -44,7 +44,7 @@ div(
                   v-if="contentKalpa.contentProvider === 'YOUTUBE'"
                   ).text-bold.text-grey-3 YouTube
           //- actions
-          .row.full-width.items-center.content-center.q-px-md
+          .row.full-width.items-center.content-center
             kalpa-share(type="content" color="grey-2" :item="contentKalpa")
             kalpa-bookmark(
               v-if="contentKalpa"
@@ -59,14 +59,15 @@ div(
             //- tutorial
             q-btn(
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: false, useProfileEditor: false}])"
-              round flat color="white" icon="fas fa-info")
+              round flat color="white")
+              q-icon(name="help_outline" size="22px")
             kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
         //- related content
         div(
           :style=`{
-            marginBottom: '300px',
+            //- marginBottom: '300px',
           }`
-          ).row.full-width.q-px-md.q-pt-xl.q-mt-xl
+          ).row.full-width.q-pt-lg
           div(
             @click="relatedContentClick(c,ci)"
             v-for="(c,ci) in contentKalpa.relatedContent" :key="ci"
@@ -114,7 +115,7 @@ import { ContentApi } from 'src/api/content'
 import * as assert from 'assert'
 
 export default {
-  name: 'pageDetails',
+  name: 'pageInfoRoot',
   props: {
     contentKalpa: {type: Object, required: true},
     player: {type: Object, required: true},

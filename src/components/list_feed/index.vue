@@ -455,7 +455,7 @@ export default {
     itemMiddleHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       if (isVisible) {
-        this.$log('isVisible', entry.target.accessKey)
+        // this.$log('isVisible', entry.target.accessKey)
         // if (this.scrollHeightChanging) return
         // let [key, idxSting] = entry.target.accessKey.split('-')
         this.itemMiddleSet(key, parseInt(idxSting))
@@ -468,11 +468,11 @@ export default {
       }
     },
     itemMiddleSet (key, idx, useTop = true) {
-      this.$log('ims', key, idx, useTop)
+      // this.$log('ims', key, idx, useTop)
       if (key) {
         if (this.itemMiddlePersist) this.itemsRes.setProperty('currentId', key)
         let item = this.itemsRes.items[idx]
-        this.$log('ims item.name', item?.name)
+        // this.$log('ims item.name', item?.name)
         let itemRef = this.$refs[`item-${key}`]
         if (itemRef && itemRef[0]) {
           itemRef = itemRef[0]
@@ -507,10 +507,10 @@ export default {
       setScrollPosition(this.scrollTarget, 0)
     },
     async prev () {
-      this.$log('prev')
       if (!this.itemsRes) return
       if (!this.itemsRes.hasPrev) return
       if (this.itemsResStatus) return
+      this.$log('prev')
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
       if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
@@ -519,10 +519,10 @@ export default {
       this.itemsResStatus = null
     },
     async next () {
-      this.$log('next')
       if (!this.itemsRes) return
       if (!this.itemsRes.hasNext) return
       if (this.itemsResStatus) return
+      this.$log('next')
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
       if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})

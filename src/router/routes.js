@@ -36,8 +36,24 @@ const routes = [
       }
    },
    {
-      path: '/docs/:id?',
-      component: () => import('layouts/docs_layout.vue')
+      path: '/help',
+      redirect: '/help/home',
+      component: () => import('layouts/help_layout.vue'),
+      children: [
+         {
+            path: 'home',
+            component: () => import('pages/help/home.vue'),
+         },
+         {
+            path: ':docId',
+            component: () => import('pages/help/doc.vue')
+         }
+      ],
+      meta: { roleMinimal: 'GUEST' },
+      beforeEnter: (to, from, next) => {
+         window.KALPA_LOAD_COMPLETE = true // чтобы крутилка не показывалась
+         next()
+      }
    },
    {
       path: '/share' // этот маршрут обрабатыватся хуком в initPWA()

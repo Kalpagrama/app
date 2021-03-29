@@ -1,16 +1,29 @@
 <template lang="pug">
 .column.fit
-  .row.full-width
-    slot(name="header")
-  .col.full-width.scroll
+  .row.full-width.justify-center
+    div(
+      :style=`{
+        maxWidth: 600+'px',
+      }`
+      ).row.full-width.items-center.content-center.q-px-md.q-py-sm
+      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Ядра')}} {{$time(player.currentTime)}}
+      .col
+      //- q-btn(round flat color="white" icon="search")
+      //- q-btn(round flat color="white" icon="more_vert")
+      //- q-input(
+        v-model="searchString"
+        placeholder="search"
+        borderless dark dense
+        ).col.br
+  div(:style=`{position: 'relative',}`).col.full-width.scroll
     .row.full-width.items-strat.content-start.justify-center
       list-feed(
         ref="list-feed"
         :query="query"
         :itemMiddlePersist="false"
         :style=`{
-          maxWidth: 650+'px',
-          marginBottom: '100px',
+          maxWidth: 600+'px',
+          //- marginBottom: '100px',
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)
@@ -21,9 +34,9 @@
             }`
             ).row.full-width.items-start.content-start
             //- group header
-            .row.full-width.q-py-sm.q-px-md
-              div().row.full-width.q-px-sm
-                small.text-grey-6 {{ group.name }}
+            .row.full-width.q-pt-sm.q-px-md
+              div().row.full-width
+                small.text-grey-8 {{ group.name.split('-')[0] }}
             .row.full-width
               //- prev
               .row.full-width.q-px-sm

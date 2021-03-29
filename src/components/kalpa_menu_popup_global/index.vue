@@ -12,7 +12,7 @@ q-btn(
   :style=`{
     ...styles,
   }`)
-  menu-popup()
+  menu-popup(:offset="offset")
   img(
     v-if="!$store.getters.isGuest"
     :src="$store.getters.currentUser().profile.photoUrl"
@@ -31,9 +31,7 @@ q-btn(
     q-icon(name="menu" color="grey-7" size="24px")
   div(
     v-if="showLabel"
-    :style=`{
-      //- marginTop: '-4px',
-    }`).row.full-width.justify-center
+    ).row.full-width.justify-center
     small {{$t('Menu')}}
 </template>
 
@@ -62,6 +60,12 @@ export default {
       type: Object,
       default () {
         return {}
+      }
+    },
+    offset: {
+      type: Array,
+      default () {
+        return [16, 16]
       }
     }
   },
