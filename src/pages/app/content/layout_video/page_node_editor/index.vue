@@ -1,13 +1,13 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
   div(:style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
-    .row.full-width
+    .row.full-width.items-start.content-start
       div(
         :style=`{
           borderRadius: '0 0 10px 10px',
           background: 'rgb(40,40,40)',
         }`
-        ).row.full-width
+        ).row.full-width.items-start.content-start
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-spheres(
             v-if="node.spheres.length > 0"
@@ -327,6 +327,7 @@ export default {
         // ---
         // where to wait for the progress of node creating ?
         // here ?
+        this.$emit('node', nodeCreating)
       }
       catch (e) {
         this.$log('nodePublish error', e)

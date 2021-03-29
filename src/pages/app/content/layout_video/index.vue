@@ -41,7 +41,8 @@ div(
           :style=`{
             borderRadius: '10px',
             overflow: 'hidden',
-          }`).b-30
+          }`
+          @node="node = $event, pageId = 'node'").b-30
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
