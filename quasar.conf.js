@@ -240,7 +240,7 @@ module.exports = function (ctx) {
             key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
             cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
          },
-         open: true // opens browser window automatically
+         open: false // opens browser window automatically
       },
 
       // animations: 'all', // --- includes all animations

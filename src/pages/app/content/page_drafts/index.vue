@@ -29,7 +29,7 @@ div(
     slot
     //- header: stats, actions
     .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-white.text-bold.q-ml-sm {{$t('Drafts')}} {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
+      span.text-white.text-bold.q-ml-sm {{$t('Notes')}} {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
       .col
       //- q-btn(
       //-   @click="drop()"

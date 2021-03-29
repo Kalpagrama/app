@@ -5,83 +5,81 @@ div(
     height: $q.screen.height+'px',
   }`
   ).column.full-width.bg-black
-  //- body
-  .col.full-width
-    div(
-      :style=`{
-        position: 'relative',
-      }`
-      ).row.fit.justify-center
+  img(
+    @load="contentKalpaThumbUrlLoaded"
+    :src="contentKalpa.thumbUrl"
+    :style=`{
+      position: 'absolute', zIndex: 100, top: '0px',
+      opacity: 0,
+      pointerEvents: 'none',
+    }`
+    ).full-width
+  content-player(
+    :contentKalpa="contentKalpa"
+    :options=`{
+      showPult: $q.screen.gt.sm ? true : !pageId,
+      showTint: $q.screen.gt.sm ? true : !pageId,
+    }`
+    @player="playerReady"
+    ).fit.bg-black
+    template(v-slot:pult)
       div(
-        :style=`{
-          position: 'relative',
-          //- maxWidth: 650+'px',
-          overflow: 'hidden',
-        }`
-        ).row.fit
-        //- node editor mobile
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          div(
-            v-if="player && $q.screen.lt.lg"
-            :style=`{
-              position: 'absolute', zIndex: 10000, top: '0px',
-            }`
-            ).row.full-width.q-pa-sm
-            node-creator(
-              :player="player"
-              :contentKalpa="contentKalpa")
-        //- pages desktop
-        transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-          div(
-            v-if="pageId && player"
-            @click.self="pageId = null"
-            :style=`{
-              position: 'absolute', zIndex: 900, top: '0px',
-            }`
-            ).row.fit.items-end.content-end.justify-center
-            div(
-              :style=`{
-                maxWidth: 650+'px',
-                maxHeight: 'calc(100% - 60px)',
-                background: 'rgba(30,30,30,0.95)',
-                borderRadius: '8px',
-              }`
-              ).row.fit
-              component(
-                :is="`page-${pageId}`"
-                :contentKalpa="contentKalpa"
-                :player="player"
-                :style=`{
-                }`
-                @close="pageId = null")
-        //- player
-        content-player(
-          @player="playerReady"
+        v-if="player && $q.screen.gt.sm"
+        :style=`{height: 'auto', maxHeight: 500+'px',}`).row.full-width
+        component(
+          :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
+          :player="player"
+          :node="node"
+          @node="node = $event, pageId = 'node'"
+          @pageId="pageId = $event"
+          @close="pageId = null")
+        page-node-editor(
+          v-if="player.figures"
+          :contentKalpa="contentKalpa"
+          :player="player"
           :style=`{
-            height: '100%',
-            //- maxWidth: 600+'px',
-          }`
-          :options=`{
-            showHeader: false,
-            showBar: true,
-            showFooter: true,
-            mode: 'editor',
-          }`
-          :styles=`{
-            height: '100%',
-            objectFit: 'contain',
-          }`
-          ).full-width.bg-black
-          template(v-slot:tint-bar=`{tintFocused}`)
-            node-creator(
-              v-if="player && !pageId && $q.screen.gt.md"
-              :player="player"
-              :contentKalpa="contentKalpa")
-  //- footer
-  nav-bottom(
-    v-show="footerShow"
-    :pageId="pageId" @pageId="pageId = $event")
+            borderRadius: '10px',
+            overflow: 'hidden',
+          }`).b-30
+    template(v-slot:footer)
+      div(
+        v-if="player && $q.screen.lt.md"
+        :style=`{height: $q.screen.height-44-contentHeight+'px',}`).row.full-width
+        component(
+          :is="`page-${pageId}`"
+          :contentKalpa="contentKalpa"
+          :player="player"
+          :node="node"
+          @node="node = $event, pageId = 'node'"
+          @pageId="pageId = $event"
+          @close="pageId = null")
+      div(
+        v-if="player"
+        :style=`{position: 'relative'}`).row.full-width
+        div(
+          v-if="player.figures && $q.screen.lt.md"
+          :style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.fit.bg-black.q-px-md
+          q-btn(
+            v-if="pageId !== 'node-editor'"
+            flat color="green" no-caps
+            :style=`{
+              height: '44px',
+            }`
+            @click="pageId = 'node-editor'"
+            ).full-width
+            span {{$t('Edit node')}}
+          q-btn(
+            v-if="pageId === 'node-editor'"
+            flat color="green" no-caps
+            :style=`{
+              height: '44px',
+            }`
+            @click="pageId = null"
+            ).full-width
+            span {{$t('Edit fragment')}}
+        nav-bottom(
+          :pageId="pageId" @pageId="pageId === $event ? pageId = null : pageId = $event")
 </template>
 
 <script>
@@ -89,10 +87,12 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'components/content_player/index.vue'
 
+import navBottom from '../nav_bottom.vue'
 import pageNodes from './page_nodes/index.vue'
+import pageNode from './page_node/index.vue'
+import pageNodeEditor from './page_node_editor/index.vue'
 import pageDrafts from '../page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
-import navBottom from '../nav_bottom.vue'
 
 import nodeCreator from '../node_creator/index.vue'
 
@@ -102,6 +102,8 @@ export default {
   components: {
     contentPlayer,
     pageNodes,
+    pageNode,
+    pageNodeEditor,
     pageDrafts,
     pageInfo,
     navBottom,
@@ -111,10 +113,21 @@ export default {
     return {
       player: null,
       pageId: null,
-      footerShow: true,
+      contentHeight: 0,
+      contentHeightMin: 0,
+      node: null,
     }
   },
   computed: {
+    // contentHeightMin () {
+    //   // if (this.$q.screen.width < 800)
+    //   let width = this.contentKalpa.thumbWidth
+    //   let height = this.contentKalpa.thumbHeight
+    //   // return this.$q.screen.height - (this.$q.screen.width * width) / height
+    //   let res = (height * this.$q.screen.width) / width
+    //   return res
+    //   // return Math.min(this.$q.screen.height / 2, res)
+    // },
     queryClusters () {
       let res = {
         selector: {
@@ -131,29 +144,43 @@ export default {
     }
   },
   watch: {
-    'player.playingCount': {
-      async handler (to, from) {
-        if (to === 1) {
-          await this.nodePlay()
-        }
-      }
-    },
     pageId: {
       handler (to, from) {
         if (to) {
-          this.player.pause()
-          // TODO: nodePlaying ?, figure?
+          this.$tween.to(this, 0.3, {contentHeight: this.contentHeightMin})
         }
         else {
-          this.player.play()
+          this.$tween.to(this, 0.3, {contentHeight: this.$q.screen.height})
         }
       }
     },
+    'player.figures': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('player.figures TO', to)
+        // if (to && !from) {
+        //   this.pageId = 'node-editor'
+        // }
+      }
+    }
+    // 'player.playingCount': {
+    //   async handler (to, from) {
+    //     if (to === 1) {
+    //       await this.nodePlay()
+    //     }
+    //   }
+    // },
   },
   methods: {
+    contentKalpaThumbUrlLoaded (e) {
+      this.$log('contentKalpaThumbUrlLoaded', e.target.clientHeight)
+      this.contentHeightMin = e.target.clientHeight
+    },
     async playerReady (player) {
       this.$log('playerReady')
-      this.player = player
+      // this.player = player
+      this.$set(this, 'player', player)
       // Handle player.autoplay
       this.$nextTick(() => {
         this.player.play()
@@ -181,6 +208,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
+    this.contentHeight = this.$q.screen.height
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

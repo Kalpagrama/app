@@ -2,14 +2,13 @@
 q-menu(
   anchor="top right" self="bottom right" dark
   :max-height="$q.screen.height+'px'"
-  :offset="[0,8]")
-  //- :offset="[16,16]"
-  div(:style=`{width: '300px',}`).row.shadow-20
+  :offset="offset || [0,0]")
+  div(:style=`{width: '300px',borderRadius: '20px',}`).row.shadow-20
     //- header
     div(
       @click="$go('/about')"
       v-close-popup
-      :style=`{borderRadius: '10px',}`
+      :style=`{borderRadius: '20px',}`
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item.cursor-pointer
       div(
         :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
@@ -88,6 +87,7 @@ q-menu(
 <script>
 export default {
   name: 'menuPopup',
+  props: ['offset'],
   computed: {
     pages () {
       return [

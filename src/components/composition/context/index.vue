@@ -1,13 +1,14 @@
 <template lang="pug">
 div(
   :style=`{
-    //- height: heightMax === 0 ? 'calc('+heightMax+'% + 28px)' : 'calc('+heightMax+'% + 28px)',
     height: heightMax+'%',
     minHeight: '27px',
-    background: 'rgba(0,0,0,0.8)',
+    //- background: 'rgba(0,0,0,0.5)',
+    background: 'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 200%)',
     borderRadius: '10px',
   }`
   ).column.full-width.items-end.content-end.justify-end
+    //- top/opened
     div(
       v-show="heightMax > 0"
       :style=`{overflow: 'hidden',}`
@@ -17,15 +18,17 @@ div(
         :style=`{overflow: 'hidden',}`
         @click.self="miniClick()"
         ).row.fit.items-start.content-start.q-pa-sm
+        //- name
         .row.full-width.q-px-md.q-py-sm
           span(
             :class=`{
               //- 'q-my-lg': $q.screen.width > 768,
             }`
             :style=`{
-              fontSize: width > 300 ? '18px' : '12px',
+              fontSize: width > 500 ? '16px' : '12px',
             }`
           ).text-white.text-bold {{ contentKalpa.name }}
+        //- go to content
         div(v-if="width > 300").row.full-width.q-px-md
           router-link(
             :to="'/content/'+contentKalpa.oid"
@@ -36,18 +39,15 @@ div(
             img(
               :src="contentKalpa.thumbUrl"
               :style=`{
-                //- height: $q.screen.width > 768 ? '100px' : '50px',
                 height: '50px',
                 borderRadius: '10px',
               }`).q-mr-sm
             .col
               div(:style=`{minHeight: '50px',}`).row.full-width.items-center.justify-end
-                .row.items-center.content-center.q-pr-md
-                  span(:style=`{fontSize: '24px',lineHeight: 1}`).text-white.text-bold {{contentKalpa.countStat.countNodes}}
-                  span(:style=`{fontSize: '16px',}`).text-white.text-bold.q-ml-sm Nodes
-                //- .row.items-center.content-center.q-px-md
-                  span(:style=`{fontSize: '24px',lineHeight: 1}`).text-white.text-bold {{contentKalpa.countStat.countViews}}
-                  span(:style=`{fontSize: '16px',}`).text-white.text-bold.q-ml-sm Views
+                .row.items-center.content-center.q-pr-sm
+                  span(:style=`{fontSize: '24px',lineHeight: 1}`).text-white.text-bold {{contentKalpaActivity}}
+                  q-icon(name="whatshot" size="30px" color="white")
+        //- go to context
         .row.full-width.q-px-md.q-pt-sm
           q-btn(
             outline no-caps color="white"
@@ -57,41 +57,44 @@ div(
             @click="goContext()"
             ).full-width
             span.text-white {{ $t('Watch in context')}}
+    //- bottom
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="isActive"
         transition-show="jump-down"
         :style=`{
           height: '28px',
-          //- background: 'rgb(0,0,0)',
           borderRadius: '10px',
-          paddingLeft: '14px',
         }`
         ).row.full-width.items-center.content-center.cursor-pointer
-        div(
-          @click="miniClick()"
-          ).col
-          .row.full-width.items-center.content-center
-          q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
-          //- small.text-grey-4 {{composition.layers[0].contentName}}
-          small.text-grey-4 {{$t('Context')}}
+        div(@click="miniClick()").col.full-height
+          .row.fit.items-center.content-center.q-px-sm
+            q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
+            //- small.text-grey-4 {{composition.layers[0].contentName}}
+            small.text-grey-4 {{$t('Context')}}
+        //- video controls
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
             v-if="composition.outputType === 'VIDEO' && player"
-            ).row.items-center.content-center.q-px-xs
+            ).row.full-height.items-center.content-center.q-px-xs
             q-btn(
-              round flat
+              round flat dense
               :color="'white'"
               :icon="'replay'" size="xs"
-              @click="player.replay()").q-px-md
-            small.text-white {{ $time(player.currentTime) }}
-            small.text-white.q-mx-xs :
-            small.text-white {{ $time(player.duration) }}
+              @click="player.replay()").q-px-md.q-mt-xs
+            //- full countdown
+            //- .row.q-px-sm.q-mt-xs
+              small.text-white {{ $time(player.currentTime) }}
+              small.text-white.q-mx-xs :
+              small.text-white {{ $time(player.duration) }}
+            //- mini countdown
+            .row.q-px-sm.q-mt-xs
+              small.text-white {{ $time(player.duration-player.currentTime) }}
             q-btn(
-              round flat
+              round flat dense
               :color="player.muted ? 'red' : 'white'"
               :icon="player.muted ? 'volume_off' : 'volume_up'" size="xs"
-              @click="player.mutedToggle()").q-px-md
+              @click="player.mutedToggle()").q-px-md.q-mt-xs
 </template>
 
 <script>
@@ -118,6 +121,21 @@ export default {
         else {
           this.$tween.to(this, 0.3, {heightMax: 0})
         }
+      }
+    }
+  },
+  computed: {
+    contentKalpaActivity () {
+      if (this.contentKalpa) {
+        return Object.values(this.contentKalpa.countStat).reduce((acc, val) => {
+          if (Number.isInteger(val)) {
+            acc += val
+          }
+          return acc
+        }, 0) + this.contentKalpa.relatedContent.length
+      }
+      else {
+        return null
       }
     }
   },

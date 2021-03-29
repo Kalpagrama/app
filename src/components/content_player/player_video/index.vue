@@ -4,13 +4,6 @@ div(
     ...styles,
   }`
   ).column.full-width
-  //- debug figureOffset
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 3000, right: '0px',
-    }`
-    ).row.text-white.bg-green
-    small {{ figureOffset }}
   player-tint(
     v-bind="$props"
     :player="player")
@@ -39,11 +32,12 @@ div(
 </template>
 
 <script>
+import assert from 'assert'
+import { ContentApi } from 'src/api/content'
+
 import playerYoutube from './player_youtube.vue'
 import playerKalpa from './player_kalpa.vue'
 import playerTint from './player_tint/index.vue'
-import assert from 'assert'
-import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'contentPlayer_video',

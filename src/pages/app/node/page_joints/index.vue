@@ -5,8 +5,9 @@ div(
     position: 'relative',
   }`
   ).row.full-width
-  .row.full-width.q-px-md.q-py-sm.text-white.text-bold
-    span.q-mr-sm {{$t('Joints')}}
+  .row.full-width.q-px-md.q-py-sm.text-white
+    q-icon(name="fas fa-link" color="white" size="20px").q-mr-sm
+    span.text-bold.q-mr-sm {{$t('Joints')}}
     div(
       v-if="itemsRes && itemsRes.totalCount > 0"
       ).row

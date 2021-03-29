@@ -19,6 +19,17 @@ div(
       //- overflow: 'hidden',
     }`
     ).row.full-width.bg-black
+    context(
+      v-if="composition.outputType !== 'VIDEO'"
+      :nodeOid="nodeOid"
+      :composition="composition"
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :height="height"
+      :width="width"
+      :style=`{
+        position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
+      }`)
     from-video(
       v-if="composition.outputType === 'VIDEO'"
       :composition="composition"

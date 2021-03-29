@@ -9,40 +9,42 @@
 page-nodes-root(
   :contentKalpa="contentKalpa"
   :player="player")
-  template(v-slot:header)
-    .row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: 650+'px',
-        }`
-        ).row.full-width.items-center.content-center.q-py-md.q-px-lg
-        span.text-white.text-bold {{$t('Ядра')}}
-        .col
-        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  template(v-slot:item=`{item,isSelected}`)
+  template(v-slot:item=`{item: node}`)
     div(
-      v-if="item.items[0] && item.items[0].layers"
-      @click="nodeClick(item)"
+      v-if="node.items[0] && node.items[0].layers"
+      @click="nodeClick(node)"
       :style=`{
       }`
-      ).row.full-width.q-px-md.node.q-mb-md
-      .row.full-width
+      ).row.full-width.node.q-mb-sm.q-px-sm
+      div(
+        :style=`{
+          background: 'rgba(35,35,35,0.6)',
+          borderRadius: '10px',
+        }`
+        ).row.full-width
         div(
           :style=`{
+            background: 'rgba(40,40,40,0.6)',
             borderRadius: '10px',
-            background: 'rgba(35,35,35,0.5)',
           }`
-          ).row.full-width
-          //- small.text-grey-4 {{ getText(item) }}
+          ).row.full-width.items-start.content-start
           img(
             draggable="false"
-            :src="item.items[0].thumbUrl"
+            :src="node.items[0].thumbUrl"
             :style=`{
-              height: '40px',
+              height: '50px',
               borderRadius: '10px',
             }`)
-      .row.full-width.q-px-sm.q-py-xs
-        span.text-white {{ item.name }}
+          .col
+            .row.full-width.q-pa-sm
+              span.text-white {{ node.name }}
+        //- selected
+        div(
+          v-if="nodeSelectedOid === node.oid"
+          ).row.full-width
+          q-btn(round flat color="white" icon="refresh" @click="nodeReplay(node)")
+          .col
+          q-btn(round flat color="white" icon="launch" @click="nodeLaunch(node)")
 </template>
 
 <script>
@@ -56,15 +58,23 @@ export default {
   },
   data () {
     return {
+      nodeSelectedOid: null,
     }
   },
   methods: {
-    nodeClick (node) {
-      this.$log('nodeClick', node)
+    nodeReplay (node) {
+      this.$log('nodeReplay')
       this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
       this.player.play()
-      this.player.setState('nodePlaying', node)
-      this.$emit('close')
+    },
+    nodeClick (node) {
+      this.$log('nodeClick', node)
+      this.nodeSelectedOid = node.oid
+      this.nodeReplay(node)
+    },
+    nodeLaunch (node) {
+      this.$log('nodeLaunch', node)
+      this.$emit('node', node)
     }
   }
 }

@@ -62,7 +62,6 @@ export default {
   mounted () {
     this.$log('mounted', this.oid)
     document.body.style.background = 'black'
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
     if (this.$store.getters.isGuest) {
       // do nothing ?
@@ -72,8 +71,7 @@ export default {
     }
   },
   async beforeDestroy () {
-    // this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
+    this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     if (this.$store.getters.isGuest) {
       // do nothing ?
