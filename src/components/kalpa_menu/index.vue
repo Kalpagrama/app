@@ -121,17 +121,18 @@ export default {
     }
   },
   data () {
-    return {
-      pages: [
+    return {}
+  },
+  computed: {
+    pages () {
+      return [
         {id: 'feeds', name: this.$t('Feed'), icon: 'view_agenda'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},
         {id: 'settings', name: this.$t('Settings'), icon: 'settings'},
-      ],
+      ]
     }
-  },
-  computed: {
   },
   methods: {
   }

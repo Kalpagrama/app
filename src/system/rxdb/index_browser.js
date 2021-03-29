@@ -85,7 +85,7 @@ let adapter = 'idb'
 // let adapter = memdown
 // let adapter = 'memory'
 
-let currentUser
+let currentUser, settings
 
 class RxDBWrapper {
    constructor () {
@@ -347,10 +347,14 @@ class RxDBWrapper {
             currentUser = getReactive(dummyUser)
             assert(currentUser, '!currentUser (dummyUser)!!') // должен быть в rxdb после init
          }
-
          assert(currentUser, '!currentUser') // init вызывается только после успешного initGlobal (а он заполнят юзера)
          this.getCurrentUser = () => {
             return currentUser
+         }
+         settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
+         assert(settings, '!settings')
+         this.getSettings = () => {
+            return settings
          }
          this.initialized = true
          // this.createTestDb()

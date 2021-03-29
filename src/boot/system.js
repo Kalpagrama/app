@@ -1,4 +1,5 @@
 import { getLogFunc, isSsr, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { systemInit } from 'src/system/services'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
@@ -19,6 +20,9 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
     } else {
       const {initApplication} = await import('src/system/services_browser')
       Vue.prototype.$systemUtils = await initApplication()
+      logD(f, 'try systemInit...')
+      await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
+      logD(f, 'systemInit OK')
     }
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {

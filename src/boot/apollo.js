@@ -129,7 +129,7 @@ export default async ({ Vue, store, app }) => {
             fetchPolicy: 'no-cache'
          }
       }
-      const servicesApollo = new ApolloClient({
+      const settingsApollo = new ApolloClient({
          link: createHttpLink({
             uri: SERVICES_URL,
             fetch (uri, options) {
@@ -143,7 +143,7 @@ export default async ({ Vue, store, app }) => {
       apollo = {
          cache,
          clients: {
-            services: servicesApollo, // нужно для AuthApi.services
+            settings: settingsApollo, // нужно для AuthApi.services
             auth: null,
             api: null,
             upload: null,
@@ -152,22 +152,22 @@ export default async ({ Vue, store, app }) => {
       }
 
       const onFetchFunc = async (oldVal, newVal) => {
-         logD(' services onFetchFunc...')
+         logD(' settings onFetchFunc...')
          if (oldVal && !isEqual(oldVal, newVal)) {
-            logD('new services received! try reload page...')
+            logD('new settings received! try reload page...')
             window.location.reload() // новые данные будут подхвачены после перезагрузки
          }
       }
 
-      let services = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'services',
+      let settings = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'settings',
          { clientFirst: true, force: true, onFetchFunc })
 
-      logD('services=', services)
-      assert(services, '!services!!!')
-      let linkAuth = services.authUrl
-      let linkApi = services.apiUrl
-      let linkWs = services.subscriptionsUrl
-      let linkUpload = services.uploadUrl
+      logD('settings=', settings)
+      assert(settings && settings.services, '!services!!!')
+      let linkAuth = settings.services.authUrl
+      let linkApi = settings.services.apiUrl
+      let linkWs = settings.services.subscriptionsUrl
+      let linkUpload = settings.services.uploadUrl
       const authApollo = new ApolloClient({
          link: ApolloLink.from([
             errLink,
@@ -265,7 +265,7 @@ export default async ({ Vue, store, app }) => {
          cache
       })
       apollo.clients = {
-         services: servicesApollo,
+         settings: settingsApollo,
          auth: authApollo,
          api: apiApollo,
          upload: uploadApollo,
