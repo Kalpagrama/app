@@ -41,7 +41,8 @@ div(
           :style=`{
             borderRadius: '10px',
             overflow: 'hidden',
-          }`).b-30
+          }`
+          @node="node = $event, pageId = 'node'").b-30
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
@@ -184,6 +185,7 @@ export default {
       // Handle player.autoplay
       this.$nextTick(() => {
         this.player.play()
+        this.nodePlay()
       })
       // Get player clusters
       this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
@@ -196,12 +198,13 @@ export default {
       if (nodeOid) {
         // get node
         this.$log('playerReady: nodeOid found, getting node...')
-        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
-        this.$log('playerReady: node found, show node in video...', node)
-        if (node.items[0] && node.items[0].layers) {
-          this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
+        this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
+        this.$log('playerReady: node found, show node in video...', this.node)
+        if (this.node.items[0] && this.node.items[0].layers) {
+          this.player.setCurrentTime(this.node.items[0].layers[0].figuresAbsolute[0].t)
           this.player.play()
-          this.player.setState('nodePlaying', node)
+          // this.player.setState('nodePlaying', this.node)
+          this.pageId = 'node'
         }
       }
     }

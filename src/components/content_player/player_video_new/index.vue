@@ -82,11 +82,22 @@ div(
         v-show="options.showTint"
         :style=`{
           position: 'absolute', zIndex: 10, bottom: '0px',
-          height: $q.screen.gt.sm ? '100%' : '300px',
+          height: '100%',
+          //- height: $q.screen.gt.sm ? '100%' : '300px',
           background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
-          pointerEvents: 'none',
+          //- pointerEvents: 'none',
         }`
-        ).row.full-width
+        @click.self="play()"
+        ).row.full-width.items-center.content-center.justify-center
+        q-btn(
+          round flat color="white"
+          :style=`{
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+          }`
+          @click="play()")
+          q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
   //- footer
   .row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px'}`).row.full-width

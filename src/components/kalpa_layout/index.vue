@@ -1,5 +1,15 @@
 <template lang="pug">
-div(
+q-layout(view="hHh LpR fFf")
+  q-header
+    slot(name="header")
+  q-footer
+    slot(name="footer")
+  q-page-containter
+    q-page
+      slot(name="body")
+//- .row.full-width.justify-center
+  slot(name="body")
+//- div(
   :style=`{
     position: 'relative',
     //- position: 'fixed', zIndex: 10, top: '0px', left: '0px', right: '0px', bottom: '0px',
@@ -83,20 +93,20 @@ export default {
     this.$log('mounted')
     // disable scroll of everything exept scroll
     // TODO maybe global shit...
-    this.$nextTick(() => {
-      disableBodyScroll(this.$refs['body-wrapper'], {
-        allowTouchMove: el => {
-          while (el && el !== document.body) {
-            if (el.classList.contains('scroll')) return true
-            el = el.parentElement;
-          }
-        },
-      })
-    })
+    // this.$nextTick(() => {
+    //   disableBodyScroll(this.$refs['body-wrapper'], {
+    //     allowTouchMove: el => {
+    //       while (el && el !== document.body) {
+    //         if (el.classList.contains('scroll')) return true
+    //         el = el.parentElement;
+    //       }
+    //     },
+    //   })
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    enableBodyScroll(this.$refs['body-wrapper'])
+    // enableBodyScroll(this.$refs['body-wrapper'])
   }
 }
 </script>
