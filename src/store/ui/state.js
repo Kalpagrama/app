@@ -22,7 +22,7 @@ export default {
   desktopNavigationShow: true,
   desktopNavigationStyles: {},
   // data exchanges
-  nodeCategories: [],
+  // nodeCategories: [],
   nodeOnContent: null,
   nodeDraft: null,
   nodeCreating: false,

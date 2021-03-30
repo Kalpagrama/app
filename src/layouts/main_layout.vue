@@ -32,7 +32,7 @@ q-layout(
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container
-    router-view(v-if="$store.state.ui.nodeCategories.length > 0")
+    router-view(v-if="$store.getters.nodeCategories.length > 0")
 </template>
 
 <script>
@@ -81,9 +81,6 @@ export default {
     if (userTutorials.main === false) {
       this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
     }
-    // // Node categories
-    // let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
-    // this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   async mounted () {
     this.$log('mounted')

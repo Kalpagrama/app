@@ -12,33 +12,33 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class ObjectCreateApi {
-   static async nodeCategories () {
-      const f = ObjectCreateApi.nodeCategories
-      logD(f, 'start')
-      const t1 = performance.now()
-      const cb = async () => {
-         let { data: { nodeCategories } } = await apollo.clients.auth.query({
-            query: gql`
-                query nodeCategories{
-                    nodeCategories{
-                        alias
-                        icon
-                        name
-                        sphere{
-                            oid
-                            type
-                            name
-                        }
-                        type
-                    }
-                }
-            `
-         })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return nodeCategories
-      }
-      return await apiCall(f, cb)
-   }
+   // static async nodeCategories () {
+   //    const f = ObjectCreateApi.nodeCategories
+   //    logD(f, 'start')
+   //    const t1 = performance.now()
+   //    const cb = async () => {
+   //       let { data: { nodeCategories } } = await apollo.clients.auth.query({
+   //          query: gql`
+   //              query nodeCategories{
+   //                  nodeCategories{
+   //                      alias
+   //                      icon
+   //                      name
+   //                      sphere{
+   //                          oid
+   //                          type
+   //                          name
+   //                      }
+   //                      type
+   //                  }
+   //              }
+   //          `
+   //       })
+   //       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   //       return nodeCategories
+   //    }
+   //    return await apiCall(f, cb)
+   // }
 
    static async emojiSpheres () {
       const f = ObjectCreateApi.emojiSpheres

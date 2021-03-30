@@ -73,24 +73,58 @@ class AuthApi {
       }
    }
 
-   static async services () {
-      assert(apollo.clients.services, '!apollo.clients.services')
-      let { data: { services } } = await apollo.clients.services.query({
+   // static async services () {
+   //    assert(apollo.clients.services, '!apollo.clients.services')
+   //    let { data: { services } } = await apollo.clients.services.query({
+   //       query: gql`query {
+   //           services {
+   //               authUrl
+   //               apiUrl
+   //               uploadUrl
+   //               subscriptionsUrl
+   //               oAuthUrlYandex
+   //               oAuthUrlVk
+   //               oAuthUrlGoogle
+   //               oAuthUrlApple
+   //               oAuthUrlFacebook
+   //           }
+   //       }`
+   //    })
+   //    return services
+   // }
+   static async settings () {
+      assert(apollo.clients.settings, '!apollo.clients.settings')
+      let { data: { settings } } = await apollo.clients.settings.query({
          query: gql`query {
-             services {
-                 authUrl
-                 apiUrl
-                 uploadUrl
-                 subscriptionsUrl
-                 oAuthUrlYandex
-                 oAuthUrlVk
-                 oAuthUrlGoogle
-                 oAuthUrlApple
-                 oAuthUrlFacebook
+             settings{
+                 services {
+                     authUrl
+                     apiUrl
+                     uploadUrl
+                     subscriptionsUrl
+                     oAuthUrlYandex
+                     oAuthUrlVk
+                     oAuthUrlGoogle
+                     oAuthUrlApple
+                     oAuthUrlFacebook
+                 }
+                 nodeCategories{
+                     lang
+                     alias
+                     icon
+                     name
+                     sphere{
+                         oid
+                         type
+                         name
+                     }
+                     type
+                 }
              }
+             
          }`
       })
-      return services
+      return settings
    }
 
    // если токен не указан - выйдет из всех сессий

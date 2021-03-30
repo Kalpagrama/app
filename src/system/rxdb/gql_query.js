@@ -20,24 +20,33 @@ class GqlQueries {
    static getFetchFunc(id, params){
       let fetchFunc
       switch (getRawIdFromId(id)) {
-         case 'services' :
+         // case 'services' :
+         //    fetchFunc = async () => {
+         //       return {
+         //          notEvict: true, // живет вечно
+         //          item: await AuthApi.services(),
+         //          actualAge: 'day'
+         //       }
+         //    }
+         //    break
+         case 'settings' :
             fetchFunc = async () => {
                return {
                   notEvict: true, // живет вечно
-                  item: await AuthApi.services(),
+                  item: await AuthApi.settings(),
                   actualAge: 'day'
                }
             }
             break
-         case 'nodeCategories' :
-            fetchFunc = async () => {
-               return {
-                  notEvict: true, // живет в кэше вечно
-                  item: await ObjectCreateApi.nodeCategories(),
-                  actualAge: 'day' // обновляется раз в день
-               }
-            }
-            break
+         // case 'nodeCategories' :
+         //    fetchFunc = async () => {
+         //       return {
+         //          notEvict: true, // живет в кэше вечно
+         //          item: await ObjectCreateApi.nodeCategories(),
+         //          actualAge: 'day' // обновляется раз в день
+         //       }
+         //    }
+         //    break
          case 'emojiSpheres' :
             fetchFunc = async () => {
                return {

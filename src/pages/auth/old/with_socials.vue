@@ -83,10 +83,10 @@ export default {
   },
   methods: {
     async serviceClick (s, si) {
-      let services = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'services')
-      assert(services, '!services')
-      this.$log('serviceClick', s, si, services)
-      let url = services[s.id]
+      let settings = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'settings')
+      assert(settings && settings.services, '!services')
+      this.$log('serviceClick', s, si, settings.services)
+      let url = settings.services[s.id]
       this.$log('oauth url = ', url)
       assert(url, '!url')
       // alert('serviceClick')

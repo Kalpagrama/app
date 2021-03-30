@@ -1,6 +1,6 @@
 <template lang="pug">
 div(id="q-app")
-  router-view(v-if="$store.state.ui.nodeCategories.length > 0")
+  router-view(v-if="$store.getters.nodeCategories.length > 0")
   //- router-view
 </template>
 
@@ -73,9 +73,6 @@ export default {
     window.visualViewport.addEventListener('resize', this.visualViewportOnResize)
     this.$store.commit('ui/stateSet', ['viewportHeight', window.visualViewport.height])
     this.$store.commit('ui/stateSet', ['viewportWidth', window.visualViewport.width])
-    // Node categories
-    let nodeCategories = await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'nodeCategories')
-    this.$store.commit('ui/stateSet', ['nodeCategories', nodeCategories])
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')
