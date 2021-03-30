@@ -19,19 +19,24 @@ div(
     :options=`{
       showPult: $q.screen.gt.sm ? true : !pageId,
       showTint: $q.screen.gt.sm ? true : !pageId,
+      showPlayBtn: !pageId,
     }`
     @player="playerReady"
     ).fit.bg-black
+    //- desktop pages
     template(v-slot:pult)
       div(
         v-if="player && $q.screen.gt.sm"
-        :style=`{height: 'auto', maxHeight: 500+'px',}`).row.full-width
+        :style=`{
+          minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
+          maxHeight: 500+'px',
+        }`).row.full-width
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
           :node="node"
-          @node="node = $event, pageId = 'node'"
+          @node="nodeFocused"
           @pageId="pageId = $event"
           @close="pageId = null")
         page-node-editor(
@@ -42,7 +47,7 @@ div(
             borderRadius: '10px',
             overflow: 'hidden',
           }`
-          @node="node = $event, pageId = 'node'").b-30
+          @node="nodeFocused").b-30
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
@@ -52,7 +57,7 @@ div(
           :contentKalpa="contentKalpa"
           :player="player"
           :node="node"
-          @node="node = $event, pageId = 'node'"
+          @node="nodeFocused"
           @pageId="pageId = $event"
           @close="pageId = null")
       div(
@@ -160,9 +165,10 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('player.figures TO', to)
-        // if (to && !from) {
-        //   this.pageId = 'node-editor'
-        // }
+        if (to && !from) {
+          this.pageId = null
+          // this.pageId = 'node-editor'
+        }
       }
     }
     // 'player.playingCount': {
@@ -174,6 +180,11 @@ export default {
     // },
   },
   methods: {
+    nodeFocused (node) {
+      this.$log('nodeFocused', node)
+      this.pageId = null
+      this.player.setState('nodeFocused', node)
+    },
     contentKalpaThumbUrlLoaded (e) {
       this.$log('contentKalpaThumbUrlLoaded', e.target.clientHeight)
       this.contentHeightMin = e.target.clientHeight
@@ -184,7 +195,11 @@ export default {
       this.$set(this, 'player', player)
       // Handle player.autoplay
       this.$nextTick(() => {
-        this.player.play()
+        // this.$q.notify('Player.play !')
+        // this.player.play()
+        // setInterval(() => {
+        //   this.player.play()
+        // }, 500)
         this.nodePlay()
       })
       // Get player clusters
@@ -195,16 +210,16 @@ export default {
     async nodePlay () {
       this.$log('nodePlay')
       let nodeOid = this.$store.state.ui.nodeOnContent
+      this.$log('nodePlay nodeOid', nodeOid)
       if (nodeOid) {
         // get node
         this.$log('playerReady: nodeOid found, getting node...')
-        this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
+        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
         this.$log('playerReady: node found, show node in video...', this.node)
-        if (this.node.items[0] && this.node.items[0].layers) {
-          this.player.setCurrentTime(this.node.items[0].layers[0].figuresAbsolute[0].t)
+        if (this.node.items[0] && node.items[0].layers) {
+          this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
           this.player.play()
-          // this.player.setState('nodePlaying', this.node)
-          this.pageId = 'node'
+          this.player.setState('nodeFocused', this.node)
         }
       }
     }

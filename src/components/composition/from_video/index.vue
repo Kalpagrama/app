@@ -21,7 +21,7 @@ div(
       position: 'absolute', zIndex: 101, top: '0px',
       opacity: 0.5,
     }`
-    ).row.fit.items-center.content-center.justify-center
+    ).row.fit.items-center.content-center.justify-center.bg-red.bg
     q-spinner(color="white" size="50px")
   img(
     v-if="!currentTimeChanged"
@@ -65,6 +65,7 @@ export default {
       currentTime: null,
       currentTimeChanged: false,
       player: null,
+      canShowSpinner: false,
     }
   },
   computed: {
@@ -87,12 +88,16 @@ export default {
         if (!this.$refs['player-video']) return
         if (to) {
           this.$refs['player-video'].play()
+          this.$wait(1000).then(() => {
+            this.canShowSpinner = true
+          })
         }
         else {
           this.$refs['player-video'].pause()
           this.$refs['player-video'].src = ''
           this.$refs['player-video'].load()
           this.currentTimeChanged = false
+          this.canShowSpinner = false
         }
       }
     },
@@ -198,6 +203,12 @@ export default {
     videoPaused (e) {
       this.$log('videoPaused', e)
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    // this.$wait(1000).then(() => {
+    //   this.canShowSpinner = true
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -186,7 +186,7 @@ export default {
       this.$router.push('/content/' + this.node.items[0].layers[0].contentOid)
     },
     nodeVoteBallClick () {
-      this.$log('nodeVoteBallClick')
+      this.$log('nodeVoteBallClick', this.node.rateUser)
       if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
@@ -194,7 +194,7 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        if (this.node.rateUser || this.node.author.oid === this.$store.getters.currentUser().oid) {
+        if (this.node.rateUser !== null || this.node.author.oid === this.$store.getters.currentUser().oid) {
           this.voteStatsShow = true
         }
         else {

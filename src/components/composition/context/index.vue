@@ -17,7 +17,7 @@ div(
         v-if="contentKalpa"
         :style=`{overflow: 'hidden',}`
         @click.self="miniClick()"
-        ).row.fit.items-start.content-start.q-pa-sm
+        ).row.fit.items-start.content-start
         //- name
         .row.full-width.q-px-md.q-py-sm
           span(
@@ -71,7 +71,7 @@ div(
           .row.fit.items-center.content-center.q-px-sm
             q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
             //- small.text-grey-4 {{composition.layers[0].contentName}}
-            small.text-grey-4 {{$t('Context')}}
+            small(v-if="width > 400").text-grey-4 {{$t('Context')}}
         //- video controls
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(

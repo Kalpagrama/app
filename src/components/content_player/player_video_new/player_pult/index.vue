@@ -4,12 +4,11 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  //- player.nodePlaying
-  //- tint-bar-node-playing(
-    v-if="player && player.nodePlaying && !player.figures"
+  //- player.nodeFocused
+  node-focused(
+    v-if="player && player.nodeFocused && !player.figures"
     :player="player"
-    :contentKalpa="contentKalpa"
-    :options="options")
+    :contentKalpa="contentKalpa")
   //- bar
   div(
     :style=`{
@@ -226,6 +225,8 @@ div(
 import actions from './actions.vue'
 import figuresActions from './figures_actions.vue'
 import figuresEditor from './figures_editor.vue'
+import nodeFocused from './node_focused.vue'
+
 export default {
   name: 'playerPult',
   props: ['player', 'contentKalpa', 'options'],
@@ -233,6 +234,7 @@ export default {
     actions,
     figuresActions,
     figuresEditor,
+    nodeFocused,
   },
   data () {
     return {
@@ -599,13 +601,13 @@ export default {
         // this.zoomed = !this.zoomed
         let t = (left / width) * this.player.duration
         this.$log('t', t)
-        // Handle outside click when nodePlaying
-        if (this.player.nodePlaying) {
-          let figures = this.player.nodePlaying.items[0].layers[0].figuresAbsolute
+        // Handle outside click when nodeFocused
+        if (this.player.nodeFocused) {
+          let figures = this.player.nodeFocused.items[0].layers[0].figuresAbsolute
           if (t < figures[0].t || t > figures[1].t) {
-            // Destroy nodePlaying
-            // alert('Destroy nodePlaying here...')
-            this.player.setState('nodePlaying', null)
+            // Destroy nodeFocused
+            // alert('Destroy nodeFocused here...')
+            this.player.setState('nodeFocused', null)
             this.player.setCurrentTime(t)
           }
         }

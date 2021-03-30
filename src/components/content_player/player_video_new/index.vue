@@ -38,7 +38,7 @@ div(
       :playsinline="true"
       :autoplay="true"
       :loop="true"
-      :muted="false"
+      :muted="muted"
       :style=`{
         objectFit: 'contain'
       }`
@@ -75,21 +75,20 @@ div(
             }`
             ).row.full-width
             slot(name="pult-footer")
-    //- Tint bottom
+    //- Tint bottom - on pause and desktops only
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
-        v-if="!playing && playerType === 'player-youtube'"
+        v-if="!playing && playerType === 'player-youtube' && $q.screen.gt.md"
         v-show="options.showTint"
         :style=`{
           position: 'absolute', zIndex: 10, bottom: '0px',
           height: '100%',
-          //- height: $q.screen.gt.sm ? '100%' : '300px',
           background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
-          //- pointerEvents: 'none',
         }`
         @click.self="play()"
         ).row.full-width.items-center.content-center.justify-center
         q-btn(
+          v-show="options.showPlayBtn"
           round flat color="white"
           :style=`{
             width: '150px',
@@ -225,10 +224,11 @@ export default {
       // Loaded!
       this.$nextTick(() => {
         this.$emit('player', this)
-        // if (localStorage.getItem('k_sound')) {
-        //   this.mutedToggle(false)
-        // }
-        this.play()
+        if (localStorage.getItem('k_sound')) {
+          this.mutedToggle(false)
+        }
+        // this.$q.notify('Player.play ! Internal')
+        // this.play()
       })
     },
     videoTimeupdate (e) {
