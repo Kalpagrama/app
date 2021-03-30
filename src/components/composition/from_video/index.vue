@@ -21,8 +21,11 @@ div(
       position: 'absolute', zIndex: 101, top: '0px',
       opacity: 0.5,
     }`
-    ).row.fit.items-center.content-center.justify-center.bg-red.bg
-    q-spinner(color="white" size="50px")
+    @click="play()"
+    ).row.fit.items-center.content-center.justify-center
+    q-spinner(
+      v-show="canShowSpinner"
+      color="white" size="50px")
   img(
     v-if="!currentTimeChanged"
     :src="composition.thumbUrl"
@@ -36,7 +39,7 @@ div(
   //- :poster="composition.thumbUrl"
   video(
     v-if="videoShow"
-    ref="player-video"
+    ref="videoRef"
     type="video/mp4"
     preload="metadata"
     :autoplay="isActive"
@@ -49,6 +52,7 @@ div(
     }`
     @click="videoClick"
     @pause="videoPaused"
+    @play="videoPlaying"
     @timeupdate="videoTimeupdate"
     ).fit
     source(:src="url")
@@ -65,6 +69,7 @@ export default {
       currentTime: null,
       currentTimeChanged: false,
       player: null,
+      playing: false,
       canShowSpinner: false,
     }
   },
@@ -85,17 +90,20 @@ export default {
   watch: {
     isActive: {
       handler (to, from) {
-        if (!this.$refs['player-video']) return
         if (to) {
-          this.$refs['player-video'].play()
+          if (this.$refs.videoRef) {
+            this.$refs.videoRef.play()
+          }
           this.$wait(1000).then(() => {
             this.canShowSpinner = true
           })
         }
         else {
-          this.$refs['player-video'].pause()
-          this.$refs['player-video'].src = ''
-          this.$refs['player-video'].load()
+          if (this.$refs.videoRef) {
+            this.$refs.videoRef.pause()
+            this.$refs.videoRef.src = ''
+            this.$refs.videoRef.load()
+          }
           this.currentTimeChanged = false
           this.canShowSpinner = false
         }
@@ -138,30 +146,36 @@ export default {
         else e.target.pause()
       }
     },
+    play () {
+      this.$log('play')
+      if (this.$refs.videoRef) {
+        this.$refs.videoRef.play()
+      }
+    },
     replay () {
       this.$log('replay')
-      if (this.$refs['player-video']) {
-        this.$refs['player-video'].currentTime = this.urlMeta[0].t
-        this.$refs['player-video'].play()
+      if (this.$refs.videRef) {
+        this.$refs.videoRef.currentTime = this.urlMeta[0].t
+        this.$refs.videoRef.play()
       }
     },
     mutedToggle () {
       this.$log('mutedToggle')
-      if (this.$refs['player-video']) {
-        if (this.$refs['player-video'].muted) {
+      if (this.$refs.videoRef) {
+        if (this.$refs.videoRef.muted) {
           localStorage.setItem('k_sound', 'on')
         }
         else {
           localStorage.removeItem('k_sound')
         }
-        this.$refs['player-video'].muted = !this.$refs['player-video'].muted
+        this.$refs.videoRef.muted = !this.$refs.videoRef.muted
         this.player.muted = !this.player.muted
       }
     },
     setCurrentTime (t) {
       this.$log('setCurrentTime')
-      if (this.$refs['player-video']) {
-        this.$refs['player-video'] = t + this.urlMeta[0].t
+      if (this.$refs.videoRef) {
+        this.$refs.videoRef = t + this.urlMeta[0].t
       }
     },
     videoTimeupdate (e) {
@@ -200,21 +214,23 @@ export default {
         e.target.play()
       }
     },
+    videoPlaying (e) {
+      // this.$log('videoPlaying', e)
+      this.playing = true
+    },
     videoPaused (e) {
-      this.$log('videoPaused', e)
+      // this.$log('videoPaused', e)
+      this.playing = false
     }
   },
   mounted () {
-    this.$log('mounted')
-    // this.$wait(1000).then(() => {
-    //   this.canShowSpinner = true
-    // })
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
-    if (this.$refs['player-video']) {
-      this.$refs['player-video'].src = ''
-      this.$refs['player-video'].load()
+    // this.$log('beforeDestroy')
+    if (this.$refs.videoRef) {
+      this.$refs.videoRef.src = ''
+      this.$refs.videoRef.load()
     }
   }
 }

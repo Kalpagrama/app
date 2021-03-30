@@ -120,7 +120,7 @@ export default {
   },
   computed: {
     slides () {
-      if (!this.doc) return []
+      if (!this.doc || !this.doc.fields.slides) return []
       return this.doc.fields.slides.map(s => {
         return {
           id: s.sys.id,
