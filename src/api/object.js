@@ -65,7 +65,7 @@ const updateStatThrottled = throttle(async () => {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec ${statAccumulator.length}`)
       statAccumulator = []
    }
-}, 1000 * 30, { leading: false }) // шлем не чаще чем раз в 30 сек
+}, 1000 * 2, { leading: false }) // шлем не чаще чем раз в 30 сек
 
 class ObjectApi {
    static fileToDataUrl (file) {
