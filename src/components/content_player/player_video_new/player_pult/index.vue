@@ -103,14 +103,14 @@ div(
                 position: 'absolute', zIndex: 3000,
               }`
               ).row.fit
-            //- node playing
+            //- node focused
             div(
-              v-if="!zoomed && player.nodePlaying"
+              v-if="!zoomed && player.nodeFocused"
               :style=`{
                 position: 'absolute', zIndex: 3000,
                 top: '-2px',
-                left: (player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t/player.duration)*100+'%',
-                width: ((player.nodePlaying.items[0].layers[0].figuresAbsolute[1].t-player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
+                left: (player.nodeFocused.items[0].layers[0].figuresAbsolute[0].t/player.duration)*100+'%',
+                width: ((player.nodeFocused.items[0].layers[0].figuresAbsolute[1].t-player.nodeFocused.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
                 height: 'calc(100% + 4px)',
                 border: '2px solid rgb(76,175,79)',
                 borderRadius: '2px',
@@ -131,7 +131,7 @@ div(
                 @first="zoomWorking = true, figureEditing = true"
                 @final="zoomWorking = false, figureEditing = false")
             //- clusters
-            //- tint-bar-clusters(
+            clusters(
               v-if="player.clusters.length > 0 && zoomed !== true"
               v-bind="$props")
             //- currentTime
@@ -223,6 +223,7 @@ div(
 
 <script>
 import actions from './actions.vue'
+import clusters from './clusters.vue'
 import figuresActions from './figures_actions.vue'
 import figuresEditor from './figures_editor.vue'
 import nodeFocused from './node_focused.vue'
@@ -232,6 +233,7 @@ export default {
   props: ['player', 'contentKalpa', 'options'],
   components: {
     actions,
+    clusters,
     figuresActions,
     figuresEditor,
     nodeFocused,
@@ -246,7 +248,7 @@ export default {
       heightBarMax: 40,
       heightWrapper: 50,
       heightWrapperMin: 60,
-      heightWrapperMax: 120,
+      heightWrapperMax: 90,
       minWidth: 0,
       zoomed: null,
       zoomWorking: false,
@@ -368,7 +370,7 @@ export default {
           })
         }
         // figures destroyed
-        if (to === null) {
+        if (to === null && from) {
           this.zoomOut()
           this.$tween.to(this, 0.5, {
             heightBar: this.heightBarMin,

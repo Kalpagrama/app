@@ -11,22 +11,26 @@ div(
     round flat
     :color="player.muted ? 'red' : 'white'"
     :icon="player.muted ? 'volume_off' : 'volume_up'")
-  //- middle controls
   div(v-if="$q.screen.gt.sm").col
-  q-btn(
-    @click="player.forward(false)"
-    round flat  color="white" icon="replay_5").col
-  q-btn(
-    @click="player.playing ? player.pause() : player.play()"
-    round flat color="white").col
-    q-icon(
-      size="34px"
-      :name="player.playing ? 'pause' : 'play_arrow'")
-  q-btn(
-    @click="player.forward(true)"
-    round flat  color="white" icon="forward_5").col
-  //- middle figure
-  //- figures-controls(
+  //- controls default without figures
+  div(
+    v-if="!player.figures"
+    ).col-6
+    .row.full-width.justify-between
+      q-btn(
+        @click="player.forward(false)"
+        round flat  color="white" icon="replay_5").col
+      q-btn(
+        @click="player.playing ? player.pause() : player.play()"
+        round flat color="white").col
+        q-icon(
+          size="34px"
+          :name="player.playing ? 'pause' : 'play_arrow'")
+      q-btn(
+        @click="player.forward(true)"
+        round flat  color="white" icon="forward_5").col
+  //- controls for figures
+  figures-controls(
     v-if="player.figures"
     :player="player" :contentKalpa="contentKalpa")
   div(v-if="$q.screen.gt.sm").col

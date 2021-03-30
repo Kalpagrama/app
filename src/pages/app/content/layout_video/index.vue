@@ -35,7 +35,6 @@ div(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
-          :node="node"
           @node="nodeFocused"
           @pageId="pageId = $event"
           @close="pageId = null")
@@ -56,7 +55,6 @@ div(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
-          :node="node"
           @node="nodeFocused"
           @pageId="pageId = $event"
           @close="pageId = null")
@@ -121,19 +119,9 @@ export default {
       pageId: null,
       contentHeight: 0,
       contentHeightMin: 0,
-      node: null,
     }
   },
   computed: {
-    // contentHeightMin () {
-    //   // if (this.$q.screen.width < 800)
-    //   let width = this.contentKalpa.thumbWidth
-    //   let height = this.contentKalpa.thumbHeight
-    //   // return this.$q.screen.height - (this.$q.screen.width * width) / height
-    //   let res = (height * this.$q.screen.width) / width
-    //   return res
-    //   // return Math.min(this.$q.screen.height / 2, res)
-    // },
     queryClusters () {
       let res = {
         selector: {
@@ -215,18 +203,21 @@ export default {
         // get node
         this.$log('playerReady: nodeOid found, getting node...')
         let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
-        this.$log('playerReady: node found, show node in video...', this.node)
-        if (this.node.items[0] && node.items[0].layers) {
+        this.$log('playerReady: node found, show node in video...', node)
+        if (node.items[0] && node.items[0].layers) {
           this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
           this.player.play()
-          this.player.setState('nodeFocused', this.node)
+          this.player.setState('nodeFocused', node)
         }
       }
     }
   },
+  created () {
+    this.$log('created')
+    this.contentHeight = this.$q.screen.height
+  },
   async mounted () {
     this.$log('mounted')
-    this.contentHeight = this.$q.screen.height
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

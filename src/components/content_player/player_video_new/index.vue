@@ -127,6 +127,7 @@ export default {
     return {
       player_: null,
       playing: false,
+      playingCount: 0,
       muted: false,
       duration: 0,
       currentTime: 0,
@@ -134,7 +135,7 @@ export default {
       nodeFocused: null,
       nodeEditing: null,
       events: null,
-      clusters: null,
+      clusters: [],
     }
   },
   computed: {
@@ -155,6 +156,7 @@ export default {
     },
     play () {
       this.$log('play')
+      this.playingCount += 1
       if (this.playerType === 'player-youtube') {
         this.player_.play()
       }

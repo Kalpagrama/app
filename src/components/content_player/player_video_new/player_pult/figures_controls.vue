@@ -9,35 +9,30 @@
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    position: 'absolute', zIndex: 10,
-    left: 'calc(50% - 100px)',
-    width: '200px',
-  }`
-  ).row.full-height.items-center.content-center.justify-between
-  q-btn(
-    @click="figureRefresh()"
-    round flat dense color="white"
-    ).col
-    q-icon(name="replay" size="26px")
-  q-btn(
-    @click="player.playing ? player.pause() : player.play()"
-    round flat dense color="white"
-    ).col
-    q-icon(
-      size="34px"
-      :name="player.playing ? 'pause' : 'play_arrow'")
-  q-btn(
-    @click="isLooping = !isLooping"
-    round flat dense
-    :color="isLooping ? 'green' : 'white'").col
-    q-icon(
-      name="loop"
-      size="26px"
-      :class=`{
-        //- 'rotating': isLooping,
-      }`)
+.col-6
+  .row.full-width.justify-between
+    q-btn(
+      @click="figureRefresh()"
+      round flat color="white"
+      ).col
+      q-icon(name="replay" size="26px")
+    q-btn(
+      @click="player.playing ? player.pause() : player.play()"
+      round flat color="white"
+      ).col
+      q-icon(
+        size="34px"
+        :name="player.playing ? 'pause' : 'play_arrow'")
+    q-btn(
+      @click="isLooping = !isLooping"
+      round flat
+      :color="isLooping ? 'green' : 'white'").col
+      q-icon(
+        name="loop"
+        size="26px"
+        :class=`{
+          'rotating': isLooping,
+        }`)
 </template>
 
 <script>
