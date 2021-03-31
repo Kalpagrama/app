@@ -159,13 +159,6 @@ export default {
         }
       }
     }
-    // 'player.playingCount': {
-    //   async handler (to, from) {
-    //     if (to === 1) {
-    //       await this.nodePlay()
-    //     }
-    //   }
-    // },
   },
   methods: {
     nodeFocused (node) {
