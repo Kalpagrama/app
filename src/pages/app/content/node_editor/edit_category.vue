@@ -6,7 +6,7 @@ div(
   ).row
   q-btn(
     flat color="white" no-caps icon-right="keyboard_arrow_down" align="between"
-    ).full-width.b-25
+    ).full-width
     span {{ categoryLabel }}
   //- TODO styling the select component... maybe the fallback to native from quasar
   select(
