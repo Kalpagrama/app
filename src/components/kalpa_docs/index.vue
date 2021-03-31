@@ -1,5 +1,6 @@
 <style lang="sass">
 .doc-item
+  color: white
   &:hover
     color: green !important
 </style>
