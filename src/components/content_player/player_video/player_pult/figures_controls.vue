@@ -96,13 +96,13 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.player.events.on('figures-forward-start', this.figureForwardStartHandle)
-    // this.player.events.on('figures-forward-end', this.figureForwardEndHandle)
+    this.player.events.on('figures-forward-start', this.figureForwardStartHandle)
+    this.player.events.on('figures-forward-end', this.figureForwardEndHandle)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.player.events.off('figures-forward-start', this.figureForwardStartHandle)
-    // this.player.events.off('figures-forward-end', this.figureForwardEndHandle)
+    this.player.events.off('figures-forward-start', this.figureForwardStartHandle)
+    this.player.events.off('figures-forward-end', this.figureForwardEndHandle)
   }
 }
 </script>

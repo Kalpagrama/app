@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit.bg
+.column.fit
   //- .row.full-width.justify-center
     div(
       :style=`{

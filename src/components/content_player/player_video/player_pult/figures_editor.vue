@@ -160,7 +160,7 @@ export default {
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.player.pause()
-        // this.player.events.emit('figures-forward-start')
+        this.player.events.emit('figures-forward-start')
       }
       // work
       let tNow = this.player.figures[index].t

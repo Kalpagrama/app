@@ -84,7 +84,7 @@ export default {
       this.player.setState('figures', null)
       this.player.setState('nodeEditing', null)
       // this.player.setState('nodePlaying', null)
-      // this.player.events.emit('figure-delete')
+      this.player.events.emit('figure-delete')
     },
   },
   mounted () {

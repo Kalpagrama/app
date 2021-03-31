@@ -385,8 +385,8 @@ export default {
       }
       // save draft ?
       else {
-        // this.player.events.emit('figure-delete')
-        // this.player.setState('figure', null)
+        this.player.events.emit('figure-delete')
+        // this.player.setState('figureы', null)
       }
     },
   },

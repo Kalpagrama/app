@@ -24,7 +24,8 @@ div(
   q-dialog(
     v-model="itemEditorShow"
     position="bottom"
-    :maximized="true")
+    :maximized="true"
+    :no-esc-dismiss="true")
     item-editor(
       v-if="joint.items[1]"
       :joint="joint"

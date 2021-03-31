@@ -12,7 +12,7 @@ div(
       opacity: 0.8,
     }`
     ).row.full-with.bg-red.text-white.bg
-    small.full-width currentTime: {{currentTime}}
+    //- small.full-width currentTime: {{currentTime}}
     small.full-width urlMeta: {{urlMeta}}
   slot(name="footer" :player="player")
   div(
@@ -126,6 +126,9 @@ export default {
           if (to >= this.urlMeta[1].t - 0.3) {
             this.replay()
           }
+          if (to < this.urlMeta[0].t) {
+            this.replay()
+          }
         }
       }
     }
@@ -164,7 +167,7 @@ export default {
     },
     replay () {
       this.$log('replay')
-      if (this.$refs.videRef) {
+      if (this.$refs.videoRef) {
         this.$refs.videoRef.currentTime = this.urlMeta[0].t
         this.$refs.videoRef.play()
       }
