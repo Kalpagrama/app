@@ -198,7 +198,7 @@
   //- next items
   div(
     v-if="itemActive && jointsRes && !itemIndependent"
-    ).row.full-width.q-pa-md
+    ).row.full-width.q-py-md.q-mb-xl
     //- got joints
     div(
       v-if="true || jointsRes.totalCount > 1"
@@ -218,7 +218,6 @@
         .row.no-wrap
           router-link(
             v-for="(i,ii) in jointsRes.items" :key="i.oid"
-            v-if="i.oid !== joint.oid"
             :to="'/graph/'+item.oid+'?oid='+i.oid"
             ).row.q-pr-sm
             img(
