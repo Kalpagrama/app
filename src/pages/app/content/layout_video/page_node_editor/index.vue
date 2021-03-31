@@ -74,7 +74,7 @@
             @change="categoryChanged"
             :style=`{
               position: 'absolute', zIndex: 100,
-              background: 'red',
+              //- background: 'red',
               opacity: 0
             }`
             ).fit
