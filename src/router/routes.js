@@ -304,7 +304,7 @@ const routes = [
             }
          }
          // logD('router :: try systemInit...')
-         // await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
+         await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
          if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
             logD('router::need more privileges')
             return next('/auth') // если маршрут требует повышения - переходим на форму входа
