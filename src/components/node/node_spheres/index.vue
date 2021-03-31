@@ -6,7 +6,7 @@
 </style>
 
 <template lang="pug">
-.row.full-width.q-px-sm.q-py-xs
+.row.full-width.q-py-xs
   .row.full-width.scroll.q-pl-sm
     component(
       v-for="(s,si) in node.spheres" :key="si"

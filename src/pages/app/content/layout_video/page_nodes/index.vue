@@ -69,8 +69,9 @@ export default {
     },
     nodeClick (node) {
       this.$log('nodeClick', node)
-      this.nodeSelectedOid = node.oid
+      // this.nodeSelectedOid = node.oid
       this.nodeReplay(node)
+      this.nodeLaunch(node)
     },
     nodeLaunch (node) {
       this.$log('nodeLaunch', node)

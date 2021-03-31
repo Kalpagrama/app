@@ -571,13 +571,13 @@ export default {
       // this.barClick({layerX: left, target: {clientWidth: width}})
     },
     zoomWrapperOnResize (e) {
-      this.$log('zoomWrapperOnResize', e)
-      // if (this.width === 0) {
-      //   this.minWidth = this.minWidthMin
-      // }
-      // this.$set(this, 'width', e.width)
+      // this.$log('zoomWrapperOnResize', e)
       this.width = e.width
       this.height = e.height
+      // this.minWidth = this.zoomed ? this.minWidthMax : this.minWidthMin
+      if (!this.zoomed) {
+        this.minWidth = this.minWidthMin
+      }
     },
     minutesWrapperDrag (e) {
       // this.$log('minutesWrapperDrag', e)
@@ -657,6 +657,7 @@ export default {
       }
     }
   },
+  // created () {},
   mounted () {
     this.$log('mounted')
     let rect = this.$refs['zoom-wrapper'].getBoundingClientRect()
