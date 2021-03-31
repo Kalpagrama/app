@@ -77,11 +77,21 @@ export default {
     url () { return ContentApi.urlSelect(this.composition) },
     urlMeta () {
       let arr = this.url.split('#t=')
-      let [start, end] = arr[1].split(',')
-      return [
-        {t: parseFloat(start)},
-        {t: parseFloat(end)},
-      ]
+      if (arr[1]) {
+        let [start, end] = arr[1].split(',')
+        return [
+          {t: parseFloat(start)},
+          {t: parseFloat(end)},
+        ]
+      } else {
+        // на выкачанных композициях нет #t
+        let duration = 0
+        for (let l of this.composition.layers) duration += l.figuresAbsolute[1].t - l.figuresAbsolute[0].t
+        return [
+          {t: 0},
+          {t: duration}
+        ]
+      }
     },
     videoShow () {
       return this.isActive
