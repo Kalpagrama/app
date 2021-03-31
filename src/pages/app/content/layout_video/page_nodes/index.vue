@@ -18,13 +18,13 @@ page-nodes-root(
       ).row.full-width.node.q-mb-sm.q-px-sm
       div(
         :style=`{
-          background: 'rgba(35,35,35,0.6)',
+          background: 'rgba(35,35,35,0.4)',
           borderRadius: '10px',
         }`
         ).row.full-width
         div(
           :style=`{
-            background: 'rgba(40,40,40,0.6)',
+            background: 'rgba(40,40,40,0.4)',
             borderRadius: '10px',
           }`
           ).row.full-width.items-start.content-start

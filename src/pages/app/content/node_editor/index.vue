@@ -27,7 +27,7 @@
             paddingRight: '40px',
             textAlign: 'center',
             fontWeight: 'bold',
-            fontSize: '18px',
+            fontSize: fontSize+'px',
             lineHeight: 1.3,
             minHeight: '60px',
           }`
@@ -67,6 +67,7 @@
             flat color="white" no-caps icon-right="keyboard_arrow_down" align="between"
             ).full-width.b-25
             span {{ categoryLabel }}
+          //- TODO styling the select component... maybe the fallback to native from quasar
           select(
             v-if="true || $q.platform.is.mobile"
             ref="categoryInput"
@@ -103,7 +104,7 @@ import { UserApi } from 'src/api/user'
 import nodeSpheres from 'components/node/node_spheres/index.vue'
 
 export default {
-  name: 'pageNodeEditor',
+  name: 'nodeEditor',
   components: {
     nodeSpheres,
   },
@@ -115,7 +116,8 @@ export default {
         items: [],
         spheres: [],
         category: null,
-        layout: 'HORIZONTAL'
+        layout: 'HORIZONTAL',
+        vertices: [],
       },
       nodePublishing: false,
       sphere: '',
@@ -144,20 +146,32 @@ export default {
       else {
         return this.$t('Pick category')
       }
+    },
+    fontSize () {
+      let l = this.node.name.length
+      if (l < 20) return 20
+      else if (l < 30) return 16
+      else if (l < 40) return 14
+      else return 12
     }
   },
   watch: {
-    // 'player.nodeEditing': {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     if (to === null) {
-    //       this.player.setState('nodeEditing', this.node)
-    //     }
-    //     if (to && !this.node) {
-    //       this.node = to
-    //     }
-    //   }
-    // }
+    'player.nodeEditing': {
+      immediate: true,
+      handler (to, from) {
+        if (to === null) {
+          // this.$q.notify('Node create!')
+          this.player.setState('nodeEditing', this.node)
+        }
+        else {
+          // this.$q.notify('Node use from player!')
+          this.node = this.player.nodeEditing
+        }
+        // if (to && !this.node) {
+        //   this.node = to
+        // }
+      }
+    }
   },
   methods: {
     categoryChanged (e) {
@@ -352,18 +366,13 @@ export default {
   },
   created () {
     this.$log('created')
-    // if (this.player.nodeEditing === null) {
-    //   this.player.setState('nodeEditing', this.node)
-    // }
-    // if (this.player.nodeEditing && !this.node) {
-    //   this.node = this.player.nodeEditing
-    // }
   },
   mounted () {
     this.$log('mounted')
-    this.$wait(500).then(() => {
-      this.$refs.nameInput.focus()
-    })
+    // TODO: autofocus only on desktop? android?
+    // this.$wait(500).then(() => {
+    //   this.$refs.nameInput.focus()
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

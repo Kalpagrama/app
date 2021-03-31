@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  name: 'layerStrips',
+  name: 'strips',
   props: ['player', 'composition', 'contentKalpa'],
 }
 </script>

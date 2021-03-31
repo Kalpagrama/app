@@ -23,7 +23,7 @@ div(
     }`
     @player="playerReady"
     ).fit.bg-black
-    //- desktop pages
+    //- Desktop page wrapper
     template(v-slot:pult)
       div(
         v-if="player && $q.screen.gt.sm"
@@ -47,6 +47,7 @@ div(
             overflow: 'hidden',
           }`
           @node="nodeFocused").b-30
+    //- Mobile page wrapper
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
@@ -61,6 +62,7 @@ div(
       div(
         v-if="player"
         :style=`{position: 'relative'}`).row.full-width
+        //- Mobile button overlay
         div(
           v-if="player.figures && $q.screen.lt.md"
           :style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.fit.bg-black.q-px-md
@@ -69,19 +71,22 @@ div(
             flat color="green" no-caps
             :style=`{
               height: '44px',
+              borderRadius: '16px',
             }`
             @click="pageId = 'node-editor'"
             ).full-width
-            span {{$t('Edit node')}}
+            span.text-bold {{ $t('Next') }}
           q-btn(
             v-if="pageId === 'node-editor'"
             flat color="green" no-caps
             :style=`{
               height: '44px',
+              borderRadius: '16px',
             }`
             @click="pageId = null"
             ).full-width
-            span {{$t('Edit fragment')}}
+            span.text-bold {{ $t('Edit fragment') }}
+        //- Nav for all platforms
         nav-bottom(
           :pageId="pageId" @pageId="pageId === $event ? pageId = null : pageId = $event")
 </template>
@@ -90,15 +95,12 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'components/content_player/index.vue'
-
 import navBottom from '../nav_bottom.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageNode from './page_node/index.vue'
-import pageNodeEditor from './page_node_editor/index.vue'
+import pageNodeEditor from '../node_editor/index.vue'
 import pageDrafts from '../page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
-
-import nodeCreator from '../node_creator/index.vue'
 
 export default {
   name: 'layoutVideo',
@@ -111,7 +113,6 @@ export default {
     pageDrafts,
     pageInfo,
     navBottom,
-    nodeCreator,
   },
   data () {
     return {
