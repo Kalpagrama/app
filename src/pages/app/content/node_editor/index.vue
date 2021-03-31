@@ -157,8 +157,10 @@ export default {
   },
   watch: {
     'player.nodeEditing': {
+      deep: true,
       immediate: true,
       handler (to, from) {
+        this.$log('player.nodeEditing TO', to ? to.name : null)
         if (to === null) {
           // this.$q.notify('Node create!')
           this.player.setState('nodeEditing', this.node)
