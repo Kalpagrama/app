@@ -76,7 +76,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 import pageNodes from './page_nodes/index.vue'
-import pageDrafts from '../page_drafts/index.vue'
+import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
