@@ -1,5 +1,6 @@
 <style lang="sass" scoped>
 .sphere-item
+  cursor: pointer !important
   &:hover
     color: rgb(76,175,79) !important
 </style>
