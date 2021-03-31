@@ -91,9 +91,9 @@ export default {
       this.player = player
       this.player.events.on('figure-delete', () => {
         this.$log('player figure-delete')
-        this.player.setState('figure', null)
+        this.player.setState('figures', null)
       })
-      if (this.figures) this.player.setState('figure', this.figures)
+      if (this.figures) this.player.setState('figures', this.figures)
       this.$nextTick(() => {
         this.player.play()
       })
@@ -111,7 +111,7 @@ export default {
             id: Date.now().toString(),
             contentOid: this.contentKalpa.oid,
             contentName: this.contentKalpa.name,
-            figuresAbsolute: this.player.figure
+            figuresAbsolute: this.player.figures
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
