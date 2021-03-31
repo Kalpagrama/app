@@ -99,7 +99,7 @@ import navBottom from '../nav_bottom.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageNode from './page_node/index.vue'
 import pageNodeEditor from '../node_editor/index.vue'
-import pageDrafts from '../page_drafts/index.vue'
+import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 
 export default {
