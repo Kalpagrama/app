@@ -3,17 +3,31 @@ div(
   :style=`{
     position: 'relative',
     height: $q.screen.height+'px',
+    overflow: 'hidden',
   }`
   ).column.full-width.bg-black
-  img(
+  //- debug
+  //- div(
+    :style=`{
+      position: 'absolute', zIndex: 10000, top: '0px',
+      pointerEvents: 'none',
+      fontSize: '10px',
+      opacity: 0.8,
+    }`
+    ).row.bg-green.text-white.q-pa-xs
+    small.full-width contentHeightMin: {{ contentHeightMin }}
+  //- debug image
+  //- img(
     @load="contentKalpaThumbUrlLoaded"
     :src="contentKalpa.thumbUrl"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      opacity: 0,
+      opacity: 0.5,
       pointerEvents: 'none',
+      maxHeight: contentHeightMin+'px',
+      objectFit: 'contain',
     }`
-    ).full-width
+    ).full-width.br
   content-player(
     :contentKalpa="contentKalpa"
     :options=`{
@@ -46,7 +60,7 @@ div(
             borderRadius: '10px',
             overflow: 'hidden',
           }`
-          @node="nodeFocused").b-30
+          @node="nodeFocused")
     //- Mobile page wrapper
     template(v-slot:footer)
       div(
@@ -119,10 +133,20 @@ export default {
       player: null,
       pageId: null,
       contentHeight: 0,
-      contentHeightMin: 0,
+      // contentHeightMin: 0,
     }
   },
   computed: {
+    contentHeightMin () {
+      let tW = this.contentKalpa.thumbWidth
+      let tH = this.contentKalpa.thumbHeight
+      let sW = this.$q.screen.width
+      let sH = (sW * tH) / tW
+      let sHMax = this.$q.screen.height / 3
+      let sHMin = 150
+      // return sH
+      return Math.max(sHMin, Math.min(sH, sHMax))
+    },
     queryClusters () {
       let res = {
         selector: {
@@ -204,6 +228,18 @@ export default {
           this.player.setState('nodeFocused', node)
         }
       }
+    },
+    onKeydown (e) {
+      // this.$log('onKeydown', e)
+      if (this.$store.state.ui.userTyping) return
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        this.player.setCurrentTime(this.player.currentTime - 5)
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        this.player.setCurrentTime(this.player.currentTime + 5)
+      }
     }
   },
   created () {
@@ -212,11 +248,13 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
+    window.addEventListener('keydown', this.onKeydown)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.player.setState('nodePlaying', null)
     this.$store.commit('ui/stateSet', ['nodeOnContent', null])
+    if (this.player) this.player.setState('nodePlaying', null)
+    window.removeEventListener('keydown', this.onKeydown)
   }
 }
 </script>

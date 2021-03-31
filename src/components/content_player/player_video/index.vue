@@ -193,7 +193,7 @@ export default {
       }
     },
     forward (next) {
-      this.$log('forward', next)
+      // this.$log('forward', next)
       let t = this.player.currentTime
       if (next) t += 5
       else t -= 5
@@ -215,7 +215,7 @@ export default {
       }
     },
     videoLoadeddata (e) {
-      this.$log('videoLoadeddata', e)
+      // this.$log('videoLoadeddata', e)
       if (this.playerType === 'player-youtube') {
         this.duration = this.player_.duration
       }
@@ -248,7 +248,7 @@ export default {
       }
     },
     videoPaused (e) {
-      this.$log('videoPaused', e)
+      // this.$log('videoPaused', e)
       if (this.playerType === 'player-youtube') {
         this.playing = false
       }
@@ -257,7 +257,7 @@ export default {
       }
     },
     videoPlaying (e) {
-      this.$log('videoPlaying', e)
+      // this.$log('videoPlaying', e)
       if (this.playerType === 'player-youtube') {
         this.playing = true
       }

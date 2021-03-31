@@ -1,6 +1,6 @@
 <template lang="pug">
-.column.fit
-  .row.full-width.justify-center
+.column.fit.bg
+  //- .row.full-width.justify-center
     div(
       :style=`{
         maxWidth: 600+'px',

@@ -1,6 +1,66 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
-  div(:style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
+  div(
+    v-if="$q.screen.gt.sm"
+    :style=`{maxWidth: 600+'px'}`).row.full-width
+    //- name
+    div(:style=`{height: '60px'}`).row.full-width
+      //- span.text-white What do you see
+      q-input(
+        v-model="node.name"
+        borderless dark
+        ref="nameInput"
+        type="textarea" autogrow
+        :placeholder="$t('What do you see?')"
+        :input-style=`{
+          paddingTop: '16px',
+          paddingBottom: '10px',
+          paddingLeft: '20px',
+          paddingRight: '10px',
+          //- textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: fontSize+'px',
+          lineHeight: 1.3,
+          minHeight: '60px',
+        }`
+        ).full-width
+    //- category, spheres,
+    .row.full-width.items-center.content-center.q-px-sm
+      edit-category(:node="node")
+      .col
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-spheres(
+            v-if="node.spheres.length > 0"
+            :node="node"
+            :disabled="true"
+            @sphere="sphereDelete")
+    div(:style=`{}`).row.full-width.items-center.content-center.q-px-md
+      .col
+        q-input(
+          v-model="sphere"
+          borderless dark dense
+          :placeholder="$t('Add spheres')"
+          :input-style=`{
+            paddingLeft: '8px',
+          }`
+          @blur="sphereAdd()"
+          @keydown.enter="sphereAdd()"
+          ).full-width
+      q-btn(
+        color="green" no-caps
+        :disable="!canPublish"
+        :loading="nodePublishing"
+        :style=`{
+          //- height: '50px',
+        }`
+        @click="nodePublish()"
+        )
+        span {{$t('Publish')}}
+    //- .row.full-width
+      small.text-white id: {{ node.id }}
+  div(
+    v-if="$q.screen.lt.md"
+    :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
     .row.full-width.items-start.content-start
       div(
         :style=`{
@@ -56,34 +116,7 @@
       div(
         v-if="node.name.length > 0"
         ).row.full-width.q-pa-md
-        //- .row.full-width
-          small.text-white {{node}}
-        div(
-          :style=`{
-            position: 'relative',
-          }`
-          ).row.full-width.q-py-md
-          q-btn(
-            flat color="white" no-caps icon-right="keyboard_arrow_down" align="between"
-            ).full-width.b-25
-            span {{ categoryLabel }}
-          //- TODO styling the select component... maybe the fallback to native from quasar
-          select(
-            v-if="true || $q.platform.is.mobile"
-            ref="categoryInput"
-            :name="$t('Pick category')"
-            @change="categoryChanged"
-            :style=`{
-              position: 'absolute', zIndex: 100,
-              //- background: 'red',
-              opacity: 0
-            }`
-            ).fit
-            option(
-              v-for="(c,ci) in categories" :key="ci"
-              :value="c.value"
-              @click="categorySet(c,ci)"
-              ) {{ c.label }}
+        edit-category(:node="node")
         q-btn(
           color="green" no-caps
           :disable="!canPublish"
@@ -102,11 +135,13 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 
 import nodeSpheres from 'components/node/node_spheres/index.vue'
+import editCategory from './edit_category.vue'
 
 export default {
   name: 'nodeEditor',
   components: {
     nodeSpheres,
+    editCategory,
   },
   props: ['player', 'contentKalpa'],
   data () {
@@ -127,26 +162,6 @@ export default {
     canPublish () {
       return this.node.name.length > 0 && this.node.category
     },
-    categories () {
-      return this.$store.getters.nodeCategories.reduce((acc, val) => {
-        if (val.type !== 'ALL') {
-          acc.push({
-            value: val.type,
-            label: val.alias.charAt(0).toUpperCase() + val.alias.slice(1),
-          })
-        }
-        return acc
-      }, [])
-    },
-    categoryLabel () {
-      if (this.node.category) {
-        let name = this.categories.find(c => c.value === this.node.category).label
-        return `${this.$t('Category - ')} ${name}`
-      }
-      else {
-        return this.$t('Pick category')
-      }
-    },
     fontSize () {
       let l = this.node.name.length
       if (l < 20) return 20
@@ -159,7 +174,7 @@ export default {
     'player.nodeEditing': {
       deep: true,
       immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('player.nodeEditing TO', to ? to.name : null)
         if (to === null) {
           // this.$q.notify('Node create!')
@@ -167,27 +182,36 @@ export default {
         }
         else {
           // this.$q.notify('Node use from player!')
-          this.node = this.player.nodeEditing
+          // We got from workspace
+          if (this.node.id && this.node.wsItemType === 'WS_NODE') {
+            // Do nothing...
+          }
+          else {
+            if (this.node.name.length > 0) {
+              // Save this to drafts...
+              // this.player.setState(await this.nodeSave())
+            }
+            else {
+              // Do nothing...
+            }
+          }
+          // Save node here
+          if (!this.nodeSaved) {
+            this.nodeSaved = true
+            this.node = to
+          }
+          if (this.node.name.length > 0 && this.node.wsItemType !== 'WS_NODE') {
+            // alert('Save node to drafts!')
+          }
         }
-        // if (to && !this.node) {
-        //   this.node = to
-        // }
       }
     }
   },
   methods: {
-    categoryChanged (e) {
-      this.$log('categoryChanged', e)
-      this.categorySet({value: e.target.value})
-    },
-    categorySet (c) {
-      this.$log('categorySet', c)
-      // this.node.category = c.value
-      this.$set(this.node, 'category', c.value)
-    },
     sphereAdd () {
       this.$log('sphereAdd')
       // checks
+      if (this.sphere.length === 0) return
       if (this.node.name === this.sphere) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Add another')})
         this.sphere = ''
@@ -202,7 +226,6 @@ export default {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum 5 spheres!')})
         return
       }
-      if (this.sphere.length === 0) return
       // do stuff
       this.node.spheres.push({name: this.sphere})
       this.sphere = ''
@@ -300,9 +323,10 @@ export default {
       nodeInput.items[0] = this.compositionCreate()
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeSaved', nodeSaved)
-      this.player.setState('figures', null)
+      return nodeSaved
+      // this.player.setState('figures', null)
       // save content bookmark to "all" collection
-      await this.contentBookmarkSave()
+      // await this.contentBookmarkSave()
       // this.$emit('nodeSaved')
     },
     async nodePublish () {
@@ -324,16 +348,16 @@ export default {
         // create node, publish this shit
         let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
         this.$emit('published', nodeCreating)
-        this.$store.commit('ui/stateSet', ['nodeCreating', true])
+        // this.$store.commit('ui/stateSet', ['nodeCreating', true])
         // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
         // ---
-        // delete draft if it is a draft, man
+        // Delete draft if it is a draft, man
         if (nodeInput.wsItemType === 'WS_NODE') {
           // await this.node.remove(true)
           await this.$rxdb.remove(this.node.id)
         }
         // save content bookmark to "all" collection
-        await this.contentBookmarkSave()
+        // await this.contentBookmarkSave()
         // ---
         // done
         this.nodePublishing = false
