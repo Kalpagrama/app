@@ -609,7 +609,7 @@ class Group {
          }
          if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()// на всякий случай
          pageItems = pageItems.filter(item => {
-            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
+            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item, this.reactiveGroup.id)
             let res = !this.debugUniqueOids.has(item[itemPrimaryKey])
             this.debugUniqueOids.add(item[itemPrimaryKey])
             return res

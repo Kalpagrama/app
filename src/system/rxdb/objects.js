@@ -302,7 +302,9 @@ class Objects {
             if (event.object.type === 'JOINT') { // создан новый джойнт. обновляем статистику джойнтов на ядре
                for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
-                  if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints++ // обновляем статистику джойнтов на ядре
+                  if (reactiveItem && reactiveItem.type === 'NODE') {
+                     reactiveItem.countStat.countJoints++
+                  } // обновляем статистику джойнтов на ядре
                }
             }
             break
@@ -340,7 +342,7 @@ class Objects {
             if (event.object.type === 'JOINT') { // удален джойнт. обновляем статистику джойнтов на ядре
                for (let oid of event.relatedSphereOids) {
                   let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
-                  if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countJoints = reactiveItem.countJoints ? reactiveItem.countJoints - 1 : 0 // обновляем статистику джойнтов на ядре
+                  if (reactiveItem && reactiveItem.type === 'NODE') reactiveItem.countStat.countJoints = reactiveItem.countStat.countJoints ? reactiveItem.countStat.countJoints - 1 : 0 // обновляем статистику джойнтов на ядре
                }
             }
             break
