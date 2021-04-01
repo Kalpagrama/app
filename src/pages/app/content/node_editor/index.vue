@@ -46,6 +46,27 @@
           @blur="sphereAdd()"
           @keydown.enter="sphereAdd()"
           ).full-width
+      //- Delete from notes
+      q-btn(
+        v-if="node.wsItemType === 'WS_NODE'"
+        outline no-caps color="red"
+        :disable="node.name.length === 0"
+        :loading="nodeSaving"
+        :style=`{}`
+        @click="nodeDeleteAction()"
+        ).q-mr-sm
+        span {{$t('Delete draft')}}
+      //- Save to notes
+      q-btn(
+        v-if="node.wsItemType !== 'WS_NODE'"
+        outline no-caps color="grey-8"
+        :disable="node.name.length === 0"
+        :loading="nodeSaving"
+        :style=`{}`
+        @click="nodeSaveAction()"
+        ).q-mr-sm
+        span {{$t('Save as draft')}}
+      //- Publish
       q-btn(
         color="green" no-caps
         :disable="!canPublish"
@@ -146,15 +167,17 @@ export default {
   props: ['player', 'contentKalpa'],
   data () {
     return {
-      node: {
-        name: '',
-        items: [],
-        spheres: [],
-        category: null,
-        layout: 'HORIZONTAL',
-        vertices: [],
-      },
+      // node: {
+      //   name: '',
+      //   items: [],
+      //   spheres: [],
+      //   category: null,
+      //   layout: 'HORIZONTAL',
+      //   vertices: [],
+      // },
       nodePublishing: false,
+      nodeDeleting: false,
+      nodeSaving: false,
       sphere: '',
     }
   },
@@ -168,44 +191,47 @@ export default {
       else if (l < 30) return 16
       else if (l < 40) return 14
       else return 12
+    },
+    node () {
+      return this.player.node
     }
   },
   watch: {
-    'player.nodeEditing': {
-      deep: true,
-      immediate: true,
-      async handler (to, from) {
-        this.$log('player.nodeEditing TO', to ? to.name : null)
-        if (to === null) {
-          // this.$q.notify('Node create!')
-          this.player.setState('nodeEditing', this.node)
-        }
-        else {
-          // this.$q.notify('Node use from player!')
-          // We got from workspace
-          if (this.node.id && this.node.wsItemType === 'WS_NODE') {
-            // Do nothing...
-          }
-          else {
-            if (this.node.name.length > 0) {
-              // Save this to drafts...
-              // this.player.setState(await this.nodeSave())
-            }
-            else {
-              // Do nothing...
-            }
-          }
-          // Save node here
-          if (!this.nodeSaved) {
-            this.nodeSaved = true
-            this.node = to
-          }
-          if (this.node.name.length > 0 && this.node.wsItemType !== 'WS_NODE') {
-            // alert('Save node to drafts!')
-          }
-        }
-      }
-    }
+    // 'player.nodeEditing': {
+    //   deep: true,
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('player.nodeEditing TO', to ? to.name : null)
+    //     if (to === null) {
+    //       // this.$q.notify('Node create!')
+    //       this.player.setState('nodeEditing', this.node)
+    //     }
+    //     else {
+    //       // this.$q.notify('Node use from player!')
+    //       // We got from workspace
+    //       if (this.node.id && this.node.wsItemType === 'WS_NODE') {
+    //         // Do nothing...
+    //       }
+    //       else {
+    //         if (this.node.name.length > 0) {
+    //           // Save this to drafts...
+    //           // this.player.setState(await this.nodeSave())
+    //         }
+    //         else {
+    //           // Do nothing...
+    //         }
+    //       }
+    //       // Save node here
+    //       if (!this.nodeSaved) {
+    //         this.nodeSaved = true
+    //         this.node = to
+    //       }
+    //       if (this.node.name.length > 0 && this.node.wsItemType !== 'WS_NODE') {
+    //         // alert('Save node to drafts!')
+    //       }
+    //     }
+    //   }
+    // }
   },
   methods: {
     sphereAdd () {
@@ -317,17 +343,44 @@ export default {
         if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
       }
     },
+    async nodeSaveAction () {
+      try {
+        this.$log('nodeSaveAction start')
+        this.nodeSaving = true
+        await this.$wait(500)
+        this.player.setState('node', await this.nodeSave())
+        // TODO: set nodeMode: edit
+        this.$log('nodeSaveAction done')
+        this.nodeSaving = false
+      }
+      catch (e) {
+        this.$log('nodeSaveAction error', e)
+        this.nodeSaving = false
+      }
+    },
+    async nodeDeleteAction () {
+      try {
+        this.$log('nodeDeleteAction start')
+        this.nodeDeleting = true
+        await this.$wait(500)
+        // TODO: set nodeMode: null
+        // await this.$rxdb.remove(this.node.id)
+        await this.node.remove(true)
+        this.player.setState('node', null)
+        this.$log('nodeDeleteAction done')
+        this.nodeDeleting = false
+      }
+      catch (e) {
+        this.$log('nodeDeleteAction error', e)
+        this.nodeDeleting = false
+      }
+    },
     async nodeSave () {
       this.$log('nodeSave')
       let nodeInput = JSON.parse(JSON.stringify(this.node))
-      nodeInput.items[0] = this.compositionCreate()
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeSaved', nodeSaved)
       return nodeSaved
-      // this.player.setState('figures', null)
-      // save content bookmark to "all" collection
-      // await this.contentBookmarkSave()
-      // this.$emit('nodeSaved')
     },
     async nodePublish () {
       try {
@@ -339,7 +392,7 @@ export default {
         // ---
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))
-        nodeInput.items[0] = this.compositionCreate()
+        // nodeInput.items[0] = this.compositionCreate()
         if (nodeInput.name.length === 0) {
           throw new Error(this.$t('Empty essence !'))
         }
@@ -347,7 +400,7 @@ export default {
         // ---
         // create node, publish this shit
         let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
-        this.$emit('published', nodeCreating)
+        // this.$emit('published', nodeCreating)
         // this.$store.commit('ui/stateSet', ['nodeCreating', true])
         // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
         // ---
@@ -356,6 +409,8 @@ export default {
           // await this.node.remove(true)
           await this.$rxdb.remove(this.node.id)
         }
+        this.player.setState('nodeMode', 'focus')
+        this.player.setState('node', nodeCreating)
         // save content bookmark to "all" collection
         // await this.contentBookmarkSave()
         // ---
@@ -363,11 +418,11 @@ export default {
         this.nodePublishing = false
         // ---
         // kill player figures, it will destroy node editor
-        this.player.setState('figures', null)
+        // this.player.setState('figures', null)
         // ---
         // where to wait for the progress of node creating ?
         // here ?
-        this.$emit('node', nodeCreating)
+        // this.$emit('node', nodeCreating)
       }
       catch (e) {
         this.$log('nodePublish error', e)
@@ -385,7 +440,8 @@ export default {
       }
       // save draft ?
       else {
-        this.player.events.emit('figure-delete')
+        this.player.setState('node', null)
+        // this.player.events.emit('figure-delete')
         // this.player.setState('figureы', null)
       }
     },

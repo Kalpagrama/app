@@ -49,7 +49,7 @@
         q-btn(
           v-if="$store.getters.currentUser().thumbUrl"
           @click="$refs.inputAvatar.click()"
-          flat dense color="grey-6" no-caps) Изменить
+          flat dense color="grey-6" no-caps) {{$t('Change')}}
         //- remove
         //- random
         //- pick

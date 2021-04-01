@@ -60,16 +60,15 @@ export default {
   },
   data () {
     return {
+      events: null,
       player_: null,
       playing: false,
       playingCount: 0,
       muted: false,
       duration: 0,
       currentTime: 0,
-      figures: null, // Figures is selected to create the node in future
-      nodeFocused: null, // When node is focused after Feeds and Creation
-      nodeEditing: null, // When node is editing in content explorer
-      events: null,
+      node: null,
+      nodeMode: null,
       clusters: [],
     }
   },
@@ -79,6 +78,14 @@ export default {
     playerType () {
       if (this.url.includes('youtu')) return 'player-youtube' // контент не выкачан - показываем плеер ютуба
       else return 'player-kalpa' // есть выкачаннный контент
+    },
+    figures () {
+      if (this.node) {
+        return this.node.items[0].layers[0].figuresAbsolute
+      }
+      else {
+        return null
+      }
     }
   },
   methods: {
@@ -124,8 +131,8 @@ export default {
       }
     },
     forward (next) {
-      // this.$log('forward', next)
-      let t = this.player.currentTime
+      this.$log('forward', next)
+      let t = this.currentTime
       if (next) t += 5
       else t -= 5
       if (t < 0) t = 0

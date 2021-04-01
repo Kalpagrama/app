@@ -7,20 +7,7 @@ div(
     overflow: 'hidden',
   }`
   ).row.fit
-  //- figures
-  //- div(
-    v-for="(f,fi) in player.figures" :key="fi"
-    :style=`{
-      position: 'absolute', zIndex: 1000+fi,
-      left: (f.figures[0].t/player.duration)*100+'%',
-      width: ((f.figures[1].t-f.figures[0].t)/player.duration)*100+'%',
-      height: '100%',
-      //- background: 'rgba(200,200,200,0.3)',
-      background: $rateMeta.find(r => f.node.rate >= r.valueMin && f.node.rate < r.valueMax).colorBackground,
-      opacity: 0.2,
-      pointerEvents: 'none',
-    }`
-    ).row
+  //- cluster wrapper
   div(
     v-for="(cluster,clusterIndex) in player.clusters" :key="clusterIndex"
     v-if="cluster.figuresAbsolute.length > 0"

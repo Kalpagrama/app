@@ -18,7 +18,6 @@ div(
     small.full-width contentHeightMin: {{ contentHeightMin }}
   //- debug image
   //- img(
-    @load="contentKalpaThumbUrlLoaded"
     :src="contentKalpa.thumbUrl"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
@@ -50,10 +49,11 @@ div(
           :contentKalpa="contentKalpa"
           :player="player"
           @node="nodeFocused"
-          @pageId="pageId = $event"
+          @draft="draftFocused"
+          @pageId="pageIdChange"
           @close="pageId = null")
         page-node-editor(
-          v-if="player.figures"
+          v-if="player.node && player.nodeMode === 'edit'"
           :contentKalpa="contentKalpa"
           :player="player"
           :style=`{
@@ -71,7 +71,8 @@ div(
           :contentKalpa="contentKalpa"
           :player="player"
           @node="nodeFocused"
-          @pageId="pageId = $event"
+          @draft="draftFocused"
+          @pageId="pageIdChange"
           @close="pageId = null")
       div(
         v-if="player"
@@ -102,7 +103,7 @@ div(
             span.text-bold {{ $t('Edit fragment') }}
         //- Nav for all platforms
         nav-bottom(
-          :pageId="pageId" @pageId="pageId === $event ? pageId = null : pageId = $event")
+          :pageId="pageId" @pageId="pageIdChange")
 </template>
 
 <script>
@@ -173,27 +174,41 @@ export default {
         }
       }
     },
-    'player.figures': {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('player.figures TO', to)
-        if (to && !from) {
-          this.pageId = null
-          // this.pageId = 'node-editor'
-        }
-      }
-    }
+    // 'player.figures': {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('player.figures TO', to)
+    //     if (to && !from) {
+    //       this.pageId = null
+    //       // this.pageId = 'node-editor'
+    //     }
+    //   }
+    // }
   },
   methods: {
+    pageIdChange (pageId) {
+      this.$log('pageIdChange')
+      if (this.pageId === pageId) {
+        this.pageId = null
+      }
+      else {
+        // TODO: ask for saving the dying node...
+        if (this.player.node) this.player.setState('node', null)
+        this.pageId = pageId
+      }
+    },
     nodeFocused (node) {
       this.$log('nodeFocused', node)
       this.pageId = null
-      this.player.setState('nodeFocused', node)
+      this.player.setState('node', node)
+      this.player.setState('nodeMode', 'focus')
     },
-    contentKalpaThumbUrlLoaded (e) {
-      this.$log('contentKalpaThumbUrlLoaded', e.target.clientHeight)
-      this.contentHeightMin = e.target.clientHeight
+    draftFocused (draft) {
+      this.$log('draftFocused', draft)
+      this.pageId = null
+      this.player.setState('node', draft)
+      this.player.setState('nodeMode', 'edit')
     },
     async playerReady (player) {
       this.$log('playerReady')
@@ -225,7 +240,8 @@ export default {
         if (node.items[0] && node.items[0].layers) {
           this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
           this.player.play()
-          this.player.setState('nodeFocused', node)
+          this.player.setState('node', node)
+          this.player.setState('nodeMode', 'focus')
         }
       }
     },

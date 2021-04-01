@@ -89,7 +89,7 @@ export const wsSchemaItem = {
       }
     },
     category: {
-      type: 'string'
+      type: ['null', 'string']
     },
     layout: {
       type: 'string'

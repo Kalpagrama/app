@@ -38,6 +38,10 @@ page-nodes-root(
           .col
             .row.full-width.q-pa-sm
               span.text-white {{ node.name }}
+              div(
+                v-if="node.items[0] && node.items[0].layers"
+                ).row.full-width
+                small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
         //- selected
         div(
           v-if="nodeSelectedOid === node.oid"
@@ -69,12 +73,15 @@ export default {
     },
     nodeClick (node) {
       this.$log('nodeClick', node)
-      // this.nodeSelectedOid = node.oid
+      this.player.setState('node', node)
+      this.player.setState('nodeMode', 'pick')
+      this.nodeSelectedOid = node.oid
       this.nodeReplay(node)
-      this.nodeLaunch(node)
+      // this.nodeLaunch(node)
     },
     nodeLaunch (node) {
       this.$log('nodeLaunch', node)
+      this.player.setState('nodeMode', 'focus')
       this.$emit('node', node)
     }
   }

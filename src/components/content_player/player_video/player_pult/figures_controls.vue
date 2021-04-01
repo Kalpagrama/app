@@ -51,12 +51,8 @@ export default {
         }
         // this.$log('player.currentTime TO', to)
         if (to >= this.player.figures[1].t + 0.2) {
-          // this.$log('to >= this.end', to, this.player.figures[1].t)
-          // this.$q.notify({type: 'negative', position: 'top', message: 'to >= this.end' + to + ' / ' + this.player.figures[1].t})
-          // this.player.setCurrentTime(this.player.figures[0].t)
           if (this.isLooping) {
             this.player.setCurrentTime(this.player.figures[0].t)
-            // this.figureReplay()
           }
           else {
             this.player.setCurrentTime(this.player.figures[1].t)
@@ -64,21 +60,17 @@ export default {
           }
         }
         if (to < this.player.figures[0].t - 0.5) {
-          // this.$log('to < this.start', to, this.player.figures[0].t)
-          // this.$q.notify({type: 'negative', position: 'top', message: 'to < this.start' + to + ' / ' + this.player.figures[0].t})
           this.player.setCurrentTime(this.player.figures[0].t)
-          // this.player.pause()
-          // this.figureReplay()
         }
       }
     },
-    'player.figureFocused': {
-      handler (to, from) {
-        if (to !== null) {
-          this.isLooping = false
-        }
-      }
-    }
+    // 'player.figureFocused': {
+    //   handler (to, from) {
+    //     if (to !== null) {
+    //       this.isLooping = false
+    //     }
+    //   }
+    // }
   },
   methods: {
     figureRefresh () {

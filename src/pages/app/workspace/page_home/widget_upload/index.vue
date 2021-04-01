@@ -30,6 +30,7 @@
           borderRadius: '10px',
           color: 'white',
           border: '2px solid rgb(76,175,79)',
+          //- paddingRight: '10px',
         }`
         @focus="urlInputFocused = true"
         @blur="urlInputFocused = false"
@@ -67,7 +68,7 @@ export default {
       async handler (to, from) {
         if (this.isURL(to)) {
           this.urlLoading = true
-          this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to))
+          this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, true))
           this.urlLoading = false
         }
         else {

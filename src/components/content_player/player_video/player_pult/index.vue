@@ -6,7 +6,7 @@ div(
   ).row.full-width.items-start.content-start
   //- player.nodeFocused
   node-focused(
-    v-if="player && player.nodeFocused && !player.figures"
+    v-if="player && player.node && player.nodeMode === 'focus'"
     :player="player"
     :contentKalpa="contentKalpa")
   //- bar
@@ -105,12 +105,12 @@ div(
               ).row.fit
             //- node focused
             div(
-              v-if="!zoomed && player.nodeFocused"
+              v-if="!zoomed && player.node && ['focus', 'pick'].includes(player.nodeMode)"
               :style=`{
                 position: 'absolute', zIndex: 3000,
                 top: '-2px',
-                left: (player.nodeFocused.items[0].layers[0].figuresAbsolute[0].t/player.duration)*100+'%',
-                width: ((player.nodeFocused.items[0].layers[0].figuresAbsolute[1].t-player.nodeFocused.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
+                left: (player.figures[0].t/player.duration)*100+'%',
+                width: ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'%',
                 height: 'calc(100% + 4px)',
                 border: '2px solid rgb(76,175,79)',
                 borderRadius: '2px',
@@ -121,7 +121,7 @@ div(
             //- figures editor
             transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
               figures-editor(
-                v-if="player && player.figures"
+                v-if="player && player.figures && player.nodeMode === 'edit'"
                 :player="player"
                 :convert="convertPxToTime"
                 :style=`{
@@ -359,6 +359,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('player.figures TO', to)
+        if (this.player.nodeMode !== 'edit') return
         // figures created
         if (to && !from) {
           this.$nextTick(() => {
