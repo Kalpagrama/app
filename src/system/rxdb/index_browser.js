@@ -336,7 +336,7 @@ class RxDBWrapper {
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },
-               vuexKey: 'currentUser' // создаст или обновит связанный объект в vuex по этому ключу
+               setMirroredVuexObject: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
             })
             this.workspace.setUser(currentUserDb) // для синхронизации мастерской с сервером
          } else {
@@ -352,10 +352,10 @@ class RxDBWrapper {
             }
             currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
-         assert(currentUserDb && currentUserDummy, '!currentUserDb && currentUserDummy') // должен быть в rxdb после init
+         assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
 
          let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
-            vuexKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
+            setMirroredVuexObject: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
          })
          assert(settingsDb, '!settingsDb')
          this.getCurrentUser = () => {
@@ -731,7 +731,7 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
-      vuexKey = null // создаст или обновит связанный объект в vuex по этому ключу
+      setMirroredVuexObject = null // создаст или обновит связанный объект в vuex по этому ключу
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
@@ -757,7 +757,7 @@ class RxDBWrapper {
             } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveDoc) {
+      if (!reactiveDoc || setMirroredVuexObject) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -769,7 +769,7 @@ class RxDBWrapper {
             beforeCreate
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactive(rxDoc, vuexKey)
+         reactiveDoc = getReactive(rxDoc, setMirroredVuexObject)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })

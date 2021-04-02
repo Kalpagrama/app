@@ -6,6 +6,7 @@ import ui from './ui'
 import debug from './debug'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import assert from 'assert'
+import cloneDeep from 'lodash/cloneDeep'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
@@ -27,7 +28,8 @@ const store = new Vuex.Store({
    mutations: {
       setMirrorObject (state, [key, val]) {
          assert(key && val, '!key && val')
-         Vue.set(state.mirrorObjects, key, val)
+         let copy = JSON.parse(JSON.stringify(val))
+         Vue.set(state.mirrorObjects, key, copy)
       }
    },
    getters: {
@@ -40,7 +42,7 @@ const store = new Vuex.Store({
       nodeCategories: (state, getters, rootState, rootGetters) => {
          let currentUser = state.mirrorObjects['currentUser']
          let currentSettings = state.mirrorObjects['currentSettings']
-         if (!currentUser || currentSettings) return []
+         if (!currentUser || !currentSettings) return []
          return currentSettings.nodeCategories.filter(c => c.lang === currentUser.profile.lang)
       },
       // currentUser: (state, getters, rootState, rootGetters) => id => {

@@ -7,7 +7,7 @@
       span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Help center')}}
       .col
       router-link(
-        v-if="!$store.getters.isGuest()"
+        v-if="!$store.getters.isGuest"
         :to="'/user/'+$store.getters.currentUser.oid")
         img(
           :src="$store.getters.currentUser.profile.photoUrl"

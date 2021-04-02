@@ -13,7 +13,7 @@
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     view-guest(
-      v-if="$store.getters.isGuest()")
+      v-if="$store.getters.isGuest")
     div(
       v-else-if="itemsRes"
       ).row.full-width.items-strat.content-start.justify-center.q-px-sm

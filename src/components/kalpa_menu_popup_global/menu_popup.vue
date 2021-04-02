@@ -45,7 +45,7 @@ q-menu(
           ).text-white {{ p.name }}
     //- footer GUEST
     div(
-      v-if="$store.getters.isGuest()"
+      v-if="$store.getters.isGuest"
       v-close-popup
       @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
       :style=`{
@@ -67,7 +67,7 @@ q-menu(
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
     div(
-      v-if="!$store.getters.isGuest()"
+      v-if="!$store.getters.isGuest"
       v-close-popup
       @click="$go('/user/'+$store.getters.currentUser.oid)"
       :style=`{

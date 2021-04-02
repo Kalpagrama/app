@@ -82,7 +82,7 @@ export default {
     async start () {
       try {
         this.$log('start')
-        if (this.$store.getters.isGuest()) {
+        if (this.$store.getters.isGuest) {
           let authGuard = {
             message: 'Чтобы добавить в закладки, войдите в аккаунт.'
           }
