@@ -89,7 +89,7 @@
             flat no-caps color="white") {{$t('Create node')}}
           q-btn(
             @click="uploadContent()"
-            flat no-caps color="green") {{$('Upload')}}
+            flat no-caps color="green") {{$t('Upload')}}
         //- editing
         template(v-if="stage === 'editing'")
           q-btn(

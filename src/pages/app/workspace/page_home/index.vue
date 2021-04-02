@@ -23,27 +23,8 @@ kalpa-layout
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
               round flat color="white" icon="fas fa-info")
       //- guest
-      div(
-        v-if="$store.getters.isGuest"
-        :style=`{
-          height: '80vh',
-        }`
-        ).row.full-width.justify-center
-        div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-          .row.full-width.justify-center
-            q-icon(name="login" color="grey-8" size="100px")
-          div(
-            :style=`{textAlign: 'center'}`
-            ).row.full-width.justify-center
-            span.text-white {{$('You will be able to add YouTube videos by URL, add bookmarks, and upload files!')}}
-          .row.full-width.justify-center.q-pt-md
-            q-btn(
-              outline color="white" no-caps
-              :to="'/auth/sign-in'"
-              :style=`{
-                height: '50px',
-              }`)
-              h1.text-white {{$('Login')}}
+      view-guest(
+        v-if="$store.getters.isGuest()")
       //- user
       div(
         v-else
@@ -68,6 +49,7 @@ import widgetBookmarks from './widget_bookmarks/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
 import widgetUpload from './widget_upload/index.vue'
+import viewGuest from './view_guest/index.vue'
 
 export default {
   name: 'pageHome',
@@ -77,6 +59,7 @@ export default {
     widgetWatchLater,
     widgetHistory,
     widgetUpload,
+    viewGuest,
   }
 }
 </script>

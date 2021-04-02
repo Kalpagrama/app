@@ -61,7 +61,8 @@ q-menu(
             minWidth: '40px', minHeight: '40px',
             maxWidth: '40px', maxHeight: '40px',
             borderRadius: '50%',
-          }`).row.b-50
+          }`).row.items-center.content-center.justify-center.b-50
+          q-icon(name="person" size="26px" color="grey-8")
       div(v-if="!mini").col.full-height
         .row.fit.items-center.content-center
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}

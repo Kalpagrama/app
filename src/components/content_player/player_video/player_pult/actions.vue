@@ -14,7 +14,7 @@ div(
   div(v-if="$q.screen.gt.sm").col
   //- controls default without figures
   div(
-    v-if="!player.figures"
+    v-if="player.nodeMode !== 'edit'"
     ).col-6
     .row.full-width.justify-between
       q-btn(
@@ -31,7 +31,7 @@ div(
         round flat  color="white" icon="forward_5").col
   //- controls for figures
   figures-controls(
-    v-if="player.figures"
+    v-if="player.nodeMode === 'edit'"
     :player="player" :contentKalpa="contentKalpa")
   div(v-if="$q.screen.gt.sm").col
   //- create player.figure
