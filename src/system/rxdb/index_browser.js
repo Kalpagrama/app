@@ -337,7 +337,8 @@ class RxDBWrapper {
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },
-               dummyObject: currentUser // не создавать новый реактивный объект, а использовать эту болванку (тк эта болванка уже отдана в UI)
+               dummyObject: currentUser, // не создавать новый реактивный объект, а использовать эту болванку (тк эта болванка уже отдана в UI)
+               vuexKey: 'currentUser'
             })
             // if (currentUser) ReactiveDocFactory.mergeReactive(currentUser, currentUserDb)
             // else currentUser = currentUserDb

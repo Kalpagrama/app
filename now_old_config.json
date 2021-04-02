@@ -2,6 +2,7 @@
   "version": 2,
   "build": {
     "env": {
+      "DOCKER_MACHINE_NAME": "vercel",
       "SERVICES_URL": "https://services-api-dev.kalpa.app/graphql",
       "SERVICES_URL_DEBUG": "https://services-api-dev.kalpa.app/graphql"
     }
