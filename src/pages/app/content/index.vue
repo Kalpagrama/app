@@ -28,7 +28,6 @@ export default {
     return {
       contentKalpa: null,
       isActiveStart: 0,
-      user: this.$store.getters.currentUser
     }
   },
   watch: {
@@ -43,10 +42,10 @@ export default {
         }
       }
     },
-    'user.profile.tutorial': {
+    '$store.getters.currentUser.profile.tutorial': {
       immediate: true,
       async handler (to, from) {
-        this.$log('user.profile.tutorial changed to', to)
+        this.$log('tutorial changed to', to)
         if (to && !to.content_first) {
           this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
         }

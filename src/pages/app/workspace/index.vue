@@ -9,11 +9,10 @@ export default {
   name: 'workspace',
   data () {
     return {
-      user: this.$store.getters.currentUser
     }
   },
   watch: {
-    'user.profile.tutorial': {
+    '$store.getters.currentUser.profile.tutorial': {
       immediate: true,
       async handler (to, from) {
         this.$log('user.profile.tutorial changed to', to)
