@@ -212,6 +212,7 @@ export default {
         this.voteVoting = val
         await this.$wait(1500)
         let res = await ObjectApi.vote(this.node.oid, val)
+        this.$ym('USER_VOTED')
         this.$log('vote done', res)
         this.voteVoting = null
         this.voteStarted = false

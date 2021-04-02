@@ -625,12 +625,13 @@ export default {
         let t = (left / width) * this.player.duration
         this.$log('t', t)
         // Handle outside click when nodeFocused
-        if (this.player.nodeFocused) {
-          let figures = this.player.nodeFocused.items[0].layers[0].figuresAbsolute
-          if (t < figures[0].t || t > figures[1].t) {
+        if (this.player.figures) {
+          // let figures = this.player.node.items[0].layers[0].figuresAbsolute
+          if (t < this.player.figures[0].t || t > this.player.figures[1].t) {
             // Destroy nodeFocused
             // alert('Destroy nodeFocused here...')
-            this.player.setState('nodeFocused', null)
+            this.player.setState('node', null)
+            this.player.setState('nodeMode', null)
             this.player.setCurrentTime(t)
           }
         }

@@ -189,6 +189,7 @@ export default {
         this.$log('jointInput', jointInput)
         let jointCreated = await ObjectCreateApi.essenceCreate(jointInput)
         this.$log('jointPublish jointCreated', jointCreated)
+        this.$ym('JOINT_CREATED')
         // done? emit? close?
         this.$log('jointPublish done')
         this.jointPublishing = false

@@ -1,5 +1,7 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
+  //- ===
+  //- Desktop editor
   div(
     v-if="$q.screen.gt.sm"
     :style=`{maxWidth: 600+'px'}`).row.full-width
@@ -12,6 +14,7 @@
         ref="nameInput"
         type="textarea" autogrow
         :placeholder="$t('What do you see?')"
+        :autofocus="true"
         :input-style=`{
           paddingTop: '16px',
           paddingBottom: '10px',
@@ -26,7 +29,14 @@
         ).full-width
     //- category, spheres,
     .row.full-width.items-center.content-center.q-px-sm
-      edit-category(:node="node")
+      edit-category(
+        :node="node"
+        :class=`{
+          br: !node.category && categoryError,
+        }`
+        :style=`{
+          borderRadius: '10px',
+        }`)
       .col
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-spheres(
@@ -67,9 +77,9 @@
         ).q-mr-sm
         span {{$t('Save as draft')}}
       //- Publish
+      //- :disable="!canPublish"
       q-btn(
         color="green" no-caps
-        :disable="!canPublish"
         :loading="nodePublishing"
         :style=`{
           //- height: '50px',
@@ -79,6 +89,8 @@
         span {{$t('Publish')}}
     //- .row.full-width
       small.text-white id: {{ node.id }}
+  //- ===
+  //- Mobile editor
   div(
     v-if="$q.screen.lt.md"
     :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
@@ -92,6 +104,7 @@
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-spheres(
             v-if="node.spheres.length > 0"
+            color="text-white"
             :node="node"
             :disabled="true"
             @sphere="sphereDelete")
@@ -133,14 +146,25 @@
               :style=`{}`
               @click="sphereAdd()"
               ).full-width
+      //- category
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(v-if="node.name.length > 0").row.full-width.q-pa-sm
+          edit-category(
+            :class=`{
+              br: !node.category && categoryError,
+            }`
+            :node="node"
+            :style=`{
+              borderRadius: '10px',
+              minHeight: '50px',
+            }`).full-width.cursor-pointer
+    //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="node.name.length > 0"
         ).row.full-width.q-pa-md
-        edit-category(:node="node")
         q-btn(
           color="green" no-caps
-          :disable="!canPublish"
           :loading="nodePublishing"
           :style=`{
             height: '50px',
@@ -167,24 +191,14 @@ export default {
   props: ['player', 'contentKalpa'],
   data () {
     return {
-      // node: {
-      //   name: '',
-      //   items: [],
-      //   spheres: [],
-      //   category: null,
-      //   layout: 'HORIZONTAL',
-      //   vertices: [],
-      // },
       nodePublishing: false,
       nodeDeleting: false,
       nodeSaving: false,
       sphere: '',
+      categoryError: false,
     }
   },
   computed: {
-    canPublish () {
-      return this.node.name.length > 0 && this.node.category
-    },
     fontSize () {
       let l = this.node.name.length
       if (l < 20) return 20
@@ -197,41 +211,6 @@ export default {
     }
   },
   watch: {
-    // 'player.nodeEditing': {
-    //   deep: true,
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     this.$log('player.nodeEditing TO', to ? to.name : null)
-    //     if (to === null) {
-    //       // this.$q.notify('Node create!')
-    //       this.player.setState('nodeEditing', this.node)
-    //     }
-    //     else {
-    //       // this.$q.notify('Node use from player!')
-    //       // We got from workspace
-    //       if (this.node.id && this.node.wsItemType === 'WS_NODE') {
-    //         // Do nothing...
-    //       }
-    //       else {
-    //         if (this.node.name.length > 0) {
-    //           // Save this to drafts...
-    //           // this.player.setState(await this.nodeSave())
-    //         }
-    //         else {
-    //           // Do nothing...
-    //         }
-    //       }
-    //       // Save node here
-    //       if (!this.nodeSaved) {
-    //         this.nodeSaved = true
-    //         this.node = to
-    //       }
-    //       if (this.node.name.length > 0 && this.node.wsItemType !== 'WS_NODE') {
-    //         // alert('Save node to drafts!')
-    //       }
-    //     }
-    //   }
-    // }
   },
   methods: {
     sphereAdd () {
@@ -388,6 +367,11 @@ export default {
         // ---
         // loading
         this.nodePublishing = true
+        if (this.node.name.length === 0) throw new Error(this.$t('Empty node name!'))
+        if (!this.node.category) {
+          this.categoryError = true
+          throw new Error(this.$t('Select node category!'))
+        }
         await this.$wait(1000)
         // ---
         // make node input
@@ -400,6 +384,7 @@ export default {
         // ---
         // create node, publish this shit
         let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
+        this.$ym('NODE_CREATED')
         // this.$emit('published', nodeCreating)
         // this.$store.commit('ui/stateSet', ['nodeCreating', true])
         // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
@@ -411,8 +396,9 @@ export default {
         }
         this.player.setState('nodeMode', 'focus')
         this.player.setState('node', nodeCreating)
+        // this.$emit('pageId', null)
         // save content bookmark to "all" collection
-        // await this.contentBookmarkSave()
+        await this.contentBookmarkSave()
         // ---
         // done
         this.nodePublishing = false
@@ -426,7 +412,7 @@ export default {
       }
       catch (e) {
         this.$log('nodePublish error', e)
-        this.$q.notify({type: 'negative', message: e.toString()})
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.nodePublishing = false
       }
     },
@@ -441,6 +427,7 @@ export default {
       // save draft ?
       else {
         this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
         // this.player.events.emit('figure-delete')
         // this.player.setState('figureы', null)
       }
@@ -451,10 +438,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // TODO: autofocus only on desktop? android?
-    // this.$wait(500).then(() => {
-    //   this.$refs.nameInput.focus()
-    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

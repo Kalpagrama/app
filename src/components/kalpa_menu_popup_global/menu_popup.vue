@@ -50,10 +50,10 @@ q-menu(
       @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
       :style=`{
         height: '60px',
-        borderRadius: '10px',
+        borderRadius: '20px',
         overflow: 'hidden'
       }`
-      ).row.full-width.items-cener.content-center.menu-item.q-mb-sm
+      ).row.full-width.items-cener.content-center.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center.q-ml-sm
         div(
           :style=`{
@@ -71,7 +71,7 @@ q-menu(
       v-close-popup
       @click="$go('/user/'+$store.getters.currentUser().oid)"
       :style=`{
-        borderRadius: '10px',
+        borderRadius: '20px',
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
