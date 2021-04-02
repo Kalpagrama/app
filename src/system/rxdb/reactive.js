@@ -10,6 +10,8 @@ import lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
+import store from 'src/store/index'
+
 import { rxdbOperationProxy } from 'src/system/rxdb/common'
 import { Notify } from 'quasar'
 import { matNextWeek } from '@quasar/extras/material-icons'
@@ -19,8 +21,9 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
-function getReactive (rxDocOrObject) {
-   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
+// dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
+function getReactive (rxDocOrObject, setMirroredVuexObject = null) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, setMirroredVuexObject) : new ReactiveObjFactory(rxDocOrObject, setMirroredVuexObject)
    return reactiveDocFactory.getReactive()
 }
 
@@ -67,7 +70,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor (object) {
+   constructor (object, setMirroredVuexObject = null) {
       assert(typeof object === 'object')
       this.vm = new Vue({
          data: {
@@ -83,6 +86,11 @@ class ReactiveObjFactory {
          assert(typeof plainData === 'object', 'typeof payload === \'object\'')
          const reactiveDoc = plainData
          Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+         if (setMirroredVuexObject) {
+            this.vuexKey = setMirroredVuexObject
+            assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
+            store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
+         }
       }
       this.setReactiveDoc(object)
    }
@@ -90,7 +98,7 @@ class ReactiveObjFactory {
 
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
-   constructor (rxDoc) {
+   constructor (rxDoc, setMirroredVuexObject = null) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
@@ -98,15 +106,8 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster) {
+      if (rxDoc.reactiveItemHolderMaster && !setMirroredVuexObject) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
-         // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
-         // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
-         // this.reactiveDocUnsubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocUnsubscribe
-         // this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe
-         // this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
-         // this.getRev = rxDoc.reactiveItemHolderMaster.getRev
-         // this.setRev = rxDoc.reactiveItemHolderMaster.setRev
          this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
          this.setDebouncedSave = rxDoc.reactiveItemHolderMaster.setDebouncedSave
          this.getSynchro = rxDoc.reactiveItemHolderMaster.getSynchro
@@ -128,6 +129,27 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc = (plainData) => {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
+            // if (dummyObject) {
+            //    for (let key of Object.keys(dummyObject)){
+            //       delete dummyObject[key]
+            //    }
+            //    switch (this.itemType) {
+            //       case 'wsItem': // wsSchemaItem
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData)
+            //          plainData = dummyObject
+            //          break
+            //       case 'object': // cacheSchema
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.cached.data)
+            //          plainData.cached.data = dummyObject
+            //          break
+            //       case 'meta':// schemaKeyValue
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.valueString)
+            //          plainData.valueString = dummyObject
+            //          break
+            //       default:
+            //          throw new Error('bad itemType: ' + this.itemType)
+            //    }
+            // }
             const reactiveDoc = plainData
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
@@ -198,6 +220,11 @@ class ReactiveDocFactory {
                }
             }
             Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+            if (setMirroredVuexObject) {
+               this.vuexKey = setMirroredVuexObject
+               assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
+               store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
+            }
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -273,6 +300,11 @@ class ReactiveDocFactory {
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
+
+         // изменить связанный объект во vuex
+         if (this.vuexKey) {
+            store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
+         }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb
             this.itemSaveFunc = async (synchro = true) => {
@@ -321,7 +353,9 @@ export const GROUP_BATCH_SZ = 11 // сервер работает пачками
 class Group {
    constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
       assert(id && typeof id === 'string')
-      this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы)
+      this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы) PS. А может и не костыль... можно оставить на всякий случай тк  vue глючит когда в списке 2 одинаковых ключа
+      // события об обновлении могут дублироваться (например, создание объекта сначала упреждающе записывает в rxdb, а потом по подписке)
+      this.mutexSubscribe = new MutexLocal('Group::rxQueryOrDocSubscribe')
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
@@ -496,8 +530,8 @@ class Group {
    }
 
    // подписаться на обновления rxDoc
-   rxQuerySubscribe (rxQueryOrRxDocOrArray) {
-      const f = this.rxQuerySubscribe
+   rxQueryOrDocSubscribe (rxQueryOrRxDocOrArray) {
+      const f = this.rxQueryOrDocSubscribe
       let rxQuery, rxDoc, array
       if (isRxQuery(rxQueryOrRxDocOrArray)) {
          rxQuery = rxQueryOrRxDocOrArray
@@ -511,53 +545,63 @@ class Group {
       if (rxQuery) {
          // skip - для пропуска n первых эвентов (после subscribe - сразу генерится эвент(даже если данные не менялись))
          let rxSubscription = rxQuery.$.pipe(skip(1)).subscribe(async results => {
-            // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
-            // logD(f, 'rxQuery changed 1', results)
-            if (this.loadedLen() === results.length) {
-               let arrayChanged = false
-               let allItems = this.loadedItems()
-               for (let i = 0; i < results.length; i++) {
-                  if (results[i][this.reactiveGroup.itemPrimaryKey] !== allItems[i][this.reactiveGroup.itemPrimaryKey]) {
-                     arrayChanged = true
-                     break
+            try {
+               await this.mutexSubscribe.lock('rxQuery::$')
+               // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
+               // logD(f, 'rxQuery changed 1', results)
+               if (this.loadedLen() === results.length) {
+                  let arrayChanged = false
+                  let allItems = this.loadedItems()
+                  for (let i = 0; i < results.length; i++) {
+                     if (results[i][this.reactiveGroup.itemPrimaryKey] !== allItems[i][this.reactiveGroup.itemPrimaryKey]) {
+                        arrayChanged = true
+                        break
+                     }
                   }
+                  if (!arrayChanged) {
+                     return
+                  } // если список не изменился - просто выходим
                }
-               if (!arrayChanged) {
-                  return
-               } // если список не изменился - просто выходим
-            }
-            // logD(f, 'rxQuery changed 2', results)
-            let pageItemsNew = results.map(rxDoc => getReactive(rxDoc).getPayload())
-            assert(this.reactiveGroup.pages.length === 1, 'this.reactiveGroup.pages.len != 1')
-            let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
-            assert(page, '!page')
-            page.pageItems = pageItemsNew // изменились итемы страницы
-            this.reactiveGroup.totalCount = pageItemsNew.length
-            let nextItems = pageItemsNew
-            if (this.populateFunc) {
-               let { startFullFil, endFullFil } = this.fulFilledRange()
-               if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-                  startFullFil = 0
-                  endFullFil = 11
+               // logD(f, 'rxQuery changed 2', results)
+               let pageItemsNew = results.map(rxDoc => getReactive(rxDoc).getPayload())
+               assert(this.reactiveGroup.pages.length === 1, 'this.reactiveGroup.pages.len != 1')
+               let page = this.reactiveGroup.pages[0] // в случае с rxquery - у нас только одна страница
+               assert(page, '!page')
+               page.pageItems = pageItemsNew // изменились итемы страницы
+               this.reactiveGroup.totalCount = pageItemsNew.length
+               let nextItems = pageItemsNew
+               if (this.populateFunc) {
+                  let { startFullFil, endFullFil } = this.fulFilledRange()
+                  if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
+                     startFullFil = 0
+                     endFullFil = 11
+                  }
+                  nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
                }
-               nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
+               await this.fulfill(nextItems, 'whole')
+            } finally {
+               this.mutexSubscribe.release()
             }
-            await this.fulfill(nextItems, 'whole')
          })
       } else if (rxDoc) {
          // в список были добавлены элементы(например при подписке)
          let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
-            logD(f, 'List::rxDoc changed. try to change this.pageItems')
-            assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
-            await this.upsertPaginationPage(rxDoc, 'replace', false)
-            let { startFullFil, endFullFil } = this.fulFilledRange()
-            if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
-               endFullFil = startFullFil = 0
+            try {
+               await this.mutexSubscribe.lock('rxDoc::$')
+               logD(f, 'List::rxDoc changed. try to change this.pageItems')
+               assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
+               await this.upsertPaginationPage(rxDoc, 'replace', false)
+               let { startFullFil, endFullFil } = this.fulFilledRange()
+               if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
+                  endFullFil = startFullFil = 0
+               }
+               let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
+               await this.fulfill(nextItems, 'whole')
+               let thiz = this
+               logD('thiz', thiz)
+            } finally {
+               this.mutexSubscribe.release()
             }
-            let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
-            await this.fulfill(nextItems, 'whole')
-            let thiz = this
-            logD('thiz', thiz)
          })
       }
    }
@@ -597,7 +641,7 @@ class Group {
          }
          if (this.reactiveGroup.pages.length === 0) this.debugUniqueOids.clear()// на всякий случай
          pageItems = pageItems.filter(item => {
-            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item)
+            if (this.debugUniqueOids.has(item[itemPrimaryKey])) logE('duplicate found!!!', item[itemPrimaryKey], item, this.reactiveGroup.id)
             let res = !this.debugUniqueOids.has(item[itemPrimaryKey])
             this.debugUniqueOids.add(item[itemPrimaryKey])
             return res
@@ -632,7 +676,7 @@ class Group {
       } else if (position === 'whole') {
          this.reactiveGroup.pages.splice(0, this.reactiveGroup.pages.length, page)
       } else throw new Error('bad position' + position)
-      if (subscribe) this.rxQuerySubscribe(rxQueryOrRxDocOrArray)
+      if (subscribe) this.rxQueryOrDocSubscribe(rxQueryOrRxDocOrArray)
    }
 
    async refresh () {
@@ -991,4 +1035,11 @@ class ReactiveListWithPaginationFactory {
    }
 }
 
-export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactive, updateRxDocPayload }
+export {
+   debounceIntervalItem,
+   ReactiveDocFactory,
+   ReactiveObjFactory,
+   ReactiveListWithPaginationFactory,
+   getReactive,
+   updateRxDocPayload
+}

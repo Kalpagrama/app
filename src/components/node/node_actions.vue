@@ -21,9 +21,6 @@
       .row.full-width
         .row.items-center.content-center
           kalpa-share(type="node" :item="node" :headerText="$t('Share')")
-            //- q-tooltip(dense dark) Поделиться
-            //- q-btn(round flat color="grey-9")
-              q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countStat.countShares || '' }}
@@ -36,7 +33,7 @@
           q-btn(
             round flat color="grey-9"
             @click="contextGo()")
-            //- q-tooltip(dense dark) Микроядра
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Context')}}
             q-icon(name="select_all" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
@@ -53,7 +50,7 @@
             small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
           q-btn(round flat color="grey-9")
-            //- q-tooltip(dense dark) Связи
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Links')}}
             q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col
@@ -186,7 +183,7 @@ export default {
       this.$router.push('/content/' + this.node.items[0].layers[0].contentOid)
     },
     nodeVoteBallClick () {
-      this.$log('nodeVoteBallClick')
+      this.$log('nodeVoteBallClick', this.node.rateUser)
       if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
@@ -194,7 +191,7 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        if (this.node.rateUser || this.node.author.oid === this.$store.getters.currentUser().oid) {
+        if (this.node.rateUser !== null || this.node.author.oid === this.$store.getters.currentUser.oid) {
           this.voteStatsShow = true
         }
         else {
@@ -204,7 +201,7 @@ export default {
     },
     async voteAgain () {
       this.$log('voteAgain')
-      if (this.node.author.oid === this.$store.getters.currentUser().oid) return
+      if (this.node.author.oid === this.$store.getters.currentUser.oid) return
       this.voteStatsShow = false
       await this.$wait(200)
       this.voteStarted = true
@@ -215,6 +212,7 @@ export default {
         this.voteVoting = val
         await this.$wait(1500)
         let res = await ObjectApi.vote(this.node.oid, val)
+        this.$ym('USER_VOTED')
         this.$log('vote done', res)
         this.voteVoting = null
         this.voteStarted = false

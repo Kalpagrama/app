@@ -45,10 +45,12 @@ div(
         @click="showTutorial = true").col
         span.text-bold {{ $t('Start') }}
   //- body
-  div(:style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  div(
+    v-if="showTutorial"
+    :style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+      //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      //- v-if="showTutorial"
       q-carousel(
-        v-if="showTutorial"
         ref="slides-carousel"
         v-model="slide"
         transition-prev="slide-right"
@@ -79,12 +81,15 @@ div(
               userSelect: 'none',
             }`
             ).fit
-  .row.full-width.justify-center.q-pa-sm
+  div(
+    v-if="showTutorial"
+    ).row.full-width.justify-center.q-pa-sm
     q-btn(
       flat color="white" no-caps
       :style=`{
         height: '50px',
         maxWidth: '300px',
+        minWidth: '300px',
       }`
       @click="$emit('close')")
       span {{$t('Close')}}
@@ -107,29 +112,17 @@ export default {
       showTutorial: false,
       slide: 'welcome',
       doc: null,
-      tutorialInitial: {
-        main: false,
-        content_first: false,
-        node_first: false,
-        joint_first: false,
-        workspace_first: false,
-        workspace_upload: false,
-        workspace_article: false,
-      }
     }
   },
   computed: {
     slides () {
-      if (!this.doc) return []
+      if (!this.doc || !this.doc.fields.slides) return []
       return this.doc.fields.slides.map(s => {
         return {
           id: s.sys.id,
           url: s.fields.file.url,
         }
       })
-    },
-    tutorial () {
-      return this.$store.getters.currentUser().profile.tutorial
     }
   },
   watch: {
@@ -179,24 +172,9 @@ export default {
   },
   async beforeDestroy () {
     this.$log('beforeDestroy')
-    // before
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials BEFORE', userTutorials)
-    // create userTutorials
-    if (typeof this.tutorial !== 'object') {
-      this.$log('userTutorials CREATE')
-      let tutorialInput = {...this.tutorialInitial, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
-    }
-    // update userTutorials
-    else {
-      this.$log('userTutorials UPDATE', this.config.id, true)
-      let tutorialInput = {...this.userTutorials, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
-    }
-    // after
-    let userTutorials2 = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials AFTER', userTutorials2)
+    let tutorialCurrent = this.$store.getters.currentUser.profile.tutorial
+    tutorialCurrent[this.config.id] = true
+    await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialCurrent)
   }
 }
 </script>

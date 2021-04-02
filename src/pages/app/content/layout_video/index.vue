@@ -3,99 +3,119 @@ div(
   :style=`{
     position: 'relative',
     height: $q.screen.height+'px',
+    overflow: 'hidden',
   }`
   ).column.full-width.bg-black
-  img(
-    @load="contentKalpaThumbUrlLoaded"
+  //- debug
+  //- div(
+    :style=`{
+      position: 'absolute', zIndex: 10000, top: '0px',
+      pointerEvents: 'none',
+      fontSize: '10px',
+      opacity: 0.8,
+    }`
+    ).row.bg-green.text-white.q-pa-xs
+    small.full-width contentHeightMin: {{ contentHeightMin }}
+  //- debug image
+  //- img(
     :src="contentKalpa.thumbUrl"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
-      opacity: 0,
+      opacity: 0.5,
       pointerEvents: 'none',
+      maxHeight: contentHeightMin+'px',
+      objectFit: 'contain',
     }`
-    ).full-width
+    ).full-width.br
   content-player(
     :contentKalpa="contentKalpa"
     :options=`{
       showPult: $q.screen.gt.sm ? true : !pageId,
       showTint: $q.screen.gt.sm ? true : !pageId,
+      showPlayBtn: !pageId,
     }`
     @player="playerReady"
     ).fit.bg-black
+    //- Desktop page wrapper
     template(v-slot:pult)
       div(
         v-if="player && $q.screen.gt.sm"
-        :style=`{height: 'auto', maxHeight: 500+'px',}`).row.full-width
+        :style=`{
+          minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
+          maxHeight: 500+'px',
+        }`).row.full-width
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
-          :node="node"
-          @node="node = $event, pageId = 'node'"
-          @pageId="pageId = $event"
+          @node="nodeFocused"
+          @draft="draftFocused"
+          @pageId="pageIdChange"
           @close="pageId = null")
         page-node-editor(
-          v-if="player.figures"
+          v-if="player.node && player.nodeMode === 'edit'"
           :contentKalpa="contentKalpa"
           :player="player"
           :style=`{
             borderRadius: '10px',
             overflow: 'hidden',
           }`
-          @node="node = $event, pageId = 'node'").b-30
+          @node="nodeFocused")
+    //- Mobile page wrapper
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
-        :style=`{height: $q.screen.height-44-contentHeight+'px',}`).row.full-width
+        :style=`{height: $q.screen.height-50-contentHeight+'px',}`).row.full-width
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
-          :node="node"
-          @node="node = $event, pageId = 'node'"
-          @pageId="pageId = $event"
+          @node="nodeFocused"
+          @draft="draftFocused"
+          @pageId="pageIdChange"
           @close="pageId = null")
       div(
         v-if="player"
         :style=`{position: 'relative'}`).row.full-width
+        //- Mobile button overlay
         div(
-          v-if="player.figures && $q.screen.lt.md"
+          v-if="player.nodeMode === 'edit' && $q.screen.lt.md"
           :style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.fit.bg-black.q-px-md
           q-btn(
             v-if="pageId !== 'node-editor'"
             flat color="green" no-caps
             :style=`{
               height: '44px',
+              borderRadius: '16px',
             }`
             @click="pageId = 'node-editor'"
             ).full-width
-            span {{$t('Edit node')}}
+            span.text-bold {{ $t('Next') }}
           q-btn(
             v-if="pageId === 'node-editor'"
             flat color="green" no-caps
             :style=`{
               height: '44px',
+              borderRadius: '16px',
             }`
             @click="pageId = null"
             ).full-width
-            span {{$t('Edit fragment')}}
+            span.text-bold {{ $t('Edit fragment') }}
+        //- Nav for all platforms
         nav-bottom(
-          :pageId="pageId" @pageId="pageId === $event ? pageId = null : pageId = $event")
+          :pageId="pageId" @pageId="pageIdChange")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'components/content_player/index.vue'
-
 import navBottom from '../nav_bottom.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageNode from './page_node/index.vue'
-import pageNodeEditor from './page_node_editor/index.vue'
-import pageDrafts from '../page_drafts/index.vue'
+import pageNodeEditor from '../node_editor/index.vue'
+import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
-
-import nodeCreator from '../node_creator/index.vue'
 
 export default {
   name: 'layoutVideo',
@@ -108,27 +128,26 @@ export default {
     pageDrafts,
     pageInfo,
     navBottom,
-    nodeCreator,
   },
   data () {
     return {
       player: null,
       pageId: null,
       contentHeight: 0,
-      contentHeightMin: 0,
-      node: null,
+      // contentHeightMin: 0,
     }
   },
   computed: {
-    // contentHeightMin () {
-    //   // if (this.$q.screen.width < 800)
-    //   let width = this.contentKalpa.thumbWidth
-    //   let height = this.contentKalpa.thumbHeight
-    //   // return this.$q.screen.height - (this.$q.screen.width * width) / height
-    //   let res = (height * this.$q.screen.width) / width
-    //   return res
-    //   // return Math.min(this.$q.screen.height / 2, res)
-    // },
+    contentHeightMin () {
+      let tW = this.contentKalpa.thumbWidth
+      let tH = this.contentKalpa.thumbHeight
+      let sW = this.$q.screen.width
+      let sH = (sW * tH) / tW
+      let sHMax = this.$q.screen.height / 3
+      let sHMin = 150
+      // return sH
+      return Math.max(sHMin, Math.min(sH, sHMax))
+    },
     queryClusters () {
       let res = {
         selector: {
@@ -155,28 +174,49 @@ export default {
         }
       }
     },
-    'player.figures': {
-      deep: true,
-      immediate: true,
+    'player.nodeMode': {
       handler (to, from) {
-        this.$log('player.figures TO', to)
-        // if (to && !from) {
-        //   this.pageId = 'node-editor'
-        // }
+        if (to && to === 'edit') {
+          this.pageId = null
+        }
       }
     }
-    // 'player.playingCount': {
-    //   async handler (to, from) {
-    //     if (to === 1) {
-    //       await this.nodePlay()
+    // 'player.figures': {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('player.figures TO', to)
+    //     if (to && !from) {
+    //       this.pageId = null
+    //       // this.pageId = 'node-editor'
     //     }
     //   }
-    // },
+    // }
   },
   methods: {
-    contentKalpaThumbUrlLoaded (e) {
-      this.$log('contentKalpaThumbUrlLoaded', e.target.clientHeight)
-      this.contentHeightMin = e.target.clientHeight
+    pageIdChange (pageId) {
+      this.$log('pageIdChange')
+      if (this.pageId === pageId) {
+        this.pageId = null
+      }
+      else {
+        // TODO: ask for saving the dying node...
+        this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
+        this.pageId = pageId
+      }
+    },
+    nodeFocused (node) {
+      this.$log('nodeFocused', node)
+      this.pageId = null
+      this.player.setState('node', node)
+      this.player.setState('nodeMode', 'focus')
+    },
+    draftFocused (draft) {
+      this.$log('draftFocused', draft)
+      this.pageId = null
+      this.player.setState('node', draft)
+      this.player.setState('nodeMode', 'edit')
     },
     async playerReady (player) {
       this.$log('playerReady')
@@ -184,7 +224,11 @@ export default {
       this.$set(this, 'player', player)
       // Handle player.autoplay
       this.$nextTick(() => {
-        this.player.play()
+        // this.$q.notify('Player.play !')
+        // this.player.play()
+        // setInterval(() => {
+        //   this.player.play()
+        // }, 500)
         this.nodePlay()
       })
       // Get player clusters
@@ -195,28 +239,46 @@ export default {
     async nodePlay () {
       this.$log('nodePlay')
       let nodeOid = this.$store.state.ui.nodeOnContent
+      this.$log('nodePlay nodeOid', nodeOid)
       if (nodeOid) {
         // get node
         this.$log('playerReady: nodeOid found, getting node...')
-        this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
-        this.$log('playerReady: node found, show node in video...', this.node)
-        if (this.node.items[0] && this.node.items[0].layers) {
-          this.player.setCurrentTime(this.node.items[0].layers[0].figuresAbsolute[0].t)
+        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, nodeOid)
+        this.$log('playerReady: node found, show node in video...', node)
+        if (node.items[0] && node.items[0].layers) {
+          this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
           this.player.play()
-          // this.player.setState('nodePlaying', this.node)
-          this.pageId = 'node'
+          this.player.setState('node', node)
+          this.player.setState('nodeMode', 'focus')
         }
+      }
+    },
+    onKeydown (e) {
+      // this.$log('onKeydown', e)
+      if (this.$store.state.ui.userTyping) return
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        this.player.setCurrentTime(this.player.currentTime - 5)
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        this.player.setCurrentTime(this.player.currentTime + 5)
       }
     }
   },
+  created () {
+    this.$log('created')
+    this.contentHeight = this.$q.screen.height
+  },
   async mounted () {
     this.$log('mounted')
-    this.contentHeight = this.$q.screen.height
+    window.addEventListener('keydown', this.onKeydown)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.player.setState('nodePlaying', null)
     this.$store.commit('ui/stateSet', ['nodeOnContent', null])
+    if (this.player) this.player.setState('nodePlaying', null)
+    window.removeEventListener('keydown', this.onKeydown)
   }
 }
 </script>

@@ -107,6 +107,7 @@ export default {
     },
     async logout () {
       this.$log('logout')
+      this.$ym('USER_LOGOUT')
       this.loggingOut = true
       await AuthApi.logout()
       await this.$router.replace('/auth')

@@ -1,5 +1,6 @@
 <style lang="sass">
 .doc-item
+  color: white
   &:hover
     color: green !important
 </style>
@@ -9,12 +10,7 @@
   router-link(
     v-for="(d,di) in docs" :key="d.id"
     flat no-caps color="white" align="left"
-    :to=`{
-      path: '/settings/docs',
-      query: {
-        docId: d.id,
-      }
-    }`
+    :to="'/help/'+d.id"
     :class=`{
     }`
     :style=`{

@@ -159,7 +159,7 @@ async function pwaShareWith (title, text, url) {
       alert('Web Share API not supported!!!')
       return
    }
-   await navigator.share({ title, text, url })
+   await navigator.share({ title: '', text: '', url })
 }
 
 async function pwaReset () {

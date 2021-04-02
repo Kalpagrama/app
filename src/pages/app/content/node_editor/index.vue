@@ -1,6 +1,99 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
-  div(:style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
+  //- ===
+  //- Desktop editor
+  div(
+    v-if="$q.screen.gt.sm"
+    :style=`{maxWidth: 600+'px'}`).row.full-width
+    //- name
+    div(:style=`{height: '60px'}`).row.full-width
+      //- span.text-white What do you see
+      q-input(
+        v-model="node.name"
+        borderless dark
+        ref="nameInput"
+        type="textarea" autogrow
+        :placeholder="$t('What do you see?')"
+        :autofocus="true"
+        :input-style=`{
+          paddingTop: '16px',
+          paddingBottom: '10px',
+          paddingLeft: '20px',
+          paddingRight: '10px',
+          //- textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: fontSize+'px',
+          lineHeight: 1.3,
+          minHeight: '60px',
+        }`
+        ).full-width
+    //- category, spheres,
+    .row.full-width.items-center.content-center.q-px-sm
+      edit-category(
+        :node="node"
+        :class=`{
+          br: !node.category && categoryError,
+        }`
+        :style=`{
+          borderRadius: '10px',
+        }`)
+      .col
+        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-spheres(
+            v-if="node.spheres.length > 0"
+            :node="node"
+            :disabled="true"
+            @sphere="sphereDelete")
+    div(:style=`{}`).row.full-width.items-center.content-center.q-px-md
+      .col
+        q-input(
+          v-model="sphere"
+          borderless dark dense
+          :placeholder="$t('Add spheres')"
+          :input-style=`{
+            paddingLeft: '8px',
+          }`
+          @blur="sphereAdd()"
+          @keydown.enter="sphereAdd()"
+          ).full-width
+      //- Delete from notes
+      q-btn(
+        v-if="node.wsItemType === 'WS_NODE'"
+        outline no-caps color="red"
+        :disable="node.name.length === 0"
+        :loading="nodeSaving"
+        :style=`{}`
+        @click="nodeDeleteAction()"
+        ).q-mr-sm
+        span {{$t('Delete draft')}}
+      //- Save to notes
+      q-btn(
+        v-if="node.wsItemType !== 'WS_NODE'"
+        outline no-caps color="grey-8"
+        :disable="node.name.length === 0"
+        :loading="nodeSaving"
+        :style=`{}`
+        @click="nodeSaveAction()"
+        ).q-mr-sm
+        span {{$t('Save as draft')}}
+      //- Publish
+      //- :disable="!canPublish"
+      q-btn(
+        color="green" no-caps
+        :loading="nodePublishing"
+        :style=`{
+          //- height: '50px',
+        }`
+        @click="nodePublish()"
+        )
+        span {{$t('Publish')}}
+    //- .row.full-width
+      small.text-white id: {{ node.id }}
+  //- ===
+  //- Mobile editor
+  div(
+    v-if="$q.screen.lt.md"
+    :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
     .row.full-width.items-start.content-start
       div(
         :style=`{
@@ -11,6 +104,7 @@
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-spheres(
             v-if="node.spheres.length > 0"
+            color="text-white"
             :node="node"
             :disabled="true"
             @sphere="sphereDelete")
@@ -27,7 +121,7 @@
             paddingRight: '40px',
             textAlign: 'center',
             fontWeight: 'bold',
-            fontSize: '18px',
+            fontSize: fontSize+'px',
             lineHeight: 1.3,
             minHeight: '60px',
           }`
@@ -52,40 +146,25 @@
               :style=`{}`
               @click="sphereAdd()"
               ).full-width
+      //- category
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(v-if="node.name.length > 0").row.full-width.q-pa-sm
+          edit-category(
+            :class=`{
+              br: !node.category && categoryError,
+            }`
+            :node="node"
+            :style=`{
+              borderRadius: '10px',
+              minHeight: '50px',
+            }`).full-width.cursor-pointer
+    //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="node.name.length > 0"
         ).row.full-width.q-pa-md
-        //- .row.full-width
-          small.text-white {{node}}
-        div(
-          :style=`{
-            position: 'relative',
-          }`
-          ).row.full-width.q-py-md
-          q-btn(
-            flat color="white" no-caps icon-right="keyboard_arrow_down" align="between"
-            ).full-width.b-25
-            span {{ categoryLabel }}
-          select(
-            v-if="true || $q.platform.is.mobile"
-            ref="categoryInput"
-            :name="$t('Pick category')"
-            @change="categoryChanged"
-            :style=`{
-              position: 'absolute', zIndex: 100,
-              background: 'red',
-              opacity: 0
-            }`
-            ).fit
-            option(
-              v-for="(c,ci) in categories" :key="ci"
-              :value="c.value"
-              @click="categorySet(c,ci)"
-              ) {{ c.label }}
         q-btn(
           color="green" no-caps
-          :disable="!canPublish"
           :loading="nodePublishing"
           :style=`{
             height: '50px',
@@ -101,77 +180,43 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 
 import nodeSpheres from 'components/node/node_spheres/index.vue'
+import editCategory from './edit_category.vue'
 
 export default {
-  name: 'pageNodeEditor',
+  name: 'nodeEditor',
   components: {
     nodeSpheres,
+    editCategory,
   },
   props: ['player', 'contentKalpa'],
   data () {
     return {
-      node: {
-        name: '',
-        items: [],
-        spheres: [],
-        category: null,
-        layout: 'HORIZONTAL'
-      },
       nodePublishing: false,
+      nodeDeleting: false,
+      nodeSaving: false,
       sphere: '',
+      categoryError: false,
     }
   },
   computed: {
-    canPublish () {
-      return this.node.name.length > 0 && this.node.category
+    fontSize () {
+      let l = this.node.name.length
+      if (l < 20) return 20
+      else if (l < 30) return 16
+      else if (l < 40) return 14
+      else return 12
     },
-    categories () {
-      return this.$store.getters.nodeCategories.reduce((acc, val) => {
-        if (val.type !== 'ALL') {
-          acc.push({
-            value: val.type,
-            label: val.alias.charAt(0).toUpperCase() + val.alias.slice(1),
-          })
-        }
-        return acc
-      }, [])
-    },
-    categoryLabel () {
-      if (this.node.category) {
-        let name = this.categories.find(c => c.value === this.node.category).label
-        return `${this.$t('Category - ')} ${name}`
-      }
-      else {
-        return this.$t('Pick category')
-      }
+    node () {
+      return this.player.node
     }
   },
   watch: {
-    // 'player.nodeEditing': {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     if (to === null) {
-    //       this.player.setState('nodeEditing', this.node)
-    //     }
-    //     if (to && !this.node) {
-    //       this.node = to
-    //     }
-    //   }
-    // }
   },
   methods: {
-    categoryChanged (e) {
-      this.$log('categoryChanged', e)
-      this.categorySet({value: e.target.value})
-    },
-    categorySet (c) {
-      this.$log('categorySet', c)
-      // this.node.category = c.value
-      this.$set(this.node, 'category', c.value)
-    },
     sphereAdd () {
       this.$log('sphereAdd')
       // checks
+      if (this.sphere.length === 0) return
       if (this.node.name === this.sphere) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Add another')})
         this.sphere = ''
@@ -186,7 +231,6 @@ export default {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum 5 spheres!')})
         return
       }
-      if (this.sphere.length === 0) return
       // do stuff
       this.node.spheres.push({name: this.sphere})
       this.sphere = ''
@@ -278,16 +322,44 @@ export default {
         if (!await UserApi.isSubscribed(this.contentKalpa.oid)) await UserApi.subscribe(this.contentKalpa.oid)
       }
     },
+    async nodeSaveAction () {
+      try {
+        this.$log('nodeSaveAction start')
+        this.nodeSaving = true
+        await this.$wait(500)
+        this.player.setState('node', await this.nodeSave())
+        // TODO: set nodeMode: edit
+        this.$log('nodeSaveAction done')
+        this.nodeSaving = false
+      }
+      catch (e) {
+        this.$log('nodeSaveAction error', e)
+        this.nodeSaving = false
+      }
+    },
+    async nodeDeleteAction () {
+      try {
+        this.$log('nodeDeleteAction start')
+        this.nodeDeleting = true
+        await this.$wait(500)
+        // TODO: set nodeMode: null
+        // await this.$rxdb.remove(this.node.id)
+        await this.node.remove(true)
+        this.player.setState('node', null)
+        this.$log('nodeDeleteAction done')
+        this.nodeDeleting = false
+      }
+      catch (e) {
+        this.$log('nodeDeleteAction error', e)
+        this.nodeDeleting = false
+      }
+    },
     async nodeSave () {
       this.$log('nodeSave')
       let nodeInput = JSON.parse(JSON.stringify(this.node))
-      nodeInput.items[0] = this.compositionCreate()
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeSaved', nodeSaved)
-      this.player.setState('figures', null)
-      // save content bookmark to "all" collection
-      await this.contentBookmarkSave()
-      // this.$emit('nodeSaved')
+      return nodeSaved
     },
     async nodePublish () {
       try {
@@ -295,11 +367,16 @@ export default {
         // ---
         // loading
         this.nodePublishing = true
+        if (this.node.name.length === 0) throw new Error(this.$t('Empty node name!'))
+        if (!this.node.category) {
+          this.categoryError = true
+          throw new Error(this.$t('Select node category!'))
+        }
         await this.$wait(1000)
         // ---
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))
-        nodeInput.items[0] = this.compositionCreate()
+        // nodeInput.items[0] = this.compositionCreate()
         if (nodeInput.name.length === 0) {
           throw new Error(this.$t('Empty essence !'))
         }
@@ -307,15 +384,19 @@ export default {
         // ---
         // create node, publish this shit
         let nodeCreating = await ObjectCreateApi.essenceCreate(nodeInput)
-        this.$emit('published', nodeCreating)
-        this.$store.commit('ui/stateSet', ['nodeCreating', true])
+        this.$ym('NODE_CREATED')
+        // this.$emit('published', nodeCreating)
+        // this.$store.commit('ui/stateSet', ['nodeCreating', true])
         // this.$q.notify({type: 'positive', message: 'Node published ' + nodeCreating.oid})
         // ---
-        // delete draft if it is a draft, man
+        // Delete draft if it is a draft, man
         if (nodeInput.wsItemType === 'WS_NODE') {
           // await this.node.remove(true)
           await this.$rxdb.remove(this.node.id)
         }
+        this.player.setState('nodeMode', 'focus')
+        this.player.setState('node', nodeCreating)
+        // this.$emit('pageId', null)
         // save content bookmark to "all" collection
         await this.contentBookmarkSave()
         // ---
@@ -323,15 +404,15 @@ export default {
         this.nodePublishing = false
         // ---
         // kill player figures, it will destroy node editor
-        this.player.setState('figures', null)
+        // this.player.setState('figures', null)
         // ---
         // where to wait for the progress of node creating ?
         // here ?
-        this.$emit('node', nodeCreating)
+        // this.$emit('node', nodeCreating)
       }
       catch (e) {
         this.$log('nodePublish error', e)
-        this.$q.notify({type: 'negative', message: e.toString()})
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.nodePublishing = false
       }
     },
@@ -345,25 +426,18 @@ export default {
       }
       // save draft ?
       else {
+        this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
         // this.player.events.emit('figure-delete')
-        // this.player.setState('figure', null)
+        // this.player.setState('figureы', null)
       }
     },
   },
   created () {
     this.$log('created')
-    // if (this.player.nodeEditing === null) {
-    //   this.player.setState('nodeEditing', this.node)
-    // }
-    // if (this.player.nodeEditing && !this.node) {
-    //   this.node = this.player.nodeEditing
-    // }
   },
   mounted () {
     this.$log('mounted')
-    this.$wait(500).then(() => {
-      this.$refs.nameInput.focus()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

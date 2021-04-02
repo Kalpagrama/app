@@ -3,7 +3,7 @@
   .row.full-width.q-px-sm
     span.text-bold.text-white {{ $t('Password', 'Пароль') }}
   //- set password
-  div(v-if="!$store.getters.currentUser().settings.hasPermanentPassword").row.full-width
+  div(v-if="!$store.getters.currentUser.settings.hasPermanentPassword").row.full-width
     //- set header
     .row.full-width.q-py-xs
       small.text-white {{ $t('You can set a permanent password if you dont want to use temporary login codes.', 'Вы можете задать постоянный пароль, если не хотите использовать одноразовые пароли.') }}
@@ -46,7 +46,7 @@
           flat color="grey-9" dense no-caps
           ) {{ $t('Cancel', 'Отмена') }}
   //- change password
-  div(v-if="$store.getters.currentUser().settings.hasPermanentPassword").row.full-width
+  div(v-if="$store.getters.currentUser.settings.hasPermanentPassword").row.full-width
     //- change action
     div(v-if="!changing").row.full-width.q-py-sm
       q-btn(flat color="white" no-caps @click="changing = true").b-50 {{ $t('Change passwor', 'Изменить пароль') }}

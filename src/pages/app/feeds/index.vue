@@ -4,26 +4,8 @@ kalpa-layout()
     kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start
-      div(
-        v-if="$store.getters.isGuest"
-        :style=`{
-          height: '80vh',
-        }`
-        ).row.full-width.justify-center
-        div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-          .row.full-width.justify-center
-            q-icon(name="login" color="grey-8" size="100px")
-          div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-            span.text-white {{$t('You will see your home feed')}}
-          .row.full-width.justify-center.q-pt-md
-            q-btn(
-              outline color="white" no-caps
-              :style=`{
-                height: '50px',
-              }`
-              @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
-            )
-              h1.text-white {{$t('Login')}}
+      view-guest(
+        v-if="$store.getters.isGuest")
       div(
         v-else
         :style=`{
@@ -34,11 +16,13 @@ kalpa-layout()
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import viewGuest from './view_guest.vue'
 import feed from './feed.vue'
 
 export default {
   name: 'pageApp_feeds',
   components: {
+    viewGuest,
     feed
   },
   data () {

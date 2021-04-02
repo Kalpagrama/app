@@ -20,7 +20,7 @@ kalpa-layout()
           .col
           //- tutorial
           q-btn(
-            @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
+            @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
             round flat color="white" icon="fas fa-info")
       //- body
       div(

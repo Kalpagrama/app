@@ -9,6 +9,8 @@ div(
       :node="node"
       :isActive="true"
       :isVisible="true"
+      :showHeader="false"
+      :showActions="false"
       :showItems="false")
     .row.full-width.q-pa-md
       q-btn(
@@ -17,7 +19,7 @@ div(
           height: '50px',
         }`
         @click="$emit('pageId', 'nodes')").full-width
-        span {{$t('Back to nodes')}}
+        span {{$t('Close')}}
 </template>
 
 <script>

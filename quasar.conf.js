@@ -95,7 +95,7 @@ module.exports = function (ctx) {
             'AddressbarColor',
             'AppVisibility',
             'Dialog',
-            'LoadingBar',
+            // 'LoadingBar',
             'Loading'
          ]
       },
@@ -103,6 +103,7 @@ module.exports = function (ctx) {
       // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
       build: {
          env: {
+            DOCKER_MACHINE_NAME: process.env.DOCKER_MACHINE_NAME || 'local', // имя контенйнера, в котором собран фронт (для того чтобы различать production от dev) (api-dev,api-main,vercel,local)
             ORIGIN_URL: process.env.ORIGIN_URL,
             ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
             SERVICES_URL: process.env.SERVICES_URL,

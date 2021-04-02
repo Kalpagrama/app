@@ -50,10 +50,10 @@ q-menu(
       @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
       :style=`{
         height: '60px',
-        borderRadius: '10px',
+        borderRadius: '20px',
         overflow: 'hidden'
       }`
-      ).row.full-width.items-cener.content-center.menu-item.q-mb-sm
+      ).row.full-width.items-cener.content-center.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center.q-ml-sm
         div(
           :style=`{
@@ -61,7 +61,8 @@ q-menu(
             minWidth: '40px', minHeight: '40px',
             maxWidth: '40px', maxHeight: '40px',
             borderRadius: '50%',
-          }`).row.b-50
+          }`).row.items-center.content-center.justify-center.b-50
+          q-icon(name="person" size="26px" color="grey-8")
       div(v-if="!mini").col.full-height
         .row.fit.items-center.content-center
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
@@ -69,18 +70,18 @@ q-menu(
     div(
       v-if="!$store.getters.isGuest"
       v-close-popup
-      @click="$go('/user/'+$store.getters.currentUser().oid)"
+      @click="$go('/user/'+$store.getters.currentUser.oid)"
       :style=`{
-        borderRadius: '10px',
+        borderRadius: '20px',
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(
-          :url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+          :url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
       .col.full-heigh
         .row.fit.items-center.content-center
           span(
-            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
           //- small.text-grey-4.full-width @username
 </template>
 

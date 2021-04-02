@@ -2,37 +2,52 @@
 div(
   :style=`{
     paddingBottom: 'env(safe-area-inset-bottom)',
-    paddingLeft: '32px', paddingRight: '32px',
   }`
-  ).row.full-width.items-center.content-center.justify-between
-  q-btn(round flat color="white" no-caps icon="west" stack @click="$router.back()")
-  div(v-if="$q.screen.gt.sm").col
+  ).row.full-width.items-center.content-center.justify-between.q-px-md
+  q-btn(
+    flat color="white" no-caps icon="west"
+    :style=`{
+      width: '50px', height: '50px',
+    }`
+    @click="$router.back()"
+    )
+    small {{$t('Back')}}
+  //- .col
   q-btn(
     flat no-caps icon="filter_tilt_shift"
     :color="pageId === 'drafts' ? 'green' : 'white'"
-    :style=`{height: '44px',}`
+    :style=`{
+      width: '50px', height: '50px',
+    }`
     @click="$emit('pageId', 'drafts')"
-    ).col
+    )
+    small {{$t('Drafts')}}
   q-btn(
     flat no-caps icon="adjust"
     :color="pageId === 'nodes' ? 'green' : 'white'"
-    :style=`{height: '44px',}`
+    :style=`{
+      width: '50px', height: '50px',
+    }`
     @click="$emit('pageId', 'nodes')"
-    ).col
+    )
+    small {{$t('Nodes')}}
   q-btn(
     flat no-caps
     :color="pageId === 'info' ? 'green' : 'white'"
     @click="$emit('pageId', 'info')"
-    :style=`{height: '44px',}`
-    ).col
-    q-icon(name="fas fa-info" size="19px")
-  div(v-if="$q.screen.gt.sm").col
+    :style=`{
+      width: '50px', height: '50px',
+    }`
+    )
+    q-icon(name="fas fa-info" size="19px").q-mb-xs
+    small {{$t('Info')}}
+  //- .col
   kalpa-menu-popup-global(
-    :showLabel="false"
+    :showLabel="true"
+    color="white"
     :offset="[16,0]"
     :style=`{
-      width: '44px',
-      height: '44px',
+      width: '50px', height: '50px',
     }`)
 </template>
 

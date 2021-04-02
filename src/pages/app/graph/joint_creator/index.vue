@@ -24,7 +24,8 @@ div(
   q-dialog(
     v-model="itemEditorShow"
     position="bottom"
-    :maximized="true")
+    :maximized="true"
+    :no-esc-dismiss="true")
     item-editor(
       v-if="joint.items[1]"
       :joint="joint"
@@ -188,6 +189,7 @@ export default {
         this.$log('jointInput', jointInput)
         let jointCreated = await ObjectCreateApi.essenceCreate(jointInput)
         this.$log('jointPublish jointCreated', jointCreated)
+        this.$ym('JOINT_CREATED')
         // done? emit? close?
         this.$log('jointPublish done')
         this.jointPublishing = false

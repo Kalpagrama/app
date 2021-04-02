@@ -131,6 +131,7 @@ const routes = [
          {
             name: 'node',
             path: 'node/:oid',
+            // alias: 'node2/:oid',
             component: () => import('pages/app/node/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
@@ -292,19 +293,8 @@ const routes = [
       ],
       meta: { roleMinimal: 'GUEST' },
       beforeEnter: async (to, from, next) => {
-         if (to.query.originalUrl) { // редирект на полную версию (после успешного входа перейдет на этот url)
-            logD('redirect command received!', to.query.originalUrl)
-            sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
-         }
-         if (to.query.masterToken) {
-            logD('clone session!', to.query.masterToken)
-            if (localStorage.getItem('k_token') !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
-               await AuthApi.userIdentify(null, to.query.masterToken)
-               await AuthApi.userAuthenticate(null)
-            }
-         }
          // logD('router :: try systemInit...')
-         // await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
+         await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
          if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
             logD('router::need more privileges')
             return next('/auth') // если маршрут требует повышения - переходим на форму входа

@@ -3,8 +3,8 @@ q-btn(
   round flat no-caps
   :color="color"
   :loading="loading"
-  @click="shareStart")
-  //- q-tooltip(dense dark) {{$t('Share')}}
+  @click="shareStart()")
+  q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Share')}}
   q-icon(name="logout" size="23px").rotate-270
   q-dialog(
     v-model="shareDialogOpened"
@@ -41,7 +41,7 @@ q-btn(
                   span.text-bold {{$t('Copy')}}
         //- TODO: add links twitter and other socials
         //- item repost
-        .row.full-width.q-pa-md
+        //- .row.full-width.q-pa-md
           q-btn(
             @click="itemRepost()"
             outline no-caps color="green"
@@ -103,7 +103,12 @@ export default {
     async shareStart () {
       this.$log('shareStart', Platform.is)
       this.shareLink = makeRoutePath(this.item, true)
-      this.shareDialogOpened = true
+      if (this.$q.platform.is.mobile) {
+        this.shareNative()
+      }
+      else {
+        this.shareDialogOpened = true
+      }
       // this.$emit('done')
     },
     async shareLinkCopy () {

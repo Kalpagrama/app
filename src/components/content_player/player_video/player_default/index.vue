@@ -25,83 +25,23 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(
+video(
+  ref="videoRef"
+  type="video/youtube"
+  :src="url"
+  :playsinline="true"
+  :autoplay="true"
+  :loop="true"
+  :muted="muted"
   :style=`{
-    //- position: 'relative',
+    objectFit: 'contain'
   }`
-  ).column.fit
-  div(:style=`{position: 'relative',}`).col.full-width
-    video(
-      ref="videoRef"
-      type="video/youtube"
-      :src="url"
-      :playsinline="true"
-      :autoplay="true"
-      :loop="true"
-      :muted="false"
-      :style=`{
-        objectFit: 'contain'
-      }`
-      @loadeddata="videoLoadeddata"
-      @timeupdate="videoTimeupdate"
-      @pause="videoPaused"
-      @play="videoPlaying"
-      ).fit
-    //- Pult
-    transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
-      div(
-        v-if="duration > 0"
-        v-show="options.showPult"
-        :style=`{
-          position: 'absolute', zIndex: 11, bottom: '0px',
-        }`
-        ).row.full-width.justify-center.q-px-md
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: 600+'px',
-              background: 'rgba(35,35,35,0.7)',
-              borderRadius: '20px',
-              //- height: '200px',
-            }`).row.full-width
-            slot(name="pult" :player="player")
-            player-pult(
-              :player="player"
-              :contentKalpa="contentKalpa")
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: 600+'px',
-            }`
-            ).row.full-width
-            slot(name="pult-footer")
-    //- Tint bottom
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="!playing && playerType === 'player-youtube'"
-        v-show="options.showTint"
-        :style=`{
-          position: 'absolute', zIndex: 10, bottom: '0px',
-          height: '100%',
-          //- height: $q.screen.gt.sm ? '100%' : '300px',
-          background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
-          //- pointerEvents: 'none',
-        }`
-        @click.self="play()"
-        ).row.full-width.items-center.content-center.justify-center
-        q-btn(
-          round flat color="white"
-          :style=`{
-            width: '150px',
-            height: '150px',
-            borderRadius: '50%',
-          }`
-          @click="play()")
-          q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
-  //- footer
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: 600+'px'}`).row.full-width
-      slot(name="footer")
+  @click="videoClick"
+  @loadeddata="videoLoadeddata"
+  @timeupdate="videoTimeupdate"
+  @pause="videoPaused"
+  @play="videoPlaying"
+  ).fit
 </template>
 
 <script>
@@ -109,14 +49,10 @@ import assert from 'assert'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
-
-import playerPult from './player_pult/index.vue'
+import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 
 export default {
-  name: 'contentPlayer__video',
-  components: {
-    playerPult
-  },
+  name: 'playerDefault',
   props: {
     contentKalpa: {type: Object, required: true},
     isVisible: {type: Boolean, default: true},
@@ -126,27 +62,46 @@ export default {
   },
   data () {
     return {
+      events: null,
       player_: null,
       playing: false,
+      playingCount: 0,
       muted: false,
       duration: 0,
       currentTime: 0,
-      figures: null,
-      nodeFocused: null,
-      nodeEditing: null,
-      events: null,
-      clusters: null,
+      node: null,
+      nodeMode: null,
+      clusters: [],
     }
   },
   computed: {
-    url () { return ContentApi.urlSelect(this.contentKalpa) },
+    url () {
+      // this.$log('url computed=', ContentApi.urlSelect(this.contentKalpa))
+      return ContentApi.urlSelect(this.contentKalpa)
+    },
     // Dynamic player depends on contentKalpa.url
     playerType () {
       if (this.url.includes('youtu')) return 'player-youtube' // контент не выкачан - показываем плеер ютуба
       else return 'player-kalpa' // есть выкачаннный контент
     },
-    player () {
-      return this
+    figures () {
+      if (this.node) {
+        return this.node.items[0].layers[0].figuresAbsolute
+      }
+      else {
+        return null
+      }
+    }
+  },
+  watch: {
+    url: {
+      async handler (to, from) {
+        if (to) {
+          this.$log('url changed!!!', to)
+          await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
+          window.location.reload()
+        }
+      }
     }
   },
   methods: {
@@ -156,6 +111,7 @@ export default {
     },
     play () {
       this.$log('play')
+      this.playingCount += 1
       if (this.playerType === 'player-youtube') {
         this.player_.play()
       }
@@ -192,7 +148,9 @@ export default {
     },
     forward (next) {
       this.$log('forward', next)
-      let t = this.player.currentTime
+      this.node = null
+      this.nodeMode = null
+      let t = this.currentTime
       if (next) t += 5
       else t -= 5
       if (t < 0) t = 0
@@ -212,8 +170,18 @@ export default {
         }
       }
     },
+    videoClick (e) {
+      this.$log('videoClick', e)
+      if (this.playerType === 'player-youtube') {
+        // do stuff
+      }
+      else if (this.playerType === 'player-kalpa') {
+        if (this.playing) e.target.pause()
+        else e.target.play()
+      }
+    },
     videoLoadeddata (e) {
-      this.$log('videoLoadeddata', e)
+      // this.$log('videoLoadeddata', e)
       if (this.playerType === 'player-youtube') {
         this.duration = this.player_.duration
       }
@@ -225,10 +193,11 @@ export default {
       // Loaded!
       this.$nextTick(() => {
         this.$emit('player', this)
-        // if (localStorage.getItem('k_sound')) {
-        //   this.mutedToggle(false)
-        // }
-        this.play()
+        if (localStorage.getItem('k_sound')) {
+          this.mutedToggle(false)
+        }
+        // this.$q.notify('Player.play ! Internal')
+        // this.play()
       })
     },
     videoTimeupdate (e) {
@@ -245,7 +214,7 @@ export default {
       }
     },
     videoPaused (e) {
-      this.$log('videoPaused', e)
+      // this.$log('videoPaused', e)
       if (this.playerType === 'player-youtube') {
         this.playing = false
       }
@@ -254,7 +223,7 @@ export default {
       }
     },
     videoPlaying (e) {
-      this.$log('videoPlaying', e)
+      // this.$log('videoPlaying', e)
       if (this.playerType === 'player-youtube') {
         this.playing = true
       }

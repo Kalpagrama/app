@@ -265,7 +265,7 @@ export default {
         // popuplate jointInput.items[1] fo GIF
         this.$log('jointInput', jointInput)
         if (jointInput.items[1].type === 'GIF' && !jointInput.items[1].oid) {
-          let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url)
+          let contentKalpa = await ContentApi.contentCreateFromUrl(jointInput.items[1].url, true)
           jointInput.items[1].oid = contentKalpa.oid
         }
         this.$log('jointInput', jointInput)

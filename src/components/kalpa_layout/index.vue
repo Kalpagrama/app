@@ -1,11 +1,15 @@
 <template lang="pug">
 q-layout(view="hHh LpR fFf")
-  q-header
+  q-header()
+    q-resize-observer(@resize="headerHeight = $event.height")
     slot(name="header")
   q-footer
     slot(name="footer")
   q-page-containter
-    q-page
+    q-page(
+      :style=`{
+        paddingTop: headerHeight+'px',
+      }`)
       slot(name="body")
 //- .row.full-width.justify-center
   slot(name="body")

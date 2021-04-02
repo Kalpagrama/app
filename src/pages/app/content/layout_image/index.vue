@@ -15,7 +15,7 @@ div(
       div(
         :style=`{
           position: 'relative',
-          //- maxWidth: 650+'px',
+          //- maxWidth: 600+'px',
           overflow: 'hidden',
         }`
         ).row.fit
@@ -45,7 +45,7 @@ div(
               :contentKalpa="contentKalpa"
               :player="player"
               :style=`{
-                maxWidth: 650+'px',
+                maxWidth: 600+'px',
                 background: 'rgba(30,30,30,0.98)',
               }`
               @close="pageId = null")
@@ -83,9 +83,14 @@ div(
               round flat color="white"
               :icon="footerShow ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
   //- footer
-  nav-bottom(
-    v-show="footerShow"
-    :pageId="pageId" @pageId="pageId = $event")
+  .row.full-width.justify-center
+    nav-bottom(
+      v-show="footerShow"
+      :pageId="pageId"
+      :style=`{
+        maxWidth: 600+'px',
+      }`
+      @pageId="pageId = $event")
 </template>
 
 <script>
@@ -94,7 +99,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'components/content_player/index.vue'
 
 import pageNodes from './page_nodes/index.vue'
-// import pageDrafts from '../page_drafts/index.vue'
+// import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 

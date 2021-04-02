@@ -11,24 +11,6 @@
           :node="item.populatedObject"
           :isActive="isActive"
           :isVisible="isVisible")
-//- .row.full-width.justify-center
-  div(
-    :style=`{
-      width: '380px',
-      height: '380px',
-    }`
-    ).column
-    .col.full-width.scroll
-      list-feed(
-        :itemStyles=`{
-          paddingBottom: '8px',
-        }`
-        :query="queryFeedItems")
-        template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-          node-feed(
-            :node="item.populatedObject"
-            :isActive="isActive"
-            :isVisible="isVisible")
 </template>
 
 <script>
@@ -50,7 +32,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
-          oidSphere: this.$store.getters.currentUser().oid,
+          oidSphere: this.$store.getters.currentUser.oid,
           // subscription: {$in: this.feedSubscriptions}
           matterReason: {$ne: 'AUTHOR'}, // только события относительно объектов, где я не являюсь автором объекта
           eventType: {$in: ['OBJECT_CREATED']} // только события о создании объектов

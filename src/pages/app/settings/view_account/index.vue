@@ -40,7 +40,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.currentUser = this.$store.getters.currentUser()
+    this.currentUser = this.$store.getters.currentUser
   }
 }
 </script>

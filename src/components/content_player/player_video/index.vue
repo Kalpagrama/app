@@ -1,50 +1,92 @@
 <template lang="pug">
-div(
-  :style=`{
-    ...styles,
-  }`
-  ).column.full-width
-  player-tint(
-    v-bind="$props"
-    :player="player")
-    template(v-slot:tint-bar=`{tintFocused}`)
-      slot(name="tint-bar" :tintFocused="tintFocused")
-    template(v-slot:tint=`{tintFocused}`)
-      slot(name="tint" :tintFocused="tintFocused")
-  //- body
-  div(
-    :style=`{
-      position: 'relative',
-    }`
-    ).col.full-width
-    component(
-      :is="playerComponent"
-      :contentKalpa="contentKalpa"
-      :style=`{
-        position: 'absolute',
-        zIndex: 100,
-        top: 0,
-        ...styles,
-        opacity: videoOpacity,
-      }`
-      :styles="styles"
-      @player="playerCreated")
+.column.fit
+  div(:style=`{position: 'relative',}`).col.full-width
+    player-default(
+      v-bind="$props"
+      @player="player = $event, $emit('player', $event)")
+    //- Pult
+    div(:style=`{position: 'absolute', zIndex: 11, bottom: '0px', }`).row.full-width.justify-center
+      div(:style=`{maxWidth: 600+'px',}`).row.full-width
+        div(:style=`{maxWidth: 600+'px', position: 'absolute', zIndex: 11, bottom: '0px',}`).row.full-width.q-px-md
+          slot(name="pult-header")
+          transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
+            div(
+              v-if="player && player.duration > 0"
+              v-show="options.showPult"
+              :style=`{
+                maxWidth: 600+'px',
+                background: 'rgba(35,35,35,0.7)',
+                borderRadius: '20px',
+              }`).row.full-width
+              slot(name="pult" :player="player")
+              player-pult(
+                :player="player"
+                :contentKalpa="contentKalpa")
+          slot(name="pult-footer")
+    //- transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
+      div(
+        v-if="player && player.duration > 0"
+        v-show="options.showPult"
+        :style=`{
+          position: 'absolute', zIndex: 11, bottom: '0px',
+        }`
+        ).row.full-width.justify-center.q-px-md
+        .row.full-width.justify-center.br
+          div(
+            :style=`{
+              maxWidth: 600+'px',
+              background: 'rgba(35,35,35,0.7)',
+              borderRadius: '20px',
+              //- height: '200px',
+            }`).row.full-width
+            slot(name="pult" :player="player")
+            player-pult(
+              :player="player"
+              :contentKalpa="contentKalpa")
+        .row.full-width.justify-center
+          div(
+            :style=`{
+              maxWidth: 600+'px',
+            }`
+            ).row.full-width
+            slot(name="pult-footer")
+    //- Tint bottom - on pause and desktops only and youtube
+    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 600"
+        v-show="options.showTint"
+        :style=`{
+          position: 'absolute', zIndex: 10, bottom: '0px',
+          height: '100%',
+          background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
+        }`
+        @click.self="player.play()"
+        ).row.full-width.items-center.content-center.justify-center
+        q-btn(
+          v-show="options.showPlayBtn"
+          round flat color="white"
+          :style=`{
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+          }`
+          @click="player.play()")
+          q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
+  //- footer
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: 600+'px'}`).row.full-width
+      slot(name="footer")
 </template>
 
 <script>
-import assert from 'assert'
-import { ContentApi } from 'src/api/content'
-
-import playerYoutube from './player_youtube.vue'
-import playerKalpa from './player_kalpa.vue'
-import playerTint from './player_tint/index.vue'
+import playerDefault from './player_default/index.vue'
+import playerPult from './player_pult/index.vue'
 
 export default {
-  name: 'contentPlayer_video',
+  name: 'contentPlayer__video',
   components: {
-    playerYoutube,
-    playerKalpa,
-    playerTint,
+    playerDefault,
+    playerPult
   },
   props: {
     contentKalpa: {type: Object, required: true},
@@ -52,62 +94,11 @@ export default {
     isActive: {type: Boolean, default: true},
     isMini: {type: Boolean, default: false},
     options: {type: Object, default: {}},
-    styles: {type: Object},
   },
   data () {
     return {
       player: null,
-      // playerComponent: {
-      //   YOUTUBE: 'player-youtube',
-      //   KALPA: 'player-kalpa',
-      // }
     }
-  },
-  computed: {
-    url () { return ContentApi.urlSelect(this.contentKalpa) },
-    playerComponent() {
-      if (this.url.includes('youtu')) return 'player-youtube' // контент не выкачан - показываем плеер ютуба
-      else return 'player-kalpa' // есть выкачаннный контент
-    },
-    figureOffset () {
-      let arr = this.url.split('#t=')
-      if (arr.length > 1) {
-        let [start, end] = arr[1].split(',')
-        return [
-          {t: parseFloat(start)},
-          {t: parseFloat(end)},
-        ]
-      }
-      else {
-        return null
-      }
-    },
-    videoOpacity () {
-      if (this.figureOffset && this.player) {
-        if (this.player.currentTimeRaw >= this.figureOffset[0].t + 0.05 && this.player.currentTimeRaw < this.figureOffset[1].t - 0.05) {
-          return 1
-        }
-        else {
-          return 0
-        }
-      }
-      else {
-        return 1
-      }
-    }
-  },
-  methods: {
-    playerCreated (player) {
-      // this.$log('playerCreated')
-      this.player = player
-      this.$emit('player', player)
-      if (this.$q.platform.is.capacitor || this.$q.platform.is.desktop) {
-        let muted = localStorage.getItem('k_muted')
-        if (muted === 'false') {
-          this.player.setState('muted', false)
-        }
-      }
-    },
   }
 }
 </script>

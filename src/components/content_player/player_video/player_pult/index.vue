@@ -4,12 +4,11 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  //- player.nodePlaying
-  //- tint-bar-node-playing(
-    v-if="player && player.nodePlaying && !player.figures"
+  //- player.nodeFocused
+  node-focused(
+    v-if="player && player.node && player.nodeMode === 'focus'"
     :player="player"
-    :contentKalpa="contentKalpa"
-    :options="options")
+    :contentKalpa="contentKalpa")
   //- bar
   div(
     :style=`{
@@ -104,14 +103,14 @@ div(
                 position: 'absolute', zIndex: 3000,
               }`
               ).row.fit
-            //- node playing
+            //- node focused
             div(
-              v-if="!zoomed && player.nodePlaying"
+              v-if="!zoomed && player.node && ['focus', 'pick'].includes(player.nodeMode)"
               :style=`{
                 position: 'absolute', zIndex: 3000,
                 top: '-2px',
-                left: (player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t/player.duration)*100+'%',
-                width: ((player.nodePlaying.items[0].layers[0].figuresAbsolute[1].t-player.nodePlaying.items[0].layers[0].figuresAbsolute[0].t)/player.duration)*100+'%',
+                left: (player.figures[0].t/player.duration)*100+'%',
+                width: ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'%',
                 height: 'calc(100% + 4px)',
                 border: '2px solid rgb(76,175,79)',
                 borderRadius: '2px',
@@ -122,7 +121,7 @@ div(
             //- figures editor
             transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
               figures-editor(
-                v-if="player && player.figures"
+                v-if="player && player.figures && player.nodeMode === 'edit'"
                 :player="player"
                 :convert="convertPxToTime"
                 :style=`{
@@ -132,7 +131,7 @@ div(
                 @first="zoomWorking = true, figureEditing = true"
                 @final="zoomWorking = false, figureEditing = false")
             //- clusters
-            //- tint-bar-clusters(
+            clusters(
               v-if="player.clusters.length > 0 && zoomed !== true"
               v-bind="$props")
             //- currentTime
@@ -215,7 +214,7 @@ div(
             ).row
   //- footer: actions
   figures-actions(
-    v-if="player && player.figures"
+    v-if="player && player.figures && player.nodeMode === 'edit'"
     v-bind="$props")
   actions(
     v-if="player"
@@ -224,15 +223,20 @@ div(
 
 <script>
 import actions from './actions.vue'
+import clusters from './clusters.vue'
 import figuresActions from './figures_actions.vue'
 import figuresEditor from './figures_editor.vue'
+import nodeFocused from './node_focused.vue'
+
 export default {
   name: 'playerPult',
   props: ['player', 'contentKalpa', 'options'],
   components: {
     actions,
+    clusters,
     figuresActions,
     figuresEditor,
+    nodeFocused,
   },
   data () {
     return {
@@ -244,7 +248,7 @@ export default {
       heightBarMax: 40,
       heightWrapper: 50,
       heightWrapperMin: 60,
-      heightWrapperMax: 120,
+      heightWrapperMax: 90,
       minWidth: 0,
       zoomed: null,
       zoomWorking: false,
@@ -351,12 +355,9 @@ export default {
         }, 300)
       }
     },
-    'player.figures': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('player.figures TO', to)
-        // figures created
-        if (to && !from) {
+    'player.nodeMode': {
+      handler (to, from) {
+        if (to === 'edit') {
           this.$nextTick(() => {
             this.zoomIn()
           })
@@ -365,8 +366,7 @@ export default {
             heightWrapper: this.heightWrapperMax,
           })
         }
-        // figures destroyed
-        if (to === null) {
+        else {
           this.zoomOut()
           this.$tween.to(this, 0.5, {
             heightBar: this.heightBarMin,
@@ -375,6 +375,31 @@ export default {
         }
       }
     },
+    // 'player.figures': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('player.figures TO', to)
+    //     // figures created
+    //     if (to && !from) {
+    //       if (this.player.nodeMode !== 'edit') return
+    //       this.$nextTick(() => {
+    //         this.zoomIn()
+    //       })
+    //       this.$tween.to(this, 0.5, {
+    //         heightBar: this.heightBarMax,
+    //         heightWrapper: this.heightWrapperMax,
+    //       })
+    //     }
+    //     // figures destroyed
+    //     if (to === null && from) {
+    //       this.zoomOut()
+    //       this.$tween.to(this, 0.5, {
+    //         heightBar: this.heightBarMin,
+    //         heightWrapper: this.heightWrapperMin,
+    //       })
+    //     }
+    //   }
+    // },
     zoomed: {
       // immediate: true,
       handler (to, from) {
@@ -567,13 +592,13 @@ export default {
       // this.barClick({layerX: left, target: {clientWidth: width}})
     },
     zoomWrapperOnResize (e) {
-      this.$log('zoomWrapperOnResize', e)
-      // if (this.width === 0) {
-      //   this.minWidth = this.minWidthMin
-      // }
-      // this.$set(this, 'width', e.width)
+      // this.$log('zoomWrapperOnResize', e)
       this.width = e.width
       this.height = e.height
+      // this.minWidth = this.zoomed ? this.minWidthMax : this.minWidthMin
+      if (!this.zoomed) {
+        this.minWidth = this.minWidthMin
+      }
     },
     minutesWrapperDrag (e) {
       // this.$log('minutesWrapperDrag', e)
@@ -599,13 +624,14 @@ export default {
         // this.zoomed = !this.zoomed
         let t = (left / width) * this.player.duration
         this.$log('t', t)
-        // Handle outside click when nodePlaying
-        if (this.player.nodePlaying) {
-          let figures = this.player.nodePlaying.items[0].layers[0].figuresAbsolute
-          if (t < figures[0].t || t > figures[1].t) {
-            // Destroy nodePlaying
-            // alert('Destroy nodePlaying here...')
-            this.player.setState('nodePlaying', null)
+        // Handle outside click when nodeFocused
+        if (this.player.figures) {
+          // let figures = this.player.node.items[0].layers[0].figuresAbsolute
+          if (t < this.player.figures[0].t || t > this.player.figures[1].t) {
+            // Destroy nodeFocused
+            // alert('Destroy nodeFocused here...')
+            this.player.setState('node', null)
+            this.player.setState('nodeMode', null)
             this.player.setCurrentTime(t)
           }
         }
@@ -653,6 +679,7 @@ export default {
       }
     }
   },
+  // created () {},
   mounted () {
     this.$log('mounted')
     let rect = this.$refs['zoom-wrapper'].getBoundingClientRect()

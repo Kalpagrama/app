@@ -19,7 +19,7 @@ export default {
     }
   },
   async mounted () {
-    this.currentUser = this.$store.getters.currentUser()
+    this.currentUser = this.$store.getters.currentUser
   }
 }
 </script>

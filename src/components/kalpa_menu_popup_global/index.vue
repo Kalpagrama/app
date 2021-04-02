@@ -15,7 +15,7 @@ q-btn(
   menu-popup(:offset="offset")
   img(
     v-if="!$store.getters.isGuest"
-    :src="$store.getters.currentUser().profile.photoUrl"
+    :src="$store.getters.currentUser.profile.photoUrl"
     :style=`{
       width: size, minWidth: size, maxWidth: size,
       height: size, minHeight: size, maxHeight: size,
@@ -31,7 +31,7 @@ q-btn(
     q-icon(name="menu" color="grey-7" size="24px")
   div(
     v-if="showLabel"
-    ).row.full-width.justify-center
+    ).row.full-width.justify-center.q-mt-xs
     small {{$t('Menu')}}
 </template>
 

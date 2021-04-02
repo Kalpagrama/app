@@ -4,7 +4,7 @@ div(
     height: heightMax+'%',
     minHeight: '27px',
     //- background: 'rgba(0,0,0,0.5)',
-    background: 'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 200%)',
+    background: wrapperBackground,
     borderRadius: '10px',
   }`
   ).column.full-width.items-end.content-end.justify-end
@@ -17,7 +17,7 @@ div(
         v-if="contentKalpa"
         :style=`{overflow: 'hidden',}`
         @click.self="miniClick()"
-        ).row.fit.items-start.content-start.q-pa-sm
+        ).row.fit.items-start.content-start
         //- name
         .row.full-width.q-px-md.q-py-sm
           span(
@@ -71,7 +71,7 @@ div(
           .row.fit.items-center.content-center.q-px-sm
             q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
             //- small.text-grey-4 {{composition.layers[0].contentName}}
-            small.text-grey-4 {{$t('Context')}}
+            small(v-if="width > 330").text-grey-4 {{$t('Context')}}
         //- video controls
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(
@@ -114,9 +114,9 @@ export default {
       immediate: true,
       handler (to, from) {
         if (to) {
-          this.$wait(3000).then(() => {
-            this.getContent()
-          })
+          // this.$wait(3000).then(() => {
+          //   this.getContent()
+          // })
         }
         else {
           this.$tween.to(this, 0.3, {heightMax: 0})
@@ -137,6 +137,14 @@ export default {
       }
       else {
         return null
+      }
+    },
+    wrapperBackground () {
+      if (this.composition.outputType === 'BOOK') {
+        return 'rgb(0,0,0)'
+      }
+      else {
+        return 'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 200%)'
       }
     }
   },

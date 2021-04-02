@@ -1,7 +1,7 @@
 <template lang="pug">
 kalpa-layout().b-30
   template(v-slot:body)
-    .row.full-width.items-start.content-start
+    div(:style=`{minHeight: $q.screen.height+'px',}`).row.full-width.items-start.content-start
       //- ====
       //- node
       div(

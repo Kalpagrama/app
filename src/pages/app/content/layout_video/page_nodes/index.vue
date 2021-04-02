@@ -18,13 +18,13 @@ page-nodes-root(
       ).row.full-width.node.q-mb-sm.q-px-sm
       div(
         :style=`{
-          background: 'rgba(35,35,35,0.6)',
+          background: 'rgba(35,35,35,0.4)',
           borderRadius: '10px',
         }`
         ).row.full-width
         div(
           :style=`{
-            background: 'rgba(40,40,40,0.6)',
+            background: 'rgba(40,40,40,0.4)',
             borderRadius: '10px',
           }`
           ).row.full-width.items-start.content-start
@@ -38,6 +38,10 @@ page-nodes-root(
           .col
             .row.full-width.q-pa-sm
               span.text-white {{ node.name }}
+              div(
+                v-if="node.items[0] && node.items[0].layers"
+                ).row.full-width
+                small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
         //- selected
         div(
           v-if="nodeSelectedOid === node.oid"
@@ -69,11 +73,15 @@ export default {
     },
     nodeClick (node) {
       this.$log('nodeClick', node)
+      // this.player.setState('node', node)
+      // this.player.setState('nodeMode', 'pick')
       this.nodeSelectedOid = node.oid
       this.nodeReplay(node)
+      // this.nodeLaunch(node)
     },
     nodeLaunch (node) {
       this.$log('nodeLaunch', node)
+      // this.player.setState('nodeMode', 'focus')
       this.$emit('node', node)
     }
   }
