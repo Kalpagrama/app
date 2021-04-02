@@ -112,15 +112,6 @@ export default {
       showTutorial: false,
       slide: 'welcome',
       doc: null,
-      tutorialInitial: {
-        main: false,
-        content_first: false,
-        node_first: false,
-        joint_first: false,
-        workspace_first: false,
-        workspace_upload: false,
-        workspace_article: false,
-      }
     }
   },
   computed: {
@@ -132,9 +123,6 @@ export default {
           url: s.fields.file.url,
         }
       })
-    },
-    tutorial () {
-      return this.$store.getters.currentUser.profile.tutorial
     }
   },
   watch: {
@@ -184,24 +172,9 @@ export default {
   },
   async beforeDestroy () {
     this.$log('beforeDestroy')
-    // before
-    let userTutorials = this.$store.getters.currentUser.profile.tutorial
-    this.$log('userTutorials BEFORE', userTutorials)
-    // create userTutorials
-    if (typeof this.tutorial !== 'object') {
-      this.$log('userTutorials CREATE')
-      let tutorialInput = {...this.tutorialInitial, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialInput)
-    }
-    // update userTutorials
-    else {
-      this.$log('userTutorials UPDATE', this.config.id, true)
-      let tutorialInput = {...this.userTutorials, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialInput)
-    }
-    // after
-    let userTutorials2 = this.$store.getters.currentUser.profile.tutorial
-    this.$log('userTutorials AFTER', userTutorials2)
+    let tutorialCurrent = this.$store.getters.currentUser.profile.tutorial
+    tutorialCurrent[this.config.id] = true
+    await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialCurrent)
   }
 }
 </script>
