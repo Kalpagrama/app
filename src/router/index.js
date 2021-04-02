@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import assert from 'assert'
 import routes from './routes'
+import { localStorage } from 'src/system/log'
+import { AuthApi } from 'src/api/auth'
 
 const debug = require('debug')('[router]:index')
 debug.enabled = true
@@ -28,10 +30,23 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
   router.historyKalpa = [] // храним тут историю последних 100 переходов
-  router.beforeEach((to, from, next) => {
+  router.beforeEach(async (to, from, next) => {
     router.historyKalpa.push(to.path)
     if (router.historyKalpa.length > 100)router.historyKalpa.splice(0, router.historyKalpa.length - 100)
-    next()
+    let redirectUrl
+    if (to.query.originalUrl) { // способ миновать путь, когда nginx редиректит на бэкенд (ssr для роботов)
+      console.log('redirect command received!', to.query.originalUrl)
+      // sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
+      redirectUrl = to.query.originalUrl
+    }
+    if (to.query.masterToken) {
+      console.log('clone session!', to.query.masterToken)
+      if (localStorage.getItem('k_token') !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
+        await AuthApi.userIdentify(null, to.query.masterToken)
+        await AuthApi.userAuthenticate(null)
+      }
+    }
+    next(redirectUrl)
   })
   return router
 }

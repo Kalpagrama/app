@@ -17,7 +17,7 @@ function makeRoutePath(object, full = false){
       else if (object.type === 'USER') res = `/user/${object.oid}`
       else if (object.type.in('WORD', 'SENTENCE', 'CHAR')) res = `/sphere/${object.oid}`
    }
-   if (full) res = (process.env.NODE_ENV === 'development' ? process.env.ORIGIN_URL_DEBUG : process.env.ORIGIN_URL) + res
+   if (full) res = (process.env.DOCKER_MACHINE_NAME.in('api-dev', 'local') ? process.env.ORIGIN_URL_DEBUG : process.env.ORIGIN_URL) + res
    return res
 }
 

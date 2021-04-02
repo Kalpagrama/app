@@ -318,11 +318,12 @@ async function systemInit () {
       // alert(' systemInit 4 ')
       if (await rxdb.isInitializedGlobal()) {
          await i18next.changeLanguage(rxdb.getCurrentUser().profile.lang)
-         if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
-            logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
-            await router.replace(sessionStorage.getItem('k_originalUrl'))
-            sessionStorage.removeItem('k_originalUrl')
-         }
+         // if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
+         //    logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
+         //    alert('redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
+         //    await router.replace(sessionStorage.getItem('k_originalUrl'))
+         //    sessionStorage.removeItem('k_originalUrl')
+         // }
          setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
       } else { // не удалось залогиниться
          // alert(' systemInit 6 ')
