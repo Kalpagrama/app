@@ -148,6 +148,8 @@ export default {
     },
     forward (next) {
       this.$log('forward', next)
+      this.node = null
+      this.nodeMode = null
       let t = this.currentTime
       if (next) t += 5
       else t -= 5
