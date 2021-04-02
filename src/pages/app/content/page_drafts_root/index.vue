@@ -1,78 +1,45 @@
+<style lang="sass">
+.note-item
+  cursor: pointer
+  &:hover
+    background: rgba(30,30,30,0.8) !important
+</style>
+
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    paddingTop: '0px',
-  }`
-  ).row.full-width.items-start.content-start.justify-center
+.column.fit
+  //- header
+  .row.full-width.q-pa-md
+    span.text-white.text-bold {{$t('Drafts')}}
   //- body
-  div(
-    v-if="$store.getters.isGuest()"
-    :style=`{maxWidth: 600+'px', minHeight: '500px',}`
-    ).row.full-width.items-center.content-center
-    .row.full-width.justify-center
-      q-icon(name="login" color="grey-8" size="100px")
-    div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-      span.text-white {{$t('To create drafts, login')}}
-    .row.full-width.justify-center.q-pt-md
-      q-btn(
-        outline color="white" no-caps
-        :style=`{
-          height: '50px',
-        }`
-        @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
-      )
-        h1.text-white {{$t('Login')}}
-  div(
-    v-else
-    :style=`{maxWidth: 600+'px'}`).row.full-width
-    slot
-    //- header: stats, actions
-    .row.full-width.items-center.content-center.justify-between.q-pa-sm
-      span.text-white.text-bold.q-ml-sm {{$t('Notes')}} {{ itemsRes ? itemsRes.totalCount === 0 ? '' : '- ' + itemsRes.totalCount : '' }}
-      .col
-      //- q-btn(
-      //-   @click="drop()"
-      //-   outline color="red" no-caps dense) Drop
-      //- q-btn(
-      //-   @click="prev()"
-      //-   outline color="white" no-caps dense) Prev
-      //- q-btn(
-      //-   @click="next()"
-      //-   outline color="white" no-caps dense) Next
-      kalpa-menu-actions(
-        icon="tune" color="white"
-        :actions="itemsActions")
-    //- body
+  div(:style=`{position: 'relative',}`).col.full-width.scroll
+    view-guest(
+      v-if="$store.getters.isGuest")
     div(
-      v-if="itemsRes"
-      ).row.full-width.q-px-md
-      draft-item(
-        v-for="(i,ii) in items" :key="i.id"
-        :item="i" :itemIndex="ii"
-        @set-selected="itemsSelectedKey = i.id"
-        :isSelected="itemsSelectedKey === i.id"
-        :player="player" :contentKalpa="contentKalpa")
-      //- add draft now, only for video content
-      //- draft-current-time(
-        v-if="contentKalpa.type === 'VIDEO'"
-        :contentKalpa="contentKalpa"
-        :player="player"
-        @focused="itemsSelectedKey = null")
+      v-else-if="itemsRes"
+      ).row.full-width.items-strat.content-start.justify-center.q-px-sm
+      div(
+        v-for="(d,di) in itemsRes.items" :key="d.id"
+        :style=`{
+          position: 'relative',
+          background: 'rgba(30,30,30,0.5)',
+          borderRadius: '10px',
+          minHeight: '40px',
+        }`
+        @click="$emit('draft', d)"
+        ).row.full-width.items-center.content-center.q-pa-sm.note-item.q-mb-sm
+        small.text-white {{ d.name }}
+        slot(name="draft" :draft="d")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-
-import draftItem from './draft_item.vue'
-import draftCurrentTime from './draft_current_time.vue'
+import viewGuest from './view_guest.vue'
 
 export default {
-  name: 'pageDrafts',
+  name: 'pageDraftsRoot',
   props: ['contentKalpa', 'player'],
   components: {
-    draftItem,
-    draftCurrentTime,
+    viewGuest
   },
   data () {
     return {
@@ -131,10 +98,10 @@ export default {
         // limit: 1000
       }
       // add name filter
-      // if (this.searchString.length > 0) {
-      //   let nameRegExp = new RegExp(this.searchString, 'i')
-      //   res.selector.name = {$regex: nameRegExp}
-      // }
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
       return res
     }
   },
@@ -160,7 +127,6 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
-    this.$log('$rxdb.find complete')
   }
 }
 </script>

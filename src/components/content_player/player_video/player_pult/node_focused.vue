@@ -6,7 +6,7 @@ div(
     :maximized="true"
     position="bottom"
     :contentStyle=`{
-      //- backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: 'rgba(0,0,0,0.8)',
     }`)
     div(
       @click.self="nodeShow = false"
@@ -14,10 +14,10 @@ div(
         height: $q.screen.height+'px',
         //- background: 'rgba(0,0,0,0.7)',
       }`
-      ).row.full-width.items-start.content-start.justify-center
+      ).row.full-width.items-start.content-start.justify-center.q-px-sm
       div(
         :style=`{
-          minHeight: '60px',
+          minHeight: '66px',
         }`
         ).row.full-width
         div(
@@ -27,25 +27,34 @@ div(
       node-feed(
         :isActive="true"
         :isVisible="true"
-        :node="player.nodeFocused"
+        :node="player.node"
         :style=`{
           maxWidth: 600+'px',
           background: 'rgba(20,20,20,0.95)',
           borderRadius: '10px',
         }`).q-pb-sm
-      .row.full-width.justify-center
+      .row.full-width.justify-center.q-py-sm
         div(
           :style=`{
-            maxWidth: 400+'px',
+            maxWidth: 600+'px',
           }`
-          ).row.full-width.q-pa-sm
+          ).row.full-width
           q-btn(
-            outline no-caps color="white"
+            outline no-caps color="green"
             :style=`{
               height: '50px',
             }`
+            @click="copyLink()"
             ).full-width
             span.text-bold {{$t('Copy link')}}
+          q-btn(
+            outline no-caps color="grey-8"
+            :style=`{
+              height: '50px',
+            }`
+            @click="nodeShow = false"
+            ).full-width.q-mt-sm
+            span.text-bold {{$t('Close')}}
   q-btn(
     @click="nodeRefresh()"
     round flat color="white" icon="refresh")
@@ -57,13 +66,15 @@ div(
         textAlign: 'center'
       }`
       ).row.full-width.justify-center
-      h1(:style=`{pointerEvents: 'none'}`).text-white {{ player.nodeFocused.name }}
+      h1(:style=`{pointerEvents: 'none'}`).text-white {{ player.node.name }}
   q-btn(
     round flat color="red" icon="clear"
-    @click="player.setState('nodeFocused', null)")
+    @click="player.setState('node', null)")
 </template>
 
 <script>
+import { makeRoutePath } from 'public/scripts/common_func'
+
 export default {
   name: 'nodeFocused',
   props: ['player', 'contentKalpa', 'options'],
@@ -72,14 +83,15 @@ export default {
       nodeShow: false,
       nodeCreating: false,
       nodeCreated: false,
+      shareLink: ''
     }
   },
   computed: {
     start () {
-      return this.player.nodeFocused.items[0].layers[0].figuresAbsolute[0].t
+      return this.player.figures[0].t
     },
     end () {
-      return this.player.nodeFocused.items[0].layers[0].figuresAbsolute[1].t
+      return this.player.figures[1].t
     }
   },
   watch: {
@@ -89,11 +101,11 @@ export default {
         else this.player.play()
       }
     },
-    'player.nodeFocused.uploadStage': {
+    'player.node.uploadStage': {
       deep: false,
       handler (to, from) {
         if (!this.nodeCreating) return
-        this.$logW('player.nodeFocused TO', to)
+        this.$logW('player.node TO', to)
         if (to === 'COMPLETE') {
           // if (!this.isHidden) this.$emit('created')
           this.nodeShow = true
@@ -108,7 +120,7 @@ export default {
                 color: 'white',
                 icon: 'launch',
                 handler: () => {
-                  this.$router.push(`/node/${this.player.nodeFocused.oid}`)
+                  this.$router.push(`/node/${this.player.node.oid}`)
                 }
               }
             ]
@@ -128,6 +140,19 @@ export default {
     },
   },
   methods: {
+    copyLink () {
+      this.$log('copyLink')
+      this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
+    },
+    clipboardWrite (val, message) {
+      this.$log('clipboardWrite', val)
+      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          await navigator.clipboard.writeText(val)
+          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
+        }
+      })
+    },
     nodeRefresh () {
       this.$log('nodeRefresh')
       this.player.setCurrentTime(this.start)
@@ -135,12 +160,18 @@ export default {
     },
     nodeLaunch () {
       this.$log('nodeLaunch')
-      this.nodeShow = true
+      if (this.player.node.oid) {
+        this.nodeShow = true
+      }
+      else {
+        // do what?
+      }
     }
   },
   mounted () {
     this.$log('mounted')
-    if (this.player.nodeFocused.uploadStage === 'COMPLETE') {
+    if (this.player.node.uploadStage === 'COMPLETE') {
+      this.shareLink = makeRoutePath(this.player.node, true)
       this.nodeCreating = false
       this.nodeCreated = true
     }

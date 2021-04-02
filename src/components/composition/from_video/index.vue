@@ -6,12 +6,13 @@ div(
   :style=`{
     position: 'absolute', zIndex: 10,
   }`).row.fit.items-start.content-start
-  //- div(
+  div(
+    v-if="$store.state.ui.useDebug"
     :style=`{
       position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
       opacity: 0.8,
     }`
-    ).row.full-with.bg-red.text-white.bg
+    ).row.full-with.bg-red.text-white
     //- small.full-width currentTime: {{currentTime}}
     small.full-width urlMeta: {{urlMeta}}
   slot(name="footer" :player="player")

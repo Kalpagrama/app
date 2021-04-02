@@ -36,13 +36,13 @@ div(
   div(v-if="$q.screen.gt.sm").col
   //- create player.figure
   q-btn(
-    v-if="!player.figures"
-    @click="figureCreate()"
+    v-if="player.nodeMode !== 'edit'"
+    @click="nodeCreate()"
     round flat color="green" icon="add_circle_outline")
   //- destroy player.figure
   q-btn(
-    v-if="player.figures && !player.nodePlaying"
-    @click="figureDelete()"
+    v-if="player.node && player.nodeMode === 'edit'"
+    @click="nodeDelete()"
     round flat color="red" icon="clear")
 </template>
 
@@ -61,8 +61,8 @@ export default {
     }
   },
   methods: {
-    figureCreate () {
-      this.$log('figureCreate')
+    nodeCreate () {
+      this.$log('nodeCreate')
       if (this.$store.getters.isGuest()) {
         let authGuard = {
           message: 'Чтобы создать ядро, войдите в аккаунт.'
@@ -70,25 +70,46 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        // remove nodePlaying
-        this.player.setState('nodePlaying', null)
+        // Create node input
         let start = this.player.currentTime
         let end = start + 30 > this.player.duration ? this.player.duration : start + 30
         let figures = [{t: start, points: []}, {t: end, points: []}]
-        this.player.setState('figures', figures)
-        // this.player.events.emit('figure-create')
+        let nodeInput = {
+          name: '',
+          category: null,
+          spheres: [],
+          layout: 'HORIZONTAL',
+          vertices: [],
+          items: [
+            {
+              id: Date.now().toString(),
+              thumbUrl: this.contentKalpa.thumbUrl,
+              thumbHeight: this.contentKalpa.thumbHeight,
+              thumbWidth: this.contentKalpa.thumbWidth,
+              outputType: 'VIDEO',
+              layers: [
+                {
+                  id: Date.now().toString(),
+                  contentOid: this.contentKalpa.oid,
+                  figuresAbsolute: figures,
+                },
+              ],
+              operation: { items: null, operations: null, type: 'CONCAT'},
+              __typename: 'Composition',
+            },
+          ]
+        }
+        this.player.setState('node', nodeInput)
+        this.player.setState('nodeMode', 'edit')
+        this.player.events.emit('node-created')
       }
     },
-    figureDelete () {
-      this.$log('figureDelete')
-      this.player.setState('figures', null)
-      this.player.setState('nodeEditing', null)
-      // this.player.setState('nodePlaying', null)
-      this.player.events.emit('figure-delete')
+    nodeDelete () {
+      this.$log('nodeDelete')
+      this.player.setState('node', null)
+      this.player.setState('nodeMode', null)
+      this.player.events.emit('node-deleted')
     },
-  },
-  mounted () {
-    this.$log('mounted')
   }
 }
 </script>

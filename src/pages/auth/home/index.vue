@@ -25,7 +25,9 @@ div(
             ).row.full-width
             div(:style=`{width: 'calc(50% + 15px)',}`).row
               div(:style=`{position: 'relative', paddingBottom: '100%',}`).row.full-width
-                div(:style=`{position: 'absolute',}`).row.fit.items-center.content-center
+                router-link(
+                  :to="'/trends'"
+                  :style=`{position: 'absolute',}`).row.fit.items-center.content-center
                   img(
                     draggable="false"
                     :src="'/images/space.png'"
@@ -57,7 +59,7 @@ div(
                     ).row.fit.items-center.content-center.justify-center
             div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, top: '0px', right: '0px',}`)
               div(:style=`{position: 'relative', paddingBottom: '100%'}`).row.full-width
-                div(:style=`{position: 'absolute',borderRadius: '30px',}`).row.fit.b-80.q-pt-lg.q-px-xl
+                div(:style=`{position: 'absolute',borderRadius: '30px',}`).row.fit.b-80.q-pt-lg.q-px-xl.scroll
                   auth-flow(:onSuccess="onSuccess")
       //- mobile layout
       div(

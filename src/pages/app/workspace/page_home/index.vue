@@ -58,8 +58,8 @@ kalpa-layout
           widget-upload().q-mb-md
           .row.full-width.q-px-md
             widget-bookmarks().q-mb-sm
-            widget-watch-later.q-mb-sm
-            widget-history.q-mb-sm
+            //- widget-watch-later.q-mb-sm
+            //- widget-history.q-mb-sm
 </template>
 
 <script>

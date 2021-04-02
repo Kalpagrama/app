@@ -1,20 +1,7 @@
 <template lang="pug">
 .column.fit
-  //- .row.full-width.justify-center
-    div(
-      :style=`{
-        maxWidth: 600+'px',
-      }`
-      ).row.full-width.items-center.content-center.q-px-md.q-py-sm
-      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ $t('Ядра') }}
-      .col
-      //- q-btn(round flat color="white" icon="search")
-      //- q-btn(round flat color="white" icon="more_vert")
-      //- q-input(
-        v-model="searchString"
-        placeholder="search"
-        borderless dark dense
-        ).col.br
+  //- header
+  //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     .row.full-width.items-strat.content-start.justify-center
       list-feed(
