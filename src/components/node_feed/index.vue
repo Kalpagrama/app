@@ -145,7 +145,7 @@ export default {
     },
     category () {
       if (!this.node) return null
-      return this.$store.getters.nodeCategories().find(c => c.type === this.node.category)
+      return this.$store.getters.nodeCategories.find(c => c.type === this.node.category)
     },
     fontSize () {
       let l = this.node.name.length

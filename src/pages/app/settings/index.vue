@@ -13,7 +13,7 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       view-guest(
-        v-if="$store.getters.isGuest()")
+        v-if="$store.getters.isGuest")
       router-view(
         v-else)
 </template>

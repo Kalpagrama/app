@@ -24,7 +24,7 @@ kalpa-layout
               round flat color="white" icon="fas fa-info")
       //- guest
       div(
-        v-if="$store.getters.isGuest()"
+        v-if="$store.getters.isGuest"
         :style=`{
           height: '80vh',
         }`

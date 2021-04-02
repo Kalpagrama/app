@@ -10,6 +10,8 @@ import lodashGet from 'lodash/get'
 import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
+import store from 'src/store/index'
+
 import { rxdbOperationProxy } from 'src/system/rxdb/common'
 import { Notify } from 'quasar'
 import { matNextWeek } from '@quasar/extras/material-icons'
@@ -20,8 +22,8 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
 // dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
-function getReactive (rxDocOrObject, dummyObject = null) {
-   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, dummyObject) : new ReactiveObjFactory(rxDocOrObject, dummyObject)
+function getReactive (rxDocOrObject, setMirroredVuexObject = null) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, setMirroredVuexObject) : new ReactiveObjFactory(rxDocOrObject, setMirroredVuexObject)
    return reactiveDocFactory.getReactive()
 }
 
@@ -68,7 +70,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor (object, dummyObject = null) {
+   constructor (object, setMirroredVuexObject = null) {
       assert(typeof object === 'object')
       this.vm = new Vue({
          data: {
@@ -82,9 +84,14 @@ class ReactiveObjFactory {
       }
       this.setReactiveDoc = (plainData) => {
          assert(typeof plainData === 'object', 'typeof payload === \'object\'')
-         if (dummyObject) ReactiveDocFactory.mergeReactive(dummyObject, plainData)
-         const reactiveDoc = dummyObject || plainData
+         const reactiveDoc = plainData
          Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+         if (setMirroredVuexObject) {
+            let vuexKey = setMirroredVuexObject
+            assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
+            Vue.set(this.getReactive(), 'vuexKey', vuexKey)
+            store.commit('setMirrorObject', [vuexKey, this.getReactive()])
+         }
       }
       this.setReactiveDoc(object)
    }
@@ -92,7 +99,7 @@ class ReactiveObjFactory {
 
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
-   constructor (rxDoc, dummyObject = null) {
+   constructor (rxDoc, setMirroredVuexObject = null) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
@@ -100,15 +107,8 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster && !dummyObject) {
+      if (rxDoc.reactiveItemHolderMaster && !setMirroredVuexObject) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
-         // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
-         // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
-         // this.reactiveDocUnsubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocUnsubscribe
-         // this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe
-         // this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
-         // this.getRev = rxDoc.reactiveItemHolderMaster.getRev
-         // this.setRev = rxDoc.reactiveItemHolderMaster.setRev
          this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
          this.setDebouncedSave = rxDoc.reactiveItemHolderMaster.setDebouncedSave
          this.getSynchro = rxDoc.reactiveItemHolderMaster.getSynchro
@@ -130,28 +130,27 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc = (plainData) => {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
-
-            if (dummyObject) {
-               for (let key of Object.keys(dummyObject)){
-                  delete dummyObject[key]
-               }
-               switch (this.itemType) {
-                  case 'wsItem': // wsSchemaItem
-                     ReactiveDocFactory.mergeReactive(dummyObject, plainData)
-                     plainData = dummyObject
-                     break
-                  case 'object': // cacheSchema
-                     ReactiveDocFactory.mergeReactive(dummyObject, plainData.cached.data)
-                     plainData.cached.data = dummyObject
-                     break
-                  case 'meta':// schemaKeyValue
-                     ReactiveDocFactory.mergeReactive(dummyObject, plainData.valueString)
-                     plainData.valueString = dummyObject
-                     break
-                  default:
-                     throw new Error('bad itemType: ' + this.itemType)
-               }
-            }
+            // if (dummyObject) {
+            //    for (let key of Object.keys(dummyObject)){
+            //       delete dummyObject[key]
+            //    }
+            //    switch (this.itemType) {
+            //       case 'wsItem': // wsSchemaItem
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData)
+            //          plainData = dummyObject
+            //          break
+            //       case 'object': // cacheSchema
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.cached.data)
+            //          plainData.cached.data = dummyObject
+            //          break
+            //       case 'meta':// schemaKeyValue
+            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.valueString)
+            //          plainData.valueString = dummyObject
+            //          break
+            //       default:
+            //          throw new Error('bad itemType: ' + this.itemType)
+            //    }
+            // }
             const reactiveDoc = plainData
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
@@ -222,6 +221,12 @@ class ReactiveDocFactory {
                }
             }
             Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+            if (setMirroredVuexObject) {
+               let vuexKey = setMirroredVuexObject
+               assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
+               Vue.set(this.getReactive(), 'vuexKey', vuexKey)
+               store.commit('setMirrorObject', [vuexKey, this.getReactive().getPayload()])
+            }
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -297,6 +302,11 @@ class ReactiveDocFactory {
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
+
+         // изменить связанный объект во vuex
+         if (this.getReactive().vuexKey) {
+            store.commit('setMirrorObject', [this.getReactive().vuexKey, this.getReactive().getPayload()])
+         }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb
             this.itemSaveFunc = async (synchro = true) => {

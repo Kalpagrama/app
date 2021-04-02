@@ -5,7 +5,7 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start
       view-guest(
-        v-if="$store.getters.isGuest()")
+        v-if="$store.getters.isGuest")
       div(
         v-else
         :style=`{

@@ -103,7 +103,7 @@ export default {
   },
   computed: {
     nodeIsMine () {
-      return this.node.author.oid === this.$store.getters.currentUser().oid
+      return this.node.author.oid === this.$store.getters.currentUser.oid
     },
     rateMax () {
       // $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax)

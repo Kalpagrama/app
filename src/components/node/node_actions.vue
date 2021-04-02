@@ -160,7 +160,7 @@ export default {
   watch: {
     isActive: {
       async handler (to, from) {
-        if (this.$store.getters.isGuest()) return
+        if (this.$store.getters.isGuest) return
         if (to) {
           this.isActiveStart = Date.now()
         }
@@ -184,14 +184,14 @@ export default {
     },
     nodeVoteBallClick () {
       this.$log('nodeVoteBallClick', this.node.rateUser)
-      if (this.$store.getters.isGuest()) {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
         }
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
       else {
-        if (this.node.rateUser !== null || this.node.author.oid === this.$store.getters.currentUser().oid) {
+        if (this.node.rateUser !== null || this.node.author.oid === this.$store.getters.currentUser.oid) {
           this.voteStatsShow = true
         }
         else {
@@ -201,7 +201,7 @@ export default {
     },
     async voteAgain () {
       this.$log('voteAgain')
-      if (this.node.author.oid === this.$store.getters.currentUser().oid) return
+      if (this.node.author.oid === this.$store.getters.currentUser.oid) return
       this.voteStatsShow = false
       await this.$wait(200)
       this.voteStarted = true

@@ -90,7 +90,7 @@ div(
                 ).q-mr-sm
       //- footer
       div(
-        v-if="node.author.oid !== $store.getters.currentUser().oid"
+        v-if="node.author.oid !== $store.getters.currentUser.oid"
         :style=`{
           //- position: 'absolute', zIndex: 1000, bottom: '0px',
         }`

@@ -32,7 +32,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
-          oidSphere: this.$store.getters.currentUser().oid,
+          oidSphere: this.$store.getters.currentUser.oid,
           // subscription: {$in: this.feedSubscriptions}
           matterReason: {$ne: 'AUTHOR'}, // только события относительно объектов, где я не являюсь автором объекта
           eventType: {$in: ['OBJECT_CREATED']} // только события о создании объектов

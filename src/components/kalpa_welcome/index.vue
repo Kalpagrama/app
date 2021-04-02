@@ -134,7 +134,7 @@ export default {
       })
     },
     tutorial () {
-      return this.$store.getters.currentUser().profile.tutorial
+      return this.$store.getters.currentUser.profile.tutorial
     }
   },
   watch: {
@@ -185,22 +185,22 @@ export default {
   async beforeDestroy () {
     this.$log('beforeDestroy')
     // before
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    let userTutorials = this.$store.getters.currentUser.profile.tutorial
     this.$log('userTutorials BEFORE', userTutorials)
     // create userTutorials
     if (typeof this.tutorial !== 'object') {
       this.$log('userTutorials CREATE')
       let tutorialInput = {...this.tutorialInitial, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
+      await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialInput)
     }
     // update userTutorials
     else {
       this.$log('userTutorials UPDATE', this.config.id, true)
       let tutorialInput = {...this.userTutorials, [this.config.id]: true}
-      await ObjectApi.update(this.$store.getters.currentUser().oid, 'profile.tutorial', tutorialInput)
+      await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialInput)
     }
     // after
-    let userTutorials2 = this.$store.getters.currentUser().profile.tutorial
+    let userTutorials2 = this.$store.getters.currentUser.profile.tutorial
     this.$log('userTutorials AFTER', userTutorials2)
   }
 }

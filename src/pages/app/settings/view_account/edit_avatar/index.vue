@@ -35,8 +35,8 @@
           round flat color="white" icon="attach_file" size="lg"
           :style=`{borderRadius: '50%',}`)
         img(
-          v-if="$store.getters.currentUser().thumbUrl"
-          :src="$store.getters.currentUser().thumbUrl"
+          v-if="$store.getters.currentUser.thumbUrl"
+          :src="$store.getters.currentUser.thumbUrl"
           :style=`{
             width: '100%', height: '100%',
             borderRadius: '50%', overflow: 'hidden',
@@ -47,7 +47,7 @@
         //- fake input...
         input(ref="inputAvatar" type="file" @input="avatarChanged" :style=`{display: 'none',}`)
         q-btn(
-          v-if="$store.getters.currentUser().thumbUrl"
+          v-if="$store.getters.currentUser.thumbUrl"
           @click="$refs.inputAvatar.click()"
           flat dense color="grey-6" no-caps) {{$t('Change')}}
         //- remove

@@ -45,7 +45,7 @@ q-menu(
           ).text-white {{ p.name }}
     //- footer GUEST
     div(
-      v-if="$store.getters.isGuest()"
+      v-if="$store.getters.isGuest"
       v-close-popup
       @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
       :style=`{
@@ -67,20 +67,20 @@ q-menu(
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
     //- footer USER
     div(
-      v-if="!$store.getters.isGuest()"
+      v-if="!$store.getters.isGuest"
       v-close-popup
-      @click="$go('/user/'+$store.getters.currentUser().oid)"
+      @click="$go('/user/'+$store.getters.currentUser.oid)"
       :style=`{
         borderRadius: '20px',
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(
-          :url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+          :url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
       .col.full-heigh
         .row.fit.items-center.content-center
           span(
-            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
           //- small.text-grey-4.full-width @username
 </template>
 

@@ -146,7 +146,7 @@ export default {
   methods: {
     voteStart () {
       this.$log('voteStart')
-      if (this.$store.getters.isGuest()) {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
         }
@@ -154,7 +154,7 @@ export default {
       }
       else {
         // shot stats if user has voted already
-        if (this.node.rateUser || (this.node.author.oid === this.$store.getters.currentUser().oid)) {
+        if (this.node.rateUser || (this.node.author.oid === this.$store.getters.currentUser.oid)) {
           this.voteStatsShow = true
         }
         // show votes to vote...
@@ -165,7 +165,7 @@ export default {
     },
     async voteAgain () {
       this.$log('voteAgain')
-      if (this.node.author.oid === this.$store.getters.currentUser().oid) return
+      if (this.node.author.oid === this.$store.getters.currentUser.oid) return
       this.voteStatsShow = false
       await this.$wait(200)
       this.votesShow = true
