@@ -300,6 +300,7 @@ export default {
       }
       catch (e) {
         this.$log('nodeSaveAction error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.nodeSaving = false
       }
     },
