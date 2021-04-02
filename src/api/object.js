@@ -65,7 +65,7 @@ const updateStatThrottled = throttle(async () => {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec ${statAccumulator.length}`)
       statAccumulator = []
    }
-}, 1000 * 2, { leading: false }) // шлем не чаще чем раз в 30 сек
+}, 1000 * 30, { leading: false }) // шлем не чаще чем раз в 30 сек
 
 class ObjectApi {
    static fileToDataUrl (file) {
@@ -159,7 +159,7 @@ class ObjectApi {
       const cb = async () => {
          let objFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
          let rev = objFull.rev
-         if (path.startsWith('settings.')) rev = objFull.settings.rev
+         // if (path.startsWith('settings.')) rev = objFull.settings.rev
          assert(objFull, '!objFull')
          let file
          let apolloClient = apollo.clients.api

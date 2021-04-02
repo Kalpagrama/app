@@ -94,7 +94,7 @@ export default {
         //   }
         // }
       }
-      if (this.$store.getters.isGuest) {
+      if (this.$store.getters.isGuest()) {
         return res
       }
       if (this.nodeIsMine) {

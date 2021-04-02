@@ -53,11 +53,11 @@ export default {
       async handler (to, from) {
         this.$log('$route CHANGED', to)
         if (to) {
-          this.category = this.$store.getters.nodeCategories.find(c => c.sphere.oid === to)
+          this.category = this.$store.getters.nodeCategories().find(c => c.sphere.oid === to)
         }
         // go to the first category: ALL
         else {
-          this.$router.replace({params: {oid: this.$store.getters.nodeCategories[0].sphere.oid}})
+          this.$router.replace({params: {oid: this.$store.getters.nodeCategories()[0].sphere.oid}})
         }
       }
     }

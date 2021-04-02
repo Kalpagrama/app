@@ -48,6 +48,7 @@ import assert from 'assert'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
+import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 
 export default {
   name: 'playerDefault',
@@ -73,7 +74,10 @@ export default {
     }
   },
   computed: {
-    url () { return ContentApi.urlSelect(this.contentKalpa) },
+    url () {
+      // this.$log('url computed=', ContentApi.urlSelect(this.contentKalpa))
+      return ContentApi.urlSelect(this.contentKalpa)
+    },
     // Dynamic player depends on contentKalpa.url
     playerType () {
       if (this.url.includes('youtu')) return 'player-youtube' // контент не выкачан - показываем плеер ютуба
@@ -85,6 +89,17 @@ export default {
       }
       else {
         return null
+      }
+    }
+  },
+  watch: {
+    url: {
+      async handler (to, from) {
+        if (to) {
+          this.$log('url changed!!!', to)
+          await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
+          window.location.reload()
+        }
       }
     }
   },

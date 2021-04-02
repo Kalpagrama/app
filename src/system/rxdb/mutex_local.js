@@ -33,6 +33,7 @@ class MutexLocal {
             //    for (let { reject } of this.queue) reject(new Error('deadlock detected! reject all locks')) // queued
             //    this.locked = false
             //    this.queue = []
+            //    if (this.timerWarnId) clearInterval(this.timerWarnId)
             // }, 60 * 1000)
             this.locked = true
             this.lockOwner = lockOwner

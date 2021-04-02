@@ -154,6 +154,7 @@ class AuthApi {
       }
       if (!token || token === localStorage.getItem('k_token')) {
          await systemReset(true, true, false, true) // вне cb (иначе дедлок)
+         await systemInit()
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }

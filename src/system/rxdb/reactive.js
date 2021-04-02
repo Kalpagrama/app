@@ -19,8 +19,9 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
-function getReactive (rxDocOrObject) {
-   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
+// dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
+function getReactive (rxDocOrObject, dummyObject = null) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, dummyObject) : new ReactiveObjFactory(rxDocOrObject, dummyObject)
    return reactiveDocFactory.getReactive()
 }
 
@@ -67,7 +68,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor (object) {
+   constructor (object, dummyObject = null) {
       assert(typeof object === 'object')
       this.vm = new Vue({
          data: {
@@ -81,7 +82,8 @@ class ReactiveObjFactory {
       }
       this.setReactiveDoc = (plainData) => {
          assert(typeof plainData === 'object', 'typeof payload === \'object\'')
-         const reactiveDoc = plainData
+         if (dummyObject) ReactiveDocFactory.mergeReactive(dummyObject, plainData)
+         const reactiveDoc = dummyObject || plainData
          Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
       }
       this.setReactiveDoc(object)
@@ -90,7 +92,7 @@ class ReactiveObjFactory {
 
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
-   constructor (rxDoc) {
+   constructor (rxDoc, dummyObject = null) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
@@ -98,7 +100,7 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster) {
+      if (rxDoc.reactiveItemHolderMaster && !dummyObject) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
          // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
@@ -128,6 +130,28 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc = (plainData) => {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
+
+            if (dummyObject) {
+               for (let key of Object.keys(dummyObject)){
+                  delete dummyObject[key]
+               }
+               switch (this.itemType) {
+                  case 'wsItem': // wsSchemaItem
+                     ReactiveDocFactory.mergeReactive(dummyObject, plainData)
+                     plainData = dummyObject
+                     break
+                  case 'object': // cacheSchema
+                     ReactiveDocFactory.mergeReactive(dummyObject, plainData.cached.data)
+                     plainData.cached.data = dummyObject
+                     break
+                  case 'meta':// schemaKeyValue
+                     ReactiveDocFactory.mergeReactive(dummyObject, plainData.valueString)
+                     plainData.valueString = dummyObject
+                     break
+                  default:
+                     throw new Error('bad itemType: ' + this.itemType)
+               }
+            }
             const reactiveDoc = plainData
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
@@ -1003,4 +1027,11 @@ class ReactiveListWithPaginationFactory {
    }
 }
 
-export { ReactiveDocFactory, ReactiveListWithPaginationFactory, getReactive, updateRxDocPayload }
+export {
+   debounceIntervalItem,
+   ReactiveDocFactory,
+   ReactiveObjFactory,
+   ReactiveListWithPaginationFactory,
+   getReactive,
+   updateRxDocPayload
+}

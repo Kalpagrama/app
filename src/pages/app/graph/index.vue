@@ -179,7 +179,7 @@ export default {
     },
     jointCreateStart () {
       this.$log('jointCreateStart')
-      if (this.$store.getters.isGuest) {
+      if (this.$store.getters.isGuest()) {
         let authGuard = {
           message: 'Чтобы создать связь, войдите в аккаунт.'
         }

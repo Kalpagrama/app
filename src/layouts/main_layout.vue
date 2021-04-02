@@ -32,7 +32,7 @@ q-layout(
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container
-    router-view(v-if="$store.getters.nodeCategories.length > 0")
+    router-view(v-if="$store.getters.nodeCategories().length > 0")
 </template>
 
 <script>
@@ -50,6 +50,7 @@ export default {
   },
   data () {
     return {
+      user: this.$store.getters.currentUser()
     }
   },
   computed: {
@@ -72,15 +73,19 @@ export default {
   },
   methods: {
   },
+  watch: {
+    'user.profile.tutorial': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('user.profile.tutorial changed to', to)
+        if (to && !to.main) {
+          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
+        }
+      }
+    }
+  },
   async created () {
     this.$log('created')
-    // Check tutorials
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials', userTutorials)
-    this.$log('userTutorials', userTutorials.main)
-    if (userTutorials.main === false) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
-    }
   },
   async mounted () {
     this.$log('mounted')

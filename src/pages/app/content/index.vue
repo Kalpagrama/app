@@ -27,7 +27,8 @@ export default {
   data () {
     return {
       contentKalpa: null,
-      isActiveStart: 0
+      isActiveStart: 0,
+      user: this.$store.getters.currentUser()
     }
   },
   watch: {
@@ -39,6 +40,15 @@ export default {
         if (to) {
           this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
           this.isActiveStart = Date.now()
+        }
+      }
+    },
+    'user.profile.tutorial': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('user.profile.tutorial changed to', to)
+        if (to && !to.content_first) {
+          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
         }
       }
     }
@@ -53,17 +63,12 @@ export default {
   },
   created () {
     this.$log('created')
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials', userTutorials)
-    if (!userTutorials.content_first) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: false}])
-    }
   },
   mounted () {
     this.$log('mounted', this.oid)
     document.body.style.background = 'black'
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
-    if (this.$store.getters.isGuest) {
+    if (this.$store.getters.isGuest()) {
       // do nothing ?
     }
     else {
@@ -73,7 +78,7 @@ export default {
   async beforeDestroy () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
-    if (this.$store.getters.isGuest) {
+    if (this.$store.getters.isGuest()) {
       // do nothing ?
     }
     else {

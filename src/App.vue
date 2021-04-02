@@ -1,6 +1,6 @@
 <template lang="pug">
 div(id="q-app")
-  router-view(v-if="$store.getters.nodeCategories.length > 0")
+  router-view(v-if="$store.getters.nodeCategories().length > 0")
   //- router-view
 </template>
 
