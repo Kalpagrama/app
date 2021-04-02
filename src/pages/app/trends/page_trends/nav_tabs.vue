@@ -7,7 +7,7 @@
       @input="$router.push({params: {oid: $event}})"
       ).full-width.text-grey-8
       q-tab(
-        v-for="c in $store.getters.nodeCategories()"
+        v-for="c in $store.getters.nodeCategories"
         :key="c.sphere.oid"
         dense
         :name="c.sphere.oid"

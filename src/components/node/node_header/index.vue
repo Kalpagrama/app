@@ -63,7 +63,7 @@ export default {
   props: ['node', 'showAuthorAlways'],
   computed: {
     nodeIsMine () {
-      return this.node.author.oid === this.$store.getters.currentUser().oid
+      return this.node.author.oid === this.$store.getters.currentUser.oid
     },
     actions () {
       let res = {
@@ -94,7 +94,7 @@ export default {
         //   }
         // }
       }
-      if (this.$store.getters.isGuest()) {
+      if (this.$store.getters.isGuest) {
         return res
       }
       if (this.nodeIsMine) {

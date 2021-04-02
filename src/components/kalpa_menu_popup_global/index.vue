@@ -14,8 +14,8 @@ q-btn(
   }`)
   menu-popup(:offset="offset")
   img(
-    v-if="!$store.getters.isGuest()"
-    :src="$store.getters.currentUser().profile.photoUrl"
+    v-if="!$store.getters.isGuest"
+    :src="$store.getters.currentUser.profile.photoUrl"
     :style=`{
       width: size, minWidth: size, maxWidth: size,
       height: size, minHeight: size, maxHeight: size,

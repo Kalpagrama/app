@@ -108,7 +108,7 @@ export default {
   },
   computed: {
     email () {
-      return this.$store.getters.currentUser().profile.email
+      return this.$store.getters.currentUser.profile.email
     }
   },
   methods: {

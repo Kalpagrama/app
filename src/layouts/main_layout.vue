@@ -32,7 +32,7 @@ q-layout(
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container
-    router-view(v-if="$store.getters.nodeCategories().length > 0")
+    router-view(v-if="$store.getters.nodeCategories.length > 0")
 </template>
 
 <script>
@@ -50,12 +50,12 @@ export default {
   },
   data () {
     return {
-      // user: this.$store.getters.currentUser()
+      // user: this.$store.getters.currentUser
     }
   },
   computed: {
     user () {
-      return this.$store.getters.currentUser()
+      return this.$store.getters.currentUser
     },
     authGuardShow: {
       get () {

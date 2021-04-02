@@ -33,12 +33,12 @@ div(:style=`{height: height+'px'}`).row.full-width
                 lineHeight: 1,
               }`
               ).row.full-width.items-start.content-start.q-px-md.q-mb-sm
-              div(v-if="$store.getters.currentUser().profile.lang === 'RUS'").col.q-px-sm
+              div(v-if="$store.getters.currentUser.profile.lang === 'RUS'").col.q-px-sm
                 span.text-white Нажмите
                 q-btn(
                   round flat dense icon="add_circle_outline" color="green")
                 span.text-white внизу, чтобы выделить фрагмент из видео, это важно потому что это важно.
-              div(v-if="$store.getters.currentUser().profile.lang === 'ENG'").col.q-pr-lg
+              div(v-if="$store.getters.currentUser.profile.lang === 'ENG'").col.q-pr-lg
                 p.text-white.q-ml-sm {{$t('Why pick fragment on looong video is important! You need to concentrate and to communicate better')}}
             //- bottom
             .row.full-width.q-pb-sm.q-px-md
@@ -123,7 +123,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // let user = this.$store.getters.currentUser().profile.lang
+    // let user = this.$store.getters.currentUser.profile.lang
     // this.$log('user', user)
   }
 }

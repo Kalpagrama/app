@@ -85,8 +85,6 @@ let adapter = 'idb'
 // let adapter = memdown
 // let adapter = 'memory'
 
-let currentUser, settings
-
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -329,35 +327,40 @@ class RxDBWrapper {
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
          // let currentUser
+         let currentUserDb, currentUserDummy
          if (userOid) {
-            let currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
+            currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-               clientFirst: false, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+               clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },
-               dummyObject: currentUser // не создавать новый реактивный объект, а использовать эту болванку (тк эта болванка уже отдана в UI)
+               setMirroredVuexObject: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
             })
-            // if (currentUser) ReactiveDocFactory.mergeReactive(currentUser, currentUserDb)
-            // else currentUser = currentUserDb
-            currentUser = currentUserDb
-            assert(currentUser, '!currentUser!!!!')// должен быть в rxdb после init
-            this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
+            this.workspace.setUser(currentUserDb) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
-            currentUser = getReactive(dummyUser, currentUser)
-            assert(currentUser, '!currentUser (dummyUser)!!') // должен быть в rxdb после init
+            dummyUser.profile.tutorial = {
+               main: true,
+               content_first: true,
+               node_first: true,
+               joint_first: true,
+               workspace_first: true,
+               workspace_upload: true,
+               workspace_article: true
+            }
+            currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
-         assert(currentUser, '!currentUser') // init вызывается только после успешного initGlobal (а он заполнят юзера)
+         assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
 
+         let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
+            setMirroredVuexObject: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
+         })
+         assert(settingsDb, '!settingsDb')
          this.getCurrentUser = () => {
-            return currentUser
-         }
-         settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
-         assert(settings, '!settings')
-         this.getSettings = () => {
-            return settings
+            assert(this.store && this.store.state.mirrorObjects['currentUser'], '!this.store && this.store.state.mirrorObjects[currentUser]')
+            return this.store.state.mirrorObjects['currentUser']
          }
          this.initialized = true
          // this.createTestDb()
@@ -378,7 +381,6 @@ class RxDBWrapper {
          assert(this.created, '!created')
          if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
          this.workspace.switchOffSynchro()
-         delete this.getCurrentUser
          this.reactiveDocDbMemCache.reset()
          if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
@@ -729,7 +731,7 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
-      dummyObject = null
+      setMirroredVuexObject = null // создаст или обновит связанный объект в vuex по этому ключу
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
@@ -755,7 +757,7 @@ class RxDBWrapper {
             } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveDoc) {
+      if (!reactiveDoc || setMirroredVuexObject) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -767,7 +769,7 @@ class RxDBWrapper {
             beforeCreate
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactive(rxDoc, dummyObject)
+         reactiveDoc = getReactive(rxDoc, setMirroredVuexObject)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })

@@ -63,7 +63,7 @@ export default {
   methods: {
     nodeCreate () {
       this.$log('nodeCreate')
-      if (this.$store.getters.isGuest()) {
+      if (this.$store.getters.isGuest) {
         let authGuard = {
           message: 'Чтобы создать ядро, войдите в аккаунт.'
         }

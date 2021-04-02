@@ -112,7 +112,7 @@ export default {
   },
   computed: {
     itsMe () {
-      return this.$store.getters.currentUser().oid === this.$route.params.oid
+      return this.$store.getters.currentUser.oid === this.$route.params.oid
     },
     actions () {
       return {
