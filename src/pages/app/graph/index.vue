@@ -1,5 +1,9 @@
 <template lang="pug">
-kalpa-layout()
+kalpa-layout(
+  :style=`{
+    minHeight: '100vh',
+  }`
+  )
   template(v-slot:footer)
     .row.full-width.justify-center
       div(

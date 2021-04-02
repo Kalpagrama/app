@@ -81,7 +81,9 @@ div(
               userSelect: 'none',
             }`
             ).fit
-  .row.full-width.justify-center.q-pa-sm
+  div(
+    v-if="showTutorial"
+    ).row.full-width.justify-center.q-pa-sm
     q-btn(
       flat color="white" no-caps
       :style=`{

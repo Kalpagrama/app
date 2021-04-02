@@ -21,9 +21,6 @@
       .row.full-width
         .row.items-center.content-center
           kalpa-share(type="node" :item="node" :headerText="$t('Share')")
-            //- q-tooltip(dense dark) Поделиться
-            //- q-btn(round flat color="grey-9")
-              q-icon(name="logout" size="23px").rotate-270
         .col
           .row.fit.items-center.content-center.justify-start
             small.text-grey-9 {{ node.countStat.countShares || '' }}
@@ -36,7 +33,7 @@
           q-btn(
             round flat color="grey-9"
             @click="contextGo()")
-            //- q-tooltip(dense dark) Микроядра
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Context')}}
             q-icon(name="select_all" size="22px")
         .col
           .row.fit.items-center.content-center.justify-start
@@ -53,7 +50,7 @@
             small.text-grey-9 {{ node.countStat.countJoints || '' }}
         .row.items-center.content-center
           q-btn(round flat color="grey-9")
-            //- q-tooltip(dense dark) Связи
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Links')}}
             q-icon(name="fas fa-link" size="20px")
     //- bookmarks
     .col
