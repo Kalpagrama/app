@@ -87,10 +87,9 @@ class ReactiveObjFactory {
          const reactiveDoc = plainData
          Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
          if (setMirroredVuexObject) {
-            let vuexKey = setMirroredVuexObject
+            this.vuexKey = setMirroredVuexObject
             assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
-            Vue.set(this.getReactive(), 'vuexKey', vuexKey)
-            store.commit('setMirrorObject', [vuexKey, this.getReactive()])
+            store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
          }
       }
       this.setReactiveDoc(object)
@@ -222,10 +221,9 @@ class ReactiveDocFactory {
             }
             Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
             if (setMirroredVuexObject) {
-               let vuexKey = setMirroredVuexObject
+               this.vuexKey = setMirroredVuexObject
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
-               Vue.set(this.getReactive(), 'vuexKey', vuexKey)
-               store.commit('setMirrorObject', [vuexKey, this.getReactive().getPayload()])
+               store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
             }
          }
          this.getDebouncedSave = () => {
@@ -304,8 +302,8 @@ class ReactiveDocFactory {
          // reactiveItem изменилась (обычно из UI)
 
          // изменить связанный объект во vuex
-         if (this.getReactive().vuexKey) {
-            store.commit('setMirrorObject', [this.getReactive().vuexKey, this.getReactive().getPayload()])
+         if (this.vuexKey) {
+            store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
          }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb

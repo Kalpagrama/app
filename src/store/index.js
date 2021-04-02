@@ -26,10 +26,11 @@ const store = new Vuex.Store({
       mirrorObjects: {} // отображения реактивных объектов из rxdb (меняются синхронно с объектами из rxdb (см  reactive.js))
    },
    mutations: {
-      setMirrorObject (state, [key, val]) {
-         assert(key && val, '!key && val')
+      setMirrorObject (state, [vuexKey, val]) {
+         assert(vuexKey && val, '!vuexKey && val')
          let copy = JSON.parse(JSON.stringify(val))
-         Vue.set(state.mirrorObjects, key, copy)
+         copy.vuexKey = vuexKey
+         Vue.set(state.mirrorObjects, vuexKey, copy)
       }
    },
    getters: {
