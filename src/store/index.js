@@ -27,12 +27,13 @@ const store = new Vuex.Store({
       //    return {currentUser, isGuest, nodeCategories}
       // },
       currentUser: (state, getters, rootState, rootGetters) => id => {
-         assert(rxdb, '!rxdb')
-         assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
-         assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
-         return rxdb.getCurrentUser()
+         // assert(rxdb, '!rxdb')
+         // assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
+         // assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
+         if (rxdb && rxdb.getCurrentUser) return rxdb.getCurrentUser()
       },
       isGuest: (state, getters) => {
+         if (!getters.currentUser()) return true
          return getters.currentUser().profile.role === 'GUEST'
       },
       nodeCategories: (state, getters) => {
