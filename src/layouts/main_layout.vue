@@ -74,13 +74,14 @@ export default {
   },
   async created () {
     this.$log('created')
-    // Check tutorials
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials', userTutorials)
-    this.$log('userTutorials', userTutorials.main)
-    if (userTutorials.main === false) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
-    }
+    // PPV теперь это делается в rxdb при инициализации юзера
+    // // Check tutorials
+    // let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    // this.$log('userTutorials', userTutorials)
+    // this.$log('userTutorials', userTutorials.main)
+    // if (userTutorials.main === false) {
+    //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
+    // }
   },
   async mounted () {
     this.$log('mounted')

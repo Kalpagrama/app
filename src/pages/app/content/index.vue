@@ -53,11 +53,12 @@ export default {
   },
   created () {
     this.$log('created')
-    let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    this.$log('userTutorials', userTutorials)
-    if (!userTutorials.content_first) {
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: false}])
-    }
+    // PPV теперь это делается в rxdb при инициализации юзера
+    // let userTutorials = this.$store.getters.currentUser().profile.tutorial
+    // this.$log('userTutorials', userTutorials)
+    // if (!userTutorials.content_first) {
+    //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: false}])
+    // }
   },
   mounted () {
     this.$log('mounted', this.oid)

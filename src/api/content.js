@@ -41,7 +41,7 @@ const UploadFormatEnum = Object.freeze({
 })
 
 class ContentApi {
-   static async contentCreateFromUrl (url, youtubeUpload = false) {
+   static async contentCreateFromUrl (url, youtubeUpload = true) {
       const f = ContentApi.contentCreateFromUrl
       logD(f, 'start', url)
       const t1 = performance.now()

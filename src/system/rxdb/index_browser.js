@@ -336,18 +336,25 @@ class RxDBWrapper {
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
-               }
+               },
+               dummyObject: currentUser // не создавать новый реактивный объект, а использовать эту болванку (тк эта болванка уже отдана в UI)
             })
-            if (currentUser) ReactiveDocFactory.mergeReactive(currentUser, currentUserDb)
-            else currentUser = currentUserDb
+            // if (currentUser) ReactiveDocFactory.mergeReactive(currentUser, currentUserDb)
+            // else currentUser = currentUserDb
+            currentUser = currentUserDb
             assert(currentUser, '!currentUser!!!!')// должен быть в rxdb после init
             this.workspace.setUser(currentUser) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
-            currentUser = getReactive(dummyUser)
+            currentUser = getReactive(dummyUser, currentUser)
             assert(currentUser, '!currentUser (dummyUser)!!') // должен быть в rxdb после init
          }
          assert(currentUser, '!currentUser') // init вызывается только после успешного initGlobal (а он заполнят юзера)
+
+         if (!currentUser.profile.tutorial.main) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
+         if (!currentUser.profile.tutorial.content_first) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
+         if (!currentUser.profile.tutorial.workspace_first) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: true, useProfileEditor: true}])
+
          this.getCurrentUser = () => {
             return currentUser
          }
@@ -714,7 +721,8 @@ class RxDBWrapper {
 
    // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
    // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
-   // params - допюпараметры для RxCollectionEnum.GQL_QUERY
+   // params - доп.параметры для RxCollectionEnum.GQL_QUERY
+   // dummyObject - не создавать новый реактивный объект c нуля, а использовать эту болванку (тк эта болванка уже отдана в UI)
    async get (rxCollectionEnum, idOrRawId, {
       id = null,
       fetchFunc,
@@ -724,7 +732,8 @@ class RxDBWrapper {
       force = false,
       onFetchFunc = null,
       params = null,
-      beforeCreate = false
+      beforeCreate = false,
+      dummyObject = null
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
@@ -762,7 +771,7 @@ class RxDBWrapper {
             beforeCreate
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactive(rxDoc)
+         reactiveDoc = getReactive(rxDoc, dummyObject)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })

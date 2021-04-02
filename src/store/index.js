@@ -23,6 +23,9 @@ const store = new Vuex.Store({
    strict: process.env.DEV,
    state: {},
    getters: {
+      // global: (state, getters) => {
+      //    return {currentUser, isGuest, nodeCategories}
+      // },
       currentUser: (state, getters, rootState, rootGetters) => id => {
          assert(rxdb, '!rxdb')
          assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
