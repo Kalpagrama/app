@@ -100,7 +100,7 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster) {
+      if (rxDoc.reactiveItemHolderMaster && !dummyObject) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          // this.setReactiveDoc = rxDoc.reactiveItemHolderMaster.setReactiveDoc
          // this.reactiveDocSubscribe = rxDoc.reactiveItemHolderMaster.reactiveDocSubscribe
@@ -132,6 +132,9 @@ class ReactiveDocFactory {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
 
             if (dummyObject) {
+               for (let key of Object.keys(dummyObject)){
+                  delete dummyObject[key]
+               }
                switch (this.itemType) {
                   case 'wsItem': // wsSchemaItem
                      ReactiveDocFactory.mergeReactive(dummyObject, plainData)

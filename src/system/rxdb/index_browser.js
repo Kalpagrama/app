@@ -333,7 +333,7 @@ class RxDBWrapper {
             let currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-               clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+               clientFirst: false, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },

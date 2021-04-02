@@ -923,6 +923,57 @@
       },
       {
         "kind": "OBJECT",
+        "name": "Settings",
+        "description": null,
+        "fields": [
+          {
+            "name": "services",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ServicesResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodeCategories",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Category",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "Stat",
         "description": null,
         "fields": [
@@ -1155,15 +1206,15 @@
         "description": null,
         "fields": [
           {
-            "name": "services",
-            "description": "вернет список сервисов",
+            "name": "settings",
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ServicesResult",
+                "name": "Settings",
                 "ofType": null
               }
             },
@@ -1489,30 +1540,6 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "nodeCategories",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Category",
-                    "ofType": null
-                  }
-                }
               }
             },
             "isDeprecated": false,
@@ -2158,6 +2185,20 @@
               },
               {
                 "name": "force",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "youtubeUpload",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -4813,22 +4854,6 @@
             "deprecationReason": null
           },
           {
-            "name": "contentSource",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ContentProviderEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "outputType",
             "description": "итоговый файл какого типа?  VIDEO AUDIO IMAGE BOOK",
             "args": [],
@@ -5611,30 +5636,6 @@
                 "kind": "ENUM",
                 "name": "NodeLayoutEnum",
                 "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "items",
-            "description": "если 1 элемент - то это ядро. если 2 - то джойнт",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "Object",
-                    "ofType": null
-                  }
-                }
               }
             },
             "isDeprecated": false,
@@ -7287,22 +7288,6 @@
             "deprecationReason": null
           },
           {
-            "name": "contentSource",
-            "description": "где по факту находится конент",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ContentProviderEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "width",
             "description": null,
             "args": [],
@@ -7613,22 +7598,6 @@
           {
             "name": "contentProvider",
             "description": "кто изначальный провайдер контента?",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ContentProviderEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contentSource",
-            "description": "где брать итоговый файл",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8052,22 +8021,6 @@
           {
             "name": "contentProvider",
             "description": "кто изначальный провайдер контента?",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ContentProviderEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contentSource",
-            "description": "где брать итоговый файл",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -9270,6 +9223,22 @@
         "description": null,
         "fields": [
           {
+            "name": "lang",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LangEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "type",
             "description": null,
             "args": [],
@@ -9517,22 +9486,6 @@
             "deprecationReason": null
           },
           {
-            "name": "type",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ObjectTypeEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "name",
             "description": null,
             "args": [],
@@ -9609,7 +9562,7 @@
             "deprecationReason": null
           },
           {
-            "name": "relatedOids",
+            "name": "internalItemOids",
             "description": null,
             "args": [],
             "type": {
