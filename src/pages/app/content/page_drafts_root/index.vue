@@ -7,7 +7,7 @@ div(
   ).row.full-width.items-start.content-start.justify-center
   //- body
   div(
-    v-if="$store.getters.isGuest"
+    v-if="$store.getters.isGuest()"
     :style=`{maxWidth: 600+'px', minHeight: '500px',}`
     ).row.full-width.items-center.content-center
     .row.full-width.justify-center

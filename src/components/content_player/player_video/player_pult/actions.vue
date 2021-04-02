@@ -63,7 +63,7 @@ export default {
   methods: {
     figureCreate () {
       this.$log('figureCreate')
-      if (this.$store.getters.isGuest) {
+      if (this.$store.getters.isGuest()) {
         let authGuard = {
           message: 'Чтобы создать ядро, войдите в аккаунт.'
         }

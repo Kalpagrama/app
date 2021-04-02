@@ -51,7 +51,7 @@
             :style=`{fontSize: '18px'}`).text-bold.text-white {{ p.name }}
         //- user
         div(
-          v-if="!$store.getters.isGuest"
+          v-if="!$store.getters.isGuest()"
           @click="$go('/user/'+$store.getters.currentUser().oid)"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
@@ -70,7 +70,7 @@
               //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
         //- login for GUEST
         div(
-          v-if="$store.getters.isGuest"
+          v-if="$store.getters.isGuest()"
           @click="$store.commit('ui/stateSet', ['authGuard', {message: ''}])"
           :style=`{
             height: '60px',

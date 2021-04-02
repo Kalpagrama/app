@@ -306,7 +306,7 @@ export default {
     },
     async showNodeInputForm () {
       this.$log('showNodeInputForm')
-      if (this.$store.getters.isGuest) {
+      if (this.$store.getters.isGuest()) {
         let authGuard = {
           message: 'Чтобы создать ядро, войдите в аккаунт.'
         }

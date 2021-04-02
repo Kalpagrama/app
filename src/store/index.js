@@ -23,23 +23,18 @@ const store = new Vuex.Store({
    strict: process.env.DEV,
    state: {},
    getters: {
-      // global: (state, getters) => {
-      //    return {currentUser, isGuest, nodeCategories}
-      // },
       currentUser: (state, getters, rootState, rootGetters) => id => {
          // assert(rxdb, '!rxdb')
          // assert(rxdb.getCurrentUser, '!rxdb.getCurrentUser')
          // assert(rxdb.getCurrentUser(), '!rxdb.getCurrentUser()')
          if (rxdb && rxdb.getCurrentUser) return rxdb.getCurrentUser()
       },
-      isGuest: (state, getters) => {
+      isGuest: (state, getters) => id => {
          if (!getters.currentUser()) return true
          return getters.currentUser().profile.role === 'GUEST'
       },
-      nodeCategories: (state, getters) => {
+      nodeCategories: (state, getters) => id => {
          assert(rxdb, '!rxdb')
-         console.log('rxdb', rxdb)
-         console.log('rxdb', rxdb.getSettings)
          assert(rxdb.getSettings, '!rxdb.getSettings')
          assert(rxdb.getSettings() && rxdb.getSettings().nodeCategories, '!rxdb.getSettings()')
          return rxdb.getSettings().nodeCategories.filter(c => c.lang === getters.currentUser().profile.lang)
