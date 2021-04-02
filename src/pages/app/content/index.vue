@@ -27,7 +27,8 @@ export default {
   data () {
     return {
       contentKalpa: null,
-      isActiveStart: 0
+      isActiveStart: 0,
+      user: this.$store.getters.currentUser()
     }
   },
   watch: {
@@ -39,6 +40,15 @@ export default {
         if (to) {
           this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
           this.isActiveStart = Date.now()
+        }
+      }
+    },
+    'user.profile.tutorial': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('user.profile.tutorial changed to', to)
+        if (to && !to.content_first) {
+          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
         }
       }
     }
@@ -53,12 +63,6 @@ export default {
   },
   created () {
     this.$log('created')
-    // PPV теперь это делается в rxdb при инициализации юзера
-    // let userTutorials = this.$store.getters.currentUser().profile.tutorial
-    // this.$log('userTutorials', userTutorials)
-    // if (!userTutorials.content_first) {
-    //   this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: false}])
-    // }
   },
   mounted () {
     this.$log('mounted', this.oid)

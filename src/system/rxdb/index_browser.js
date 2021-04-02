@@ -351,10 +351,6 @@ class RxDBWrapper {
          }
          assert(currentUser, '!currentUser') // init вызывается только после успешного initGlobal (а он заполнят юзера)
 
-         if (!currentUser.profile.tutorial.main) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
-         if (!currentUser.profile.tutorial.content_first) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
-         if (!currentUser.profile.tutorial.workspace_first) this.store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: true, useProfileEditor: true}])
-
          this.getCurrentUser = () => {
             return currentUser
          }

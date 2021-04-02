@@ -159,7 +159,7 @@ class ObjectApi {
       const cb = async () => {
          let objFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
          let rev = objFull.rev
-         if (path.startsWith('settings.')) rev = objFull.settings.rev
+         // if (path.startsWith('settings.')) rev = objFull.settings.rev
          assert(objFull, '!objFull')
          let file
          let apolloClient = apollo.clients.api
