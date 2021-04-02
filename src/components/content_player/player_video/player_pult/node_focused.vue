@@ -142,6 +142,7 @@ export default {
   methods: {
     copyLink () {
       this.$log('copyLink')
+      this.shareLink = makeRoutePath(this.player.node, true)
       this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
     },
     clipboardWrite (val, message) {
@@ -171,9 +172,9 @@ export default {
   mounted () {
     this.$log('mounted')
     if (this.player.node.uploadStage === 'COMPLETE') {
-      this.shareLink = makeRoutePath(this.player.node, true)
       this.nodeCreating = false
       this.nodeCreated = true
+      this.nodeShow = true
     }
     else {
       this.nodeCreating = true

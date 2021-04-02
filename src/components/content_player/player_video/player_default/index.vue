@@ -36,6 +36,7 @@ video(
   :style=`{
     objectFit: 'contain'
   }`
+  @click="videoClick"
   @loadeddata="videoLoadeddata"
   @timeupdate="videoTimeupdate"
   @pause="videoPaused"
@@ -165,6 +166,16 @@ export default {
           this.currentTime = t
           this.$refs.videoRef.currentTime = t
         }
+      }
+    },
+    videoClick (e) {
+      this.$log('videoClick', e)
+      if (this.playerType === 'player-youtube') {
+        // do stuff
+      }
+      else if (this.playerType === 'player-kalpa') {
+        if (this.playing) e.target.pause()
+        else e.target.play()
       }
     },
     videoLoadeddata (e) {

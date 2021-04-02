@@ -194,6 +194,7 @@ export default {
     },
     async finish () {
       this.$log('finish')
+      this.$ym('USER_LOGIN')
       // Call callback if provided...
       if (this.onSuccess) {
         this.onSuccess()

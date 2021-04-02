@@ -1,5 +1,6 @@
 <style lang="sass" scoped>
 .sphere-item
+  color: white
   cursor: pointer !important
   &:hover
     color: rgb(76,175,79) !important
@@ -17,8 +18,9 @@
         whiteSpace: 'nowrap',
         background: 'none !important',
       }`
+      :class=`[color]`
       @click="$emit('sphere', s)"
-      ).row.items-center.content-center.text-grey-7.no-wrap.q-mr-sm.sphere-item
+      ).row.items-center.content-center.no-wrap.q-mr-sm.sphere-item
       //- q-icon(
         name="blur_on"
         color="grey-7"
@@ -37,6 +39,7 @@ export default {
   props: {
     node: {type: Object},
     disabled: {type: Boolean, default: false},
+    color: {type: String, default: 'text-grey-8'}
   }
 }
 </script>

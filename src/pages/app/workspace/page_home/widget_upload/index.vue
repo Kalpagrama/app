@@ -69,6 +69,7 @@ export default {
         if (this.isURL(to)) {
           this.urlLoading = true
           this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, true))
+          this.$ym('CONTENT_ADDED')
           this.urlLoading = false
         }
         else {
