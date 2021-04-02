@@ -24,7 +24,7 @@ kalpa-layout
               round flat color="white" icon="fas fa-info")
       //- guest
       view-guest(
-        v-if="$store.getters.isGuest()")
+        v-if="$store.getters.isGuest")
       //- user
       div(
         v-else
