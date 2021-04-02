@@ -16,10 +16,10 @@ div(
     @change="categoryChanged"
     :style=`{
       position: 'absolute', zIndex: 100,
-      //- background: 'red',
       opacity: 0
     }`
     ).fit
+    option(:value="null") {{$t('Nothing')}}
     option(
       v-for="(c,ci) in categories" :key="ci"
       :value="c.value"

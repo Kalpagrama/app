@@ -7,7 +7,6 @@
     :style=`{maxWidth: 600+'px'}`).row.full-width
     //- name
     div(:style=`{height: '60px'}`).row.full-width
-      //- span.text-white What do you see
       q-input(
         v-model="node.name"
         borderless dark
@@ -27,68 +26,47 @@
           minHeight: '60px',
         }`
         ).full-width
-    //- category, spheres,
-    .row.full-width.items-center.content-center.q-px-sm
-      edit-category(
-        :node="node"
-        :class=`{
-          br: !node.category && categoryError,
-        }`
-        :style=`{
-          borderRadius: '10px',
-        }`)
-      .col
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-spheres(
-            v-if="node.spheres.length > 0"
-            :node="node"
-            :disabled="true"
-            @sphere="sphereDelete")
-    div(:style=`{}`).row.full-width.items-center.content-center.q-px-md
-      .col
-        q-input(
-          v-model="sphere"
-          borderless dark dense
-          :placeholder="$t('Add spheres')"
-          :input-style=`{
-            paddingLeft: '8px',
+    //- category and spheres
+    edit-spheres(:node="node")
+      template(v-slot:left)
+        edit-category(
+          :node="node"
+          :class=`{
+            br: !node.category && categoryError,
           }`
-          @blur="sphereAdd()"
-          @keydown.enter="sphereAdd()"
-          ).full-width
-      //- Delete from notes
-      q-btn(
-        v-if="node.wsItemType === 'WS_NODE'"
-        outline no-caps color="red"
-        :disable="node.name.length === 0"
-        :loading="nodeSaving"
-        :style=`{}`
-        @click="nodeDeleteAction()"
-        ).q-mr-sm
-        span {{$t('Delete draft')}}
-      //- Save to notes
-      q-btn(
-        v-if="node.wsItemType !== 'WS_NODE'"
-        outline no-caps color="grey-8"
-        :disable="node.name.length === 0"
-        :loading="nodeSaving"
-        :style=`{}`
-        @click="nodeSaveAction()"
-        ).q-mr-sm
-        span {{$t('Save as draft')}}
-      //- Publish
-      //- :disable="!canPublish"
-      q-btn(
-        color="green" no-caps
-        :loading="nodePublishing"
-        :style=`{
-          //- height: '50px',
-        }`
-        @click="nodePublish()"
-        )
-        span {{$t('Publish')}}
-    //- .row.full-width
-      small.text-white id: {{ node.id }}
+          :style=`{
+            borderRadius: '10px',
+          }`)
+      template(v-slot:spheres-right)
+        .row
+          //- Delete from notes
+          q-btn(
+            v-if="node.wsItemType === 'WS_NODE'"
+            outline no-caps color="red"
+            :loading="nodeSaving"
+            :style=`{}`
+            @click="nodeDeleteAction()"
+            ).q-mr-sm
+            span {{$t('Delete draft')}}
+          //- Save to notes
+          q-btn(
+            v-if="node.wsItemType !== 'WS_NODE'"
+            outline no-caps color="white"
+            :loading="nodeSaving"
+            :style=`{}`
+            @click="nodeSaveAction()"
+            ).q-mr-sm
+            span {{$t('Save as draft')}}
+          //- Publish
+          q-btn(
+            color="green" no-caps
+            :loading="nodePublishing"
+            :style=`{
+              //- height: '50px',
+            }`
+            @click="nodePublish()"
+            )
+            span {{$t('Publish')}}
   //- ===
   //- Mobile editor
   div(
@@ -101,7 +79,7 @@
           background: 'rgb(40,40,40)',
         }`
         ).row.full-width.items-start.content-start
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-spheres(
             v-if="node.spheres.length > 0"
             color="text-white"
@@ -126,38 +104,51 @@
             minHeight: '60px',
           }`
           ).full-width
-      //- sphere input
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        q-input(
+      //- category and spheres
+      .row.full-width.q-pt-sm
+        edit-spheres(
           v-if="node.name.length > 0"
-          v-model="sphere"
-          borderless dark desne
-          :placeholder="$t('Add sphere of essence')"
-          :input-style=`{
-            textAlign: 'center',
-          }`
-          @blur="sphereAdd()"
-          @keydown.enter="sphereAdd()"
-          ).full-width
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          div(v-if="sphere.length > 0").row.full-width.q-px-md
-            q-btn(
-              flat no-caps
-              :style=`{}`
-              @click="sphereAdd()"
-              ).full-width
-      //- category
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(v-if="node.name.length > 0").row.full-width.q-pa-sm
-          edit-category(
-            :class=`{
-              br: !node.category && categoryError,
-            }`
-            :node="node"
-            :style=`{
-              borderRadius: '10px',
-              minHeight: '50px',
-            }`).full-width.cursor-pointer
+          :node="node")
+          template(v-slot:left)
+            edit-category(
+              v-if="node.name.length > 0"
+              :node="node"
+              :class=`{
+                br: !node.category && categoryError,
+              }`
+              :style=`{
+                borderRadius: '10px',
+              }`)
+          template(v-slot:spheres-right)
+            div(v-if="node.name.length > 0").row
+              //- Delete from notes
+              q-btn(
+                v-if="node.wsItemType === 'WS_NODE'"
+                outline no-caps color="red"
+                :loading="nodeSaving"
+                :style=`{}`
+                @click="nodeDeleteAction()"
+                ).q-mr-sm
+                span {{$t('Delete draft')}}
+              //- Save to notes
+              q-btn(
+                v-if="node.wsItemType !== 'WS_NODE'"
+                outline no-caps color="white"
+                :loading="nodeSaving"
+                :style=`{}`
+                @click="nodeSaveAction()"
+                ).q-mr-sm
+                span {{$t('Save as draft')}}
+              //- Publish
+              //- q-btn(
+                color="green" no-caps
+                :loading="nodePublishing"
+                :style=`{
+                  //- height: '50px',
+                }`
+                @click="nodePublish()"
+                )
+                span {{$t('Publish')}}
     //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -179,13 +170,13 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 
-import nodeSpheres from 'components/node/node_spheres/index.vue'
+import editSpheres from './edit_spheres.vue'
 import editCategory from './edit_category.vue'
 
 export default {
   name: 'nodeEditor',
   components: {
-    nodeSpheres,
+    editSpheres,
     editCategory,
   },
   props: ['player', 'contentKalpa'],
@@ -213,32 +204,6 @@ export default {
   watch: {
   },
   methods: {
-    sphereAdd () {
-      this.$log('sphereAdd')
-      // checks
-      if (this.sphere.length === 0) return
-      if (this.node.name === this.sphere) {
-        this.$q.notify({type: 'negative', position: 'top', message: this.$t('Add another')})
-        this.sphere = ''
-        return
-      }
-      if (this.node.spheres.find(s => s.name === this.sphere)) {
-        this.$q.notify({type: 'negative', position: 'top', message: this.$t('Already added!')})
-        this.sphere = ''
-        return
-      }
-      if (this.node.spheres.length >= 5) {
-        this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum 5 spheres!')})
-        return
-      }
-      // do stuff
-      this.node.spheres.push({name: this.sphere})
-      this.sphere = ''
-    },
-    sphereDelete (s) {
-      this.$log('sphereDelete', s)
-      this.node.spheres = this.node.spheres.filter(i => i.name !== s.name)
-    },
     compositionCreate () {
       let composition
       // VIDEO select 30 sec from currentTime
@@ -325,6 +290,7 @@ export default {
     async nodeSaveAction () {
       try {
         this.$log('nodeSaveAction start')
+        if (this.node.name.length === 0) throw new Error(this.$t('Empty node name!'))
         this.nodeSaving = true
         await this.$wait(500)
         this.player.setState('node', await this.nodeSave())
@@ -334,6 +300,7 @@ export default {
       }
       catch (e) {
         this.$log('nodeSaveAction error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.nodeSaving = false
       }
     },
@@ -346,11 +313,14 @@ export default {
         // await this.$rxdb.remove(this.node.id)
         await this.node.remove(true)
         this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
+        this.$emit('pageId', null)
         this.$log('nodeDeleteAction done')
         this.nodeDeleting = false
       }
       catch (e) {
         this.$log('nodeDeleteAction error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
         this.nodeDeleting = false
       }
     },
@@ -409,6 +379,7 @@ export default {
         // where to wait for the progress of node creating ?
         // here ?
         // this.$emit('node', nodeCreating)
+        this.$emit('pageId', null)
       }
       catch (e) {
         this.$log('nodePublish error', e)

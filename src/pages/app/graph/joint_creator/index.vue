@@ -87,6 +87,7 @@ div(
           //- Edit
           q-btn(
             flat color="white" icon="edit"
+            :disable="editDisabled"
             :style=`{
               width: '50px',
               height: '50px',
@@ -129,6 +130,14 @@ export default {
   computed: {
     isFocused () {
       return this.itemFinderShow || this.itemEditorShow
+    },
+    editDisabled () {
+      if (this.joint.items[1]) {
+        return this.joint.items[1].type === 'NODE'
+      }
+      else {
+        return true
+      }
     }
   },
   watch: {

@@ -6,7 +6,7 @@ div(
     :maximized="true"
     position="bottom"
     :contentStyle=`{
-      backgroundColor: 'rgba(0,0,0,0.8)',
+      backgroundColor: 'rgba(30,30,30,0.99)',
     }`)
     div(
       @click.self="nodeShow = false"
@@ -174,7 +174,7 @@ export default {
     if (this.player.node.uploadStage === 'COMPLETE') {
       this.nodeCreating = false
       this.nodeCreated = true
-      this.nodeShow = true
+      // this.nodeShow = true
     }
     else {
       this.nodeCreating = true
