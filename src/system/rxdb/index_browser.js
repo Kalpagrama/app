@@ -358,6 +358,10 @@ class RxDBWrapper {
             vuexKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
          })
          assert(settingsDb, '!settingsDb')
+         this.getCurrentUser = () => {
+            assert(this.store && this.store.state.mirrorObjects['currentUser'], '!this.store && this.store.state.mirrorObjects[currentUser]')
+            return this.store.state.mirrorObjects['currentUser']
+         }
          this.initialized = true
          // this.createTestDb()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

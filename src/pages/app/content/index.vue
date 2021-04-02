@@ -28,7 +28,7 @@ export default {
     return {
       contentKalpa: null,
       isActiveStart: 0,
-      user: this.$store.getters.currentUser()
+      user: this.$store.getters.currentUser
     }
   },
   watch: {

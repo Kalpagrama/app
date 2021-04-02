@@ -133,7 +133,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
         target,
         {
           from: this.$options.name,
-          user: store.getters.currentUser(),
+          user: store.getters.currentUser,
           ...payload
         }
       )

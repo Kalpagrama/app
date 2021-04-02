@@ -9,7 +9,7 @@ export default {
   name: 'workspace',
   data () {
     return {
-      user: this.$store.getters.currentUser()
+      user: this.$store.getters.currentUser
     }
   },
   watch: {

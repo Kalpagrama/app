@@ -8,9 +8,9 @@
       .col
       router-link(
         v-if="!$store.getters.isGuest()"
-        :to="'/user/'+$store.getters.currentUser().oid")
+        :to="'/user/'+$store.getters.currentUser.oid")
         img(
-          :src="$store.getters.currentUser().profile.photoUrl"
+          :src="$store.getters.currentUser.profile.photoUrl"
           :style=`{
             width: '30px',
             height: '30px',
@@ -75,7 +75,7 @@ export default {
   methods: {
     async getDocs () {
       this.$log('getDocs')
-      const id = this.$store.getters.currentUser().profile.lang.toLowerCase()
+      const id = this.$store.getters.currentUser.profile.lang.toLowerCase()
       const fieldId = `kalpa_app_${id}`
       this.$log('id', id)
       const {items: [doc]} = await this.$contentful.getEntries({

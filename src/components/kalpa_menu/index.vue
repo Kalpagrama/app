@@ -52,9 +52,9 @@
         //- user
         div(
           v-if="!$store.getters.isGuest()"
-          @click="$go('/user/'+$store.getters.currentUser().oid)"
+          @click="$go('/user/'+$store.getters.currentUser.oid)"
           :class=`{
-            'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser().oid
+            'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser.oid
           }`
           :style=`{
             height: '60px',
@@ -63,11 +63,11 @@
           }`
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+            user-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-              //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser().username }}
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
+              //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
         //- login for GUEST
         div(
           v-if="$store.getters.isGuest()"

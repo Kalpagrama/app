@@ -217,10 +217,10 @@ class ReactiveDocFactory {
             }
             Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
             if (vuexKey) {
+               this.vuexKey = vuexKey
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
-
+               store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
             }
-
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -296,6 +296,11 @@ class ReactiveDocFactory {
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
+
+         // изменить связанный объект во vuex
+         if (this.vuexKey) {
+            store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
+         }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb
             this.itemSaveFunc = async (synchro = true) => {
