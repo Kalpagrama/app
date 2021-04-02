@@ -174,7 +174,7 @@ export default {
     if (this.player.node.uploadStage === 'COMPLETE') {
       this.nodeCreating = false
       this.nodeCreated = true
-      this.nodeShow = true
+      // this.nodeShow = true
     }
     else {
       this.nodeCreating = true
