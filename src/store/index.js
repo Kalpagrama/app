@@ -21,7 +21,9 @@ const store = new Vuex.Store({
       debug
    },
    strict: process.env.DEV,
-   state: {},
+   state: {
+      mirrorObjects: {} // отображения реактивных объектов из rxdb (меняются синхронно с объектами из rxdb (см  reactive.js))
+   },
    getters: {
       currentUser: (state, getters, rootState, rootGetters) => id => {
          // assert(rxdb, '!rxdb')
