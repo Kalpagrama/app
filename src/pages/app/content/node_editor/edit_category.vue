@@ -16,7 +16,6 @@ div(
     @change="categoryChanged"
     :style=`{
       position: 'absolute', zIndex: 100,
-      //- background: 'red',
       opacity: 0
     }`
     ).fit
