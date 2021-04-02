@@ -11,7 +11,7 @@ div(
   :style=`{
     position: 'relative',
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-start.content-start.q-mb-xl
   //- header
   .row.full-width.q-pb-lg.q-pt-sm
     span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome, login with email')}}
@@ -70,9 +70,12 @@ div(
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'white',
-        background: 'rgb(70,70,70)',
-        borderRadius: '10px',
+        //- background: 'rgb(70,70,70)',
+        //- borderRadius: '10px',
         //- border: '2px solid rgb(50,50,50)',
+        background: 'rgb(60,60,60)',
+        borderRadius: '10px',
+        border: '2px solid rgb(90,90,90)',
       }`
       @keyup.enter="passwordSend()"
       ).full-width
@@ -103,7 +106,7 @@ div(
         }`
         @click="reset()")
         span(:style=`{fontSize: '14px'}`) {{ $t('Reset form') }}
-  .row.full-width.q-pa-md.text-grey-6
+  .row.full-width.q-py-md.text-grey-6
     kalpa-docs(
       :title="$t('If you proceed, you agree with our terms')"
       titleColor="grey-2"

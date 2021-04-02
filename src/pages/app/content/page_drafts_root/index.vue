@@ -9,7 +9,7 @@
 .column.fit
   //- header
   .row.full-width.q-pa-md
-    span.text-white.text-bold {{$t('Notes')}}
+    span.text-white.text-bold {{$t('Drafts')}}
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     view-guest(

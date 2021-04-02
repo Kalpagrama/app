@@ -355,13 +355,9 @@ export default {
         }, 300)
       }
     },
-    'player.figures': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('player.figures TO', to)
-        if (this.player.nodeMode !== 'edit') return
-        // figures created
-        if (to && !from) {
+    'player.nodeMode': {
+      handler (to, from) {
+        if (to === 'edit') {
           this.$nextTick(() => {
             this.zoomIn()
           })
@@ -370,8 +366,7 @@ export default {
             heightWrapper: this.heightWrapperMax,
           })
         }
-        // figures destroyed
-        if (to === null && from) {
+        else {
           this.zoomOut()
           this.$tween.to(this, 0.5, {
             heightBar: this.heightBarMin,
@@ -380,6 +375,31 @@ export default {
         }
       }
     },
+    // 'player.figures': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('player.figures TO', to)
+    //     // figures created
+    //     if (to && !from) {
+    //       if (this.player.nodeMode !== 'edit') return
+    //       this.$nextTick(() => {
+    //         this.zoomIn()
+    //       })
+    //       this.$tween.to(this, 0.5, {
+    //         heightBar: this.heightBarMax,
+    //         heightWrapper: this.heightWrapperMax,
+    //       })
+    //     }
+    //     // figures destroyed
+    //     if (to === null && from) {
+    //       this.zoomOut()
+    //       this.$tween.to(this, 0.5, {
+    //         heightBar: this.heightBarMin,
+    //         heightWrapper: this.heightWrapperMin,
+    //       })
+    //     }
+    //   }
+    // },
     zoomed: {
       // immediate: true,
       handler (to, from) {

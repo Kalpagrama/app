@@ -31,7 +31,7 @@ q-btn(
     q-icon(name="menu" color="grey-7" size="24px")
   div(
     v-if="showLabel"
-    ).row.full-width.justify-center
+    ).row.full-width.justify-center.q-mt-xs
     small {{$t('Menu')}}
 </template>
 

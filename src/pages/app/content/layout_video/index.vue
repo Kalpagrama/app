@@ -65,7 +65,7 @@ div(
     template(v-slot:footer)
       div(
         v-if="player && $q.screen.lt.md"
-        :style=`{height: $q.screen.height-44-contentHeight+'px',}`).row.full-width
+        :style=`{height: $q.screen.height-50-contentHeight+'px',}`).row.full-width
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
@@ -79,7 +79,7 @@ div(
         :style=`{position: 'relative'}`).row.full-width
         //- Mobile button overlay
         div(
-          v-if="player.figures && $q.screen.lt.md"
+          v-if="player.nodeMode === 'edit' && $q.screen.lt.md"
           :style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.fit.bg-black.q-px-md
           q-btn(
             v-if="pageId !== 'node-editor'"
@@ -174,6 +174,13 @@ export default {
         }
       }
     },
+    'player.nodeMode': {
+      handler (to, from) {
+        if (to && to === 'edit') {
+          this.pageId = null
+        }
+      }
+    }
     // 'player.figures': {
     //   deep: true,
     //   immediate: true,

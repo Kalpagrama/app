@@ -45,10 +45,12 @@ div(
         @click="showTutorial = true").col
         span.text-bold {{ $t('Start') }}
   //- body
-  div(:style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  div(
+    v-if="showTutorial"
+    :style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+      //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      //- v-if="showTutorial"
       q-carousel(
-        v-if="showTutorial"
         ref="slides-carousel"
         v-model="slide"
         transition-prev="slide-right"
@@ -85,6 +87,7 @@ div(
       :style=`{
         height: '50px',
         maxWidth: '300px',
+        minWidth: '300px',
       }`
       @click="$emit('close')")
       span {{$t('Close')}}

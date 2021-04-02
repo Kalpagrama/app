@@ -73,15 +73,15 @@ export default {
     },
     nodeClick (node) {
       this.$log('nodeClick', node)
-      this.player.setState('node', node)
-      this.player.setState('nodeMode', 'pick')
+      // this.player.setState('node', node)
+      // this.player.setState('nodeMode', 'pick')
       this.nodeSelectedOid = node.oid
       this.nodeReplay(node)
       // this.nodeLaunch(node)
     },
     nodeLaunch (node) {
       this.$log('nodeLaunch', node)
-      this.player.setState('nodeMode', 'focus')
+      // this.player.setState('nodeMode', 'focus')
       this.$emit('node', node)
     }
   }

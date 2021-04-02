@@ -36,12 +36,12 @@ div(
   div(v-if="$q.screen.gt.sm").col
   //- create player.figure
   q-btn(
-    v-if="!player.node"
+    v-if="player.nodeMode !== 'edit'"
     @click="nodeCreate()"
     round flat color="green" icon="add_circle_outline")
   //- destroy player.figure
   q-btn(
-    v-if="player.node"
+    v-if="player.node && player.nodeMode === 'edit'"
     @click="nodeDelete()"
     round flat color="red" icon="clear")
 </template>
@@ -107,6 +107,7 @@ export default {
     nodeDelete () {
       this.$log('nodeDelete')
       this.player.setState('node', null)
+      this.player.setState('nodeMode', null)
       this.player.events.emit('node-deleted')
     },
   }

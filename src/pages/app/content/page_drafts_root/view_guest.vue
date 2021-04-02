@@ -3,7 +3,7 @@
   div(
     :style=`{
       maxWidth: 600+'px',
-      minHeight: '500px',
+      minHeight: '350px',
     }`
     ).row.full-width.items-center.content-center
     .row.full-width.justify-center
