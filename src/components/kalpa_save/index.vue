@@ -7,6 +7,7 @@ q-btn(
   :dense="dense"
   @click="onClick()"
   )
+  q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
   q-dialog(
     v-if="isActive && bookmark"
     v-model="bookmarkCreatedDialogShow"

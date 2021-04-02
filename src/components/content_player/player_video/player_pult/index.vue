@@ -214,7 +214,7 @@ div(
             ).row
   //- footer: actions
   figures-actions(
-    v-if="player && player.figures"
+    v-if="player && player.figures && player.nodeMode === 'edit'"
     v-bind="$props")
   actions(
     v-if="player"

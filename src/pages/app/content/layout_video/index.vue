@@ -201,7 +201,8 @@ export default {
       }
       else {
         // TODO: ask for saving the dying node...
-        if (this.player.node) this.player.setState('node', null)
+        this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
         this.pageId = pageId
       }
     },

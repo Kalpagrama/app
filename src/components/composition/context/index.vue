@@ -71,7 +71,7 @@ div(
           .row.fit.items-center.content-center.q-px-sm
             q-icon(name="select_all" color="grey-4" size="14px").q-mr-xs
             //- small.text-grey-4 {{composition.layers[0].contentName}}
-            small(v-if="width > 350").text-grey-4 {{$t('Context')}}
+            small(v-if="width > 330").text-grey-4 {{$t('Context')}}
         //- video controls
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           div(

@@ -50,10 +50,13 @@ export default {
   },
   data () {
     return {
-      user: this.$store.getters.currentUser()
+      // user: this.$store.getters.currentUser()
     }
   },
   computed: {
+    user () {
+      return this.$store.getters.currentUser()
+    },
     authGuardShow: {
       get () {
         return this.$store.state.ui.authGuard !== null

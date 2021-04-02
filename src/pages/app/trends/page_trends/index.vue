@@ -53,6 +53,8 @@ export default {
       async handler (to, from) {
         this.$log('$route CHANGED', to)
         if (to) {
+          this.category = null
+          await this.$wait(500)
           this.category = this.$store.getters.nodeCategories().find(c => c.sphere.oid === to)
         }
         // go to the first category: ALL

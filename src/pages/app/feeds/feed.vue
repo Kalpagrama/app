@@ -11,24 +11,6 @@
           :node="item.populatedObject"
           :isActive="isActive"
           :isVisible="isVisible")
-//- .row.full-width.justify-center
-  div(
-    :style=`{
-      width: '380px',
-      height: '380px',
-    }`
-    ).column
-    .col.full-width.scroll
-      list-feed(
-        :itemStyles=`{
-          paddingBottom: '8px',
-        }`
-        :query="queryFeedItems")
-        template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-          node-feed(
-            :node="item.populatedObject"
-            :isActive="isActive"
-            :isVisible="isVisible")
 </template>
 
 <script>

@@ -4,7 +4,7 @@ q-btn(
   :color="color"
   :loading="loading"
   @click="shareStart()")
-  //- q-tooltip(dense dark) {{$t('Share')}}
+  q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Share')}}
   q-icon(name="logout" size="23px").rotate-270
   q-dialog(
     v-model="shareDialogOpened"
