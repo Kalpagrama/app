@@ -54,7 +54,7 @@ div(
             }`
             @click="nodeShow = false"
             ).full-width.q-mt-sm
-            span.text-bold {{$t('Close')}}
+            span.text-bold {{$t('Back to watching')}}
   q-btn(
     @click="nodeRefresh()"
     round flat color="white" icon="refresh")
