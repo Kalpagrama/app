@@ -26,6 +26,7 @@
     q-btn(
       @click="refresh()"
       flat color="grey-6" no-caps
+      :loading="refreshing"
       :style=`{
         height: '50px',
       }`
@@ -85,6 +86,7 @@ export default {
     return {
       feedbackOpened: false,
       loggingOut: false,
+      refreshing: false,
     }
   },
   methods: {
@@ -113,8 +115,11 @@ export default {
       await this.$router.replace('/auth')
     },
     async refresh () {
+      this.$log('refresh')
+      this.refreshing = true
       this.$wait(300).then(async () => await this.$systemUtils.vibrate(150))
       await this.$systemUtils.reset()
+      this.refreshing = false
     },
     async setDebugOutput () {
       this.$wait(300).then(async () => await this.$systemUtils.vibrate(150))

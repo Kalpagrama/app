@@ -1,8 +1,8 @@
 <template lang="pug">
-q-layout(view="hHh LpR fFf")
+q-layout(view="hHh LpR fFf" @scroll="onScroll")
   q-header()
     q-resize-observer(@resize="headerHeight = $event.height")
-    slot(name="header")
+    slot(name="header" :scrollTop="scrollTop")
   q-footer
     slot(name="footer")
   q-page-containter
@@ -81,11 +81,12 @@ export default {
   },
   methods: {
     onScroll (e) {
-      // this.$log('onScroll', e)
-      this.scrollTop = e.target.scrollTop
-      this.scrollWidth = e.target.scrollWidth
-      this.scrollHeight = e.target.scrollHeight
-      this.bodyHeight = e.target.clientHeight
+      this.$log('onScroll', e)
+      this.scrollTop = e.position
+      // this.scrollTop = e.target.scrollTop
+      // this.scrollWidth = e.target.scrollWidth
+      // this.scrollHeight = e.target.scrollHeight
+      // this.bodyHeight = e.target.clientHeight
     },
     onPan (e) {
       this.$log('onPan', e)

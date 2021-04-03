@@ -136,12 +136,12 @@ export default {
     mutedToggle (val) {
       this.$log('mutedToggle', val)
       if (this.playerType === 'player-youtube') {
-        this.player_.setMuted(val || !this.player_.muted)
+        // this.player_.setMuted(val || !this.player_.muted)
         this.muted = val || !this.muted
       }
       else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
-          this.$refs.videoRef.muted = !this.$refs.videoRef.muted
+          // this.$refs.videoRef.muted = !this.$refs.videoRef.muted
           this.muted = val || !this.muted
         }
       }

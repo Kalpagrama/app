@@ -153,7 +153,7 @@ export default {
     },
     async pointDrag (e, index) {
       // this.$log('pointDrag', e, index)
-      // first
+      // First
       if (e.isFirst) {
         this.$emit('first')
         this.pointClicked = null
@@ -162,25 +162,30 @@ export default {
         this.player.pause()
         this.player.events.emit('figures-forward-start')
       }
-      // work
+      // Get time
       let tNow = this.player.figures[index].t
       let tDelta = this.convert(e.delta.x)
       let t = tNow + tDelta
       // this.$log('pointDrag t', t)
-      // handle <0 and  >duration case
+      // Handle <0 and  >duration case
       if (t <= 0 || t >= this.player.duration) return
+      // Handle index 0 > 1
+      if (index === 0 && t >= this.player.figures[1].t - 0.5) return
+      // Handle index 1 < 0
+      if (index === 1 && t <= this.player.figures[0].t + 0.5) return
+      // Set time
       this.player.setCurrentTime(t)
       this.player.figures[index].t = t
-      // final
+      // Final
       if (e.isFinal) {
         // after dragging start playing
         if (index === 0) {
           this.player.play()
         }
         if (index === 1) {
-          let t = this.player.currentTime - 2
-          if (t > this.player.figures[0].t) this.player.setCurrentTime(t)
-          else this.player.setCurrentTime(this.player.figures[0].t)
+          // let t = this.player.currentTime - 2
+          // if (t > this.player.figures[0].t) this.player.setCurrentTime(t)
+          // else this.player.setCurrentTime(this.player.figures[0].t)
           this.player.play()
         }
         this.pointDragging = false

@@ -196,6 +196,10 @@ export default {
   methods: {
     pageIdChange (pageId) {
       this.$log('pageIdChange')
+      if (pageId === null) {
+        this.pageId = null
+        return
+      }
       if (this.pageId === pageId) {
         this.pageId = null
       }
@@ -229,6 +233,7 @@ export default {
         // setInterval(() => {
         //   this.player.play()
         // }, 500)
+        if (this.$q.platform.is.desktop) this.player.mutedToggle(false)
         this.nodePlay()
       })
       // Get player clusters

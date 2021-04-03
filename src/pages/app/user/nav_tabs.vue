@@ -22,7 +22,7 @@ export default {
   computed: {
     tabs () {
       return [
-        {id: 'collections', name: this.$t('Collections'), icon: 'folder_special'},
+        // {id: 'collections', name: this.$t('Collections'), icon: 'folder_special'},
         {id: 'nodes', name: this.$t('Nodes'), icon: 'panorama_fish_eye'},
         {id: 'joints', name: this.$t('Joints'), icon: 'panorama_fish_eye'},
         {id: 'votes', name: this.$t('Votes'), icon: 'adjust'},

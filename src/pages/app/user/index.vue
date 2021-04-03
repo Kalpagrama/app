@@ -66,6 +66,8 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to) {
+          this.user = null
+          await this.$wait(300)
           this.user = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           // if (!this.$route.params.page) this.$router.replace('nodes')
         }
