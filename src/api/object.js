@@ -315,6 +315,34 @@ class ObjectApi {
       updateStatThrottled()
       return true
    }
+
+   static async commentCreate (oid, text) {
+      assert(oid, '!oid')
+      const f = ObjectApi.commentCreate
+      logD(f, 'start', oid, text)
+      const t1 = performance.now()
+      const cb = async () => {
+         let { data: { commentCreate } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.commentFragment}
+                mutation commentCreate ($oid: OID!, $text: String!) {
+                    commentCreate (oid: $oid, text: $text){
+                        ...commentFragment
+                    }
+                }
+            `,
+            variables: {
+               oid: oid,
+               text: text
+            }
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return commentCreate
+      }
+      let comment = await apiCall(f, cb)
+      await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
+      return comment
+   }
 }
 
 export { ObjectApi }

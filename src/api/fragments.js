@@ -415,6 +415,19 @@ const contentCutFragment = gql`
         params
     }
 `
+const commentFragment = gql`
+    fragment commentFragment on Comment {
+        id
+        createdAt 
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        text
+    }
+`
 
 const findResultFragment = gql`
     ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment} ${contentCutFragment}
@@ -440,7 +453,8 @@ const fragments = {
    essenceFragment,
    sphereFragment,
    findResultFragment,
-   contentCutFragment
+   contentCutFragment,
+   commentFragment
 }
 
 export {
