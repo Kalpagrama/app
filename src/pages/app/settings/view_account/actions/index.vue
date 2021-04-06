@@ -79,6 +79,7 @@
 import { AuthApi } from 'src/api/auth'
 import { initLogRocket, LogLevelEnum, window } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'actions',
@@ -115,6 +116,8 @@ export default {
       await this.$router.replace('/auth')
     },
     async refresh () {
+      // let comment = await ObjectApi.commentCreate('100958595302072330', 'Комммент')
+      // this.$logW('comment=', comment)
       this.$log('refresh')
       this.refreshing = true
       this.$wait(300).then(async () => await this.$systemUtils.vibrate(150))
