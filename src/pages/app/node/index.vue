@@ -24,6 +24,7 @@ kalpa-layout()
             round flat color="white" icon="fas fa-info")
       //- body
       div(
+        v-if="node"
         :style=`{
           //- paddingTop: '8px',
           paddingBottom: '200px',
@@ -47,7 +48,8 @@ kalpa-layout()
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              page-joints(:node="node")
+              //- page-joints(:node="node")
+              page-comments(:node="node")
               //- widget-joints(:node="node")
 </template>
 
@@ -57,6 +59,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
 import pageJoints from './page_joints/index.vue'
+import pageComments from './page_comments/index.vue'
 
 export default {
   name: 'pageApp_node',
@@ -64,6 +67,7 @@ export default {
     navMobile,
     widgetJoints,
     pageJoints,
+    pageComments,
   },
   data () {
     return {
