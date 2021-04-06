@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     onScroll (e) {
-      this.$log('onScroll', e)
+      // this.$log('onScroll', e)
       this.scrollTop = e.position
       // this.scrollTop = e.target.scrollTop
       // this.scrollWidth = e.target.scrollWidth

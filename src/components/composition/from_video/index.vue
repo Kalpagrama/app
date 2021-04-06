@@ -135,6 +135,19 @@ export default {
     }
   },
   methods: {
+    videoAutoplay () {
+      this.$log('videoAutoplay')
+      var promise = document.querySelector('video').play();
+      if (promise !== undefined) {
+        promise.then(_ => {
+          // Autoplay started!
+        }).catch(error => {
+          // Autoplay was prevented.
+          // Show a "Play" button so that user can start playback.
+          this.$log('videoAutoplay error', error)
+        });
+      }
+    },
     videoClick (e) {
       this.$log('videoClick', e)
       // if (e.target.muted) {
