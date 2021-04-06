@@ -83,9 +83,11 @@ export default {
         this.$log('commentSend')
         this.commentSending = true
         // checks
-        this.comment = ''
         if (this.comment.length === 0) throw new Error(this.$t('Empty comment!'))
-        const comment = await ObjectApi.commentCreate(this.node.oid, this.comment)
+        const commentInput = this.comment
+        this.comment = ''
+        const comment = await ObjectApi.commentCreate(this.node.oid, commentInput)
+        // this.comment = ''
         this.$log('commentSend comment', comment)
         this.$log('commentSend done')
         // this.comment = ''
