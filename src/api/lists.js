@@ -17,6 +17,7 @@ const FindCollectionEnum = Object.freeze({
    EVENTS: 'EVENTS',
    SUBSCRIPTIONS: 'SUBSCRIPTIONS',
    SUBSCRIBERS: 'SUBSCRIBERS',
+   COMMENTS: 'COMMENTS',
    CUTS: 'CUTS',
 })
 
@@ -82,6 +83,10 @@ class ListsApi {
             assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
             // assert(mangoQuery.selector.oidSphere === rxdb.getCurrentUser().oid, 'разрешено только для текущего юзера')
             res = await ListsApi.find(FindCollectionEnum.SUBSCRIPTIONS, mangoQuery, pagination)
+            break
+         case RxCollectionEnum.LST_COMMENTS:
+            assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+            res = await ListsApi.find(FindCollectionEnum.COMMENTS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SEARCH:
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)

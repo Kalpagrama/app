@@ -479,8 +479,9 @@ class Group {
             case RxCollectionEnum.LST_SUBSCRIPTIONS:
                itemPrimaryKey = 'oid'
                break
-            case RxCollectionEnum.LST_FEED:
-               itemPrimaryKey = 'id' // эвенты
+            case RxCollectionEnum.LST_FEED: // эвенты
+            case RxCollectionEnum.LST_COMMENTS: // комменты
+               itemPrimaryKey = 'id'
                break
             case RxCollectionEnum.LST_CONTENT_CUTS:
                itemPrimaryKey = 'cutId'

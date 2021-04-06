@@ -28,6 +28,7 @@ const LstCollectionEnum = Object.freeze({
    LST_FEED: 'LST_FEED',
    LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
    LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
+   LST_COMMENTS: 'LST_COMMENTS', // комменты под ядром / сферой
    LST_SEARCH: 'LST_SEARCH',
    LST_CONTENT_CUTS: 'LST_CONTENT_CUTS'
 })
