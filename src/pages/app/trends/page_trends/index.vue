@@ -40,7 +40,7 @@ export default {
           objectTypeEnum: { $in: ['NODE', 'JOINT'] },
           // objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.sphereOid,
-          sortStrategy: 'ACTIVITY', // AGE
+          sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
         populateObjects: true,
       }

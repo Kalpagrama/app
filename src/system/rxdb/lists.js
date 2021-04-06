@@ -149,6 +149,39 @@ class Lists {
       }
    }
 
+   async addRemoveCommentToObj (type, oid, comment) {
+      assert(oid && comment && type && type.in('COMMENT_DELETED', 'COMMENT_CREATED'), 'bad addRemoveCommentToObj params' + JSON.stringify({
+         type,
+         oid,
+         comment
+      }))
+      const f = this.addRemoveCommentToObj
+      logD(f, 'start', oid, type, comment)
+      const t1 = performance.now()
+      let rxDocs = await Lists.cache.find({
+         selector: {
+            'props.rxCollectionEnum': LstCollectionEnum.LST_COMMENTS,
+            'props.oid': oid
+         }
+      })
+      for (let rxDoc of rxDocs) {
+         let reactiveDoc = getReactive(rxDoc).getPayload()
+         let indx = reactiveDoc.items.findIndex(el => el.id === comment.id)
+         if (type === 'COMMENT_CREATED') {
+            if (indx === -1) {
+               reactiveDoc.items.splice(0, 0, comment)
+               reactiveDoc.totalCount++
+            }
+         } else if (type === 'OBJECT_DELETED') {
+            if (indx >= 0) {
+               logD(f, 'delete object from list', indx)
+               reactiveDoc.items.splice(indx, 1)
+               reactiveDoc.totalCount--
+            }
+         }
+      }
+   }
+
    async addRemoveObjectToRxDoc (type, rxDoc, object) {
       const f = this.addRemoveObjectToRxDoc
       let mangoQuery = rxDoc.props.mangoQuery
@@ -275,7 +308,11 @@ class Lists {
          let indx = foundGroup.items.findIndex(el => el.oid === object.oid)
          if (type === 'OBJECT_CREATED') {
             if (indx === -1) {
-               foundGroup.items.splice(0, 0, { oid: object.oid, figuresAbsoluteList: objectFiguresAbsoluteList, internalItemOids: [] })
+               foundGroup.items.splice(0, 0, {
+                  oid: object.oid,
+                  figuresAbsoluteList: objectFiguresAbsoluteList,
+                  internalItemOids: []
+               })
                foundGroup.totalCount++
             }
          } else if (type === 'OBJECT_DELETED') {

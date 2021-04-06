@@ -47,7 +47,7 @@ class MutexLocal {
    release () {
       assert(this.lockOwner, '!this.lockOwner')
       let lockOwnerOld = this.lockOwner
-      if (Date.now() - this.lockDate > 5 * 1000) logW(`mutex::${this.name} long operation! lockOwner=${this.lockOwner} duration=${Date.now() - this.lockDate} queue:${JSON.stringify(this.queue.map(item => item.lockOwner))}`)
+      if (Date.now() - this.lockDate > 5 * 1000) logW(`mutex::${this.name} long operation! lockOwner=${this.lockOwner} duration=${Date.now() - this.lockDate}`)
       if (this.queue.length > 0) {
          const { resolve, reject, lockOwner, lockDate } = this.queue.shift()
          this.lockOwner = lockOwner
