@@ -101,6 +101,8 @@ class Event {
             case 'WS_ITEM_DELETED':
                await this.workspace.processEvent(event)
                break
+            case 'COMMENT_CREATED':
+               break
             default:
                throw new Error(`unsupported Event ${event.type}`)
          }

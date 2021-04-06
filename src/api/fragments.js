@@ -347,6 +347,22 @@ const eventFragment = gql`
             relatedSphereOids
             matter {reason subscription}
         }
+        ... on EventCommentCreate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            comment{
+                id
+                createdAt
+                author {
+                    oid
+                    type
+                    name
+                    thumbUrl(preferWidth: 50)
+                }
+                text
+            }
+            matter {reason subscription}
+        }
         ... on EventObjectRate{
             subject{... objectShortFragment}
             object{... objectShortFragment}
