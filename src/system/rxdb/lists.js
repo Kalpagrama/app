@@ -397,7 +397,7 @@ class Lists {
    // от сервера прилетел эвент (поправим данные в кэше)
    async processEvent (event) {
       const f = this.processEvent
-      logD(f, 'start')
+      logD(f, 'start', event)
       const t1 = performance.now()
       switch (event.type) {
          case 'USER_SUBSCRIBED': {
@@ -482,6 +482,9 @@ class Lists {
             }
             break
          }
+         case 'COMMENT_CREATED':
+            await this.addRemoveCommentToObj(event.type, event.object.oid, event.comment)
+            break
          case 'OBJECT_CREATED':
          case 'OBJECT_DELETED': {
             assert(event.relatedSphereOids && Array.isArray(event.relatedSphereOids), 'event.relatedSphereOids')

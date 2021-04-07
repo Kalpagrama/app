@@ -102,6 +102,7 @@ class Event {
                await this.workspace.processEvent(event)
                break
             case 'COMMENT_CREATED':
+               await this.lists.processEvent(event) // поместить объект во все ленты
                break
             default:
                throw new Error(`unsupported Event ${event.type}`)
