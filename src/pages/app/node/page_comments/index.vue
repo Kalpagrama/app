@@ -8,17 +8,19 @@
     }`
     ).row.full-width.items-start.content-start.b-35
     .col
+      //- @keyup.enter="commentSend()"
       q-input(
         v-model="comment"
-        borderless dark type="textarea"
-        :placeholder="$t('Write comment')"
+        autogrow
+        borderless dark type="textarea" :resize="false"
+        :placeholder="$t('Join the discussion')"
         :input-style=`{
+          resize: 'none',
           padding: '10px',
           background: 'rgb(45,45,45)',
           borderRadius: '10px',
-          height: '60px',
+          minHeight: '60px',
         }`
-        @keyup.enter="commentSend()"
         ).full-width
     q-btn(
       flat color="green" icon="send"
