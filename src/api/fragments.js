@@ -446,14 +446,14 @@ const commentFragment = gql`
 `
 
 const findResultFragment = gql`
-    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment} ${contentCutFragment}
+    ${eventFragment} ${topObjectFragment} ${groupFragment} ${objectShortFragment} ${contentCutFragment} ${commentFragment}
     fragment findResultFragment on FindResult {
         totalCount
         nextPageToken
         currentPageToken
         prevPageToken
         ... on EventFindResult { events: items {...eventFragment} }
-        ... on ItemsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment ...contentCutFragment} }
+        ... on ItemsFindResult { objects: items { ...topObjectFragment ...groupFragment ...objectShortFragment ...contentCutFragment ...commentFragment} }
         ... on WSFindResult { items }
     }
 `
