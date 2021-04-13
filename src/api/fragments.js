@@ -300,6 +300,7 @@ const essenceFragment = gql`
           ...objectShortFragment
       }
     vertices
+    scope
   }
 `
 

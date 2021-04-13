@@ -170,6 +170,7 @@ class ObjectCreateApi {
          // }
       })
       essenceInput.vertices = essence.vertices || []
+      essenceInput.scope = essence.scope || 'todo undefined!'
       return essenceInput
    }
 
