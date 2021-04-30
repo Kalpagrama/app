@@ -80,6 +80,7 @@ import { AuthApi } from 'src/api/auth'
 import { initLogRocket, LogLevelEnum, window } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { ObjectApi } from 'src/api/object'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'actions',
@@ -92,6 +93,49 @@ export default {
   },
   methods: {
     async toggleChat () {
+      // let result = await ObjectCreateApi.courseCreate({
+      //   name: 'test',
+      //   description: 'test course5',
+      //   spheres: [],
+      //   category: 'FUN',
+      //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+      //   paths: [{
+      //     id: '123',
+      //     name: 'asd',
+      //     contents: {
+      //       contentOid: '168815073555431447',
+      //       themes: {
+      //         id: '123123',
+      //         name: 'adasd',
+      //         figures: [],
+      //         tasks: []
+      //       }
+      //     }
+      //   }]
+      // })
+      // let result2 = await ObjectApi.courseUpdate({
+      //   oid: '175964791553271816',
+      //   rev: 3,
+      //   name: 'test222',
+      //   description: 'test course4',
+      //   spheres: [],
+      //   category: 'FUN',
+      //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+      //   paths: [{
+      //     id: '123',
+      //     name: 'asd',
+      //     contents: {
+      //       contentOid: '168815073555431447',
+      //       themes: {
+      //         id: '123123',
+      //         name: 'adasd',
+      //         figures: [],
+      //         tasks: []
+      //       }
+      //     }
+      //   }]
+      // })
+      // this.$log('result', result)
       this.$log('toggleChat')
       // window.Chatra()
       // if (!window.Chatra) return

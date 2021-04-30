@@ -153,18 +153,18 @@ const imageFragment = gql`${objectFragment}
 `
 
 const figureFragment = gql`
-  fragment figureFragment on Figure {
-      t
-      points {
-          x
-          y
-      }
-      epubCfi
-      epubCfiText
-      epubChapterId
-      epubTocId
-      epubHref
-  }
+    fragment figureFragment on Figure {
+        t
+        points {
+            x
+            y
+        }
+        epubCfi
+        epubCfiText
+        epubChapterId
+        epubTocId
+        epubHref
+    }
 `
 
 const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragment}
@@ -266,42 +266,92 @@ const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragm
 //   }
 // `
 const essenceFragment = gql`
-  ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
-  fragment essenceFragment on Essence {
-    ...objectFragment
-    relatedSphereOids
-    sphereFromName{...objectShortFragment}
-    rate
-    weight
-    rateStat {percent, weight, count}
-    rateUser
-    author {
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 50)
+    ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+    fragment essenceFragment on Essence {
+        ...objectFragment
+        relatedSphereOids
+        sphereFromName{...objectShortFragment}
+        rate
+        weight
+        rateStat {percent, weight, count}
+        rateUser
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        spheres {
+            oid
+            name
+        }
+        category
+        layout
+        #    items {
+        #        ...on Video {...videoFragment}
+        #        ...on Book {...bookFragment}
+        #        ...on Image {...imageFragment}
+        #        ...on Essence {...essenceFragmentLeaf}
+        #        ...on Sphere {... sphereFragment}
+        #        ...on User {... userFragment}
+        #        ...on Composition {...compositionFragment}
+        #    }
+        itemsShort {
+            ...objectShortFragment
+        }
+        vertices
+        scope
     }
-    spheres {
-      oid
-      name
+`
+const courseFragment = gql`
+    ${objectFragment} ${objectShortFragment} ${figureFragment}
+    fragment courseFragment on Course {
+        ...objectFragment
+        relatedSphereOids
+        sphereFromName{...objectShortFragment}
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        spheres {
+            oid
+            name
+        }
+        category
+        scope
+        description
+        members{
+            createdAt
+            name
+            oid
+            thumbUrl(preferWidth: 600)
+            type
+            voteHistory{
+                date
+                essenceOid
+                rate
+            }
+        }
+        rev
+        paths{
+            id
+            name
+            contents{
+                contentOid
+                themes{
+                    id
+                    name
+                    figures {...figureFragment}
+                    tasks{
+                        node {...objectShortFragment}
+                        voteAuthor
+                    }
+                }
+            }
+        }
     }
-    category
-    layout
-#    items {
-#        ...on Video {...videoFragment}
-#        ...on Book {...bookFragment}
-#        ...on Image {...imageFragment}
-#        ...on Essence {...essenceFragmentLeaf}
-#        ...on Sphere {... sphereFragment}
-#        ...on User {... userFragment}
-#        ...on Composition {...compositionFragment}
-#    }
-      itemsShort {
-          ...objectShortFragment
-      }
-    vertices
-    scope
-  }
 `
 
 const eventFragment = gql`
@@ -387,7 +437,7 @@ const eventFragmentWithBatch = gql`
 
 const objectFullFragment = gql`
     ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment}
-    ${sphereFragment} ${userFragment} ${objectFragment}
+    ${sphereFragment} ${userFragment} ${objectFragment} ${courseFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
         ...on Video {...videoFragment}
@@ -397,6 +447,7 @@ const objectFullFragment = gql`
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
+        ...on Course {...courseFragment}
     }
 `
 const topObjectFragment = gql`${figureFragment}
@@ -424,7 +475,7 @@ const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFr
 const contentCutFragment = gql`
     fragment contentCutFragment on ContentCut {
         cutId
-#        url
+        #        url
         urlWithFormats{ format url }
         duration
         epubCfi
@@ -435,7 +486,7 @@ const contentCutFragment = gql`
 const commentFragment = gql`
     fragment commentFragment on Comment {
         id
-        createdAt 
+        createdAt
         author {
             oid
             type
@@ -468,6 +519,7 @@ const fragments = {
    objectShortFragment,
    objectShortStatFragment,
    essenceFragment,
+   courseFragment,
    sphereFragment,
    findResultFragment,
    contentCutFragment,

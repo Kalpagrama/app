@@ -9,6 +9,7 @@ import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import throttle from 'lodash/throttle'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
+import store from 'src/store'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -185,6 +186,35 @@ class ObjectApi {
          return objectChange
       }
       return await apiCall(f, cb)
+   }
+
+   static async courseUpdate (course) {
+      const f = ObjectApi.courseUpdate
+      logD(f, 'start', course)
+      const t1 = performance.now()
+      const cb = async () => {
+         let courseInput = ObjectCreateApi.makeCourseInput(course)
+         console.log('courseInput', courseInput)
+         let { data: { courseUpdate: updatedCourse } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.courseFragment}
+                mutation courseUpdate($course:  CourseInput!) {
+                    courseUpdate (course: $course){
+                        ...courseFragment
+                    }
+                }
+            `,
+            variables: {
+               course: courseInput
+            }
+         })
+         let reactiveCourse = await rxdb.set(RxCollectionEnum.OBJ, updatedCourse, { actualAge: 'day' })
+         return reactiveCourse
+      }
+      let reactiveCourse = await apiCall(f, cb)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      assert(store, '!store')
+      return reactiveCourse
    }
 
    static async unPublish (oid) {

@@ -170,7 +170,7 @@ class ObjectCreateApi {
          // }
       })
       essenceInput.vertices = essence.vertices || []
-      essenceInput.scope = essence.scope || 'todo undefined!'
+      essenceInput.scope = essence.scope
       return essenceInput
    }
 
@@ -264,6 +264,33 @@ class ObjectCreateApi {
       }
    }
 
+   static makeCourseInput (course) {
+      const f = ObjectCreateApi.makeCourseInput
+      course = cloneDeep(course) // makeCourseInput меняет essence
+      {
+         // checks
+         assert.ok(course.category, 'essence.category')
+         assert.ok(course.spheres.length >= 0 && course.spheres.length <= 10, 'essence spheres')
+         assert.ok(course.paths.length > 0 && course.paths.length <= 100, 'course.paths.length ')
+      }
+      let courseInput = {}
+      // logD(f, nodeInput, essence.spheres, essence.spheres.length)
+      // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
+      // assert(nodeInput.name, '!nodeInput.name')
+      courseInput.rev = course.rev
+      courseInput.oid = course.oid
+      courseInput.scope = course.scope
+      courseInput.name = course.name
+      courseInput.description = course.description
+      courseInput.coverImage = course.coverImage
+      courseInput.category = course.category || 'FUN'
+      courseInput.spheres = course.spheres.map(s => {
+         return { name: s.name, oid: s.oid }
+      })
+      courseInput.paths = course.paths
+      return courseInput
+   }
+
    static async jointCreate (joint) {
       const f = ObjectCreateApi.jointCreate
       logD(f, 'start')
@@ -290,6 +317,37 @@ class ObjectCreateApi {
       // }
       // return await apiCall(f, cb)
       return await ObjectCreateApi.essenceCreate(joint)
+   }
+
+   static async courseCreate (course) {
+      const f = ObjectCreateApi.courseCreate
+      logD(f, 'start', course)
+      const t1 = performance.now()
+      const cb = async () => {
+         let courseInput = ObjectCreateApi.makeCourseInput(course)
+         console.log('courseInput', courseInput)
+         let { data: { courseCreate: createdCourse } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.courseFragment}
+                mutation courseCreate($course:  CourseInput!) {
+                    courseCreate (course: $course){
+                        ...courseFragment
+                    }
+                }
+            `,
+            variables: {
+               course: courseInput
+            }
+         })
+         let reactiveCourse = await rxdb.set(RxCollectionEnum.OBJ, createdCourse, { actualAge: 'day' })
+         return reactiveCourse
+      }
+      let reactiveCourse = await apiCall(f, cb)
+      assert(reactiveCourse.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveCourse.relatedSphereOids, reactiveCourse) // вне cb (иначе - дедлок)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      assert(store, '!store')
+      return reactiveCourse
    }
 }
 
