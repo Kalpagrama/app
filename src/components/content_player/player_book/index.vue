@@ -82,9 +82,9 @@ div(
     //- q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
     .col
     q-btn(flat color="white" no-caps icon="keyboard_arrow_left" @click='goToPrevPage')
-      span().gt-xs {{$t('Next chapter')}}
-    q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
       span().gt-xs {{$t('Prev chapter')}}
+    q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
+      span().gt-xs {{$t('Next chapter')}}
     .col
     q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
     //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
