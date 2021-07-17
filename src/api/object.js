@@ -258,7 +258,6 @@ class ObjectApi {
                     votes{...objectShortStatFragment}
                     views{...objectShortStatFragment}
                     joints{...objectShortStatFragment}
-                    researches{...objectShortStatFragment}
                     bookmarks{...objectShortStatFragment}
                     shares{...objectShortStatFragment}
                     remakes{...objectShortStatFragment}

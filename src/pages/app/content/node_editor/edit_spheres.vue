@@ -14,7 +14,7 @@
           whiteSpace: 'nowrap',
         }`
         @click="sphereDelete(s)"
-      ).q-px-xs {{ '#'+s.name }}
+      ).q-px-xs {{ '✦'+s.name }}
   .row
     slot(name="right")
   .row.full-width
