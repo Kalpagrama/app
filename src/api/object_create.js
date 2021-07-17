@@ -1,5 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { apollo } from 'src/boot/apollo'
+import gql from 'graphql-tag'
 import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'

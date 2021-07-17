@@ -206,7 +206,7 @@ module.exports = function (ctx) {
 
                               // имена npm-пакетов можно, не опасаясь проблем, использовать
                               // в URL, но некоторые серверы не любят символы наподобие @
-                              return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
+                              return 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
                            }
                         }
                      }

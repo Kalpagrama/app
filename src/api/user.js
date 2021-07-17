@@ -1,4 +1,5 @@
 import { apollo } from 'src/boot/apollo'
+import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'

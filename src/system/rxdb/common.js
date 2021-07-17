@@ -136,10 +136,8 @@ async function rxdbOperationProxyExec (collection, operation, ...params) {
             return await collection.remove(...params)
          case 'destroy':
             return await collection.destroy(...params)
-         case 'findOne': {
-            let res = await collection.findOne(...params).exec()
-            return res
-         }
+         case 'findOne':
+            return await collection.findOne(...params).exec()
          case 'find':
             return await collection.find(...params).exec()
          case 'atomicUpsert':
