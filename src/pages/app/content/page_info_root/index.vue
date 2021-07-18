@@ -56,6 +56,17 @@ div(
               inactiveColor="grey-3"
               :fields=`{contentType: contentKalpa.type}`
               @bookmark="$event => $emit('bookmark', $event)")
+            //- buy
+            kalpa-pay(
+              v-if="contentKalpa"
+              :oid="contentKalpa.oid"
+              :type="contentKalpa.type"
+              :name="contentKalpa.name"
+              :thumbUrl="contentKalpa.thumbUrl"
+              :isActive="true"
+              inactiveColor="grey-3"
+              :fields=`{contentType: contentKalpa.type}`
+              @bookmark="$event => $emit('bookmark', $event)")
             //- tutorial
             q-btn(
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: false, useProfileEditor: false}])"

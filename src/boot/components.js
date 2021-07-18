@@ -5,6 +5,7 @@ import kalpaShare from 'components/kalpa_share/index.vue'
 import kalpaLogo from 'components/kalpa_logo/index.vue'
 import kalpaFinder from 'components/kalpa_finder/index.vue'
 import kalpaBookmark from 'components/kalpa_bookmark/index.vue'
+import kalpaPay from 'components/kalpa_pay/index.vue'
 import kalpaSave from 'components/kalpa_save/index.vue'
 import kalpaDocs from 'components/kalpa_docs/index.vue'
 
@@ -30,6 +31,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   Vue.component('kalpaLogo', kalpaLogo)
   Vue.component('kalpaFinder', kalpaFinder)
   Vue.component('kalpaBookmark', kalpaBookmark)
+  Vue.component('kalpaPay', kalpaPay)
   Vue.component('kalpaSave', kalpaSave)
   Vue.component('kalpaDocs', kalpaDocs)
   // menus

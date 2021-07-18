@@ -8,15 +8,15 @@
     ).row.full-width
     //- header
     router-link(
-      to="/workspace/collections"
+      to="/workspace/bookmarks"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="tab" color="white" size="24px").q-mr-sm
+      q-icon(name="perm_media" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold {{$t('Collections')}}
+        span.text-white.text-bold {{$t('Contents')}}
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="!collectionsRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="!bookmarksRes").row.full-width.no-wrap.q-pa-sm
         div(
           v-for="n in 10" :key="n"
           :style=`{
@@ -25,10 +25,10 @@
           }`
           ).row.b-40.q-mr-sm
       //- bookmarks loaded
-      div(v-if="collectionsRes && bookmarksRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
         router-link(
-          v-for="(c,ci) in collections" :key="c.id"
-          :to="'/workspace/collection/'+c.id"
+          v-for="b in bookmarksRes.items" :key="b.oid"
+          :to="'/content/'+b.oid"
           :style=`{
             height: '50px', width: '58px', minWidth: '58px',
           }`
@@ -39,14 +39,16 @@
             }`
             ).row.fit.b-40
             img(
+              v-if="!bookmarksErrored.includes(b.oid)"
               draggable="false"
-              :src="c.id === 'all' ? bookmarksRes.items[0].thumbUrl : c.thumbUrl"
+              :src="b.thumbUrl"
               :style=`{
                 objectFit: 'cover',
                 borderRadius: '10px',
               }`
+              @error="bookmarksErrored.push(b.oid)"
               ).fit
-            //- div(
+            div(
               v-else
               :style=`{
                 borderRadius: '10px',
@@ -58,47 +60,35 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'widgetCollections',
+  name: 'widgetContents',
   data () {
     return {
-      collectionsRes: null,
       bookmarksRes: null,
+      // bookmarks: null,
+      bookmarksErrored: []
     }
   },
   computed: {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
         },
         limit: 10,
         sort: [{createdAt: 'desc'}]
       }
       return res
-    },
-    queryBookmarks () {
-      let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']}
-        },
-        limit: 1,
-        sort: [{createdAt: 'desc'}]
-      }
-      return res
-    },
-    collections () {
-      const collectionAll = {
-        id: 'all',
-        name: 'All',
-      }
-      return [collectionAll, ...this.collectionsRes.items]
-    },
+    }
+  },
+  methods: {
   },
   async mounted () {
-    this.$log('myComponent mounted')
-    this.collectionsRes = await this.$rxdb.find(this.query, true)
-    this.bookmarksRes = await this.$rxdb.find(this.queryBookmarks, true)
+    this.$log('mounted')
+    this.bookmarksRes = await this.$rxdb.find(this.query, true)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

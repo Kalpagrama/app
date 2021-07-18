@@ -38,6 +38,8 @@ kalpa-layout
           }`).row.full-width.items-start.content-start
           widget-upload().q-mb-md
           .row.full-width.q-px-md
+            widget-contents().q-mb-sm
+            widget-collections().q-mb-sm
             widget-bookmarks().q-mb-sm
             //- widget-watch-later.q-mb-sm
             //- widget-history.q-mb-sm
@@ -46,6 +48,7 @@ kalpa-layout
 <script>
 import widgetCollections from './widget_collections/index.vue'
 import widgetBookmarks from './widget_bookmarks/index.vue'
+import widgetContents from './widget_contents/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
 import widgetUpload from './widget_upload/index.vue'
@@ -56,6 +59,7 @@ export default {
   components: {
     widgetCollections,
     widgetBookmarks,
+    widgetContents,
     widgetWatchLater,
     widgetHistory,
     widgetUpload,
