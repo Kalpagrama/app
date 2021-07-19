@@ -66,7 +66,7 @@ div(
               :isActive="true"
               inactiveColor="grey-3"
               :fields=`{contentType: contentKalpa.type}`
-              @bookmark="$event => $emit('bookmark', $event)")
+              @content="$event => $emit('content', $event)")
             //- tutorial
             q-btn(
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: false, useProfileEditor: false}])"

@@ -10,8 +10,8 @@
 export default {
   name: 'profileEditor',
   components: {
-    editAvatar: () => import('pages/settings/view_account/edit_avatar/index.vue'),
-    editProfile: () => import('pages/settings/view_account/edit_profile/index.vue'),
+    editAvatar: () => import('src/pages/app/settings/view_account/edit_avatar/index.vue'),
+    editProfile: () => import('src/pages/app/settings/view_account/edit_profile/index.vue'),
   },
   data () {
     return {

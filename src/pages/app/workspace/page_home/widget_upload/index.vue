@@ -7,10 +7,10 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`
     ).row.full-width.q-pa-md
-    .row.full-width.justify-center.q-pb-md
+    //- .row.full-width.justify-center.q-pb-md
       span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Add by Link')}}
     div(
-      :style=`{borderRadius: '10px',}`
+      :style=`{borderRadius: '10px'}`
       ).row.full-width.b-40
       q-input(
         v-model="url"
@@ -30,32 +30,48 @@
           borderRadius: '10px',
           color: 'white',
           border: '2px solid rgb(76,175,79)',
+          // height: '50px'
           //- paddingRight: '10px',
         }`
         @focus="urlInputFocused = true"
         @blur="urlInputFocused = false"
-        ).full-width.text-white.b-40
-    div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-md
+        ).col.full-width.text-white.b-40
+      //- upload
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).q-mx-xs
+        q-btn(
+          outline color="grey-8" no-caps
+          icon="file_upload"
+          :to="'/workspace/create/?upload=true'"
+          ).full-width.full-height
+          //component(
+          //  is='view-upload'
+          //  @started="pageStarted = true")
+          q-tooltip(dense dark) {{$t('Upload content')}}
+          //span.text-grey-6 {{$t('Create')}}
+      //- create
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`)
+        q-btn(
+          outline color="grey-8" no-caps
+          icon="create"
+          :to="'/workspace/create/'"
+          ).full-width.full-height
+          q-tooltip(dense dark) {{$t('Create content')}}
+          //span.text-grey-6 {{$t('Create')}}
+    div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
-  //- create
-  .row.full-width.justify-center.q-px-md
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.q-pt-sm
-      q-btn(
-        outline color="grey-8" no-caps
-        :to="'/workspace/create/'"
-        :style=`{
-          height: '50px',
-        }`).full-width
-        span.text-grey-6 {{$t('Create')}}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
+import viewUpload from 'src/pages/app/workspace/page_create/view_upload'
 
 export default {
   name: 'widgetUpload',
+  components: {
+    viewUpload,
+  },
   data () {
     return {
       url: '',
@@ -87,7 +103,7 @@ export default {
     async contentKalpaFound (contentKalpa) {
       this.$log('contentKalpaFound', contentKalpa)
       // this.$emit('contentKalpa', contentKalpa)
-      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
+      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
       if (bookmark) {
         // revive from dead ?
         // await bookmark.restoreFromTrash()
@@ -98,9 +114,9 @@ export default {
           oid: contentKalpa.oid,
           name: contentKalpa.name,
           thumbUrl: contentKalpa.thumbUrl,
-          isSubscribed: true
+          paid: false,
         }
-        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       }
       // go to content

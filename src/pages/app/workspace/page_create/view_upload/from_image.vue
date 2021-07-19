@@ -114,7 +114,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
 
-import nodeEditor from 'pages/app/content/node_creator/node_editor/index.vue'
+import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
 
 export default {
   name: 'fromImage',
@@ -160,28 +160,26 @@ export default {
       let contentKalpa = await ContentApi.contentCreateFromFile(this.file)
       this.$log('contentKalpa', contentKalpa)
       // check bookmark with contentKalpa.oid
-      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
-      // got bookmark, revive from trash ? subscribe ?
-      if (bookmark) {
+      let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
+      if (content) {
       }
       // create bookmark
       else {
-        let bookmarkInput = {
+        let contentInput = {
           type: 'IMAGE',
           oid: contentKalpa.oid,
           name: '',
           thumbUrl: contentKalpa.thumbUrl,
-          isSubscribed: true
+          paid: false
         }
-        this.$log('bookmarkInput', bookmarkInput)
+        this.$log('contentInput', contentInput)
         // create
-        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-        this.$log('bookmark', bookmark)
-        // subscribe to this bookmark
-        if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
+        content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+        this.$log('content', content)
       }
       // go to this content...
-      this.$router.push('/content/' + contentKalpa.oid)
+      await this.$router.push('/content/' + contentKalpa.oid)
+      // this.$router.push('/workspace/contents')
     },
     nodePublish () {
       this.$log('nodePublish')

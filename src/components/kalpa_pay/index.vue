@@ -1,46 +1,41 @@
 <template lang="pug">
 .row
-  slot(name="action" :start="start" :bookmark="bookmark")
+  slot(name="action" :start="start" :content="content")
   q-btn(
     v-if="!$scopedSlots.action"
-    @click="start()"
     round flat no-caps
-    :color="bookmark ? activeColor : inactiveColor"
-    :icon="bookmark ? 'shopping_cart' : 'shopping_cart_outlined'"
+    :color="paid ? activeColor : inactiveColor"
+    icon="paid"
     :loading="loading")
-    //- q-tooltip(dense dark) Добавить в закладки
-    //- :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
-    //- q-badge(floating transparent)
-    //- q-icon(
-      v-if="bookmark"
-      name="notifications_none"
-      size="12px"
-      :color="'white'"
-      :style=`{
-        position: 'absolute', zIndex: 10,
-        top: '13px',
-        //- top: '2px', right: '2px',
-        //- top: '-2px', left: '15px',
-      }`)
-    //- q-menu(
+    q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
+    q-menu(
+    v-if="!paid"
       dark)
       .row
         img(
           :style=`{
-            height: '50px',
-            borderRadius: '10px',
-          }`
-          ).br
+                objectFit: 'cover',
+                maxWidth: '100px',
+                borderRadius: '10px',
+              }`
+          :src="thumbUrl"
+          )
         .row.full-width
-          span {{ name }}
+          q-btn(
+            @click="start()"
+            :label="$t('sberPay')"
+            icon='shopping_cart'
+            round flat no-caps
+          )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { UserApi } from 'src/api/user'
+import * as assert from 'assert'
+import { ContentApi } from 'src/api/content'
 
 export default {
-  name: 'kalpaBookmark',
+  name: 'kalpaPay',
   props: {
     oid: {type: String},
     type: {type: String},
@@ -56,9 +51,14 @@ export default {
   data () {
     return {
       showDialog: false,
-      bookmark: null,
+      content: null,
       loading: false
     }
+  },
+  computed: {
+    paid () {
+      return this.content && this.content.paid
+    },
   },
   watch: {
     isActive: {
@@ -66,17 +66,17 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
-          if (bookmark) this.bookmark = bookmark
+          let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.oid}})
+          if (content) this.content = content
         }
       }
     },
-    bookmark: {
-      handler (to, from) {
-        this.$log('bookmark TO', to)
-        if (to) this.$emit('bookmark', to)
-      }
-    }
+    // content: {
+    //   handler (to, from) {
+    //     this.$log('content TO', to)
+    //     if (to) this.$emit('content', to)
+    //   }
+    // }
   },
   methods: {
     async start () {
@@ -84,7 +84,7 @@ export default {
         this.$log('start')
         if (this.$store.getters.isGuest) {
           let authGuard = {
-            message: 'Чтобы добавить в закладки, войдите в аккаунт.'
+            message: 'Чтобы купить, войдите в аккаунт.'
           }
           this.$store.commit('ui/stateSet', ['authGuard', authGuard])
         }
@@ -92,31 +92,25 @@ export default {
           this.loading = true
           await this.$systemUtils.vibrate(500)
           // await this.$wait(500)
-          let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.oid}})
-          this.$log('start [bookmark]', bookmark)
-          if (bookmark) {
-            this.$log('bookmark DELETE')
-            await bookmark.remove(true)
-            if (!await UserApi.isSubscribed(this.oid)) await UserApi.unSubscribe(this.oid)
-            bookmark = null
-          }
-          else {
-            this.$log('bookmark CREATE')
-            // TODO: where to handle bookmarkInput create?
-            let bookmarkInput = {
+          let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.oid}})
+          this.$log('start [content]', content)
+          if (!content) {
+            this.$log('content CREATE')
+            let contentInput = {
               type: this.type,
               oid: this.oid,
               name: this.name,
               thumbUrl: this.thumbUrl,
               ...this.fields || {},
-              isSubscribed: true
+              paid: false
             }
-            bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-            // subscribe to this oid...
-            if (!await UserApi.isSubscribed(this.oid)) await UserApi.subscribe(this.oid)
+            content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
           }
+          assert(content, '!content!!')
           this.$log('start done')
-          this.bookmark = bookmark
+          this.content = content
+          // todo веменное решение! Надо переделать так, чтобы этим занимался бэкенд.
+          this.content.paid = true
           this.loading = false
           // this.showDialog = true
         }

@@ -5,7 +5,7 @@ import assert from 'assert'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 
 // components
-// import settingsDocs from 'pages/app/settings/view_docs/index.vue'
+// import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
@@ -22,8 +22,8 @@ const routes = [
       redirect: '/auth/sign-in',
       component: () => import('layouts/auth_layout.vue'),
       children: [
-         { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/home/index.vue') },
-         // { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in.vue') }
+         { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/home/index.vue') },
+         // { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/sign_in.vue') }
       ],
       beforeEnter: (to, from, next) => {
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
@@ -42,11 +42,11 @@ const routes = [
       children: [
          {
             path: 'home',
-            component: () => import('pages/help/home.vue'),
+            component: () => import('src/pages/help/home.vue'),
          },
          {
             path: ':docId',
-            component: () => import('pages/help/doc.vue')
+            component: () => import('src/pages/help/doc.vue')
          }
       ],
       meta: { roleMinimal: 'GUEST' },
@@ -98,32 +98,32 @@ const routes = [
          {
             name: 'about',
             path: 'about',
-            component: () => import('pages/app/about/index.vue'),
+            component: () => import('src/pages/app/about/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'feeds',
             path: 'feeds/:id?',
-            component: () => import('pages/app/feeds/index.vue'),
+            component: () => import('src/pages/app/feeds/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'settings',
             path: 'settings',
             redirect: 'settings/account',
-            component: () => import('pages/app/settings'),
+            component: () => import('src/pages/app/settings'),
             children: [
                {
                   name: 'settings.account',
                   path: 'account',
-                  component: () => import('pages/app/settings/view_account/index.vue'),
+                  component: () => import('src/pages/app/settings/view_account/index.vue'),
                   // meta: { roleMinimal: 'GUEST' }
                },
                {
                   name: 'settings.docs',
                   path: 'docs',
                   // component: settingsDocs,
-                  component: () => import('pages/app/settings/view_docs/index.vue')
+                  component: () => import('src/pages/app/settings/view_docs/index.vue')
                }
             ],
             meta: { roleMinimal: 'GUEST' }
@@ -132,36 +132,36 @@ const routes = [
             name: 'node',
             path: 'node/:oid',
             // alias: 'node2/:oid',
-            component: () => import('pages/app/node/index.vue'),
+            component: () => import('src/pages/app/node/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'node-render',
             path: 'node-render/:oid',
-            component: () => import('pages/app/node_render/index.vue'),
+            component: () => import('src/pages/app/node_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'joint',
             path: 'joint/:oid',
-            component: () => import('pages/app/joint/index.vue'),
+            component: () => import('src/pages/app/joint/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'joint-render',
             path: 'joint-render/:oid',
-            component: () => import('pages/app/joint_render/index.vue'),
+            component: () => import('src/pages/app/joint_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'graph',
             path: 'graph/:oid',
-            component: () => import('pages/app/graph/index.vue'),
+            component: () => import('src/pages/app/graph/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             path: 'user/:oid',
-            component: () => import('pages/app/user/index.vue'),
+            component: () => import('src/pages/app/user/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             children: [
                {
@@ -172,63 +172,63 @@ const routes = [
                {
                   name: 'user.collections',
                   path: 'collections',
-                  component: () => import('pages/app/user/page_collections/index.vue'),
+                  component: () => import('src/pages/app/user/page_collections/index.vue'),
                },
                {
                   name: 'user.nodes',
                   path: 'nodes',
-                  component: () => import('pages/app/user/page_nodes/index.vue'),
+                  component: () => import('src/pages/app/user/page_nodes/index.vue'),
                },
                {
                   name: 'user.joints',
                   path: 'joints',
-                  component: () => import('pages/app/user/page_joints/index.vue'),
+                  component: () => import('src/pages/app/user/page_joints/index.vue'),
                },
                {
                   name: 'user.votes',
                   path: 'votes',
-                  component: () => import('pages/app/user/page_votes/index.vue'),
+                  component: () => import('src/pages/app/user/page_votes/index.vue'),
                },
                {
                   name: 'user.following',
                   path: 'following',
-                  component: () => import('pages/app/user/page_following/index.vue'),
+                  component: () => import('src/pages/app/user/page_following/index.vue'),
                },
                {
                   name: 'user.followers',
                   path: 'followers',
-                  component: () => import('pages/app/user/page_followers/index.vue'),
+                  component: () => import('src/pages/app/user/page_followers/index.vue'),
                }
             ]
          },
          {
             name: 'user-render',
             path: 'user-render/:oid/:page?',
-            component: () => import('pages/app/user_render/index.vue'),
+            component: () => import('src/pages/app/user_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'sphere',
             path: 'sphere/:oid/:page?',
-            component: () => import('pages/app/sphere/index.vue'),
+            component: () => import('src/pages/app/sphere/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'sphere-threads',
             path: 'sphere-threads/:oid',
-            component: () => import('pages/app/sphere_threads/index'),
+            component: () => import('src/pages/app/sphere_threads/index'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'sphere-render',
             path: 'sphere-render/:oid/:page?',
-            component: () => import('pages/app/sphere_render/index.vue'),
+            component: () => import('src/pages/app/sphere_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'trends',
             path: 'trends/:oid?',
-            component: () => import('pages/app/trends/index.vue'),
+            component: () => import('src/pages/app/trends/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -249,39 +249,44 @@ const routes = [
          {
             name: 'notifications',
             path: 'notifications',
-            component: () => import('pages/app/notifications/index.vue'),
+            component: () => import('src/pages/app/notifications/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          // workspace
          {
             path: 'workspace',
-            component: () => import('pages/app/workspace/index.vue'),
+            component: () => import('src/pages/app/workspace/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             children: [
                {
                   name: 'workspace',
                   path: '',
-                  component: () => import('pages/app/workspace/page_home/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_home/index.vue'),
                },
                {
                   name: 'workspace.collections',
                   path: 'collections',
-                  component: () => import('pages/app/workspace/page_collections/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_collections/index.vue'),
                },
                {
                   name: 'workspace.collection',
                   path: 'collection/:id',
-                  component: () => import('pages/app/workspace/page_collection/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_collection/index.vue'),
                },
                {
                   name: 'workspace.bookmarks',
                   path: 'bookmarks',
-                  component: () => import('pages/app/workspace/page_bookmarks/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_bookmarks/index.vue'),
+               },
+               {
+                  name: 'workspace.contents',
+                  path: 'contents',
+                  component: () => import('src/pages/app/workspace/page_contents/index.vue'),
                },
                {
                   name: 'workspace.create',
                   path: 'create',
-                  component: () => import('pages/app/workspace/page_create/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_create/index.vue'),
                }
             ]
          },

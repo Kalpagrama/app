@@ -6,7 +6,7 @@ page-auth(
 </template>
 
 <script>
-import pageAuth from 'pages/auth/home/index.vue'
+import pageAuth from 'src/pages/auth/home/index.vue'
 
 export default {
   name: 'kalpaAuthGuard',

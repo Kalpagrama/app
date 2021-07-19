@@ -17,7 +17,7 @@ export const schemaKeyValue = {
 
 export const wsSchemaItem = {
   title: 'wsSchemaItem',
-  version: 1,
+  version: 2,
   description: 'wsSchemaItem',
   type: 'object',
   properties: {
@@ -103,7 +103,7 @@ export const wsSchemaItem = {
         type: 'object'
       }
     },
-    contentOid: {
+    contentOid: { // deprecated! не используется?
       type: 'string'
     },
     contentType: {
@@ -111,6 +111,9 @@ export const wsSchemaItem = {
     },
     operation: {
       type: 'object'
+    },
+    paid: { // контент куплен
+      type: 'boolean'
     },
     // ---- collection ----
     bookmarks: { // список id букмарков в этой коллекции

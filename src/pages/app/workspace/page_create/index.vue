@@ -50,6 +50,7 @@ kalpa-layout()
 <script>
 import viewWrite from './view_write/index.vue'
 import viewUpload from './view_upload/index.vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'workspace_pageCreate',
@@ -59,7 +60,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'upload',
+      pageId: this.$route.query.upload ? 'upload' : 'write',
       pageStarted: false,
     }
   },
