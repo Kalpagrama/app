@@ -28,7 +28,7 @@
         :style=`{
           //- marginTop: '2px',
         }`)
-      small #
+      small ✦
       small {{ s.name }}
       small(v-if="si !== node.spheres.length-1") ,
 </template>

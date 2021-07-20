@@ -8,7 +8,7 @@ page-bookmarks(
 </template>
 
 <script>
-import pageBookmarks from 'pages/app/workspace/page_bookmarks/index.vue'
+import pageBookmarks from 'src/pages/app/workspace/page_bookmarks/index.vue'
 
 export default {
   name: 'kalpaFinder_pageWorkspace',

@@ -1,4 +1,5 @@
 import { apollo } from 'src/boot/apollo'
+import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { rxdb, RxCollectionEnum, makeId } from 'src/system/rxdb'
@@ -258,7 +259,6 @@ class ObjectApi {
                     votes{...objectShortStatFragment}
                     views{...objectShortStatFragment}
                     joints{...objectShortStatFragment}
-                    researches{...objectShortStatFragment}
                     bookmarks{...objectShortStatFragment}
                     shares{...objectShortStatFragment}
                     remakes{...objectShortStatFragment}

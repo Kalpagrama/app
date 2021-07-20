@@ -4,6 +4,7 @@ import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { apiCall } from 'src/api/index'
 import { rxdb } from 'src/system/rxdb'
+import gql from 'graphql-tag'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)

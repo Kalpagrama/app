@@ -48,8 +48,8 @@ kalpa-layout()
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              //- page-joints(:node="node")
-              page-comments(:node="node")
+              page-joints(:node="node")
+              //- page-comments(:node="node")
               //- widget-joints(:node="node")
 </template>
 

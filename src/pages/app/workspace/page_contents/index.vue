@@ -17,7 +17,7 @@ kalpa-layout(
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col.full-height
             .row.fit.items-center.content-center.justify-center
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Bookmarks')}}
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Uploaded contents')}}
           q-btn(round flat color="white" icon="more_vert")
   template(v-slot:body)
     div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
@@ -108,7 +108,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'content',
+      pageId: 'video',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       searchString: '',
@@ -121,10 +121,9 @@ export default {
     pages () {
       let pages = [
         // {id: 'collections', name: this.$t('Collections')},
-        {id: 'content', name: this.$t('Media')},
-        {id: 'nodes', name: this.$t('Nodes')},
-        {id: 'joints', name: this.$t('Joints')},
-        {id: 'spheres', name: this.$t('Spheres')}
+        {id: 'video', name: this.$t('Video')},
+        {id: 'book', name: this.$t('Books')},
+        {id: 'image', name: this.$t('Images')}
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages
@@ -132,22 +131,19 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
         },
         sort: [{createdAt: 'desc'}]
       }
       // Get types
-      if (this.pageId === 'content') {
-        res.selector.type = {$in: ['IMAGE', 'VIDEO', 'BOOK']}
+      if (this.pageId === 'video') {
+        res.selector.type = 'VIDEO'
       }
-      else if (this.pageId === 'nodes') {
-        res.selector.type = {$in: ['NODE']}
+      else if (this.pageId === 'book') {
+        res.selector.type = 'BOOK'
       }
-      else if (this.pageId === 'joints') {
-        res.selector.type = {$in: ['JOINT']}
-      }
-      else if (this.pageId === 'spheres') {
-        res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
+      else if (this.pageId === 'image') {
+        res.selector.type = 'IMAGE'
       }
       // Search by name
       if (this.searchString.length > 0) {

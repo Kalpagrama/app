@@ -12,30 +12,29 @@ export default {
   name: 'fromBook',
   props: ['file', 'fileSrc'],
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.file)
     let contentKalpa = await ContentApi.contentCreateFromFile(this.file)
     this.$log('contentKalpa', contentKalpa)
-    let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
-    if (bookmark) {
+    let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
+    if (content) {
     }
-    // create bookmark
+    // create content
     else {
-      let bookmarkInput = {
+      let contentInput = {
         type: 'BOOK',
         oid: contentKalpa.oid,
         name: contentKalpa.name,
         thumbUrl: contentKalpa.thumbUrl,
-        isSubscribed: true
+        paid: false
       }
-      this.$log('bookmarkInput', bookmarkInput)
+      this.$log('contentInput', contentInput)
       // create
-      bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-      this.$log('bookmark', bookmark)
-      // subscribe to this bookmark
-      if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
-      // go to this content...
-      this.$router.push('/content/' + contentKalpa.oid)
+      content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+      this.$log('content', content)
     }
+    // go to this content...
+    await this.$router.push('/content/' + contentKalpa.oid)
+    // this.$router.push('/workspace/contents')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

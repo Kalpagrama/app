@@ -19,7 +19,7 @@ div(
     :style=`{
       width: '50px', height: '50px',
     }`
-    @click="$emit('pageId', 'drafts')"
+    @click="$emit('pageId', pageId === 'drafts' ? null : 'drafts')"
     )
     small {{$t('Drafts')}}
   q-btn(
@@ -28,13 +28,13 @@ div(
     :style=`{
       width: '50px', height: '50px',
     }`
-    @click="$emit('pageId', 'nodes')"
+    @click="$emit('pageId', pageId === 'nodes' ? null : 'nodes')"
     )
     small {{$t('Nodes')}}
   q-btn(
     flat no-caps
     :color="pageId === 'info' ? 'green' : 'white'"
-    @click="$emit('pageId', 'info')"
+    @click="$emit('pageId', pageId === 'info' ? null : 'info')"
     :style=`{
       width: '50px', height: '50px',
     }`

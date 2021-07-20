@@ -49,6 +49,7 @@ module.exports = function (ctx) {
 
       // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
       framework: {
+         // lang: 'ru',
          importStrategy: 'auto',
          // components: [
          //    'QLayout',
@@ -206,7 +207,7 @@ module.exports = function (ctx) {
 
                               // имена npm-пакетов можно, не опасаясь проблем, использовать
                               // в URL, но некоторые серверы не любят символы наподобие @
-                              return `npm.${packageName.replace('@', '_sobaka_').replace(':', '_colon_')}`;
+                              return 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
                            }
                         }
                      }

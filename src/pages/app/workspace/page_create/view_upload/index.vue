@@ -32,14 +32,6 @@
               }`
               ).b-40
               span.text-white {{$t('Upload from device')}}
-          input(
-            ref="fileInput"
-            type="file"
-            @input="fileChanged"
-            :accept="accept"
-            :style=`{
-              display: 'none',
-            }`)
     //- file
     div(
       v-if="file"
@@ -65,7 +57,6 @@ export default {
   data () {
     return {
       file: null,
-      // fileType: null,
       fileSrc: null,
     }
   },
@@ -86,6 +77,7 @@ export default {
   methods: {
     start () {
       this.$log('start')
+      alert('start')
       this.$refs.fileInput.click()
     },
     fileChanged (e) {
@@ -99,6 +91,16 @@ export default {
       // this.$emit('file', new Blob(e.target.files[0]))
       // e.target.value = ''
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    // this.$wait(100).then(() => { this.start() })
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = this.fileChanged
+    input.accept = this.accept
+    this.$log('input.click()')
+    input.click();
   }
 }
 </script>
