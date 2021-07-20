@@ -82,10 +82,10 @@ div(
 
 <script>
 // import nodeItems from './node_items.vue'
-import nodeItems from 'components/node/node_items/index.vue'
-import nodeActions from 'components/node/node_actions.vue'
-import nodeSpheres from 'components/node/node_spheres/index.vue'
-import nodeHeader from 'components/node/node_header/index.vue'
+import nodeItems from 'src/components/node/node_items/index.vue'
+import nodeActions from 'src/components/node/node_actions.vue'
+import nodeSpheres from 'src/components/node/node_spheres/index.vue'
+import nodeHeader from 'src/components/node/node_header/index.vue'
 
 export default {
   name: 'nodeFeed',

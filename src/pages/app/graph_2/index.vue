@@ -126,7 +126,7 @@ import itemFinder from './item_finder/index.vue'
 import jointCreator from './joint_creator/index.vue'
 import jointItem from './joint_item/index.vue'
 import jointsRow from './joints_row/index.vue'
-import nodeActions from 'components/node/node_actions.vue'
+import nodeActions from 'src/components/node/node_actions.vue'
 
 export default {
   name: 'pageAppGraph2',

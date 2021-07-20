@@ -107,7 +107,7 @@ q-page(:style=`{paddingBottom: '200px',}`)
 import { AuthApi } from 'src/api/auth'
 
 import withSocials from '../old/with_socials.vue'
-import kalpaDocs from 'components/kalpa_docs/index.vue'
+import kalpaDocs from 'src/components/kalpa_docs/index.vue'
 
 export default {
   name: 'pageAuth__signIn',

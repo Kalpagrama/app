@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import kalpaDocs from 'components/kalpa_docs/index.vue'
+import kalpaDocs from 'src/components/kalpa_docs/index.vue'
 
 export default {
   name: 'kalpaMenu',

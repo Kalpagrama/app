@@ -92,7 +92,7 @@ div.row.full-width.items-start.content-start.justify-center
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import kalpaDocs from 'components/kalpa_docs/index.vue'
+import kalpaDocs from 'src/components/kalpa_docs/index.vue'
 
 export default {
   name: 'pageAuth_signIn',

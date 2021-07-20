@@ -73,7 +73,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import contentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 
 import pageNodes from './page_nodes/index.vue'
 import pageDrafts from './page_drafts/index.vue'

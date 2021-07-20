@@ -189,8 +189,8 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 
-import kalpaFinder from 'components/kalpa_finder/index.vue'
-// import itemEditor from 'components/node_editor/item_editor.vue'
+import kalpaFinder from 'src/components/kalpa_finder/index.vue'
+// import itemEditor from 'src/components/node_editor/item_editor.vue'
 
 export default {
   name: 'jointCreator',

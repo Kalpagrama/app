@@ -38,8 +38,8 @@ q-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import kalpaMenu from 'components/kalpa_menu/index.vue'
-import kalpaAuthGuard from 'components/kalpa_auth_guard/index.vue'
+import kalpaMenu from 'src/components/kalpa_menu/index.vue'
+import kalpaAuthGuard from 'src/components/kalpa_auth_guard/index.vue'
 
 export default {
   name: 'mainLayout',

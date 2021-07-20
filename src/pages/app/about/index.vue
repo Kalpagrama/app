@@ -197,7 +197,7 @@ export default {
   name: 'pageApp_about',
   components: {
     sectionVideo,
-    nodeVoteBall: () => import('components/node/node_vote_ball.vue')
+    nodeVoteBall: () => import('src/components/node/node_vote_ball.vue')
   },
   data () {
     return {

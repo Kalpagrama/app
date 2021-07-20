@@ -91,8 +91,8 @@ kalpa-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import bookmarkListItem from 'components/bookmark/bookmark_list_item.vue'
-import bookmarkEditor from 'components/bookmark/bookmark_editor.vue'
+import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
+import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 
 export default {
   name: 'workspace_pageBookmarks',

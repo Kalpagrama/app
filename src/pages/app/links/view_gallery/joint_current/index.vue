@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import nodeItemsItem from 'components/node_feed/node_items_item.vue'
+import nodeItemsItem from 'src/components/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointCurrent',

@@ -33,7 +33,7 @@ q-layout(
 
 <script>
 
-import imageCropper from 'components/image_cropper/index.vue'
+import imageCropper from 'src/components/image_cropper/index.vue'
 
 export default {
   name: 'editAvatar_editor',

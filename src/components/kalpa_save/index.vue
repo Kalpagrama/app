@@ -44,7 +44,7 @@ q-btn(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
-import bookmarkEditor from 'components/bookmark/bookmark_editor.vue'
+import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 
 export default {
   name: 'kalpaSave',

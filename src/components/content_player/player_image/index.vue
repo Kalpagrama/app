@@ -93,7 +93,7 @@ div(
 
 <script>
 import playerTint from './player_tint.vue'
-import imageCropper from 'components/image_cropper/index.vue'
+import imageCropper from 'src/components/image_cropper/index.vue'
 import assert from 'assert'
 import { ContentApi } from 'src/api/content'
 

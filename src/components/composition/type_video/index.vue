@@ -47,7 +47,7 @@ div(
 </template>
 
 <script>
-import contentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 import assert from 'assert'
 import { ContentApi } from 'src/api/content'
 

@@ -63,7 +63,7 @@ div(:style=`{height: height+'px'}`).row.full-width
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import contentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 
 export default {
   name: 'composerVideo',

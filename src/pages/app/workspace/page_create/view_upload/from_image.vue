@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import imageCropper from 'components/image_cropper/index.vue'
+import imageCropper from 'src/components/image_cropper/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'

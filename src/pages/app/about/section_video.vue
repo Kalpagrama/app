@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import contentPlayer from 'components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 
 export default {
   name: 'sectionVideo',

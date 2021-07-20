@@ -80,7 +80,7 @@ export default {
   name: 'trends_pageSearch',
   props: ['searchString'],
   components: {
-    kalpaFinder: () => import('components/kalpa_finder/index.vue'),
+    kalpaFinder: () => import('src/components/kalpa_finder/index.vue'),
   },
   data () {
     return {
