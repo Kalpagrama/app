@@ -123,7 +123,7 @@ export default {
       }
       // save to collection named all...
       else {
-        this.bookmark = await this.createBookmark(this.item, {collections: ['all']})
+        this.bookmark = await this.createBookmark(this.item, {collections: []})
         this.bookmarkCreatedDialogShow = true
       }
     },

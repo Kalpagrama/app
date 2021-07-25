@@ -8,6 +8,7 @@ import kalpaBookmark from 'src/components/kalpa_bookmark/index.vue'
 import kalpaPay from 'src/components/kalpa_pay/index.vue'
 import kalpaSave from 'src/components/kalpa_save/index.vue'
 import kalpaDocs from 'src/components/kalpa_docs/index.vue'
+import addCollectionBtn from 'src/components/collection/add_collection_btn.vue'
 
 // menus
 import kalpaMenuMobile from 'src/components/kalpa_menu_mobile/index.vue'
@@ -47,4 +48,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   // Vue.component('jointFeed', jointFeed)
   // user
   Vue.component('userAvatar', userAvatar)
+
+  Vue.component('addCollectionBtn', addCollectionBtn)
 }

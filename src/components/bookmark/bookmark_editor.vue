@@ -40,19 +40,16 @@ div(
       .row.full-width
         small.text-grey-8 {{bookmark.type}} {{$date(bookmark.createdAt)}}
     //- collections
-    .row.full-width.q-py-xs.q-px-sm
-      .row.full-width
-        span.text-white {{$t('Collections:')}}
-      div(
-        v-if="bookmarkCollectionsRes"
-        ).row.full-width
-        div(
-          v-for="(c,ci) in bookmarkCollectionsRes.items" :key="ci"
-          :style=`{
-            borderRadius: '10px',
-          }`
-          ).row.q-px-sm.q-py-xs.q-mr-sm.b-40
-          span.text-white {{ c }}
+    .row.full-width.text-grey-8.q-py-xs.q-px-sm
+      .col.scroll
+        .row.full-width.items-center.content-center.q-py-xs.no-wrap
+          add-collection-btn(
+            v-model="collectionsModel"
+            :highlightSelected="false"
+            :showDeleteButton="false"
+            :showAllCollection="false"
+            @collection-select="addCollectionToBookmark")
+          q-btn(v-for="(c,ci) in bookmark.collections" :key="c" :label="getCollectionName(c)" @click="deleteCollectionFromButton(c)")
     //- isSubscribed
     .row.full-width.items-center.content-center.q-py-xs
       q-toggle(
@@ -84,8 +81,8 @@ export default {
   },
   data () {
     return {
+      collectionsModel: {collectionId: null, collections: []},
       bookmarkDeleting: false,
-      bookmarkCollectionsRes: null,
     }
   },
   computed: {
@@ -138,19 +135,36 @@ export default {
         }
       }
     },
-    bookmarkCollectionsQuery () {
-      let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
-          id: {$in: this.bookmark.collections}
-        },
-        // limit: 10,
-        sort: [{createdAt: 'desc'}]
-      }
-      return res
-    }
   },
   methods: {
+    getCollectionName(collectionId) {
+      let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
+      return collection ? collection.name : null
+    },
+    async addCollectionToBookmark(collectionId) {
+      if (!this.bookmark.collections) this.bookmark.collections = []
+      if (!this.bookmark.collections.find(cid => cid === collectionId)){
+        this.bookmark.collections.push(collectionId)
+      }
+      // не используем this.collectionsModel.collections, тк при добавлении новой коллекции addCollectionToBookmark вызывается раньше, чем изменяется this.collectionsModel.collections
+      let collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, collectionId)
+      if (collection) {
+        if (!collection.bookmarks) collection.bookmarks = []
+        if (!collection.bookmarks.find(bid => bid === this.bookmark.id)){
+          collection.bookmarks.push(this.bookmark.id)
+          collection.thumbUrl = this.bookmark.thumbUrl
+        }
+      }
+    },
+    deleteCollectionFromButton(collectionId){
+      let indxC = this.bookmark.collections.findIndex(cid => cid === collectionId)
+      if (indxC >= 0) this.bookmark.collections.splice(indxC, 1)
+      let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
+      if (collection) {
+        let indxB = collection.bookmarks.findIndex(bid => bid === this.bookmark.id)
+        if (indxB >= 0) collection.bookmarks.splice(indxB, 1)
+      }
+    },
     bookmarkLaunch () {
       this.$log('bookmarkLaunch')
       this.$router.push(this.bookmarkMeta.link)
@@ -167,8 +181,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // get bookmarkCollections [full,full] filter by id $in: []
-    this.bookmarkCollectionsRes = await this.$rxdb.find(this.bookmarkCollectionsQuery, true)
   }
 }
 </script>

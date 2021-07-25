@@ -52,10 +52,10 @@
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`)
         q-btn(
           outline color="grey-8" no-caps
-          icon="create"
+          icon="add"
           :to="'/workspace/create/'"
           ).full-width.full-height
-          q-tooltip(dense dark) {{$t('Create content')}}
+          q-tooltip(dense dark) {{$t('Create new')}}
           //span.text-grey-6 {{$t('Create')}}
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}

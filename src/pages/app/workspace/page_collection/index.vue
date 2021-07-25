@@ -1,33 +1,27 @@
 <template lang="pug">
-page-bookmarks(
-  :isContainer="true"
-  :useHeader="true"
-  :pagesFilter="pagesFilter"
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  mode="standalone"
+page-collections(
+  :collectionId="$route.params.id"
   @bookmark="$emit('item', $event)")
   template(v-slot:header)
     div(
       :style=`{
         borderRadius: '10px',
       }`
-      ).row.full-width.q-pa-sm.b-40
+    ).row.full-width.q-pa-sm.b-40
       q-btn(
         round flat color="white" icon="west"
         @click="$routerKalpa.back()"
-        ).q-mr-sm
+      ).q-mr-sm
       span(:style=`{fontSize: '24px'}`).text-white.text-bold {{ $route.params.id }}
 </template>
 
 <script>
-import pageBookmarks from '../page_bookmarks/index.vue'
+import pageCollections from '../page_collections/index.vue'
 
 export default {
   name: 'pageCollection',
   components: {
-    pageBookmarks
+    pageCollections
   },
   data () {
     return {

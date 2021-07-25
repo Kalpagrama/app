@@ -40,14 +40,16 @@ kalpa-layout
           .row.full-width.q-px-md
             widget-contents().q-mb-sm
             widget-collections().q-mb-sm
-            widget-bookmarks().q-mb-sm
-            widget-watch-later.q-mb-sm
+            //widget-bookmarks().q-mb-sm
+            widget-drafts().q-mb-sm
+            //widget-watch-later.q-mb-sm
             widget-history.q-mb-sm
 </template>
 
 <script>
 import widgetCollections from './widget_collections/index.vue'
 import widgetBookmarks from './widget_bookmarks/index.vue'
+import widgetDrafts from './widget_drafts/index.vue'
 import widgetContents from './widget_contents/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
@@ -59,6 +61,7 @@ export default {
   components: {
     widgetCollections,
     widgetBookmarks,
+    widgetDrafts,
     widgetContents,
     widgetWatchLater,
     widgetHistory,
