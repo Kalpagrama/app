@@ -41,7 +41,7 @@
         q-btn(
           outline color="grey-8" no-caps
           icon="file_upload"
-          :to="'/workspace/create/?upload=true'"
+          :to="'/workspace/create?mode=upload'"
           ).full-width.full-height
           //component(
           //  is='view-upload'
@@ -53,9 +53,30 @@
         q-btn(
           outline color="grey-8" no-caps
           icon="add"
-          :to="'/workspace/create/'"
           ).full-width.full-height
           q-tooltip(dense dark) {{$t('Create new')}}
+          q-menu(
+            v-if="!paid"
+            dark
+            :contentStyle=`{
+              borderRadius: '10px',
+            }`
+            )
+            .row.full-width
+              q-btn(
+                align="left"
+                :to="'/workspace/create?mode=block'"
+                :label="$t('Essence block')"
+                icon='dashboard_customize'
+                round flat no-caps
+              ).row.full-width.q-pr-sm
+              q-btn(
+                align="left"
+                :to="'/workspace/create?mode=article'"
+                :label="$t('Article')"
+                icon='post_add'
+                round flat no-caps
+              ).row.full-width.q-pr-sm
           //span.text-grey-6 {{$t('Create')}}
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}

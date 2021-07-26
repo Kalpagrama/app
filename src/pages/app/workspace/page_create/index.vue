@@ -48,19 +48,19 @@ kalpa-layout()
 </template>
 
 <script>
-import viewWrite from './view_write/index.vue'
+import viewArticle from './view_article/index.vue'
 import viewUpload from './view_upload/index.vue'
-import { RxCollectionEnum } from 'src/system/rxdb'
+import viewBlock from './view_block/index.vue'
 
 export default {
   name: 'workspace_pageCreate',
   components: {
-    viewWrite,
+    viewArticle,
     viewUpload,
+    viewBlock,
   },
   data () {
     return {
-      pageId: this.$route.query.upload ? 'upload' : 'write',
       pageStarted: false,
     }
   },
@@ -71,6 +71,14 @@ export default {
         {id: 'write', name: 'Статья/Книга'},
         // {id: 'stream', name: 'Stream'},
       ]
+    },
+    pageId () {
+      switch (this.$route.query.mode) {
+        case 'upload': return 'upload'
+        case 'article': return 'article'
+        case 'block': return 'block'
+        default: throw new Error('bad mode: ' + this.$route.query.mode)
+      }
     }
   }
 }

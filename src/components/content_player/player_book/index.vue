@@ -456,6 +456,7 @@ export default {
       assert(this.lastAnnotation && this.lastAnnotation.cfiRange, 'bad lastAnnotation')
       let nodeInput = {
         name: '',
+        thumbUrl: this.contentKalpa.thumbUrl,
         layout: 'HORIZONTAL',
         items: [{
           layers: [{

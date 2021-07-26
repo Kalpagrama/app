@@ -8,9 +8,9 @@
     ).row.full-width
       //- header
       router-link(
-        to="/workspace/bookmarks"
+        to="/workspace/history"
         :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-        q-icon(name="bookmark_outline" color="white" size="24px").q-mr-sm
+        q-icon(name="history" color="white" size="24px").q-mr-sm
         .col
           span.text-white.text-bold {{$t('History')}}
       //- scrolled bookmarks preview max 10...
@@ -28,7 +28,7 @@
         div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
           router-link(
             v-for="b in bookmarksRes.items" :key="b.oid"
-            :to="'/content/'+b.oid"
+            :to="itemLink(b)"
             :style=`{
             height: '50px', width: '58px', minWidth: '58px',
           }`
@@ -72,8 +72,7 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_HISTORY,
-          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
+          rxCollectionEnum: RxCollectionEnum.WS_HISTORY
         },
         limit: 10,
         sort: [{createdAt: 'desc'}]
@@ -82,10 +81,25 @@ export default {
     }
   },
   methods: {
+    itemLink (item) {
+      let itemMap = {
+        NODE: '/node/',
+        USER: '/user/',
+        WORD: '/sphere/',
+        SENTENCE: '/sphere/',
+        JOINT: '/joint/',
+        VIDEO: '/content/',
+        IMAGE: '/content/',
+        BOOK: '/content/',
+        WEB: '/content/',
+      }
+      return itemMap[item.type] + item.oid
+    }
   },
   async mounted () {
     this.$log('mounted')
     this.bookmarksRes = await this.$rxdb.find(this.query, true)
+    // alert(JSON.stringify(this.bookmarksRes.items))
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

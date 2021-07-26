@@ -64,6 +64,10 @@ export const wsSchemaItem = {
     color: {
       type: 'string'
     },
+    temporary: { // объект служебный (создан пользователем неявно)
+      type: 'boolean',
+      default: false
+    },
     // ---- node ----
     contentOids: {
       type: 'array',

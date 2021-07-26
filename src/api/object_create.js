@@ -193,6 +193,7 @@ class ObjectCreateApi {
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
       essenceInput.name = essenceFull.name
+      essenceInput.thumbUrl = essenceFull.thumbUrl
       essenceInput.category = essenceFull.category || 'FUN'
       essenceInput.spheres = essenceFull.spheres.map(s => {
          return { name: s.name, oid: s.oid }

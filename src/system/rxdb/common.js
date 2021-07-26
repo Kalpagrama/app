@@ -12,11 +12,12 @@ const RxModuleEnum = Object.freeze({
 const WsItemTypeEnum = Object.freeze({
    WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
    WS_NODE: 'WS_NODE',
+   WS_JOINT: 'WS_JOINT',
+   WS_BLOCK: 'WS_BLOCK',
    WS_CONTENT: 'WS_CONTENT',
    WS_SPHERE: 'WS_SPHERE',
    WS_BOOKMARK: 'WS_BOOKMARK',
    WS_HISTORY: 'WS_HISTORY',
-   WS_JOINT: 'WS_JOINT',
    WS_COLLECTION: 'WS_COLLECTION',
    WS_BOARD: 'WS_BOARD',
    WS_COURSE: 'WS_COURSE',

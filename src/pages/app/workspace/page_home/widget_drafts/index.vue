@@ -8,9 +8,9 @@
     ).row.full-width
     //- header
     router-link(
-      to="/workspace/bookmarks"
+      to="/workspace/drafts"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="bookmark_outline" color="white" size="24px").q-mr-sm
+      q-icon(name="filter_tilt_shift" color="white" size="24px").q-mr-sm
       .col
         span.text-white.text-bold {{$t('My drafts')}}
     //- scrolled bookmarks preview max 10...
@@ -73,7 +73,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_ANY,
-          type: {$in: ['IMAGE', 'VIDEO', 'BOOK']},
+          wsItemType: {$in: [RxCollectionEnum.WS_NODE, RxCollectionEnum.WS_BLOCK, RxCollectionEnum.WS_JOINT]},
         },
         limit: 10,
         sort: [{createdAt: 'desc'}]

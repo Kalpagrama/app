@@ -134,6 +134,7 @@ export default {
     async nodeSave () {
       this.$log('nodeSave')
       let nodeInput = JSON.parse(JSON.stringify(this.node))
+      nodeInput.thumbUrl = this.contentKalpa.thumbUrl
       nodeInput.items[0] = this.compositionCreate()
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeSaved', nodeSaved)

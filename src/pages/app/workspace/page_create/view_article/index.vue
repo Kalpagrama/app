@@ -105,7 +105,7 @@ import {
 import StarterKit from '@tiptap/starter-kit'
 
 export default {
-  name: 'viewWrite',
+  name: 'viewArticle',
   components: {
     EditorContent,
     BubbleMenu,

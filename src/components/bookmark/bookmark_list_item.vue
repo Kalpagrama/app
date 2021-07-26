@@ -57,7 +57,7 @@ div(
             small.text-grey-8 {{ $date(bookmark.createdAt) }}
   //- right
   q-btn(
-    v-if="mode !== 'select'"
+    v-if="mode !== 'select' && showMenuBtn"
     round flat color="grey-8" icon="more_vert"
     @click="$emit('bookmark', bookmark)"
     ).q-mt-xs.q-mr-xs
@@ -75,7 +75,8 @@ export default {
     },
     mode: {
       type: String,
-    }
+    },
+    showMenuBtn: {type: Boolean, default: true}
   },
   data () {
     return {
@@ -84,6 +85,7 @@ export default {
   },
   computed: {
     bookmarkMeta () {
+      // alert(JSON.stringify(this.bookmark))
       if (['VIDEO', 'IMAGE', 'BOOK'].includes(this.bookmark.type)) {
         let typesNames = {
           VIDEO: 'Видео',
@@ -103,7 +105,7 @@ export default {
           type: null
         }
       }
-      else if (this.bookmark.type === 'SPHERE') {
+      else if (this.bookmark.type.in('SPHERE', 'SENTENCE', 'WORD')) {
         return {
           link: '/sphere/' + this.bookmark.oid,
           name: this.bookmark.name,

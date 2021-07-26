@@ -1,14 +1,36 @@
 import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
-import { systemInit, systemReset } from 'src/system/services'
+import { systemInit } from 'src/system/services'
 import assert from 'assert'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
 // components
 // import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
+async function saveHistory(oid) {
+   let item = await rxdb.get(RxCollectionEnum.OBJ, oid)
+   if (item) {
+      let res = await rxdb.find({
+         selector: {
+            rxCollectionEnum: RxCollectionEnum.WS_HISTORY
+         },
+         sort: [{createdAt: 'asc'}]
+      }, true)
+      let existing = res.items.find(el => el.oid === oid)
+      if (existing) await existing.remove(true)
+      let historyItemInput = {
+         type: item.type,
+         oid: item.oid,
+         name: item.name,
+         thumbUrl: item.thumbUrl,
+      }
+      let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
+      if (res.items.length > 100) await rxdb.remove(res.items[0].id)
+   }
+}
 
 function startPage () {
    let res = '/home'
@@ -22,7 +44,7 @@ const routes = [
       redirect: '/auth/sign-in',
       component: () => import('layouts/auth_layout.vue'),
       children: [
-         { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/home/index.vue') },
+         { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/home/index.vue') }
          // { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/sign_in.vue') }
       ],
       beforeEnter: (to, from, next) => {
@@ -42,7 +64,7 @@ const routes = [
       children: [
          {
             path: 'home',
-            component: () => import('src/pages/help/home.vue'),
+            component: () => import('src/pages/help/home.vue')
          },
          {
             path: ':docId',
@@ -116,7 +138,7 @@ const routes = [
                {
                   name: 'settings.account',
                   path: 'account',
-                  component: () => import('src/pages/app/settings/view_account/index.vue'),
+                  component: () => import('src/pages/app/settings/view_account/index.vue')
                   // meta: { roleMinimal: 'GUEST' }
                },
                {
@@ -133,7 +155,11 @@ const routes = [
             path: 'node/:oid',
             // alias: 'node2/:oid',
             component: () => import('src/pages/app/node/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) await saveHistory(to.params.oid)
+               next()
+            }
          },
          {
             name: 'node-render',
@@ -145,7 +171,11 @@ const routes = [
             name: 'joint',
             path: 'joint/:oid',
             component: () => import('src/pages/app/joint/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) await saveHistory(to.params.oid)
+               next()
+            }
          },
          {
             name: 'joint-render',
@@ -167,39 +197,43 @@ const routes = [
                {
                   name: 'user.home',
                   path: '',
-                  redirect: 'nodes',
+                  redirect: 'nodes'
                },
                {
                   name: 'user.collections',
                   path: 'collections',
-                  component: () => import('src/pages/app/user/page_collections/index.vue'),
+                  component: () => import('src/pages/app/user/page_collections/index.vue')
                },
                {
                   name: 'user.nodes',
                   path: 'nodes',
-                  component: () => import('src/pages/app/user/page_nodes/index.vue'),
+                  component: () => import('src/pages/app/user/page_nodes/index.vue')
                },
                {
                   name: 'user.joints',
                   path: 'joints',
-                  component: () => import('src/pages/app/user/page_joints/index.vue'),
+                  component: () => import('src/pages/app/user/page_joints/index.vue')
                },
                {
                   name: 'user.votes',
                   path: 'votes',
-                  component: () => import('src/pages/app/user/page_votes/index.vue'),
+                  component: () => import('src/pages/app/user/page_votes/index.vue')
                },
                {
                   name: 'user.following',
                   path: 'following',
-                  component: () => import('src/pages/app/user/page_following/index.vue'),
+                  component: () => import('src/pages/app/user/page_following/index.vue')
                },
                {
                   name: 'user.followers',
                   path: 'followers',
-                  component: () => import('src/pages/app/user/page_followers/index.vue'),
+                  component: () => import('src/pages/app/user/page_followers/index.vue')
                }
-            ]
+            ],
+            beforeEnter: async (to, from, next) => {
+               if (to) await saveHistory(to.params.oid)
+               next()
+            }
          },
          {
             name: 'user-render',
@@ -211,7 +245,11 @@ const routes = [
             name: 'sphere',
             path: 'sphere/:oid/:page?',
             component: () => import('src/pages/app/sphere/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) await saveHistory(to.params.oid)
+               next()
+            }
          },
          {
             name: 'sphere-threads',
@@ -236,7 +274,11 @@ const routes = [
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid }),
             component: () => import('src/pages/app/content/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) await saveHistory(to.params.oid)
+               next()
+            }
          },
          {
             name: 'content-render',
@@ -261,32 +303,42 @@ const routes = [
                {
                   name: 'workspace',
                   path: '',
-                  component: () => import('src/pages/app/workspace/page_home/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_home/index.vue')
                },
                {
                   name: 'workspace.collections',
                   path: 'collections',
-                  component: () => import('src/pages/app/workspace/page_collections/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_collections/index.vue')
                },
                {
                   name: 'workspace.collection',
                   path: 'collection/:id',
-                  component: () => import('src/pages/app/workspace/page_collection/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_collection/index.vue')
                },
                {
                   name: 'workspace.bookmarks',
                   path: 'bookmarks',
-                  component: () => import('src/pages/app/workspace/page_bookmarks/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_bookmarks/index.vue')
+               },
+               {
+                  name: 'workspace.drafts',
+                  path: 'drafts',
+                  component: () => import('src/pages/app/workspace/page_drafts/index.vue')
+               },
+               {
+                  name: 'workspace.history',
+                  path: 'history',
+                  component: () => import('src/pages/app/workspace/page_history/index.vue')
                },
                {
                   name: 'workspace.contents',
                   path: 'contents',
-                  component: () => import('src/pages/app/workspace/page_contents/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_contents/index.vue')
                },
                {
                   name: 'workspace.create',
                   path: 'create',
-                  component: () => import('src/pages/app/workspace/page_create/index.vue'),
+                  component: () => import('src/pages/app/workspace/page_create/index.vue')
                }
             ]
          },
