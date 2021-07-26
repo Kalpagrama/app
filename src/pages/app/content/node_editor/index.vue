@@ -139,16 +139,6 @@
                 @click="nodeSaveAction()"
                 ).q-mr-sm
                 span {{$t('Save as draft')}}
-              //- Publish
-              //- q-btn(
-                color="green" no-caps
-                :loading="nodePublishing"
-                :style=`{
-                  //- height: '50px',
-                }`
-                @click="nodePublish()"
-                )
-                span {{$t('Publish')}}
     //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(

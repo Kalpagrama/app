@@ -5,7 +5,7 @@ kalpa-layout()
       .row.full-width.justify-center.q-pa-sm
         div(
           :style=`{
-            height: '60px',
+            height: headerHeight + 'px',
             maxWidth: $store.state.ui.pageWidth+'px',
             background: 'rgb(40,40,40)',
             borderRadius: '10px',
@@ -14,43 +14,21 @@ kalpa-layout()
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col
             .row.fit.items-center.content-center.justify-center.q-pa-sm
-              span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Create')}}
+              span(:style=`{fontSize: '18px',}`).text-white.text-bold {{pageName}}
           q-btn(round flat color="white" icon="more_vert")
       .row.full-width
         component(
           :is="'view-'+pageId"
+          :item="item"
+          :height="($q.screen.height - headerHeight)"
           @started="pageStarted = true")
-//- q-layout(
-  view="hHh Lpr lff")
-  q-header()
-  q-page-container
-    q-page
-      component(
-        :is="'view-'+pageId"
-        @started="pageStarted = true")
-      q-page-sticky(
-        v-if="!pageStarted"
-        expand position="bottom"
-        :offset=`[0,80]`
-        :style=`{zIndex: 1000,}`
-        ).row.full-width.justify-center
-        q-btn-group(
-          flat no-caps
-          :style=`{
-            borderRadius: '10px',
-          }`).b-40
-          q-btn(
-            @click="pageId = p.id"
-            v-for="(p,pi) in pages" :key="p.id"
-            flat no-caps
-            :color="pageId === p.id ? 'green' : 'grey-6'")
-            span {{ p.name }}
 </template>
 
 <script>
 import viewArticle from './view_article/index.vue'
 import viewUpload from './view_upload/index.vue'
 import viewBlock from './view_block/index.vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'workspace_pageCreate',
@@ -62,16 +40,11 @@ export default {
   data () {
     return {
       pageStarted: false,
+      item: null,
+      headerHeight: 60
     }
   },
   computed: {
-    pages () {
-      return [
-        {id: 'upload', name: 'Загрузить'},
-        {id: 'write', name: 'Статья/Книга'},
-        // {id: 'stream', name: 'Stream'},
-      ]
-    },
     pageId () {
       switch (this.$route.query.mode) {
         case 'upload': return 'upload'
@@ -79,7 +52,32 @@ export default {
         case 'block': return 'block'
         default: throw new Error('bad mode: ' + this.$route.query.mode)
       }
+    },
+    pageName () {
+      let pageName = this.$t('Create')
+      if (this.pageId === 'article') pageName += ' ' + this.$t('article')
+      if (this.pageId === 'block') pageName += ' ' + this.$t('essence block')
+      return pageName
     }
-  }
+  },
+  async mounted () {
+    this.$log('mounted')
+    if (this.pageId === 'block'){
+      let {items: [existingBlock]} = await this.$rxdb.find({
+        selector: {rxCollectionEnum: RxCollectionEnum.WS_BLOCK, temporary: true},
+        sort: [{ createdAt: 'desc' }]
+      })
+      if (existingBlock) this.item = existingBlock
+      else {
+        let blockInput = {
+          name: '',
+          spheres: [],
+          category: 'FUN',
+          temporary: true,
+        }
+        this.item = await this.$rxdb.set(RxCollectionEnum.WS_BLOCK, blockInput)
+      }
+    }
+  },
 }
 </script>

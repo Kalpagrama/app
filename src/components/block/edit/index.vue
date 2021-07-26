@@ -8,11 +8,10 @@
 div(
   :style=`{
     position: 'relative',
+    // height: $q.screen.height + 'px',
     ...styles,
   }`
   ).row.full-width.items-start.content-start
-  slot(name="wrapper")
-  //- wrapper
   div(
     :style=`{
       position: 'relative',
@@ -21,134 +20,88 @@ div(
       ...styles,
     }`).row.full-width.items-start.content-start
     slot(name="wrapper-inside")
-    //- HEADER: author, createdAt, actions, date, views
-    node-header(
-      v-if="showHeader && node.oid"
-      :node="node"
-      :showAuthorAlways="showAuthorAlways"
-      :style=`{
-        order: orderHeader,
-      }`)
-    //- ITEMS: one or two
-    slot(name="items")
-    composition(
-      v-if="showItems && !$slots.items && node.items.length === 1"
-      :composition="node.items[0]"
-      :isVisible="isVisible"
-      :isActive="isActive"
-      :nodeOid="node.oid")
-    node-items(
-      v-if="showItems && !$slots.items && node.items.length === 2"
-      v-bind="$props"
-      :itemsStyles="itemsStyles"
-      @itemActive="$emit('itemActive', $event)")
-    //- NAME: dynamic link/ dynamic fontSize
-    slot(name="name")
-    router-link(
-      v-if="showName && node.oid"
-      :to="nodeEssenceLink"
-      :style=`{
-        order: 4,
-        minHeight: '60px',
-        fontSize: fontSize+'px',
-        textAlign: 'center',
-      }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-      span(
-        :class=`{
-          'text-bold': node.name.length < 20
+    //graph
+    div().row.full-width.full-height.br
+      q-btn(
+        label="graph"
+        :style=`{height: graphHeight + 'px',}`
+      ).row.full-width.full-heigh
+    //- name
+    div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
+      q-input(
+        v-model="block.name"
+        borderless dark
+        ref="nameInput"
+        type="textarea" autogrow
+      :placeholder="$t('What do you see?')"
+        :autofocus="true"
+        :input-style=`{
+          paddingTop: '16px',
+          paddingBottom: '10px',
+          paddingLeft: '20px',
+          paddingRight: '10px',
+          //- textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: fontSize+'px',
+          lineHeight: 1.3,
+          minHeight: '60px',
         }`
-        ).text-white {{ nodeName }}
-    //- SPHERES
-    node-spheres(
-      v-if="showSpheres && node.spheres.length > 0"
-      :node="node"
-      :style=`{
-        order: 3,
-      }`)
-  //- FOOTER: actions, slot
-  node-actions(
-    v-if="showActions && node.oid"
-    :node="node"
-    :nodeBackgroundColor="nodeBackgroundColor"
-    :nodeActionsColor="nodeActionsColor"
-    :isActive="isActive"
-    :isVisible="isVisible"
-    :style=`{
-      order: 5,
-    }`)
-  slot(name="footer")
+      ).full-width
+    // category and spheres
+    div(ref="spheresRef").row.full-width.full-height.q-pt-sm
+      edit-spheres(
+        :node="block")
+        template(v-slot:left)
+          edit-category(
+            :node="block"
+            :class=`{
+                br: !block.category && categoryError,
+              }`
+            :style=`{
+                borderRadius: '10px',
+              }`)
+        template(v-slot:spheres-right)
+          .div(v-if="false").row
+            //- Delete from notes
+            q-btn(
+              outline no-caps color="red"
+              :style=`{}`
+              @click="cancel"
+            ).q-mr-sm
+              span {{$t('Cancel')}}
+            //- Save to notes
+            q-btn(
+              outline no-caps color="white"
+              :style=`{}`
+            ).q-mr-sm
+              span {{$t('Save as draft')}}
 </template>
 
 <script>
-// import nodeItems from './node_items.vue'
-import nodeItems from 'src/components/node/node_items/index.vue'
-import nodeActions from 'src/components/node/node_actions.vue'
-import nodeSpheres from 'src/components/node/node_spheres/index.vue'
-import nodeHeader from 'src/components/node/node_header/index.vue'
+
+import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
+import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
 
 export default {
-  name: 'nodeFeed',
+  name: 'blockEdit',
   components: {
-    nodeItems,
-    nodeActions,
-    nodeSpheres,
-    nodeHeader,
+    editSpheres,
+    editCategory
   },
   props: {
-    node: {type: Object},
-    nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
-    nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
-    isActive: {type: Boolean},
-    isVisible: {type: Boolean},
-    showHeader: {type: Boolean, default: true},
-    showName: {type: Boolean, default: true},
-    showAuthorAlways: {type: Boolean, default: false},
-    showActions: {type: Boolean, default: true},
-    showSpheres: {type: Boolean, default: true},
-    showSpheresAlways: {type: Boolean, default: false},
-    showCategory: {type: Boolean, default: true},
-    showItems: {type: Boolean, default: true},
-    orderHeader: {type: Number, default: -1},
-    orderName: {type: Number, default: 1},
-    orderSpheres: {type: Number, default: 2},
-    orderActions: {type: Number, default: 3},
-    itemsStyles: { type: Array, default () { return [{}, {}] } },
+    block: {type: Object, required: true},
     styles: {type: Object},
     borderRadius: {type: String, default: '10px'},
-    actionsColor: {type: String, default: 'grey-9'}
+    height: {type: Number, required: true}
   },
   data () {
     return {
+      graphHeight: this.height
     }
   },
   computed: {
-    nodeName () {
-      if (this.node.items.length === 1 || this.node.vertices[0] === 'ESSENCE') {
-        return this.node.name
-      }
-      else if (this.node.vertices[0] === 'ASSOCIATIVE') {
-        return 'Ассоциация'
-      }
-      else {
-        return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name
-      }
-    },
-    nodeEssenceLink () {
-      if (this.node.items.length === 2) {
-        return `/graph/${this.node.items[0].oid}?oid=${this.node.oid}`
-      }
-      else {
-        return '/node/' + this.node.oid
-        // return '/sphere-full/' + this.node.sphereFromName.oid
-      }
-    },
-    category () {
-      if (!this.node) return null
-      return this.$store.getters.nodeCategories.find(c => c.type === this.node.category)
-    },
     fontSize () {
-      let l = this.node.name.length
+      let l = this.block.name.length
       if (l < 20) return 22
       else if (l < 30) return 20
       else if (l < 40) return 16
@@ -157,6 +110,7 @@ export default {
   },
   mounted () {
     // this.$log('mounted', this.node.name)
+    this.graphHeight = this.height - this.$refs.spheresRef.clientHeight - this.$refs.nameRef.clientHeight
   }
 }
 </script>

@@ -2,35 +2,19 @@
   kalpa-layout()
     template(v-slot:footer)
       nav-mobile(
-        v-if="$q.screen.lt.md"
+        v-if="true || $q.screen.lt.md"
         :pageId="pageId"
         @pageId="pageIdChange")
     template(v-slot:body)
       .row.full-width.items-start.content-start
-        //- header
-        .row.full-width.justify-center.b-30.q-pa-sm
-          div(
-            :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-            borderRadius: '10px',
-          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-            q-icon(name="adjust" color="white" size="30px").q-ml-sm
-            .col
-            h1.text-white.text-bold {{$t('Essence Block')}}
-            .col
-            //- tutorial
-            q-btn(
-              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
-              round flat color="white" icon="fas fa-info")
         //- body
         div(
-          v-if="node"
+          v-if="item"
           :style=`{
           //- paddingTop: '8px',
           paddingBottom: '200px',
         }`).row.full-width.justify-center.b-30
           div(
-            v-if="node"
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
             //- node wrapper
             div(
@@ -43,43 +27,34 @@
                 }
               }`
             ).row.full-width
-              node-feed(
-                :node="node"
-                :isActive="nodeIsVisible"
-                :isVisible="nodeIsVisible")
+              block-edit(
+                :block="item"
+                :height="height"
+                )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/pages/app/node/nav_mobile.vue'
-import pageComments from 'src/pages/app/node/page_comments/index.vue'
+import blockEdit from 'src/components/block/edit/index.vue'
 
 export default {
   name: 'viewBlock',
+  props: {
+    item: {type: Object, required: true},
+    height: {type: Number, required: true}
+  },
   components: {
     navMobile,
-    pageComments,
+    blockEdit,
   },
   data () {
     return {
-      node: null,
       nodeIsVisible: true,
     }
   },
   computed: {
-  },
-  watch: {
-    // '$route.params.oid': {
-    //   deep: true,
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     if (to) {
-    //       // this.$log('$route.params.oid TO', to)
-    //       this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-    //     }
-    //   }
-    // },
   },
   methods: {
     nodeVisibilityCallback (isVisible, entry) {
@@ -89,7 +64,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, '180444567869458458')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
