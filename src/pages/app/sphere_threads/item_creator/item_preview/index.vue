@@ -10,7 +10,7 @@
       :isVisible="true")
   //- content
   div(
-    v-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
+    v-else-if="['VIDEO', 'IMAGE', 'BOOK'].includes(item.type)"
     ).row.full-width.items-start.content-start
     div(
       :style=`{
@@ -73,6 +73,9 @@ export default {
     }
   },
   methods: {
+  },
+  mounted () {
+    this.$log('mounted')
   }
 }
 </script>

@@ -21,11 +21,12 @@ div(
     }`).row.full-width.items-start.content-start
     slot(name="wrapper-inside")
     //graph
-    div().row.full-width.full-height.br
-      q-btn(
-        label="graph"
-        :style=`{height: graphHeight + 'px',}`
-      ).row.full-width.full-heigh
+    graph-view(:height="graphHeight" :width="$store.state.ui.pageWidth").row.full-width.full-height
+    //div().row.full-width.full-height.br
+      //q-btn(
+      //  label="graph"
+      //  :style=`{height: graphHeight + 'px',}`
+      //).row.full-width.full-heigh
     //- name
     div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
       q-input(
@@ -81,12 +82,14 @@ div(
 
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
+import graphView from 'src/components/block/graph_view.vue'
 
 export default {
   name: 'blockEdit',
   components: {
     editSpheres,
-    editCategory
+    editCategory,
+    graphView,
   },
   props: {
     block: {type: Object, required: true},
