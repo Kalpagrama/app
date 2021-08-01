@@ -3,12 +3,7 @@
 // https://observablehq.com/@rymarchikbot/d3-js-force-layout-click-to-group-bundle-nodes
 // https://bl.ocks.org/cjrd/6863459
 // http://bl.ocks.org/GerHobbelt/3071239
-// https://github.com/d3/d3/wiki/Gallery
-// import {selectAll} from "d3-selection";
 
-// отображает граф.
-// @add - добавить новый элемент
-// @preview - показать превью узла
 <style>
 
 #toolbox {
@@ -134,8 +129,8 @@ path.link.selected {
       "pointer-events": "none",
       opacity:0
       }`)
-    div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
-      q-btn(:label="$t('reload')" @click="updateGraph2").text-grey-4
+    div(ref="addItemMenu" :style=`{position: "absolute", opacity:0, top: 500}`)
+      q-btn(:label="$t('Add from workspace')").text-grey-4
     svg(ref="graphSvg" :style=`{height: height, 'overflow-x': 'auto'}`).row.full-width
 </template>
 
@@ -172,6 +167,7 @@ class LongClickDetector {
     return this.res
   }
 }
+
 export default {
   name: 'graphView',
   components: {
@@ -239,8 +235,6 @@ export default {
       link: null,
       graphEdges: null,
       edgepaths: null,
-      dragLine: null,
-      clipPath: null,
       hoveredNodeData: null,
       simulation: d3.forceSimulation()
           .force('link', d3.forceLink() // This force provides links between nodes
@@ -303,14 +297,26 @@ export default {
         else n.linked = false
       }
       if (this.svg) this.svg.remove();
+      let longClickDetector = new LongClickDetector(1000)
       this.svg = d3.select(this.$refs.graphSvg)
           // .append('svg')
           .attr('width', this.width + this.margin.left + this.margin.right)
           .attr('height', this.height + this.margin.top + this.margin.bottom)
+          .on('mouseup', (event) => {
+            console.log('svg mouseup')
+            longClickDetector.mouseDown()
+          })
+          .on('mousedown', (event) => {
+            console.log('svg mousedown')
+            longClickDetector.mouseDown(() => {
+              console.log('svg long tap')
+              this.itemFinderShow = true
+              this.newItemLocation = d3.pointer(event, this.svg.node())
+            })
+          })
           .on('click', (event) => {
             console.log('svg click')
-            this.itemFinderShow = true
-            this.newItemLocation = d3.pointer(event, this.svg.node())
+            longClickDetector.mouseup()
             // let addItemMenu = d3.select(this.$refs.addItemMenu)
             // if (addItemMenu.node().style.opacity > 0) {
             //   addItemMenu.style('opacity', 0);
@@ -326,7 +332,6 @@ export default {
             // }
           })
           .call(d3.zoom().on('zoom', (event) => {
-            console.log('svg zoom')
             this.svg.attr('transform', event.transform)
           }))
           .append('g').attr('transform', `translate(${this.margin.left},${this.margin.top})`);
@@ -349,6 +354,12 @@ export default {
           .attr('fill', '#999')
           .attr('fill-opacity', 0.8)
           .attr('stroke', 'none')
+    },
+    drawNodes () {
+      // Initialize the nodes
+      const thiz = this
+
+      let longClickDetector = new LongClickDetector(700)
       this.defs.append('svg:marker')
           .attr('id', 'mark-end-arrow')
           .attr('viewBox', '0 -5 10 10')
@@ -359,24 +370,11 @@ export default {
           .append('svg:path')
           .attr('d', 'M0,-5L10,0L0,5');
       // displayed when dragging between nodes
-      this.dragLine = this.svg.append('svg:path')
+      let dragLine = this.svg.append('svg:path')
           .attr('class', 'link dragline hidden')
           .attr('d', 'M0,0L0,0')
           .style('marker-end', 'url(#mark-end-arrow)');
-      this.clipPath = this.defs.append('clipPath')
-          .attr('id', 'clip-rect')
-          .append('rect')
-          .attr('x', -this.nodeRadius / 2)
-          .attr('y', -this.nodeRadius / 2)
-          .attr('width', this.nodeRadius)
-          .attr('height', this.nodeRadius)
-          .attr('rx', 10)
-          .attr('ry', 10)
-    },
-    drawNodes () {
-      // Initialize the nodes
-      const thiz = this
-      let longClickDetector = new LongClickDetector(700)
+
       this.graphNodes = this.svg.selectAll('.graphNodes')
           .data(this.dataset.nodes)
           .enter()
@@ -434,8 +432,9 @@ export default {
                 // When the drag gesture starts, the targeted node is fixed to the pointer
                 // eslint-disable-next-line no-constant-condition
                 if (longClickDetector.isLongClick()) {
-                  thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
-                  thiz.dragLine.classed('hidden', false);
+                  // console.log('shift drag1', thiz.svg, d3.pointer(event), d3.pointer(event, this), d3.pointer(event, d3.select(this)), d)
+                  dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
+                  dragLine.classed('hidden', false);
                 } else {
                   longClickDetector.cancel()
                   d.fx = event.x;
@@ -449,12 +448,22 @@ export default {
                 // if (!event.active) this.simulation.alphaTarget(0);
                 // d.fx = null;
                 // d.fy = null;
-                this.dragLine.classed('hidden', true);
                 if (longClickDetector.isLongClick() && this.hoveredNodeData && d !== this.hoveredNodeData) {
                   this.addEdge(d, this.hoveredNodeData)
                 }
               })
           );
+
+      let clipPath = this.defs.append('clipPath')
+          .attr('id', 'clip-rect')
+          .append('rect')
+          .attr('x', -this.nodeRadius / 2)
+          .attr('y', -this.nodeRadius / 2)
+          .attr('width', this.nodeRadius)
+          .attr('height', this.nodeRadius)
+          .attr('rx', 10)
+          .attr('ry', 10)
+
       let rect = this.graphNodes.append('rect')
           .attr('id', d => 'nodeRect' + d.id)
           .attr('x', -this.nodeRadius / 2)
@@ -466,7 +475,7 @@ export default {
           .style('stroke', 'grey')
           .style('stroke-width', 5)
           .style('fill', 'none')
-          // .style('fill', d => this.colorScale(d.type))
+      // .style('fill', d => this.colorScale(d.type))
 
       let tooltip = d3.select(this.$refs.graphTooltip)
       this.graphNodes.append('image')
@@ -515,13 +524,14 @@ export default {
                 .style('top', (event.layerY + 10) + 'px');
           })
 
-      // this.graphNodes.append('title')
+      // node.append('title')
       //     .text(d => d.id + ': ' + d.name + ' - ' + d.type);
-      // this.graphNodes.append('text')
+      //
+      // node.append('text')
       //     .attr('dy', 4)
       //     .attr('dx', 0)
-      //     .text(d => d.name)
-      // this.graphNodes.append('text')
+      //     .text(d => d.name);
+      // node.append('text')
       //     .attr('dy', 25)
       //     .attr('dx', 0)
       //     .text(d => d.type);
@@ -1259,12 +1269,6 @@ export default {
       this.drawNodes()
       this.doLayout()
       // this.testGraph()
-    },
-    updateGraph2 () {
-      // this.initGraph()
-      this.drawEdges()
-      this.drawNodes()
-      this.doLayout()
     }
   },
   mounted () {
