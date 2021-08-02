@@ -99,6 +99,7 @@ export default {
         if (to) {
           this.$log('url changed!!!', to)
           await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
+          this.$logW('before reload!')
           window.location.reload()
         }
       }

@@ -127,7 +127,7 @@ class RxDBWrapper {
                      throw new Error('bad event' + eventKey)
                }
             } catch (err) {
-               logE('cant process rxdb event!', err)
+               logE('cant process rxdb event! before reload!', err)
                alert('error on processStoreEvent: ' + JSON.stringify(err))
                await window.location.reload()
                logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -271,6 +271,7 @@ class RxDBWrapper {
          this.created = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
+         // alert('!!!!!!')
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
          else await removeRxDatabase('kalpadb', adapter)

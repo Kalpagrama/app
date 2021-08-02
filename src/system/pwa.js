@@ -222,6 +222,7 @@ async function checkUpdate () {
 
 async function updatePWA () {
    await pwaReset()
+   logW('before reload!')
    await window.location.reload()
 }
 

@@ -245,11 +245,13 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
       await mutexGlobal.lock('system::systemReset')
       if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
          logW('too often systemReset!')
-         let hardReset = confirm('Too often system reset. \n Make app hard reset?')
-         if (hardReset) {
-            await systemHardReset()
-            window.location.reload()
-         }
+         await systemHardReset()
+         return
+         // let hardReset = confirm('Too often system reset. \n Make app hard reset?')
+         // if (hardReset) {
+         //    hardResetInProgress = true
+         //    await systemHardReset()
+         // }
       }
       if (clearRxdb) await rxdb.deInitGlobal() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
@@ -262,13 +264,15 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
       let hardReset = confirm('critical error on systemReset: ' + JSON.stringify(err) + '\n\n Make hardReset?')
       if (hardReset) {
          await systemHardReset()
-         window.location.reload()
       }
    } finally {
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
       await mutexGlobal.release('system::systemReset')
-      if (reload) window.location.reload()
+      if (reload) {
+         logW('systemReset::before reload')
+         window.location.reload()
+      }
    }
 }
 
@@ -345,36 +349,43 @@ async function systemInit () {
 }
 
 async function systemHardReset () {
-   await wait(1000)
-   if (window.indexedDB) {
-      if (window.indexedDB.databases) {
-         let dbs = await window.indexedDB.databases()
-         // alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
-         // alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
-         for (let db of dbs) {
-            // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
-            logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
-            window.indexedDB.deleteDatabase(db.name)
-         }
-      } else {
-         // alert('systemHardReset 2')
-         for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i)
-            if (key.includes('rxdb')) {
-               // alert('indexedDB.deleteDatabase(databaseName): ' + key)
-               logD('indexedDB.deleteDatabase(databaseName): ' + key)
-               window.indexedDB.deleteDatabase(key)
+   logW('systemHardReset')
+   alert('before systemHardReset')
+   try {
+      await wait(1000)
+      if (window.indexedDB) {
+         if (window.indexedDB.databases) {
+            let dbs = await window.indexedDB.databases()
+            // alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
+            // alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
+            for (let db of dbs) {
+               // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
+               logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
+               window.indexedDB.deleteDatabase(db.name)
+            }
+         } else {
+            // alert('systemHardReset 2')
+            for (let i = 0; i < localStorage.length; i++) {
+               let key = localStorage.key(i)
+               if (key.includes('rxdb')) {
+                  // alert('indexedDB.deleteDatabase(databaseName): ' + key)
+                  logD('indexedDB.deleteDatabase(databaseName): ' + key)
+                  window.indexedDB.deleteDatabase(key)
+               }
             }
          }
-      }
-   } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
-   if (process.env.MODE === 'pwa') await pwaReset()
-   localStorage.clear()
-   sessionStorage.clear()
-   logD('systemHardReset complete')
-   await wait(1000)
-   // alert('reload after systemHardReset...')
-   window.location.reload()
+      } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
+      if (process.env.MODE === 'pwa') await pwaReset()
+      localStorage.clear()
+      sessionStorage.clear()
+      logW('systemHardReset complete')
+      await wait(1000)
+      alert('reload after systemHardReset...')
+      window.location.reload()
+   } catch (err) {
+      alert('error on systemHardReset... reload' + JSON.stringify(err))
+      window.location.reload()
+   }
 }
 
 {

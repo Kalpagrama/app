@@ -149,7 +149,10 @@ class Logger {
       try {
          if (showAlert) this.showAlert(msg)
          let reload = confirm('critical error: ' + JSON.stringify(...msg) + '\n\nReload page?')
-         if (reload) window.location.reload()
+         if (reload) {
+            console.warn('logger::before reload')
+            window.location.reload()
+         }
          if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
             this.prepareParams(msg)
             console.error(...msg)

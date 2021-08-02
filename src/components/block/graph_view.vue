@@ -27,7 +27,7 @@
           search: {views: ['default']},
           gif: {views: ['popular']},
         }`
-        @item="addWsItem"
+        @item="addNode"
         @close="itemFinderShow = false"
       ).b-30
     // превьюшка выбранного элемента на графе
@@ -43,6 +43,7 @@
         item-preview(:item="selectedItem")
     div(ref="graphTooltip"
       :style=`{
+      zIndex: itemFinderShow || previewShow ? 10 : 10001,
       position: "absolute",
       "background-color": "white",
       "max-width": "200px",
@@ -66,46 +67,13 @@ import * as d3 from 'd3';
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-class LongClickDetector {
-  constructor (timeout = 1000) {
-    this.res = false
-    this.timeout = timeout
-  }
-
-  mouseDown (func) {
-    this.cancel()
-    this.timerId = setTimeout(() => {
-      this.res = true
-      if (func) func()
-      this.timerId = null
-    }, this.timeout)
-  }
-
-  mouseup () {
-    this.cancel()
-  }
-
-  cancel () {
-    this.res = false
-    clearTimeout(this.timerId)
-    this.timerId = null
-  }
-
-  isLongClick () {
-    return this.res
-  }
-
-  isClick () {
-    return !!this.timerId
-  }
-}
-
 export default {
   name: 'graphView',
   components: {
     itemPreview
   },
   props: {
+    block: { type: Object, required: true },
     width: {
       type: Number
     },
@@ -186,8 +154,7 @@ export default {
       graphEdges: null,
       edgepaths: null,
       dragLine: null,
-      clipPath: null,
-      linkedNodeData: null
+      clipPath: null
     }
   },
   computed: {
@@ -211,11 +178,11 @@ export default {
       console.log(j1, j2)
       return (this.nodeIsEqual(j1.source, j2.source) && this.nodeIsEqual(j1.target, j2.target)) || (this.nodeIsEqual(j1.source, j2.target) && this.nodeIsEqual(j1.target, j2.source))
     },
-    addWsItem (item) {
-      console.log('addWsItem')
+    addNode (item) {
+      console.log('addNode')
       assert(item.id)
       this.itemFinderShow = false
-      if (this.dataset.nodes.find(n => n.id === item.id)) {
+      if (this.block.graph.nodes.find(n => n.id === item.id)) {
         this.$notify('error', this.$t('same item found'))
         return
       }
@@ -228,7 +195,8 @@ export default {
         x: this.newItemLocation[0],
         y: this.newItemLocation[1]
       }
-      this.dataset.nodes.push(d);
+      this.block.graph.nodes.push(d);
+      this.block.thumbUrl = d.thumbUrl
       this.updateGraph()
       this.blinkNode(d)
     },
@@ -238,56 +206,162 @@ export default {
       if (d1.id === d2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
       }
-      if (this.dataset.joints.find(j => this.jointIsEqual(j, newEdge))) {
+      if (this.block.graph.joints.find(j => this.jointIsEqual(j, newEdge))) {
         this.$notify('error', this.$t('same joint found'))
         return
       }
 
-      this.dataset.joints.push(newEdge);
+      this.block.graph.joints.push(newEdge);
       this.updateGraph()
     },
-    blinkNode (d) {
+    blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
       selectedRect
           .transition()
           .duration(200)
-          .style('stroke-width', 20)
+          .style('stroke-width', width)
+          .style('stroke', 'green')
           .transition()
           .duration(200)
           .style('stroke-width', 5)
+          .style('stroke', 'grey')
+    },
+    selectNode (d, width = 20) {
+      let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
+      selectedRect
+          .transition()
+          .duration(200)
+          .style('stroke-width', width)
+          .style('stroke', 'green')
+    },
+    unselectNode (d) {
+      let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
+      selectedRect
+          .transition()
+          .duration(200)
+          .style('stroke-width', 5)
+          .style('stroke', 'grey')
     },
     initGraph () {
+      let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
       this.height = this.$refs.graphSvg.clientHeight
-      for (let n of this.dataset.nodes) {
-        if (this.dataset.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
+      for (let n of this.block.graph.nodes) {
+        if (this.block.graph.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
         else n.linked = false
       }
+      for (let j of this.block.graph.joints) {
+        j.source = j.source.id || j.source.id
+        j.target = j.target.id || j.target.id
+      }
+
+      class GraphClickProcessor {
+        constructor () {
+          this.state = 'BLANK'
+        }
+
+        registerEvent (event, d, type = null) {
+          type = type || event.type
+          console.log('registerEvent', type, event.type)
+          switch (type) {
+            case 'click':
+              // event.stopPropagation()
+              // this.onClick(d, 300)
+              break
+            case 'mousedown':
+              this.startLongClickDetection(this.onLongClick.bind(this, event))
+              break
+            case 'mouseup':
+              break
+            case 'touchstart':
+              event.stopPropagation();
+              event.preventDefault();
+              this.startLongClickDetection(this.onLongClick.bind(this, event))
+              break
+            case 'touchend':
+              this.cancelLongClickDetection()
+              event.stopPropagation();
+              event.preventDefault();
+              break
+            case 'start':
+              // zoom start
+              this.zoomdetected = false
+              this.zoomInitialTransform = event.transform
+              // console.log('zoom start', event)
+              break
+            case 'zoom':
+              // console.log('zoom', event)
+              if (this.state === 'START_LONG_CLICK' && Math.abs(event.transform.x - this.zoomInitialTransform.x) + Math.abs(event.transform.y - this.zoomInitialTransform.y) < (event.sourceEvent instanceof TouchEvent ? 10 : 5)) {
+                // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
+              } else {
+                this.zoomdetected = true
+                this.cancelLongClickDetection()
+                thiz.svg.attr('transform', event.transform)
+              }
+              break
+            case 'end':
+              // zoom end
+              if (!this.zoomdetected) {
+                this.cancelLongClickDetection()
+              }
+              break
+            default :
+              throw new Error('bad event:' + type)
+          }
+        }
+
+        startLongClickDetection (func) {
+          this.cancelLongClickDetection()
+          this.state = 'START_LONG_CLICK'
+          this.timerId = setTimeout(() => {
+            this.state = 'LONG_CLICK'
+            console.log('long click!!!!')
+            thiz.$systemUtils.hapticsImpact()
+            if (func) func()
+            this.timerId = null
+          }, 700)
+        }
+
+        cancelLongClickDetection () {
+          this.state = 'BLANK'
+          clearTimeout(this.timerId)
+          this.timerId = null
+        }
+
+        onLongClick (event) {
+          thiz.itemFinderShow = true
+          thiz.newItemLocation = d3.pointer(event, thiz.svg.node())
+          // let addItemMenu = d3.select(this.$refs.addItemMenu)
+          // if (addItemMenu.node().style.opacity > 0) {
+          //   addItemMenu.style('opacity', 0);
+          //   this.svg.style('opacity', 1)
+          // } else if (event.target.nodeName === 'svg') {
+          //   addItemMenu.style('left', (event.layerX) + 'px')
+          //       .style('top', (event.layerY + 10) + 'px')
+          //       .style('opacity', 1)
+          //   this.svg
+          //       .transition()
+          //       .duration(500)
+          //       .style('opacity', 0.2)
+          // }
+        }
+      }
+
+      let graphClickProcessor = new GraphClickProcessor()
+
       if (this.svg) this.svg.remove();
       this.svg = d3.select(this.$refs.graphSvg)
           // .append('svg')
-          .on('click', (event) => {
-            console.log('svg click')
-            this.itemFinderShow = true
-            this.newItemLocation = d3.pointer(event, this.svg.node())
-            // let addItemMenu = d3.select(this.$refs.addItemMenu)
-            // if (addItemMenu.node().style.opacity > 0) {
-            //   addItemMenu.style('opacity', 0);
-            //   this.svg.style('opacity', 1)
-            // } else if (event.target.nodeName === 'svg') {
-            //   addItemMenu.style('left', (event.layerX) + 'px')
-            //       .style('top', (event.layerY + 10) + 'px')
-            //       .style('opacity', 1)
-            //   this.svg
-            //       .transition()
-            //       .duration(500)
-            //       .style('opacity', 0.2)
-            // }
-          })
-          .call(d3.zoom().on('zoom', (event) => {
-            console.log('svg zoom')
-            this.svg.attr('transform', event.transform)
-          }))
+          .on('click', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('mousedown', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('mouseup', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('touchstart', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('touchend', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .call(d3.zoom()
+              .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+              .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+              .on('end', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          )
           .append('g')
 
       // appending little triangles, path object, as arrowhead
@@ -338,116 +412,182 @@ export default {
     drawNodes () {
       // Initialize the nodes
       const thiz = this
-      let longClickDetector = new LongClickDetector(500)
       let tooltip = d3.select(this.$refs.graphTooltip)
+
+      class NodeClickProcessor {
+        constructor () {
+          this.state = 'BLANK'
+        }
+
+        registerEvent (event, d, type = null) {
+          type = type || event.type
+          console.log('registerEvent', type, event.type)
+          switch (type) {
+            case 'dblclick':
+              event.stopPropagation();
+              break
+            case 'click':
+              event.stopPropagation()
+              this.onClick(d, 300)
+              break
+            case 'mousedown':
+              this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 20))
+              break
+            case 'mouseup':
+              break
+            case 'mouseover':
+              this.onMouseOverWithLongClick(d)
+              break
+            case 'mouseout':
+              this.onMouseOutWithLongClick(d)
+              break
+            case 'touchstart':
+              event.stopPropagation();
+              event.preventDefault();
+              this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 80))
+              break
+            case 'touchend':
+              this.cancelLongClickDetection()
+              event.stopPropagation();
+              event.preventDefault();
+              break
+            case 'start':
+              this.dragdetected = false
+              // When the drag gesture starts, the targeted node is fixed to the pointer
+              // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
+              if (!event.active) thiz.simulationLinked.alphaTarget(0.2).restart();// sets the current target alpha to the specified number in the range [0,1].
+              break
+            case 'drag':
+              if (this.state === 'LONG_CLICK') {
+                this.dragLine(event, d)
+                if (event.sourceEvent instanceof TouchEvent) {
+                  let linkedNodeData = null
+                  for (let n of thiz.dataset.nodes) {
+                    let x = n.x - event.x
+                    let y = n.y - event.y
+                    let l = Math.sqrt(x * x + y * y)
+                    let r = thiz.nodeRadius;
+                    if (l < r) {
+                      linkedNodeData = n;
+                    }
+                  }
+                  if (this.linkedNodeData) thiz.unselectNode(this.linkedNodeData)
+                  this.linkedNodeData = linkedNodeData;
+                  if (this.linkedNodeData && this.linkedNodeData !== d) thiz.selectNode(this.linkedNodeData, 60)
+                  console.log('drag this.linkedNodeData', this.linkedNodeData)
+                }
+              } else if (this.state === 'START_LONG_CLICK' && Math.abs(d.x - event.x) + Math.abs(d.y - event.y) < (event.sourceEvent instanceof TouchEvent ? 20 : 5)) {
+                // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
+              } else {
+                this.dragdetected = true
+                this.cancelLongClickDetection()
+                d.fx = event.x;
+                d.fy = event.y;
+              }
+              break
+            case 'end':
+              this.clearLine()
+              if (this.linkedNodeData && d !== this.linkedNodeData) this.createEdge(d)
+              if (!this.dragdetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
+              break
+            default :
+              throw new Error('bad event:' + type)
+          }
+        }
+
+        onClick (d, dblClickInterval = 300) {
+          console.log('!!!click')
+          if (Date.now() - this.lastClickDt < dblClickInterval) {
+            // даблклик
+            clearTimeout(this.timeClickId)
+            this.onDblClick(d)
+            this.lastClickDt = null
+            return
+          }
+          this.lastClickDt = Date.now()
+          this.timeClickId = setTimeout(() => {
+            delete d.fx;
+            delete d.fy;
+          }, dblClickInterval + 50)
+        }
+
+        onDblClick (d) {
+          if (d.oid) {
+            thiz.$systemUtils.hapticsImpact()
+            thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
+              thiz.$log(item)
+              thiz.selectedItem = item
+            }).catch(err => thiz.$logE(err))
+          }
+        }
+
+        onMouseOverWithLongClick (d) {
+          if (this.state === 'LONG_CLICK') this.linkedNodeData = d
+        }
+
+        onMouseOutWithLongClick (d) {
+          this.linkedNodeData = null
+        }
+
+        dragLine (event, d) {
+          // thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
+          thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (event.x) + ',' + (event.y))
+          thiz.dragLine.classed('hidden', false);
+        }
+
+        clearLine () {
+          thiz.dragLine.classed('hidden', true);
+        }
+
+        createEdge (d) {
+          thiz.addEdge(d, this.linkedNodeData)
+          this.linkedNodeData = null
+          thiz.$systemUtils.hapticsImpact()
+        }
+
+        hideToolTip () {
+          tooltip.transition()
+              .duration(100)
+              .style('opacity', 0);
+        }
+
+        startLongClickDetection (func) {
+          this.cancelLongClickDetection()
+          this.state = 'START_LONG_CLICK'
+          this.timerId = setTimeout(() => {
+            this.state = 'LONG_CLICK'
+            if (func) func()
+            thiz.$systemUtils.hapticsImpact()
+            this.timerId = null
+          }, 700)
+        }
+
+        cancelLongClickDetection () {
+          this.state = 'BLANK'
+          this.hideToolTip()
+          clearTimeout(this.timerId)
+          this.timerId = null
+        }
+      }
+
+      let clickProcessor = new NodeClickProcessor()
       this.graphNodes = this.svg.selectAll('.graphNodes')
-          .data(this.dataset.nodes)
+          .data(this.block.graph.nodes)
           .enter()
           .append('g')
           // .attr('class', 'nodes')
-          .on('dblclick', async (event, d) => {
-            console.log('node dblclick')
-            event.stopPropagation();
-            longClickDetector.cancel()
-            if (d.oid) {
-              let xxx = await this.$rxdb.get(RxCollectionEnum.OBJ, d.oid)
-              this.$log(xxx)
-              this.selectedItem = xxx
-            }
-          })
-          .on('click', (event, d) => {
-            console.log('node click', d)
-            event.stopPropagation();
-            longClickDetector.cancel()
-            delete d.fx;
-            delete d.fy;
-          })
-          .on('mousedown', (event, d) => {
-            console.log('node mousedown')
-            // event.stopPropagation();
-            longClickDetector.mouseDown(() => this.blinkNode(d))
-          })
-          .on('mouseup', (event, d) => {
-            // не работает вместе с drag
-            console.log('node mouseup')
-            // event.stopPropagation();
-            longClickDetector.mouseup()
-          })
-          .on('touchstart', (event, d) => {
-            console.log('node touchstart')
-            event.stopPropagation();
-            event.preventDefault();
-            longClickDetector.mouseDown(() => this.blinkNode(d))
-          })
-          .on('touchend', (event, d) => {
-            console.log('node touchend')
-            event.stopPropagation();
-            event.preventDefault();
-            if (longClickDetector.isClick()) {
-              delete d.fx;
-              delete d.fy;
-            }
-            longClickDetector.mouseup()
-          })
-          .on('mouseover', (event, d) => {
-            console.log('node mouseover')
-            if (longClickDetector.isLongClick()) this.linkedNodeData = d
-          })
-          .on('mouseout', (event, d) => {
-            console.log('node mouseout')
-            if (longClickDetector.isLongClick()) this.linkedNodeData = null
-          })
+          .on('dblclick', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('click', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('mousedown', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('mouseup', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('touchstart', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('touchend', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('mouseover', clickProcessor.registerEvent.bind(clickProcessor))
+          .on('mouseout', clickProcessor.registerEvent.bind(clickProcessor))
           .call(d3.drag() // sets the event listener for the specified typenames and returns the drag behavior.
-              .on('start', function (event, d) {
-                console.log('drag start')
-                // start - after a new pointer becomes active (on mousedown or touchstart).
-                // When the drag gesture starts, the targeted node is fixed to the pointer
-                // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
-                if (!event.active) thiz.simulationLinked.alphaTarget(0.2).restart();// sets the current target alpha to the specified number in the range [0,1].
-              })
-              .on('drag', function (event, d) {
-                // console.log('drag', d, event)
-                // console.log('shift drag', d, d3.selection(this))
-                // drag - after an active pointer moves (on mousemove or touchmove).
-                // When the drag gesture starts, the targeted node is fixed to the pointer
-                // eslint-disable-next-line no-constant-condition
-                if (longClickDetector.isLongClick()) {
-                  // thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
-                  thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (event.x) + ',' + (event.y))
-                  thiz.dragLine.classed('hidden', false);
-                  if (event.sourceEvent instanceof TouchEvent) {
-                    let linkedNodeData = null
-                    for (let n of thiz.dataset.nodes){
-                      let x = n.x - event.x
-                      let y = n.y - event.y
-                      let l = Math.sqrt(x * x + y * y)
-                      let r = thiz.nodeRadius;
-                      if (l < r) {
-                        linkedNodeData = n;
-                      }
-                    }
-                    thiz.linkedNodeData = linkedNodeData;
-                    console.log('drag this.linkedNodeData', thiz.linkedNodeData)
-                  }
-                } else {
-                  longClickDetector.cancel()
-                  d.fx = event.x;
-                  d.fy = event.y;
-                }
-              })
-              .on('end', (event, d) => {
-                console.log('drag end', d, this.linkedNodeData)
-                // end - after an active pointer becomes inactive (on mouseup, touchend or touchcancel)
-                // the targeted node is released when the gesture ends
-                // if (!event.active) simulation.alphaTarget(0);
-                // d.fx = null;
-                // d.fy = null;
-                this.dragLine.classed('hidden', true);
-                if (this.linkedNodeData && d !== this.linkedNodeData) {
-                  this.addEdge(d, this.linkedNodeData)
-                  thiz.linkedNodeData = null
-                }
-              })
+              .on('start', clickProcessor.registerEvent.bind(clickProcessor))
+              .on('drag', clickProcessor.registerEvent.bind(clickProcessor))
+              .on('end', clickProcessor.registerEvent.bind(clickProcessor))
           );
       let rect = this.graphNodes.append('rect')
           .attr('id', d => 'nodeRect' + d.id)
@@ -522,7 +662,7 @@ export default {
     drawEdges () {
       // Initialize the links
       this.graphEdges = this.svg.selectAll('.graphEdges')
-          .data(this.dataset.joints)
+          .data(this.block.graph.joints)
           .enter()
           .append('line')
           .attr('class', 'links')
@@ -536,7 +676,7 @@ export default {
       this.graphEdges.append('title').text(d => d.type);
 
       this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
-          .data(this.dataset.joints)
+          .data(this.block.graph.joints)
           .enter()
           .append('path')
           .attr('class', 'edgepath')
@@ -548,7 +688,7 @@ export default {
           .style('pointer-events', 'none');
 
       const edgelabels = this.svg.selectAll('.edgelabel')
-          .data(this.dataset.joints)
+          .data(this.block.graph.joints)
           .enter()
           .append('text')
           .style('pointer-events', 'none')
@@ -578,7 +718,7 @@ export default {
       //     // .force('center', d3.forceCenter().x(200).y(200))
       //     .force('charge', d3.forceManyBody().strength(-2500));
       // this.simulationUnlinked
-      //     .nodes(this.dataset.nodes.filter(n => !n.linked))
+      //     .nodes(this.block.graph.nodes.filter(n => !n.linked))
       //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
       //     .on('tick', (d) => {
       //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
@@ -594,7 +734,7 @@ export default {
           // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
           .force('charge', d3.forceManyBody().strength(d => d.linked ? -2500 : -700)) // This adds repulsion (if it's negative) between nodes.
       this.simulationLinked
-          .nodes(this.dataset.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
+          .nodes(this.block.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
             thiz.graphEdges.attr('x1', d => d.source.x)
@@ -609,7 +749,7 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.force('link').links(this.dataset.joints)
+      this.simulationLinked.force('link').links(this.block.graph.joints)
       this.simulationLinked.alphaTarget(0.1).restart();
       // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
@@ -693,6 +833,7 @@ export default {
     }
   },
   mounted () {
+    this.$log('block=', JSON.parse(JSON.stringify(this.block)))
     this.updateGraph()
     // this.testGraph()
   }

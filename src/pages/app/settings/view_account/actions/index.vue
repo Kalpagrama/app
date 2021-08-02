@@ -187,6 +187,7 @@ export default {
           if (result.state === 'granted' || result.state === 'prompt') {
             await navigator.clipboard.writeText(this.$store.state.core.logRocketSessionUrl)
             alert('Ссылка на проблему скопирована в буфер обмена.\n отправьте ее в телеграм канал поддержки пользователей')
+            this.$logW('before reload')
             window.location.reload() // у логрокет нет возможности прервать сессию. приходится перезагружать страницу
           }
         }

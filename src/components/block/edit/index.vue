@@ -1,42 +1,42 @@
 <style lang="sass">
 .sphere-item
   &:hover
-    background: rgb(50,50,50)
+    background: rgb(50, 50, 50)
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
+  div(
+    :style=`{
     position: 'relative',
     // height: $q.screen.height + 'px',
     ...styles,
   }`
   ).row.full-width.items-start.content-start
-  div(
-    :style=`{
+    div(
+      :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
       borderRadius: borderRadius,
       ...styles,
     }`).row.full-width.items-start.content-start
-    slot(name="wrapper-inside")
-    //graph
-    graph-view(:height="graphHeight").row.full-width.full-height
-    //div().row.full-width.full-height.br
-      //q-btn(
-      //  label="graph"
-      //  :style=`{height: graphHeight + 'px',}`
-      //).row.full-width.full-heigh
-    //- name
-    div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
-      q-input(
-        v-model="block.name"
-        borderless dark
-        ref="nameInput"
-        type="textarea" autogrow
-        :placeholder="$t('What do you see?')"
-        :autofocus="false"
-        :input-style=`{
+      slot(name="wrapper-inside")
+      //graph
+      graph-view(:height="graphHeight" :block="block").row.full-width.full-height
+      //div().row.full-width.full-height.br
+        //q-btn(
+        //  label="graph"
+        //  :style=`{height: graphHeight + 'px',}`
+        //).row.full-width.full-heigh
+      //- name
+      div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
+        q-input(
+          v-model="block.name"
+          borderless dark
+          ref="nameInput"
+          type="textarea" autogrow
+        :placeholder="$t('what is this block about')"
+          :autofocus="false"
+          :input-style=`{
           paddingTop: '16px',
           paddingBottom: '10px',
           paddingLeft: '20px',
@@ -47,35 +47,35 @@ div(
           lineHeight: 1.3,
           minHeight: '60px',
         }`
-      ).full-width
-    // category and spheres
-    div(ref="spheresRef").row.full-width.full-height.q-pt-sm
-      edit-spheres(
-        :node="block")
-        template(v-slot:left)
-          edit-category(
-            :node="block"
-            :class=`{
+        ).full-width
+      // category and spheres
+      div(ref="spheresRef").row.full-width.full-height.q-pt-sm
+        edit-spheres(
+          :node="block")
+          template(v-slot:left)
+            edit-category(
+              :node="block"
+              :class=`{
                 br: !block.category && categoryError,
               }`
-            :style=`{
+              :style=`{
                 borderRadius: '10px',
               }`)
-        template(v-slot:spheres-right)
-          .div(v-if="false").row
-            //- Delete from notes
-            q-btn(
-              outline no-caps color="red"
-              :style=`{}`
-              @click="cancel"
-            ).q-mr-sm
-              span {{$t('Cancel')}}
-            //- Save to notes
-            q-btn(
-              outline no-caps color="white"
-              :style=`{}`
-            ).q-mr-sm
-              span {{$t('Save as draft')}}
+          template(v-slot:spheres-right)
+            .div(v-if="false").row
+              //- Delete from notes
+              q-btn(
+                outline no-caps color="red"
+                :style=`{}`
+                @click="cancel"
+              ).q-mr-sm
+                span {{$t('Cancel')}}
+              //- Save to notes
+              q-btn(
+                outline no-caps color="white"
+                :style=`{}`
+              ).q-mr-sm
+                span {{$t('Save as draft')}}
 </template>
 
 <script>
@@ -89,13 +89,13 @@ export default {
   components: {
     editSpheres,
     editCategory,
-    graphView,
+    graphView
   },
   props: {
-    block: {type: Object, required: true},
-    styles: {type: Object},
-    borderRadius: {type: String, default: '10px'},
-    height: {type: Number, required: true}
+    block: { type: Object, required: true },
+    styles: { type: Object },
+    borderRadius: { type: String, default: '10px' },
+    height: { type: Number, required: true }
   },
   data () {
     return {
@@ -114,6 +114,9 @@ export default {
   mounted () {
     // this.$log('mounted', this.node.name)
     this.graphHeight = this.height - this.$refs.spheresRef.clientHeight - this.$refs.nameRef.clientHeight
+  },
+  beforeDestroy (to, from, next) {
+    if (this.block.name) this.block.temporary = false
   }
 }
 </script>

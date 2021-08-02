@@ -142,6 +142,10 @@ export const wsSchemaItem = {
       type: 'boolean',
       default: true,
     },
+    // ----- block ------
+    graph: {
+      type: 'object'
+    },
     // ------ system -----
     hasChanges: { // hasChanges === false - либо нет изменений, либо изменения учтены в ws_changes
       type: 'boolean',

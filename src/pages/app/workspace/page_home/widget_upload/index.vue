@@ -62,21 +62,23 @@
               borderRadius: '10px',
             }`
             )
-            .row.full-width
+            div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
               q-btn(
+                outline color="grey-8"
                 align="left"
                 :to="'/workspace/create?mode=block'"
                 :label="$t('Essence block')"
                 icon='dashboard_customize'
                 round flat no-caps
-              ).row.full-width.q-pr-sm
+              ).row.full-width.q-pa-sm
               q-btn(
+                outline color="grey-8"
                 align="left"
                 :to="'/workspace/create?mode=article'"
                 :label="$t('Article')"
                 icon='post_add'
                 round flat no-caps
-              ).row.full-width.q-pr-sm
+              ).row.full-width.q-pa-sm
           //span.text-grey-6 {{$t('Create')}}
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}

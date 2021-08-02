@@ -25,6 +25,7 @@ import { systemReset } from 'src/system/services'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.BOOT)
 
 let apollo
 
@@ -77,10 +78,11 @@ export default async ({ Vue, store, app }) => {
                   // alert('error on gql request: ' + JSON.stringify(err))
                   AuthApi.logout(null)
                      .then(() => {
+                        logW('AuthApi. before reload!')
                         window.location.reload()
                      })
                      .catch(err => {
-                        logE('AuthApi.logout error', err)
+                        logE('AuthApi.logout error. before reload', err)
                         window.location.reload()
                      })
                } else if (err.code === 'BAD_DATA') {

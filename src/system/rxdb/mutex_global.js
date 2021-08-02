@@ -59,12 +59,14 @@ class MutexGlobal {
                let current = JSON.parse(event.newValue)
                assert(current.instanceId, '!current.instanceId')
                if (current.instanceId !== mutexGlobal.getInstanceId()) {
-                  logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком')
-                  window.location.reload()
+                  logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. before reload')
+                  let reload = confirm('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. \n Reload?')
+                  if (reload) window.location.reload()
                }
             } else {
                logW('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это - пожтому делаем reload)')
-               window.location.reload()
+               let reload = confirm('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это. \n Reload?')
+               if (reload) window.location.reload()
             }
          }
          if (event.key && event.key.in('k_leader_instance_id')) {
@@ -153,7 +155,8 @@ class MutexGlobal {
             let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
             if (!current || current.instanceId !== mutexGlobal.getInstanceId()) {
                logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком')
-               window.location.reload()
+               let reload = confirm('другая вкладка захватила наш мьютекс тк посчитала это дедлоком(2). \n Reload?')
+               if (reload) window.location.reload()
             } else { // обновляем актуальность блокировки
                current.dtActual = Date.now()
                localStorage.setItem('k_global_lock', JSON.stringify(current))
