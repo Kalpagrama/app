@@ -21,7 +21,7 @@ div(
     }`).row.full-width.items-start.content-start
     slot(name="wrapper-inside")
     //graph
-    graph-view(:height="graphHeight" :width="$store.state.ui.pageWidth").row.full-width.full-height
+    graph-view(:height="graphHeight").row.full-width.full-height
     //div().row.full-width.full-height.br
       //q-btn(
       //  label="graph"
@@ -34,8 +34,8 @@ div(
         borderless dark
         ref="nameInput"
         type="textarea" autogrow
-      :placeholder="$t('What do you see?')"
-        :autofocus="true"
+        :placeholder="$t('What do you see?')"
+        :autofocus="false"
         :input-style=`{
           paddingTop: '16px',
           paddingBottom: '10px',

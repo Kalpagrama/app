@@ -115,7 +115,7 @@ const routes = [
    },
    {
       path: '/',
-      component: () => import('layouts/main_layout'),
+      component: () => import('src/layouts/main_layout'),
       children: [
          {
             name: 'about',

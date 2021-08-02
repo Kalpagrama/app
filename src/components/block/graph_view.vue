@@ -4,98 +4,19 @@
 // https://bl.ocks.org/cjrd/6863459
 // http://bl.ocks.org/GerHobbelt/3071239
 // https://github.com/d3/d3/wiki/Gallery
+// https://habr.com/ru/post/302968/
 // import {selectAll} from "d3-selection";
 
 // отображает граф.
 // @add - добавить новый элемент
 // @preview - показать превью узла
-<style>
 
-#toolbox {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  margin-bottom: 0.5em;
-  margin-left: 1em;
-  border: 2px solid #EEEEEE;
-  border-radius: 5px;
-  padding: 1em;
-  z-index: 5;
-}
-
-#toolbox input {
-  width: 30px;
-  opacity: 0.4;
-}
-
-#toolbox input:hover {
-  opacity: 1;
-  cursor: pointer;
-}
-
-#hidden-file-upload {
-  display: none;
-}
-
-#download-input {
-  margin: 0 0.5em;
-}
-
-.conceptG text {
-  pointer-events: none;
-}
-
-marker {
-  fill: #333;
-}
-
-g.conceptG circle {
-  fill: #F6FBFF;
-  stroke: #333;
-  stroke-width: 2px;
-}
-
-g.conceptG:hover circle {
-  fill: rgb(200, 238, 241);
-}
-
-g.selected circle {
-  fill: rgb(250, 232, 255);
-}
-
-g.selected:hover circle {
-  fill: rgb(250, 232, 255);
-}
-
-path.link {
-  fill: none;
-  stroke: #333;
-  stroke-width: 6px;
-  cursor: default;
-}
-
-path.link:hover {
-  stroke: rgb(94, 196, 204);
-}
-
-g.connect-node circle {
-  fill: #BEFFFF;
-}
-
-path.link.hidden {
-  stroke-width: 0;
-}
-
-path.link.selected {
-  stroke: rgb(229, 172, 247);
-}
-</style>
 <template lang="pug">
-  div(ref="graphArea" :style=`{maxWidth: width-1+'px', height: height}`).row.full-width
+  div(ref="graphArea").row.full-width
     //- item finder
     q-dialog(
       v-model="itemFinderShow"
-      position="bottom"
+      position="standard"
       :maximized="true")
       kalpa-finder(
         :height="$q.screen.height"
@@ -115,10 +36,10 @@ path.link.selected {
       position="standard"
       :maximized="false"
       @hide="selectedItem = null"
-      )
+    )
       div(
         @click.self="selectedItem = null"
-        ).row.fit.items-center.content-center.justify-center
+      ).row.fit.items-center.content-center.justify-center
         item-preview(:item="selectedItem")
     div(ref="graphTooltip"
       :style=`{
@@ -134,9 +55,9 @@ path.link.selected {
       "pointer-events": "none",
       opacity:0
       }`)
-    div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
-      q-btn(:label="$t('reload')" @click="updateGraph2").text-grey-4
-    svg(ref="graphSvg" :style=`{height: height, 'overflow-x': 'auto'}`).row.full-width
+    //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
+      q-btn(:label="$t('reload')" @click="updateGraph").text-grey-4
+    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow ? 10 : 10000}`).row.full-width
 </template>
 
 <script>
@@ -156,6 +77,7 @@ class LongClickDetector {
     this.timerId = setTimeout(() => {
       this.res = true
       if (func) func()
+      this.timerId = null
     }, this.timeout)
   }
 
@@ -166,33 +88,29 @@ class LongClickDetector {
   cancel () {
     this.res = false
     clearTimeout(this.timerId)
+    this.timerId = null
   }
 
   isLongClick () {
     return this.res
   }
+
+  isClick () {
+    return !!this.timerId
+  }
 }
+
 export default {
   name: 'graphView',
   components: {
-    itemPreview,
+    itemPreview
   },
   props: {
-    data: {
-      type: Array,
-      required: true
+    width: {
+      type: Number
     },
     height: {
-      type: Number,
-      required: true
-    },
-    width: {
-      type: Number,
-      required: true
-    },
-    margin: {
-      type: Object,
-      default: () => ({ top: 30, right: 80, bottom: 5, left: 5 })
+      type: Number
     }
   },
   data () {
@@ -222,6 +140,34 @@ export default {
             name: 'Alan Watts',
             type: 'NODE',
             thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
+          },
+          {
+            id: 4,
+            oid: '166300537782929431',
+            name: 'Alan Watts',
+            type: 'NODE',
+            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
+          },
+          {
+            id: 5,
+            oid: '166300537782929431',
+            name: 'Alan Watts',
+            type: 'NODE',
+            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
+          },
+          {
+            id: 6,
+            oid: '166300537782929431',
+            name: 'Alan Watts',
+            type: 'NODE',
+            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
+          },
+          {
+            id: 7,
+            oid: '166300537782929431',
+            name: 'Alan Watts',
+            type: 'NODE',
+            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
           }
         ],
         joints: [
@@ -241,29 +187,38 @@ export default {
       edgepaths: null,
       dragLine: null,
       clipPath: null,
-      hoveredNodeData: null,
-      simulation: d3.forceSimulation()
-          .force('link', d3.forceLink() // This force provides links between nodes
-              .id(d => d.id) // This sets the node id accessor to the specified function. If not specified, will default to the index of a node.
-              .distance(120)
-          )
-          .force('x', d3.forceX(d => this.width / 2))
-          .force('y', d3.forceY(d => this.height / 2))
-          // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
-          .force('charge', d3.forceManyBody().strength(-2500)), // This adds repulsion (if it's negative) between nodes.
-      colorScale: d3.scaleOrdinal() //= d3.scaleOrdinal(d3.schemeSet2)
-          .domain(['NODE', 'JOINT', 'BLOCK', 'VIDEO', 'BOOK'])
-          .range(['#ff9e6d', '#86cbff', '#c2e5a0', '#fff686', '#9e79db'])
+      linkedNodeData: null
     }
   },
   computed: {
-    previewShow () { return !!this.selectedItem }
+    previewShow () {
+      return !!this.selectedItem
+    }
+  },
+  watch: {
+    width: {
+      handler (to, from) {
+        console.log('!!!!!!!!!!!!!!!!!!width:', to)
+      }
+    }
   },
   methods: {
+    nodeIsEqual (n1, n2) {
+      // console.log(n1, n2)
+      return n1 === n2 || n1.id === n2.id || n1 === n2.id || n2 === n1.id
+    },
+    jointIsEqual (j1, j2) {
+      console.log(j1, j2)
+      return (this.nodeIsEqual(j1.source, j2.source) && this.nodeIsEqual(j1.target, j2.target)) || (this.nodeIsEqual(j1.source, j2.target) && this.nodeIsEqual(j1.target, j2.source))
+    },
     addWsItem (item) {
       console.log('addWsItem')
       assert(item.id)
       this.itemFinderShow = false
+      if (this.dataset.nodes.find(n => n.id === item.id)) {
+        this.$notify('error', this.$t('same item found'))
+        return
+      }
       let d = {
         id: item.id,
         oid: item.oid,
@@ -279,8 +234,15 @@ export default {
     },
     addEdge (d1, d2) {
       console.log('addEdge')
-      let newEdge = { source: d1.id, target: d2.id, type: this.$t('ASSOCIATION') }
-      // todo проверить на уникальность
+      let newEdge = { source: d1, target: d2, type: this.$t('ASSOCIATION') }
+      if (d1.id === d2.id) {
+        this.$notify('error', this.$t('loop links deprecated'))
+      }
+      if (this.dataset.joints.find(j => this.jointIsEqual(j, newEdge))) {
+        this.$notify('error', this.$t('same joint found'))
+        return
+      }
+
       this.dataset.joints.push(newEdge);
       this.updateGraph()
     },
@@ -295,18 +257,15 @@ export default {
           .style('stroke-width', 5)
     },
     initGraph () {
+      this.width = this.$refs.graphSvg.clientWidth
+      this.height = this.$refs.graphSvg.clientHeight
       for (let n of this.dataset.nodes) {
-        let cmp = (n1, n2) => {
-          return n1 === n2 || n1.id === n2.id || n1 === n2.id || n2 === n1.id
-        }
-        if (this.dataset.joints.find(joint => cmp(joint.source, n) || cmp(joint.target, n))) n.linked = true
+        if (this.dataset.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
         else n.linked = false
       }
       if (this.svg) this.svg.remove();
       this.svg = d3.select(this.$refs.graphSvg)
           // .append('svg')
-          .attr('width', this.width + this.margin.left + this.margin.right)
-          .attr('height', this.height + this.margin.top + this.margin.bottom)
           .on('click', (event) => {
             console.log('svg click')
             this.itemFinderShow = true
@@ -329,11 +288,11 @@ export default {
             console.log('svg zoom')
             this.svg.attr('transform', event.transform)
           }))
-          .append('g').attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+          .append('g')
+
       // appending little triangles, path object, as arrowhead
       // The <defs> element is used to store graphical objects that will be used at a later time
       // The <marker> element defines the graphic that is to be used for drawing arrowheads or polymarkers on a given <path>, <line>, <polyline> or <polygon> element.
-
       this.defs = this.svg.append('defs')
       this.defs.append('marker')
           .attr('id', 'arrowhead')
@@ -349,20 +308,23 @@ export default {
           .attr('fill', '#999')
           .attr('fill-opacity', 0.8)
           .attr('stroke', 'none')
-      this.defs.append('svg:marker')
-          .attr('id', 'mark-end-arrow')
+      this.defs.append('marker')
+          .attr('id', 'dragline-end')
           .attr('viewBox', '0 -5 10 10')
           .attr('refX', 7)
           .attr('markerWidth', 3.5)
           .attr('markerHeight', 3.5)
           .attr('orient', 'auto')
+          .attr('fill', 'grey')
           .append('svg:path')
           .attr('d', 'M0,-5L10,0L0,5');
       // displayed when dragging between nodes
-      this.dragLine = this.svg.append('svg:path')
+      this.dragLine = this.svg.append('path')
           .attr('class', 'link dragline hidden')
           .attr('d', 'M0,0L0,0')
-          .style('marker-end', 'url(#mark-end-arrow)');
+          .attr('stroke', 'grey')
+          .attr('stroke-width', '3')
+          .style('marker-end', 'url(#dragline-end)');
       this.clipPath = this.defs.append('clipPath')
           .attr('id', 'clip-rect')
           .append('rect')
@@ -376,12 +338,13 @@ export default {
     drawNodes () {
       // Initialize the nodes
       const thiz = this
-      let longClickDetector = new LongClickDetector(700)
+      let longClickDetector = new LongClickDetector(500)
+      let tooltip = d3.select(this.$refs.graphTooltip)
       this.graphNodes = this.svg.selectAll('.graphNodes')
           .data(this.dataset.nodes)
           .enter()
           .append('g')
-          .attr('class', 'nodes')
+          // .attr('class', 'nodes')
           .on('dblclick', async (event, d) => {
             console.log('node dblclick')
             event.stopPropagation();
@@ -393,9 +356,11 @@ export default {
             }
           })
           .on('click', (event, d) => {
-            console.log('node click')
+            console.log('node click', d)
             event.stopPropagation();
             longClickDetector.cancel()
+            delete d.fx;
+            delete d.fy;
           })
           .on('mousedown', (event, d) => {
             console.log('node mousedown')
@@ -408,34 +373,62 @@ export default {
             // event.stopPropagation();
             longClickDetector.mouseup()
           })
+          .on('touchstart', (event, d) => {
+            console.log('node touchstart')
+            event.stopPropagation();
+            event.preventDefault();
+            longClickDetector.mouseDown(() => this.blinkNode(d))
+          })
+          .on('touchend', (event, d) => {
+            console.log('node touchend')
+            event.stopPropagation();
+            event.preventDefault();
+            if (longClickDetector.isClick()) {
+              delete d.fx;
+              delete d.fy;
+            }
+            longClickDetector.mouseup()
+          })
           .on('mouseover', (event, d) => {
-            // console.log('node mouseover')
-            this.hoveredNodeData = d
+            console.log('node mouseover')
+            if (longClickDetector.isLongClick()) this.linkedNodeData = d
           })
           .on('mouseout', (event, d) => {
-            // console.log('node mouseout')
-            this.hoveredNodeData = null
+            console.log('node mouseout')
+            if (longClickDetector.isLongClick()) this.linkedNodeData = null
           })
           .call(d3.drag() // sets the event listener for the specified typenames and returns the drag behavior.
               .on('start', function (event, d) {
                 console.log('drag start')
-                // d3.select(this).classed('fixed', true);
                 // start - after a new pointer becomes active (on mousedown or touchstart).
                 // When the drag gesture starts, the targeted node is fixed to the pointer
                 // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
-                if (!event.active) thiz.simulation.alphaTarget(0.3).restart();// sets the current target alpha to the specified number in the range [0,1].
-                d.fy = d.y; // fx - the node’s fixed x-position. Original is null.
-                d.fx = d.x; // fy - the node’s fixed y-position. Original is null.
+                if (!event.active) thiz.simulationLinked.alphaTarget(0.2).restart();// sets the current target alpha to the specified number in the range [0,1].
               })
               .on('drag', function (event, d) {
-                // console.log('drag', event.x, event.y)
+                // console.log('drag', d, event)
                 // console.log('shift drag', d, d3.selection(this))
                 // drag - after an active pointer moves (on mousemove or touchmove).
                 // When the drag gesture starts, the targeted node is fixed to the pointer
                 // eslint-disable-next-line no-constant-condition
                 if (longClickDetector.isLongClick()) {
-                  thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
+                  // thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]))
+                  thiz.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (event.x) + ',' + (event.y))
                   thiz.dragLine.classed('hidden', false);
+                  if (event.sourceEvent instanceof TouchEvent) {
+                    let linkedNodeData = null
+                    for (let n of thiz.dataset.nodes){
+                      let x = n.x - event.x
+                      let y = n.y - event.y
+                      let l = Math.sqrt(x * x + y * y)
+                      let r = thiz.nodeRadius;
+                      if (l < r) {
+                        linkedNodeData = n;
+                      }
+                    }
+                    thiz.linkedNodeData = linkedNodeData;
+                    console.log('drag this.linkedNodeData', thiz.linkedNodeData)
+                  }
                 } else {
                   longClickDetector.cancel()
                   d.fx = event.x;
@@ -443,15 +436,16 @@ export default {
                 }
               })
               .on('end', (event, d) => {
-                console.log('drag end')
+                console.log('drag end', d, this.linkedNodeData)
                 // end - after an active pointer becomes inactive (on mouseup, touchend or touchcancel)
                 // the targeted node is released when the gesture ends
-                // if (!event.active) this.simulation.alphaTarget(0);
+                // if (!event.active) simulation.alphaTarget(0);
                 // d.fx = null;
                 // d.fy = null;
                 this.dragLine.classed('hidden', true);
-                if (longClickDetector.isLongClick() && this.hoveredNodeData && d !== this.hoveredNodeData) {
-                  this.addEdge(d, this.hoveredNodeData)
+                if (this.linkedNodeData && d !== this.linkedNodeData) {
+                  this.addEdge(d, this.linkedNodeData)
+                  thiz.linkedNodeData = null
                 }
               })
           );
@@ -466,9 +460,7 @@ export default {
           .style('stroke', 'grey')
           .style('stroke-width', 5)
           .style('fill', 'none')
-          // .style('fill', d => this.colorScale(d.type))
-
-      let tooltip = d3.select(this.$refs.graphTooltip)
+      // .style('fill', d => this.colorScale(d.type))
       this.graphNodes.append('image')
           .attr('id', 'node-image')
           .attr('xlink:href', d => d.thumbUrl)
@@ -479,6 +471,7 @@ export default {
           .attr('clip-path', 'url(#clip-rect)')
           .attr('preserveAspectRatio', 'xMidYMid slice')
           .on('mouseover', function (event, d) {
+            // console.log('image mouseover')
             d3.select(this)
                 .transition()
                 .duration(350)
@@ -576,18 +569,33 @@ export default {
           .text(d => d.type);
     },
     doLayout () {
+      console.log('doLayout', this.width)
       // Listen for tick events to render the nodes as they update in your Canvas or SVG.
       let thiz = this
-      this.simulation
-          .nodes(this.dataset.nodes) // sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
+      // this.simulationUnlinked = this.simulationUnlinked || d3.forceSimulation()
+      //     .force('x', d3.forceX(d => this.width / 2))
+      //     .force('y', d3.forceY(d => this.height / 2))
+      //     // .force('center', d3.forceCenter().x(200).y(200))
+      //     .force('charge', d3.forceManyBody().strength(-2500));
+      // this.simulationUnlinked
+      //     .nodes(this.dataset.nodes.filter(n => !n.linked))
+      //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
+      //     .on('tick', (d) => {
+      //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
+      //     });
+
+      this.simulationLinked = this.simulationLinked || d3.forceSimulation()
+          .force('link', d3.forceLink() // This force provides links between nodes
+              .id(d => d.id) // This sets the node id accessor to the specified function. If not specified, will default to the index of a node.
+              .distance(120)
+          )
+          .force('x', d3.forceX().strength(d => d.linked ? 0.1 : 0.5).x(d => d.linked ? this.width / 2 : this.width / 4))
+          .force('y', d3.forceY().strength(d => d.linked ? 0.1 : 0.5).y(d => d.linked ? this.height / 2 : this.height / 4))
+          // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
+          .force('charge', d3.forceManyBody().strength(d => d.linked ? -2500 : -700)) // This adds repulsion (if it's negative) between nodes.
+      this.simulationLinked
+          .nodes(this.dataset.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
-            // use simulation.on to listen for tick events as the simulation runs.
-            // After this, Each node must be an object. The following properties are assigned by the simulation:
-            // index - the node’s zero-based index into nodes
-            // x - the node’s current x-position
-            // y - the node’s current y-position
-            // vx - the node’s current x-velocity
-            // vy - the node’s current y-velocity
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
             thiz.graphEdges.attr('x1', d => d.source.x)
                 .attr('y1', d => d.source.y)
@@ -601,657 +609,9 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulation.force('link').links(this.dataset.joints);
-    },
-    testGraph () {
-      let thiz = this
-      // define graphcreator object
-      let GraphCreator = function (svg, nodes, edges) {
-        let thisGraph = this;
-        thisGraph.idct = 0;
-
-        thisGraph.nodes = nodes || [];
-        thisGraph.edges = edges || [];
-
-        thisGraph.state = {
-          selectedNode: null,
-          selectedEdge: null,
-          mouseDownNode: null,
-          mouseDownLink: null,
-          justDragged: false,
-          justScaleTransGraph: false,
-          lastKeyDown: -1,
-          shiftNodeDrag: false,
-          selectedText: null
-        };
-
-        // define arrow markers for graph links
-        let defs = svg.append('svg:defs');
-        defs.append('svg:marker')
-            .attr('id', 'end-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', '32')
-            .attr('markerWidth', 3.5)
-            .attr('markerHeight', 3.5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5');
-
-        // define arrow markers for leading arrow
-        defs.append('svg:marker')
-            .attr('id', 'mark-end-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 7)
-            .attr('markerWidth', 3.5)
-            .attr('markerHeight', 3.5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5');
-
-        thisGraph.svg = svg;
-        thisGraph.svgG = svg.append('g')
-            .classed(thisGraph.consts.graphClass, true);
-        let svgG = thisGraph.svgG;
-
-        // displayed when dragging between nodes
-        thisGraph.dragLine = svgG.append('svg:path')
-            .attr('class', 'link dragline hidden')
-            .attr('d', 'M0,0L0,0')
-            .style('marker-end', 'url(#mark-end-arrow)');
-
-        // svg nodes and edges
-        thisGraph.paths = svgG.append('g').selectAll('g');
-        thisGraph.circles = svgG.append('g').selectAll('g');
-
-        thisGraph.drag = d3.drag()
-            // .origin(function(d){
-            //   return {x: d.x, y: d.y};
-            // })
-            .on('drag', function (event, d) {
-              console.log('drag')
-              thisGraph.state.justDragged = true;
-              // eslint-disable-next-line no-useless-call,no-constant-condition
-              if (thisGraph.state.shiftNodeDrag) {
-                // console.log('shift drag1', d3.pointer(event), d3.pointer(event, this), d3.pointer(event, d3.select(this)), d)
-                thisGraph.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + (d.x + d3.pointer(event, this)[0]) + ',' + (d.y + d3.pointer(event, this)[1]));
-              } else {
-                d.x += event.dx;
-                d.y += event.dy;
-                thisGraph.updateGraph();
-              }
-            })
-            .on('end', function () {
-              // todo check if edge-mode is selected
-            });
-
-        // listen for key events
-        d3.select(window).on('keydown', function (event) {
-          // eslint-disable-next-line no-useless-call
-          thisGraph.svgKeyDown.call(thisGraph, event);
-        })
-            .on('keyup', function () {
-              // eslint-disable-next-line no-useless-call
-              thisGraph.svgKeyUp.call(thisGraph);
-            });
-        // eslint-disable-next-line no-useless-call
-        svg.on('mousedown', function (event, d) {
-          console.log('mousedown')
-          // eslint-disable-next-line no-useless-call
-          thisGraph.svgMouseDown.call(thisGraph, event, d);
-        });
-        // eslint-disable-next-line no-useless-call
-        svg.on('mouseup', function (event, d) {
-          console.log('mouseup')
-          // eslint-disable-next-line no-useless-call
-          thisGraph.svgMouseUp.call(thisGraph, event, d);
-        });
-        svg.on('click', function (event, d) {
-          console.log('click')
-          // eslint-disable-next-line no-useless-call
-          thisGraph.svgClick.call(thisGraph, event, d);
-        });
-
-        // listen for dragging
-        let dragSvg = d3.zoom()
-            .on('zoom', function (event) {
-              if (event.sourceEvent.shiftKey) {
-                // TODO  the internal d3 state is still changing
-                return false;
-              } else {
-                // eslint-disable-next-line no-useless-call
-                thisGraph.zoomed.call(thisGraph, event);
-              }
-              return true;
-            })
-            .on('start', function (event) {
-              let ael = d3.select('#' + thisGraph.consts.activeEditId).node();
-              if (ael) {
-                ael.blur();
-              }
-              if (!event.sourceEvent.shiftKey) d3.select('body').style('cursor', 'move');
-            })
-            .on('end', function () {
-              d3.select('body').style('cursor', 'auto');
-            });
-
-        svg.call(dragSvg).on('dblclick.zoom', null);
-
-        // listen for resize
-        window.onresize = function () {
-          thisGraph.updateWindow(svg);
-        };
-
-        // handle download data
-        d3.select('#download-input').on('click', function () {
-          let saveEdges = [];
-          thisGraph.edges.forEach(function (val, i) {
-            saveEdges.push({ source: val.source.id, target: val.target.id });
-          });
-          let blob = new Blob([window.JSON.stringify({
-            nodes: thisGraph.nodes,
-            edges: saveEdges
-          })], { type: 'text/plain;charset=utf-8' });
-          // saveAs(blob, 'mydag.json');
-        });
-
-        // handle uploaded data
-        d3.select('#upload-input').on('click', function () {
-          document.getElementById('hidden-file-upload').click();
-        });
-        d3.select('#hidden-file-upload').on('change', function () {
-          if (window.File && window.FileReader && window.FileList && window.Blob) {
-            let uploadFile = this.files[0];
-            let filereader = new window.FileReader();
-
-            filereader.onload = function () {
-              let txtRes = filereader.result;
-              // TODO better error handling
-              try {
-                let jsonObj = JSON.parse(txtRes);
-                thisGraph.deleteGraph(true);
-                thisGraph.nodes = jsonObj.nodes;
-                thisGraph.setIdCt(jsonObj.nodes.length + 1);
-                let newEdges = jsonObj.edges;
-                newEdges.forEach(function (e, i) {
-                  newEdges[i] = {
-                    source: thisGraph.nodes.filter(function (n) {
-                      return n.id === e.source;
-                    })[0],
-                    target: thisGraph.nodes.filter(function (n) {
-                      return n.id === e.target;
-                    })[0]
-                  };
-                });
-                thisGraph.edges = newEdges;
-                thisGraph.updateGraph();
-              } catch (err) {
-                window.alert('Error parsing uploaded file\nerror message: ' + err.message);
-              }
-            };
-            filereader.readAsText(uploadFile);
-          } else {
-            alert("Your browser won't let you save this graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
-          }
-        });
-
-        // handle delete graph
-        d3.select('#delete-graph').on('click', function () {
-          thisGraph.deleteGraph(false);
-        });
-      };
-
-      GraphCreator.prototype.setIdCt = function (idct) {
-        this.idct = idct;
-      };
-
-      GraphCreator.prototype.consts = {
-        selectedClass: 'selected',
-        connectClass: 'connect-node',
-        circleGClass: 'conceptG',
-        graphClass: 'graph',
-        activeEditId: 'active-editing',
-        BACKSPACE_KEY: 8,
-        DELETE_KEY: 46,
-        ENTER_KEY: 13,
-        nodeRadius: 50
-      };
-
-      /* PROTOTYPE FUNCTIONS */
-
-      GraphCreator.prototype.deleteGraph = function (skipPrompt) {
-        let thisGraph = this;
-        let doDelete = true;
-        if (!skipPrompt) {
-          doDelete = window.confirm('Press OK to delete this graph');
-        }
-        if (doDelete) {
-          thisGraph.nodes = [];
-          thisGraph.edges = [];
-          thisGraph.updateGraph();
-        }
-      };
-
-      /* select all text in element: taken from http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element */
-      GraphCreator.prototype.selectElementContents = function (el) {
-        let range = document.createRange();
-        range.selectNodeContents(el);
-        let sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-      };
-
-      /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-      GraphCreator.prototype.insertTitleLinebreaks = function (gEl, title) {
-        let words = title.split(/\s+/g);
-        let nwords = words.length;
-        let el = gEl.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '-' + (nwords - 1) * 7.5);
-
-        for (let i = 0; i < words.length; i++) {
-          let tspan = el.append('tspan').text(words[i]);
-          if (i > 0) {
-            tspan.attr('x', 0).attr('dy', '15');
-          }
-        }
-      };
-
-      // remove edges associated with a node
-      GraphCreator.prototype.spliceLinksForNode = function (node) {
-        let thisGraph = this;
-        let toSplice = thisGraph.edges.filter(function (l) {
-          return (l.source === node || l.target === node);
-        });
-        toSplice.map(function (l) {
-          thisGraph.edges.splice(thisGraph.edges.indexOf(l), 1);
-        });
-      };
-
-      GraphCreator.prototype.replaceSelectEdge = function (d3Path, edgeData) {
-        let thisGraph = this;
-        d3Path.classed(thisGraph.consts.selectedClass, true);
-        if (thisGraph.state.selectedEdge) {
-          thisGraph.removeSelectFromEdge();
-        }
-        thisGraph.state.selectedEdge = edgeData;
-      };
-
-      GraphCreator.prototype.replaceSelectNode = function (d3Node, nodeData) {
-        let thisGraph = this;
-        d3Node.classed(this.consts.selectedClass, true);
-        if (thisGraph.state.selectedNode) {
-          thisGraph.removeSelectFromNode();
-        }
-        thisGraph.state.selectedNode = nodeData;
-      };
-
-      GraphCreator.prototype.removeSelectFromNode = function () {
-        let thisGraph = this;
-        thisGraph.circles.filter(function (cd) {
-          return cd.id === thisGraph.state.selectedNode.id;
-        }).classed(thisGraph.consts.selectedClass, false);
-        thisGraph.state.selectedNode = null;
-      };
-
-      GraphCreator.prototype.removeSelectFromEdge = function () {
-        let thisGraph = this;
-        thisGraph.paths.filter(function (cd) {
-          return cd === thisGraph.state.selectedEdge;
-        }).classed(thisGraph.consts.selectedClass, false);
-        thisGraph.state.selectedEdge = null;
-      };
-
-      GraphCreator.prototype.pathMouseDown = function (event, d3path, d) {
-        let thisGraph = this;
-        let state = thisGraph.state;
-        event.stopPropagation();
-        state.mouseDownLink = d;
-
-        if (state.selectedNode) {
-          thisGraph.removeSelectFromNode();
-        }
-
-        let prevEdge = state.selectedEdge;
-        if (!prevEdge || prevEdge !== d) {
-          thisGraph.replaceSelectEdge(d3path, d);
-        } else {
-          thisGraph.removeSelectFromEdge();
-        }
-      };
-
-      // mousedown on node
-      GraphCreator.prototype.circleMouseDown = function (event, d3node, d) {
-        let thisGraph = this;
-        let state = thisGraph.state;
-        event.stopPropagation();
-        state.mouseDownNode = d;
-        if (event.shiftKey) {
-          state.shiftNodeDrag = event.shiftKey;
-          // reposition dragged directed edge
-          thisGraph.dragLine.classed('hidden', false)
-              .attr('d', 'M' + d.x + ',' + d.y + 'L' + d.x + ',' + d.y);
-        }
-      };
-
-      /* place editable text on node in place of svg text */
-      GraphCreator.prototype.changeTextOfNode = function (event, d3node, d) {
-        let thisGraph = this;
-        let consts = thisGraph.consts;
-        let htmlEl = d3node.node();
-        d3node.selectAll('text').remove();
-        let nodeBCR = htmlEl.getBoundingClientRect();
-        let curScale = nodeBCR.width / consts.nodeRadius;
-        let placePad = 5 * curScale;
-        let useHW = curScale > 1 ? nodeBCR.width * 0.71 : consts.nodeRadius * 1.42;
-        // replace with editableconent text
-        let d3txt = thisGraph.svg.selectAll('foreignObject')
-            .data([d])
-            .enter()
-            .append('foreignObject')
-            .attr('x', nodeBCR.left + placePad)
-            .attr('y', nodeBCR.top + placePad)
-            .attr('height', 2 * useHW)
-            .attr('width', useHW)
-            .append('xhtml:p')
-            .attr('id', consts.activeEditId)
-            .attr('contentEditable', 'true')
-            .text(d.title)
-            .on('mousedown', function (event, d) {
-              event.stopPropagation();
-            })
-            .on('keydown', function (event, d) {
-              event.stopPropagation();
-              if (event.keyCode === consts.ENTER_KEY && !event.shiftKey) {
-                this.blur();
-              }
-            })
-            .on('blur', function (event, d) {
-              d.title = this.textContent;
-              thisGraph.insertTitleLinebreaks(d3node, d.title);
-              d3.select(this.parentElement).remove();
-            });
-        return d3txt;
-      };
-
-      // mouseup on nodes
-      GraphCreator.prototype.circleMouseUp = function (event, d3node, d) {
-        let thisGraph = this;
-        let state = thisGraph.state;
-        let consts = thisGraph.consts;
-        // reset the states
-        state.shiftNodeDrag = false;
-        d3node.classed(consts.connectClass, false);
-
-        let mouseDownNode = state.mouseDownNode;
-
-        if (!mouseDownNode) return;
-
-        thisGraph.dragLine.classed('hidden', true);
-
-        if (mouseDownNode !== d) {
-          // we're in a different node: create new edge for mousedown edge and add to graph
-          let newEdge = { source: mouseDownNode, target: d };
-          let filtRes = thisGraph.paths.filter(function (d) {
-            if (d.source === newEdge.target && d.target === newEdge.source) {
-              thisGraph.edges.splice(thisGraph.edges.indexOf(d), 1);
-            }
-            return d.source === newEdge.source && d.target === newEdge.target;
-          });
-          if (!filtRes[0].length) {
-            thisGraph.edges.push(newEdge);
-            thisGraph.updateGraph();
-          }
-        } else {
-          // we're in the same node
-          if (state.justDragged) {
-            // dragged, not clicked
-            state.justDragged = false;
-          } else {
-            // clicked, not dragged
-            if (event.shiftKey) {
-              // shift-clicked node: edit text content
-              let d3txt = thisGraph.changeTextOfNode(event, d3node, d);
-              let txtNode = d3txt.node();
-              thisGraph.selectElementContents(txtNode);
-              txtNode.focus();
-            } else {
-              if (state.selectedEdge) {
-                thisGraph.removeSelectFromEdge();
-              }
-              let prevNode = state.selectedNode;
-
-              if (!prevNode || prevNode.id !== d.id) {
-                thisGraph.replaceSelectNode(d3node, d);
-              } else {
-                thisGraph.removeSelectFromNode();
-              }
-            }
-          }
-        }
-        state.mouseDownNode = null;
-      }; // end of circles mouseup
-
-      // mousedown on main svg
-      GraphCreator.prototype.svgMouseDown = function (event, d) {
-        this.state.graphMouseDown = true;
-      };
-
-      // mouseup on main svg
-      GraphCreator.prototype.svgMouseUp = function (event, d) {
-        console.log('asdasdasd')
-        let thisGraph = this;
-        let state = thisGraph.state;
-        if (state.justScaleTransGraph) {
-          // dragged not clicked
-          state.justScaleTransGraph = false;
-        } else if (state.graphMouseDown && event.shiftKey) {
-          // clicked not dragged from svg
-          // let xycoords = d3.mouse(thisGraph.svgG.node());
-          console.log('asdasdasd')
-          let xycoords = d3.pointer(event, thisGraph.svgG.node())
-          let d = { id: thisGraph.idct++, title: 'new concept', x: xycoords[0], y: xycoords[1] };
-          thisGraph.nodes.push(d);
-          thisGraph.updateGraph();
-          // make title of text immediently editable
-          let d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function (dval) {
-            return dval.id === d.id;
-          }), d);
-          let txtNode = d3txt.node();
-          thisGraph.selectElementContents(txtNode);
-          txtNode.focus();
-        } else if (state.shiftNodeDrag) {
-          // dragged from node
-          state.shiftNodeDrag = false;
-          thisGraph.dragLine.classed('hidden', true);
-        }
-        state.graphMouseDown = false;
-      };
-
-      GraphCreator.prototype.svgClick = function (event, d) {
-        let thisGraph = this;
-        if (event.shiftKey) {
-          // clicked not dragged from svg
-          // let xycoords = d3.mouse(thisGraph.svgG.node());
-          console.log('asdasdasd')
-          let xycoords = d3.pointer(event, thisGraph.svgG.node())
-          let d = { id: thisGraph.idct++, title: 'new concept', x: xycoords[0], y: xycoords[1] };
-          thisGraph.nodes.push(d);
-          thisGraph.updateGraph();
-          // make title of text immediently editable
-          let d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function (dval) {
-            return dval.id === d.id;
-          }), d);
-          let txtNode = d3txt.node();
-          thisGraph.selectElementContents(txtNode);
-          txtNode.focus();
-        }
-      };
-
-      // keydown on main svg
-      GraphCreator.prototype.svgKeyDown = function (event) {
-        let thisGraph = this;
-        let state = thisGraph.state;
-        let consts = thisGraph.consts;
-        // make sure repeated key presses don't register for each keydown
-        if (state.lastKeyDown !== -1) return;
-
-        state.lastKeyDown = event.keyCode;
-        let selectedNode = state.selectedNode;
-        let selectedEdge = state.selectedEdge;
-
-        switch (event.keyCode) {
-          case consts.BACKSPACE_KEY:
-          case consts.DELETE_KEY:
-            event.preventDefault();
-            if (selectedNode) {
-              thisGraph.nodes.splice(thisGraph.nodes.indexOf(selectedNode), 1);
-              thisGraph.spliceLinksForNode(selectedNode);
-              state.selectedNode = null;
-              thisGraph.updateGraph();
-            } else if (selectedEdge) {
-              thisGraph.edges.splice(thisGraph.edges.indexOf(selectedEdge), 1);
-              state.selectedEdge = null;
-              thisGraph.updateGraph();
-            }
-            break;
-        }
-      };
-
-      GraphCreator.prototype.svgKeyUp = function () {
-        this.state.lastKeyDown = -1;
-      };
-
-      // call to propagate changes to graph
-      GraphCreator.prototype.updateGraph = function () {
-        let thisGraph = this;
-        let consts = thisGraph.consts;
-        let state = thisGraph.state;
-
-        thisGraph.paths = thisGraph.paths.data(thisGraph.edges, function (d) {
-          return String(d.source.id) + '+' + String(d.target.id);
-        });
-        let paths = thisGraph.paths;
-        // update existing paths
-        paths.style('marker-end', 'url(#end-arrow)')
-            .classed(consts.selectedClass, function (d) {
-              return d === state.selectedEdge;
-            })
-            .attr('d', function (d) {
-              return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
-            });
-
-        // add new paths
-        paths.enter()
-            .append('path')
-            .style('marker-end', 'url(#end-arrow)')
-            .classed('link', true)
-            .attr('d', function (d) {
-              return 'M' + d.source.x + ',' + d.source.y + 'L' + d.target.x + ',' + d.target.y;
-            })
-            .on('mousedown', function (event, d) {
-                  // eslint-disable-next-line no-useless-call
-                  thisGraph.pathMouseDown.call(event, thisGraph, d3.select(this), d);
-                }
-            )
-            .on('mouseup', function (event, d) {
-              state.mouseDownLink = null;
-            });
-
-        // remove old links
-        paths.exit().remove();
-
-        // update existing nodes
-        thisGraph.circles = thisGraph.circles.data(thisGraph.nodes, function (d) {
-          return d.id;
-        });
-        thisGraph.circles.attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + d.y + ')';
-        });
-
-        // add new nodes
-        let newGs = thisGraph.circles.enter()
-            .append('g');
-
-        newGs.classed(consts.circleGClass, true)
-            .attr('transform', function (d) {
-              return 'translate(' + d.x + ',' + d.y + ')';
-            })
-            .on('mouseover', function (event, d) {
-              if (state.shiftNodeDrag) {
-                d3.select(this).classed(consts.connectClass, true);
-              }
-            })
-            .on('mouseout', function (event, d) {
-              d3.select(this).classed(consts.connectClass, false);
-            })
-            .on('mousedown', function (event, d) {
-              // eslint-disable-next-line no-useless-call
-              thisGraph.circleMouseDown.call(thisGraph, event, d3.select(this), d);
-            })
-            .on('mouseup', function (event, d) {
-              // eslint-disable-next-line no-useless-call
-              thisGraph.circleMouseUp.call(thisGraph, event, d3.select(this), d);
-            })
-            .call(thisGraph.drag);
-
-        newGs.append('circle')
-            .attr('r', String(consts.nodeRadius));
-
-        newGs.each(function (d) {
-          thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
-        });
-
-        // remove old nodes
-        thisGraph.circles.exit().remove();
-      };
-
-      GraphCreator.prototype.zoomed = function (event) {
-        this.state.justScaleTransGraph = true;
-        d3.select('.' + this.consts.graphClass)
-            .attr('transform', event.transform)
-      };
-
-      GraphCreator.prototype.updateWindow = function (svg) {
-        let docEl = document.documentElement;
-        let bodyEl = document.getElementsByTagName('body')[0];
-        let x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-        let y = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
-        svg.attr('width', x).attr('height', y);
-      };
-
-      /** ** MAIN ****/
-
-      // warn the user when leaving
-      window.onbeforeunload = function () {
-        return 'Make sure to save your graph locally before leaving :-)';
-      };
-
-      let docEl = document.documentElement;
-      let bodyEl = document.getElementsByTagName('body')[0];
-
-      let width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-      let height = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
-
-      let xLoc = width / 2 - 25;
-      let yLoc = 100;
-
-      // initial node data
-      let nodes = [{ title: 'new concept', id: 0, x: xLoc, y: yLoc },
-        { title: 'new concept', id: 1, x: xLoc, y: yLoc + 200 }];
-      let edges = [{ source: nodes[1], target: nodes[0] }];
-
-      let svg = d3.select(this.$refs.graphSvg)
-          // .append('svg')
-          .attr('width', this.width + this.margin.left + this.margin.right)
-          .attr('height', this.height + this.margin.top + this.margin.bottom)
-      // .call(d3.zoom().on('zoom', (event) => {
-      //   this.svg.attr('transform', event.transform)
-      // }))
-      // .append('g').attr('transform', `translate(${this.margin.left},${this.margin.top})`);
-
-      let graph = new GraphCreator(svg, nodes, edges);
-      graph.setIdCt(2);
-      graph.updateGraph();
+      this.simulationLinked.force('link').links(this.dataset.joints)
+      this.simulationLinked.alphaTarget(0.1).restart();
+      // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
     updateGraph () {
       this.initGraph()
@@ -1260,15 +620,81 @@ export default {
       this.doLayout()
       // this.testGraph()
     },
-    updateGraph2 () {
-      // this.initGraph()
-      this.drawEdges()
-      this.drawNodes()
-      this.doLayout()
+    testGraph () {
+      this.width = this.$refs.graphSvg.clientWidth
+      this.height = this.$refs.graphSvg.clientHeight
+      let radius = 6
+      let step = radius * 2
+      let theta = Math.PI * (3 - Math.sqrt(5))
+      let data = Array.from({ length: 2000 }, (_, i) => {
+        const radius = step * Math.sqrt(i += 0.5)
+        const a = theta * i;
+        return {
+          x: this.width / 2 + radius * Math.cos(a),
+          y: this.height / 2 + radius * Math.sin(a)
+        };
+      })
+
+      const svg = d3.select(this.$refs.graphSvg)
+          .attr('viewBox', [0, 0, this.width, this.height])
+          .on('touchstart', function (event) {
+            console.log('touchstart', event)
+            event.stopPropagation()
+          })
+          .on('touchmove', function (event) {
+            console.log('touchmove', event)
+            event.stopPropagation()
+          });
+
+      const g = svg.append('g')
+          .attr('cursor', 'grab');
+
+      g.selectAll('circle')
+          .data(data)
+          .join('circle')
+          .attr('cx', ({ x }) => x)
+          .attr('cy', ({ y }) => y)
+          .attr('r', radius)
+          .attr('fill', (d, i) => d3.interpolateRainbow(i / 360))
+          .call(d3.drag()
+              .on('start', dragstarted)
+              .on('drag', dragged)
+              .on('end', dragended));
+
+      svg.call(d3.zoom()
+          .extent([[0, 0], [this.width, this.height]])
+          .scaleExtent([1, 8])
+          .on('zoom', zoomed));
+
+      function dragstarted (event) {
+        console.log('dragstarted', event)
+        event.sourceEvent.stopPropagation();
+        d3.select(this).raise();
+        g.attr('cursor', 'grabbing');
+      }
+
+      function dragged (event, d) {
+        console.log('dragged', event)
+        event.sourceEvent.stopPropagation();
+        d3.select(this).attr('cx', d.x = event.x).attr('cy', d.y = event.y);
+      }
+
+      function dragended (event) {
+        console.log('dragended', event)
+        event.sourceEvent.stopPropagation();
+        g.attr('cursor', 'grab');
+      }
+
+      function zoomed ({ transform }) {
+        g.attr('transform', transform);
+      }
+
+      return svg.node();
     }
   },
   mounted () {
     this.updateGraph()
+    // this.testGraph()
   }
 }
 </script>
