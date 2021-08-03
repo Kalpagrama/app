@@ -91,7 +91,7 @@ export default {
   data () {
     return {
       itemFinderShow: false,
-      jointCreatorShow: true,
+      jointCreatorShow: false,
       newItemLocation: [0, 0],
       selectedItem: null,
       nodeRadius: 50,
@@ -150,7 +150,7 @@ export default {
     },
     addEdge (d1, d2) {
       console.log('addEdge')
-      this.jointCreatorShow = true
+      // this.jointCreatorShow = true
       let newEdge = { source: d1, target: d2, type: this.$t('ASSOCIATION') }
       if (d1.id === d2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
