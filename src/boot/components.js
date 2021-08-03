@@ -9,6 +9,7 @@ import kalpaPay from 'src/components/kalpa_pay/index.vue'
 import kalpaSave from 'src/components/kalpa_save/index.vue'
 import kalpaDocs from 'src/components/kalpa_docs/index.vue'
 import addCollectionBtn from 'src/components/collection/add_collection_btn.vue'
+import graphView from 'src/components/graph/graph_view.vue'
 
 // menus
 import kalpaMenuMobile from 'src/components/kalpa_menu_mobile/index.vue'
@@ -50,4 +51,5 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   Vue.component('userAvatar', userAvatar)
 
   Vue.component('addCollectionBtn', addCollectionBtn)
+  Vue.component('graphView', graphView)
 }

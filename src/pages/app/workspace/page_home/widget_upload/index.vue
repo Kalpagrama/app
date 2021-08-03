@@ -7,8 +7,6 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`
     ).row.full-width.q-pa-md
-    //- .row.full-width.justify-center.q-pb-md
-      span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Add by Link')}}
     div(
       :style=`{borderRadius: '10px'}`
       ).row.full-width.b-40
@@ -53,33 +51,31 @@
         q-btn(
           outline color="grey-8" no-caps
           icon="add"
+          @click="addItemMenuShow = true"
           ).full-width.full-height
           q-tooltip(dense dark) {{$t('Create new')}}
-          q-menu(
-            v-if="!paid"
-            dark
-            :contentStyle=`{
-              borderRadius: '10px',
-            }`
+          q-dialog(
+            v-model="addItemMenuShow"
+            position="standard"
+            :maximized="false"
             )
-            div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
-              q-btn(
-                outline color="grey-8"
-                align="left"
-                :to="'/workspace/create?mode=block'"
-                :label="$t('Essence block')"
-                icon='dashboard_customize'
-                round flat no-caps
-              ).row.full-width.q-pa-sm
-              q-btn(
-                outline color="grey-8"
-                align="left"
-                :to="'/workspace/create?mode=article'"
-                :label="$t('Article')"
-                icon='post_add'
-                round flat no-caps
-              ).row.full-width.q-pa-sm
-          //span.text-grey-6 {{$t('Create')}}
+              div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
+                  q-btn(
+                    outline color="grey-8"
+                    align="left"
+                    :to="'/workspace/create?mode=block'"
+                    :label="$t('Essence block')"
+                    icon='dashboard_customize'
+                    round flat no-caps
+                    ).row.full-width.q-pa-sm
+                  q-btn(
+                    outline color="grey-8"
+                    align="left"
+                    :to="'/workspace/create?mode=article'"
+                    :label="$t('Article')"
+                    icon='post_add'
+                    round flat no-caps
+                    ).row.full-width.q-pa-sm
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
 </template>
@@ -97,6 +93,7 @@ export default {
   },
   data () {
     return {
+      addItemMenuShow: false,
       url: '',
       urlLoading: false,
       urlInputFocused: false,

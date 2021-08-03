@@ -75,8 +75,9 @@ kalpa-layout()
                   }`
                 ).row.full-width.items-start.content-start.justify-center.q-pa-sm
                   component(
-                    :is="'page-' + p.id"
+                    :is="'page-' + pageId"
                     :node="node"
+                    :height="700"
                   )
                   //page-joints(:node="node")
                   //page-comments(:node="node")
@@ -90,6 +91,7 @@ import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
 import pageJoints from './page_joints/index.vue'
 import pageComments from './page_comments/index.vue'
+import pageGraph from './page_graph/index.vue'
 
 export default {
   name: 'pageApp_node',
@@ -98,13 +100,14 @@ export default {
     widgetJoints,
     pageJoints,
     pageComments,
+    pageGraph
   },
   data () {
     return {
       node: null,
       nodeIsVisible: true,
       pageId: 'joints',
-      pages: [{id: 'joints', name: this.$t('Joints')}, {id: 'comments', name: this.$t('Comments')}]
+      pages: [{id: 'graph', name: this.$t('Graph')}, {id: 'joints', name: this.$t('Joints')}, {id: 'comments', name: this.$t('Comments')}]
     }
   },
   computed: {
@@ -120,6 +123,18 @@ export default {
         }
       }
     },
+    pageId: {
+      // immediate: true,
+      handler (to, from) {
+        if (this.$route.query.pageId !== to) this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to }})
+      }
+    },
+    '$route.query.pageId': {
+      immediate: true,
+      handler (to, from) {
+        this.pageId = to || this.pageId
+      }
+    }
   },
   methods: {
     nodeVisibilityCallback (isVisible, entry) {

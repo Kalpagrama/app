@@ -17,7 +17,7 @@ export const schemaKeyValue = {
 
 export const wsSchemaItem = {
   title: 'wsSchemaItem',
-  version: 2,
+  version: 3,
   description: 'wsSchemaItem',
   type: 'object',
   properties: {

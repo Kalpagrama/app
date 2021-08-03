@@ -110,7 +110,7 @@ export default {
     pageId: {
       // immediate: true,
       handler (to, from) {
-        this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to }})
+        if (this.$route.query.pageId !== to) this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to }})
       }
     },
     '$route.query.pageId': {

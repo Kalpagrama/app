@@ -1,57 +1,28 @@
 <template lang="pug">
-div(
-  v-if="itemsRes"
-  :style=`{
+  div(
+    v-if="itemsRes"
+    :style=`{
     position: 'relative',
   }`
-  ).row.full-width.br
-  .row.full-width.q-px-md.q-py-sm.text-white
-    q-icon(name="fas fa-link" color="white" size="20px").q-mr-sm
-    span.text-bold.q-mr-sm {{$t('Joints')}}
-    div(
-      v-if="itemsRes && itemsRes.totalCount > 0"
-      ).row
-      span.q-mr-sm -
-      span {{ itemsRes ? itemsRes.totalCount : '' }}
-  div(
-    v-for="(joint, jointIndex) in itemsRes.items"
-    :key="joint[itemsRes.itemPrimaryKey]"
-    ).col-6.q-pa-xs
-    div(
-      @click="jointClick(joint)"
-      :style=`{
-        position: 'relative',
-        paddingBottom: '100%',
-      }`
-      ).row.full-width
-      joint-item(
-        :oid="node.oid"
-        :joint="joint.populatedObject"
-        :style=`{
-          position: 'absolute', zIndex: 10,
-          background: 'rgba(35,35,35)',
-          borderRadius: '10px',
-        }`).fit
+  ).row.full-width
+    graph-view(:height="700" :graph="graph")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import jointItem from './joint_item.vue'
-import jointsSlider from './joints_slider.vue'
+import * as assert from 'assert'
 
 export default {
   name: 'pageJoints',
   props: ['node'],
   components: {
-    jointItem,
-    jointsSlider,
   },
   data () {
     return {
       itemsRes: null,
       itemsSliderShow: false,
-      itemsSliderJoint: null,
+      itemsSliderJoint: null
     }
   },
   computed: {
@@ -61,18 +32,31 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['JOINT'] },
           oidSphere: this.node.oid,
-          sortStrategy: 'AGE',
+          sortStrategy: 'AGE'
         },
-        populateObjects: true,
+        populateObjects: true
       }
+    },
+    graph () {
+      let graph = { nodes: [], joints: [] }
+      if (this.itemsRes) {
+        this.$log('this.itemsRes.items', this.itemsRes.items)
+        for (let item of this.itemsRes.items) {
+          let joint = item.populatedObject
+          assert(joint.type === 'JOINT')
+          let leftNode = joint.itemsShort[0]
+          let rightNode = joint.itemsShort[1]
+          if (!graph.nodes.find(n => n.oid === leftNode.oid)) graph.nodes.push(JSON.parse(JSON.stringify(leftNode)))
+          if (!graph.nodes.find(n => n.oid === rightNode.oid)) graph.nodes.push(JSON.parse(JSON.stringify(rightNode)))
+          let jointType = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
+          graph.joints.push({oid: joint.oid, type: jointType, source: leftNode.oid, target: rightNode.oid})
+        }
+      }
+      this.$log('graph', graph)
+      return graph
     }
   },
-  methods: {
-    jointClick (joint) {
-      this.$log('jointClick', joint)
-      this.$router.push(`/graph/${this.node.oid}?oid=${joint.oid}`)
-    },
-  },
+  methods: {},
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)

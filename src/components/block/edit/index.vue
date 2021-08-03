@@ -21,7 +21,7 @@
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")
       //graph
-      graph-view(:height="graphHeight" :block="block").row.full-width.full-height
+      graph-view(:height="graphHeight" :graph="block.graph").row.full-width.full-height
       //div().row.full-width.full-height.br
         //q-btn(
         //  label="graph"
@@ -82,14 +82,12 @@
 
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
-import graphView from 'src/components/block/graph_view.vue'
 
 export default {
   name: 'blockEdit',
   components: {
     editSpheres,
     editCategory,
-    graphView
   },
   props: {
     block: { type: Object, required: true },
@@ -100,6 +98,13 @@ export default {
   data () {
     return {
       graphHeight: this.height
+    }
+  },
+  watch: {
+    'block.graph': {
+      handler (to, from) {
+        if (to.nodes.length) this.block.thumbUrl = to.nodes[0].thumbUrl
+      }
     }
   },
   computed: {

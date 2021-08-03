@@ -41,9 +41,16 @@
         @click.self="selectedItem = null"
       ).row.fit.items-center.content-center.justify-center
         item-preview(:item="selectedItem")
+    q-dialog(
+      v-model="jointCreatorShow"
+      position="standard"
+      :maximized="false"
+      )
+      //q-btn(label="qwerqwer").text-white
+      joint-creator().br
     div(ref="graphTooltip"
       :style=`{
-      zIndex: itemFinderShow || previewShow ? 10 : 10001,
+      zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10001,
       position: "absolute",
       "background-color": "white",
       "max-width": "200px",
@@ -58,11 +65,11 @@
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
       q-btn(:label="$t('reload')" @click="updateGraph").text-grey-4
-    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow ? 10 : 10000}`).row.full-width
+    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10000}`).row.full-width
 </template>
 
 <script>
-import itemPreview from 'src/pages/app/sphere_threads/item_creator/item_preview/index.vue'
+import itemPreview from 'src/pages/app/sphere_threads/item_creator/item_preview'
 import * as d3 from 'd3';
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -73,7 +80,7 @@ export default {
     itemPreview
   },
   props: {
-    block: { type: Object, required: true },
+    graph: { type: Object, required: true },
     width: {
       type: Number
     },
@@ -84,67 +91,9 @@ export default {
   data () {
     return {
       itemFinderShow: false,
+      jointCreatorShow: true,
       newItemLocation: [0, 0],
       selectedItem: null,
-      dataset: {
-        nodes: [
-          {
-            id: 1,
-            oid: '166220274927142929',
-            name: 'Черный человек',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/jv/9x/165900530068013071_cuts/[5210.5]_600_cut.jpg?rev=5'
-          },
-          {
-            id: 2,
-            oid: '166229872765569043',
-            name: 'Андрюха на хакатоне',
-            type: 'NODE',
-            thumbUrl: 'https://thumbs-yandexdev.kalpa.store/we/am/166677930032807953_600_thumb.jpg?rev=15'
-          },
-          {
-            id: 3,
-            oid: '166300537782929431',
-            name: 'Alan Watts',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
-          },
-          {
-            id: 4,
-            oid: '166300537782929431',
-            name: 'Alan Watts',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
-          },
-          {
-            id: 5,
-            oid: '166300537782929431',
-            name: 'Alan Watts',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
-          },
-          {
-            id: 6,
-            oid: '166300537782929431',
-            name: 'Alan Watts',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
-          },
-          {
-            id: 7,
-            oid: '166300537782929431',
-            name: 'Alan Watts',
-            type: 'NODE',
-            thumbUrl: 'https://cuts-yandexdev.kalpa.store/zo/y0/166299168166559750_cuts/[1101.77]_600_cut.jpg?rev=5'
-          }
-        ],
-        joints: [
-          { source: 1, target: 3, type: this.$t('ASSOCIATION') },
-          { source: 2, target: 3, type: this.$t('ESSENCE') },
-          { source: 1, target: 2, type: this.$t('ASSOCIATION') }
-
-        ]
-      },
       nodeRadius: 50,
       svg: null,
       defs: null,
@@ -182,7 +131,7 @@ export default {
       console.log('addNode')
       assert(item.id)
       this.itemFinderShow = false
-      if (this.block.graph.nodes.find(n => n.id === item.id)) {
+      if (this.graph.nodes.find(n => n.id === item.id)) {
         this.$notify('error', this.$t('same item found'))
         return
       }
@@ -195,23 +144,23 @@ export default {
         x: this.newItemLocation[0],
         y: this.newItemLocation[1]
       }
-      this.block.graph.nodes.push(d);
-      this.block.thumbUrl = d.thumbUrl
+      this.graph.nodes.push(d);
       this.updateGraph()
       this.blinkNode(d)
     },
     addEdge (d1, d2) {
       console.log('addEdge')
+      this.jointCreatorShow = true
       let newEdge = { source: d1, target: d2, type: this.$t('ASSOCIATION') }
       if (d1.id === d2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
       }
-      if (this.block.graph.joints.find(j => this.jointIsEqual(j, newEdge))) {
+      if (this.graph.joints.find(j => this.jointIsEqual(j, newEdge))) {
         this.$notify('error', this.$t('same joint found'))
         return
       }
 
-      this.block.graph.joints.push(newEdge);
+      this.graph.joints.push(newEdge);
       this.updateGraph()
     },
     blinkNode (d, width = 20) {
@@ -246,13 +195,17 @@ export default {
       let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
       this.height = this.$refs.graphSvg.clientHeight
-      for (let n of this.block.graph.nodes) {
-        if (this.block.graph.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
+      for (let n of this.graph.nodes) {
+        assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
+        n.id = n.id || n.oid
+        if (this.graph.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
         else n.linked = false
       }
-      for (let j of this.block.graph.joints) {
-        j.source = j.source.id || j.source.id
-        j.target = j.target.id || j.target.id
+      for (let j of this.graph.joints) {
+        // assert(j.oid || j.id, 'joint should have oid or id' + JSON.stringify(j))
+        j.id = j.id || j.oid
+        j.source = j.source.id || j.source
+        j.target = j.target.id || j.target
       }
 
       class GraphClickProcessor {
@@ -262,7 +215,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          console.log('registerEvent', type, event.type)
+          // console.log('registerEvent', type, event.type)
           switch (type) {
             case 'click':
               // event.stopPropagation()
@@ -421,7 +374,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          console.log('registerEvent', type, event.type)
+          // console.log('registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -462,7 +415,7 @@ export default {
                 this.dragLine(event, d)
                 if (event.sourceEvent instanceof TouchEvent) {
                   let linkedNodeData = null
-                  for (let n of thiz.dataset.nodes) {
+                  for (let n of thiz.graph.nodes) {
                     let x = n.x - event.x
                     let y = n.y - event.y
                     let l = Math.sqrt(x * x + y * y)
@@ -572,7 +525,7 @@ export default {
 
       let clickProcessor = new NodeClickProcessor()
       this.graphNodes = this.svg.selectAll('.graphNodes')
-          .data(this.block.graph.nodes)
+          .data(this.graph.nodes)
           .enter()
           .append('g')
           // .attr('class', 'nodes')
@@ -662,7 +615,7 @@ export default {
     drawEdges () {
       // Initialize the links
       this.graphEdges = this.svg.selectAll('.graphEdges')
-          .data(this.block.graph.joints)
+          .data(this.graph.joints)
           .enter()
           .append('line')
           .attr('class', 'links')
@@ -676,7 +629,7 @@ export default {
       this.graphEdges.append('title').text(d => d.type);
 
       this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
-          .data(this.block.graph.joints)
+          .data(this.graph.joints)
           .enter()
           .append('path')
           .attr('class', 'edgepath')
@@ -688,7 +641,7 @@ export default {
           .style('pointer-events', 'none');
 
       const edgelabels = this.svg.selectAll('.edgelabel')
-          .data(this.block.graph.joints)
+          .data(this.graph.joints)
           .enter()
           .append('text')
           .style('pointer-events', 'none')
@@ -718,7 +671,7 @@ export default {
       //     // .force('center', d3.forceCenter().x(200).y(200))
       //     .force('charge', d3.forceManyBody().strength(-2500));
       // this.simulationUnlinked
-      //     .nodes(this.block.graph.nodes.filter(n => !n.linked))
+      //     .nodes(this.graph.nodes.filter(n => !n.linked))
       //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
       //     .on('tick', (d) => {
       //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
@@ -734,7 +687,7 @@ export default {
           // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
           .force('charge', d3.forceManyBody().strength(d => d.linked ? -2500 : -700)) // This adds repulsion (if it's negative) between nodes.
       this.simulationLinked
-          .nodes(this.block.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
+          .nodes(this.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
             thiz.graphEdges.attr('x1', d => d.source.x)
@@ -749,7 +702,7 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.force('link').links(this.block.graph.joints)
+      this.simulationLinked.force('link').links(this.graph.joints)
       this.simulationLinked.alphaTarget(0.1).restart();
       // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
@@ -782,7 +735,7 @@ export default {
             event.stopPropagation()
           })
           .on('touchmove', function (event) {
-            console.log('touchmove', event)
+            // console.log('touchmove', event)
             event.stopPropagation()
           });
 
@@ -833,7 +786,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('block=', JSON.parse(JSON.stringify(this.block)))
+    this.$log('graph=', JSON.parse(JSON.stringify(this.graph)))
     this.updateGraph()
     // this.testGraph()
   }

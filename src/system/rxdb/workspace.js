@@ -89,6 +89,7 @@ class Workspace {
                   // ..., - см wsSchemaItem.version (из schema.js)
                   1: oldDoc => oldDoc,
                   2: oldDoc => oldDoc,
+                  3: oldDoc => oldDoc,
                }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })

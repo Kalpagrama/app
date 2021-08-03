@@ -1,52 +1,68 @@
 <template lang="pug">
-.row
-  slot(name="action" :start="start" :content="content")
-  q-btn(
-    v-if="!$scopedSlots.action"
-    round flat no-caps
-    :color="paid ? activeColor : inactiveColor"
-    icon="paid"
-    :loading="loading")
-    q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
-    q-menu(
-    v-if="!paid"
-      dark)
-      .row
-        img(
-          :style=`{
-                objectFit: 'cover',
-                maxWidth: '100px',
-                borderRadius: '10px',
-              }`
-          :src="thumbUrl"
+  .row
+    slot(name="action" :start="start" :content="content")
+      q-btn(
+        v-if="!$scopedSlots.action"
+        round flat no-caps
+        :color="paid ? activeColor : inactiveColor"
+        icon="paid"
+        @click="showDialog = (!paid ? true : false)"
+        :loading="loading")
+        q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
+        q-dialog(
+          v-model="showDialog"
+          position="standard"
+          :maximized="false"
+        )
+          payanyway-form(
+            :amount="12.34"
+            :transactionId="Date.now()"
+            :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
+            :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
+            :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
+            @success="onSuccessPay"
           )
-        .row.full-width
-          q-btn(
-            @click="start()"
-            :label="$t('sberPay')"
-            icon='shopping_cart'
-            round flat no-caps
-          )
+        q-menu(
+          v-if="false"
+          dark)
+          .row
+            img(
+              :style=`{
+                  objectFit: 'cover',
+                  maxWidth: '100px',
+                  borderRadius: '10px',
+                }`
+              :src="thumbUrl"
+            )
+            .row.full-width
+              q-btn(
+                @click="onSuccessPay"
+                :label="$t('sberPay')"
+                icon='shopping_cart'
+                round flat no-caps
+              )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import * as assert from 'assert'
-import { ContentApi } from 'src/api/content'
+import payanywayForm from 'src/components/kalpa_pay/payanyway_form.vue'
 
 export default {
   name: 'kalpaPay',
   props: {
-    oid: {type: String},
-    type: {type: String},
-    name: {type: String},
-    thumbUrl: {type: String},
-    isActive: {type: Boolean},
-    fields: {type: Object},
-    inactiveColor: {type: String, default: 'white'},
-    activeColor: {type: String, default: 'green'},
+    oid: { type: String },
+    item: { type: Object },
+    type: { type: String },
+    name: { type: String },
+    thumbUrl: { type: String },
+    isActive: { type: Boolean },
+    fields: { type: Object },
+    inactiveColor: { type: String, default: 'white' },
+    activeColor: { type: String, default: 'green' }
   },
   components: {
+    payanywayForm
   },
   data () {
     return {
@@ -58,7 +74,7 @@ export default {
   computed: {
     paid () {
       return this.content && this.content.paid
-    },
+    }
   },
   watch: {
     isActive: {
@@ -66,20 +82,20 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.oid}})
+          let { items: [content] } = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+              oid: this.oid
+            }
+          })
           if (content) this.content = content
         }
       }
-    },
-    // content: {
-    //   handler (to, from) {
-    //     this.$log('content TO', to)
-    //     if (to) this.$emit('content', to)
-    //   }
-    // }
+    }
   },
   methods: {
-    async start () {
+    async onSuccessPay () {
+      this.$log('onSuccessPay')
       try {
         this.$log('start')
         if (this.$store.getters.isGuest) {
@@ -87,12 +103,16 @@ export default {
             message: 'Чтобы купить, войдите в аккаунт.'
           }
           this.$store.commit('ui/stateSet', ['authGuard', authGuard])
-        }
-        else {
+        } else {
           this.loading = true
           await this.$systemUtils.vibrate(500)
           // await this.$wait(500)
-          let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.oid}})
+          let { items: [content] } = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+              oid: this.oid
+            }
+          })
           this.$log('start [content]', content)
           if (!content) {
             this.$log('content CREATE')
@@ -112,10 +132,9 @@ export default {
           // todo веменное решение! Надо переделать так, чтобы этим занимался бэкенд.
           this.content.paid = true
           this.loading = false
-          // this.showDialog = true
+          await this.$router.push('/workspace/contents')
         }
-      }
-      catch (e) {
+      } catch (e) {
         this.$log('start error', e)
         this.loading = false
       }
