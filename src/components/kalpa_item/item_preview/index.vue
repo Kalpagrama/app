@@ -1,7 +1,8 @@
 <template lang="pug">
 component(
+  v-if="itemFull"
   :is="itemComponent"
-  :item="item"
+  :item="itemFull"
   :isActive="isActive")
 </template>
 
@@ -11,6 +12,7 @@ import typeImage from 'src/components/kalpa_item/item_preview/type_image.vue'
 import typeVideo from 'src/components/kalpa_item/item_preview/type_video.vue'
 import typeNode from 'src/components/kalpa_item/item_preview/type_node.vue'
 import typeContent from 'src/components/kalpa_item/item_preview/type_content.vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'itemPreview',
@@ -22,6 +24,11 @@ export default {
     typeContent,
   },
   props: ['item', 'isActive'],
+  data () {
+    return {
+      itemFull: null
+    }
+  },
   computed: {
     itemComponent () {
       if (this.item.type === 'NODE') return 'type-node'
@@ -30,7 +37,12 @@ export default {
       else if (this.item.__typename === 'Composition' && this.item.outputType === 'IMAGE') return 'type-image'
       else if (this.item.__typename === 'Composition' && this.item.outputType === 'BOOK') return 'type-book'
       else return null
-    }
+    },
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.itemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid)
+    this.$log('itemFull=', this.itemFull)
   }
 }
 </script>

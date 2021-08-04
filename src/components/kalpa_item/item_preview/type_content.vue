@@ -8,11 +8,23 @@
     }`
     ).row.full-width.items-start.content-start
     img(
-      :src="url"
+      v-if="!playerReady"
+      :src="item.thumbUrl"
       :style=`{
         borderRadius: '10px',
       }`
       ).full-width
+    content-player(
+      v-if="item.type === 'VIDEO'"
+      @player="playerReady"
+      :contentKalpa="item"
+      :isActive="true"
+      :isVisible="true"
+      :isMini="false"
+      :style=`{
+      position: 'absolute', zIndex: 100, top: '0px',
+    }`
+    ).fit
     //- footer
     .row.full-width.items-center.content-center.no-wrap.q-pa-sm
       q-icon(name="select_all" color="white" size="36px").q-mr-sm
@@ -21,12 +33,17 @@
 
 <script>
 import { ContentApi } from 'src/api/content'
+import contentPlayer from 'src/components/content_player/index.vue'
 
 export default {
   name: 'typeContent',
   props: ['item', 'isActive'],
+  components: {
+    contentPlayer
+  },
   data () {
     return {
+      playerReady: false
     }
   },
   computed: {

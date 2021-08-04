@@ -35,12 +35,9 @@
       v-model="previewShow"
       position="standard"
       :maximized="false"
-      @hide="selectedItem = null"
-    )
-      div(
-        @click.self="selectedItem = null"
-        ).row.fit.items-center.content-center.justify-center
-        item-preview(:item="selectedItem")
+      @close="selectedItem = null"
+      )
+      item-preview(:item="selectedItem")
     q-dialog(
       v-model="jointCreatorShow"
       position="standard"
@@ -91,8 +88,9 @@ export default {
   },
   data () {
     return {
+      previewShow: false,
       itemFinderShow: false,
-      jointCreatorShow: true,
+      jointCreatorShow: false,
       newItemLocation: [0, 0],
       selectedItem: null,
       nodeRadius: 50,
@@ -108,9 +106,6 @@ export default {
     }
   },
   computed: {
-    previewShow () {
-      return !!this.selectedItem
-    }
   },
   watch: {
     width: {
@@ -471,6 +466,7 @@ export default {
             thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
               thiz.$log(item)
               thiz.selectedItem = item
+              thiz.previewShow = true
             }).catch(err => thiz.$logE(err))
           }
         }
