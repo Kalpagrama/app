@@ -1,76 +1,73 @@
 <template lang="pug">
-kalpa-layout().b-30
-  template(v-slot:body)
-    div(:style=`{minHeight: $q.screen.height+'px',}`).row.full-width.items-start.content-start
-      //- ====
-      //- node
-      div(
-        v-if="item.type === 'NODE'"
-        ).row.full-width
-        item-preview(:item="item")
-        .row.full-width.q-py-lg.q-px-sm
-          q-btn(
-            outline no-caps color="grey-6"
-            :disable="true"
-            :style=`{
-              height: '50px',
-            }`
-            ).full-width.q-mb-sm
-            span {{$t('Change essence')}}
-      //- joint
-      //- sphere
-      //- user
-      //- ===
-      //- content VIDEO
-      composer-video(
-        v-else-if="['VIDEO'].includes(item.type)"
-        :oid="item.oid"
-        :figures="null"
-        :height="$q.screen.height-0"
-        :fromComposition="false"
-        @composition="contentComposed('VIDEO', $event)"
-        @close="contentClosed('VIDEO')")
-      //- content BOOK
-      composer-book(
-        v-else-if="['BOOK'].includes(item.type)"
-        :oid="item.oid"
-        :figures="null"
-        :height="$q.screen.height-0"
-        @composition="contentComposed('BOOK', $event)"
-        @close="contetnClosed('BOOK')")
-      //- content IMAGE
-      composer-image(
-        v-else-if="['IMAGE'].includes(item.type)"
-        :oid="item.oid"
-        :figures="null"
-        :height="$q.screen.height-0"
-        @composition="contentComposed('BOOK', $event)"
-        @close="contetnClosed('BOOK')")
-      //- ===
-      //- composition VIDEO
-      composer-video(
-        v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
-        :oid="item.layers[0].contentOid"
-        :figures="item.layers[0].figuresAbsolute"
-        :height="$q.screen.height-0"
-        :fromComposition="true"
-        @composition="compositionChanged('VIDEO', $event)"
-        @close="compositionClosed('VIDEO')")
-      //- composition BOOK
-      composer-book(
-        v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
-        :oid="item.layers[0].contentOid"
-        :figures="item.layers[0].figuresAbsolute"
-        :height="$q.screen.height"
-        :fromComposition="true"
-        @composition="compositionChanged('BOOK', $event)"
-        @close="compositionClosed('BOOK')")
-      //- composition AUDIO
-      composer-joint(
-        v-else-if="item.type === 'JOINT'"
-        :joint="item"
-        :height="$q.screen.height"
-        @close="").br
+.row
+  //- node
+  div(
+    v-if="item.type === 'NODE'"
+    ).row.full-width
+    item-preview(:item="item")
+    .row.full-width.q-py-lg.q-px-sm
+      q-btn(
+        outline no-caps color="grey-6"
+        :disable="true"
+        :style=`{
+          height: '50px',
+        }`
+        ).full-width.q-mb-sm
+        span {{$t('Change essence')}}
+  //- joint
+  //- sphere
+  //- user
+  //- ===
+  //- content VIDEO
+  composer-video(
+    v-else-if="['VIDEO'].includes(item.type)"
+    :oid="item.oid"
+    :figures="null"
+    :height="$q.screen.height-0"
+    :fromComposition="false"
+    @composition="contentComposed('VIDEO', $event)"
+    @close="contentClosed('VIDEO')")
+  //- content BOOK
+  composer-book(
+    v-else-if="['BOOK'].includes(item.type)"
+    :oid="item.oid"
+    :figures="null"
+    :height="$q.screen.height-0"
+    @composition="contentComposed('BOOK', $event)"
+    @close="contetnClosed('BOOK')")
+  //- content IMAGE
+  composer-image(
+    v-else-if="['IMAGE'].includes(item.type)"
+    :oid="item.oid"
+    :figures="null"
+    :height="$q.screen.height-0"
+    @composition="contentComposed('BOOK', $event)"
+    @close="contetnClosed('BOOK')")
+  //- ===
+  //- composition VIDEO
+  composer-video(
+    v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
+    :oid="item.layers[0].contentOid"
+    :figures="item.layers[0].figuresAbsolute"
+    :height="$q.screen.height-0"
+    :fromComposition="true"
+    @composition="compositionChanged('VIDEO', $event)"
+    @close="compositionClosed('VIDEO')")
+  //- composition BOOK
+  composer-book(
+    v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
+    :oid="item.layers[0].contentOid"
+    :figures="item.layers[0].figuresAbsolute"
+    :height="$q.screen.height"
+    :fromComposition="true"
+    @composition="compositionChanged('BOOK', $event)"
+    @close="compositionClosed('BOOK')")
+  //- composition AUDIO
+  composer-joint(
+    v-else-if="item.type === 'JOINT'"
+    :joint="item"
+    :height="$q.screen.height"
+    @close="$emit('close', $event)")
 </template>
 
 <script>
@@ -81,7 +78,7 @@ import composerJoint from 'src/components/kalpa_item/item_editor/composer-joint'
 // import composerAudio from './composer_audio.vue'
 
 export default {
-  name: 'itemEditor',
+  name: 'composer',
   components: {
     composerBook,
     composerImage,

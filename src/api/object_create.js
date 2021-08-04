@@ -250,21 +250,21 @@ class ObjectCreateApi {
       return reactiveEssence
    }
 
-   static makeJointInput (joint) {
-      let chainInput = {}
-      assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
-      assert(joint.rightItem.oid || joint.rightItem.nodeInput, '!joint.rightItem.oid')
-      assert(joint.jointType, '!joint.jointType')
-      if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.leftItem.nodeInput)
-      if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.rightItem.nodeInput)
-      return {
-         swap: joint.swap || false,
-         jointType: joint.jointType,
-         leftItem: joint.leftItem,
-         rightItem: joint.rightItem,
-         name: joint.name
-      }
-   }
+   // static makeJointInput (joint) {
+   //    let chainInput = {}
+   //    assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
+   //    assert(joint.rightItem.oid || joint.rightItem.nodeInput, '!joint.rightItem.oid')
+   //    assert(joint.jointType, '!joint.jointType')
+   //    if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.leftItem.nodeInput)
+   //    if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.rightItem.nodeInput)
+   //    return {
+   //       swap: joint.swap || false,
+   //       jointType: joint.jointType,
+   //       leftItem: joint.leftItem,
+   //       rightItem: joint.rightItem,
+   //       name: joint.name
+   //    }
+   // }
 
    static makeCourseInput (course) {
       const f = ObjectCreateApi.makeCourseInput

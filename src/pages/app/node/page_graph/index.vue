@@ -21,6 +21,7 @@ export default {
   data () {
     return {
       itemsRes: null,
+      graph: { nodes: [], joints: [] },
       itemsSliderShow: false,
       itemsSliderJoint: null
     }
@@ -37,29 +38,21 @@ export default {
         populateObjects: true
       }
     },
-    graph () {
-      let graph = { nodes: [], joints: [] }
-      if (this.itemsRes) {
-        this.$log('this.itemsRes.items', this.itemsRes.items)
-        for (let item of this.itemsRes.items) {
-          let joint = item.populatedObject
-          assert(joint.type === 'JOINT')
-          let leftNode = joint.itemsShort[0]
-          let rightNode = joint.itemsShort[1]
-          if (!graph.nodes.find(n => n.oid === leftNode.oid)) graph.nodes.push(JSON.parse(JSON.stringify(leftNode)))
-          if (!graph.nodes.find(n => n.oid === rightNode.oid)) graph.nodes.push(JSON.parse(JSON.stringify(rightNode)))
-          let jointType = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
-          graph.joints.push({oid: joint.oid, type: jointType, source: leftNode.oid, target: rightNode.oid})
-        }
-      }
-      this.$log('graph', graph)
-      return graph
-    }
   },
   methods: {},
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query, true)
+    if (this.itemsRes) {
+      this.$log('this.itemsRes.items', this.itemsRes.items)
+      for (let item of this.itemsRes.items) {
+        let joint = item.populatedObject
+        assert(joint.type === 'JOINT')
+        let jointCopy = JSON.parse(JSON.stringify(joint))
+        delete jointCopy.items // есть  itemsShort
+        this.graph.joints.push(jointCopy)
+      }
+    }
     await this.itemsRes.setProperty('currentId', null)
     await this.itemsRes.gotoStart()
   }

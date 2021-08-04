@@ -3,7 +3,10 @@ component(
   v-if="itemFull"
   :is="itemComponent"
   :item="itemFull"
-  :isActive="isActive")
+  :isActive="isActive"
+  :showHeader="showHeader"
+  :showSpheres="showSpheres"
+  )
 </template>
 
 <script>
@@ -23,7 +26,7 @@ export default {
     typeNode,
     typeContent,
   },
-  props: ['item', 'isActive'],
+  props: ['item', 'isActive', 'showHeader', 'showSpheres'],
   data () {
     return {
       itemFull: null

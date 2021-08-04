@@ -27,7 +27,7 @@
           search: {views: ['default']},
           gif: {views: ['popular']},
         }`
-        @item="addNode"
+        @item="addNodeToGraph"
         @close="itemFinderShow = false"
       ).b-30
     // превьюшка выбранного элемента на графе
@@ -36,14 +36,23 @@
       position="standard"
       :maximized="false"
       @close="selectedItem = null"
-      )
-      item-preview(:item="selectedItem")
+    )
+      item-preview(:item="selectedItem", :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
+    // меню создания связи
     q-dialog(
       v-model="jointCreatorShow"
       position="standard"
       :maximized="false"
-      )
-      joint-creator().br
+      @close="newJoint = null"
+    )
+      composer(
+        :joint="newJoint"
+        :item="newJoint"
+        @remove="$log('item-editor @remove')"
+        @close="addJointToGraph(newJoint)"
+        :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
+            borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
+            }`)
     div(ref="graphTooltip"
       :style=`{
       zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10001,
@@ -60,13 +69,13 @@
       opacity:0
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
-      q-btn(:label="$t('reload')" @click="updateGraph").text-grey-4
+    //q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
     svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10000}`).row.full-width
 </template>
 
 <script>
 import itemPreview from 'src/components/kalpa_item/item_preview'
-import jointCreator from './joint_creator/index.vue'
+import composer from 'src/components/kalpa_item/item_editor/composer.vue'
 import * as d3 from 'd3';
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -75,7 +84,7 @@ export default {
   name: 'graphView',
   components: {
     itemPreview,
-    jointCreator
+    composer
   },
   props: {
     graph: { type: Object, required: true },
@@ -91,6 +100,7 @@ export default {
       previewShow: false,
       itemFinderShow: false,
       jointCreatorShow: false,
+      newJoint: null,
       newItemLocation: [0, 0],
       selectedItem: null,
       nodeRadius: 50,
@@ -105,26 +115,31 @@ export default {
       clipPath: null
     }
   },
-  computed: {
-  },
-  watch: {
-    width: {
-      handler (to, from) {
-        console.log('!!!!!!!!!!!!!!!!!!width:', to)
-      }
-    }
-  },
+  computed: {},
   methods: {
-    nodeIsEqual (n1, n2) {
-      // console.log(n1, n2)
-      return n1 === n2 || n1.id === n2.id || n1 === n2.id || n2 === n1.id
-    },
     jointIsEqual (j1, j2) {
-      console.log(j1, j2)
-      return (this.nodeIsEqual(j1.source, j2.source) && this.nodeIsEqual(j1.target, j2.target)) || (this.nodeIsEqual(j1.source, j2.target) && this.nodeIsEqual(j1.target, j2.source))
+      // this.$log(j1, j2)
+      return (j1.itemsShort[0].id === j2.itemsShort[0].id && j1.itemsShort[1].id === j2.itemsShort[1].id) ||
+          (j1.itemsShort[0].id === j2.itemsShort[1].id && j1.itemsShort[1].id === j2.itemsShort[0].id)
     },
-    addNode (item) {
-      console.log('addNode')
+    prepareJoint (joint) {
+      let [leftNode, rightNode] = joint.itemsShort
+      joint.id = joint.id || joint.oid
+      assert(joint.id && joint.type === 'JOINT', 'bad joint' + JSON.stringify(joint))
+      assert(leftNode && rightNode, 'bad joint nodes' + JSON.stringify(joint))
+      leftNode.id = leftNode.id || leftNode.oid
+      rightNode.id = rightNode.id || rightNode.oid
+      if (!this.graph.nodes.find(n => n.id === leftNode.id)) this.graph.nodes.push(leftNode)
+      if (!this.graph.nodes.find(n => n.oid === rightNode.id)) this.graph.nodes.push(rightNode)
+      for (let prop in joint) { // удаляем ненужные поля
+        if (!prop.in('itemsShort', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
+      }
+      joint.source = leftNode.id
+      joint.target = rightNode.id
+      if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
+    },
+    addNodeToGraph (item) {
+      console.log('addNodeToGraph')
       assert(item.id)
       this.itemFinderShow = false
       if (this.graph.nodes.find(n => n.id === item.id)) {
@@ -144,20 +159,16 @@ export default {
       this.updateGraph()
       this.blinkNode(d)
     },
-    addEdge (d1, d2) {
-      console.log('addEdge')
-      this.jointCreatorShow = true
-      let newEdge = { source: d1, target: d2, type: this.$t('ASSOCIATION') }
-      if (d1.id === d2.id) {
-        this.$notify('error', this.$t('loop links deprecated'))
-      }
-      if (this.graph.joints.find(j => this.jointIsEqual(j, newEdge))) {
+    addJointToGraph (joint) {
+      this.$log('addJointToGraph', joint)
+      this.prepareJoint(joint)
+      if (this.graph.joints.find(j => this.jointIsEqual(j, joint))) {
         this.$notify('error', this.$t('same joint found'))
         return
       }
-
-      this.graph.joints.push(newEdge);
+      this.graph.joints.push(joint)
       this.updateGraph()
+      this.jointCreatorShow = false
     },
     blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -170,6 +181,14 @@ export default {
           .duration(200)
           .style('stroke-width', 5)
           .style('stroke', 'grey')
+    },
+    connectNodes (n1, n2) {
+      console.log('connectNodes')
+      if (n1.id === n2.id) {
+        this.$notify('error', this.$t('loop links deprecated'))
+      }
+      this.newJoint = {id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
+      this.jointCreatorShow = true
     },
     selectNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -191,17 +210,12 @@ export default {
       let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
       this.height = this.$refs.graphSvg.clientHeight
+      for (let j of this.graph.joints) this.prepareJoint(j)
       for (let n of this.graph.nodes) {
         assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
         n.id = n.id || n.oid
-        if (this.graph.joints.find(joint => this.nodeIsEqual(joint.source, n) || this.nodeIsEqual(joint.target, n))) n.linked = true
+        if (this.graph.joints.find(j => j.itemsShort[0].id === n.id || j.itemsShort[1].id === n.id)) n.linked = true
         else n.linked = false
-      }
-      for (let j of this.graph.joints) {
-        // assert(j.oid || j.id, 'joint should have oid or id' + JSON.stringify(j))
-        j.id = j.id || j.oid
-        j.source = j.source.id || j.source
-        j.target = j.target.id || j.target
       }
 
       class GraphClickProcessor {
@@ -423,7 +437,7 @@ export default {
                   if (this.linkedNodeData) thiz.unselectNode(this.linkedNodeData)
                   this.linkedNodeData = linkedNodeData;
                   if (this.linkedNodeData && this.linkedNodeData !== d) thiz.selectNode(this.linkedNodeData, 60)
-                  console.log('drag this.linkedNodeData', this.linkedNodeData)
+                  // console.log('drag this.linkedNodeData', this.linkedNodeData)
                 }
               } else if (this.state === 'START_LONG_CLICK' && Math.abs(d.x - event.x) + Math.abs(d.y - event.y) < (event.sourceEvent instanceof TouchEvent ? 20 : 5)) {
                 // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
@@ -436,7 +450,7 @@ export default {
               break
             case 'end':
               this.clearLine()
-              if (this.linkedNodeData && d !== this.linkedNodeData) this.createEdge(d)
+              if (this.linkedNodeData && d !== this.linkedNodeData) this.makeEdge(d)
               if (!this.dragdetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
               break
             default :
@@ -489,8 +503,8 @@ export default {
           thiz.dragLine.classed('hidden', true);
         }
 
-        createEdge (d) {
-          thiz.addEdge(d, this.linkedNodeData)
+        makeEdge (d) {
+          thiz.connectNodes(d, this.linkedNodeData)
           this.linkedNodeData = null
           thiz.$systemUtils.hapticsImpact()
         }
@@ -618,12 +632,12 @@ export default {
           .attr('class', 'links')
           // .attr('fill', 'black')
           .attr('marker-end', function (d, i) {
-            return d.type === 'ASSOCIATION' ? 'url(#arrowhead)' : 'url(#arrowhead)' // The marker-end attribute defines the arrowhead or polymarker that will be drawn at the final vertex of the given shape.
+            return 'url(#arrowhead)' // The marker-end attribute defines the arrowhead or polymarker that will be drawn at the final vertex of the given shape.
           })
 
       // The <title> element provides an accessible, short-text description of any SVG container element or graphics element.
       // Text in a <title> element is not rendered as part of the graphic, but browsers usually display it as a tooltip.
-      this.graphEdges.append('title').text(d => d.type);
+      this.graphEdges.append('title').text(d => d.name);
 
       this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
           .data(this.graph.joints)
@@ -656,7 +670,7 @@ export default {
           .style('text-anchor', 'middle')
           .style('pointer-events', 'none')
           .attr('startOffset', '50%')
-          .text(d => d.type);
+          .text(d => d.name);
     },
     doLayout () {
       console.log('doLayout', this.width)

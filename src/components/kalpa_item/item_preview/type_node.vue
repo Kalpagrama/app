@@ -12,6 +12,8 @@
   node-feed(
     v-if="node"
     :node="node"
+    :showHeader="showHeader"
+    :showSpheres="showSpheres"
     :isActive="isActive"
     :isVisible="isActive"
     :showActions="false")
@@ -22,7 +24,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'typeNode',
-  props: ['item', 'isActive'],
+  props: ['item', 'isActive', 'showHeader', 'showSpheres'],
   data () {
     return {
       node: null,
