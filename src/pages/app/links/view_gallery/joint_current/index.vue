@@ -76,7 +76,7 @@
             borderRadius: '50%',
           }`)
         q-btn(
-          :to="'/graph/'+joint.items[itemIndex].oid"
+          :to="'/cube/'+joint.items[itemIndex].oid"
           round flat color="green" icon="fas fa-link")
 </template>
 

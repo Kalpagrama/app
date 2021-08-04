@@ -179,7 +179,7 @@ export default {
       this.$log('rowsNext')
       let rowLast = this.rows[this.rows.length - 1]
       this.$log('rowLast', rowLast)
-      this.$router.push('/graph/' + rowLast.oid)
+      this.$router.push('/cube/' + rowLast.oid)
     },
     jointCreateStart () {
       this.$log('jointCreateStart')

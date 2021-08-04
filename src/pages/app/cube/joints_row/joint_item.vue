@@ -208,7 +208,7 @@
       }`
       ).row.full-width
       router-link(
-        :to="'/graph/'+item.oid"
+        :to="'/cube/'+item.oid"
         ).row.full-width.items-center.content-center.q-pa-md
         q-icon(name="fas fa-link" color="white" size="24px").q-mr-md
         span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('Links')}} {{ jointsRes.totalCount }}
@@ -218,7 +218,7 @@
         .row.no-wrap
           router-link(
             v-for="(i,ii) in jointsRes.items" :key="i.oid"
-            :to="'/graph/'+item.oid+'?oid='+i.oid"
+            :to="'/cube/'+item.oid+'?oid='+i.oid"
             ).row.q-pr-sm
             img(
               draggable="false"
@@ -236,7 +236,7 @@
       }`
       ).row.full-width
       q-btn(
-        :to="'/graph/'+item.oid"
+        :to="'/cube/'+item.oid"
         flat color="white" no-caps
         ).full-width У этого элемента пока нет связей, будьте первыми!
 </template>

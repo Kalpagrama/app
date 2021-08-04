@@ -9,7 +9,7 @@
     ).row.full-width
     //- header
     router-link(
-      :to="'/graph/'+node.oid"
+      :to="'/cube/'+node.oid"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="fas fa-link" color="white" size="24px").q-mr-sm
       .col
@@ -32,7 +32,7 @@
         router-link(
           v-for="j in jointsRes.items"
           :key="j.populatedObject.oid"
-          :to="'/graph/'+node.oid+'?oid='+j.oid"
+          :to="'/cube/'+node.oid+'?oid='+j.oid"
           :style=`{
             height: '50px', width: '50px', minWidth: '50px',
             borderRadius: '10px',
@@ -50,7 +50,7 @@
       div(v-if="jointsRes && jointsRes.items.length === 0").row.full-width.no-wrap.q-pa-sm
         q-btn(
           flat no-caps color="white" align="left"
-          :to="'/graph/'+node.oid"
+          :to="'/cube/'+node.oid"
           :style=`{
             height: '50px',
           }`

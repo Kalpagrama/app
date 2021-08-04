@@ -39,14 +39,13 @@
     )
       div(
         @click.self="selectedItem = null"
-      ).row.fit.items-center.content-center.justify-center
+        ).row.fit.items-center.content-center.justify-center
         item-preview(:item="selectedItem")
     q-dialog(
       v-model="jointCreatorShow"
       position="standard"
       :maximized="false"
       )
-      //q-btn(label="qwerqwer").text-white
       joint-creator().br
     div(ref="graphTooltip"
       :style=`{
@@ -69,7 +68,8 @@
 </template>
 
 <script>
-import itemPreview from 'src/pages/app/sphere_threads/item_creator/item_preview'
+import itemPreview from 'src/components/kalpa_item/item_preview'
+import jointCreator from './joint_creator/index.vue'
 import * as d3 from 'd3';
 import * as assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -77,7 +77,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'graphView',
   components: {
-    itemPreview
+    itemPreview,
+    jointCreator
   },
   props: {
     graph: { type: Object, required: true },
@@ -91,7 +92,7 @@ export default {
   data () {
     return {
       itemFinderShow: false,
-      jointCreatorShow: false,
+      jointCreatorShow: true,
       newItemLocation: [0, 0],
       selectedItem: null,
       nodeRadius: 50,
@@ -150,7 +151,7 @@ export default {
     },
     addEdge (d1, d2) {
       console.log('addEdge')
-      // this.jointCreatorShow = true
+      this.jointCreatorShow = true
       let newEdge = { source: d1, target: d2, type: this.$t('ASSOCIATION') }
       if (d1.id === d2.id) {
         this.$notify('error', this.$t('loop links deprecated'))

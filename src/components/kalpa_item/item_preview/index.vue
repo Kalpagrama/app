@@ -6,11 +6,11 @@ component(
 </template>
 
 <script>
-import typeBook from './type_book.vue'
-import typeImage from './type_image.vue'
-import typeVideo from './type_video.vue'
-import typeNode from './type_node.vue'
-import typeContent from './type_content.vue'
+import typeBook from 'src/components/kalpa_item/item_preview/type_book.vue'
+import typeImage from 'src/components/kalpa_item/item_preview/type_image.vue'
+import typeVideo from 'src/components/kalpa_item/item_preview/type_video.vue'
+import typeNode from 'src/components/kalpa_item/item_preview/type_node.vue'
+import typeContent from 'src/components/kalpa_item/item_preview/type_content.vue'
 
 export default {
   name: 'itemPreview',

@@ -101,8 +101,8 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
 import vertexEditor from './vertex_editor.vue'
-import itemEditor from './item_editor/index.vue'
-import itemPreview from './item_preview/index.vue'
+import itemEditor from 'src/components/kalpa_item/item_editor/index.vue'
+import itemPreview from 'src/components/kalpa_item/item_preview/index.vue'
 
 export default {
   name: 'jointCreator',

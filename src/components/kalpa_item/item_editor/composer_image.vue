@@ -26,7 +26,7 @@ kalpa-layout(
         template(v-slot:tint-bar=`{tintFocused}`)
           div(
             v-if="player"
-            ).row.full-width.justify-center.q-pb-xs.q-px-md
+            ).row.full-width.justify-center.q-pa-md
             div(
               :style=`{
                 maxWidth: 600+'px',
@@ -53,7 +53,7 @@ kalpa-layout(
                   ).q-mr-sm {{$t('Close')}}
                 .col
                 q-btn(
-                  @click="fragmentUpdate"
+                  @click="compositionUpdate"
                   no-caps color="green"
                   :disable="!player.figure"
                   :style=`{
@@ -64,10 +64,10 @@ kalpa-layout(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import contentPlayer from 'src/components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player'
 
 export default {
-  name: 'composerBook',
+  name: 'composerImage',
   props: ['oid', 'figures', 'height'],
   components: {
     contentPlayer
@@ -91,14 +91,14 @@ export default {
       this.$log('playerReady', player)
       this.player = player
     },
-    fragmentUpdate () {
-      this.$log('fragmentUpdate')
+    compositionUpdate () {
+      this.$log('compositionUpdate')
       let compositionInput = {
         id: Date.now().toString(),
         thumbUrl: this.contentKalpa.thumbUrl,
         thumbHeight: this.contentKalpa.thumbHeight,
         thumbWidth: this.contentKalpa.thumbWidth,
-        outputType: 'BOOK',
+        outputType: 'IMAGE',
         layers: [
           {
             id: Date.now().toString(),
@@ -110,6 +110,7 @@ export default {
         operation: { items: null, operations: null, type: 'CONCAT'},
         __typename: 'Composition',
       }
+      this.$log('compositionUpdate', compositionInput)
       this.$emit('composition', compositionInput)
     }
   }

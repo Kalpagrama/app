@@ -184,9 +184,9 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'graph',
-            path: 'graph/:oid',
-            component: () => import('src/pages/app/graph/index.vue'),
+            name: 'cube',
+            path: 'cube/:oid',
+            component: () => import('src/pages/app/cube/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {

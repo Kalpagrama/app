@@ -69,9 +69,9 @@ kalpa-layout().b-30
 </template>
 
 <script>
-import composerBook from './composer_book.vue'
-import composerImage from './composer_image.vue'
-import composerVideo from './composer_video.vue'
+import composerBook from 'src/components/kalpa_item/item_editor/composer_book.vue'
+import composerImage from 'src/components/kalpa_item/item_editor/composer_image.vue'
+import composerVideo from 'src/components/kalpa_item/item_editor/composer_video.vue'
 // import composerAudio from './composer_audio.vue'
 
 export default {

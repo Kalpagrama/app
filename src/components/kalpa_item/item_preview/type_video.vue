@@ -39,7 +39,7 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import contentPlayer from 'src/components/content_player/index.vue'
+import contentPlayer from 'src/components/content_player'
 
 export default {
   name: 'typeVideo',

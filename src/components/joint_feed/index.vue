@@ -91,7 +91,7 @@
               }`)
     //- vertices
     router-link(
-      :to="'/graph/'+joint.items[0].oid+'?with='+joint.items[1].oid"
+      :to="'/cube/'+joint.items[0].oid+'?with='+joint.items[1].oid"
       :style=`{
         height: '60px',
       }`

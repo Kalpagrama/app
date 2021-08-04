@@ -124,10 +124,10 @@ export default {
   computed: {
     graphLink () {
       if (this.node.items.length === 1) {
-        return '/graph/' + this.node.oid
+        return '/cube/' + this.node.oid
       }
       else {
-        return '/graph/' + this.node.items[0].oid + '?oid=' + this.node.oid
+        return '/cube/' + this.node.items[0].oid + '?oid=' + this.node.oid
       }
     }
   },

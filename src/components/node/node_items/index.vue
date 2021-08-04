@@ -7,7 +7,7 @@ div(
   //- link btn
   q-btn(
     flat color="green" icon="fas fa-link" size="lg"
-    :to="`/graph/${node.items[0].oid}?oid=${node.oid}`"
+    :to="`/cube/${node.items[0].oid}?oid=${node.oid}`"
     :style=`{
       position: 'absolute', zIndex: 1000,
       left: 'calc(50% - 30px)',
