@@ -55,8 +55,9 @@ div(
     @pause="videoPaused"
     @play="videoPlaying"
     @timeupdate="videoTimeupdate"
+    :src="url"
     ).fit
-    source(:src="url")
+    //source(:src="url")
 </template>
 
 <script>
