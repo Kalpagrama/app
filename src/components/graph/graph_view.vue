@@ -152,15 +152,14 @@ export default {
       if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
     addNodeToGraph (item) {
-      console.log('addNodeToGraph')
-      assert(item.id)
+      console.log('addNodeToGraph', item)
       this.itemFinderShow = false
-      if (this.graph.nodes.find(n => n.id === item.id)) {
+      if (this.graph.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
         this.$notify('error', this.$t('same item found'))
         return
       }
       let d = {
-        id: item.id,
+        id: item.id || item.oid,
         oid: item.oid,
         name: item.name,
         type: item.type,
