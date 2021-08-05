@@ -182,6 +182,20 @@ export default {
       this.updateGraph()
       this.jointCreatorShow = false
     },
+    removeNode (item) {
+      this.$log('removeNode', item)
+      if (!confirm('Удалить?')) return
+      let indx = this.graph.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
+      if (indx >= 0) this.graph.nodes.splice(indx, 1)
+      this.updateGraph()
+    },
+    removeJoint (joint) {
+      this.$log('removeJoint', joint)
+      if (!confirm('Удалить?')) return
+      let indx = this.graph.joints.findIndex(j => this.jointIsEqual(j, joint))
+      if (indx >= 0) this.graph.joints.splice(indx, 1)
+      this.updateGraph()
+    },
     blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
       selectedRect
@@ -211,6 +225,7 @@ export default {
           .duration(200)
           .style('stroke-width', width)
           .style('stroke', 'green')
+      this.$wait(1000).then(() => this.unselectNode(d))
     },
     unselectNode (d) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -398,7 +413,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          console.log('registerEvent', type, event.type)
+          // thiz.$log('registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -467,9 +482,9 @@ export default {
               break
             case 'end':
               if (this.lineDrawed) {
+                this.makeEdge(d, this.linkedNodeData)
                 this.clearLine()
-                thiz.$log('drag end', this.state, this.dragdetected)
-                this.makeEdge(d)
+                this.linkedNodeData = null
                 this.lineDrawed = false
               }
               if (!this.dragdetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
@@ -480,16 +495,30 @@ export default {
         }
 
         onClick (d, dblClickInterval = 300) {
-          console.log('!!!click')
+          if (Date.now() - this.lastDoubleClickDt < dblClickInterval) {
+            // тройной клик
+            thiz.$log('triple click')
+            this.lastDoubleClickDt = null
+            clearTimeout(this.timeDblClickId)
+            this.onTripleClick(d)
+            return
+          }
           if (Date.now() - this.lastClickDt < dblClickInterval) {
             // даблклик
-            clearTimeout(this.timeClickId)
-            this.onDblClick(d)
             this.lastClickDt = null
+            clearTimeout(this.timeClickId)
+            this.lastDoubleClickDt = Date.now()
+            // пока непонятно что это дабл клик или трипл клик
+            this.timeDblClickId = setTimeout(() => {
+              thiz.$log('double click')
+              this.onDblClick(d)
+            }, dblClickInterval + 50)
             return
           }
           this.lastClickDt = Date.now()
+          // пока непонятно что это клик или дабл клик
           this.timeClickId = setTimeout(() => {
+            thiz.$log('click')
             delete d.fx;
             delete d.fy;
           }, dblClickInterval + 50)
@@ -503,6 +532,15 @@ export default {
               thiz.selectedItem = item
               thiz.previewShow = true
             }).catch(err => thiz.$logE(err))
+          }
+        }
+
+        onTripleClick (d) {
+          if (d.oid) {
+            thiz.$systemUtils.hapticsImpact()
+            let joint = thiz.graph.joints.find(j => j.itemsShort[0].id === d.id || j.itemsShort[1].id === d.id)
+            if (joint) thiz.removeJoint(joint)
+            else thiz.removeNode(d)
           }
         }
 
@@ -524,10 +562,9 @@ export default {
           thiz.dragLine.classed('hidden', true);
         }
 
-        makeEdge (d) {
-          thiz.$log('makeEdge')
-          thiz.connectNodes(d, this.linkedNodeData)
-          this.linkedNodeData = null
+        makeEdge (d1, d2) {
+          // thiz.$log('makeEdge')
+          thiz.connectNodes(d1, d2)
           thiz.$systemUtils.hapticsImpact()
         }
 
@@ -646,16 +683,119 @@ export default {
       //     .text(d => d.type);
     },
     drawEdges () {
+      let thiz = this
+
+      class JointClickProcessor {
+        constructor () {
+          this.state = 'BLANK'
+        }
+
+        registerEvent (event, d, type = null) {
+          type = type || event.type
+          thiz.$log('JointClickProcessor registerEvent', type, event.type)
+          switch (type) {
+            case 'dblclick':
+              event.stopPropagation();
+              break
+            case 'click':
+              event.stopPropagation()
+              this.onClick(d, 300)
+              break
+            case 'mousedown':
+              this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 20))
+              break
+            case 'mouseup':
+              break
+            case 'mouseover':
+              this.onMouseOverWithLongClick(d)
+              break
+            case 'mouseout':
+              this.onMouseOutWithLongClick(d)
+              break
+            case 'touchstart':
+              event.stopPropagation();
+              event.preventDefault();
+              this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 80))
+              break
+            case 'touchend':
+              this.cancelLongClickDetection()
+              event.stopPropagation();
+              event.preventDefault();
+              break
+            default :
+              throw new Error('bad event:' + type)
+          }
+        }
+
+        onClick (d, dblClickInterval = 300) {
+          console.log('!!!click')
+          if (Date.now() - this.lastClickDt < dblClickInterval) {
+            // даблклик
+            clearTimeout(this.timeClickId)
+            this.onDblClick(d)
+            this.lastClickDt = null
+            return
+          }
+          this.lastClickDt = Date.now()
+          this.timeClickId = setTimeout(() => {
+            delete d.fx;
+            delete d.fy;
+          }, dblClickInterval + 50)
+        }
+
+        onDblClick (d) {
+
+        }
+
+        onMouseOverWithLongClick (d) {
+        }
+
+        onMouseOutWithLongClick (d) {
+        }
+
+        hideToolTip () {
+        }
+
+        startLongClickDetection (func) {
+          this.cancelLongClickDetection()
+          this.state = 'START_LONG_CLICK'
+          this.timerId = setTimeout(() => {
+            this.state = 'LONG_CLICK'
+            if (func) func()
+            thiz.$systemUtils.hapticsImpact()
+            this.timerId = null
+          }, 700)
+        }
+
+        cancelLongClickDetection () {
+          this.state = 'BLANK'
+          this.hideToolTip()
+          clearTimeout(this.timerId)
+          this.timerId = null
+        }
+      }
+
+      let jointClickProcessor = new JointClickProcessor()
       // Initialize the links
       this.graphEdges = this.svg.selectAll('.graphEdges')
           .data(this.graph.joints)
           .enter()
           .append('line')
           .attr('class', 'links')
-          // .attr('fill', 'black')
+          .attr('stroke', 'grey')
+          .attr('stroke-width', '1px')
+          .attr('stroke-opacity', 0.1)
           .attr('marker-end', function (d, i) {
             return 'url(#arrowhead)' // The marker-end attribute defines the arrowhead or polymarker that will be drawn at the final vertex of the given shape.
           })
+      // .on('dblclick', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('click', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('mousedown', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('mouseup', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('touchstart', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('touchend', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('mouseover', jointClickProcessor.registerEvent.bind(jointClickProcessor))
+      // .on('mouseout', jointClickProcessor.registerEvent.bind(jointClickProcessor))
 
       // The <title> element provides an accessible, short-text description of any SVG container element or graphics element.
       // Text in a <title> element is not rendered as part of the graphic, but browsers usually display it as a tooltip.
@@ -682,8 +822,8 @@ export default {
           .attr('id', function (d, i) {
             return 'edgelabel' + i
           })
-          .attr('font-size', 10)
-          .attr('fill', '#aaa');
+          .attr('font-size', 9)
+          .attr('fill', '#aaa')
 
       edgelabels.append('textPath') // To render text along the shape of a <path>, enclose the text in a <textPath> element that has an href attribute with a reference to the <path> element.
           .attr('xlink:href', function (d, i) {
@@ -692,7 +832,7 @@ export default {
           .style('text-anchor', 'middle')
           .style('pointer-events', 'none')
           .attr('startOffset', '50%')
-          .text(d => d.name);
+          .text(d => d.name)
     },
     doLayout () {
       console.log('doLayout', this.width)
