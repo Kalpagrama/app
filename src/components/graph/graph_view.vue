@@ -55,7 +55,7 @@
             }`)
     div(ref="graphTooltip"
       :style=`{
-      zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10001,
+      zIndex: graphViewActive ? 'auto' : $store.state.ui.graphViewZ + 1,
       position: "absolute",
       "background-color": "white",
       "max-width": "200px",
@@ -70,7 +70,7 @@
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
     //q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
-    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 1000}`).row.full-width
+    svg(ref="graphSvg" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ : 'auto'}`).row.full-width
 </template>
 
 <script>
@@ -115,7 +115,20 @@ export default {
       clipPath: null
     }
   },
-  computed: {},
+  computed: {
+    graphViewActive () {
+      return !this.itemFinderShow && !this.previewShow && !this.jointCreatorShow
+    }
+  },
+  watch: {
+    graphViewActive: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('graphViewActive = ', to)
+        this.$store.commit('ui/stateSet', ['graphViewActive', to])
+      }
+    }
+  },
   methods: {
     jointIsEqual (j1, j2) {
       // this.$log(j1, j2)
@@ -187,7 +200,7 @@ export default {
       if (n1.id === n2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
       }
-      this.newJoint = {id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
+      this.newJoint = { id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
       this.jointCreatorShow = true
     },
     selectNode (d, width = 20) {
@@ -799,7 +812,9 @@ export default {
   mounted () {
     this.$log('graph=', JSON.parse(JSON.stringify(this.graph)))
     this.updateGraph()
-    // this.testGraph()
+  },
+  destroyed () {
+    this.$store.commit('ui/stateSet', ['graphViewActive', false])
   }
 }
 </script>

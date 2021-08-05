@@ -3,7 +3,7 @@ q-layout(view="hHh LpR fFf" @scroll="onScroll")
   q-header()
     q-resize-observer(@resize="headerHeight = $event.height")
     slot(name="header" :scrollTop="scrollTop")
-  q-footer
+  q-footer(:style=`{zIndex: $store.state.ui.graphViewActive ? $store.state.ui.graphViewZ + 1 : 2000}`)
     slot(name="footer")
   q-page-containter
     q-page(

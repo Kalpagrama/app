@@ -12,6 +12,9 @@ export default {
   pageWidthMini: 400,
   pageWidthMedi: 600,
   pageWidthMaxi: 800,
+  // граф показывается с zIndex = 9999(иначе в мобильниках некорректно работает скролл) и перекрывает некоторые элементы
+  graphViewActive: false,
+  graphViewZ: 9999,
   // user
   userTyping: false,
   userScrolling: false,

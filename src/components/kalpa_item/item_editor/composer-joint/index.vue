@@ -2,12 +2,14 @@
   .row
     item-preview(v-if="joint.itemsShort[0]"
       :item="joint.itemsShort[0]"
+      :isActive="true"
       :showHeader="false"
       :showSpheres="false").row
     vertex-editor(:joint="joint").row
     item-preview(
       v-if="joint.itemsShort[1]"
       :item="joint.itemsShort[1]"
+      :isActive="true"
       :showHeader="false"
       :showSpheres="false"
       ).row
