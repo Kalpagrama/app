@@ -93,8 +93,8 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'workspace', name: this.$t('Workspace'), component: 'page-workspace'},
         {id: 'nodes', name: this.$t('My Nodes'), component: 'page-nodes'},
+        {id: 'workspace', name: this.$t('Workspace'), component: 'page-workspace'},
         {id: 'gif', name: this.$t('Gif'), component: 'page-gif'},
         // {id: 'search', name: 'Search', component: 'page-search'},
       ]
