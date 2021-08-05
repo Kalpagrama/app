@@ -1,5 +1,22 @@
 <template lang="pug">
   .row
+    //- item finder
+    q-dialog(
+      v-model="itemFinderShow"
+      position="standard"
+      :maximized="true")
+      kalpa-finder(
+        :height="$q.screen.height"
+        :headerTitle="$t('Pick new element for joint')",
+        :pages=`{
+          nodes: {views: ['all']},
+          workspace: {views: ['node', 'media']},
+          search: {views: ['default']},
+          gif: {views: ['popular']},
+        }`
+        @item="itemFound"
+        @close="itemFinderShow = false"
+      ).b-30
     item-preview(v-if="joint.itemsShort[0]"
       :item="joint.itemsShort[0]"
       :isActive="true"
@@ -13,6 +30,15 @@
       :showHeader="false"
       :showSpheres="false"
       ).row
+    div(v-else).row.full-width.q-px-sm.q-pb-sm
+      q-btn(
+        @click="itemFinderShow = true"
+        flat color="white" no-caps icon="add" size="lg" stack
+        :style=`{
+            minHeight: '200px',
+          }`
+        ).full-width.b-40
+        span(:style=`{fontSize: '18px'}`) {{$t('Pick element to join')}}
     q-btn(
       :label="$t('Create joint')"
       :loading="jointPublishing"
@@ -35,6 +61,8 @@ export default {
   },
   data () {
     return {
+      itemFinderShow: false,
+      foundItem: null,
       jointPublishing: false
     }
   },
@@ -44,11 +72,13 @@ export default {
       required: true,
     }
   },
-  computed: {
-  },
   watch: {
   },
   methods: {
+    itemFound (item) {
+      this.joint.itemsShort[1] = JSON.parse(JSON.stringify(item))
+      this.itemFinderShow = false
+    },
     async jointPublish () {
       try {
         this.$log('jointPublish start')

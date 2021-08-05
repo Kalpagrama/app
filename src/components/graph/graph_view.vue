@@ -195,9 +195,11 @@ export default {
           .style('stroke', 'grey')
     },
     connectNodes (n1, n2) {
-      console.log('connectNodes')
-      if (n1.id === n2.id) {
+      this.$log('connectNodes')
+      assert(n1, 'n1 required!')
+      if (n2 && n1.id === n2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
+        return
       }
       this.newJoint = { id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
       this.jointCreatorShow = true
@@ -396,7 +398,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          // console.log('registerEvent', type, event.type)
+          console.log('registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -428,13 +430,16 @@ export default {
               break
             case 'start':
               this.dragdetected = false
+              this.lineDrawed = false
               // When the drag gesture starts, the targeted node is fixed to the pointer
               // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
               if (!event.active) thiz.simulationLinked.alphaTarget(0.2).restart();// sets the current target alpha to the specified number in the range [0,1].
               break
             case 'drag':
               if (this.state === 'LONG_CLICK') {
+                // рисуем стрелку
                 this.dragLine(event, d)
+                this.lineDrawed = true
                 if (event.sourceEvent instanceof TouchEvent) {
                   let linkedNodeData = null
                   for (let n of thiz.graph.nodes) {
@@ -461,8 +466,12 @@ export default {
               }
               break
             case 'end':
-              this.clearLine()
-              if (this.linkedNodeData && d !== this.linkedNodeData) this.makeEdge(d)
+              if (this.lineDrawed) {
+                this.clearLine()
+                thiz.$log('drag end', this.state, this.dragdetected)
+                this.makeEdge(d)
+                this.lineDrawed = false
+              }
               if (!this.dragdetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
               break
             default :
@@ -516,6 +525,7 @@ export default {
         }
 
         makeEdge (d) {
+          thiz.$log('makeEdge')
           thiz.connectNodes(d, this.linkedNodeData)
           this.linkedNodeData = null
           thiz.$systemUtils.hapticsImpact()
