@@ -48,6 +48,14 @@ export default {
     this.itemsRes = await this.$rxdb.find(this.query, true)
     if (this.itemsRes) {
       this.$log('this.itemsRes.items', this.itemsRes.items)
+      let rootNode = {
+        id: this.node.oid,
+        oid: this.node.oid,
+        name: this.node.name,
+        type: this.node.type,
+        thumbUrl: this.node.thumbUrl,
+      }
+      this.graph.nodes.push(rootNode);
       for (let item of this.itemsRes.items) {
         let joint = item.populatedObject
         assert(joint.type === 'JOINT')
