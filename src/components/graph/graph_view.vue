@@ -37,7 +37,7 @@
       :maximized="false"
       @close="selectedItem = null"
     )
-      item-preview(:item="selectedItem", :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
+      item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
     // меню создания связи
     q-dialog(
       v-model="jointCreatorShow"
@@ -70,7 +70,7 @@
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
     //q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
-    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 10000}`).row.full-width
+    svg(ref="graphSvg" :style=`{height: height, zIndex: itemFinderShow || previewShow || jointCreatorShow ? 10 : 1000}`).row.full-width
 </template>
 
 <script>

@@ -2,6 +2,7 @@
 div(
   :style=`{
     //- paddingBottom: 'env(safe-area-inset-bottom)',
+    // zIndex: 10001
   }`
   ).row.full-width.justify-center
   div(

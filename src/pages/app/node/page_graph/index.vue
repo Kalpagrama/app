@@ -3,6 +3,9 @@
     v-if="itemsRes"
     :style=`{
     position: 'relative',
+    borderStyle: 'solid',
+    borderRadius: '10px',
+    borderColor: '#222',
   }`
   ).row.full-width
     graph-view(:height="700" :graph="graph")
@@ -14,7 +17,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import * as assert from 'assert'
 
 export default {
-  name: 'pageJoints',
+  name: 'pageGraph',
   props: ['node'],
   components: {
   },
