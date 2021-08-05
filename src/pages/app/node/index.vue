@@ -106,7 +106,7 @@ export default {
     return {
       node: null,
       nodeIsVisible: true,
-      pageId: 'joints',
+      pageId: 'graph',
       pages: [{id: 'graph', name: this.$t('Graph')}, {id: 'joints', name: this.$t('Joints')}, {id: 'comments', name: this.$t('Comments')}]
     }
   },
