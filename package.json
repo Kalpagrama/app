@@ -17,7 +17,7 @@
     "dev_ios": "quasar dev -m capacitor -T ios",
     "dev_bex": "quasar dev -m bex",
     "dev_ssr": "quasar dev -m ssr",
-    "build2": "quasar build --debug -m pwa",
+    "build_debug": "quasar build --debug -m pwa",
     "build": "quasar build -m spa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
@@ -29,7 +29,9 @@
     "icons": "icongenie generate -p .icongenie.profile.json",
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "now-build": "quasar build -m pwa",
+    "now": "now"
   },
   "dependencies": {
     "@apollo/client": "^3.3.6",
