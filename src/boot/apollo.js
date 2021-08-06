@@ -32,7 +32,7 @@ let apollo
 export default async ({ Vue, store, app }) => {
    try {
       const f = { nameExtra: 'boot::apollo' }
-      logD(f, 'start')
+      logW(f, 'start', 'process.env=', process.env)
       const t1 = performance.now()
       let fetchFunc
       // console.error('apollo::isSsr=', isSsr)

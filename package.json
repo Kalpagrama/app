@@ -17,7 +17,7 @@
     "dev_ios": "quasar dev -m capacitor -T ios",
     "dev_bex": "quasar dev -m bex",
     "dev_ssr": "quasar dev -m ssr",
-    "build": "quasar build --debug -m spa",
+    "build": "quasar build --debug -m pwa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_android": "quasar build -m capacitor -T android",
@@ -29,8 +29,6 @@
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
-    "now-build": "quasar build -m pwa",
-    "now": "now"
   },
   "dependencies": {
     "@apollo/client": "^3.3.6",
