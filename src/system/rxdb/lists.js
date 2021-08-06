@@ -171,12 +171,14 @@ class Lists {
             if (indx === -1) {
                reactiveDoc.items.splice(0, 0, comment)
                reactiveDoc.totalCount++
+               reactiveDoc.flushDebounce()
             }
-         } else if (type === 'OBJECT_DELETED') {
+         } else if (type === 'COMMENT_DELETED') {
             if (indx >= 0) {
                logD(f, 'delete object from list', indx)
                reactiveDoc.items.splice(indx, 1)
                reactiveDoc.totalCount--
+               reactiveDoc.flushDebounce()
             }
          }
       }

@@ -205,6 +205,9 @@ class ReactiveDocFactory {
                payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
                }
+               payload.flushDebounce = () => {
+                  if (this.debouncedItemSaveFunc) this.debouncedItemSaveFunc.flush()
+               }
                if (payload.wsItemType) {
                   payload.remove = async (permanent = false) => {
                      if (payload.beforeRemove) await payload.beforeRemove(permanent)

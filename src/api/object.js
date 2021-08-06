@@ -380,13 +380,13 @@ class ObjectApi {
          },
          text
       }
-      // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, DummyComment)
+      await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, DummyComment)
       try {
          let comment = await apiCall(f, cb)
-         // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
+         await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
          return comment
-      } catch (err) {
-         // await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, DummyComment) // вне cb (иначе - дедлок)
+      } finally {
+         await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, DummyComment) // вне cb (иначе - дедлок)
       }
    }
 
@@ -410,13 +410,11 @@ class ObjectApi {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return commentDelete
       }
-      // await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, deletedComment)
+      await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, deletedComment)
       try {
          let boolRes = await apiCall(f, cb)
-         // if (boolRes) await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, deletedComment) // вне cb (иначе - дедлок)
          return boolRes
       } catch (err) {
-         // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, deletedComment) // вне cb (иначе - дедлок)
       }
    }
 }

@@ -126,7 +126,8 @@ div(
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="60px")
     //- item wrapper
-    //- div(
+    div(
+      v-if="false"
       v-for="(n,ni) in 100" :key="ni"
       :accessKey="ni"
       :class=`{
@@ -142,6 +143,7 @@ div(
         }
       }`
       ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
+    q-btn(v-if="itemsRes.hasPrev" label="..." @click="prev").row.full-width.text-white
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
@@ -164,8 +166,8 @@ div(
         }
       }`
       ).row.full-width
-      //- div(
-        v-if="item[itemKey] !== (itemMiddle ? itemMiddle.key : undefined)"
+      div(
+        v-if="false && item[itemKey] !== (itemMiddle ? itemMiddle.key : undefined)"
         @click="itemMiddleHandler(true, {target: {accessKey: `${item[itemKey]}-${itemIndex}`}}), itemMiddleScrollIntoView('template')"
         :style=`{position: 'absolute', background: 'rgba(0,0,0,0.5)',borderRadius: '10px',}`
         ).row.fit.br
@@ -176,6 +178,7 @@ div(
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
+    q-btn(v-if="itemsRes.hasNext" label="..." @click="next").row.full-width.text-white
     //- next loading
     div(
       v-if="itemsResStatus === 'NEXT'"
