@@ -7,26 +7,26 @@ div(
   }`
   ).column.full-width.bg-black
   //- debug
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 10000, top: '0px',
-      pointerEvents: 'none',
-      fontSize: '10px',
-      opacity: 0.8,
-    }`
-    ).row.bg-green.text-white.q-pa-xs
-    small.full-width contentHeightMin: {{ contentHeightMin }}
-  //- debug image
-  //- img(
-    :src="contentKalpa.thumbUrl"
-    :style=`{
-      position: 'absolute', zIndex: 100, top: '0px',
-      opacity: 0.5,
-      pointerEvents: 'none',
-      maxHeight: contentHeightMin+'px',
-      objectFit: 'contain',
-    }`
-    ).full-width.br
+  //div(
+  //  :style=`{
+  //    position: 'absolute', zIndex: 10000, top: '0px',
+  //    pointerEvents: 'none',
+  //    fontSize: '10px',
+  //    opacity: 0.8,
+  //  }`
+  //  ).row.bg-green.text-white.q-pa-xs
+  //  small.full-width contentHeightMin: {{ contentHeightMin }}
+  ////- debug image
+  ////- img(
+  //  :src="contentKalpa.thumbUrl"
+  //  :style=`{
+  //    position: 'absolute', zIndex: 100, top: '0px',
+  //    opacity: 0.5,
+  //    pointerEvents: 'none',
+  //    maxHeight: contentHeightMin+'px',
+  //    objectFit: 'contain',
+  //  }`
+  //  ).full-width.br
   content-player(
     :contentKalpa="contentKalpa"
     :options=`{

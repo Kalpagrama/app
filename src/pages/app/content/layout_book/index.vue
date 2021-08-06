@@ -65,9 +65,11 @@ div(
               round flat color="white"
               :icon="footerShow ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
   //- footer
-  nav-bottom(
-    v-show="footerShow"
-    :pageId="pageId" @pageId="pageId = $event")
+  .row.full-width.justify-center
+    nav-bottom(
+      v-show="footerShow"
+      :style=`{maxWidth: 650+'px'}`
+      :pageId="pageId" @pageId="pageId = $event").row.full-width.justify-center
 </template>
 
 <script>
