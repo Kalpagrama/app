@@ -296,7 +296,7 @@ export default {
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items TO', to.length)
+        this.$log('itemsRes.items TO', to.length, this.itemsRes, this.itemsRes.hasPrev)
         this.itemMiddleScrollIntoView('itemsRes.items WATCHER')
         this.$nextTick(() => {
           this.$log('itemsRes.items $nextTick')

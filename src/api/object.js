@@ -369,9 +369,55 @@ class ObjectApi {
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return commentCreate
       }
-      let comment = await apiCall(f, cb)
-      await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
-      return comment
+      let DummyComment = {
+         id: Date.now(),
+         createdAt: Date.now(),
+         author: {
+            oid: rxdb.getCurrentUser().oid,
+            type: rxdb.getCurrentUser().type,
+            name: rxdb.getCurrentUser().name,
+            thumbUrl: rxdb.getCurrentUser().thumbUrl,
+         },
+         text
+      }
+      // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, DummyComment)
+      try {
+         let comment = await apiCall(f, cb)
+         // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
+         return comment
+      } catch (err) {
+         // await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, DummyComment) // вне cb (иначе - дедлок)
+      }
+   }
+
+   static async commentDelete (oid, deletedComment) {
+      assert(oid && deletedComment, '!oid')
+      const f = ObjectApi.commentDelete
+      logD(f, 'start', oid, deletedComment)
+      const t1 = performance.now()
+      const cb = async () => {
+         let { data: { commentDelete } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                mutation commentDelete ($oid: OID!, $idComment: String!) {
+                    commentDelete (oid: $oid, idComment: $idComment)
+                }
+            `,
+            variables: {
+               oid: oid,
+               idComment: deletedComment.id
+            }
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return commentDelete
+      }
+      // await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, deletedComment)
+      try {
+         let boolRes = await apiCall(f, cb)
+         // if (boolRes) await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, deletedComment) // вне cb (иначе - дедлок)
+         return boolRes
+      } catch (err) {
+         // await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, deletedComment) // вне cb (иначе - дедлок)
+      }
    }
 }
 

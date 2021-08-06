@@ -102,6 +102,7 @@ class Event {
                await this.workspace.processEvent(event)
                break
             case 'COMMENT_CREATED':
+            case 'COMMENT_DELETED':
                await this.lists.processEvent(event) // поместить объект во все ленты
                break
             default:

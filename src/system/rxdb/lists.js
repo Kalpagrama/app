@@ -483,6 +483,7 @@ class Lists {
             break
          }
          case 'COMMENT_CREATED':
+         case 'COMMENT_DELETED':
             await this.addRemoveCommentToObj(event.type, event.object.oid, event.comment)
             break
          case 'OBJECT_CREATED':

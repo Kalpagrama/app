@@ -92,6 +92,10 @@ class EventApi {
             resultCard.title = 'Новый комментарий'
             resultCard.items = [cropObj(event.subject), `создал комментарий на ${verbalizeObjectType(event.object)}`, cropObj(event.object), event.comment.text]
             break
+         case 'COMMENT_DELETED':
+            resultCard.title = 'Удален комментарий'
+            resultCard.items = [cropObj(event.subject), `удалил комментарий на ${verbalizeObjectType(event.object)}`, cropObj(event.object), event.comment.text]
+            break
       }
       resultCard.description = ''
       resultCard.title = resultCard.items.reduce((acc, item) => {

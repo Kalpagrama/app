@@ -41,7 +41,7 @@
         maxWidth: $store.state.ui.pageWidth+'px',
       }`)
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-        comment-item(:comment="item" :isActive="isActive")
+        comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
 </template>
 
 <script>
@@ -93,6 +93,20 @@ export default {
         this.$log('commentSend comment', comment)
         this.$log('commentSend done')
         // this.comment = ''
+        this.commentSending = false
+      }
+      catch (e) {
+        this.$log('commentSend error', e)
+        this.commentSending = false
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+      }
+    },
+    async commentDelete (comment) {
+      try {
+        this.$log('commentDelete')
+        this.commentSending = true
+        const res = await ObjectApi.commentDelete(this.node.oid, comment)
+        this.$log('commentDelete done')
         this.commentSending = false
       }
       catch (e) {

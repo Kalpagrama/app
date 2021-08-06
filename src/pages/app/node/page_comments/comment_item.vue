@@ -43,6 +43,7 @@ a
           ).text-white
       //- TODO: actions
       .row.full-width
+  q-btn(v-if="comment.author.oid === $store.getters.currentUser.oid" icon="close", :style=`{ height: '50px', maxWidth: '50px'}` @click="$emit('delete', comment)").col.text-grey
 </template>
 
 <script>
