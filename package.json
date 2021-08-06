@@ -30,7 +30,7 @@
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
-    "now-build": "quasar build -m pwa",
+    "now-build": "quasar build -m spa",
     "now": "now"
   },
   "dependencies": {

@@ -34,6 +34,7 @@ export default async ({ Vue, store, app }) => {
       const f = { nameExtra: 'boot::apollo' }
       logW(f, 'start')
       logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
+      logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
       logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
       logW(f, 'VERCEL_BUILD=', process.env.VERCEL_BUILD)
       const t1 = performance.now()
@@ -70,7 +71,7 @@ export default async ({ Vue, store, app }) => {
       let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
-      let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
+      let SERVICES_URL = (process.env.NODE_ENV === 'development' || process.env.DOCKER_MACHINE_NAME === 'vercel' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
       logD('SERVICES_URL=' + SERVICES_URL)
       const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
          if (graphQLErrors) {
