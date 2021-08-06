@@ -18,6 +18,7 @@
     "dev_bex": "quasar dev -m bex",
     "dev_ssr": "quasar dev -m ssr",
     "build": "quasar build --debug -m pwa",
+    "build2": "quasar build -m spa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_android": "quasar build -m capacitor -T android",
