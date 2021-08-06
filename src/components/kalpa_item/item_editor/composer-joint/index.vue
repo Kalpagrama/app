@@ -34,9 +34,7 @@
       q-btn(
         @click="itemFinderShow = true"
         flat color="white" no-caps icon="add" size="lg" stack
-        :style=`{
-            minHeight: '200px',
-          }`
+        :style=`{minHeight: '200px'}`
         ).full-width.b-40
         span(:style=`{fontSize: '18px'}`) {{$t('Pick element to join')}}
     q-btn(

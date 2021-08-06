@@ -33,10 +33,9 @@ export default async ({ Vue, store, app }) => {
    try {
       const f = { nameExtra: 'boot::apollo' }
       logW(f, 'start')
-      logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
-      logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
-      logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
-      logW(f, 'VERCEL_BUILD=', process.env.VERCEL_BUILD)
+      // logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
+      // logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
+      // logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
       const t1 = performance.now()
       let fetchFunc
       // console.error('apollo::isSsr=', isSsr)

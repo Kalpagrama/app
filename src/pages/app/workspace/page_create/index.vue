@@ -15,7 +15,7 @@
             .col
               .row.fit.items-center.content-center.justify-center.q-pa-sm
                 span(:style=`{fontSize: '18px',}`).text-white.text-bold {{pageName}}
-            q-btn(round flat color="white" icon="more_vert")
+            q-btn(round flat color="white" icon="delete" @click="clearData")
         .row.full-width
           component(
             :is="'view-'+pageId"
@@ -29,6 +29,7 @@ import viewArticle from './view_article/index.vue'
 import viewUpload from './view_upload/index.vue'
 import viewBlock from './view_block/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { WsItemTypeEnum } from 'src/system/rxdb/common'
 
 export default {
   name: 'workspace_pageCreate',
@@ -62,6 +63,17 @@ export default {
       if (this.pageId === 'article') pageName += ' ' + this.$t('article')
       if (this.pageId === 'block') pageName += ' ' + this.$t('essence block')
       return pageName
+    }
+  },
+  methods: {
+    clearData () {
+      if (this.item) {
+        if (this.item.wsItemType === WsItemTypeEnum.WS_BLOCK){
+          this.item.graph.joints.splice(0, this.item.graph.joints.length)
+          this.item.graph.nodes.splice(0, this.item.graph.nodes.length)
+          this.item.flushDebounce()
+        }
+      }
     }
   },
   async mounted () {

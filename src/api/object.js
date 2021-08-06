@@ -383,10 +383,9 @@ class ObjectApi {
       await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, DummyComment)
       try {
          let comment = await apiCall(f, cb)
-         await rxdb.lists.addRemoveCommentToObj('COMMENT_CREATED', oid, comment) // вне cb (иначе - дедлок)
+         DummyComment.id = comment.id
          return comment
       } finally {
-         await rxdb.lists.addRemoveCommentToObj('COMMENT_DELETED', oid, DummyComment) // вне cb (иначе - дедлок)
       }
    }
 

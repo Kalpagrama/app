@@ -17,10 +17,11 @@
     q-dialog(
       v-model="itemFinderShow"
       position="standard"
-      :maximized="true")
+      :maximized="false")
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
+        :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`
         :pages=`{
           nodes: {views: ['all']},
           workspace: {views: ['node', 'media']},
@@ -70,6 +71,14 @@
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
     //q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
+    //div(v-if="!graph.nodes.length" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}`).row.full-width.full-height
+    q-btn(
+      v-if="!graph.nodes.length"
+      @click="itemFinderShow = true"
+      flat color="white" no-caps icon="add" size="lg" stack
+      :style=`{minHeight: '500px'}`
+      ).row.full-width.full-height.b-40
+      span(:style=`{fontSize: '18px'}`) {{$t('Pick element to graph')}}
     svg(ref="graphSvg" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ : 'auto'}`).row.full-width
 </template>
 
@@ -152,7 +161,7 @@ export default {
       if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
     addNodeToGraph (item) {
-      console.log('addNodeToGraph', item)
+      console.log('addNodeToGraph', item, this.graph)
       this.itemFinderShow = false
       if (this.graph.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
         this.$notify('error', this.$t('same item found'))
