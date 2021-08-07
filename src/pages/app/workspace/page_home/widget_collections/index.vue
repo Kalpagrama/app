@@ -40,7 +40,7 @@
             ).row.fit.b-40
             img(
               draggable="false"
-              :src="bookmarksRes?.items.length && c.id === 'all' ? bookmarksRes.items[0].thumbUrl : c.thumbUrl"
+              :src="bookmarksRes && bookmarksRes.items.length && c.id === 'all' ? bookmarksRes.items[0].thumbUrl : c.thumbUrl"
               :style=`{
                 objectFit: 'cover',
                 borderRadius: '10px',
