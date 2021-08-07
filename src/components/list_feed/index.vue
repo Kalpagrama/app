@@ -143,7 +143,7 @@ div(
         }
       }`
       ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
-    q-btn(v-if="itemsRes.hasPrev" label="..." @click="prev").row.full-width.text-white
+    q-btn(label="..." @click="prev" size="sm" :style=`{opacity:itemsRes.hasPrev ? 1 : 0}`).row.full-width.text-white
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
@@ -178,7 +178,7 @@ div(
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
-    q-btn(v-if="itemsRes.hasNext" label="..." @click="next").row.full-width.text-white
+    q-btn(label="..." @click="next" size="sm" :style=`{opacity:itemsRes.hasNext ? 1 : 0}`).row.full-width.text-white
     //- next loading
     div(
       v-if="itemsResStatus === 'NEXT'"
