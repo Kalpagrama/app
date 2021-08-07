@@ -206,7 +206,9 @@ class ReactiveDocFactory {
                   await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
                }
                payload.flushDebounce = () => {
-                  if (this.debouncedItemSaveFunc) this.debouncedItemSaveFunc.flush()
+                  wait(0).then(() => { // для того чтобы успел reactiveDocSubscribe сработать до нас
+                     if (this.debouncedItemSaveFunc) this.debouncedItemSaveFunc.flush()
+                  })
                }
                if (payload.wsItemType) {
                   payload.remove = async (permanent = false) => {
