@@ -125,6 +125,8 @@ div(
       }`
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="60px")
+    q-btn(v-else-if="itemsRes.hasPrev" @click="prev" :style=`{position: 'absolute', top: '0px', zIndex: 10000, height: '30px'}`).row.full-width.text-white
+      span(:style=`{fontSize: '30px', position: 'relative', bottom: '12px'}`).text-white ...
     //- item wrapper
     div(
       v-if="false"
@@ -143,7 +145,6 @@ div(
         }
       }`
       ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
-    q-btn(label="..." @click="prev" size="sm" :style=`{opacity:itemsRes.hasPrev ? 1 : 0}`).row.full-width.text-white
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
@@ -178,7 +179,6 @@ div(
         :itemIndex="itemIndex"
         :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
         :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
-    q-btn(label="..." @click="next" size="sm" :style=`{opacity:itemsRes.hasNext ? 1 : 0}`).row.full-width.text-white
     //- next loading
     div(
       v-if="itemsResStatus === 'NEXT'"
@@ -188,6 +188,8 @@ div(
       }`
       ).row.full-width.items-center.content-center.justify-center
       q-spinner-dots(color="green" size="60px")
+    q-btn(v-else-if="itemsRes.hasNext" @click="next" :style=`{position: 'absolute', bottom: '0px', zIndex: 10000, height: '30px'}`).row.full-width.text-white
+      span(:style=`{fontSize: '30px', position: 'relative', bottom: '12px'}`).text-white ...
   slot(name="append")
   div(
     v-if="appendShow"
@@ -199,6 +201,8 @@ div(
 
 <script>
 import { scroll } from 'quasar'
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { LstCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
@@ -225,6 +229,11 @@ export default {
     itemsPerPage: {
       type: Number,
       default () {
+        if (this.query.rxCollectionEnum in WsCollectionEnum) return 100
+        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_COMMENTS) return 200
+        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_SUBSCRIBERS) return 100
+        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_SUBSCRIPTIONS) return 100
+        else if (this.query.rxCollectionEnum in LstCollectionEnum) return 11
         return 11
       }
     },
@@ -525,7 +534,7 @@ export default {
       if (!this.itemsRes) return
       if (!this.itemsRes.hasNext) return
       if (this.itemsResStatus) return
-      this.$log('next')
+      this.$log('next', this.itemsPerPage)
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
       if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})

@@ -163,6 +163,7 @@ export default {
     addNodeToGraph (item) {
       console.log('addNodeToGraph', item, this.graph)
       this.itemFinderShow = false
+      assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
       if (this.graph.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
         this.$notify('error', this.$t('same item found'))
         return
