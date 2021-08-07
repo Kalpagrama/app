@@ -36,7 +36,7 @@
         flat color="white" no-caps icon="add" size="lg" stack
         :style=`{minHeight: '200px'}`
         ).full-width.b-40
-        span(:style=`{fontSize: '18px'}`) {{$t('Pick element to join')}}
+        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
     q-btn(
       :label="$t('Create joint')"
       :loading="jointPublishing"

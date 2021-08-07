@@ -206,7 +206,7 @@ class ReactiveDocFactory {
                   await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
                }
                payload.flushDebounce = () => {
-                  wait(0).then(() => { // для того чтобы успел reactiveDocSubscribe сработать до нас
+                  wait(0).then(() => { // для того чтобы reactiveDocSubscribe успел сработать до нас
                      if (this.debouncedItemSaveFunc) this.debouncedItemSaveFunc.flush()
                   })
                }
@@ -869,13 +869,13 @@ class Group {
    async gotoCurrent () {
       const f = this.gotoCurrent
       logD(f, 'start')
-      let count
-      if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-      else count = this.loadedLen() // выдаем все элементы разом
       let currentId = this.getProperty('currentId')
       if (currentId) {
          let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
+            let count
+            if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
+            else count = this.loadedLen() // выдаем все элементы разом
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')

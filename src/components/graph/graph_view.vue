@@ -78,7 +78,7 @@
       flat color="white" no-caps icon="add" size="lg" stack
       :style=`{minHeight: '500px'}`
       ).row.full-width.full-height.b-40
-      span(:style=`{fontSize: '18px'}`) {{$t('Pick element to graph')}}
+      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
     svg(ref="graphSvg" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ : 'auto'}`).row.full-width
 </template>
 
@@ -968,7 +968,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('graph=', JSON.parse(JSON.stringify(this.graph)))
+    this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
     this.updateGraph()
   },
   destroyed () {
