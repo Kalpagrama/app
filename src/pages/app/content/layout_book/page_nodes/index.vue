@@ -23,17 +23,12 @@
             border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).color,
             }`
         @click="player.showItem(item), $emit('close')"
-      ).row.full-width.q-px-md.q-mb-md.node.q-py-sm
-        // цитата
-        .row.full-width
-          div(
-            :style=`{
-            borderRadius: '10px',
-          }`
-          ).row.full-width.q-pa-sm.b-40
-            small.text-grey-4 {{ getText(item) }}
-        .row.full-width.q-px-sm.q-py-xs
-          span.text-white {{ item.name }}
+      ).row.full-width.q-mb-md.node
+        // цитата + суть
+        div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.b-50
+          small.text-grey-4 {{ getText(item) }}
+        .row.full-width.justify-center.q-px-md
+          span.text-white.text-bold {{ item.name }}
 </template>
 
 <script>

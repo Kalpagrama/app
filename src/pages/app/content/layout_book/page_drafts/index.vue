@@ -24,19 +24,14 @@
           q-btn(
             v-if="true || draft.items[0] && draft.items[0].layers"
             round outline no-caps
-            :style=`{ border: '2px solid grey'}`
+            :style=`{ border: '3px solid grey'}`
             @click="player.showItem(draft), $emit('close')"
-          ).row.full-width.q-px-md.q-mb-md.node.q-py-sm
-            // цитата
-            .row.full-width
-              div(
-                :style=`{
-                borderRadius: '10px',
-              }`
-              ).row.full-width.q-pa-sm.b-40
-                small.text-grey-4 {{ getText(draft) }}
-            .row.full-width.q-px-sm.q-py-xs
-              span.text-white {{ draft.name }}
+          ).row.full-width.q-mb-md.node
+            // цитата + суть
+            div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.b-50
+              small.text-grey-4 {{ getText(draft) }}
+            .row.full-width.justify-center.q-px-md
+              span.text-white.text-bold {{ draft.name }}
 </template>
 
 <script>
