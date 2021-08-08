@@ -8,7 +8,7 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
-import VueShowdown from 'vue-showdown'
+// import VueShowdown from 'vue-showdown'
 import isEqual from 'lodash/isEqual'
 
 // import Vue from 'vue'
@@ -52,12 +52,12 @@ export default async ({ Vue, store, router: VueRouter }) => {
     logD(f, 'start')
     const t1 = performance.now()
     Vue.use(VueVirtualScroller)
-    Vue.use(VueShowdown, {
-      flavor: 'github',
-      options: {
-        emoji: false,
-      },
-    })
+    // Vue.use(VueShowdown, {
+    //   flavor: 'github',
+    //   options: {
+    //     emoji: false,
+    //   },
+    // })
     // contentful
     const contentfulConfig = {
       space: 'f0vpl39owsy8',
