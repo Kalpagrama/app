@@ -14,6 +14,15 @@ div(
     small {{$t('Back')}}
   //- .col
   q-btn(
+    flat no-caps icon="device_hub"
+    :color="pageId === 'graph' ? 'green' : 'white'"
+    :style=`{
+      width: '50px', height: '50px',
+    }`
+    @click="$emit('pageId', pageId === 'drafts' ? null : 'drafts')"
+    )
+    small {{$t('Graph')}}
+  q-btn(
     flat no-caps icon="filter_tilt_shift"
     :color="pageId === 'drafts' ? 'green' : 'white'"
     :style=`{

@@ -4,6 +4,7 @@ import { systemInit } from 'src/system/services'
 import assert from 'assert'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { wait } from 'src/system/utils'
 
 // components
 // import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
@@ -11,11 +12,12 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 async function saveHistory(oid) {
+   logD('saveHistory', oid)
    let item = await rxdb.get(RxCollectionEnum.OBJ, oid)
    if (item) {
       let res = await rxdb.find({
          selector: {
-            rxCollectionEnum: RxCollectionEnum.WS_HISTORY
+            rxCollectionEnum: RxCollectionEnum.WS_HISTORY,
          },
          sort: [{createdAt: 'asc'}]
       }, true)
@@ -28,7 +30,9 @@ async function saveHistory(oid) {
          thumbUrl: item.thumbUrl,
       }
       let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
-      if (res.items.length > 100) await rxdb.remove(res.items[0].id)
+      for (let i = 0; i < res.items.length - 100; i++) { // максимум 100 в истории
+         res.items[i].remove(true)
+      }
    }
 }
 
@@ -157,7 +161,7 @@ const routes = [
             component: () => import('src/pages/app/node/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {
-               if (to) await saveHistory(to.params.oid)
+               if (to) saveHistory(to.params.oid)
                next()
             }
          },
@@ -173,7 +177,7 @@ const routes = [
             component: () => import('src/pages/app/joint/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {
-               if (to) await saveHistory(to.params.oid)
+               if (to) saveHistory(to.params.oid)
                next()
             }
          },
@@ -231,7 +235,7 @@ const routes = [
                }
             ],
             beforeEnter: async (to, from, next) => {
-               if (to) await saveHistory(to.params.oid)
+               if (to) saveHistory(to.params.oid)
                next()
             }
          },
@@ -247,7 +251,7 @@ const routes = [
             component: () => import('src/pages/app/sphere/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {
-               if (to) await saveHistory(to.params.oid)
+               if (to) saveHistory(to.params.oid)
                next()
             }
          },
@@ -276,7 +280,7 @@ const routes = [
             component: () => import('src/pages/app/content/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {
-               if (to) await saveHistory(to.params.oid)
+               if (to) saveHistory(to.params.oid)
                next()
             }
          },
