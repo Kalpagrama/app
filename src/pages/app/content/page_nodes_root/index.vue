@@ -23,7 +23,7 @@
             //- group header
             .row.full-width.q-pt-sm.q-px-md
               div().row.full-width
-                small.text-grey-8 {{ group.name.split('-')[0] }}
+                small.text-green.text-bold.text-italic {{ group.name.split('-')[0] }}
             .row.full-width
               //- prev
               .row.full-width.q-px-sm
@@ -52,7 +52,7 @@
                   :style=`{
                     paddingLeft: '12px'
                   }`
-                  ).full-width {{$t('Next')}} {{ group.totalCount-group.items.length }}
+                  ).full-width {{$t('Next more')}} {{ group.totalCount-group.items.length }} ...
         //- template(v-slot:append)
 </template>
 

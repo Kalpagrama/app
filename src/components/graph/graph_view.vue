@@ -531,6 +531,7 @@ export default {
             thiz.$log('click')
             delete d.fx;
             delete d.fy;
+            // this.$emit('nodeClick', d)
           }, dblClickInterval + 50)
         }
 
@@ -542,6 +543,7 @@ export default {
               thiz.selectedItem = item
               thiz.previewShow = true
             }).catch(err => thiz.$logE(err))
+            // this.$emit('nodeDblClick', d)
           }
         }
 

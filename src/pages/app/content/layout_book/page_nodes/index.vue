@@ -1,35 +1,39 @@
 <style lang="sass" scoped>
 .node
   cursor: pointer
+
   &:hover
-    // background: rgba(50,50,50,0.5)
+// background: rgba(50,50,50,0.5)
 </style>
 
 <template lang="pug">
-page-nodes-root(
-  :contentKalpa="contentKalpa"
-  :player="player")
-  template(v-slot:header)
-    .row.full-width.items-center.content-center.q-py-md.q-px-lg
-      span.text-white.text-bold {{$t('Nodes')}}
-      .col
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  template(v-slot:item=`{item,isSelected}`)
-    div(
-      v-if="item.items[0] && item.items[0].layers"
-      @click="player.showItem(item), $emit('close')"
-      :style=`{
-      }`
+  page-nodes-root(
+    :contentKalpa="contentKalpa"
+    :player="player")
+    template(v-slot:header)
+      .row.full-width.items-center.content-center.q-py-md.q-px-lg
+        span.text-white.text-bold {{$t('Nodes')}}
+        .col
+        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    template(v-slot:item=`{item,isSelected}`)
+      q-btn(
+        v-if="item.items[0] && item.items[0].layers"
+        round outline no-caps
+        :style=`{
+            border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).color,
+            }`
+        @click="player.showItem(item), $emit('close')"
       ).row.full-width.q-px-md.q-mb-md.node.q-py-sm
-      .row.full-width
-        div(
-          :style=`{
+        // цитата
+        .row.full-width
+          div(
+            :style=`{
             borderRadius: '10px',
           }`
           ).row.full-width.q-pa-sm.b-40
-          small.text-grey-4 {{ getText(item) }}
-      .row.full-width.q-px-sm.q-py-xs
-        span.text-white {{ item.name }}
+            small.text-grey-4 {{ getText(item) }}
+        .row.full-width.q-px-sm.q-py-xs
+          span.text-white {{ item.name }}
 </template>
 
 <script>
@@ -39,19 +43,17 @@ export default {
   name: 'pageNodes',
   props: ['contentKalpa', 'player'],
   components: {
-    pageNodesRoot,
+    pageNodesRoot
   },
   data () {
-    return {
-    }
+    return {}
   },
   methods: {
     getText (item) {
       let text = item.items[0].layers[0].figuresAbsolute[0].epubCfiText
       if (text.length > 220) {
         return text.slice(0, 220) + '...'
-      }
-      else {
+      } else {
         return text
       }
     }

@@ -144,7 +144,7 @@ div(
           //- threshold: 0.9,
         }
       }`
-      ).row.full-width.q-pa-md.q-mb-xl.br {{ ni }}
+      ).row.full-width.q-pa-md.q-mb-xl {{ ni }}
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
