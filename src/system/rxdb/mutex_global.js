@@ -1,6 +1,5 @@
-import assert from 'assert'
+import { assert, wait } from 'src/system/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { wait } from 'src/system/utils'
 import { AppVisibility, Platform } from 'quasar'
 import Vue from 'vue'
 

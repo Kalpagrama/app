@@ -6,95 +6,91 @@ iframe
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
+  div(
+    :style=`{
     position: 'relative',
     height: '100%',
     overflow: 'hidden',
   }`
   ).column.full-width
-  player-node(:oid="showNodeOid" @close="showNodeOid = null")
-  //- fictive/invisible input for emit/on/off events with native html element events
-  input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
-  //- figure editor + audioplayer
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="true"
-      :style=`{
+    player-node(:node="selectedEssence" @close="selectedEssence = null")
+    //- fictive/invisible input for emit/on/off events with native html element events
+    input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
+    //- figure editor + audioplayer
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="true"
+        :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '80px',
       }`
       ).row.full-width.justify-center
-      slot(name="tint-bar" :tintFocused="true")
-      //- (lastAnnotation && !audioPlayer.audio)
-      div(
-        v-if="!figure && lastAnnotation"
-        :style=`{
-          width: '300px',
+        slot(name="tint-bar" :tintFocused="true")
+        //- (currentSelection && !audioPlayer.audio)
+        div(
+          v-if="currentSelection && !selectedDraft"
+          :style=`{
+          width: '200px',
           borderRadius: '20px',
           background: 'rgba(30,30,30,0.8)',
         }`
         ).row.items-center.content-center.q-pa-md
-        //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
-        q-btn(
-          v-if="showDraftId"
-          round flat color="red" icon="delete_outline"
-          @click="showDraftDelete")
-        .col
-        q-btn(round flat color="red" icon="lens" @click="createColorNodeBookmark('red')")
-        q-btn(round flat color="green" icon="lens" @click="createColorNodeBookmark('green')")
-        q-btn(round flat color="purple" icon="lens" @click="createColorNodeBookmark('purple')")
-        .col
-        //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateLastAnnotation(null, null, -1)")
-        //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateLastAnnotation(null, null, 1)")
-        q-btn(v-if="!figure" @click='showNodeInputForm' round flat dense color="green" icon="add_circle_outline")
-        q-btn(v-if="figure" @click='hideNodeInputForm' round flat dense color="white" icon="clear")
-  //- table of contents
-  transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
-    player-toc(
-      v-if="toc && tocShow"
-      :toc="toc"
-      :tocId="tocId"
-      :style=`{
+          //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
+          .col
+          q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
+          q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
+          q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
+          q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
+          .col
+          //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
+          //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
+    //- table of contents
+    transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
+      player-toc(
+        v-if="toc && tocShow"
+        :toc="toc"
+        :tocId="tocId"
+        :style=`{
         position: 'absolute', top: '0px', left: '0px', zIndex: 1000,
         height: 'calc(100% - 50px)',
       }`
-      @close="tocShow = false")
-  //- body book area wrapper
-  div(
-    :style=`{
+        @close="tocShow = false")
+    //- body book area wrapper
+    div(
+      :style=`{
       position: 'relative',
       borderRadius: '10px',
       overflow: 'hidden',
       background: '#f3e8d2',
     }`).col.full-width
-    q-resize-observer(@resize="onResize" :debounce="300")
-    //- book ara
-    div(
-      ref="book-area"
-      :style=`{
+      q-resize-observer(@resize="onResize" :debounce="300")
+      //- book area
+      div(
+        ref="book-area"
+        :style=`{
         borderRadius: '0 0 10px 10px'
       }`).row.fit
-  //- footer
-  .row.full-width.justify-center.q-pa-xs
-    slot(name="footer")
-    //- input(v-model="cfi" width="500").row.full-width
-    //- q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
-    .col
-    q-btn(flat color="white" no-caps icon="keyboard_arrow_left" @click='goToPrevPage')
-      span().gt-xs {{$t('Prev chapter')}}
-    q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
-      span().gt-xs {{$t('Next chapter')}}
-    .col
-    q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
-    //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
-    //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
+    //- footer
+    .row.full-width.justify-center.q-pa-xs
+      slot(name="footer")
+      //- input(v-model="cfi" width="500").row.full-width
+      //- q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
+      .col
+      q-btn(flat color="white" no-caps icon="keyboard_arrow_left" @click='goToPrevPage')
+        span().gt-xs {{$t('Prev chapter')}}
+      q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
+        span().gt-xs {{$t('Next chapter')}}
+      .col
+      q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
+      //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
+      //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
 
 <script>
-import { Book, EpubCFI } from 'epubjs'
+import { Book } from 'epubjs'
+import cloneDeep from 'lodash/cloneDeep'
 import debounce from 'lodash/debounce'
-import * as assert from 'assert'
+import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
@@ -106,7 +102,7 @@ export default {
   name: 'contentPlayer_book',
   components: {
     playerToc,
-    playerNode,
+    playerNode
   },
   props: {
     contentKalpa: {
@@ -139,7 +135,7 @@ export default {
           '::selection': {
             background: 'rgba(76,175,79, 0.5)'
           },
-          name: 'BEIGE',
+          name: 'BEIGE'
         },
         night: {
           body: {
@@ -184,14 +180,15 @@ export default {
       contentBookmark: null, // закладка, хранимая в мастерской (на закладке хранится текущая позиция на контенте)
       // tableOfContents: false,
       cfiRangeSelectInProgress: null, // начатое выделение (начали выделять)
-      lastAnnotation: null, // текущее выделение
+      currentSelection: null, // текущее выделение
       figure: null, // текущее выделение TODO почему называется figure, а не figuresAbsolute???
+      selectedItem: null, // активное ядро
       events: {},
       findNodesRes: null, // список всех ядер на контенте
       findDraftsRes: null, // список всех черновиков на контенте
-      showNodeOid: null,
-      showDraftId: null,
-      nodePlaying: null,
+      selectedEssence: null,
+      selectedDraft: null,
+      nodePlaying: null
     }
   },
   watch: {
@@ -203,10 +200,12 @@ export default {
     },
     progressValue (val) {
       this.$emit('update:progress', val)
-    },
+    }
   },
   computed: {
-    url () { return ContentApi.urlSelect(this.contentKalpa) }
+    url () {
+      return ContentApi.urlSelect(this.contentKalpa)
+    }
   },
   methods: {
     setState (key, val) {
@@ -300,58 +299,34 @@ export default {
       await this.goToCfi(target)
       if (percentage === 1) await this.goToNextPage()
     },
-    hideNodeInputForm () {
-      this.$log('hideNodeInputForm')
+    clearSelection () {
+      this.$log('clearSelection', this.currentSelection, this.selectedDraft)
+      if (this.currentSelection) {
+        this.rendition.annotations.remove(this.currentSelection.cfiRange, 'highlight')
+      }
+      this.currentSelection = null
       this.figure = null
+      this.selectedEssence = null
+      this.selectedDraft = null
     },
-    async showNodeInputForm () {
-      this.$log('showNodeInputForm')
-      if (this.$store.getters.isGuest) {
-        let authGuard = {
-          message: 'Чтобы создать ядро, войдите в аккаунт.'
-        }
-        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
-      }
-      else {
-        assert(this.lastAnnotation.cfiRange, 'bad this.lastAnnotation.cfiRange!')
-        let range = await this.book.getRange(this.lastAnnotation.cfiRange)
-        this.figure = [
-          {
-            epubCfi: this.lastAnnotation.cfiRange,
-            epubCfiText: range.toString(),
-            points: [],
-            t: null
-          }
-        ]
-      }
-    },
-    clearLastAnnotation () {
-      this.$log('clearLastAnnotation')
-      if (this.lastAnnotation) {
-        this.rendition.annotations.remove(this.lastAnnotation.cfiRange, 'highlight')
-      }
-      this.lastAnnotation = null
-      this.showDraftId = null
-      this.figure = null
-    },
-    updateLastAnnotation (color, startOffset, endOffset) {
-      this.$log('updateLastAnnotation')
+    updateSelection (color, startOffset, endOffset) {
+      this.$log('updateSelection')
       // safari не поддерживает Lookbehind!!! Пока отключаем. Если потребуется - сделать без регулярки
 
-      // assert(this.lastAnnotation, '!this.lastAnnotation')
-      // let cfiRange = this.lastAnnotation.cfiRange
-      // color = color || this.lastAnnotation.styles.fill
+      // assert(this.currentSelection, '!this.currentSelection')
+      // let cfiRange = this.currentSelection.cfiRange
+      // color = color || this.currentSelection.styles.fill
       // if (endOffset) {
       //   cfiRange = cfiRange.replace(/(?<=epubcfi\(.*,.*,\/.*:).*(?=\))/, function (a, b) {
       //     return parseInt(a) + endOffset
       //   })
       // }
-      // this.clearLastAnnotation() // удалим старую и нарисуем новую
-      // this.makeLastAnnotation(cfiRange, color, '0.3')
+      // this.clearSelection() // удалим старую и нарисуем новую
+      // this.makeSelection(cfiRange, color, '0.3')
     },
-    makeLastAnnotation (cfiRange, color, opacity) {
-      this.lastAnnotation = this.rendition.annotations.highlight(cfiRange, {}, async (e) => {
-        this.$logE('highlight clicked', cfiRange)
+    makeSelection (cfiRange, color, opacity) {
+      this.currentSelection = this.rendition.annotations.highlight(cfiRange, {}, async (e) => {
+        this.$log('selection highlight clicked', cfiRange)
       }, undefined, {
         fill: color,
         'fill-opacity': opacity,
@@ -377,7 +352,7 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findNodesRes.items', async (newVal, oldVal) => {
-          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllNodesForCurrentLocation()
         }, {
           immediate: false,
@@ -390,14 +365,15 @@ export default {
         epubTocId = epubTocId || ''
         if (chapterId === epubChapterId /* && epubTocId === (tocId || epubTocId) */) {
           for (let item of group.items) {
+            console.error('item=', cloneDeep(item))
             let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
             for (let figuresAbsolute of figuresAbsoluteList) {
               this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
               this.rendition.annotations.highlight(figuresAbsolute[0].epubCfi, { item }, async (e) => {
-                this.$logE('highlight clicked 3', item)
-                await this.showNodeInList(item.oid)
+                this.$logD('node highlight clicked', item)
+                this.selectedEssence = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
               }, undefined, {
-                fill: 'indigo',
+                fill: rate ? this.$rateMeta.find(r => rate >= r.valueMin && rate < r.valueMax).color : 'grey',
                 'fill-opacity': '0.5',
                 'mix-blend-mode': 'multiply'
               })
@@ -407,6 +383,7 @@ export default {
       }
     },
     async showAllDraftsForCurrentLocation () {
+      this.$log('showAllDraftsForCurrentLocation start')
       let currentLocation = await this.rendition.currentLocation()
       let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let tocId = getTocIdFromCfi(currentLocation.start.cfi)
@@ -420,29 +397,43 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
-          this.$log('showAllDraftsForCurrentLocation', newVal)
-          this.clearLastAnnotation() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
-          await this.showAllDraftsForCurrentLocation()
+          this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
+          this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
           immediate: false,
           deep: false
         })
       }
+      if (this.tmpDraftEpubCfis) {
+        for (let cfi of this.tmpDraftEpubCfis){
+          this.$log('this.rendition.annotations.remove:', cfi)
+          this.rendition.annotations.remove(cfi, 'highlight')
+          this.rendition.annotations.remove(cfi, 'highlight')
+          this.rendition.annotations.remove(cfi, 'highlight')
+        }
+      }
+      this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
+        this.$logW('item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
         assert(draftEpubCfi, '!draftEpubCfi')
+        this.tmpDraftEpubCfis.push(draftEpubCfi)
         let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
         let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
         if (chapterId === draftChapterId /* && draftTocId === (tocId || draftTocId) */) {
           this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
           this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
-            this.$logE('highlight clicked', draft)
-            await this.showDraftInList(draft.id)
+            this.$log('draft highlight clicked', draft)
+            // закомментил (иначе при удалении черновика не снимается выделение)
+            // this.makeSelection(draft.items[0].layers[0].figuresAbsolute[0].epubCfi, draft.color || 'black', 0.2)
+            this.figure = draft.items[0].layers[0].figuresAbsolute[0]
+            this.selectedDraft = draft
           }, undefined, {
             fill: color,
-            'fill-opacity': '0.5',
+            'fill-opacity': '0.15',
             'mix-blend-mode': 'multiply',
             stroke: 'black',
             'stroke-width': '1',
@@ -452,8 +443,9 @@ export default {
       }
     },
     // делаем черновик из текущего выделения
-    async createColorNodeBookmark (color = 'green') {
-      assert(this.lastAnnotation && this.lastAnnotation.cfiRange, 'bad lastAnnotation')
+    async createColorNodeDraft (color) {
+      assert(this.currentSelection && this.currentSelection.cfiRange, 'bad currentSelection')
+      let range = await this.book.getRange(this.currentSelection.cfiRange)
       let nodeInput = {
         name: '',
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -461,7 +453,7 @@ export default {
         items: [{
           layers: [{
             contentOid: this.contentKalpa.oid,
-            figuresAbsolute: [{ points: [], epubCfi: this.lastAnnotation.cfiRange }]
+            figuresAbsolute: [{ points: [], epubCfi: this.currentSelection.cfiRange, epubCfiText: range.toString() }],
           }]
         }],
         vertices: [],
@@ -470,38 +462,37 @@ export default {
         color
       }
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
-      await this.updateLastAnnotation(color)
+      await this.updateSelection(color)
     },
     // TODO: показать список ядер и сфокусироваться на этом ядре
-    async showNodeInList (oid) {
-      this.$log('showNodeInList', oid)
-      this.showNodeOid = oid
-    },
+    // async showNodeInList (oid) {
+    //   this.$log('showNodeInList', oid)
+    // },
     // TODO: показать список заметок и сфокусироваться на этой заметке
-    async showDraftInList (id) {
-      this.$log('showDraftInList', id)
-      // draft by id
-      let { items: [nodeDraft] } = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          id: id,
-        }
-      })
-      if (nodeDraft) {
-        this.$log('nodeDraft', nodeDraft)
-        let cfiRange = nodeDraft.items[0].layers[0].figuresAbsolute[0].epubCfi
-        this.makeLastAnnotation(cfiRange, 'red', 0.5)
-      }
-      this.showDraftId = id
-    },
-    async showDraftDelete () {
-      this.$log('showDraftDelete')
-      if (this.showDraftId) {
-        await this.$rxdb.remove(this.showDraftId)
-        this.showDraftId = null
-        await this.showAllDraftsForCurrentLocation()
-      }
-    },
+    // async showDraftInList (id) {
+    //   // this.$log('showDraftInList', id)
+    //   // // draft by id
+    //   // let { items: [nodeDraft] } = await this.$rxdb.find({
+    //   //   selector: {
+    //   //     rxCollectionEnum: RxCollectionEnum.WS_NODE,
+    //   //     id: id,
+    //   //   }
+    //   // })
+    //   // if (nodeDraft) {
+    //   //   this.$log('nodeDraft', nodeDraft)
+    //   //   let cfiRange = nodeDraft.items[0].layers[0].figuresAbsolute[0].epubCfi
+    //   //   this.makeSelection(cfiRange, nodeDraft.color || 'black', 0.2)
+    //   // }
+    //   // this.showDraftId = id
+    // },
+    // async showDraftDelete () {
+    //   // this.$log('showDraftDelete')
+    //   // if (this.showDraftId) {
+    //   //   await this.$rxdb.remove(this.showDraftId)
+    //   //   this.showDraftId = null
+    //   //   await this.showAllDraftsForCurrentLocation()
+    //   // }
+    // },
     // blink node
     async showItem (item) {
       if (item.populatedObject) item = item.populatedObject
@@ -591,12 +582,12 @@ export default {
         }
 
         const completeSelection = () => {
-          this.clearLastAnnotation() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
+          this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
           this.$wait(300).then(async () => {
-            this.$log('mouseup')
+            this.$log('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
-              this.makeLastAnnotation(this.cfiRangeSelectInProgress, 'black', '0.3')
+              this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
               this.cfiRangeSelectInProgress = null
             }
           })

@@ -1,14 +1,13 @@
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { AppVisibility, Notify, Platform, Loading } from 'quasar'
+import { Loading, Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
-import assert from 'assert';
+import { assert, wait } from 'src/system/utils';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
-import { wait } from 'src/system/utils'
 import { router } from 'src/boot/system'
 import store from 'src/store/index'
 import { ContentApi } from 'src/api/content'

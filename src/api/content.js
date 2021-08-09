@@ -1,6 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { apollo } from 'src/boot/apollo'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { fragments } from 'src/api/fragments'
 import { apiCall } from 'src/api/index'
 import { rxdb } from 'src/system/rxdb'
@@ -47,7 +47,7 @@ class ContentApi {
       logD(f, 'start', url)
       const t1 = performance.now()
       const cb = async () => {
-         assert.ok(url)
+         assert(url)
          let { data: { contentCreateFromUrl } } = await apollo.clients.upload.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
@@ -73,7 +73,7 @@ class ContentApi {
       logD(f, 'start', file)
       const t1 = performance.now()
       const cb = async () => {
-         assert.ok(file)
+         assert(file)
          // file.lastModifiedDate = file.lastModifiedDate || new Date()
          // file.name = file.name || '*empty*'
          // if (file.size > 5 * 1024 * 1024){

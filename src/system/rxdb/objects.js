@@ -1,11 +1,10 @@
 // сцепляет запросы и отправляет пачкой
-import assert from 'assert'
+import { assert, wait } from 'src/system/utils'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { makeId, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
-import { wait } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)

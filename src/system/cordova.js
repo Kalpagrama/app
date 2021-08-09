@@ -1,5 +1,5 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)

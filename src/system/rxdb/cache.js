@@ -1,15 +1,12 @@
 import LruCache from 'lru-cache'
-import assert from 'assert'
-import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
+import { assert } from 'src/system/utils'
+import { cacheSchema } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
-import cloneDeep from 'lodash/cloneDeep'
-import isEqual from 'lodash/isEqual'
-import { wait } from 'src/system/utils'
-import { rxdbOperationProxy, rxdbOperationProxyExec } from 'src/system/rxdb/common'
+import { rxdbOperationProxyExec } from 'src/system/rxdb/common'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
@@ -74,7 +71,7 @@ class Cache {
          // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
          this.fastCache = {}
          this.fastCache.insert = (rxDoc) => {
-            if (!this.fastCache[rxDoc.id]){
+            if (!this.fastCache[rxDoc.id]) {
                this.fastCache[rxDoc.id] = rxDoc
                this.fastCache.list = this.fastCache.list || []
                let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
@@ -345,7 +342,7 @@ class Cache {
                   assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
                   let existingRxDoc, existingItem
                   let notEvict = fetchRes.notEvict
-                  if (this.cacheLru.get(id)){ // такой итем уже есть в кэше...
+                  if (this.cacheLru.get(id)) { // такой итем уже есть в кэше...
                      existingRxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
                      existingItem = existingRxDoc ? existingRxDoc.toJSON().cached.data : null
                      notEvict = notEvict || (existingRxDoc ? existingRxDoc.props.notEvict : false) // если у старой сущности стоял notEvict - храним его

@@ -14,7 +14,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 
 export default {
   name: 'pageGraph',

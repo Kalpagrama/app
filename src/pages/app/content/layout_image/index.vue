@@ -27,7 +27,7 @@ div(
               position: 'absolute', zIndex: 10000, top: '0px',
             }`
             ).row.full-width.q-pa-sm
-            node-creator(
+            node-editor(
               :player="player"
               :contentKalpa="contentKalpa")
         //- pages
@@ -56,7 +56,7 @@ div(
             position: 'absolute', zIndex: 10000, bottom: '0px',
           }`
           ).row.full-width.q-px-sm
-          node-creator(
+          node-editor(
             :player="player"
             :contentKalpa="contentKalpa")
         //- player
@@ -73,7 +73,7 @@ div(
           }`
           ).full-width
           template(v-slot:tint-bar=`{tintFocused}`)
-            node-creator(
+            node-editor(
               v-if="player && !pageId && $q.screen.gt.md"
               :player="player"
               :contentKalpa="contentKalpa")
@@ -103,7 +103,7 @@ import pageNodes from './page_nodes/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
-import nodeCreator from '../node_creator/index.vue'
+import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
 
 export default {
   name: 'layoutImage',
@@ -114,7 +114,7 @@ export default {
     // pageDrafts,
     pageInfo,
     navBottom,
-    nodeCreator,
+    nodeEditor,
   },
   data () {
     return {

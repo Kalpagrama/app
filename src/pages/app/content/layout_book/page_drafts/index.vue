@@ -24,11 +24,11 @@
           q-btn(
             v-if="true || draft.items[0] && draft.items[0].layers"
             round outline no-caps
-            :style=`{ border: '3px solid grey'}`
+            :color="draft.color"
             @click="player.showItem(draft), $emit('close')"
           ).row.full-width.q-mb-md.node
             // цитата + суть
-            div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.b-50
+            div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-xs.q-ma-xs
               small.text-grey-4 {{ getText(draft) }}
             .row.full-width.justify-center.q-px-md
               span.text-white.text-bold {{ draft.name }}

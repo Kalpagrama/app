@@ -123,7 +123,7 @@ div(
 <script>
 import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 
 export default {
   name: 'pageInfoRoot',

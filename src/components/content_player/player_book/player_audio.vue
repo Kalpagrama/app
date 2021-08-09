@@ -22,7 +22,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { EpubCFI } from 'epubjs'
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 import { ContentApi } from 'src/api/content'
 import debounce from 'lodash/debounce'
 
@@ -115,7 +115,7 @@ export default {
           }
         }
         if (!currentParagraph) return await this.nextAudio(0) // проиграем сначала
-        this.clearLastAnnotation()
+        // this.clearSelection()
       } else { // играем след параграф
         currentParagraph = this.audioPlayer.paragraphs[Math.max(0, this.audioPlayer.currentParagraphIndx + step)]
       }

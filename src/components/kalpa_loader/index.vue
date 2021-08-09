@@ -1,6 +1,6 @@
 <script>
 import debounce from 'lodash/debounce'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 
 export default {
   render () {

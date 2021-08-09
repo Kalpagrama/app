@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import routes from './routes'
 import { localStorage } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'

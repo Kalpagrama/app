@@ -48,7 +48,7 @@ div(
 
 <script>
 import contentPlayer from 'src/components/content_player/index.vue'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { ContentApi } from 'src/api/content'
 
 export default {

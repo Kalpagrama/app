@@ -95,7 +95,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 
 export default {
   name: 'workspace_pageCollections',

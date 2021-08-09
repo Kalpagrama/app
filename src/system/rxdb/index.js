@@ -1,5 +1,5 @@
 import {RxCollectionEnum} from 'src/system/rxdb/common'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { isSsr } from 'src/system/log'
 
 let rxdb

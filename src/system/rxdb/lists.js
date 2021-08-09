@@ -1,4 +1,4 @@
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import {

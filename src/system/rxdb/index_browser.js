@@ -1,28 +1,17 @@
-import assert from 'assert'
+import { assert } from 'src/system/utils'
 import { Workspace } from 'src/system/rxdb/workspace'
-import {
-   WsCollectionEnum,
-   LstCollectionEnum,
-   RxCollectionEnum,
-   rxdbOperationProxy,
-   rxdbOperationProxyExec
-} from 'src/system/rxdb/common'
+import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
-import { getLogFunc, initLogRocket, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { addRxPlugin, createRxDatabase, isRxQuery, removeRxDatabase } from 'rxdb'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
-import {
-   getReactive,
-   ReactiveDocFactory,
-   ReactiveListWithPaginationFactory,
-   updateRxDocPayload
-} from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
@@ -30,12 +19,8 @@ import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services_browser'
-import { getRxCollectionEnumFromId, getRawIdFromId, makeId } from 'src/system/rxdb'
-import debounce from 'lodash/debounce'
-import { AuthApi } from 'src/api/auth'
+import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb'
 import { ObjectApi } from 'src/api/object'
-import { wait } from 'src/system/utils'
-import { ContentApi } from 'src/api/content'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)

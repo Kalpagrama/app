@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { assert, wait } from 'src/system/utils'
 import {
    RxCollectionEnum,
    rxdbOperationProxy,
@@ -16,7 +16,6 @@ import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
-import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
@@ -89,7 +88,7 @@ class Workspace {
                   // ..., - см wsSchemaItem.version (из schema.js)
                   1: oldDoc => oldDoc,
                   2: oldDoc => oldDoc,
-                  3: oldDoc => oldDoc,
+                  3: oldDoc => oldDoc
                }
             })
             await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })

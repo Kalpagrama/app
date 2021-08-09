@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-duplicates
 import 'src/system/utils'
 import { initLogger, performance } from 'src/system/log'
 

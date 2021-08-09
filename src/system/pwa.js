@@ -3,11 +3,9 @@ import { AuthApi } from 'src/api/auth'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
-import { Store, get, clear } from 'public/scripts/idb-keyval/idb-keyval.mjs'
-import { wait } from 'src/system/utils'
+import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
-import assert from 'assert'
 import { shareIn } from 'src/system/services_browser'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)

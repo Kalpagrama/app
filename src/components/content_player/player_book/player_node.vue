@@ -5,7 +5,7 @@ q-dialog(
   :full-width="true"
   @hide="$emit('close')")
   div(
-    @click.self="nodeShow = false"
+    @click.self="node = null"
     ).row.fit.items-center.content-center.justify-center
     node-feed(
       :isActive="true"
@@ -21,27 +21,17 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'playerNode',
-  props: ['oid'],
+  props: ['node'],
   data () {
-    return {
-      node: null,
-      nodeShow: false,
+    return {}
+  },
+  computed: {
+    nodeShow () {
+      return !!this.node
     }
   },
-  watch: {
-    oid: {
-      immediate: true,
-      async handler (to, from) {
-        if (to) {
-          this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.nodeShow = true
-        }
-        else {
-          this.nodeShow = false
-          this.node = null
-        }
-      }
-    }
+  mounted () {
+    // this.$logE('mounted', this.node)
   }
 }
 </script>

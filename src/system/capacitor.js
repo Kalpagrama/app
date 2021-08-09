@@ -1,11 +1,10 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import assert from 'assert'
+import { assert } from 'src/system/utils'
 import { router } from 'src/boot/system'
-import { Plugins, StatusBarStyle, HapticsImpactStyle } from '@capacitor/core'
+import { HapticsImpactStyle, Plugins, StatusBarStyle } from '@capacitor/core'
 // import { Screenshot } from 'com.darktalker.cordova.screenshot'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
-import { wait } from 'src/system/utils'
 import { shareIn } from 'src/system/services_browser'
 
 const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins

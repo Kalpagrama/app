@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { rxdb, RxCollectionEnum, makeId } from 'src/system/rxdb'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
@@ -223,7 +223,7 @@ class ObjectApi {
       logD(f, 'start')
       const t1 = performance.now()
       const cb = async () => {
-         assert.ok(oid)
+         assert(oid)
          let { data: { unPublish: deletedObject } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}

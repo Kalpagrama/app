@@ -61,7 +61,7 @@ div(
 </template>
 
 <script>
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { Platform } from 'quasar'
 import { RxCollectionEnum } from 'src/system/rxdb'
 

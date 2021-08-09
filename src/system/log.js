@@ -1,6 +1,5 @@
-import assert from 'assert'
 // import 'src/system/utils'
-import { wait } from 'src/system/utils'
+import { wait, assert } from 'src/system/utils'
 
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {

@@ -11,8 +11,8 @@
       marginTop: '6px',
     }`
     ).row.items-center.content-center.q-px-sm.q-mr-sm.cursor-pointer
-    q-icon(name="blur_on" color="grey-6" size="20px").q-mr-xs
-    span.text-grey-4 {{ s.name }}
+    //q-icon(name="blur_on" color="grey-6" size="20px").q-mr-xs
+    span.text-grey-4 {{ '✦'+ s.name }}
   q-input(
     ref="sphereInput"
     v-model="sphere"

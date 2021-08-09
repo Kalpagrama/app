@@ -1,4 +1,6 @@
-import assert from 'assert'
+// eslint-disable-next-line import/no-duplicates
+import {assert} from 'src/system/utils'
+// eslint-disable-next-line import/no-duplicates
 import 'src/system/utils'
 import { LogSystemModulesEnum, LogLevelEnum, sessionStorage } from 'src/system/log'
 

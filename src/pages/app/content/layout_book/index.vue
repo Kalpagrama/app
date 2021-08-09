@@ -22,7 +22,7 @@ div(
         //- pages
         transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
-            v-if="pageId && player && !player.figure"
+            v-if="pageId && player && !player.selectedDraft"
             :style=`{
               position: 'absolute', top: '0px', left: '0px', zIndex: 900,
               background: 'rgba(30,30,30,0.98)',
@@ -37,15 +37,20 @@ div(
               }`
               @close="pageId = null")
         //- node creator
-        div(
-          v-if="player && !pageId"
-          :style=`{
-            position: 'absolute', zIndex: 1000, bottom: '40px',
-          }`
-          ).row.full-width.q-px-sm.q-pb-sm
-          node-creator(
-            :player="player"
-            :contentKalpa="contentKalpa")
+        transition(enter-active-class="animated slideInUp")
+          div(
+            v-if="player && player.selectedDraft && !pageId"
+            :style=`{
+              position: 'absolute', zIndex: 1000, bottom: '40px',
+            }`
+            ).row.full-width.q-px-sm.q-pb-sm
+            node-editor(
+              :player="player"
+              :contentKalpa="contentKalpa"
+              :node="player.selectedDraft"
+              @close="player.selectedDraft = null"
+              @update="player.showAllDraftsForCurrentLocation()"
+              )
         //- player
         content-player(
           @player="playerReady"
@@ -82,7 +87,7 @@ import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
-import nodeCreator from '../node_creator/index.vue'
+import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
 
 export default {
   name: 'layoutBook',
@@ -93,7 +98,7 @@ export default {
     pageDrafts,
     pageInfo,
     navBottom,
-    nodeCreator,
+    nodeEditor,
   },
   data () {
     return {

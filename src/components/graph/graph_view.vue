@@ -86,7 +86,7 @@
 import itemPreview from 'src/components/kalpa_item/item_preview'
 import composer from 'src/components/kalpa_item/item_editor/composer.vue'
 import * as d3 from 'd3';
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {

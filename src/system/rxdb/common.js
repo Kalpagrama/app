@@ -1,5 +1,5 @@
 import { isRxCollection } from 'rxdb'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)

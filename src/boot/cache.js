@@ -1,4 +1,4 @@
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import LruCache from 'lru-cache'
 import {
   clear as idbClear,

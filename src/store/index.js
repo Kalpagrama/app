@@ -5,7 +5,7 @@ import core from './core'
 import ui from './ui'
 import debug from './debug'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 

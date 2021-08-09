@@ -1,25 +1,25 @@
 import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
-import assert from 'assert'
+import { assert } from 'src/system/utils'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-import { wait } from 'src/system/utils'
 
 // components
 // import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
-async function saveHistory(oid) {
+
+async function saveHistory (oid) {
    logD('saveHistory', oid)
    let item = await rxdb.get(RxCollectionEnum.OBJ, oid)
    if (item) {
       let res = await rxdb.find({
          selector: {
-            rxCollectionEnum: RxCollectionEnum.WS_HISTORY,
+            rxCollectionEnum: RxCollectionEnum.WS_HISTORY
          },
-         sort: [{createdAt: 'asc'}]
+         sort: [{ createdAt: 'asc' }]
       }, true)
       let existing = res.items.find(el => el.oid === oid)
       if (existing) await existing.remove(true)
@@ -27,7 +27,7 @@ async function saveHistory(oid) {
          type: item.type,
          oid: item.oid,
          name: item.name,
-         thumbUrl: item.thumbUrl,
+         thumbUrl: item.thumbUrl
       }
       let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
       for (let i = 0; i < res.items.length - 100; i++) { // максимум 100 в истории

@@ -1,12 +1,11 @@
-import assert from 'assert'
-import { getLogFunc, initLogRocket, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { assert } from 'src/system/utils'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { getReactive } from 'src/system/rxdb/reactive'
-import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
@@ -114,7 +113,7 @@ class Event {
 
 // вывести уведомление о действии пользователя
    notifyUserActionComplete (eventType, object) {
-      assert.ok(eventType && object)
+      assert(eventType && object)
       let eventMessage = ''
       switch (eventType) {
          case 'OBJECT_CREATED':
@@ -172,7 +171,7 @@ class Event {
    }
 
    notifyError (event) {
-      assert.ok(event)
+      assert(event)
       notify('error', `${event.operation} ${event.code} ${event.message}`)
    }
 }

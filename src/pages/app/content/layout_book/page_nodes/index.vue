@@ -19,16 +19,28 @@
       q-btn(
         v-if="item.items[0] && item.items[0].layers"
         round outline no-caps
-        :style=`{
-            border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).color,
-            }`
+        :color="$rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).colorName"
         @click="player.showItem(item), $emit('close')"
       ).row.full-width.q-mb-md.node
         // цитата + суть
-        div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.b-50
+        div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.q-ma-xs
           small.text-grey-4 {{ getText(item) }}
         .row.full-width.justify-center.q-px-md
           span.text-white.text-bold {{ item.name }}
+
+      //q-btn(
+      //  v-if="item.items[0] && item.items[0].layers"
+      //  round outline no-caps
+      //  :style=`{
+      //      border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).color,
+      //      }`
+      //  @click="player.showItem(item), $emit('close')"
+      //).row.full-width.q-mb-md.node
+      //  // цитата + суть
+      //  div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.b-50
+      //    small.text-grey-4 {{ getText(item) }}
+      //  .row.full-width.justify-center.q-px-md
+      //    span.text-white.text-bold {{ item.name }}
 </template>
 
 <script>

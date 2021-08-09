@@ -1,7 +1,7 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
-import assert from 'assert'
+import {assert} from 'src/system/utils'
 import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
@@ -65,8 +65,8 @@ class ObjectCreateApi {
 
    static makeCompositionInput (composition) {
       console.log('makeCompositionInput', composition)
-      assert.ok(Array.isArray(composition.layers), '!composition.layers')
-      assert(composition.operation, '!operation')
+      assert(Array.isArray(composition.layers), '!composition.layers')
+      composition.operation = composition.operation || { items: null, operations: null, type: 'CONCAT'}
       if (composition.layers.length === 0) { // если ничего не выделено - считаем что выделен весь контент
          assert(composition.contentOid)
          composition.layers.push(
@@ -81,16 +81,16 @@ class ObjectCreateApi {
       }
       let compositionLen = 0
       for (let l of composition.layers) {
-         // assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
+         // assert(l.content && l.content.oid, 'l.content && l.content.oid')
          // assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
          assert(l.contentOid, 'Layer must contain contentOid !')
          assert(Array.isArray(l.figuresAbsolute), 'Layer figuresAbsolute must be an Array !')
          // if (l.figuresAbsolute.length > 1) {
-         //   assert.ok(l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
+         //   assert(l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
          //   let start = l.figuresAbsolute[0].t
          //   let end = l.figuresAbsolute[1].t
-         //   assert.ok(start >= 0 && end > 0, 'start >= 0 && end > 0')
-         //   assert.ok(end > start, 'end > start')
+         //   assert(start >= 0 && end > 0, 'start >= 0 && end > 0')
+         //   assert(end > start, 'end > start')
          //   compositionLen += (end - start)
          // }
       }
@@ -130,10 +130,10 @@ class ObjectCreateApi {
       essence = cloneDeep(essence) // makeEssenceInput меняет essence
       {
          // checks
-         assert.ok(essence.category, 'essence.category')
-         assert.ok(essence.spheres.length >= 0 && essence.spheres.length <= 10, 'essence spheres')
-         assert.ok(essence.items.length > 0 && essence.items.length <= 2, 'essence.items.length > 0')
-         assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essence.layout), 'essence.layout')
+         assert(essence.category, 'essence.category')
+         assert(essence.spheres.length >= 0 && essence.spheres.length <= 10, 'essence spheres')
+         assert(essence.items.length > 0 && essence.items.length <= 2, 'essence.items.length > 0')
+         assert(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essence.layout), 'essence.layout')
       }
       let essenceInput = {}
       essenceInput.layout = essence.layout
@@ -181,10 +181,10 @@ class ObjectCreateApi {
       {
          // checks
          assert(essenceFull.type.in('NODE', 'JOINT'), 'type required')
-         assert.ok(essenceFull.category, 'essence.category')
-         assert.ok(essenceFull.spheres.length >= 0 && essenceFull.spheres.length <= 10, 'essence spheres')
-         assert.ok(essenceFull.items.length > 0 && essenceFull.items.length <= 2, 'essence.items.length > 0')
-         assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essenceFull.layout), 'essence.layout')
+         assert(essenceFull.category, 'essence.category')
+         assert(essenceFull.spheres.length >= 0 && essenceFull.spheres.length <= 10, 'essence spheres')
+         assert(essenceFull.items.length > 0 && essenceFull.items.length <= 2, 'essence.items.length > 0')
+         assert(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essenceFull.layout), 'essence.layout')
       }
       let type = essenceFull.type
       let essenceInput = {}
@@ -221,11 +221,11 @@ class ObjectCreateApi {
 
    static async essenceCreate (essence) {
       const f = ObjectCreateApi.essenceCreate
-      logD(f, 'start', essence)
+      logW(f, 'start. essence=', essence)
       const t1 = performance.now()
       const cb = async () => {
          let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
-         console.log('essenceInput', essenceInput)
+         logW(f, 'essenceInput=', essenceInput)
          let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
@@ -271,9 +271,9 @@ class ObjectCreateApi {
       course = cloneDeep(course) // makeCourseInput меняет essence
       {
          // checks
-         assert.ok(course.category, 'essence.category')
-         assert.ok(course.spheres.length >= 0 && course.spheres.length <= 10, 'essence spheres')
-         assert.ok(course.paths.length > 0 && course.paths.length <= 100, 'course.paths.length ')
+         assert(course.category, 'essence.category')
+         assert(course.spheres.length >= 0 && course.spheres.length <= 10, 'essence spheres')
+         assert(course.paths.length > 0 && course.paths.length <= 100, 'course.paths.length ')
       }
       let courseInput = {}
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)

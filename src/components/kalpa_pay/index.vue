@@ -45,7 +45,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import * as assert from 'assert'
+import {assert} from 'src/system/utils'
 import payanywayForm from 'src/components/kalpa_pay/payanyway_form.vue'
 
 export default {

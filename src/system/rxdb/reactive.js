@@ -1,21 +1,15 @@
 import Vue from 'vue'
-import assert from 'assert'
+import { assert, wait } from 'src/system/utils'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'
-import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
-import { wait } from 'src/system/utils'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
 import store from 'src/store/index'
-
-import { rxdbOperationProxy } from 'src/system/rxdb/common'
-import { Notify } from 'quasar'
-import { matNextWeek } from '@quasar/extras/material-icons'
-import { ContentApi } from 'src/api/content'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
