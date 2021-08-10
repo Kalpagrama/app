@@ -27,23 +27,23 @@ iframe
       ).row.full-width.justify-center
         slot(name="tint-bar" :tintFocused="true")
         //- (currentSelection && !audioPlayer.audio)
-        div(
-          v-if="currentSelection && !selectedDraft"
-          :style=`{
-          width: '200px',
-          borderRadius: '20px',
-          background: 'rgba(30,30,30,0.8)',
-        }`
-        ).row.items-center.content-center.q-pa-md
-          //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
-          .col
-          q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
-          q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
-          q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
-          q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
-          .col
-          //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
-          //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
+        //div(
+        //  v-if="currentSelection && !selectedDraft"
+        //  :style=`{
+        //  width: '200px',
+        //  borderRadius: '20px',
+        //  background: 'rgba(30,30,30,0.8)',
+        //}`
+        //).row.items-center.content-center.q-pa-md
+        //  //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
+        //  .col
+        //  q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
+        //  q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
+        //  q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
+        //  q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
+        //  .col
+        //  //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
+        //  //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
     //- table of contents
     transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
       player-toc(
@@ -93,6 +93,7 @@ import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
+import cloneDeep from 'lodash/cloneDeep'
 
 import playerToc from './player_toc.vue'
 import playerNode from './player_node.vue'
@@ -180,14 +181,14 @@ export default {
       // tableOfContents: false,
       cfiRangeSelectInProgress: null, // начатое выделение (начали выделять)
       currentSelection: null, // текущее выделение
-      figure: null, // текущее выделение TODO почему называется figure, а не figuresAbsolute???
+      figure: null, // текущее выделение
       selectedItem: null, // активное ядро
       events: {},
       findNodesRes: null, // список всех ядер на контенте
       findDraftsRes: null, // список всех черновиков на контенте
       selectedEssence: null,
       selectedDraft: null,
-      nodePlaying: null,
+      nodePlaying: null
     }
   },
   watch: {
@@ -199,7 +200,7 @@ export default {
     },
     progressValue (val) {
       this.$emit('update:progress', val)
-    },
+    }
   },
   computed: {
     url () {
@@ -309,10 +310,10 @@ export default {
       if (this.currentSelection) {
         this.rendition.annotations.remove(this.currentSelection.cfiRange, 'highlight')
       }
-      this.currentSelection = null
-      this.figure = null
-      this.selectedEssence = null
-      this.selectedDraft = null
+      // this.currentSelection = null
+      // this.figure = null
+      // this.selectedEssence = null
+      // this.selectedDraft = null
     },
     updateSelection (color, startOffset, endOffset) {
       this.$log('updateSelection')
@@ -357,7 +358,7 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findNodesRes.items', async (newVal, oldVal) => {
-          this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllNodesForCurrentLocation()
         }, {
           immediate: false,
@@ -378,7 +379,7 @@ export default {
                 this.$logD('node highlight clicked', item)
                 this.selectedEssence = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
               }, undefined, {
-                fill: rate ? this.$rateMeta.find(r => rate >= r.valueMin && rate < r.valueMax).color : 'grey',
+                fill: rate ? this.$rateMeta.find(r => rate >= r.valueMin && rate < r.valueMax).color : 'rgba(156,39,176,0.7)',
                 'fill-opacity': '0.5',
                 'mix-blend-mode': 'multiply'
               })
@@ -403,7 +404,7 @@ export default {
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
           this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
-          this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
+          // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
           immediate: false,
@@ -448,9 +449,10 @@ export default {
       }
     },
     // делаем черновик из текущего выделения
-    async createColorNodeDraft (color) {
-      assert(this.currentSelection && this.currentSelection.cfiRange, 'bad currentSelection')
-      let range = await this.book.getRange(this.currentSelection.cfiRange)
+    async createColorNodeDraft (color, cfiRange, temporary = true) {
+      this.$log('createColorNodeDraft')
+      assert(cfiRange, 'bad cfiRange')
+      let range = await this.book.getRange(cfiRange)
       let nodeInput = {
         name: '',
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -458,16 +460,18 @@ export default {
         items: [{
           layers: [{
             contentOid: this.contentKalpa.oid,
-            figuresAbsolute: [{ points: [], epubCfi: this.currentSelection.cfiRange, epubCfiText: range.toString() }]
+            figuresAbsolute: [{ points: [], epubCfi: cfiRange, epubCfiText: range.toString() }]
           }]
         }],
         vertices: [],
         spheres: [],
         category: 'FUN',
+        temporary,
         color
       }
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       await this.updateSelection(color)
+      return nodeSaved
     },
     // TODO: показать список ядер и сфокусироваться на этом ядре
     // async showNodeInList (oid) {
@@ -570,13 +574,14 @@ export default {
       // on selection, close on mouseup or touchend...
       this.rendition.on('selected', async (cfiRange, contents) => {
         this.$log('selected', cfiRange, contents)
+        this.selectedDraft = null // сбросим. чтобы убрать окно редактирования ядра
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // let range = await this.book.getRange(cfiRange)
         // if (range) {
         //   this.$log('selected2', cfiRange)
         //   this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // }
-        // contents.window.getSelection().removeAllRanges();
+        this.contentsWindowSelection = contents.window.getSelection()
       })
       // on rendered to work with DOM of iframe...
       this.rendition.on('rendered', async (section, iframe) => {
@@ -587,13 +592,15 @@ export default {
         }
 
         const completeSelection = () => {
-          this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
+          // this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
           this.$wait(300).then(async () => {
             this.$log('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
-              this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
+              // this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
+              this.selectedDraft = await this.createColorNodeDraft('black', this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
+              if (this.contentsWindowSelection) this.contentsWindowSelection.removeAllRanges();
             }
           })
         }

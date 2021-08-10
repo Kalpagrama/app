@@ -22,7 +22,7 @@ div(
         //- pages
         transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
-            v-if="pageId && player && !player.selectedDraft"
+            v-if="pageShow"
             :style=`{
               position: 'absolute', top: '0px', left: '0px', zIndex: 900,
               background: 'rgba(30,30,30,0.98)',
@@ -39,7 +39,7 @@ div(
         //- node creator
         transition(enter-active-class="animated slideInUp")
           div(
-            v-if="player && player.selectedDraft && !pageId"
+            v-if="nodeEditorShow"
             :style=`{
               position: 'absolute', zIndex: 1000, bottom: '40px',
             }`
@@ -48,8 +48,6 @@ div(
               :player="player"
               :contentKalpa="contentKalpa"
               :node="player.selectedDraft"
-              @close="player.selectedDraft = null"
-              @update="player.showAllDraftsForCurrentLocation()"
               )
         //- player
         content-player(
@@ -88,6 +86,7 @@ import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
 import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
+import { assert } from 'src/system/utils'
 
 export default {
   name: 'layoutBook',
@@ -108,7 +107,13 @@ export default {
     }
   },
   computed: {
-  },
+    nodeEditorShow() {
+      return this.player && this.player.selectedDraft && !this.pageId
+    },
+    pageShow() {
+      return this.pageId && !this.nodeEditorShow
+    }
+   },
   methods: {
     async playerReady (player) {
       this.$log('playerReady')
@@ -122,7 +127,7 @@ export default {
         await this.player.showItem(node)
         this.player.setState('nodePlaying', node)
       }
-    }
+    },
   },
   mounted () {
     this.$log('mounted')

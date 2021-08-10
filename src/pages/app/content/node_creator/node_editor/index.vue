@@ -21,16 +21,13 @@
           :input-style=`{
           padding: '20px',
           fontSize: fontSize+'px',
-          color: 'white',
-        }`
-        ).full-width
+          color: 'white'}`
+          ).full-width
+          q-btn(round flat color="white" icon="clear" @click="close")
         edit-spheres(:node="node")
         actions(
           :node="node" :player="player" :contentKalpa="contentKalpa"
-          @close="$emit('close', $event)"
-          @delete="$emit('delete', $event)"
-          @update="$emit('update', $event)"
-          @publish="$emit('publish', $event)"
+          @close="close"
           )
 </template>
 
@@ -76,21 +73,15 @@ export default {
       else return 12
     }
   },
-  methods: {},
+  methods: {
+    close() {
+      this.$log('close')
+      this.player.selectedDraft = null
+    }
+  },
   watch: {},
   created () {
     this.$log('created')
-    let nodeDraft = this.$store.state.ui.nodeDraft
-    this.$log('nodeDraft', nodeDraft)
-    if (nodeDraft) {
-      // remove from store...
-      this.$store.commit('ui/stateSet', ['nodeDraft', null])
-      // set here...
-      this.node = JSON.parse(JSON.stringify(nodeDraft))
-    }
   },
-  beforeDestroy () {
-    this.$emit('close')
-  }
 }
 </script>

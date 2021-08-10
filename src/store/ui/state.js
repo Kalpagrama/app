@@ -27,7 +27,6 @@ export default {
   // data exchanges
   // nodeCategories: [],
   nodeOnContent: null,
-  nodeDraft: null,
   nodeCreating: false,
   listFeedNeedDrop: false,
   // debug
