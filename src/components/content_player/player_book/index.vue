@@ -88,7 +88,6 @@ iframe
 
 <script>
 import { Book } from 'epubjs'
-import cloneDeep from 'lodash/cloneDeep'
 import debounce from 'lodash/debounce'
 import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -188,7 +187,7 @@ export default {
       findDraftsRes: null, // список всех черновиков на контенте
       selectedEssence: null,
       selectedDraft: null,
-      nodePlaying: null
+      nodePlaying: null,
     }
   },
   watch: {
@@ -200,7 +199,7 @@ export default {
     },
     progressValue (val) {
       this.$emit('update:progress', val)
-    }
+    },
   },
   computed: {
     url () {
@@ -280,16 +279,22 @@ export default {
       }
     },
     async restorePosition () {
-      // go to saved position (хранится внутри закладки)
-      let { items: [bookmark] } = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-          oid: this.contentKalpa.oid
-        }
-      })
-      this.contentBookmark = bookmark
       let cfi = null
-      if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) cfi = this.contentBookmark.meta.currentCfi
+      if (this.$route.query.wsNodeId) {
+        let wsNode = await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.$route.query.wsNodeId)
+        cfi = wsNode.items[0].layers[0].figuresAbsolute[0].epubCfi
+        this.selectedDraft = wsNode
+      } else {
+        // go to saved position (хранится внутри закладки)
+        let { items: [bookmark] } = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+            oid: this.contentKalpa.oid
+          }
+        })
+        this.contentBookmark = bookmark
+        if (this.contentBookmark && this.contentBookmark.meta && this.contentBookmark.meta.currentCfi) cfi = this.contentBookmark.meta.currentCfi
+      }
       await this.goToCfi(cfi)
       await this.goToCfi(cfi) // epubjs глючит и не переключается с первого раза
     },
@@ -365,7 +370,7 @@ export default {
         epubTocId = epubTocId || ''
         if (chapterId === epubChapterId /* && epubTocId === (tocId || epubTocId) */) {
           for (let item of group.items) {
-            console.error('item=', cloneDeep(item))
+            // console.error('item=', cloneDeep(item))
             let { oid, name, vertexType, figuresAbsoluteList, relatedOids, rate, weight, countVotes } = item
             for (let figuresAbsolute of figuresAbsoluteList) {
               this.rendition.annotations.remove(figuresAbsolute[0].epubCfi, 'highlight') // если такая уже есть - удалим
@@ -406,7 +411,7 @@ export default {
         })
       }
       if (this.tmpDraftEpubCfis) {
-        for (let cfi of this.tmpDraftEpubCfis){
+        for (let cfi of this.tmpDraftEpubCfis) {
           this.$log('this.rendition.annotations.remove:', cfi)
           this.rendition.annotations.remove(cfi, 'highlight')
           this.rendition.annotations.remove(cfi, 'highlight')
@@ -415,7 +420,7 @@ export default {
       }
       this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
-        this.$logW('item=', draft)
+        // this.$logW('draft item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
@@ -453,7 +458,7 @@ export default {
         items: [{
           layers: [{
             contentOid: this.contentKalpa.oid,
-            figuresAbsolute: [{ points: [], epubCfi: this.currentSelection.cfiRange, epubCfiText: range.toString() }],
+            figuresAbsolute: [{ points: [], epubCfi: this.currentSelection.cfiRange, epubCfiText: range.toString() }]
           }]
         }],
         vertices: [],

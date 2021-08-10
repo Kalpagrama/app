@@ -26,9 +26,10 @@
           ).row.b-40.q-mr-sm
       //- bookmarks loaded
       div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
+        //span(v-for="d in bookmarksRes.items" :key="d.id") {{// d.items}}
         router-link(
           v-for="b in bookmarksRes.items" :key="b.oid"
-          :to="'/content/'+b.oid"
+          :to="getUrl(b)"
           :style=`{
             height: '50px', width: '58px', minWidth: '58px',
           }`
@@ -82,6 +83,13 @@ export default {
     }
   },
   methods: {
+    getUrl(wsItem) {
+      switch (wsItem.wsItemType) {
+        case RxCollectionEnum.WS_NODE: return '/content/' + wsItem.items[0].layers[0].contentOid + '?wsNodeId=' + wsItem.id
+        case RxCollectionEnum.WS_SPHERE: return '/sphere/' + wsItem.oid
+        default: return '/workspace'
+      }
+    }
   },
   async mounted () {
     this.$log('mounted')

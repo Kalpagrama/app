@@ -20,9 +20,32 @@ async function saveHistory (oid) {
             rxCollectionEnum: RxCollectionEnum.WS_HISTORY
          },
          sort: [{ createdAt: 'asc' }]
-      }, true)
+      }, false)
+      await res.next(100500, 100500)
+      // console.log('history before=', res.items.map(item => item.name))
+      // for (let item of res.items){
+      //    for (let item2 of res.items){
+      //       if (item.oid === item2.oid){
+      //          console.log('history remove item=', item)
+      //          item.remove(true)
+      //          item.flushDebounce()
+      //       }
+      //    }
+      // }
+      // res = await rxdb.find({
+      //    selector: {
+      //       rxCollectionEnum: RxCollectionEnum.WS_HISTORY
+      //    },
+      //    sort: [{ createdAt: 'asc' }]
+      // }, true)
+
       let existing = res.items.find(el => el.oid === oid)
-      if (existing) await existing.remove(true)
+      if (existing) {
+         console.log('existing=', existing.name)
+         await existing.remove(true)
+         existing.flushDebounce()
+      }
+      // console.log('history after remove=', res.items.map(item => item.name))
       let historyItemInput = {
          type: item.type,
          oid: item.oid,
@@ -30,9 +53,12 @@ async function saveHistory (oid) {
          thumbUrl: item.thumbUrl
       }
       let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
+      // console.log('history after=', res.items.map(item => item.name))
       for (let i = 0; i < res.items.length - 100; i++) { // максимум 100 в истории
+         console.log('history remove=', res.items[i].name)
          res.items[i].remove(true)
       }
+      // console.log('history after trim=', res.items.map(item => item.name))
    }
 }
 
