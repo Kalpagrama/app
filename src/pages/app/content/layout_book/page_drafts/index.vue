@@ -10,6 +10,11 @@
 .column.fit
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     .row.full-width.items-strat.content-start.justify-center
+      // header
+      .row.full-width.items-center.content-center.q-py-md.q-px-lg
+        span.text-white.text-bold {{$t('Notes')}}
+        .col
+        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
       list-feed(
         ref="list-feed"
         :query="query"

@@ -4,6 +4,7 @@
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     .row.full-width.items-strat.content-start.justify-center
+      slot(name="header")
       list-feed(
         ref="list-feed"
         :query="query"
