@@ -13,6 +13,23 @@
 
 <template lang="pug">
   div(ref="graphArea").row.full-width
+    // меню
+    q-btn(icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px', zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}").text-white
+    q-dialog(
+      v-model="menuShow"
+      position="standard"
+      :maximized="false")
+      div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
+        q-btn(
+          round flat no-caps outline color="grey-8" align="left" icon='add'
+          :label="$t('Add item')"
+          @click="menuShow = false, itemFinderShow = true"
+        ).row.full-width.q-pa-sm
+        q-btn(
+          round flat no-caps outline color="grey-8" align="left" icon='grain'
+          :label="$t('Reset graph layout')"
+          @click="menuShow = false, resetFixedPos()"
+        ).row.full-width.q-pa-sm
     //- item finder
     q-dialog(
       v-model="itemFinderShow"
@@ -37,8 +54,9 @@
       position="standard"
       :maximized="false"
       @close="selectedItem = null"
-    )
-      item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
+      )
+      div(:style="{width: '300px'}")
+        item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '20px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
     // меню создания связи
     q-dialog(
       v-model="jointCreatorShow"
@@ -54,6 +72,7 @@
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
             borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
             }`)
+    //tooltip
     div(ref="graphTooltip"
       :style=`{
       zIndex: graphViewActive ? 'auto' : $store.state.ui.graphViewZ + 1,
@@ -69,8 +88,6 @@
       "pointer-events": "none",
       opacity:0
       }`)
-    //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
-    q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
     //div(v-if="!graph.nodes.length" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}`).row.full-width.full-height
     q-btn(
       v-if="!graph.nodes.length"
@@ -106,6 +123,7 @@ export default {
   },
   data () {
     return {
+      menuShow: false,
       previewShow: false,
       itemFinderShow: false,
       jointCreatorShow: false,
@@ -126,7 +144,7 @@ export default {
   },
   computed: {
     graphViewActive () {
-      return !this.itemFinderShow && !this.previewShow && !this.jointCreatorShow
+      return !this.itemFinderShow && !this.previewShow && !this.jointCreatorShow && !this.menuShow
     }
   },
   watch: {
@@ -244,6 +262,13 @@ export default {
           .duration(200)
           .style('stroke-width', 5)
           .style('stroke', 'grey')
+    },
+    resetFixedPos(){
+      for (let node of this.graph.nodes) {
+        node.fx = null
+        node.fy = null
+      }
+      this.doLayout()
     },
     initGraph () {
       let thiz = this
@@ -506,6 +531,7 @@ export default {
         }
 
         onClick (d, dblClickInterval = 300) {
+          this.cancelLongClickDetection()
           if (Date.now() - this.lastDoubleClickDt < dblClickInterval) {
             // тройной клик
             thiz.$log('triple click')
@@ -532,20 +558,23 @@ export default {
             thiz.$log('click')
             // delete d.fx;
             // delete d.fy;
-            // this.$emit('nodeClick', d)
+            this.showItemPreview(d)
           }, dblClickInterval + 50)
         }
 
         onDblClick (d) {
           if (d.oid) {
-            thiz.$systemUtils.hapticsImpact()
-            thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
-              thiz.$log(item)
-              thiz.selectedItem = item
-              thiz.previewShow = true
-            }).catch(err => thiz.$logE(err))
+            // thiz.$systemUtils.hapticsImpact()
             // this.$emit('nodeDblClick', d)
           }
+        }
+
+        showItemPreview(d) {
+          thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
+            thiz.$log(item)
+            thiz.selectedItem = item
+            thiz.previewShow = true
+          }).catch(err => thiz.$logE(err))
         }
 
         onTripleClick (d) {
@@ -901,7 +930,6 @@ export default {
       if (this.simulationLinked.alpha() <= 0.2) this.simulationLinked.alpha(1)
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
-      // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
     updateGraph () {
       this.initGraph()
