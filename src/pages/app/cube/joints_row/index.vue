@@ -16,7 +16,7 @@ div(
     div(
       :style=`{
         maxWidth: rowItemWidth+'px',
-        padding: '2px 36px',
+        padding: '0px 36px',
       }`).row.full-width.justify-center
       div(
         v-for="(joint,jointIndex) in jointsRes.items" :key="joint.oid"

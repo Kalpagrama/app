@@ -10,7 +10,7 @@
       //- background: itemActive ? 'rgba(76,175,80,0.1)' : 'none',
       borderRadius: itemIndependent ? '10px 10px 0px 0px' : '0px 0px 10px 10px',
     }`
-    ).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
+    ).row.full-width.items-start.content-start.q-px-sm
     slot
     //- frame
     //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -32,7 +32,7 @@
     //- vertices
     div(
       v-if="joint && rowActive"
-      :style=`{height: '70px'}`
+      :style=`{height: '35px'}`
       ).row.full-width
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
@@ -183,7 +183,7 @@
           position: 'relative',
           zIndex: 200,
         }`
-        ).row.full-width.q-py-md
+        ).row.full-width
         node-feed(
           :node="joint"
           :isActive="false"
@@ -193,7 +193,7 @@
           :showHeader="false"
           :style=`{
             zIndex: 100,
-          }`)
+          }`).q-pb-xs
   //- ===
   //- next items
   div(
