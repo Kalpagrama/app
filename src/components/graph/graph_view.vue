@@ -898,6 +898,7 @@ export default {
       // index - the zero-based index into links, assigned by this method
       this.simulationLinked.force('link').links(this.graph.joints)
       this.$log('thiz.simulationLinked.alpha()=', thiz.simulationLinked.alpha())
+      if (this.simulationLinked.alpha() <= 0.2) this.simulationLinked.alpha(1)
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
       // this.simulationUnlinked.alphaTarget(0.2).restart();
