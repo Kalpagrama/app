@@ -70,7 +70,7 @@
       opacity:0
       }`)
     //div(ref="addItemMenu" :style=`{position: "absolute", opacity:1, top: 500}`)
-    //q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
+    q-btn(:label="$t('reload')" @click="updateGraph").row.text-white
     //div(v-if="!graph.nodes.length" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}`).row.full-width.full-height
     q-btn(
       v-if="!graph.nodes.length"
@@ -530,8 +530,8 @@ export default {
           // пока непонятно что это клик или дабл клик
           this.timeClickId = setTimeout(() => {
             thiz.$log('click')
-            delete d.fx;
-            delete d.fy;
+            // delete d.fx;
+            // delete d.fy;
             // this.$emit('nodeClick', d)
           }, dblClickInterval + 50)
         }
@@ -875,7 +875,7 @@ export default {
       this.simulationLinked
           .nodes(this.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
-            console.log('tick!!!')
+            // console.log('tick!!!')
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
             thiz.graphEdges.attr('x1', d => d.source.x)
                 .attr('y1', d => d.source.y)
@@ -896,7 +896,9 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).force('link').links(this.graph.joints)
+      this.simulationLinked.force('link').links(this.graph.joints)
+      this.$log('thiz.simulationLinked.alpha()=', thiz.simulationLinked.alpha())
+      this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
       // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
