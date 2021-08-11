@@ -76,8 +76,8 @@
       v-if="!graph.nodes.length"
       @click="itemFinderShow = true"
       flat color="white" no-caps icon="add" size="lg" stack
-      :style=`{minHeight: '500px'}`
-      ).row.full-width.full-height.b-40
+    :style=`{minHeight: '500px'}`
+    ).row.full-width.full-height.b-40
       span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
     svg(ref="graphSvg" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ : 'auto'}`).row.full-width
 </template>
@@ -86,7 +86,7 @@
 import itemPreview from 'src/components/kalpa_item/item_preview'
 import composer from 'src/components/kalpa_item/item_editor/composer.vue'
 import * as d3 from 'd3';
-import {assert} from 'src/system/utils'
+import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -458,7 +458,7 @@ export default {
               this.lineDrawed = false
               // When the drag gesture starts, the targeted node is fixed to the pointer
               // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
-              if (!event.active) thiz.simulationLinked.alphaTarget(0.2).restart();// sets the current target alpha to the specified number in the range [0,1].
+              // if (!event.active) thiz.simulationLinked.alphaMin(0.2).alpha(1).restart();// sets the current target alpha to the specified number in the range [0,1].
               break
             case 'drag':
               if (this.state === 'LONG_CLICK') {
@@ -486,6 +486,7 @@ export default {
               } else {
                 this.dragdetected = true
                 this.cancelLongClickDetection()
+                if (thiz.simulationLinked.alpha() <= 0.2) thiz.simulationLinked.alphaMin(0.2).alpha(1).restart()
                 d.fx = event.x;
                 d.fy = event.y;
               }
@@ -874,21 +875,29 @@ export default {
       this.simulationLinked
           .nodes(this.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
+            console.log('tick!!!')
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
             thiz.graphEdges.attr('x1', d => d.source.x)
                 .attr('y1', d => d.source.y)
                 .attr('x2', d => d.target.x)
                 .attr('y2', d => d.target.y);
             thiz.graphNodes.attr('transform', d => `translate(${d.x},${d.y})`);
+            // thiz.graphNodes.forEach()
             thiz.edgepaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y);
-          });
+          })
+          .on('end', () => {
+            for (let node of this.graph.nodes) {
+              // node.fx = node.x
+              // node.fy = node.y
+            }
+          })
       // sets the array of links associated with this force, recomputes the distance and strength parameters for each link, and returns this force.
       // After this, Each link is an object with the following properties:
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.force('link').links(this.graph.joints)
-      this.simulationLinked.alphaTarget(0.1).restart();
+      this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).force('link').links(this.graph.joints)
+      // this.simulationLinked.alphaTarget(1).restart();
       // this.simulationUnlinked.alphaTarget(0.2).restart();
     },
     updateGraph () {
