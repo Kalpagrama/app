@@ -310,6 +310,17 @@ const routes = [
                next()
             }
          },
+        {
+          name: 'cover',
+          path: 'cover/:oid',
+          props: (route) => ({ oid: route.params.oid }),
+          component: () => import('src/pages/app/cover/index.vue'),
+          meta: { roleMinimal: 'GUEST' },
+          beforeEnter: async (to, from, next) => {
+            if (to) saveHistory(to.params.oid)
+            next()
+          }
+        },
          {
             name: 'content-render',
             path: 'content-render/:oid',

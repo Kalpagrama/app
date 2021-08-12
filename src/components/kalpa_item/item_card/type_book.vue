@@ -1,26 +1,44 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    borderRadius: '10px',
-    minHeight: '240px',
-  }`
-  ).row.full-width.items-center.content-center.q-px-lg.q-py-xl.b-40
-  span.text-white {{ item.layers[0].figuresAbsolute[0].epubCfiText }}
   div(
     :style=`{
-      position: 'absolute', zIndex: 100, bottom: '0px', left: '0px',
-      background: 'rgba(30,30,30,0.3)',
+      position: 'relative',
+      background: 'rgb(35,35,35)',
       borderRadius: '10px',
     }`
-    ).row.full-width.items-center.content-center.q-px-md.q-py-xs
-    q-icon(name="select_all" color="white" size="16px").q-mr-xs
-    span.text-white {{ item.layers[0].contentName }}
+    )
+    img(
+      v-if="!playerReady"
+      :src="item.thumbUrl"
+      :style=`{
+        borderRadius: '10px',
+      }`
+      ).row.full-width
+    //- footer
+    .row.full-width.items-center.content-center.no-wrap.q-pa-sm
+      q-icon(name="select_all" color="white" size="36px").q-mr-sm
+      span(:style=`{lineHeight: 1.2}`).text-white {{ item.name }}
 </template>
 
 <script>
+import { ContentApi } from 'src/api/content'
+import contentPlayer from 'src/components/content_player/index.vue'
+
 export default {
   name: 'typeBook',
-  props: ['item'],
+  props: ['item', 'isActive'],
+  components: {
+    contentPlayer
+  },
+  data () {
+    return {
+      playerReady: false
+    }
+  },
+  computed: {
+    url () { return ContentApi.urlSelect(this.item) },
+  },
+  mounted() {
+    this.$log('item=', this.item)
+  }
 }
 </script>

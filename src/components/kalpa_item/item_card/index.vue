@@ -12,8 +12,7 @@ component(
 import typeBook from 'src/components/kalpa_item/item_card/type_book.vue'
 import typeImage from 'src/components/kalpa_item/item_card/type_image.vue'
 import typeVideo from 'src/components/kalpa_item/item_card/type_video.vue'
-import typeNode from 'src/components/kalpa_item/item_card/type_node.vue'
-import typeContent from 'src/components/kalpa_item/item_card/type_content.vue'
+import typeBlock from 'src/components/kalpa_item/item_card/type_block.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -22,8 +21,7 @@ export default {
     typeBook,
     typeImage,
     typeVideo,
-    typeNode,
-    typeContent,
+    typeBlock,
   },
   props: ['item', 'isActive'],
   data () {
@@ -33,16 +31,17 @@ export default {
   },
   computed: {
     itemComponent () {
-      if (this.item.type === 'NODE') return 'type-node'
-      else if (['VIDEO', 'IMAGE', 'BOOK', 'GIF'].includes(this.item.type)) return 'type-content'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'VIDEO') return 'type-video'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'IMAGE') return 'type-image'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'BOOK') return 'type-book'
-      else return null
+      switch (this.item.type){
+        case 'BOOK': return 'type-book'
+        case 'VIDEO': return 'type-video'
+        case 'IMAGE': return 'type-image'
+        case 'BLOCK': return 'type-block'
+        default: throw new Error('bad item' + this.item.type)
+      }
     },
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.item)
     this.itemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid)
     this.$log('itemFull=', this.itemFull)
   }
