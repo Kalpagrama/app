@@ -272,8 +272,8 @@ export default {
         this.$log('publish done')
         this.publishing = false
         // let createdNode = null
-        let createdNode = await ObjectCreateApi.essenceCreate(jointInput)
-        this.$log('publish createdNode', createdNode)
+        let createdJoint = await ObjectCreateApi.jointCreate(jointInput)
+        this.$log('publish createdNode', createdJoint)
         this.$emit('close')
         // this.$emit('published', createdNode)
         // this.cancel()

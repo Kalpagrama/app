@@ -45,22 +45,22 @@ class ObjectCreateApi {
       const f = ObjectCreateApi.emojiSpheres
       logD(f, 'start')
       const t1 = performance.now()
-      const cb = async () => {
-         let { data: { emojiSpheres } } = await apollo.clients.auth.query({
-            query: gql`
-                query emojiSpheres{
-                    emojiSpheres{
-                        oid
-                        type
-                        name
-                    }
-                }
-            `
-         })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return emojiSpheres
-      }
-      return await apiCall(f, cb)
+      // const cb = async () => {
+      //    let { data: { emojiSpheres } } = await apollo.clients.auth.query({
+      //       query: gql`
+      //           query emojiSpheres{
+      //               emojiSpheres{
+      //                   oid
+      //                   type
+      //                   name
+      //               }
+      //           }
+      //       `
+      //    })
+      //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      //    return emojiSpheres
+      // }
+      // return await apiCall(f, cb)
    }
 
    static makeCompositionInput (composition) {
@@ -250,6 +250,37 @@ class ObjectCreateApi {
       return reactiveEssence
    }
 
+   static async jointCreate (joint) {
+      const f = ObjectCreateApi.jointCreate
+      logD(f, 'start. joint=', joint)
+      const t1 = performance.now()
+      const cb = async () => {
+         let jointInput = ObjectCreateApi.makeEssenceInput(joint)
+         logD(f, 'jointInput=', jointInput)
+         let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation jointCreate($joint:  EssenceInput!) {
+                    jointCreate (joint: $joint){
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               joint: jointInput
+            }
+         })
+         let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'day' })
+         return reactiveJoint
+      }
+      let reactiveEssence = await apiCall(f, cb)
+      assert(reactiveEssence.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence) // вне cb (иначе - дедлок)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      assert(store, '!store')
+      return reactiveEssence
+   }
+
    // static makeJointInput (joint) {
    //    let chainInput = {}
    //    assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
@@ -295,34 +326,6 @@ class ObjectCreateApi {
       return courseInput
    }
 
-   static async jointCreate (joint) {
-      const f = ObjectCreateApi.jointCreate
-      logD(f, 'start')
-      // const t1 = performance.now()
-      // const cb = async () => {
-      //    let jointInput = ObjectCreateApi.makeJointInput(joint)
-      //    logD('jointCreate jointInput', jointInput)
-      //    let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
-      //       mutation: gql`
-      //           ${fragments.objectFullFragment}
-      //           mutation jointCreate($joint: JointInput!) {
-      //               jointCreate (joint: $joint){
-      //                   ...objectFullFragment
-      //               }
-      //           }
-      //       `,
-      //       variables: {
-      //          joint: jointInput
-      //       }
-      //    })
-      //    let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-      //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      //    return reactiveJoint
-      // }
-      // return await apiCall(f, cb)
-      return await ObjectCreateApi.essenceCreate(joint)
-   }
-
    static async courseCreate (course) {
       const f = ObjectCreateApi.courseCreate
       logD(f, 'start', course)
@@ -330,12 +333,12 @@ class ObjectCreateApi {
       const cb = async () => {
          let courseInput = ObjectCreateApi.makeCourseInput(course)
          console.log('courseInput', courseInput)
-         let { data: { courseCreate: createdCourse } } = await apollo.clients.api.mutate({
+         let { data: { blockCreate: createdCourse } } = await apollo.clients.api.mutate({
             mutation: gql`
-                ${fragments.courseFragment}
-                mutation courseCreate($course:  CourseInput!) {
-                    courseCreate (course: $course){
-                        ...courseFragment
+                ${fragments.blockFragment}
+                mutation blockCreate($block:  BlockInput!) {
+                    blockCreate (block: $block){
+                        ...blockFragment
                     }
                 }
             `,

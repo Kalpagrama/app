@@ -303,9 +303,9 @@ const essenceFragment = gql`
         scope
     }
 `
-const courseFragment = gql`
+const blockFragment = gql`
     ${objectFragment} ${objectShortFragment} ${figureFragment}
-    fragment courseFragment on Course {
+    fragment blockFragment on Block {
         ...objectFragment
         relatedSphereOids
         sphereFromName{...objectShortFragment}
@@ -328,29 +328,13 @@ const courseFragment = gql`
             oid
             thumbUrl(preferWidth: 600)
             type
-            voteHistory{
-                date
-                essenceOid
-                rate
-            }
+            role
+        }
+        graph {
+            joints{...objectShortFragment}
+            nodes{...objectShortFragment}
         }
         rev
-        paths{
-            id
-            name
-            contents{
-                contentOid
-                themes{
-                    id
-                    name
-                    figures {...figureFragment}
-                    tasks{
-                        node {...objectShortFragment}
-                        voteAuthor
-                    }
-                }
-            }
-        }
     }
 `
 
@@ -437,7 +421,7 @@ const eventFragmentWithBatch = gql`
 
 const objectFullFragment = gql`
     ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment}
-    ${sphereFragment} ${userFragment} ${objectFragment} ${courseFragment}
+    ${sphereFragment} ${userFragment} ${objectFragment} ${blockFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
         ...on Video {...videoFragment}
@@ -447,7 +431,7 @@ const objectFullFragment = gql`
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
-        ...on Course {...courseFragment}
+        ...on Block {...blockFragment}
     }
 `
 const topObjectFragment = gql`${figureFragment}
@@ -519,7 +503,7 @@ const fragments = {
    objectShortFragment,
    objectShortStatFragment,
    essenceFragment,
-   courseFragment,
+   blockFragment,
    sphereFragment,
    findResultFragment,
    contentCutFragment,

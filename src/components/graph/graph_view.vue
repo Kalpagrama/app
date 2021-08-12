@@ -1018,6 +1018,7 @@ export default {
     },
   },
   mounted () {
+    // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
     this.updateGraph()

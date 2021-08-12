@@ -196,12 +196,12 @@ class ObjectApi {
       const cb = async () => {
          let courseInput = ObjectCreateApi.makeCourseInput(course)
          console.log('courseInput', courseInput)
-         let { data: { courseUpdate: updatedCourse } } = await apollo.clients.api.mutate({
+         let { data: { blockUpdate: updatedCourse } } = await apollo.clients.api.mutate({
             mutation: gql`
-                ${fragments.courseFragment}
-                mutation courseUpdate($course:  CourseInput!) {
-                    courseUpdate (course: $course){
-                        ...courseFragment
+                ${fragments.blockFragment}
+                mutation blockUpdate($block:  BlockInput!) {
+                    blockUpdate (block: $block){
+                        ...blockFragment
                     }
                 }
             `,
