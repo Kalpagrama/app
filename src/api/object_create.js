@@ -266,30 +266,32 @@ class ObjectCreateApi {
    //    }
    // }
 
-   static makeCourseInput (course) {
+   static makeCourseInput (block) {
       const f = ObjectCreateApi.makeCourseInput
-      course = cloneDeep(course) // makeCourseInput меняет essence
+      block = cloneDeep(block) // makeCourseInput меняет essence
       {
          // checks
-         assert(course.category, 'essence.category')
-         assert(course.spheres.length >= 0 && course.spheres.length <= 10, 'essence spheres')
-         assert(course.paths.length > 0 && course.paths.length <= 100, 'course.paths.length ')
+         assert(block.category, 'essence.category')
+         assert(block.spheres.length >= 0 && block.spheres.length <= 10, 'essence spheres')
+         assert(block.paths.length > 0 && block.paths.length <= 100, 'block.paths.length ')
       }
       let courseInput = {}
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
-      courseInput.rev = course.rev
-      courseInput.oid = course.oid
-      courseInput.scope = course.scope
-      courseInput.name = course.name
-      courseInput.description = course.description
-      courseInput.coverImage = course.coverImage
-      courseInput.category = course.category || 'FUN'
-      courseInput.spheres = course.spheres.map(s => {
+      courseInput.rev = block.rev
+      courseInput.oid = block.oid
+      courseInput.scope = block.scope
+      courseInput.name = block.name
+      courseInput.description = block.description
+      courseInput.coverImage = block.coverImage
+      courseInput.category = block.category || 'FUN'
+      courseInput.spheres = block.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      courseInput.paths = course.paths
+      courseInput.graph = block.graph
+      courseInput.editors = block.editors
+      courseInput.vewers = block.vewers
       return courseInput
    }
 
@@ -351,6 +353,49 @@ class ObjectCreateApi {
       assert(store, '!store')
       return reactiveCourse
    }
+// let result = await ObjectCreateApi.courseCreate({
+   //   name: 'test',
+   //   description: 'test course5',
+   //   spheres: [],
+   //   category: 'FUN',
+   //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+   //   paths: [{
+   //     id: '123',
+   //     name: 'asd',
+   //     contents: {
+   //       contentOid: '168815073555431447',
+   //       themes: {
+   //         id: '123123',
+   //         name: 'adasd',
+   //         figures: [],
+   //         tasks: []
+   //       }
+   //     }
+   //   }]
+   // })
+   // let result2 = await ObjectApi.courseUpdate({
+   //   oid: '175964791553271816',
+   //   rev: 3,
+   //   name: 'test222',
+   //   description: 'test course4',
+   //   spheres: [],
+   //   category: 'FUN',
+   //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+   //   paths: [{
+   //     id: '123',
+   //     name: 'asd',
+   //     contents: {
+   //       contentOid: '168815073555431447',
+   //       themes: {
+   //         id: '123123',
+   //         name: 'adasd',
+   //         figures: [],
+   //         tasks: []
+   //       }
+   //     }
+   //   }]
+   // })
+   // this.$log('result', result)
 }
 
 export { ObjectCreateApi }

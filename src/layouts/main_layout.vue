@@ -32,7 +32,7 @@ q-layout(
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
       kalpa-menu-mobile
   q-page-container
-    router-view(v-if="$store.getters.nodeCategories.length > 0")
+      router-view(v-if="$store.getters.nodeCategories.length > 0")
 </template>
 
 <script>
