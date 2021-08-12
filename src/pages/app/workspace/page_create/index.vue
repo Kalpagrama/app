@@ -2,13 +2,13 @@
   kalpa-layout()
     template(v-slot:body)
       .row.full-width.items-start.content-start
-        .row.full-width.justify-center.q-pa-sm
+        .row.full-width.justify-center
           div(
             :style=`{
             height: headerHeight + 'px',
             maxWidth: $store.state.ui.pageWidth+'px',
             background: 'rgb(40,40,40)',
-            borderRadius: '10px',
+            borderRadius: '0px',
           }`
           ).row.full-width.items-center.content-center.q-pa-sm
             q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")

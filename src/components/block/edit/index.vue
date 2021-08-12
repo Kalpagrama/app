@@ -15,13 +15,13 @@
     div(
       :style=`{
       position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: borderRadius,
+      background: 'rgb(40,40,40)',
+      borderRadius: '0px',
       ...styles,
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")
       //graph
-      graph-view(:height="graphHeight" :graph="block.graph").row.full-width.full-height
+      graph-view(:height="graphHeight" :graph="block.graph" :style=`{background: 'rgb(35,35,35)'}`).row.full-width.full-height
       //div().row.full-width.full-height.br
         //q-btn(
         //  label="graph"
@@ -92,7 +92,6 @@ export default {
   props: {
     block: { type: Object, required: true },
     styles: { type: Object },
-    borderRadius: { type: String, default: '10px' },
     height: { type: Number, required: true }
   },
   data () {
