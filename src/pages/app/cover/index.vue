@@ -14,7 +14,7 @@ import itemCard from 'src/components/kalpa_item/item_card/index.vue'
 
 export default {
   name: 'pageApp_content',
-  props: ['oid'],``
+  props: ['oid'],
   components: {
     itemCard,
   },
