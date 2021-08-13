@@ -7,6 +7,7 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
 import { apiCall } from 'src/api/index'
+import { WsItemTypeEnum } from 'src/system/rxdb/common'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -297,43 +298,55 @@ class ObjectCreateApi {
    //    }
    // }
 
-   static makeCourseInput (block) {
-      const f = ObjectCreateApi.makeCourseInput
-      block = cloneDeep(block) // makeCourseInput меняет essence
+   static makeBlockInput (block) {
+      const f = ObjectCreateApi.makeBlockInput
+      block = cloneDeep(block)
+      block.spheres = block.spheres || []
+      block.category = block.category || 'FUN'
+      block.members = block.members || []
       {
          // checks
          assert(block.category, 'essence.category')
          assert(block.spheres.length >= 0 && block.spheres.length <= 10, 'essence spheres')
-         assert(block.paths.length > 0 && block.paths.length <= 100, 'block.paths.length ')
+         assert(block.graph && block.graph.nodes && block.graph.joints, 'block.graph')
       }
-      let courseInput = {}
+      let blockInput = {}
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
-      courseInput.rev = block.rev
-      courseInput.oid = block.oid
-      courseInput.scope = block.scope
-      courseInput.name = block.name
-      courseInput.description = block.description
-      courseInput.coverImage = block.coverImage
-      courseInput.category = block.category || 'FUN'
-      courseInput.spheres = block.spheres.map(s => {
+      blockInput.rev = block.rev
+      blockInput.oid = block.oid
+      blockInput.scope = block.scope
+      blockInput.name = block.name
+      blockInput.description = block.description
+      blockInput.coverImage = block.coverImage
+      blockInput.category = block.category
+      blockInput.spheres = block.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      courseInput.graph = block.graph
-      courseInput.editors = block.editors
-      courseInput.vewers = block.vewers
-      return courseInput
+      blockInput.graph = block.graph
+      blockInput.members = block.members
+      blockInput.graph = {
+         nodes: block.graph.nodes.map(n => {
+            if (n.wsItemtype === WsItemTypeEnum.WS_NODE) return ObjectCreateApi.makeEssenceInput(n)
+            else return { name: n.name, oid: n.oid }
+         }),
+         joints: block.graph.joints.map(j => {
+            if (j.wsItemtype === WsItemTypeEnum.WS_JOINT) return ObjectCreateApi.makeEssenceInput(j)
+            else return { name: j.name, oid: j.oid }
+         })
+      }
+      return blockInput
    }
 
-   static async courseCreate (course) {
-      const f = ObjectCreateApi.courseCreate
-      logD(f, 'start', course)
+   static async blockCreate (block) {
+      const f = ObjectCreateApi.blockCreate
+      logD(f, 'start', block)
       const t1 = performance.now()
       const cb = async () => {
-         let courseInput = ObjectCreateApi.makeCourseInput(course)
-         console.log('courseInput', courseInput)
-         let { data: { blockCreate: createdCourse } } = await apollo.clients.api.mutate({
+         let blockInput = ObjectCreateApi.makeBlockInput(block)
+         console.log('blockInput', blockInput)
+         let { data: { blockCreate: createdBlock } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.blockFragment}
                 mutation blockCreate($block:  BlockInput!) {
@@ -343,22 +356,22 @@ class ObjectCreateApi {
                 }
             `,
             variables: {
-               course: courseInput
+               block: blockInput
             }
          })
-         let reactiveCourse = await rxdb.set(RxCollectionEnum.OBJ, createdCourse, { actualAge: 'day' })
-         return reactiveCourse
+         let reactiveBlock = await rxdb.set(RxCollectionEnum.OBJ, createdBlock, { actualAge: 'day' })
+         return reactiveBlock
       }
-      let reactiveCourse = await apiCall(f, cb)
-      assert(reactiveCourse.relatedSphereOids)
-      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveCourse.relatedSphereOids, reactiveCourse) // вне cb (иначе - дедлок)
+      let reactiveBlock = await apiCall(f, cb)
+      assert(reactiveBlock.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveBlock.relatedSphereOids, reactiveBlock) // вне cb (иначе - дедлок)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       assert(store, '!store')
-      return reactiveCourse
+      return reactiveBlock
    }
-// let result = await ObjectCreateApi.courseCreate({
+// let result = await ObjectCreateApi.blockCreate({
    //   name: 'test',
-   //   description: 'test course5',
+   //   description: 'test block5',
    //   spheres: [],
    //   category: 'FUN',
    //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
@@ -376,11 +389,11 @@ class ObjectCreateApi {
    //     }
    //   }]
    // })
-   // let result2 = await ObjectApi.courseUpdate({
+   // let result2 = await ObjectApi.blockUpdate({
    //   oid: '175964791553271816',
    //   rev: 3,
    //   name: 'test222',
-   //   description: 'test course4',
+   //   description: 'test block4',
    //   spheres: [],
    //   category: 'FUN',
    //   coverImage: {oid: '165507718097059859', name: 'asdasd'},

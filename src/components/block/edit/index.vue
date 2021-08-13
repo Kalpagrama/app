@@ -82,6 +82,7 @@
 
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
+import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'blockEdit',
@@ -113,6 +114,29 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
+    }
+  },
+  methods: {
+    publish() {
+      // let result = await ObjectCreateApi.blockCreate({
+      //   name: 'test',
+      //   description: 'test block5',
+      //   category: 'FUN',
+      //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+      //   graph: {nodes: [], joints: []}
+      // })
+      // let result = await ObjectApi.blockUpdate({
+      //   oid: '  213988039058397187',
+      //   rev: 1,
+      //   name: 'test222',
+      //   description: 'test block4',
+      //   spheres: [],
+      //   category: 'FUN',
+      //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
+      //   graph: {nodes: [], joints: []}
+      // })
+      // this.$log('result', result)
+      // return
     }
   },
   mounted () {

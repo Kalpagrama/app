@@ -189,14 +189,14 @@ class ObjectApi {
       return await apiCall(f, cb)
    }
 
-   static async courseUpdate (course) {
-      const f = ObjectApi.courseUpdate
-      logD(f, 'start', course)
+   static async blockUpdate (block) {
+      const f = ObjectApi.blockUpdate
+      logD(f, 'start', block)
       const t1 = performance.now()
       const cb = async () => {
-         let courseInput = ObjectCreateApi.makeCourseInput(course)
-         console.log('courseInput', courseInput)
-         let { data: { blockUpdate: updatedCourse } } = await apollo.clients.api.mutate({
+         let blockInput = ObjectCreateApi.makeBlockInput(block)
+         console.log('blockInput', blockInput)
+         let { data: { blockUpdate: updatedBlock } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.blockFragment}
                 mutation blockUpdate($block:  BlockInput!) {
@@ -206,16 +206,16 @@ class ObjectApi {
                 }
             `,
             variables: {
-               course: courseInput
+               block: blockInput
             }
          })
-         let reactiveCourse = await rxdb.set(RxCollectionEnum.OBJ, updatedCourse, { actualAge: 'day' })
-         return reactiveCourse
+         let reactiveBlock = await rxdb.set(RxCollectionEnum.OBJ, updatedBlock, { actualAge: 'day' })
+         return reactiveBlock
       }
-      let reactiveCourse = await apiCall(f, cb)
+      let reactiveBlock = await apiCall(f, cb)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       assert(store, '!store')
-      return reactiveCourse
+      return reactiveBlock
    }
 
    static async unPublish (oid) {

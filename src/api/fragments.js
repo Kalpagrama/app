@@ -304,7 +304,7 @@ const essenceFragment = gql`
     }
 `
 const blockFragment = gql`
-    ${objectFragment} ${objectShortFragment} ${figureFragment}
+    ${objectFragment} ${objectShortFragment}
     fragment blockFragment on Block {
         ...objectFragment
         relatedSphereOids
