@@ -14,7 +14,7 @@
 <template lang="pug">
   div(ref="graphArea").row.full-width
     // меню
-    q-btn(icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px', zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}").text-white
+    q-btn(icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px'}").text-white
     q-dialog(
       v-model="menuShow"
       position="standard"
@@ -75,7 +75,6 @@
     //tooltip
     div(ref="graphTooltip"
       :style=`{
-      zIndex: graphViewActive ? 'auto' : $store.state.ui.graphViewZ + 1,
       position: "absolute",
       "background-color": "white",
       "max-width": "200px",
@@ -88,7 +87,6 @@
       "pointer-events": "none",
       opacity:0
       }`)
-    //div(v-if="!graph.nodes.length" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ + 1 : 'auto'}`).row.full-width.full-height
     q-btn(
       v-if="!graph.nodes.length"
       @click="itemFinderShow = true"
@@ -96,7 +94,8 @@
     :style=`{minHeight: '500px'}`
     ).row.full-width.full-height.b-40
       span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-    svg(ref="graphSvg" :style=`{height: height, zIndex: graphViewActive ? $store.state.ui.graphViewZ : 'auto'}`).row.full-width
+    svg(ref="graphSvg"
+      :style=`{height: height}`).row.full-width
 </template>
 
 <script>
@@ -143,18 +142,8 @@ export default {
     }
   },
   computed: {
-    graphViewActive () {
-      return !this.itemFinderShow && !this.previewShow && !this.jointCreatorShow && !this.menuShow
-    }
   },
   watch: {
-    graphViewActive: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('graphViewActive = ', to)
-        this.$store.commit('ui/stateSet', ['graphViewActive', to])
-      }
-    }
   },
   methods: {
     jointIsEqual (j1, j2) {
@@ -289,7 +278,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          // console.log('registerEvent', type, event.type)
+          console.log('GraphClickProcessor registerEvent', type, event.type)
           switch (type) {
             case 'click':
               // event.stopPropagation()
@@ -301,14 +290,16 @@ export default {
             case 'mouseup':
               break
             case 'touchstart':
-              event.stopPropagation();
-              event.preventDefault();
+              thiz.disableScroll()
+              // event.stopPropagation();
+              // event.preventDefault();
               this.startLongClickDetection(this.onLongClick.bind(this, event))
               break
             case 'touchend':
+              thiz.enableScroll()
               this.cancelLongClickDetection()
-              event.stopPropagation();
-              event.preventDefault();
+              // event.stopPropagation();
+              // event.preventDefault();
               break
             case 'start':
               // zoom start
@@ -317,6 +308,8 @@ export default {
               // console.log('zoom start', event)
               break
             case 'zoom':
+              // event.sourceEvent.stopPropagation();
+              // event.sourceEvent.preventDefault();
               // console.log('zoom', event)
               if (this.state === 'START_LONG_CLICK' && Math.abs(event.transform.x - this.zoomInitialTransform.x) + Math.abs(event.transform.y - this.zoomInitialTransform.y) < (event.sourceEvent instanceof TouchEvent ? 10 : 5)) {
                 // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
@@ -333,7 +326,8 @@ export default {
               }
               break
             default :
-              throw new Error('bad event:' + type)
+              // throw new Error('bad event:' + type)
+                break
           }
         }
 
@@ -384,6 +378,7 @@ export default {
           .on('mouseup', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchstart', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchend', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          // .on('touchmove', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .call(d3.zoom()
               .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
               .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
@@ -448,7 +443,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          // thiz.$log('registerEvent', type, event.type)
+          thiz.$log('NodeClickProcessor::registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -755,14 +750,14 @@ export default {
               this.onMouseOutWithLongClick(d)
               break
             case 'touchstart':
-              event.stopPropagation();
-              event.preventDefault();
+              // event.stopPropagation();
+              // event.preventDefault();
               this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 80))
               break
             case 'touchend':
               this.cancelLongClickDetection()
-              event.stopPropagation();
-              event.preventDefault();
+              // event.stopPropagation();
+              // event.preventDefault();
               break
             default :
               throw new Error('bad event:' + type)
@@ -1008,14 +1003,28 @@ export default {
       }
 
       return svg.node();
-    }
+    },
+    handleTouchMove(e) {
+      this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
+      if (this.stopScrolling)e.preventDefault()
+    },
+    disableScroll(){
+      this.$logW('disableScroll')
+      this.stopScrolling = true
+    },
+    enableScroll(){
+      this.$logW('enableScroll')
+      this.stopScrolling = false
+    },
   },
   mounted () {
+    // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
+    window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
     this.updateGraph()
   },
   destroyed () {
-    this.$store.commit('ui/stateSet', ['graphViewActive', false])
+    window.removeEventListener('touchmove', this.handleTouchMove)
   }
 }
 </script>

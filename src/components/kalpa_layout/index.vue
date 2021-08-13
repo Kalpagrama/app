@@ -3,14 +3,15 @@ q-layout(view="hHh LpR fFf" @scroll="onScroll")
   q-header()
     q-resize-observer(@resize="headerHeight = $event.height")
     slot(name="header" :scrollTop="scrollTop")
-  q-footer(:style=`{zIndex: $store.state.ui.graphViewActive ? $store.state.ui.graphViewZ + 1 : 2000}`)
+  q-footer()
     slot(name="footer")
   q-page-containter
-    q-page(
-      :style=`{
-        paddingTop: headerHeight+'px',
-      }`)
-      slot(name="body")
+    div(overflow-hidden)
+      q-page(
+        :style=`{
+          paddingTop: headerHeight+'px',
+        }`)
+        slot(name="body")
 //- .row.full-width.justify-center
   slot(name="body")
 //- div(

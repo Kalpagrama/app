@@ -20,7 +20,6 @@ const WsItemTypeEnum = Object.freeze({
    WS_HISTORY: 'WS_HISTORY',
    WS_COLLECTION: 'WS_COLLECTION',
    WS_BOARD: 'WS_BOARD',
-   WS_COURSE: 'WS_COURSE',
 
 })
 const WsCollectionEnum = Object.freeze({

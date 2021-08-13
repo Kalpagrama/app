@@ -196,7 +196,7 @@ export default {
         }
         // create...
         this.$log('jointInput', jointInput)
-        let jointCreated = await ObjectCreateApi.essenceCreate(jointInput)
+        let jointCreated = await ObjectCreateApi.jointCreate(jointInput)
         this.$log('jointPublish jointCreated', jointCreated)
         this.$ym('JOINT_CREATED')
         // done? emit? close?
