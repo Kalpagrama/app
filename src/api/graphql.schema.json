@@ -3551,7 +3551,7 @@
           },
           {
             "kind": "OBJECT",
-            "name": "ObjectShortJoint",
+            "name": "ObjectShortEssence",
             "ofType": null
           },
           {
@@ -3683,8 +3683,8 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ObjectShortJoint",
-        "description": "тип для прередачи микростатистики по объекту",
+        "name": "ObjectShortEssence",
+        "description": "тип для прередачи метаданных",
         "specifiedByUrl": null,
         "fields": [
           {
@@ -3785,8 +3785,32 @@
             "deprecationReason": null
           },
           {
+            "name": "items",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rate",
-            "description": "рейтинг",
+            "description": "рейтинг (устаревает)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -3817,31 +3841,15 @@
             "deprecationReason": null
           },
           {
-            "name": "leftItem",
-            "description": null,
+            "name": "countStat",
+            "description": "численная статистика",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "rightItem",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "OBJECT",
+                "name": "CountStat",
                 "ofType": null
               }
             },
@@ -6767,8 +6775,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
+                    "kind": "OBJECT",
+                    "name": "ObjectShortEssence",
                     "ofType": null
                   }
                 }
@@ -6791,8 +6799,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
+                    "kind": "OBJECT",
+                    "name": "ObjectShortEssence",
                     "ofType": null
                   }
                 }

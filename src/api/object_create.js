@@ -128,7 +128,7 @@ class ObjectCreateApi {
 
    static makeEssenceInput (essence) {
       const f = ObjectCreateApi.makeEssenceInput
-      logW(f, 'start', essence)
+      logD(f, 'start', essence)
       essence = cloneDeep(essence) // makeEssenceInput меняет essence
       essence.name = essence.name || ''
       essence.category = essence.category || 'FUN'
@@ -228,11 +228,11 @@ class ObjectCreateApi {
 
    static async essenceCreate (essence) {
       const f = ObjectCreateApi.essenceCreate
-      logW(f, 'start. essence=', essence)
+      logD(f, 'start. essence=', essence)
       const t1 = performance.now()
       const cb = async () => {
          let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
-         logW(f, 'essenceInput=', essenceInput)
+         logD(f, 'essenceInput=', essenceInput)
          let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
@@ -349,11 +349,10 @@ class ObjectCreateApi {
 
    static async blockCreate (block) {
       const f = ObjectCreateApi.blockCreate
-      logW(f, 'start', block)
+      logD(f, 'start', block)
       const t1 = performance.now()
       const cb = async () => {
          let blockInput = ObjectCreateApi.makeBlockInput(block)
-         console.log('blockInput', blockInput)
          let { data: { blockCreate: createdBlock } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.blockFragment}

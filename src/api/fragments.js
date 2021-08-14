@@ -1,5 +1,18 @@
 import gql from 'graphql-tag'
 
+const countStatFragment = gql`
+    fragment countStatFragment on CountStat {
+        countVotes
+        countViews
+        countJoints
+        countNodes
+        countBookmarks
+        countShares
+        countRemakes
+        countSubscribers
+        countSubscriptions
+    }
+`
 const objectShortFragment = gql`
     fragment objectShortFragment on ObjectShort {
         type
@@ -19,8 +32,17 @@ fragment objectShortStatFragment on ObjectShortStat {
 
 }
 `
+const ObjectShortEssenceFragment = gql`  ${objectShortFragment} ${countStatFragment}
+    fragment ObjectShortEssenceFragment on ObjectShortEssence {
+        ...objectShortFragment
+        items {...objectShortFragment}
+        rate
+        weight
+        countStat{...countStatFragment}
+    }
+`
 
-const objectFragment = gql`${objectShortFragment}
+const objectFragment = gql`${objectShortFragment} ${countStatFragment}
   fragment objectFragment on Object {
     type
     oid
@@ -35,17 +57,7 @@ const objectFragment = gql`${objectShortFragment}
     subscriberCnt
     subscribers {...objectShortFragment}
     rev
-    countStat{
-      countVotes
-      countViews
-      countJoints
-      countNodes
-      countBookmarks
-      countShares
-      countRemakes
-      countSubscribers
-      countSubscriptions
-      }
+    countStat{...countStatFragment}
   }
 `
 
@@ -304,7 +316,7 @@ const essenceFragment = gql`
     }
 `
 const blockFragment = gql`
-    ${objectFragment} ${objectShortFragment}
+    ${objectFragment} ${objectShortFragment} ${ObjectShortEssenceFragment}
     fragment blockFragment on Block {
         ...objectFragment
         relatedSphereOids
@@ -331,8 +343,8 @@ const blockFragment = gql`
             role
         }
         graph {
-            joints{...objectShortFragment}
-            nodes{...objectShortFragment}
+            joints{...ObjectShortEssenceFragment}
+            nodes{...ObjectShortEssenceFragment}
         }
         rev
     }

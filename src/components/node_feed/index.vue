@@ -22,7 +22,7 @@ div(
     }`).row.full-width.items-start.content-start
     slot(name="wrapper-inside")
     //- HEADER: author, createdAt, actions, date, views
-    node-header(
+    essence-header(
       v-if="showHeader && node.oid"
       :node="node"
       :showAuthorAlways="showAuthorAlways"
@@ -37,7 +37,7 @@ div(
       :isVisible="isVisible"
       :isActive="isActive"
       :nodeOid="node.oid")
-    node-items(
+    essence-items(
       v-if="showItems && !$slots.items && node.items.length === 2"
       v-bind="$props"
       :itemsStyles="itemsStyles"
@@ -60,16 +60,16 @@ div(
         }`
         ).text-white {{ nodeName }}
     //- SPHERES
-    node-spheres(
+    essence-spheres(
       v-if="showSpheres && node.spheres.length > 0"
       :node="node"
       :style=`{
         order: 3,
       }`)
   //- FOOTER: actions, slot
-  node-actions(
+  essence-actions(
     v-if="showActions && node.oid"
-    :node="node"
+    :essence="node"
     :nodeBackgroundColor="nodeBackgroundColor"
     :nodeActionsColor="nodeActionsColor"
     :isActive="isActive"
@@ -81,19 +81,19 @@ div(
 </template>
 
 <script>
-// import nodeItems from './node_items.vue'
-import nodeItems from 'src/components/node/node_items/index.vue'
-import nodeActions from 'src/components/node/node_actions.vue'
-import nodeSpheres from 'src/components/node/node_spheres/index.vue'
-import nodeHeader from 'src/components/node/node_header/index.vue'
+// import essenceItems from './node_items.vue'
+import essenceItems from 'src/components/essence/essence_items/index.vue'
+import essenceActions from 'src/components/essence/essence_actions.vue'
+import essenceSpheres from 'src/components/essence/essence_spheres/index.vue'
+import essenceHeader from 'src/components/essence/essence_header/index.vue'
 
 export default {
   name: 'nodeFeed',
   components: {
-    nodeItems,
-    nodeActions,
-    nodeSpheres,
-    nodeHeader,
+    essenceItems,
+    essenceActions,
+    essenceSpheres,
+    essenceHeader,
   },
   props: {
     node: {type: Object},

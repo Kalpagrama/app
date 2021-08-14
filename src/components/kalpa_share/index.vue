@@ -71,7 +71,6 @@ import { makeRoutePath } from 'public/scripts/common_func'
 export default {
   name: 'kalpaShare',
   props: {
-    type: {type: String, required: true},
     item: {type: Object, required: true},
     headerText: {
       type: String,

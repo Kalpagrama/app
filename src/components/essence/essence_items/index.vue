@@ -105,7 +105,7 @@ div(
 import { ContentApi } from 'src/api/content'
 
 export default {
-  name: 'nodeItems',
+  name: 'essenceItems',
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {

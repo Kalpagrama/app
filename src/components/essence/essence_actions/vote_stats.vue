@@ -6,11 +6,11 @@ div(
     paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
   }`
   ).column.full-width.justify-center.b-40
-      //- div(
-        :style=`{
-          maxWidth: 500+'px',
-        }`
-        ).row.full-width.items-start.content-start.q-pb-xl
+      //div(
+      //  :style=`{
+      //    maxWidth: 500+'px',
+      //  }`
+      //  ).row.full-width.items-start.content-start.q-pb-xl
       //- header
       .row.full-width.q-pa-md
         .col
@@ -90,7 +90,7 @@ div(
                 ).q-mr-sm
       //- footer
       div(
-        v-if="node.author.oid !== $store.getters.currentUser.oid"
+        v-if="essence.author.oid !== $store.getters.currentUser.oid"
         :style=`{
           //- position: 'absolute', zIndex: 1000, bottom: '0px',
         }`
@@ -115,7 +115,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'voteStats',
-  props: ['node'],
+  props: ['essence'],
   data () {
     return {
       rateId: null,
@@ -164,12 +164,12 @@ export default {
   },
   async created () {
     this.$log('created')
-    // get node stats
-    this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.node.oid}}))
+    // get essence stats
+    this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.essence.oid}}))
     // set rateMax
     let percentMax = null
     let percentMaxIndex = 0
-    this.node.rateStat.map((r, ri) => {
+    this.essence.rateStat.map((r, ri) => {
       if (percentMax) {
         if (r.percent > percentMax) {
           percentMax = r.percent
@@ -182,7 +182,7 @@ export default {
     })
     let rateMax = this.$rateMeta[percentMaxIndex]
     // let rateMax = this.$rateMeta.find(r => {
-    //   return this.node.rate >= r.valueMin && this.node.rate < r.valueMax
+    //   return this.essence.rate >= r.valueMin && this.essence.rate < r.valueMax
     // })
     if (rateMax) {
       this.rateIdMax = rateMax.value

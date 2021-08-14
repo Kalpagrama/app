@@ -108,7 +108,7 @@ import voteOptions from './vote_options.vue'
 import voteStats from './vote_stats.vue'
 
 export default {
-  name: 'nodeActionsRight',
+  name: 'essenceActions',
   props: ['node', 'isActive'],
   components: {
     voteBall,

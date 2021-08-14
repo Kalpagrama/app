@@ -589,7 +589,7 @@ class Group {
          })
       } else if (rxDoc) {
          // в список были добавлены элементы(например при подписке)
-         let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
+         let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async (change, x1, x2, x3, x4) => {
             try {
                await this.mutexSubscribe.lock('rxDoc::$')
                logD(f, 'List::rxDoc changed. try to change this.pageItems')
@@ -599,6 +599,8 @@ class Group {
                if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                   endFullFil = startFullFil = 0
                }
+               if (startFullFil === 1) startFullFil = 0 // workaround если добавился сверху 1 элемент
+               if (endFullFil === this.loadedLen() - 2) endFullFil = this.loadedLen() - 1 // workaround если добавился снизу 1 элемент
                let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
                await this.fulfill(nextItems, 'whole')
                let thiz = this

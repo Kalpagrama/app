@@ -59,7 +59,7 @@ div(
 import { ObjectApi } from 'src/api/object'
 
 export default {
-  name: 'nodeHeader',
+  name: 'essenceHeader',
   props: ['node', 'showAuthorAlways'],
   computed: {
     nodeIsMine () {

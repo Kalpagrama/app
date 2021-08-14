@@ -35,7 +35,7 @@
 
 <script>
 export default {
-  name: 'nodeSpheres',
+  name: 'essenceSpheres',
   props: {
     node: {type: Object},
     disabled: {type: Boolean, default: false},
