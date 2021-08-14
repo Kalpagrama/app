@@ -192,6 +192,17 @@ const routes = [
             }
          },
          {
+            name: 'block',
+            path: 'block/:oid',
+            // alias: 'node2/:oid',
+            component: () => import('src/pages/app/block/index.vue'),
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) saveHistory(to.params.oid)
+               next()
+            }
+         },
+         {
             name: 'node-render',
             path: 'node-render/:oid',
             component: () => import('src/pages/app/node_render/index.vue'),

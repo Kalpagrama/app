@@ -60,7 +60,8 @@ export default {
         let joint = item.populatedObject
         assert(joint.type === 'JOINT')
         let jointCopy = JSON.parse(JSON.stringify(joint))
-        delete jointCopy.items // есть  itemsShort
+        // jointCopy.items - тут полные сущности. Они нам не нужны(и хранить их в графе не надо)
+        jointCopy.items = jointCopy.itemsShort
         this.graph.joints.push(jointCopy)
       }
     }

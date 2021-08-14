@@ -203,14 +203,14 @@ export default {
       this.$log('voteAgain')
       if (this.node.author.oid === this.$store.getters.currentUser.oid) return
       this.voteStatsShow = false
-      await this.$wait(200)
+      // await this.$wait(200)
       this.voteStarted = true
     },
     async vote (val) {
       try {
         this.$log('vote', val)
         this.voteVoting = val
-        await this.$wait(1500)
+        // await this.$wait(1500)
         let res = await ObjectApi.vote(this.node.oid, val)
         this.$ym('USER_VOTED')
         this.$log('vote done', res)

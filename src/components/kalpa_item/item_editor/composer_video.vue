@@ -70,7 +70,7 @@ export default {
   components: {
     contentPlayer
   },
-  props: ['oid', 'figures', 'height', 'fromComposition'],
+  props: ['oid', 'figures', 'height', 'fromComposition', 'action'],
   data () {
     return {
       contentKalpa: null,

@@ -58,7 +58,7 @@ export default {
         this.$log('follow start')
         this.loading = true
         let res = await UserApi.subscribe(this.oid)
-        await this.$wait(500)
+        // await this.$wait(500)
         this.subscribed = await UserApi.isSubscribed(this.oid)
         this.subscribed = true
         this.$log('follow done')
@@ -74,7 +74,7 @@ export default {
         this.$log('unFollow')
         this.loading = false
         let res = await UserApi.unSubscribe(this.oid)
-        await this.$wait(500)
+        // await this.$wait(500)
         this.subscribed = await UserApi.isSubscribed(this.oid)
         this.subscribed = false
         this.$log('unFollow done')

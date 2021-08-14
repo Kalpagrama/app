@@ -100,7 +100,7 @@ export default {
         ...fields,
       }
       let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-      await this.$wait(500)
+      // await this.$wait(500)
       this.bookmarkCreating = false
       return bookmark
     },

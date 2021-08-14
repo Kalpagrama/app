@@ -42,10 +42,7 @@ export default {
   },
   computed: {
     canPublish () {
-      if (!this.node.name) {
-       return false
-      }
-      return true
+      return !!(this.node.name)
     },
   },
   methods: {
@@ -65,7 +62,7 @@ export default {
         // ---
         // loading
         this.nodePublishing = true
-        await this.$wait(1000)
+        // await this.$wait(1000)
         // ---
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))

@@ -86,7 +86,7 @@ div(
       div(
         v-for="(joint, jointIndex) in jointsRes.items" :key="joint.oid"
         v-if="!row.oidsHidden.includes(joint.oid)"
-        v-observe-visibility=`{
+        v-§=`{
           throttle: 150,
           callback: jointVisibilityCallback,
           intersection: {
@@ -331,7 +331,7 @@ export default {
       this.jointsResMoving = true
       if (isNext) await this.jointsRes.next()
       else await this.jointsRes.prev()
-      await this.$wait(500)
+      // await this.$wait(500)
       this.$log('jointsResMove DONE')
       this.jointsResMoving = false
     },

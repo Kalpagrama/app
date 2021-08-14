@@ -5,37 +5,37 @@ div(
   }`
   ).row.full-width
   //- itemFinder
-  //- q-dialog(
-    v-model="itemFinderShow"
-    position="bottom" maximized)
-    kalpa-finder(
-      @contentKalpa="itemFound"
-      :pages=`{
-        nodes: {views: ['all']},
-        workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
-        kalpagrama: {views: ['all', 'users', 'nodes']},
-        gif: {views: ['all']},
-        web: {views: ['all', 'image', 'video',]}
-      }`
-      :style=`{
-        //- maxWidth: $store.state.ui.pageWidth+'px',
-        height: $q.screen.height+'px',
-      }`).b-30
-      template(v-slot:header)
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-              height: '60px',
-            }`
-            ).row.full-width.items-center.content-center
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
-            .col
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Pick joint')}}
-      template(v-slot:tint=`{item}`)
-        div(
-          @click="itemFound(item)"
-          :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
+  ////- q-dialog(
+  //  v-model="itemFinderShow"
+  //  position="bottom" maximized)
+  //  kalpa-finder(
+  //    @contentKalpa="itemFound"
+  //    :pages=`{
+  //      nodes: {views: ['all']},
+  //      workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
+  //      kalpagrama: {views: ['all', 'users', 'nodes']},
+  //      gif: {views: ['all']},
+  //      web: {views: ['all', 'image', 'video',]}
+  //    }`
+  //    :style=`{
+  //      //- maxWidth: $store.state.ui.pageWidth+'px',
+  //      height: $q.screen.height+'px',
+  //    }`).b-30
+  //    template(v-slot:header)
+  //      .row.full-width.justify-center
+  //        div(
+  //          :style=`{
+  //            maxWidth: $store.state.ui.pageWidth+'px',
+  //            height: '60px',
+  //          }`
+  //          ).row.full-width.items-center.content-center
+  //          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderShow = false")
+  //          .col
+  //            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Pick joint')}}
+  //    template(v-slot:tint=`{item}`)
+  //      div(
+  //        @click="itemFound(item)"
+  //        :style=`{position: 'absolute', zIndex: 1000,}`).row.fit.cursor-pointer
   //- joint name/vertices
   div(
     :style=`{
@@ -312,7 +312,7 @@ export default {
       try {
         this.$log('publish start')
         this.publishing = true
-        await this.$wait(500)
+        // await this.$wait(500)
         let jointInput = JSON.parse(JSON.stringify(this.joint))
         if (jointInput.items.length === 1) {
           jointInput.vertices = []

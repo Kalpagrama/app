@@ -16,30 +16,30 @@ kalpa-layout
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
           }`)
-//- q-layout(
-  view="hHh lpR fFf"
-  :container="false"
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  @scroll="onScroll").b-30
-  q-header(
-    v-if="user && scrollTop > 300"
-    reveal)
-    nav-tabs(:user="user")
-  q-footer(v-if="$q.screen.lt.md")
-    kalpa-menu-mobile
-  q-page-container
-    q-page(
-      v-if="user"
-      ).row.full-width.items-start.content-start.justify-center
-      nav-header(:user="user")
-      nav-tabs(:user="user")
-      router-view(
-        :user="user"
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-        }`)
+////- q-layout(
+//  view="hHh lpR fFf"
+//  :container="false"
+//  :style=`{
+//    height: $q.screen.height+'px',
+//  }`
+//  @scroll="onScroll").b-30
+//  q-header(
+//    v-if="user && scrollTop > 300"
+//    reveal)
+//    nav-tabs(:user="user")
+//  q-footer(v-if="$q.screen.lt.md")
+//    kalpa-menu-mobile
+//  q-page-container
+//    q-page(
+//      v-if="user"
+//      ).row.full-width.items-start.content-start.justify-center
+//      nav-header(:user="user")
+//      nav-tabs(:user="user")
+//      router-view(
+//        :user="user"
+//        :style=`{
+//          maxWidth: $store.state.ui.pageWidth+'px',
+//        }`)
 </template>
 
 <script>
@@ -67,7 +67,7 @@ export default {
       async handler (to, from) {
         if (to) {
           this.user = null
-          await this.$wait(300)
+          // await this.$wait(300)
           this.user = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           // if (!this.$route.params.page) this.$router.replace('nodes')
         }

@@ -126,7 +126,7 @@ export default {
       try {
         this.$log('passwordSet start', this.passwordNew, this.passwordNewConfirm)
         this.loading = true
-        await this.$wait(1000)
+        // await this.$wait(1000)
         if (this.passwordNew.length === 0) throw new Error('No new password!')
         if (this.passwordNewConfirm.length === 0) throw new Error('No new password repeat!')
         if (this.passwordNew !== this.passwordNewConfirm) throw new Error('Passwords dont match!')
@@ -148,7 +148,7 @@ export default {
       try {
         this.$log('passwordChange start', this.passwordOld, this.passwordNew, this.passwordNewConfirm)
         this.loading = true
-        await this.$wait(1000)
+        // await this.$wait(1000)
         if (this.passwordOld.length === 0) throw new Error('No old password!')
         if (this.passwordNew.length === 0) throw new Error('No new password!')
         if (this.passwordNewConfirm.length === 0) throw new Error('No new password repeat!')

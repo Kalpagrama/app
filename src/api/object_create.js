@@ -128,7 +128,12 @@ class ObjectCreateApi {
 
    static makeEssenceInput (essence) {
       const f = ObjectCreateApi.makeEssenceInput
+      logW(f, 'start', essence)
       essence = cloneDeep(essence) // makeEssenceInput меняет essence
+      essence.name = essence.name || ''
+      essence.category = essence.category || 'FUN'
+      essence.spheres = essence.spheres || []
+      essence.layout = essence.layout || 'HORIZONTAL'
       {
          // checks
          assert(essence.category, 'essence.category')
@@ -142,7 +147,8 @@ class ObjectCreateApi {
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
       essenceInput.name = essence.name
-      essenceInput.category = essence.category || 'FUN'
+      essenceInput.category = essence.category
+
       essenceInput.spheres = essence.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
@@ -304,6 +310,8 @@ class ObjectCreateApi {
       block.spheres = block.spheres || []
       block.category = block.category || 'FUN'
       block.members = block.members || []
+      // todo coverImage!
+      block.coverImage = block.coverImage || { oid: block.graph.nodes[0].oid, name: block.graph.nodes[0].name }
       {
          // checks
          assert(block.category, 'essence.category')
@@ -328,12 +336,12 @@ class ObjectCreateApi {
       blockInput.members = block.members
       blockInput.graph = {
          nodes: block.graph.nodes.map(n => {
-            if (n.wsItemtype === WsItemTypeEnum.WS_NODE) return ObjectCreateApi.makeEssenceInput(n)
-            else return { name: n.name, oid: n.oid }
+            if (n.oid) return { oid: n.oid }
+            else return {essenceInput: ObjectCreateApi.makeEssenceInput(n)}
          }),
          joints: block.graph.joints.map(j => {
-            if (j.wsItemtype === WsItemTypeEnum.WS_JOINT) return ObjectCreateApi.makeEssenceInput(j)
-            else return { name: j.name, oid: j.oid }
+            if (j.oid) return { oid: j.oid }
+            else return {essenceInput: ObjectCreateApi.makeEssenceInput(j)}
          })
       }
       return blockInput
@@ -341,7 +349,7 @@ class ObjectCreateApi {
 
    static async blockCreate (block) {
       const f = ObjectCreateApi.blockCreate
-      logD(f, 'start', block)
+      logW(f, 'start', block)
       const t1 = performance.now()
       const cb = async () => {
          let blockInput = ObjectCreateApi.makeBlockInput(block)

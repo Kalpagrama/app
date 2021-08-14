@@ -15,7 +15,7 @@
             .col
               .row.fit.items-center.content-center.justify-center.q-pa-sm
                 span(:style=`{fontSize: '18px',}`).text-white.text-bold {{pageName}}
-            q-btn(round flat color="white" icon="delete" @click="clearData")
+            //q-btn(round flat color="white" icon="delete" @click="clearData")
         .row.full-width
           component(
             :is="'view-'+pageId"
@@ -66,15 +66,6 @@ export default {
     }
   },
   methods: {
-    clearData () {
-      if (this.item) {
-        if (this.item.wsItemType === WsItemTypeEnum.WS_BLOCK){
-          this.item.graph.joints.splice(0, this.item.graph.joints.length)
-          this.item.graph.nodes.splice(0, this.item.graph.nodes.length)
-          this.item.flushDebounce()
-        }
-      }
-    }
   },
   async mounted () {
     this.$log('mounted')

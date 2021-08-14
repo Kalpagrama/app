@@ -21,6 +21,7 @@ import kalpaTree from 'src/components/kalpa_tree/index.vue'
 // essence
 import composition from 'src/components/composition/index.vue'
 import nodeFeed from 'src/components/node_feed/index.vue'
+import blockFeed from 'src/components/block_feed/index.vue'
 // import jointFeed from 'src/components/joint_feed/index.vue'
 // user
 import userAvatar from 'src/components/user_avatar/index.vue'
@@ -46,6 +47,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   // essence
   Vue.component('composition', composition)
   Vue.component('nodeFeed', nodeFeed)
+  Vue.component('blockFeed', blockFeed)
   // Vue.component('jointFeed', jointFeed)
   // user
   Vue.component('userAvatar', userAvatar)

@@ -13,8 +13,6 @@
 
 <template lang="pug">
   div(ref="graphArea").row.full-width
-    // меню
-    q-btn(icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px'}").text-white
     q-dialog(
       v-model="menuShow"
       position="standard"
@@ -29,6 +27,11 @@
           round flat no-caps outline color="grey-8" align="left" icon='grain'
           :label="$t('Reset graph layout')"
           @click="menuShow = false, resetFixedPos()"
+        ).row.full-width.q-pa-sm
+        q-btn(
+          round flat no-caps outline color="grey-8" align="left" icon='delete'
+          :label="$t('clear graph')"
+          @click="menuShow = false, clearGraph()"
         ).row.full-width.q-pa-sm
     //- item finder
     q-dialog(
@@ -54,7 +57,7 @@
       position="standard"
       :maximized="false"
       @close="selectedItem = null"
-      )
+    )
       div(:style="{width: '300px'}")
         item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '20px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
     // меню создания связи
@@ -67,8 +70,8 @@
       composer(
         :joint="newJoint"
         :item="newJoint"
+        :action="addJointToGraph"
         @remove="$log('item-editor @remove')"
-        @close="addJointToGraph(newJoint)"
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
             borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
             }`)
@@ -87,15 +90,17 @@
       "pointer-events": "none",
       opacity:0
       }`)
-    q-btn(
-      v-if="!graph.nodes.length"
-      @click="itemFinderShow = true"
-      flat color="white" no-caps icon="add" size="lg" stack
-    :style=`{minHeight: '500px'}`
-    ).row.full-width.full-height.b-40
-      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-    svg(ref="graphSvg"
-      :style=`{height: height}`).row.full-width
+    div(:style=`{position: 'relative'}`).row.full-width
+      // меню
+      q-btn(v-if="showGraph" icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px'}").text-white
+      q-btn(
+        v-if="!showGraph"
+        @click="itemFinderShow = true"
+        outline color="white" no-caps icon="add" size="lg" stack
+      :style=`{minHeight: '500px'}`
+      ).row.full-width.full-height
+        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
+      svg(v-else ref="graphSvg" :style=`{height: height+'px'}`).row.full-width
 </template>
 
 <script>
@@ -104,6 +109,8 @@ import composer from 'src/components/kalpa_item/item_editor/composer.vue'
 import * as d3 from 'd3';
 import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import debounce from 'lodash/debounce'
+import { WsItemTypeEnum } from 'src/system/rxdb/common'
 
 export default {
   name: 'graphView',
@@ -142,17 +149,32 @@ export default {
     }
   },
   computed: {
+    showGraph () {
+      return this.graph.nodes.length
+    }
   },
   watch: {
+    'graph.nodes': {
+      handler (to, from) {
+        this.$log('graph changed!!!', this.graph)
+        this.debouncedUpdateGraph()
+      }
+    },
+    'graph.joints': {
+      handler (to, from) {
+        this.$log('graph changed!!!', this.graph)
+        this.debouncedUpdateGraph()
+      }
+    }
   },
   methods: {
     jointIsEqual (j1, j2) {
       // this.$log(j1, j2)
-      return (j1.itemsShort[0].id === j2.itemsShort[0].id && j1.itemsShort[1].id === j2.itemsShort[1].id) ||
-          (j1.itemsShort[0].id === j2.itemsShort[1].id && j1.itemsShort[1].id === j2.itemsShort[0].id)
+      return (j1.items[0].id === j2.items[0].id && j1.items[1].id === j2.items[1].id) ||
+          (j1.items[0].id === j2.items[1].id && j1.items[1].id === j2.items[0].id)
     },
     prepareJoint (joint) {
-      let [leftNode, rightNode] = joint.itemsShort
+      let [leftNode, rightNode] = joint.items
       joint.id = joint.id || joint.oid
       assert(joint.id && joint.type === 'JOINT', 'bad joint' + JSON.stringify(joint))
       assert(leftNode && rightNode, 'bad joint nodes' + JSON.stringify(joint))
@@ -161,11 +183,12 @@ export default {
       if (!this.graph.nodes.find(n => n.id === leftNode.id)) this.graph.nodes.push(leftNode)
       if (!this.graph.nodes.find(n => n.oid === rightNode.id)) this.graph.nodes.push(rightNode)
       for (let prop in joint) { // удаляем ненужные поля
-        if (!prop.in('itemsShort', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
+        if (!prop.in('items', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
       }
       joint.source = leftNode.id
       joint.target = rightNode.id
-      if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
+      joint.label = joint.name || (joint.vertices && joint.vertices.length === 2 ? this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name : '')
+      // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
     addNodeToGraph (item) {
       console.log('addNodeToGraph', item, this.graph)
@@ -185,7 +208,6 @@ export default {
         y: this.newItemLocation[1]
       }
       this.graph.nodes.push(d);
-      this.updateGraph()
       this.blinkNode(d)
     },
     addJointToGraph (joint) {
@@ -196,7 +218,6 @@ export default {
         return
       }
       this.graph.joints.push(joint)
-      this.updateGraph()
       this.jointCreatorShow = false
     },
     removeNode (item) {
@@ -204,14 +225,16 @@ export default {
       if (!confirm('Удалить?')) return
       let indx = this.graph.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
       if (indx >= 0) this.graph.nodes.splice(indx, 1)
-      this.updateGraph()
     },
     removeJoint (joint) {
       this.$log('removeJoint', joint)
       if (!confirm('Удалить?')) return
       let indx = this.graph.joints.findIndex(j => this.jointIsEqual(j, joint))
       if (indx >= 0) this.graph.joints.splice(indx, 1)
-      this.updateGraph()
+    },
+    clearGraph() {
+      this.graph.joints.splice(0, this.graph.joints.length)
+      this.graph.nodes.splice(0, this.graph.nodes.length)
     },
     blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -232,7 +255,7 @@ export default {
         this.$notify('error', this.$t('loop links deprecated'))
         return
       }
-      this.newJoint = { id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
+      this.newJoint = { id: Date.now().toString(), type: 'JOINT', items: [n1, n2], vertices: [] }
       this.jointCreatorShow = true
     },
     selectNode (d, width = 20) {
@@ -252,7 +275,7 @@ export default {
           .style('stroke-width', 5)
           .style('stroke', 'grey')
     },
-    resetFixedPos(){
+    resetFixedPos () {
       for (let node of this.graph.nodes) {
         node.fx = null
         node.fy = null
@@ -267,8 +290,7 @@ export default {
       for (let n of this.graph.nodes) {
         assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
         n.id = n.id || n.oid
-        if (this.graph.joints.find(j => j.itemsShort[0].id === n.id || j.itemsShort[1].id === n.id)) n.linked = true
-        else n.linked = false
+        n.linked = !!(this.graph.joints.find(j => j.items[0].id === n.id || j.items[1].id === n.id))
       }
 
       class GraphClickProcessor {
@@ -327,7 +349,7 @@ export default {
               break
             default :
               // throw new Error('bad event:' + type)
-                break
+              break
           }
         }
 
@@ -564,7 +586,7 @@ export default {
           }
         }
 
-        showItemPreview(d) {
+        showItemPreview (d) {
           thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
             thiz.$log(item)
             thiz.selectedItem = item
@@ -575,7 +597,7 @@ export default {
         onTripleClick (d) {
           if (d.oid) {
             thiz.$systemUtils.hapticsImpact()
-            let joint = thiz.graph.joints.find(j => j.itemsShort[0].id === d.id || j.itemsShort[1].id === d.id)
+            let joint = thiz.graph.joints.find(j => j.items[0].id === d.id || j.items[1].id === d.id)
             if (joint) thiz.removeJoint(joint)
             else thiz.removeNode(d)
           }
@@ -836,7 +858,7 @@ export default {
 
       // The <title> element provides an accessible, short-text description of any SVG container element or graphics element.
       // Text in a <title> element is not rendered as part of the graphic, but browsers usually display it as a tooltip.
-      this.graphEdges.append('title').text(d => d.name);
+      this.graphEdges.append('title').text(d => d.label);
 
       this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
           .data(this.graph.joints)
@@ -869,7 +891,7 @@ export default {
           .style('text-anchor', 'middle')
           .style('pointer-events', 'none')
           .attr('startOffset', '50%')
-          .text(d => d.name)
+          .text(d => d.label)
     },
     doLayout () {
       console.log('doLayout', this.width)
@@ -927,11 +949,13 @@ export default {
       // this.simulationLinked.alphaTarget(1).restart();
     },
     updateGraph () {
-      this.initGraph()
-      this.drawEdges()
-      this.drawNodes()
-      this.doLayout()
-      // this.testGraph()
+      this.$log('updateGraph')
+      if (this.showGraph) {
+        this.initGraph()
+        this.drawEdges()
+        this.drawNodes()
+        this.doLayout()
+      }
     },
     testGraph () {
       this.width = this.$refs.graphSvg.clientWidth
@@ -1004,23 +1028,24 @@ export default {
 
       return svg.node();
     },
-    handleTouchMove(e) {
+    handleTouchMove (e) {
       this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
-      if (this.stopScrolling)e.preventDefault()
+      if (this.stopScrolling) e.preventDefault()
     },
-    disableScroll(){
+    disableScroll () {
       this.$logW('disableScroll')
       this.stopScrolling = true
     },
-    enableScroll(){
+    enableScroll () {
       this.$logW('enableScroll')
       this.stopScrolling = false
-    },
+    }
   },
   mounted () {
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
+    this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
     this.updateGraph()
   },
   destroyed () {
