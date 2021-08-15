@@ -3809,6 +3809,30 @@
             "deprecationReason": null
           },
           {
+            "name": "vertices",
+            "description": "если это джойнт - то vertices.len = 2",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "VertexTypeEnum",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rate",
             "description": "рейтинг (устаревает)",
             "args": [],
@@ -3842,7 +3866,7 @@
           },
           {
             "name": "countStat",
-            "description": "численная статистика",
+            "description": "численная статистика (устаревает)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -12919,6 +12943,22 @@
             "deprecationReason": null
           },
           {
+            "name": "rev",
+            "description": "ревизия измененного объекта",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "path",
             "description": "где изменилось",
             "args": [],
@@ -12941,6 +12981,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objectFull",
+            "description": "весь объект (перехается если path = '')",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "Object",
               "ofType": null
             },
             "isDeprecated": false,

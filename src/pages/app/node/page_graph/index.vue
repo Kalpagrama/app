@@ -8,7 +8,7 @@
     borderColor: '#222',
   }`
   ).row.full-width
-    graph-view(:height="700" :graph="graph")
+    graph-view(:height="700" :graphD3="graph")
 </template>
 
 <script>

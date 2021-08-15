@@ -187,11 +187,9 @@ class ObjectCreateApi {
       essenceFull = cloneDeep(essenceFull) // makeEssenceInput меняет essence
       {
          // checks
-         assert(essenceFull.type.in('NODE', 'JOINT'), 'type required')
+         assert(essenceFull.type.in('NODE', 'JOINT', 'BLOCK'), 'type required')
          assert(essenceFull.category, 'essence.category')
          assert(essenceFull.spheres.length >= 0 && essenceFull.spheres.length <= 10, 'essence spheres')
-         assert(essenceFull.items.length > 0 && essenceFull.items.length <= 2, 'essence.items.length > 0')
-         assert(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essenceFull.layout), 'essence.layout')
       }
       let type = essenceFull.type
       let essenceInput = {}
@@ -205,23 +203,28 @@ class ObjectCreateApi {
       essenceInput.spheres = essenceFull.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      essenceInput.items = essenceFull.items.map(i => {
-         if (i.layers || i.compositionInput) {
-            return ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
-         }
-         else {
-            return {
-               essenceInput: ObjectCreateApi.makeEssenceInput(i)
+      if (essenceFull.type.in('NODE', 'JOINT')){
+         essenceInput.items = (essenceFull.items || []).map(i => {
+            if (i.layers || i.compositionInput) {
+               return ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
             }
-         }
-         // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
-         // else if (i.oid) itemInput = {oid: i.oid}
-         // else itemInput = ObjectCreateApi.makeEssenceInput(i)
-         // return itemInput
-         // return {
-         //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
-         // }
-      })
+            else {
+               return {
+                  essenceInput: ObjectCreateApi.makeEssenceInput(i)
+               }
+            }
+            // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
+            // else if (i.oid) itemInput = {oid: i.oid}
+            // else itemInput = ObjectCreateApi.makeEssenceInput(i)
+            // return itemInput
+            // return {
+            //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
+            // }
+         })
+      }
+      if (essenceFull.type === 'BLOCK'){
+         essenceInput.graph = essenceFull.graph
+      }
       essenceInput.vertices = essenceFull.vertices || []
       return essenceInput
    }

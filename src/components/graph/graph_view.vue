@@ -92,7 +92,7 @@
       }`)
     div(:style=`{position: 'relative'}`).row.full-width
       // меню
-      q-btn(v-if="showGraph" icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px'}").text-white
+      //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
       q-btn(
         v-if="!showGraph"
         @click="itemFinderShow = true"
@@ -110,7 +110,7 @@ import * as d3 from 'd3';
 import { assert } from 'src/system/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
-import { WsItemTypeEnum } from 'src/system/rxdb/common'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'graphView',
@@ -119,7 +119,7 @@ export default {
     composer
   },
   props: {
-    graph: { type: Object, required: true },
+    graphD3: { type: Object, required: true }, // d3 меняет этот объект
     width: {
       type: Number
     },
@@ -134,7 +134,7 @@ export default {
       itemFinderShow: false,
       jointCreatorShow: false,
       newJoint: null,
-      newItemLocation: [0, 0],
+      newItemLocation: [10, 10],
       selectedItem: null,
       nodeRadius: 50,
       svg: null,
@@ -150,20 +150,20 @@ export default {
   },
   computed: {
     showGraph () {
-      return this.graph.nodes.length
+      return !!this.graphD3.nodes.length
     }
   },
   watch: {
-    'graph.nodes': {
+    'graphD3.nodes': {
       handler (to, from) {
-        this.$log('graph changed!!!', this.graph)
-        this.debouncedUpdateGraph()
+        this.$log('graphD3.nodes changed!!!', this.graphD3)
+        this.debouncedUpdateGraph() // обновим лэйаут
       }
     },
-    'graph.joints': {
+    'graphD3.joints': {
       handler (to, from) {
-        this.$log('graph changed!!!', this.graph)
-        this.debouncedUpdateGraph()
+        this.$log('graphD3.joints changed!!!', this.graphD3)
+        this.debouncedUpdateGraph() // обновим лэйаут
       }
     }
   },
@@ -180,8 +180,12 @@ export default {
       assert(leftNode && rightNode, 'bad joint nodes' + JSON.stringify(joint))
       leftNode.id = leftNode.id || leftNode.oid
       rightNode.id = rightNode.id || rightNode.oid
-      if (!this.graph.nodes.find(n => n.id === leftNode.id)) this.graph.nodes.push(leftNode)
-      if (!this.graph.nodes.find(n => n.oid === rightNode.id)) this.graph.nodes.push(rightNode)
+      if (!this.graphD3.nodes.find(n => n.id === leftNode.id)) {
+        this.graphD3.nodes.push(leftNode)
+      }
+      if (!this.graphD3.nodes.find(n => n.oid === rightNode.id)) {
+        this.graphD3.nodes.push(rightNode)
+      }
       for (let prop in joint) { // удаляем ненужные поля
         if (!prop.in('items', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
       }
@@ -191,10 +195,10 @@ export default {
       // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
     addNodeToGraph (item) {
-      console.log('addNodeToGraph', item, this.graph)
+      console.log('addNodeToGraph', item, this.graphD3)
       this.itemFinderShow = false
       assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
-      if (this.graph.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
+      if (this.graphD3.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
         this.$notify('error', this.$t('same item found'))
         return
       }
@@ -207,34 +211,38 @@ export default {
         x: this.newItemLocation[0],
         y: this.newItemLocation[1]
       }
-      this.graph.nodes.push(d);
+      this.graphD3.nodes.push(d);
       this.blinkNode(d)
+      this.$emit('changed')
     },
     addJointToGraph (joint) {
       this.$log('addJointToGraph', joint)
       this.prepareJoint(joint)
-      if (this.graph.joints.find(j => this.jointIsEqual(j, joint))) {
+      if (this.graphD3.joints.find(j => this.jointIsEqual(j, joint))) {
         this.$notify('error', this.$t('same joint found'))
         return
       }
-      this.graph.joints.push(joint)
+      this.graphD3.joints.push(joint)
       this.jointCreatorShow = false
+      this.$emit('changed')
     },
     removeNode (item) {
       this.$log('removeNode', item)
       if (!confirm('Удалить?')) return
-      let indx = this.graph.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
-      if (indx >= 0) this.graph.nodes.splice(indx, 1)
+      let indx = this.graphD3.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
+      if (indx >= 0) this.graphD3.nodes.splice(indx, 1)
+      this.$emit('changed')
     },
     removeJoint (joint) {
       this.$log('removeJoint', joint)
       if (!confirm('Удалить?')) return
-      let indx = this.graph.joints.findIndex(j => this.jointIsEqual(j, joint))
-      if (indx >= 0) this.graph.joints.splice(indx, 1)
+      let indx = this.graphD3.joints.findIndex(j => this.jointIsEqual(j, joint))
+      if (indx >= 0) this.graphD3.joints.splice(indx, 1)
+      this.$emit('changed')
     },
-    clearGraph() {
-      this.graph.joints.splice(0, this.graph.joints.length)
-      this.graph.nodes.splice(0, this.graph.nodes.length)
+    clearGraph () {
+      this.graphD3.joints.splice(0, this.graphD3.joints.length)
+      this.graphD3.nodes.splice(0, this.graphD3.nodes.length)
     },
     blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -276,7 +284,7 @@ export default {
           .style('stroke', 'grey')
     },
     resetFixedPos () {
-      for (let node of this.graph.nodes) {
+      for (let node of this.graphD3.nodes) {
         node.fx = null
         node.fy = null
       }
@@ -286,11 +294,13 @@ export default {
       let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
       this.height = this.$refs.graphSvg.clientHeight
-      for (let j of this.graph.joints) this.prepareJoint(j)
-      for (let n of this.graph.nodes) {
+      for (let n of this.graphD3.nodes) {
         assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
         n.id = n.id || n.oid
-        n.linked = !!(this.graph.joints.find(j => j.items[0].id === n.id || j.items[1].id === n.id))
+      }
+      for (let j of this.graphD3.joints) this.prepareJoint(j)
+      for (let n of this.graphD3.nodes) {
+        n.linked = !!(this.graphD3.joints.find(j => j.items[0].id === n.id || j.items[1].id === n.id))
       }
 
       class GraphClickProcessor {
@@ -372,8 +382,10 @@ export default {
         }
 
         onLongClick (event) {
-          thiz.itemFinderShow = true
-          thiz.newItemLocation = d3.pointer(event, thiz.svg.node())
+          thiz.menuShow = true
+          // thiz.itemFinderShow = true
+          // thiz.newItemLocation = d3.pointer(event, thiz.svg.node())
+
           // let addItemMenu = d3.select(this.$refs.addItemMenu)
           // if (addItemMenu.node().style.opacity > 0) {
           //   addItemMenu.style('opacity', 0);
@@ -509,7 +521,7 @@ export default {
                 this.lineDrawed = true
                 if (event.sourceEvent instanceof TouchEvent) {
                   let linkedNodeData = null
-                  for (let n of thiz.graph.nodes) {
+                  for (let n of thiz.graphD3.nodes) {
                     let x = n.x - event.x
                     let y = n.y - event.y
                     let l = Math.sqrt(x * x + y * y)
@@ -597,7 +609,7 @@ export default {
         onTripleClick (d) {
           if (d.oid) {
             thiz.$systemUtils.hapticsImpact()
-            let joint = thiz.graph.joints.find(j => j.items[0].id === d.id || j.items[1].id === d.id)
+            let joint = thiz.graphD3.joints.find(j => j.items[0].id === d.id || j.items[1].id === d.id)
             if (joint) thiz.removeJoint(joint)
             else thiz.removeNode(d)
           }
@@ -654,7 +666,7 @@ export default {
 
       let clickProcessor = new NodeClickProcessor()
       this.graphNodes = this.svg.selectAll('.graphNodes')
-          .data(this.graph.nodes)
+          .data(this.graphD3.nodes)
           .enter()
           .append('g')
           // .attr('class', 'nodes')
@@ -837,7 +849,7 @@ export default {
       let jointClickProcessor = new JointClickProcessor()
       // Initialize the links
       this.graphEdges = this.svg.selectAll('.graphEdges')
-          .data(this.graph.joints)
+          .data(this.graphD3.joints)
           .enter()
           .append('line')
           .attr('class', 'links')
@@ -861,7 +873,7 @@ export default {
       this.graphEdges.append('title').text(d => d.label);
 
       this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
-          .data(this.graph.joints)
+          .data(this.graphD3.joints)
           .enter()
           .append('path')
           .attr('class', 'edgepath')
@@ -873,7 +885,7 @@ export default {
           .style('pointer-events', 'none');
 
       const edgelabels = this.svg.selectAll('.edgelabel')
-          .data(this.graph.joints)
+          .data(this.graphD3.joints)
           .enter()
           .append('text')
           .style('pointer-events', 'none')
@@ -903,7 +915,7 @@ export default {
       //     // .force('center', d3.forceCenter().x(200).y(200))
       //     .force('charge', d3.forceManyBody().strength(-2500));
       // this.simulationUnlinked
-      //     .nodes(this.graph.nodes.filter(n => !n.linked))
+      //     .nodes(this.graphD3.nodes.filter(n => !n.linked))
       //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
       //     .on('tick', (d) => {
       //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
@@ -919,7 +931,7 @@ export default {
           // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
           .force('charge', d3.forceManyBody().strength(d => d.linked ? -2500 : -700)) // This adds repulsion (if it's negative) between nodes.
       this.simulationLinked
-          .nodes(this.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
+          .nodes(this.graphD3.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
             // console.log('tick!!!')
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
@@ -932,7 +944,7 @@ export default {
             thiz.edgepaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y);
           })
           .on('end', () => {
-            for (let node of this.graph.nodes) {
+            for (let node of this.graphD3.nodes) {
               // node.fx = node.x
               // node.fy = node.y
             }
@@ -942,7 +954,7 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.force('link').links(this.graph.joints)
+      this.simulationLinked.force('link').links(this.graphD3.joints)
       this.$log('thiz.simulationLinked.alpha()=', thiz.simulationLinked.alpha())
       if (this.simulationLinked.alpha() <= 0.2) this.simulationLinked.alpha(1)
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
@@ -1044,7 +1056,7 @@ export default {
   mounted () {
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
-    this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
+    this.$log('mounted. graphD3=', cloneDeep(this.graphD3))
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
     this.updateGraph()
   },

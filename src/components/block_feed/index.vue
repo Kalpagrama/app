@@ -24,12 +24,16 @@
       //- HEADER: author, createdAt, actions, date, views
       essence-header(
         v-if="showHeader && block.oid"
-        :node="block"
+        :essence="block"
         :showAuthorAlways="showAuthorAlways"
         :style=`{
         order: orderHeader,
       }`)
-      graph-view(:height="700" :graph="graph")
+      graph-view(
+        :height="700"
+        :graphD3="block.graph"
+        @changed="block.setChanged(true)"
+        :style=`{background: 'rgb(40,40,40)'}`)
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       .row.full-width.items-center.content-center.justify-center.q-pa-md
@@ -65,7 +69,6 @@ import essenceItems from 'src/components/essence/essence_items/index.vue'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres/index.vue'
 import essenceHeader from 'src/components/essence/essence_header/index.vue'
-import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'blockFeed',
@@ -107,10 +110,6 @@ export default {
     return {}
   },
   computed: {
-    graph () {
-      let copyGraph = cloneDeep(this.block.graph)
-      return copyGraph
-    },
     fontSize () {
       let l = this.block.name.length
       if (l < 20) return 22

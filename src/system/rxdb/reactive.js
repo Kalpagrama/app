@@ -150,6 +150,7 @@ class ReactiveDocFactory {
                   case 'wsItem':
                      return reactiveDoc // wsSchemaItem
                   case 'object':
+                     reactiveDoc.cached.data.hasChanges = reactiveDoc.cached.data.hasChanges || false
                      return reactiveDoc.cached.data // cacheSchema
                   case 'meta':
                      return reactiveDoc.valueString // schemaKeyValue
@@ -198,6 +199,10 @@ class ReactiveDocFactory {
             if (typeof payload === 'object') {
                payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
+               }
+               payload.setChanged = (res = true) => {
+                  payload.hasChanges = res
+                  payload.flushDebounce()
                }
                payload.flushDebounce = () => {
                   wait(0).then(() => { // для того чтобы reactiveDocSubscribe успел сработать до нас

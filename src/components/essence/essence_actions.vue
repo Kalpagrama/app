@@ -130,9 +130,6 @@ import essenceVoteStats from './essence_actions/vote_stats.vue'
 
 export default {
   name: 'essenceActions',
-  mounted () {
-    this.$logW(this.essence)
-  },
   props: {
     essence: { type: Object, required: true },
     nodeBackgroundColor: { type: String },

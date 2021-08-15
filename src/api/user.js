@@ -11,6 +11,14 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
+const UserRoleEnum = Object.freeze({
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  MEMBER: 'MEMBER',
+  UNCONFIRMED: 'UNCONFIRMED', // неподтвержденная запись (нужно будет подтвердить позже)
+  GUEST: 'GUEST' // вход без логина
+})
+
 class UserApi {
   static async setFavouriteCategories (categoryTypes) {
     const f = UserApi.setFavouriteCategories
@@ -135,4 +143,4 @@ class UserApi {
   }
 }
 
-export { UserApi }
+export { UserApi, UserRoleEnum }

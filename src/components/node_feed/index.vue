@@ -24,7 +24,7 @@ div(
     //- HEADER: author, createdAt, actions, date, views
     essence-header(
       v-if="showHeader && node.oid"
-      :node="node"
+      :essence="node"
       :showAuthorAlways="showAuthorAlways"
       :style=`{
         order: orderHeader,

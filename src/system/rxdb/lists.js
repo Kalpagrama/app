@@ -346,7 +346,7 @@ class Lists {
          selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
             'props.oid': { $in: relatedSphereOids }
-            // 'props.mangoQuery.selector.objectTypeEnum.$in': { $in: [object.type] }
+            // 'props.mangoQuery.selector.objectTyeEnum.$in': { $in: [object.type] }
          }
       })
       rxDocs = rxDocs.filter(rxDoc => {
