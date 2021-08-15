@@ -251,6 +251,11 @@ const routes = [
                   component: () => import('src/pages/app/user/page_nodes/index.vue')
                },
                {
+                  name: 'user.blocks',
+                  path: 'blocks',
+                  component: () => import('src/pages/app/user/page_blocks/index.vue')
+               },
+               {
                   name: 'user.joints',
                   path: 'joints',
                   component: () => import('src/pages/app/user/page_joints/index.vue')
