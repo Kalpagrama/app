@@ -30,7 +30,7 @@
         order: orderHeader,
       }`)
       graph-view(
-        :height="700"
+        :height="450"
         :graphD3="block.graph"
         @changed="block.setChanged(true)"
         :style=`{background: 'rgb(40,40,40)'}`)

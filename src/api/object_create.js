@@ -319,7 +319,7 @@ class ObjectCreateApi {
          // checks
          assert(block.category, 'essence.category')
          assert(block.spheres.length >= 0 && block.spheres.length <= 10, 'essence spheres')
-         assert(block.graph && block.graph.nodes && block.graph.joints, 'block.graph')
+         assert(block.graph && block.graph.nodes && block.graph.joints && block.graph.nodes.length, 'block.graph')
       }
       let blockInput = {}
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)

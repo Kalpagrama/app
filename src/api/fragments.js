@@ -322,6 +322,10 @@ const blockFragment = gql`
         ...objectFragment
         relatedSphereOids
         sphereFromName{...objectShortFragment}
+        rate
+        weight
+        rateStat {percent, weight, count}
+        rateUser
         author {
             oid
             type

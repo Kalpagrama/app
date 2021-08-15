@@ -24,7 +24,7 @@
           .col
             .row.fit.items-center.content-center.justify-start
               small.text-grey-9 {{ essence.countStat.countShares || '' }}
-      //- micronodes/comments
+      // content
       div(
         v-if="essence.type === 'NODE'"
       ).col
@@ -35,7 +35,7 @@
               @click="contextGo()")
               q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Context')}}
               q-icon(name="select_all" size="22px")
-      essence-vote-ball(v-if="essence.type.in('JOINT', 'NODE')" :essence="essence" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
+      essence-vote-ball(v-if="essence.type.in('JOINT', 'NODE', 'BLOCK')" :essence="essence" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
       //- joints/chains
       router-link(
         v-if="essence.type === 'NODE'"

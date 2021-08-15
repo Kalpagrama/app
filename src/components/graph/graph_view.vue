@@ -37,7 +37,7 @@
     q-dialog(
       v-model="itemFinderShow"
       position="standard"
-      :maximized="false")
+      :maximized="true")
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
