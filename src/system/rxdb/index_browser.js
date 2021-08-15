@@ -594,14 +594,19 @@ class RxDBWrapper {
                               let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
                               topObjectCopy.populatedObject = populatedObject
                               return topObjectCopy
+                           }).catch(err => {
+                              logE('cant find topObject fullItem1:' + topObject.oid, err)
                            })
                      })
                      let internalObjectPromises = [] // внутренние объекты ядра и джоинтов (запрашиваем с упреждением чтобы все уместилось в 1 запрос на бэкенд)
                      for (let topObject of itemsForPopulate) {
-                        internalObjectPromises.push(...topObject.internalItemOids.map(oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true })))
+                        internalObjectPromises.push(...topObject.internalItemOids.map(
+                              oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true }
+                              ).catch(err => logE('cant find topObject fullItem2:' + topObject.oid, err))
+                           ))
                      }
 
-                     populatedItems = await Promise.all(promises)
+                     populatedItems = (await Promise.all(promises)).filter(el => !!el)
                      await Promise.all(internalObjectPromises)
 
                      if (itemsForPrefetch) {
