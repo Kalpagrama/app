@@ -92,7 +92,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
-          objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'USER']},
+          objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER']},
           querySearch: this.searchString,
         },
         populateObjects: false,

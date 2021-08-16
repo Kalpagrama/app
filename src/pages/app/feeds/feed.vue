@@ -7,8 +7,8 @@
       }`
       :query="queryFeedItems" :itemKey="'id'")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-        node-feed(
-          :node="item.populatedObject"
+        item-feed(
+          :item="item.populatedObject"
           :isActive="isActive"
           :isVisible="isVisible")
 </template>

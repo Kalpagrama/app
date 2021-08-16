@@ -66,8 +66,8 @@ q-layout(
                   callback: nodeVisibilityCallback
                 }`
                 ).row.full-width.items-start.content-start
-                node-feed(
-                  :node="node.populatedObject"
+                item-feed(
+                  :item="node.populatedObject"
                   :isActive="nodeIsVisible"
                   :isVisible="nodeIsVisible"
                   :showName="false"

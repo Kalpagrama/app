@@ -62,9 +62,9 @@ div(
             height: '70px',
           }`
           ).row.full-width.items-end.content-end
-          node-feed(
+          item-feed(
             v-if="jointActive"
-            :node="jointActive"
+            :item="jointActive"
             :showItems="false"
             :showActions="false"
             :showName="false"
@@ -101,9 +101,9 @@ div(
           //- background: r.oid+'-'+ri === rowActiveKey ? 'red' : 'none',
         }`)
         template(v-slot:header)
-          node-feed(
+          item-feed(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
-            :node="jointActive"
+            :item="jointActive"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false"

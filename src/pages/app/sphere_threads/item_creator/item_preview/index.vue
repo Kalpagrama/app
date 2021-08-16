@@ -4,8 +4,8 @@
   div(
     v-if="item.type === 'NODE'"
     ).row.full-width
-    node-feed(
-      :node="item"
+    item-feed(
+      :item="item"
       :isActive="true"
       :isVisible="true")
   //- content

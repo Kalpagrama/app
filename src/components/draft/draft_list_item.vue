@@ -94,7 +94,7 @@ export default {
       this.draft.name = draftFresh.name
     },
     async onSelect () {
-      this.$log(this.draft)
+      this.$log('onSelect', this.draft, this.mode)
       if (this.mode === 'select') {
         this.$emit('draft', this.draft)
       } else {

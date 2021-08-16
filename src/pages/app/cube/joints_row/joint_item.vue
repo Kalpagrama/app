@@ -81,9 +81,9 @@
               span.text-white.text-bold {{ $nodeItemType(joint.vertices[itemIndex]).name }}
     //- ===
     //- node
-    node-feed(
+    item-feed(
       v-if="item.type === 'NODE'"
-      :node="item"
+      :item="item"
       :isActive="itemActive"
       :isVisible="itemActive"
       :showActions="false"
@@ -184,8 +184,8 @@
           zIndex: 200,
         }`
         ).row.full-width
-        node-feed(
-          :node="joint"
+        item-feed(
+          :item="joint"
           :isActive="false"
           :isVisible="false"
           :showName="false"

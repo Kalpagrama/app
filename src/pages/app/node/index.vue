@@ -43,8 +43,8 @@ kalpa-layout()
                 }
               }`
               ).row.full-width
-              node-feed(
-                :node="node"
+              item-feed(
+                :item="node"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs

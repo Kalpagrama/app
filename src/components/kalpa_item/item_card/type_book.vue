@@ -38,7 +38,7 @@ export default {
     url () { return ContentApi.urlSelect(this.item) },
   },
   mounted() {
-    this.$log('item=', this.item)
+    this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
   }
 }
 </script>

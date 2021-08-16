@@ -1,8 +1,8 @@
 <template lang="pug">
 .row.full-width
-  node-feed(
+  item-feed(
     v-if="item.type === 'NODE'"
-    :node="item"
+    :item="item"
     :isActive="isActive"
     :isVisible="isActive"
     :showHeader="false"

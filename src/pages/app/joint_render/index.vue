@@ -1,8 +1,8 @@
 <template lang="pug">
 .row.full-width.justify-center
-  node-feed(
+  item-feed(
     v-if="node"
-    :node="node"
+    :item="node"
     :isActive="false"
     :isVisible="false"
     :showAuthorAlways="true"

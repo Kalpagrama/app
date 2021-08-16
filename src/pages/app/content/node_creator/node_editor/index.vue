@@ -26,7 +26,7 @@
           q-btn(round flat color="white" icon="clear" @click="close")
         edit-spheres(:node="node")
         actions(
-          :node="node" :player="player" :contentKalpa="contentKalpa"
+          :node="node" :player="player" :contentKalpa="contentKalpa" :showColor="showColor"
           @close="close"
           )
 </template>
@@ -41,6 +41,7 @@ export default {
     player: { type: Object, required: true },
     contentKalpa: { type: Object, required: true },
     background: { type: String, required: false },
+    showColor: { type: Boolean, default: false },
     node: {
       type: Object,
       default: {
@@ -49,7 +50,8 @@ export default {
         items: [],
         vertices: [],
         spheres: [],
-        category: 'FUN'
+        category: 'FUN',
+        temporary: true
       }
     }
   },

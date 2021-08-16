@@ -1,8 +1,8 @@
 <template lang="pug">
 .row.full-width.justify-center.q-pb-sm
-  node-feed(
+  item-feed(
     v-if="node"
-    :node="node"
+    :item="node"
     :isActive="isOpened"
     :isVisible="isOpened"
     :showActions="isOpened"

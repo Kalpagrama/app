@@ -45,6 +45,7 @@ div(
             }`
             ).row.full-width.q-px-sm.q-pb-sm
             node-editor(
+              :showColor="true"
               :player="player"
               :contentKalpa="contentKalpa"
               :node="player.selectedDraft"

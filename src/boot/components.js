@@ -20,9 +20,7 @@ import listFeed from 'src/components/list_feed/index.vue'
 import kalpaTree from 'src/components/kalpa_tree/index.vue'
 // essence
 import composition from 'src/components/composition/index.vue'
-import nodeFeed from 'src/components/node_feed/index.vue'
-import blockFeed from 'src/components/block_feed/index.vue'
-// import jointFeed from 'src/components/joint_feed/index.vue'
+import itemFeed from 'src/components/kalpa_item/item_feed/index.vue'
 // user
 import userAvatar from 'src/components/user_avatar/index.vue'
 
@@ -46,9 +44,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   Vue.component('listFeed', listFeed)
   // essence
   Vue.component('composition', composition)
-  Vue.component('nodeFeed', nodeFeed)
-  Vue.component('blockFeed', blockFeed)
-  // Vue.component('jointFeed', jointFeed)
+  Vue.component('itemFeed', itemFeed)
   // user
   Vue.component('userAvatar', userAvatar)
 

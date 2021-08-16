@@ -9,9 +9,9 @@
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
-  node-feed(
+  item-feed(
     v-if="node"
-    :node="node"
+    :item="node"
     :showHeader="showHeader"
     :showSpheres="showSpheres"
     :isActive="isActive"

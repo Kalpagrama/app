@@ -59,9 +59,9 @@ kalpa-layout(
               :item="jointItem"
               :itemActive="!jointCreatorFocused"
               :itemIndependent="true")
-              node-feed(
+              item-feed(
                 v-if="jointActive"
-                :node="jointActive"
+                :item="jointActive"
                 :showItems="false"
                 :showActions="false"
                 :showName="false"

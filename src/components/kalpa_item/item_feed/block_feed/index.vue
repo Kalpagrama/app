@@ -29,19 +29,38 @@
         :style=`{
         order: orderHeader,
       }`)
+      masonry-cover(v-if="showMasonry" :block="block" :style=`{height: '350px'}` @click.native="showMasonry = false")
       graph-view(
+        v-else
         :height="450"
         :graphD3="block.graph"
         @changed="block.setChanged(true)"
         :style=`{background: 'rgb(40,40,40)'}`)
       //- NAME: dynamic link/ dynamic fontSize
+
       slot(name="name")
-      .row.full-width.items-center.content-center.justify-center.q-pa-md
+      router-link(
+        v-if="showName && block.oid"
+        :to="'/block/' + this.block.oid"
+        :style=`{
+          order: 4,
+          minHeight: '60px',
+          fontSize: fontSize+'px',
+          textAlign: 'center',
+        }`
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
         span(
           :class=`{
-          'text-bold': block.name.length < 20
-        }`
+            'text-bold': block.name.length < 20
+          }`
         ).text-white {{ block.name }}
+
+      //.row.full-width.items-center.content-center.justify-center.q-pa-md
+      //  span(
+      //    :class=`{
+      //    'text-bold': block.name.length < 20
+      //  }`
+      //  ).text-white {{ block.name }}
       //- SPHERES
       essence-spheres(
         v-if="showSpheres && block.spheres.length > 0"
@@ -65,10 +84,11 @@
 
 <script>
 // import essenceItems from './node_items.vue'
-import essenceItems from 'src/components/essence/essence_items/index.vue'
+import essenceItems from 'src/components/essence/essence_items'
 import essenceActions from 'src/components/essence/essence_actions.vue'
-import essenceSpheres from 'src/components/essence/essence_spheres/index.vue'
-import essenceHeader from 'src/components/essence/essence_header/index.vue'
+import essenceSpheres from 'src/components/essence/essence_spheres'
+import essenceHeader from 'src/components/essence/essence_header'
+import masonryCover from 'src/components/kalpa_item/item_feed/block_feed/masonry_cover.vue'
 
 export default {
   name: 'blockFeed',
@@ -76,7 +96,8 @@ export default {
     essenceItems,
     essenceActions,
     essenceSpheres,
-    essenceHeader
+    essenceHeader,
+    masonryCover
   },
   props: {
     block: { type: Object },
@@ -107,7 +128,9 @@ export default {
     actionsColor: { type: String, default: 'grey-9' }
   },
   data () {
-    return {}
+    return {
+      showMasonry: true
+    }
   },
   computed: {
     fontSize () {
@@ -118,7 +141,13 @@ export default {
       else return 14
     }
   },
+  methods: {
+    masonryClick () {
+      alert('masonryClick')
+    }
+  },
   mounted () {
+    this.$log('mounted', this.block, this.isActive)
   }
 }
 </script>

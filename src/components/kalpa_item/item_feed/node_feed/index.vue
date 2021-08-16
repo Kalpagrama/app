@@ -82,10 +82,10 @@ div(
 
 <script>
 // import essenceItems from './node_items.vue'
-import essenceItems from 'src/components/essence/essence_items/index.vue'
+import essenceItems from 'src/components/essence/essence_items'
 import essenceActions from 'src/components/essence/essence_actions.vue'
-import essenceSpheres from 'src/components/essence/essence_spheres/index.vue'
-import essenceHeader from 'src/components/essence/essence_header/index.vue'
+import essenceSpheres from 'src/components/essence/essence_spheres'
+import essenceHeader from 'src/components/essence/essence_header'
 
 export default {
   name: 'nodeFeed',

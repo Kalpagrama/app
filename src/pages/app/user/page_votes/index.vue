@@ -35,8 +35,8 @@ list-feed(
           borderRadius: '50%',
           background: rateMeta(item.votedUserRate).colorBackground,
         }`).row.q-ml-xs.q-mr-sm
-    node-feed(
-      :node="item.populatedObject"
+    item-feed(
+      :item="item.populatedObject"
       :showAuthorAlways="true"
       :isActive="isActive"
       :isVisible="isVisible")
@@ -53,7 +53,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
           oidSphere: this.user.oid,
           oidAuthor: {$ne: this.user.oid},
           sortStrategy: 'AGE',

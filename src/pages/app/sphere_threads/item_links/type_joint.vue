@@ -65,8 +65,8 @@ div(
         span(v-if="joint.name.length > 0").text-white {{ joint.name }}
         span.text-white {{ $nodeItemType(joint.vertices[itemIndex]).name }}
       //- item-wrapper
-      node-feed(
-        :node="item"
+      item-feed(
+        :item="item"
         :isActive="isVisible"
         :isVisible="isVisible"
         :showHeader="false"

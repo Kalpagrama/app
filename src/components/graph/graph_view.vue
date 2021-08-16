@@ -58,7 +58,7 @@
       :maximized="false"
       @close="selectedItem = null"
     )
-      div(:style="{width: '300px'}")
+      div(:style="{}").full-width
         item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '20px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
     // меню создания связи
     q-dialog(

@@ -2,8 +2,8 @@
 div(
   v-if="node"
   ).row.full-width.justify-center
-  node-feed(
-    :node="node"
+  item-feed(
+    :item="node"
     :isActive="true"
     :isVisible="true"
     :style=`{

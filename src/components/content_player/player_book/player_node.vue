@@ -7,10 +7,10 @@ q-dialog(
   div(
     @click.self="node = null"
     ).row.fit.items-center.content-center.justify-center
-    node-feed(
+    item-feed(
       :isActive="true"
       :isVisible="true"
-      :node="node"
+      :item="node"
       :style=`{
         maxWidth: 600+'px',
       }`)

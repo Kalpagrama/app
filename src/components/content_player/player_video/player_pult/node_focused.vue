@@ -24,10 +24,10 @@ div(
           v-if="nodeCreating"
           :style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
           h1(:style=`{fontSize: '36px',}`).text-white.text-bold Ядро создано 🎉
-      node-feed(
+      item-feed(
         :isActive="true"
         :isVisible="true"
-        :node="player.node"
+        :item="player.node"
         :style=`{
           maxWidth: 600+'px',
           background: 'rgba(20,20,20,0.95)',

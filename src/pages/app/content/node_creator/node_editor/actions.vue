@@ -4,18 +4,19 @@
   q-btn(
     round flat color="red" icon="delete_outline" @click="nodeDelete()")
   .col
-  q-btn(round flat :style=`{borderStyle: node.color === 'orange'? 'solid' : null, borderWidth: '1px'}` color="orange" icon="lens"
-    @click="setColor('orange')")
-  q-btn(round flat :style=`{borderStyle: node.color === 'red'? 'solid' : null, borderWidth: '1px'}` color="red" icon="lens"
-    @click="setColor('red')")
-  q-btn(round flat :style=`{borderStyle: node.color === 'green'? 'solid' : null, borderWidth: '1px'}` color="green" icon="lens"
-    @click="setColor('green')")
-  q-btn(round flat :style=`{borderStyle: node.color === 'blue'? 'solid' : null, borderWidth: '1px'}` color='blue' icon="lens"
-    @click="setColor('blue')")
+  div(v-if="showColor")
+    q-btn(round flat :style=`{borderStyle: node.color === 'orange'? 'solid' : null, borderWidth: '1px'}` color="orange" icon="lens"
+      @click="setColor('orange')")
+    q-btn(round flat :style=`{borderStyle: node.color === 'red'? 'solid' : null, borderWidth: '1px'}` color="red" icon="lens"
+      @click="setColor('red')")
+    q-btn(round flat :style=`{borderStyle: node.color === 'green'? 'solid' : null, borderWidth: '1px'}` color="green" icon="lens"
+      @click="setColor('green')")
+    q-btn(round flat :style=`{borderStyle: node.color === 'blue'? 'solid' : null, borderWidth: '1px'}` color='blue' icon="lens"
+      @click="setColor('blue')")
   .col
   q-btn(
     @click="nodeSave()"
-    flat color="grey-5" no-caps) {{$t('Save draft')}}
+    flat color="grey-5" no-caps) {{$t('Save')}}
   //- v-if="true || node.name.length > 0"
   q-btn(
     @click="nodePublish()"
@@ -34,7 +35,7 @@ import {assert} from 'src/system/utils'
 
 export default {
   name: 'nodeEditorActions',
-  props: ['player', 'node', 'contentKalpa'],
+  props: ['player', 'node', 'contentKalpa', 'showColor'],
   data () {
     return {
       nodePublishing: false,
@@ -134,7 +135,7 @@ export default {
       this.$log('remove')
       this.node.remove(true)
     }
-    await this.player.showAllDraftsForCurrentLocation()
+    // await this.player.showAllDraftsForCurrentLocation()
 
     this.player.events.off('figure-create', this.playerFigureCreateHandle)
     this.player.events.off('figure-delete', this.playerFigureDeleteHandle)
