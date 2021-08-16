@@ -86,7 +86,7 @@ div(
       div(
         v-for="(joint, jointIndex) in jointsRes.items" :key="joint.oid"
         v-if="!row.oidsHidden.includes(joint.oid)"
-        v-§=`{
+        v-observe-visibility=`{
           throttle: 150,
           callback: jointVisibilityCallback,
           intersection: {
