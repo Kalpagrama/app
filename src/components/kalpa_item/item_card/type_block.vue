@@ -36,7 +36,7 @@ import { ContentApi } from 'src/api/content'
 import contentPlayer from 'src/components/content_player/index.vue'
 
 export default {
-  name: 'typeContent',
+  name: 'typeBlock',
   props: ['item', 'isActive'],
   components: {
     contentPlayer

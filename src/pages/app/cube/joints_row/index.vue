@@ -16,7 +16,7 @@ div(
     div(
       :style=`{
         maxWidth: rowItemWidth+'px',
-        padding: '2px 36px',
+        padding: '0px 36px',
       }`).row.full-width.justify-center
       div(
         v-for="(joint,jointIndex) in jointsRes.items" :key="joint.oid"
@@ -36,30 +36,30 @@ div(
           }`
           ).row.fit
   //- debug row
-  div(
-    v-if="jointsRes && rowActive"
-    :style=`{
-      position: 'absolute', zIndex: 3000, top: '-4px',
-      opacity: 0.1,
-    }`
-    ).row.full-width.justify-center
-    div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-px-sm
-      q-btn(
-        @click="jointsResToStart()"
-        flat no-caps dense color="white") To Start
-      q-btn(
-        @click="jointsResMove(false)"
-        flat no-caps dense
-        :disabled="!jointsRes.hasPrev"
-        :color="jointsRes.hasPrev ? 'white' : 'red'") Prev
-      q-btn(
-        @click="jointsResMove(true)"
-        flat no-caps dense
-        :disabled="!jointsRes.hasPrev"
-        :color="jointsRes.hasNext ? 'white' : 'red'") Next
-      q-btn(
-        @click="jointsResStartHere()"
-        flat no-caps dense color="white") Start here
+  //div(
+  //  v-if="jointsRes && rowActive"
+  //  :style=`{
+  //    position: 'absolute', zIndex: 3000, top: '-4px',
+  //    opacity: 0.1,
+  //  }`
+  //  ).row.full-width.justify-center
+  //  div(:style=`{maxWidth: rowItemWidth+'px',}`).row.full-width.justify-center.q-px-sm
+  //    q-btn(
+  //      @click="jointsResToStart()"
+  //      flat no-caps dense color="white") To Start
+  //    q-btn(
+  //      @click="jointsResMove(false)"
+  //      flat no-caps dense
+  //      :disabled="!jointsRes.hasPrev"
+  //      :color="jointsRes.hasPrev ? 'white' : 'red'") Prev
+  //    q-btn(
+  //      @click="jointsResMove(true)"
+  //      flat no-caps dense
+  //      :disabled="!jointsRes.hasPrev"
+  //      :color="jointsRes.hasNext ? 'white' : 'red'") Next
+  //    q-btn(
+  //      @click="jointsResStartHere()"
+  //      flat no-caps dense color="white") Start here
   div(
     ref="scroll-wrapper"
     :style=`{
