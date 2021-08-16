@@ -43,8 +43,8 @@ kalpa-layout()
                 }
               }`
               ).row.full-width
-              block-feed(
-                :block="block"
+              item-feed(
+                :item="block"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
 </template>

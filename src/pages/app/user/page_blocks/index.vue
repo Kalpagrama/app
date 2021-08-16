@@ -7,8 +7,8 @@ list-feed(
   template(v-slot:prepend)
     slot(name="prepend")
   template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-    block-feed(
-      :block="item.populatedObject"
+    item-feed(
+      :item="item.populatedObject"
       :showAuthorAlways="true"
       :isActive="isActive"
       :isVisible="isVisible")
