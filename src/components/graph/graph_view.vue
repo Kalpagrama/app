@@ -157,13 +157,13 @@ export default {
     'graphD3.nodes': {
       handler (to, from) {
         this.$log('graphD3.nodes changed!!!', this.graphD3)
-        this.debouncedUpdateGraph() // обновим лэйаут
+        this.debouncedUpdateGraph()
       }
     },
     'graphD3.joints': {
       handler (to, from) {
         this.$log('graphD3.joints changed!!!', this.graphD3)
-        this.debouncedUpdateGraph() // обновим лэйаут
+        this.debouncedUpdateGraph()
       }
     }
   },
@@ -194,12 +194,12 @@ export default {
       joint.label = joint.name || (joint.vertices && joint.vertices.length === 2 ? this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name : '')
       // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
-    addNodeToGraph (item) {
+    addNodeToGraph (item, notifyOnDublicates = true) {
       console.log('addNodeToGraph', item, this.graphD3)
       this.itemFinderShow = false
       assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
       if (this.graphD3.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
-        this.$notify('error', this.$t('same item found'))
+        if (notifyOnDublicates) this.$notify('error', this.$t('same item found'))
         return
       }
       let d = {
@@ -215,11 +215,11 @@ export default {
       this.blinkNode(d)
       this.$emit('changed')
     },
-    addJointToGraph (joint) {
+    addJointToGraph (joint, notifyOnDublicates = true) {
       this.$log('addJointToGraph', joint)
       this.prepareJoint(joint)
       if (this.graphD3.joints.find(j => this.jointIsEqual(j, joint))) {
-        this.$notify('error', this.$t('same joint found'))
+        if (notifyOnDublicates) this.$notify('error', this.$t('same joint found'))
         return
       }
       this.graphD3.joints.push(joint)
@@ -594,7 +594,7 @@ export default {
         onDblClick (d) {
           if (d.oid) {
             // thiz.$systemUtils.hapticsImpact()
-            // this.$emit('nodeDblClick', d)
+            thiz.$emit('nodeDblClick', d)
           }
         }
 
