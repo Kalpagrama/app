@@ -39,16 +39,16 @@
       //- joints/chains
       router-link(
         v-if="essence.type === 'NODE'"
-        :to="'/cube/'+essence.oid"
+        :to="'/graph/'+essence.oid"
       ).col
         .row.full-width
           .col
             .row.fit.items-center.content-center.justify-end
               small.text-grey-9 {{ essence.countStat.countJoints || '' }}
           .row.items-center.content-center
-            q-btn(round flat color="grey-9")
-              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Links')}}
-              q-icon(name="fas fa-link" size="20px")
+            q-btn(round flat color="grey-9" icon="hub")
+              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Graph')}}
+              //q-icon(name="fas fa-link" size="20px")
       //- bookmarks
       .col
         .row.full-width

@@ -8,8 +8,6 @@
 // import {selectAll} from "d3-selection";
 
 // отображает граф.
-// @add - добавить новый элемент
-// @preview - показать превью узла
 
 <template lang="pug">
   div(ref="graphArea").row.full-width
@@ -94,7 +92,7 @@
       // меню
       //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
       q-btn(
-        v-if="!showGraph"
+        v-if="!showGraph && showAddBtn"
         @click="itemFinderShow = true"
         outline color="white" no-caps icon="add" size="lg" stack
       :style=`{minHeight: '500px'}`
@@ -120,6 +118,7 @@ export default {
   },
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект
+    showAddBtn: { type: Boolean, default: true },
     width: {
       type: Number
     },
@@ -587,6 +586,7 @@ export default {
             thiz.$log('click')
             // delete d.fx;
             // delete d.fy;
+            thiz.$emit('nodeClick', d)
             this.showItemPreview(d)
           }, dblClickInterval + 50)
         }
