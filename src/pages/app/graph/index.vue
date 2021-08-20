@@ -32,7 +32,7 @@ kalpa-layout()
           div(
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
             //- block wrapper
-            graph-navigator(:oid="oid" :height="$q.screen.height - 115" @discover="onDiscover")
+            graph-navigator(:oid="oid" :height="$q.screen.height - 115")
 </template>
 
 <script>
@@ -56,9 +56,6 @@ export default {
   computed: {
   },
   methods: {
-    async onDiscover(item) {
-      this.$router.replace('/graph/' + item.oid)
-    }
   },
   async mounted () {
     this.$log('mounted', this.oid)

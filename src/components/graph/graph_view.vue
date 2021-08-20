@@ -68,7 +68,7 @@
           //  icon="mediation" flat color="grey"
           //  v-close-popup
           //  :label="selectedItemFull.countStat.countJoints || 0"
-          //  @click="$emit('discover', graphD3.selectedItem)").q-mx-sm
+          //  @click="discover(graphD3.selectedItem)").q-mx-sm
           q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
           q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(graphD3.selectedItem, null)").q-mx-sm
         .row.full-width.items-center.content-center.justify-center.q-pa-sm
@@ -131,7 +131,6 @@ import { assert } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { MutexLocal } from 'src/system/rxdb/mutex_local'
 
 export default {
   name: 'graphView',
@@ -142,6 +141,8 @@ export default {
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект
     showAddBtn: { type: Boolean, default: true },
+    getJoints: { type: Function, required: true },
+    oidRoot: { type: String, required: true },
     width: {
       type: Number
     },
@@ -175,7 +176,7 @@ export default {
     showGraph () {
       return !!this.graphD3.nodes.length
     },
-    selectedItem() {
+    selectedItem () {
       return this.graphD3.selectedItem
     }
   },
@@ -185,14 +186,15 @@ export default {
         if (from) {
           this.selectedItemFull = null
           // this.unselectNode(from)
-          if (!to) await this.zoomTo(from, 1)
+          if (!to) this.zoomTo(from, 1)
         }
         if (to) {
           // this.$log('onselectedItem', to.name)
           // this.selectNode(to)
-          await this.zoomTo(to, 3, () => {
+          this.zoomTo(to, 3, async () => {
             this.$log('zoomTo ends!!!')
             this.itemDetailsShow = true
+            await this.discover(to)
           })
           this.selectedItemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
         } else this.selectedItemFull = null
@@ -290,6 +292,12 @@ export default {
       if (indx >= 0) this.graphD3.joints.splice(indx, 1)
       this.$emit('changed')
     },
+    async discover (d) {
+      if (d.discovered) return
+      let joints = await this.getJoints(d.oid)
+      for (let j of joints) this.addJointToGraph(j, false)
+      d.discovered = true
+    },
     clearGraph () {
       this.graphD3.joints.splice(0, this.graphD3.joints.length)
       this.graphD3.nodes.splice(0, this.graphD3.nodes.length)
@@ -343,19 +351,15 @@ export default {
       // this.doLayout()
       this.debouncedUpdateGraph()
     },
-    async zoomTo (d, scale = 3, onEnd = null) {
+    zoomTo (d, scale = 3, onEnd = null) {
       this.$log('zoomTo node: ', d)
       let duration = 1000
-      await this.mutex.lock('zoomTo')
       let transition = this.svg.transition().duration(duration).call(
           this.zoom.transform,
           d3.zoomIdentity.translate(this.width / 2, this.height / 2).scale(scale).translate(-d.x, -d.y - 50)
-      ).on('end', () => {
-        if (onEnd) onEnd()
+      ).on('end', async () => {
+        if (onEnd) await onEnd()
       })
-      setTimeout(() => {
-        this.mutex.release()
-      }, duration + 100)
     },
     zoomReset () {
       this.svg.transition().duration(750).call(
@@ -364,86 +368,6 @@ export default {
           d3.zoomTransform(this.svg.node()).invert([this.width / 2, this.height / 2])
       );
     },
-    testGraph () {
-      if (this.svgG) return
-      let thiz = this
-      thiz.width = this.$refs.graphSvg.clientWidth
-      thiz.height = this.$refs.graphSvg.clientHeight
-      let radius = 6
-      let step = radius * 2
-      let theta = Math.PI * (3 - Math.sqrt(5))
-      let data = Array.from({ length: 2000 }, (_, i) => {
-        const radius = step * Math.sqrt(i += 0.5)
-        const a = theta * i
-        return [
-          thiz.width / 2 + radius * Math.cos(a),
-          thiz.height / 2 + radius * Math.sin(a)
-        ];
-      })
-
-      const random = () => {
-        const [x, y] = data[Math.floor(Math.random() * data.length)];
-        this.svg.transition().duration(2500).call(
-            this.zoom.transform,
-            d3.zoomIdentity.translate(thiz.width / 2, thiz.height / 2).scale(40).translate(-x, -y)
-        );
-      }
-      thiz.randomZoom = random
-
-      const reset = () => {
-        this.svg.transition().duration(750).call(
-            this.zoom.transform,
-            d3.zoomIdentity,
-            d3.zoomTransform(this.svg.node()).invert([thiz.width / 2, thiz.height / 2])
-        );
-      }
-      thiz.resetZoom = reset
-
-      const clicked = (event, [x, y]) => {
-        thiz.$log('clicked', event)
-        event.stopPropagation();
-        this.svg.transition().duration(750).call(
-            this.zoom.transform,
-            d3.zoomIdentity.translate(thiz.width / 2, thiz.height / 2).scale(40).translate(-x, -y),
-            [event.x, event.y]
-        );
-      }
-
-      const zoomed = ({ transform }) => {
-        this.svgG.attr('transform', transform);
-      }
-
-      this.zoom = d3.zoom()
-          .scaleExtent([1, 40])
-          .on('zoom', zoomed);
-
-      this.svg = d3.select(this.$refs.graphSvg)
-          .attr('viewBox', [0, 0, thiz.width, thiz.height])
-          .on('click', reset);
-      // if (this.svgG) this.svgG.remove();
-
-      this.svgG = this.svg.append('g');
-
-      this.svgG.selectAll('circle')
-          .data(data)
-          .join('circle')
-          .attr('cx', ([x]) => x)
-          .attr('cy', ([, y]) => y)
-          .attr('r', radius)
-          .attr('fill', (d, i) => d3.interpolateRainbow(i / 360))
-          .on('click', clicked);
-
-      this.svg.call(this.zoom);
-
-      // this.$log('svg.node()=', svg.node())
-      // return Object.assign(svg.node(), {
-      //   zoomIn: () => svg.transition().call(zoom.scaleBy, 2),
-      //   zoomOut: () => svg.transition().call(zoom.scaleBy, 0.5),
-      //   zoomRandom: random,
-      //   zoomReset: reset
-      // });
-    },
-
     initGraph () {
       let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
@@ -490,14 +414,14 @@ export default {
               break
             case 'start':
               // zoom start
-              console.log('zoom start', event)
+              // console.log('zoom start', event)
               this.zoomdetected = false
               this.zoomInitialTransform = event.transform
               break
             case 'zoom':
               // event.sourceEvent.stopPropagation();
               // event.sourceEvent.preventDefault();
-              console.log('zoom', event)
+              // console.log('zoom', event)
               if (this.state === 'START_LONG_CLICK' && Math.abs(event.transform.x - this.zoomInitialTransform.x) + Math.abs(event.transform.y - this.zoomInitialTransform.y) < (event.sourceEvent instanceof TouchEvent ? 10 : 5)) {
                 // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
               } else {
@@ -508,7 +432,7 @@ export default {
               break
             case 'end':
               // zoom end
-              console.log('zoom end ', event)
+              // console.log('zoom end ', event)
               if (!this.zoomdetected) {
                 this.cancelLongClickDetection()
               }
@@ -1092,20 +1016,15 @@ export default {
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
     },
-    async updateGraph () {
+    updateGraph () {
       this.$log('updateGraph')
-      try {
-        await this.mutex.lock('updateGraph')
-        if (this.showGraph) {
-          this.initGraph()
-          this.drawEdges()
-          this.drawNodes()
-          this.doLayout()
-        }
-      } finally {
-        this.mutex.release()
+      if (this.showGraph) {
+        this.initGraph()
+        this.drawEdges()
+        this.drawNodes()
+        this.doLayout()
       }
-      if (this.selectedItem) await this.zoomTo(this.selectedItem)
+      if (this.selectedItem) this.zoomTo(this.selectedItem)
     },
     handleTouchMove (e) {
       // this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
@@ -1120,14 +1039,17 @@ export default {
       this.stopScrolling = false
     }
   },
-  mounted () {
-    this.$log('mounted. graphD3=', cloneDeep(this.graphD3))
-    // this.testGraph()
-    this.mutex = new MutexLocal('graphMutex')
+  async mounted () {
+    this.$log('mounted. graphD3=', cloneDeep(this.graphD3), this.oidRoot)
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
-    this.updateGraph()
+    if (!this.graphD3.nodes.length) {
+      let rootNode = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oidRoot)
+      let node = this.addNodeToGraph(cloneDeep(rootNode))
+      await this.discover(node)
+    }
+    this.debouncedUpdateGraph()
   },
   destroyed () {
     window.removeEventListener('touchmove', this.handleTouchMove)
