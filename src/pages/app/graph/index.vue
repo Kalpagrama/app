@@ -8,12 +8,12 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.b-30.q-pa-sm
+      .row.full-width.justify-center.b-30
         div(
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
             borderRadius: '10px',
-          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
+          }`).row.full-width.items-center.content-center.b-40
           q-icon(name="hub" color="white" size="30px").q-ml-sm
           .col
           h1.text-white.text-bold {{$t('Graph')}}
@@ -30,9 +30,9 @@ kalpa-layout()
           paddingBottom: '200px',
         }`).row.full-width.justify-center.b-30
           div(
-            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
+            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
             //- block wrapper
-            graph-navigator(:oid="oid" @setRoot="onSetRoot")
+            graph-navigator(:oid="oid" :height="$q.screen.height - 115" @discover="onDiscover")
 </template>
 
 <script>
@@ -56,7 +56,7 @@ export default {
   computed: {
   },
   methods: {
-    async onSetRoot(item) {
+    async onDiscover(item) {
       this.$router.replace('/graph/' + item.oid)
     }
   },

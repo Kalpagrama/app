@@ -132,8 +132,8 @@ export default {
   name: 'essenceActions',
   props: {
     essence: { type: Object, required: true },
-    nodeBackgroundColor: { type: String },
-    nodeActionsColor: { type: String },
+    nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
+    nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
     isActive: { type: Boolean },
     isVisible: { type: Boolean }
   },

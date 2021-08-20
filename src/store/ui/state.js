@@ -56,5 +56,7 @@ export default {
       name: 'Users',
       selector: {type: {$in: ['USER']}},
     }
-  ]
+  ],
+  // graph (последний запомненный граф (чтобы вернуться назад - и граф не стерся))
+  graph: null
 }
