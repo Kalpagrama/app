@@ -53,6 +53,7 @@
     q-dialog(
       v-model="itemDetailsShow"
       position="bottom"
+      @hide="graphD3.selectedItem = null"
     )
       div(
         :style=`{
@@ -60,16 +61,16 @@
             borderRadius: '20px 20px 0 0',
             // border: '2px solid green',
           }`).row.full-width.b-40
-        div(v-if="selectedItem").row.full-width.q-ma-sm
-          q-btn(icon="delete" flat color="grey" @click="removeNode(selectedItem)").q-mx-sm
+        div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
+          q-btn(icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
           //q-btn(
-          //  v-if="selectedItemFull && !selectedItem.discovered"
+          //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
           //  icon="mediation" flat color="grey"
           //  v-close-popup
           //  :label="selectedItemFull.countStat.countJoints || 0"
-          //  @click="$emit('discover', selectedItem)").q-mx-sm
-          q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + selectedItem.oid").q-mx-sm
-          q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(selectedItem, null)").q-mx-sm
+          //  @click="$emit('discover', graphD3.selectedItem)").q-mx-sm
+          q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
+          q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(graphD3.selectedItem, null)").q-mx-sm
         .row.full-width.items-center.content-center.justify-center.q-pa-sm
           //spinner
           div(v-if="!selectedItemFull")
@@ -116,7 +117,7 @@
       :style=`{minHeight: '500px'}`
       ).row.full-width.full-height
         span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-      svg(v-else-if="showGraph" ref="graphSvg" :style=`{height: height+'px'}`).row.full-width
+      svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: height+'px'}`).row.full-width
     //// превьюшка узла внутри графа
     //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
     //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
@@ -130,6 +131,7 @@ import { assert } from 'src/system/utils'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { MutexLocal } from 'src/system/rxdb/mutex_local'
 
 export default {
   name: 'graphView',
@@ -155,7 +157,6 @@ export default {
       itemDetailsShow: false,
       newJoint: null,
       newItemLocation: [10, 10],
-      selectedItem: null,
       selectedItemFull: null,
       nodeRadius: 50,
       svgG: null,
@@ -173,6 +174,9 @@ export default {
   computed: {
     showGraph () {
       return !!this.graphD3.nodes.length
+    },
+    selectedItem() {
+      return this.graphD3.selectedItem
     }
   },
   watch: {
@@ -180,11 +184,16 @@ export default {
       async handler (to, from) {
         if (from) {
           this.selectedItemFull = null
-          this.unselectNode(from)
+          // this.unselectNode(from)
+          if (!to) await this.zoomTo(from, 1)
         }
         if (to) {
           // this.$log('onselectedItem', to.name)
-          this.selectNode(to)
+          // this.selectNode(to)
+          await this.zoomTo(to, 3, () => {
+            this.$log('zoomTo ends!!!')
+            this.itemDetailsShow = true
+          })
           this.selectedItemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
         } else this.selectedItemFull = null
       }
@@ -230,7 +239,7 @@ export default {
       // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
     addNodeToGraph (item, notifyOnExisting = true) {
-      console.log('addNodeToGraph', item, this.graphD3)
+      // this.$log('addNodeToGraph', item, this.graphD3)
       if (this.simulationLinked) this.simulationLinked.stop()
       this.itemFinderShow = false
       assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
@@ -254,7 +263,7 @@ export default {
       return d
     },
     addJointToGraph (joint, notifyOnExisting = true) {
-      this.$log('addJointToGraph', joint)
+      // this.$log('addJointToGraph', joint)
       if (this.simulationLinked) this.simulationLinked.stop()
       this.prepareJoint(joint)
       let existing = this.graphD3.joints.find(j => this.jointIsEqual(j, joint))
@@ -315,8 +324,6 @@ export default {
           .duration(200)
           .style('stroke-width', width)
           .style('stroke', 'green')
-      // this.$wait(1000).then(() => this.unselectNode(d))
-      // this.positionTo(d)
     },
     unselectNode (d) {
       // this.$log('unselectNode')
@@ -336,35 +343,107 @@ export default {
       // this.doLayout()
       this.debouncedUpdateGraph()
     },
-    positionTo (d) {
-      this.currentTransform = this.currentTransform || [this.width / 2, this.height / 2, this.height];
-      let nextTransform = d ? [d.x, d.y + 40, this.nodeRadius * 3 + 1] : [this.width / 2, this.height / 2, this.height]
-      const i = d3.interpolateZoom(this.currentTransform, nextTransform);
-      let transform = ([x, y, r]) => {
-        return `
-          translate(${this.width / 2}, ${this.height / 2})
-          scale(${this.height / r})
-          translate(${-x}, ${-y})
-        `;
-      }
-      this.svgG.transition()
-          .delay(250)
-          .duration(i.duration)
-          .attrTween('transform', () => t => transform(this.currentTransform = i(t)))
-          .on('end', () => {
-            // let itemPreview = d3.select(this.$refs.selectedItemPreview)
-            // this.$log('select node', d)
-            // itemPreview
-            //     .style('position', 'absolute')
-            //     .style('width', '500px')
-            //     .style('height', '500px')
-            //     .attr('transform', () => `translate(${d.x},${d.y})`)
-            //     .transition()
-            //     .duration(300)
-            //     .style('opacity', 0.9);
-          })
-      this.currentTransform = nextTransform
+    async zoomTo (d, scale = 3, onEnd = null) {
+      this.$log('zoomTo node: ', d)
+      let duration = 1000
+      await this.mutex.lock('zoomTo')
+      let transition = this.svg.transition().duration(duration).call(
+          this.zoom.transform,
+          d3.zoomIdentity.translate(this.width / 2, this.height / 2).scale(scale).translate(-d.x, -d.y - 50)
+      ).on('end', () => {
+        if (onEnd) onEnd()
+      })
+      setTimeout(() => {
+        this.mutex.release()
+      }, duration + 100)
     },
+    zoomReset () {
+      this.svg.transition().duration(750).call(
+          this.zoom.transform,
+          d3.zoomIdentity,
+          d3.zoomTransform(this.svg.node()).invert([this.width / 2, this.height / 2])
+      );
+    },
+    testGraph () {
+      if (this.svgG) return
+      let thiz = this
+      thiz.width = this.$refs.graphSvg.clientWidth
+      thiz.height = this.$refs.graphSvg.clientHeight
+      let radius = 6
+      let step = radius * 2
+      let theta = Math.PI * (3 - Math.sqrt(5))
+      let data = Array.from({ length: 2000 }, (_, i) => {
+        const radius = step * Math.sqrt(i += 0.5)
+        const a = theta * i
+        return [
+          thiz.width / 2 + radius * Math.cos(a),
+          thiz.height / 2 + radius * Math.sin(a)
+        ];
+      })
+
+      const random = () => {
+        const [x, y] = data[Math.floor(Math.random() * data.length)];
+        this.svg.transition().duration(2500).call(
+            this.zoom.transform,
+            d3.zoomIdentity.translate(thiz.width / 2, thiz.height / 2).scale(40).translate(-x, -y)
+        );
+      }
+      thiz.randomZoom = random
+
+      const reset = () => {
+        this.svg.transition().duration(750).call(
+            this.zoom.transform,
+            d3.zoomIdentity,
+            d3.zoomTransform(this.svg.node()).invert([thiz.width / 2, thiz.height / 2])
+        );
+      }
+      thiz.resetZoom = reset
+
+      const clicked = (event, [x, y]) => {
+        thiz.$log('clicked', event)
+        event.stopPropagation();
+        this.svg.transition().duration(750).call(
+            this.zoom.transform,
+            d3.zoomIdentity.translate(thiz.width / 2, thiz.height / 2).scale(40).translate(-x, -y),
+            [event.x, event.y]
+        );
+      }
+
+      const zoomed = ({ transform }) => {
+        this.svgG.attr('transform', transform);
+      }
+
+      this.zoom = d3.zoom()
+          .scaleExtent([1, 40])
+          .on('zoom', zoomed);
+
+      this.svg = d3.select(this.$refs.graphSvg)
+          .attr('viewBox', [0, 0, thiz.width, thiz.height])
+          .on('click', reset);
+      // if (this.svgG) this.svgG.remove();
+
+      this.svgG = this.svg.append('g');
+
+      this.svgG.selectAll('circle')
+          .data(data)
+          .join('circle')
+          .attr('cx', ([x]) => x)
+          .attr('cy', ([, y]) => y)
+          .attr('r', radius)
+          .attr('fill', (d, i) => d3.interpolateRainbow(i / 360))
+          .on('click', clicked);
+
+      this.svg.call(this.zoom);
+
+      // this.$log('svg.node()=', svg.node())
+      // return Object.assign(svg.node(), {
+      //   zoomIn: () => svg.transition().call(zoom.scaleBy, 2),
+      //   zoomOut: () => svg.transition().call(zoom.scaleBy, 0.5),
+      //   zoomRandom: random,
+      //   zoomReset: reset
+      // });
+    },
+
     initGraph () {
       let thiz = this
       this.width = this.$refs.graphSvg.clientWidth
@@ -388,8 +467,9 @@ export default {
           // console.log('GraphClickProcessor registerEvent', type, event)
           switch (type) {
             case 'click':
-              // event.stopPropagation()
-              // this.onClick(d, 300)
+              thiz.$log('graph clicked', event)
+              event.stopPropagation();
+              thiz.zoomReset()
               break
             case 'mousedown':
               this.startLongClickDetection(this.onLongClick.bind(this, event))
@@ -424,7 +504,6 @@ export default {
                 this.zoomdetected = true
                 this.cancelLongClickDetection()
                 thiz.svgG.attr('transform', event.transform)
-                thiz.graphD3.transform = event.transform
               }
               break
             case 'end':
@@ -464,32 +543,26 @@ export default {
       }
 
       let graphClickProcessor = new GraphClickProcessor()
+
       if (this.svgG) this.svgG.remove();
-      let zoom = d3.zoom()
+
+      this.zoom = d3.zoom()
+          .scaleExtent([1, 40])
           .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('end', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+
       this.svg = d3.select(this.$refs.graphSvg)
+          .attr('viewBox', [0, 0, thiz.width, thiz.height])
           .on('click', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('mousedown', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('mouseup', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchstart', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchend', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           // .on('touchmove', graphClickProcessor.registerEvent.bind(graphClickProcessor))
-          // .call(zoom)
+          .call(this.zoom)
 
       this.svgG = this.svg.append('g')
-
-      if (this.graphD3.transform) { // передвигаем граф на исходную позицию
-        this.$logD('this.graphD3.transform=', this.graphD3.transform)
-        zoom.transform(this.svgG, this.graphD3.transform)
-        // zoom.transform(this.svgG, d3.zoomIdentity.translate(this.graphD3.transform.x, this.graphD3.transform.y).scale(this.graphD3.transform.k))
-        // zoom.transform(this.svg, this.graphD3.transform)
-        // this.svgG.transition().duration(0)
-        //     .attr('transform', this.graphD3.transform)
-        // this.graphD3.transform = null
-      }
-      this.svg.call(zoom)
 
       // appending little triangles, path object, as arrowhead
       // The <defs> element is used to store graphical objects that will be used at a later time
@@ -603,10 +676,7 @@ export default {
                       linkedNodeData = n;
                     }
                   }
-                  // if (this.linkedNodeData) thiz.unselectNode(this.linkedNodeData)
                   this.linkedNodeData = linkedNodeData;
-                  // if (this.linkedNodeData && this.linkedNodeData !== d) thiz.selectNode(this.linkedNodeData, 60)
-                  // console.log('drag this.linkedNodeData', this.linkedNodeData)
                 }
               } else if (this.state === 'START_LONG_CLICK' && Math.abs(d.x - event.x) + Math.abs(d.y - event.y) < (event.sourceEvent instanceof TouchEvent ? 20 : 5)) {
                 // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
@@ -660,8 +730,12 @@ export default {
             // thiz.$log('node click', d.name)
             // delete d.fx;
             // delete d.fy;
-            thiz.selectedItem = d
-            if (!thiz.itemDetailsShow) thiz.itemDetailsShow = true
+
+            thiz.graphD3.selectedItem = null
+            thiz.$nextTick(() => {
+              thiz.graphD3.selectedItem = d
+            })
+
             thiz.$emit('node_click', d)
           }, dblClickInterval + 50)
         }
@@ -669,7 +743,7 @@ export default {
         onDblClick (d) {
           if (d.oid) {
             // thiz.$systemUtils.hapticsImpact()
-            thiz.selectedItem = d
+            thiz.graphD3.selectedItem = d
             thiz.$emit('node_dbl_click', d)
           }
         }
@@ -772,44 +846,43 @@ export default {
           .attr('height', this.nodeRadius)
           .attr('clip-path', 'url(#clip-rect)')
           .attr('preserveAspectRatio', 'xMidYMid slice')
-          .on('mouseover', function (event, d) {
-            // console.log('image mouseover')
-            d3.select(this)
-                .transition()
-                .duration(350)
-                .attr('width', 70)
-                .attr('height', 70)
-          })
-          .on('mouseout', function (event, d) {
-            d3.select(this)
-                .transition()
-                .duration(350)
-                .attr('width', function (event, d) {
-                  return 50
-                })
-                .attr('height', function (event, d) {
-                  return 50
-                })
-          })
-          .on('mouseover.tooltip', function (event, d) {
-            // console.log(event)
-            tooltip.transition()
-                .duration(300)
-                .style('opacity', 0.8);
-            tooltip.html(d.type + '<p/>' + d.name)
-                .style('left', (event.layerX) + 'px')
-                .style('top', (event.layerY + 10) + 'px');
-          })
-          .on('mouseout.tooltip', function () {
-            tooltip.transition()
-                .duration(100)
-                .style('opacity', 0);
-          })
-          .on('mousemove', function (event) {
-            tooltip.style('left', (event.layerX) + 'px')
-                .style('top', (event.layerY + 10) + 'px');
-          })
-      if (this.selectedItem) this.selectNode(this.selectedItem)
+      // .on('mouseover', function (event, d) {
+      //   // console.log('image mouseover')
+      //   d3.select(this)
+      //       .transition()
+      //       .duration(350)
+      //       .attr('width', 70)
+      //       .attr('height', 70)
+      // })
+      // .on('mouseout', function (event, d) {
+      //   d3.select(this)
+      //       .transition()
+      //       .duration(350)
+      //       .attr('width', function (event, d) {
+      //         return 50
+      //       })
+      //       .attr('height', function (event, d) {
+      //         return 50
+      //       })
+      // })
+      // .on('mouseover.tooltip', function (event, d) {
+      //   // console.log(event)
+      //   tooltip.transition()
+      //       .duration(300)
+      //       .style('opacity', 0.8);
+      //   tooltip.html(d.type + '<p/>' + d.name)
+      //       .style('left', (event.layerX) + 'px')
+      //       .style('top', (event.layerY + 10) + 'px');
+      // })
+      // .on('mouseout.tooltip', function () {
+      //   tooltip.transition()
+      //       .duration(100)
+      //       .style('opacity', 0);
+      // })
+      // .on('mousemove', function (event) {
+      //   tooltip.style('left', (event.layerX) + 'px')
+      //       .style('top', (event.layerY + 10) + 'px');
+      // })
       // this.graphNodes.append('title')
       //     .text(d => d.id + ': ' + d.name + ' - ' + d.type);
       // this.graphNodes.append('text')
@@ -978,18 +1051,6 @@ export default {
       console.log('doLayout. graphD3=', cloneDeep(this.graphD3))
       // Listen for tick events to render the nodes as they update in your Canvas or SVG.
       let thiz = this
-      // this.simulationUnlinked = this.simulationUnlinked || d3.forceSimulation()
-      //     .force('x', d3.forceX(d => this.width / 2))
-      //     .force('y', d3.forceY(d => this.height / 2))
-      //     // .force('center', d3.forceCenter().x(200).y(200))
-      //     .force('charge', d3.forceManyBody().strength(-2500));
-      // this.simulationUnlinked
-      //     .nodes(this.graphD3.nodes.filter(n => !n.linked))
-      //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
-      //     .on('tick', (d) => {
-      //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
-      //     });
-
       this.simulationLinked = this.simulationLinked || d3.forceSimulation()
           .force('link', d3.forceLink() // This force provides links between nodes
               .id(d => d.id) // This sets the node id accessor to the specified function. If not specified, will default to the index of a node.
@@ -1031,14 +1092,20 @@ export default {
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
     },
-    updateGraph () {
+    async updateGraph () {
       this.$log('updateGraph')
-      if (this.showGraph) {
-        this.initGraph()
-        this.drawEdges()
-        this.drawNodes()
-        this.doLayout()
+      try {
+        await this.mutex.lock('updateGraph')
+        if (this.showGraph) {
+          this.initGraph()
+          this.drawEdges()
+          this.drawNodes()
+          this.doLayout()
+        }
+      } finally {
+        this.mutex.release()
       }
+      if (this.selectedItem) await this.zoomTo(this.selectedItem)
     },
     handleTouchMove (e) {
       // this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
@@ -1055,7 +1122,8 @@ export default {
   },
   mounted () {
     this.$log('mounted. graphD3=', cloneDeep(this.graphD3))
-    this.selectedItem = this.graphD3.selectedItem
+    // this.testGraph()
+    this.mutex = new MutexLocal('graphMutex')
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)

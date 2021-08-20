@@ -28,7 +28,7 @@ export default {
     return {
       itemsRes: null,
       inProcess: false,
-      graph: { nodes: [], joints: [], selectedItem: null, transform: null }
+      graph: { nodes: [], joints: [], selectedItem: null }
     }
   },
   computed: {},
@@ -53,7 +53,7 @@ export default {
           rootNode = this.$refs.graphView.addNodeToGraph(cloneDeep(fullNode))
         }
         if (rootNode.discovered) return
-        this.inProcess = true
+        // this.inProcess = true
         this.itemsRes = await this.$rxdb.find(this.query(oid), true)
         this.$log('this.itemsRes', JSON.parse(JSON.stringify(this.itemsRes.items)))
         await this.itemsRes.setProperty('currentId', null)
@@ -68,10 +68,39 @@ export default {
           this.$refs.graphView.addJointToGraph(jointCopy, false)
         }
         rootNode.discovered = true
-        this.graph.selectedItem = rootNode
       } finally {
         this.$wait(700).then(() => {
-          this.inProcess = false
+          // this.inProcess = false
+        })
+      }
+    },
+    async getJoints (oid) {
+      try {
+        this.$log('addAdjacent', this.rootItem)
+        let rootNode = this.graph.nodes.find(n => n.oid === oid)
+        if (!rootNode) {
+          let fullNode = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+          rootNode = this.$refs.graphView.addNodeToGraph(cloneDeep(fullNode))
+        }
+        if (rootNode.discovered) return
+        // this.inProcess = true
+        this.itemsRes = await this.$rxdb.find(this.query(oid), true)
+        this.$log('this.itemsRes', JSON.parse(JSON.stringify(this.itemsRes.items)))
+        await this.itemsRes.setProperty('currentId', null)
+        await this.itemsRes.gotoStart()
+        for (let item of this.itemsRes.items) {
+          let joint = item.populatedObject
+          assert(joint.type === 'JOINT')
+          let jointCopy = JSON.parse(JSON.stringify(joint))
+          // jointCopy.items - тут полные сущности. Они нам не нужны(и хранить их в графе не надо)
+          jointCopy.items = jointCopy.itemsShort
+          // this.$log('jointCopy=', jointCopy)
+          this.$refs.graphView.addJointToGraph(jointCopy, false)
+        }
+        rootNode.discovered = true
+      } finally {
+        this.$wait(700).then(() => {
+          // this.inProcess = false
         })
       }
     },
