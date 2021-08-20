@@ -66,7 +66,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['graph', this.graph])
+    this.$store.commit('ui/stateSet', ['graph', cloneDeep(this.graph)])
   }
 }
 </script>
