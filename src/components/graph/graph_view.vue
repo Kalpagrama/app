@@ -11,23 +11,25 @@
 
 <template lang="pug">
   div(ref="graphArea").row.full-width
+    q-resize-observer(@resize="height = $event.height, width = $event.width")
+    // меню
     q-dialog(
       v-model="menuShow"
       position="standard"
       :maximized="false")
-      div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
+      div(:style=`{background: 'rgb(40,40,40)',borderRadius: '10px'}`).row.full-width.q-pa-md
         q-btn(
-          round flat no-caps outline color="grey-8" align="left" icon='add'
+          round flat no-caps outline color="grey" align="left" icon='add'
           :label="$t('Add item')"
           @click="menuShow = false, itemFinderShow = true"
         ).row.full-width.q-pa-sm
         q-btn(
-          round flat no-caps outline color="grey-8" align="left" icon='grain'
+          round flat no-caps outline color="grey" align="left" icon='grain'
           :label="$t('Reset graph layout')"
           @click="menuShow = false, resetFixedPos()"
         ).row.full-width.q-pa-sm
         q-btn(
-          round flat no-caps outline color="grey-8" align="left" icon='delete'
+          round flat no-caps outline color="grey" align="left" icon='delete'
           :label="$t('clear graph')"
           @click="menuShow = false, clearGraph()"
         ).row.full-width.q-pa-sm
@@ -39,7 +41,7 @@
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
-        :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`
+        :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
         :pages=`{
           nodes: {views: ['all']},
           workspace: {views: ['node', 'media']},
@@ -107,7 +109,7 @@
       "pointer-events": "none",
       opacity:0
       }`)
-    div(:style=`{position: 'relative'}`).row.full-width
+    div(:style=`{position: 'relative', maxHeight: maxHeight+'px'}`).row.full-width
       // меню
       //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
       q-btn(
@@ -117,7 +119,7 @@
       :style=`{minHeight: '500px'}`
       ).row.full-width.full-height
         span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-      svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: height+'px'}`).row.full-width
+      svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
     //// превьюшка узла внутри графа
     //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
     //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
@@ -143,15 +145,14 @@ export default {
     showAddBtn: { type: Boolean, default: true },
     getJoints: { type: Function, required: true },
     oidRoot: { type: String, required: true },
-    width: {
-      type: Number
-    },
-    height: {
+    maxHeight: {
       type: Number
     }
   },
   data () {
     return {
+      width: 100,
+      height: 100,
       menuShow: false,
       itemFinderShow: false,
       jointCreatorShow: false,
@@ -370,8 +371,6 @@ export default {
     },
     initGraph () {
       let thiz = this
-      this.width = this.$refs.graphSvg.clientWidth
-      this.height = this.$refs.graphSvg.clientHeight
       for (let n of this.graphD3.nodes) {
         assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
         n.id = n.id || n.oid
@@ -1041,6 +1040,8 @@ export default {
   },
   async mounted () {
     this.$log('mounted. graphD3=', cloneDeep(this.graphD3), this.oidRoot)
+    // alert('this.width=' + this.width)
+    // alert('this.height=' + this.height)
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)

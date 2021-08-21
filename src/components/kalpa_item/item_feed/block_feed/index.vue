@@ -32,7 +32,7 @@
       masonry-cover(v-if="showMasonry" :block="block" :style=`{height: '350px'}` @click.native="showMasonry = false")
       graph-view(
         v-else
-        :height="450"
+        :maxHeight="450"
         :graphD3="block.graph"
         @changed="block.setChanged(true)"
         :style=`{background: 'rgb(40,40,40)'}`)

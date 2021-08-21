@@ -4,6 +4,7 @@ div(
     height: $q.screen.height+'px',
   }`
   ).row.full-widith
+  //header + tabs
   div(
     :style=`{
       height: '100px',

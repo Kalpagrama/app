@@ -7,7 +7,7 @@
     borderColor: '#222',
   }`
   ).row.full-width
-    graph-view(ref="graphView" :showAddBtn="false" :height="height" :graphD3="graph" :getJoints="getJoints", :oidRoot="oid")
+    graph-view(ref="graphView" :showAddBtn="false" :maxHeight="height" :graphD3="graph" :getJoints="getJoints", :oidRoot="oid")
 </template>
 
 <script>
