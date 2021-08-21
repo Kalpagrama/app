@@ -754,6 +754,9 @@ class Group {
       let startPos = position === 'bottom' ? this.reactiveGroup.items.length : 0
       let deleteCount = position === 'whole' ? this.reactiveGroup.items.length : 0
       assert(startPos >= 0 && nextItems && Array.isArray(nextItems), 'bad fulfill params')
+      let blackLists = await Lists.getBlackLists()
+      // logW('blackLists=', blackLists)
+      let filtered = nextItems.filter(item => !Lists.isElementBlacklisted(item, blackLists))
       if (this.reactiveGroup.itemType === 'GROUP') {
          let makeNextGroup = async (nextGroup) => {
             let {
@@ -785,14 +788,12 @@ class Group {
             await group.next(this.populateFunc ? 3 : null) // сразу грузим по 3 ядра в группе (исли нужны полные сущности)
             return group.reactiveGroup
          }
-         nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
+         filtered = await Promise.all(filtered.map(nextGroup => makeNextGroup(nextGroup)))
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
-            nextItems = await this.populateFunc(nextItems, [], this.reactiveGroup.items)
+            filtered = await this.populateFunc(filtered, [], this.reactiveGroup.items)
          }
       }
-      let blackLists = await Lists.getBlackLists()
-      let filtered = nextItems.filter(item => !Lists.isElementBlacklisted(item, blackLists))
 
       // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
       let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз

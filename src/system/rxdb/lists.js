@@ -123,7 +123,7 @@ class Lists {
    async hideObjectOrSource (oid, authorOid) {
       const f = this.hideObjectOrSource
       assert(oid || authorOid, 'bad oid')
-      logD(f, 'start')
+      logD(f, 'start', oid, authorOid)
       let blackLists = await Lists.getBlackLists()
       if (oid && !blackLists.blackListObjectOids.includes(oid)) blackLists.blackListObjectOids.push(oid)
       else if (authorOid && !blackLists.blackListAuthorOids.includes(authorOid)) blackLists.blackListAuthorOids.push(authorOid)
@@ -147,6 +147,7 @@ class Lists {
          //    reactiveItem.totalCount -= countDiff
          // }
       }
+      logD(f, 'complete')
    }
 
    async addRemoveCommentToObj (type, oid, comment) {

@@ -128,8 +128,11 @@ class QueryAccumulator {
                this.resolveItem(object)
             } else if (object && !object.deletedAt) {
                this.rejectItem(oid, 'deleted')
-            } else {
-               this.rejectItem(oid, 'notFound')
+            } else { // объекта нет на сервере (мы его запрашивали, но ничего не вернулось)
+               // добавим в blackList (чтобы больше не запрашивали)
+               rxdb.hideObjectOrSource(oid, null).then(() => {
+                  this.rejectItem(oid, 'notFound')
+               })
             }
          }
          this.next()
