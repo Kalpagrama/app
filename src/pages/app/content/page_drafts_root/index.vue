@@ -126,7 +126,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.itemsRes = await this.$rxdb.find(this.query, true)
+    this.itemsRes = await this.$rxdb.find(this.query)
   }
 }
 </script>

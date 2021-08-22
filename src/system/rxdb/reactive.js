@@ -805,7 +805,13 @@ class Group {
       }
       for (let item of filtered) {
          item.debugInfo = () => {
-            return `#${this.findIndx(item[this.reactiveGroup.itemPrimaryKey])} of ${this.loadedLen()}. totalCount:${this.reactiveGroup.totalCount}`
+            // return `#${this.findIndx(item[this.reactiveGroup.itemPrimaryKey])} of ${this.loadedLen()}. totalCount:${this.reactiveGroup.totalCount} ${JSON.stringify(this.fulFilledRange())}`
+            return {
+               indx: this.findIndx(item[this.reactiveGroup.itemPrimaryKey]),
+               loadedLen: this.loadedLen(),
+               totalCount: this.reactiveGroup.totalCount,
+               fulFilledRange: this.fulFilledRange()
+            }
          }
       }
       items.splice(startPos, deleteCount, ...filtered) // добавляем новые

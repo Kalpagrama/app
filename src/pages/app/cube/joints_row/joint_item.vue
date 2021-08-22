@@ -276,7 +276,7 @@ export default {
           this.$wait(200).then(() => {
             this.itemActiveLocal = true
           })
-          this.jointsRes = await this.$rxdb.find(this.query, true)
+          this.jointsRes = await this.$rxdb.find(this.query)
         }
         else {
           this.itemActiveLocal = false

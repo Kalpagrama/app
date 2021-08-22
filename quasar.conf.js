@@ -35,7 +35,7 @@ module.exports = function (ctx) {
       css: [
          // 'quasar.variables.sass',
          'fonts.variables.sass',
-         'app.sass'
+         'app.sass',
       ],
 
       animations: 'all',

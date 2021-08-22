@@ -533,8 +533,10 @@ class RxDBWrapper {
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
    // screenSize - список будет обрезаться сверху или снизу чтобы его размер был не больше screenSize
-   async find (mangoQuery, autoNext = true, screenSize = 0) {
+   // autoNextSize - загрузит все что можно
+   async find (mangoQuery, autoNextSize = 0, screenSize = 0) {
       assert(this.created, 'cant find! !this.created')
+      assert(typeof autoNextSize === 'number' && autoNextSize >= 0)
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
@@ -635,7 +637,7 @@ class RxDBWrapper {
                let populateObjects = mangoQuery.populateObjects
                delete mangoQuery.populateObjects // мешает нормальному кэшированию в rxdb
 
-               let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
+               let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
                let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', listId) // до удаления populateObjects
                let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
                   fetchFunc: async () => {
@@ -666,7 +668,7 @@ class RxDBWrapper {
             this.reactiveDocDbMemCache.set(queryId, findResult)
          }
          await findResult.gotoCurrent()
-         if (autoNext && findResult.items.length === 0) await findResult.next()
+         if (findResult.items.length === 0) await findResult.next(autoNextSize)
          // this.store.commit('debug/addFindResult', { queryId, findResult })
          this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult && findResult.next, '!findResult.next')

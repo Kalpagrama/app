@@ -42,7 +42,7 @@ export default {
       }
     },
     async getJoints (oid) {
-      this.itemsRes = await this.$rxdb.find(this.query(oid), true)
+      this.itemsRes = await this.$rxdb.find(this.query(oid))
       this.$log('this.itemsRes', JSON.parse(JSON.stringify(this.itemsRes.items)))
       await this.itemsRes.setProperty('currentId', null)
       await this.itemsRes.gotoStart()

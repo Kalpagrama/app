@@ -98,7 +98,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.bookmarksRes = await this.$rxdb.find(this.query, true)
+    this.bookmarksRes = await this.$rxdb.find(this.query)
     // alert(JSON.stringify(this.bookmarksRes.items))
   },
   beforeDestroy () {

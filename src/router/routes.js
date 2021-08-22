@@ -20,7 +20,7 @@ async function saveHistory (oid) {
             rxCollectionEnum: RxCollectionEnum.WS_HISTORY
          },
          sort: [{ createdAt: 'asc' }]
-      }, true)
+      })
       // console.log('history before=', res.items.map(item => item.name))
       // for (let item of res.items){
       //    for (let item2 of res.items){
@@ -36,7 +36,7 @@ async function saveHistory (oid) {
       //       rxCollectionEnum: RxCollectionEnum.WS_HISTORY
       //    },
       //    sort: [{ createdAt: 'asc' }]
-      // }, true)
+      // })
 
       let existing = res.items.find(el => el.oid === oid)
       if (existing) {

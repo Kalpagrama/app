@@ -196,7 +196,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('row TO', to)
-        this.jointsRes = await this.$rxdb.find(this.query, true)
+        this.jointsRes = await this.$rxdb.find(this.query)
         // check empty to create from the start
         if (this.jointsRes.totalCount === 0) {
           this.$emit('empty')

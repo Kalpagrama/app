@@ -90,7 +90,7 @@ export default {
   methods: {
   },
   async mounted () {
-    this.jointsRes = await this.$rxdb.find(this.query, true)
+    this.jointsRes = await this.$rxdb.find(this.query)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
