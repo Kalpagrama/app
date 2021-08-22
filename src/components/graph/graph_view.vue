@@ -154,7 +154,7 @@ export default {
       width: 100,
       height: 100,
       menuShow: false,
-      itemFinderShow: false,
+      itemFinderShow: true,
       jointCreatorShow: false,
       itemDetailsShow: false,
       newJoint: null,
@@ -1045,7 +1045,7 @@ export default {
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
-    if (!this.graphD3.nodes.length) {
+    if (!this.graphD3.nodes.length && this.oidRoot) {
       let rootNode = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oidRoot)
       let node = this.addNodeToGraph(cloneDeep(rootNode))
       await this.discover(node)

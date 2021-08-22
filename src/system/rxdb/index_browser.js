@@ -532,7 +532,8 @@ class RxDBWrapper {
 
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-   async find (mangoQuery, autoNext = true, goToCurrent = false) {
+   // screenSize - список будет обрезаться сверху или снизу чтобы его размер был не больше screenSize
+   async find (mangoQuery, autoNext = true, screenSize = 0) {
       assert(this.created, 'cant find! !this.created')
       const f = this.find
       const t1 = performance.now()
@@ -631,10 +632,11 @@ class RxDBWrapper {
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
-               let listId = JSON.stringify(mangoQuery) // populate в запросе влияет на результат (запросы с и без populate -это разные списки)
-               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery)) // до удаления populateObjects
                let populateObjects = mangoQuery.populateObjects
                delete mangoQuery.populateObjects // мешает нормальному кэшированию в rxdb
+
+               let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
+               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', listId) // до удаления populateObjects
                let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
                   fetchFunc: async () => {
                      return {
@@ -656,15 +658,15 @@ class RxDBWrapper {
                }
 
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive, screenSize)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveDocDbMemCache.set(queryId, findResult)
          }
-         if (autoNext && findResult.items.length === 0) await findResult.next()
          await findResult.gotoCurrent()
+         if (autoNext && findResult.items.length === 0) await findResult.next()
          // this.store.commit('debug/addFindResult', { queryId, findResult })
          this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult && findResult.next, '!findResult.next')

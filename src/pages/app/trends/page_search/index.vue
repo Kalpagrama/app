@@ -3,9 +3,9 @@
   //- small.text-white {{ query }}
   list-feed(
     :query="query"
-    :itemsPerPage="24"
+    :nextSize="24"
     :itemMiddlePersist="false"
-    :itemsMax="100"
+    :screenSize="100"
     :itemStyles=`{
       paddingBottom: '8px',
     }`

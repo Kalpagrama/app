@@ -127,24 +127,23 @@ div(
       q-spinner-dots(color="green" size="60px")
     q-btn(v-else-if="itemsRes.hasPrev" @click="prev" :style=`{position: 'absolute', top: '0px', zIndex: 10000, height: '30px'}`).row.full-width.text-white
       span(:style=`{fontSize: '30px', position: 'relative', bottom: '12px'}`).text-white ...
-    //- item wrapper
-    div(
-      v-if="false"
-      v-for="(n,ni) in 100" :key="ni"
-      :accessKey="ni"
-      :class=`{
-        'bg-red': itemMiddleIndex === ni,
-      }`
-      v-observe-visibility=`{
-        throttle: 150,
-        callback: itemMiddleHandlerTest,
-        intersection: {
-          root: scrollTargetIsWindow ? null : scrollTarget,
-          rootMargin: rootMargin,
-          //- threshold: 0.9,
-        }
-      }`
-      ).row.full-width.q-pa-md.q-mb-xl {{ ni }}
+    ////- item wrapper
+    //div(
+    //  v-for="(n,ni) in 100" :key="ni"
+    //  :accessKey="ni"
+    //  :class=`{
+    //    'bg-red': itemMiddleIndex === ni,
+    //  }`
+    //  v-observe-visibility=`{
+    //    throttle: 150,
+    //    callback: itemMiddleHandlerTest,
+    //    intersection: {
+    //      root: scrollTargetIsWindow ? null : scrollTarget,
+    //      rootMargin: rootMargin,
+    //      //- threshold: 0.9,
+    //    }
+    //  }`
+    //  ).row.full-width.q-pa-md.q-mb-xl {{ ni }}
     div(
       v-for="(item, itemIndex) in itemsRes.items"
       :key="item[itemKey]"
@@ -167,12 +166,13 @@ div(
         }
       }`
       ).row.full-width
-      div(
-        v-if="false && item[itemKey] !== (itemMiddle ? itemMiddle.key : undefined)"
-        @click="itemMiddleHandler(true, {target: {accessKey: `${item[itemKey]}-${itemIndex}`}}), itemMiddleScrollIntoView('template')"
-        :style=`{position: 'absolute', background: 'rgba(0,0,0,0.5)',borderRadius: '10px',}`
-        ).row.fit.br
+      //div(
+      //  v-if="item[itemKey] !== (itemMiddle ? itemMiddle.key : undefined)"
+      //  @click="itemMiddleHandler(true, {target: {accessKey: `${item[itemKey]}-${itemIndex}`}}), itemMiddleScrollIntoView('template')"
+      //  :style=`{position: 'absolute', background: 'rgba(0,0,0,0.5)',borderRadius: '10px',}`
+      //  ).row.fit.br
       //- item slot
+      span(v-if="$store.state.ui.useDebug").text-white {{ item.debugInfo() }}
       slot(
         name="item"
         :item="item"
@@ -226,7 +226,7 @@ export default {
         return true
       }
     },
-    itemsPerPage: {
+    nextSize: {
       type: Number,
       default () {
         if (this.query.rxCollectionEnum in WsCollectionEnum) return 100
@@ -237,7 +237,7 @@ export default {
         return 11
       }
     },
-    itemsMax: {
+    screenSize: {
       type: Number,
       default () {
         return 36
@@ -303,7 +303,7 @@ export default {
     query: {
       immediate: true,
       async handler (to, from) {
-        this.itemsRes = await this.$rxdb.find(to, true)
+        this.itemsRes = await this.$rxdb.find(to, true, this.screenSize)
       }
     },
     'itemsRes.items': {
@@ -526,7 +526,7 @@ export default {
       this.itemsResStatus = 'PREV'
       this.$log('prev start')
       if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Prev !', position: 'top'})
-      await this.itemsRes.prev(this.itemsPerPage, this.itemsMax)
+      await this.itemsRes.prev(this.nextSize)
       this.$log('prev done')
       this.itemsResStatus = null
     },
@@ -534,11 +534,11 @@ export default {
       if (!this.itemsRes) return
       if (!this.itemsRes.hasNext) return
       if (this.itemsResStatus) return
-      this.$log('next', this.itemsPerPage)
+      this.$log('next', this.nextSize)
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
       if (this.$store.state.ui.useDebug) this.$q.notify({type: 'positive', message: 'Next !', position: 'bottom'})
-      await this.itemsRes.next(this.itemsPerPage, this.itemsMax)
+      await this.itemsRes.next(this.nextSize)
       this.$log('next done')
       this.itemsResStatus = null
     },

@@ -20,8 +20,7 @@ async function saveHistory (oid) {
             rxCollectionEnum: RxCollectionEnum.WS_HISTORY
          },
          sort: [{ createdAt: 'asc' }]
-      }, false)
-      await res.next(100500, 100500)
+      }, true)
       // console.log('history before=', res.items.map(item => item.name))
       // for (let item of res.items){
       //    for (let item2 of res.items){
