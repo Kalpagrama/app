@@ -272,16 +272,17 @@ class Lists {
                assert(groupFiguresAbsolute, '!group.figuresAbsolute')
                // вернет все области контента, задествованные на этом ядре
                let findObjectFigures = (objectFull, contentOid) => {
-                  assert(objectFull.type.in('NODE', 'JOINT'), 'bad type essence')
+                  assert(objectFull.type.in('NODE', 'JOINT', 'BLOCK'), 'bad type essence')
                   assert(objectFull.items, '!essence items')
+                  let items = objectFull.items || objectFull.graph.nodes
                   let res = []
-                  for (let item of objectFull.items) {
+                  for (let item of items) {
                      if (item.type === 'COMPOSITION') {
                         assert(item.layers && item.layers.length, '!item.layers')
                         for (let layer of item.layers) {
                            if (layer.contentOid === contentOid) res.push(layer.figuresAbsolute)
                         }
-                     } else if (item.type.in('NODE', 'JOINT')) {
+                     } else if (item.type.in('NODE', 'JOINT', 'BLOCK')) {
                         res.push(...findObjectFigures(item, contentOid)) // рекурсивно идем внутрь
                      } else if (item.oid === contentOid) {
                         res.push([]) // весь контент

@@ -51,16 +51,16 @@
         @item="addNodeToGraph"
         @close="itemFinderShow = false"
       ).b-30
-    // item preview
+    // item detail
     q-dialog(
       v-model="itemDetailsShow"
-      position="bottom"
+      :position="detailPosition"
       @hide="graphD3.selectedItem = null"
     )
       div(
         :style=`{
             // boxShadow: '1px 1px 20px rgba(192,192,192, .5)',
-            borderRadius: '20px 20px 0 0',
+            borderRadius: detailPosition === 'bottom' ? '20px 20px 0 0' : '20px',
             // border: '2px solid green',
           }`).row.full-width.b-40
         div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
@@ -73,6 +73,8 @@
           //  @click="discover(graphD3.selectedItem)").q-mx-sm
           q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
           q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(graphD3.selectedItem, null)").q-mx-sm
+          .col
+          q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
         .row.full-width.items-center.content-center.justify-center.q-pa-sm
           //spinner
           div(v-if="!selectedItemFull")
@@ -145,6 +147,7 @@ export default {
     showAddBtn: { type: Boolean, default: true },
     getJoints: { type: Function, required: true },
     oidRoot: { type: String, required: true },
+    detailPosition: { type: String, default: 'bottom' }, // q-menu
     maxHeight: {
       type: Number
     }
@@ -154,7 +157,7 @@ export default {
       width: 100,
       height: 100,
       menuShow: false,
-      itemFinderShow: true,
+      itemFinderShow: false,
       jointCreatorShow: false,
       itemDetailsShow: false,
       newJoint: null,
@@ -470,7 +473,7 @@ export default {
       if (this.svgG) this.svgG.remove();
 
       this.zoom = d3.zoom()
-          .scaleExtent([1, 40])
+          .scaleExtent([0.2, 8])
           .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('end', graphClickProcessor.registerEvent.bind(graphClickProcessor))
@@ -557,6 +560,7 @@ export default {
               this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 20))
               break
             case 'mouseup':
+              this.cancelLongClickDetection()
               break
             case 'mouseover':
               this.onMouseOverWithLongClick(d)
@@ -650,7 +654,7 @@ export default {
           this.lastClickDt = Date.now()
           // пока непонятно что это клик или дабл клик
           this.timeClickId = setTimeout(() => {
-            // thiz.$log('node click', d.name)
+            thiz.$log('node click', d.name)
             // delete d.fx;
             // delete d.fy;
 
@@ -714,6 +718,7 @@ export default {
           this.cancelLongClickDetection()
           this.state = 'START_LONG_CLICK'
           this.timerId = setTimeout(() => {
+            thiz.$log('long click')
             this.state = 'LONG_CLICK'
             if (func) func()
             thiz.$systemUtils.hapticsImpact()

@@ -3,9 +3,9 @@
   //- small.text-white {{ query }}
   list-feed(
     :query="query"
-    :nextSize="24"
+    nextSize=24
     :itemMiddlePersist="false"
-    :screenSize="100"
+    screenSize=100
     :itemStyles=`{
       paddingBottom: '8px',
     }`
@@ -106,39 +106,43 @@ export default {
     itemMetaMap () {
       return {
         VIDEO: {
-          name: 'Видео',
+          name: this.$t('Video'),
           link: '/content/'
         },
         IMAGE: {
-          name: 'Изображение',
+          name: this.$t('Image'),
           link: '/content/'
         },
         BOOK: {
-          name: 'Книга',
+          name: this.$t('Book'),
           link: '/content/'
         },
         NODE: {
-          name: 'Ядро',
+          name: this.$t('Node'),
           link: '/node/'
         },
         JOINT: {
-          name: 'Связь',
+          name: this.$t('Joint'),
           link: '/joint/'
         },
+        BLOCK: {
+          name: this.$t('Essence block'),
+          link: '/block/'
+        },
         WORD: {
-          name: 'Сфера',
+          name: this.$t('Sphere'),
           link: '/sphere/'
         },
         SENTENCE: {
-          name: 'Сфера',
+          name: this.$t('Sphere'),
           link: '/sphere/'
         },
         SPHERE: {
-          name: 'Сфера',
+          name: this.$t('Sphere'),
           link: '/sphere/'
         },
         USER: {
-          name: 'Пользователь',
+          name: this.$t('User'),
           link: '/user/'
         }
       }

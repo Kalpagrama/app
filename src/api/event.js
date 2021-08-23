@@ -41,6 +41,8 @@ class EventApi {
                return 'ядро'
             case 'JOINT':
                return 'связь'
+            case 'BLOCK':
+               return 'смысловой блок'
             case 'USER':
                return 'пользователь'
             case 'SPHERE':

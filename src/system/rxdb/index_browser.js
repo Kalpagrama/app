@@ -536,7 +536,7 @@ class RxDBWrapper {
    // autoNextSize - загрузит все что можно
    async find (mangoQuery, autoNextSize = 0, screenSize = 0) {
       assert(this.created, 'cant find! !this.created')
-      assert(typeof autoNextSize === 'number' && autoNextSize >= 0)
+      assert(autoNextSize >= 0, autoNextSize)
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)

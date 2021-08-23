@@ -77,9 +77,9 @@ kalpa-layout
         list-feed(
           v-if="!$store.getters.isGuest && sphereOid"
           :query="query"
-          nextSize="24"
+          nextSize=25
           :itemMiddlePersist="false"
-          :screenSize="100"
+          screenSize=100
           :itemStyles=`{
             paddingBottom: '8px',
           }`

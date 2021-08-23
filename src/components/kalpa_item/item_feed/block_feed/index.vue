@@ -34,6 +34,7 @@
         v-else
         :maxHeight="450"
         :graphD3="block.graph"
+        detailPosition="standard"
         @changed="block.setChanged(true)"
         :style=`{background: 'rgb(40,40,40)'}`)
       //- NAME: dynamic link/ dynamic fontSize

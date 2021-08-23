@@ -21,7 +21,7 @@
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")
       //graph
-      graph-view(:maxHeight="graphHeight" :graphD3="block.graph" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
+      graph-view(:maxHeight="graphHeight" :graphD3="block.graph" detailPosition="standard" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
       //div().row.full-width.full-height.br
         //q-btn(
         //  label="graph"

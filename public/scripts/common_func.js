@@ -13,6 +13,7 @@ function makeRoutePath(object, full = false){
       assert(object.oid, '!object.oid')
       if (object.type === 'NODE') res = `/node/${object.oid}`
       else if (object.type === 'JOINT') res = `/joint/${object.oid}`
+      else if (object.type === 'BLOCK') res = `/block/${object.oid}`
       else if (object.type.in('VIDEO', 'IMAGE')) res = `/content/${object.oid}`
       else if (object.type === 'USER') res = `/user/${object.oid}`
       else if (object.type.in('WORD', 'SENTENCE', 'CHAR')) res = `/sphere/${object.oid}`

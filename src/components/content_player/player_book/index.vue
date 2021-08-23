@@ -348,7 +348,7 @@ export default {
         this.findNodesRes = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-            objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+            objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
             // objectTypeEnum: { $in: ['NODE'] },
             oidSphere: this.contentKalpa.oid,
             sortStrategy: 'AGE',

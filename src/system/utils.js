@@ -27,5 +27,5 @@ Object.assign(String.prototype, {
 export const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const assert = (cond, errorText) => {
-   if (!cond) throw new Error('asserion:' + errorText)
+   if (!cond) throw new Error('assertion:' + JSON.stringify(errorText))
 }

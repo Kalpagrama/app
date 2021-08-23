@@ -34,9 +34,9 @@
   .row.full-width.justify-center.q-pt-sm
     list-feed(
       :query="query"
-      :nextSize="24"
+      nextSize=24
       :itemMiddlePersist="false"
-      :screenSize="100"
+      screenSize=100
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
       }`)

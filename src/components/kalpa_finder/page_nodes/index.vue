@@ -6,9 +6,9 @@ kalpa-layout(
     .row.full-width.items-start.content-start.justify-center.q-pt-sm.q-px-sm
       list-feed(
         :query="query"
-        :nextSize="50"
+        nextSize=50
         :itemMiddlePersist="false"
-        :screenSize="100"
+        screenSize=100
         :itemStyles=`{
           paddingBottom: '2px',
         }`

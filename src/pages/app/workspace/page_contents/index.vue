@@ -74,9 +74,9 @@ kalpa-layout(
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
           list-feed(
             :query="query"
-            :nextSize="24"
+            nextSize=24
             :itemMiddlePersist="false"
-            :screenSize="100"
+            screenSize=100
             :style=`{
               maxWidth: $store.state.ui.pageWidth+'px',
             }`)
