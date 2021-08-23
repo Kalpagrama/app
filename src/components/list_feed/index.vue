@@ -1,11 +1,5 @@
 <template lang="pug">
-  div(
-    :style=`{
-    //- paddingTop: '100px',
-    //- paddingTop: scrollTargetHeight+'px',
-    //- paddingBottom: scrollTargetHeight+'px',
-  }`
-  ).row.full-width.items-start.content-start
+  .row.full-width.items-start.content-start
     q-resize-observer(@resize="scrollHeightResized")
     //- debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -36,19 +30,9 @@
               small(:class=`{'bg-red': scrollTopChanging}`).full-width scrollTop: {{ scrollTop }}
               small.full-width scrollBottom: {{ scrollBottom }}
               small(:class=`{'bg-red-3': scrollHeightChanging}`).full-width scrollHeight: {{ scrollHeight }}
-              small.full-width itemsRes.items: {{ itemsRes.items.length }}
+              small.full-width itemsRes.itemsHeaderFooter: {{ itemsRes.itemsHeaderFooter.length }}
               small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
               small(v-if="itemMiddle").full-width itemMiddle.indx: {{ itemMiddle.item.debugInfo().indx }}
-              q-btn(
-                @click="prependShow = !prependShow"
-                outline dense no-caps align="left" size="sm"
-                :color="prependShow ? 'red' : 'white'"
-              ).full-width.q-mb-xs {{ prependShow ? 'Hide prepend' : 'Show prepend' }}
-              q-btn(
-                @click="appendShow = !appendShow"
-                outline dense no-caps  align="left" size="sm"
-                :color="appendShow ? 'red' : 'white'"
-              ).full-width.q-mb-xs {{ appendShow ? 'Hide append' : 'Show append' }}
               q-btn(
                 @click="itemMiddleGetPosition"
                 outline dense no-caps align="lef" size="sm"
@@ -92,53 +76,35 @@
             round flat dense  icon="south").full-width
             //- q-tooltip Вперед
     slot(name="prepend")
-    div(
-      v-if="prependShow"
-      :style=`{
-      height: '340px',
-    }`
-    ).row.full-width
-    //- loading start, no itemsRes
+    //- loading start(spinner), no itemsRes
     div(
       v-if="!itemsRes"
       :style=`{
       position: 'absolute', zIndex: 10, top: '0px', left: '0px',
       height:scrollTargetHeight+'px',
       //- height: scrollTargetHeight/2+'px',
-    }`
+      }`
     ).row.full-width.items-center.content-center.justify-center
       //- q-spinner(size="50px" color="green")
       q-spinner-dots(color="green" size="60px")
-    //- got itemsRes and some items
+    //- items
     div(
       v-if="itemsRes"
       ref="items-res-wrapper"
       :style=`{
       position: 'relative',
-    }`
-    ).row.full-width.items-start.content-start
-      //- prev loading
-      div(
-        v-if="itemsResStatus === 'PREV'"
-        :style=`{
-        position: 'absolute', top: '0px', zIndex: 10000,
-        height: '60px',
       }`
-      ).row.full-width.items-center.content-center.justify-center
-        q-spinner-dots(color="green" size="60px")
-      q-btn(v-else-if="nextPrevBtnShow && itemsRes.hasPrev" @click="prev" flat outline round color="green" icon="expand_less" size="xl" :style=`{position: 'absolute', top: '0px', zIndex: 10000}`).full-width
+    ).row.full-width.items-start.content-start
       div(
-        v-for="(item, itemIndex) in itemsRes.items"
+        v-for="(item, itemIndex) in itemsRes.itemsHeaderFooter"
         :key="item[itemKey]"
         :ref="`item-${item[itemKey]}`"
         :accessKey="`${item[itemKey]}-${itemIndex}`"
         :class=`{
         //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
-      }`
+         }`
         :style=`{
-        position: 'relative',
-        ...itemStyles,
-      }`
+        position: 'relative'}`
         v-observe-visibility=`{
         throttle: 150,
         callback: itemMiddleHandler,
@@ -150,30 +116,26 @@
       }`
       ).row.full-width
         //item slot
-        span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`) {{ item.debugInfo() }}
-        slot(
-          name="item"
-          :item="item"
-          :itemIndex="itemIndex"
-          :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
-          :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
-      //- next loading
-      div(
-        v-if="itemsResStatus === 'NEXT'"
-        :style=`{
-        position: 'absolute', bottom: '70px', zIndex: 10000,
-        height: '60px',
-      }`
-      ).row.full-width.items-center.content-center.justify-center
-        q-spinner-dots(color="green" size="60px")
-      q-btn(v-else-if="nextPrevBtnShow && itemsRes.hasNext" @click="next" flat outline round color="green" icon="expand_more" size="lg" :style=`{position: 'absolute', bottom: '70px', zIndex: 10000}`).full-width
+        //- prev loading
+        div(v-if="item[itemKey] === 'header'" :style=`{height: '30px'}`).row.full-width
+          q-spinner-dots(v-if="itemsResStatus === 'PREV'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+          q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").full-width.full-height
+            q-icon(name="expand_less" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+        //- next loading
+        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: '30px'}`).row.full-width
+          q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+          q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" size="lg").full-width.full-height
+            q-icon(name="expand_more" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+        // item
+        div(v-else  :style=`{...itemStyles}`).row.full-width
+          span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`) {{ item.debugInfo() }}
+          slot(
+            name="item"
+            :item="item"
+            :itemIndex="itemIndex"
+            :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
+            :isVisible="itemMiddle ? (itemMiddle.idx === itemIndex-1 || itemMiddle.idx === itemIndex+1) : false")
     slot(name="append")
-    div(
-      v-if="appendShow"
-      :style=`{
-      height: '340px',
-    }`
-    ).row.full-width
 </template>
 
 <script>
@@ -230,9 +192,6 @@ export default {
     return {
       // debug
       debugOpened: false,
-      prependShow: false,
-      nextPrevBtnShow: false,
-      appendShow: false,
       showHeader: false,
       // scrollTarget
       scrollTarget: null,
@@ -248,7 +207,6 @@ export default {
       scrollHeight: 0,
       scrollHeightTimeout: null,
       scrollHeightChanging: false,
-      // items
       itemsRes: null,
       itemsResStatus: null,
       // item
@@ -288,16 +246,16 @@ export default {
         this.itemsRes = await this.$rxdb.find(to, this.nextSize, this.screenSize)
       }
     },
-    'itemsRes.items': {
+    'itemsRes.itemsHeaderFooter': {
       async handler (to, from) {
-        this.$log('itemsRes.items TO', to.length, this.itemsRes, this.itemsRes.hasPrev)
-        this.itemMiddleScrollIntoView('itemsRes.items WATCHER')
+        this.$log('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes, this.itemsRes.hasPrev)
+        this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
         this.$nextTick(() => {
-          this.$log('itemsRes.items $nextTick')
+          this.$log('itemsRes.itemsHeaderFooter $nextTick')
           if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
             this.itemMiddleSet(this.itemsRes.getProperty('currentId'), 0, false)
           }
-          this.itemMiddleScrollIntoView('itemsRes.items WATCHER $nextTick')
+          this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER $nextTick')
         })
       }
     },
@@ -364,16 +322,6 @@ export default {
             this.prev()
           }
         }, 600)
-      }
-    },
-    itemsResStatus: {
-      async handler (to, from) {
-        if (!to) {
-          this.nextPrevBtnShow = false
-          setTimeout(() => {
-            this.nextPrevBtnShow = true
-          }, 2000)
-        }
       }
     }
   },
@@ -450,7 +398,7 @@ export default {
         scrollWithScrollIntoView()
         this.$log('imsiv done')
       } else {
-        this.$logW('imsiv itemMiddle NOT FOUND, failed, go to TOP')
+        this.$log('imsiv itemMiddle NOT FOUND, failed, go to TOP')
         setScrollPosition(this.scrollTarget, 0)
       }
     },
@@ -474,7 +422,7 @@ export default {
       this.$log('ims', idx, useTop)
       if (key) {
         if (this.itemMiddlePersist) this.itemsRes.setProperty('currentId', key)
-        let item = this.itemsRes.items[idx]
+        let item = this.itemsRes.itemsHeaderFooter[idx]
         // this.$log('ims item.name', item?.name)
         let itemRef = this.$refs[`item-${key}`]
         if (itemRef && itemRef[0]) {

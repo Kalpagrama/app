@@ -376,6 +376,7 @@ class Group {
                name,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
                items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
+               itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
@@ -824,6 +825,11 @@ class Group {
             items.splice(0, Math.max(0, items.length - this.screenSize)) // листнули вниз. обрезаем сверху старое
          }
       }
+      this.reactiveGroup.itemsHeaderFooter = [
+         {[this.reactiveGroup.itemPrimaryKey]: 'header'},
+         ...items,
+         {[this.reactiveGroup.itemPrimaryKey]: 'footer'}
+      ]
       this.updateReactiveGroup()
    }
 
