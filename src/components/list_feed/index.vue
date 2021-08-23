@@ -126,6 +126,8 @@
           q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
           q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" size="lg").full-width.full-height
             q-icon(name="expand_more" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+        // компенсация kalpa-menu-mobile
+        div(v-if="item[itemKey] === 'footer'" :style=`{height: $store.state.ui.mobileMenuShown ? '65px' : '0px'}`).full-width
         // item
         div(v-else  :style=`{...itemStyles}`).row.full-width
           span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`) {{ item.debugInfo() }}

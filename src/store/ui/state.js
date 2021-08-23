@@ -18,7 +18,7 @@ export default {
   // navigations
   mobileNavigationShow: true,
   mobileNavigationStyles: {},
-  mobileMenuShow: false,
+  mobileMenuShown: false,
   desktopNavigationShow: true,
   desktopNavigationStyles: {},
   // data exchanges

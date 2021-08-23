@@ -75,6 +75,12 @@ export default {
     }
   },
   methods: {
+  },
+  mounted () {
+    this.$store.commit('ui/stateSet', ['mobileMenuShown', true])
+  },
+  beforeDestroy () {
+    this.$store.commit('ui/stateSet', ['mobileMenuShown', false])
   }
 }
 </script>
