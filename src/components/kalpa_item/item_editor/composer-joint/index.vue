@@ -21,7 +21,9 @@
       :item="joint.items[0]"
       :isActive="true"
       :showHeader="false"
-      :showSpheres="false").row
+      :showSpheres="false"
+      :showActions="false"
+    ).row
     vertex-editor(:joint="joint").row
     item-preview(
       v-if="joint.items[1]"
@@ -29,6 +31,7 @@
       :isActive="true"
       :showHeader="false"
       :showSpheres="false"
+      :showActions="false"
     ).row
     div(v-else).row.full-width.q-px-sm.q-pb-sm
       q-btn(
