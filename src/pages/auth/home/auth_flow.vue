@@ -29,9 +29,9 @@ div(
       fontWeight: 'bold',
       textAlign: 'center',
       color: 'white',
-      background: 'rgb(60,60,60)',
+      background: 'rgba(0,0,0, 0.2)',
       borderRadius: '10px',
-      border: '2px solid rgb(90,90,90)',
+      // border: '2px solid rgba(90,90,90,0.6)',
     }`
     @keyup.enter="emailSend()"
     ).full-width
@@ -41,14 +41,13 @@ div(
     ).row.full-width.q-pt-lg
     q-btn(
       outline no-caps color="green"
+      :label="$t('Next')"
       :disable="!emailIsValid"
       :loading="emailSending"
-      :style=`{
-        height: '60px',
-      }`
+      size="lg"
       @click="emailSend()"
-      ).full-width
-      span(:style=`{fontSize: '18px',}`).text-bold {{$t('Next')}}
+      ).full-width.text-bold
+      //span(:style=`{fontSize: '18px',}`).text-bold {{$t('Next')}}
   //- email sent
   div(
     v-if="emailSent").row.full-width.q-pt-lg
@@ -73,9 +72,9 @@ div(
         //- background: 'rgb(70,70,70)',
         //- borderRadius: '10px',
         //- border: '2px solid rgb(50,50,50)',
-        background: 'rgb(60,60,60)',
+        background: 'rgba(60,60,60, 0.5)',
         borderRadius: '10px',
-        border: '2px solid rgb(90,90,90)',
+        // border: '2px solid rgba(90,90,90,0.6)',
       }`
       @keyup.enter="passwordSend()"
       ).full-width
@@ -88,15 +87,14 @@ div(
         flat dense no-caps color="white") {{ passwordShow ? 'Hide password' : 'Show password' }}
     //- password send
     q-btn(
-      no-caps color="green"
+      outline no-caps color="green"
       :loading="passwordSending"
       :disable="password.length < 4"
-      :style=`{
-        height: '60px',
-      }`
+      :label="$t('Login')"
+      size="lg"
       @click="passwordSend()"
       ).full-width.q-mt-md
-      span(:style=`{fontSize: '18px'}`).text-bold {{ $t('Login') }}
+      //span(:style=`{fontSize: '18px'}`).text-bold {{ $t('Login') }}
     //- reset
     .row.full-width.q-pa-xs
       q-btn(
