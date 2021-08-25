@@ -3551,7 +3551,7 @@
           },
           {
             "kind": "OBJECT",
-            "name": "ObjectShortJoint",
+            "name": "ObjectShortEssence",
             "ofType": null
           },
           {
@@ -3683,8 +3683,8 @@
       },
       {
         "kind": "OBJECT",
-        "name": "ObjectShortJoint",
-        "description": "тип для прередачи микростатистики по объекту",
+        "name": "ObjectShortEssence",
+        "description": "тип для прередачи метаданных",
         "specifiedByUrl": null,
         "fields": [
           {
@@ -3785,8 +3785,56 @@
             "deprecationReason": null
           },
           {
+            "name": "items",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "vertices",
+            "description": "если это джойнт - то vertices.len = 2",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "VertexTypeEnum",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rate",
-            "description": "рейтинг",
+            "description": "рейтинг (устаревает)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -3817,31 +3865,15 @@
             "deprecationReason": null
           },
           {
-            "name": "leftItem",
-            "description": null,
+            "name": "countStat",
+            "description": "численная статистика (устаревает)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "rightItem",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "OBJECT",
+                "name": "CountStat",
                 "ofType": null
               }
             },
@@ -6767,8 +6799,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
+                    "kind": "OBJECT",
+                    "name": "ObjectShortEssence",
                     "ofType": null
                   }
                 }
@@ -6791,8 +6823,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
+                    "kind": "OBJECT",
+                    "name": "ObjectShortEssence",
                     "ofType": null
                   }
                 }
@@ -7261,6 +7293,74 @@
                 "kind": "ENUM",
                 "name": "CategoryEnum",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rateUser",
+            "description": "оценка текущего пользователя",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rate",
+            "description": "рейтинг ядра",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "weight",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rateStat",
+            "description": "статистика голосования для полосы",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "RateStatItem",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -9400,6 +9500,18 @@
                 "name": "ContentProviderEnum",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "providerInfo",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -12911,6 +13023,22 @@
             "deprecationReason": null
           },
           {
+            "name": "rev",
+            "description": "ревизия измененного объекта",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "path",
             "description": "где изменилось",
             "args": [],
@@ -12933,6 +13061,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objectFull",
+            "description": "весь объект (перехается если path = '')",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "Object",
               "ofType": null
             },
             "isDeprecated": false,
