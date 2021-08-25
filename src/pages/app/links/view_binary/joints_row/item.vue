@@ -18,7 +18,7 @@ div(
 </template>
 
 <script>
-import item from 'src/components/node_feed/node_items_item.vue'
+import item from 'src/components/kalpa_item/item_feed/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointsRowItem',

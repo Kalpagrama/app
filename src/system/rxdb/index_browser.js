@@ -532,8 +532,11 @@ class RxDBWrapper {
 
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-   async find (mangoQuery, autoNext = true, goToCurrent = false) {
+   // screenSize - список будет обрезаться сверху или снизу чтобы его размер был не больше screenSize
+   // autoNextSize - загрузит все что можно
+   async find (mangoQuery, autoNextSize = 0, screenSize = 0) {
       assert(this.created, 'cant find! !this.created')
+      assert(autoNextSize >= 0, autoNextSize)
       const f = this.find
       const t1 = performance.now()
       logD(f, 'start', mangoQuery)
@@ -594,14 +597,23 @@ class RxDBWrapper {
                               let topObjectCopy = cloneDeep(topObject) // не меняем исходную ленту(она реактивна)
                               topObjectCopy.populatedObject = populatedObject
                               return topObjectCopy
+                           }).catch(err => {
+                              logE('cant populate topObject1:' + topObject.oid, err)
                            })
                      })
                      let internalObjectPromises = [] // внутренние объекты ядра и джоинтов (запрашиваем с упреждением чтобы все уместилось в 1 запрос на бэкенд)
                      for (let topObject of itemsForPopulate) {
-                        internalObjectPromises.push(...topObject.internalItemOids.map(oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true })))
+                        internalObjectPromises.push(...topObject.internalItemOids.map(
+                              oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true }
+                              ).catch(err => {
+                                 // не найден внутренний элемент. Добавим родительский объект в черный список
+                                 this.hideObjectOrSource(topObject.oid, null).catch(err => logE('cant hideObjectOrSource topObject2:', topObject, err))
+                                 logE('cant populate topObject2:', topObject, err)
+                              })
+                           ))
                      }
 
-                     populatedItems = await Promise.all(promises)
+                     populatedItems = (await Promise.all(promises)).filter(el => !!el)
                      await Promise.all(internalObjectPromises)
 
                      if (itemsForPrefetch) {
@@ -622,10 +634,11 @@ class RxDBWrapper {
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
-               let listId = JSON.stringify(mangoQuery) // populate в запросе влияет на результат (запросы с и без populate -это разные списки)
-               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', makeListCacheId(mangoQuery)) // до удаления populateObjects
                let populateObjects = mangoQuery.populateObjects
                delete mangoQuery.populateObjects // мешает нормальному кэшированию в rxdb
+
+               let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
+               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', listId) // до удаления populateObjects
                let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
                   fetchFunc: async () => {
                      return {
@@ -647,15 +660,15 @@ class RxDBWrapper {
                }
 
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive, screenSize)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveDocDbMemCache.set(queryId, findResult)
          }
-         if (autoNext && findResult.items.length === 0) await findResult.next()
          await findResult.gotoCurrent()
+         if (findResult.items.length === 0) await findResult.next(autoNextSize)
          // this.store.commit('debug/addFindResult', { queryId, findResult })
          this.store.commit('debug/addFindResult', { queryId, findResult })
          assert(findResult && findResult.next, '!findResult.next')

@@ -34,8 +34,8 @@
         top: '8px', right: '8px',
       }`)
   //- body
-  node-feed(
-    :node="joint"
+  item-feed(
+    :item="joint"
     :isActive="true"
     :isVisible="true"
     :showItems="true"
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import nodeItemsItem from 'src/components/node_feed/node_items_item.vue'
+import nodeItemsItem from 'src/components/kalpa_item/item_feed/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointCurrent',

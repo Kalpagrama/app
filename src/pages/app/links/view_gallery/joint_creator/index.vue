@@ -153,7 +153,7 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
 import viewFinder from './view_finder.vue'
-import nodeItemsItem from 'src/components/node_feed/node_items_item.vue'
+import nodeItemsItem from 'src/components/kalpa_item/item_feed/node_feed/node_items_item.vue'
 
 export default {
   name: 'jointCreator',

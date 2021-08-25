@@ -108,7 +108,7 @@ export default {
       async handler (to, from) {
         this.$log('oid TO', to)
         if (to) {
-          this.jointsRes = await this.$rxdb.find(this.query, true)
+          this.jointsRes = await this.$rxdb.find(this.query)
           this.$nextTick(() => {
             if (this.jointsRes.items[0]) {
               this.jointMakeActive(this.jointsRes.items[0], true)

@@ -6,6 +6,7 @@ component(
   :isActive="isActive"
   :showHeader="showHeader"
   :showSpheres="showSpheres"
+  :showActions="showActions"
   )
 </template>
 
@@ -26,7 +27,7 @@ export default {
     typeNode,
     typeContent,
   },
-  props: ['item', 'isActive', 'showHeader', 'showSpheres'],
+  props: ['item', 'isActive', 'showHeader', 'showSpheres', 'showActions'],
   data () {
     return {
       itemFull: null

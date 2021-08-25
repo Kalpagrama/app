@@ -18,7 +18,7 @@ export default {
   // navigations
   mobileNavigationShow: true,
   mobileNavigationStyles: {},
-  mobileMenuShow: false,
+  mobileMenuShown: false,
   desktopNavigationShow: true,
   desktopNavigationStyles: {},
   // data exchanges
@@ -56,5 +56,7 @@ export default {
       name: 'Users',
       selector: {type: {$in: ['USER']}},
     }
-  ]
+  ],
+  // graph (последний запомненный граф (чтобы вернуться назад - и граф не стерся))
+  graph: null
 }

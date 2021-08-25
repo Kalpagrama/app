@@ -66,8 +66,8 @@ q-layout(
                   callback: nodeVisibilityCallback
                 }`
                 ).row.full-width.items-start.content-start
-                node-feed(
-                  :node="node.populatedObject"
+                item-feed(
+                  :item="node.populatedObject"
                   :isActive="nodeIsVisible"
                   :isVisible="nodeIsVisible"
                   :showName="false"
@@ -125,7 +125,7 @@ export default {
         if (to) {
           this.$log('$route.params.oid TO', to)
           this.sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.sphereNodes = await this.$rxdb.find(this.query, true)
+          this.sphereNodes = await this.$rxdb.find(this.query)
         }
       }
     },

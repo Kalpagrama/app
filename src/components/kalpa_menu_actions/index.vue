@@ -2,20 +2,22 @@
 q-btn(round flat :icon="icon" :color="color" :dense="dense")
   //- maximized position="bottom" dark
   q-popup-proxy(
+    :contentStyle=`{
+      borderRadius: '10px 10px 10px 10px',
+    }`
     cover anchor="top right" self="top right" dark
     max-width="200px"
     position="bottom")
     div(
       :style=`{
-        borderRadius: '20px 20px 0 0',
+        borderRadius: '10px 10px 0 0',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }`
       ).row.full-width.items-start.content-start.b-40
       //- header
       div(
-        v-if="headerText"
-        ).row.full-width.items-center.content-center.q-pa-md
-        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{ headerText }}
+        ).row.full-width.items-center.content-center
+        span( v-if="headerText" :style=`{fontSize: '24px'}`).text-white.text-bold {{ headerText }}
         .col
         q-btn(round flat color="white" icon="clear" v-close-popup)
       //- body

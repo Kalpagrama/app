@@ -102,7 +102,7 @@ export default {
     }
   },
   mounted() {
-    this.$log('mounted item=', JSON.parse(JSON.stringify(this.item)))
+    this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
   }
 }
 </script>

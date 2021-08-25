@@ -1,9 +1,6 @@
 <template lang="pug">
-div(
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  ).row.full-widith
+.row.full-widith.scroll
+  //header + tabs
   div(
     :style=`{
       height: '100px',

@@ -6,6 +6,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { makeId, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import debounce from 'lodash/debounce'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -127,8 +128,11 @@ class QueryAccumulator {
                this.resolveItem(object)
             } else if (object && !object.deletedAt) {
                this.rejectItem(oid, 'deleted')
-            } else {
-               this.rejectItem(oid, 'notFound')
+            } else { // объекта нет на сервере (мы его запрашивали, но ничего не вернулось)
+               // добавим в blackList (чтобы больше не запрашивали)
+               rxdb.hideObjectOrSource(oid, null).then(() => {
+                  this.rejectItem(oid, 'notFound')
+               })
             }
          }
          this.next()
@@ -283,11 +287,19 @@ class Objects {
       const t1 = performance.now()
       switch (event.type) {
          case 'OBJECT_CHANGED': {
-            if (!event.path /* || (event.path === 'uploadStage' && event.value === 'COMPLETE') */) { // объект изменился целиком
-               let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
-            } else {
-               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
-            }
+            // if (!event.path /* || (event.path === 'uploadStage' && event.value === 'COMPLETE') */) { // объект изменился целиком
+            //    let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
+            // } else {
+            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid), event.path, event.value, false)
+            // }
+            let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
+            logD('reactiveItem=', cloneDeep(reactiveItem), event.rev)
+            if (reactiveItem && reactiveItem.rev < event.rev) { // только если ревизия объекта в эвенте > локальной
+               assert(event.objectFull || event.path)
+               await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid),
+                  event.path, event.path ? event.value : event.objectFull,
+                  false)
+            } else logD('event ignored! local already updated') // например, если это мы сами меняли (например, через ObjectApi.blockUpdate)
             break
          }
          case 'OBJECT_CREATED':

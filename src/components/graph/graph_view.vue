@@ -8,37 +8,40 @@
 // import {selectAll} from "d3-selection";
 
 // отображает граф.
-// @add - добавить новый элемент
-// @preview - показать превью узла
 
 <template lang="pug">
   div(ref="graphArea").row.full-width
+    q-resize-observer(@resize="height = $event.height, width = $event.width")
     // меню
-    q-btn(icon="more_vert" @click="menuShow = true" :style="{position: 'absolute', top: '5px', right: '5px'}").text-white
     q-dialog(
       v-model="menuShow"
       position="standard"
       :maximized="false")
-      div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md
+      div(:style=`{background: 'rgb(40,40,40)',borderRadius: '10px'}`).row.full-width.q-pa-md
         q-btn(
-          round flat no-caps outline color="grey-8" align="left" icon='add'
+          round flat no-caps outline color="grey" align="left" icon='add'
           :label="$t('Add item')"
           @click="menuShow = false, itemFinderShow = true"
         ).row.full-width.q-pa-sm
         q-btn(
-          round flat no-caps outline color="grey-8" align="left" icon='grain'
+          round flat no-caps outline color="grey" align="left" icon='grain'
           :label="$t('Reset graph layout')"
           @click="menuShow = false, resetFixedPos()"
+        ).row.full-width.q-pa-sm
+        q-btn(
+          round flat no-caps outline color="grey" align="left" icon='delete'
+          :label="$t('clear graph')"
+          @click="menuShow = false, clearGraph()"
         ).row.full-width.q-pa-sm
     //- item finder
     q-dialog(
       v-model="itemFinderShow"
       position="standard"
-      :maximized="false")
+      :maximized="true")
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
-        :style=`{borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`
+        :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
         :pages=`{
           nodes: {views: ['all']},
           workspace: {views: ['node', 'media']},
@@ -48,15 +51,36 @@
         @item="addNodeToGraph"
         @close="itemFinderShow = false"
       ).b-30
-    // превьюшка выбранного элемента на графе
+    // item detail
     q-dialog(
-      v-model="previewShow"
-      position="standard"
-      :maximized="false"
-      @close="selectedItem = null"
-      )
-      div(:style="{width: '300px'}")
-        item-preview(:item="selectedItem", :isActive="true" :style=`{borderRadius: '20px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)' }`)
+      v-model="itemDetailsShow"
+      :position="detailPosition"
+      @hide="graphD3.selectedItem = null"
+    )
+      div(
+        :style=`{
+            // boxShadow: '1px 1px 20px rgba(192,192,192, .5)',
+            borderRadius: detailPosition === 'bottom' ? '20px 20px 0 0' : '20px',
+            // border: '2px solid green',
+          }`).row.full-width.b-40
+        div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
+          q-btn(icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
+          //q-btn(
+          //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
+          //  icon="mediation" flat color="grey"
+          //  v-close-popup
+          //  :label="selectedItemFull.countStat.countJoints || 0"
+          //  @click="discover(graphD3.selectedItem)").q-mx-sm
+          q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
+          q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(graphD3.selectedItem, null)").q-mx-sm
+          .col
+          q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
+        .row.full-width.items-center.content-center.justify-center.q-pa-sm
+          //spinner
+          div(v-if="!selectedItemFull")
+            q-spinner(size="50px" color="green")
+          div(v-else )
+            item-preview(:item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
     // меню создания связи
     q-dialog(
       v-model="jointCreatorShow"
@@ -67,8 +91,8 @@
       composer(
         :joint="newJoint"
         :item="newJoint"
+        :action="addJointToGraph"
         @remove="$log('item-editor @remove')"
-        @close="addJointToGraph(newJoint)"
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
             borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
             }`)
@@ -87,15 +111,20 @@
       "pointer-events": "none",
       opacity:0
       }`)
-    q-btn(
-      v-if="!graph.nodes.length"
-      @click="itemFinderShow = true"
-      flat color="white" no-caps icon="add" size="lg" stack
-    :style=`{minHeight: '500px'}`
-    ).row.full-width.full-height.b-40
-      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-    svg(ref="graphSvg"
-      :style=`{height: height}`).row.full-width
+    div(:style=`{position: 'relative', maxHeight: maxHeight+'px'}`).row.full-width
+      // меню
+      //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
+      q-btn(
+        v-if="!showGraph && showAddBtn"
+        @click="itemFinderShow = true"
+        outline color="white" no-caps icon="add" size="lg" stack
+      :style=`{minHeight: '500px'}`
+      ).row.full-width.full-height
+        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
+      svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
+    //// превьюшка узла внутри графа
+    //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
+    //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
 </template>
 
 <script>
@@ -103,6 +132,8 @@ import itemPreview from 'src/components/kalpa_item/item_preview'
 import composer from 'src/components/kalpa_item/item_editor/composer.vue'
 import * as d3 from 'd3';
 import { assert } from 'src/system/utils'
+import debounce from 'lodash/debounce'
+import cloneDeep from 'lodash/cloneDeep'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -112,24 +143,28 @@ export default {
     composer
   },
   props: {
-    graph: { type: Object, required: true },
-    width: {
-      type: Number
-    },
-    height: {
+    graphD3: { type: Object, required: true }, // d3 меняет этот объект
+    showAddBtn: { type: Boolean, default: true },
+    getJoints: { type: Function, default: null },
+    oidRoot: { type: String, required: true },
+    detailPosition: { type: String, default: 'bottom' }, // q-menu
+    maxHeight: {
       type: Number
     }
   },
   data () {
     return {
+      width: 100,
+      height: 100,
       menuShow: false,
-      previewShow: false,
       itemFinderShow: false,
       jointCreatorShow: false,
+      itemDetailsShow: false,
       newJoint: null,
-      newItemLocation: [0, 0],
-      selectedItem: null,
+      newItemLocation: [10, 10],
+      selectedItemFull: null,
       nodeRadius: 50,
+      svgG: null,
       svg: null,
       defs: null,
       graphNodes: null,
@@ -142,38 +177,79 @@ export default {
     }
   },
   computed: {
+    showGraph () {
+      return !!this.graphD3.nodes.length
+    },
   },
   watch: {
+    'graphD3.selectedItem': {
+      async handler (to, from) {
+        if (from) {
+          this.selectedItemFull = null
+          // this.unselectNode(from)
+          if (!to) this.zoomTo(from, 1)
+        }
+        if (to) {
+          // this.$log('onselectedItem', to.name)
+          // this.selectNode(to)
+          this.zoomTo(to, 3, async () => {
+            this.$log('zoomTo ends!!!')
+            this.itemDetailsShow = true
+            await this.discover(to)
+          })
+          this.selectedItemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
+        } else this.selectedItemFull = null
+      }
+    },
+    'graphD3.nodes': {
+      handler (to, from) {
+        this.$log('graphD3.nodes changed!!!', this.graphD3)
+        this.debouncedUpdateGraph()
+      }
+    },
+    'graphD3.joints': {
+      handler (to, from) {
+        this.$log('graphD3.joints changed!!!', this.graphD3)
+        this.debouncedUpdateGraph()
+      }
+    }
   },
   methods: {
     jointIsEqual (j1, j2) {
       // this.$log(j1, j2)
-      return (j1.itemsShort[0].id === j2.itemsShort[0].id && j1.itemsShort[1].id === j2.itemsShort[1].id) ||
-          (j1.itemsShort[0].id === j2.itemsShort[1].id && j1.itemsShort[1].id === j2.itemsShort[0].id)
+      return (j1.items[0].id === j2.items[0].id && j1.items[1].id === j2.items[1].id) ||
+          (j1.items[0].id === j2.items[1].id && j1.items[1].id === j2.items[0].id)
     },
     prepareJoint (joint) {
-      let [leftNode, rightNode] = joint.itemsShort
+      let [leftNode, rightNode] = joint.items
       joint.id = joint.id || joint.oid
       assert(joint.id && joint.type === 'JOINT', 'bad joint' + JSON.stringify(joint))
       assert(leftNode && rightNode, 'bad joint nodes' + JSON.stringify(joint))
       leftNode.id = leftNode.id || leftNode.oid
       rightNode.id = rightNode.id || rightNode.oid
-      if (!this.graph.nodes.find(n => n.id === leftNode.id)) this.graph.nodes.push(leftNode)
-      if (!this.graph.nodes.find(n => n.oid === rightNode.id)) this.graph.nodes.push(rightNode)
+      if (!this.graphD3.nodes.find(n => n.id === leftNode.id)) {
+        this.graphD3.nodes.push(leftNode)
+      }
+      if (!this.graphD3.nodes.find(n => n.oid === rightNode.id)) {
+        this.graphD3.nodes.push(rightNode)
+      }
       for (let prop in joint) { // удаляем ненужные поля
-        if (!prop.in('itemsShort', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
+        if (!prop.in('items', 'vertices', 'name', 'type', 'oid', 'id')) delete joint[prop]
       }
       joint.source = leftNode.id
       joint.target = rightNode.id
-      if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
+      joint.label = joint.name || (joint.vertices && joint.vertices.length === 2 ? this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name : '')
+      // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
-    addNodeToGraph (item) {
-      console.log('addNodeToGraph', item, this.graph)
+    addNodeToGraph (item, notifyOnExisting = true) {
+      // this.$log('addNodeToGraph', item, this.graphD3)
+      if (this.simulationLinked) this.simulationLinked.stop()
       this.itemFinderShow = false
       assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
-      if (this.graph.nodes.find(n => n.id === item.id || n.oid === item.oid)) {
-        this.$notify('error', this.$t('same item found'))
-        return
+      let existing = this.graphD3.nodes.find(n => n.id === item.id || n.oid === item.oid)
+      if (existing) {
+        if (notifyOnExisting) this.$notify('error', this.$t('same item found'))
+        return existing
       }
       let d = {
         id: item.id || item.oid,
@@ -184,34 +260,50 @@ export default {
         x: this.newItemLocation[0],
         y: this.newItemLocation[1]
       }
-      this.graph.nodes.push(d);
-      this.updateGraph()
+      this.graphD3.nodes.push(d);
       this.blinkNode(d)
+      this.$emit('changed')
+      return d
     },
-    addJointToGraph (joint) {
-      this.$log('addJointToGraph', joint)
+    addJointToGraph (joint, notifyOnExisting = true) {
+      // this.$log('addJointToGraph', joint)
+      if (this.simulationLinked) this.simulationLinked.stop()
       this.prepareJoint(joint)
-      if (this.graph.joints.find(j => this.jointIsEqual(j, joint))) {
-        this.$notify('error', this.$t('same joint found'))
-        return
+      let existing = this.graphD3.joints.find(j => this.jointIsEqual(j, joint))
+      if (existing) {
+        if (notifyOnExisting) this.$notify('error', this.$t('same joint found'))
+        return existing
       }
-      this.graph.joints.push(joint)
-      this.updateGraph()
+      this.graphD3.joints.push(joint)
       this.jointCreatorShow = false
+      this.$emit('changed')
+      return joint
     },
     removeNode (item) {
-      this.$log('removeNode', item)
+      // this.$log('removeNode', item)
       if (!confirm('Удалить?')) return
-      let indx = this.graph.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
-      if (indx >= 0) this.graph.nodes.splice(indx, 1)
-      this.updateGraph()
+      let indx = this.graphD3.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
+      if (indx >= 0) this.graphD3.nodes.splice(indx, 1)
+      this.$emit('changed')
     },
     removeJoint (joint) {
-      this.$log('removeJoint', joint)
+      // this.$log('removeJoint', joint)
       if (!confirm('Удалить?')) return
-      let indx = this.graph.joints.findIndex(j => this.jointIsEqual(j, joint))
-      if (indx >= 0) this.graph.joints.splice(indx, 1)
-      this.updateGraph()
+      let indx = this.graphD3.joints.findIndex(j => this.jointIsEqual(j, joint))
+      if (indx >= 0) this.graphD3.joints.splice(indx, 1)
+      this.$emit('changed')
+    },
+    async discover (d) {
+      if (d.discovered) return
+      if (this.getJoints) {
+        let joints = await this.getJoints(d.oid)
+        for (let j of joints) this.addJointToGraph(j, false)
+      }
+      d.discovered = true
+    },
+    clearGraph () {
+      this.graphD3.joints.splice(0, this.graphD3.joints.length)
+      this.graphD3.nodes.splice(0, this.graphD3.nodes.length)
     },
     blinkNode (d, width = 20) {
       let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
@@ -226,49 +318,68 @@ export default {
           .style('stroke', 'grey')
     },
     connectNodes (n1, n2) {
-      this.$log('connectNodes')
+      // this.$log('connectNodes')
       assert(n1, 'n1 required!')
       if (n2 && n1.id === n2.id) {
         this.$notify('error', this.$t('loop links deprecated'))
         return
       }
-      this.newJoint = { id: Date.now().toString(), type: 'JOINT', itemsShort: [n1, n2], vertices: [] }
+      this.newJoint = { id: Date.now().toString(), type: 'JOINT', items: [n1, n2], vertices: [] }
       this.jointCreatorShow = true
     },
-    selectNode (d, width = 20) {
-      let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
+    selectNode (d, width = 5) {
+      this.$log('selectNode', d, d3.select(document.getElementById('nodeRect' + (d.id || d.oid))))
+      let selectedRect = d3.select(document.getElementById('nodeRect' + (d.id || d.oid)))
       selectedRect
           .transition()
           .duration(200)
           .style('stroke-width', width)
           .style('stroke', 'green')
-      this.$wait(1000).then(() => this.unselectNode(d))
     },
     unselectNode (d) {
-      let selectedRect = d3.select(document.getElementById('nodeRect' + d.id))
+      // this.$log('unselectNode')
+      let selectedRect = d3.select(document.getElementById('nodeRect' + (d.id || d.oid)))
       selectedRect
           .transition()
           .duration(200)
           .style('stroke-width', 5)
           .style('stroke', 'grey')
+      // this.positionTo()
     },
-    resetFixedPos(){
-      for (let node of this.graph.nodes) {
-        node.fx = null
-        node.fy = null
+    resetFixedPos () {
+      for (let node of this.graphD3.nodes) {
+        delete node.fx
+        delete node.fy
       }
-      this.doLayout()
+      // this.doLayout()
+      this.debouncedUpdateGraph()
+    },
+    zoomTo (d, scale = 3, onEnd = null) {
+      this.$log('zoomTo node: ', d)
+      let duration = 1000
+      let transition = this.svg.transition().duration(duration).call(
+          this.zoom.transform,
+          d3.zoomIdentity.translate(this.width / 2, this.height / 2).scale(scale).translate(-d.x, -d.y - 50)
+      ).on('end', async () => {
+        if (onEnd) await onEnd()
+      })
+    },
+    zoomReset () {
+      this.svg.transition().duration(750).call(
+          this.zoom.transform,
+          d3.zoomIdentity,
+          d3.zoomTransform(this.svg.node()).invert([this.width / 2, this.height / 2])
+      );
     },
     initGraph () {
       let thiz = this
-      this.width = this.$refs.graphSvg.clientWidth
-      this.height = this.$refs.graphSvg.clientHeight
-      for (let j of this.graph.joints) this.prepareJoint(j)
-      for (let n of this.graph.nodes) {
+      for (let n of this.graphD3.nodes) {
         assert(n.oid || n.id, 'node should have oid or id' + JSON.stringify(n))
         n.id = n.id || n.oid
-        if (this.graph.joints.find(j => j.itemsShort[0].id === n.id || j.itemsShort[1].id === n.id)) n.linked = true
-        else n.linked = false
+      }
+      for (let j of this.graphD3.joints) this.prepareJoint(j)
+      for (let n of this.graphD3.nodes) {
+        n.linked = !!(this.graphD3.joints.find(j => j.items[0].id === n.id || j.items[1].id === n.id))
       }
 
       class GraphClickProcessor {
@@ -278,11 +389,12 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          console.log('GraphClickProcessor registerEvent', type, event.type)
+          // console.log('GraphClickProcessor registerEvent', type, event)
           switch (type) {
             case 'click':
-              // event.stopPropagation()
-              // this.onClick(d, 300)
+              thiz.$log('graph clicked', event)
+              event.stopPropagation();
+              thiz.zoomReset()
               break
             case 'mousedown':
               this.startLongClickDetection(this.onLongClick.bind(this, event))
@@ -303,9 +415,9 @@ export default {
               break
             case 'start':
               // zoom start
+              // console.log('zoom start', event)
               this.zoomdetected = false
               this.zoomInitialTransform = event.transform
-              // console.log('zoom start', event)
               break
             case 'zoom':
               // event.sourceEvent.stopPropagation();
@@ -316,18 +428,19 @@ export default {
               } else {
                 this.zoomdetected = true
                 this.cancelLongClickDetection()
-                thiz.svg.attr('transform', event.transform)
+                thiz.svgG.attr('transform', event.transform)
               }
               break
             case 'end':
               // zoom end
+              // console.log('zoom end ', event)
               if (!this.zoomdetected) {
                 this.cancelLongClickDetection()
               }
               break
             default :
               // throw new Error('bad event:' + type)
-                break
+              break
           }
         }
 
@@ -350,46 +463,36 @@ export default {
         }
 
         onLongClick (event) {
-          thiz.itemFinderShow = true
-          thiz.newItemLocation = d3.pointer(event, thiz.svg.node())
-          // let addItemMenu = d3.select(this.$refs.addItemMenu)
-          // if (addItemMenu.node().style.opacity > 0) {
-          //   addItemMenu.style('opacity', 0);
-          //   this.svg.style('opacity', 1)
-          // } else if (event.target.nodeName === 'svg') {
-          //   addItemMenu.style('left', (event.layerX) + 'px')
-          //       .style('top', (event.layerY + 10) + 'px')
-          //       .style('opacity', 1)
-          //   this.svg
-          //       .transition()
-          //       .duration(500)
-          //       .style('opacity', 0.2)
-          // }
+          thiz.menuShow = true
         }
       }
 
       let graphClickProcessor = new GraphClickProcessor()
 
-      if (this.svg) this.svg.remove();
+      if (this.svgG) this.svgG.remove();
+
+      this.zoom = d3.zoom()
+          .scaleExtent([0.2, 8])
+          .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+          .on('end', graphClickProcessor.registerEvent.bind(graphClickProcessor))
+
       this.svg = d3.select(this.$refs.graphSvg)
-          // .append('svg')
+          .attr('viewBox', [0, 0, thiz.width, thiz.height])
           .on('click', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('mousedown', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('mouseup', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchstart', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           .on('touchend', graphClickProcessor.registerEvent.bind(graphClickProcessor))
           // .on('touchmove', graphClickProcessor.registerEvent.bind(graphClickProcessor))
-          .call(d3.zoom()
-              .on('start', graphClickProcessor.registerEvent.bind(graphClickProcessor))
-              .on('zoom', graphClickProcessor.registerEvent.bind(graphClickProcessor))
-              .on('end', graphClickProcessor.registerEvent.bind(graphClickProcessor))
-          )
-          .append('g')
+          .call(this.zoom)
+
+      this.svgG = this.svg.append('g')
 
       // appending little triangles, path object, as arrowhead
       // The <defs> element is used to store graphical objects that will be used at a later time
       // The <marker> element defines the graphic that is to be used for drawing arrowheads or polymarkers on a given <path>, <line>, <polyline> or <polygon> element.
-      this.defs = this.svg.append('defs')
+      this.defs = this.svgG.append('defs')
       this.defs.append('marker')
           .attr('id', 'arrowhead')
           .attr('viewBox', '-0 -5 10 10') // the bound of the SVG viewport for the current SVG fragment. defines a coordinate system 10 wide and 10 high starting on (0,-5)
@@ -415,7 +518,7 @@ export default {
           .append('svg:path')
           .attr('d', 'M0,-5L10,0L0,5');
       // displayed when dragging between nodes
-      this.dragLine = this.svg.append('path')
+      this.dragLine = this.svgG.append('path')
           .attr('class', 'link dragline hidden')
           .attr('d', 'M0,0L0,0')
           .attr('stroke', 'grey')
@@ -443,7 +546,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          thiz.$log('NodeClickProcessor::registerEvent', type, event.type)
+          // thiz.$log('NodeClickProcessor::registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -456,6 +559,7 @@ export default {
               this.startLongClickDetection(thiz.blinkNode.bind(thiz, d, 20))
               break
             case 'mouseup':
+              this.cancelLongClickDetection()
               break
             case 'mouseover':
               this.onMouseOverWithLongClick(d)
@@ -474,20 +578,22 @@ export default {
               event.preventDefault();
               break
             case 'start':
-              this.dragdetected = false
+              this.drag = false
+              this.dragDetected = false
               this.lineDrawed = false
               // When the drag gesture starts, the targeted node is fixed to the pointer
               // The simulation is temporarily “heated” during interaction by setting the target alpha to a non-zero value.
               // if (!event.active) thiz.simulationLinked.alphaMin(0.2).alpha(1).restart();// sets the current target alpha to the specified number in the range [0,1].
               break
             case 'drag':
+              this.drag = true // сработал драг (даже если чуть чуть подвигали нечаянно)
               if (this.state === 'LONG_CLICK') {
                 // рисуем стрелку
                 this.dragLine(event, d)
                 this.lineDrawed = true
                 if (event.sourceEvent instanceof TouchEvent) {
                   let linkedNodeData = null
-                  for (let n of thiz.graph.nodes) {
+                  for (let n of thiz.graphD3.nodes) {
                     let x = n.x - event.x
                     let y = n.y - event.y
                     let l = Math.sqrt(x * x + y * y)
@@ -496,15 +602,12 @@ export default {
                       linkedNodeData = n;
                     }
                   }
-                  if (this.linkedNodeData) thiz.unselectNode(this.linkedNodeData)
                   this.linkedNodeData = linkedNodeData;
-                  if (this.linkedNodeData && this.linkedNodeData !== d) thiz.selectNode(this.linkedNodeData, 60)
-                  // console.log('drag this.linkedNodeData', this.linkedNodeData)
                 }
               } else if (this.state === 'START_LONG_CLICK' && Math.abs(d.x - event.x) + Math.abs(d.y - event.y) < (event.sourceEvent instanceof TouchEvent ? 20 : 5)) {
                 // если чуть-чуть подвигали, драг не засчитываем (возможно это LONG_CLICK)
               } else {
-                this.dragdetected = true
+                this.dragDetected = true
                 this.cancelLongClickDetection()
                 if (thiz.simulationLinked.alpha() <= 0.2) thiz.simulationLinked.alphaMin(0.2).alpha(1).restart()
                 d.fx = event.x;
@@ -518,7 +621,7 @@ export default {
                 this.linkedNodeData = null
                 this.lineDrawed = false
               }
-              if (!this.dragdetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
+              if (!this.dragDetected && event.sourceEvent instanceof TouchEvent) this.onClick(d, 500)
               break
             default :
               throw new Error('bad event:' + type)
@@ -550,32 +653,31 @@ export default {
           this.lastClickDt = Date.now()
           // пока непонятно что это клик или дабл клик
           this.timeClickId = setTimeout(() => {
-            thiz.$log('click')
+            thiz.$log('node click', d.name)
             // delete d.fx;
             // delete d.fy;
-            this.showItemPreview(d)
+
+            thiz.graphD3.selectedItem = null
+            thiz.$nextTick(() => {
+              thiz.graphD3.selectedItem = d
+            })
+
+            thiz.$emit('node_click', d)
           }, dblClickInterval + 50)
         }
 
         onDblClick (d) {
           if (d.oid) {
             // thiz.$systemUtils.hapticsImpact()
-            // this.$emit('nodeDblClick', d)
+            thiz.graphD3.selectedItem = d
+            thiz.$emit('node_dbl_click', d)
           }
-        }
-
-        showItemPreview(d) {
-          thiz.$rxdb.get(RxCollectionEnum.OBJ, d.oid).then(item => {
-            thiz.$log(item)
-            thiz.selectedItem = item
-            thiz.previewShow = true
-          }).catch(err => thiz.$logE(err))
         }
 
         onTripleClick (d) {
           if (d.oid) {
             thiz.$systemUtils.hapticsImpact()
-            let joint = thiz.graph.joints.find(j => j.itemsShort[0].id === d.id || j.itemsShort[1].id === d.id)
+            let joint = thiz.graphD3.joints.find(j => j.items[0].id === d.id || j.items[1].id === d.id)
             if (joint) thiz.removeJoint(joint)
             else thiz.removeNode(d)
           }
@@ -615,6 +717,7 @@ export default {
           this.cancelLongClickDetection()
           this.state = 'START_LONG_CLICK'
           this.timerId = setTimeout(() => {
+            thiz.$log('long click')
             this.state = 'LONG_CLICK'
             if (func) func()
             thiz.$systemUtils.hapticsImpact()
@@ -631,8 +734,8 @@ export default {
       }
 
       let clickProcessor = new NodeClickProcessor()
-      this.graphNodes = this.svg.selectAll('.graphNodes')
-          .data(this.graph.nodes)
+      this.graphNodes = this.svgG.selectAll('.graphNodes')
+          .data(this.graphD3.nodes)
           .enter()
           .append('g')
           // .attr('class', 'nodes')
@@ -670,44 +773,43 @@ export default {
           .attr('height', this.nodeRadius)
           .attr('clip-path', 'url(#clip-rect)')
           .attr('preserveAspectRatio', 'xMidYMid slice')
-          .on('mouseover', function (event, d) {
-            // console.log('image mouseover')
-            d3.select(this)
-                .transition()
-                .duration(350)
-                .attr('width', 70)
-                .attr('height', 70)
-          })
-          .on('mouseout', function (event, d) {
-            d3.select(this)
-                .transition()
-                .duration(350)
-                .attr('width', function (event, d) {
-                  return 50
-                })
-                .attr('height', function (event, d) {
-                  return 50
-                })
-          })
-          .on('mouseover.tooltip', function (event, d) {
-            // console.log(event)
-            tooltip.transition()
-                .duration(300)
-                .style('opacity', 0.8);
-            tooltip.html(d.type + '<p/>' + d.name)
-                .style('left', (event.layerX) + 'px')
-                .style('top', (event.layerY + 10) + 'px');
-          })
-          .on('mouseout.tooltip', function () {
-            tooltip.transition()
-                .duration(100)
-                .style('opacity', 0);
-          })
-          .on('mousemove', function (event) {
-            tooltip.style('left', (event.layerX) + 'px')
-                .style('top', (event.layerY + 10) + 'px');
-          })
-
+      // .on('mouseover', function (event, d) {
+      //   // console.log('image mouseover')
+      //   d3.select(this)
+      //       .transition()
+      //       .duration(350)
+      //       .attr('width', 70)
+      //       .attr('height', 70)
+      // })
+      // .on('mouseout', function (event, d) {
+      //   d3.select(this)
+      //       .transition()
+      //       .duration(350)
+      //       .attr('width', function (event, d) {
+      //         return 50
+      //       })
+      //       .attr('height', function (event, d) {
+      //         return 50
+      //       })
+      // })
+      // .on('mouseover.tooltip', function (event, d) {
+      //   // console.log(event)
+      //   tooltip.transition()
+      //       .duration(300)
+      //       .style('opacity', 0.8);
+      //   tooltip.html(d.type + '<p/>' + d.name)
+      //       .style('left', (event.layerX) + 'px')
+      //       .style('top', (event.layerY + 10) + 'px');
+      // })
+      // .on('mouseout.tooltip', function () {
+      //   tooltip.transition()
+      //       .duration(100)
+      //       .style('opacity', 0);
+      // })
+      // .on('mousemove', function (event) {
+      //   tooltip.style('left', (event.layerX) + 'px')
+      //       .style('top', (event.layerY + 10) + 'px');
+      // })
       // this.graphNodes.append('title')
       //     .text(d => d.id + ': ' + d.name + ' - ' + d.type);
       // this.graphNodes.append('text')
@@ -729,7 +831,7 @@ export default {
 
         registerEvent (event, d, type = null) {
           type = type || event.type
-          thiz.$log('JointClickProcessor registerEvent', type, event.type)
+          // thiz.$log('JointClickProcessor registerEvent', type, event.type)
           switch (type) {
             case 'dblclick':
               event.stopPropagation();
@@ -777,6 +879,7 @@ export default {
           this.timeClickId = setTimeout(() => {
             delete d.fx;
             delete d.fy;
+            thiz.$emit('joint_click', d)
           }, dblClickInterval + 50)
         }
 
@@ -814,8 +917,8 @@ export default {
 
       let jointClickProcessor = new JointClickProcessor()
       // Initialize the links
-      this.graphEdges = this.svg.selectAll('.graphEdges')
-          .data(this.graph.joints)
+      this.graphEdges = this.svgG.selectAll('.graphEdges')
+          .data(this.graphD3.joints)
           .enter()
           .append('line')
           .attr('class', 'links')
@@ -836,10 +939,10 @@ export default {
 
       // The <title> element provides an accessible, short-text description of any SVG container element or graphics element.
       // Text in a <title> element is not rendered as part of the graphic, but browsers usually display it as a tooltip.
-      this.graphEdges.append('title').text(d => d.name);
+      this.graphEdges.append('title').text(d => d.label)
 
-      this.edgepaths = this.svg.selectAll('.edgepath') // make path go along with the link provide position for link labels
-          .data(this.graph.joints)
+      this.edgepaths = this.svgG.selectAll('.edgepath') // make path go along with the link provide position for link labels
+          .data(this.graphD3.joints)
           .enter()
           .append('path')
           .attr('class', 'edgepath')
@@ -850,8 +953,8 @@ export default {
           })
           .style('pointer-events', 'none');
 
-      const edgelabels = this.svg.selectAll('.edgelabel')
-          .data(this.graph.joints)
+      const edgelabels = this.svgG.selectAll('.edgelabel')
+          .data(this.graphD3.joints)
           .enter()
           .append('text')
           .style('pointer-events', 'none')
@@ -869,24 +972,12 @@ export default {
           .style('text-anchor', 'middle')
           .style('pointer-events', 'none')
           .attr('startOffset', '50%')
-          .text(d => d.name)
+          .text(d => d.label)
     },
     doLayout () {
-      console.log('doLayout', this.width)
+      console.log('doLayout. graphD3=', cloneDeep(this.graphD3))
       // Listen for tick events to render the nodes as they update in your Canvas or SVG.
       let thiz = this
-      // this.simulationUnlinked = this.simulationUnlinked || d3.forceSimulation()
-      //     .force('x', d3.forceX(d => this.width / 2))
-      //     .force('y', d3.forceY(d => this.height / 2))
-      //     // .force('center', d3.forceCenter().x(200).y(200))
-      //     .force('charge', d3.forceManyBody().strength(-2500));
-      // this.simulationUnlinked
-      //     .nodes(this.graph.nodes.filter(n => !n.linked))
-      //     .force('collide', d3.forceCollide().strength(0.5).radius(d => { return this.nodeRadius }).iterations(1))
-      //     .on('tick', (d) => {
-      //       thiz.graphNodes.filter(n => !n.linked).attr('transform', d => `translate(${d.x},${d.y})`);
-      //     });
-
       this.simulationLinked = this.simulationLinked || d3.forceSimulation()
           .force('link', d3.forceLink() // This force provides links between nodes
               .id(d => d.id) // This sets the node id accessor to the specified function. If not specified, will default to the index of a node.
@@ -897,7 +988,7 @@ export default {
           // .force('center', d3.forceCenter(this.width / 2, this.height / 2))
           .force('charge', d3.forceManyBody().strength(d => d.linked ? -2500 : -700)) // This adds repulsion (if it's negative) between nodes.
       this.simulationLinked
-          .nodes(this.graph.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
+          .nodes(this.graphD3.nodes)// sets the simulation’s nodes to the specified array of objects, initializing their positions and velocities,
           .on('tick', function () {
             // console.log('tick!!!')
             // This function is run at each iteration of the force algorithm, updating the nodes position (the nodes data array is directly manipulated).
@@ -905,14 +996,16 @@ export default {
                 .attr('y1', d => d.source.y)
                 .attr('x2', d => d.target.x)
                 .attr('y2', d => d.target.y);
-            thiz.graphNodes.attr('transform', d => `translate(${d.x},${d.y})`);
+            thiz.graphNodes.attr('transform', d => {
+              return `translate(${d.x},${d.y})`
+            });
             // thiz.graphNodes.forEach()
             thiz.edgepaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y);
           })
           .on('end', () => {
-            for (let node of this.graph.nodes) {
-              // node.fx = node.x
-              // node.fy = node.y
+            for (let node of this.graphD3.nodes) {
+              node.fx = node.x
+              node.fy = node.y
             }
           })
       // sets the array of links associated with this force, recomputes the distance and strength parameters for each link, and returns this force.
@@ -920,108 +1013,47 @@ export default {
       // source - the link’s source node;
       // target - the link’s target node;
       // index - the zero-based index into links, assigned by this method
-      this.simulationLinked.force('link').links(this.graph.joints)
-      this.$log('thiz.simulationLinked.alpha()=', thiz.simulationLinked.alpha())
+      this.simulationLinked.force('link').links(this.graphD3.joints)
+      // this.$log('thiz.simulationLinked.alpha()=', thiz.simulationLinked.alpha())
       if (this.simulationLinked.alpha() <= 0.2) this.simulationLinked.alpha(1)
       this.simulationLinked.alphaMin(0.2).velocityDecay(0.2).restart()
       // this.simulationLinked.alphaTarget(1).restart();
     },
     updateGraph () {
-      this.initGraph()
-      this.drawEdges()
-      this.drawNodes()
-      this.doLayout()
-      // this.testGraph()
+      this.$log('updateGraph')
+      if (this.showGraph) {
+        this.initGraph()
+        this.drawEdges()
+        this.drawNodes()
+        this.doLayout()
+      }
+      if (this.graphD3.selectedItem) this.zoomTo(this.graphD3.selectedItem)
     },
-    testGraph () {
-      this.width = this.$refs.graphSvg.clientWidth
-      this.height = this.$refs.graphSvg.clientHeight
-      let radius = 6
-      let step = radius * 2
-      let theta = Math.PI * (3 - Math.sqrt(5))
-      let data = Array.from({ length: 2000 }, (_, i) => {
-        const radius = step * Math.sqrt(i += 0.5)
-        const a = theta * i;
-        return {
-          x: this.width / 2 + radius * Math.cos(a),
-          y: this.height / 2 + radius * Math.sin(a)
-        };
-      })
-
-      const svg = d3.select(this.$refs.graphSvg)
-          .attr('viewBox', [0, 0, this.width, this.height])
-          .on('touchstart', function (event) {
-            console.log('touchstart', event)
-            event.stopPropagation()
-          })
-          .on('touchmove', function (event) {
-            // console.log('touchmove', event)
-            event.stopPropagation()
-          });
-
-      const g = svg.append('g')
-          .attr('cursor', 'grab');
-
-      g.selectAll('circle')
-          .data(data)
-          .join('circle')
-          .attr('cx', ({ x }) => x)
-          .attr('cy', ({ y }) => y)
-          .attr('r', radius)
-          .attr('fill', (d, i) => d3.interpolateRainbow(i / 360))
-          .call(d3.drag()
-              .on('start', dragstarted)
-              .on('drag', dragged)
-              .on('end', dragended));
-
-      svg.call(d3.zoom()
-          .extent([[0, 0], [this.width, this.height]])
-          .scaleExtent([1, 8])
-          .on('zoom', zoomed));
-
-      function dragstarted (event) {
-        console.log('dragstarted', event)
-        event.sourceEvent.stopPropagation();
-        d3.select(this).raise();
-        g.attr('cursor', 'grabbing');
-      }
-
-      function dragged (event, d) {
-        console.log('dragged', event)
-        event.sourceEvent.stopPropagation();
-        d3.select(this).attr('cx', d.x = event.x).attr('cy', d.y = event.y);
-      }
-
-      function dragended (event) {
-        console.log('dragended', event)
-        event.sourceEvent.stopPropagation();
-        g.attr('cursor', 'grab');
-      }
-
-      function zoomed ({ transform }) {
-        g.attr('transform', transform);
-      }
-
-      return svg.node();
+    handleTouchMove (e) {
+      // this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
+      if (this.stopScrolling) e.preventDefault()
     },
-    handleTouchMove(e) {
-      this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
-      if (this.stopScrolling)e.preventDefault()
-    },
-    disableScroll(){
-      this.$logW('disableScroll')
+    disableScroll () {
+      // this.$logW('disableScroll')
       this.stopScrolling = true
     },
-    enableScroll(){
-      this.$logW('enableScroll')
+    enableScroll () {
+      // this.$logW('enableScroll')
       this.stopScrolling = false
-    },
+    }
   },
-  mounted () {
+  async mounted () {
+    this.$log('mounted. graphD3=', cloneDeep(this.graphD3), this.oidRoot)
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
-    this.$log('mounted. graph=', JSON.parse(JSON.stringify(this.graph)))
-    this.updateGraph()
+    this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
+    if (!this.graphD3.nodes.length && this.oidRoot) {
+      let rootNode = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oidRoot)
+      let node = this.addNodeToGraph(cloneDeep(rootNode))
+      await this.discover(node)
+    }
+    if (!this.graphD3.selectedItem) this.$set(this.graphD3, 'selectedItem', null)
+    this.debouncedUpdateGraph()
   },
   destroyed () {
     window.removeEventListener('touchmove', this.handleTouchMove)

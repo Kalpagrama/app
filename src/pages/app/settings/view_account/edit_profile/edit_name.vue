@@ -56,7 +56,7 @@ export default {
     if (this.currentUser.name) {
       this.locked = true
       this.name = this.currentUser.name
-      await this.$wait(300)
+      // await this.$wait(300)
       this.locked = false
     }
   }

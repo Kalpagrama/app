@@ -62,9 +62,9 @@ div(
             height: '70px',
           }`
           ).row.full-width.items-end.content-end
-          node-feed(
+          item-feed(
             v-if="jointActive"
-            :node="jointActive"
+            :item="jointActive"
             :showItems="false"
             :showActions="false"
             :showName="false"
@@ -101,9 +101,9 @@ div(
           //- background: r.oid+'-'+ri === rowActiveKey ? 'red' : 'none',
         }`)
         template(v-slot:header)
-          node-feed(
+          item-feed(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
-            :node="jointActive"
+            :item="jointActive"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false"
@@ -111,9 +111,9 @@ div(
             :showHeader="false"
             :showActions="false")
         template(v-slot:item)
-          node-actions(
+          essence-actions(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
-            :node="jointActive"
+            :essence="jointActive"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false")
@@ -126,7 +126,7 @@ import itemFinder from './item_finder/index.vue'
 import jointCreator from './joint_creator/index.vue'
 import jointItem from './joint_item/index.vue'
 import jointsRow from './joints_row/index.vue'
-import nodeActions from 'src/components/node/node_actions.vue'
+import essenceActions from 'src/components/essence/essence_actions.vue'
 
 export default {
   name: 'pageAppGraph2',
@@ -135,7 +135,7 @@ export default {
     jointCreator,
     jointItem,
     jointsRow,
-    nodeActions
+    essenceActions
   },
   data () {
     return {

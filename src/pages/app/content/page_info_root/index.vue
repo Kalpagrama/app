@@ -194,7 +194,7 @@ export default {
         this.relatedContentLoading = contentIndex
         let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal, true)
         this.relatedContentLoading = null
-        await this.$wait(300)
+        // await this.$wait(300)
         if (contentKalpa) {
           this.$router.push('/content/' + contentKalpa.oid)
         }

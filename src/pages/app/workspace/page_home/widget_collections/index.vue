@@ -97,8 +97,8 @@ export default {
   },
   async mounted () {
     this.$log('myComponent mounted')
-    this.collectionsRes = await this.$rxdb.find(this.query, true)
-    this.bookmarksRes = await this.$rxdb.find(this.queryBookmarks, true)
+    this.collectionsRes = await this.$rxdb.find(this.query)
+    this.bookmarksRes = await this.$rxdb.find(this.queryBookmarks)
   }
 }
 </script>

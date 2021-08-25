@@ -100,7 +100,7 @@ div(:style=`{position: 'relative', padding: '11px'}`).row.full-width.items-end.c
 </template>
 
 <script>
-import item from './node_items_item.vue'
+import item from 'src/components/kalpa_item/item_feed/node_feed/node_items_item.vue'
 
 export default {
   name: 'nodeFeed__nodeItems',

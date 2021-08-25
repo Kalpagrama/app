@@ -150,6 +150,7 @@ class ReactiveDocFactory {
                   case 'wsItem':
                      return reactiveDoc // wsSchemaItem
                   case 'object':
+                     reactiveDoc.cached.data.hasChanges = reactiveDoc.cached.data.hasChanges || false
                      return reactiveDoc.cached.data // cacheSchema
                   case 'meta':
                      return reactiveDoc.valueString // schemaKeyValue
@@ -198,6 +199,10 @@ class ReactiveDocFactory {
             if (typeof payload === 'object') {
                payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
                   await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
+               }
+               payload.setChanged = (res = true) => {
+                  payload.hasChanges = res
+                  payload.flushDebounce()
                }
                payload.flushDebounce = () => {
                   wait(0).then(() => { // для того чтобы reactiveDocSubscribe успел сработать до нас
@@ -354,7 +359,7 @@ class ReactiveDocFactory {
 export const GROUP_BATCH_SZ = 11 // сервер работает пачками по 55 (11 джойнтов - это 55 объектов(в джоинте 2 ядра и в каждом - 1 композиция))
 
 class Group {
-   constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}) {
+   constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}, screenSize = 0) {
       assert(id && typeof id === 'string')
       this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы) PS. А может и не костыль... можно оставить на всякий случай тк  vue глючит когда в списке 2 одинаковых ключа
       // события об обновлении могут дублироваться (например, создание объекта сначала упреждающе записывает в rxdb, а потом по подписке)
@@ -362,6 +367,7 @@ class Group {
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
       this.propsReactive = propsReactive
+      this.screenSize = screenSize // максимальная длина ленты (при превышении - обрезается снизу или сверху)
       assert(this.propsReactive, '!this.propsReactive')
       this.vm = new Vue({
          data: {
@@ -369,8 +375,8 @@ class Group {
                id,
                name,
                pages: [], // вся лента разбита на пагинированные блоки(страницы)
-               itemsMaxLen: 36, // максимальная длина ленты (при превышении - обрезается снизу или сверху)
-               items: [], // кусочек от this.pages (для каждого item вызывается populate)
+               items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
+               itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
@@ -589,16 +595,18 @@ class Group {
          })
       } else if (rxDoc) {
          // в список были добавлены элементы(например при подписке)
-         let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async change => {
+         let rxSubscription = rxDoc.$.pipe(skip(1)).subscribe(async (change) => {
             try {
                await this.mutexSubscribe.lock('rxDoc::$')
-               logD(f, 'List::rxDoc changed. try to change this.pageItems')
+               logD(f, 'List::rxDoc changed. try to change this.pageItems', this.reactiveGroup.id)
                assert(change.cached.data.items && Array.isArray(change.cached.data.items), '!change.items && Array.isArray(change.items)')
                await this.upsertPaginationPage(rxDoc, 'replace', false)
                let { startFullFil, endFullFil } = this.fulFilledRange()
                if (endFullFil - startFullFil === 0) { // сдвигаемся с мертвой точки
                   endFullFil = startFullFil = 0
                }
+               if (startFullFil === 1) startFullFil = 0 // workaround если добавился сверху 1 элемент
+               if (endFullFil === this.loadedLen() - 2) endFullFil = this.loadedLen() - 1 // workaround если добавился снизу 1 элемент
                let nextItems = this.loadedItems().slice(startFullFil, endFullFil + 1)
                await this.fulfill(nextItems, 'whole')
                let thiz = this
@@ -740,15 +748,27 @@ class Group {
       }
    }
 
-   // заполнить итоговый массив
+   // заполнить итоговый массив(отдается в UI)
    async fulfill (nextItems, position) {
       assert(position.in('top', 'bottom', 'whole'), 'bad position')
       // let isGroupedList = (items) => items.length && items[0].items
+      let items = this.reactiveGroup.items
       let startPos = position === 'bottom' ? this.reactiveGroup.items.length : 0
       let deleteCount = position === 'whole' ? this.reactiveGroup.items.length : 0
       assert(startPos >= 0 && nextItems && Array.isArray(nextItems), 'bad fulfill params')
+      let blackLists = await Lists.getBlackLists()
+      let filtered = nextItems.filter(item => !Lists.isElementBlacklisted(item, blackLists))
+      let maxInsertCount = filtered.length
+      // максимум this.screenSize элементов (если больше - то отрезаем верх или низ) отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+      if (this.screenSize) maxInsertCount = this.screenSize / 2 + Math.max((this.screenSize / 2) - items.length, 0) // можем вставить половину от screenSize + столько, сколько не хватает в items до половины от screenSize
+      if (this.populateFunc) maxInsertCount = Math.min(maxInsertCount, GROUP_BATCH_SZ) // (populateFunc - тяжелая операция. запрашиваем не более GROUP_BATCH_SZ элементов)
+      if (position === 'top') {
+         filtered.splice(0, Math.max(0, filtered.length - maxInsertCount)) // обрезаем сверху
+      } else if (position === 'bottom' || position === 'whole') {
+         filtered.splice(maxInsertCount, filtered.length) // обрезаем снизу
+      }
       if (this.reactiveGroup.itemType === 'GROUP') {
-         let makeNextGroup = async (nextGroup) => {
+         let makeNextGroup = async (nextGroup, nextSize) => {
             let {
                id: groupId,
                name: groupName,
@@ -768,45 +788,48 @@ class Group {
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
             Vue.set(this.propsReactive, '')
-            let group = new Group(groupId, groupName, this.populateFunc, null, this.propsReactive)
+            let group = new Group(groupId, groupName, this.populateFunc, null, this.propsReactive, this.screenSize)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
             Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
             Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
             Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
             await group.upsertPaginationPage(items, 'whole')
-            await group.next(this.populateFunc ? 3 : null) // сразу грузим по 3 ядра в группе (исли нужны полные сущности)
+            await group.next(nextSize) // сразу грузим элементы в группе
             return group.reactiveGroup
          }
-         nextItems = await Promise.all(nextItems.map(nextGroup => makeNextGroup(nextGroup)))
+         filtered = await Promise.all(filtered.map(nextGroup => makeNextGroup(nextGroup, 3)))
       } else {
          if (this.populateFunc) { // запрашиваем полные сущности
-            nextItems = await this.populateFunc(nextItems, [], this.reactiveGroup.items)
+            filtered = await this.populateFunc(filtered, [], this.reactiveGroup.items)
          }
       }
-      let blackLists = await Lists.getBlackLists()
-      let filtered = nextItems.filter(item => !Lists.isElementBlacklisted(item, blackLists))
-
-      // this.reactiveGroup.items.splice(startPos, deleteCount, ...filtered) -- так не делаем чтобы не менять массив дважды
-      let itemsCopy = this.reactiveGroup.items // .slice(0, this.reactiveGroup.items.length) // делаем копию для того чтобы список обновился только 1 раз
-      itemsCopy.splice(startPos, deleteCount, ...filtered) // добавляем новые
-
-      // максимум this.reactiveGroup.itemsMaxLen элементов (если больше - то отрезаем верх или низ)
-      // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
-      if (position === 'top') {
-         itemsCopy.splice(this.reactiveGroup.itemsMaxLen, itemsCopy.length)
-      } else if (position === 'bottom') {
-         itemsCopy.splice(0, Math.max(0, itemsCopy.length - this.reactiveGroup.itemsMaxLen))
+      for (let item of filtered) {
+         item.debugInfo = () => {
+            // return `#${this.findIndx(item[this.reactiveGroup.itemPrimaryKey])} of ${this.loadedLen()}. totalCount:${this.reactiveGroup.totalCount} ${JSON.stringify(this.fulFilledRange())}`
+            return {
+               indx: this.findIndx(item[this.reactiveGroup.itemPrimaryKey]),
+               loadedLen: this.loadedLen(),
+               totalCount: this.reactiveGroup.totalCount,
+               fulFilledRange: this.fulFilledRange()
+            }
+         }
       }
-      // setTimeout(() => {
-      //    if (position === 'top') {
-      //       itemsCopy.splice(this.reactiveGroup.itemsMaxLen, itemsCopy.length)
-      //    } else if (position === 'bottom') {
-      //       itemsCopy.splice(0, Math.max(0, itemsCopy.length - this.reactiveGroup.itemsMaxLen))
-      //    }
-      // }, 1000)
-      // this.reactiveGroup.items.splice(0, this.reactiveGroup.items.length, ...itemsCopy) // реактивно обновляем 1 раз
-
+      items.splice(startPos, deleteCount, ...filtered) // добавляем новые
+      if (this.screenSize) {
+         // максимум this.screenSize элементов (если больше - то отрезаем верх или низ)
+         // отрезать надо тк при большик кол-вах реактивных элементов запросы в rxDB начинают выполнятся очень долго!
+         if (position === 'top') {
+            items.splice(this.screenSize, items.length) // листнули вверх. обрезаем снизу старое
+         } else if (position === 'bottom') {
+            items.splice(0, Math.max(0, items.length - this.screenSize)) // листнули вниз. обрезаем сверху старое
+         }
+      }
+      this.reactiveGroup.itemsHeaderFooter = [
+         {[this.reactiveGroup.itemPrimaryKey]: 'header'},
+         ...items,
+         {[this.reactiveGroup.itemPrimaryKey]: 'footer'}
+      ]
       this.updateReactiveGroup()
    }
 
@@ -866,14 +889,12 @@ class Group {
    // обрежет список сферху и начнет с этого элемента
    async gotoCurrent () {
       const f = this.gotoCurrent
-      logD(f, 'start')
       let currentId = this.getProperty('currentId')
       if (currentId) {
+         logD(f, 'start. currentId=', currentId, this.fulFilledRange(), this.reactiveGroup.id)
          let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
-            let count
-            if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-            else count = this.loadedLen() // выдаем все элементы разом
+            let count = this.loadedLen() // выдаем все элементы разом
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')
@@ -884,6 +905,7 @@ class Group {
             }
          }
       }
+      logD(f, 'complete', this.fulFilledRange(), this.reactiveGroup.id)
    }
 
    async gotoStart () {
@@ -892,9 +914,7 @@ class Group {
          let rxDocPagination = await this.paginateFunc()
          await this.upsertPaginationPage(rxDocPagination, 'whole')
       }
-      let count
-      if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-      else count = this.loadedLen() // выдаем все элементы разом
+      let count = this.loadedLen() // выдаем все элементы разом
       let nextItems = this.loadedItems().slice(0, count)
       await this.fulfill(nextItems, 'whole')
    }
@@ -914,22 +934,10 @@ class Group {
       return startFullFil > 0 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[0].prevPageToken
    }
 
-   async next (count, itemsMaxLen = 36) {
+   async next (count) {
       const f = this.next
-      logD(f, 'start')
-      this.reactiveGroup.itemsMaxLen = Math.max(Math.min(itemsMaxLen || 0, 100), 10)
-      // if (!this.reactiveGroup.id.includes('WS_BOOKMARK')) {
-      //    logD('asdasdasasds')
-      // }
-      if (this.populateFunc && count > GROUP_BATCH_SZ) {
-         logW(f, `next allow only ${GROUP_BATCH_SZ} with populate`)
-         count = GROUP_BATCH_SZ
-      }
-      if (!count && this.reactiveGroup.items.length === 0) { // autoNext
-         if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-         else count = this.loadedLen() // выдаем все элементы разом
-      }
-      count = count || GROUP_BATCH_SZ
+      logD(f, 'start', this.reactiveGroup.id, this.fulFilledRange())
+      count = count || this.loadedLen()
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
          // запросим данные с сервера
@@ -945,34 +953,18 @@ class Group {
       }
       if (endFullFil >= this.loadedLen()) return false // дошли до конца списка
       let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
-      // let fromId
-      // if (!fromId && !this.reactiveGroup.items.length) { // первая загрузка - будем грузить от currentIdItem (если она указана)
-      //    fromId = this.getProperty('currentId')
-      // }
-      // if (fromId) {
-      //    let indxFrom = this.loadedItems().findIndex(item => item.oid === this.getProperty('currentId') || item.id === this.getProperty('currentId'))
-      //    if (indxFrom >= 0) fulfillFrom = indxFrom
-      // }
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'bottom')
+      logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
    }
 
-   async prev (count, itemsMaxLen = 36) {
+   async prev (count) {
       const f = this.prev
       // return
       // // eslint-disable-next-line no-unreachable
-      this.reactiveGroup.itemsMaxLen = Math.max(Math.min(itemsMaxLen || 0, 100), 10)
-      logD(f, 'start')
-      if (this.populateFunc && count > GROUP_BATCH_SZ) {
-         logW(`next allow only ${GROUP_BATCH_SZ} with populate`)
-         count = GROUP_BATCH_SZ
-      }
-      if (!count && this.reactiveGroup.items.length === 0) { // autoNext
-         if (this.populateFunc) count = GROUP_BATCH_SZ // дорогая операция
-         else count = this.loadedLen() // выдаем все элементы разом
-      }
-      count = count || GROUP_BATCH_SZ
+      logD(f, 'start', this.fulFilledRange(), this.reactiveGroup.id)
+      count = count || this.loadedLen()
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && startFullFil !== -1 && count > startFullFil) {
          // запросим данные с сервера (вверх)
@@ -986,10 +978,10 @@ class Group {
       }
       if (startFullFil === 0) return false // дошли до начала списка
       let fulfillFrom = Math.max(startFullFil - count, 0) // начиная с какого индекса грузить
-      let fulfillTo = startFullFil === -1 ? GROUP_BATCH_SZ : startFullFil // до куда грузить (end + 1)
+      let fulfillTo = startFullFil === -1 ? count : startFullFil // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-
       await this.fulfill(nextItems, 'top')
+      logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
    }
 
    setProperty (name, value) {
@@ -1019,7 +1011,7 @@ class Group {
 }
 
 class ReactiveListWithPaginationFactory {
-   async create (rxQueryOrRxDoc, listId = null, populateFunc = null, paginateFunc = null, propsReactive = {}) {
+   async create (rxQueryOrRxDoc, listId = null, populateFunc = null, paginateFunc = null, propsReactive = {}, screenSize = 0) {
       rxQueryOrRxDoc.reactiveListHolderMaster = rxQueryOrRxDoc.reactiveListHolderMaster || {}
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
       if (!listId) listId = isRxDocument(rxQueryOrRxDoc) ? rxQueryOrRxDoc.id : JSON.stringify(rxQueryOrRxDoc.mangoQuery)
@@ -1029,7 +1021,7 @@ class ReactiveListWithPaginationFactory {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
-         this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive)
+         this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive, screenSize)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'whole')
          rxQueryOrRxDoc.reactiveListHolderMaster[listId] = this
       }

@@ -4,7 +4,7 @@ function assert(cond, strError){
 }
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const vueRoutesRegexp = /.+\/(auth|help|share|ui|about|links|\*|feeds|welcome|settings|user|user-render|node|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
+const vueRoutesRegexp = /.+\/(auth|help|share|ui|about|links|\*|feeds|welcome|settings|user|user-render|node|block|block-render|graph|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
 
 function makeRoutePath(object, full = false){
    let res = '/'
@@ -13,6 +13,7 @@ function makeRoutePath(object, full = false){
       assert(object.oid, '!object.oid')
       if (object.type === 'NODE') res = `/node/${object.oid}`
       else if (object.type === 'JOINT') res = `/joint/${object.oid}`
+      else if (object.type === 'BLOCK') res = `/block/${object.oid}`
       else if (object.type.in('VIDEO', 'IMAGE')) res = `/content/${object.oid}`
       else if (object.type === 'USER') res = `/user/${object.oid}`
       else if (object.type.in('WORD', 'SENTENCE', 'CHAR')) res = `/sphere/${object.oid}`

@@ -21,7 +21,7 @@
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")
       //graph
-      graph-view(:height="graphHeight" :graph="block.graph" :style=`{background: 'rgb(35,35,35)'}`).row.full-width.full-height
+      graph-view(:maxHeight="graphHeight" :graphD3="block.graph" detailPosition="standard" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
       //div().row.full-width.full-height.br
         //q-btn(
         //  label="graph"
@@ -76,19 +76,29 @@
                 :style=`{}`
               ).q-mr-sm
                 span {{$t('Save as draft')}}
+      div(ref="okCancelRef").row.full-width.justify-end
+        q-btn(
+          @click="saveDraft"
+          flat color="grey-5" no-caps) {{$t('Save draft')}}
+        q-btn(
+          @click="publish"
+          flat  no-caps
+          :color="canPublish ? 'green' : 'red'"
+          :disable="!canPublish"
+          :loading="nodePublishing") {{$t('Publish')}}
 </template>
 
 <script>
 
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
-import { ObjectApi } from 'src/api/object'
+import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
   name: 'blockEdit',
   components: {
     editSpheres,
-    editCategory,
+    editCategory
   },
   props: {
     block: { type: Object, required: true },
@@ -108,6 +118,11 @@ export default {
     }
   },
   computed: {
+    canPublish () {
+      if (!this.block.name) return false
+      if (!this.block.graph.nodes.length) return false
+      return true
+    },
     fontSize () {
       let l = this.block.name.length
       if (l < 20) return 22
@@ -117,15 +132,23 @@ export default {
     }
   },
   methods: {
-    publish() {
-      // let result = await ObjectCreateApi.blockCreate({
+    saveDraft () {
+      this.block.temporary = false
+    },
+    async publish () {
+      this.$log('try create block', this.block)
+      let createdBlock = await ObjectCreateApi.blockCreate(this.block)
+      this.$log('block Created!', createdBlock)
+      await this.block.remove(true)
+      this.$router.push('/block/' + createdBlock.oid)
+      // let createdBlock = await ObjectCreateApi.blockCreate({
       //   name: 'test',
       //   description: 'test block5',
       //   category: 'FUN',
       //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
       //   graph: {nodes: [], joints: []}
       // })
-      // let result = await ObjectApi.blockUpdate({
+      // let createdBlock = await ObjectApi.blockUpdate({
       //   oid: '  213988039058397187',
       //   rev: 1,
       //   name: 'test222',
@@ -135,13 +158,13 @@ export default {
       //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
       //   graph: {nodes: [], joints: []}
       // })
-      // this.$log('result', result)
+      // this.$log('createdBlock', createdBlock)
       // return
     }
   },
   mounted () {
     // this.$log('mounted', this.node.name)
-    this.graphHeight = this.height - this.$refs.spheresRef.clientHeight - this.$refs.nameRef.clientHeight
+    this.graphHeight = this.height - this.$refs.spheresRef.clientHeight - this.$refs.nameRef.clientHeight - this.$refs.okCancelRef.clientHeight - 70
   },
   beforeDestroy (to, from, next) {
     if (this.block.name) this.block.temporary = false

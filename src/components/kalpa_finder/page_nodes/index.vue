@@ -6,11 +6,11 @@ kalpa-layout(
     .row.full-width.items-start.content-start.justify-center.q-pt-sm.q-px-sm
       list-feed(
         :query="query"
-        :itemsPerPage="24"
+        nextSize=50
         :itemMiddlePersist="false"
-        :itemsMax="100"
+        screenSize=100
         :itemStyles=`{
-          paddingBottom: '8px',
+          paddingBottom: '2px',
         }`
         :style=`{
           maxWidth: $store.state.ui.pageWidth+'px',
@@ -66,10 +66,6 @@ export default {
     },
     query () {
       let res = {
-        // selector: {
-        //   rxCollectionEnum: RxCollectionEnum.WS_ANY,
-        // },
-        // sort: [{updatedAt: 'desc'}]
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE'] },
@@ -79,18 +75,6 @@ export default {
         },
         populateObjects: true,
       }
-      // add selector filter
-      // if (this.view) {
-      //   res.selector = {...res.selector, ...this.view.selector}
-      // }
-      // else {
-      //   // res.selector = {...res.selector, ...this.types}
-      // }
-      // add name filter
-      // if (this.searchString.length > 0) {
-      //   let nameRegExp = new RegExp(this.searchString, 'i')
-      //   res.selector.name = {$regex: nameRegExp}
-      // }
       return res
     },
   }

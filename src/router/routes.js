@@ -20,8 +20,7 @@ async function saveHistory (oid) {
             rxCollectionEnum: RxCollectionEnum.WS_HISTORY
          },
          sort: [{ createdAt: 'asc' }]
-      }, false)
-      await res.next(100500, 100500)
+      })
       // console.log('history before=', res.items.map(item => item.name))
       // for (let item of res.items){
       //    for (let item2 of res.items){
@@ -37,7 +36,7 @@ async function saveHistory (oid) {
       //       rxCollectionEnum: RxCollectionEnum.WS_HISTORY
       //    },
       //    sort: [{ createdAt: 'asc' }]
-      // }, true)
+      // })
 
       let existing = res.items.find(el => el.oid === oid)
       if (existing) {
@@ -214,6 +213,35 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'block',
+            path: 'block/:oid',
+            // alias: 'node2/:oid',
+            component: () => import('src/pages/app/block/index.vue'),
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) saveHistory(to.params.oid)
+               next()
+            }
+         },
+         {
+            name: 'block-render',
+            path: 'block-render/:oid',
+            // alias: 'node2/:oid',
+            component: () => import('src/pages/app/block_render/index.vue'),
+            meta: { roleMinimal: 'GUEST' },
+         },
+         {
+            name: 'graph',
+            path: 'graph/:oid',
+            props: (route) => ({ oid: route.params.oid }),
+            component: () => import('src/pages/app/graph/index.vue'),
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) saveHistory(to.params.oid)
+               next()
+            }
+         },
+         {
             name: 'cube',
             path: 'cube/:oid',
             component: () => import('src/pages/app/cube/index.vue'),
@@ -238,6 +266,11 @@ const routes = [
                   name: 'user.nodes',
                   path: 'nodes',
                   component: () => import('src/pages/app/user/page_nodes/index.vue')
+               },
+               {
+                  name: 'user.blocks',
+                  path: 'blocks',
+                  component: () => import('src/pages/app/user/page_blocks/index.vue')
                },
                {
                   name: 'user.joints',

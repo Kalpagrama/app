@@ -9,14 +9,14 @@ div(
   }`
   ).row.full-width.justify-center
   //- tint
-  //- div(
-    :style=`{
-      position: 'absolute', zIndex: 300,
-    }`
-    ).row.fit.items-center.content-center.b-30.q-px-xl
-    q-btn(
-      push no-caps color="green"
-      ).full-width Go inside
+  ////- div(
+  //  :style=`{
+  //    position: 'absolute', zIndex: 300,
+  //  }`
+  //  ).row.fit.items-center.content-center.b-30.q-px-xl
+  //  q-btn(
+  //    push no-caps color="green"
+  //    ).full-width Go inside
   //- vote stats
   q-dialog(
     v-model="voteStatsShow"
@@ -108,7 +108,7 @@ import voteOptions from './vote_options.vue'
 import voteStats from './vote_stats.vue'
 
 export default {
-  name: 'nodeActionsRight',
+  name: 'essenceActions',
   props: ['node', 'isActive'],
   components: {
     voteBall,
@@ -167,7 +167,7 @@ export default {
       this.$log('voteAgain')
       if (this.node.author.oid === this.$store.getters.currentUser.oid) return
       this.voteStatsShow = false
-      await this.$wait(200)
+      // await this.$wait(200)
       this.votesShow = true
     },
   }

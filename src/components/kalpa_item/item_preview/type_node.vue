@@ -9,14 +9,14 @@
     }`
     ).row.full-width.items-center.content-center.justify-center
     q-spinner(size="50px" color="green")
-  node-feed(
+  item-feed(
     v-if="node"
-    :node="node"
+    :item="node"
     :showHeader="showHeader"
     :showSpheres="showSpheres"
     :isActive="isActive"
     :isVisible="isActive"
-    :showActions="false")
+    :showActions="showActions")
 </template>
 
 <script>
@@ -24,7 +24,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'typeNode',
-  props: ['item', 'isActive', 'showHeader', 'showSpheres'],
+  props: ['item', 'isActive', 'showHeader', 'showSpheres', 'showActions'],
   data () {
     return {
       node: null,

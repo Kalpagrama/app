@@ -1,5 +1,18 @@
 import gql from 'graphql-tag'
 
+const countStatFragment = gql`
+    fragment countStatFragment on CountStat {
+        countVotes
+        countViews
+        countJoints
+        countNodes
+        countBookmarks
+        countShares
+        countRemakes
+        countSubscribers
+        countSubscriptions
+    }
+`
 const objectShortFragment = gql`
     fragment objectShortFragment on ObjectShort {
         type
@@ -19,8 +32,18 @@ fragment objectShortStatFragment on ObjectShortStat {
 
 }
 `
+const ObjectShortEssenceFragment = gql`  ${objectShortFragment} ${countStatFragment}
+    fragment ObjectShortEssenceFragment on ObjectShortEssence {
+        ...objectShortFragment
+        items {...objectShortFragment}
+        vertices
+        rate
+        weight
+        countStat{...countStatFragment}
+    }
+`
 
-const objectFragment = gql`${objectShortFragment}
+const objectFragment = gql`${objectShortFragment} ${countStatFragment}
   fragment objectFragment on Object {
     type
     oid
@@ -35,17 +58,7 @@ const objectFragment = gql`${objectShortFragment}
     subscriberCnt
     subscribers {...objectShortFragment}
     rev
-    countStat{
-      countVotes
-      countViews
-      countJoints
-      countNodes
-      countBookmarks
-      countShares
-      countRemakes
-      countSubscribers
-      countSubscriptions
-      }
+    countStat{...countStatFragment}
   }
 `
 
@@ -305,11 +318,15 @@ const essenceFragment = gql`
     }
 `
 const blockFragment = gql`
-    ${objectFragment} ${objectShortFragment}
+    ${objectFragment} ${objectShortFragment} ${ObjectShortEssenceFragment}
     fragment blockFragment on Block {
         ...objectFragment
         relatedSphereOids
         sphereFromName{...objectShortFragment}
+        rate
+        weight
+        rateStat {percent, weight, count}
+        rateUser
         author {
             oid
             type
@@ -332,91 +349,10 @@ const blockFragment = gql`
             role
         }
         graph {
-            joints{...objectShortFragment}
-            nodes{...objectShortFragment}
+            joints{...ObjectShortEssenceFragment}
+            nodes{...ObjectShortEssenceFragment}
         }
         rev
-    }
-`
-
-const eventFragment = gql`
-    ${objectShortFragment}
-    fragment eventFragment on Event {
-        id
-        createdAt
-        type
-        ... on EventError{
-            operation
-            code
-            message
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-        }
-        ... on EventProgress{
-            oid
-            action
-            progress
-        }
-        ... on EventNotice{
-            typeNotice
-            message
-        }
-        ... on EventWS{
-            wsRevision
-            wsItem
-        }
-        ... on EventObjectUpdate{
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-            path
-            value
-            matter {reason subscription}
-        }
-        ... on EventGeneral{
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-            matter {reason subscription}
-        }
-        ... on EventObjectCreateDelete{
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-            relatedSphereOids
-            matter {reason subscription}
-        }
-        ... on EventCommentCreate{
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-            comment{
-                id
-                createdAt
-                author {
-                    oid
-                    type
-                    name
-                    thumbUrl(preferWidth: 50)
-                }
-                text
-            }
-            matter {reason subscription}
-        }
-        ... on EventObjectRate{
-            subject{... objectShortFragment}
-            object{... objectShortFragment}
-            rate
-            rateUser
-            rateStat {percent, weight, count}
-            matter {reason subscription}
-        }
-    }
-`
-
-const eventFragmentWithBatch = gql`
-    ${eventFragment}
-    fragment eventFragmentWithBatch on Event {
-        ...eventFragment
-        ... on EventBatch {
-            events {...eventFragment}
-        }
     }
 `
 
@@ -479,6 +415,88 @@ const commentFragment = gql`
             thumbUrl(preferWidth: 50)
         }
         text
+    }
+`
+
+const eventFragment = gql`
+    ${objectShortFragment} ${objectFullFragment}
+    fragment eventFragment on Event {
+        id
+        createdAt
+        type
+        ... on EventError{
+            operation
+            code
+            message
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+        }
+        ... on EventProgress{
+            oid
+            action
+            progress
+        }
+        ... on EventNotice{
+            typeNotice
+            message
+        }
+        ... on EventWS{
+            wsRevision
+            wsItem
+        }
+        ... on EventObjectUpdate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            rev
+            path
+            value
+            objectFull{...objectFullFragment}
+            matter {reason subscription}
+        }
+        ... on EventGeneral{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            matter {reason subscription}
+        }
+        ... on EventObjectCreateDelete{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            relatedSphereOids
+            matter {reason subscription}
+        }
+        ... on EventCommentCreate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            comment{
+                id
+                createdAt
+                author {
+                    oid
+                    type
+                    name
+                    thumbUrl(preferWidth: 50)
+                }
+                text
+            }
+            matter {reason subscription}
+        }
+        ... on EventObjectRate{
+            subject{... objectShortFragment}
+            object{... objectShortFragment}
+            rate
+            rateUser
+            rateStat {percent, weight, count}
+            matter {reason subscription}
+        }
+    }
+`
+const eventFragmentWithBatch = gql`
+    ${eventFragment}
+    fragment eventFragmentWithBatch on Event {
+        ...eventFragment
+        ... on EventBatch {
+            events {...eventFragment}
+        }
     }
 `
 

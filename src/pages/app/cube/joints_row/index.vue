@@ -196,7 +196,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('row TO', to)
-        this.jointsRes = await this.$rxdb.find(this.query, true)
+        this.jointsRes = await this.$rxdb.find(this.query)
         // check empty to create from the start
         if (this.jointsRes.totalCount === 0) {
           this.$emit('empty')
@@ -331,7 +331,7 @@ export default {
       this.jointsResMoving = true
       if (isNext) await this.jointsRes.next()
       else await this.jointsRes.prev()
-      await this.$wait(500)
+      // await this.$wait(500)
       this.$log('jointsResMove DONE')
       this.jointsResMoving = false
     },

@@ -62,7 +62,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.itemsRes = await this.$rxdb.find(this.query, true)
+    this.itemsRes = await this.$rxdb.find(this.query)
     this.itemsRes.setProperty('currentId', this.joint.oid)
     this.itemsRes.gotoCurrent()
   }

@@ -35,7 +35,7 @@ class Logger {
             if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
             else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
          }
-         if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'gui')
+         if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', 'any')
       }
       let logLevel = sessionStorage.getItem('k_log_level')
       let logFormat = JSON.parse(sessionStorage.getItem('k_log_format'))

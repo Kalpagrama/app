@@ -49,7 +49,7 @@ export default {
       try {
         this.$log('save')
         this.saving = true
-        await this.$wait(400)
+        // await this.$wait(400)
         this.$refs.imageCropper.cropper.getCroppedCanvas()
           .toBlob(async (blob) => {
             this.$log('save blob', blob)

@@ -68,7 +68,7 @@ import contentPlayer from 'src/components/content_player'
 
 export default {
   name: 'composerBook',
-  props: ['oid', 'figures', 'height'],
+  props: ['oid', 'figures', 'height', 'action'],
   components: {
     contentPlayer
   },

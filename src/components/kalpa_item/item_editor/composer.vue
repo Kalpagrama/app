@@ -22,6 +22,7 @@
   composer-video(
     v-else-if="['VIDEO'].includes(item.type)"
     :oid="item.oid"
+    :action="action"
     :figures="null"
     :height="$q.screen.height-0"
     :fromComposition="false"
@@ -31,6 +32,7 @@
   composer-book(
     v-else-if="['BOOK'].includes(item.type)"
     :oid="item.oid"
+    :action="action"
     :figures="null"
     :height="$q.screen.height-0"
     @composition="contentComposed('BOOK', $event)"
@@ -39,6 +41,7 @@
   composer-image(
     v-else-if="['IMAGE'].includes(item.type)"
     :oid="item.oid"
+    :action="action"
     :figures="null"
     :height="$q.screen.height-0"
     @composition="contentComposed('BOOK', $event)"
@@ -48,6 +51,7 @@
   composer-video(
     v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
     :oid="item.layers[0].contentOid"
+    :action="action"
     :figures="item.layers[0].figuresAbsolute"
     :height="$q.screen.height-0"
     :fromComposition="true"
@@ -57,6 +61,7 @@
   composer-book(
     v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
     :oid="item.layers[0].contentOid"
+    :action="action"
     :figures="item.layers[0].figuresAbsolute"
     :height="$q.screen.height"
     :fromComposition="true"
@@ -66,6 +71,7 @@
   composer-joint(
     v-else-if="item.type === 'JOINT'"
     :joint="item"
+    :action="action"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
 </template>
@@ -86,7 +92,7 @@ export default {
     composerJoint,
     // composerAudio,
   },
-  props: ['joint', 'item'],
+  props: ['joint', 'item', 'action'],
   data () {
     return {
       content: null,

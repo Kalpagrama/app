@@ -128,7 +128,12 @@ class ObjectCreateApi {
 
    static makeEssenceInput (essence) {
       const f = ObjectCreateApi.makeEssenceInput
+      logD(f, 'start', essence)
       essence = cloneDeep(essence) // makeEssenceInput меняет essence
+      essence.name = essence.name || ''
+      essence.category = essence.category || 'FUN'
+      essence.spheres = essence.spheres || []
+      essence.layout = essence.layout || 'HORIZONTAL'
       {
          // checks
          assert(essence.category, 'essence.category')
@@ -142,7 +147,8 @@ class ObjectCreateApi {
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
       essenceInput.name = essence.name
-      essenceInput.category = essence.category || 'FUN'
+      essenceInput.category = essence.category
+
       essenceInput.spheres = essence.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
@@ -181,11 +187,9 @@ class ObjectCreateApi {
       essenceFull = cloneDeep(essenceFull) // makeEssenceInput меняет essence
       {
          // checks
-         assert(essenceFull.type.in('NODE', 'JOINT'), 'type required')
+         assert(essenceFull.type.in('NODE', 'JOINT', 'BLOCK'), 'type required')
          assert(essenceFull.category, 'essence.category')
          assert(essenceFull.spheres.length >= 0 && essenceFull.spheres.length <= 10, 'essence spheres')
-         assert(essenceFull.items.length > 0 && essenceFull.items.length <= 2, 'essence.items.length > 0')
-         assert(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(essenceFull.layout), 'essence.layout')
       }
       let type = essenceFull.type
       let essenceInput = {}
@@ -199,34 +203,39 @@ class ObjectCreateApi {
       essenceInput.spheres = essenceFull.spheres.map(s => {
          return { name: s.name, oid: s.oid }
       })
-      essenceInput.items = essenceFull.items.map(i => {
-         if (i.layers || i.compositionInput) {
-            return ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
-         }
-         else {
-            return {
-               essenceInput: ObjectCreateApi.makeEssenceInput(i)
+      if (essenceFull.type.in('NODE', 'JOINT')){
+         essenceInput.items = (essenceFull.items || []).map(i => {
+            if (i.layers || i.compositionInput) {
+               return ObjectCreateApi.makeCompositionInput(i.compositionInput || i)
             }
-         }
-         // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
-         // else if (i.oid) itemInput = {oid: i.oid}
-         // else itemInput = ObjectCreateApi.makeEssenceInput(i)
-         // return itemInput
-         // return {
-         //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
-         // }
-      })
+            else {
+               return {
+                  essenceInput: ObjectCreateApi.makeEssenceInput(i)
+               }
+            }
+            // if (i.layers) itemInput = ObjectCreateApi.makeCompositionInput(i)
+            // else if (i.oid) itemInput = {oid: i.oid}
+            // else itemInput = ObjectCreateApi.makeEssenceInput(i)
+            // return itemInput
+            // return {
+            //    compositionInput: ObjectCreateApi.makeCompositionInput(i)
+            // }
+         })
+      }
+      if (essenceFull.type === 'BLOCK'){
+         essenceInput.graph = essenceFull.graph
+      }
       essenceInput.vertices = essenceFull.vertices || []
       return essenceInput
    }
 
    static async essenceCreate (essence) {
       const f = ObjectCreateApi.essenceCreate
-      logW(f, 'start. essence=', essence)
+      logD(f, 'start. essence=', essence)
       const t1 = performance.now()
       const cb = async () => {
          let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
-         logW(f, 'essenceInput=', essenceInput)
+         logD(f, 'essenceInput=', essenceInput)
          let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
@@ -304,11 +313,13 @@ class ObjectCreateApi {
       block.spheres = block.spheres || []
       block.category = block.category || 'FUN'
       block.members = block.members || []
+      // todo coverImage!
+      block.coverImage = block.coverImage || { oid: block.graph.nodes[0].oid, name: block.graph.nodes[0].name }
       {
          // checks
          assert(block.category, 'essence.category')
          assert(block.spheres.length >= 0 && block.spheres.length <= 10, 'essence spheres')
-         assert(block.graph && block.graph.nodes && block.graph.joints, 'block.graph')
+         assert(block.graph && block.graph.nodes && block.graph.joints && block.graph.nodes.length, 'block.graph')
       }
       let blockInput = {}
       // logD(f, nodeInput, essence.spheres, essence.spheres.length)
@@ -328,12 +339,12 @@ class ObjectCreateApi {
       blockInput.members = block.members
       blockInput.graph = {
          nodes: block.graph.nodes.map(n => {
-            if (n.wsItemtype === WsItemTypeEnum.WS_NODE) return ObjectCreateApi.makeEssenceInput(n)
-            else return { name: n.name, oid: n.oid }
+            if (n.oid) return { oid: n.oid }
+            else return {essenceInput: ObjectCreateApi.makeEssenceInput(n)}
          }),
          joints: block.graph.joints.map(j => {
-            if (j.wsItemtype === WsItemTypeEnum.WS_JOINT) return ObjectCreateApi.makeEssenceInput(j)
-            else return { name: j.name, oid: j.oid }
+            if (j.oid) return { oid: j.oid }
+            else return {essenceInput: ObjectCreateApi.makeEssenceInput(j)}
          })
       }
       return blockInput
@@ -345,7 +356,6 @@ class ObjectCreateApi {
       const t1 = performance.now()
       const cb = async () => {
          let blockInput = ObjectCreateApi.makeBlockInput(block)
-         console.log('blockInput', blockInput)
          let { data: { blockCreate: createdBlock } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.blockFragment}

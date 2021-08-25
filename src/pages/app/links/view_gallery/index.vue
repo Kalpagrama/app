@@ -78,7 +78,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import jointCreator from './joint_creator/index.vue'
 import jointCurrent from './joint_current/index.vue'
 import jointsGallery from './joints_gallery/index.vue'
-import nodeItemsItem from 'src/components/node_feed/node_items_item.vue'
+import nodeItemsItem from 'src/components/kalpa_item/item_feed/node_feed/node_items_item.vue'
 
 export default {
   name: 'viewGallery',

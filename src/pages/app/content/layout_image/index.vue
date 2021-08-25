@@ -20,20 +20,21 @@ div(
         }`
         ).row.fit
         //- node editor mobile
-        transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          div(
-            v-if="player && $q.screen.lt.lg"
-            :style=`{
-              position: 'absolute', zIndex: 10000, top: '0px',
-            }`
-            ).row.full-width.q-pa-sm
-            node-editor(
-              :player="player"
-              :contentKalpa="contentKalpa")
+        //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //  div(
+        //    v-if="nodeEditorShow && $q.screen.lt.lg"
+        //    :style=`{
+        //      position: 'absolute', zIndex: 10000, top: '0px',
+        //    }`
+        //    ).row.full-width
+        //    node-editor(
+        //      :player="player"
+        //      :contentKalpa="contentKalpa"
+        //      :node="player.selectedDraft")
         //- pages
         transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           div(
-            v-if="pageId && player && !player.figure"
+            v-if="pageShow"
             :style=`{
               position: 'absolute', top: '0px', left: '0px', zIndex: 900,
               //- background: 'rgba(30,30,30,0.98)',
@@ -48,17 +49,8 @@ div(
                 maxWidth: 600+'px',
                 background: 'rgba(30,30,30,0.98)',
               }`
+              @draft="onDraftSelected"
               @close="pageId = null")
-        //- node creator
-        //- div(
-          v-if="player && !pageId"
-          :style=`{
-            position: 'absolute', zIndex: 10000, bottom: '0px',
-          }`
-          ).row.full-width.q-px-sm
-          node-editor(
-            :player="player"
-            :contentKalpa="contentKalpa")
         //- player
         content-player(
           @player="playerReady"
@@ -74,9 +66,10 @@ div(
           ).full-width
           template(v-slot:tint-bar=`{tintFocused}`)
             node-editor(
-              v-if="player && !pageId && $q.screen.gt.md"
+              v-if="nodeEditorShow"
               :player="player"
-              :contentKalpa="contentKalpa")
+              :contentKalpa="contentKalpa"
+              :node="player.selectedDraft")
           template(v-slot:footer)
             q-btn(
               @click="footerShow = !footerShow"
@@ -99,7 +92,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'src/components/content_player/index.vue'
 
 import pageNodes from './page_nodes/index.vue'
-// import pageDrafts from './page_drafts/index.vue'
+import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
@@ -111,7 +104,7 @@ export default {
   components: {
     contentPlayer,
     pageNodes,
-    // pageDrafts,
+    pageDrafts,
     pageInfo,
     navBottom,
     nodeEditor,
@@ -124,8 +117,19 @@ export default {
     }
   },
   computed: {
+    nodeEditorShow() {
+      return this.player && this.player.selectedDraft && !this.pageId
+    },
+    pageShow() {
+      return this.pageId && !this.nodeEditorShow
+    }
   },
   methods: {
+    onDraftSelected (draft) {
+      this.$log('onDraftSelected', draft)
+      this.player.selectedDraft = draft
+      this.pageId = null
+    },
     async playerReady (player) {
       this.$log('playerReady')
       this.player = player

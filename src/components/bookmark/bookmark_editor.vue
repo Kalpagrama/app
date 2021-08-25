@@ -172,7 +172,7 @@ export default {
     async bookmarkDelete () {
       this.$log('bookmarkDelete start')
       this.bookmarkDeleting = true
-      await this.$wait(1000)
+      // await this.$wait(1000)
       await this.bookmark.remove(true)
       this.bookmarkDeleting = false
       this.$log('bookmarkDelete done')

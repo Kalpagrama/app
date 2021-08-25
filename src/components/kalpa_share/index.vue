@@ -40,16 +40,16 @@ q-btn(
                 q-btn(color="green" flat no-caps @click="shareLinkCopy()")
                   span.text-bold {{$t('Copy')}}
         //- TODO: add links twitter and other socials
-        //- item repost
-        //- .row.full-width.q-pa-md
-          q-btn(
-            @click="itemRepost()"
-            outline no-caps color="green"
-            :style=`{
-              height: '50px',
-            }`
-            ).full-width
-            span {{$t('Make a repost')}}
+        ////- item repost
+        ////- .row.full-width.q-pa-md
+        //  q-btn(
+        //    @click="itemRepost()"
+        //    outline no-caps color="green"
+        //    :style=`{
+        //      height: '50px',
+        //    }`
+        //    ).full-width
+        //    span {{$t('Make a repost')}}
         //- share native
         div(
           v-if="$q.platform.is.mobile"
@@ -71,7 +71,6 @@ import { makeRoutePath } from 'public/scripts/common_func'
 export default {
   name: 'kalpaShare',
   props: {
-    type: {type: String, required: true},
     item: {type: Object, required: true},
     headerText: {
       type: String,
@@ -114,7 +113,7 @@ export default {
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
       this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
-      await this.$wait(500)
+      // await this.$wait(500)
       this.shareDialogOpened = false
     },
     shareEmbed () {
@@ -124,7 +123,7 @@ export default {
     async shareEmbedCopy () {
       this.$log('shareEmbedCopy')
       this.clipboardWrite(this.shareEmbedText, 'Copied to clipboard!')
-      await this.$wait(500)
+      // await this.$wait(500)
       this.shareDialogOpened = false
     },
     clipboardWrite (val, message) {

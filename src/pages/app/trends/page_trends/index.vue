@@ -12,8 +12,8 @@
       }`
       :query="query")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-        node-feed(
-          :node="item.populatedObject"
+        item-feed(
+          :item="item.populatedObject"
           :isActive="isActive"
           :isVisible="isVisible")
 </template>
@@ -37,8 +37,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
-          // objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
           oidSphere: this.sphereOid,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
@@ -54,7 +53,7 @@ export default {
         this.$log('$route CHANGED', to)
         if (to) {
           this.category = null
-          await this.$wait(500)
+          // await this.$wait(500)
           this.category = this.$store.getters.nodeCategories.find(c => c.sphere.oid === to)
         }
         // go to the first category: ALL

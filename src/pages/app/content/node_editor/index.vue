@@ -79,13 +79,13 @@
           background: 'rgb(40,40,40)',
         }`
         ).row.full-width.items-start.content-start
-        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          node-spheres(
-            v-if="node.spheres.length > 0"
-            color="text-white"
-            :node="node"
-            :disabled="true"
-            @sphere="sphereDelete")
+        ////- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //  node-spheres(
+        //    v-if="node.spheres.length > 0"
+        //    color="text-white"
+        //    :node="node"
+        //    :disabled="true"
+        //    @sphere="sphereDelete")
         q-input(
           v-model="node.name"
           borderless dark
@@ -282,7 +282,7 @@ export default {
         this.$log('nodeSaveAction start')
         if (this.node.name.length === 0) throw new Error(this.$t('Empty node name!'))
         this.nodeSaving = true
-        await this.$wait(500)
+        // await this.$wait(500)
         this.player.setState('node', await this.nodeSave())
         // TODO: set nodeMode: edit
         this.$log('nodeSaveAction done')
@@ -298,7 +298,7 @@ export default {
       try {
         this.$log('nodeDeleteAction start')
         this.nodeDeleting = true
-        await this.$wait(500)
+        // await this.$wait(500)
         // TODO: set nodeMode: null
         // await this.$rxdb.remove(this.node.id)
         await this.node.remove(true)
@@ -333,7 +333,7 @@ export default {
           this.categoryError = true
           throw new Error(this.$t('Select node category!'))
         }
-        await this.$wait(1000)
+        // await this.$wait(1000)
         // ---
         // make node input
         let nodeInput = JSON.parse(JSON.stringify(this.node))

@@ -30,7 +30,7 @@ div(
                   :style=`{position: 'absolute',}`).row.fit.items-center.content-center
                   img(
                     draggable="false"
-                    :src="'/images/space.png'"
+                    :src="'/images/rainbow.png'"
                     :style=`{
                       objectFit: 'cover',
                     }`
@@ -74,7 +74,7 @@ div(
           ).row.full-width
           img(
             draggable="false"
-            :src="'/images/space.png'"
+            :src="'/images/rainbow.png'"
             :style=`{
               objectFit: 'cover',
               maxHeight: '50vh'
@@ -82,7 +82,7 @@ div(
             ).fit
           img(
             draggable="false"
-            :src="'/images/space.png'"
+            :src="'/images/rainbow.png'"
             :style=`{
               objectFit: 'cover',
               maxHeight: '50vh',

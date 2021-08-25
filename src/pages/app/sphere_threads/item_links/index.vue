@@ -52,7 +52,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('oid TO', to)
-        this.itemsRes = await this.$rxdb.find(this.query, true)
+        this.itemsRes = await this.$rxdb.find(this.query)
         this.$emit('loaded')
         if (this.itemsRes.totalCount === 0) this.$emit('empty')
       }

@@ -29,7 +29,7 @@ const WsCollectionEnum = Object.freeze({
 
 const LstCollectionEnum = Object.freeze({
    LST_SPHERE_ITEMS: 'LST_SPHERE_ITEMS', // элементы на сфере
-   LST_FEED: 'LST_FEED',
+   LST_FEED: 'LST_FEED', // эвенты
    LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
    LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS', // подписки пользователя
    LST_COMMENTS: 'LST_COMMENTS', // комменты под ядром / сферой

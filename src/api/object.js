@@ -1,16 +1,16 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
-import { rxdb, RxCollectionEnum, makeId } from 'src/system/rxdb'
-import {assert} from 'src/system/utils'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { assert } from 'src/system/utils'
 import { ActionEnum, AuthApi } from 'src/api/auth'
 import { apiCall } from 'src/api/index'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import throttle from 'lodash/throttle'
 import { ObjectCreateApi } from 'src/api/object_create'
-import { ContentApi } from 'src/api/content'
-import store from 'src/store'
+import cloneDeep from 'lodash/cloneDeep'
+import { WsItemTypeEnum } from 'src/system/rxdb/common'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -192,29 +192,44 @@ class ObjectApi {
    static async blockUpdate (block) {
       const f = ObjectApi.blockUpdate
       logD(f, 'start', block)
+      assert(block.hasChanges)
       const t1 = performance.now()
       const cb = async () => {
-         let blockInput = ObjectCreateApi.makeBlockInput(block)
-         console.log('blockInput', blockInput)
-         let { data: { blockUpdate: updatedBlock } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.blockFragment}
-                mutation blockUpdate($block:  BlockInput!) {
-                    blockUpdate (block: $block){
-                        ...blockFragment
-                    }
-                }
-            `,
-            variables: {
-               block: blockInput
+         try {
+            let blockInput = ObjectCreateApi.makeBlockInput(block)
+            logD('blockInput', blockInput)
+            let { data: { blockUpdate: updatedBlock } } = await apollo.clients.api.mutate({
+               mutation: gql`
+                   ${fragments.blockFragment}
+                   mutation blockUpdate($block:  BlockInput!) {
+                       blockUpdate (block: $block){
+                           ...blockFragment
+                       }
+                   }
+               `,
+               variables: {
+                  block: blockInput
+               }
+            })
+            let reactiveBlock = await rxdb.set(RxCollectionEnum.OBJ, updatedBlock, { actualAge: 'day' })
+            reactiveBlock.setChanged(false)
+            logD('updated reactiveBlock', cloneDeep(reactiveBlock))
+            return reactiveBlock
+         } catch (err) {
+            if (err.message.includes('VERSION_CONFLICT')) {
+               logW('отправка изменений не удалась! VERSION_CONFLICT. Пробуем получить версию сервера...')
+               let serverItem = await rxdb.get(RxCollectionEnum.OBJ, block.oid, { force: true })
+               serverItem.setChanged(false)
+               logW('версия сервера получена. Локальная версия Выброшена', cloneDeep(serverItem))
+               return serverItem
+            } else {
+               logE('не удалось оправить изменения на сервер!', err)
+               throw err
             }
-         })
-         let reactiveBlock = await rxdb.set(RxCollectionEnum.OBJ, updatedBlock, { actualAge: 'day' })
-         return reactiveBlock
+         }
       }
       let reactiveBlock = await apiCall(f, cb)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      assert(store, '!store')
       return reactiveBlock
    }
 
@@ -242,7 +257,12 @@ class ObjectApi {
       }
       let deletedObject = await apiCall(f, cb)
       await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
-      await rxdb.set(RxCollectionEnum.WS_NODE, ObjectCreateApi.makeWsEssence(deletedObject)) // сохраним в черновиках
+      let wsItemType
+      if (deletedObject.type === 'NODE') wsItemType = WsItemTypeEnum.WS_NODE
+      if (deletedObject.type === 'JOINT') wsItemType = WsItemTypeEnum.WS_JOINT
+      if (deletedObject.type === 'BLOCK') wsItemType = WsItemTypeEnum.WS_BLOCK
+      assert(wsItemType)
+      await rxdb.set(wsItemType, ObjectCreateApi.makeWsEssence(deletedObject)) // сохраним в черновиках
    }
 
    static async stat (oid) {
@@ -376,7 +396,7 @@ class ObjectApi {
             oid: rxdb.getCurrentUser().oid,
             type: rxdb.getCurrentUser().type,
             name: rxdb.getCurrentUser().name,
-            thumbUrl: rxdb.getCurrentUser().thumbUrl,
+            thumbUrl: rxdb.getCurrentUser().thumbUrl
          },
          text
       }

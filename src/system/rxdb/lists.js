@@ -123,7 +123,7 @@ class Lists {
    async hideObjectOrSource (oid, authorOid) {
       const f = this.hideObjectOrSource
       assert(oid || authorOid, 'bad oid')
-      logD(f, 'start')
+      logD(f, 'start', oid, authorOid)
       let blackLists = await Lists.getBlackLists()
       if (oid && !blackLists.blackListObjectOids.includes(oid)) blackLists.blackListObjectOids.push(oid)
       else if (authorOid && !blackLists.blackListAuthorOids.includes(authorOid)) blackLists.blackListAuthorOids.push(authorOid)
@@ -147,6 +147,7 @@ class Lists {
          //    reactiveItem.totalCount -= countDiff
          // }
       }
+      logD(f, 'complete')
    }
 
    async addRemoveCommentToObj (type, oid, comment) {
@@ -271,16 +272,17 @@ class Lists {
                assert(groupFiguresAbsolute, '!group.figuresAbsolute')
                // вернет все области контента, задествованные на этом ядре
                let findObjectFigures = (objectFull, contentOid) => {
-                  assert(objectFull.type.in('NODE', 'JOINT'), 'bad type essence')
+                  assert(objectFull.type.in('NODE', 'JOINT', 'BLOCK'), 'bad type essence')
                   assert(objectFull.items, '!essence items')
+                  let items = objectFull.items || objectFull.graph.nodes
                   let res = []
-                  for (let item of objectFull.items) {
+                  for (let item of items) {
                      if (item.type === 'COMPOSITION') {
                         assert(item.layers && item.layers.length, '!item.layers')
                         for (let layer of item.layers) {
                            if (layer.contentOid === contentOid) res.push(layer.figuresAbsolute)
                         }
-                     } else if (item.type.in('NODE', 'JOINT')) {
+                     } else if (item.type.in('NODE', 'JOINT', 'BLOCK')) {
                         res.push(...findObjectFigures(item, contentOid)) // рекурсивно идем внутрь
                      } else if (item.oid === contentOid) {
                         res.push([]) // весь контент
@@ -346,7 +348,7 @@ class Lists {
          selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_ITEMS,
             'props.oid': { $in: relatedSphereOids }
-            // 'props.mangoQuery.selector.objectTypeEnum.$in': { $in: [object.type] }
+            // 'props.mangoQuery.selector.objectTyeEnum.$in': { $in: [object.type] }
          }
       })
       rxDocs = rxDocs.filter(rxDoc => {

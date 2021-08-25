@@ -56,7 +56,7 @@ export default {
     if (this.currentUser.profile.status) {
       this.locked = true
       this.status = this.currentUser.profile.status
-      await this.$wait(300)
+      // await this.$wait(300)
       this.locked = false
     }
   }

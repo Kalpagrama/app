@@ -76,7 +76,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.collectionsRes = await this.$rxdb.find(this.queryCollections, true)
+    this.collectionsRes = await this.$rxdb.find(this.queryCollections)
     // this.$set(this.value, 'collectionId', this.collectionsRes.items.length ? this.collectionsRes.items[0].id : 'all')
     this.value.collectionId = this.value.collectionId || (this.collectionsRes.items.length ? this.collectionsRes.items[0].id : 'all')
   }

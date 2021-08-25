@@ -172,7 +172,7 @@ export default {
       try {
         this.$log('jointPublish start')
         this.jointPublishing = true
-        await this.$wait(1000)
+        // await this.$wait(1000)
         let jointInput = JSON.parse(JSON.stringify(this.joint))
         jointInput.items[0] = this.item
         if (jointInput.items.length === 2) {

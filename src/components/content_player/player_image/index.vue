@@ -15,8 +15,8 @@ div(
   }`
   ).row.full-width
   //- preview your crop...
-  //- div(
-    v-if="figure"
+  div(
+    v-if="false && figure"
     :style=`{
       position: 'absolute', zIndex: 1000,
     }`
@@ -35,10 +35,10 @@ div(
     ref="imageCropper"
     :src="url"
     :options=`{
-      viewMode: 2,
+      viewMode: 0,
       dragMode: 'move',
       //- dragMode: mode,
-      initialAspectRatio: 10/10,
+      // initialAspectRatio: 10/10,
       minCropBoxHeight: 100,
       minCropBoxWidth: 100,
       autoCrop: false,
@@ -46,12 +46,12 @@ div(
       responsive: true,
       checkCrossOrigin: true,
       checkOrientation: true,
-      guides: false,
+      guides: true,
       cropBoxMovable: true,
       cropBoxResizable: true,
     }`
-    @cropper="player = $event"
-    @crop="imageCropped"
+    @cropper="cropper = $event"
+    @crop="onCropChanged"
     :style=`{
       //- border: imageValid ? 'none' : '2px solid red',
       borderRadius: '10px', overflow: 'hidden',
@@ -70,22 +70,28 @@ div(
         background: 'rgba(40,40,40,0.9)',
       }`
       ).row.full-width.q-pa-sm
-      q-btn(round flat dense color="white" icon="refresh" @click="player.reset()")
-      .col
-      q-btn(
-        v-if="cropping"
-        @click="imageCrop()"
-        color="green" no-caps) Crop
+      q-btn(round flat dense color="white" icon="refresh" @click="cancelCrop")
       .col
       q-btn(
         v-if="!figure"
-        @click="croppingStart"
+        no-caps round flat
+        icon="crop" color="grey"
+        @click="startCrop")
+      q-btn(
+        v-if="figure"
+        no-caps round flat
+        icon="crop" color="green"
+        @click="cancelCrop")
+      .col
+      q-btn(
+        v-if="!selectedDraft"
+        @click="createNodeDraft()"
         round flat dense
         :color="cropping ? 'white' : 'green'"
         :icon="cropping ? 'clear' : 'add_circle_outline'")
       q-btn(
-        v-if="figure"
-        @click="figure = null"
+        v-if="selectedDraft"
+        @click="selectedDraft = null"
         round flat dense
         color="white"
         icon="clear")
@@ -96,6 +102,7 @@ import playerTint from './player_tint.vue'
 import imageCropper from 'src/components/image_cropper/index.vue'
 import {assert} from 'src/system/utils'
 import { ContentApi } from 'src/api/content'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'contentPlayer_image',
@@ -111,56 +118,59 @@ export default {
       points: [],
       isFullscreen: false,
       imageValid: false,
-      player: null,
+      cropper: null,
       cropping: false,
       mode: 'move',
       urlCropped: null,
       figure: null,
-      figureEditing: null,
       nodePlaying: null,
+      selectedDraft: null
     }
   },
   watch: {
-    cropping: {
+    selectedDraft: {
       handler (to, from) {
-        if (to) {
-          this.mode = 'crop'
-          this.player.crop()
-        }
-        else {
-          this.mode = 'move'
-          this.player.clear()
+        if (to && to.items[0].layers[0].figuresAbsolute.length) {
+          this.startCrop()
+          let [point1, point2, point3, point4] = this.selectedDraft.items[0].layers[0].figuresAbsolute[0].points
+          this.$log('selectedDraft::startCrop', point1, point2, point3, point4)
+          this.$log('getContainerData', this.cropper.getImageData())
+          let {width, height} = this.cropper.getImageData()
+          this.$log('left', point1.x * width)
+          this.$log('top', point1.y * height)
+          this.cropper.setCropBoxData({
+            left: point1.x * width,
+            top: point1.y * height,
+            width: (point2.x - point1.x) * width,
+            height: (point4.y - point1.y) * height,
+          })
         }
       }
     }
+    // cropping: {
+    //   handler (to, from) {
+    //     if (to) {
+    //       this.mode = 'crop'
+    //       this.cropper.crop()
+    //     }
+    //     else {
+    //       this.mode = 'move'
+    //       this.cropper.clear()
+    //     }
+    //   }
+    // }
   },
   computed: {
     url () { return ContentApi.urlSelect(this.contentKalpa) }
   },
   methods: {
-    croppingStart () {
-      this.$log('croppingStart')
-      if (this.$store.getters.isGuest) {
-        let authGuard = {
-          message: 'Чтобы создать ядро, войдите в аккаунт.'
-        }
-        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
-      }
-      else {
-        // this.cropping = !this.cropping
-        // TODO: go to the essence...
-        this.figure = [
-          {
-            t: null,
-            points: [
-              {x: 0, y: 0},
-              {x: 100, y: 0},
-              {x: 100, y: 100},
-              {x: 0, y: 100}
-            ]
-          }
-        ]
-      }
+    startCrop () {
+      this.cropper.crop();
+    },
+    cancelCrop() {
+      this.cropper.reset()
+      this.cropper.clear()
+      this.figure = null
     },
     setState (key, val) {
       this.$log('setState', key, val)
@@ -172,24 +182,22 @@ export default {
     async imageCrop () {
       this.$log('imageCrop')
       // TODO: get data...
-      this.player.getCroppedCanvas().toBlob(async (blob) => {
+      this.cropper.getCroppedCanvas().toBlob(async (blob) => {
         this.urlCropped = URL.createObjectURL(blob)
         this.$log('urlCropped', this.urlCropped)
         this.cropping = false
-        // this.figure = [{t: null, points: []}]
-        this.figure = this.figureEditing
       })
     },
-    imageCropped (e) {
-      // this.$log('imageCropped', e)
+    onCropChanged (e) {
+      this.$log('onCropChanged', e)
       let imageWidth = e.target.width
       let imageHeight = e.target.height
-      let x = e.detail.x / imageHeight
+      let x = e.detail.x / imageWidth
       let y = e.detail.y / imageHeight
       let w = e.detail.width / imageWidth
       let h = e.detail.height / imageHeight
       // this.$log({imageWidth, imageHeight, x, y, w, h})
-      this.figureEditing = [
+      this.figure = [
         {
           t: null,
           points: [
@@ -200,8 +208,30 @@ export default {
           ]
         }
       ]
-      this.$log('figure', JSON.stringify(this.figureEditing))
-    }
+      if (this.selectedDraft) this.selectedDraft.items[0].layers[0].figuresAbsolute = this.figure
+      this.$log('figure', JSON.stringify(this.figure))
+    },
+    async createNodeDraft () {
+      // делаем черновик из текущего выделения
+      this.$log('createNodeDraft')
+      let nodeInput = {
+        name: '',
+        thumbUrl: this.contentKalpa.thumbUrl,
+        layout: 'HORIZONTAL',
+        items: [{
+          layers: [{
+            contentOid: this.contentKalpa.oid,
+            figuresAbsolute: this.figure ? this.figure : []
+          }]
+        }],
+        vertices: [],
+        spheres: [],
+        category: 'FUN',
+        temporary: true,
+      }
+      let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.selectedDraft = nodeSaved
+    },
   },
   mounted () {
     this.$log('mounted')

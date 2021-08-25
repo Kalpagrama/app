@@ -43,45 +43,53 @@ kalpa-layout()
                 }
               }`
               ).row.full-width
-              node-feed(
-                :node="node"
+              item-feed(
+                :item="node"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              //- tabs sticky
-              div(
-                :style=`{
-                  position: 'sticky', top: '0px', zIndex: 1000,
-                }`).row.full-width.q-px-md.b-30
-                q-tabs(
-                  v-model="pageId"
-                  switch-indicator no-caps dense
-                  active-color="green"
-                ).full-width.text-grey-8
-                  q-tab(
-                    v-for="(p,pi) in pages" :key="p.id"
-                    :name="p.id" :label="p.name")
-              //- tab panels
-              q-tab-panels(
-                v-model="pageId"
-                :swipeable="$q.platform.is.mobile"
-                :animated="$q.platform.is.mobile"
-                :style=`{}`).full-width.b-30
-                q-tab-panel(
-                  v-for="(p,pi) in pages" :key="p.id" :name="p.id"
-                  :style=`{
-                    background: 'none',
-                    minHeight: '70vh',
-                  }`
-                ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-                  component(
-                    :is="'page-' + pageId"
-                    :node="node"
-                    :height="700"
-                  )
-                  //page-joints(:node="node")
-                  //page-comments(:node="node")
-                  //- widget-joints(:node="node")
+              ////- tabs sticky
+              //div(
+              //  :style=`{
+              //    position: 'sticky', top: '0px', zIndex: 1000,
+              //  }`).row.full-width.q-px-md.b-30
+              //  q-tabs(
+              //    v-model="pageId"
+              //    switch-indicator no-caps dense
+              //    active-color="green"
+              //  ).full-width.text-grey-8
+              //    q-tab(
+              //      v-for="(p,pi) in pages" :key="p.id"
+              //      :name="p.id" :label="p.name")
+              ////- tab panels
+              //q-tab-panels(
+              //  v-model="pageId"
+              //  :swipeable="$q.platform.is.mobile"
+              //  :animated="$q.platform.is.mobile"
+              //  :style=`{}`).full-width.b-30
+              //  q-tab-panel(
+              //    v-for="(p,pi) in pages" :key="p.id" :name="p.id"
+              //    :style=`{
+              //      background: 'none',
+              //      minHeight: '70vh',
+              //    }`
+              //  ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+              //    component(
+              //      :is="'page-' + pageId"
+              //      :node="node"
+              //      :height="700"
+              //    )
+              //    //page-joints(:node="node")
+              //    //page-comments(:node="node")
+              //    //- widget-joints(:node="node")
+              page-comments(
+                :node="node"
+                :height="700"
+              )
+              page-joints(
+                :node="node"
+                :height="700"
+              )
 </template>
 
 <script>
@@ -91,7 +99,6 @@ import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
 import pageJoints from './page_joints/index.vue'
 import pageComments from './page_comments/index.vue'
-import pageGraph from './page_graph/index.vue'
 
 export default {
   name: 'pageApp_node',
@@ -100,7 +107,6 @@ export default {
     widgetJoints,
     pageJoints,
     pageComments,
-    pageGraph
   },
   data () {
     return {

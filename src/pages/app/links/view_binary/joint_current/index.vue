@@ -13,8 +13,8 @@ div(
       overflow: 'hidden',
     }`
     ).row.full-width.b-30
-    node-feed(
-      :node="joint"
+    item-feed(
+      :item="joint"
       :showHeader="jointOpened"
       :showSpheres="false"
       :showActions="jointOpened"

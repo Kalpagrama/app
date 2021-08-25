@@ -1,4 +1,4 @@
-import {assert} from 'src/system/utils'
+import {assert, wait} from 'src/system/utils'
 import LruCache from 'lru-cache'
 import {
   clear as idbClear,
@@ -9,7 +9,6 @@ import {
   Store
 } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { wait } from 'src/system/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CACHE)
 const logI = getLogFunc(LogLevelEnum.INFO, LogSystemModulesEnum.VUEX_CACHE)

@@ -17,25 +17,28 @@
         @item="itemFound"
         @close="itemFinderShow = false"
       ).b-30
-    item-preview(v-if="joint.itemsShort[0]"
-      :item="joint.itemsShort[0]"
-      :isActive="true"
-      :showHeader="false"
-      :showSpheres="false").row
-    vertex-editor(:joint="joint").row
-    item-preview(
-      v-if="joint.itemsShort[1]"
-      :item="joint.itemsShort[1]"
+    item-preview(v-if="joint.items[0]"
+      :item="joint.items[0]"
       :isActive="true"
       :showHeader="false"
       :showSpheres="false"
-      ).row
+      :showActions="false"
+    ).row
+    vertex-editor(:joint="joint").row
+    item-preview(
+      v-if="joint.items[1]"
+      :item="joint.items[1]"
+      :isActive="true"
+      :showHeader="false"
+      :showSpheres="false"
+      :showActions="false"
+    ).row
     div(v-else).row.full-width.q-px-sm.q-pb-sm
       q-btn(
         @click="itemFinderShow = true"
         flat color="white" no-caps icon="add" size="lg" stack
-        :style=`{minHeight: '200px'}`
-        ).full-width.b-40
+      :style=`{minHeight: '200px'}`
+      ).full-width.b-40
         span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
     q-btn(
       :label="$t('Create joint')"
@@ -47,12 +50,11 @@
 <script>
 import itemPreview from 'src/components/kalpa_item/item_preview'
 import vertexEditor from 'src/components/kalpa_item/item_editor/composer-joint/vertex_editor.vue'
-import { ContentApi } from 'src/api/content'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'graph_jointCreator',
+  name: 'composerJoint',
   components: {
     itemPreview,
     vertexEditor
@@ -67,27 +69,35 @@ export default {
   props: {
     joint: {
       type: Object,
-      required: true,
+      required: true
+    },
+    action: {
+      type: Function,
+      required: false
     }
+
   },
-  watch: {
-  },
+  watch: {},
   methods: {
     itemFound (item) {
-      this.joint.itemsShort[1] = JSON.parse(JSON.stringify(item))
+      this.joint.items[1] = JSON.parse(JSON.stringify(item))
       this.itemFinderShow = false
     },
     async jointPublish () {
+      if (this.action) {
+        this.$log('jointPublish', this.joint)
+        await this.action(this.joint)
+        return
+      }
       try {
         this.$log('jointPublish start')
         this.jointPublishing = true
-        const itemLeftFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.itemsShort[0].oid)
+        const itemLeftFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.items[0].oid)
         let jointInput = JSON.parse(JSON.stringify(this.joint))
         jointInput.category = itemLeftFull.category
         jointInput.spheres = []
         jointInput.layout = 'VERTICAL'
         jointInput.name = jointInput.name || ''
-        jointInput.items = jointInput.itemsShort
         // create...
         this.$log('jointInput', jointInput)
         let jointCreated = await ObjectCreateApi.jointCreate(jointInput)
@@ -97,18 +107,16 @@ export default {
         this.$log('jointPublish done')
         // this.$emit('created', jointCreated)
         this.$emit('close', jointCreated)
-      }
-      catch (e) {
+      } catch (e) {
         this.$log('jointPublish error', e)
         this.jointPublishing = false
-      }
-      finally {
+      } finally {
         this.jointPublishing = false
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.joint)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

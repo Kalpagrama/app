@@ -152,7 +152,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT'] },
+          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
           // objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.contentKalpa.oid,
           sortStrategy: 'AGE',
@@ -237,7 +237,7 @@ export default {
         this.nodePlay()
       })
       // Get player clusters
-      this.clustersRes = await this.$rxdb.find(this.queryClusters, true)
+      this.clustersRes = await this.$rxdb.find(this.queryClusters)
       this.$log('clustersRes', this.clustersRes)
       this.player.setState('clusters', this.clustersRes.items)
     },

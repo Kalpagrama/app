@@ -21,9 +21,9 @@ div(
       mode: 'feed',
     }`
     :styles="styles")
-  node-feed(
+  item-feed(
     v-if="item && item.type === 'NODE'"
-    :node="item"
+    :item="item"
     :isVisible="itemActive"
     :isActive="itemActive"
     :showHeader="itemOpened"
