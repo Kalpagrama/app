@@ -2,8 +2,8 @@
 .node
   cursor: pointer
 
-  &:hover
-// background: rgba(50,50,50,0.5)
+  //&:hover
+    background: rgba(50,50,50,0.5)
 </style>
 
 <template lang="pug">
@@ -22,7 +22,7 @@
         :color="$rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).colorName"
         @click="player.showItem(item), $emit('close')"
       ).row.full-width.q-mb-md.node
-        // цитата + суть
+        // цитата + СУТЬ
         div(:style=`{ borderRadius: '10px'}`).row.full-width.q-px-md.q-ma-xs
           small.text-grey-4 {{ getText(item) }}
         .row.full-width.justify-center.q-px-md
