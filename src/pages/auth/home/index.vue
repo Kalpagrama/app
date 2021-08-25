@@ -22,26 +22,28 @@ div(
               borderRadius: '30px',
               overflow: 'hidden',
             }`
-            ).row.full-width
-            div(:style=`{width: 'calc(50% + 15px)',}`).row
-              div(:style=`{position: 'relative', paddingBottom: '100%',}`).row.full-width
+          ).row.full-width
+            img(
+              draggable="false"
+              :src="'/images/rainbow.jpg'"
+              :style=`{
+                      objectFit: 'cover',
+                    }`
+            ).fit
+            div(
+              :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)'}`
+            ).row.fit
+              div(:style=`{position: 'absolute', width: 'calc(50% + 15px)',}`).full-height
                 router-link(
                   :to="'/trends'"
                   :style=`{position: 'absolute',}`).row.fit.items-center.content-center
-                  img(
-                    draggable="false"
-                    :src="'/images/rainbow.png'"
-                    :style=`{
-                      objectFit: 'cover',
-                    }`
-                    ).fit
                   //- logo
                   div(
                     :style=`{
-                      position: 'absolute', zIndex: 3, top: '0px',
-                      //- maxHeight: '55vh',
-                    }`
-                    ).row.fit.row.fit.items-center.content-center.justify-center
+                        position: 'absolute', zIndex: 3, top: '0px',
+                        //- maxHeight: '55vh',
+                      }`
+                  ).row.fit.row.fit.items-center.content-center.justify-center
                     kalpa-logo(
                       :width="200"
                       :height="200").q-mb-md.rotating-slow
@@ -49,21 +51,41 @@ div(
                       router-link(
                         :to="'/trends'"
                         :style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
+
                   //- tint
-                  div(
-                    :style=`{
-                      position: 'absolute', zIndex: 2, top: '0px',
-                      background: 'rgba(0,0,0,0.5)',
-                      //- maxHeight: '100vh',
-                    }`
-                    ).row.fit.items-center.content-center.justify-center
-            div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, top: '0px', right: '0px',}`)
-              div(:style=`{position: 'relative', paddingBottom: '100%'}`).row.full-width
-                div(:style=`{position: 'absolute',borderRadius: '30px',}`).row.fit.b-80.q-pt-lg.q-px-xl.scroll
-                  auth-flow(:onSuccess="onSuccess")
+
+              div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, right: '0px', borderLeft: '0px solid rgba(90,90,90,0.6)'}`).full-height.q.ma-sm
+                auth-flow(:onSuccess="onSuccess").q-pa-lg.full-height.scroll
       //- mobile layout
       div(
         v-if="$q.screen.width <= 768"
+        @click="() => {}"
+      ).row.full-height
+        img(
+          draggable="false"
+          :src="'/images/rainbow.jpg'"
+          :style=`{
+                transform: 'rotate(180deg)',
+                objectFit: 'fill',
+              }`
+        ).row.fit
+        div(
+          :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)',}`
+        ).row.full-height
+          //- logo
+          kalpa-logo(
+            :width="100"
+            :height="100"
+            :style=`{
+                transform: 'rotate(' + scrollTop / 2 + 'deg)',
+              }`).rotating-slow.q-mb-xs
+          span( :style=`{fontSize: '22px',}`).text-white.text-bold.text-center.full-width {{$t('Kalpagrama')}}
+          // - tong
+          div().q.ma-sm
+            auth-flow(
+              :onSuccess="onSuccess").q-pa-lg.full-height.scroll.br
+      div(
+        v-if="false && $q.screen.width <= 768"
         @click="() => {}"
         :style=`{position: 'relative',}`).row.full-width.items-start.content-start
         div(
@@ -74,7 +96,7 @@ div(
           ).row.full-width
           img(
             draggable="false"
-            :src="'/images/rainbow.png'"
+            :src="'/images/rainbow.jpg'"
             :style=`{
               objectFit: 'cover',
               maxHeight: '50vh'
@@ -82,7 +104,7 @@ div(
             ).fit
           img(
             draggable="false"
-            :src="'/images/rainbow.png'"
+            :src="'/images/rainbow.jpg'"
             :style=`{
               objectFit: 'cover',
               maxHeight: '50vh',
