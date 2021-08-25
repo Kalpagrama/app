@@ -54,6 +54,13 @@ export default {
       }
     },
   },
+  mounted () {
+    // alert('mounted!!!!')
+    window.itemRenderMounted = true // puppeteer на бэкенде ждет и не рендерит страничку пока эта переменная = false
+  },
+  destroyed () {
+    window.itemRenderMounted = false
+  },
   created () {
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
