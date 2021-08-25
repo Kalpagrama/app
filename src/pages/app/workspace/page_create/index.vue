@@ -85,7 +85,7 @@ export default {
           spheres: [],
           category: 'FUN',
           temporary: true,
-          graph: { nodes: [], joints: [] }
+          graph: { nodes: [], joints: [], selectedItem: null }
         }
         this.item = await this.$rxdb.set(RxCollectionEnum.WS_BLOCK, blockInput)
       }

@@ -4,7 +4,7 @@ function assert(cond, strError){
 }
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const vueRoutesRegexp = /.+\/(auth|help|share|ui|about|links|\*|feeds|welcome|settings|user|user-render|node|block|graph|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
+const vueRoutesRegexp = /.+\/(auth|help|share|ui|about|links|\*|feeds|welcome|settings|user|user-render|node|block|block-render|graph|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
 
 function makeRoutePath(object, full = false){
    let res = '/'

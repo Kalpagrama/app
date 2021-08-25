@@ -145,7 +145,7 @@ export default {
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект
     showAddBtn: { type: Boolean, default: true },
-    getJoints: { type: Function, required: true },
+    getJoints: { type: Function, default: null },
     oidRoot: { type: String, required: true },
     detailPosition: { type: String, default: 'bottom' }, // q-menu
     maxHeight: {
@@ -180,12 +180,9 @@ export default {
     showGraph () {
       return !!this.graphD3.nodes.length
     },
-    selectedItem () {
-      return this.graphD3.selectedItem
-    }
   },
   watch: {
-    selectedItem: {
+    'graphD3.selectedItem': {
       async handler (to, from) {
         if (from) {
           this.selectedItemFull = null
@@ -298,8 +295,10 @@ export default {
     },
     async discover (d) {
       if (d.discovered) return
-      let joints = await this.getJoints(d.oid)
-      for (let j of joints) this.addJointToGraph(j, false)
+      if (this.getJoints) {
+        let joints = await this.getJoints(d.oid)
+        for (let j of joints) this.addJointToGraph(j, false)
+      }
       d.discovered = true
     },
     clearGraph () {
@@ -1028,7 +1027,7 @@ export default {
         this.drawNodes()
         this.doLayout()
       }
-      if (this.selectedItem) this.zoomTo(this.selectedItem)
+      if (this.graphD3.selectedItem) this.zoomTo(this.graphD3.selectedItem)
     },
     handleTouchMove (e) {
       // this.$logW('handleTouchMove!!! this.stopScrolling=', this.stopScrolling)
@@ -1045,8 +1044,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted. graphD3=', cloneDeep(this.graphD3), this.oidRoot)
-    // alert('this.width=' + this.width)
-    // alert('this.height=' + this.height)
     // d3 некорректно работает с touchmove и он доходит до внешнего скролла (при таскании элемнета на графе - одновременно проматывается глобальный скролл (из main-layout))
     window.addEventListener('touchmove', this.handleTouchMove, { passive: false })
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
@@ -1055,6 +1052,7 @@ export default {
       let node = this.addNodeToGraph(cloneDeep(rootNode))
       await this.discover(node)
     }
+    if (!this.graphD3.selectedItem) this.$set(this.graphD3, 'selectedItem', null)
     this.debouncedUpdateGraph()
   },
   destroyed () {
