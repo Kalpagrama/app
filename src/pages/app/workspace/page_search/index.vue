@@ -33,7 +33,7 @@ kalpa-layout(
           :bookmark="bookmarkSelected"
           @close="bookmarkEditorShow = false, bookmarkSelected = null")
       //- search bar
-      div(
+      div(v-if="searchStringShow"
         ).row.full-width.justify-center.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
           q-input(
@@ -99,6 +99,8 @@ export default {
   props: {
     height: {type: Number},
     useHeader: {type: Boolean, default: true},
+    searchString: {type: String, default: ''},
+    searchStringShow: {type: String, default: true},
     mode: {type: String},
     pagesFilter: {type: Function},
   },
@@ -111,7 +113,6 @@ export default {
       pageId: 'content',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
-      searchString: '',
     }
   },
   computed: {
@@ -121,6 +122,8 @@ export default {
     pages () {
       let pages = [
         // {id: 'collections', name: this.$t('Collections')},
+        {id: 'all', name: this.$t('All')},
+        {id: 'published', name: this.$t('Published')},
         {id: 'content', name: this.$t('Media')},
         {id: 'nodes', name: this.$t('Nodes')},
         {id: 'joints', name: this.$t('Joints')},
@@ -131,10 +134,15 @@ export default {
     },
     query () {
       let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-        },
+        selector: {},
         sort: [{createdAt: 'desc'}]
+      }
+      if (this.pageId === 'all') {
+        res.selector.rxCollectionEnum = RxCollectionEnum.WS_ANY
+      } else if (this.pageId === 'published') {
+        res.selector.rxCollectionEnum = RxCollectionEnum.WS_PUBLISHED
+      } else {
+        res.selector.rxCollectionEnum = RxCollectionEnum.WS_BOOKMARK
       }
       // Get types
       if (this.pageId === 'content') {
@@ -161,7 +169,7 @@ export default {
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
       if (this.mode === 'select') {
-        this.$emit('bookmark', bookmark)
+        this.$emit('item', bookmark)
       }
       else {
         this.bookmarkSelected = bookmark

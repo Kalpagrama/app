@@ -392,7 +392,7 @@ const routes = [
                {
                   name: 'workspace.bookmarks',
                   path: 'bookmarks',
-                  component: () => import('src/pages/app/workspace/page_bookmarks/index.vue')
+                  component: () => import('src/pages/app/workspace/page_search/index.vue')
                },
                {
                   name: 'workspace.drafts',

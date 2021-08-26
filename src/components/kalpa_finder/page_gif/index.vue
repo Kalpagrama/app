@@ -70,7 +70,7 @@ kalpa-layout(
 <script>
 export default {
   name: 'kalpaFinder_pageGif',
-  props: ['height'],
+  props: ['height', 'searchString'],
   data () {
     return {
       tenorSearch: '',

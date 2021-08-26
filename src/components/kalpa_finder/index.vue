@@ -2,9 +2,7 @@
 .row.full-widith.scroll
   //header + tabs
   div(
-    :style=`{
-      height: '100px',
-    }`
+    :style=`{height: '160px'}`
     ).row.full-width.items-start.content-start.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       //- header
@@ -20,7 +18,7 @@
           .row.full-width.scroll
             .row.full-width.items-center.content-center.no-wrap
               q-btn(
-                v-for="p in pagesFiltered" :key="p.id"
+                v-for="p in pages" :key="p.id"
                 flat no-caps dense
                 :color="p.id === pageId ? 'green' : 'white'"
                 :class=`{
@@ -32,22 +30,37 @@
                 @click="pageId = p.id"
                 ).q-mr-sm.q-px-sm {{ p.name }}
               div(:style=`{width: '100px',minWidth: '100px',}`).row
+
+      //- search bar
+      .row.full-width.justify-center.q-px-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+          q-input(
+            v-model="searchString"
+            borderless dark
+            :placeholder="$t('Search')"
+            :input-style=`{
+                  padding: '16px',
+                  background: 'rgb(40,40,40)',
+                  borderRadius: '10px',
+                }`
+          ).full-width
   component(
     v-bind="$props"
-    :is="`page-${pageId}`"
-    :height="$q.screen.height-100"
-    :searchString="searchStringLocal"
+    :is="pages.find(p=>p.id === pageId).component"
+    :useHeader="false"
+    :height="$q.screen.height-160"
+    :pagesFilter="pagesFilter"
+    :searchStringShow="false"
+    :searchString="searchString"
+    mode="select"
     :page="page"
     @item="$emit('item', $event)")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { UserApi } from 'src/api/user'
-
-import pageWorkspace from './page_workspace/index.vue'
-import pagePublished from './page_published/index.vue'
-import pageSearch from './page_search/index.vue'
+import pageWsSearch from 'src/pages/app/workspace/page_search/index.vue'
+import pageSearch from 'src/pages/app/trends/page_search'
 import pageGif from './page_gif/index.vue'
 
 export default {
@@ -60,7 +73,7 @@ export default {
     pageId_: {type: String},
     pagesFilter: {type: Array},
     pagesShow: {type: Boolean, default: true},
-    pages: {type: Object},
+    // pages: {type: Object},
     searchString: {type: String},
     headerTitle: {
       type: String,
@@ -68,15 +81,13 @@ export default {
     }
   },
   components: {
-    pageWorkspace,
+    pageWsSearch,
     pageSearch,
-    pagePublished,
     pageGif,
   },
   data () {
     return {
-      pageId: null,
-      searchStringLocal: ''
+      pageId: 'workspace',
     }
   },
   computed: {
@@ -88,59 +99,22 @@ export default {
       if (this.pageId) return this.pages[this.pageId]
       else return null
     },
-    pagesFiltered () {
+    pages () {
       return [
-        {id: 'nodes', name: this.$t('Published'), component: 'page-published'},
-        {id: 'workspace', name: this.$t('Workspace'), component: 'page-workspace'},
+        {id: 'workspace', name: this.$t('Workspace'), component: 'page-ws-search'},
+        {id: 'kalpagrama', name: this.$t('Kalpagrama'), component: 'page-search'},
         {id: 'gif', name: this.$t('Gif'), component: 'page-gif'},
         // {id: 'search', name: 'Search', component: 'page-search'},
       ]
     }
   },
-  watch: {
-    searchString: {
-      handler (to, from) {
-        if (to) {
-          this.searchStringLocal = to
-        }
-      }
-    },
-    pageId_: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('pageId_ TO', to)
-        if (to) {
-          this.pageId = to
-        }
-        else {
-          if (this.pagesFiltered) {
-            this.pageId = this.pagesFiltered[0].id
-          }
-        }
-      }
-    }
-  },
   methods: {
-    async contentKalpaFound (contentKalpa) {
-      this.$log('contentKalpaFound', contentKalpa)
-      // this.$router.replace('/content/' + contentKalpa.oid)
-      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: contentKalpa.oid}})
-      if (bookmark) {
-        await bookmark.restoreFromTrash() // на тот случай если он сейчас в корзине
-      } else {
-        let bookmarkInput = {
-          type: contentKalpa.type,
-          oid: contentKalpa.oid,
-          name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl,
-          isSubscribed: true
-        }
-        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
-      }
-      // bookmark subscribe
-      if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
-      this.$emit('contentKalpa', contentKalpa)
-    }
+    // pagesFilter (pages) {
+    //   return pages.filter(p => {
+    //     // return p.id !== 'joints'
+    //     return !['joints', 'spheres'].includes(p.id)
+    //   })
+    // }
   },
 }
 </script>
