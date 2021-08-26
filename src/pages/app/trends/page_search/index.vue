@@ -13,8 +13,8 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`)
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-      router-link(
-        :to="itemLink(item)"
+      div(
+        @click="onSelected(getItem(item))"
         :style=`{
           background: 'rgb(35,35,35)',
           borderRadius: '10px',
@@ -23,7 +23,7 @@
         img(
           v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
           draggable="false"
-          :src="item.thumbUrl"
+          :src="getItem(item).thumbUrl"
           :style=`{
             height: '50px',
             minWidth: '89px',
@@ -38,47 +38,18 @@
         .col.full-height
           .row.fit.items-between.content-between.q-pa-sm
             .row.full-width
-              span.text-white {{ item.name }}
+              span.text-white {{ getItem(item).name }}
             .row.full-width
-              small.text-grey-8 {{ item.type }}
-      //- .row.full-width
-        .row.full-width {{ item.oid }}
-        small.text-white {{ item.type }}
-        //- router-link(
-          :to="itemLink(item)"
-          :style=`{
-            background: 'rgb(35,35,35)',
-            borderRadius: '10px',
-          }`
-          ).row.full-width
-          img(
-            v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
-            draggable="false"
-            :src="item.thumbUrl"
-            :style=`{
-              height: '50px',
-              minWidth: '89px',
-              borderRadius: '10px',
-              objectFit: 'contain',
-            }`).b-50.q-mr-sm
-          div(
-            v-else
-            :style=`{width: '50px', height: '50px',}`
-            ).row.items-center.content-center.justify-center
-            q-icon(name="blur_on" size="30px" color="white")
-          .col
-            div(:style=`{minHeight: '50px',}`).row.full-width.items-center.content-center
-              span.text-white {{ item.name }}
-              .row.full-width
-                small.text-grey-8 {{ itemMetaMap[item.type].name }}
+              small.text-grey-8 {{ getItem(item).type }}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/utils'
 
 export default {
   name: 'trends_pageSearch',
-  props: ['searchString'],
+  props: ['searchString', 'mode'],
   components: {
     kalpaFinder: () => import('src/components/kalpa_finder/index.vue'),
   },
@@ -89,19 +60,27 @@ export default {
   },
   computed: {
     query () {
-      let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
-          objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER']},
-          querySearch: this.searchString,
-        },
-        populateObjects: false,
-        limit: 100
+      if (!this.searchString) {
+        return {
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+            objectTypeEnum: { $in: ['NODE'] },
+            oidSphere: this.$store.getters.nodeCategories[0].sphere.oid,
+            sortStrategy: 'HOT' // 'ACTIVITY', // AGE
+          },
+          populateObjects: true,
+        }
+      } else {
+         return {
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
+            objectTypeEnum: {$in: ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER']},
+            querySearch: this.searchString,
+          },
+          populateObjects: false,
+          limit: 100
+        }
       }
-      // if (this.tab) {
-      //   res.selector.objectTypeEnum = {$in: this.tab.types}
-      // }
-      return res
     },
     itemMetaMap () {
       return {
@@ -149,6 +128,17 @@ export default {
     }
   },
   methods: {
+    getItem(item) {
+      assert(item)
+      return item.populatedObject || item
+    },
+    onSelected(item) {
+      if (this.mode === 'select') {
+        this.$emit('item', item)
+      } else {
+        this.$router.push(this.itemLink(item))
+      }
+    },
     itemLink (item) {
       // this.$log('itemLink', item)
       if (item.wsItemType) {

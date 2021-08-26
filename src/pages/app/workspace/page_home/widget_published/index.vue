@@ -8,11 +8,11 @@
     ).row.full-width
     //- header
     router-link(
-      to="/workspace/drafts"
+      to="/workspace/published"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="filter_tilt_shift" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold {{$t('My drafts')}}
+        span.text-white.text-bold {{$t('My published')}}
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
@@ -61,7 +61,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'widgetDrafts',
+  name: 'widgetPublished',
   data () {
     return {
       bookmarksRes: null,
@@ -73,7 +73,7 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_ANY,
+          rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED,
           wsItemType: {$in: [RxCollectionEnum.WS_NODE, RxCollectionEnum.WS_BLOCK, RxCollectionEnum.WS_JOINT]},
         },
         limit: 10,

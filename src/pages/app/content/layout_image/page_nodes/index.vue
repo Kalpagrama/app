@@ -1,8 +1,8 @@
 <style lang="sass" scoped>
 .node
   cursor: pointer
-  &:hover
-    // background: rgba(50,50,50,0.5)
+  //&:hover
+    background: rgba(50,50,50,0.5)
 </style>
 
 <template lang="pug">

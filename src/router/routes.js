@@ -193,7 +193,7 @@ const routes = [
          {
             name: 'node-render',
             path: 'node-render/:oid',
-            component: () => import('src/pages/app/node_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -209,7 +209,7 @@ const routes = [
          {
             name: 'joint-render',
             path: 'joint-render/:oid',
-            component: () => import('src/pages/app/joint_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -227,7 +227,7 @@ const routes = [
             name: 'block-render',
             path: 'block-render/:oid',
             // alias: 'node2/:oid',
-            component: () => import('src/pages/app/block_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' },
          },
          {
@@ -301,7 +301,7 @@ const routes = [
          {
             name: 'user-render',
             path: 'user-render/:oid/:page?',
-            component: () => import('src/pages/app/user_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -323,7 +323,7 @@ const routes = [
          {
             name: 'sphere-render',
             path: 'sphere-render/:oid/:page?',
-            component: () => import('src/pages/app/sphere_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
@@ -358,7 +358,7 @@ const routes = [
             name: 'content-render',
             path: 'content-render/:oid',
             props: (route) => ({ oid: route.params.oid }),
-            component: () => import('src/pages/app/content_render/index.vue'),
+            component: () => import('src/pages/app/snippet_render/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          // notifications
@@ -392,12 +392,17 @@ const routes = [
                {
                   name: 'workspace.bookmarks',
                   path: 'bookmarks',
-                  component: () => import('src/pages/app/workspace/page_bookmarks/index.vue')
+                  component: () => import('src/pages/app/workspace/page_search/index.vue')
                },
                {
                   name: 'workspace.drafts',
                   path: 'drafts',
                   component: () => import('src/pages/app/workspace/page_drafts/index.vue')
+               },
+               {
+                  name: 'workspace.published',
+                  path: 'published',
+                  component: () => import('src/pages/app/workspace/page_published/index.vue')
                },
                {
                   name: 'workspace.history',

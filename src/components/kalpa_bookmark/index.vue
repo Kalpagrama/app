@@ -102,7 +102,6 @@ export default {
           }
           else {
             this.$log('bookmark CREATE')
-            // TODO: where to handle bookmarkInput create?
             let bookmarkInput = {
               type: this.type,
               oid: this.oid,

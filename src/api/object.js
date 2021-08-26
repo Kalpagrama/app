@@ -233,6 +233,23 @@ class ObjectApi {
       return reactiveBlock
    }
 
+   static async setPublished (item) {
+      assert(item.oid && item.type && item.thumbUrl)
+      let bookmarkInput = {
+         oid: item.oid,
+         type: item.type,
+         name: item.name,
+         thumbUrl: item.thumbUrl
+      }
+      let bookmark = await rxdb.set(RxCollectionEnum.WS_PUBLISHED, bookmarkInput)
+   }
+
+   static async unsetPublished (oid) {
+      assert(oid)
+      let {items: [bookmark]} = await rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED, oid: oid}})
+      if (bookmark) bookmark.remove(true)
+   }
+
    static async unPublish (oid) {
       const f = ObjectApi.unPublish
       logD(f, 'start')
@@ -263,6 +280,7 @@ class ObjectApi {
       if (deletedObject.type === 'BLOCK') wsItemType = WsItemTypeEnum.WS_BLOCK
       assert(wsItemType)
       await rxdb.set(wsItemType, ObjectCreateApi.makeWsEssence(deletedObject)) // сохраним в черновиках
+      await ObjectApi.unsetPublished(oid)
    }
 
    static async stat (oid) {

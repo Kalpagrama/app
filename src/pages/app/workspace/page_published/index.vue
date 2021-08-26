@@ -17,7 +17,7 @@ kalpa-layout(
           q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
           .col.full-height
             .row.fit.items-center.content-center.justify-center
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Bookmarks')}}
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Published')}}
           q-btn(round flat color="white" icon="more_vert")
   template(v-slot:body)
     div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
@@ -108,7 +108,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'content',
+      pageId: 'nodes',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       searchString: '',
@@ -121,10 +121,10 @@ export default {
     pages () {
       let pages = [
         // {id: 'collections', name: this.$t('Collections')},
-        {id: 'content', name: this.$t('Media')},
+        {id: 'all', name: this.$t('All')},
         {id: 'nodes', name: this.$t('Nodes')},
         {id: 'joints', name: this.$t('Joints')},
-        {id: 'spheres', name: this.$t('Spheres')}
+        {id: 'blocks', name: this.$t('Blocks')}
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages
@@ -132,22 +132,19 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED,
         },
         sort: [{createdAt: 'desc'}]
       }
       // Get types
-      if (this.pageId === 'content') {
-        res.selector.type = {$in: ['IMAGE', 'VIDEO', 'BOOK']}
-      }
-      else if (this.pageId === 'nodes') {
+      if (this.pageId === 'nodes') {
         res.selector.type = {$in: ['NODE']}
       }
       else if (this.pageId === 'joints') {
         res.selector.type = {$in: ['JOINT']}
       }
-      else if (this.pageId === 'spheres') {
-        res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
+      else if (this.pageId === 'blocks') {
+        res.selector.type = {$in: ['BLOCK']}
       }
       // Search by name
       if (this.searchString.length > 0) {
