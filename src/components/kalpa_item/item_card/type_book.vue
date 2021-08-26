@@ -28,15 +28,13 @@
             q-icon(name="fas fa-link" color="white" size="20px").q-mx-xs
               q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Joints')}}
         .row
-          .col.full-width.q-mx-xs
-            q-btn(
-              style="background: #4caf4f; color: white"
-              no-caps
-              label="Читать"
-              :to="'/content/131407322114344990'"
-            ).row.full-width.full-height
-          .q-mx-xs
-            kalpa-save(:item="item" :isActive="true" inactiveColor="grey-9")
+          q-btn(
+            no-caps
+            color="green"
+            label="Читать"
+            @click="$router.push('/content/' + item.oid)"
+            ).col.full-width.q-mx-xs
+          kalpa-save(:item="item" :isActive="true" inactiveColor="grey-9").q-mx-xs
     .row.full-width.q-pt-md
       //- tabs sticky
       div(
@@ -75,6 +73,7 @@ import pageComments from 'src/pages/app/node/page_comments/index.vue'
 import itemDescription from 'src/components/kalpa_item/item_card/item_description.vue'
 import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
 import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
+import {ContentApi} from 'src/api/content';
 
 export default {
   name: 'typeBook',
@@ -97,6 +96,7 @@ export default {
     }
   },
   computed: {
+    url () { return ContentApi.urlSelect(this.item) },
     author() {
       return this.item.providerInfo.authors.map(a => a.value).join(', ')
     }

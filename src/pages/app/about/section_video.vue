@@ -26,7 +26,7 @@
       :contentKalpa=`{
         oid: contentOid,
         name: 'Кальпаграма',
-        url: 'https://www.youtube.com/embed/DuqUaOtQ76o',
+        url: 'https://www.youtube.com/embed/6n6mYnKo1fw',
         type: 'VIDEO',
         // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',

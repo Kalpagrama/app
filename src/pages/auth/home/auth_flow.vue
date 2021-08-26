@@ -2,8 +2,8 @@
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill
-  -webkit-box-shadow: 0 0 0 1000px rgb(50,50,50) inset !important
-  -webkit-text-fill-color: white !important
+  -webkit-box-shadow: 0 0 0 1000px white inset !important
+  -webkit-text-fill-color: black !important
 </style>
 
 <template lang="pug">
@@ -13,10 +13,13 @@ div(
   }`
   ).row.full-width.items-start.content-start.q-mb-xl
   //- header
-  .row.full-width.q-pb-lg.q-pt-sm
-    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome, login with email')}}
+  .row.full-width.q-pb-md.q-pt-sm
+    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome')}}
   //- email
-  q-input(
+  .row.full-width
+    .row.full-width.justify-start.q-py-xs.q-px-sm
+      span(:style=`{opacity:email? 1:0}`).text-white {{$t('Enter your email')}}
+    q-input(
     v-model="email"
     borderless dark
     type="email" inputmode="email"
@@ -72,7 +75,7 @@ div(
         //- background: 'rgb(70,70,70)',
         //- borderRadius: '10px',
         //- border: '2px solid rgb(50,50,50)',
-        background: 'rgba(60,60,60, 0.5)',
+        background: 'rgba(0,0,0, 0.2)',
         borderRadius: '10px',
         // border: '2px solid rgba(90,90,90,0.6)',
       }`
