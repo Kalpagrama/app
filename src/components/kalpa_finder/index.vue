@@ -46,7 +46,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 import pageWorkspace from './page_workspace/index.vue'
-import pageNodes from './page_nodes/index.vue'
+import pagePublished from './page_published/index.vue'
 import pageSearch from './page_search/index.vue'
 import pageGif from './page_gif/index.vue'
 
@@ -70,7 +70,7 @@ export default {
   components: {
     pageWorkspace,
     pageSearch,
-    pageNodes,
+    pagePublished,
     pageGif,
   },
   data () {
@@ -90,7 +90,7 @@ export default {
     },
     pagesFiltered () {
       return [
-        {id: 'nodes', name: this.$t('My Nodes'), component: 'page-nodes'},
+        {id: 'nodes', name: this.$t('Published'), component: 'page-published'},
         {id: 'workspace', name: this.$t('Workspace'), component: 'page-workspace'},
         {id: 'gif', name: this.$t('Gif'), component: 'page-gif'},
         // {id: 'search', name: 'Search', component: 'page-search'},

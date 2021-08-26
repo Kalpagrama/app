@@ -42,6 +42,7 @@ kalpa-layout
             widget-collections().q-mb-sm
             //widget-bookmarks().q-mb-sm
             widget-drafts().q-mb-sm
+            widget-published().q-mb-sm
             //widget-watch-later.q-mb-sm
             widget-history.q-mb-sm
 </template>
@@ -50,6 +51,7 @@ kalpa-layout
 import widgetCollections from './widget_collections/index.vue'
 import widgetBookmarks from './widget_bookmarks/index.vue'
 import widgetDrafts from './widget_drafts/index.vue'
+import widgetPublished from './widget_published/index.vue'
 import widgetContents from './widget_contents/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
@@ -62,6 +64,7 @@ export default {
     widgetCollections,
     widgetBookmarks,
     widgetDrafts,
+    widgetPublished,
     widgetContents,
     widgetWatchLater,
     widgetHistory,

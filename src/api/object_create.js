@@ -8,40 +8,13 @@ import cloneDeep from 'lodash/cloneDeep'
 import store from 'src/store/index'
 import { apiCall } from 'src/api/index'
 import { WsItemTypeEnum } from 'src/system/rxdb/common'
+import { ObjectApi } from 'src/api/object'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
 
 class ObjectCreateApi {
-   // static async nodeCategories () {
-   //    const f = ObjectCreateApi.nodeCategories
-   //    logD(f, 'start')
-   //    const t1 = performance.now()
-   //    const cb = async () => {
-   //       let { data: { nodeCategories } } = await apollo.clients.auth.query({
-   //          query: gql`
-   //              query nodeCategories{
-   //                  nodeCategories{
-   //                      alias
-   //                      icon
-   //                      name
-   //                      sphere{
-   //                          oid
-   //                          type
-   //                          name
-   //                      }
-   //                      type
-   //                  }
-   //              }
-   //          `
-   //       })
-   //       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   //       return nodeCategories
-   //    }
-   //    return await apiCall(f, cb)
-   // }
-
    static async emojiSpheres () {
       const f = ObjectCreateApi.emojiSpheres
       logD(f, 'start')
@@ -229,84 +202,6 @@ class ObjectCreateApi {
       return essenceInput
    }
 
-   static async essenceCreate (essence) {
-      const f = ObjectCreateApi.essenceCreate
-      logD(f, 'start. essence=', essence)
-      const t1 = performance.now()
-      const cb = async () => {
-         let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
-         logD(f, 'essenceInput=', essenceInput)
-         let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation essenceCreate($essence:  EssenceInput!) {
-                    essenceCreate (essence: $essence){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               essence: essenceInput
-            }
-         })
-         let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'day' })
-         return reactiveEssence
-      }
-      let reactiveEssence = await apiCall(f, cb)
-      assert(reactiveEssence.relatedSphereOids)
-      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence) // вне cb (иначе - дедлок)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      assert(store, '!store')
-      return reactiveEssence
-   }
-
-   static async jointCreate (joint) {
-      const f = ObjectCreateApi.jointCreate
-      logD(f, 'start. joint=', joint)
-      const t1 = performance.now()
-      const cb = async () => {
-         let jointInput = ObjectCreateApi.makeEssenceInput(joint)
-         logD(f, 'jointInput=', jointInput)
-         let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation jointCreate($joint:  EssenceInput!) {
-                    jointCreate (joint: $joint){
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               joint: jointInput
-            }
-         })
-         let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'day' })
-         return reactiveJoint
-      }
-      let reactiveEssence = await apiCall(f, cb)
-      assert(reactiveEssence.relatedSphereOids)
-      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence) // вне cb (иначе - дедлок)
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      assert(store, '!store')
-      return reactiveEssence
-   }
-
-   // static makeJointInput (joint) {
-   //    let chainInput = {}
-   //    assert(joint.leftItem.oid || joint.leftItem.nodeInput, '!joint.leftItem.oid')
-   //    assert(joint.rightItem.oid || joint.rightItem.nodeInput, '!joint.rightItem.oid')
-   //    assert(joint.jointType, '!joint.jointType')
-   //    if (joint.leftItem.nodeInput) joint.leftItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.leftItem.nodeInput)
-   //    if (joint.rightItem.nodeInput) joint.rightItem.nodeInput = ObjectCreateApi.makeEssenceInput(joint.rightItem.nodeInput)
-   //    return {
-   //       swap: joint.swap || false,
-   //       jointType: joint.jointType,
-   //       leftItem: joint.leftItem,
-   //       rightItem: joint.rightItem,
-   //       name: joint.name
-   //    }
-   // }
-
    static makeBlockInput (block) {
       const f = ObjectCreateApi.makeBlockInput
       block = cloneDeep(block)
@@ -350,6 +245,68 @@ class ObjectCreateApi {
       return blockInput
    }
 
+   static async essenceCreate (essence) {
+      const f = ObjectCreateApi.essenceCreate
+      logD(f, 'start. essence=', essence)
+      const t1 = performance.now()
+      const cb = async () => {
+         let essenceInput = ObjectCreateApi.makeEssenceInput(essence)
+         logD(f, 'essenceInput=', essenceInput)
+         let { data: { essenceCreate: createdEssence } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation essenceCreate($essence:  EssenceInput!) {
+                    essenceCreate (essence: $essence){
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               essence: essenceInput
+            }
+         })
+         let reactiveEssence = await rxdb.set(RxCollectionEnum.OBJ, createdEssence, { actualAge: 'day' })
+         return reactiveEssence
+      }
+      let reactiveEssence = await apiCall(f, cb)
+      assert(reactiveEssence.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveEssence.relatedSphereOids, reactiveEssence) // вне cb (иначе - дедлок)
+      await ObjectApi.setPublished(reactiveEssence)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return reactiveEssence
+   }
+
+   static async jointCreate (joint) {
+      const f = ObjectCreateApi.jointCreate
+      logD(f, 'start. joint=', joint)
+      const t1 = performance.now()
+      const cb = async () => {
+         let jointInput = ObjectCreateApi.makeEssenceInput(joint)
+         logD(f, 'jointInput=', jointInput)
+         let { data: { jointCreate: createdJoint } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation jointCreate($joint:  EssenceInput!) {
+                    jointCreate (joint: $joint){
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               joint: jointInput
+            }
+         })
+         let reactiveJoint = await rxdb.set(RxCollectionEnum.OBJ, createdJoint, { actualAge: 'day' })
+         return reactiveJoint
+      }
+      let reactiveJoint = await apiCall(f, cb)
+      assert(reactiveJoint.relatedSphereOids)
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveJoint.relatedSphereOids, reactiveJoint) // вне cb (иначе - дедлок)
+      await ObjectApi.setPublished(reactiveJoint)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      return reactiveJoint
+   }
+
    static async blockCreate (block) {
       const f = ObjectCreateApi.blockCreate
       logD(f, 'start', block)
@@ -375,53 +332,10 @@ class ObjectCreateApi {
       let reactiveBlock = await apiCall(f, cb)
       assert(reactiveBlock.relatedSphereOids)
       await rxdb.lists.addRemoveObjectToLists('OBJECT_CREATED', reactiveBlock.relatedSphereOids, reactiveBlock) // вне cb (иначе - дедлок)
+      await ObjectApi.setPublished(reactiveBlock)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      assert(store, '!store')
       return reactiveBlock
    }
-// let result = await ObjectCreateApi.blockCreate({
-   //   name: 'test',
-   //   description: 'test block5',
-   //   spheres: [],
-   //   category: 'FUN',
-   //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
-   //   paths: [{
-   //     id: '123',
-   //     name: 'asd',
-   //     contents: {
-   //       contentOid: '168815073555431447',
-   //       themes: {
-   //         id: '123123',
-   //         name: 'adasd',
-   //         figures: [],
-   //         tasks: []
-   //       }
-   //     }
-   //   }]
-   // })
-   // let result2 = await ObjectApi.blockUpdate({
-   //   oid: '175964791553271816',
-   //   rev: 3,
-   //   name: 'test222',
-   //   description: 'test block4',
-   //   spheres: [],
-   //   category: 'FUN',
-   //   coverImage: {oid: '165507718097059859', name: 'asdasd'},
-   //   paths: [{
-   //     id: '123',
-   //     name: 'asd',
-   //     contents: {
-   //       contentOid: '168815073555431447',
-   //       themes: {
-   //         id: '123123',
-   //         name: 'adasd',
-   //         figures: [],
-   //         tasks: []
-   //       }
-   //     }
-   //   }]
-   // })
-   // this.$log('result', result)
 }
 
 export { ObjectCreateApi }

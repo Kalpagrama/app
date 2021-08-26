@@ -400,6 +400,11 @@ const routes = [
                   component: () => import('src/pages/app/workspace/page_drafts/index.vue')
                },
                {
+                  name: 'workspace.published',
+                  path: 'published',
+                  component: () => import('src/pages/app/workspace/page_published/index.vue')
+               },
+               {
                   name: 'workspace.history',
                   path: 'history',
                   component: () => import('src/pages/app/workspace/page_history/index.vue')
