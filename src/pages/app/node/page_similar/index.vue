@@ -35,7 +35,7 @@ export default {
           objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
           oidSphere: this.node.oid,
           deep: 5,
-          sortStrategy: 'AGE' // 'ACTIVITY', // AGE
+          sortStrategy: 'HOT' // 'ACTIVITY', // AGE
         },
         populateObjects: true,
       }
