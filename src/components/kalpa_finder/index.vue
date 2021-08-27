@@ -39,9 +39,10 @@
   component(
     :is="'page-' + pageId"
     :useHeader="false"
+    mode="select"
     :searchStringShow="false"
     :searchString="searchString"
-    )
+    @item="$emit('item', $event)")
 </template>
 
 <script>
