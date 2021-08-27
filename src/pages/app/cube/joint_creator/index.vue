@@ -100,7 +100,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ContentApi } from 'src/api/content'
 
-import vertexEditor from 'src/components/kalpa_item/item_editor/composer-joint/vertex_editor.vue'
+import vertexEditor from 'src/components/kalpa_item/item_editor/composer_joint/vertex_editor.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor/index.vue'
 import itemPreview from 'src/components/kalpa_item/item_preview/index.vue'
 

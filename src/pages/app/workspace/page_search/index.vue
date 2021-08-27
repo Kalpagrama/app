@@ -72,7 +72,9 @@ kalpa-layout(
             minHeight: '70vh',
           }`
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+          pageCollections(v-if="pageId==='collections'" :useHeader="false" :searchString="searchString" :searchStringShow="searchStringShow" :mode="mode" @item="bookmarkSelectHandle")
           list-feed(
+            v-else
             :query="query"
             nextSize=50
             :itemMiddlePersist="false"
@@ -84,7 +86,7 @@ kalpa-layout(
               bookmark-list-item(
                 :bookmark="bookmark"
                 :mode="mode"
-                @bookmark="bookmarkSelectHandle"
+                @item="bookmarkSelectHandle"
                 ).q-mb-sm
 </template>
 
@@ -93,6 +95,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import pageCollections from 'src/pages/app/workspace/page_collections/index.vue'
 
 export default {
   name: 'workspace_pageBookmarks',
@@ -107,6 +110,7 @@ export default {
   components: {
     bookmarkListItem,
     bookmarkEditor,
+    pageCollections,
   },
   data () {
     return {
@@ -127,7 +131,8 @@ export default {
         {id: 'content', name: this.$t('Media')},
         {id: 'nodes', name: this.$t('Nodes')},
         {id: 'joints', name: this.$t('Joints')},
-        {id: 'spheres', name: this.$t('Spheres')}
+        {id: 'spheres', name: this.$t('Spheres')},
+        {id: 'collections', name: this.$t('Collections')}
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages

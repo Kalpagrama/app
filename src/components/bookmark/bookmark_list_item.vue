@@ -21,7 +21,7 @@ div(
       :style=`{
         minHeight: '50px',
       }`
-      @click="mode === 'select' ? $emit('bookmark', bookmark) : null"
+      @click="mode === 'select' ? $emit('item', bookmark) : null"
       ).row.full-width.items-start.content-start.cursor-pointer
       //- preview, but not for sphere...
       img(
@@ -59,7 +59,7 @@ div(
   q-btn(
     v-if="mode !== 'select' && showMenuBtn"
     round flat color="grey-8" icon="more_vert"
-    @click="$emit('bookmark', bookmark)"
+    @click="$emit('item', bookmark)"
     ).q-mt-xs.q-mr-xs
 </template>
 

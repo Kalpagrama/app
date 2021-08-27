@@ -1,13 +1,14 @@
 <template lang="pug">
-component(
-  v-if="itemFull"
-  :is="itemComponent"
-  :item="itemFull"
-  :isActive="isActive"
-  :showHeader="showHeader"
-  :showSpheres="showSpheres"
-  :showActions="showActions"
-  )
+.row
+  component(
+    v-if="itemFull"
+    :is="itemComponent"
+    :item="itemFull"
+    :isActive="isActive"
+    :showHeader="showHeader"
+    :showSpheres="showSpheres"
+    :showActions="showActions"
+    )
 </template>
 
 <script>
@@ -35,11 +36,11 @@ export default {
   },
   computed: {
     itemComponent () {
-      if (this.item.type === 'NODE') return 'type-node'
-      else if (['VIDEO', 'IMAGE', 'BOOK', 'GIF'].includes(this.item.type)) return 'type-content'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'VIDEO') return 'type-video'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'IMAGE') return 'type-image'
-      else if (this.item.__typename === 'Composition' && this.item.outputType === 'BOOK') return 'type-book'
+      if (this.itemFull.type === 'NODE') return 'type-node'
+      else if (['VIDEO', 'IMAGE', 'BOOK', 'GIF'].includes(this.itemFull.type)) return 'type-content'
+      else if (this.itemFull.type === 'COMPOSITION' && this.itemFull.outputType === 'VIDEO') return 'type-video'
+      else if (this.itemFull.type === 'COMPOSITION' && this.itemFull.outputType === 'IMAGE') return 'type-image'
+      else if (this.itemFull.type === 'COMPOSITION' && this.itemFull.outputType === 'BOOK') return 'type-book'
       else return null
     },
   },

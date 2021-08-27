@@ -84,7 +84,7 @@ kalpa-layout(
               bookmark-list-item(
                 :bookmark="bookmark"
                 :mode="mode"
-                @bookmark="bookmarkSelectHandle"
+                @item="bookmarkSelectHandle"
                 ).q-mb-sm
 </template>
 
@@ -157,7 +157,7 @@ export default {
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
       if (this.mode === 'select') {
-        this.$emit('bookmark', bookmark)
+        this.$emit('item', bookmark)
       }
       else {
         this.bookmarkSelected = bookmark

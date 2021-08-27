@@ -1,7 +1,7 @@
 <template lang="pug">
 page-collections(
   :collectionId="$route.params.id"
-  @bookmark="$emit('item', $event)")
+  @item="$emit('item', $event)")
   template(v-slot:header)
     div(
       :style=`{

@@ -49,9 +49,10 @@
 
 <script>
 import itemPreview from 'src/components/kalpa_item/item_preview'
-import vertexEditor from 'src/components/kalpa_item/item_editor/composer-joint/vertex_editor.vue'
+import vertexEditor from 'src/components/kalpa_item/item_editor/composer_joint/vertex_editor.vue'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/utils'
 
 export default {
   name: 'composerJoint',
@@ -74,12 +75,17 @@ export default {
     action: {
       type: Function,
       required: false
+    },
+    publish: {
+      type: Boolean,
+      default: false
     }
 
   },
   watch: {},
   methods: {
     itemFound (item) {
+      assert(item.type.in('NODE', 'VIDEO', 'BOOK'), 'bad joint second item:' + item.type)
       this.joint.items[1] = JSON.parse(JSON.stringify(item))
       this.itemFinderShow = false
     },
@@ -87,31 +93,32 @@ export default {
       if (this.action) {
         this.$log('jointPublish', this.joint)
         await this.action(this.joint)
-        return
       }
-      try {
-        this.$log('jointPublish start')
-        this.jointPublishing = true
-        const itemLeftFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.items[0].oid)
-        let jointInput = JSON.parse(JSON.stringify(this.joint))
-        jointInput.category = itemLeftFull.category
-        jointInput.spheres = []
-        jointInput.layout = 'VERTICAL'
-        jointInput.name = jointInput.name || ''
-        // create...
-        this.$log('jointInput', jointInput)
-        let jointCreated = await ObjectCreateApi.jointCreate(jointInput)
-        this.$log('jointPublish jointCreated', jointCreated)
-        this.$ym('JOINT_CREATED')
-        // done? emit? close?
-        this.$log('jointPublish done')
-        // this.$emit('created', jointCreated)
-        this.$emit('close', jointCreated)
-      } catch (e) {
-        this.$log('jointPublish error', e)
-        this.jointPublishing = false
-      } finally {
-        this.jointPublishing = false
+      if (this.publish) {
+        try {
+          this.$log('jointPublish start')
+          this.jointPublishing = true
+          const itemLeftFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.joint.items[0].oid)
+          let jointInput = JSON.parse(JSON.stringify(this.joint))
+          jointInput.category = itemLeftFull.category
+          jointInput.spheres = []
+          jointInput.layout = 'VERTICAL'
+          jointInput.name = jointInput.name || ''
+          // create...
+          this.$log('jointInput', jointInput)
+          let jointCreated = await ObjectCreateApi.jointCreate(jointInput)
+          this.$log('jointPublish jointCreated', jointCreated)
+          this.$ym('JOINT_CREATED')
+          // done? emit? close?
+          this.$log('jointPublish done')
+          // this.$emit('created', jointCreated)
+          this.$emit('close', jointCreated)
+        } catch (e) {
+          this.$log('jointPublish error', e)
+          this.jointPublishing = false
+        } finally {
+          this.jointPublishing = false
+        }
       }
     }
   },
