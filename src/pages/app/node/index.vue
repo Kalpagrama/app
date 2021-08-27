@@ -92,7 +92,6 @@ kalpa-layout()
               //)
               page-recommendations(
                 :node="node"
-                :height="700"
               )
 </template>
 

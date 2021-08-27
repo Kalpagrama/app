@@ -22,7 +22,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageRecommendations',
-  props: ['oid'],
+  props: ['node'],
   data () {
     return {
     }
@@ -33,7 +33,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
-          oidSphere: '165515717720934437',
+          oidSphere: this.node.oid,
           deep: 5,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
