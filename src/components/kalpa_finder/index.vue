@@ -1,8 +1,8 @@
 <template lang="pug">
-.row.full-widith.scroll
+.row.full-widith
   //header + tabs
   div(
-    :style=`{height: '160px'}`
+    :style=`{ height: '155px', position: 'sticky', top: '0px', zIndex: 1000 }`
     ).row.full-width.items-start.content-start.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       //- header
@@ -10,27 +10,15 @@
         .col.q-pl-sm
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      //- tabs
-      .row.full-width.items-center.content-center.q-px-sm.q-py-xs
-        .row.q-pl-sm
-          span.text-white.q-mr-sm {{$t('From')}}:
-        .col
-          .row.full-width.scroll
-            .row.full-width.items-center.content-center.no-wrap
-              q-btn(
-                v-for="p in pages" :key="p.id"
-                flat no-caps dense
-                :color="p.id === pageId ? 'green' : 'white'"
-                :class=`{
-                  'b-40': p.id === pageId,
-                }`
-                :style=`{
-                  whiteSpace: 'nowrap',
-                }`
-                @click="pageId = p.id"
-                ).q-mr-sm.q-px-sm {{ p.name }}
-              div(:style=`{width: '100px',minWidth: '100px',}`).row
-
+      div().row.full-width.q-px-md.b-30
+        q-tabs(
+          v-model="pageId"
+          switch-indicator no-caps dense
+          active-color="green"
+        ).full-width.text-grey-8
+          q-tab(
+            v-for="(p,pi) in pages" :key="p.id"
+            :name="p.id" :label="p.name")
       //- search bar
       .row.full-width.justify-center.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
@@ -44,15 +32,37 @@
                   borderRadius: '10px',
                 }`
           ).full-width
+      ////- tabs
+      //.row.full-width.items-center.content-center.q-px-sm.q-py-xs
+      //  .row.q-pl-sm
+      //    span.text-white.q-mr-sm {{$t('From')}}:
+      //  .col
+      //    .row.full-width.scroll
+      //      .row.full-width.items-center.content-center.no-wrap
+      //        q-btn(
+      //          v-for="p in pages" :key="p.id"
+      //          flat no-caps dense
+      //          :color="p.id === pageId ? 'green' : 'white'"
+      //          :class=`{
+      //            'b-40': p.id === pageId,
+      //          }`
+      //          :style=`{
+      //            whiteSpace: 'nowrap',
+      //          }`
+      //          @click="pageId = p.id"
+      //          ).q-mr-sm.q-px-sm {{ p.name }}
+      //        div(:style=`{width: '100px',minWidth: '100px',}`).row
   component(
     v-bind="$props"
     :is="pages.find(p=>p.id === pageId).component"
     :useHeader="false"
-    :height="$q.screen.height-160"
+    :height="$q.screen.height-155"
     :pagesFilter="pagesFilter"
     :searchStringShow="false"
     :searchString="searchString"
+    :tabsShow="false"
     mode="select"
+    :pageId="pageId"
     :page="page"
     @item="$emit('item', $event)")
 </template>
@@ -86,7 +96,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'workspace',
+      pageId: 'published',
     }
   },
   computed: {
@@ -100,10 +110,10 @@ export default {
     },
     pages () {
       return [
-        {id: 'workspace', name: this.$t('Workspace'), component: 'page-ws-search'},
+        {id: 'published', name: this.$t('published'), component: 'page-ws-search'},
+        {id: 'collections', name: this.$t('collections'), component: 'page-ws-search'},
         {id: 'kalpagrama', name: this.$t('Kalpagrama'), component: 'page-search'},
         {id: 'gif', name: this.$t('Gif'), component: 'page-gif'},
-        // {id: 'search', name: 'Search', component: 'page-search'},
       ]
     }
   },

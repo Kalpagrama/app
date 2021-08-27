@@ -48,6 +48,7 @@ kalpa-layout(
             ).full-width
       //- tabs sticky
       div(
+        v-if="tabsShow"
         :style=`{
           position: 'sticky', top: '0px', zIndex: 1000,
         }`).row.full-width.q-px-md.b-30
@@ -100,10 +101,12 @@ import pageCollections from 'src/pages/app/workspace/page_collections/index.vue'
 export default {
   name: 'workspace_pageBookmarks',
   props: {
+    pageId: {type: String, default: 'content'},
     height: {type: Number},
     useHeader: {type: Boolean, default: true},
     searchString: {type: String, default: ''},
     searchStringShow: {type: String, default: true},
+    tabsShow: {type: String, default: true},
     mode: {type: String},
     pagesFilter: {type: Function},
   },
@@ -114,7 +117,6 @@ export default {
   },
   data () {
     return {
-      pageId: 'content',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
     }
