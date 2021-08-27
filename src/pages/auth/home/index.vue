@@ -1,155 +1,80 @@
 <template lang="pug">
-div(
-  :style=`{
-    height: $q.screen.height+'px',
-  }`
-  ).column.full-width
-  .col.full-width.scroll
-    .row.fit.items-center.content-center.justify-center
-      //- desktop layout
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(
-          v-if="isReady && $q.screen.width > 768"
-          :style=`{
-            position: 'relative',
-          }`
-          @click.self="close()"
-          ).row.fit.items-center.content-center.justify-center.q-px-lg
-          div(
-            :style=`{
-              position: 'relative',
-              maxWidth: '900px',
-              borderRadius: '30px',
-              overflow: 'hidden',
-            }`
-          ).row.full-width
-            img(
-              draggable="false"
-              :src="'/images/rainbow.jpg'"
-              :style=`{
-                      objectFit: 'cover',
-                    }`
-            ).fit
-            div(
-              :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)'}`
-            ).row.fit
-              div(:style=`{position: 'absolute', width: 'calc(50% + 15px)',}`).full-height
-                router-link(
-                  :to="'/trends'"
-                  :style=`{position: 'absolute',}`).row.fit.items-center.content-center
-                  //- logo
-                  div(
-                    :style=`{
-                        position: 'absolute', zIndex: 3, top: '0px',
-                        //- maxHeight: '55vh',
-                      }`
-                  ).row.fit.row.fit.items-center.content-center.justify-center
-                    kalpa-logo(
-                      :width="200"
-                      :height="200").q-mb-md.rotating-slow
-                    .row.full-width.justify-center
-                      router-link(
-                        :to="'/trends'"
-                        :style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
-
-                  //- tint
-
-              div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, right: '0px', borderLeft: '0px solid rgba(90,90,90,0.6)'}`).full-height.q.ma-sm
-                auth-flow(:onSuccess="onSuccess").q-pa-lg.full-height.scroll
-      //- mobile layout
+.row.window-height.window-width
+  div(v-if="isReady && $q.screen.width > 768").row.fit.items-center.content-center.justify-center
+    //- desktop layout
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
-        v-if="$q.screen.width <= 768"
-        @click="() => {}"
-      ).row.full-height
+        @click.self="close()"
+        :style=`{
+          position: 'relative',
+          maxWidth: '900px',
+          borderRadius: '30px',
+          overflow: 'hidden',
+        }`
+      )
         img(
           draggable="false"
           :src="'/images/rainbow.jpg'"
           :style=`{
-                transform: 'rotate(180deg)',
-                objectFit: 'fill',
-              }`
+                  objectFit: 'cover',
+                }`
+        ).fit
+        div(
+          :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)'}`
         ).row.fit
-        div(
-          :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)',}`
-        ).row.full-height
-          //- logo
-          kalpa-logo(
-            :width="100"
-            :height="100"
-            :style=`{
-                transform: 'rotate(' + scrollTop / 2 + 'deg)',
-              }`).rotating-slow.q-mb-xs
-          span( :style=`{fontSize: '22px',}`).text-white.text-bold.text-center.full-width {{$t('Kalpagrama')}}
-          // - tong
-          div().q.ma-sm
-            auth-flow(
-              :onSuccess="onSuccess").q-pa-lg.full-height.scroll.br
-      div(
-        v-if="false && $q.screen.width <= 768"
-        @click="() => {}"
-        :style=`{position: 'relative',}`).row.full-width.items-start.content-start
-        div(
-          @click="$emit('close')"
-          :style=`{
-            position: 'fixed',  zIndex: 1, top: '0px',
+          div(:style=`{position: 'absolute', width: 'calc(50% + 15px)',}`).full-height
+            router-link(
+              :to="'/trends'"
+              :style=`{position: 'absolute',}`).row.fit.items-center.content-center
+              //- logo
+              div(
+                :style=`{
+                    position: 'absolute', zIndex: 3, top: '0px',
+                    //- maxHeight: '55vh',
+                  }`
+              ).row.fit.row.fit.items-center.content-center.justify-center
+                kalpa-logo(
+                  :width="200"
+                  :height="200").q-mb-md.rotating-slow
+                .row.full-width.justify-center
+                  router-link(
+                    :to="'/trends'"
+                    :style=`{fontSize: '30px',}`).text-white {{$t('Kalpagrama')}}
+
+              //- tint
+
+          div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, right: '0px', borderLeft: '0px solid rgba(90,90,90,0.6)'}`).full-height.q.ma-sm
+            auth-flow(:onSuccess="onSuccess").q-pa-lg.full-height.scroll
+    //- mobile layout
+  div(
+    v-else
+    @click="() => {}"
+  ).row.full-height
+    img(
+      draggable="false"
+      :src="'/images/rainbow.jpg'"
+      :style=`{
+            position: 'fixed', top: '0px',
+            transform: 'rotate(180deg)',
+            objectFit: 'fill',
           }`
-          ).row.full-width
-          img(
-            draggable="false"
-            :src="'/images/rainbow.jpg'"
-            :style=`{
-              objectFit: 'cover',
-              maxHeight: '50vh'
-            }`
-            ).fit
-          img(
-            draggable="false"
-            :src="'/images/rainbow.jpg'"
-            :style=`{
-              objectFit: 'cover',
-              maxHeight: '50vh',
-              transform: 'scaleY(-1)',
-            }`
-            ).fit
-        //- logo
-        div(
-          @click="$emit('close')"
-          :style=`{
-            position: 'fixed', zIndex: 3, top: '0px',
-            maxHeight: '20vh',
-          }`
-          ).row.fit.row.fit.items-center.content-center.justify-center
-          kalpa-logo(
-            :width="100"
-            :height="100"
-            :style=`{
-              transform: 'rotate(' + scrollTop / 2 + 'deg)',
-            }`).rotating-slow.q-mb-xs
-          .row.full-width.justify-center
-            span(
-              :style=`{fontSize: '22px',}`
-              ).text-white.text-bold {{$t('Kalpagrama')}}
-        //- tint
-        div(
-          @click="$emit('close')"
-          :style=`{
-            position: 'fixed', zIndex: 2, top: '0px',
-            background: 'rgba(0,0,0,0.6)',
-            maxHeight: '100vh',
-          }`
-          ).row.fit.items-center.content-center.justify-center
-        //- tong
-        div(
-          @click.self="() => {}"
-          :style=`{
-            position: 'relative', zIndex: 100, transform: 'translate3d(0,0,0)',
-            marginTop: '40vh',
-            borderRadius: getRadius(scrollTop, scrollHeight),
-            minHeight: $q.screen.height+'px',
-            maxHeight: $q.screen.height+'px',
-          }`
-          ).row.full-width.items-start.content-start.b-80.q-pt-lg.q-px-xl
-          auth-flow(:onSuccess="onSuccess")
+    ).row.fit
+    div(
+      :style=`{position: 'fixed', top: '0px', background: 'rgba(0,0,0,0.5)'}`
+    ).row.fit
+    div(:style=`{zIndex: 2}`).row.fit
+      //- logo
+      kalpa-logo(
+        :width="100"
+        :height="100"
+        :style=`{
+            transform: 'rotate(' + scrollTop / 2 + 'deg)',
+          }`).rotating-slow.q-mb-xs
+      span( :style=`{fontSize: '22px',}`).text-white.text-bold.text-center.full-width {{$t('Kalpagrama')}}
+      // - tong
+      div().q.ma
+        auth-flow(
+          :onSuccess="onSuccess").no-scroll.q-pa-lg
 </template>
 
 <script>

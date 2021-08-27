@@ -151,6 +151,7 @@ const bookFragment = gql`${objectFragment}
   fragment bookFragment on Book {
     ...objectFragment
     contentProvider
+    providerInfo
     urlWithFormats{ format url }
 #    contentSource
   }

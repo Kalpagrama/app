@@ -68,14 +68,14 @@
                     icon='dashboard_customize'
                     round flat no-caps
                     ).row.full-width.q-pa-sm
-                  q-btn(
-                    outline color="grey-8"
-                    align="left"
-                    :to="'/workspace/create?mode=article'"
-                    :label="$t('Article')"
-                    icon='post_add'
-                    round flat no-caps
-                    ).row.full-width.q-pa-sm
+                  //q-btn(
+                  //  outline color="grey-8"
+                  //  align="left"
+                  //  :to="'/workspace/create?mode=article'"
+                  //  :label="$t('Article')"
+                  //  icon='post_add'
+                  //  round flat no-caps
+                  //  ).row.full-width.q-pa-sm
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
       small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
 </template>
