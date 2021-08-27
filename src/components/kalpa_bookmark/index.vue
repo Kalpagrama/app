@@ -74,7 +74,7 @@ export default {
     bookmark: {
       handler (to, from) {
         this.$log('bookmark TO', to)
-        if (to) this.$emit('bookmark', to)
+        if (to) this.$emit('item', to)
       }
     }
   },

@@ -2,7 +2,7 @@
 kalpa-layout().b-30
   template(v-slot:body)
     div(:style=`{minHeight: $q.screen.height+'px',}`).row.full-width.items-start.content-start
-      composer(:joint="joint" :item="item" @close="$emit('close', $event)" @remove="$emit('remove', $event)").row.full-width.full-height
+      composer(:joint="joint" :item="item" :publish="true" @close="$emit('close', $event)" @remove="$emit('remove', $event)").row.full-width.full-height
 </template>
 
 <script>

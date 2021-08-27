@@ -34,7 +34,7 @@
             @close="bookmarkEditorShow = false, bookmarkSelected = null")
         //- search bar
         .row.full-width.justify-center.q-px-sm
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+          div(v-if="searchStringShow" :style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
             q-input(
               v-model="searchString"
               borderless dark
@@ -86,7 +86,7 @@
                 bookmark-list-item(
                   :bookmark="bookmark"
                   :mode="mode"
-                  @bookmark="bookmarkSelectHandle"
+                  @item="bookmarkSelectHandle"
                 ).q-mb-sm
 </template>
 
@@ -102,6 +102,8 @@ export default {
   props: {
     height: { type: Number },
     useHeader: { type: Boolean, default: true },
+    searchStringShow: { type: Boolean, default: true },
+    searchString: { type: String, default: ''},
     mode: { type: String },
     collectionFilter: { type: Function },
     collectionId: {type: String, default: ''}
@@ -116,7 +118,6 @@ export default {
       collectionsRes: null,
       bookmarkSelected: null,
       bookmarkEditorShow: false,
-      searchString: '',
       newCollectionName: ''
     }
   },
@@ -161,7 +162,7 @@ export default {
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
       if (this.mode === 'select') {
-        this.$emit('bookmark', bookmark)
+        this.$emit('item', bookmark)
       } else {
         this.bookmarkSelected = bookmark
         this.bookmarkEditorShow = true

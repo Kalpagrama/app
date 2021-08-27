@@ -72,6 +72,7 @@
     v-else-if="item.type === 'JOINT'"
     :joint="item"
     :action="action"
+    :publish="publish"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
 </template>
@@ -80,7 +81,7 @@
 import composerBook from 'src/components/kalpa_item/item_editor/composer_book.vue'
 import composerImage from 'src/components/kalpa_item/item_editor/composer_image.vue'
 import composerVideo from 'src/components/kalpa_item/item_editor/composer_video.vue'
-import composerJoint from 'src/components/kalpa_item/item_editor/composer-joint'
+import composerJoint from 'src/components/kalpa_item/item_editor/composer_joint'
 // import composerAudio from './composer_audio.vue'
 
 export default {
@@ -92,7 +93,24 @@ export default {
     composerJoint,
     // composerAudio,
   },
-  props: ['joint', 'item', 'action'],
+  props: {
+    joint: {
+      type: Object,
+      required: true
+    },
+    item: {
+      type: Object,
+      required: true
+    },
+    action: {
+      type: Function,
+      required: false
+    },
+    publish: {
+      type: Boolean,
+    }
+
+  },
   data () {
     return {
       content: null,

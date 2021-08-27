@@ -92,6 +92,7 @@
         :joint="newJoint"
         :item="newJoint"
         :action="addJointToGraph"
+        :publish="publish"
         @remove="$log('item-editor @remove')"
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
             borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
@@ -146,6 +147,7 @@ export default {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект
     showAddBtn: { type: Boolean, default: true },
     getJoints: { type: Function, default: null },
+    publish: { type: Boolean, default: false }, // при false - будет создавать реальные связи в системе
     oidRoot: { type: String, required: true },
     detailPosition: { type: String, default: 'bottom' }, // q-menu
     maxHeight: {
@@ -230,7 +232,7 @@ export default {
       if (!this.graphD3.nodes.find(n => n.id === leftNode.id)) {
         this.graphD3.nodes.push(leftNode)
       }
-      if (!this.graphD3.nodes.find(n => n.oid === rightNode.id)) {
+      if (!this.graphD3.nodes.find(n => n.id === rightNode.id)) {
         this.graphD3.nodes.push(rightNode)
       }
       for (let prop in joint) { // удаляем ненужные поля

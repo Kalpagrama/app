@@ -58,7 +58,6 @@
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
 import pageWsSearch from 'src/pages/app/workspace/page_search/index.vue'
 import pageSearch from 'src/pages/app/trends/page_search'
 import pageGif from './page_gif/index.vue'

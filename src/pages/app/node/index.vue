@@ -86,9 +86,12 @@ kalpa-layout()
                 :node="node"
                 :height="700"
               )
-              page-joints(
+              //page-joints(
+              //  :node="node"
+              //  :height="700"
+              //)
+              page-similar(
                 :node="node"
-                :height="700"
               )
 </template>
 
@@ -98,6 +101,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from './nav_mobile.vue'
 import widgetJoints from './widget_joints/index.vue'
 import pageJoints from './page_joints/index.vue'
+import pageSimilar from './page_similar/index.vue'
 import pageComments from './page_comments/index.vue'
 
 export default {
@@ -107,6 +111,7 @@ export default {
     widgetJoints,
     pageJoints,
     pageComments,
+    pageSimilar,
   },
   data () {
     return {

@@ -55,7 +55,7 @@ div(
               :isActive="true"
               inactiveColor="grey-3"
               :fields=`{contentType: contentKalpa.type}`
-              @bookmark="$event => $emit('bookmark', $event)")
+              @item="$event => $emit('item', $event)")
             //- buy
             kalpa-pay(
               v-if="contentKalpa"

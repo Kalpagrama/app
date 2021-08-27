@@ -7,7 +7,15 @@
     borderColor: '#222',
   }`
   ).row.full-width
-    graph-view(ref="graphView" :showAddBtn="false" :maxHeight="height" :graphD3="graph" detailPosition="bottom" :getJoints="getJoints", :oidRoot="oid")
+    graph-view(
+      ref="graphView"
+      :showAddBtn="false"
+      :maxHeight="height"
+      :graphD3="graph"
+      detailPosition="bottom"
+      :getJoints="getJoints"
+      :publish="true"
+      :oidRoot="oid")
 </template>
 
 <script>
@@ -57,7 +65,7 @@ export default {
         joints.push(jointCopy)
       }
       return joints
-    },
+    }
   },
   async beforeMount () {
     this.$log('beforeMount', this.oid)
