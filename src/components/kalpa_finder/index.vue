@@ -34,14 +34,14 @@
           ).full-width
   //page-published(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
   //page-collections(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
-  page-search(:useHeader="false" :searchStringShow="false" :searchString="searchString")
+  //page-search(:useHeader="false" :searchStringShow="false" :searchString="searchString")
   //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
-  //component(
-  //  :is="'page-' + pageId"
-  //  :useHeader="false"
-  //  :searchStringShow="false"
-  //  :searchString="searchString"
-  //  )
+  component(
+    :is="'page-' + pageId"
+    :useHeader="false"
+    :searchStringShow="false"
+    :searchString="searchString"
+    )
 </template>
 
 <script>

@@ -181,9 +181,63 @@ export default {
         populateObjects: false,
         limit: 150
       }
+    },
+    itemMetaMap () {
+      return {
+        VIDEO: {
+          name: this.$t('Video'),
+          link: '/content/'
+        },
+        IMAGE: {
+          name: this.$t('Image'),
+          link: '/content/'
+        },
+        BOOK: {
+          name: this.$t('Book'),
+          link: '/content/'
+        },
+        NODE: {
+          name: this.$t('Node'),
+          link: '/node/'
+        },
+        JOINT: {
+          name: this.$t('Joint'),
+          link: '/joint/'
+        },
+        BLOCK: {
+          name: this.$t('Essence block'),
+          link: '/block/'
+        },
+        WORD: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        SENTENCE: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        SPHERE: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        USER: {
+          name: this.$t('User'),
+          link: '/user/'
+        }
+      }
     }
   },
   methods: {
+    itemLink (item) {
+      // this.$log('itemLink', item)
+      if (item.wsItemType) {
+        // confirm('Open in workspace?')
+        return '/trends'
+      }
+      else {
+        return this.itemMetaMap[item.type].link + item.oid
+      }
+    },
     onSelected(item) {
       if (this.mode === 'select') {
         this.$emit('item', item)
