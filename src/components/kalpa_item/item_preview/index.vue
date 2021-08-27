@@ -1,14 +1,13 @@
 <template lang="pug">
-.row
-  component(
-    v-if="itemFull"
-    :is="itemComponent"
-    :item="itemFull"
-    :isActive="isActive"
-    :showHeader="showHeader"
-    :showSpheres="showSpheres"
-    :showActions="showActions"
-    )
+component(
+  v-if="itemFull"
+  :is="itemComponent"
+  :item="itemFull"
+  :isActive="isActive"
+  :showHeader="showHeader"
+  :showSpheres="showSpheres"
+  :showActions="showActions"
+  )
 </template>
 
 <script>
