@@ -403,6 +403,7 @@ const routes = [
                   name: 'workspace.published',
                   path: 'published',
                   component: () => import('src/pages/app/workspace/page_published/index.vue')
+                  // component: () => import('src/components/kalpa_finder/index.vue')
                },
                {
                   name: 'workspace.history',

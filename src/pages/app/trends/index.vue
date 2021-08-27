@@ -34,7 +34,9 @@ kalpa-layout
     component(
       :is="`page-${pageId}`"
       :oid="$route.params.oid"
+      :useHeader="false"
       :searchString="searchString"
+      :searchStringShow="false"
       @close="viewId = 'trends'")
 </template>
 
@@ -43,7 +45,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import pageTrends from './page_trends/index.vue'
 import pageTrendsNavTabs from './page_trends/nav_tabs.vue'
-import pageSearch from './page_search/index.vue'
+// import pageSearch from './page_search/index.vue'
+import pageSearch from 'src/pages/app/search'
 
 export default {
   name: 'pageApp_trends',

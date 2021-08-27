@@ -21,7 +21,7 @@
         }`
         ).row.full-width.items-start.content-start
         img(
-          v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+          v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(getItem(item).type)"
           draggable="false"
           :src="getItem(item).thumbUrl"
           :style=`{
