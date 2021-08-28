@@ -21,20 +21,23 @@ kalpa-layout
                 fontSize: '18px',
                 fontWeight: 'bold',
               }`
+              @focus="searchPageShown = true"
               ).full-width
               template(v-slot:prepend)
                 q-icon(name="search" color="white" size="30px").q-ml-md
               template(v-slot:append)
                 q-btn(
-                  v-if="searchString.length > 0"
-                  @click="searchString = ''"
+                  v-if="searchPageShown"
+                  @click="searchPageShown = false"
                   round flat dense color="white" icon="clear").q-mr-sm
     div(:style=`{position: 'sticky', zIndex: 1000, top: '0px',}`).row.full-width
       page-trends-nav-tabs(v-if="pageId === 'trends'")
     component(
       :is="`page-${pageId}`"
       :oid="$route.params.oid"
+      :useHeader="false"
       :searchString="searchString"
+      :searchStringShow="false"
       @close="viewId = 'trends'")
 </template>
 
@@ -43,7 +46,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import pageTrends from './page_trends/index.vue'
 import pageTrendsNavTabs from './page_trends/nav_tabs.vue'
-import pageSearch from './page_search/index.vue'
+import pageSearch from 'src/pages/app/search'
 
 export default {
   name: 'pageApp_trends',
@@ -56,13 +59,13 @@ export default {
     return {
       pageId: 'trends',
       searchString: '',
+      searchPageShown: false
     }
   },
   watch: {
-    searchString: {
+    searchPageShown: {
       handler (to, from) {
-        this.$log('searchString TO', to)
-        if (to.length > 0) {
+        if (to) {
           this.pageId = 'search'
         }
         else {

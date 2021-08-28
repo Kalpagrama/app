@@ -17,7 +17,7 @@
             q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
             .col.full-height
               .row.fit.items-center.content-center.justify-center
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Published')}}
+                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Search')}}
             q-btn(round flat color="white" icon="more_vert")
     template(v-slot:body)
       div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
@@ -79,22 +79,45 @@
               :style=`{
               maxWidth: $store.state.ui.pageWidth+'px',
             }`)
-              template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
-                bookmark-list-item(
-                  :bookmark="bookmark"
-                  :mode="mode"
-                  @item="bookmarkSelectHandle"
-                ).q-mb-sm
+              template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+                div(
+                  @click="onSelected(item)"
+                  :style=`{
+                  background: 'rgb(35,35,35)',
+                  borderRadius: '10px',
+                }`
+                ).row.full-width.items-start.content-start
+                  img(
+                    v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+                    draggable="false"
+                    :src="item.thumbUrl"
+                    :style=`{
+                      height: '50px',
+                      minWidth: '89px',
+                      borderRadius: '10px',
+                      objectFit: 'contain',
+                    }`).b-50
+                  div(
+                    v-else
+                    :style=`{width: '50px', height: '50px',}`
+                  ).row.items-center.content-center.justify-center
+                    q-icon(name="blur_on" size="30px" color="white")
+                  .col.full-height
+                    .row.fit.items-between.content-between.q-pa-sm
+                      .row.full-width
+                        span.text-white {{ item.name }}
+                      .row.full-width
+                        small.text-grey-8 {{ item.type }}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import { assert } from 'src/system/utils'
 
 export default {
-  name: 'workspace_pageBookmarks',
+  name: 'pageSearch',
   props: {
     height: { type: Number },
     useHeader: { type: Boolean, default: true },
@@ -109,7 +132,7 @@ export default {
   },
   data () {
     return {
-      pageId: 'nodes',
+      pageId: 'all',
       bookmarkSelected: null,
       bookmarkEditorShow: false
     }
@@ -120,46 +143,106 @@ export default {
     },
     pages () {
       let pages = [
-        // {id: 'collections', name: this.$t('Collections')},
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
+        { id: 'blocks', name: this.$t('Blocks') },
+        { id: 'contents', name: this.$t('Contents') },
+        { id: 'users', name: this.$t('Users') },
+        { id: 'spheres', name: this.$t('Spheres') }
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)
       else return pages
     },
     query () {
-      let res = {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED
-        },
-        sort: [{ createdAt: 'desc' }]
-      }
-      // Get types
-      if (this.pageId === 'nodes') {
-        res.selector.type = { $in: ['NODE'] }
+      let objectTypes
+      if (this.pageId === 'all') {
+        objectTypes = ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER', 'JOINT', 'WORD', 'SENTENCE', 'CHAR']
+      } else if (this.pageId === 'nodes') {
+        objectTypes = ['NODE']
       } else if (this.pageId === 'joints') {
-        res.selector.type = { $in: ['JOINT'] }
+        objectTypes = ['JOINT']
       } else if (this.pageId === 'blocks') {
-        res.selector.type = { $in: ['BLOCK'] }
+        objectTypes = ['BLOCK']
+      } else if (this.pageId === 'contents') {
+        objectTypes = ['VIDEO', 'IMAGE', 'BOOK']
+      } else if (this.pageId === 'users') {
+        objectTypes = ['USER']
+      } else if (this.pageId === 'spheres') {
+        objectTypes = ['WORD', 'SENTENCE', 'CHAR']
+      } else throw new Error('bad pageId: ' + this.pageId)
+
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SEARCH,
+          objectTypeEnum: { $in: objectTypes },
+          querySearch: this.searchString || 'any_random_values',
+        },
+        populateObjects: false,
+        limit: 150
       }
-      // Search by name
-      if (this.searchString.length > 0) {
-        let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = { $regex: nameRegExp }
+    },
+    itemMetaMap () {
+      return {
+        VIDEO: {
+          name: this.$t('Video'),
+          link: '/content/'
+        },
+        IMAGE: {
+          name: this.$t('Image'),
+          link: '/content/'
+        },
+        BOOK: {
+          name: this.$t('Book'),
+          link: '/content/'
+        },
+        NODE: {
+          name: this.$t('Node'),
+          link: '/node/'
+        },
+        JOINT: {
+          name: this.$t('Joint'),
+          link: '/joint/'
+        },
+        BLOCK: {
+          name: this.$t('Essence block'),
+          link: '/block/'
+        },
+        WORD: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        SENTENCE: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        SPHERE: {
+          name: this.$t('Sphere'),
+          link: '/sphere/'
+        },
+        USER: {
+          name: this.$t('User'),
+          link: '/user/'
+        }
       }
-      return res
     }
   },
   methods: {
-    bookmarkSelectHandle (bookmark) {
-      this.$log('bookmarkSelectHandle', bookmark)
+    itemLink (item) {
+      // this.$log('itemLink', item)
+      if (item.wsItemType) {
+        // confirm('Open in workspace?')
+        return '/trends'
+      }
+      else {
+        return this.itemMetaMap[item.type].link + item.oid
+      }
+    },
+    onSelected(item) {
       if (this.mode === 'select') {
-        this.$emit('item', bookmark)
+        this.$emit('item', item)
       } else {
-        this.bookmarkSelected = bookmark
-        this.bookmarkEditorShow = true
+        this.$router.push(this.itemLink(item))
       }
     }
   }

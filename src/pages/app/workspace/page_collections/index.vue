@@ -33,8 +33,8 @@
             :bookmark="bookmarkSelected"
             @close="bookmarkEditorShow = false, bookmarkSelected = null")
         //- search bar
-        .row.full-width.justify-center.q-px-sm
-          div(v-if="searchStringShow" :style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+        div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
+          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
             q-input(
               v-model="searchString"
               borderless dark
@@ -46,21 +46,20 @@
             }`
             ).full-width
         //- tabs sticky
-        .row.full-width.justify-center
-          div(
-            :style=`{
-            position: 'sticky', top: '0px', zIndex: 1000, maxWidth: $store.state.ui.pageWidth+'px'
-          }`).row.full-width.b-30
-            q-tabs(
-              v-model="collectionsModel.collectionId"
-              switch-indicator no-caps dense
-              active-color="green"
-            ).full-width.text-grey-8
-              // add collection btn
-              add-collection-btn(v-model="collectionsModel")
-              q-tab(
-                v-for="(c,ci) in collectionsModel.collections" :key="c.id"
-                :name="c.id" :label="c.name")
+        div(
+          :style=`{position: 'sticky', top: '0px', zIndex: 1000 }`
+          ).row.full-width.justify-center.q-px-md.b-30
+          q-tabs(
+            v-model="collectionsModel.collectionId"
+            switch-indicator no-caps dense
+            active-color="green"
+            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+          ).full-width.text-grey-8
+            // add collection btn
+            add-collection-btn(v-model="collectionsModel")
+            q-tab(
+              v-for="(c,ci) in collectionsModel.collections" :key="c.id"
+              :name="c.id" :label="c.name")
         //- tab panels
         q-tab-panels(
           v-model="collectionsModel.collectionId"
@@ -70,9 +69,9 @@
           q-tab-panel(
             v-for="(c,ci) in collectionsModel.collections" :key="c.id" :name="c.id"
             :style=`{
-            background: 'none',
-            minHeight: '70vh',
-          }`
+          background: 'none',
+          minHeight: '70vh',
+        }`
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
             list-feed(
               :query="query"
@@ -80,8 +79,8 @@
               :itemMiddlePersist="false"
               screenSize=100
               :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-            }`)
+            maxWidth: $store.state.ui.pageWidth+'px',
+          }`)
               template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
                 bookmark-list-item(
                   :bookmark="bookmark"
@@ -95,7 +94,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
-import {assert} from 'src/system/utils'
+import { assert } from 'src/system/utils'
 
 export default {
   name: 'workspace_pageCollections',
@@ -103,10 +102,10 @@ export default {
     height: { type: Number },
     useHeader: { type: Boolean, default: true },
     searchStringShow: { type: Boolean, default: true },
-    searchString: { type: String, default: ''},
+    searchString: { type: String, default: '' },
     mode: { type: String },
     collectionFilter: { type: Function },
-    collectionId: {type: String, default: ''}
+    collectionId: { type: String, default: '' }
   },
   components: {
     bookmarkListItem,
@@ -114,7 +113,7 @@ export default {
   },
   data () {
     return {
-      collectionsModel: {collectionId: this.collectionId, collections: []},
+      collectionsModel: { collectionId: this.collectionId, collections: [] },
       collectionsRes: null,
       bookmarkSelected: null,
       bookmarkEditorShow: false,
@@ -141,10 +140,10 @@ export default {
       }
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = {$regex: nameRegExp}
+        res.selector.name = { $regex: nameRegExp }
       }
       return res
-    },
+    }
   },
   methods: {
     async createCollection () {

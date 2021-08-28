@@ -88,7 +88,7 @@
       :maximized="false"
       @close="newJoint = null"
     )
-      composer(
+      item-editor(
         :joint="newJoint"
         :item="newJoint"
         :action="addJointToGraph"
@@ -130,7 +130,7 @@
 
 <script>
 import itemPreview from 'src/components/kalpa_item/item_preview'
-import composer from 'src/components/kalpa_item/item_editor/composer.vue'
+import itemEditor from 'src/components/kalpa_item/item_editor'
 import * as d3 from 'd3';
 import { assert } from 'src/system/utils'
 import debounce from 'lodash/debounce'
@@ -141,7 +141,7 @@ export default {
   name: 'graphView',
   components: {
     itemPreview,
-    composer
+    itemEditor
   },
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект

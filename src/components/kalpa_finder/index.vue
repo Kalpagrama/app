@@ -2,7 +2,7 @@
 .row.full-widith
   //header + tabs
   div(
-    :style=`{ height: '155px', position: 'sticky', top: '0px', zIndex: 1000 }`
+    :style=`{ height: '155px'}`
     ).row.full-width.items-start.content-start.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       //- header
@@ -10,7 +10,7 @@
         .col.q-pl-sm
           span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      div().row.full-width.q-px-md.b-30
+      div(:style=`{position: 'sticky', top: '0px', zIndex: 1000}`).row.full-width.q-px-md.b-30
         q-tabs(
           v-model="pageId"
           switch-indicator no-caps dense
@@ -32,45 +32,25 @@
                   borderRadius: '10px',
                 }`
           ).full-width
-      ////- tabs
-      //.row.full-width.items-center.content-center.q-px-sm.q-py-xs
-      //  .row.q-pl-sm
-      //    span.text-white.q-mr-sm {{$t('From')}}:
-      //  .col
-      //    .row.full-width.scroll
-      //      .row.full-width.items-center.content-center.no-wrap
-      //        q-btn(
-      //          v-for="p in pages" :key="p.id"
-      //          flat no-caps dense
-      //          :color="p.id === pageId ? 'green' : 'white'"
-      //          :class=`{
-      //            'b-40': p.id === pageId,
-      //          }`
-      //          :style=`{
-      //            whiteSpace: 'nowrap',
-      //          }`
-      //          @click="pageId = p.id"
-      //          ).q-mr-sm.q-px-sm {{ p.name }}
-      //        div(:style=`{width: '100px',minWidth: '100px',}`).row
+  //page-published(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
+  //page-collections(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
+  //page-search(:useHeader="false" :searchStringShow="false" :searchString="searchString")
+  //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
   component(
-    v-bind="$props"
-    :is="pages.find(p=>p.id === pageId).component"
+    :is="'page-' + pageId"
     :useHeader="false"
-    :height="$q.screen.height-155"
-    :pagesFilter="pagesFilter"
+    mode="select"
     :searchStringShow="false"
     :searchString="searchString"
-    :tabsShow="false"
-    mode="select"
-    :pageId="pageId"
-    :page="page"
     @item="$emit('item', $event)")
 </template>
 
 <script>
-import pageWsSearch from 'src/pages/app/workspace/page_search/index.vue'
-import pageSearch from 'src/pages/app/trends/page_search'
+import pagePublished from 'src/pages/app/workspace/page_published/index.vue'
+import pageCollections from 'src/pages/app/workspace/page_collections/index.vue'
+import pageSearch from 'src/pages/app/search'
 import pageGif from './page_gif/index.vue'
+import pageWsSearch from 'src/pages/app/workspace/page_search/index.vue'
 
 export default {
   name: 'kalpaFinder',
@@ -90,7 +70,8 @@ export default {
     }
   },
   components: {
-    pageWsSearch,
+    pagePublished,
+    pageCollections,
     pageSearch,
     pageGif,
   },
@@ -110,10 +91,10 @@ export default {
     },
     pages () {
       return [
-        {id: 'published', name: this.$t('published'), component: 'page-ws-search'},
-        {id: 'collections', name: this.$t('collections'), component: 'page-ws-search'},
-        {id: 'kalpagrama', name: this.$t('Kalpagrama'), component: 'page-search'},
-        {id: 'gif', name: this.$t('Gif'), component: 'page-gif'},
+        {id: 'published', name: this.$t('published')},
+        {id: 'collections', name: this.$t('collections')},
+        {id: 'search', name: this.$t('Kalpagrama')},
+        {id: 'gif', name: this.$t('Gif')},
       ]
     }
   },
