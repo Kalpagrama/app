@@ -1,5 +1,6 @@
+// если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  .row.full-width.items-start.content-start
+  div(:style=`{height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
     q-resize-observer(@resize="scrollHeightResized")
     //- debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -122,7 +123,7 @@
           q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").full-width.full-height
             q-icon(name="expand_less" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
         //- next loading + компенсация kalpa-menu-mobile
-        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: $store.state.ui.mobileMenuShown ? '95px' : '30px'}`).row.full-width
+        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: !scrollAreaHeight && $store.state.ui.mobileMenuShown ? '95px' : '30px'}`).row.full-width
           q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
           q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" :style=`{height: '30px'}`).full-width
             q-icon(name="expand_more" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
@@ -148,6 +149,10 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 export default {
   name: 'listFeed',
   props: {
+    scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
+      type: Number,
+      default: null
+    },
     rootMargin: {
       type: String,
       default () {
