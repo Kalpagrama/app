@@ -1,6 +1,6 @@
 // если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  div(:style=`{height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
+  div(:style=`{paddingTop: headerHeight +'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
     q-resize-observer(@resize="scrollHeightResized")
     //- debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -88,6 +88,11 @@
     ).row.full-width.items-center.content-center.justify-center
       //- q-spinner(size="50px" color="green")
       q-spinner-dots(color="green" size="60px")
+    //-header
+    transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+      div(v-if="!autoHideHeader || headerShow || scrollTop === 0" :style=`{position: scrollAreaHeight ? 'absolute' : 'fixed', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+        q-resize-observer(@resize="headerHeight = $event.height")
+        slot(name="header")
     //- items
     div(
       v-if="itemsRes"
@@ -191,7 +196,14 @@ export default {
       default () {
         return 36
       }
-    }
+    },
+    autoHideHeader: {
+      type: Boolean,
+      default () {
+        return true
+      }
+    },
+
   },
   data () {
     return {
@@ -212,6 +224,8 @@ export default {
       scrollHeight: 0,
       scrollHeightTimeout: null,
       scrollHeightChanging: false,
+      headerShow: true,
+      headerHeight: 0,
       itemsRes: null,
       itemsResStatus: null,
       // item
@@ -496,6 +510,16 @@ export default {
     },
     scrollUpdate (e) {
       this.scrollTop = getScrollPosition(this.scrollTarget)
+      if (!this.directionTimer) {
+        this.directionTimer = setTimeout(() => {
+          if (this.lastScrollTop < this.scrollTop) this.headerShow = false
+          if (this.lastScrollTop > this.scrollTop) this.headerShow = true // scrollUp
+          this.$log('this.scrollUpdate timer', this.lastScrollTop, this.scrollTop, this.scrollDirection)
+          this.lastScrollTop = this.scrollTop
+          this.directionTimer = null
+        }, 1000)
+      }
+
       this.scrollHeight = getScrollHeight(this.scrollTarget)
       this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
     },
@@ -510,6 +534,8 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$emit('xxx')
+    this.$parent.$emit('xxx')
     // alert('scrollTargetIsWindow=' + this.scrollTargetIsWindow)
     this.scrollTarget = getScrollTarget(this.$el)
     this.$log('this.scrollTarget', this.scrollTarget)
