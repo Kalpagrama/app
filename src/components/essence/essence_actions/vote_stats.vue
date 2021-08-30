@@ -109,7 +109,6 @@ div(
             }`).full-width
             span.q-ml-sm {{$t('Revote')}}
           q-btn(
-            v-close-popup
             @click="$emit('renode')"
             outline color="green" no-caps icon="add"
             :style=`{

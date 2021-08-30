@@ -212,9 +212,9 @@ export default {
       this.voteStarted = true
     },
     async renode() {
+      this.voteStatsShow = false
+      await this.$wait(200)
       this.itemEditorShow = true
-      // alert('!!$$$')
-      // this.voteStatsShow = false
     },
     async vote (val) {
       try {
