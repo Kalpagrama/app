@@ -58,7 +58,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageSearch',

@@ -24,7 +24,7 @@ import pageSearch from 'src/pages/app/search'
 import pageTrends from './page_trends'
 import pageTrendsNavTabs from 'src/pages/app/trends/nav_tabs.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageApp_trends',
