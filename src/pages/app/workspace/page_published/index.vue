@@ -3,7 +3,7 @@
     :height="_height")
     template(v-slot:header)
       div(
-        v-if="useHeader"
+        v-if="useNavHeader"
       ).row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           slot(name="header")
@@ -20,7 +20,7 @@
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Published')}}
             q-btn(round flat color="white" icon="more_vert")
     template(v-slot:body)
-      div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
+      .row.full-width.items-start.content-start
         //- bookmark editor
         q-dialog(
           v-model="bookmarkEditorShow"
@@ -97,7 +97,7 @@ export default {
   name: 'workspace_pageBookmarks',
   props: {
     height: { type: Number },
-    useHeader: { type: Boolean, default: true },
+    useNavHeader: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
     searchStringShow: { type: String, default: true },
     mode: { type: String },

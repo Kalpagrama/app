@@ -328,7 +328,7 @@ const routes = [
          },
          {
             name: 'trends',
-            path: 'trends/:oid?',
+            path: 'trends/',
             component: () => import('src/pages/app/trends/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },

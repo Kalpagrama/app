@@ -1,81 +1,52 @@
 <template lang="pug">
-kalpa-layout
-  template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md")
-  template(v-slot:body)
-    //- header
-    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        div(:style=`{height: '60px', borderRadius: '10px',}`
-          ).row.full-width.items-center.content-center.justify-between.b-40
-          .col
-            q-input(
-              v-model="searchString"
-              flat borderless dark
-              icon="search"
-              :placeholder="$t('Type here to search...')"
-              :debounce="500"
-              :style=`{}`
-              :input-style=`{
-                color: 'white',
-                fontSize: '18px',
-                fontWeight: 'bold',
-              }`
-              @focus="searchPageShown = true"
-              ).full-width
-              template(v-slot:prepend)
-                q-icon(name="search" color="white" size="30px").q-ml-md
-              template(v-slot:append)
-                q-btn(
-                  v-if="searchPageShown"
-                  @click="searchPageShown = false"
-                  round flat dense color="white" icon="clear").q-mr-sm
-    div(:style=`{position: 'sticky', zIndex: 1000, top: '0px',}`).row.full-width
-      page-trends-nav-tabs(v-if="pageId === 'trends'")
-    component(
-      :is="`page-${pageId}`"
-      :oid="$route.params.oid"
-      :useHeader="false"
-      :searchString="searchString"
-      :searchStringShow="false"
-      @close="viewId = 'trends'")
+  kalpa-layout
+    template(v-slot:footer)
+      kalpa-menu-mobile(v-if="$q.screen.lt.md")
+    template(v-slot:body)
+      //-header
+      transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+        div(v-if="pageInfo.search || showHeader" :style=`{position: 'fixed', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+          q-resize-observer(@resize="headerHeight = $event.height")
+          page-trends-nav-tabs(:pageInfo="pageInfo")
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          page-search(v-if="pageInfo.search" :useNavHeader="false" :searchString="pageInfo.searchString"
+            :searchStringShow="false" @showHeader="this.showHeader = $event")
+          page-trends(v-else :pageInfo="pageInfo" :useNavHeader="false"
+            :searchString="pageInfo.searchString" :searchStringShow="false" @showHeader="showHeader = $event")
+            template(v-slot:prepend)
+              div(:style=`{height: headerHeight + 'px' }`).row.full-width
+            template(v-slot:append)
+              div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
-
-import pageTrends from './page_trends/index.vue'
-import pageTrendsNavTabs from './page_trends/nav_tabs.vue'
 import pageSearch from 'src/pages/app/search'
+import pageTrends from './page_trends'
+import pageTrendsNavTabs from 'src/pages/app/trends/nav_tabs.vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/utils'
 
 export default {
   name: 'pageApp_trends',
   components: {
-    pageTrends,
     pageTrendsNavTabs,
     pageSearch,
+    pageTrends
   },
   data () {
     return {
-      pageId: 'trends',
-      searchString: '',
-      searchPageShown: false
-    }
-  },
-  watch: {
-    searchPageShown: {
-      handler (to, from) {
-        if (to) {
-          this.pageId = 'search'
-        }
-        else {
-          this.pageId = 'trends'
-        }
+      headerHeight: 0,
+      showHeader: true,
+      pageInfo: {
+        pages: [
+          ...this.$store.getters.nodeCategories.map(c => {
+            return { id: c.sphere.oid, name: c.alias, label: c.alias }
+          })],
+        pageId: this.$route.query.pageId || this.$store.getters.nodeCategories[0].sphere.oid,
+        searchString: '',
+        search: false
       }
     }
-  },
-  mounted () {
-    this.$log('mounted')
   }
 }
 </script>

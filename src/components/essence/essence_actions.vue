@@ -9,7 +9,16 @@
         height: Math.min(500, $q.screen.height)+'px',
       }`
         @voteAgain="voteAgain"
+        @renode="renode"
         @close="voteStatsShow = false")
+    q-dialog(
+      v-model="itemEditorShow"
+      :maximized="false"
+      position="standard")
+      item-editor(
+        :item="essence"
+        :publish="true"
+        @close="itemEditorShow = false")
     div(
       :style=`{
       position: 'relative',
@@ -127,6 +136,7 @@ import { ObjectApi } from 'src/api/object'
 
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
+import itemEditor from 'src/components/kalpa_item/item_editor'
 
 export default {
   name: 'essenceActions',
@@ -139,7 +149,8 @@ export default {
   },
   components: {
     essenceVoteBall,
-    essenceVoteStats
+    essenceVoteStats,
+    itemEditor,
   },
   data () {
     return {
@@ -148,6 +159,7 @@ export default {
       votesShow: false,
       voteStarted: false,
       voteStatsShow: false,
+      itemEditorShow: false,
       voteVoting: null,
       rateOver: null
     }
@@ -198,6 +210,11 @@ export default {
       this.voteStatsShow = false
       // await this.$wait(200)
       this.voteStarted = true
+    },
+    async renode() {
+      this.voteStatsShow = false
+      await this.$wait(200)
+      this.itemEditorShow = true
     },
     async vote (val) {
       try {

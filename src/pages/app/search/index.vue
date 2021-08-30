@@ -3,12 +3,10 @@
     :height="_height")
     template(v-slot:header)
       div(
-        v-if="useHeader"
-      ).row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
+        v-if="useNavHeader"
+      ).row.full-width.justify-center.b-30
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          slot(name="header")
           div(
-            v-if="!$slots.header"
             :style=`{
             height: '60px',
             borderRadius: '10px',
@@ -20,7 +18,7 @@
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Search')}}
             q-btn(round flat color="white" icon="more_vert")
     template(v-slot:body)
-      div(:style=`{paddingTop: useHeader ? '76px' : '0px',}`).row.full-width.items-start.content-start
+      .row.full-width.items-start.content-start
         //- bookmark editor
         q-dialog(
           v-model="bookmarkEditorShow"
@@ -32,32 +30,6 @@
           bookmark-editor(
             :bookmark="bookmarkSelected"
             @close="bookmarkEditorShow = false, bookmarkSelected = null")
-        //- search bar
-        div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
-          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
-            q-input(
-              v-model="searchString"
-              borderless dark
-              :placeholder="$t('Search')"
-              :input-style=`{
-              padding: '16px',
-              background: 'rgb(40,40,40)',
-              borderRadius: '10px',
-            }`
-            ).full-width
-        //- tabs sticky
-        div(
-          :style=`{
-          position: 'sticky', top: '0px', zIndex: 1000,
-        }`).row.full-width.q-px-md.b-30
-          q-tabs(
-            v-model="pageId"
-            switch-indicator no-caps dense
-            active-color="green"
-          ).full-width.text-grey-8
-            q-tab(
-              v-for="(p,pi) in pages" :key="p.id"
-              :name="p.id" :label="p.name")
         //- tab panels
         q-tab-panels(
           v-model="pageId"
@@ -70,15 +42,42 @@
             background: 'none',
             minHeight: '70vh',
           }`
-          ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+          ).row.full-width.items-start.content-start.justify-center
             list-feed(
+              :scrollAreaHeight="_height"
               :query="query"
               nextSize=50
               :itemMiddlePersist="false"
               screenSize=100
-              :style=`{
-              maxWidth: $store.state.ui.pageWidth+'px',
-            }`)
+              :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+              @showHeader="$emit('showHeader', $event)")
+              template(v-slot:header)
+                // external header
+                slot(name="header")
+                //- search bar
+                div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
+                  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+                    q-input(
+                      v-model="searchString"
+                      borderless dark
+                      :placeholder="$t('Search')"
+                      :input-style=`{
+                      padding: '16px',
+                      background: 'rgb(40,40,40)',
+                      borderRadius: '10px',
+                    }`
+                    ).full-width
+                //- tabs sticky
+                .row.full-width.q-px-md.b-30
+                  q-tabs(
+                    v-model="pageId"
+                    :switch-indicator="!$slots.header"
+                    no-caps dense
+                    active-color="green"
+                  ).full-width.text-grey-8
+                    q-tab(
+                      v-for="(p,pi) in pages" :key="p.id"
+                      :name="p.id" :label="p.name")
               template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
                 div(
                   @click="onSelected(item)"
@@ -122,9 +121,9 @@ export default {
   name: 'pageSearch',
   props: {
     height: { type: Number },
-    useHeader: { type: Boolean, default: true },
+    useNavHeader: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
-    searchStringShow: { type: String, default: true },
+    searchStringShow: { type: Boolean, default: true },
     mode: { type: String },
     pagesFilter: { type: Function }
   },

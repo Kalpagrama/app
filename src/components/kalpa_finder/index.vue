@@ -32,13 +32,13 @@
                   borderRadius: '10px',
                 }`
           ).full-width
-  //page-published(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
-  //page-collections(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
-  //page-search(:useHeader="false" :searchStringShow="false" :searchString="searchString")
+  //page-published(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
+  //page-collections(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
+  //page-search(:useNavHeader="false" :searchStringShow="false" :searchString="searchString")
   //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
   component(
     :is="'page-' + pageId"
-    :useHeader="false"
+    :useNavHeader="false"
     mode="select"
     :searchStringShow="false"
     :searchString="searchString"

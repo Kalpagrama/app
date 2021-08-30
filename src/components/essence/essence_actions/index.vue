@@ -25,7 +25,15 @@ div(
       :node="node"
       :style=`{}`
       @voteAgain="voteAgain"
+      @renode="renode"
       @close="voteStatsShow = false")
+  q-dialog(
+    v-model="itemEditorShow"
+    :maximized="false"
+    position="standard")
+    item-editor(
+      :item="node"
+      @close="itemEditorShow = false")
   div(
     :style=`{
       position: 'relative',
@@ -106,6 +114,7 @@ div(
 import voteBall from './vote_ball.vue'
 import voteOptions from './vote_options.vue'
 import voteStats from './vote_stats.vue'
+import itemEditor from 'src/components/kalpa_item/item_editor'
 
 export default {
   name: 'essenceActions',
@@ -113,12 +122,14 @@ export default {
   components: {
     voteBall,
     voteOptions,
-    voteStats
+    voteStats,
+    itemEditor,
   },
   data () {
     return {
       votesShow: false,
       voteStatsShow: false,
+      itemEditorShow: false,
     }
   },
   computed: {
@@ -170,6 +181,11 @@ export default {
       // await this.$wait(200)
       this.votesShow = true
     },
+    async renode() {
+      this.voteStatsShow = false
+      this.itemEditorShow = true
+      alert('!!!!!')
+    }
   }
 }
 </script>
