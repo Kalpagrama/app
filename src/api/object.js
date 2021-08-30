@@ -273,6 +273,7 @@ class ObjectApi {
          return deletedObject
       }
       let deletedObject = await apiCall(f, cb)
+      let reactiveObject = await rxdb.set(RxCollectionEnum.OBJ, deletedObject, { actualAge: 'day' })
       await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
       let wsItemType
       if (deletedObject.type === 'NODE') wsItemType = WsItemTypeEnum.WS_NODE
