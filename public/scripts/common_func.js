@@ -1,4 +1,4 @@
-import 'src/system/utils' // string.in func
+import 'src/system/common/utils' // string.in func
 function assert(cond, strError){
    if(!cond) throw new Error('dummy assert: ' + strError)
 }

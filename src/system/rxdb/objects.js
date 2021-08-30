@@ -1,5 +1,5 @@
 // сцепляет запросы и отправляет пачкой
-import { assert, wait } from 'src/system/utils'
+import { assert, wait } from 'src/system/common/utils'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'

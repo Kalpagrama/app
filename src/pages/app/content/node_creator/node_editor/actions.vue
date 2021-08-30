@@ -31,7 +31,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 import { WsItemTypeEnum } from 'src/system/rxdb/common'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 
 export default {
   name: 'nodeEditorActions',

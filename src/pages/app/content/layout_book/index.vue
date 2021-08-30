@@ -87,7 +87,7 @@ import pageInfo from '../page_info_root/index.vue'
 import navBottom from '../nav_bottom.vue'
 
 import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'layoutBook',

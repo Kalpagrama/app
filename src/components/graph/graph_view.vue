@@ -132,7 +132,7 @@
 import itemPreview from 'src/components/kalpa_item/item_preview'
 import itemEditor from 'src/components/kalpa_item/item_editor'
 import * as d3 from 'd3';
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import { RxCollectionEnum } from 'src/system/rxdb'

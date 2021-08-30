@@ -47,7 +47,7 @@ div(
 </template>
 
 <script>
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 
 export default {

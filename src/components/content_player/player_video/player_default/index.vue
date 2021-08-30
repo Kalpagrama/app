@@ -45,7 +45,7 @@ video(
 </template>
 
 <script>
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'

@@ -1,6 +1,6 @@
 // import { LoadingBar } from 'quasar'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
 import { notify } from 'src/boot/notify'
 import store from 'src/store'

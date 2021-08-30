@@ -1,16 +1,19 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-px-sm
+  .q-pa-sm.text-h6.text-bold.text-white {{$t('Comments')}} ({{commentsCount}})
   //- comment input
   div(
     :style=`{
       minHeight: '60px',
       borderRadius: '10px',
+      align:"center",
     }`
     ).row.full-width.items-start.content-start.b-35
     .col
-      //- @keyup.enter="commentSend()"
+      //- @keyup.enter.ctrl="commentSend()"
       q-input(
         v-model="comment"
+        @keyup.enter.ctrl="commentSend()"
         autogrow
         borderless dark type="textarea" :resize="false"
         :placeholder="$t('Join the discussion')"
@@ -33,6 +36,7 @@
   //- comments
   .row.full-width.justify-center.q-pt-sm
     list-feed(
+      ref="listFeed"
       :query="query"
       nextSize=24
       :itemMiddlePersist="false"
@@ -62,6 +66,9 @@ export default {
     }
   },
   computed: {
+    commentsCount() {
+      return this.$refs.listFeed?.itemsRes?.items?.length || 0
+    },
     query () {
       return {
         selector: {

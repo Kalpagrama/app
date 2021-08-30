@@ -5,6 +5,7 @@
       maxWidth: $store.state.ui.pageWidth+'px',
     }`
     ).row.full-width.items-start.content-start
+      .row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       list-feed(
         :itemStyles=`{
         paddingBottom: '50px',
@@ -21,8 +22,11 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageRecommendations',
-  props: ['node'],
+  name: 'pageSimilar',
+  props: {
+    node: {type: Object},
+    types: {type: Array, default: ['NODE', 'JOINT', 'BLOCK']},
+  },
   data () {
     return {
     }
@@ -32,7 +36,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
+          objectTypeEnum: { $in: this.types },
           oidSphere: this.node.oid,
           deep: 5,
           sortStrategy: 'HOT' // 'ACTIVITY', // AGE

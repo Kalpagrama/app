@@ -28,15 +28,15 @@ q-layout(
             p.text-white Мы верим в то, что люди самостоятельно могут докопаться до истины, и для этого им просто нужен удобный инструмент.
             p.text-white Который помогает быстро вникать в суть вещей и делать новые открытия, с помощью коллективной мудрости.
             p.text-white Все это возможно в Кальпаграме - платформе коллективного мышления.
-            .row.full-width
-              div(
-                v-for="n in 5" :key="n"
-                :style=`{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '10px',
-                  background: 'rgb(35,35,35)',
-                }`).q-mr-sm
+            //.row.full-width
+            //  div(
+            //    v-for="n in 5" :key="n"
+            //    :style=`{
+            //      width: '50px',
+            //      height: '50px',
+            //      borderRadius: '10px',
+            //      background: 'rgb(35,35,35)',
+            //    }`).q-mr-sm
         //- content
         .row.full-width.justify-center.q-mt-lg
           q-icon(name="select_all" color="grey-5" size="300px")
@@ -48,15 +48,15 @@ q-layout(
             }`
           ).row.full-width.items-start.content-start
             p.text-white Добавляйте контент из YouTube, Twitter, Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
-            .row.full-width
-              div(
-                v-for="n in 5" :key="n"
-                :style=`{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '10px',
-                  background: 'rgb(35,35,35)',
-                }`).q-mr-sm
+            //.row.full-width
+            //  div(
+            //    v-for="n in 5" :key="n"
+            //    :style=`{
+            //      width: '50px',
+            //      height: '50px',
+            //      borderRadius: '10px',
+            //      background: 'rgb(35,35,35)',
+            //    }`).q-mr-sm
         //- nodes
         .row.full-width.justify-center.q-pt-md
           q-icon(name="adjust" color="grey-5" size="276px")
@@ -68,15 +68,15 @@ q-layout(
             }`
           ).row.full-width.items-start.content-start
             p.text-white Находите смыслы и создавайте смысловые ядра, Пришло озарение ? Создайте ядро и поделитесь своим пониманием с другими. Смысловое ядро - это смысл найденный во фрагменте из видеоролика, книги или аудио, который вы опубликовали в Кальпаграме. Если вы не хотите делать найденный смысл общедоступным - вы просто сохраняете его в заметки.
-            .row.full-width
-              div(
-                v-for="n in 5" :key="n"
-                :style=`{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '10px',
-                  background: 'rgb(35,35,35)',
-                }`).q-mr-sm
+            //.row.full-width
+            //  div(
+            //    v-for="n in 5" :key="n"
+            //    :style=`{
+            //      width: '50px',
+            //      height: '50px',
+            //      borderRadius: '10px',
+            //      background: 'rgb(35,35,35)',
+            //    }`).q-mr-sm
           //- q-icon(name="adjust" color="grey-5" size="300px")
         //- joints
         .row.full-width.justify-center.q-mt-xl
@@ -89,15 +89,15 @@ q-layout(
             }`
             ).row.full-width.items-start.content-start
             p.text-white Смысловые ядра можно связывать друг с другом, раскрывая новые смыслы в сравнении. Суть связей может выражаться парой: Причина-Следствие, Проблема-Решение, Факт-Опровержение, Вопрос-Ответ и т.д. Или, например, можно соединить фрагмент из книги и отрывок фильма с одинаковым смыслом. Таким образом связи помогают увидеть картину шире и становятся отправной точкой для исследования.
-            .row.full-width
-              div(
-                v-for="n in 5" :key="n"
-                :style=`{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '10px',
-                  background: 'rgb(35,35,35)',
-                }`).q-mr-sm
+            //.row.full-width
+            //  div(
+            //    v-for="n in 5" :key="n"
+            //    :style=`{
+            //      width: '50px',
+            //      height: '50px',
+            //      borderRadius: '10px',
+            //      background: 'rgb(35,35,35)',
+            //    }`).q-mr-sm
         //- vote
         .row.full-width.justify-center.q-pt-xl
           div(
@@ -179,15 +179,15 @@ q-layout(
             }`
             ).row.full-width.items-start.content-start.q-pt-md
             p.text-white Голосуя, вы определяете насколько близко к сути ядро или связь, что так же отражается на рейтинге автора. Чем больше этот рейтинг, тем сильнее голос пользователя повлияет на рейтинг ядра или связи за которые он проголосовал. Всё что опубликовано в Кальпаграме - объединяется в глобальную карту знаний.  Раположение элементов на этой карте определено голосованием сообщества. Теперь пользователи определяют и проверяют истинность информации. Не алгоритмы и корпорации, а ВЫ решаете, что будет в центре внимания.
-            .row.full-width
-              div(
-                v-for="n in 5" :key="n"
-                :style=`{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '10px',
-                  background: 'rgb(35,35,35)',
-                }`).q-mr-sm
+            //.row.full-width
+            //  div(
+            //    v-for="n in 5" :key="n"
+            //    :style=`{
+            //      width: '50px',
+            //      height: '50px',
+            //      borderRadius: '10px',
+            //      background: 'rgb(35,35,35)',
+            //    }`).q-mr-sm
 </template>
 
 <script>

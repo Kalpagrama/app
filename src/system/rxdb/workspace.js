@@ -1,4 +1,4 @@
-import { assert, wait } from 'src/system/utils'
+import { assert, wait } from 'src/system/common/utils'
 import {
    RxCollectionEnum,
    rxdbOperationProxy,

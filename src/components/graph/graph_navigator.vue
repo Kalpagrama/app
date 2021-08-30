@@ -23,7 +23,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import itemPreview from 'src/components/kalpa_item/item_preview'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {

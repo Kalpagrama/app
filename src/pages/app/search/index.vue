@@ -86,35 +86,37 @@
                   background: 'rgb(35,35,35)',
                   borderRadius: '10px',
                 }`
-                ).row.full-width.items-start.content-start
+                ).row.full-width.items-start.content-start.q-mb-sm
                   img(
                     v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
                     draggable="false"
                     :src="item.thumbUrl"
                     :style=`{
-                      height: '50px',
-                      minWidth: '89px',
+                      height: '60px',
+                      minWidth: '90px',
+                      maxWidth: '90px',
                       borderRadius: '10px',
-                      objectFit: 'contain',
-                    }`).b-50
+                      objectFit: 'cover',
+                    }`).b-50.q-mt-sm.q-ml-sm.q-mb-sm
                   div(
                     v-else
-                    :style=`{width: '50px', height: '50px',}`
-                  ).row.items-center.content-center.justify-center
-                    q-icon(name="blur_on" size="30px" color="white")
+                    :style=`{width: '90px', height: '60px',}`
+                  ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
+                    q-icon(name="blur_on" size="60px" color="white")
                   .col.full-height
                     .row.fit.items-between.content-between.q-pa-sm
                       .row.full-width
-                        span.text-white {{ item.name }}
+                        span.text-white.q-pt-sm {{ item.name }}
                       .row.full-width
-                        small.text-grey-8 {{ item.type }}
+                        small.text-grey-8 {{ itemType(item) }}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
+import {objectTypeName, objectUrl} from '../../../system/common/object_info';
 
 export default {
   name: 'pageSearch',
@@ -182,52 +184,11 @@ export default {
         limit: 150
       }
     },
-    itemMetaMap () {
-      return {
-        VIDEO: {
-          name: this.$t('Video'),
-          link: '/content/'
-        },
-        IMAGE: {
-          name: this.$t('Image'),
-          link: '/content/'
-        },
-        BOOK: {
-          name: this.$t('Book'),
-          link: '/content/'
-        },
-        NODE: {
-          name: this.$t('Node'),
-          link: '/node/'
-        },
-        JOINT: {
-          name: this.$t('Joint'),
-          link: '/joint/'
-        },
-        BLOCK: {
-          name: this.$t('Essence block'),
-          link: '/block/'
-        },
-        WORD: {
-          name: this.$t('Sphere'),
-          link: '/sphere/'
-        },
-        SENTENCE: {
-          name: this.$t('Sphere'),
-          link: '/sphere/'
-        },
-        SPHERE: {
-          name: this.$t('Sphere'),
-          link: '/sphere/'
-        },
-        USER: {
-          name: this.$t('User'),
-          link: '/user/'
-        }
-      }
-    }
   },
   methods: {
+    itemType(item) {
+      return objectTypeName(item)
+    },
     itemLink (item) {
       // this.$log('itemLink', item)
       if (item.wsItemType) {
@@ -235,7 +196,7 @@ export default {
         return '/trends'
       }
       else {
-        return this.itemMetaMap[item.type].link + item.oid
+        return objectUrl(item)
       }
     },
     onSelected(item) {

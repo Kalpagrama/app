@@ -3,7 +3,7 @@
     div(
       :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px'}`
     ).row.full-width
-      q-input(v-model="newCollectionName", borderless dark :placeholder="$t('Collection name')" @keyup.enter="createCollection").col.full-width
+      q-input(v-model="newCollectionName", borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
       q-btn(round flat v-close-popup :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
     div(v-for="(c,ci) in value.collections" :key="c.id").row.full-width
       q-btn( round flat no-caps v-close-popup align="left" :color="value.collectionId==c.id && highlightSelected? 'green' : 'grey-8'" :label="c.name" @click="value.collectionId=c.id, $emit('collection-select', c.id)").col.full-width.q-pl-sm
@@ -13,7 +13,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 
 export default {
   name: 'AddCollectionBtn',
@@ -35,7 +35,7 @@ export default {
         if (to) {
           const collectionAll = {
             id: 'all',
-            name: 'All',
+            name: this.$t('All')
           }
           this.value.collections = (this.showAllCollection ? [collectionAll, ...this.collectionsRes.items] : this.collectionsRes.items)
           // this.value.collections.splice(0, this.value.collections.length, ...[collectionAll, ...this.collectionsRes.items])

@@ -5,7 +5,7 @@ import { Loading, Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
-import { assert, wait } from 'src/system/utils';
+import { assert, wait } from 'src/system/common/utils';
 import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'

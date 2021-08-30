@@ -1,7 +1,7 @@
 import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 

@@ -1,5 +1,5 @@
 import LruCache from 'lru-cache'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { cacheSchema } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'

@@ -1,4 +1,4 @@
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { Workspace } from 'src/system/rxdb/workspace'
 import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'

@@ -1,4 +1,4 @@
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'

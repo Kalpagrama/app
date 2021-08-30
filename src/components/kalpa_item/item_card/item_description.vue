@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import {ContentApi} from '../../../api/content';
 
 export default {

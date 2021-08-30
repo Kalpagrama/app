@@ -12,7 +12,7 @@
 <script>
 import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'composerNode',

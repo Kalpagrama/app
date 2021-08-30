@@ -1,5 +1,5 @@
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { router } from 'src/boot/system'
 import { HapticsImpactStyle, Plugins, StatusBarStyle } from '@capacitor/core'
 // import { Screenshot } from 'com.darktalker.cordova.screenshot'

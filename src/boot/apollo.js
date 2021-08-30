@@ -5,7 +5,7 @@ import { onError } from 'apollo-link-error'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 

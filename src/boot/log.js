@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-duplicates
-import 'src/system/utils'
+import 'src/system/common/utils'
 import { initLogger, performance } from 'src/system/log'
 
 export default async ({ Vue, store, app, ssrContext }) => {

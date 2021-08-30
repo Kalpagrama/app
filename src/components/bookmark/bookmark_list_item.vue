@@ -17,7 +17,7 @@ div(
   .col
     component(
       :is="mode === 'select' ? 'div' : 'router-link'"
-      :to="bookmarkMeta.link"
+      :to="link"
       :style=`{
         minHeight: '50px',
       }`
@@ -52,7 +52,7 @@ div(
           div(:style=`{minHeight:'32px',}`).row.full-width
             span(:style=`{lineHeight: 1.1,}`).text-white {{ bookmark.name }}
           .row.full-width.q-py-xs
-            small.text-grey-8 {{ bookmarkMeta.type }}
+            small.text-grey-8 {{ type }}
             .col
             small.text-grey-8 {{ $date(bookmark.createdAt) }}
   //- right
@@ -65,6 +65,7 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import {objectTypeName, objectUrl} from '../../system/common/object_info';
 
 export default {
   name: 'bookmarkListItem',
@@ -84,55 +85,11 @@ export default {
     }
   },
   computed: {
-    bookmarkMeta () {
-      // alert(JSON.stringify(this.bookmark))
-      if (['VIDEO', 'IMAGE', 'BOOK'].includes(this.bookmark.type)) {
-        let typesNames = {
-          VIDEO: 'Видео',
-          IMAGE: 'Изображение',
-          BOOK: 'Книга'
-        }
-        return {
-          link: '/content/' + this.bookmark.oid,
-          name: this.bookmark.name,
-          type: typesNames[this.bookmark.type]
-        }
-      }
-      else if (this.bookmark.type === 'NODE') {
-        return {
-          link: '/node/' + this.bookmark.oid,
-          name: this.bookmark.name,
-          type: null
-        }
-      }
-      else if (this.bookmark.type.in('SPHERE', 'SENTENCE', 'WORD')) {
-        return {
-          link: '/sphere/' + this.bookmark.oid,
-          name: this.bookmark.name,
-          type: null
-        }
-      }
-      else if (this.bookmark.type === 'JOINT') {
-        return {
-          link: '/joint/' + this.bookmark.oid,
-          name: this.bookmark.name || 'Связь',
-          type: null
-        }
-      }
-      else if (this.bookmark.type === 'USER') {
-        return {
-          link: '/user/' + this.bookmark.oid,
-          name: this.bookmark.name,
-          type: null
-        }
-      }
-      else {
-        return {
-          link: '/workspace/bookmarks',
-          name: null,
-          type: null,
-        }
-      }
+    link() {
+      return objectUrl(this.bookmark)
+    },
+    type() {
+      return objectTypeName(this.bookmark)
     },
     actions () {
       return {
@@ -140,7 +97,7 @@ export default {
           name: 'Перейти',
           cb: () => {
             this.$log('launch')
-            this.$router.push(this.bookmarkMeta.link)
+            this.$router.push(this.link)
           }
         },
         delete: {

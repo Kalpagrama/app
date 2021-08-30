@@ -52,7 +52,7 @@ import itemPreview from 'src/components/kalpa_item/item_preview'
 import vertexEditor from 'src/components/kalpa_item/item_editor/composer_joint/vertex_editor.vue'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'composerJoint',

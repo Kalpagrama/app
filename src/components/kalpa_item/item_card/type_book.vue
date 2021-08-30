@@ -34,7 +34,7 @@
             label="Читать"
             @click="$router.push('/content/' + item.oid)"
             ).col.full-width.q-mx-xs
-          kalpa-save(:item="item" :isActive="true" inactiveColor="grey-9").q-mx-xs
+          kalpa-save(:item="item" :isActive="true" :showHeader="false" inactiveColor="grey-9").q-mx-xs
     .row.full-width.q-pt-md
       //- tabs sticky
       div(
@@ -66,6 +66,7 @@
           page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
           item-description(v-if="pageId === 'description'" :item="item" :height="700")
           page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
+          page-similar(v-if="pageId === 'similar'" :node="item" :height="700" :types="['VIDEO', 'BOOKS', 'IMAGE']")
 </template>
 
 <script>
@@ -73,6 +74,7 @@ import pageComments from 'src/pages/app/node/page_comments/index.vue'
 import itemDescription from 'src/components/kalpa_item/item_card/item_description.vue'
 import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
 import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
+import pageSimilar from 'src/pages/app/node/page_similar/index.vue'
 import {ContentApi} from 'src/api/content';
 
 export default {
@@ -82,7 +84,8 @@ export default {
     pageComments,
     itemDescription,
     pageNodes,
-    pageJoints
+    pageJoints,
+    pageSimilar
   },
   data () {
     return {

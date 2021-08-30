@@ -1,5 +1,5 @@
 // сцепляет запросы и отправляет пачкой
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { getRawIdFromId } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'

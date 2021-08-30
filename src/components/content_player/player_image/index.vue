@@ -100,7 +100,7 @@ div(
 <script>
 import playerTint from './player_tint.vue'
 import imageCropper from 'src/components/image_cropper/index.vue'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
 

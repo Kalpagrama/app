@@ -8,35 +8,34 @@ q-btn(
   @click="onClick()"
   )
   q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
-  q-dialog(
-    v-if="isActive && bookmark"
-    v-model="bookmarkCreatedDialogShow"
-    position="bottom"
-    auto-close)
-    div(
-      v-if="isActive && bookmark"
-      :style=`{
-        position: 'relative',
-        borderRadius: '20px 20px 0 0',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
-      }`
-      ).row.full-width.q-px-sm.q-pt-sm.b-40
-      q-btn(
-        flat no-caps color="white" align="left"
-        :style=`{
-          height: '50px',
-        }`
-        @click="saveBookmark()"
-        ).full-width.q-mb-md
-        span.text-white {{ $t('Save to collection') }}
+  //q-dialog(
+  //  v-if="isActive && bookmark"
+  //  v-model="bookmarkCreatedDialogShow"
+  //  position="bottom"
+  //  auto-close)
+  //  div(
+  //    :style=`{
+  //      position: 'relative',
+  //      borderRadius: '20px 20px 0 0',
+  //      paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+  //    }`
+  //    ).row.full-width.q-px-sm.q-pt-sm.b-40
+  //    q-btn(
+  //      flat no-caps color="white" align="left"
+  //      :style=`{
+  //        height: '50px',
+  //      }`
+  //      @click="saveBookmark()"
+  //      ).full-width.q-mb-md
+  //      span.text-white {{ $t('Save to collection') }}
   //- edit bookmark...
   q-dialog(
     v-if="isActive && bookmark"
     v-model="bookmarkEditorDialogShow"
     position="bottom")
     bookmark-editor(
-      v-if="isActive && bookmark"
       :bookmark="bookmark"
+      :showHeader="showHeader"
       @deleted="boookmarkDeleted")
 </template>
 
@@ -56,6 +55,7 @@ export default {
     color: {type: String, default: 'grey-9'},
     dense: {type: Boolean, default: false},
     item: {type: Object, required: true},
+    showHeader: {type: Boolean},
   },
   data () {
     return {

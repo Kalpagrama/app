@@ -46,16 +46,17 @@ div(
           //- actions
           .row.full-width.items-center.content-center
             kalpa-share(type="content" color="grey-2" :item="contentKalpa")
-            kalpa-bookmark(
-              v-if="contentKalpa"
-              :oid="contentKalpa.oid"
-              :type="contentKalpa.type"
-              :name="contentKalpa.name"
-              :thumbUrl="contentKalpa.thumbUrl"
-              :isActive="true"
-              inactiveColor="grey-3"
-              :fields=`{contentType: contentKalpa.type}`
-              @item="$event => $emit('item', $event)")
+            kalpa-save(:item="contentKalpa" :isActive="true" inactiveColor="white" color="grey-2").q-mx-xs
+            //kalpa-bookmark(
+            //  v-if="contentKalpa"
+            //  :oid="contentKalpa.oid"
+            //  :type="contentKalpa.type"
+            //  :name="contentKalpa.name"
+            //  :thumbUrl="contentKalpa.thumbUrl"
+            //  :isActive="true"
+            //  inactiveColor="grey-3"
+            //  :fields=`{contentType: contentKalpa.type}`
+            //  @item="$event => $emit('item', $event)")
             //- buy
             kalpa-pay(
               v-if="contentKalpa"
@@ -123,12 +124,13 @@ div(
 <script>
 import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 
 export default {
   name: 'pageInfoRoot',
   props: {
     contentKalpa: {type: Object, required: true},
+    isActive: {type: Boolean},
     player: {type: Object, required: true},
     styles: {
       type: Object,

@@ -22,7 +22,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { EpubCFI } from 'epubjs'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import debounce from 'lodash/debounce'
 

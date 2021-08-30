@@ -5,7 +5,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStora
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import { LstCollectionEnum } from 'src/system/rxdb/common'
 import { apiCall } from 'src/api/index'
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)

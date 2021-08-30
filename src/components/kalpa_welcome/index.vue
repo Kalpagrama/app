@@ -57,7 +57,7 @@ div(
         transition-next="slide-left"
         swipeable animated navigation arrows
         infinite
-        :autoplay="10000"
+        :autoplay="15000"
         control-color="white"
         :style=`{
           position: 'absolute',
@@ -68,7 +68,7 @@ div(
           :name="s.id"
           :style=`{
             position: 'relative',
-            zIndex: 10,
+            zIndex: 'auto',
             userSelect: 'none',
           }`
           ).row.fit.items-center.content-center.justify-center.b-30

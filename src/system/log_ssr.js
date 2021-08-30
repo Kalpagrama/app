@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-duplicates
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 // eslint-disable-next-line import/no-duplicates
-import 'src/system/utils'
+import 'src/system/common/utils'
 import { LogSystemModulesEnum, LogLevelEnum } from 'src/system/log'
 
 let logSystemModulesValueSet = new Set(Object.values(LogSystemModulesEnum))

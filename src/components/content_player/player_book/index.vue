@@ -89,7 +89,7 @@ iframe
 <script>
 import { Book } from 'epubjs'
 import debounce from 'lodash/debounce'
-import { assert } from 'src/system/utils'
+import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'

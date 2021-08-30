@@ -1,4 +1,4 @@
-import {assert, wait} from 'src/system/utils'
+import {assert, wait} from 'src/system/common/utils'
 import LruCache from 'lru-cache'
 import {
   clear as idbClear,

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { assert, wait } from 'src/system/utils'
+import { assert, wait } from 'src/system/common/utils'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'

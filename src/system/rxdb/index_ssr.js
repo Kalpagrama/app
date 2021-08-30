@@ -1,4 +1,4 @@
-import {assert} from 'src/system/utils'
+import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { LstCollectionEnum, RxCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
 import { getRawIdFromId, getRxCollectionEnumFromId, makeId, rxdb } from 'src/system/rxdb'
