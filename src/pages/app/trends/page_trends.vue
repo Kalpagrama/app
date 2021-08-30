@@ -37,6 +37,7 @@
               nextSize=50
               :itemMiddlePersist="false"
               screenSize=100
+              :itemStyles=`{ paddingBottom: '30px',}`
               :style=`{ maxWidth: $store.state.ui.pageWidth+'px'}`
               @showHeader="$emit('showHeader', $event)")
               template(v-slot:header)

@@ -1,26 +1,8 @@
 <template lang="pug">
 .row
-  //- node
-  div(
-    v-if="item.type === 'NODE'"
-    ).row.full-width
-    item-preview(:item="item")
-    .row.full-width.q-py-lg.q-px-sm
-      q-btn(
-        outline no-caps color="grey-6"
-        :disable="true"
-        :style=`{
-          height: '50px',
-        }`
-        ).full-width.q-mb-sm
-        span {{$t('Change essence')}}
-  //- joint
-  //- sphere
-  //- user
-  //- ===
   //- content VIDEO
   composer-video(
-    v-else-if="['VIDEO'].includes(item.type)"
+    v-if="['VIDEO'].includes(item.type)"
     :oid="item.oid"
     :action="action"
     :figures="null"
@@ -75,11 +57,13 @@
     :publish="publish"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
+  //- node
   composer-node(
     v-else-if="item.type === 'NODE'"
     :item="item"
     :action="action"
     :publish="publish"
+    :showActions="false"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
 </template>

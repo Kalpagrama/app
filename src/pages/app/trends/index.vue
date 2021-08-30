@@ -12,7 +12,7 @@
           page-search(v-if="pageInfo.search" :useNavHeader="false" :searchString="pageInfo.searchString"
             :searchStringShow="false" @showHeader="this.showHeader = $event")
           page-trends(v-else :pageInfo="pageInfo" :useNavHeader="false"
-            :searchString="pageInfo.searchString" :searchStringShow="false" @showHeader="showHeader = $event").br
+            :searchString="pageInfo.searchString" :searchStringShow="false" @showHeader="showHeader = $event")
             template(v-slot:prepend)
               div(:style=`{height: headerHeight + 'px' }`).row.full-width
             template(v-slot:append)

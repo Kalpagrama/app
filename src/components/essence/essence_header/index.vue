@@ -49,6 +49,7 @@
         q-icon(name="visibility" color="grey-8").q-mr-xs
         small(:style=`{lineHeight: 0.6}`).text-grey-8 {{ essence.countStat.countViews }}
     kalpa-menu-actions(
+      v-if="showActions"
       icon="more_vert"
       color="grey-8"
       :actions="actions")
@@ -60,7 +61,11 @@ import { UserRoleEnum } from 'src/api/user'
 
 export default {
   name: 'essenceHeader',
-  props: ['essence', 'showAuthorAlways'],
+  props: {
+    essence: {type: Object, required: true},
+    showAuthorAlways: {type: Boolean, default: false},
+    showActions: {type: Boolean, default: true},
+  },
   computed: {
     essenceIsMine () {
       return this.essence.author.oid === this.$store.getters.currentUser.oid
