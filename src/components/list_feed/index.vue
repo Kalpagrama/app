@@ -1,6 +1,6 @@
 // если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  div(:style=`{paddingTop: headerHeight +'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
+  div(:style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
     q-resize-observer(@resize="scrollHeightResized")
     //- debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -77,22 +77,9 @@
             round flat dense  icon="south").full-width
             //- q-tooltip Вперед
     slot(name="prepend")
-    //- loading start(spinner), no itemsRes
-    div(
-      v-if="!itemsRes"
-      :style=`{
-      position: 'absolute', zIndex: 10, top: '0px', left: '0px',
-      height:scrollTargetHeight+'px',
-      //- height: scrollTargetHeight/2+'px',
-      }`
-    ).row.full-width.items-center.content-center.justify-center
-      //- q-spinner(size="50px" color="green")
+    //- spinner, no itemsRes
+    div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
       q-spinner-dots(color="green" size="60px")
-    //-header
-    transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-      div(v-if="!autoHideHeader || headerShow || scrollTop === 0" :style=`{position: scrollAreaHeight ? 'absolute' : 'fixed', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
-        q-resize-observer(@resize="headerHeight = $event.height")
-        slot(name="header")
     //- items
     div(
       v-if="itemsRes"
@@ -128,7 +115,7 @@
           q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").full-width.full-height
             q-icon(name="expand_less" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
         //- next loading + компенсация kalpa-menu-mobile
-        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: !scrollAreaHeight && $store.state.ui.mobileMenuShown ? '95px' : '30px'}`).row.full-width
+        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: '30px'}`).row.full-width
           q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
           q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" :style=`{height: '30px'}`).full-width
             q-icon(name="expand_more" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
@@ -196,13 +183,7 @@ export default {
       default () {
         return 36
       }
-    },
-    autoHideHeader: {
-      type: Boolean,
-      default () {
-        return true
-      }
-    },
+    }
 
   },
   data () {
@@ -224,8 +205,6 @@ export default {
       scrollHeight: 0,
       scrollHeightTimeout: null,
       scrollHeightChanging: false,
-      headerShow: true,
-      headerHeight: 0,
       itemsRes: null,
       itemsResStatus: null,
       // item
@@ -510,16 +489,7 @@ export default {
     },
     scrollUpdate (e) {
       this.scrollTop = getScrollPosition(this.scrollTarget)
-      if (!this.directionTimer) {
-        this.directionTimer = setTimeout(() => {
-          if (this.lastScrollTop < this.scrollTop) this.headerShow = false
-          if (this.lastScrollTop > this.scrollTop) this.headerShow = true // scrollUp
-          this.$log('this.scrollUpdate timer', this.lastScrollTop, this.scrollTop, this.scrollDirection)
-          this.lastScrollTop = this.scrollTop
-          this.directionTimer = null
-        }, 1000)
-      }
-
+      this.updateShowHeader(this.scrollTop)
       this.scrollHeight = getScrollHeight(this.scrollTarget)
       this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
     },
@@ -530,15 +500,54 @@ export default {
       this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
       this.scrollHeight = e.height
       this.scrollUpdate()
+    },
+    updateShowHeader (scrollTop) {
+      // едем вниз/вверх более 1 сек и более 200 px
+      let minScrollLen = 200
+      let minScrollDur = 1000
+      if (!this.scrollState) {
+        this.scrollState = { direction: null, startTm: 0, startPos: 0, lastScrollTop: 0, showHeader: true }
+      }
+      let scrollDirection = null
+      if (this.scrollState.lastScrollTop > scrollTop) scrollDirection = 'up'
+      if (this.scrollState.lastScrollTop < scrollTop) scrollDirection = 'down'
+      if (this.scrollState.direction !== scrollDirection) { // изменилось направление
+        this.scrollState.direction = scrollDirection
+        this.scrollState.startTm = Date.now()
+        this.scrollState.startPos = scrollTop
+      }
+      this.scrollState.lastScrollTop = scrollTop
+
+      // едем вниз более 1 сек и проехали более 200 px
+      if (this.scrollState.direction === 'down' &&
+          Date.now() - this.scrollState.startTm > minScrollDur &&
+          Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen) {
+        if (this.scrollState.showHeader) {
+          this.scrollState.showHeader = false
+          this.$emit('showHeader', this.scrollState.showHeader)
+        }
+      }
+
+      // едем вверх более 1 сек и проехали более 200 px
+      if ((scrollTop === 0) || (this.scrollState.direction === 'up' &&
+          Date.now() - this.scrollState.startTm > minScrollDur &&
+          Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen)) {
+        if (!this.scrollState.showHeader) {
+          this.scrollState.showHeader = true
+          this.$emit('showHeader', this.scrollState.showHeader)
+        }
+      }
+      // мы на самом верху
+      if (scrollTop === 0) {
+        this.scrollState.showHeader = true
+      }
     }
   },
   mounted () {
     this.$log('mounted')
-    this.$emit('xxx')
-    this.$parent.$emit('xxx')
     // alert('scrollTargetIsWindow=' + this.scrollTargetIsWindow)
     this.scrollTarget = getScrollTarget(this.$el)
-    this.$log('this.scrollTarget', this.scrollTarget)
+    // this.$log('this.scrollTarget', this.scrollTarget)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
     this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
