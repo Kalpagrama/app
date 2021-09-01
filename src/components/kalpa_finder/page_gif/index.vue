@@ -1,11 +1,32 @@
 <template lang="pug">
-kalpa-layout(
-  :height="height"
-  )
-  template(v-slot:body)
-    .row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        div(v-if="viewId === 'search'").row.full-width.items-start.content-start
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+    // header
+    .row.full-width.q-px-md.q-pb-sm.b-30
+      q-resize-observer(@resize="headerHeight = $event.height")
+      //- tabs sticky
+      q-tabs(
+        v-model="categoryId"
+        switch-indicator="false" no-caps dense
+      active-color="green"
+      ).full-width.text-grey-8
+        q-tab(
+          v-for="(p,pi) in categories" :key="p.name"
+          :name="p.name" :label="p.character")
+
+    //- tab panels
+    q-tab-panels(
+      v-model="categoryId"
+      :swipeable="$q.platform.is.mobile"
+      :animated="$q.platform.is.mobile"
+      :style=`{height: scrollAreaHeight - headerHeight + 'px'}`).full-width.b-30
+      q-tab-panel(
+        v-for="(p,pi) in categories" :key="p.name" :name="p.name"
+        :style=`{
+            background: 'none',
+            minHeight: '70vh',
+          }`
+      ).row.full-width.items-start.content-start.justify-center.q-pa-none
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           masonry(
             :cols="3"
             :gutter="{default: 6}").full-width.items-start.content-start
@@ -16,16 +37,7 @@ kalpa-layout(
                 borderRadius: '10px', overflow: 'hidden',
               }`
               @click="$emit('item', {oid: null, type: 'GIF', thumbUrl: gif.media[0]['tinygif']['url'], url: gif.media[0]['gif']['url']})"
-              ).row.full-width.items-start.content-start.q-mb-sm
-              //- slot(
-                name="tint"
-                :item=`{
-                  oid: null,
-                  type: 'GIF',
-                  thumbUrl: gif.media[0]['tinygif']['url'],
-                  url: gif.media[0]['gif']['url']
-                }`
-                :itemKey="gif.id")
+            ).row.full-width.items-start.content-start.q-mb-sm
               //- img
               img(
                 :src="gif.media[0]['tinygif']['url']"
@@ -33,55 +45,23 @@ kalpa-layout(
                 :style=`{
                   pointerEvents: 'none',
                 }`
-                ).full-width
-//- q-page(
-  :style=`{
-    paddingTop: '8px',
-    paddingBottom: '0px',
-  }`
-  ).row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
-    //- header
-    div(
-      :style=`{position: 'sticky', zIndex: 1000, top: '0px',}`
-      ).row.full-width.q-px-sm
-      div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-        //- q-input(
-          v-model="tenorSearch"
-          filled dark dense color='grey-7'
-          placeholder="Поиск"
-          :debounce="600"
-          ).full-width
-      //- .row.full-width.q-px-md
-        q-tabs(
-          v-model="viewId"
-          dense active-color="green" no-caps switch-indicator inline-label
-          ).full-width.text-grey-6
-          q-tab(name="bookmarked" icon="bookmark" label="Закладки")
-          q-tab(name="search" :label="$t('Search', 'Поиск')")
-    //- body
-    .row.full-width
-      //- favorite
-      //- div(v-if="viewId === 'bookmarked'").row.full-width.items-start.content-start.justify-center
-        h6.text-white Your favorite GIFs will be here soon :)
-      //- search
+              ).full-width
 </template>
 
 <script>
 export default {
   name: 'kalpaFinder_pageGif',
-  props: ['height', 'searchString'],
+  props: ['scrollAreaHeight', 'searchString'],
   data () {
     return {
       tenorSearch: '',
       tenorUrl: 'https://api.tenor.com/v1',
       tenorKey: 'EVS1EYKI5ZRC',
       gifs: [],
-      viewId: 'search',
-      views: [
-        {id: 'bookmarked', name: 'Избранные'},
-        {id: 'search', name: 'Поиск'},
-      ],
+      categories: [],
+      categoryId: null,
+      showHeader: true,
+      headerHeight: 0
     }
   },
   computed: {
@@ -90,6 +70,10 @@ export default {
     },
     tenorUrlTrending () {
       return `${this.tenorUrl}/trending?key=${this.tenorKey}&locale=ru_RU&limit=50`
+    },
+    tenorUrlCategories () {
+      // return `${this.tenorUrl}/categories?key=${this.tenorKey}&locale=ru_RU`
+      return `${this.tenorUrl}/categories?key=${this.tenorKey}&locale=ru_RU&type=emoji`
     },
   },
   watch: {
@@ -100,15 +84,28 @@ export default {
         this.gifs = data.results
         console.log('data', data)
       }
+    },
+    categoryId: {
+      async handler (to, from) {
+        console.log('searchString TO', to)
+        if (to) {
+          let category = this.categories.find(c => c.name === to)
+          let {data: dataTrending} = await this.$axios.get(category.path + '&limit=50')
+          this.gifs = dataTrending.results
+          this.$log('this.gifs', this.gifs)
+        }
+      }
     }
   },
   methods: {
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.scrollAreaHeight)
     // load initial trending gifs
-    let {data} = await this.$axios.get(this.tenorUrlTrending)
-    this.gifs = data.results
+    let {data: dataCategories} = await this.$axios.get(this.tenorUrlCategories)
+    this.$log('mounted', dataCategories)
+    this.categories.splice(0, this.categories.length, ...dataCategories.tags)
+    this.categoryId = this.categories[0].name
   }
 }
 </script>

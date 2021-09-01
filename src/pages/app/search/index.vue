@@ -1,113 +1,212 @@
 <template lang="pug">
-  kalpa-layout(
-    :height="_height")
-    template(v-slot:header)
-      div(
-        v-if="useNavHeader"
-      ).row.full-width.justify-center.b-30
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          div(
-            :style=`{
-            height: '60px',
-            borderRadius: '10px',
-          }`
-          ).row.full-width.items-center.content-center.q-pa-sm.b-40
-            q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-            .col.full-height
-              .row.fit.items-center.content-center.justify-center
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Search')}}
-            q-btn(round flat color="white" icon="more_vert")
-    template(v-slot:body)
-      .row.full-width.items-start.content-start
-        //- bookmark editor
-        q-dialog(
-          v-model="bookmarkEditorShow"
-          :full-width="$q.screen.xs"
-          :full-height="$q.screen.xs"
-          :maximized="$q.screen.xs"
-          :square="$q.screen.xs"
-          @hide="bookmarkSelected = null")
-          bookmark-editor(
-            :bookmark="bookmarkSelected"
-            @close="bookmarkEditorShow = false, bookmarkSelected = null")
-        //- tab panels
-        q-tab-panels(
-          v-model="pageId"
-          :swipeable="$q.platform.is.mobile"
-          :animated="$q.platform.is.mobile"
-          :style=`{}`).full-width.b-30
-          q-tab-panel(
-            v-for="(p,pi) in pages" :key="p.id" :name="p.id"
-            :style=`{
-            background: 'none',
-            minHeight: '70vh',
-          }`
-          ).row.full-width.items-start.content-start.justify-center
-            list-feed(
-              :scrollAreaHeight="_height"
-              :query="query"
-              nextSize=50
-              :itemMiddlePersist="false"
-              screenSize=100
-              :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
-              @showHeader="$emit('showHeader', $event)")
-              template(v-slot:header)
-                // external header
-                slot(name="header")
-                //- search bar
-                div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
-                  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
-                    q-input(
-                      v-model="searchString"
-                      borderless dark
-                      :placeholder="$t('Search')"
-                      :input-style=`{
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+    //- bookmark editor
+    q-dialog(
+      v-model="bookmarkEditorShow"
+      :full-width="$q.screen.xs"
+      :full-height="$q.screen.xs"
+      :maximized="$q.screen.xs"
+      :square="$q.screen.xs"
+      @hide="bookmarkSelected = null")
+      bookmark-editor(
+        :bookmark="bookmarkSelected"
+        @close="bookmarkEditorShow = false, bookmarkSelected = null")
+
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(v-if="showHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+        q-resize-observer(@resize="headerHeight = $event.height")
+        //- search bar
+        div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
+          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+            q-input(
+              v-model="searchString"
+              borderless dark
+              :placeholder="$t('Search')"
+              :input-style=`{
                       padding: '16px',
                       background: 'rgb(40,40,40)',
                       borderRadius: '10px',
                     }`
-                    ).full-width
-                //- tabs sticky
-                .row.full-width.q-px-md.b-30
-                  q-tabs(
-                    v-model="pageId"
-                    :switch-indicator="!$slots.header"
-                    no-caps dense
-                    active-color="green"
-                  ).full-width.text-grey-8
-                    q-tab(
-                      v-for="(p,pi) in pages" :key="p.id"
-                      :name="p.id" :label="p.name")
-              template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-                div(
-                  @click="onSelected(item)"
-                  :style=`{
+            ).full-width
+        //- tabs sticky
+        .row.full-width.q-px-md.b-30
+          q-tabs(
+            v-model="pageInfo.pageId"
+            :switch-indicator="false"
+            no-caps dense
+            active-color="green"
+          ).full-width.text-grey-8
+            q-tab(
+              v-for="(p,pi) in pageInfo.pages" :key="p.id"
+              :name="p.id" :label="p.name")
+
+    //- tab panels
+    q-tab-panels(
+      v-model="pageInfo.pageId"
+      :swipeable="$q.platform.is.mobile"
+      :animated="$q.platform.is.mobile").full-width.b-30
+      q-tab-panel(
+        v-for="(p,pi) in pageInfo.pages" :key="p.id" :name="p.id"
+        :style=`{
+            background: 'none',
+          }`
+      ).row.full-width.items-start.content-start.justify-center.q-pa-none
+        list-feed(
+          :scrollAreaHeight="scrollAreaHeight"
+          :query="query"
+          nextSize=50
+          :itemMiddlePersist="false"
+          screenSize=100
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+          @showHeader="showHeader = $event")
+          template(v-slot:prepend)
+            div(:style=`{height: headerHeight + 'px' }`).row.full-width
+          template(v-slot:append)
+            div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
+          template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+            div(
+              @click="onSelected(item)"
+              :style=`{
                   background: 'rgb(35,35,35)',
                   borderRadius: '10px',
                 }`
-                ).row.full-width.items-start.content-start.q-mb-sm
-                  img(
-                    v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
-                    draggable="false"
-                    :src="item.thumbUrl"
-                    :style=`{
+            ).row.full-width.items-start.content-start.q-mb-sm
+              img(
+                v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+                draggable="false"
+                :src="item.thumbUrl"
+                :style=`{
                       height: '60px',
                       minWidth: '90px',
                       maxWidth: '90px',
                       borderRadius: '10px',
                       objectFit: 'cover',
                     }`).b-50.q-mt-sm.q-ml-sm.q-mb-sm
-                  div(
-                    v-else
-                    :style=`{width: '90px', height: '60px',}`
-                  ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
-                    q-icon(name="blur_on" size="60px" color="white")
-                  .col.full-height
-                    .row.fit.items-between.content-between.q-pa-sm
-                      .row.full-width
-                        span.text-white.q-pt-sm {{ item.name }}
-                      .row.full-width
-                        small.text-grey-8 {{ itemType(item) }}
+              div(
+                v-else
+                :style=`{width: '90px', height: '60px',}`
+              ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
+                q-icon(name="blur_on" size="60px" color="white")
+              .col.full-height
+                .row.fit.items-between.content-between.q-pa-sm
+                  .row.full-width
+                    span.text-white.q-pt-sm {{ item.name }}
+                  .row.full-width
+                    small.text-grey-8 {{ itemType(item) }}
+  //kalpa-layout
+  //  template(v-slot:header)
+  //    div(
+  //      v-if="useNavHeader"
+  //    ).row.full-width.justify-center.b-30
+  //      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+  //        div(
+  //          :style=`{
+  //          height: '60px',
+  //          borderRadius: '10px',
+  //        }`
+  //        ).row.full-width.items-center.content-center.q-pa-sm.b-40
+  //          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+  //          .col.full-height
+  //            .row.fit.items-center.content-center.justify-center
+  //              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Search')}}
+  //          q-btn(round flat color="white" icon="more_vert")
+  //  template(v-slot:body)
+  //    .row.full-width.items-start.content-start
+  //      //- bookmark editor
+  //      q-dialog(
+  //        v-model="bookmarkEditorShow"
+  //        :full-width="$q.screen.xs"
+  //        :full-height="$q.screen.xs"
+  //        :maximized="$q.screen.xs"
+  //        :square="$q.screen.xs"
+  //        @hide="bookmarkSelected = null")
+  //        bookmark-editor(
+  //          :bookmark="bookmarkSelected"
+  //          @close="bookmarkEditorShow = false, bookmarkSelected = null")
+  //
+  //      transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+  //        div(v-if="showHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+  //          q-resize-observer(@resize="headerHeight = $event.height")
+  //          //- search bar
+  //          div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
+  //            div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+  //              q-input(
+  //                v-model="searchString"
+  //                borderless dark
+  //                :placeholder="$t('Search')"
+  //                :input-style=`{
+  //                    padding: '16px',
+  //                    background: 'rgb(40,40,40)',
+  //                    borderRadius: '10px',
+  //                  }`
+  //              ).full-width
+  //          //- tabs sticky
+  //          .row.full-width.q-px-md.b-30
+  //            q-tabs(
+  //              v-model="pageInfo.pageId"
+  //              :switch-indicator="false"
+  //              no-caps dense
+  //              active-color="green"
+  //            ).full-width.text-grey-8
+  //              q-tab(
+  //                v-for="(p,pi) in pageInfo.pages" :key="p.id"
+  //                :name="p.id" :label="p.name")
+  //
+  //      //- tab panels
+  //      q-tab-panels(
+  //        v-model="pageInfo.pageId"
+  //        :swipeable="$q.platform.is.mobile"
+  //        :animated="$q.platform.is.mobile"
+  //        :style=`{}`).full-width.b-30
+  //        q-tab-panel(
+  //          v-for="(p,pi) in pageInfo.pages" :key="p.id" :name="p.id"
+  //          :style=`{
+  //          background: 'none',
+  //          minHeight: '70vh',
+  //        }`
+  //        ).row.full-width.items-start.content-start.justify-center.q-pa-none
+  //          list-feed(
+  //            :scrollAreaHeight="scrollAreaHeight"
+  //            :query="query"
+  //            nextSize=50
+  //            :itemMiddlePersist="false"
+  //            screenSize=100
+  //            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+  //            @showHeader="showHeader = $event")
+  //            template(v-slot:prepend)
+  //              div(:style=`{height: headerHeight + 'px' }`).row.full-width
+  //            template(v-slot:append)
+  //              div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
+  //            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+  //              div(
+  //                @click="onSelected(item)"
+  //                :style=`{
+  //                background: 'rgb(35,35,35)',
+  //                borderRadius: '10px',
+  //              }`
+  //              ).row.full-width.items-start.content-start.q-mb-sm
+  //                img(
+  //                  v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+  //                  draggable="false"
+  //                  :src="item.thumbUrl"
+  //                  :style=`{
+  //                    height: '60px',
+  //                    minWidth: '90px',
+  //                    maxWidth: '90px',
+  //                    borderRadius: '10px',
+  //                    objectFit: 'cover',
+  //                  }`).b-50.q-mt-sm.q-ml-sm.q-mb-sm
+  //                div(
+  //                  v-else
+  //                  :style=`{width: '90px', height: '60px',}`
+  //                ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
+  //                  q-icon(name="blur_on" size="60px" color="white")
+  //                .col.full-height
+  //                  .row.fit.items-between.content-between.q-pa-sm
+  //                    .row.full-width
+  //                      span.text-white.q-pt-sm {{ item.name }}
+  //                    .row.full-width
+  //                      small.text-grey-8 {{ itemType(item) }}
 </template>
 
 <script>
@@ -119,59 +218,69 @@ import {objectTypeName, objectUrl} from '../../../system/common/object_info';
 
 export default {
   name: 'pageSearch',
+  components: {
+    bookmarkListItem,
+    bookmarkEditor
+  },
   props: {
-    height: { type: Number },
+    pageInfo: {
+      type: Object,
+      default() {
+        return {
+          pages: [
+            { id: 'all', name: this.$t('All') },
+            { id: 'nodes', name: this.$t('Nodes') },
+            { id: 'joints', name: this.$t('Joints') },
+            { id: 'blocks', name: this.$t('Blocks') },
+            { id: 'contents', name: this.$t('Contents') },
+            { id: 'users', name: this.$t('Users') },
+            { id: 'spheres', name: this.$t('Spheres') }
+          ],
+          pageId: 'all'
+        }
+      }
+    },
+    scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
     searchStringShow: { type: Boolean, default: true },
     mode: { type: String },
     pagesFilter: { type: Function }
   },
-  components: {
-    bookmarkListItem,
-    bookmarkEditor
+  watch: {
+    'pageInfo.pageId': {
+      immediate: true,
+      handler (to, from) {
+        this.showHeader = true
+      }
+    }
   },
   data () {
     return {
-      pageId: 'all',
       bookmarkSelected: null,
-      bookmarkEditorShow: false
+      bookmarkEditorShow: false,
+      headerHeight: 0,
+      showHeader: true
     }
   },
   computed: {
-    _height () {
-      return this.height || this.$q.screen.height
-    },
-    pages () {
-      let pages = [
-        { id: 'all', name: this.$t('All') },
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') },
-        { id: 'contents', name: this.$t('Contents') },
-        { id: 'users', name: this.$t('Users') },
-        { id: 'spheres', name: this.$t('Spheres') }
-      ]
-      if (this.pagesFilter) return this.pagesFilter(pages)
-      else return pages
-    },
     query () {
       let objectTypes
-      if (this.pageId === 'all') {
+      if (this.pageInfo.pageId === 'all') {
         objectTypes = ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER', 'JOINT', 'WORD', 'SENTENCE', 'CHAR']
-      } else if (this.pageId === 'nodes') {
+      } else if (this.pageInfo.pageId === 'nodes') {
         objectTypes = ['NODE']
-      } else if (this.pageId === 'joints') {
+      } else if (this.pageInfo.pageId === 'joints') {
         objectTypes = ['JOINT']
-      } else if (this.pageId === 'blocks') {
+      } else if (this.pageInfo.pageId === 'blocks') {
         objectTypes = ['BLOCK']
-      } else if (this.pageId === 'contents') {
+      } else if (this.pageInfo.pageId === 'contents') {
         objectTypes = ['VIDEO', 'IMAGE', 'BOOK']
-      } else if (this.pageId === 'users') {
+      } else if (this.pageInfo.pageId === 'users') {
         objectTypes = ['USER']
-      } else if (this.pageId === 'spheres') {
+      } else if (this.pageInfo.pageId === 'spheres') {
         objectTypes = ['WORD', 'SENTENCE', 'CHAR']
-      } else throw new Error('bad pageId: ' + this.pageId)
+      } else throw new Error('bad pageInfo.pageId: ' + this.pageInfo.pageId)
 
       return {
         selector: {
@@ -205,6 +314,10 @@ export default {
         this.$router.push(this.itemLink(item))
       }
     }
+  },
+  mounted () {
+    // this.$logW('this.$q.screen.height', this.$q.screen.height)
+    // this.$logW('this.scrollAreaHeight', this.scrollAreaHeight)
   }
 }
 </script>

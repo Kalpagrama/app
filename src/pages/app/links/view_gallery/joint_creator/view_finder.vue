@@ -7,6 +7,7 @@ div(
   }`
   ).row.full-width
   kalpa-finder(
+    :height="$q.screen.height"
     @contentKalpa="itemFound"
     :pages=`{
       nodes: {views: ['all']},

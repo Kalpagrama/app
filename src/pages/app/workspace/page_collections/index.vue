@@ -1,37 +1,19 @@
 <template lang="pug">
-  kalpa-layout(
-    :height="_height")
-    template(v-slot:header)
-      div(
-        v-if="useNavHeader"
-      ).row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          slot(name="header")
-          div(
-            v-if="!$slots.header"
-            :style=`{
-            height: '60px',
-            borderRadius: '10px',
-          }`
-          ).row.full-width.items-center.content-center.q-pa-sm.b-40
-            q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-            .col.full-height
-              .row.fit.items-center.content-center.justify-center
-                span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Collections')}}
-            q-btn(round flat color="white" icon="more_vert")
-    template(v-slot:body)
-      .row.full-width.items-start.content-start
-        //- bookmark editor
-        q-dialog(
-          v-model="bookmarkEditorShow"
-          :full-width="$q.screen.xs"
-          :full-height="$q.screen.xs"
-          :maximized="$q.screen.xs"
-          :square="$q.screen.xs"
-          @hide="bookmarkSelected = null")
-          bookmark-editor(
-            :bookmark="bookmarkSelected"
-            @close="bookmarkEditorShow = false, bookmarkSelected = null")
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+    //- bookmark editor
+    q-dialog(
+      v-model="bookmarkEditorShow"
+      :full-width="$q.screen.xs"
+      :full-height="$q.screen.xs"
+      :maximized="$q.screen.xs"
+      :square="$q.screen.xs"
+      @hide="bookmarkSelected = null")
+      bookmark-editor(
+        :bookmark="bookmarkSelected"
+        @close="bookmarkEditorShow = false, bookmarkSelected = null")
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(v-if="showHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+        q-resize-observer(@resize="headerHeight = $event.height")
         //- search bar
         div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
           div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
@@ -40,19 +22,17 @@
               borderless dark
               :placeholder="$t('Search')"
               :input-style=`{
-              padding: '16px',
-              background: 'rgb(40,40,40)',
-              borderRadius: '10px',
-            }`
+                  padding: '16px',
+                  background: 'rgb(40,40,40)',
+                  borderRadius: '10px',
+                }`
             ).full-width
         //- tabs sticky
-        div(
-          :style=`{position: 'sticky', top: '0px', zIndex: 1000 }`
-          ).row.full-width.justify-center.q-px-md.b-30
+        .row.full-width.justify-center.q-px-md.b-30
           q-tabs(
             v-model="collectionsModel.collectionId"
-            switch-indicator no-caps dense
-            active-color="green"
+            switch-indicator="false" no-caps dense
+          active-color="green"
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
           ).full-width.text-grey-8
             // add collection btn
@@ -60,33 +40,125 @@
             q-tab(
               v-for="(c,ci) in collectionsModel.collections" :key="c.id"
               :name="c.id" :label="c.name")
-        //- tab panels
-        q-tab-panels(
-          v-model="collectionsModel.collectionId"
-          :swipeable="$q.platform.is.mobile"
-          :animated="$q.platform.is.mobile"
-          :style=`{}`).full-width.b-30
-          q-tab-panel(
-            v-for="(c,ci) in collectionsModel.collections" :key="c.id" :name="c.id"
-            :style=`{
+    //- tab panels
+    q-tab-panels(
+      v-model="collectionsModel.collectionId"
+      :swipeable="$q.platform.is.mobile"
+      :animated="$q.platform.is.mobile"
+      :style=`{}`).full-width.b-30
+      q-tab-panel(
+        v-for="(c,ci) in collectionsModel.collections" :key="c.id" :name="c.id"
+        :style=`{
           background: 'none',
           minHeight: '70vh',
-        }`
-          ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-            list-feed(
-              :query="query"
-              nextSize=24
-              :itemMiddlePersist="false"
-              screenSize=100
-              :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-          }`)
-              template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
-                bookmark-list-item(
-                  :bookmark="bookmark"
-                  :mode="mode"
-                  @item="bookmarkSelectHandle"
-                ).q-mb-sm
+          }`
+      ).row.full-width.items-start.content-start.justify-center.q-pa-none
+        list-feed(
+          :scrollAreaHeight="scrollAreaHeight"
+          :query="query"
+          nextSize=24
+          :itemMiddlePersist="false"
+          screenSize=100
+          :style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`
+          @showHeader="showHeader = $event")
+          template(v-slot:prepend)
+            div(:style=`{height: headerHeight + 'px' }`).row.full-width
+          template(v-slot:append)
+            div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
+          template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+            bookmark-list-item(
+              :bookmark="bookmark"
+              :mode="mode"
+              @item="bookmarkSelectHandle"
+            ).q-mb-sm
+  //kalpa-layout
+  //  template(v-slot:header)
+  //    div(
+  //      v-if="useNavHeader"
+  //    ).row.full-width.justify-center.q-px-sm.q-pt-sm.b-30
+  //      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+  //        slot(name="header")
+  //        div(
+  //          v-if="!$slots.header"
+  //          :style=`{
+  //          height: '60px',
+  //          borderRadius: '10px',
+  //        }`
+  //        ).row.full-width.items-center.content-center.q-pa-sm.b-40
+  //          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+  //          .col.full-height
+  //            .row.fit.items-center.content-center.justify-center
+  //              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Collections')}}
+  //          q-btn(round flat color="white" icon="more_vert")
+  //  template(v-slot:body)
+  //    .row.full-width.items-start.content-start
+  //      //- bookmark editor
+  //      q-dialog(
+  //        v-model="bookmarkEditorShow"
+  //        :full-width="$q.screen.xs"
+  //        :full-height="$q.screen.xs"
+  //        :maximized="$q.screen.xs"
+  //        :square="$q.screen.xs"
+  //        @hide="bookmarkSelected = null")
+  //        bookmark-editor(
+  //          :bookmark="bookmarkSelected"
+  //          @close="bookmarkEditorShow = false, bookmarkSelected = null")
+  //      transition(enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+  //      div(v-if="showHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+  //        q-resize-observer(@resize="headerHeight = $event.height")
+  //        //- search bar
+  //        div(v-if="searchStringShow").row.full-width.justify-center.q-px-sm
+  //          div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
+  //            q-input(
+  //              v-model="searchString"
+  //              borderless dark
+  //              :placeholder="$t('Search')"
+  //              :input-style=`{
+  //              padding: '16px',
+  //              background: 'rgb(40,40,40)',
+  //              borderRadius: '10px',
+  //            }`
+  //            ).full-width
+  //        //- tabs sticky
+  //        .row.full-width.justify-center.q-px-md.b-30
+  //          q-tabs(
+  //            v-model="collectionsModel.collectionId"
+  //            switch-indicator="false" no-caps dense
+  //            active-color="green"
+  //            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+  //          ).full-width.text-grey-8
+  //            // add collection btn
+  //            add-collection-btn(v-model="collectionsModel")
+  //            q-tab(
+  //              v-for="(c,ci) in collectionsModel.collections" :key="c.id"
+  //              :name="c.id" :label="c.name")
+  //      //- tab panels
+  //      q-tab-panels(
+  //        v-model="collectionsModel.collectionId"
+  //        :swipeable="$q.platform.is.mobile"
+  //        :animated="$q.platform.is.mobile"
+  //        :style=`{}`).full-width.b-30
+  //        q-tab-panel(
+  //          v-for="(c,ci) in collectionsModel.collections" :key="c.id" :name="c.id"
+  //          :style=`{
+  //        background: 'none',
+  //        minHeight: '70vh',
+  //        }`
+  //        ).row.full-width.items-start.content-start.justify-center.q-pa-none
+  //          list-feed(
+  //            :scrollAreaHeight="scrollAreaHeight - headerHeight"
+  //            :query="query"
+  //            nextSize=24
+  //            :itemMiddlePersist="false"
+  //            screenSize=100
+  //            :style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`
+  //            @showHeader="showHeader = $event")
+  //            template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+  //              bookmark-list-item(
+  //                :bookmark="bookmark"
+  //                :mode="mode"
+  //                @item="bookmarkSelectHandle"
+  //              ).q-mb-sm
 </template>
 
 <script>
@@ -99,7 +171,7 @@ import { assert } from 'src/system/common/utils'
 export default {
   name: 'workspace_pageCollections',
   props: {
-    height: { type: Number },
+    scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
     searchStringShow: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
@@ -117,13 +189,20 @@ export default {
       collectionsRes: null,
       bookmarkSelected: null,
       bookmarkEditorShow: false,
-      newCollectionName: ''
+      newCollectionName: '',
+      showHeader: true,
+      headerHeight: 0
+    }
+  },
+  watch: {
+    collectionId: {
+      immediate: true,
+      handler (to, from) {
+        this.showHeader = true
+      }
     }
   },
   computed: {
-    _height () {
-      return this.height || this.$q.screen.height
-    },
     // запрос за элементами коллекции
     query () {
       let res = {

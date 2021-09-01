@@ -25,9 +25,9 @@ export default {
   // nodeCategories: [],
   nodeOnContent: null,
   nodeCreating: false,
-  listFeedNeedDrop: false,
+  listFeedGoToSte: false,
   // debug
-  useDebug: false,
+  useDebug: true,
   kalpaWelcome: null,
   authGuard: null,
   bookmarkTypes: [

@@ -124,7 +124,7 @@ export default {
   },
   methods: {
     headerClick () {
-      this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+      this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
     }
   },
 }

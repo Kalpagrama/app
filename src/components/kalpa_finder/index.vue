@@ -1,48 +1,55 @@
 <template lang="pug">
-.row.full-widith
-  //header + tabs
-  div(
-    :style=`{ height: '155px'}`
-    ).row.full-width.items-start.content-start.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+  div(ref="xxx").row.full-widith
+    //header + tabs
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-sm
+      q-resize-observer(@resize="headerHeight = $event.height")
       //- header
-      .row.full-width.items-center.content-center.q-pa-sm
-        .col.q-pl-sm
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ headerTitle_ }}
+      .row.full-width.items-center.content-center
+        .col
+          span(:style=`{fontSize: '18px'}`).row.justify-center.text-white.text-bold {{ headerTitle_ }}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      div(:style=`{position: 'sticky', top: '0px', zIndex: 1000}`).row.full-width.q-px-md.b-30
+      //search String
+      q-input(
+        v-if="searchStringShow"
+        v-model="searchString"
+        flat borderless dark dense autofocus
+        icon="search"
+        :placeholder="$t('Type here to search...')"
+        :debounce="500"
+        :style=`{height: '40px'}`
+        :input-style=`{
+                width: '500px',
+                color: 'grey',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }`
+        @focus=""
+      ).row.full-width
+        template(v-slot:prepend)
+          q-icon(name="search" :color="'green'" size="25px").q-mx-md
+      .row.full-width.b-30
+        q-btn(v-if="!searchStringShow" flat no-caps color="grey" icon="search" @click="searchStringShow = true").no-border-radius
         q-tabs(
           v-model="pageId"
           switch-indicator no-caps dense
+          align="justify"
           active-color="green"
-        ).full-width.text-grey-8
+        ).col.text-grey-8
           q-tab(
             v-for="(p,pi) in pages" :key="p.id"
             :name="p.id" :label="p.name")
-      //- search bar
-      .row.full-width.justify-center.q-px-sm
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
-          q-input(
-            v-model="searchString"
-            borderless dark
-            :placeholder="$t('Search')"
-            :input-style=`{
-                  padding: '16px',
-                  background: 'rgb(40,40,40)',
-                  borderRadius: '10px',
-                }`
-          ).full-width
-  //page-published(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
-  //page-collections(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
-  //page-search(:useNavHeader="false" :searchStringShow="false" :searchString="searchString")
-  //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
-  component(
-    :is="'page-' + pageId"
-    :useNavHeader="false"
-    mode="select"
-    :searchStringShow="false"
-    :searchString="searchString"
-    @item="$emit('item', $event)")
+    //page-published(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
+    //page-collections(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
+    //page-search(:useNavHeader="false" :searchStringShow="false" :searchString="searchString")
+    //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
+    component(
+      :is="'page-' + pageId"
+      :useNavHeader="false"
+      :scrollAreaHeight="scrollAreaHeight"
+      mode="select"
+      :searchStringShow="false"
+      :searchString="searchString"
+      @item="$emit('item', $event)")
 </template>
 
 <script>
@@ -57,15 +64,13 @@ export default {
   props: {
     height: {
       type: Number,
-      required: true,
+      required: true
     },
-    pageId_: {type: String},
-    pagesFilter: {type: Array},
-    pagesShow: {type: Boolean, default: true},
-    // pages: {type: Object},
-    searchString: {type: String},
+    pageId_: { type: String },
+    pagesShow: { type: Boolean, default: true },
+    searchString: { type: String },
     headerTitle: {
-      type: String,
+      type: String
       // default: 'Выбрать элемент для связи'
     }
   },
@@ -73,14 +78,31 @@ export default {
     pagePublished,
     pageCollections,
     pageSearch,
-    pageGif,
+    pageGif
   },
   data () {
     return {
       pageId: 'published',
+      searchStringShow: false,
+      headerHeight: 0
+    }
+  },
+  watch: {
+    pageId: {
+      handler (to, from) {
+        if (!this.searchString) this.searchStringShow = false
+      }
+    },
+    searchString: {
+      handler (to, from) {
+        this.searchStringShow = !!to
+      }
     }
   },
   computed: {
+    scrollAreaHeight () {
+      return (this.height || this.$q.screen.height) - this.headerHeight
+    },
     headerTitle_ () {
       if (this.headerTitle) return this.headerTitle
       else return this.$t('Find your item')
@@ -91,10 +113,10 @@ export default {
     },
     pages () {
       return [
-        {id: 'published', name: this.$t('published')},
-        {id: 'collections', name: this.$t('collections')},
-        {id: 'search', name: this.$t('Kalpagrama')},
-        {id: 'gif', name: this.$t('Gif')},
+        { id: 'published', name: this.$t('published') },
+        { id: 'collections', name: this.$t('collections') },
+        { id: 'search', name: this.$t('Kalpagrama') },
+        { id: 'gif', name: this.$t('Gif') }
       ]
     }
   },
@@ -106,5 +128,8 @@ export default {
     //   })
     // }
   },
+  mounted () {
+    this.$log('mounted scrollAreaHeight=', this.scrollAreaHeight)
+  }
 }
 </script>

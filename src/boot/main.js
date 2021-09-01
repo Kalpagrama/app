@@ -107,11 +107,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.prototype.$go = function (to) {
       if (isEqual(goLast, to)) {
         console.log('$go DUPLICATE')
-        console.log('$go listFeedNeedDrop')
-        this.$store.commit('ui/stateSet', ['listFeedNeedDrop', true])
+        console.log('$go listFeedGoToStart')
+        this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
         // Handle if there is no listFeed component to set back to false...
         this.$wait(1000).then(() => {
-          this.$store.commit('ui/stateSet', ['listFeedNeedDrop', false])
+          this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
         })
         this.$router.push(to).catch(e => e)
       }

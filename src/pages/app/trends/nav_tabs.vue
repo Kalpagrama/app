@@ -1,11 +1,12 @@
 <template lang="pug">
   .row.full-width.justify-center.b-30
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-px-md
-      div(:style=`{height: '40px'}`).row.full-width.items-center.content-center
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', height: height + 'px'}`).row.full-width.q-px-md
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         q-input(
+          v-if="pageInfo.rootPageId === 'search'"
           ref="searchInput"
           v-model="pageInfo.searchString"
-          flat borderless dark dense
+          flat borderless dark dense autofocus
           icon="search"
           :placeholder="$t('Type here to search...')"
           :debounce="500"
@@ -18,34 +19,49 @@
           @focus="pageInfo.search=true"
         ).full-width
           template(v-slot:prepend)
-            q-icon(name="search" :color="pageInfo.search ? 'green' : 'white'" size="30px").q-ml-md
+            q-icon(name="search" :color="pageInfo.search ? 'green' : 'white'" size="25px").q-mx-lg
           template(v-slot:append)
             q-btn(
-              v-if="pageInfo.search"
-              @click="pageInfo.search=false, pageInfo.searchString = ''"
+              @click="pageInfo.searchString = '', pageInfo.rootPageId = pageInfo.rootPages[1].id"
               round flat dense color="white" icon="clear").q-mr-sm
-      q-tabs(
-        v-if="!pageInfo.search"
-        v-model="pageInfo.pageId"
-        dense no-caps active-color="green" switch-indicator=false
-        @input="$router.replace({query: {pageId: $event}})"
-      ).full-width.text-grey-8
-        q-tab(
-          v-for="p in pageInfo.pages"
-          :key="p.id"
-          :icon="p.icon"
-          :name="p.id"
-          :label="p.label")
-          // q-menu(anchor="top right" self="top left" dark
-            transition-show="scale"
-            transition-hide="scale"
-            )
+        q-tabs(
+          v-if="pageInfo.rootPageId !== 'search'"
+          v-model="pageInfo.rootPageId"
+          align="justify"
+          dense no-caps active-color="green" switch-indicator=true
+        ).full-width.text-grey-8
+          q-tab(
+            v-for="p in pageInfo.rootPages"
+            :key="p.id"
+            :icon="p.icon"
+            :name="p.id"
+            :label="p.label")
+            //q-menu(
+            //  v-model="showSearchInput"
+            //  anchor="top right" self="top left" dark persistent no-parent-event
+            //  transition-show="slide-right"
+            //  transition-hide="slide-left"
+            //  )
 </template>
 
 <script>
 export default {
   name: 'navTabs',
-  props: ['pageInfo'],
+  props: ['pageInfo', 'height'],
+  data() {
+    return {
+      showSearchInput: false,
+    }
+  },
+  watch: {
+    'pageInfo.rootPageId': {
+      immediate: true,
+      handler (to, from) {
+        if (to) this.$router.replace({query: {rootPageId: to}})
+        this.showSearchInput = to === 'search'
+      }
+    }
+  },
   mounted () {
     // if (this.pageInfo.search) {
     //   setTimeout(() => this.$refs.searchInput.focus(), 500)
