@@ -67,7 +67,7 @@ export default {
   },
   computed: {
     commentsCount() {
-      return this.$refs.listFeed?.itemsRes?.items?.length || 0
+      return this.$refs.listFeed?.length || 0
     },
     query () {
       return {

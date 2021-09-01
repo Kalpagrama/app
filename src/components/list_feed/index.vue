@@ -258,6 +258,9 @@ export default {
         else this.itemMiddleHistory.splice(0, 1) // удалим верхний
         this.itemMiddleHistory.splice(8, this.itemMiddleHistory.length) // в истории - не больше 8 элементов
       }
+    },
+    length () {
+      return this.itemsRes ? this.itemsRes.itemsHeaderFooter.length : 0
     }
   },
   watch: {
@@ -270,8 +273,15 @@ export default {
     'itemsRes.itemsHeaderFooter': {
       async handler (to, from) {
         this.$log('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes, this.itemsRes.hasPrev)
-        let filtered = this.itemMiddleHistory.filter(itemMiddle => to.find(item => item[this.itemKey] === itemMiddle.key))
-        this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...filtered) // удаляем те, которых нет в новом списке
+        // удаляем те, которых нет в новом списке
+        for (let itemMiddle of this.itemMiddleHistory){
+          itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)
+          // this.$log('ims item.name', item?.name)
+          let itemRef = this.$refs[`item-${itemMiddle.key}`]
+          if (itemRef) itemMiddle.ref = itemRef[0]
+        }
+        this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
+        this.itemMiddleTopUpdate()
         this.itemsMeta.splice(0, this.itemsMeta.length, ...to.map(item => {
           return { key: item[this.itemKey], visible: false }
         }))
@@ -494,7 +504,7 @@ export default {
       if (!this.itemsRes.hasNext) return
       if (this.itemsResStatus) return
       if (Date.now() - this.prevCompleteDt < 2000) return // PPV при попытке промотки вниз когда список закончился - скролл оттягивается вниз, а потом вверх и поэтому может сработать prev()
-      this.$log('next', this.nextSize)
+      this.$log('next. this.nextSize=', this.nextSize)
       this.itemsResStatus = 'NEXT'
       this.$log('next start')
       if (this.$store.state.ui.useDebug) {
@@ -504,8 +514,9 @@ export default {
           position: 'bottom-right'
         })
       }
+      this.$log('before next', this.length)
       await this.itemsRes.next(this.nextSize)
-      this.$log('next done')
+      this.$log('next done', this.length)
       this.itemsResStatus = null
       this.nextCompleteDt = Date.now()
     },

@@ -936,8 +936,9 @@ class Group {
 
    async next (count) {
       const f = this.next
-      logD(f, 'start', this.reactiveGroup.id, this.fulFilledRange())
-      count = count || this.loadedLen()
+      logD(f, 'start', count, this.screenSize, this.reactiveGroup.id)
+      count = parseInt(count || this.loadedLen())
+      assert(!this.screenSize || count < this.screenSize, {count, screenSize: this.screenSize}) // иначе обрежутся новые элементы
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
          // запросим данные с сервера
@@ -956,15 +957,16 @@ class Group {
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'bottom')
-      logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
+      // logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
    }
 
    async prev (count) {
       const f = this.prev
       // return
       // // eslint-disable-next-line no-unreachable
-      logD(f, 'start', this.fulFilledRange(), this.reactiveGroup.id)
-      count = count || this.loadedLen()
+      logD(f, 'start', this.reactiveGroup.id)
+      count = parseInt(count || this.loadedLen())
+      assert(!this.screenSize || this.screenSize > count, {count, screenSize: this.screenSize}) // иначе обрежутся новые элементы
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && startFullFil !== -1 && count > startFullFil) {
          // запросим данные с сервера (вверх)
@@ -981,7 +983,7 @@ class Group {
       let fulfillTo = startFullFil === -1 ? count : startFullFil // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       await this.fulfill(nextItems, 'top')
-      logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
+      // logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.reactiveGroup.id)
    }
 
    setProperty (name, value) {

@@ -59,7 +59,7 @@
           :style=`{
               maxWidth: $store.state.ui.pageWidth+'px',
             }`
-          @showHeader="showHeader = $event").br
+          @showHeader="showHeader = $event")
           template(v-slot:prepend)
             div(:style=`{height: headerHeight + 'px' }`).row.full-width
           template(v-slot:append)
