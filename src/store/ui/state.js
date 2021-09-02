@@ -25,7 +25,7 @@ export default {
   // nodeCategories: [],
   nodeOnContent: null,
   nodeCreating: false,
-  listFeedGoToSte: false,
+  listFeedGoToStart: false,
   // debug
   useDebug: false,
   kalpaWelcome: null,

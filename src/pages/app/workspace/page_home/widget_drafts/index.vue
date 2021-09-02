@@ -85,7 +85,7 @@ export default {
   methods: {
     getUrl(wsItem) {
       switch (wsItem.wsItemType) {
-        case RxCollectionEnum.WS_NODE: return '/content/' + wsItem.items[0].layers[0].contentOid + '?wsNodeId=' + wsItem.id
+        case RxCollectionEnum.WS_NODE: return '/content/' + wsItem.items[0]?.layers[0]?.contentOid + '?wsNodeId=' + wsItem.id
         case RxCollectionEnum.WS_SPHERE: return '/sphere/' + wsItem.oid
         default: return '/workspace'
       }

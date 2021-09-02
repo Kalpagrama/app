@@ -1,16 +1,38 @@
 <template lang="pug">
-.row.full-width.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
-    list-feed(
-      :itemStyles=`{
-        paddingBottom: '50px',
-      }`
-      :query="queryFeedItems" :itemKey="'id'")
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
-        item-feed(
-          :item="item.populatedObject"
-          :isActive="isActive"
-          :isVisible="isVisible")
+  kalpa-layout
+    template(v-slot:footer)
+      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    template(v-slot:body)
+      .row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          //- bookmark editor
+          q-dialog(
+            v-model="bookmarkEditorShow"
+            :full-width="$q.screen.xs"
+            :full-height="$q.screen.xs"
+            :maximized="$q.screen.xs"
+            :square="$q.screen.xs"
+            @hide="bookmarkSelected = null")
+            bookmark-editor(
+              :bookmark="bookmarkSelected"
+              @close="bookmarkEditorShow = false, bookmarkSelected = null")
+          tab-list-feed(
+            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+            :navHeaderText="$t('Feed')"
+            :searchStringShow="searchStringShow"
+            :searchString="searchString"
+            :query="query"
+            nextSize=50
+            :itemMiddlePersist="false"
+            screenSize=100
+            @searchString="searchString = $event"
+            @pageId="pageId = $event"
+          ).row.full-width
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+              item-feed(
+                :item="item.populatedObject"
+                :isActive="isActive"
+                :isVisible="isVisible")
 </template>
 
 <script>
@@ -28,7 +50,7 @@ export default {
   methods: {
   },
   computed: {
-    queryFeedItems () {
+    query () {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_FEED,
@@ -41,8 +63,6 @@ export default {
       }
       return res
     }
-  },
-  watch: {
   },
   mounted () {
     this.$log('mounted')

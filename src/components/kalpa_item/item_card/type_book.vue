@@ -63,17 +63,17 @@
                   }`
         ).row.full-width.items-start.content-start.justify-center.q-pa-sm
           page-comments(v-if="pageId === 'comments'" :node="item" :height="700")
-          page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
+          //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
           item-description(v-if="pageId === 'description'" :item="item" :height="700")
-          page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
+          //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
           page-similar(v-if="pageId === 'similar'" :node="item" :height="700" :types="['VIDEO', 'BOOKS', 'IMAGE']")
 </template>
 
 <script>
 import pageComments from 'src/pages/app/node/page_comments/index.vue'
 import itemDescription from 'src/components/kalpa_item/item_card/item_description.vue'
-import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
-import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
+// import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
+// import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
 import pageSimilar from 'src/pages/app/node/page_similar/index.vue'
 import {ContentApi} from 'src/api/content';
 
@@ -83,8 +83,8 @@ export default {
   components: {
     pageComments,
     itemDescription,
-    pageNodes,
-    pageJoints,
+    // pageNodes,
+    // pageJoints,
     pageSimilar
   },
   data () {

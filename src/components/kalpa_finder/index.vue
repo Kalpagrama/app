@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(ref="xxx").row.full-widith
+  .row.full-widith
     //header + tabs
     div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-sm
       q-resize-observer(@resize="headerHeight = $event.height")
@@ -46,9 +46,9 @@
       :is="'page-' + pageId"
       :useNavHeader="false"
       :scrollAreaHeight="scrollAreaHeight"
-      mode="select"
       :searchStringShow="false"
       :searchString="searchString"
+      mode="select"
       @item="$emit('item', $event)")
 </template>
 

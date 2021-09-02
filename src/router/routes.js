@@ -255,32 +255,7 @@ const routes = [
                {
                   name: 'user.home',
                   path: '',
-                  redirect: 'nodes'
-               },
-               {
-                  name: 'user.collections',
-                  path: 'collections',
-                  component: () => import('src/pages/app/user/page_collections/index.vue')
-               },
-               {
-                  name: 'user.nodes',
-                  path: 'nodes',
-                  component: () => import('src/pages/app/user/page_nodes/index.vue')
-               },
-               {
-                  name: 'user.blocks',
-                  path: 'blocks',
-                  component: () => import('src/pages/app/user/page_blocks/index.vue')
-               },
-               {
-                  name: 'user.joints',
-                  path: 'joints',
-                  component: () => import('src/pages/app/user/page_joints/index.vue')
-               },
-               {
-                  name: 'user.votes',
-                  path: 'votes',
-                  component: () => import('src/pages/app/user/page_votes/index.vue')
+                  component: () => import('src/pages/app/user/index.vue'),
                },
                {
                   name: 'user.following',

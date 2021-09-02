@@ -1,17 +1,31 @@
 <template lang="pug">
-kalpa-layout()
-  template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md")
-  template(v-slot:body)
-    .row.full-width.items-start.content-start.justify-center
-      page-header(v-if="sphere" :sphere="sphere").q-mb-sm
-      component(
-        v-if="sphere"
-        :is="`page-${$route.params.page}`"
-        :sphere="sphere"
-        :style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-        }`)
+  kalpa-layout
+    template(v-slot:footer)
+      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    template(v-slot:body)
+      .row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          tab-list-feed(
+            v-if="sphere"
+            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+            :searchStringShow="searchStringShow"
+            :searchString="searchString"
+            :pages="pages"
+            :pageId="pageId"
+            :query="query"
+            nextSize=50
+            :itemMiddlePersist="false"
+            screenSize=100
+            @searchString="searchString = $event"
+            @pageId="pageId = $event"
+          ).row.full-width
+            template(v-slot:externalHeader)
+              page-header(v-if="sphere" :sphere="sphere").q-mb-sm
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+              item-feed(
+                :item="item.populatedObject"
+                :isActive="isActive"
+                :isVisible="isVisible")
 </template>
 
 <script>
@@ -19,37 +33,58 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import pageHeader from './page_header.vue'
 
-import pageNodes from './page_nodes/index.vue'
-import pageJoints from './page_joints/index.vue'
-import pageContent from './page_content/index.vue'
-import pageSpheres from './page_spheres/index.vue'
-import pagePeople from './page_people/index.vue'
-
 export default {
   name: 'pageApp__sphere',
   components: {
     pageHeader,
-    pageNodes,
-    pageJoints,
-    pageContent,
-    pageSpheres,
-    pagePeople,
   },
   data () {
     return {
       sphere: null,
-      pageId: 'nodes',
+      pageId: 'all',
     }
   },
   computed: {
-    tabs () {
+    pages () {
       return [
-        {id: 'content', name: 'Медиа'},
-        {id: 'nodes', name: 'Ядра'},
-        {id: 'joints', name: 'Связи'},
-        {id: 'people', name: 'Люди'},
-        {id: 'spheres', name: 'Сферы'}
+        {id: 'all', name: this.$t('All')},
+        {id: 'contents', name: this.$t('Media')},
+        {id: 'nodes', name: this.$t('Nodes')},
+        {id: 'joints', name: this.$t('Joints')},
+        {id: 'blocks', name: this.$t('Blocks')},
+        {id: 'spheres', name: this.$t('Spheres')},
+        {id: 'users', name: this.$t('Users')}
       ]
+    },
+    query () {
+      let objectTypes
+      if (this.pageId === 'all') {
+        objectTypes = ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER', 'JOINT', 'WORD', 'SENTENCE', 'CHAR']
+      } else if (this.pageId === 'nodes') {
+        objectTypes = ['NODE']
+      } else if (this.pageId === 'joints') {
+        objectTypes = ['JOINT']
+      } else if (this.pageId === 'blocks') {
+        objectTypes = ['BLOCK']
+      } else if (this.pageId === 'contents') {
+        objectTypes = ['VIDEO', 'IMAGE', 'BOOK']
+      } else if (this.pageId === 'users') {
+        objectTypes = ['USER']
+      } else if (this.pageId === 'spheres') {
+        objectTypes = ['WORD', 'SENTENCE', 'CHAR']
+      } else throw new Error('bad pageId: ' + this.pageId)
+
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          oidSphere: this.sphere.oid,
+          objectTypeEnum: { $in: objectTypes },
+          // querySearch: this.searchString,
+          sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
+        },
+        populateObjects: true,
+        limit: 150
+      }
     }
   },
   watch: {
