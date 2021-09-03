@@ -35,7 +35,7 @@
                     fontWeight: 'bold',
                   }`
             @focus=""
-          ).row.full-width
+          ).row.full-width.b-30
             template(v-slot:prepend)
               q-icon(name="search" :color="'green'" size="25px").q-mx-md
 

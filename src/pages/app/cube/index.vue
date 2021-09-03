@@ -67,7 +67,7 @@ kalpa-layout(
                 :showName="false"
                 :showAuthorAlways="false")
         //- dynamic items
-        .row.full-width.q-mb-xl.br
+        .row.full-width.q-mb-xl
           //- v-if="rowActiveKey === rowIndex+row.oid"
           joints-row(
             v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
