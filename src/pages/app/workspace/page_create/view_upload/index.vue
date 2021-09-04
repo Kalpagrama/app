@@ -77,8 +77,7 @@ export default {
   methods: {
     start () {
       this.$log('start')
-      alert('start')
-      this.$refs.fileInput.click()
+      this.input.click();
     },
     fileChanged (e) {
       this.$log('fileChanged', e)
@@ -95,12 +94,12 @@ export default {
   mounted () {
     this.$log('mounted')
     // this.$wait(100).then(() => { this.start() })
-    let input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = this.fileChanged
-    input.accept = this.accept
+    this.input = document.createElement('input');
+    this.input.type = 'file';
+    this.input.onchange = this.fileChanged
+    this.input.accept = this.accept
     this.$log('input.click()')
-    input.click();
+    this.input.click();
   }
 }
 </script>

@@ -44,7 +44,7 @@ div(
       autoCrop: false,
       background: false,
       responsive: true,
-      checkCrossOrigin: true,
+      // checkCrossOrigin: true,
       checkOrientation: true,
       guides: true,
       cropBoxMovable: true,
