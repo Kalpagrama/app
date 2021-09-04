@@ -367,7 +367,7 @@ export default {
       }
       // this.$log('allNodes', this.findNodesRes)
       for (let group of this.findNodesRes.items) {
-        let { epubChapterId, epubTocId, epubHref } = group.figuresAbsolute[0]
+        let { epubChapterId, epubTocId, epubHref } = group.figuresAbsolute[0] || {}
         epubTocId = epubTocId || ''
         if (chapterId === epubChapterId /* && epubTocId === (tocId || epubTocId) */) {
           for (let item of group.items) {
