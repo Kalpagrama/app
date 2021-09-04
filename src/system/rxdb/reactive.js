@@ -831,6 +831,7 @@ class Group {
          {[this.reactiveGroup.itemPrimaryKey]: 'footer'}
       ]
       this.updateReactiveGroup()
+      return filtered
    }
 
    // найдет элемент в списке (поиск идет и вглубь (не важно на каком уровне находится элемент))
@@ -936,7 +937,8 @@ class Group {
 
    async next (count) {
       const f = this.next
-      logD(f, 'start', count, this.screenSize, this.reactiveGroup.id)
+      const t1 = performance.now()
+      // if (this.reactiveGroup.id.includes('LST_SPHERE_ITEMS')) logW(f, 'start', count, this.screenSize)
       count = parseInt(count || this.loadedLen())
       assert(!this.screenSize || count < this.screenSize, {count, screenSize: this.screenSize}) // иначе обрежутся новые элементы
       let { startFullFil, endFullFil } = this.fulFilledRange()
@@ -956,7 +958,8 @@ class Group {
       let fulfillFrom = endFullFil + 1 // начиная с какого индекса грузить
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
-      await this.fulfill(nextItems, 'bottom')
+      let fulfilledItems = await this.fulfill(nextItems, 'bottom')
+      // if (this.reactiveGroup.id.includes('LST_SPHERE_ITEMS')) logW(f, `complete: ${Math.floor(performance.now() - t1)} msec  insertedCnt=${fulfilledItems.length} screen=${this.reactiveGroup.items.length}`)
       // logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
    }
 

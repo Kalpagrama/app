@@ -27,14 +27,11 @@
             v-if="!$store.getters.isGuest && sphereOid"
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :navHeaderText="$t('Activity')"
-            :searchStringShow="searchStringShow"
-            :searchString="searchString"
+            searchInputState="disabled"
             :query="query"
             nextSize=50
             :itemMiddlePersist="false"
             screenSize=100
-            @searchString="searchString = $event"
-            @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
               notification-item(
@@ -55,7 +52,6 @@ export default {
   },
   data () {
     return {
-      searchString: ''
     }
   },
   computed: {

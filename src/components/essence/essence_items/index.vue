@@ -19,6 +19,7 @@ div(
     v-for="(i,ii) in node.items" :key="i"
     ).col-6
     div(
+      v-if="!!i"
       :style=`{
         position: 'relative', paddingBottom: 'calc(100% + 0px)',
         perspective: '1000px',

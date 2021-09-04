@@ -38,15 +38,11 @@
           q-tab(
             v-for="(p,pi) in pages" :key="p.id"
             :name="p.id" :label="p.name")
-    //page-published(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
-    //page-collections(:useNavHeader="false" :searchStringShow="false" :searchString="searchString").br
-    //page-search(:useNavHeader="false" :searchStringShow="false" :searchString="searchString")
-    //page-gif(:useHeader="false" :searchStringShow="false" :searchString="searchString").br
     component(
       :is="'page-' + pageId"
       :useNavHeader="false"
       :scrollAreaHeight="scrollAreaHeight"
-      :searchStringShow="false"
+      searchInputState="disabled"
       :searchString="searchString"
       mode="select"
       @item="$emit('item', $event)")

@@ -19,7 +19,7 @@
           tab-list-feed(
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :navHeaderText="useNavHeader ? $t('History') : ''"
-            :searchStringShow="searchStringShow"
+            :searchInputState="searchInputState"
             :searchString="searchString"
             :pages="pages"
             :pageId="pageId"
@@ -50,6 +50,7 @@ export default {
   props: {
     height: {type: Number},
     useNavHeader: {type: Boolean, default: true},
+    searchInputState: {type: String},
     mode: {type: String},
     pagesFilter: {type: Function},
   },

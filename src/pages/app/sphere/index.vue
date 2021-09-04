@@ -8,8 +8,7 @@
           tab-list-feed(
             v-if="sphere"
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-            :searchStringShow="searchStringShow"
-            :searchString="searchString"
+            searchInputState="disabled"
             :pages="pages"
             :pageId="pageId"
             :query="query"

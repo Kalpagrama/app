@@ -3,7 +3,7 @@
     tab-list-feed(
       :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
       :navHeaderText="useNavHeader ? $t('Published') : ''"
-      :searchStringShow="searchStringShow"
+      :searchInputState="searchInputState"
       :searchString="searchString"
       :pages="pages"
       :pageId="pageId"
@@ -13,6 +13,7 @@
       screenSize=100
       @searchString="searchString = $event"
       @pageId="pageId = $event"
+      @searchInputState="$emit('searchInputState', $event)"
     ).row.full-width
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         div(
@@ -63,7 +64,7 @@ export default {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
-    searchStringShow: { type: Boolean, default: true },
+    searchInputState: { type: String},
     mode: { type: String }
   },
   data () {

@@ -19,14 +19,11 @@
           tab-list-feed(
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :navHeaderText="$t('Feed')"
-            :searchStringShow="searchStringShow"
-            :searchString="searchString"
+            searchInputState="disabled"
             :query="query"
             nextSize=50
             :itemMiddlePersist="false"
             screenSize=100
-            @searchString="searchString = $event"
-            @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
               item-feed(

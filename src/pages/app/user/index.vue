@@ -10,15 +10,13 @@ kalpa-layout
         tab-list-feed(
           v-if="user"
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-          :searchStringShow="searchStringShow"
-          :searchString="searchString"
+          searchInputState="disabled"
           :pages="pages"
           :pageId="pageId"
           :query="query"
           nextSize=50
           :itemMiddlePersist="false"
           screenSize=100
-          @searchString="searchString = $event"
           @pageId="pageId = $event"
         ).row.full-width
           template(v-slot:externalHeader)

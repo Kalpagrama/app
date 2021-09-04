@@ -21,7 +21,7 @@
           //- search bar
           //search String
           q-input(
-            v-if="searchStringShow && searchInputVisible"
+            v-if="searchInputState === 'opened'"
             v-model="searchString"
             flat borderless dark dense autofocus
             icon="search"
@@ -38,10 +38,12 @@
           ).row.full-width.b-30
             template(v-slot:prepend)
               q-icon(name="search" :color="'green'" size="25px").q-mx-md
+            template(v-slot:append)
+              q-btn(round flat dense color="white" icon="clear" @click="searchString = '', searchInputState = 'enabled'" ).q-mr-md
 
           //- tabs
           .row.full-width.q-px-md.b-30
-            q-btn(v-if="searchStringShow && !searchInputVisible" flat no-caps color="grey" icon="search" @click="searchInputVisible = true").no-border-radius
+            q-btn(v-if="searchInputState === 'enabled'" flat no-caps color="grey" icon="search" @click="searchInputState = 'opened'").no-border-radius
             q-tabs(
               v-model="pageId"
               align="justify"
@@ -81,14 +83,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
-  name: 'listSearch',
+  name: 'tabListFeed',
   props: {
+    // id: { type: String, default: 'null' },
     scrollAreaHeight: { type: Number },
     navHeaderText: { type: String, default: '' },
     searchString: { type: String, default: '' },
-    searchStringShow: { type: String, default: true },
+    searchInputState: { type: String, default: 'enabled' }, // disabled|enabled|opened
     pages: {type: Array, default: [{id: 'empty'}]},
     pageId: {type: String, default: 'empty'},
     query: {type: String, required: true},
@@ -103,7 +107,6 @@ export default {
   },
   data () {
     return {
-      searchInputVisible: false,
       showTabsHeader: true,
       externalHeaderHeight: 0,
       navHeaderHeight: 0,
@@ -114,7 +117,6 @@ export default {
     pageId: {
       immediate: true,
       handler (to, from) {
-        if (!this.searchString) this.searchInputVisible = false
         this.showTabsHeader = true
         this.$emit('pageId', this.pageId)
       }
@@ -122,12 +124,17 @@ export default {
     searchString: {
       immediate: true,
       handler (to, from) {
-        this.searchInputVisible = !!to
         this.$emit('searchString', this.searchString)
       }
     },
-  },
-  methods: {
+
+    searchInputState: {
+      immediate: true,
+      handler (to, from) {
+        assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
+        this.$emit('searchInputState', to)
+      }
+    },
   }
 }
 </script>

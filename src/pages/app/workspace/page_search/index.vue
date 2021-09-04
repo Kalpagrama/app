@@ -33,8 +33,7 @@ kalpa-layout(
           :bookmark="bookmarkSelected"
           @close="bookmarkEditorShow = false, bookmarkSelected = null")
       //- search bar
-      div(v-if="searchStringShow"
-        ).row.full-width.justify-center.q-px-sm
+      .row.full-width.justify-center.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width
           q-input(
             v-model="searchString"
@@ -73,7 +72,7 @@ kalpa-layout(
             minHeight: '70vh',
           }`
           ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          pageCollections(v-if="pageId==='collections'" :useHeader="false" :searchString="searchString" :searchStringShow="searchStringShow" :mode="mode" @item="bookmarkSelectHandle")
+          pageCollections(v-if="pageId==='collections'" :useHeader="false" :searchString="searchString" :searchInputState="searchInputState" :mode="mode" @item="bookmarkSelectHandle")
           list-feed(
             v-else
             :query="query"
@@ -105,7 +104,7 @@ export default {
     height: {type: Number},
     useHeader: {type: Boolean, default: true},
     searchString: {type: String, default: ''},
-    searchStringShow: {type: String, default: true},
+    searchInputState: {type: String},
     tabsShow: {type: String, default: true},
     mode: {type: String},
     pagesFilter: {type: Function},
