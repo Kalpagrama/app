@@ -55,13 +55,20 @@ iframe
         height: 'calc(100% - 50px)',
       }`
         @close="tocShow = false")
+    //- settings
+    div(
+      v-if="settingsShow"
+      :style=`{zIndex: 1000, width: '70%'}`
+      ).absolute-center
+      player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
     //- body book area wrapper
     div(
       :style=`{
       position: 'relative',
       borderRadius: '10px',
+      border: '3px solid #222',
       overflow: 'hidden',
-      background: '#f3e8d2',
+      // background: '#f3e8d2',
     }`).col.full-width
       q-resize-observer(@resize="onResize" :debounce="300")
       //- book area
@@ -70,6 +77,8 @@ iframe
         :style=`{
         borderRadius: '0 0 10px 10px'
       }`).row.fit
+    // progress
+    q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
     //- footer
     .row.full-width.justify-center.q-pa-xs
       slot(name="footer")
@@ -82,6 +91,7 @@ iframe
         span().gt-xs {{$t('Next chapter')}}
       .col
       q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
+      q-btn(round flat :color="settingsShow ? 'green' : 'white'" icon="settings" @click="settingsShow = !settingsShow")
       //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
       //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
@@ -96,22 +106,21 @@ import { ContentApi } from 'src/api/content'
 import cloneDeep from 'lodash/cloneDeep'
 
 import playerToc from './player_toc.vue'
+import playerSettings from './player_settings.vue'
 import playerNode from './player_node.vue'
+import { rxdb } from 'src/system/rxdb/index_browser'
 
 export default {
   name: 'contentPlayer_book',
   components: {
     playerToc,
+    playerSettings,
     playerNode
   },
   props: {
     contentKalpa: {
       type: Object,
       required: true
-    },
-    fontSize: {
-      type: Number,
-      default: 100
     },
     themes: {
       type: Object,
@@ -128,6 +137,15 @@ export default {
           name: 'WHITE'
         },
         beige: {
+          'a:link': {
+            color: 'green',
+          },
+          'a:visited': {
+            color: 'grey',
+          },
+          'a:hover': {
+            color: 'teal !important',
+          },
           body: {
             color: '#000000',
             background: '#f3e8d2'
@@ -138,9 +156,19 @@ export default {
           name: 'BEIGE'
         },
         night: {
+          'a:link': {
+            color: 'green',
+          },
+          'a:visited': {
+            color: 'grey',
+          },
+          'a:hover': {
+            color: 'teal !important',
+          },
           body: {
-            color: '#c8c8c8',
-            background: '#282828'
+            color: 'silver',
+            background: 'rgb(30,30,30)',
+            'font-family': 'Roboto, sans-serif !important'
           },
           '::selection': {
             background: 'rgba(76,175,79, 0.5)'
@@ -152,7 +180,7 @@ export default {
     theme: {
       type: String,
       required: true,
-      default: 'beige'
+      default: 'night'
     },
     progress: {
       type: Number,
@@ -166,6 +194,8 @@ export default {
   data () {
     return {
       tocShow: false,
+      settingsShow: false,
+      settings: null,
       tocId: null,
       book: null,
       rendition: null,
@@ -195,8 +225,14 @@ export default {
     theme (val) {
       this.setTheme(val)
     },
-    fontSize (val) {
-      this.setFontSize(val)
+    settings: {
+      deep: true,
+      async handler(to, from){
+        this.$log('settings=', to)
+        assert(to.fontSize && to.fontSize >= 50 && to.fontSize <= 200)
+        this.rendition.themes.fontSize(to.fontSize + '%')
+        await rxdb.set(RxCollectionEnum.META, { id: 'playerBookSettings', valueString: JSON.stringify(this.settings) })
+      }
     },
     progressValue (val) {
       this.$emit('update:progress', val)
@@ -224,9 +260,6 @@ export default {
     setTheme (theme) {
       this.rendition.themes.select(theme)
       document.body.style.background = this.themes[theme].body.background
-    },
-    setFontSize (size) {
-      this.rendition.themes.fontSize(size + '%')
     },
     resizeToScreenSize () {
       this.updateScreenSizeInfo()
@@ -274,7 +307,6 @@ export default {
     },
     async savePosition (epubCfi) {
       if (this.contentBookmark) { // save position
-        this.$log('savePosition: ', epubCfi)
         if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
         this.contentBookmark.meta.currentCfi = epubCfi
       }
@@ -289,7 +321,7 @@ export default {
         // go to saved position (хранится внутри закладки)
         let { items: [bookmark] } = await this.$rxdb.find({
           selector: {
-            rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+            rxCollectionEnum: RxCollectionEnum.WS_ANY,
             oid: this.contentKalpa.oid
           }
         })
@@ -421,7 +453,7 @@ export default {
       }
       this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
-        // this.$logW('draft item=', draft)
+        this.$logW('draft item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
@@ -441,7 +473,7 @@ export default {
             fill: color,
             'fill-opacity': '0.15',
             'mix-blend-mode': 'multiply',
-            stroke: 'black',
+            stroke: color,
             'stroke-width': '1',
             'stroke-dasharray': '3'
           })
@@ -543,6 +575,22 @@ export default {
       populateToc(this.toc)
     }
   },
+  async created () {
+    this.$log('created')
+    // create events with fake input, html element here...
+    this.events = {
+      on: (event, cb) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.addEventListener(event, cb)
+      },
+      off: (event, cb) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.removeEventListener(event, cb)
+      },
+      emit: (event, val) => {
+        if (this.$refs.nameInput) this.$refs.nameInput.dispatchEvent(new CustomEvent(event, { detail: val }))
+      }
+    }
+    // window.addEventListener('keyup', this.keyListener)
+  },
   async mounted () {
     this.$log('mounted')
     // init
@@ -560,7 +608,8 @@ export default {
       })
       this.registerThemes()
       this.setTheme(this.theme)
-      this.setFontSize(this.fontSize)
+      this.settings = JSON.parse(await rxdb.get(RxCollectionEnum.META, 'playerBookSettings')) || { fontSize: 100 }
+      // this.setFontSize(200)
       // this.rendition.themes.default({
       //   '::selection': {
       //     background: 'rgba(200,200,200, 0.3)',
@@ -598,7 +647,7 @@ export default {
             this.$log('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
               // this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
-              this.selectedDraft = await this.createColorNodeDraft('black', this.cfiRangeSelectInProgress)
+              this.selectedDraft = await this.createColorNodeDraft('orange', this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
               if (this.contentsWindowSelection) this.contentsWindowSelection.removeAllRanges();
             }
@@ -665,23 +714,7 @@ export default {
     // everything ready, emit player!
     this.$emit('player', this)
   },
-  created () {
-    this.$log('created')
-    // create events with fake input, html element here...
-    this.events = {
-      on: (event, cb) => {
-        if (this.$refs.nameInput) this.$refs.nameInput.addEventListener(event, cb)
-      },
-      off: (event, cb) => {
-        if (this.$refs.nameInput) this.$refs.nameInput.removeEventListener(event, cb)
-      },
-      emit: (event, val) => {
-        if (this.$refs.nameInput) this.$refs.nameInput.dispatchEvent(new CustomEvent(event, { detail: val }))
-      }
-    }
-    // window.addEventListener('keyup', this.keyListener)
-  },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$log('beforeDestroy')
     // window.removeEventListener('keyup', this.keyListener)
   }

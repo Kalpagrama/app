@@ -41,15 +41,16 @@ div(
           div(
             v-if="nodeEditorShow"
             :style=`{
-              position: 'absolute', zIndex: 1000, bottom: '40px',
+              position: 'absolute', zIndex: 1000, bottom: '50px',
             }`
-            ).row.full-width.q-px-sm.q-pb-sm
+            ).row.full-width
             node-editor(
               :showColor="true"
               :player="player"
               :contentKalpa="contentKalpa"
               :node="player.selectedDraft"
-              )
+              :style=`{border: '3px solid #222', borderRadius: '10px'}`
+              ).b-40
         //- player
         content-player(
           @player="playerReady"

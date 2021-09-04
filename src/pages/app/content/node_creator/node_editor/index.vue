@@ -1,13 +1,13 @@
 <template lang="pug">
-  .row.full-width.justify-center.q-pb-sm
+  .row.full-width.justify-center
     //- figure editor of node
     div(
       :style=`{
-      position: 'relative',
+      // position: 'relative',
       minHeight: '100px',
-      maxWidth: '600px',
-      background: background || 'rgba(30,30,30,0.8)',
-      borderRadius: '20px',
+      // maxWidth: '600px',
+      // background: background || 'rgba(30,30,30,0.8)',
+      // borderRadius: '20px',
     }`
     ).row.full-width.items-start.content-start
       //- figure
