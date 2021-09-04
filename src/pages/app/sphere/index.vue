@@ -12,9 +12,9 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            nextSize=50
-            :itemMiddlePersist="false"
-            screenSize=100
+            nextSize=11
+            :itemMiddlePersist="true"
+            screenSize=36
             @searchString="searchString = $event"
             @pageId="pageId = $event"
           ).row.full-width
@@ -82,7 +82,6 @@ export default {
           sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
         },
         populateObjects: true,
-        limit: 150
       }
     }
   },

@@ -21,9 +21,9 @@
             :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
-            nextSize=50
-            :itemMiddlePersist="false"
-            screenSize=100
+            nextSize=11
+            :itemMiddlePersist="true"
+            screenSize=36
           ).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
               item-feed(

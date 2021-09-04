@@ -107,7 +107,6 @@ export default {
           querySearch: this.searchString || 'any_random_values'
         },
         populateObjects: false,
-        limit: 150
       }
     }
   },

@@ -16,7 +16,7 @@ kalpa-layout
           :pageId="pageInfo.rootPageId"
           :query="query"
           nextSize=11
-          :itemMiddlePersist="false"
+          :itemMiddlePersist="true"
           screenSize=36
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
