@@ -9,6 +9,7 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 // import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 
 async function saveHistory (oid) {
@@ -17,32 +18,15 @@ async function saveHistory (oid) {
    if (item) {
       let res = await rxdb.find({
          selector: {
-            rxCollectionEnum: RxCollectionEnum.WS_HISTORY
+            rxCollectionEnum: RxCollectionEnum.WS_HISTORY,
+            deletedAt: 0
          },
          sort: [{ createdAt: 'asc' }]
       })
-      // console.log('history before=', res.items.map(item => item.name))
-      // for (let item of res.items){
-      //    for (let item2 of res.items){
-      //       if (item.oid === item2.oid){
-      //          console.log('history remove item=', item)
-      //          item.remove(true)
-      //          item.flushDebounce()
-      //       }
-      //    }
-      // }
-      // res = await rxdb.find({
-      //    selector: {
-      //       rxCollectionEnum: RxCollectionEnum.WS_HISTORY
-      //    },
-      //    sort: [{ createdAt: 'asc' }]
-      // })
+      console.log('history before=', res.items)
 
-      let existing = res.items.find(el => el.oid === oid)
-      if (existing) {
-         console.log('existing=', existing.name)
-         await existing.remove(true)
-         existing.flushDebounce()
+      for (let item of res.items) {
+         if (item.oid === oid) await item.remove(true)
       }
       // console.log('history after remove=', res.items.map(item => item.name))
       let historyItemInput = {
@@ -228,7 +212,7 @@ const routes = [
             path: 'block-render/:oid',
             // alias: 'node2/:oid',
             component: () => import('src/pages/app/snippet_render/index.vue'),
-            meta: { roleMinimal: 'GUEST' },
+            meta: { roleMinimal: 'GUEST' }
          },
          {
             name: 'graph',
@@ -255,7 +239,7 @@ const routes = [
                {
                   name: 'user.home',
                   path: '',
-                  component: () => import('src/pages/app/user/index.vue'),
+                  component: () => import('src/pages/app/user/index.vue')
                },
                {
                   name: 'user.following',
@@ -318,17 +302,17 @@ const routes = [
                next()
             }
          },
-        {
-          name: 'cover',
-          path: 'cover/:oid',
-          props: (route) => ({ oid: route.params.oid }),
-          component: () => import('src/pages/app/cover/index.vue'),
-          meta: { roleMinimal: 'GUEST' },
-          beforeEnter: async (to, from, next) => {
-            if (to) saveHistory(to.params.oid)
-            next()
-          }
-        },
+         {
+            name: 'cover',
+            path: 'cover/:oid',
+            props: (route) => ({ oid: route.params.oid }),
+            component: () => import('src/pages/app/cover/index.vue'),
+            meta: { roleMinimal: 'GUEST' },
+            beforeEnter: async (to, from, next) => {
+               if (to) saveHistory(to.params.oid)
+               next()
+            }
+         },
          {
             name: 'content-render',
             path: 'content-render/:oid',
