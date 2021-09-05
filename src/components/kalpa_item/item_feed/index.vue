@@ -1,7 +1,6 @@
 <template lang="pug">
-  div(v-if="!!item").row.full-width
-    div(v-if="item.deletedAt" :style=`{position: 'absolute', zIndex: 1000, background: 'rgba(0,0,0, 0.8)'}`
-    ).row.fit.items-center.content-center.justify-center
+  div(v-if="!!item" :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
+    div(v-if="item.deletedAt" :style=`{position: 'absolute', zIndex: 1000, background: 'rgba(0,0,0, 0.8)'}`).row.fit.items-center.content-center.justify-center
       span.text-grey.text-h4.items-center.content-center.justify-center {{$t('unpublished')}}
     block-feed(
       v-if="item.type === 'BLOCK'"
