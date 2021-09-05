@@ -78,8 +78,8 @@
             //- q-tooltip Вперед
     slot(name="prepend")
     //- spinner, no itemsRes
-    div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
-      q-spinner-dots(color="green" size="60px")
+    //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
+    q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
     //- items
     div(
       v-if="itemsRes"
@@ -116,9 +116,9 @@
             q-icon(name="expand_less" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
         //- next loading + компенсация kalpa-menu-mobile
         div(v-else-if="item[itemKey] === 'footer'" :style=`{height: '30px'}`).row.full-width
-          q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+          q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px").absolute-center
           q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" :style=`{height: '30px'}`).full-width
-            q-icon(name="expand_more" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+            q-icon(name="expand_more" size="50px").absolute-center
         // item
         div(
           v-else
