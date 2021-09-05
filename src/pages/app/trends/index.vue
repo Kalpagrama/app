@@ -6,12 +6,11 @@ kalpa-layout
     .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         page-search(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
-          :useNavHeader="false", :searchInputState="pageInfo.searchInputState", :searchString="pageInfo.searchString" @searchInputState="pageInfo.searchInputState = $event")
+          :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
           :searchInputState="pageInfo.searchInputState"
-          :searchString="pageInfo.searchString"
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"

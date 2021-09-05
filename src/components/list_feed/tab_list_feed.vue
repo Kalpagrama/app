@@ -117,20 +117,23 @@ export default {
     pageId: {
       immediate: true,
       handler (to, from) {
+        // this.$logW('pageId:', to)
         this.showTabsHeader = true
-        this.$emit('pageId', this.pageId)
+        this.$emit('pageId', to)
       }
     },
     searchString: {
       immediate: true,
       handler (to, from) {
-        this.$emit('searchString', this.searchString)
+        // this.$logW('searchString:', to)
+        this.$emit('searchString', to)
       }
     },
 
     searchInputState: {
       immediate: true,
       handler (to, from) {
+        // this.$logW('searchInputState:', to)
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }
