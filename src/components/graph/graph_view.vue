@@ -284,7 +284,7 @@ export default {
     removeNode (item) {
       // this.$log('removeNode', item)
       if (!confirm('Удалить?')) return
-      let indx = this.graphD3.nodes.findIndex(n => n => n.id === item.id || n.oid === item.oid)
+      let indx = this.graphD3.nodes.findIndex(n => n.id === item.id || n.oid === item.oid)
       if (indx >= 0) this.graphD3.nodes.splice(indx, 1)
       this.$emit('changed')
     },
