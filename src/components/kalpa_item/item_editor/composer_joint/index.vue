@@ -53,6 +53,7 @@ import vertexEditor from 'src/components/kalpa_item/item_editor/composer_joint/v
 import { ObjectCreateApi } from 'src/api/object_create'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
+import { VertexTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'composerJoint',
@@ -90,6 +91,20 @@ export default {
       this.itemFinderShow = false
     },
     async jointPublish () {
+      assert(this.joint.vertices.length === 2)
+      assert(this.joint.items.length === 2)
+      this.$log('before swap', JSON.stringify(this.joint.vertices))
+      if (this.joint.vertices[0].in(VertexTypeEnum.EFFECT, VertexTypeEnum.SOLUTION, VertexTypeEnum.TO, VertexTypeEnum.DISPROOF, VertexTypeEnum.PROOF, VertexTypeEnum.ANSWER)) {
+        // swap items
+        let tmp = this.joint.vertices[0]
+        this.joint.vertices[0] = this.joint.vertices[1]
+        this.joint.vertices[1] = tmp
+        tmp = this.joint.items[0]
+        this.joint.items[0] = this.joint.items[1]
+        this.joint.items[1] = tmp
+        this.$log('after swap', JSON.stringify(this.joint.vertices))
+        this.$log('after swap', JSON.parse(JSON.stringify(this.joint.items)))
+      }
       if (this.action) {
         this.$log('jointPublish', this.joint)
         await this.action(this.joint)

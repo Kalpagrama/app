@@ -1,6 +1,7 @@
 import { isRxCollection } from 'rxdb'
 import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import {WsItemTypeEnum as WsItemTypeEnumOrig} from 'src/system/common/enums'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 
@@ -11,15 +12,7 @@ const RxModuleEnum = Object.freeze({
 
 const WsItemTypeEnum = Object.freeze({
    WS_ANY: 'WS_ANY', // нужно только для запросов (рельных объектов с таким типом нет)
-   WS_NODE: 'WS_NODE',
-   WS_JOINT: 'WS_JOINT',
-   WS_BLOCK: 'WS_BLOCK',
-   WS_CONTENT: 'WS_CONTENT',
-   WS_SPHERE: 'WS_SPHERE',
-   WS_BOOKMARK: 'WS_BOOKMARK',
-   WS_PUBLISHED: 'WS_PUBLISHED', // мои опубликванные ядра джойнты и блоки
-   WS_HISTORY: 'WS_HISTORY',
-   WS_COLLECTION: 'WS_COLLECTION',
+  ...WsItemTypeEnumOrig
 
 })
 const WsCollectionEnum = Object.freeze({
