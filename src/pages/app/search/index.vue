@@ -1,6 +1,7 @@
 <template lang="pug">
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
     tab-list-feed(
+      v-if="pageId"
       :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
       :navHeaderText="useNavHeader ? $t('Published') : ''"
       :searchInputState="searchInputState"
@@ -70,7 +71,12 @@ export default {
   },
   data () {
     return {
-      pages: [
+      pageId: null,
+    }
+  },
+  computed: {
+    pages() {
+      return [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
@@ -78,12 +84,7 @@ export default {
         { id: 'contents', name: this.$t('Contents') },
         { id: 'users', name: this.$t('Users') },
         { id: 'spheres', name: this.$t('Spheres') }
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id)),
-    }
-  },
-  computed: {
-    pageId() {
-      return this.pages[0]?.id
+      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
     },
     query () {
       let objectTypes
@@ -135,6 +136,7 @@ export default {
     }
   },
   mounted () {
+    this.pageId = this.pages ? this.pages[0]?.id : null
     // this.$logW('this.$q.screen.height', this.$q.screen.height)
     // this.$logW('this.scrollAreaHeight', this.scrollAreaHeight)
   }

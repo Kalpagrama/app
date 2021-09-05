@@ -17,6 +17,7 @@
               :bookmark="bookmarkSelected"
               @close="bookmarkEditorShow = false, bookmarkSelected = null")
           tab-list-feed(
+            v-if="pageId"
             :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
             :navHeaderText="useNavHeader ? $t('Collections') : ''"
             :searchInputState="searchInputState"
@@ -76,12 +77,7 @@ export default {
     return {
       collectionsModel: { collectionId: this.collectionId, collections: [] },
       collectionsRes: null,
-      pages: [
-        { id: 'all', name: this.$t('All') },
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id)),
+      pageId: null,
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       newCollectionName: '',
@@ -89,8 +85,13 @@ export default {
     }
   },
   computed: {
-    pageId() {
-      return this.pages[0]?.id
+    pages() {
+      return [
+        { id: 'all', name: this.$t('All') },
+        { id: 'nodes', name: this.$t('Nodes') },
+        { id: 'joints', name: this.$t('Joints') },
+        { id: 'blocks', name: this.$t('Blocks') }
+      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
     },
     // запрос за элементами коллекции
     query () {
@@ -148,7 +149,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.pageId = this.pages ? this.pages[0]?.id : null
   }
 }
 </script>
