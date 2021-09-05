@@ -774,9 +774,9 @@ class RxDBWrapper {
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
       let reactiveObject = reactiveDoc.getPayload()
       const populate = async (obj) => {
-         if (obj.type.in('NODE', 'JOINT')) {
-            assert(obj.itemsShort)
-            let promises = obj.itemsShort.map(objShort => {
+         if (obj.type.in('NODE', 'JOINT', 'BLOCK')) {
+            assert(obj.itemsShort || obj.graph)
+            let promises = (obj.itemsShort || [...obj.graph.joints, ...obj.graph.nodes]).map(objShort => {
                return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
             })
             obj.items = await Promise.all(promises)

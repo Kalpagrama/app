@@ -42,13 +42,10 @@
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
         :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
-        :pages=`{
-          nodes: {views: ['all']},
-          workspace: {views: ['node', 'media']},
-          search: {views: ['default']},
-          gif: {views: ['popular']},
+        :pageFilter=`{
+          whiteList: ['nodes', 'joints', 'blocks'],
         }`
-        @item="addNodeToGraph"
+        @item="addItemToGraph"
         @close="itemFinderShow = false"
       ).b-30
     // item detail
@@ -91,7 +88,7 @@
       item-editor(
         :joint="newJoint"
         :item="newJoint"
-        :action="addJointToGraph"
+        :action="addItemToGraph"
         :publish="publish"
         @remove="$log('item-editor @remove')"
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
@@ -136,6 +133,7 @@ import { assert } from 'src/system/common/utils'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'graphView',
@@ -243,11 +241,17 @@ export default {
       joint.label = joint.name || (joint.vertices && joint.vertices.length === 2 ? this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name : '')
       // if (!joint.name && joint.vertices && joint.vertices.length === 2) joint.name = this.$nodeItemTypesPairs.find(p => p.id.includes(joint.vertices[0]) && p.id.includes(joint.vertices[1])).name
     },
+    addItemToGraph (item, notifyOnExisting = true) {
+      if (item.type === 'NODE') return this.addNodeToGraph(item, notifyOnExisting)
+      else if (item.type === 'JOINT') return this.addJointToGraph(item, notifyOnExisting)
+      else throw new Error('bad type' + JSON.stringify(item))
+    },
     addNodeToGraph (item, notifyOnExisting = true) {
       // this.$log('addNodeToGraph', item, this.graphD3)
       if (this.simulationLinked) this.simulationLinked.stop()
       this.itemFinderShow = false
       assert(item.id || item.oid, 'bad item:' + JSON.stringify(item))
+      assert(item.type === ObjectTypeEnum.NODE, 'only node allowed')
       let existing = this.graphD3.nodes.find(n => n.id === item.id || n.oid === item.oid)
       if (existing) {
         if (notifyOnExisting) this.$notify('error', this.$t('same item found'))
@@ -299,7 +303,7 @@ export default {
       if (d.discovered) return
       if (this.getJoints) {
         let joints = await this.getJoints(d.oid)
-        for (let j of joints) this.addJointToGraph(j, false)
+        for (let j of joints) this.addItemToGraph(j, false)
       }
       d.discovered = true
     },
@@ -1051,7 +1055,7 @@ export default {
     this.debouncedUpdateGraph = debounce(this.updateGraph, 500)
     if (!this.graphD3.nodes.length && this.oidRoot) {
       let rootNode = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oidRoot)
-      let node = this.addNodeToGraph(cloneDeep(rootNode))
+      let node = this.addItemToGraph(cloneDeep(rootNode))
       await this.discover(node)
     }
     if (!this.graphD3.selectedItem) this.$set(this.graphD3, 'selectedItem', null)

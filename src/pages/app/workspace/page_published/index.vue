@@ -52,6 +52,7 @@ export default {
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
+    pageFilter: { type: Object},
   },
   components: {
     bookmarkListItem,
@@ -59,13 +60,12 @@ export default {
   },
   data () {
     return {
-      pageId: 'all',
       pages: [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
         { id: 'blocks', name: this.$t('Blocks') }
-      ],
+      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id)),
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       showHeader: true,
@@ -93,6 +93,9 @@ export default {
     },
   },
   computed: {
+    pageId() {
+      return this.pages[0]?.id
+    },
     query () {
       let res = {
         selector: {

@@ -44,6 +44,7 @@
       :scrollAreaHeight="scrollAreaHeight"
       searchInputState="disabled"
       :searchString="searchString"
+      :pageFilter="pageFilter"
       mode="select"
       @item="$emit('item', $event)")
 </template>
@@ -62,7 +63,12 @@ export default {
       type: Number,
       required: true
     },
-    pageId_: { type: String },
+    pageFilter: {
+      type: Object,
+      default: {
+        whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres']
+      }
+    },
     pagesShow: { type: Boolean, default: true },
     searchString: { type: String },
     headerTitle: {

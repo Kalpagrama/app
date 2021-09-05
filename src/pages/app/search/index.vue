@@ -65,7 +65,8 @@ export default {
     useNavHeader: { type: Boolean, default: true },
     searchString: { type: String, default: '' },
     searchInputState: { type: String},
-    mode: { type: String }
+    mode: { type: String },
+    pageFilter: { type: Object},
   },
   data () {
     return {
@@ -77,11 +78,13 @@ export default {
         { id: 'contents', name: this.$t('Contents') },
         { id: 'users', name: this.$t('Users') },
         { id: 'spheres', name: this.$t('Spheres') }
-      ],
-      pageId: 'all'
+      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id)),
     }
   },
   computed: {
+    pageId() {
+      return this.pages[0]?.id
+    },
     query () {
       let objectTypes
       if (this.pageId === 'all') {

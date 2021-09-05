@@ -9,13 +9,8 @@ div(
   kalpa-finder(
     :height="$q.screen.height"
     @contentKalpa="itemFound"
-    :pages=`{
-      nodes: {views: ['all']},
-      //- workspace: {views: ['image', 'video', 'node', 'sphere', 'user']},
-      workspace: {views: ['node']},
-      //- kalpagrama: {views: ['all', 'users', 'nodes']},
-      //- gif: {views: ['all']},
-      //- web: {views: ['all', 'image', 'video',]}
+    :pageFilter=`{
+          whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres'],
     }`
     :style=`{
       height: '500px',

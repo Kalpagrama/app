@@ -65,7 +65,8 @@ export default {
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
-    collectionId: { type: String, default: '' }
+    collectionId: { type: String, default: '' },
+    pageFilter: { type: Object},
   },
   components: {
     bookmarkListItem,
@@ -75,13 +76,12 @@ export default {
     return {
       collectionsModel: { collectionId: this.collectionId, collections: [] },
       collectionsRes: null,
-      pageId: 'all',
       pages: [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
         { id: 'blocks', name: this.$t('Blocks') }
-      ],
+      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id)),
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       newCollectionName: '',
@@ -89,6 +89,9 @@ export default {
     }
   },
   computed: {
+    pageId() {
+      return this.pages[0]?.id
+    },
     // запрос за элементами коллекции
     query () {
       let res = {

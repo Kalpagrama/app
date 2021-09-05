@@ -11,11 +11,8 @@ div(
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
-      :pages=`{
-        nodes: {views: ['all']},
-        workspace: {views: ['node', 'media']},
-        search: {views: ['default']},
-        gif: {views: ['popular']},
+      :pageFilter=`{
+          whiteList: ['nodes'],
       }`
       @item="itemFound"
       @close="itemFinderShow = false"

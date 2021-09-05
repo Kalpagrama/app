@@ -8,11 +8,8 @@
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for joint')",
-        :pages=`{
-          nodes: {views: ['all']},
-          workspace: {views: ['node', 'media']},
-          search: {views: ['default']},
-          gif: {views: ['popular']},
+        :pageFilter=`{
+          whiteList: ['nodes'],
         }`
         @item="itemFound"
         @close="itemFinderShow = false"
