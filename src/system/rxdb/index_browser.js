@@ -545,10 +545,21 @@ class RxDBWrapper {
       try {
          await this.findMutex.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
          assert(this.initialized, '! this.initialized2 !')
-         const queryId = JSON.stringify(mangoQuery)
-         assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + queryId)
+         let populateObjects = mangoQuery.populateObjects
+         delete mangoQuery.populateObjects // populateObjects мешает нормальному кэшированию в rxdb (нужно только тут)
+         let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
+         let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', listId) // до удаления populateObjects
+         let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
+            fetchFunc: async () => {
+               return {
+                  item: {}, // пустой объект для начальной иницализации props
+                  actualAge: 'infinity'
+               }
+            }
+         })
+         assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + listId)
          let findResult
-         let cachedReactiveList = this.reactiveDocDbMemCache.get(queryId)
+         let cachedReactiveList = this.reactiveDocDbMemCache.get(listId)
          // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
@@ -558,7 +569,7 @@ class RxDBWrapper {
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery, listId, null, null, propsReactive, screenSize)
                assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
                let populateFunc = async (itemsForPopulate, itemsForPrefetch, reactiveListFulFilled) => {
@@ -634,19 +645,6 @@ class RxDBWrapper {
                   let rxDocPagination = await this.lists.find(paginationMangoQuery)
                   return rxDocPagination
                }
-               let populateObjects = mangoQuery.populateObjects
-               delete mangoQuery.populateObjects // мешает нормальному кэшированию в rxdb
-
-               let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)
-               let propsCacheItemId = makeId(RxCollectionEnum.LOCAL, 'ReactiveList.props', listId) // до удаления populateObjects
-               let propsReactive = await this.get(RxCollectionEnum.LOCAL, propsCacheItemId, {
-                  fetchFunc: async () => {
-                     return {
-                        item: {}, // пустой объект для начальной иницализации props
-                        actualAge: 'infinity'
-                     }
-                  }
-               })
                if (propsReactive[listId] && propsReactive[listId].currentPageToken && propsReactive[listId].currentPageSize) {
                   mangoQuery.pagination = { // c запомненной позиции
                      pageSize: propsReactive[listId].currentPageSize,
@@ -665,12 +663,11 @@ class RxDBWrapper {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
             assert(findResult, '!findResult' + JSON.stringify(findResult))
-            this.reactiveDocDbMemCache.set(queryId, findResult)
+            this.reactiveDocDbMemCache.set(listId, findResult)
          }
          await findResult.gotoCurrent()
          if (findResult.items.length === 0) await findResult.next(autoNextSize)
-         // this.store.commit('debug/addFindResult', { queryId, findResult })
-         this.store.commit('debug/addFindResult', { queryId, findResult })
+         this.store.commit('debug/addFindResult', { listId, findResult })
          assert(findResult && findResult.next, '!findResult.next')
          return findResult
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)

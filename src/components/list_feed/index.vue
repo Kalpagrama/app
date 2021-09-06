@@ -125,6 +125,7 @@
           :style=`{...itemStyles}`
           :accessKey="`${item[itemKey]}-${itemIndex}`"
           v-observe-visibility=`{
+          throttle: 300,
           callback: itemVisibilityHandler,
           intersection: {
             threshold: 0.2,

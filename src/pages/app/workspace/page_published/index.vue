@@ -32,6 +32,7 @@ kalpa-layout
           @pageId="pageId = $event"
         ).row.full-width
           template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+            //q-btn(:label="bookmarkIndex + '::' + bookmark.name", size="xl").full-width
             bookmark-list-item(
               :bookmark="bookmark"
               :mode="mode"
