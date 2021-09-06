@@ -272,7 +272,7 @@ export default {
     },
     'itemsRes.itemsHeaderFooter': {
       async handler (to, from) {
-        this.$log('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes, this.itemsRes.hasPrev)
+        this.$log('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes.hasPrev, this.itemsRes.hasNext)
         // удаляем те, которых нет в новом списке
         for (let itemMiddle of this.itemMiddleHistory){
           itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)

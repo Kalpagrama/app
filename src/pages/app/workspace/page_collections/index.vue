@@ -26,7 +26,7 @@
             :pageId="pageId"
             :query="query"
             nextSize=50
-            :itemMiddlePersist="false"
+            :itemMiddlePersist="itemMiddlePersist"
             screenSize=100
             @searchString="searchString = $event"
             @pageId="pageId = $event"
@@ -63,6 +63,7 @@ export default {
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
+    itemMiddlePersist: { type: Boolean, default: false },
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },

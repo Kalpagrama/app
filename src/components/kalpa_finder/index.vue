@@ -45,8 +45,9 @@
       searchInputState="disabled"
       :searchString="searchString"
       :pageFilter="pageFilter"
+      :itemMiddlePersist="true"
       mode="select"
-      @item="$emit('item', $event)")
+      @item="$emit('item', $event)").br
 </template>
 
 <script>
@@ -84,15 +85,16 @@ export default {
   },
   data () {
     return {
-      pageId: 'published',
+      pageId: null,
       searchStringShow: false,
-      headerHeight: 0
+      headerHeight: 0,
     }
   },
   watch: {
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchStringShow = false
+        this.$store.commit('ui/stateSet', ['finderPageId', to])
       }
     },
     searchString: {
@@ -103,6 +105,8 @@ export default {
   },
   computed: {
     scrollAreaHeight () {
+      // this.$logW('this.$q.screen.height=', this.$q.screen.height)
+      // this.$logW('scrollAreaHeight=', (this.height || this.$q.screen.height) - this.headerHeight)
       return (this.height || this.$q.screen.height) - this.headerHeight
     },
     headerTitle_ () {
@@ -132,6 +136,7 @@ export default {
   },
   mounted () {
     this.$log('mounted scrollAreaHeight=', this.scrollAreaHeight)
+    this.pageId = this.$store.state.ui.finderPageId || 'published'
   }
 }
 </script>

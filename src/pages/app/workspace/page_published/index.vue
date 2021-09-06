@@ -26,7 +26,7 @@ kalpa-layout
           :pageId="pageId"
           :query="query"
           nextSize=50
-          :itemMiddlePersist="false"
+          :itemMiddlePersist="itemMiddlePersist"
           screenSize=100
           @searchString="searchString = $event"
           @pageId="pageId = $event"
@@ -50,6 +50,7 @@ export default {
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
+    itemMiddlePersist: { type: Boolean, default: false },
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
@@ -71,6 +72,12 @@ export default {
     }
   },
   watch: {
+    scrollAreaHeight: {
+      immediate: true,
+      handler(to, from) {
+        // this.$logW('scrollAreaHeight=', to)
+      }
+    },
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false

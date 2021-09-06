@@ -114,6 +114,12 @@ export default {
     }
   },
   watch: {
+    scrollAreaHeight: {
+      immediate: true,
+      handler(to, from) {
+        this.$logW('scrollAreaHeight=', to)
+      }
+    },
     pageId: {
       immediate: true,
       handler (to, from) {
