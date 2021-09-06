@@ -19,8 +19,11 @@ kalpa-layout()
           h1.text-white.text-bold {{$t('Node')}}
           .col
           //- tutorial
+          //q-btn(
+          //  @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+          //  round flat color="white" icon="fas fa-info")
           q-btn(
-            @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+            @click=""
             round flat color="white" icon="fas fa-info")
       //- body
       div(

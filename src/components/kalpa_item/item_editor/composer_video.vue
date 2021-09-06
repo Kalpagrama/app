@@ -34,10 +34,10 @@ div(:style=`{height: height+'px'}`).row.full-width
               }`
               ).row.full-width.items-start.content-start.q-px-md.q-mb-sm
               div(v-if="$store.getters.currentUser.profile.lang === 'RUS'").col.q-px-sm
-                span.text-white Нажмите
+                span.text-white {{$t('Click')}}
                 q-btn(
                   round flat dense icon="add_circle_outline" color="green")
-                span.text-white внизу, чтобы выделить фрагмент из видео, это важно потому что это важно.
+                span.text-white {{$t('at the bottom to select a fragment from the video.')}}
               div(v-if="$store.getters.currentUser.profile.lang === 'ENG'").col.q-pr-lg
                 p.text-white.q-ml-sm {{$t('Why pick fragment on looong video is important! You need to concentrate and to communicate better')}}
             //- bottom

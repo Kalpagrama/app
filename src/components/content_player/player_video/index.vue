@@ -24,32 +24,32 @@
                 :contentKalpa="contentKalpa")
           slot(name="pult-footer")
     //- transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
-      div(
-        v-if="player && player.duration > 0"
-        v-show="options.showPult"
-        :style=`{
-          position: 'absolute', zIndex: 11, bottom: '0px',
-        }`
-        ).row.full-width.justify-center.q-px-md
-        .row.full-width.justify-center.br
-          div(
-            :style=`{
-              maxWidth: 600+'px',
-              background: 'rgba(35,35,35,0.7)',
-              borderRadius: '20px',
-              //- height: '200px',
-            }`).row.full-width
-            slot(name="pult" :player="player")
-            player-pult(
-              :player="player"
-              :contentKalpa="contentKalpa")
-        .row.full-width.justify-center
-          div(
-            :style=`{
-              maxWidth: 600+'px',
-            }`
-            ).row.full-width
-            slot(name="pult-footer")
+    //  div(
+    //    v-if="player && player.duration > 0"
+    //    v-show="options.showPult"
+    //    :style=`{
+    //      position: 'absolute', zIndex: 11, bottom: '0px',
+    //    }`
+    //    ).row.full-width.justify-center.q-px-md
+    //    .row.full-width.justify-center.br
+    //      div(
+    //        :style=`{
+    //          maxWidth: 600+'px',
+    //          background: 'rgba(35,35,35,0.7)',
+    //          borderRadius: '20px',
+    //          //- height: '200px',
+    //        }`).row.full-width
+    //        slot(name="pult" :player="player")
+    //        player-pult(
+    //          :player="player"
+    //          :contentKalpa="contentKalpa")
+    //    .row.full-width.justify-center
+    //      div(
+    //        :style=`{
+    //          maxWidth: 600+'px',
+    //        }`
+    //        ).row.full-width
+    //        slot(name="pult-footer")
     //- Tint bottom - on pause and desktops only and youtube
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(

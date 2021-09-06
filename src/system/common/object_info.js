@@ -12,7 +12,7 @@ export function objectTypeName(object) {
     case 'VIDEO': return i18n.t('Video')
     case 'IMAGE': return i18n.t('Image')
     case 'BOOK': return i18n.t('Book')
-    case 'BLOCk': return i18n.t('Block')
+    case 'BLOCK': return i18n.t('Block')
     case 'USER': return i18n.t('User')
     default: return i18n.t('unknown')
   }
@@ -31,7 +31,7 @@ export function objectUrlPath(object) {
     case 'VIDEO': return '/content/'
     case 'IMAGE': return '/content/'
     case 'BOOK': return '/content/'
-    case 'BLOCk': return '/block/'
+    case 'BLOCK': return '/block/'
     case 'USER': return '/user/'
     default: return '/'
   }

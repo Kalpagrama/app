@@ -9,46 +9,51 @@
 page-nodes-root(
   :contentKalpa="contentKalpa"
   :player="player")
+  template(v-slot:header)
+    .row.full-width.items-center.content-center.q-px-lg
+      span.text-white.text-bold {{$t('Nodes')}}
+      .col
+      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   template(v-slot:item=`{item: node}`)
     div(
-      v-if="node.items[0] && node.items[0].layers"
-      @click="nodeClick(node)"
-      :style=`{
-      }`
-      ).row.full-width.node.q-mb-sm.q-px-sm
-      div(
+        v-if="node.items[0] && node.items[0].layers"
+        @click="nodeClick(node)"
         :style=`{
-          background: 'rgba(35,35,35,0.4)',
-          borderRadius: '10px',
         }`
-        ).row.full-width
+        ).row.full-width.node.q-mb-sm.q-px-sm
         div(
           :style=`{
-            background: 'rgba(40,40,40,0.4)',
+            background: 'rgba(35,35,35,0.4)',
             borderRadius: '10px',
           }`
-          ).row.full-width.items-start.content-start
-          img(
-            draggable="false"
-            :src="node.items[0].thumbUrl"
-            :style=`{
-              height: '50px',
-              borderRadius: '10px',
-            }`)
-          .col
-            .row.full-width.q-pa-sm
-              span.text-white {{ node.name }}
-              div(
-                v-if="node.items[0] && node.items[0].layers"
-                ).row.full-width
-                small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
-        //- selected
-        div(
-          v-if="nodeSelectedOid === node.oid"
           ).row.full-width
-          q-btn(round flat color="white" icon="refresh" @click="nodeReplay(node)")
-          .col
-          q-btn(round flat color="white" icon="launch" @click="nodeLaunch(node)")
+          div(
+            :style=`{
+              background: 'rgba(40,40,40,0.4)',
+              borderRadius: '10px',
+            }`
+            ).row.full-width.items-start.content-start
+            img(
+              draggable="false"
+              :src="node.items[0].thumbUrl"
+              :style=`{
+                height: '50px',
+                borderRadius: '10px',
+              }`)
+            .col
+              .row.full-width.q-pa-sm
+                span.text-white {{ node.name }}
+                div(
+                  v-if="node.items[0] && node.items[0].layers"
+                  ).row.full-width
+                  small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
+          //- selected
+          div(
+            v-if="nodeSelectedOid === node.oid"
+            ).row.full-width
+            q-btn(round flat color="white" icon="refresh" @click="nodeReplay(node)")
+            .col
+            q-btn(round flat color="white" icon="launch" @click="nodeLaunch(node)")
 </template>
 
 <script>
