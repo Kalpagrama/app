@@ -33,7 +33,6 @@
               small(:class=`{'bg-red-3': scrollHeightChanging}`).full-width scrollHeight: {{ scrollHeight }}
               small.full-width itemsRes.itemsHeaderFooter: {{ itemsRes.itemsHeaderFooter.length }}
               small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
-              small(v-if="itemMiddle").full-width itemMiddle.indx: {{ itemMiddle.item.debugInfo().indx }}
               q-btn(
                 @click="itemMiddleGetPosition"
                 outline dense no-caps align="lef" size="sm"
@@ -110,14 +109,14 @@
       ).row.full-width
         //item slot
         //- prev loading
-        div(v-if="item[itemKey] === 'header'" :style=`{height: '30px'}`).row.full-width
-          q-spinner-dots(v-if="itemsResStatus === 'PREV'" color="green" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
-          q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").full-width.full-height
-            q-icon(name="expand_less" size="50px" :style=`{position: 'absolute', left: '50%', top: '-10px'}`)
+        div(v-if="item[itemKey] === 'header'" :style=`{position: 'relative', height: '30px'}`).row.full-width.br
+          q-spinner-dots(v-if="itemsResStatus === 'PREV'" color="green" size="50px").absolute-center
+          q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").fit
+            q-icon(name="expand_less" size="50px").absolute-center
         //- next loading + компенсация kalpa-menu-mobile
-        div(v-else-if="item[itemKey] === 'footer'" :style=`{height: '30px'}`).row.full-width
+        div(v-else-if="item[itemKey] === 'footer'" :style=`{position: 'relative', height: '30px'}`).row.full-width.br
           q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px").absolute-center
-          q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green" :style=`{height: '30px'}`).full-width
+          q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green").fit
             q-icon(name="expand_more" size="50px").absolute-center
         // item
         div(
@@ -132,9 +131,9 @@
              threshold: 0.2,
           },
           }`
-        ).row.full-width
-          span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
-            ) indx:{{itemIndex}} visible:{{!!itemsVisibility[itemIndex]}} {{item.debugInfo() }}
+        ).row.full-width.br
+          span(v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[itemIndex]" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
+          ) # {{itemIndex}} of {{itemsRes.itemsHeaderFooter.length}} orig# {{item.debugInfo().indxHF }} of {{item.debugInfo().loadedLen}} {{!!itemsVisibility[itemIndex] ? '-----VISIBLE' : ''}}
           slot(
             name="item"
             :item="item"
@@ -227,6 +226,18 @@ export default {
     }
   },
   computed: {
+    v0() { return this.itemsVisibility[0] },
+    v1() { return this.itemsVisibility[1] },
+    v2() { return this.itemsVisibility[2] },
+    v3() { return this.itemsVisibility[3] },
+    v4() { return this.itemsVisibility[4] },
+    v5() { return this.itemsVisibility[5] },
+    v6() { return this.itemsVisibility[6] },
+    v7() { return this.itemsVisibility[7] },
+    v8() { return this.itemsVisibility[8] },
+    v9() { return this.itemsVisibility[9] },
+    v10() { return this.itemsVisibility[10] },
+    v11() { return this.itemsVisibility[11] },
     debugPosition () {
       if (!this.scrollTarget) return null
       if (this.scrollTargetIsWindow) {
@@ -267,6 +278,22 @@ export default {
     }
   },
   watch: {
+    itemsVisibility: {
+      deep: true,
+      handler(to) { this.$logW('itemsVisibility', to) }
+    },
+    // itemsVisibility(to) { this.$logW('itemsVisibility', to) },
+    v1(to) { this.$logW('v1', to) },
+    v2(to) { this.$logW('v2', to) },
+    v3(to) { this.$logW('v3', to) },
+    v4(to) { this.$logW('v4', to) },
+    v5(to) { this.$logW('v5', to) },
+    v6(to) { this.$logW('v6', to) },
+    v7(to) { this.$logW('v7', to) },
+    v8(to) { this.$logW('v8', to) },
+    v9(to) { this.$logW('v9', to) },
+    v10(to) { this.$logW('v10', to) },
+    v11(to) { this.$logW('v11', to) },
     query: {
       immediate: true,
       async handler (to, from) {
@@ -377,6 +404,7 @@ export default {
       let itemsResWrapperOffsetParent = itemsResWrapperRef.offsetParent
       this.$log('itemsResWrapper', { itemsResWrapperRect, itemsResWrapperOffsetTop, itemsResWrapperOffsetParent })
       this.$log('itemsVisibility', this.itemsVisibility)
+      if (this.itemMiddle) this.$log('itemMiddle.item.debugInfo()', this.itemMiddle.item.debugInfo())
       // let scrollTarget
     },
     // обновит itemMiddle.top для каждого элемента в itemMiddleHistory
@@ -450,12 +478,13 @@ export default {
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      this.$logW('itemVisibilityChanged', isVisible, idxSting)
-      this.itemsVisibility[parseInt(idxSting)] = isVisible
+      this.$logW('itemVisibilityChanged', isVisible, idxSting, this.itemsVisibility)
+      this.itemsVisibility.splice(parseInt(idxSting), 0, isVisible)
     },
     itemMiddleSet (key, idx) {
       this.$log('ims', idx)
       assert(key && idx && idx >= 0)
+      if (key.in('header', 'footer')) return
       if (this.itemMiddlePersist) this.itemsRes.setProperty('currentId', key)
       let item = this.itemsRes.itemsHeaderFooter[idx]
       // this.$log('ims item.name', item?.name)

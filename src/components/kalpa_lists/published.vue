@@ -14,16 +14,16 @@
           @close="bookmarkEditorShow = false, bookmarkSelected = null")
       tab-list-feed(
         v-if="pageId"
-        :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+        :scrollAreaHeight="400"
         :navHeaderText="useNavHeader ? $t('Published') : ''"
         :searchInputState="searchInputState"
         :searchString="searchString"
         :pages="pages"
         :pageId="pageId"
         :query="query"
-        nextSize=50
+        nextSize=1
         :itemMiddlePersist="itemMiddlePersist"
-        screenSize=100
+        screenSize=4
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
@@ -106,7 +106,8 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED
         },
-        sort: [{ createdAt: 'desc' }]
+        sort: [{ createdAt: 'desc' }],
+        limit: 10
       }
       // Get types
       if (this.pageId === 'nodes') {
