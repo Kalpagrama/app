@@ -1,10 +1,10 @@
 <template lang="pug">
   kalpa-layout()
     template(v-slot:footer)
-      nav-mobile(
-        v-if="true || $q.screen.lt.md"
-        :pageId="pageId"
-        @pageId="pageIdChange")
+      //nav-mobile(
+      //  v-if="true || $q.screen.lt.md"
+      //  :pageId="pageId"
+      //  @pageId="pageIdChange")
     template(v-slot:body)
       .row.full-width.items-start.content-start
         //- body

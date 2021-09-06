@@ -60,7 +60,7 @@
         :animated="$q.platform.is.mobile").full-width.b-30
         q-tab-panel(
           v-for="(p,pi) in (pages)" :key="p.id" :name="p.id"
-          :style=`{background: 'none', minHeight: '70vh',}`
+          :style=`{background: 'none',}`
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
           list-feed(
             :scrollAreaHeight="scrollAreaHeight || ($q.screen.height - navHeaderHeight - externalHeaderHeight)"
