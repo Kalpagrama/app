@@ -1,6 +1,6 @@
 // если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  div(:style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
+  div(:style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start.br
     q-resize-observer(@resize="scrollHeightResized")
     //- debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -28,9 +28,10 @@
               small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
               small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
               small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
-              small(:class=`{'bg-red': scrollTopChanging}`).full-width scrollTop: {{ scrollTop }}
+              small.full-width scrollTop: {{ scrollTop }}
               small.full-width scrollBottom: {{ scrollBottom }}
-              small(:class=`{'bg-red-3': scrollHeightChanging}`).full-width scrollHeight: {{ scrollHeight }}
+              small.full-width scrollHeight: {{ scrollHeight }}
+              small.full-width itemsTotalHeight: {{ itemsTotalHeight }}
               small.full-width itemsRes.itemsHeaderFooter: {{ itemsRes.itemsHeaderFooter.length }}
               small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
               q-btn(
@@ -86,7 +87,8 @@
       :style=`{
       position: 'relative',
       }`
-    ).row.full-width.items-start.content-start
+    ).row.full-width.items-start.content-start.br
+      q-resize-observer(@resize="itemsTotalHeight = $event.height")
       div(
         v-for="(item, itemIndex) in itemsRes.itemsHeaderFooter"
         :key="item[itemKey]"
@@ -107,14 +109,13 @@
         }
       }`
       ).row.full-width
-        //item slot
         //- prev loading
-        div(v-if="item[itemKey] === 'header'" :style=`{position: 'relative', height: '30px'}`).row.full-width.br
+        div(v-if="item[itemKey] === 'header'" :style=`{position: 'relative', height: '30px'}`).row.full-width
           q-spinner-dots(v-if="itemsResStatus === 'PREV'" color="green" size="50px").absolute-center
           q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").fit
             q-icon(name="expand_less" size="50px").absolute-center
-        //- next loading + компенсация kalpa-menu-mobile
-        div(v-else-if="item[itemKey] === 'footer'" :style=`{position: 'relative', height: '30px'}`).row.full-width.br
+        //- next loading
+        div(v-else-if="item[itemKey] === 'footer'" :style=`{position: 'relative', height: '30px'}`).row.full-width
           q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px").absolute-center
           q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green").fit
             q-icon(name="expand_more" size="50px").absolute-center
@@ -131,15 +132,15 @@
              threshold: 0.2,
           },
           }`
-        ).row.full-width.br
-          span(v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[itemIndex]" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
-          ) # {{itemIndex}} of {{itemsRes.itemsHeaderFooter.length}} orig# {{item.debugInfo().indxHF }} of {{item.debugInfo().loadedLen}} {{!!itemsVisibility[itemIndex] ? '-----VISIBLE' : ''}}
+        ).row.full-width
+          span(v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
+          ) # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{item.debugInfo().indxHF }} of {{item.debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
           slot(
             name="item"
             :item="item"
             :itemIndex="itemIndex"
             :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
-            :isVisible="!!itemsVisibility[itemIndex]")
+            :isVisible="!!itemsVisibility[item[itemKey]]")
     slot(name="append")
 </template>
 
@@ -211,33 +212,20 @@ export default {
       // scrollTop
       scrollTop: 0,
       scrollTopTimeout: null,
-      scrollTopChanging: false,
       // scrollBottom
       scrollBottom: 0,
       // scrollHeight
       scrollHeight: 0,
+      itemsTotalHeight: 0,
       scrollHeightTimeout: null,
-      scrollHeightChanging: false,
       itemsRes: null,
       itemsResStatus: null,
       // item
       itemMiddleHistory: [],
-      itemsVisibility: []
+      itemsVisibility: {}
     }
   },
   computed: {
-    v0() { return this.itemsVisibility[0] },
-    v1() { return this.itemsVisibility[1] },
-    v2() { return this.itemsVisibility[2] },
-    v3() { return this.itemsVisibility[3] },
-    v4() { return this.itemsVisibility[4] },
-    v5() { return this.itemsVisibility[5] },
-    v6() { return this.itemsVisibility[6] },
-    v7() { return this.itemsVisibility[7] },
-    v8() { return this.itemsVisibility[8] },
-    v9() { return this.itemsVisibility[9] },
-    v10() { return this.itemsVisibility[10] },
-    v11() { return this.itemsVisibility[11] },
     debugPosition () {
       if (!this.scrollTarget) return null
       if (this.scrollTargetIsWindow) {
@@ -278,22 +266,6 @@ export default {
     }
   },
   watch: {
-    itemsVisibility: {
-      deep: true,
-      handler(to) { this.$logW('itemsVisibility', to) }
-    },
-    // itemsVisibility(to) { this.$logW('itemsVisibility', to) },
-    v1(to) { this.$logW('v1', to) },
-    v2(to) { this.$logW('v2', to) },
-    v3(to) { this.$logW('v3', to) },
-    v4(to) { this.$logW('v4', to) },
-    v5(to) { this.$logW('v5', to) },
-    v6(to) { this.$logW('v6', to) },
-    v7(to) { this.$logW('v7', to) },
-    v8(to) { this.$logW('v8', to) },
-    v9(to) { this.$logW('v9', to) },
-    v10(to) { this.$logW('v10', to) },
-    v11(to) { this.$logW('v11', to) },
     query: {
       immediate: true,
       async handler (to, from) {
@@ -347,38 +319,32 @@ export default {
           clearTimeout(this.scrollTopTimeout)
           this.scrollTopTimeout = null
         }
-        if (!this.scrollTopChanging) this.$log('scrollTop START')
+        // if (!this.scrollTopChanging) this.$log('scrollTop START')
         // handle prev/next...
         if (to < this.paginationBufferHeight) await this.prev()
         if (this.scrollBottom < this.paginationBufferHeight) await this.next()
         // changing...
-        this.scrollTopChanging = true
         this.scrollTopTimeout = setTimeout(async () => {
           // END of scrollTopChanging
-          this.$log('scrollTop END')
-          this.scrollTopChanging = false
           // if (this.scrollTop < this.paginationBufferHeight) await this.prev()
           // if (this.scrollBottom < this.paginationBufferHeight) await this.next()
         }, 600)
       }
     },
-    scrollHeight: {
+    itemsTotalHeight: {
       async handler (to, from) {
         // this.$log('scrollHeight To/From:', to, from)
 
         // wait for the end
-        if (!this.scrollHeightChanging) this.$log('scrollHeight START')
+        // if (!this.scrollHeightChanging) this.$log('scrollHeight START')
         if (this.scrollHeightTimeout) {
           clearTimeout(this.scrollHeightTimeout)
           this.scrollHeightTimeout = null
           this.itemMiddleScrollIntoView('scrollHeight IN')
         }
-        this.scrollHeightChanging = true
         this.scrollHeightTimeout = setTimeout(() => {
-          this.scrollHeightChanging = false
-
           // END of scrollHeightChanging
-          this.$log('scrollHeight END')
+          // this.$log('scrollHeight END')
           // this.itemMiddleScrollIntoView('scrollHeight END')
           // handle AUTO prev
           if (this.itemsRes && this.itemsRes.hasPrev && this.scrollTop < this.paginationBufferHeight) {
@@ -478,8 +444,8 @@ export default {
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      this.$logW('itemVisibilityChanged', isVisible, idxSting, this.itemsVisibility)
-      this.itemsVisibility.splice(parseInt(idxSting), 0, isVisible)
+      this.$logW('itemVisibilityChanged', isVisible, idxSting, key)
+      this.$set(this.itemsVisibility, key, isVisible)
     },
     itemMiddleSet (key, idx) {
       this.$log('ims', idx)
@@ -528,6 +494,7 @@ export default {
       this.$log('prev done')
       this.itemsResStatus = null
       this.prevCompleteDt = Date.now()
+      this.$log('prev complete')
     },
     async next () {
       if (!this.itemsRes) return
@@ -559,9 +526,9 @@ export default {
     scrollHeightResized (e) {
       this.$log('scrollHeightResized', e.height)
       if (!this.scrollTarget) return
+      this.$log('scrollHeightResized2', e.height, getScrollHeight(this.scrollTarget))
       this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
       this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
-      this.scrollHeight = e.height
       this.scrollUpdate()
     },
     updateShowHeader (scrollTop) {

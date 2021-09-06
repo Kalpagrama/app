@@ -14,7 +14,7 @@
           @close="bookmarkEditorShow = false, bookmarkSelected = null")
       tab-list-feed(
         v-if="pageId"
-        :scrollAreaHeight="400"
+        :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
         :navHeaderText="useNavHeader ? $t('Published') : ''"
         :searchInputState="searchInputState"
         :searchString="searchString"
@@ -23,7 +23,7 @@
         :query="query"
         nextSize=1
         :itemMiddlePersist="itemMiddlePersist"
-        screenSize=4
+        screenSize=2
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
