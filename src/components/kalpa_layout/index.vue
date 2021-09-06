@@ -4,12 +4,14 @@ q-layout(view="hHh LpR fFf" @scroll="onScroll")
     q-resize-observer(@resize="headerHeight = $event.height")
     slot(name="header" :scrollTop="scrollTop")
   q-footer()
+    q-resize-observer(@resize="footerHeight = $event.height")
     slot(name="footer")
   q-page-containter
     div(overflow-hidden)
       q-page(
         :style=`{
           paddingTop: headerHeight+'px',
+          paddingBottom: footerHeight+'px',
         }`)
         slot(name="body")
 </template>

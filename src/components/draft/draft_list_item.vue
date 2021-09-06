@@ -52,8 +52,8 @@
             div(:style=`{minHeight:'32px',}`).row.full-width
               span(:style=`{lineHeight: 1.1,}`).text-white {{ draft.name }}
             .row.full-width.q-py-xs
-              //small.text-grey-8 {{ type }}
-              //.col
+              small.text-grey-8 {{ type }}
+              .col
               small.text-grey-8 {{ $date(draft.createdAt) }}
     //- right
     q-btn(
@@ -84,11 +84,11 @@ export default {
       thumbUrlErrored: false
     }
   },
-  // computed: {
-  //   type() {
-  //     return objectTypeName(this.draft)
-  //   },
-  // },
+  computed: {
+    type() {
+      return objectTypeName(this.draft)
+    },
+  },
   methods: {
     async removeDraft () {
       await this.draft.remove(true)
