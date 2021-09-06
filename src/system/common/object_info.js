@@ -1,19 +1,25 @@
 import {assert} from './utils';
 import {i18n} from '../../boot/i18n';
+import { ObjectTypeEnum, WsItemTypeEnum } from 'src/system/common/enums'
 
 export function objectTypeName(object) {
-  assert(object && object.type)
-  switch (object.type) {
-    case 'NODE': return i18n.t('Node')
-    case 'JOINT': return i18n.t('Joint')
-    case 'WORD': return i18n.t('Sphere')
-    case 'SENTENCE': return i18n.t('Sphere')
-    case 'CHAR': return i18n.t('Sphere')
-    case 'VIDEO': return i18n.t('Video')
-    case 'IMAGE': return i18n.t('Image')
-    case 'BOOK': return i18n.t('Book')
-    case 'BLOCk': return i18n.t('Block')
-    case 'USER': return i18n.t('User')
+  assert(object && (object.type || object.wsItemType))
+  switch (object.type || object.wsItemType) {
+    case WsItemTypeEnum.WS_NODE:
+    case ObjectTypeEnum.NODE: return i18n.t('Node')
+    case WsItemTypeEnum.WS_JOINT:
+    case ObjectTypeEnum.JOINT: return i18n.t('Joint')
+    case WsItemTypeEnum.WS_SPHERE:
+    case ObjectTypeEnum.WORD:
+    case ObjectTypeEnum.SENTENCE:
+    case ObjectTypeEnum.CHAR: return i18n.t('Sphere')
+    case WsItemTypeEnum.WS_CONTENT: return i18n.t('Content')
+    case ObjectTypeEnum.VIDEO: return i18n.t('Video')
+    case ObjectTypeEnum.IMAGE: return i18n.t('Image')
+    case ObjectTypeEnum.BOOK: return i18n.t('Book')
+    case WsItemTypeEnum.WS_BLOCK:
+    case ObjectTypeEnum.BLOCK: return i18n.t('Block')
+    case ObjectTypeEnum.USER: return i18n.t('User')
     default: return i18n.t('unknown')
   }
 }
@@ -23,16 +29,16 @@ export function objectUrl(object) {
 export function objectUrlPath(object) {
   assert(object && object.type)
   switch (object.type) {
-    case 'NODE': return '/node/'
-    case 'JOINT': return '/joint/'
-    case 'WORD': return '/sphere/'
-    case 'SENTENCE': return '/sphere/'
-    case 'CHAR': return '/sphere/'
-    case 'VIDEO': return '/content/'
-    case 'IMAGE': return '/content/'
-    case 'BOOK': return '/content/'
-    case 'BLOCk': return '/block/'
-    case 'USER': return '/user/'
+    case ObjectTypeEnum.NODE: return '/node/'
+    case ObjectTypeEnum.JOINT: return '/joint/'
+    case ObjectTypeEnum.WORD:
+    case ObjectTypeEnum.SENTENCE:
+    case ObjectTypeEnum.CHAR: return '/sphere/'
+    case ObjectTypeEnum.VIDEO:
+    case ObjectTypeEnum.IMAGE:
+    case ObjectTypeEnum.BOOK: return '/content/'
+    case ObjectTypeEnum.BLOCK: return '/block/'
+    case ObjectTypeEnum.USER: return '/user/'
     default: return '/'
   }
 }

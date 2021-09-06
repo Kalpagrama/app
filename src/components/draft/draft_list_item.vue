@@ -11,6 +11,7 @@
     minHeight: '50px',
     background: 'rgb(35,35,35)',
     borderRadius: '10px',
+
   }`
   ).row.full-width.items-start.content-start.draft-item
     //- left
@@ -51,7 +52,7 @@
             div(:style=`{minHeight:'32px',}`).row.full-width
               span(:style=`{lineHeight: 1.1,}`).text-white {{ draft.name }}
             .row.full-width.q-py-xs
-              small.text-grey-8 {{ draft.type }}
+              small.text-grey-8 {{ type }}
               .col
               small.text-grey-8 {{ $date(draft.createdAt) }}
     //- right
@@ -64,6 +65,7 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import {objectTypeName} from '../../system/common/object_info';
 
 export default {
   name: 'draftListItem',
@@ -81,6 +83,11 @@ export default {
     return {
       thumbUrlErrored: false
     }
+  },
+  computed: {
+    type() {
+      return objectTypeName(this.draft)
+    },
   },
   methods: {
     async removeDraft () {

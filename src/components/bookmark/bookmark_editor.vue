@@ -13,10 +13,10 @@
       borderRadius: '20px 20px 0 0',
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
     }`
-    ).row.full-width.q-px-md.q-pt-md
+    ).row.full-width.q-px-md.q-pt-xs
       // preview + name + type
       div(v-if="showHeader").row.full-width
-        .row.full-width
+        .row.full-width.q-pt-sm
           img(
             :src="bookmark.thumbUrl"
             :style=`{
@@ -26,7 +26,7 @@
             borderRadius: '10px',
           }`).b-50.justify-center
           .col
-            div(:style=`{marginTop: '-10px'}`).row.full-width.justify-end
+            .row.full-width.justify-end
               q-btn(round flat color="white" icon="clear" v-close-popup)
               //q-btn(
               //  round flat color="white"
@@ -43,24 +43,31 @@
           .row.full-width
             small.text-grey-8 {{type}} {{$date(bookmark.createdAt)}}
       //- collections
-      .row.full-width.text-white.q-py-xs.q-px-sm
-        .col.scroll
-          .row.full-width.items-center.content-center.q-py-xs.wrap
-            add-collection-btn(
-              v-model="collectionsModel"
-              :highlightSelected="false"
-              :showDeleteButton="false"
-              :showAllCollection="false"
-              @collection-select="addCollectionToBookmark")
-            q-btn(v-for="(c,ci) in bookmark.collections" :key="c" no-caps :label="getCollectionName(c)" @click="deleteCollectionFromButton(c)")
+      div(v-if="!showHeader").row.full-width
+        .row.full-width.items-center.justify-center.text-white.text-h6 {{$t('Add to сollection')}}
+        .col
+          div(:style=`{
+          position: 'relative',
+          left: '11px'
+            }`
+          ).row.full-width.justify-end
+            q-btn(round flat color="white" icon="clear" v-close-popup)
+      .row.full-width.items-center.content-center.text-white.q-py-xs.wrap
+        add-collection-btn(
+          v-model="collectionsModel"
+          :highlightSelected="false"
+          :showDeleteButton="false"
+          :showAllCollection="false"
+          @collection-select="addCollectionToBookmark").q-ma-xs
+        q-btn(v-for="(c,ci) in bookmark.collections" :key="c" no-caps no-wrap :label="getCollectionName(c)" @click="deleteCollectionFromButton(c)").q-ma-xs
       //- isSubscribed
-      .row.full-width.items-center.content-center.q-py-xs
+      .row.full-width.items-center.content-center.q-py-xs.no-wrap.justify-center.q-mt-xs
         q-toggle(
           v-model="bookmark.isSubscribed"
           dark
           :label="$t('Receive updates')"
           :style=`{color: 'white'}`
-          color="green").full-width
+          color="green").full-width.justify-center
       //- delete
       .row.full-width.q-mt-md
         q-btn(
@@ -139,6 +146,7 @@ export default {
       this.bookmarkDeleting = false
       this.$log('bookmarkDelete done')
       this.$emit('deleted')
+      this.$emit('close')
     },
   },
   async mounted() {

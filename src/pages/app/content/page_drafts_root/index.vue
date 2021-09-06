@@ -8,8 +8,7 @@
 <template lang="pug">
 .column.fit
   //- header
-  .row.full-width.q-pa-md
-    span.text-white.text-bold {{$t('Drafts')}}
+  slot(name="header")
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     view-guest(

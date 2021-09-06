@@ -19,8 +19,11 @@ kalpa-layout()
           h1.text-white.text-bold {{$t('Essence block')}}
           .col
           //- tutorial
+          //q-btn(
+          //  @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+          //  round flat color="white" icon="fas fa-info")
           q-btn(
-            @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+            @click=""
             round flat color="white" icon="fas fa-info")
       //- body
       div(
@@ -47,17 +50,29 @@ kalpa-layout()
                 :item="block"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
+            .row.full-width.q-pt-lg.q-px-xs
+              page-comments(
+                :node="block"
+                :height="700"
+              )
+              page-similar(
+                :node="block"
+              )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/pages/app/node/nav_mobile.vue'
+import pageComments from '../node/page_comments';
+import pageSimilar from '../node/page_similar';
 
 export default {
   name: 'pageApp_node',
   components: {
     navMobile,
+    pageComments,
+    pageSimilar,
   },
   data () {
     return {
