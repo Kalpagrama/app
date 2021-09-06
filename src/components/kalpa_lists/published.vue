@@ -21,9 +21,9 @@
         :pages="pages"
         :pageId="pageId"
         :query="query"
-        nextSize=1
+        nextSize=44
         :itemMiddlePersist="itemMiddlePersist"
-        screenSize=2
+        screenSize=88
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
@@ -107,7 +107,6 @@ export default {
           rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED
         },
         sort: [{ createdAt: 'desc' }],
-        limit: 10
       }
       // Get types
       if (this.pageId === 'nodes') {

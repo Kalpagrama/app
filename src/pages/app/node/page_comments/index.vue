@@ -43,7 +43,8 @@
       screenSize=100
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
-      }`)
+      }`
+      @count="commentsCount = $event")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
 </template>
@@ -63,12 +64,10 @@ export default {
     return {
       comment: '',
       commentSending: false,
+      commentsCount: 0
     }
   },
   computed: {
-    commentsCount() {
-      return this.$refs.listFeed?.length || 0
-    },
     query () {
       return {
         selector: {
