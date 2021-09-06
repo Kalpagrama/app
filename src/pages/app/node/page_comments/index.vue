@@ -38,9 +38,9 @@
     list-feed(
       ref="listFeed"
       :query="query"
-      nextSize=24
+      nextSize=44
       :itemMiddlePersist="false"
-      screenSize=100
+      screenSize=88
       :style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
       }`

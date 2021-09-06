@@ -20,9 +20,9 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            nextSize=50
+            nextSize=44
             :itemMiddlePersist="false"
-            screenSize=100
+            screenSize=88
             showAddBtn=true
             @searchString="searchString = $event"
             @pageId="pageId = $event"

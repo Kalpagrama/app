@@ -9,9 +9,9 @@
       :pages="pages"
       :pageId="pageId"
       :query="query"
-      nextSize=50
+      nextSize=44
       :itemMiddlePersist="itemMiddlePersist"
-      screenSize=100
+      screenSize=88
       @searchString="searchString = $event"
       @pageId="pageId = $event"
       @searchInputState="$emit('searchInputState', $event)"
