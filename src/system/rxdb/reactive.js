@@ -806,8 +806,10 @@ class Group {
       for (let item of filtered) {
          item.debugInfo = () => {
             // return `#${this.findIndx(item[this.reactiveGroup.itemPrimaryKey])} of ${this.loadedLen()}. totalCount:${this.reactiveGroup.totalCount} ${JSON.stringify(this.fulFilledRange())}`
+            let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
             return {
-               indx: this.findIndx(item[this.reactiveGroup.itemPrimaryKey]),
+               indx,
+               indxHF: indx + 1,
                loadedLen: this.loadedLen(),
                totalCount: this.reactiveGroup.totalCount,
                fulFilledRange: this.fulFilledRange()

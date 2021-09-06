@@ -128,17 +128,19 @@
           throttle: 300,
           callback: itemVisibilityHandler,
           intersection: {
-            threshold: 0.2,
+             root: scrollTargetIsWindow ? null : scrollTarget,
+             threshold: 0.2,
           },
           }`
         ).row.full-width
-          span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`) {{itemsMeta[itemIndex].visible}} {{item.debugInfo() }}
+          span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
+            ) indx:{{itemIndex}} visible:{{!!itemsVisibility[itemIndex]}} {{item.debugInfo() }}
           slot(
             name="item"
             :item="item"
             :itemIndex="itemIndex"
             :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
-            :isVisible="itemsMeta[itemIndex].visible")
+            :isVisible="!!itemsVisibility[itemIndex]")
     slot(name="append")
 </template>
 
@@ -221,7 +223,7 @@ export default {
       itemsResStatus: null,
       // item
       itemMiddleHistory: [],
-      itemsMeta: [],
+      itemsVisibility: []
     }
   },
   computed: {
@@ -273,9 +275,9 @@ export default {
     },
     'itemsRes.itemsHeaderFooter': {
       async handler (to, from) {
-        this.$log('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes.hasPrev, this.itemsRes.hasNext)
+        this.$logW('itemsRes.itemsHeaderFooter TO', to.length, this.itemsRes.getProperty('currentId'))
         // удаляем те, которых нет в новом списке
-        for (let itemMiddle of this.itemMiddleHistory){
+        for (let itemMiddle of this.itemMiddleHistory) {
           itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)
           // this.$log('ims item.name', item?.name)
           let itemRef = this.$refs[`item-${itemMiddle.key}`]
@@ -283,9 +285,6 @@ export default {
         }
         this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
         this.itemMiddleTopUpdate()
-        this.itemsMeta.splice(0, this.itemsMeta.length, ...to.map(item => {
-          return { key: item[this.itemKey], visible: false }
-        }))
         this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
         this.$nextTick(() => {
           this.$log('itemsRes.itemsHeaderFooter $nextTick')
@@ -377,6 +376,7 @@ export default {
       let itemsResWrapperOffsetTop = itemsResWrapperRef.offsetTop
       let itemsResWrapperOffsetParent = itemsResWrapperRef.offsetParent
       this.$log('itemsResWrapper', { itemsResWrapperRect, itemsResWrapperOffsetTop, itemsResWrapperOffsetParent })
+      this.$log('itemsVisibility', this.itemsVisibility)
       // let scrollTarget
     },
     // обновит itemMiddle.top для каждого элемента в itemMiddleHistory
@@ -450,8 +450,8 @@ export default {
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      // this.$logW('itemVisibilityChanged', isVisible, idxSting, key)
-      this.itemsMeta[parseInt(idxSting)].visible = isVisible
+      this.$logW('itemVisibilityChanged', isVisible, idxSting)
+      this.itemsVisibility[parseInt(idxSting)] = isVisible
     },
     itemMiddleSet (key, idx) {
       this.$log('ims', idx)
