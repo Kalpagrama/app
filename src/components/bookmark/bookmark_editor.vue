@@ -146,6 +146,7 @@ export default {
       this.bookmarkDeleting = false
       this.$log('bookmarkDelete done')
       this.$emit('deleted')
+      this.$emit('close')
     },
   },
   async mounted() {
