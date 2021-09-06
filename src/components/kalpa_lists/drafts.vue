@@ -1,8 +1,4 @@
 <template lang="pug">
-  kalpa-layout
-    template(v-slot:footer)
-      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-    template(v-slot:body)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           //- bookmark editor
@@ -46,7 +42,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import draftListItem from 'src/components/draft/draft_list_item.vue'
 
 export default {
-  name: 'workspace_pageDrafts',
+  name: 'listDrafts',
   props: {
     height: { type: Number },
     useNavHeader: { type: Boolean, default: true },

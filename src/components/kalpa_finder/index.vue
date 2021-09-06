@@ -39,7 +39,7 @@
             v-for="(p,pi) in pages" :key="p.id"
             :name="p.id" :label="p.name")
     component(
-      :is="'page-' + pageId"
+      :is="'list-' + pageId"
       :useNavHeader="false"
       :scrollAreaHeight="scrollAreaHeight"
       searchInputState="disabled"
@@ -47,15 +47,14 @@
       :pageFilter="pageFilter"
       :itemMiddlePersist="true"
       mode="select"
-      @item="$emit('item', $event)").br
+      @item="$emit('item', $event)")
 </template>
 
 <script>
-import pagePublished from 'src/pages/app/workspace/page_published/index.vue'
-import pageCollections from 'src/pages/app/workspace/page_collections/index.vue'
-import pageSearch from 'src/pages/app/search'
-import pageGif from './page_gif/index.vue'
-import pageWsSearch from 'src/pages/app/workspace/page_search/index.vue'
+import listPublished from 'src/components/kalpa_lists/published.vue'
+import listCollections from 'src/components/kalpa_lists/collections.vue'
+import listSearchKalpa from 'src/components/kalpa_lists/search_kalpa.vue'
+import listGif from './page_gif/index.vue'
 
 export default {
   name: 'kalpaFinder',
@@ -78,10 +77,10 @@ export default {
     }
   },
   components: {
-    pagePublished,
-    pageCollections,
-    pageSearch,
-    pageGif
+    listPublished,
+    listCollections,
+    listSearchKalpa,
+    listGif
   },
   data () {
     return {
@@ -121,7 +120,7 @@ export default {
       return [
         { id: 'published', name: this.$t('published') },
         { id: 'collections', name: this.$t('collections') },
-        { id: 'search', name: this.$t('Kalpagrama') },
+        { id: 'search-kalpa', name: this.$t('Kalpagrama') },
         { id: 'gif', name: this.$t('Gif') }
       ]
     }

@@ -1,5 +1,5 @@
 <template lang="pug">
-page-collections(
+list-collections(
   :collectionId="$route.params.id"
   @item="$emit('item', $event)")
   template(v-slot:header)
@@ -16,12 +16,12 @@ page-collections(
 </template>
 
 <script>
-import pageCollections from '../page_collections/index.vue'
+import listCollections from 'src/components/kalpa_lists/collections.vue'
 
 export default {
   name: 'pageCollection',
   components: {
-    pageCollections
+    listCollections
   },
   data () {
     return {

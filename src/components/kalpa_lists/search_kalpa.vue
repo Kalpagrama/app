@@ -53,10 +53,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
-import { objectTypeName, objectUrl } from '../../../system/common/object_info';
+import { objectTypeName, objectUrl } from 'src/system/common/object_info'
 
 export default {
-  name: 'pageSearch',
+  name: 'listSearchKalpa',
   components: {
     bookmarkListItem,
     bookmarkEditor

@@ -341,7 +341,8 @@ const routes = [
                {
                   name: 'workspace.collections',
                   path: 'collections',
-                  component: () => import('src/pages/app/workspace/page_collections/index.vue')
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.collection',
@@ -349,30 +350,34 @@ const routes = [
                   component: () => import('src/pages/app/workspace/page_collection/index.vue')
                },
                {
-                  name: 'workspace.bookmarks',
-                  path: 'bookmarks',
-                  component: () => import('src/pages/app/workspace/page_search/index.vue')
+                  name: 'workspace.search',
+                  path: 'search',
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.drafts',
                   path: 'drafts',
-                  component: () => import('src/pages/app/workspace/page_drafts/index.vue')
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.published',
                   path: 'published',
-                  component: () => import('src/pages/app/workspace/page_published/index.vue')
-                  // component: () => import('src/components/kalpa_finder/index.vue')
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.history',
                   path: 'history',
-                  component: () => import('src/pages/app/workspace/page_history/index.vue')
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.contents',
                   path: 'contents',
-                  component: () => import('src/pages/app/workspace/page_contents/index.vue')
+                  props: (route) => ({ listName: route.name.split('.')[1] }),
+                  component: () => import('src/pages/app/list/index.vue')
                },
                {
                   name: 'workspace.create',

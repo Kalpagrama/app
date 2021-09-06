@@ -5,7 +5,7 @@ kalpa-layout
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        page-search(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
+        list-search-kalpa(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
@@ -35,7 +35,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import pageTrendsNavTabs from 'src/pages/app/trends/nav_tabs.vue'
-import pageSearch from 'src/pages/app/search'
+import listSearchKalpa from 'src/components/kalpa_lists/search_kalpa.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
@@ -44,7 +44,7 @@ export default {
     bookmarkListItem,
     bookmarkEditor,
     pageTrendsNavTabs,
-    pageSearch
+    listSearchKalpa
   },
   data () {
     return {

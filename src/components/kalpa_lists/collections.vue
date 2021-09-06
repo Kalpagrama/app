@@ -1,54 +1,50 @@
 <template lang="pug">
-  kalpa-layout
-    template(v-slot:footer)
-      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-    template(v-slot:body)
-      .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          //- bookmark editor
-          q-dialog(
-            v-model="bookmarkEditorShow"
-            :full-width="$q.screen.xs"
-            :full-height="$q.screen.xs"
-            :maximized="$q.screen.xs"
-            :square="$q.screen.xs"
-            @hide="bookmarkSelected = null")
-            bookmark-editor(
-              :bookmark="bookmarkSelected"
-              @close="bookmarkEditorShow = false, bookmarkSelected = null")
-          tab-list-feed(
-            v-if="pageId"
-            :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
-            :navHeaderText="useNavHeader ? $t('Collections') : ''"
-            :searchInputState="searchInputState"
-            :searchString="searchString"
-            :pages="pages"
-            :pageId="pageId"
-            :query="query"
-            nextSize=50
-            :itemMiddlePersist="itemMiddlePersist"
-            screenSize=100
-            @searchString="searchString = $event"
-            @pageId="pageId = $event"
-          ).row.full-width
-            template(v-slot:externalHeader)
-              q-tabs(
-                v-model="collectionsModel.collectionId"
-                switch-indicator="false" no-caps dense
-              active-color="green"
-                :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
-              ).full-width.text-grey-8
-                // add collection btn
-                add-collection-btn(v-model="collectionsModel")
-                q-tab(
-                  v-for="(c,ci) in collectionsModel.collections" :key="c.id"
-                  :name="c.id" :label="getCollectionNameWithCnt(c)")
-            template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
-              bookmark-list-item(
-                :bookmark="bookmark"
-                :mode="mode"
-                @item="bookmarkSelectHandle"
-              ).q-mb-sm
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    //- bookmark editor
+    q-dialog(
+      v-model="bookmarkEditorShow"
+      :full-width="$q.screen.xs"
+      :full-height="$q.screen.xs"
+      :maximized="$q.screen.xs"
+      :square="$q.screen.xs"
+      @hide="bookmarkSelected = null")
+      bookmark-editor(
+        :bookmark="bookmarkSelected"
+        @close="bookmarkEditorShow = false, bookmarkSelected = null")
+    tab-list-feed(
+      v-if="pageId"
+      :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
+      :navHeaderText="useNavHeader ? $t('Collections') : ''"
+      :searchInputState="searchInputState"
+      :searchString="searchString"
+      :pages="pages"
+      :pageId="pageId"
+      :query="query"
+      nextSize=50
+      :itemMiddlePersist="itemMiddlePersist"
+      screenSize=100
+      @searchString="searchString = $event"
+      @pageId="pageId = $event"
+    ).row.full-width
+      template(v-slot:externalHeader)
+        q-tabs(
+          v-model="collectionsModel.collectionId"
+          switch-indicator="false" no-caps dense
+        active-color="green"
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
+        ).full-width.text-grey-8
+          // add collection btn
+          add-collection-btn(v-model="collectionsModel")
+          q-tab(
+            v-for="(c,ci) in collectionsModel.collections" :key="c.id"
+            :name="c.id" :label="getCollectionNameWithCnt(c)")
+      template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+        bookmark-list-item(
+          :bookmark="bookmark"
+          :mode="mode"
+          @item="bookmarkSelectHandle"
+        ).q-mb-sm
 </template>
 
 <script>
@@ -59,7 +55,7 @@ import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
-  name: 'pageCollections',
+  name: 'listCollections',
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },

@@ -1,8 +1,4 @@
 <template lang="pug">
-kalpa-layout
-  template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-  template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         //- bookmark editor
@@ -17,27 +13,26 @@ kalpa-layout
             :bookmark="bookmarkSelected"
             @close="bookmarkEditorShow = false, bookmarkSelected = null")
         tab-list-feed(
-          v-if="pageId"
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-          :navHeaderText="useNavHeader ? $t('Published') : ''"
+          :navHeaderText="useNavHeader ? $t('Contents') : ''"
           :searchInputState="searchInputState"
           :searchString="searchString"
           :pages="pages"
           :pageId="pageId"
           :query="query"
           nextSize=50
-          :itemMiddlePersist="itemMiddlePersist"
+          :itemMiddlePersist="false"
           screenSize=100
           @searchString="searchString = $event"
           @pageId="pageId = $event"
         ).row.full-width
           template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
-            //q-btn(:label="bookmarkIndex + '::' + bookmark.name", size="xl").full-width
             bookmark-list-item(
               :bookmark="bookmark"
               :mode="mode"
               @item="bookmarkSelectHandle"
             ).q-mb-sm
+
 </template>
 
 <script>
@@ -47,83 +42,55 @@ import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 
 export default {
-  name: 'pagePublished',
+  name: 'listContents',
   props: {
     scrollAreaHeight: { type: Number },
-    useNavHeader: { type: Boolean, default: true },
-    itemMiddlePersist: { type: Boolean, default: false },
-    searchInputState: { type: String },
-    searchString: { type: String, default: '' },
-    mode: { type: String },
-    pageFilter: { type: Object},
+    useNavHeader: {type: Boolean, default: true},
+    searchInputState: {type: String},
+    mode: {type: String},
   },
   components: {
     bookmarkListItem,
-    bookmarkEditor
+    bookmarkEditor,
   },
   data () {
     return {
-      pageId: null,
+      pageId: 'video',
       bookmarkSelected: null,
       bookmarkEditorShow: false,
-      showHeader: true,
-      searchInputShow: false,
-      headerHeight1: 0,
-      headerHeight2: 0
+      searchString: '',
     }
-  },
-  watch: {
-    scrollAreaHeight: {
-      immediate: true,
-      handler(to, from) {
-        // this.$logW('scrollAreaHeight=', to)
-      }
-    },
-    pageId: {
-      handler (to, from) {
-        if (!this.searchString) this.searchInputShow = false
-      }
-    },
-    searchString: {
-      handler (to, from) {
-        this.searchInputShow = !!to
-      }
-    },
-    collectionId: {
-      immediate: true,
-      handler (to, from) {
-        this.showHeader = true
-      }
-    },
   },
   computed: {
     pages () {
       return [
-        { id: 'all', name: this.$t('All') },
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
+        // {id: 'collections', name: this.$t('Collections')},
+        {id: 'video', name: this.$t('Video')},
+        {id: 'book', name: this.$t('Books')},
+        {id: 'image', name: this.$t('Images')}
+      ]
     },
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
         },
-        sort: [{ createdAt: 'desc' }]
+        sort: [{createdAt: 'desc'}]
       }
       // Get types
-      if (this.pageId === 'nodes') {
-        res.selector.type = { $in: ['NODE'] }
-      } else if (this.pageId === 'joints') {
-        res.selector.type = { $in: ['JOINT'] }
-      } else if (this.pageId === 'blocks') {
-        res.selector.type = { $in: ['BLOCK'] }
+      if (this.pageId === 'video') {
+        res.selector.type = 'VIDEO'
+      }
+      else if (this.pageId === 'book') {
+        res.selector.type = 'BOOK'
+      }
+      else if (this.pageId === 'image') {
+        res.selector.type = 'IMAGE'
       }
       // Search by name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
-        res.selector.name = { $regex: nameRegExp }
+        res.selector.name = {$regex: nameRegExp}
       }
       return res
     }
@@ -133,14 +100,12 @@ export default {
       this.$log('bookmarkSelectHandle', bookmark)
       if (this.mode === 'select') {
         this.$emit('item', bookmark)
-      } else {
+      }
+      else {
         this.bookmarkSelected = bookmark
         this.bookmarkEditorShow = true
       }
     }
-  },
-  mounted () {
-    this.pageId = this.pages ? this.pages[0]?.id : null
   }
 }
 </script>
