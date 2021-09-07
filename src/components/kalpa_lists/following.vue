@@ -3,7 +3,7 @@
     div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
       tab-list-feed(
         :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
-        :navHeaderText="useNavHeader ? $t('Collections') : ''"
+        :navHeaderText="useNavHeader ? $t('Following') : ''"
         :searchInputState="'enabled'"
         :searchString="searchString"
         :query="query"
@@ -12,6 +12,9 @@
         :itemMiddlePersist="false"
         @searchString="searchString = $event"
       ).row.full-width
+        template(v-slot:externalHeader)
+          .full-width
+            span.text-grey {{$t('Following')}}
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
           div(
             v-if="item.type === 'USER'"

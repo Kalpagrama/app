@@ -386,8 +386,11 @@ class Group {
                // prev: this.prev.bind(this),
                next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
                prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
                hasPrev: false,
+               loadedLen: 0,
+               fulFilledRange: { startFullFil: -1, endFullFil: -1 },
                newItemsBelow: 0, // в списке появились новые элементы выше
                newItemsAbove: 0, // в списке появились новые элементы ниже
                setProperty: this.setProperty.bind(this),
@@ -400,8 +403,9 @@ class Group {
       this.updateReactiveGroup = () => {
          this.reactiveGroup.hasNext = this.hasNext()
          this.reactiveGroup.hasPrev = this.hasPrev()
+         this.reactiveGroup.loadedLen = this.loadedLen()
+         this.reactiveGroup.fulFilledRange = this.fulFilledRange()
 
-         // пытаемся понять - не добавилось ли сверху или снизу элементов
          let currentId = this.getProperty('currentId')
          if (currentId) {
             let currentAbsoluteIndx = this.getAbsoluteIndex(this.findIndx(currentId))
@@ -418,7 +422,6 @@ class Group {
          // this.getAbsoluteIndex(this.findIndx(value)
          // this.setProperty('currentAbsoluteIndx', value ? this.getAbsoluteIndex(this.findIndx(value)) : -1) // индекс с учетом серверной пагинации
          // this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
-         let currentAbsoluteIndx
       }
    }
 
@@ -805,7 +808,6 @@ class Group {
       }
       for (let item of filtered) {
          item.debugInfo = () => {
-            // return `#${this.findIndx(item[this.reactiveGroup.itemPrimaryKey])} of ${this.loadedLen()}. totalCount:${this.reactiveGroup.totalCount} ${JSON.stringify(this.fulFilledRange())}`
             let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
             return {
                indx,
@@ -827,9 +829,9 @@ class Group {
          }
       }
       this.reactiveGroup.itemsHeaderFooter = [
-         {[this.reactiveGroup.itemPrimaryKey]: 'header'},
+         { [this.reactiveGroup.itemPrimaryKey]: 'header' },
          ...items,
-         {[this.reactiveGroup.itemPrimaryKey]: 'footer'}
+         { [this.reactiveGroup.itemPrimaryKey]: 'footer' }
       ]
       this.updateReactiveGroup()
       return filtered
@@ -893,7 +895,7 @@ class Group {
       const f = this.gotoCurrent
       let currentId = this.getProperty('currentId')
       if (currentId) {
-         logD(f, 'start. currentId=', currentId, this.fulFilledRange(), this.reactiveGroup.id)
+         logD(f, 'start. currentId=', currentId, this.reactiveGroup.id)
          let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
             let count = this.loadedLen() // выдаем все элементы разом
@@ -907,7 +909,7 @@ class Group {
             }
          }
       }
-      logD(f, 'complete', this.fulFilledRange(), this.reactiveGroup.id)
+      logD(f, 'complete', this.reactiveGroup.id)
    }
 
    async gotoStart () {
@@ -926,6 +928,19 @@ class Group {
       logE('not impl!!!')
    }
 
+   async gotoPercent (percent) {
+      const f = this.gotoPercent
+      if (!this.loadedLen()) return
+      assert(percent >= 0 && percent <= 1)
+      let indxFrom = Math.floor(this.loadedLen() * percent)
+      assert(indxFrom >= 0 && indxFrom < this.loadedLen())
+      let count = this.loadedLen() // выдаем все элементы разом
+      let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+      let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
+      await this.fulfill(nextItems, 'whole')
+      logD(f, 'complete', this.reactiveGroup.id)
+   }
+
    hasNext () {
       let { startFullFil, endFullFil } = this.fulFilledRange()
       return endFullFil < this.loadedLen() - 1 || this.reactiveGroup.pages.length === 0 || this.reactiveGroup.pages[this.reactiveGroup.pages.length - 1].nextPageToken
@@ -941,7 +956,7 @@ class Group {
       const t1 = performance.now()
       // if (this.reactiveGroup.id.includes('LST_SPHERE_ITEMS')) logW(f, 'start', count, this.screenSize)
       count = parseInt(count || this.loadedLen())
-      assert(!this.screenSize || count < this.screenSize, {count, screenSize: this.screenSize}) // иначе обрежутся новые элементы
+      assert(!this.screenSize || count < this.screenSize, { count, screenSize: this.screenSize }) // иначе обрежутся новые элементы
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && endFullFil !== -1 && endFullFil + count >= this.loadedLen()) {
          // запросим данные с сервера
@@ -960,8 +975,6 @@ class Group {
       let fulfillTo = Math.min(fulfillFrom + count, this.loadedLen()) // до куда грузить (end + 1)
       let nextItems = this.loadedItems().slice(fulfillFrom, fulfillTo)
       let fulfilledItems = await this.fulfill(nextItems, 'bottom')
-      // if (this.reactiveGroup.id.includes('LST_SPHERE_ITEMS')) logW(f, `complete: ${Math.floor(performance.now() - t1)} msec  insertedCnt=${fulfilledItems.length} screen=${this.reactiveGroup.items.length}`)
-      // logD(f, `complete add from:${fulfillFrom} to:${fulfillTo} total range:`, this.fulFilledRange(), this.reactiveGroup.id)
    }
 
    async prev (count) {
@@ -970,7 +983,7 @@ class Group {
       // // eslint-disable-next-line no-unreachable
       logD(f, 'start', this.reactiveGroup.id)
       count = parseInt(count || this.loadedLen())
-      assert(!this.screenSize || this.screenSize > count, {count, screenSize: this.screenSize}) // иначе обрежутся новые элементы
+      assert(!this.screenSize || this.screenSize > count, { count, screenSize: this.screenSize }) // иначе обрежутся новые элементы
       let { startFullFil, endFullFil } = this.fulFilledRange()
       if (this.paginateFunc && startFullFil !== -1 && count > startFullFil) {
          // запросим данные с сервера (вверх)

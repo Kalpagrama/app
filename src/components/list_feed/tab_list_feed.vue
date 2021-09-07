@@ -53,6 +53,21 @@
               q-tab(
                 v-for="(p,pi) in pages" :key="p.id"
                 :name="p.id" :label="p.name" :icon="p.icon")
+      // scrollbar
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        .column
+          div(v-if="progressShow || pan === 'start'" :style=`{width: '20px', height: '100%', zIndex: 1000}`).absolute-right.q-py-xl
+            q-slider(
+              v-model="progress"
+              :min="0"
+              :max="1"
+              :step="0.01"
+              vertical snap label dense
+              :label-value="Math.floor(progress * 100) +'%'"
+              color="green"
+              @change="gotoPercent"
+              @pan="pan = $event"
+              ).fit
       //- tab panels
       q-tab-panels(
         v-model="pageId"
@@ -63,12 +78,14 @@
           :style=`{background: 'none',}`
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
           list-feed(
+            ref="listFeed"
             :scrollAreaHeight="(scrollAreaHeight || $q.screen.height) - navHeaderHeight - externalHeaderHeight"
             :query="query"
             :nextSize="nextSize"
             :itemMiddlePersist="itemMiddlePersist"
             :screenSize="screenSize"
-            @showHeader="showTabsHeader = $event")
+            @showHeader="showTabsHeader = $event"
+            @progress="progress = $event")
             template(v-slot:prepend)
               div(:style=`{height: tabsHeaderHeight + 'px' }`).row.full-width
             template(v-slot:append)
@@ -93,13 +110,13 @@ export default {
     navHeaderText: { type: String, default: '' },
     searchString: { type: String, default: '' },
     searchInputState: { type: String, default: 'enabled' }, // disabled|enabled|opened
-    pages: {type: Array, default: [{id: 'empty'}]},
-    pageId: {type: String, default: 'empty'},
-    query: {type: String, required: true},
-    nextSize: {type: Number, default: 50},
-    screenSize: {type: Number, default: 100},
-    itemMiddlePersist: {type: Boolean, default: false},
-    showAddBtn: {type: Boolean, default: false},
+    pages: { type: Array, default: [{ id: 'empty' }] },
+    pageId: { type: String, default: 'empty' },
+    query: { type: String, required: true },
+    nextSize: { type: Number, default: 50 },
+    screenSize: { type: Number, default: 100 },
+    itemMiddlePersist: { type: Boolean, default: false },
+    showAddBtn: { type: Boolean, default: false }
   },
   components: {
     bookmarkListItem,
@@ -107,6 +124,9 @@ export default {
   },
   data () {
     return {
+      progress: 0,
+      progressShow: false,
+      pan: null,
       showTabsHeader: true,
       externalHeaderHeight: 0,
       navHeaderHeight: 0,
@@ -114,6 +134,15 @@ export default {
     }
   },
   watch: {
+    progress: {
+      handler (to, from) {
+        this.progressShow = true
+        clearTimeout(this.closeProgressTimer)
+        this.closeProgressTimer = setTimeout(() => {
+          this.progressShow = false
+        }, 2000)
+      }
+    },
     pageId: {
       immediate: true,
       handler (to, from) {
@@ -137,7 +166,13 @@ export default {
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }
-    },
+    }
+  },
+  methods: {
+    async gotoPercent(percent) {
+      this.$logE(this.$refs.listFeed[0])
+      await this.$refs.listFeed[0].gotoPercent(percent)
+    }
   }
 }
 </script>

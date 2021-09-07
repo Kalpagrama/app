@@ -435,6 +435,7 @@ export default {
           top: 0
         }
         this.itemMiddleTopUpdate()
+        if (this.itemsRes.fulFilledRange.startFullFil >= 0 && this.itemsRes.loadedLen) this.$emit('progress', (idx + this.itemsRes.fulFilledRange.startFullFil) / this.itemsRes.loadedLen)
       } else {
         this.$logE('ims itemRef NOT FOUND', key, idx, item?.name, this.itemsRes)
       }
@@ -495,7 +496,7 @@ export default {
       this.scrollHeight = this.$refs.scrolledItems.clientHeight // обновится чуть позже в scrollHeightResized (а сейчас scrollHeight - в неактуальном состоянии. берем актуальные данные)
       this.scrollTop = getScrollPosition(this.scrollTarget)
       this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
-      this.updateShowHeader(this.scrollTop)
+      this.emitShowHeader(this.scrollTop)
     },
     scrollHeightResized (e) {
       // this.$logW('scrollHeightResized', e.height)
@@ -505,7 +506,7 @@ export default {
       this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
       this.scrollUpdate()
     },
-    updateShowHeader (scrollTop) {
+    emitShowHeader (scrollTop) {
       // едем вниз/вверх более 1 сек и более 200 px
       let minScrollLen = 200
       let minScrollDur = 1000
@@ -526,6 +527,7 @@ export default {
       if (this.scrollState.direction === 'down' &&
           Date.now() - this.scrollState.startTm > minScrollDur &&
           Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen) {
+        // this.$emit('progress', this.scrollTop / this.scrollHeight)
         if (this.scrollState.showHeader) {
           this.scrollState.showHeader = false
           this.$emit('showHeader', this.scrollState.showHeader)
@@ -536,6 +538,7 @@ export default {
       if ((scrollTop === 0) || (this.scrollState.direction === 'up' &&
           Date.now() - this.scrollState.startTm > minScrollDur &&
           Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen)) {
+        // this.$emit('progress', this.scrollTop / this.scrollHeight)
         if (!this.scrollState.showHeader) {
           this.scrollState.showHeader = true
           this.$emit('showHeader', this.scrollState.showHeader)
@@ -545,6 +548,9 @@ export default {
       if (scrollTop === 0) {
         this.scrollState.showHeader = true
       }
+    },
+    async gotoPercent(percent) {
+      await this.itemsRes.gotoPercent(percent)
     }
   },
   mounted () {
