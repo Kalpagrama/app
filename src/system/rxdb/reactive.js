@@ -934,10 +934,16 @@ class Group {
       assert(percent >= 0 && percent <= 1)
       let indxFrom = Math.floor(this.loadedLen() * percent)
       assert(indxFrom >= 0 && indxFrom < this.loadedLen())
-      let count = this.loadedLen() // выдаем все элементы разом
-      let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
-      let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
-      await this.fulfill(nextItems, 'whole')
+      let item = this.loadedItems()[indxFrom]
+      assert(item)
+      this.setProperty('currentId', item[this.reactiveGroup.itemPrimaryKey])
+      await this.gotoCurrent()
+      this.setProperty('currentId', null)
+      //
+      // let count = this.loadedLen() // выдаем все элементы разом
+      // let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+      // let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
+      // await this.fulfill(nextItems, 'whole')
       logD(f, 'complete', this.reactiveGroup.id)
    }
 
@@ -1007,7 +1013,7 @@ class Group {
       let groupData = this.propsReactive[this.reactiveGroup.id] || {}
       groupData[name] = value
       Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
-      if (name === 'currentId') {
+      if (name === 'currentId' && value) {
          let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
          this.setProperty('currentAbsoluteIndx', this.getAbsoluteIndex(localIndx)) // индекс с учетом серверной пагинации
          this.setProperty('currentTotalCount', this.reactiveGroup.totalCount)
