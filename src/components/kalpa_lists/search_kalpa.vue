@@ -75,6 +75,14 @@ export default {
       pageId: null,
     }
   },
+  watch: {
+    pageId: {
+      handler (to, from) {
+        if (!this.searchString) this.searchInputShow = false
+        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdSearch', to])
+      }
+    },
+  },
   computed: {
     pages() {
       return [
@@ -137,9 +145,9 @@ export default {
     }
   },
   mounted () {
-    this.pageId = this.pages ? this.pages[0]?.id : null
-    // this.$logW('this.$q.screen.height', this.$q.screen.height)
-    // this.$logW('this.scrollAreaHeight', this.scrollAreaHeight)
+    let pageId
+    if (this.itemMiddlePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdSearch)?.id
+    this.pageId = pageId || (this.pages ? this.pages[0]?.id : null)
   }
 }
 </script>

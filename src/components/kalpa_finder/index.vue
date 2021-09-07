@@ -45,7 +45,7 @@
       searchInputState="disabled"
       :searchString="searchString"
       :pageFilter="pageFilter"
-      :itemMiddlePersist="true"
+      :itemMiddlePersist="itemMiddlePersist"
       mode="select"
       @item="$emit('item', $event)")
 </template>
@@ -70,6 +70,7 @@ export default {
       }
     },
     pagesShow: { type: Boolean, default: true },
+    itemMiddlePersist: { type: Boolean, default: true },
     searchString: { type: String },
     headerTitle: {
       type: String
@@ -86,14 +87,14 @@ export default {
     return {
       pageId: null,
       searchStringShow: false,
-      headerHeight: 0,
+      headerHeight: 0
     }
   },
   watch: {
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchStringShow = false
-        this.$store.commit('ui/stateSet', ['finderPageId', to])
+        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdFinder', to])
       }
     },
     searchString: {
@@ -135,7 +136,9 @@ export default {
   },
   mounted () {
     this.$log('mounted scrollAreaHeight=', this.scrollAreaHeight)
-    this.pageId = this.$store.state.ui.finderPageId || 'published'
+    let pageId
+    if (this.itemMiddlePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdFinder)?.id
+    this.pageId = pageId || 'published'
   }
 }
 </script>

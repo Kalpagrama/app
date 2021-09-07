@@ -72,7 +72,7 @@ export default {
   },
   data () {
     return {
-      collectionsModel: { collectionId: this.collectionId, collections: [] },
+      collectionsModel: { collectionId: null, collections: [] },
       collectionsRes: null,
       pageId: null,
       bookmarkSelected: null,
@@ -145,8 +145,28 @@ export default {
       }
     }
   },
+  watch: {
+    'collectionsModel.collectionId': {
+      handler (to, from) {
+        if (!this.searchString) this.searchInputShow = false
+        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdCollectionCollections', to])
+      }
+    },
+    pageId: {
+      handler (to, from) {
+        if (!this.searchString) this.searchInputShow = false
+        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdCollections', to])
+      }
+    },
+  },
   async mounted () {
-    this.pageId = this.pages ? this.pages[0]?.id : null
+    let pageId, pageCollectionId
+    if (this.itemMiddlePersist) {
+      pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdCollections)?.id
+      pageCollectionId = this.$store.state.ui.pageIdCollectionCollections
+    }
+    this.pageId = pageId || (this.pages ? this.pages[0]?.id : null)
+    this.collectionsModel.collectionId = this.collectionId || pageCollectionId || this.collectionsModel.collectionId
   }
 }
 </script>

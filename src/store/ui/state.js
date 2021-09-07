@@ -59,5 +59,9 @@ export default {
   ],
   // graph (последний запомненный граф (чтобы вернуться назад - и граф не стерся))
   graph: null,
-  finderPageId: null,
+  pageIdFinder: null,
+  pageIdPublished: null,
+  pageIdCollectionCollections: null,
+  pageIdCollections: null,
+  pageIdSearch: null,
 }

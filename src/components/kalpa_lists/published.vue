@@ -51,7 +51,7 @@ export default {
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
-    pageFilter: { type: Object},
+    pageFilter: { type: Object }
   },
   components: {
     bookmarkListItem,
@@ -71,13 +71,14 @@ export default {
   watch: {
     scrollAreaHeight: {
       immediate: true,
-      handler(to, from) {
+      handler (to, from) {
         // this.$logW('scrollAreaHeight=', to)
       }
     },
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false
+        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdPublished', to])
       }
     },
     searchString: {
@@ -90,7 +91,7 @@ export default {
       handler (to, from) {
         this.showHeader = true
       }
-    },
+    }
   },
   computed: {
     pages () {
@@ -106,7 +107,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_PUBLISHED
         },
-        sort: [{ createdAt: 'desc' }],
+        sort: [{ createdAt: 'desc' }]
       }
       // Get types
       if (this.pageId === 'nodes') {
@@ -136,7 +137,9 @@ export default {
     }
   },
   mounted () {
-    this.pageId = this.pages ? this.pages[0]?.id : null
+    let pageId
+    if (this.itemMiddlePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdPublished)?.id
+    this.pageId = pageId || (this.pages ? this.pages[0]?.id : null)
   }
 }
 </script>
