@@ -289,7 +289,7 @@ export default {
           }
           this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER $nextTick')
         })
-        this.$emit('count', to.length)
+        this.$emit('count', to.length - 2)
       }
     },
     // watch it to drop position, and scrollToTop

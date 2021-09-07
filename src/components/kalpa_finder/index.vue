@@ -1,7 +1,7 @@
 <template lang="pug">
-  .row.full-widith
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith
     //header + tabs
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-sm
+    .row.full-width.items-start.content-start.justify-center.q-px-sm
       q-resize-observer(@resize="headerHeight = $event.height")
       //- header
       .row.full-width.items-center.content-center

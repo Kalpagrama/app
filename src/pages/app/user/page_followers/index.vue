@@ -6,15 +6,17 @@
 
 <template lang="pug">
 .row.full-width.q-px-sm
-  list-feed(
+  tab-list-feed(
+    :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
+    :navHeaderText="useNavHeader ? $t('Collections') : ''"
+    :searchInputState="'enabled'"
+    :searchString="searchString"
     :query="query"
-    :itemStyles=`{
-      paddingBottom: '8px',
-    }`
-    :style=`{
-    }`)
-    template(v-slot:prepend)
-      slot(name="prepend")
+    nextSize=44
+    screenSize=88
+    :itemMiddlePersist="false"
+    @searchString="searchString = $event"
+  ).row.full-width
     template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
       div(
         v-if="item.type === 'USER'"
@@ -23,7 +25,7 @@
           background: 'rgb(35,35,35)',
           borderRadius: '10px',
         }`
-        ).row.fit.items-center.content-center.q-pa-sm
+      ).row.fit.items-center.content-center.q-pa-sm
         img(
           draggable="false"
           :src="item.thumbUrl"
@@ -33,6 +35,32 @@
             borderRadius: '50%',
           }`).q-mr-sm
         span.text-white {{ item.name }}
+
+  //list-feed(
+  //  :query="query"
+  //  :itemStyles=`{
+  //    paddingBottom: '8px',
+  //  }`)
+  //  template(v-slot:prepend)
+  //    slot(name="prepend")
+  //  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+  //    div(
+  //      v-if="item.type === 'USER'"
+  //      @click="$router.push('/user/'+item.oid)"
+  //      :style=`{
+  //        background: 'rgb(35,35,35)',
+  //        borderRadius: '10px',
+  //      }`
+  //      ).row.fit.items-center.content-center.q-pa-sm
+  //      img(
+  //        draggable="false"
+  //        :src="item.thumbUrl"
+  //        :style=`{
+  //          width: '30px',
+  //          height: '30px',
+  //          borderRadius: '50%',
+  //        }`).q-mr-sm
+  //      span.text-white {{ item.name }}
 </template>
 
 <script>
@@ -43,6 +71,7 @@ export default {
   props: ['user'],
   data () {
     return {
+      searchString: ''
     }
   },
   computed: {
@@ -58,6 +87,9 @@ export default {
     }
   },
   methods: {
+  },
+  created () {
+    this.$log('mounted')
   }
 }
 </script>

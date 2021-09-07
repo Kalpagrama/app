@@ -63,7 +63,7 @@
           :style=`{background: 'none',}`
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
           list-feed(
-            :scrollAreaHeight="scrollAreaHeight || ($q.screen.height - navHeaderHeight - externalHeaderHeight)"
+            :scrollAreaHeight="(scrollAreaHeight || $q.screen.height) - navHeaderHeight - externalHeaderHeight"
             :query="query"
             :nextSize="nextSize"
             :itemMiddlePersist="itemMiddlePersist"
