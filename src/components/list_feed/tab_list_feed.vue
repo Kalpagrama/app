@@ -16,7 +16,7 @@
     div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       //- header2
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(v-if="pageId !== 'empty' && showTabsHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
+        div(v-if="pages.length > 1 && showTabsHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
           q-resize-observer(@resize="tabsHeaderHeight = $event.height")
           //- search bar
           //search String
