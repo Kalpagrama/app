@@ -239,18 +239,8 @@ const routes = [
                {
                   name: 'user.home',
                   path: '',
-                  component: () => import('src/pages/app/user/index.vue')
+                  component: () => import('src/pages/app/user/home.vue')
                },
-               {
-                  name: 'user.following',
-                  path: 'following',
-                  component: () => import('src/pages/app/user/page_following/index.vue')
-               },
-               {
-                  name: 'user.followers',
-                  path: 'followers',
-                  component: () => import('src/pages/app/user/page_followers/index.vue')
-               }
             ],
             beforeEnter: async (to, from, next) => {
                if (to) saveHistory(to.params.oid)

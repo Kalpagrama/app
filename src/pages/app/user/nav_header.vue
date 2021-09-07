@@ -76,9 +76,7 @@
             span.text-white.q-mr-xs {{ user.weightVal }}
             small.text-grey-7.q-mr-md R
           //- following
-          router-link(
-            :to=`'following'`
-            ).row.items-end.content-end
+          div(@click="$emit('following')").row.items-end.content-end.cursor-pointer
             span.text-white.q-mr-xs {{ user.countStat.countSubscriptions }}
             small(
               :class=`{
@@ -87,9 +85,7 @@
               }`
             ).q-mr-md {{$t('Following')}}
           //- followers
-          router-link(
-            :to=`'followers'`
-            ).row.items-end.content-end
+          div(@click="$emit('followers')").row.items-end.content-end.cursor-pointer
             span.text-white.q-mr-xs {{ user.countStat.countSubscribers }}
             small(
               :class=`{
