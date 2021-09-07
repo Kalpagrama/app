@@ -5,9 +5,10 @@
     ).row.full-width
       q-input(v-model="newCollectionName", borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
       q-btn(round flat v-close-popup :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
-    div(v-for="(c,ci) in value.collections" :key="c.id").row.full-width
-      q-btn( round flat no-caps v-close-popup align="left" :color="value.collectionId==c.id && highlightSelected? 'green' : 'grey-8'" :label="c.name" @click="value.collectionId=c.id, $emit('collection-select', c.id)").col.full-width.q-pl-sm
-      q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
+    div(:style=`{height: Math.min(value.collections.length*40, 300)+'px'}`).scroll
+      div(v-for="(c,ci) in value.collections" :key="c.id").row.full-width
+        q-btn( round flat no-caps v-close-popup align="left" :color="value.collectionId==c.id && highlightSelected? 'green' : 'grey-8'" :label="c.name" @click="value.collectionId=c.id, $emit('collection-select', c.id)").col.full-width.q-pl-sm
+        q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
 </template>
 
 <script>
