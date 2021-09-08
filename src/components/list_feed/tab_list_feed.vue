@@ -56,7 +56,7 @@
       // scrollbar
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         .column
-          div(v-if="progressShow || pan === 'start'" :style=`{width: '20px', height: '100%', zIndex: 1000}`).absolute-right.q-py-xl
+          div(v-if="progressShow || pan === 'start'" :style=`{width: '20px', height: '80%', top: '10%', zIndex: 1000}`).absolute-right.q-py-xl
             q-slider(
               v-model="progress"
               :min="0"
