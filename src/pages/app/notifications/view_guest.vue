@@ -8,7 +8,7 @@ div(
     .row.full-width.justify-center
       q-icon(name="login" color="grey-8" size="100px")
     div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-      span.text-white {{$t('Login to see your home feed')}}
+      span.text-white {{$t('Login to see your notifications')}}
     .row.full-width.justify-center.q-pt-md
       q-btn(
         outline color="white" no-caps
@@ -22,6 +22,6 @@ div(
 
 <script>
 export default {
-  name: 'pageAppFeedsViewGuest'
+  name: 'pageAppNotificationsViewGuest'
 }
 </script>

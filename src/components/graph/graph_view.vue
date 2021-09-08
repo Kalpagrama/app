@@ -120,6 +120,15 @@
       ).row.full-width.full-height
         span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
       svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
+      // добавление элемента на граф
+      .col
+        div(:style=`{position: 'relative'}`).row.justify-end.content-end.full-height
+          q-btn(
+            round flat dense icon="add_circle_outline" color="green" size="lg" stack
+            @click="menuShow = false, itemFinderShow = true"
+          ).row.q-pa-xs
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Pick new element')}}
+
     //// превьюшка узла внутри графа
     //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
     //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")

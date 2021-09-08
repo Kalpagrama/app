@@ -24,7 +24,7 @@ div(
     borderless dark
     type="email" inputmode="email"
     autocomplete="username" name="username"
-    autocorrect="off" autocapitalize="on"
+    autocorrect="off" autocapitalize="on" autofocus="on"
     :placeholder="$t('Enter your email')"
     :input-style=`{
       padding: '16px',
@@ -64,7 +64,7 @@ div(
       borderless dark
       placeholder="Enter password"
       :type="passwordShow ? 'text' : 'password'"
-      :autofocus="false"
+      :autofocus="true"
       :disable="false"
       :input-style=`{
         padding: '16px',

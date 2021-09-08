@@ -16,7 +16,7 @@
       :style=`{
       position: 'relative',
       background: 'rgb(40,40,40)',
-      borderRadius: '0px',
+      borderRadius: '10px',
       ...styles,
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")

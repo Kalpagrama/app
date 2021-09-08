@@ -45,6 +45,8 @@
 
           div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, right: '0px', borderLeft: '0px solid rgba(90,90,90,0.6)'}`).full-height.q.ma-sm
             auth-flow(:onSuccess="onSuccess").q-pa-lg.full-height.scroll
+          div(:style=`{position: 'absolute', zIndex: 100, right: '0px'}`).q-ma-xs
+            q-btn(round flat color="white" icon="clear" @click="close")
     //- mobile layout
   div(
     v-else
@@ -63,6 +65,10 @@
       :style=`{position: 'fixed', top: '0px', background: 'rgba(0,0,0,0.5)'}`
     ).row.fit
     div(:style=`{zIndex: 2}`).row.fit
+      q-btn(
+        round flat color="white" icon="clear" @click="close"
+        :style=`{position: 'absolute', zIndex: 100, right: '0px'}`
+        )
       //- logo
       kalpa-logo(
         :width="100"

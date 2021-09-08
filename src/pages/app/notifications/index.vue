@@ -6,22 +6,8 @@
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           //- guest
-          div(
-            v-if="$store.getters.isGuest"
-            :style=`{maxWidth: 600+'px'}`).row.full-width.items-center.content-center.justify-center
-            .row.full-width.justify-center
-              q-icon(name="login" color="grey-8" size="100px")
-            div(:style=`{textAlign: 'center'}`).row.full-width.justify-center
-              span.text-white {{$t('You will see your notifications')}}
-            .row.full-width.justify-center.q-pt-md
-              q-btn(
-                outline color="white" no-caps
-              :style=`{
-                  height: '50px',
-                }`
-                @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
-              )
-                h1.text-white {{$t('Login')}}
+          view-guest(
+            v-if="$store.getters.isGuest")
           //- user
           tab-list-feed(
             v-if="!$store.getters.isGuest && sphereOid"
@@ -44,11 +30,13 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import notificationItem from './notification_item.vue'
+import viewGuest from '../notifications/view_guest';
 
 export default {
   name: 'pageApp__notifications',
   components: {
     notificationItem,
+    viewGuest,
   },
   data () {
     return {
