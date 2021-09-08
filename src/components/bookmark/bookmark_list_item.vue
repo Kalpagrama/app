@@ -118,6 +118,9 @@ export default {
       this.bookmark.thumbUrl = bookmarkFresh.thumbUrl
       this.bookmark.name = bookmarkFresh.name
     }
+  },
+  mounted () {
+    this.$log('mounted!!!')
   }
 }
 </script>

@@ -77,7 +77,7 @@
           v-for="(p,pi) in (pages)" :key="p.id" :name="p.id"
           :style=`{background: 'none',}`
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
-          list-feed(
+          list-feed-vs(
             ref="listFeed"
             :scrollAreaHeight="(scrollAreaHeight || $q.screen.height) - navHeaderHeight - externalHeaderHeight"
             :query="query"
@@ -101,6 +101,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
+import listFeedVs from 'src/components/list_feed/list_feed_vs.vue'
 
 export default {
   name: 'tabListFeed',
@@ -120,7 +121,8 @@ export default {
   },
   components: {
     bookmarkListItem,
-    bookmarkEditor
+    bookmarkEditor,
+    listFeedVs,
   },
   data () {
     return {
