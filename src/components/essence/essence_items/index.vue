@@ -39,7 +39,13 @@ div(
           :isActive="isActive"
           :isVisible="isVisible"
           :nodeOid="null"
-          :isSquare="true")
+          :isSquare="true"
+          :options=`{
+                loop: false,
+                paused: compositionPlayState[ii]==='pause'
+              }`
+          @playing="$set(compositionPlayState,ii,'play'), $set(compositionPlayState, ii===0?1:0, 'pause')"
+          @ended="$set(compositionPlayState,ii,'pause'), $set(compositionPlayState, ii===0?1:0, 'play')")
         //- ===
         //- node
         div(
@@ -58,7 +64,13 @@ div(
             :isActive="isActive"
             :isVisible="isVisible"
             :nodeOid="i.items[0].oid"
-            :isSquare="true")
+            :isSquare="true"
+            :options=`{
+                loop: false,
+                paused: compositionPlayState[ii]==='pause'
+              }`
+            @playing="$set(compositionPlayState,ii,'play'), $set(compositionPlayState, ii===0?1:0, 'pause'), $logE('playing', i)"
+            @ended="$set(compositionPlayState,ii,'pause'), $set(compositionPlayState, ii===0?1:0, 'play'), $logE('ended', i)")
         //- media content
         //- IMAGE, VIDEO, BOOK, AUDIO
         div(
@@ -108,8 +120,16 @@ import { ContentApi } from 'src/api/content'
 export default {
   name: 'essenceItems',
   props: ['node', 'isActive', 'isVisible'],
+  // watch: {
+  //   compositionPlayState: {
+  //     handler(to, from) {
+  //       this.$logE('compositionPlayState changed', this.compositionPlayState)
+  //     }
+  //   }
+  // },
   data () {
     return {
+      compositionPlayState: ['play', 'pause']
     }
   },
   computed: {
