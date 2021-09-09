@@ -1,63 +1,63 @@
 <template lang="pug">
-  div(
-    :class=`{
+div(
+  :class=`{
     //- 'br': isVisible || isActive,
   }`
-    :style=`{
+  :style=`{
     position: 'absolute', zIndex: 10,
   }`).row.fit.items-start.content-start
-    div(
-      v-if="$store.state.ui.useDebug"
-      :style=`{
+  div(
+    v-if="$store.state.ui.useDebug"
+    :style=`{
       position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
       opacity: 0.8,
     }`
     ).row.full-with.bg-red.text-white
-      //- small.full-width currentTime: {{currentTime}}
-      small.full-width urlMeta: {{urlMeta}}
-    slot(name="footer" :player="player")
-    // spinner + playBtn
-    div(
-      v-if="isPlayerVisible && statusPlayer !== 'playing'"
-      :style=`{ position: 'absolute', zIndex: 101, top: '0px', opacity: 0.5}`
-      @click="play()"
+    //- small.full-width currentTime: {{currentTime}}
+    small.full-width urlMeta: {{urlMeta}}
+  slot(name="footer" :player="player")
+  div(
+    v-if="isActive && !currentTimeChanged"
+    :style=`{
+      position: 'absolute', zIndex: 101, top: '0px',
+      opacity: 0.5,
+    }`
+    @click="play()"
     ).row.fit.items-center.content-center.justify-center
-      q-spinner(v-show="statusPlayer === 'loading'" color="white" size="50px")
-      q-icon(v-if="statusPlayer === 'paused'" name="play_circle_outline" size="90px" color="grey")
-    // poster
-    img(
-      v-if="!isPlayerVisible || !playBackReady"
-      :src="composition.thumbUrl"
-      :style=`{
-      position: 'absolute',
-      zIndex: 100,
+    q-spinner(
+      v-show="canShowSpinner"
+      color="white" size="50px")
+  img(
+    v-if="!currentTimeChanged"
+    :src="composition.thumbUrl"
+    :style=`{
+      position: 'absolute', zIndex: 100, top: '0px',
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
+      opacity: currentTimeChanged ? 0 : 1,
     }`
-    ).fit.br
-    video(
-      v-if="isPlayerVisible"
-      ref="videoRef"
-      type="video/mp4"
-      preload="metadata"
-      :autoplay="isActive"
-      :loop="true"
-      :muted="true"
-      :playsinline="true"
-      :style=`{
-      objectFit: objectFit || 'contain',
-      borderRadius: '10px',
-    }`
-      @click="videoClick"
-      @timeupdate="videoTimeupdate"
-      @waiting="playBackLoading = true"
-      @canplay="playBackLoading = false, playBackReady=true"
-      @pause="playBackState = 'paused'"
-      @play="playBackState = 'playing'"
-      @playing="playBackState = 'playing'"
-      :src="url"
     ).fit
-    //span.text-red.text-bold.absolute-center statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
+  //- :poster="composition.thumbUrl"
+  video(
+    v-if="videoShow"
+    ref="videoRef"
+    type="video/mp4"
+    preload="metadata"
+    :autoplay="isActive"
+    :loop="true"
+    :muted="true"
+    :playsinline="true"
+    :style=`{
+      objectFit: objectFit || 'contain',
+      borderRadius: '10px',
+    }`
+    @click="videoClick"
+    @pause="videoPaused"
+    @play="videoPlaying"
+    @timeupdate="videoTimeupdate"
+    :src="url"
+    ).fit
+    //source(:src="url")
 </template>
 
 <script>
@@ -69,67 +69,62 @@ export default {
   data () {
     return {
       currentTime: null,
+      currentTimeChanged: false,
       player: null,
-      playBackState: 'paused',
-      playBackLoading: false,
-      playBackReady: false
+      playing: false,
+      canShowSpinner: false,
     }
   },
   computed: {
-    url () {
-      return ContentApi.urlSelect(this.composition)
-    },
+    url () { return ContentApi.urlSelect(this.composition) },
     urlMeta () {
       let arr = this.url.split('#t=')
       if (arr[1]) {
         let [start, end] = arr[1].split(',')
         return [
-          { t: parseFloat(start) },
-          { t: parseFloat(end) }
+          {t: parseFloat(start)},
+          {t: parseFloat(end)},
         ]
       } else {
         // на выкачанных композициях нет #t
         let duration = 0
         for (let l of this.composition.layers) duration += l.figuresAbsolute[1].t - l.figuresAbsolute[0].t
         return [
-          { t: 0 },
-          { t: duration }
+          {t: 0},
+          {t: duration}
         ]
       }
     },
-    isPlayerVisible () {
-      return !!this.isActive
+    videoShow () {
+      return this.isActive
     },
-    statusPlayer () { // playing|paused|loading
-      if (this.playBackLoading) return 'loading'
-      return this.playBackState
-    }
   },
   watch: {
     isActive: {
       handler (to, from) {
-        this.playBackReady = false
-        this.playBackState = 'paused'
-        this.playBackLoading = false
-
-        if (!to && this.$refs.videoRef) {
-          // отменяем загрузку видео (чтобы браузер не грузил в фоне)
-          this.$refs.videoRef.pause()
-          this.$refs.videoRef.src = ''
-          this.$refs.videoRef.load()
-        } else {
-          this.$nextTick(() => {
-            if (this.$refs.videoRef) {
-              this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
-              this.$refs.videoRef.play()
-            }
+        if (to) {
+          if (this.$refs.videoRef) {
+            this.$refs.videoRef.play()
+          }
+          this.$wait(1000).then(() => {
+            this.canShowSpinner = true
           })
+        }
+        else {
+          if (this.$refs.videoRef) {
+            this.$refs.videoRef.pause()
+            this.$refs.videoRef.src = ''
+            this.$refs.videoRef.load()
+          }
+          this.currentTimeChanged = false
+          this.canShowSpinner = false
         }
       }
     },
     currentTime: {
       handler (to, from) {
         if (to && from) {
+          this.currentTimeChanged = true
           if (to >= this.urlMeta[1].t - 0.3) {
             this.replay()
           }
@@ -173,7 +168,8 @@ export default {
       // }
       if (e.target.muted && localStorage.getItem('k_sound')) {
         e.target.muted = false
-      } else {
+      }
+      else {
         if (e.target.paused) e.target.play()
         else e.target.pause()
       }
@@ -196,7 +192,8 @@ export default {
       if (this.$refs.videoRef) {
         if (this.$refs.videoRef.muted) {
           localStorage.setItem('k_sound', 'on')
-        } else {
+        }
+        else {
           localStorage.removeItem('k_sound')
         }
         this.$refs.videoRef.muted = !this.$refs.videoRef.muted
@@ -216,7 +213,8 @@ export default {
         this.player.muted = e.target.muted
         this.player.duration = this.urlMeta[1].t - this.urlMeta[0].t
         this.player.currentTime = e.target.currentTime - this.urlMeta[0].t
-      } else {
+      }
+      else {
         this.player = {
           play () {
             e.target.play()
@@ -243,6 +241,14 @@ export default {
         e.target.currentTime = this.urlMeta[0].t
         e.target.play()
       }
+    },
+    videoPlaying (e) {
+      // this.$log('videoPlaying', e)
+      this.playing = true
+    },
+    videoPaused (e) {
+      // this.$log('videoPaused', e)
+      this.playing = false
     }
   },
   mounted () {
