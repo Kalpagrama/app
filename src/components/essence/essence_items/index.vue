@@ -68,7 +68,7 @@ div(
             :options=`{
                 playBackState: compositionPlayBackState[ii]
               }`
-            @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing'), $logE('ended', i)")
+            @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing')")
         //- media content
         //- IMAGE, VIDEO, BOOK, AUDIO
         div(
