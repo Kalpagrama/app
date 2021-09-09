@@ -37,7 +37,11 @@ div(
       :isVisible="isVisible"
       :objectFit="isSquare ? 'cover' : null"
       :height="height"
-      :width="width")
+      :width="width"
+      :options="options || {}"
+      @playing="$emit('playing')"
+      @ended="$emit('ended')"
+      )
       template(v-slot:footer=`{player}`)
         context(
           :nodeOid="nodeOid"
@@ -135,6 +139,9 @@ export default {
       this.width = e.width
       this.height = e.height
     }
-  }
+  },
+  mounted() {
+    // this.$log('mounted', this.options)
+  },
 }
 </script>
