@@ -65,18 +65,18 @@
               position: 'absolute', zIndex: 100,
             }`
             ).row.fit.items-start.content-start
-            //- img(
-              :src="joint.items[ii].thumbUrl"
-              :style=`{
-                borderRadius: '10px',
-                objectFit: 'cover',
-              }`
-              ).fit
+            // img(
+            //  :src="joint.items[ii].thumbUrl"
+            //  :style=`{
+            //    borderRadius: '10px',
+            //    objectFit: 'cover',
+            //  }`
+            //  ).fit
             composition(
               @click.native="itemActive = ii"
               :compositionKey="`${joint.oid}-${ii}`"
               :composition="joint.items[ii].type === 'NODE' ? joint.items[ii].items[0] : joint.items[ii]"
-              :isActive="isActive"
+              :isActive="isActive && compositionPlayState[ii]==='play'"
               :isVisible="true"
               :isMini="true"
               :styles=`{
@@ -84,11 +84,13 @@
                 objectFit: 'cover',
               }`
               :options=`{
-                loop: true,
+                loop: false,
                 showBar: false,
                 showHeader: true,
                 footerOverlay: true,
-              }`)
+              }`
+              @playing="compositionPlayState[ii] = 'play', compositionPlayState[ii===0?1:0] = 'pause'"
+              @ended="compositionPlayState[ii] = 'pause', compositionPlayState[ii===0?1:0] = 'play'")
     //- vertices
     router-link(
       :to="'/cube/'+joint.items[0].oid+'?with='+joint.items[1].oid"
@@ -127,6 +129,7 @@ export default {
   data () {
     return {
       itemActive: 0,
+      compositionPlayState: ['play', 'pause']
     }
   },
   computed: {

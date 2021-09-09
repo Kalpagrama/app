@@ -123,10 +123,10 @@
       // добавление элемента на граф
       .col
         div(:style=`{position: 'relative'}`).row.justify-end.content-end.full-height
-          q-btn(
-            round flat dense icon="add_circle_outline" color="green" size="lg" stack
+          q-icon(
+            name="add_circle_outline" color="green" size="lg"
             @click="menuShow = false, itemFinderShow = true"
-          ).row.q-pa-xs
+          ).cursor-pointer.row.q-pa-xs
             q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Pick new element')}}
 
     //// превьюшка узла внутри графа
