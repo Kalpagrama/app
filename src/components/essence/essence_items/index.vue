@@ -42,10 +42,10 @@ div(
           :isSquare="true"
           :options=`{
                 loop: false,
-                paused: compositionPlayState[ii]==='pause'
+                paused: compositionPlayBackState[ii]
               }`
-          @playing="$set(compositionPlayState,ii,'play'), $set(compositionPlayState, ii===0?1:0, 'pause')"
-          @ended="$set(compositionPlayState,ii,'pause'), $set(compositionPlayState, ii===0?1:0, 'play')")
+          @playing="$set(compositionPlayBackState,ii,'playing'), $set(compositionPlayBackState, ii===0?1:0, 'paused')"
+          @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing')")
         //- ===
         //- node
         div(
@@ -66,11 +66,9 @@ div(
             :nodeOid="i.items[0].oid"
             :isSquare="true"
             :options=`{
-                loop: false,
-                paused: compositionPlayState[ii]==='pause'
+                playBackState: compositionPlayBackState[ii]
               }`
-            @playing="$set(compositionPlayState,ii,'play'), $set(compositionPlayState, ii===0?1:0, 'pause'), $logE('playing', i)"
-            @ended="$set(compositionPlayState,ii,'pause'), $set(compositionPlayState, ii===0?1:0, 'play'), $logE('ended', i)")
+            @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing'), $logE('ended', i)")
         //- media content
         //- IMAGE, VIDEO, BOOK, AUDIO
         div(
@@ -121,15 +119,15 @@ export default {
   name: 'essenceItems',
   props: ['node', 'isActive', 'isVisible'],
   // watch: {
-  //   compositionPlayState: {
+  //   compositionPlayBackState: {
   //     handler(to, from) {
-  //       this.$logE('compositionPlayState changed', this.compositionPlayState)
+  //       this.$logE('compositionPlayBackState changed', this.compositionPlayBackState)
   //     }
   //   }
   // },
   data () {
     return {
-      compositionPlayState: ['play', 'pause']
+      compositionPlayBackState: ['playing', 'paused']
     }
   },
   computed: {

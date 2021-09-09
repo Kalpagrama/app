@@ -51,7 +51,7 @@
       @click="videoClick"
       @timeupdate="videoTimeupdate"
       @waiting="playBackLoading = true"
-      @canplay="playBackLoading = false, playBackReady=true"
+      @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
       @pause="playBackState = 'paused'"
       @play="playBackState = 'playing'"
       @playing="playBackState = 'playing'"
@@ -65,7 +65,7 @@ import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'fromVideo',
-  props: ['composition', 'isActive', 'isVisible', 'objectFit'],
+  props: ['composition', 'isActive', 'isVisible', 'objectFit', 'options'],
   data () {
     return {
       currentTime: null,
@@ -106,6 +106,14 @@ export default {
     }
   },
   watch: {
+    'options.playBackState': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('options.playBackState:', to, this?.composition?.layers[0]?.contentName)
+        if (to === 'paused') this.pause()
+        else if (to === 'playing') this.play()
+      }
+    },
     isActive: {
       handler (to, from) {
         this.playBackReady = false
@@ -121,7 +129,7 @@ export default {
           this.$nextTick(() => {
             if (this.$refs.videoRef) {
               this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
-              this.$refs.videoRef.play()
+              this.play()
             }
           })
         }
@@ -130,65 +138,46 @@ export default {
     currentTime: {
       handler (to, from) {
         if (to && from) {
-          if (to >= this.urlMeta[1].t - 0.3) {
-            this.replay()
-          }
-          if (to < this.urlMeta[0].t) {
-            this.replay()
+          if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t) {
+            this.play(this.urlMeta[0].t)
+            this.$log('ended:', this?.composition?.layers[0]?.contentName)
+            this.$emit('ended')
           }
         }
       }
     }
   },
   methods: {
-    videoAutoplay () {
-      this.$log('videoAutoplay')
-      var promise = document.querySelector('video').play();
-      if (promise !== undefined) {
-        promise.then(_ => {
-          // Autoplay started!
-        }).catch(error => {
-          // Autoplay was prevented.
-          // Show a "Play" button so that user can start playback.
-          this.$log('videoAutoplay error', error)
-        });
-      }
+    onCanPlay () {
+      // this.$logE('onCanPlay', this.options.playBackState, this?.composition?.layers[0]?.contentName)
+      if (this.options.playBackState === 'paused') this.pause()
     },
     videoClick (e) {
       this.$log('videoClick', e)
-      // if (e.target.muted) {
-      //   e.target.muted = false
-      // }
-      // else {
-      //   let width = e.target.clientWidth
-      //   let left = e.layerX
-      //   this.$log('videoClick', {width, left})
-      //   if (left / width > 0.5) {
-      //     if (e.target.paused) e.target.play()
-      //     else e.target.pause()
-      //   }
-      //   else {
-      //     this.videoRestart(e)
-      //   }
-      // }
       if (e.target.muted && localStorage.getItem('k_sound')) {
         e.target.muted = false
       } else {
-        if (e.target.paused) e.target.play()
-        else e.target.pause()
+        // if (e.target.paused) e.target.play()
+        // else e.target.pause()
+        if (this.playBackState === 'paused') this.play()
+        else this.pause()
       }
     },
-    play () {
-      this.$log('play')
+    play (fromTime = null) {
+      this.$log('play', this?.composition?.layers[0]?.contentName)
       if (this.$refs.videoRef) {
-        this.$refs.videoRef.play()
+        if (fromTime) this.$refs.videoRef.currentTime = fromTime
+        this.playPromise = this.$refs.videoRef.play()
       }
     },
-    replay () {
-      this.$log('replay')
-      if (this.$refs.videoRef) {
-        this.$refs.videoRef.currentTime = this.urlMeta[0].t
-        this.$refs.videoRef.play()
+    pause () {
+      this.$log('pause', this?.composition?.layers[0]?.contentName)
+      if (this.playPromise) {
+        this.playPromise.then(_ => {
+          if (this.$refs.videoRef) this.$refs.videoRef.pause()
+        }).catch(error => {
+          this.$logE('error om play video', error)
+        });
       }
     },
     mutedToggle () {
@@ -226,7 +215,7 @@ export default {
           },
           setCurrentTime: this.setCurrentTime,
           mutedToggle: this.mutedToggle,
-          replay: this.replay,
+          replay: () => this.play(this.urlMeta[0].t),
           muted: e.target.muted,
           duration: this.urlMeta[1].t - this.urlMeta[0].t,
           currentTime: e.target.currentTime - this.urlMeta[0].t
@@ -236,20 +225,10 @@ export default {
         e.target.muted = false
         this.player.muted = false
       }
-    },
-    videoRestart (e) {
-      this.$log('videoRestart', e)
-      if (this.urlMeta) {
-        e.target.currentTime = this.urlMeta[0].t
-        e.target.play()
-      }
     }
   },
-  mounted () {
-    // this.$log('mounted')
-  },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    // отменяем загрузку видео (чтобы браузер не грузил в фоне)
     if (this.$refs.videoRef) {
       this.$refs.videoRef.src = ''
       this.$refs.videoRef.load()
