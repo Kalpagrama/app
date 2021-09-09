@@ -34,7 +34,7 @@
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
     }`
-    ).fit.br
+    ).fit
     video(
       v-if="isPlayerVisible"
       ref="videoRef"
