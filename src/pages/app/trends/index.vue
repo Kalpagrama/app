@@ -14,9 +14,8 @@ kalpa-layout
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          nextSize=11
+          :itemHeightApprox="500"
           :itemMiddlePersist="true"
-          screenSize=36
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
@@ -25,7 +24,7 @@ kalpa-layout
           //  page-trends-nav-tabs(ref="navTabs" :pageInfo="pageInfo" :height="rootTabsHeight")
           template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
             item-feed(
-              :item="item.populatedObject"
+              :item="item"
               :isActive="isActive"
               :isVisible="isVisible")
 </template>
@@ -77,7 +76,7 @@ export default {
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: true
+        populateObjects: false
       }
     }
   }

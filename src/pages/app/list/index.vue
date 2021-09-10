@@ -1,7 +1,7 @@
 <template lang="pug">
   kalpa-layout
-    //template(v-slot:footer)
-    //  kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    template(v-slot:footer)
+      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
     template(v-slot:body)
       component(:is="'list-' + listName")
 </template>

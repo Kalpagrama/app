@@ -26,12 +26,12 @@
           id="scroll-area-with-virtual-scroll-1"
         ).full-width
           // header
-          .row.full-width.q-px-md
+          .row.full-width.q-pr-md
             slot(name="header")
           // sticky header
-          div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
+          div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width.q-pr-md
             q-resize-observer(@resize="stickyHeaderHeight = $event.height")
-            slot(name="sticky-header").row.full-width.br
+            slot(name="sticky-header")
             //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
           // items list
           q-virtual-scroll(
@@ -65,9 +65,8 @@
                   :itemIndex="index"
                   :isActive="false"
                   :isVisible="!!itemsVisibility[item[itemKey]]")
-          // footer
-          slot(name="footer")
-          //div(:style=`{height: '50000px', background: 'red'}`).row.full-width.bg
+          //// footer
+          //slot(name="footer")
 </template>
 
 <script>
@@ -84,10 +83,6 @@ export default {
     scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
       type: Number,
       default: 300
-    },
-    headerHeight: { // место для скрываемого заголовка
-      type: Number,
-      default: 0
     },
     query: {
       type: Object,
@@ -117,12 +112,6 @@ export default {
     }
   },
   watch: {
-    length: {
-      immediate: true,
-      async handler (to, from) {
-        this.$logE('length changed!!!', to)
-      }
-    },
     query: {
       immediate: true,
       async handler (to, from) {
@@ -137,7 +126,7 @@ export default {
         }
         if (this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
           this.$nextTick(_ => {
-            this.$logW('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
+            // this.$logW('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
             this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
           })
         }

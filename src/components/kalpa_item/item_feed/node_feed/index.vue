@@ -1,83 +1,100 @@
 <style lang="sass">
 .sphere-item
   &:hover
-    background: rgb(50,50,50)
+    background: rgb(50, 50, 50)
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    ...styles,
-  }`
-  ).row.full-width.items-start.content-start
-  slot(name="wrapper")
-  //- wrapper
-  div(
-    :style=`{
+  .row
+    div(v-if="!node")
+      .q-pa-md
+        q-card(style='max-width: 300px')
+          q-item
+            q-item-section(avatar='')
+              q-skeleton(type='QAvatar')
+            q-item-section
+              q-item-label
+                q-skeleton(type='text')
+              q-item-label(caption='')
+                q-skeleton(type='text')
+          q-skeleton(height='200px' square='')
+            q-card-actions.q-gutter-md(align='right')
+              q-skeleton(type='QBtn')
+                q-skeleton(type='QBtn')
+    div(
+      v-if="node"
+      :style=`{
       position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: borderRadius,
       ...styles,
-    }`).row.full-width.items-start.content-start
-    slot(name="wrapper-inside")
-    //- HEADER: author, createdAt, actions, date, views
-    essence-header(
-      v-if="showHeader && node.oid"
-      :essence="node"
-      :showAuthorAlways="showAuthorAlways"
-      :style=`{
-        order: orderHeader,
-      }`)
-    //- ITEMS: one or two
-    slot(name="items")
-    composition(
-      v-if="showItems && !$slots.items && node.items.length === 1"
-      :composition="node.items[0]"
-      :isVisible="isVisible"
-      :isActive="isActive"
-      :nodeOid="node.oid")
-    essence-items(
-      v-if="showItems && !$slots.items && node.items.length === 2"
-      v-bind="$props"
-      :itemsStyles="itemsStyles"
-      @itemActive="$emit('itemActive', $event)")
-    //- NAME: dynamic link/ dynamic fontSize
-    slot(name="name")
-    router-link(
-      v-if="showName && node.oid"
-      :to="nodeEssenceLink"
-      :style=`{
-        order: 4,
-        minHeight: '60px',
-        fontSize: fontSize+'px',
-        textAlign: 'center',
-      }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-      span(
-        :class=`{
-          'text-bold': node.name.length < 20
+    }`
+    ).row.full-width.items-start.content-start.br
+      slot(name="wrapper")
+      //- wrapper
+      div(
+        :style=`{
+        position: 'relative',
+        background: 'rgb(35,35,35)',
+        borderRadius: borderRadius,
+        ...styles,
+      }`).row.full-width.items-start.content-start
+        slot(name="wrapper-inside")
+        //- HEADER: author, createdAt, actions, date, views
+        essence-header(
+          v-if="showHeader && node.oid"
+          :essence="node"
+          :showAuthorAlways="showAuthorAlways"
+          :style=`{
+          order: orderHeader,
+        }`)
+        //- ITEMS: one or two
+        slot(name="items")
+        composition(
+          v-if="showItems && !$slots.items && node.items.length === 1"
+          :composition="node.items[0]"
+          :isVisible="isVisible"
+          :isActive="isActive"
+          :nodeOid="node.oid")
+        essence-items(
+          v-if="showItems && !$slots.items && node.items.length === 2"
+          v-bind="$props"
+          :itemsStyles="itemsStyles"
+          @itemActive="$emit('itemActive', $event)")
+        //- NAME: dynamic link/ dynamic fontSize
+        slot(name="name")
+        router-link(
+          v-if="showName && node.oid"
+          :to="nodeEssenceLink"
+          :style=`{
+          order: 4,
+          minHeight: '60px',
+          fontSize: fontSize+'px',
+          textAlign: 'center',
         }`
-        ).text-white {{ nodeName }}
-    //- SPHERES
-    essence-spheres(
-      v-if="showSpheres && node.spheres.length > 0"
-      :node="node"
-      :style=`{
-        order: 3,
+        ).row.full-width.items-center.content-center.justify-center.q-pa-md
+          span(
+            :class=`{
+            'text-bold': node.name.length < 20
+          }`
+          ).text-white {{ nodeName }}
+        //- SPHERES
+        essence-spheres(
+          v-if="showSpheres && node.spheres.length > 0"
+          :node="node"
+          :style=`{
+          order: 3,
+        }`)
+      //- FOOTER: actions, slot
+      essence-actions(
+        v-if="showActions && node.oid"
+        :essence="node"
+        :nodeBackgroundColor="nodeBackgroundColor"
+        :nodeActionsColor="nodeActionsColor"
+        :isActive="isActive"
+        :isVisible="isVisible"
+        :style=`{
+        order: 5,
       }`)
-  //- FOOTER: actions, slot
-  essence-actions(
-    v-if="showActions && node.oid"
-    :essence="node"
-    :nodeBackgroundColor="nodeBackgroundColor"
-    :nodeActionsColor="nodeActionsColor"
-    :isActive="isActive"
-    :isVisible="isVisible"
-    :style=`{
-      order: 5,
-    }`)
-  slot(name="footer")
+      slot(name="footer")
 </template>
 
 <script>
@@ -86,6 +103,7 @@ import essenceItems from 'src/components/essence/essence_items'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceHeader from 'src/components/essence/essence_header'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeFeed',
@@ -93,52 +111,68 @@ export default {
     essenceItems,
     essenceActions,
     essenceSpheres,
-    essenceHeader,
+    essenceHeader
   },
   props: {
-    node: {type: Object},
-    nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
-    nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
-    isActive: {type: Boolean},
-    isVisible: {type: Boolean},
-    showHeader: {type: Boolean, default: true},
-    showName: {type: Boolean, default: true},
-    showAuthorAlways: {type: Boolean, default: false},
-    showActions: {type: Boolean, default: true},
-    showSpheres: {type: Boolean, default: true},
-    showSpheresAlways: {type: Boolean, default: false},
-    showCategory: {type: Boolean, default: true},
-    showItems: {type: Boolean, default: true},
-    orderHeader: {type: Number, default: -1},
-    orderName: {type: Number, default: 1},
-    orderSpheres: {type: Number, default: 2},
-    orderActions: {type: Number, default: 3},
-    itemsStyles: { type: Array, default () { return [{}, {}] } },
-    styles: {type: Object},
-    borderRadius: {type: String, default: '10px'},
-    actionsColor: {type: String, default: 'grey-9'}
+    item: { type: Object },
+    node: { type: Object, default: null },
+    nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
+    nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
+    isActive: { type: Boolean },
+    isVisible: { type: Boolean },
+    showHeader: { type: Boolean, default: true },
+    showName: { type: Boolean, default: true },
+    showAuthorAlways: { type: Boolean, default: false },
+    showActions: { type: Boolean, default: true },
+    showSpheres: { type: Boolean, default: true },
+    showSpheresAlways: { type: Boolean, default: false },
+    showCategory: { type: Boolean, default: true },
+    showItems: { type: Boolean, default: true },
+    orderHeader: { type: Number, default: -1 },
+    orderName: { type: Number, default: 1 },
+    orderSpheres: { type: Number, default: 2 },
+    orderActions: { type: Number, default: 3 },
+    itemsStyles: {
+      type: Array,
+      default () {
+        return [{}, {}]
+      }
+    },
+    styles: { type: Object },
+    borderRadius: { type: String, default: '10px' },
+    actionsColor: { type: String, default: 'grey-9' }
   },
   data () {
     return {
+    }
+  },
+  watch: {
+    isVisible: {
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          // this.$logW('get full node', this.item)
+          this.node = await this.item.getFullItem()
+        } else {
+          await this.item.getFullItem(true)
+        }
+      }
     }
   },
   computed: {
     nodeName () {
       if (this.node.items.length === 1 || this.node.vertices[0] === 'ESSENCE') {
         return this.node.name
-      }
-      else if (this.node.vertices[0] === 'ASSOCIATIVE') {
+      } else if (this.node.vertices[0] === 'ASSOCIATIVE') {
         return 'Ассоциация'
-      }
-      else {
+      } else {
         return this.$nodeItemType(this.node.vertices[0]).name + '  -  ' + this.$nodeItemType(this.node.vertices[1]).name
       }
     },
     nodeEssenceLink () {
       if (this.node.items.length === 2) {
         return `/cube/${this.node.items[0].oid}?oid=${this.node.oid}`
-      }
-      else {
+      } else {
         return '/node/' + this.node.oid
         // return '/sphere-full/' + this.node.sphereFromName.oid
       }
@@ -155,8 +189,8 @@ export default {
       else return 14
     }
   },
-  mounted () {
-    // this.$log('mounted', this.node.name)
+  async mounted () {
+    // this.$logW('mounted', this.isVisible)
   }
 }
 </script>

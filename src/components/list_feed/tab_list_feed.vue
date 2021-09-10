@@ -14,9 +14,8 @@
             ref="listFeed"
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :query="query"
-            :nextSize="nextSize"
-            :itemMiddlePersist="itemMiddlePersist"
-            :screenSize="screenSize")
+            :itemHeightApprox="itemHeightApprox"
+            :itemMiddlePersist="itemMiddlePersist")
             template(v-slot:header)
               //- nav header
               div(v-if="navHeaderText").row.full-width.justify-center.b-30
@@ -68,7 +67,6 @@
                       :name="p.id" :label="p.name" :icon="p.icon")
             template(v-slot:footer)
               q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
-              div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
               slot(name="item" :item="item" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible")
 </template>
@@ -92,8 +90,9 @@ export default {
     pages: { type: Array, default: [{ id: 'empty' }] },
     pageId: { type: String, default: 'empty' },
     query: { type: String, required: true },
-    nextSize: { type: Number, default: 50 },
-    screenSize: { type: Number, default: 100 },
+    itemHeightApprox: { // средний размер одного элемента
+      type: Number,
+    },
     itemMiddlePersist: { type: Boolean, default: false },
     showAddBtn: { type: Boolean, default: false }
   },

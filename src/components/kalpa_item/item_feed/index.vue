@@ -9,11 +9,11 @@
     node-feed(
       v-else-if="item.type === 'NODE'"
       v-bind="$props"
-      :node="item")
+      :item="item")
     node-feed(
       v-else-if="item.type === 'JOINT'"
       v-bind="$props"
-      :node="item")
+      :item="item")
 </template>
 
 <script>

@@ -569,7 +569,7 @@ class RxDBWrapper {
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery, listId, null, null, propsReactive, screenSize)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery, listId, null, null, null, propsReactive, screenSize)
                assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
                let populateFunc = async (itemsForPopulate, itemsForPrefetch, reactiveListFulFilled) => {
@@ -656,9 +656,14 @@ class RxDBWrapper {
                      pageToken: null
                   }
                }
+               let getFullItemFunc = async (item, cancel) => {
+                  // cancel - отменяет запрос (чтобы не ждать того, чего уже не надо)
+                  let [populated] = await populateFunc([item], [])
+                  return populated.populatedObject
+               }
 
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive, screenSize)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, getFullItemFunc, propsReactive, screenSize)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }

@@ -21,9 +21,7 @@
         :pages="pages"
         :pageId="pageId"
         :query="query"
-        nextSize=44
         :itemMiddlePersist="itemMiddlePersist"
-        screenSize=88
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
