@@ -1,73 +1,6 @@
 <template lang="pug">
   div(:style=`{position: 'relative'}`)
-    //- nav header
-    div(v-if="navHeaderText").row.full-width.justify-center.q-px-sm.q-py-sm.b-30
-      q-resize-observer(@resize="navHeaderHeight = $event.height")
-      div( :style=`{ height: '60px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-40
-        q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-        .col.full-height
-          .row.fit.items-center.content-center.justify-center
-            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{navHeaderText}}
-        q-btn(round flat color="white" icon="more_vert")
-    //-externalHeader
-    .row.full-width.justify-center.q-px-sm.q-py-sm.b-30
-      q-resize-observer(@resize="externalHeaderHeight = $event.height")
-      slot(name="externalHeader")
     div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-      //- header2
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(v-if="pages.length > 1 && showTabsHeader" :style=`{position: 'absolute', zIndex: 1000, top: '0px', left: '0px'}`).row.full-width.items-center.content-center.justify-center
-          q-resize-observer(@resize="tabsHeaderHeight = $event.height")
-          //- search bar
-          //search String
-          q-input(
-            v-if="searchInputState === 'opened'"
-            v-model="searchString"
-            flat borderless dark dense autofocus
-            icon="search"
-            :placeholder="$t('Type here to search...')"
-            :debounce="500"
-            :style=`{height: '40px'}`
-            :input-style=`{
-                    width: '500px',
-                    color: 'grey',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                  }`
-            @focus=""
-          ).row.full-width.b-30
-            template(v-slot:prepend)
-              q-icon(name="search" :color="'green'" size="25px").q-mx-md
-            template(v-slot:append)
-              q-btn(round flat dense color="white" icon="clear" @click="searchString = '', searchInputState = 'enabled'" ).q-mr-md
-
-          //- tabs
-          .row.full-width.q-px-md.b-30
-            q-btn(v-if="searchInputState === 'enabled'" flat no-caps color="grey" icon="search" @click="searchInputState = 'opened'").no-border-radius
-            q-tabs(
-              v-model="pageId"
-              align="justify"
-              switch-indicator="false" no-caps dense
-            active-color="green"
-            ).col.text-grey-8
-              q-tab(
-                v-for="(p,pi) in pages" :key="p.id"
-                :name="p.id" :label="p.name" :icon="p.icon")
-      // scrollbar
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        .column
-          div(v-if="progressShow || pan === 'start'" :style=`{width: '20px', height: '80%', top: '10%', zIndex: 1000}`).absolute-right.q-py-xl
-            q-slider(
-              v-model="progress"
-              :min="0"
-              :max="1"
-              :step="0.01"
-              vertical snap label dense
-              :label-value="Math.floor(progress * 100) +'%'"
-              color="green"
-              @change="gotoPercent"
-              @pan="pan = $event"
-              ).fit
       //- tab panels
       q-tab-panels(
         v-model="pageId"
@@ -79,16 +12,61 @@
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
           list-feed-vs(
             ref="listFeed"
-            :scrollAreaHeight="(scrollAreaHeight || $q.screen.height) - navHeaderHeight - externalHeaderHeight"
+            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :query="query"
             :nextSize="nextSize"
             :itemMiddlePersist="itemMiddlePersist"
-            :screenSize="screenSize"
-            @showHeader="showTabsHeader = $event"
-            @progress="progress = $event")
-            template(v-slot:prepend)
-              div(:style=`{height: tabsHeaderHeight + 'px' }`).row.full-width
-            template(v-slot:append)
+            :screenSize="screenSize")
+            template(v-slot:header)
+              //- nav header
+              div(v-if="navHeaderText").row.full-width.justify-center.b-30
+                div( :style=`{ height: '60px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-40
+                  q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+                  .col.full-height
+                    .row.fit.items-center.content-center.justify-center
+                      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{navHeaderText}}
+                  q-btn(round flat color="white" icon="more_vert")
+              //-externalHeader
+              .row.full-width.justify-center.q-px-sm.q-py-sm.b-30
+                slot(name="externalHeader")
+            template(v-slot:sticky-header)
+              div(v-if="pages.length > 1").row.full-width.items-center.content-center.justify-center
+                //- search bar
+                //search String
+                q-input(
+                  v-if="searchInputState === 'opened'"
+                  v-model="searchString"
+                  flat borderless dark dense autofocus
+                  icon="search"
+                  :placeholder="$t('Type here to search...')"
+                  :debounce="500"
+                  :style=`{height: '40px'}`
+                  :input-style=`{
+                          width: '500px',
+                          color: 'grey',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                        }`
+                  @focus=""
+                ).row.full-width.b-30
+                  template(v-slot:prepend)
+                    q-icon(name="search" :color="'green'" size="25px").q-mx-md
+                  template(v-slot:append)
+                    q-btn(round flat dense color="white" icon="clear" @click="searchString = '', searchInputState = 'enabled'" ).q-mr-md
+
+                //- tabs
+                .row.full-width.q-px-md.b-30
+                  q-btn(v-if="searchInputState === 'enabled'" flat no-caps color="grey" icon="search" @click="searchInputState = 'opened'").no-border-radius
+                  q-tabs(
+                    v-model="pageId"
+                    align="justify"
+                    switch-indicator="false" no-caps dense
+                  active-color="green"
+                  ).col.text-grey-8
+                    q-tab(
+                      v-for="(p,pi) in pages" :key="p.id"
+                      :name="p.id" :label="p.name" :icon="p.icon")
+            template(v-slot:footer)
               q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
               div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
@@ -124,32 +102,11 @@ export default {
     bookmarkEditor,
     listFeedVs,
   },
-  data () {
-    return {
-      progress: 0,
-      progressShow: false,
-      pan: null,
-      showTabsHeader: true,
-      externalHeaderHeight: 0,
-      navHeaderHeight: 0,
-      tabsHeaderHeight: 0
-    }
-  },
   watch: {
-    progress: {
-      handler (to, from) {
-        this.progressShow = true
-        clearTimeout(this.closeProgressTimer)
-        this.closeProgressTimer = setTimeout(() => {
-          this.progressShow = false
-        }, 2000)
-      }
-    },
     pageId: {
       immediate: true,
       handler (to, from) {
         // this.$logW('pageId:', to)
-        this.showTabsHeader = true
         this.$emit('pageId', to)
       }
     },
@@ -168,12 +125,6 @@ export default {
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }
-    }
-  },
-  methods: {
-    async gotoPercent(percent) {
-      this.$logE(this.$refs.listFeed[0])
-      await this.$refs.listFeed[0].gotoPercent(percent)
     }
   }
 }
