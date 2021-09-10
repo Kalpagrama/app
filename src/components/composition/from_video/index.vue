@@ -109,7 +109,7 @@ export default {
     'options.playBackState': {
       immediate: true,
       handler (to, from) {
-        this.$log('options.playBackState:', to, this?.composition?.layers[0]?.contentName)
+        // this.$log('options.playBackState:', to, this?.composition?.layers[0]?.contentName)
         if (to === 'paused') this.pause()
         else if (to === 'playing') this.play()
       }
@@ -140,7 +140,7 @@ export default {
         if (to && from) {
           if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t) {
             this.play(this.urlMeta[0].t)
-            this.$log('ended:', this?.composition?.layers[0]?.contentName)
+            // this.$log('ended:', this?.composition?.layers[0]?.contentName)
             this.$emit('ended')
           }
         }
@@ -153,7 +153,7 @@ export default {
       if (this.options.playBackState === 'paused') this.pause()
     },
     videoClick (e) {
-      this.$log('videoClick', e)
+      // this.$log('videoClick', e)
       if (e.target.muted && localStorage.getItem('k_sound')) {
         e.target.muted = false
       } else {
@@ -164,14 +164,14 @@ export default {
       }
     },
     play (fromTime = null) {
-      this.$log('play', this?.composition?.layers[0]?.contentName)
+      // this.$log('play', this?.composition?.layers[0]?.contentName)
       if (this.$refs.videoRef) {
         if (fromTime) this.$refs.videoRef.currentTime = fromTime
         this.playPromise = this.$refs.videoRef.play()
       }
     },
     pause () {
-      this.$log('pause', this?.composition?.layers[0]?.contentName)
+      // this.$log('pause', this?.composition?.layers[0]?.contentName)
       if (this.playPromise) {
         this.playPromise.then(_ => {
           if (this.$refs.videoRef) this.$refs.videoRef.pause()
@@ -181,7 +181,7 @@ export default {
       }
     },
     mutedToggle () {
-      this.$log('mutedToggle')
+      // this.$log('mutedToggle')
       if (this.$refs.videoRef) {
         if (this.$refs.videoRef.muted) {
           localStorage.setItem('k_sound', 'on')
@@ -193,7 +193,7 @@ export default {
       }
     },
     setCurrentTime (t) {
-      this.$log('setCurrentTime')
+      // this.$log('setCurrentTime')
       if (this.$refs.videoRef) {
         this.$refs.videoRef = t + this.urlMeta[0].t
       }
