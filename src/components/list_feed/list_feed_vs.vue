@@ -3,7 +3,7 @@
     .row.full-width
       q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
       //- items
-      div( v-if="itemsRes" :style=`{ position: 'relative'}`).row.full-width.items-start.content-start
+      div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
         q-scroll-area(
           :visible="false"
           :delay="1500"
@@ -35,6 +35,7 @@
             //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
           // items list
           q-virtual-scroll(
+            v-if="itemsRes"
             ref="vs"
             scroll-target="#scroll-area-with-virtual-scroll-1 > .scroll"
             dark
@@ -146,7 +147,7 @@ export default {
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
+      // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
     onScroll (details) {

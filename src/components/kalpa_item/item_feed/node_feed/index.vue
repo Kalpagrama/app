@@ -5,105 +5,79 @@
 </style>
 
 <template lang="pug">
-  .row.full-width
-    div(v-if="!node").row.full-width.q-pa-md
-      q-card(flat bordered :style=`{width: $store.state.ui.pageWidth+'px'}` dark)
-        q-item
-          q-item-section(avatar='')
-            q-skeleton(type='QAvatar' animation="fade" dark)
-          q-item-section
-            q-item-label
-              q-skeleton(type='text')
-            q-item-label(caption='')
-              q-skeleton(type='text' width='80%')
-        q-item
-          q-item-section(avatar='')
-          q-item-section.q-pl-sm
-            q-skeleton.q-mb-sm(height='350px' animation="none" dark bordered)
-            .row.items-center.justify-between.no-wrap
-              .row.items-center
-                q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
-              .row.items-center
-                q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
-              .row.items-center
-                q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
+  div(
+    :style=`{
+      position: 'relative',
+      ...styles,
+    }`
+  ).row.full-width.items-start.content-start
+    slot(name="wrapper")
+    //- wrapper
     div(
-      v-else
       :style=`{
-        position: 'relative',
-        ...styles,
-      }`
-    ).row.full-width.items-start.content-start
-      slot(name="wrapper")
-      //- wrapper
-      div(
-        :style=`{
-        position: 'relative',
-        background: 'rgb(35,35,35)',
-        borderRadius: borderRadius,
-        ...styles,
-      }`).row.full-width.items-start.content-start
-        slot(name="wrapper-inside")
-        //- HEADER: author, createdAt, actions, date, views
-        essence-header(
-          v-if="showHeader && node.oid"
-          :essence="node"
-          :showAuthorAlways="showAuthorAlways"
-          :style=`{
-          order: orderHeader,
-        }`)
-        //- ITEMS: one or two
-        slot(name="items")
-        composition(
-          v-if="showItems && !$slots.items && node.items.length === 1"
-          :composition="node.items[0]"
-          :isVisible="isVisible"
-          :isActive="isActive"
-          :nodeOid="node.oid")
-        essence-items(
-          v-if="showItems && !$slots.items && node.items.length === 2"
-          v-bind="$props"
-          :itemsStyles="itemsStyles"
-          @itemActive="$emit('itemActive', $event)")
-        //- NAME: dynamic link/ dynamic fontSize
-        slot(name="name")
-        router-link(
-          v-if="showName && node.oid"
-          :to="nodeEssenceLink"
-          :style=`{
-          order: 4,
-          minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`
-        ).row.full-width.items-center.content-center.justify-center.q-pa-md
-          span(
-            :class=`{
-            'text-bold': node.name.length < 20
-          }`
-          ).text-white {{ nodeName }}
-        //- SPHERES
-        essence-spheres(
-          v-if="showSpheres && node.spheres.length > 0"
-          :node="node"
-          :style=`{
-          order: 3,
-        }`)
-      //- FOOTER: actions, slot
-      essence-actions(
-        v-if="showActions && node.oid"
+      position: 'relative',
+      background: 'rgb(35,35,35)',
+      borderRadius: borderRadius,
+      ...styles,
+    }`).row.full-width.items-start.content-start
+      slot(name="wrapper-inside")
+      //- HEADER: author, createdAt, actions, date, views
+      essence-header(
+        v-if="showHeader && node.oid"
         :essence="node"
-        :nodeBackgroundColor="nodeBackgroundColor"
-        :nodeActionsColor="nodeActionsColor"
-        :isActive="isActive"
-        :isVisible="isVisible"
+        :showAuthorAlways="showAuthorAlways"
         :style=`{
-        order: 5,
+        order: orderHeader,
       }`)
-      slot(name="footer")
+      //- ITEMS: one or two
+      slot(name="items")
+      composition(
+        v-if="showItems && !$slots.items && node.items.length === 1"
+        :composition="node.items[0]"
+        :isVisible="isVisible"
+        :isActive="isActive"
+        :nodeOid="node.oid")
+      essence-items(
+        v-if="showItems && !$slots.items && node.items.length === 2"
+        v-bind="$props"
+        :itemsStyles="itemsStyles"
+        @itemActive="$emit('itemActive', $event)")
+      //- NAME: dynamic link/ dynamic fontSize
+      slot(name="name")
+      router-link(
+        v-if="showName && node.oid"
+        :to="nodeEssenceLink"
+        :style=`{
+        order: 4,
+        minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
+        span(
+          :class=`{
+          'text-bold': node.name.length < 20
+        }`
+        ).text-white {{ nodeName }}
+      //- SPHERES
+      essence-spheres(
+        v-if="showSpheres && node.spheres.length > 0"
+        :node="node"
+        :style=`{
+        order: 3,
+      }`)
+    //- FOOTER: actions, slot
+    essence-actions(
+      v-if="showActions && node.oid"
+      :essence="node"
+      :nodeBackgroundColor="nodeBackgroundColor"
+      :nodeActionsColor="nodeActionsColor"
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :style=`{
+      order: 5,
+    }`)
+    slot(name="footer")
 </template>
 
 <script>

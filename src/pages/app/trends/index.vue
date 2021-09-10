@@ -27,7 +27,7 @@ kalpa-layout
               :item="item"
               :itemIndex="itemIndex"
               :isActive="isActive"
-              :isVisible="isVisible")
+              :isVisible="isVisible").q-pb-xl
 </template>
 
 <script>

@@ -1,10 +1,37 @@
 <template lang="pug">
-  div(v-if="!!item" :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    div(v-if="item.deletedAt" :style=`{position: 'absolute', zIndex: 1000, background: 'rgba(0,0,0, 0.8)'}`).row.fit.items-center.content-center.justify-center
+div(:style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
+  div(v-if="!reactiveItem || !reactiveItem.itemFull").row.full-width
+    q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
+      q-item
+        q-item-section(avatar)
+          q-skeleton(type='QAvatar' animation="fade" dark)
+        q-item-section
+          q-item-label
+            q-skeleton(type='text' animation="fade" dark)
+          q-item-label(caption='')
+            q-skeleton(type='text' width='80%' animation="fade" dark)
+      q-item
+        //q-item-section(avatar).br
+        q-item-section
+          .row
+            q-skeleton(height='350px' animation="none" dark bordered).col.q-mb-sm
+            q-skeleton(v-if="item.type === 'JOINT'" height='350px' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
+          .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
+            span {{item.name || item.vertexType}}
+          .row.items-center.justify-between.no-wrap
+            .row.items-center
+              q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
+              q-skeleton(type='text' width='30px' animation="fade" dark)
+            .row.items-center
+              q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
+              q-skeleton(type='text' width='30px' animation="fade" dark)
+            .row.items-center
+              q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
+              q-skeleton(type='text' width='30px' animation="fade" dark)
+
+  div(v-else).row.full-width
+    div(v-if="reactiveItem.itemFull.deletedAt" :style=`{position: 'absolute', zIndex: 1000, background: 'rgba(0,0,0, 0.8)'}`).row.fit.items-center.content-center.justify-center
       span.text-grey.text-h4.items-center.content-center.justify-center {{$t('unpublished')}}
-    .row.full-width {{item.name}}
-    .row.full-width {{reactiveItem.name}}
-    .row.full-width {{reactiveItem.itemFull ? reactiveItem.itemFull.name:'---null---'}}
     block-feed(
       v-if="reactiveItem.type === 'BLOCK'"
       v-bind="$props"
@@ -80,7 +107,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to) {
-          this.$log('isVisible #', this.itemIndex, this.item.name, this.item.oid)
+          // this.$log('isVisible #', this.itemIndex, this.item.name, this.item.oid)
           let item = this.item // может поменяться во время await
           if (!item.itemFull) {
             this.$set(item, 'itemFull', await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid))
