@@ -5,82 +5,98 @@
 </style>
 
 <template lang="pug">
-  div(
-    :style=`{
-    position: 'relative',
-    ...styles,
-  }`
-  ).row.full-width.items-start.content-start
-    slot(name="wrapper")
-    //- wrapper
+  .row
+    div(v-if="!block")
+      q-card(:style=`{width: $store.state.ui.pageWidth+'px'}`)
+        q-item
+          q-item-section(avatar='')
+            q-skeleton(type='QAvatar')
+          q-item-section
+            q-item-label
+              q-skeleton(type='text')
+            q-item-label(caption='')
+              q-skeleton(type='text')
+        q-skeleton(height='300px' square='')
+        q-card-actions.q-gutter-md(align='right')
+          q-skeleton(type='QBtn').br
+          q-skeleton(type='QBtn')
     div(
+      v-if="!!block"
       :style=`{
       position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: borderRadius,
       ...styles,
-    }`).row.full-width.items-start.content-start
-      slot(name="wrapper-inside")
-      //- HEADER: author, createdAt, actions, date, views
-      essence-header(
-        v-if="showHeader && block.oid"
-        :essence="block"
-        :showAuthorAlways="showAuthorAlways"
+    }`
+    ).row.full-width.items-start.content-start
+      slot(name="wrapper")
+      //- wrapper
+      div(
         :style=`{
-        order: orderHeader,
-      }`)
-      masonry-cover(v-if="showMasonry" :block="block" :style=`{height: '350px'}` @click.native="showMasonry = false")
-      graph-view(
-        v-else
-        :maxHeight="450"
-        :graphD3="block.graph"
-        detailPosition="standard"
-        @changed="block.setChanged(true)"
-        :style=`{background: 'rgb(40,40,40)'}`)
-      //- NAME: dynamic link/ dynamic fontSize
+        position: 'relative',
+        background: 'rgb(35,35,35)',
+        borderRadius: borderRadius,
+        ...styles,
+      }`).row.full-width.items-start.content-start
+        slot(name="wrapper-inside")
+        //- HEADER: author, createdAt, actions, date, views
+        essence-header(
+          v-if="showHeader && block.oid"
+          :essence="block"
+          :showAuthorAlways="showAuthorAlways"
+          :style=`{
+          order: orderHeader,
+        }`)
+        masonry-cover(v-if="showMasonry" :block="block" :style=`{height: '350px'}` @click.native="showMasonry = false")
+        graph-view(
+          v-else
+          :maxHeight="450"
+          :graphD3="block.graph"
+          detailPosition="standard"
+          @changed="block.setChanged(true)"
+          :style=`{background: 'rgb(40,40,40)'}`)
+        //- NAME: dynamic link/ dynamic fontSize
 
-      slot(name="name")
-      router-link(
-        v-if="showName && block.oid"
-        :to="'/block/' + this.block.oid"
-        :style=`{
-          order: 4,
-          minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-        span(
-          :class=`{
-            'text-bold': block.name.length < 20
+        slot(name="name")
+        router-link(
+          v-if="showName && block.oid"
+          :to="'/block/' + this.block.oid"
+          :style=`{
+            order: 4,
+            minHeight: '60px',
+            fontSize: fontSize+'px',
+            textAlign: 'center',
           }`
-        ).text-white {{ block.name }}
+        ).row.full-width.items-center.content-center.justify-center.q-pa-md
+          span(
+            :class=`{
+              'text-bold': block.name.length < 20
+            }`
+          ).text-white {{ block.name }}
 
-      //.row.full-width.items-center.content-center.justify-center.q-pa-md
-      //  span(
-      //    :class=`{
-      //    'text-bold': block.name.length < 20
-      //  }`
-      //  ).text-white {{ block.name }}
-      //- SPHERES
-      essence-spheres(
-        v-if="showSpheres && block.spheres.length > 0"
-        :node="block"
+        //.row.full-width.items-center.content-center.justify-center.q-pa-md
+        //  span(
+        //    :class=`{
+        //    'text-bold': block.name.length < 20
+        //  }`
+        //  ).text-white {{ block.name }}
+        //- SPHERES
+        essence-spheres(
+          v-if="showSpheres && block.spheres.length > 0"
+          :node="block"
+          :style=`{
+          order: 3,
+        }`)
+      //- FOOTER: actions, slot
+      essence-actions(
+        v-if="showActions && block.oid"
+        :essence="block"
+        :nodeBackgroundColor="nodeBackgroundColor"
+        :nodeActionsColor="nodeActionsColor"
+        :isActive="isActive"
+        :isVisible="isVisible"
         :style=`{
-        order: 3,
+        order: 5,
       }`)
-    //- FOOTER: actions, slot
-    essence-actions(
-      v-if="showActions && block.oid"
-      :essence="block"
-      :nodeBackgroundColor="nodeBackgroundColor"
-      :nodeActionsColor="nodeActionsColor"
-      :isActive="isActive"
-      :isVisible="isVisible"
-      :style=`{
-      order: 5,
-    }`)
-    slot(name="footer")
+      slot(name="footer")
 </template>
 
 <script>
@@ -101,6 +117,7 @@ export default {
     masonryCover
   },
   props: {
+    item: { type: Object },
     block: { type: Object },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
@@ -131,6 +148,21 @@ export default {
   data () {
     return {
       showMasonry: true
+    }
+  },
+  watch: {
+    isVisible: {
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          // this.$logW('get full node', this.item)
+          this.item.getFullItem().then(itemFull => {
+            this.node = itemFull
+          }).catch(err => this.$logE('error on getFullItem', err))
+        } else {
+          this.item.getFullItem(true).catch(err => this.$logE('error on getFullItem cancel', err))
+        }
+      }
     }
   },
   computed: {

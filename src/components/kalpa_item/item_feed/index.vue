@@ -5,7 +5,7 @@
     block-feed(
       v-if="item.type === 'BLOCK'"
       v-bind="$props"
-      :block="item")
+      :item="item")
     node-feed(
       v-else-if="item.type === 'NODE'"
       v-bind="$props"

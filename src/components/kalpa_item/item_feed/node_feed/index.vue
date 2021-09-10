@@ -5,29 +5,28 @@
 </style>
 
 <template lang="pug">
-  .row
-    div(v-if="!node")
-      .q-pa-md
-        q-card(style='max-width: 300px')
-          q-item
-            q-item-section(avatar='')
-              q-skeleton(type='QAvatar')
-            q-item-section
-              q-item-label
-                q-skeleton(type='text')
-              q-item-label(caption='')
-                q-skeleton(type='text')
-          q-skeleton(height='200px' square='')
-            q-card-actions.q-gutter-md(align='right')
-              q-skeleton(type='QBtn')
-                q-skeleton(type='QBtn')
+  .row.full-width
+    div(v-if="!node").row.full-width.q-pa-md
+      q-card(:style=`{width: $store.state.ui.pageWidth+'px'}` dark)
+        q-item
+          q-item-section(avatar='')
+            q-skeleton(type='QAvatar')
+          q-item-section
+            q-item-label
+              q-skeleton(type='text')
+            q-item-label(caption='')
+              q-skeleton(type='text')
+        q-skeleton(height='300px' square='')
+        q-card-actions.q-gutter-md(align='right')
+          q-skeleton(type='QBtn').br
+          q-skeleton(type='QBtn')
     div(
-      v-if="node"
+      v-else
       :style=`{
-      position: 'relative',
-      ...styles,
-    }`
-    ).row.full-width.items-start.content-start.br
+        position: 'relative',
+        ...styles,
+      }`
+    ).row.full-width.items-start.content-start
       slot(name="wrapper")
       //- wrapper
       div(
@@ -143,18 +142,19 @@ export default {
     actionsColor: { type: String, default: 'grey-9' }
   },
   data () {
-    return {
-    }
+    return {}
   },
   watch: {
     isVisible: {
       immediate: true,
-      async handler (to, from) {
+      handler (to, from) {
         if (to) {
           // this.$logW('get full node', this.item)
-          this.node = await this.item.getFullItem()
+          this.item.getFullItem().then(itemFull => {
+            this.node = itemFull
+          }).catch(err => this.$logE('error on getFullItem', err))
         } else {
-          await this.item.getFullItem(true)
+          this.item.getFullItem(true).catch(err => this.$logE('error on getFullItem cancel', err))
         }
       }
     }
