@@ -569,7 +569,7 @@ class RxDBWrapper {
             if (rxCollectionEnum in WsCollectionEnum) {
                // mangoQuery.selector = { rxCollectionEnum: WsCollectionEnum.WS_ANY }
                let rxQuery = await this.workspace.find(mangoQuery)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery, listId, null, null, null, propsReactive, screenSize)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxQuery, listId, null, null, propsReactive, screenSize)
                assert(findResult, '!reactiveList')
             } else if (rxCollectionEnum in LstCollectionEnum) {
                let populateFunc = async (itemsForPopulate, itemsForPrefetch, reactiveListFulFilled) => {
@@ -656,14 +656,8 @@ class RxDBWrapper {
                      pageToken: null
                   }
                }
-               let getFullItemFunc = async (item, cancel) => {
-                  // cancel - отменяет запрос (чтобы не ждать того, чего уже не надо)
-                  let [populated] = await populateFunc([item], [])
-                  return populated.populatedObject
-               }
-
                let rxDocInitial = await this.lists.find(mangoQuery) // начальный запрос (от него пойдет пагинация)
-               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, getFullItemFunc, propsReactive, screenSize)
+               findResult = await (new ReactiveListWithPaginationFactory()).create(rxDocInitial, listId, populateObjects ? populateFunc : null, paginateFunc, propsReactive, screenSize)
             } else {
                throw new Error('bad collection: ' + rxCollectionEnum)
             }
@@ -732,6 +726,7 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
+      cancel = false, // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
       setMirroredVuexObject = null // создаст или обновит связанный объект в vuex по этому ключу
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
@@ -775,17 +770,17 @@ class RxDBWrapper {
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
       let reactiveObject = reactiveDoc.getPayload()
-      const populate = async (obj) => {
+      const populate = async (obj, cancel) => {
          if (obj.type.in('NODE', 'JOINT', 'BLOCK')) {
             assert(obj.itemsShort || obj.graph)
             let promises = (obj.itemsShort || [...obj.graph.joints, ...obj.graph.nodes]).map(objShort => {
-               return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
+               return this.get(RxCollectionEnum.OBJ, objShort.oid, {cancel, clientFirst: true })
             })
             obj.items = await Promise.all(promises)
             logD('obj.items=', obj.items)
          }
       }
-      if (rxCollectionEnum === RxCollectionEnum.OBJ) await populate(reactiveObject)
+      if (rxCollectionEnum === RxCollectionEnum.OBJ) await populate(reactiveObject, cancel)
       return reactiveObject
    }
 

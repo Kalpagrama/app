@@ -51,19 +51,19 @@
                   throttle: 300,
                   callback: itemVisibilityHandler,
                   intersection: {
-                     threshold: 0.2,
+                     threshold: 0.0,
                   },
                 }`
                 :style=`{border: itemMiddleIndx === index && $store.state.ui.useDebug ? '1px solid green' : ''}`
               ).row.full-width
                 span(
                   v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
-                ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}}
+                ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
                 slot(
                   name="item"
                   :item="item"
                   :itemIndex="index"
-                  :isActive="false"
+                  :isActive="itemMiddleIndx === index"
                   :isVisible="!!itemsVisibility[item[itemKey]]")
           //// footer
           //slot(name="footer")
@@ -139,19 +139,22 @@ export default {
       assert(this.itemsRes)
       if (from >= this.itemsRes.items.length) return []
       let result = Object.freeze(cloneDeep((this.itemsRes.items.slice(from, from + size))))
+      // for (let i of result) i.itemFull = null
       assert(result.length <= size)
       // this.$log('result=', result)
       return result
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      // if (isVisible) this.$log('itemVisibilityChanged', isVisible, idxSting, key)
+      if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
     onScroll (details) {
       this.itemMiddleIndx = details.index // Math.floor((details.from + details.to) / 2)
       this.$log('scroll', this.itemMiddleIndx, details)
       this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
+      // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
+      this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
     }
   },
   mounted () {

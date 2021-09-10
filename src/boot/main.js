@@ -12,8 +12,8 @@ import axios from 'axios'
 import isEqual from 'lodash/isEqual'
 
 // import Vue from 'vue'
-import VueVirtualScroller from 'vue-virtual-scroller'
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+// import VueVirtualScroller from 'vue-virtual-scroller'
+// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 // import 'tiptap/src/style.css'
 const contentful = require('contentful')
 
@@ -51,7 +51,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     const f = {nameExtra: 'boot::main'}
     logD(f, 'start')
     const t1 = performance.now()
-    Vue.use(VueVirtualScroller)
+    // Vue.use(VueVirtualScroller)
     // Vue.use(VueShowdown, {
     //   flavor: 'github',
     //   options: {

@@ -25,6 +25,7 @@ kalpa-layout
           template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
             item-feed(
               :item="item"
+              :itemIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible")
 </template>

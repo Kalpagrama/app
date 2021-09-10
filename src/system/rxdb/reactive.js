@@ -358,14 +358,13 @@ class ReactiveDocFactory {
 export const GROUP_BATCH_SZ = 11 // сервер работает пачками по 55 (11 джойнтов - это 55 объектов(в джоинте 2 ядра и в каждом - 1 композиция))
 
 class Group {
-   constructor (id, name, populateFunc = null, paginateFunc = null, getFullItemFunc = null, propsReactive = {}, screenSize = 0) {
+   constructor (id, name, populateFunc = null, paginateFunc = null, propsReactive = {}, screenSize = 0) {
       assert(id && typeof id === 'string')
       this.debugUniqueOids = new Set() // TODO костыль (бэкенд дублирует элементы) PS. А может и не костыль... можно оставить на всякий случай тк  vue глючит когда в списке 2 одинаковых ключа
       // события об обновлении могут дублироваться (например, создание объекта сначала упреждающе записывает в rxdb, а потом по подписке)
       this.mutexSubscribe = new MutexLocal('Group::rxQueryOrDocSubscribe')
       this.paginateFunc = paginateFunc
       this.populateFunc = populateFunc
-      this.getFullItemFunc = getFullItemFunc
       this.propsReactive = propsReactive
       this.screenSize = screenSize // максимальная длина ленты (при превышении - обрезается снизу или сверху)
       assert(this.propsReactive, '!this.propsReactive')
@@ -791,7 +790,7 @@ class Group {
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
             Vue.set(this.propsReactive, '')
-            let group = new Group(groupId, groupName, this.populateFunc, null, this.getFullItemFunc, this.propsReactive, this.screenSize)
+            let group = new Group(groupId, groupName, this.populateFunc, null, this.propsReactive, this.screenSize)
             Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
             Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
             Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
@@ -808,7 +807,6 @@ class Group {
          }
       }
       for (let item of filtered) {
-         item.getFullItem = async (cancel) => await this.getFullItemFunc(item, cancel)
          item.debugInfo = () => {
             let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
             return {
@@ -1038,7 +1036,7 @@ class Group {
 }
 
 class ReactiveListWithPaginationFactory {
-   async create (rxQueryOrRxDoc, listId = null, populateFunc = null, paginateFunc = null, getFullItemFunc = null, propsReactive = {}, screenSize = 0) {
+   async create (rxQueryOrRxDoc, listId = null, populateFunc = null, paginateFunc = null, propsReactive = {}, screenSize = 0) {
       rxQueryOrRxDoc.reactiveListHolderMaster = rxQueryOrRxDoc.reactiveListHolderMaster || {}
       assert(isRxQuery(rxQueryOrRxDoc) || isRxDocument(rxQueryOrRxDoc), '!isRxQuery(rxQuery)')
       if (!listId) listId = isRxDocument(rxQueryOrRxDoc) ? rxQueryOrRxDoc.id : JSON.stringify(rxQueryOrRxDoc.mangoQuery)
@@ -1048,7 +1046,7 @@ class ReactiveListWithPaginationFactory {
       } else {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
-         this.group = new Group(listId, 'root', populateFunc, paginateFunc, getFullItemFunc, propsReactive, screenSize)
+         this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive, screenSize)
          await this.group.upsertPaginationPage(rxQueryOrRxDoc, 'whole')
          rxQueryOrRxDoc.reactiveListHolderMaster[listId] = this
       }

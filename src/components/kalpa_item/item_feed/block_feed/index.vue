@@ -117,7 +117,6 @@ export default {
     masonryCover
   },
   props: {
-    item: { type: Object },
     block: { type: Object },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
@@ -150,21 +149,6 @@ export default {
       showMasonry: true
     }
   },
-  watch: {
-    isVisible: {
-      immediate: true,
-      handler (to, from) {
-        if (to) {
-          // this.$logW('get full node', this.item)
-          this.item.getFullItem().then(itemFull => {
-            this.node = itemFull
-          }).catch(err => this.$logE('error on getFullItem', err))
-        } else {
-          this.item.getFullItem(true).catch(err => this.$logE('error on getFullItem cancel', err))
-        }
-      }
-    }
-  },
   computed: {
     fontSize () {
       let l = this.block.name.length
@@ -180,7 +164,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.block, this.isActive)
+    // this.$log('mounted', this.block, this.isActive)
   }
 }
 </script>

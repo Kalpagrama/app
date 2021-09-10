@@ -7,19 +7,29 @@
 <template lang="pug">
   .row.full-width
     div(v-if="!node").row.full-width.q-pa-md
-      q-card(:style=`{width: $store.state.ui.pageWidth+'px'}` dark)
+      q-card(flat bordered :style=`{width: $store.state.ui.pageWidth+'px'}` dark)
         q-item
           q-item-section(avatar='')
-            q-skeleton(type='QAvatar')
+            q-skeleton(type='QAvatar' animation="fade" dark)
           q-item-section
             q-item-label
               q-skeleton(type='text')
             q-item-label(caption='')
-              q-skeleton(type='text')
-        q-skeleton(height='300px' square='')
-        q-card-actions.q-gutter-md(align='right')
-          q-skeleton(type='QBtn').br
-          q-skeleton(type='QBtn')
+              q-skeleton(type='text' width='80%')
+        q-item
+          q-item-section(avatar='')
+          q-item-section.q-pl-sm
+            q-skeleton.q-mb-sm(height='350px' animation="none" dark bordered)
+            .row.items-center.justify-between.no-wrap
+              .row.items-center
+                q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
+              .row.items-center
+                q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
+              .row.items-center
+                q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
     div(
       v-else
       :style=`{
@@ -103,6 +113,8 @@ import essenceActions from 'src/components/essence/essence_actions.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceHeader from 'src/components/essence/essence_header'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/common/utils'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'nodeFeed',
@@ -113,8 +125,7 @@ export default {
     essenceHeader
   },
   props: {
-    item: { type: Object },
-    node: { type: Object, default: null },
+    node: { type: Object },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
     isActive: { type: Boolean },
@@ -142,21 +153,7 @@ export default {
     actionsColor: { type: String, default: 'grey-9' }
   },
   data () {
-    return {}
-  },
-  watch: {
-    isVisible: {
-      immediate: true,
-      handler (to, from) {
-        if (to) {
-          // this.$logW('get full node', this.item)
-          this.item.getFullItem().then(itemFull => {
-            this.node = itemFull
-          }).catch(err => this.$logE('error on getFullItem', err))
-        } else {
-          this.item.getFullItem(true).catch(err => this.$logE('error on getFullItem cancel', err))
-        }
-      }
+    return {
     }
   },
   computed: {
@@ -189,8 +186,10 @@ export default {
       else return 14
     }
   },
-  async mounted () {
-    // this.$logW('mounted', this.isVisible)
+  methods: {
+  },
+  async created () {
+    // this.$logW('created')
   }
 }
 </script>

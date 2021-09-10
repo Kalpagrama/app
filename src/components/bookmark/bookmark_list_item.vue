@@ -74,6 +74,10 @@ export default {
       type: Object,
       required: true,
     },
+    itemIndex: {
+      type: Number,
+      required: true,
+    },
     mode: {
       type: String,
     },
@@ -81,8 +85,16 @@ export default {
   },
   data () {
     return {
+      // origIndx: null,
       thumbUrlErrored: false
     }
+  },
+  watch: {
+    // itemIndex: {
+    //   handler(to, from){
+    //     this.$log('itemIndex changed', from, to)
+    //   }
+    // }
   },
   computed: {
     link() {
@@ -120,7 +132,8 @@ export default {
     }
   },
   mounted () {
-    // this.$log('mounted!!!')
+    // this.origIndx = this.itemIndex
+    // this.$log('mounted!!!', this.itemIndex)
   }
 }
 </script>

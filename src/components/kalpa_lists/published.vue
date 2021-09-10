@@ -29,6 +29,7 @@
           //q-btn(:label="bookmarkIndex + '::' + bookmark.name", size="xl").full-width
           bookmark-list-item(
             :bookmark="bookmark"
+            :itemIndex="bookmarkIndex"
             :mode="mode"
             @item="bookmarkSelectHandle"
           ).q-mb-sm
