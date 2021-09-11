@@ -35,18 +35,25 @@
       @click="commentSend()")
   //- comments
   .row.full-width.justify-center.q-pt-sm
-    list-feed(
-      ref="listFeed"
+    tab-list-feed(
+      :scrollAreaHeight="400"
       :query="query"
-      nextSize=44
-      :itemMiddlePersist="false"
-      screenSize=88
-      :style=`{
-        maxWidth: $store.state.ui.pageWidth+'px',
-      }`
-      @count="commentsCount = $event")
+      :itemHeightApprox="60"
+      :itemMiddlePersist="true"
+      @count="commentsCount = $event").row.full-width
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
+    //list-feed(
+    //  :query="query"
+    //  nextSize=44
+    //  :itemMiddlePersist="false"
+    //  screenSize=88
+    //  :style=`{
+    //    maxWidth: $store.state.ui.pageWidth+'px',
+    //  }`
+    //  @count="commentsCount = $event")
+    //  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+    //    comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
 </template>
 
 <script>

@@ -15,9 +15,8 @@
             :navHeaderText="$t('Activity')"
             searchInputState="disabled"
             :query="query"
-            nextSize=44
-            :itemMiddlePersist="false"
-            screenSize=88
+            :itemHeightApprox="100"
+            :itemMiddlePersist="true"
           ).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
               notification-item(

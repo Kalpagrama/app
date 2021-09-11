@@ -10,6 +10,7 @@ import lodashGet from 'lodash/get'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
 import store from 'src/store/index'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -51,6 +52,9 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
             assert(value, '!value')
          } else value = valueOrFunc
          reactiveDoc.updatePayloadByPath(path, value)
+      } catch (err) {
+         logE('err on updateRxDocPayload', cloneDeep(reactiveDoc.getPayload()))
+         throw err
       } finally {
          wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов reactiveDocSubscribe
             reactiveDocFactory.setDebouncedSave(true)
@@ -330,6 +334,9 @@ class ReactiveDocFactory {
                   })
                   this.setRev(updatedRxDoc._rev)
                   // logD(f, `rxDoc changed ${updatedRxDoc.id} ${updatedRxDoc._rev}`)
+               } catch (err) {
+                  logE('err on reactiveDocSubscribe', cloneDeep(this.getReactive()))
+                  throw err
                } finally {
                   // this.rxDocSubscribe()
                   this.mutex.release()

@@ -17,7 +17,7 @@
       :query="query")
       template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
         item-feed(
-          :item="item.populatedObject"
+          :itemFull="item.populatedObject"
           :isActive="isActive_ && isActive"
           :isVisible="isVisible")
 </template>

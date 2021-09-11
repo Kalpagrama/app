@@ -56,7 +56,7 @@ export default {
           // querySearch: this.searchString,
           sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
         },
-        populateObjects: true,
+        populateObjects: false,
         limit: 150
       }
     },

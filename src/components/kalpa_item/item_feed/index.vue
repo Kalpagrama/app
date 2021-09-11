@@ -1,7 +1,7 @@
 <template lang="pug">
   div(:style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
     div(v-if="$store.state.ui.useDebug").row.full-width isActive:{{isActive}} isVisible:{{isVisible}}
-    div(v-if="!reactiveItem || !reactiveItem.itemFull").row.full-width
+    div(v-if="!isItemFullReceived").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
@@ -31,8 +31,8 @@
                 q-skeleton(type='text' width='30px' animation="fade" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :block="reactiveItem.itemFull" :node="reactiveItem.itemFull")
-      div(v-if="reactiveItem.itemFull.deletedAt").absolute.fit.dimmed.z-top
+      component(:is="componentName"  v-bind="$props" :block="item" :node="item")
+      div(v-if="item.deletedAt").absolute.fit.dimmed.z-top
         span.absolute-center.text-white.text-h4 {{$t('unpublished')}}
 </template>
 
@@ -43,11 +43,13 @@ import joinFeed from 'src/components/kalpa_item/item_feed/joint_feed'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import { ObjectTypeEnum } from 'src/system/common/enums'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'itemFeed',
   props: {
-    item: { type: Object },
+    itemFull: { type: Object },
+    itemShort: { type: Object },
     itemIndex: { type: Number },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
@@ -82,29 +84,39 @@ export default {
   },
   data () {
     return {
-      reactiveItem: this.item // item изначально не реактивен
+      reactiveItemShort: this.itemShort // itemShort изначально не реактивен
     }
   },
   computed: {
     componentName () {
-      switch (this.reactiveItem.type) {
-        case ObjectTypeEnum.NODE: return 'node-feed'
-        case ObjectTypeEnum.JOINT: return 'node-feed'
-        case ObjectTypeEnum.BOOK: return 'block-feed'
-        default: throw new Error('bad reactiveItem.type:' + this.reactiveItem.type)
+      switch (this.item.type) {
+        case ObjectTypeEnum.NODE:
+          return 'node-feed'
+        case ObjectTypeEnum.JOINT:
+          return 'node-feed'
+        case ObjectTypeEnum.BLOCK:
+          return 'block-feed'
+        default:
+          throw new Error('bad reactiveItemShort.type:' + this.reactiveItemShort.type)
       }
+    },
+    isItemFullReceived () {
+      return !!(this.itemFull || this.itemShort.itemFull)
+    },
+    item () {
+      return this.itemFull || this.itemShort.itemFull || this.itemShort
     }
   },
   watch: {
     // virtualScroll переиспользует оболочки и засовывает в них новые данные(этот экземпляр может использоватья для отображения разных ядер)
-    // используем item для хранения состояния
-    item: {
+    // используем itemShort для хранения состояния
+    itemShort: {
       immediate: true,
       deep: false,
       async handler (to, from) {
-        this.reactiveItem = to
-        if (this.isVisible) {
-          // this.$log('item changed', to)
+        this.reactiveItemShort = to
+        if (to && this.isVisible) {
+          // this.$log('itemShort changed', to)
           this.getFullItem(to)
         }
       }
@@ -112,42 +124,45 @@ export default {
     isVisible: {
       immediate: true,
       async handler (to, from) {
-        if (to) {
-          // this.$log('isVisible=true #', this.itemIndex, this.item.name, this.item.oid)
-          this.getFullItem(this.item)
-        } else {
-          // this.$log('isVisible=false #', this.itemIndex, this.item.name, this.item.oid)
-          this.cancelItemFull(this.item)
+        if (this.itemShort) {
+          if (to) {
+            // this.$log('isVisible=true #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
+            this.getFullItem(this.itemShort)
+          } else {
+            // this.$log('isVisible=false #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
+            this.cancelItemFull(this.itemShort)
+          }
         }
       }
     }
   },
   methods: {
-    getFullItem(item) {
-      if (!item.itemFull && !item.queryId) {
-        item.queryId = Date.now()
-        // this.$log('get itemFull #', this.itemIndex, item.name, item.oid, cloneDeep(item))
-        this.$rxdb.get(RxCollectionEnum.OBJ, item.oid, { queryId: item.queryId })
+    getFullItem (itemShort) {
+      assert(itemShort)
+      if (!itemShort.itemFull && !itemShort.queryId) {
+        itemShort.queryId = Date.now()
+        // this.$log('get itemFull #', this.itemIndex, itemShort.name, itemShort.oid, cloneDeep(itemShort))
+        this.$rxdb.get(RxCollectionEnum.OBJ, itemShort.oid, { queryId: itemShort.queryId })
             .then(itemFull => {
-              this.$set(item, 'itemFull', itemFull)
-              item.queryId = null
+              this.$set(itemShort, 'itemFull', itemFull)
+              itemShort.queryId = null
             })
             .catch(err => {
               this.$logE('err on get itemFull', err)
-              item.queryId = null
+              itemShort.queryId = null
             })
       }
     },
-    cancelItemFull(item) {
-      if (item.queryId) {
-        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, {queryId: item.queryId, cancel: true })
+    cancelItemFull (itemShort) {
+      if (itemShort.queryId) {
+        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: itemShort.queryId, cancel: true })
             .catch(err => this.$log('err on cancel request', err))
-        // this.$log('cancel itemFull OK #', this.itemIndex, item.name, item.name)
+        // this.$log('cancel itemFull OK #', this.itemIndex, itemShort.name, itemShort.name)
       }
     }
   },
   created () {
-    this.$set(this.item, 'itemFull', null)
+    if (this.itemShort) this.$set(this.itemShort, 'itemFull', null)
     // this.$log('created', this.itemIndex, this.item)
   }
 }

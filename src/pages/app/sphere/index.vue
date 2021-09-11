@@ -12,9 +12,8 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            nextSize=11
+            :itemHeightApprox="500"
             :itemMiddlePersist="true"
-            screenSize=36
             @searchString="searchString = $event"
             @pageId="pageId = $event"
           ).row.full-width
@@ -22,7 +21,7 @@
               page-header(v-if="sphere" :sphere="sphere").q-mb-sm
             template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
               item-feed(
-                :item="item.populatedObject"
+                :itemShort="item"
                 :isActive="isActive"
                 :isVisible="isVisible")
 </template>
@@ -81,7 +80,7 @@ export default {
           // querySearch: this.searchString,
           sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
         },
-        populateObjects: true,
+        populateObjects: false,
       }
     }
   },

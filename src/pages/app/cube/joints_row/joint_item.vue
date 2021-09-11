@@ -83,7 +83,7 @@
     //- node
     item-feed(
       v-if="item.type === 'NODE'"
-      :item="item"
+      :itemFull="item"
       :isActive="itemActive"
       :isVisible="itemActive"
       :showActions="false"
@@ -185,7 +185,7 @@
         }`
         ).row.full-width
         item-feed(
-          :item="joint"
+          :itemFull="joint"
           :isActive="false"
           :isVisible="false"
           :showName="false"

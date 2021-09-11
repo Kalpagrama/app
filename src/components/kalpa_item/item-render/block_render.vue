@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center
   item-feed(
-    :item="item"
+    :itemFull="item"
     :isActive="false"
     :isVisible="false"
     :showAuthorAlways="true"

@@ -47,7 +47,7 @@ kalpa-layout()
               }`
               ).row.full-width
               item-feed(
-                :item="node"
+                :itemFull="node"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
@@ -87,7 +87,6 @@ kalpa-layout()
               //    //- widget-joints(:node="node")
               page-comments(
                 :node="node"
-                :height="700"
               )
               //page-joints(
               //  :node="node"

@@ -21,13 +21,12 @@
             :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
-            nextSize=11
+            :itemHeightApprox="500"
             :itemMiddlePersist="true"
-            screenSize=36
           ).row.full-width
             template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
               item-feed(
-                :item="item.populatedObject"
+                :itemShort="item"
                 :isActive="isActive"
                 :isVisible="isVisible")
 </template>
@@ -56,7 +55,7 @@ export default {
           matterReason: {$ne: 'AUTHOR'}, // только события относительно объектов, где я не являюсь автором объекта
           eventType: {$in: ['OBJECT_CREATED']} // только события о создании объектов
         },
-        populateObjects: true
+        populateObjects: false
       }
       return res
     }

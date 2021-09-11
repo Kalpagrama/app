@@ -136,6 +136,10 @@ export default {
     iUrl (item) {
       return ContentApi.urlSelect(item) || item.thumbUrl
     }
+  },
+  created () {
+    // this.$log('created', JSON.parse(JSON.stringify(this.node)))
+    // this.$log('created2', this.node)
   }
 }
 </script>

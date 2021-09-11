@@ -7,8 +7,7 @@
         :searchInputState="'enabled'"
         :searchString="searchString"
         :query="query"
-        nextSize=44
-        screenSize=88
+        :itemHeightApprox="100"
         :itemMiddlePersist="false"
         @searchString="searchString = $event"
       ).row.full-width

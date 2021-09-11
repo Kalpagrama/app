@@ -64,7 +64,7 @@ div(
           ).row.full-width.items-end.content-end
           item-feed(
             v-if="jointActive"
-            :item="jointActive"
+            :itemFull="jointActive"
             :showItems="false"
             :showActions="false"
             :showName="false"
@@ -103,7 +103,7 @@ div(
         template(v-slot:header)
           item-feed(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
-            :item="jointActive"
+            :itemFull="jointActive"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false"

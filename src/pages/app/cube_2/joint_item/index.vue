@@ -2,7 +2,7 @@
 .row.full-width
   item-feed(
     v-if="item.type === 'NODE'"
-    :item="item"
+    :itemFull="item"
     :isActive="isActive"
     :isVisible="isActive"
     :showHeader="false"

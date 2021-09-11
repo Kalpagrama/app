@@ -3,7 +3,7 @@ div(
   v-if="node"
   ).row.full-width.justify-center
   item-feed(
-    :item="node"
+    :itemFull="node"
     :isActive="true"
     :isVisible="true"
     :style=`{

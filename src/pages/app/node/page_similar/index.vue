@@ -1,21 +1,28 @@
 <template lang="pug">
   .row.full-width.items-start.content-start.justify-center.q-pt-sm
-    div(
-      :style=`{
-      maxWidth: $store.state.ui.pageWidth+'px',
-    }`
-    ).row.full-width.items-start.content-start
+    div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
       .row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
-      list-feed(
-        :itemStyles=`{
-        paddingBottom: '50px',
-      }`
-        :query="query")
+      tab-list-feed(
+        :scrollAreaHeight="400"
+        :query="query"
+        :itemHeightApprox="60"
+        :itemMiddlePersist="true").row.full-width
         template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
           item-feed(
-            :item="item.populatedObject"
+            :itemShort="item"
+            :itemIndex="itemIndex"
             :isActive="isActive"
-            :isVisible="isVisible")
+            :isVisible="isVisible").q-pb-xl
+      //list-feed(
+      //  :itemStyles=`{
+      //  paddingBottom: '50px',
+      //}`
+      //  :query="query")
+      //  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      //    item-feed(
+      //      :item="item.populatedObject"
+      //      :isActive="isActive"
+      //      :isVisible="isVisible")
 </template>
 
 <script>
@@ -41,7 +48,7 @@ export default {
           deep: 5,
           sortStrategy: 'HOT' // 'ACTIVITY', // AGE
         },
-        populateObjects: true,
+        populateObjects: false,
       }
     },
   },

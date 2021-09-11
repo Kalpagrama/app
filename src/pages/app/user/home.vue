@@ -36,9 +36,8 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            nextSize=11
+            :itemHeightApprox="500"
             :itemMiddlePersist="true"
-            screenSize=36
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)
@@ -71,7 +70,7 @@
                   background: rateMeta(item.votedUserRate).colorBackground,
                 }`).row.q-ml-xs.q-mr-sm
               item-feed(
-                :item="item.populatedObject"
+                :itemShort="item"
                 :isActive="isActive"
                 :isVisible="isVisible").q-pb-sm
 </template>
@@ -140,7 +139,7 @@ export default {
           // querySearch: this.searchString,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: true
+        populateObjects: false
       }
     }
   },

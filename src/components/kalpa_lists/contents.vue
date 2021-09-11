@@ -20,9 +20,8 @@
           :pages="pages"
           :pageId="pageId"
           :query="query"
-          nextSize=44
-          :itemMiddlePersist="false"
-          screenSize=88
+          :itemHeightApprox="100"
+          :itemMiddlePersist="itemMiddlePersist"
           @searchString="searchString = $event"
           @pageId="pageId = $event"
         ).row.full-width

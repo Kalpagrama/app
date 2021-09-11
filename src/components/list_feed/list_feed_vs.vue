@@ -110,9 +110,10 @@ export default {
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },
-    itemsCopy(){
+    itemsCopy () {
       // this.$log('itemsCopy:', this.itemsRes.items.length)
-      return Object.freeze(cloneDeep((this.itemsRes.items)))
+      // return Object.freeze(cloneDeep((this.itemsRes.items)))
+      return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
     }
   },
   watch: {
@@ -154,11 +155,14 @@ export default {
       this.$set(this.itemsVisibility, key, isVisible)
     },
     onScroll (details) {
-      this.itemMiddleIndx = details.index // Math.floor((details.from + details.to) / 2)
-      this.$log('scroll', this.itemMiddleIndx, details)
-      this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
-      // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
-      this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
+      if (this.length) {
+        this.itemMiddleIndx = details.index // Math.floor((details.from + details.to) / 2)
+        this.$log('scroll', this.itemMiddleIndx, details)
+        this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
+        // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
+        this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.itemsRes.items.length)
+        this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
+      }
     }
   },
   mounted () {

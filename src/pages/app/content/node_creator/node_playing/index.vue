@@ -2,7 +2,7 @@
 .row.full-width.justify-center.q-pb-sm
   item-feed(
     v-if="node"
-    :item="node"
+    :itemFull="node"
     :isActive="isOpened"
     :isVisible="isOpened"
     :showActions="isOpened"
