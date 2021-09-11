@@ -39,8 +39,7 @@
             ref="vs"
             scroll-target="#scroll-area-with-virtual-scroll-1 > .scroll"
             dark
-            :items-fn="itemsFn"
-            :items-size="length"
+            :items="itemsCopy"
             :virtual-scroll-item-size="itemHeightApprox"
             :virtual-scroll-sticky-size-start="stickyHeaderHeight"
             @virtual-scroll="onScroll").q-pr-md
@@ -106,10 +105,14 @@ export default {
   },
   computed: {
     length () {
-      return this.itemsRes ? this.itemsRes.items.length : 0
+      return this?.itemsRes?.items?.length || 0
     },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
+    },
+    itemsCopy(){
+      // this.$log('itemsCopy:', this.itemsRes.items.length)
+      return Object.freeze(cloneDeep((this.itemsRes.items)))
     }
   },
   watch: {
@@ -136,7 +139,7 @@ export default {
   },
   methods: {
     itemsFn (from, size) {
-      // this.$log('itemsFn:', from, size, this.itemsRes.items.length)
+      this.$logW('itemsFn:', from, size, this.itemsRes.items.length)
       assert(this.itemsRes)
       if (from >= this.itemsRes.items.length) return []
       let result = Object.freeze(cloneDeep((this.itemsRes.items.slice(from, from + size))))

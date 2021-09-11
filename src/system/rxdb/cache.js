@@ -326,6 +326,8 @@ class Cache {
                let processFetchErrorFunc = async (err) => {
                   if (err === 'queued item was evicted legally') { // ничего не делаем
                      logW(f, `Данные не получены(${id})! запрос на сервер был отброшен(легально) по причне переполнения очереди!`, err)
+                  } else if (err === 'queued item was evicted by cancel') { // ничего не делаем
+                     logW(f, `Данные не получены(${id})! запрос на сервер был отменен (cancel queryId)!`, err)
                   } else {
                      logE(`Данные не получены (${id})! Произошла ошибка. Через минуту  можно пробовать еще. err=`, err)
                      const min = 1000 * 60

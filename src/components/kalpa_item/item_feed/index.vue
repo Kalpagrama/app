@@ -1,49 +1,39 @@
 <template lang="pug">
-div(:style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-  div(v-if="!reactiveItem || !reactiveItem.itemFull").row.full-width
-    q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
-      q-item
-        q-item-section(avatar)
-          q-skeleton(type='QAvatar' animation="fade" dark)
-        q-item-section
-          q-item-label
-            q-skeleton(type='text' animation="fade" dark)
-          q-item-label(caption='')
-            q-skeleton(type='text' width='80%' animation="fade" dark)
-      q-item
-        //q-item-section(avatar).br
-        q-item-section
-          .row
-            q-skeleton(height='350px' animation="none" dark bordered).col.q-mb-sm
-            q-skeleton(v-if="item.type === 'JOINT'" height='350px' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
-          .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
-            span {{item.name || item.vertexType}}
-          .row.items-center.justify-between.no-wrap
-            .row.items-center
-              q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
-              q-skeleton(type='text' width='30px' animation="fade" dark)
-            .row.items-center
-              q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
-              q-skeleton(type='text' width='30px' animation="fade" dark)
-            .row.items-center
-              q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
-              q-skeleton(type='text' width='30px' animation="fade" dark)
+  div(:style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
+    div(v-if="$store.state.ui.useDebug").row.full-width isActive:{{isActive}} isVisible:{{isVisible}}
+    div(v-if="!reactiveItem || !reactiveItem.itemFull").row.full-width
+      q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
+        q-item
+          q-item-section(avatar)
+            q-skeleton(type='QAvatar' animation="fade" dark)
+          q-item-section
+            q-item-label
+              q-skeleton(type='text' animation="fade" dark)
+            q-item-label(caption='')
+              q-skeleton(type='text' width='80%' animation="fade" dark)
+        q-item
+          //q-item-section(avatar).br
+          q-item-section
+            .row
+              q-skeleton(height='350px' animation="none" dark bordered).col.q-mb-sm
+              q-skeleton(v-if="item.type === 'JOINT'" height='350px' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
+            .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
+              span {{item.name || item.vertexType}}
+            .row.items-center.justify-between.no-wrap
+              .row.items-center
+                q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
+              .row.items-center
+                q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
+              .row.items-center
+                q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
+                q-skeleton(type='text' width='30px' animation="fade" dark)
 
-  div(v-else).row.full-width
-    div(v-if="reactiveItem.itemFull.deletedAt" :style=`{position: 'absolute', zIndex: 1000, background: 'rgba(0,0,0, 0.8)'}`).row.fit.items-center.content-center.justify-center
-      span.text-grey.text-h4.items-center.content-center.justify-center {{$t('unpublished')}}
-    block-feed(
-      v-if="reactiveItem.type === 'BLOCK'"
-      v-bind="$props"
-      :block="reactiveItem.itemFull")
-    node-feed(
-      v-else-if="reactiveItem.type === 'NODE'"
-      v-bind="$props"
-      :node="reactiveItem.itemFull")
-    node-feed(
-      v-else-if="reactiveItem.type === 'JOINT'"
-      v-bind="$props"
-      :node="reactiveItem.itemFull")
+    div(v-else :style=`{position: 'relative'}`).row.full-width
+      component(:is="componentName"  v-bind="$props" :block="reactiveItem.itemFull" :node="reactiveItem.itemFull")
+      div(v-if="reactiveItem.itemFull.deletedAt").absolute.fit.dimmed.z-top
+        span.absolute-center.text-white.text-h4 {{$t('unpublished')}}
 </template>
 
 <script>
@@ -51,6 +41,8 @@ import blockFeed from 'src/components/kalpa_item/item_feed/block_feed'
 import nodeFeed from 'src/components/kalpa_item/item_feed/node_feed'
 import joinFeed from 'src/components/kalpa_item/item_feed/joint_feed'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import cloneDeep from 'lodash/cloneDeep'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'itemFeed',
@@ -90,16 +82,30 @@ export default {
   },
   data () {
     return {
-      reactiveItem: this.item
+      reactiveItem: this.item // item изначально не реактивен
+    }
+  },
+  computed: {
+    componentName () {
+      switch (this.reactiveItem.type) {
+        case ObjectTypeEnum.NODE: return 'node-feed'
+        case ObjectTypeEnum.JOINT: return 'node-feed'
+        case ObjectTypeEnum.BOOK: return 'block-feed'
+        default: throw new Error('bad reactiveItem.type:' + this.reactiveItem.type)
+      }
     }
   },
   watch: {
-    item: { // virtualScroll переиспользует оболочки и засовывает в них новые данные(этот экземпляр может использоватья для отображения разных ядер)
+    // virtualScroll переиспользует оболочки и засовывает в них новые данные(этот экземпляр может использоватья для отображения разных ядер)
+    // используем item для хранения состояния
+    item: {
       immediate: true,
+      deep: false,
       async handler (to, from) {
         this.reactiveItem = to
-        if (this.isVisible && !to.itemFull) {
-          this.$set(to, 'itemFull', await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid))
+        if (this.isVisible) {
+          // this.$log('item changed', to)
+          this.getFullItem(to)
         }
       }
     },
@@ -107,15 +113,36 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to) {
-          // this.$log('isVisible #', this.itemIndex, this.item.name, this.item.oid)
-          let item = this.item // может поменяться во время await
-          if (!item.itemFull) {
-            this.$set(item, 'itemFull', await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid))
-          }
+          // this.$log('isVisible=true #', this.itemIndex, this.item.name, this.item.oid)
+          this.getFullItem(this.item)
         } else {
-          // this.$logW('cancel full node', this.name_, this.oid_)
-          // await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, {cancel: true})
+          // this.$log('isVisible=false #', this.itemIndex, this.item.name, this.item.oid)
+          this.cancelItemFull(this.item)
         }
+      }
+    }
+  },
+  methods: {
+    getFullItem(item) {
+      if (!item.itemFull && !item.queryId) {
+        item.queryId = Date.now()
+        // this.$log('get itemFull #', this.itemIndex, item.name, item.oid, cloneDeep(item))
+        this.$rxdb.get(RxCollectionEnum.OBJ, item.oid, { queryId: item.queryId })
+            .then(itemFull => {
+              this.$set(item, 'itemFull', itemFull)
+              item.queryId = null
+            })
+            .catch(err => {
+              this.$logE('err on get itemFull', err)
+              item.queryId = null
+            })
+      }
+    },
+    cancelItemFull(item) {
+      if (item.queryId) {
+        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, {queryId: item.queryId, cancel: true })
+            .catch(err => this.$log('err on cancel request', err))
+        // this.$log('cancel itemFull OK #', this.itemIndex, item.name, item.name)
       }
     }
   },

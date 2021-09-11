@@ -560,7 +560,6 @@ class RxDBWrapper {
          assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + listId)
          let findResult
          let cachedReactiveList = this.reactiveDocDbMemCache.get(listId)
-         // logD(f, 'addFindResult')
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
@@ -683,7 +682,9 @@ class RxDBWrapper {
       force = false,
       onFetchFunc = null,
       params = null,
-      beforeCreate = false
+      beforeCreate = false,
+      queryId = Date.now(),
+      cancel = false
    } = {}) {
       assert(beforeCreate || this.created, 'cant getRxDoc! !this.created')
       const f = this.getRxDoc
@@ -697,7 +698,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum in LstCollectionEnum) {
          rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc)
+         rxDoc = await this.objects.get(id, notEvict, priority, clientFirst, force, onFetchFunc, queryId, cancel)
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
@@ -726,13 +727,14 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
+      setMirroredVuexObject = null, // создаст или обновит связанный объект в vuex по этому ключу
+      queryId = Date.now(), // id запроса чтобы потом можно было отменить
       cancel = false, // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
-      setMirroredVuexObject = null // создаст или обновит связанный объект в vuex по этому ключу
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
       const t1 = performance.now()
-      logD(f, 'start', rxCollectionEnum, idOrRawId)
+      logD(f, 'start', rxCollectionEnum, idOrRawId, queryId)
       if (!id) {
          assert(idOrRawId, 'idOrRawId!' + JSON.stringify({ rxCollectionEnum, idOrRawId, id }))
          if (idOrRawId.includes('::')) {
@@ -753,7 +755,7 @@ class RxDBWrapper {
             } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveDoc || setMirroredVuexObject) {
+      if (!reactiveDoc || setMirroredVuexObject || cancel) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -762,7 +764,9 @@ class RxDBWrapper {
             force,
             onFetchFunc,
             params,
-            beforeCreate
+            beforeCreate,
+            queryId,
+            cancel,
          })
          if (!rxDoc) return null
          reactiveDoc = getReactive(rxDoc, setMirroredVuexObject)
@@ -770,17 +774,18 @@ class RxDBWrapper {
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
       let reactiveObject = reactiveDoc.getPayload()
-      const populate = async (obj, cancel) => {
-         if (obj.type.in('NODE', 'JOINT', 'BLOCK')) {
-            assert(obj.itemsShort || obj.graph)
-            let promises = (obj.itemsShort || [...obj.graph.joints, ...obj.graph.nodes]).map(objShort => {
-               return this.get(RxCollectionEnum.OBJ, objShort.oid, {cancel, clientFirst: true })
+      const populate = async (obj, queryId) => {
+         if (obj.type.in('NODE', 'JOINT')) {
+            logD('populate itemFull', obj.name, obj.oid)
+            assert(obj.itemsShort)
+            let promises = (obj.itemsShort).map(objShort => {
+               return this.get(RxCollectionEnum.OBJ, objShort.oid, {queryId, clientFirst: true })
             })
             obj.items = await Promise.all(promises)
-            logD('obj.items=', obj.items)
+            // logD('obj.items=', obj.items)
          }
       }
-      if (rxCollectionEnum === RxCollectionEnum.OBJ) await populate(reactiveObject, cancel)
+      if (rxCollectionEnum === RxCollectionEnum.OBJ && !cancel) await populate(reactiveObject, queryId)
       return reactiveObject
    }
 

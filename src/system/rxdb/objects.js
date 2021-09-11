@@ -29,13 +29,24 @@ class QueryAccumulator {
          } catch (err) {
             reject(err)
          }
-      }, 300, { maxWait: 1000 })
+      }, 300, { maxWait: 1500 })
+   }
+
+   // Данные были запрошены, но уже не нужны. отменит запрос
+   cancel (queryId) {
+      assert(queryId)
+      let canceledItems = [...this.queueMaster.filter(item => item.queryId === queryId), ...this.queueSecondary.filter(item => item.queryId === queryId)]
+      for (let item of canceledItems) item.reject('queued item was evicted by cancel')
+      this.queueMaster = this.queueMaster.filter(item => item.queryId !== queryId)
+      this.queueSecondary = this.queueSecondary.filter(item => item.queryId !== queryId)
+      logD('cancel queue. size=', this.queueSz(this.queueMaster), this.queueMaster.length, Array.from(new Set(this.queueMaster.map(item => item.oid))))
+      return null
    }
 
    // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
-   push (oid, priority) {
+   push (oid, priority, queryId) {
+      assert(queryId)
       assert(oid && priority >= 0, 'oid && priority' + oid + priority)
-      // todo вместо wait(500) заюзать debounce(next)
       return new Promise((resolve, reject) => {
          let queue
          let queueMaxSz = 0
@@ -51,7 +62,8 @@ class QueryAccumulator {
          // if (queue.findIndex(item => item.oid === oid) === -1) { так нельзя!!!!! нельзя терять resolve'ры
          //   queue.push({ oid, resolve, reject })
          // }
-         queue.push({ oid, resolve, reject }) // сохраняем КАЖДЫЙ запрос (даже если oid повторяются)
+         queue.push({ oid, resolve, reject, queryId}) // сохраняем КАЖДЫЙ запрос (даже если oid повторяются). каждый надо разрезолвить либо реджектить
+         logD('push queue. size=', this.queueSz(queue), queue.length, Array.from(new Set(queue.map(item => item.oid))))
          while (this.queueSz(queue) > queueMaxSz) {
             let firstItem = queue.shift()
             let { oid, resolve, reject } = firstItem
@@ -119,6 +131,7 @@ class QueryAccumulator {
       }
       if (oidsForQuery.length === 0) return
       this.queryInProgress = true // Не более одного запроса в единицу времени
+      // logD('next. oidsForQuery=', oidsForQuery)
       ObjectApi.objectList(oidsForQuery).then(objectList => {
          this.queryInProgress = false
          for (let oid of oidsForQuery) {
@@ -263,10 +276,13 @@ class Objects {
    // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 24 штук. Последние запрошенные - в первую очередь
    // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
    // priority -1 - если есть - вернет из кэша (с сервера запрашивать не будет)
-   async get (id, notEvict, priority, clientFirst, force, onFetchFunc = null) {
+   // cancel - отменить запрос на сервер если это возможно (используется при прокрутке ленты)
+   // queryId - чтобы понимать какие запросы потом отменять
+   async get (id, notEvict, priority, clientFirst, force, onFetchFunc = null, queryId = null, cancel = false) {
+      if (cancel) return this.queryAccumulator.cancel(queryId)
       const fetchFunc = async () => {
          logD('objects::get::fetchFunc start')
-         let promise = this.queryAccumulator.push(getOidFromId(id), priority)
+         let promise = this.queryAccumulator.push(getOidFromId(id), priority, queryId)
          let result = await promise
          result.notEvict = notEvict
          logD('objects::get::fetchFunc complete')
