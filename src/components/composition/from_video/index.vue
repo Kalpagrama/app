@@ -16,7 +16,7 @@
       //- small.full-width currentTime: {{currentTime}}
       small.full-width urlMeta: {{urlMeta}}
     slot(name="footer" :player="player")
-    span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
+    //span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
     // spinner + playBtn
     div(
       v-if="isPlayerVisible && statusPlayer !== 'playing'"
@@ -27,38 +27,39 @@
       q-icon(v-if="statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
     // poster
     img(
-      v-if="!isPlayerVisible || !playBackReady"
       :src="composition.thumbUrl"
       :style=`{
       position: 'absolute',
-      zIndex: 100,
+      // zIndex: 100,
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
-      background: 'rgb(35,35,35)',
+      // background: 'rgb(35,35,35)',
     }`
     ).fit
-    video(
-      v-if="isPlayerVisible"
-      ref="videoRef"
-      type="video/mp4"
-      preload="metadata"
-      :autoplay="isActive"
-      :loop="true"
-      :muted="true"
-      :playsinline="true"
-      :style=`{
-      objectFit: objectFit || 'contain',
-      borderRadius: '10px',
-    }`
-      @click="videoClick"
-      @timeupdate="videoTimeupdate"
-      @waiting="playBackLoading = true"
-      @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
-      @pause="playBackState = 'paused'"
-      @play="playBackState = 'playing'"
-      @playing="playBackState = 'playing'"
-      :src="url"
-    ).fit
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      video(
+        v-if="isPlayerVisible"
+        ref="videoRef"
+        type="video/mp4"
+        preload="metadata"
+        :autoplay="isActive"
+        :loop="true"
+        :muted="true"
+        :playsinline="true"
+        :style=`{
+        position: 'absolute',
+        objectFit: objectFit || 'contain',
+        borderRadius: '10px',
+      }`
+        @click="videoClick"
+        @timeupdate="videoTimeupdate"
+        @waiting="playBackLoading = true"
+        @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
+        @pause="playBackState = 'paused'"
+        @play="playBackState = 'playing'"
+        @playing="playBackState = 'playing'"
+        :src="url"
+      ).fit
 </template>
 
 <script>
@@ -108,16 +109,17 @@ export default {
     }
   },
   watch: {
-    composition: {
+    'composition.oid': {
       immediate: false,
       deep: false,
       handler (to, from) {
         // virtual scroll переиспользует dom-элементы и засовывает в них новые данные (поэтому этот компонент может использоваться для показа разных композиций)
-        this.$log('composition changed', this.id, this.isActive, from?.layers[0]?.contentName, '->', to?.layers[0]?.contentName)
+        this.$log('composition changed', this.id, this.isActive, from, '->', to)
         this.cancelLoad() // отменяем загрузку старой композиции
         this.playBackReady = false
         this.playBackState = 'paused'
         this.playBackLoading = false
+        this.compositionChanded = true // ждем изменения isActive
       }
     },
     statusPlayer: {
@@ -138,19 +140,13 @@ export default {
     },
     isActive: {
       handler (to, from) {
+        if (this.compositionChanded) {
+          this.compositionChanded = false
+          return
+        }
         this.playBackReady = false
         this.playBackState = 'paused'
         this.playBackLoading = false
-        // this.$nextTick(() => {
-        //   if (to) {
-        //     if (this.$refs.videoRef) {
-        //       this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
-        //       this.play()
-        //     }
-        //   } else {
-        //     this.cancelLoad()
-        //   }
-        // })
         this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
         if (to) {
           this.$nextTick(() => {
@@ -177,9 +173,6 @@ export default {
     }
   },
   methods: {
-    updateState() {
-
-    },
     onCanPlay () {
       // this.$logE('onCanPlay', this.options.playBackState, this?.composition?.layers[0]?.contentName)
       if (this.options.playBackState === 'paused') this.pause()
@@ -220,7 +213,7 @@ export default {
       if (this.$refs.videoRef) {
         // отменяем загрузку видео (чтобы браузер не грузил в фоне)
         this.$log('cancelLoad', this.id)
-        // this.$refs.videoRef.pause()
+        this.$refs.videoRef.pause()
         this.$refs.videoRef.src = ''
         this.$refs.videoRef.load()
       }
