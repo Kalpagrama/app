@@ -118,13 +118,15 @@ import { ContentApi } from 'src/api/content'
 export default {
   name: 'essenceItems',
   props: ['node', 'isActive', 'isVisible'],
-  // watch: {
-  //   compositionPlayBackState: {
-  //     handler(to, from) {
-  //       this.$logE('compositionPlayBackState changed', this.compositionPlayBackState)
-  //     }
-  //   }
-  // },
+  watch: {
+    'node.oid': {
+      // virtual scroll переиспользует dom-элементы и засовывает в них новые данные (поэтому этот компонент может использоваться для показа разных композиций)
+      handler(to, from) {
+        this.$log('node changed', from, to)
+        this.compositionPlayBackState = ['playing', 'paused']
+      }
+    }
+  },
   data () {
     return {
       compositionPlayBackState: ['playing', 'paused']
