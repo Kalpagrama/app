@@ -30,36 +30,36 @@
       :src="composition.thumbUrl"
       :style=`{
       position: 'absolute',
-      // zIndex: 100,
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
+      zIndex: currentTimeChangedCnt > 0 ? 'auto' : 100
       // background: 'rgb(35,35,35)',
     }`
     ).fit
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      video(
-        v-if="isPlayerVisible"
-        ref="videoRef"
-        type="video/mp4"
-        preload="metadata"
-        :autoplay="isActive"
-        :loop="true"
-        :muted="true"
-        :playsinline="true"
-        :style=`{
-        position: 'absolute',
-        objectFit: objectFit || 'contain',
-        borderRadius: '10px',
-      }`
-        @click="videoClick"
-        @timeupdate="videoTimeupdate"
-        @waiting="playBackLoading = true"
-        @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
-        @pause="playBackState = 'paused'"
-        @play="playBackState = 'playing'"
-        @playing="playBackState = 'playing'"
-        :src="url"
-      ).fit
+    //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    video(
+      v-if="isPlayerVisible"
+      ref="videoRef"
+      type="video/mp4"
+      preload="metadata"
+      :autoplay="isActive"
+      :loop="true"
+      :muted="true"
+      :playsinline="true"
+      :style=`{
+      position: 'absolute',
+      objectFit: objectFit || 'contain',
+      borderRadius: '10px',
+    }`
+      @click="videoClick"
+      @timeupdate="videoTimeupdate"
+      @waiting="playBackLoading = true"
+      @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
+      @pause="playBackState = 'paused'"
+      @play="playBackState = 'playing'"
+      @playing="playBackState = 'playing'"
+      :src="url"
+    ).fit
 </template>
 
 <script>
@@ -75,7 +75,8 @@ export default {
       playBackState: 'paused',
       playBackLoading: false,
       playBackReady: false,
-      statusPlayerLag: this.statusPlayer
+      statusPlayerLag: this.statusPlayer,
+      currentTimeChangedCnt: 0
     }
   },
   computed: {
@@ -119,6 +120,7 @@ export default {
         this.playBackReady = false
         this.playBackState = 'paused'
         this.playBackLoading = false
+        this.currentTimeChangedCnt = 0
         this.compositionChanded = true // ждем изменения isActive
       }
     },
@@ -147,6 +149,7 @@ export default {
         this.playBackReady = false
         this.playBackState = 'paused'
         this.playBackLoading = false
+        this.currentTimeChangedCnt = 0
         this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
         if (to) {
           this.$nextTick(() => {
@@ -163,6 +166,7 @@ export default {
     currentTime: {
       handler (to, from) {
         if (to && from) {
+          this.currentTimeChangedCnt++
           if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t) {
             this.play(this.urlMeta[0].t)
             // this.$log('ended:', this?.composition?.layers[0]?.contentName)

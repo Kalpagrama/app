@@ -98,7 +98,7 @@ export default {
         case ObjectTypeEnum.BLOCK:
           return 'block-feed'
         default:
-          throw new Error('bad reactiveItemShort.type:' + this.reactiveItemShort.type)
+          throw new Error('bad this.item.type:' + this.item.type)
       }
     },
     isItemFullReceived () {

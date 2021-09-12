@@ -163,7 +163,7 @@ export default {
   methods: {
   },
   async created () {
-    // this.$logW('created')
+    // this.$logW('created', this.node.name, this.node.oid)
   }
 }
 </script>
