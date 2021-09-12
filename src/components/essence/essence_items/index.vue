@@ -138,8 +138,8 @@ export default {
     }
   },
   created () {
-    this.$log('created', JSON.parse(JSON.stringify(this.node)))
-    this.$log('created2', this.node)
+    // this.$log('created', JSON.parse(JSON.stringify(this.node)))
+    // this.$log('created2', this.node)
   }
 }
 </script>

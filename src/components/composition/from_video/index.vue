@@ -16,14 +16,15 @@
       //- small.full-width currentTime: {{currentTime}}
       small.full-width urlMeta: {{urlMeta}}
     slot(name="footer" :player="player")
+    span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
     // spinner + playBtn
     div(
       v-if="isPlayerVisible && statusPlayer !== 'playing'"
       :style=`{ position: 'absolute', zIndex: 101, top: '0px', opacity: 0.5}`
       @click="play()"
     ).row.fit.items-center.content-center.justify-center
-      q-spinner(v-show="statusPlayer === 'loading'" color="white" size="50px")
-      q-icon(v-if="statusPlayer === 'paused'" name="play_circle_outline" size="90px" color="grey")
+      q-spinner(v-show="statusPlayerLag === 'loading'" color="white" size="50px")
+      q-icon(v-if="statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
     // poster
     img(
       v-if="!isPlayerVisible || !playBackReady"
@@ -33,6 +34,7 @@
       zIndex: 100,
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
+      background: 'rgb(35,35,35)',
     }`
     ).fit
     video(
@@ -57,7 +59,6 @@
       @playing="playBackState = 'playing'"
       :src="url"
     ).fit
-    //span.text-red.text-bold.absolute-center statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
 </template>
 
 <script>
@@ -72,7 +73,8 @@ export default {
       player: null,
       playBackState: 'paused',
       playBackLoading: false,
-      playBackReady: false
+      playBackReady: false,
+      statusPlayerLag: this.statusPlayer
     }
   },
   computed: {
@@ -106,6 +108,26 @@ export default {
     }
   },
   watch: {
+    composition: {
+      immediate: false,
+      deep: false,
+      handler (to, from) {
+        // virtual scroll переиспользует dom-элементы и засовывает в них новые данные (поэтому этот компонент может использоваться для показа разных композиций)
+        this.$log('composition changed', this.id, this.isActive, from?.layers[0]?.contentName, '->', to?.layers[0]?.contentName)
+        this.cancelLoad() // отменяем загрузку старой композиции
+        this.playBackReady = false
+        this.playBackState = 'paused'
+        this.playBackLoading = false
+      }
+    },
+    statusPlayer: {
+      handler (to, from) {
+        clearTimeout(this.timerStatusPlayer)
+        this.timerStatusPlayer = setTimeout(() => {
+          this.statusPlayerLag = this.statusPlayer
+        }, 700)
+      }
+    },
     'options.playBackState': {
       immediate: true,
       handler (to, from) {
@@ -119,19 +141,26 @@ export default {
         this.playBackReady = false
         this.playBackState = 'paused'
         this.playBackLoading = false
-
-        if (!to && this.$refs.videoRef) {
-          // отменяем загрузку видео (чтобы браузер не грузил в фоне)
-          this.$refs.videoRef.pause()
-          this.$refs.videoRef.src = ''
-          this.$refs.videoRef.load()
-        } else {
+        // this.$nextTick(() => {
+        //   if (to) {
+        //     if (this.$refs.videoRef) {
+        //       this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
+        //       this.play()
+        //     }
+        //   } else {
+        //     this.cancelLoad()
+        //   }
+        // })
+        this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
+        if (to) {
           this.$nextTick(() => {
             if (this.$refs.videoRef) {
               this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
               this.play()
             }
           })
+        } else {
+          this.cancelLoad()
         }
       }
     },
@@ -148,9 +177,13 @@ export default {
     }
   },
   methods: {
+    updateState() {
+
+    },
     onCanPlay () {
       // this.$logE('onCanPlay', this.options.playBackState, this?.composition?.layers[0]?.contentName)
       if (this.options.playBackState === 'paused') this.pause()
+      // else if (this.options.playBackState === 'playing') this.play()
     },
     videoClick (e) {
       // this.$log('videoClick', e)
@@ -164,20 +197,32 @@ export default {
       }
     },
     play (fromTime = null) {
-      // this.$log('play', this?.composition?.layers[0]?.contentName)
       if (this.$refs.videoRef) {
+        this.$log('play', this.id, this?.composition?.layers[0]?.contentName)
         if (fromTime) this.$refs.videoRef.currentTime = fromTime
         this.playPromise = this.$refs.videoRef.play()
       }
     },
     pause () {
-      // this.$log('pause', this?.composition?.layers[0]?.contentName)
       if (this.playPromise) {
         this.playPromise.then(_ => {
-          if (this.$refs.videoRef) this.$refs.videoRef.pause()
+          if (this.$refs.videoRef) {
+            this.$log('pause', this?.composition?.layers[0]?.contentName)
+            this.$refs.videoRef.pause()
+          }
+          this.statusPlayerLag = 'paused' // force lag
         }).catch(error => {
           this.$logE('error om play video', error)
         });
+      }
+    },
+    cancelLoad () {
+      if (this.$refs.videoRef) {
+        // отменяем загрузку видео (чтобы браузер не грузил в фоне)
+        this.$log('cancelLoad', this.id)
+        // this.$refs.videoRef.pause()
+        this.$refs.videoRef.src = ''
+        this.$refs.videoRef.load()
       }
     },
     mutedToggle () {
@@ -227,12 +272,14 @@ export default {
       }
     }
   },
+  created () {
+    this.id = Date.now()
+    // this.$log('created', this.id, this?.composition?.layers[0]?.contentName)
+  },
   beforeDestroy () {
     // отменяем загрузку видео (чтобы браузер не грузил в фоне)
-    if (this.$refs.videoRef) {
-      this.$refs.videoRef.src = ''
-      this.$refs.videoRef.load()
-    }
+    // this.$log('beforeDestroy', this?.composition?.layers[0]?.contentName)
+    this.cancelLoad()
   }
 }
 </script>

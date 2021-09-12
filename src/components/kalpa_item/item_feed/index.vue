@@ -117,7 +117,7 @@ export default {
       async handler (to, from) {
         this.reactiveItemShort = to
         if (to && this.isVisible) {
-          // this.$log('itemShort changed', to)
+          this.$log('itemShort changed', this.isActive, this.itemIndex, from.name, to.name)
           this.getFullItem(to)
         }
       }
@@ -177,12 +177,12 @@ export default {
     },
     getFullItemPreload (itemShort) {
       assert(itemShort)
-      this.$log('preload start', this.itemIndex, this.itemShort.name)
+      // this.$log('preload start', this.itemIndex, this.itemShort.name)
       if (!itemShort.itemFull && !itemShort.queryId && !itemShort.queryIdPreload) {
         itemShort.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, itemShort.oid, { priority: 1, queryId: itemShort.queryIdPreload })
             .then(itemFull => {
-              this.$log('preload ОК itemFull=', itemFull)
+              // this.$log('preload ОК itemFull=', itemFull)
               if (itemFull) this.$set(itemShort, 'itemFull', itemFull)
               itemShort.queryIdPreload = null
             })

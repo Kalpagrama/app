@@ -69,7 +69,7 @@ export default {
     isActive: {
       immediate: true,
       async handler (to, from) {
-        this.$log('isActive TO', to)
+        // this.$log('isActive TO', to)
         if (to) {
           this.bookmark = await this.getBookmark()
         }
@@ -78,13 +78,13 @@ export default {
   },
   methods: {
     async getBookmark () {
-      this.$log('getBookmark', this.item.oid)
+      // this.$log('getBookmark', this.item.oid)
       if (!this.item.oid) {
         this.$q.notify({type: 'negative', position: 'bottom', message: this.$t('Cant save this item :(')})
         return
       }
       let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.item.oid}})
-      this.$log('getBookmark', bookmark)
+      // this.$log('getBookmark', bookmark)
       return bookmark
     },
     async createBookmark (item, fields) {
@@ -114,7 +114,7 @@ export default {
       this.bookmarkEditorDialogShow = true
     },
     async onClick () {
-      this.$log('onClick', this.item)
+      // this.$log('onClick', this.item)
       // is we got this bookmark ?
       this.bookmark = await this.getBookmark()
       // got bookmark already!, move it to another collections/dimension

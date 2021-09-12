@@ -58,7 +58,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     // disable scroll of everything exept scroll
     // TODO maybe global shit...
     // this.$nextTick(() => {
@@ -73,7 +73,7 @@ export default {
     // })
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     // enableBodyScroll(this.$refs['body-wrapper'])
   }
 }

@@ -74,7 +74,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('composition', this.composition)
+    // this.$log('composition', this.composition)
     this.$nextTick(() => {
       this.heightWrapper = this.$refs['wrapper'].clientHeight
       this.heightP = this.$refs['p-wrapper'].clientHeight
