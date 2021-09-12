@@ -19,11 +19,12 @@
           ).row.full-width
             template(v-slot:externalHeader)
               page-header(v-if="sphere" :sphere="sphere").q-mb-sm
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
               item-feed(
                 :itemShort="item"
                 :isActive="isActive"
-                :isVisible="isVisible")
+                :isVisible="isVisible"
+                :isPreload="isPreload")
 </template>
 
 <script>

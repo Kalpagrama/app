@@ -33,14 +33,14 @@ fragment objectShortStatFragment on ObjectShortStat {
 }
 `
 const ObjectShortEssenceFragment = gql`  ${objectShortFragment} ${countStatFragment}
-    fragment ObjectShortEssenceFragment on ObjectShortEssence {
-        ...objectShortFragment
-        items {...objectShortFragment}
-        vertices
-        rate
-        weight
-        countStat{...countStatFragment}
-    }
+fragment ObjectShortEssenceFragment on ObjectShortEssence {
+    ...objectShortFragment
+    items {...objectShortFragment}
+    vertices
+    rate
+    weight
+    countStat{...countStatFragment}
+}
 `
 
 const objectFragment = gql`${objectShortFragment} ${countStatFragment}
@@ -317,6 +317,75 @@ const essenceFragment = gql`
         scope
     }
 `
+const nodeFragment = gql`
+    ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+    fragment nodeFragment on Node {
+        ...objectFragment
+        relatedSphereOids
+        sphereFromName{...objectShortFragment}
+        rate
+        weight
+        rateStat {percent, weight, count}
+        rateUser
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        spheres {
+            oid
+            name
+        }
+        category
+        layout
+        itemsShort {
+            ...objectShortFragment
+        }
+        items {
+            ...on Composition {...compositionFragment}
+        }
+        vertices
+        scope
+    }
+`
+const jointFragment = gql`
+    ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+    fragment jointFragment on Joint {
+        ...objectFragment
+        relatedSphereOids
+        sphereFromName{...objectShortFragment}
+        rate
+        weight
+        rateStat {percent, weight, count}
+        rateUser
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        spheres {
+            oid
+            name
+        }
+        category
+        itemsShort {
+            ...objectShortFragment
+        }
+        items {
+            ...on Video {...videoFragment}
+            ...on Book {...bookFragment}
+            ...on Image {...imageFragment}
+            ...on Sphere {... sphereFragment}
+            ...on User {... userFragment}
+            ...on Composition {...compositionFragment}
+            ...on Node {...nodeFragment}
+        }
+        vertices
+        scope
+    }
+`
 const blockFragment = gql`
     ${objectFragment} ${objectShortFragment} ${ObjectShortEssenceFragment}
     fragment blockFragment on Block {
@@ -357,7 +426,7 @@ const blockFragment = gql`
 `
 
 const objectFullFragment = gql`
-    ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment}
+    ${compositionFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${essenceFragment} ${nodeFragment} ${jointFragment}
     ${sphereFragment} ${userFragment} ${objectFragment} ${blockFragment}
     fragment objectFullFragment on Object {
         ...objectFragment
@@ -365,6 +434,8 @@ const objectFullFragment = gql`
         ...on Book {...bookFragment}
         ...on Image {...imageFragment}
         ...on Essence {... essenceFragment}
+        ...on Node {... nodeFragment}
+        ...on Joint {... jointFragment}
         ...on Sphere {... sphereFragment}
         ...on User {... userFragment}
         ...on Composition {...compositionFragment}
@@ -523,6 +594,8 @@ const fragments = {
    objectShortFragment,
    objectShortStatFragment,
    essenceFragment,
+   nodeFragment,
+   jointFragment,
    blockFragment,
    sphereFragment,
    findResultFragment,

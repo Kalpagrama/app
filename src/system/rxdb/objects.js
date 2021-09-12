@@ -14,6 +14,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
 const QUEUE_MAX_SZ = 88 // макимальное число сущностей в очереди на запрос
+const QUEUE_MAX_SZ_PRELOAD = 8 // макимальное число сущностей в очереди на запрос на предзагрузку
 const BATCH_SZ = 55 // сколько за раз запрашивать с сервера
 class QueryAccumulator {
    constructor () {
@@ -32,7 +33,7 @@ class QueryAccumulator {
       }, 300, { maxWait: 1500 })
    }
 
-   // Данные были запрошены, но уже не нужны. отменит запрос
+   // Данные были запрошены, но уже не нужны. отменит запрос во всех очередях
    cancel (queryId) {
       assert(queryId)
       let canceledItems = [...this.queueMaster.filter(item => item.queryId === queryId), ...this.queueSecondary.filter(item => item.queryId === queryId)]
@@ -46,7 +47,7 @@ class QueryAccumulator {
    // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
    push (oid, priority, queryId) {
       assert(queryId)
-      assert(oid && priority >= 0, 'oid && priority' + oid + priority)
+      assert(oid && (priority === 0 || priority === 1), 'oid && priority' + oid + priority)
       return new Promise((resolve, reject) => {
          let queue
          let queueMaxSz = 0
@@ -55,7 +56,7 @@ class QueryAccumulator {
             queueMaxSz = QUEUE_MAX_SZ
          } else if (priority === 1) {
             queue = this.queueSecondary
-            queueMaxSz = 4
+            queueMaxSz = QUEUE_MAX_SZ_PRELOAD
          }
          assert(queue && queueMaxSz)
 

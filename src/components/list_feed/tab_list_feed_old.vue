@@ -91,8 +91,8 @@
             template(v-slot:append)
               q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
               div(v-if="$store.state.ui.mobileMenuShown" :style=`{height: '65px' }`).row.full-width
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
-              slot(name="item" :item="item" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible")
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+              slot(name="item" :item="item" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible" :isPreload="isPreload")
 </template>
 
 <script>

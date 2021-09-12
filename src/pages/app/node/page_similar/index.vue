@@ -7,18 +7,19 @@
         :query="query"
         :itemHeightApprox="60"
         :itemMiddlePersist="true").row.full-width
-        template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+        template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
           item-feed(
             :itemShort="item"
             :itemIndex="itemIndex"
             :isActive="isActive"
-            :isVisible="isVisible").q-pb-xl
+            :isVisible="isVisible"
+            :isPreload="isPreload").q-pb-xl
       //list-feed(
       //  :itemStyles=`{
       //  paddingBottom: '50px',
       //}`
       //  :query="query")
-      //  template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+      //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
       //    item-feed(
       //      :item="item.populatedObject"
       //      :isActive="isActive"

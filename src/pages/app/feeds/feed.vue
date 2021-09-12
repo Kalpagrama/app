@@ -24,11 +24,12 @@
             :itemHeightApprox="500"
             :itemMiddlePersist="true"
           ).row.full-width
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible,width}`)
+            template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
               item-feed(
                 :itemShort="item"
                 :isActive="isActive"
-                :isVisible="isVisible")
+                :isVisible="isVisible"
+                :isPreload="isPreload")
 </template>
 
 <script>

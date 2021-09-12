@@ -57,7 +57,7 @@ export default {
           sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
         },
         populateObjects: false,
-        limit: 150
+        limit: 350
       }
     },
     tabs () {

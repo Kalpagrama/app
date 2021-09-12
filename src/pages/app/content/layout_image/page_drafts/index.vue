@@ -25,7 +25,7 @@
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)
-        template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible}`)
+        template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible,isPreload}`)
           draft-list-item(
             :draft="draft"
             mode="select"

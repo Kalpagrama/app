@@ -55,6 +55,7 @@ export default {
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
     isActive: { type: Boolean },
     isVisible: { type: Boolean },
+    isPreload: { type: Boolean },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
     showAuthorAlways: { type: Boolean, default: false },
@@ -134,6 +135,20 @@ export default {
           }
         }
       }
+    },
+    isPreload: {
+      immediate: true,
+      async handler (to, from) {
+        if (this.itemShort) {
+          if (to) {
+            // this.$log('isVisible=true #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
+            this.getFullItemPreload(this.itemShort)
+          } else {
+            // this.$log('isVisible=false #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
+            this.cancelItemFullPreload(this.itemShort)
+          }
+        }
+      }
     }
   },
   methods: {
@@ -158,6 +173,29 @@ export default {
         this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: itemShort.queryId, cancel: true })
             .catch(err => this.$log('err on cancel request', err))
         // this.$log('cancel itemFull OK #', this.itemIndex, itemShort.name, itemShort.name)
+      }
+    },
+    getFullItemPreload (itemShort) {
+      assert(itemShort)
+      this.$log('preload start', this.itemIndex, this.itemShort.name)
+      if (!itemShort.itemFull && !itemShort.queryId && !itemShort.queryIdPreload) {
+        itemShort.queryIdPreload = Date.now()
+        this.$rxdb.get(RxCollectionEnum.OBJ, itemShort.oid, { priority: 1, queryId: itemShort.queryIdPreload })
+            .then(itemFull => {
+              this.$log('preload ОК itemFull=', itemFull)
+              if (itemFull) this.$set(itemShort, 'itemFull', itemFull)
+              itemShort.queryIdPreload = null
+            })
+            .catch(err => {
+              this.$logE('err on preload itemFull', err)
+              itemShort.queryIdPreload = null
+            })
+      }
+    },
+    cancelItemFullPreload (itemShort) {
+      if (itemShort.queryIdPreload) {
+        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: itemShort.queryIdPreload, cancel: true })
+            .catch(err => this.$log('err on cancel preload request', err))
       }
     }
   },

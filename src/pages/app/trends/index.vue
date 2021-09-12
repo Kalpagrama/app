@@ -22,12 +22,13 @@ kalpa-layout
         ).row.full-width
           //template(v-slot:externalHeader)
           //  page-trends-nav-tabs(ref="navTabs" :pageInfo="pageInfo" :height="rootTabsHeight")
-          template(v-slot:item=`{item,itemIndex,isActive,isVisible}`)
+          template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
             item-feed(
               :itemShort="item"
               :itemIndex="itemIndex"
               :isActive="isActive"
-              :isVisible="isVisible").q-pb-xl
+              :isVisible="isVisible"
+              :isPreload="isPreload").q-pb-xl
 </template>
 
 <script>

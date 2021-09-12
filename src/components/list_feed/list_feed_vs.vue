@@ -64,7 +64,9 @@
                   :item="item"
                   :itemIndex="index"
                   :isActive="itemMiddleIndx === index"
-                  :isVisible="!!itemsVisibility[item[itemKey]]")
+                  :isVisible="!!itemsVisibility[item[itemKey]]"
+                  :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+                )
           //// footer
           //slot(name="footer")
 </template>
@@ -100,7 +102,8 @@ export default {
       nonReactiveItems: [],
       itemsVisibility: {},
       itemMiddleIndx: null,
-      stickyHeaderHeight: 0
+      stickyHeaderHeight: 0,
+      preloadInterval: { from: -1, to: -1 }
     }
   },
   computed: {
@@ -157,7 +160,17 @@ export default {
     onScroll (details) {
       if (this.length) {
         this.itemMiddleIndx = details.index // Math.floor((details.from + details.to) / 2)
-        this.$log('scroll', this.itemMiddleIndx, details)
+        if (details.direction === 'increase') { // мотаем вниз
+          this.preloadInterval.from = this.itemMiddleIndx
+          this.preloadInterval.to = Math.min(this.length, this.itemMiddleIndx + Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // + 2 экрана вниз
+          // this.preloadInterval.to = details.to
+        } else {
+          this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // - 2 экрана вверх
+          // this.preloadInterval.from = details.from
+          this.preloadInterval.to = this.itemMiddleIndx
+        }
+        assert(this.preloadInterval.from <= this.preloadInterval.to)
+        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval)
         this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
         this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.itemsRes.items.length)

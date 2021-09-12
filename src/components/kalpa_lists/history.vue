@@ -25,7 +25,7 @@
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
-        template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+        template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible,isPreload}`)
           bookmark-list-item(
             :bookmark="bookmark"
             :mode="mode"

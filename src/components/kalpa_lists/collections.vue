@@ -38,7 +38,7 @@
           q-tab(
             v-for="(c,ci) in collectionsModel.collections" :key="c.id"
             :name="c.id" :label="getCollectionNameWithCnt(c)")
-      template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible}`)
+      template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible,isPreload}`)
         bookmark-list-item(
           :bookmark="bookmark"
           :mode="mode"

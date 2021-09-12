@@ -774,18 +774,18 @@ class RxDBWrapper {
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
       let reactiveObject = reactiveDoc.getPayload()
-      const populate = async (obj, queryId) => {
-         if (obj.type.in('NODE', 'JOINT')) {
-            logD('populate itemFull', obj.name, obj.oid)
-            assert(obj.itemsShort)
-            let promises = (obj.itemsShort).map(objShort => {
-               return this.get(RxCollectionEnum.OBJ, objShort.oid, {queryId, clientFirst: true })
-            })
-            obj.items = await Promise.all(promises)
-            // logD('obj.items=', obj.items)
-         }
-      }
-      if (rxCollectionEnum === RxCollectionEnum.OBJ && !cancel) await populate(reactiveObject, queryId)
+      // const populate = async (obj, queryId) => {
+      //    if (obj.type.in('NODE', 'JOINT')) {
+      //       logD('populate itemFull', obj.name, obj.oid)
+      //       assert(obj.itemsShort)
+      //       let promises = (obj.itemsShort).map(objShort => {
+      //          return this.get(RxCollectionEnum.OBJ, objShort.oid, {queryId, clientFirst: true })
+      //       })
+      //       obj.items = await Promise.all(promises)
+      //       // logD('obj.items=', obj.items)
+      //    }
+      // }
+      // if (rxCollectionEnum === RxCollectionEnum.OBJ && !cancel) await populate(reactiveObject, queryId)
       return reactiveObject
    }
 
