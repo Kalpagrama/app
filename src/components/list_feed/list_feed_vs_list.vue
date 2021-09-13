@@ -80,17 +80,6 @@ export default {
     },
     itemsCopy () {
       // this.$log('itemsCopy:', this.itemsRes.items.length)
-      // return Object.freeze(cloneDeep((this.itemsRes.items)))
-      // let res = []
-      // for (let i = 0; i < 400; i++) {
-      //   let items = Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items))).map(item => {
-      //     item.id = i + item.id
-      //     item.name = i + item.name
-      //     return item
-      //   })
-      //   res.push(...items)
-      // }
-      // return res
       return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
     }
   },
