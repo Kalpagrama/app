@@ -16,7 +16,7 @@ import kalpaMenuMobile from 'src/components/kalpa_menu_mobile/index.vue'
 import kalpaMenuActions from 'src/components/kalpa_menu_actions/index.vue'
 import kalpaMenuPopupGlobal from 'src/components/kalpa_menu_popup_global/index.vue'
 // lists
-import listFeed from 'src/components/list_feed/index.vue'
+import listFeed from 'src/components/list_feed/list_feed_custom.vue'
 import tabListFeed from 'src/components/list_feed/tab_list_feed.vue'
 import kalpaTree from 'src/components/kalpa_tree/index.vue'
 // essence

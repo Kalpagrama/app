@@ -4,83 +4,48 @@
       q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
       //- items
       div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
-        q-scroll-area(
-          :visible="false"
-          :delay="1500"
-          :style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}`
-          dark
-          :thumb-style=`{
-            right: '5px',
-            zIndex: 100,
-            borderRadius: '8px',
-            backgroundColor: 'rgb(50,50,50)',
-            width: '8px',
-            opacity: 0.75}`
-          :bar-style=`{
-            right: '2px',
-            borderRadius: '14px',
-            backgroundColor: '#2222',
-            width: '14px',
-            opacity: 0.2,
-            }`
-          id="scroll-area-with-virtual-scroll-1"
-        ).full-width
-          // header
-          .row.full-width.q-pr-md
-            slot(name="header")
-          // sticky header
-          div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width.q-pr-md
-            q-resize-observer(@resize="stickyHeaderHeight = $event.height")
-            slot(name="sticky-header")
-            //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
-          // items list
-          q-virtual-scroll(
-            v-if="itemsRes"
-            ref="vs"
-            scroll-target="#scroll-area-with-virtual-scroll-1 > .scroll"
-            dark
-            :items="itemsCopy"
-            :virtual-scroll-item-size="itemHeightApprox"
-            :virtual-scroll-sticky-size-start="stickyHeaderHeight"
-            @virtual-scroll="onScroll").q-pr-md
-            template(v-slot:default=`{ item, index }`)
-              //-item
-              div(
-                :accessKey="`${item[itemKey]}-${index}`"
-                v-observe-visibility=`{
-                  throttle: 300,
-                  callback: itemVisibilityHandler,
-                  intersection: {
-                     threshold: 0.0,
-                  },
-                }`
-                :style=`{border: itemMiddleIndx === index && $store.state.ui.useDebug ? '1px solid green' : ''}`
-              ).row.full-width
-                span(
-                  v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
-                ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
-                slot(
-                  name="item"
-                  :item="item"
-                  :itemIndex="index"
-                  :isActive="itemMiddleIndx === index"
-                  :isVisible="!!itemsVisibility[item[itemKey]]"
-                  :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
-                )
-          //// footer
-          //slot(name="footer")
+        // header
+        .row.full-width.q-pr-md
+          slot(name="header")
+        // sticky header
+        div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width.q-pr-md
+          q-resize-observer(@resize="stickyHeaderHeight = $event.height")
+          slot(name="sticky-header")
+          //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
+        // items list
+        virtual-list(
+          v-if="itemsRes"
+          :style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px', overflowY: 'auto'}`
+          :data-key="itemKey"
+          :data-sources="itemsCopy"
+          :estimate-size="itemHeightApprox"
+          :page-mode="false"
+        ).full-width.br
+          template(v-slot:item=`{ item, index, scope }`)
+            //item-component(:index="index", :source="item")
+            slot(
+              name="item"
+              :item="item"
+              :itemIndex="index"
+              :isActive="itemMiddleIndx === index"
+              :isVisible="!!itemsVisibility[item[itemKey]]"
+              :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+            )
+
 </template>
 
 <script>
 import { scroll } from 'quasar'
 import { LstCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
 import { assert } from 'src/system/common/utils'
+import VirtualList from 'vue-virtual-scroll-list'
 import cloneDeep from 'lodash/cloneDeep'
 
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
 export default {
   name: 'listFeedVirtualScroll',
+  components: { VirtualList },
   props: {
     scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
       type: Number,
@@ -116,6 +81,16 @@ export default {
     itemsCopy () {
       // this.$log('itemsCopy:', this.itemsRes.items.length)
       // return Object.freeze(cloneDeep((this.itemsRes.items)))
+      // let res = []
+      // for (let i = 0; i < 400; i++) {
+      //   let items = Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items))).map(item => {
+      //     item.id = i + item.id
+      //     item.name = i + item.name
+      //     return item
+      //   })
+      //   res.push(...items)
+      // }
+      // return res
       return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
     }
   },
@@ -135,7 +110,7 @@ export default {
         if (this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
           this.$nextTick(_ => {
             // this.$logW('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
-            this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
+            // this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
           })
         }
       }

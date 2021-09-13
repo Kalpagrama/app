@@ -5,30 +5,30 @@
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
-            q-skeleton(type='QAvatar' animation="fade" dark)
+            q-skeleton(type='QAvatar' animation="none" dark)
           q-item-section
             q-item-label
-              q-skeleton(type='text' animation="fade" dark)
+              q-skeleton(type='text' animation="none" dark)
             q-item-label(caption='')
-              q-skeleton(type='text' width='80%' animation="fade" dark)
+              q-skeleton(type='text' width='80%' animation="none" dark)
         q-item
           //q-item-section(avatar).br
           q-item-section
             .row
-              q-skeleton(height='350px' animation="none" dark bordered).col.q-mb-sm
-              q-skeleton(v-if="item.type === 'JOINT'" height='350px' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
+              q-skeleton(height='50vw' animation="none" dark bordered).col.q-mb-sm
+              q-skeleton(v-if="item.type === 'JOINT'" height='50vw' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
               span {{item.name || item.vertexType}}
             .row.items-center.justify-between.no-wrap
               .row.items-center
                 q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
+                q-skeleton(type='text' width='30px' animation="none" dark)
               .row.items-center
                 q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
+                q-skeleton(type='text' width='30px' animation="none" dark)
               .row.items-center
                 q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="fade" dark)
+                q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
       component(:is="componentName"  v-bind="$props" :block="item" :node="item")

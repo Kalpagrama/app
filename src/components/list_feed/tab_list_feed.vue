@@ -77,7 +77,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
-import listFeedVs from 'src/components/list_feed/list_feed_vs.vue'
+import listFeedVs from 'src/components/list_feed/list_feed_vs_quasar.vue'
+// import listFeedVs from 'src/components/list_feed/list_feed_vs_list.vue'
 
 export default {
   name: 'tabListFeed',
