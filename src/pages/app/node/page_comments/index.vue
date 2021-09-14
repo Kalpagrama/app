@@ -36,7 +36,7 @@
   //- comments
   .row.full-width.justify-center.q-pt-sm
     tab-list-feed(
-      :scrollAreaHeight="400"
+      :scrollAreaHeight="0"
       :query="query"
       :itemHeightApprox="60"
       :itemMiddlePersist="true"

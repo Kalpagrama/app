@@ -15,8 +15,8 @@
           //q-item-section(avatar).br
           q-item-section
             .row
-              q-skeleton(height='50vw' animation="none" dark bordered).col.q-mb-sm
-              q-skeleton(v-if="item.type === 'JOINT'" height='50vw' animation="none" dark bordered).col.q-mb-sm.q-ml-sm
+              q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
+              q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
               span {{item.name || item.vertexType}}
             .row.items-center.justify-between.no-wrap

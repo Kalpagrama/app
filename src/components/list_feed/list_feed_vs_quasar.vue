@@ -7,7 +7,11 @@
         q-scroll-area(
           :visible="false"
           :delay="1500"
-          :style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}`
+          :style=`{
+            maxHeight: $q.screen.height+'px',
+            // если scrollAreaHeight не указана - занимаем всю высоту скролла (но не больше высоты экрана)
+            height: (scrollAreaHeight || scrollHeight || 50) +'px'
+            }`
           dark
           :thumb-style=`{
             right: '5px',
@@ -37,7 +41,7 @@
           q-virtual-scroll(
             v-if="itemsRes"
             ref="vs"
-            scroll-target="#scroll-area-with-virtual-scroll-1 > .scroll"
+            :scroll-target="'#scroll-area-with-virtual-scroll-1 > .scroll'"
             dark
             :items="itemsCopy"
             :virtual-scroll-item-size="itemHeightApprox"
@@ -67,8 +71,6 @@
                   :isVisible="!!itemsVisibility[item[itemKey]]"
                   :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
                 )
-          //// footer
-          //slot(name="footer")
 </template>
 
 <script>
@@ -99,11 +101,13 @@ export default {
   data () {
     return {
       itemsRes: null,
+      items: [],
       nonReactiveItems: [],
       itemsVisibility: {},
       itemMiddleIndx: null,
       stickyHeaderHeight: 0,
-      preloadInterval: { from: -1, to: -1 }
+      preloadInterval: { from: -1, to: -1 },
+      scrollHeight: 0
     }
   },
   computed: {
@@ -115,17 +119,7 @@ export default {
     },
     itemsCopy () {
       // this.$log('itemsCopy:', this.itemsRes.items.length)
-      // return Object.freeze(cloneDeep((this.itemsRes.items)))
-      let res = []
-      // for (let i = 0; i < 400; i++) {
-      //   let items = Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items))).map(item => {
-      //     item.id = i + item.id
-      //     item.name = i + item.name
-      //     return item
-      //   })
-      //   res.push(...items)
-      // }
-      // return res
+      // this.$log('itemsCopy=', JSON.parse(JSON.stringify(this.itemsRes.items)))
       return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
     }
   },
@@ -134,6 +128,10 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.itemsRes = await this.$rxdb.find(to, 10500, 100500)
+        this.items = this.itemsRes.items.map(item => {
+          return { item, state: {} }
+        })
+        this.$log('this.items=', this.items)
         if (from) {
           this.itemsRes.setProperty('itemMiddleIndx', null)
           this.$nextTick(_ => {
@@ -180,7 +178,8 @@ export default {
           this.preloadInterval.to = this.itemMiddleIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
-        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval)
+        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
+        this.scrollHeight = details.ref.$el.clientHeight
         this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
         this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.itemsRes.items.length)

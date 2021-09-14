@@ -3,7 +3,7 @@
     div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
       .row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       tab-list-feed(
-        :scrollAreaHeight="400"
+        :scrollAreaHeight="0"
         :query="query"
         :itemHeightApprox="60"
         :itemMiddlePersist="true").row.full-width

@@ -52,12 +52,14 @@ export default {
   props: ['comment'],
   data () {
     return {
-      text: null,
     }
   },
   computed: {
     words () {
       return this.comment.text.split(' ')
+    },
+    text() {
+      return this.urlify(this.comment.text)
     }
   },
   methods: {
@@ -72,8 +74,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    var text = 'Find me at http://www.example.com and also at http://stackoverflow.com';
-    this.text = this.urlify(this.comment.text)
   }
 }
 </script>

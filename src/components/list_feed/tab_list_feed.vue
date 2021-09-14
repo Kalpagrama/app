@@ -12,7 +12,7 @@
         ).row.full-width.items-start.content-start.justify-center.q-pa-none
           list-feed-vs(
             ref="listFeed"
-            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+            :scrollAreaHeight="scrollAreaHeight"
             :query="query"
             :itemHeightApprox="itemHeightApprox"
             :itemMiddlePersist="itemMiddlePersist")
