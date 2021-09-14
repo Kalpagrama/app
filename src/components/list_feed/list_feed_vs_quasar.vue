@@ -43,7 +43,7 @@
             ref="vs"
             :scroll-target="'#scroll-area-with-virtual-scroll-1 > .scroll'"
             dark
-            :items="itemsCopy"
+            :items="items"
             :virtual-scroll-item-size="itemHeightApprox"
             :virtual-scroll-sticky-size-start="stickyHeaderHeight"
             @virtual-scroll="onScroll")
@@ -117,11 +117,11 @@ export default {
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },
-    itemsCopy () {
-      // this.$log('itemsCopy:', this.itemsRes.items.length)
-      // this.$log('itemsCopy=', JSON.parse(JSON.stringify(this.itemsRes.items)))
-      return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
-    }
+    // itemsCopy () {
+    //   // this.$log('itemsCopy:', this.itemsRes.items.length)
+    //   // this.$log('itemsCopy=', JSON.parse(JSON.stringify(this.itemsRes.items)))
+    //   return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
+    // }
   },
   watch: {
     query: {
@@ -129,7 +129,7 @@ export default {
       async handler (to, from) {
         this.itemsRes = await this.$rxdb.find(to, 10500, 100500)
         this.items = this.itemsRes.items.map(item => {
-          return { item, state: {} }
+          return item // { item, state: {} }
         })
         this.$log('this.items=', this.items)
         if (from) {
