@@ -123,8 +123,9 @@ export default {
     'itemsRes.items': {
       immediate: true,
       async handler (to, from) {
+        this.$log('itemsRes.items', to?.length, to)
         this.vsItems = this?.itemsRes?.items.map(item => {
-          return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
+          return { source: item, state: {itemId: item[this.itemKey]} }
         }) || []
       }
     },

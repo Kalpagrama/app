@@ -91,9 +91,9 @@ export default {
       if (!this.itemState) this.itemState = {}
       let key = this.$options.name
       if (!this.itemState[key]) {
-        // assert(this.itemState.oid === this.itemShortOrFull.oid)
+        // assert(this.itemState.id === this.itemShortOrFull.oid)
         this.$set(this.itemState, key, {
-          oid: this.itemState.oid,
+          oid: this.itemShortOrFull?.object?.oid || this.itemState.itemId,
           itemFull: null
         })
       }
@@ -140,7 +140,7 @@ export default {
     isVisible: {
       immediate: false,
       async handler (to, from) {
-        this.$log('isVisible', this.itemIndex, to)
+        this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItem()
           else this.cancelItemFull()
@@ -150,7 +150,7 @@ export default {
     isPreload: {
       immediate: false,
       async handler (to, from) {
-        this.$log('isPreload', this.itemIndex, to)
+        this.$log(`isPreload=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItemPreload()
           else this.cancelItemFullPreload()
@@ -161,7 +161,7 @@ export default {
   methods: {
     getFullItem () {
       let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
-      assert(data && data.oid)
+      assert(data && data.oid, data)
       if (!data.itemFull && !data.queryId) {
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
@@ -209,7 +209,7 @@ export default {
     }
   },
   created () {
-    // this.$log('created', this.itemIndex, this.itemState)
+    this.$log('created', this.itemIndex, this.itemState)
     assert((this.itemState || this.itemIndex == null) && this.itemShortOrFull, [this.itemIndex, this.itemState, this.itemShortOrFull])
     if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
   },
