@@ -5,15 +5,15 @@ div(
   }`
   ).row.full-width.q-px-sm.q-pt-sm.q-pb-xl
   //- link btn
-  q-btn(
-    flat color="green" icon="fas fa-link" size="lg"
-    :to="`/cube/${node.items[0].oid}?oid=${node.oid}`"
-    :style=`{
-      position: 'absolute', zIndex: 1000,
-      left: 'calc(50% - 30px)',
-      top: 'calc(50% - 56px)',
-      width: '60px', height: '60px',
-    }`)
+  //q-btn(
+  //  flat color="green" icon="fas fa-link" size="lg"
+  //  :to="`/cube/${node.items[0].oid}?oid=${node.oid}`"
+  //  :style=`{
+  //    position: 'absolute', zIndex: 10,
+  //    left: 'calc(50% - 30px)',
+  //    top: 'calc(50% - 56px)',
+  //    width: '60px', height: '60px',
+  //  }`)
   //- items
   div(
     v-for="(i,ii) in node.items" :key="i"
