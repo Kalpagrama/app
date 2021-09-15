@@ -127,6 +127,7 @@ export default {
         this.vsItems = this?.itemsRes?.items.map(item => {
           return { source: item, state: {itemId: item[this.itemKey]} }
         }) || []
+        this.$emit('count', to?.length || 0)
       }
     },
     query: {

@@ -15,7 +15,8 @@
             :scrollAreaHeight="scrollAreaHeight"
             :query="query"
             :itemHeightApprox="itemHeightApprox"
-            :itemMiddlePersist="itemMiddlePersist")
+            :itemMiddlePersist="itemMiddlePersist"
+            @count="$emit('count', $event)")
             template(v-slot:header)
               //- nav header
               div(v-if="navHeaderText").row.full-width.justify-center.b-30
