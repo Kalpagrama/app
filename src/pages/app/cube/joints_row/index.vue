@@ -287,7 +287,7 @@ export default {
         // tween to visible item
         if (useTween) {
           this.$emit('joint-change-start')
-          this.$tween.to(
+          this.$gsap.to(
             this.scrollWrapperRef,
             0.3,
             {

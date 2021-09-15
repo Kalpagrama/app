@@ -79,12 +79,12 @@ export default {
     resizerBarOver: {
       handler (to, from) {
         this.$log('resizerBarOver TO', to)
-        if (to) this.$tween.to(this, 0.2, {resizerBarWidth: 20})
+        if (to) this.$gsap.to(this, 0.2, {resizerBarWidth: 20})
         else {
           if (this.resizerPanning) {
           }
           else {
-            this.$tween.to(this, 0.2, {resizerBarWidth: 4})
+            this.$gsap.to(this, 0.2, {resizerBarWidth: 4})
           }
         }
       }

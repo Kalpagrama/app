@@ -167,10 +167,10 @@ export default {
     pageId: {
       handler (to, from) {
         if (to) {
-          this.$tween.to(this, 0.3, {contentHeight: this.contentHeightMin})
+          this.$gsap.to(this, 0.3, {contentHeight: this.contentHeightMin})
         }
         else {
-          this.$tween.to(this, 0.3, {contentHeight: this.$q.screen.height})
+          this.$gsap.to(this, 0.3, {contentHeight: this.$q.screen.height})
         }
       }
     },

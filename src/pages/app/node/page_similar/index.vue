@@ -1,11 +1,11 @@
 <template lang="pug">
   .row.full-width.items-start.content-start.justify-center.q-pt-sm
     div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
-      .row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
+      //.row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       tab-list-feed(
-        :scrollAreaHeight="0"
+        :scrollAreaHeight="900"
         :query="query"
-        :itemHeightApprox="60"
+        :itemHeightApprox="500"
         :itemMiddlePersist="true").row.full-width
         template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
           item-feed(

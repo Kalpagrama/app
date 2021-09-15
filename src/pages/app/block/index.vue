@@ -51,13 +51,16 @@ kalpa-layout()
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              page-comments(
-                :node="block"
-                :height="700"
-              )
-              page-similar(
-                :node="block"
-              )
+              q-list(bordered).row.full-width
+                q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
+                  // template(v-slot:header)
+                    // todo самый лучший коммент
+                  row.full-width
+                    page-comments(:node="block")
+                q-separator
+                q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
+                  page-similar(:node="block")
+                q-separator
 </template>
 
 <script>

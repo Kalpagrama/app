@@ -138,7 +138,7 @@ export default {
     itemGo (item, ii) {
       // this.$log('itemGo', item, ii)
       let left = item.from - this.itemsPadding
-      this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollLeft: left})
+      this.$gsap.to(this.$refs.scrollWrapper, 0.5, {scrollLeft: left})
     },
     itemPercent (i) {
       let itemWidth = i.to - i.from
@@ -156,7 +156,7 @@ export default {
       let widthItems = this.items.length * this.itemSide
       let width = (widthItems / 2) - (this.itemSide / 2)
       this.$log('width', width)
-      this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollLeft: width})
+      this.$gsap.to(this.$refs.scrollWrapper, 0.5, {scrollLeft: width})
     }
   },
   mounted () {

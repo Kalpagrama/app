@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    height: heightMax+'%',
+    height: data.heightMax+'%',
     minHeight: '27px',
     //- background: 'rgba(0,0,0,0.5)',
     background: wrapperBackground,
@@ -10,11 +10,11 @@ div(
   ).column.full-width.items-end.content-end.justify-end
     //- top/opened
     div(
-      v-show="heightMax > 0"
+      v-show="data.heightMax > 0"
       :style=`{overflow: 'hidden',}`
       ).col.full-width
       div(
-        v-if="contentKalpa"
+        v-if="data.contentKalpa"
         :style=`{overflow: 'hidden',}`
         @click.self="miniClick()"
         ).row.fit.items-start.content-start
@@ -27,17 +27,17 @@ div(
             :style=`{
               fontSize: width > 500 ? '16px' : '12px',
             }`
-          ).text-white.text-bold {{ contentKalpa.name }}
+          ).text-white.text-bold {{ data.contentKalpa.name }}
         //- go to content
         div(v-if="width > 300").row.full-width.q-px-md
           router-link(
-            :to="'/content/'+contentKalpa.oid"
+            :to="'/content/'+data.contentKalpa.oid"
             :style=`{
               borderRadius: '10px',
             }`
             ).row.full-width.b-35.q-pa-xs
             img(
-              :src="contentKalpa.thumbUrl"
+              :src="data.contentKalpa.thumbUrl"
               :style=`{
                 height: '50px',
                 borderRadius: '10px',
@@ -97,18 +97,14 @@ div(
               @click="player.mutedToggle()").q-px-md.q-mt-xs
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'context',
-  props: ['composition', 'isActive', 'isVisible', 'nodeOid', 'width', 'height', 'player'],
-  data () {
-    return {
-      heightMax: 0,
-      contentKalpa: null,
-    }
-  },
+  props: ['composition', 'itemState', 'isActive', 'isVisible', 'nodeOid', 'width', 'height', 'player'],
   watch: {
     isActive: {
       immediate: true,
@@ -119,16 +115,29 @@ export default {
           // })
         }
         else {
-          this.$tween.to(this, 0.3, {heightMax: 0})
+          this.$gsap.to(this.data, 0.3, {heightMax: 0})
         }
       }
     }
   },
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      // if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
+      let key = this.$options.name + this.composition.oid
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          heightMax: 0,
+          contentKalpa: null,
+        })
+      }
+      return this.itemState[key]
+    },
     contentKalpaActivity () {
-      if (this.contentKalpa) {
-        //  + this.contentKalpa.relatedContent.length
-        return Object.values(this.contentKalpa.countStat).reduce((acc, val) => {
+      if (this.data.contentKalpa) {
+        //  + this.data.contentKalpa.relatedContent.length
+        return Object.values(this.data.contentKalpa.countStat).reduce((acc, val) => {
           if (Number.isInteger(val)) {
             acc += val
           }
@@ -152,11 +161,11 @@ export default {
     miniClick () {
       this.$log('miniClick')
       if (!this.contentKalap) this.getContent()
-      this.$tween.to(this, 0.3, {heightMax: this.heightMax === 100 ? 0 : 100})
+      this.$gsap.to(this.data, 0.3, {heightMax: this.data.heightMax === 100 ? 0 : 100})
     },
     async getContent () {
       this.$log('getContent')
-      this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.layers[0].contentOid)
+      this.data.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.layers[0].contentOid)
     },
     goContent () {
       this.$log('goContent')

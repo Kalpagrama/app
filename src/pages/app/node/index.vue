@@ -30,7 +30,6 @@ kalpa-layout()
         v-if="node"
         :style=`{
           //- paddingTop: '8px',
-          paddingBottom: '200px',
         }`).row.full-width.justify-center.b-30
           div(
             v-if="node"
@@ -51,50 +50,21 @@ kalpa-layout()
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
-              ////- tabs sticky
-              //div(
-              //  :style=`{
-              //    position: 'sticky', top: '0px', zIndex: 1000,
-              //  }`).row.full-width.q-px-md.b-30
-              //  q-tabs(
-              //    v-model="pageId"
-              //    switch-indicator no-caps dense
-              //    active-color="green"
-              //  ).full-width.text-grey-8
-              //    q-tab(
-              //      v-for="(p,pi) in pages" :key="p.id"
-              //      :name="p.id" :label="p.name")
-              ////- tab panels
-              //q-tab-panels(
-              //  v-model="pageId"
-              //  :swipeable="$q.platform.is.mobile"
-              //  :animated="$q.platform.is.mobile"
-              //  :style=`{}`).full-width.b-30
-              //  q-tab-panel(
-              //    v-for="(p,pi) in pages" :key="p.id" :name="p.id"
-              //    :style=`{
-              //      background: 'none',
-              //      minHeight: '70vh',
-              //    }`
-              //  ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-              //    component(
-              //      :is="'page-' + pageId"
-              //      :node="node"
-              //      :height="700"
-              //    )
-              //    //page-joints(:node="node")
-              //    //page-comments(:node="node")
-              //    //- widget-joints(:node="node")
-              page-comments(
-                :node="node"
-              )
+              q-list(bordered).row.full-width
+                q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
+                  // template(v-slot:header)
+                    // todo самый лучший коммент
+                  row.full-width
+                    page-comments(:node="node")
+                q-separator
+                q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
+                  page-similar(:node="node")
+                q-separator
               //page-joints(
               //  :node="node"
               //  :height="700"
               //)
-              page-similar(
-                :node="node"
-              )
+
 </template>
 
 <script>
@@ -156,7 +126,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.node)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

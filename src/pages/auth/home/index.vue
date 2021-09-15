@@ -106,7 +106,7 @@ export default {
     },
     close () {
       this.$log('close START')
-      this.$tween.to(
+      this.$gsap.to(
         this,
         0.3,
         {
@@ -122,7 +122,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$tween.to(this, 0.5, {backgroundOpacity: 1})
+    this.$gsap.to(this, 0.5, {backgroundOpacity: 1})
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

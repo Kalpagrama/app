@@ -223,7 +223,7 @@ export default {
       }
       let scrollTop = index * this.rowHeight
       this.rowsNexting = true
-      this.$tween.to(
+      this.$gsap.to(
         this.$refs.rowsScrollArea,
         0.3,
         {

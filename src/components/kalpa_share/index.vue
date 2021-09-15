@@ -2,12 +2,12 @@
 q-btn(
   round flat no-caps
   :color="color"
-  :loading="loading"
+  :loading="data.loading"
   @click="shareStart()")
   q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Share')}}
   q-icon(name="logout" size="23px").rotate-270
   q-dialog(
-    v-model="shareDialogOpened"
+    v-model="data.shareDialogOpened"
     position="bottom")
     div(
       :style=`{
@@ -33,7 +33,7 @@ q-btn(
               borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
             ).row.full-width
             q-input(
-              v-model="shareLink"
+              v-model="data.shareLink"
               filled dark color="grey-9"
               ).full-width
               template(v-slot:append)
@@ -64,28 +64,38 @@ q-btn(
             span {{ $t('Share via') }}
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { Platform, openURL } from 'quasar'
 import { makeRoutePath } from 'public/scripts/common_func'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'kalpaShare',
   props: {
     item: {type: Object, required: true},
+    itemState: {type: Object},
     headerText: {
       type: String,
     },
     color: {type: String, default: 'grey-9'}
   },
-  data () {
-    return {
-      loading: false,
-      shareLink: '',
-      shareDialogOpened: false,
-      shareTarget: null,
-    }
-  },
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      // if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          loading: false,
+          shareLink: '',
+          shareDialogOpened: false,
+          shareTarget: null,
+        })
+      }
+      return this.itemState[key]
+    },
     shareEmbedText () {
       return `<iframe width="100%" height="315" src="${makeRoutePath(this.item, true)}?embed=true" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
     }
@@ -101,30 +111,30 @@ export default {
     },
     async shareStart () {
       this.$log('shareStart', Platform.is)
-      this.shareLink = makeRoutePath(this.item, true)
+      this.data.shareLink = makeRoutePath(this.item, true)
       if (this.$q.platform.is.mobile) {
         this.shareNative()
       }
       else {
-        this.shareDialogOpened = true
+        this.data.shareDialogOpened = true
       }
       // this.$emit('done')
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
-      this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
+      this.clipboardWrite(this.data.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
       // await this.$wait(500)
-      this.shareDialogOpened = false
+      this.data.shareDialogOpened = false
     },
     shareEmbed () {
       this.$log('shareEmbed')
-      this.shareTarget = 'embed'
+      this.data.shareTarget = 'embed'
     },
     async shareEmbedCopy () {
       this.$log('shareEmbedCopy')
       this.clipboardWrite(this.shareEmbedText, 'Copied to clipboard!')
       // await this.$wait(500)
-      this.shareDialogOpened = false
+      this.data.shareDialogOpened = false
     },
     clipboardWrite (val, message) {
       this.$log('clipboardWrite', val)
@@ -137,7 +147,7 @@ export default {
     },
     shareWithTwitter () {
       this.$log('shareWithTwitter')
-      let url = `https://twitter.com/intent/tweet?url=${this.shareLink}&via=Kalpagrama&text=${this.node.name}`
+      let url = `https://twitter.com/intent/tweet?url=${this.data.shareLink}&via=Kalpagrama&text=${this.node.name}`
       openURL(url)
     }
   }

@@ -1,11 +1,5 @@
 <template lang="pug">
-  div(
-    :class=`{
-    //- 'br': isVisible || isActive,
-  }`
-    :style=`{
-    position: 'absolute', zIndex: 10,
-  }`).row.fit.items-start.content-start
+  div(:style=`{ position: 'absolute', zIndex: 10}`).row.fit.items-start.content-start
     div(
       v-if="$store.state.ui.useDebug"
       :style=`{
@@ -13,18 +7,18 @@
       opacity: 0.8,
     }`
     ).row.full-with.bg-red.text-white
-      //- small.full-width currentTime: {{currentTime}}
+      //- small.full-width currentTime: {{data.currentTime}}
       small.full-width urlMeta: {{urlMeta}}
-    slot(name="footer" :player="player")
-    //span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} playBackReady={{playBackReady}}
+    slot(name="footer" :player="data.player")
+    //span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} data.playBackReady={{data.playBackReady}}
     // spinner + playBtn
     div(
       v-if="isPlayerVisible && statusPlayer !== 'playing'"
       :style=`{ position: 'absolute', zIndex: 101, top: '0px', opacity: 0.5}`
       @click="play()"
     ).row.fit.items-center.content-center.justify-center
-      q-spinner(v-show="statusPlayerLag === 'loading'" color="white" size="50px")
-      q-icon(v-if="statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
+      q-spinner(v-show="data.statusPlayerLag === 'loading'" color="white" size="50px")
+      q-icon(v-if="data.statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
     // poster
     img(
       :src="composition.thumbUrl"
@@ -32,7 +26,7 @@
       position: 'absolute',
       objectFit: objectFit || 'contain',
       borderRadius: '10px',
-      zIndex: currentTimeChangedCnt > 0 ? 'auto' : 100
+      zIndex: data.currentTimeChangedCnt > 0 ? 'auto' : 100
       // background: 'rgb(35,35,35)',
     }`
     ).fit
@@ -53,33 +47,43 @@
     }`
       @click="videoClick"
       @timeupdate="videoTimeupdate"
-      @waiting="playBackLoading = true"
-      @canplay="playBackLoading = false, playBackReady=true, onCanPlay()"
-      @pause="playBackState = 'paused'"
-      @play="playBackState = 'playing'"
-      @playing="playBackState = 'playing'"
+      @waiting="data.playBackLoading = true"
+      @canplay="data.playBackLoading = false, data.playBackReady=true, onCanPlay()"
+      @pause="data.playBackState = 'paused'"
+      @play="data.playBackState = 'playing'"
+      @playing="data.playBackState = 'playing'"
       :src="url"
     ).fit
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { ContentApi } from 'src/api/content'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'fromVideo',
-  props: ['composition', 'isActive', 'isVisible', 'objectFit', 'options'],
-  data () {
-    return {
-      currentTime: null,
-      player: null,
-      playBackState: 'paused',
-      playBackLoading: false,
-      playBackReady: false,
-      statusPlayerLag: this.statusPlayer,
-      currentTimeChangedCnt: 0
-    }
-  },
+  props: ['composition', 'itemState', 'isActive', 'isVisible', 'objectFit', 'options'],
   computed: {
+    data () {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      // if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
+      let key = this.$options.name + this.composition.oid
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          currentTime: null,
+          player: null,
+          playBackState: 'paused',
+          playBackLoading: false,
+          playBackReady: false,
+          statusPlayerLag: null,
+          currentTimeChangedCnt: 0,
+          videoRef: null
+        })
+      }
+      return this.itemState[key]
+    },
     url () {
       return ContentApi.urlSelect(this.composition)
     },
@@ -105,30 +109,16 @@ export default {
       return !!this.isActive
     },
     statusPlayer () { // playing|paused|loading
-      if (this.playBackLoading) return 'loading'
-      return this.playBackState
+      if (this.data.playBackLoading) return 'loading'
+      return this.data.playBackState
     }
   },
   watch: {
-    'composition.oid': {
-      immediate: false,
-      deep: false,
-      handler (to, from) {
-        // virtual scroll переиспользует dom-элементы и засовывает в них новые данные (поэтому этот компонент может использоваться для показа разных композиций)
-        this.$log('composition changed', this.id, this.isActive, from, '->', to)
-        this.cancelLoad() // отменяем загрузку старой композиции
-        this.playBackReady = false
-        this.playBackState = 'paused'
-        this.playBackLoading = false
-        this.currentTimeChangedCnt = 0
-        this.compositionChanded = true // ждем изменения isActive
-      }
-    },
     statusPlayer: {
       handler (to, from) {
         clearTimeout(this.timerStatusPlayer)
         this.timerStatusPlayer = setTimeout(() => {
-          this.statusPlayerLag = this.statusPlayer
+          this.data.statusPlayerLag = this.statusPlayer
         }, 700)
       }
     },
@@ -142,19 +132,16 @@ export default {
     },
     isActive: {
       handler (to, from) {
-        if (this.compositionChanded) {
-          this.compositionChanded = false
-          return
-        }
-        this.playBackReady = false
-        this.playBackState = 'paused'
-        this.playBackLoading = false
-        this.currentTimeChangedCnt = 0
+        this.data.playBackReady = false
+        this.data.playBackState = 'paused'
+        this.data.playBackLoading = false
+        this.data.currentTimeChangedCnt = 0
+        this.data.statusPlayerLag = null
         this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
         if (to) {
           this.$nextTick(() => {
             if (this.$refs.videoRef) {
-              this.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
+              this.data.playBackState = this.$refs.videoRef.paused ? 'paused' : 'playing'
               this.play()
             }
           })
@@ -163,13 +150,13 @@ export default {
         }
       }
     },
-    currentTime: {
+    'data.currentTime': {
       handler (to, from) {
         if (to && from) {
-          this.currentTimeChangedCnt++
+          this.data.currentTimeChangedCnt++
           if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t) {
             this.play(this.urlMeta[0].t)
-            // this.$log('ended:', this?.composition?.layers[0]?.contentName)
+            this.$log('ended:', this?.composition?.layers[0]?.contentName)
             this.$emit('ended')
           }
         }
@@ -189,7 +176,7 @@ export default {
       } else {
         // if (e.target.paused) e.target.play()
         // else e.target.pause()
-        if (this.playBackState === 'paused') this.play()
+        if (this.data.playBackState === 'paused') this.play()
         else this.pause()
       }
     },
@@ -207,7 +194,7 @@ export default {
             this.$log('pause', this?.composition?.layers[0]?.contentName)
             this.$refs.videoRef.pause()
           }
-          this.statusPlayerLag = 'paused' // force lag
+          this.data.statusPlayerLag = 'paused' // force lag
         }).catch(error => {
           this.$logE('error om play video', error)
         });
@@ -216,7 +203,7 @@ export default {
     cancelLoad () {
       if (this.$refs.videoRef) {
         // отменяем загрузку видео (чтобы браузер не грузил в фоне)
-        this.$log('cancelLoad', this.id)
+        this.$log('cancelLoad', this.$refs.videoRef.src)
         this.$refs.videoRef.pause()
         this.$refs.videoRef.src = ''
         this.$refs.videoRef.load()
@@ -231,7 +218,7 @@ export default {
           localStorage.removeItem('k_sound')
         }
         this.$refs.videoRef.muted = !this.$refs.videoRef.muted
-        this.player.muted = !this.player.muted
+        this.data.player.muted = !this.data.player.muted
       }
     },
     setCurrentTime (t) {
@@ -242,13 +229,13 @@ export default {
     },
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
-      this.currentTime = e.target.currentTime
-      if (this.player) {
-        this.player.muted = e.target.muted
-        this.player.duration = this.urlMeta[1].t - this.urlMeta[0].t
-        this.player.currentTime = e.target.currentTime - this.urlMeta[0].t
+      this.data.currentTime = e.target.currentTime
+      if (this.data.player) {
+        this.data.player.muted = e.target.muted
+        this.data.player.duration = this.urlMeta[1].t - this.urlMeta[0].t
+        this.data.player.currentTime = e.target.currentTime - this.urlMeta[0].t
       } else {
-        this.player = {
+        this.data.player = {
           play () {
             e.target.play()
           },
@@ -265,7 +252,7 @@ export default {
       }
       if (localStorage.getItem('k_sound') && this.$q.platform.is.desktop) {
         e.target.muted = false
-        this.player.muted = false
+        this.data.player.muted = false
       }
     }
   },

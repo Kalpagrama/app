@@ -4,7 +4,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 import { Screen, date } from 'quasar'
-import { TweenMax } from 'gsap'
+import { gsap } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
@@ -80,7 +80,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     })
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     Vue.prototype.$axios = axios
-    Vue.prototype.$tween = TweenMax
+    Vue.prototype.$gsap = gsap
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'DD.MM.YYYY', {
         dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],

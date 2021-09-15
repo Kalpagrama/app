@@ -180,7 +180,7 @@ export default {
         this.$log('passwordSend start', this.password)
         this.passwordSending = true
         if (this.password.length === 0) throw new Error('Empty password!')
-        // this.$tween.to(this.$refs['wrapper-mobile'], 5, {height: 2000})
+        // this.$gsap.to(this.$refs['wrapper-mobile'], 5, {height: 2000})
         let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password, null)
         if (result === false) throw new Error(`Error: ${failReason}`)
         this.$log('passwordSend done')

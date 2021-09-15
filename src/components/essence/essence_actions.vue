@@ -29,7 +29,7 @@
       .col
         .row.full-width
           .row.items-center.content-center
-            kalpa-share(:item="essence" :headerText="$t('Share')")
+            kalpa-share(:item="essence" :itemState="data" :headerText="$t('Share')")
           .col
             .row.fit.items-center.content-center.justify-start
               small.text-grey-9 {{ essence.countStat.countShares || '' }}
@@ -66,7 +66,7 @@
               small.text-grey-9 {{ essence.countStat.countBookmarks || '' }}
           .row.items-center.content-center
             kalpa-save(
-              :item="essence" :isActive="isActive" inactiveColor="grey-9")
+              :item="essence" :itemState="data" :isActive="isActive" inactiveColor="grey-9")
       //- ======
       //- VOTING:
       //- vote bar
@@ -156,7 +156,8 @@ export default {
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      if (!this.itemState) this.itemState = {}
+      // if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
         this.$set(this.itemState, key, {

@@ -99,7 +99,7 @@ export default {
       if (this.textContainerOverflowHidden) {
         // scroll a little bit!
         this.textContainerOverflowHidden = false
-        this.$tween.to(
+        this.$gsap.to(
           this.textContainerRef,
           1.5,
           {
@@ -113,7 +113,7 @@ export default {
       else {
         // scrollto back to top!
         this.textContainerOverflowHidden = true
-        this.$tween.to(
+        this.$gsap.to(
           this.textContainerRef,
           0.3,
           {

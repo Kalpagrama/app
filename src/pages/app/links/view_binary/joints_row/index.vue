@@ -206,7 +206,7 @@ export default {
       }
       let scrollTo = index * this.width
       this.jointsNexting = true
-      this.$tween.to(
+      this.$gsap.to(
         this.$refs.jointsScrollArea,
         0.3,
         {

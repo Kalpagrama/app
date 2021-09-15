@@ -206,7 +206,7 @@ export default {
       // let scrollWrapperRef = this.$refs['scroll-wrapper']
       this.$log('scrollTop', scrollTop)
       if (useTween) {
-        this.$tween.to(
+        this.$gsap.to(
           this.scrollWrapperRef,
           0.3,
           {

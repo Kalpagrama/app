@@ -102,10 +102,10 @@ export default {
     isOpened: {
       handler (to, from) {
         if (to) {
-          this.$tween.to(this, 0.3, {contentKalpaFullHeight: this.height - 30})
+          this.$gsap.to(this, 0.3, {contentKalpaFullHeight: this.height - 30})
         }
         else {
-          this.$tween.to(this, 0.3, {contentKalpaFullHeight: 0})
+          this.$gsap.to(this, 0.3, {contentKalpaFullHeight: 0})
         }
       }
     }

@@ -98,7 +98,7 @@ export default {
       // set itemNexting for full-height prop
       this.itemNexting = i
       // tween
-      this.$tween.to(
+      this.$gsap.to(
         this,
         0.5,
         {

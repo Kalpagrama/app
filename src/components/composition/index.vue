@@ -23,6 +23,7 @@ div(
       v-if="composition.outputType !== 'VIDEO'"
       :nodeOid="nodeOid"
       :composition="composition"
+      :itemState="data"
       :isActive="isActive"
       :isVisible="isVisible"
       :height="data.height"
@@ -33,12 +34,13 @@ div(
     from-video(
       v-if="composition.outputType === 'VIDEO'"
       :composition="composition"
+      :itemState="data"
       :isActive="isActive"
       :isVisible="isVisible"
       :objectFit="isSquare ? 'cover' : null"
       :height="data.height"
       :width="data.width"
-      :options="options || {}"
+      :options="options || data.options"
       @playing="$emit('playing')"
       @ended="$emit('ended')"
       )
@@ -46,6 +48,7 @@ div(
         context(
           :nodeOid="nodeOid"
           :composition="composition"
+          :itemState="data"
           :isActive="isActive"
           :isVisible="isVisible"
           :height="data.height"
@@ -57,6 +60,7 @@ div(
     from-book(
       v-else-if="composition.outputType === 'BOOK'"
       :composition="composition"
+      :itemState="data"
       :isActive="isActive"
       :isVisible="isVisible"
       :objectFit="isSquare ? 'cover' : null"
@@ -135,7 +139,8 @@ export default {
             WEB: 'type-web',
           },
           height: 0,
-          width: 0
+          width: 0,
+          options: {}
         })
       }
       return this.itemState[key]

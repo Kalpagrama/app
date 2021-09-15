@@ -2,15 +2,15 @@
 q-btn(
   round flat
   icon="bookmark_outline"
-  :loading="bookmarkCreating"
-  :color="bookmark ? 'green' : color"
+  :loading="data.bookmarkCreating"
+  :color="data.bookmark ? 'green' : color"
   :dense="dense"
   @click="onClick()"
   )
   q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
   q-dialog(
-    v-if="bookmark"
-    v-model="bookmarkCreatedDialogShow"
+    v-if="data.bookmark"
+    v-model="data.bookmarkCreatedDialogShow"
     position="bottom"
     auto-close)
     div(
@@ -30,20 +30,22 @@ q-btn(
         span.text-white {{ $t('Save to collection') }}
   //- edit bookmark...
   q-dialog(
-    v-if="bookmark"
-    v-model="bookmarkEditorDialogShow"
+    v-if="data.bookmark"
+    v-model="data.bookmarkEditorDialogShow"
     position="bottom")
     bookmark-editor(
-      :bookmark="bookmark"
+      :bookmark="data.bookmark"
       :showHeader="showHeader"
       @deleted="boookmarkDeleted")
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { UserApi } from 'src/api/user'
 
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'kalpaSave',
@@ -52,17 +54,27 @@ export default {
   },
   props: {
     isActive: {type: Boolean},
+    itemState: {type: Object},
     color: {type: String, default: 'grey-9'},
     dense: {type: Boolean, default: false},
     item: {type: Object, required: true},
     showHeader: {type: Boolean},
   },
-  data () {
-    return {
-      bookmark: null,
-      bookmarkCreating: false,
-      bookmarkCreatedDialogShow: false,
-      bookmarkEditorDialogShow: false,
+  computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      // assert(this.itemState)
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          bookmark: null,
+          bookmarkCreating: false,
+          bookmarkCreatedDialogShow: false,
+          bookmarkEditorDialogShow: false,
+        })
+      }
+      return this.itemState[key]
     }
   },
   watch: {
@@ -71,7 +83,7 @@ export default {
       async handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-          this.bookmark = await this.getBookmark()
+          this.data.bookmark = await this.getBookmark()
         }
       }
     }
@@ -89,7 +101,7 @@ export default {
     },
     async createBookmark (item, fields) {
       this.$log('createBookmark', item)
-      this.bookmarkCreating = true
+      this.data.bookmarkCreating = true
       let bookmarkInput = {
         type: item.type,
         oid: item.oid,
@@ -101,30 +113,30 @@ export default {
       }
       let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       // await this.$wait(500)
-      this.bookmarkCreating = false
+      this.data.bookmarkCreating = false
       return bookmark
     },
     saveBookmark () {
       this.$log('saveBookmark')
-      this.bookmarkEditorDialogShow = true
+      this.data.bookmarkEditorDialogShow = true
     },
     boookmarkDeleted () {
       this.$log('bookmarkDeleted')
-      this.bookmark = null
-      this.bookmarkEditorDialogShow = true
+      this.data.bookmark = null
+      this.data.bookmarkEditorDialogShow = true
     },
     async onClick () {
       // this.$log('onClick', this.item)
       // is we got this bookmark ?
-      this.bookmark = await this.getBookmark()
+      this.data.bookmark = await this.getBookmark()
       // got bookmark already!, move it to another collections/dimension
-      if (this.bookmark) {
-        this.bookmarkEditorDialogShow = true
+      if (this.data.bookmark) {
+        this.data.bookmarkEditorDialogShow = true
       }
       // save to collection named all...
       else {
-        this.bookmark = await this.createBookmark(this.item, {collections: []})
-        this.bookmarkCreatedDialogShow = true
+        this.data.bookmark = await this.createBookmark(this.item, {collections: []})
+        this.data.bookmarkCreatedDialogShow = true
       }
     },
   }

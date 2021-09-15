@@ -62,11 +62,21 @@
                     minHeight: '70vh',
                   }`
         ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          page-comments(v-if="pageId === 'comments'" :node="item" :height="700")
+          //q-list(bordered).row.full-width
+            //q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
+            //  // template(v-slot:header)
+            //    // todo самый лучший коммент
+            //  row.full-width
+            //    page-comments(:node="block")
+            //q-separator
+            //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
+            //  page-similar(:node="block")
+            //q-separator
+          page-comments(v-if="pageId === 'comments'" :node="item")
           //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
           item-description(v-if="pageId === 'description'" :item="item" :height="700")
           //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
-          page-similar(v-if="pageId === 'similar'" :node="item" :height="700" :types="['VIDEO', 'BOOKS', 'IMAGE']")
+          page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
 </template>
 
 <script>

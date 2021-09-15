@@ -5,10 +5,6 @@ div(
     position: 'absolute', zIndex: 10, top: '0px',
   }`
   ).column.fit
-  //- Debug
-  //- div(:style=`{position: 'absolute',zIndex: 100,top: '0px',left: '0px',borderRadius: '10px',opacity:0.5,}`).row.full-width.text-white.bg-red.q-pa-sm
-    small.full-width heightWrapper: {{ heightWrapper }}
-    small.full-width heightP: {{ heightP }}
   //- Footer here...
   div(
     :class=`{
@@ -35,19 +31,29 @@ div(
         //- p.text-white {{ composition.layers[0].figuresAbsolute[0].epubCfiText }}
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
+import { assert } from 'src/system/common/utils'
+
 export default {
   name: 'fromBook',
-  props: ['composition', 'isActive', 'isVisible'],
-  data () {
-    return {
-      heightWrapper: 0,
-      heightP: 0,
-    }
-  },
+  props: ['composition', 'itemState', 'isActive', 'isVisible'],
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      // if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
+      let key = this.$options.name + this.composition.oid
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          heightWrapper: 0,
+          heightP: 0,
+        })
+      }
+      return this.itemState[key]
+    },
     isOverflowed () {
-      return this.heightWrapper <= this.heightP
+      return this.data.heightWrapper <= this.data.heightP
     },
     epubCfiText () {
       return this.composition.layers[0].figuresAbsolute[0].epubCfiText
@@ -76,8 +82,8 @@ export default {
   mounted () {
     // this.$log('composition', this.composition)
     this.$nextTick(() => {
-      this.heightWrapper = this.$refs['wrapper'].clientHeight
-      this.heightP = this.$refs['p-wrapper'].clientHeight
+      this.data.heightWrapper = this.$refs['wrapper'].clientHeight
+      this.data.heightP = this.$refs['p-wrapper'].clientHeight
     })
   }
 }

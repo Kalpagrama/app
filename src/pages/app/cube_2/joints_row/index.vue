@@ -157,7 +157,7 @@ export default {
       let scrollWrapperRef = this.$refs['scroll-wrapper']
       if (useTween) {
         this.jointActiveOidIn = joint.oid
-        this.$tween.to(
+        this.$gsap.to(
           scrollWrapperRef,
           0.3,
           {

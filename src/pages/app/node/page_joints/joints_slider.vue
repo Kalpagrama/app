@@ -55,7 +55,7 @@ export default {
       this.$log('onSwipe', e)
       let scrollTargetRef = this.$refs['scroll-wrapper']
       let width = scrollTargetRef.clientWidth
-      this.$tween.to(scrollTargetRef, 0.3, {
+      this.$gsap.to(scrollTargetRef, 0.3, {
         scrollLeft: e.direction === 'left' ? scrollTargetRef.scrollLeft + width : scrollTargetRef.scrollLeft - width
       })
     }

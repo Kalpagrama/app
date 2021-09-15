@@ -91,7 +91,7 @@ export default {
       if (!this.itemState) this.itemState = {}
       let key = this.$options.name
       if (!this.itemState[key]) {
-        assert(this.itemState.oid === this.itemShortOrFull.oid)
+        // assert(this.itemState.oid === this.itemShortOrFull.oid)
         this.$set(this.itemState, key, {
           oid: this.itemState.oid,
           itemFull: null
@@ -120,6 +120,23 @@ export default {
     }
   },
   watch: {
+    hasItemFull: {
+      immediate: false,
+      async handler (to, from) {
+        if (process.env.NODE_ENV === 'development') {
+          // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
+          if (to) {
+            let checkChData = (parent) => {
+              assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
+              for (let ch of parent.$children) {
+                checkChData(ch)
+              }
+            }
+            this.$nextTick(() => checkChData(this))
+          }
+        }
+      }
+    },
     isVisible: {
       immediate: false,
       async handler (to, from) {
@@ -192,12 +209,12 @@ export default {
     }
   },
   created () {
-    this.$log('created', this.itemIndex, this.itemState)
+    // this.$log('created', this.itemIndex, this.itemState)
     assert((this.itemState || this.itemIndex == null) && this.itemShortOrFull, [this.itemIndex, this.itemState, this.itemShortOrFull])
     if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
   },
   mounted () {
-    this.$log('mounted', this.itemIndex, this.itemState)
+    // this.$log('mounted', this.itemIndex, this.itemState, this)
   }
 }
 </script>

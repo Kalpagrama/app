@@ -27,7 +27,7 @@
             width: '14px',
             opacity: 0.2,
             }`
-          id="scroll-area-with-virtual-scroll-1"
+          :id="scrollId"
         ).full-width
           // header
           .row.full-width
@@ -41,7 +41,7 @@
           q-virtual-scroll(
             v-if="itemsRes"
             ref="vs"
-            :scroll-target="'#scroll-area-with-virtual-scroll-1 > .scroll'"
+            :scroll-target="`#${scrollId} > .scroll`"
             dark
             :items="vsItems"
             :virtual-scroll-item-size="itemHeightApprox"
@@ -112,6 +112,9 @@ export default {
     }
   },
   computed: {
+    scrollId () {
+      return 'scroll-area-with-virtual-scroll-uid-' + Date.now() + Math.random()
+    },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },

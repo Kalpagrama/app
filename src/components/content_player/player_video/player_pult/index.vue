@@ -345,7 +345,7 @@ export default {
         let scrollLeft = (to / this.player.duration) * width
         this.zoomWrapperScrollingAuthor = 'player'
         // this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-        this.$tween.to(this.$refs['zoom-wrapper'], 0.3, {scrollLeft: scrollLeft})
+        this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {scrollLeft: scrollLeft})
         if (this.playerCurrentTimeTimer) {
           clearTimeout(this.playerCurrentTimeTimer)
           this.playerCurrentTimeTimer = null
@@ -361,14 +361,14 @@ export default {
           this.$nextTick(() => {
             this.zoomIn()
           })
-          this.$tween.to(this, 0.5, {
+          this.$gsap.to(this, 0.5, {
             heightBar: this.heightBarMax,
             heightWrapper: this.heightWrapperMax,
           })
         }
         else {
           this.zoomOut()
-          this.$tween.to(this, 0.5, {
+          this.$gsap.to(this, 0.5, {
             heightBar: this.heightBarMin,
             heightWrapper: this.heightWrapperMin,
           })
@@ -385,7 +385,7 @@ export default {
     //       this.$nextTick(() => {
     //         this.zoomIn()
     //       })
-    //       this.$tween.to(this, 0.5, {
+    //       this.$gsap.to(this, 0.5, {
     //         heightBar: this.heightBarMax,
     //         heightWrapper: this.heightWrapperMax,
     //       })
@@ -393,7 +393,7 @@ export default {
     //     // figures destroyed
     //     if (to === null && from) {
     //       this.zoomOut()
-    //       this.$tween.to(this, 0.5, {
+    //       this.$gsap.to(this, 0.5, {
     //         heightBar: this.heightBarMin,
     //         heightWrapper: this.heightWrapperMin,
     //       })
@@ -407,7 +407,7 @@ export default {
         this.zoomWorking = true
         if (to) this.width += 32
         else this.width -= 32
-        this.$tween.to(this, 0.5, {
+        this.$gsap.to(this, 0.5, {
           barWrapperPaddingX: to ? 0 : 16,
           leftRightMarginWidth: to ? this.width / 2 : 0,
           minWidth: to ? this.minWidthMax : this.minWidthMin,
@@ -422,7 +422,7 @@ export default {
             // this.$log('zoomed onUpdate scrollLeft', scrollLeft)
             // this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
             // this.zoomWorking = false
-            this.$tween.to(this.$refs['zoom-wrapper'], 0.5, {
+            this.$gsap.to(this.$refs['zoom-wrapper'], 0.5, {
               scrollLeft: scrollLeft,
               onComplete: () => {
                 this.player.play()
@@ -440,7 +440,7 @@ export default {
             this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
           }
         })
-        // this.$tween.to(this.$refs['zoom-wrapper'], 1, {
+        // this.$gsap.to(this.$refs['zoom-wrapper'], 1, {
         //   scrollLeft:
         // })
       }
@@ -644,7 +644,7 @@ export default {
         // // let scrollLeft = (left / width) * this.width
         // let scrollLeft = (t / this.player.duration) * widthMinutes
         // this.zoomWorking = true
-        // this.$tween.to(this.$refs['zoom-wrapper'], 0.3, {
+        // this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {
         //   scrollLeft: scrollLeft,
         //   onComplete: () => {
         //     this.zoomWorking = false
@@ -670,7 +670,7 @@ export default {
         let {width: widthMinutes} = ref.getBoundingClientRect()
         let scrollLeft = (t / this.player.duration) * widthMinutes
         this.zoomWorking = true
-        this.$tween.to(this.$refs['zoom-wrapper'], 0.3, {
+        this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {
           scrollLeft: scrollLeft,
           onComplete: () => {
             this.zoomWorking = false
