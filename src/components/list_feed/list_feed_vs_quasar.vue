@@ -102,6 +102,7 @@ export default {
   data () {
     return {
       itemsRes: null,
+      vsItems: [],
       nonReactiveItems: [],
       itemsVisibility: {},
       itemMiddleIndx: null,
@@ -116,14 +117,17 @@ export default {
     },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
-    },
-    vsItems () {
-      return this?.itemsRes?.items.map(item => {
-        return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
-      }) || []
     }
   },
   watch: {
+    'itemsRes.items': {
+      immediate: true,
+      async handler (to, from) {
+        this.vsItems = this?.itemsRes?.items.map(item => {
+          return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
+        }) || []
+      }
+    },
     query: {
       immediate: true,
       async handler (to, from) {
