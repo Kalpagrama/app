@@ -102,7 +102,6 @@ export default {
   data () {
     return {
       itemsRes: null,
-      vsItems: [],
       nonReactiveItems: [],
       itemsVisibility: {},
       itemMiddleIndx: null,
@@ -118,16 +117,18 @@ export default {
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },
+    vsItems () {
+      return this?.itemsRes?.items.map(item => {
+        return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
+      }) || []
+    }
   },
   watch: {
     query: {
       immediate: true,
       async handler (to, from) {
         this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 10)
-        this.vsItems = this.itemsRes.items.map(item => {
-          return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
-        })
-        this.$log('this.vsItems length=', this.vsItems.length)
+        this.$log('this.itemsRes.items length=', this.itemsRes.items.length)
         if (from) {
           this.itemsRes.setProperty('itemMiddleIndx', null)
           this.$nextTick(_ => {
