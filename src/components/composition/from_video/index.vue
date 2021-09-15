@@ -185,6 +185,12 @@ export default {
         this.$log('play', this.id, this?.composition?.layers[0]?.contentName)
         if (fromTime) this.$refs.videoRef.currentTime = fromTime
         this.playPromise = this.$refs.videoRef.play()
+        this.playPromise.then(() => {
+          this.$log('play OK!', this?.composition?.layers[0]?.contentName)
+        }).catch(err => {
+          this.$logD('error om play video. this.$refs.videoRef=', this.$refs.videoRef)
+          this.$logE('error om play video', err)
+        })
       }
     },
     pause () {
@@ -195,9 +201,7 @@ export default {
             this.$refs.videoRef.pause()
           }
           this.data.statusPlayerLag = 'paused' // force lag
-        }).catch(error => {
-          this.$logE('error om play video', error)
-        });
+        })
       }
     },
     cancelLoad () {

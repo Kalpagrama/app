@@ -209,7 +209,7 @@ export default {
     }
   },
   created () {
-    this.$log('created', this.itemIndex, this.itemState)
+    // this.$log('created', this.itemIndex, this.itemState)
     assert((this.itemState || this.itemIndex == null) && this.itemShortOrFull, [this.itemIndex, this.itemState, this.itemShortOrFull])
     if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
   },

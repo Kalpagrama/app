@@ -28,7 +28,7 @@ div(
       div(
         v-for="(r,ri) in $rateMeta" :key="ri"
         :style=`{
-          position: 'absolute', zIndex: 100+ri,
+          position: 'absolute', zIndex: 1+ri,
           width: 100-(6*ri+1)+'%',
           height: 100-(6*ri+1)+'%',
           borderRadius: '50%',
@@ -38,7 +38,7 @@ div(
     div(
       v-if="showRateMax"
       :style=`{
-        position: 'absolute', zIndex: 300,
+        position: 'absolute', zIndex: 5,
         width: '70%', minWidth: '70%', maxWidth: '70%',
         height: '70%', minHeight: '70%', maxHeight: '70%',
         borderRadius: '50%',
@@ -57,7 +57,7 @@ div(
     div(
       v-if="showRateUser && essence.rateUser !== null"
       :style=`{
-        position: 'absolute', zIndex: 300,
+        position: 'absolute', zIndex: 5,
         //- top: '-4px', right: '-4px',
         top: '12px', left: '-16px',
         width: '10px', height: '10px',
@@ -69,7 +69,7 @@ div(
     div(
       v-if="showRateCounts"
       :style=`{
-        position: 'absolute', zIndex: 100,
+        position: 'absolute', zIndex: 5,
         top: '9px', right: '-39px',
       }`
       ).row.full-width.justify-start
@@ -78,7 +78,7 @@ div(
     div(
       v-if="showRateName"
       :style=`{
-        position: 'absolute', zIndex: 100,
+        position: 'absolute', zIndex: 5,
         bottom: '-18px',
       }`
       ).row.full-width.justify-center

@@ -4,7 +4,7 @@
       //- tab panels
       q-tab-panels(
         v-model="pageId"
-        :swipeable="$q.platform.is.mobile"
+        :swipeable="false && $q.platform.is.mobile"
         :animated="$q.platform.is.mobile").full-width.b-30
         q-tab-panel(
           v-for="(p,pi) in (pages)" :key="p.id" :name="p.id"

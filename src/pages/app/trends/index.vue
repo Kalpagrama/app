@@ -9,7 +9,7 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
-          :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+          :scrollAreaHeight="scrollAreaHeight"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
@@ -20,8 +20,6 @@ kalpa-layout
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
         ).row.full-width
-          //template(v-slot:externalHeader)
-          //  page-trends-nav-tabs(ref="navTabs" :pageInfo="pageInfo" :height="rootTabsHeight")
           template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
             item-feed(
               :itemShortOrFull="item"
@@ -53,7 +51,6 @@ export default {
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       showHeader: true,
-      rootTabsHeight: 40,
       pageInfo: {
         rootPages: [
           ...this.$store.getters.nodeCategories.map(c => {
@@ -67,7 +64,7 @@ export default {
   },
   computed: {
     scrollAreaHeight () {
-      return this.$q.screen.height - this.rootTabsHeight
+      return this.$q.screen.height
     },
     query () {
       assert(this.pageInfo.rootPageId !== 'search')
