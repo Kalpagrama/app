@@ -39,9 +39,7 @@
         :nodeOid="node.oid")
       essence-items(
         v-if="showItems && !$slots.items && node.items.length === 2"
-        v-bind="$props"
-        :itemsStyles="itemsStyles"
-        @itemActive="$emit('itemActive', $event)")
+        v-bind="$props")
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       q-input(

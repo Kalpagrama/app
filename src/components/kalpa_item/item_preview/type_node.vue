@@ -11,7 +11,7 @@
     q-spinner(size="50px" color="green")
   item-feed(
     v-if="node"
-    :itemFull="node"
+    :itemShortOrFull="node"
     :showHeader="showHeader"
     :showSpheres="showSpheres"
     :isActive="isActive"

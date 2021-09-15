@@ -1,7 +1,7 @@
 <template lang="pug">
   div(:style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
     div(v-if="$store.state.ui.useDebug").row.full-width isActive:{{isActive}} isVisible:{{isVisible}}
-    div(v-if="!isItemFullReceived").row.full-width
+    div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
@@ -11,15 +11,14 @@
               q-skeleton(type='text' animation="none" dark)
             q-item-label(caption='')
               q-skeleton(type='text' width='80%' animation="none" dark)
-        q-item
-          //q-item-section(avatar).br
+        q-item.q-px-none
           q-item-section
             .row
               q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
               q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
               span {{item.name || item.vertexType}}
-            .row.items-center.justify-between.no-wrap
+            .row.items-center.justify-between.no-wrap.q-px-md
               .row.items-center
                 q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
                 q-skeleton(type='text' width='30px' animation="none" dark)
@@ -31,11 +30,14 @@
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :block="item" :node="item")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
       div(v-if="item.deletedAt").absolute.fit.dimmed.z-top
         span.absolute-center.text-white.text-h4 {{$t('unpublished')}}
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
+// virtualScroll переиспользует оболочки и засовывает в них новые данные(этот экземпляр может использоватья для отображения разных ядер)
+// используем itemState для хранения состояния
 <script>
 import blockFeed from 'src/components/kalpa_item/item_feed/block_feed'
 import nodeFeed from 'src/components/kalpa_item/item_feed/node_feed'
@@ -48,14 +50,14 @@ import { assert } from 'src/system/common/utils'
 export default {
   name: 'itemFeed',
   props: {
-    itemFull: { type: Object },
-    itemShort: { type: Object },
+    itemShortOrFull: { type: Object },
+    itemState: { type: Object },
     itemIndex: { type: Number },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
-    isActive: { type: Boolean },
-    isVisible: { type: Boolean },
-    isPreload: { type: Boolean },
+    isActive: { type: Boolean, default: false },
+    isVisible: { type: Boolean, default: false },
+    isPreload: { type: Boolean, default: false },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
     showAuthorAlways: { type: Boolean, default: false },
@@ -83,12 +85,20 @@ export default {
     nodeFeed,
     joinFeed
   },
-  data () {
-    return {
-      reactiveItemShort: this.itemShort // itemShort изначально не реактивен
-    }
-  },
   computed: {
+    data () {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        assert(this.itemState.oid === this.itemShortOrFull.oid)
+        this.$set(this.itemState, key, {
+          oid: this.itemState.oid,
+          itemFull: null
+        })
+      }
+      return this.itemState[key]
+    },
     componentName () {
       switch (this.item.type) {
         case ObjectTypeEnum.NODE:
@@ -101,107 +111,93 @@ export default {
           throw new Error('bad this.item.type:' + this.item.type)
       }
     },
-    isItemFullReceived () {
-      return !!(this.itemFull || this.itemShort.itemFull)
+    hasItemFull () {
+      // либо изначально прередали полный объект, либо запросили и уже получили
+      return this.itemShortOrFull.items || this.data.itemFull
     },
     item () {
-      return this.itemFull || this.itemShort.itemFull || this.itemShort
+      return this.data.itemFull || this.itemShortOrFull
     }
   },
   watch: {
-    // virtualScroll переиспользует оболочки и засовывает в них новые данные(этот экземпляр может использоватья для отображения разных ядер)
-    // используем itemShort для хранения состояния
-    itemShort: {
-      immediate: true,
-      deep: false,
-      async handler (to, from) {
-        this.reactiveItemShort = to
-        if (to && this.isVisible) {
-          this.$log('itemShort changed', this.isActive, this.itemIndex, from.name, to.name)
-          this.getFullItem(to)
-        }
-      }
-    },
     isVisible: {
-      immediate: true,
+      immediate: false,
       async handler (to, from) {
-        if (this.itemShort) {
-          if (to) {
-            // this.$log('isVisible=true #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
-            this.getFullItem(this.itemShort)
-          } else {
-            // this.$log('isVisible=false #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
-            this.cancelItemFull(this.itemShort)
-          }
+        this.$log('isVisible', this.itemIndex, to)
+        if (!this.hasItemFull) {
+          if (to) this.getFullItem()
+          else this.cancelItemFull()
         }
       }
     },
     isPreload: {
-      immediate: true,
+      immediate: false,
       async handler (to, from) {
-        if (this.itemShort) {
-          if (to) {
-            // this.$log('isVisible=true #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
-            this.getFullItemPreload(this.itemShort)
-          } else {
-            // this.$log('isVisible=false #', this.itemIndex, this.itemShort.name, this.itemShort.oid)
-            this.cancelItemFullPreload(this.itemShort)
-          }
+        this.$log('isPreload', this.itemIndex, to)
+        if (!this.hasItemFull) {
+          if (to) this.getFullItemPreload()
+          else this.cancelItemFullPreload()
         }
       }
     }
   },
   methods: {
-    getFullItem (itemShort) {
-      assert(itemShort)
-      if (!itemShort.itemFull && !itemShort.queryId) {
-        itemShort.queryId = Date.now()
-        // this.$log('get itemFull #', this.itemIndex, itemShort.name, itemShort.oid, cloneDeep(itemShort))
-        this.$rxdb.get(RxCollectionEnum.OBJ, itemShort.oid, { queryId: itemShort.queryId })
-            .then(itemFull => {
-              this.$set(itemShort, 'itemFull', itemFull)
-              itemShort.queryId = null
-            })
-            .catch(err => {
-              this.$logE('err on get itemFull', err)
-              itemShort.queryId = null
+    getFullItem () {
+      let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
+      assert(data && data.oid)
+      if (!data.itemFull && !data.queryId) {
+        data.queryId = Date.now()
+        this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
+            .then(itemFull => this.$set(data, 'itemFull', itemFull))
+            .catch(err => this.$logE('err on get itemFull', err))
+            .finally(() => {
+              data.queryId = null
             })
       }
     },
-    cancelItemFull (itemShort) {
-      if (itemShort.queryId) {
-        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: itemShort.queryId, cancel: true })
+    cancelItemFull () {
+      let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
+      if (data.queryId) {
+        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: data.queryId, cancel: true })
             .catch(err => this.$log('err on cancel request', err))
-        // this.$log('cancel itemFull OK #', this.itemIndex, itemShort.name, itemShort.name)
+            .finally(() => {
+              data.queryId = null
+            })
       }
     },
-    getFullItemPreload (itemShort) {
-      assert(itemShort)
-      // this.$log('preload start', this.itemIndex, this.itemShort.name)
-      if (!itemShort.itemFull && !itemShort.queryId && !itemShort.queryIdPreload) {
-        itemShort.queryIdPreload = Date.now()
-        this.$rxdb.get(RxCollectionEnum.OBJ, itemShort.oid, { priority: 1, queryId: itemShort.queryIdPreload })
+    getFullItemPreload () {
+      let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
+      assert(data && data.oid)
+      if (!data.itemFull && !data.queryId && !data.queryIdPreload) {
+        data.queryIdPreload = Date.now()
+        this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
-              // this.$log('preload ОК itemFull=', itemFull)
-              if (itemFull) this.$set(itemShort, 'itemFull', itemFull)
-              itemShort.queryIdPreload = null
+              if (itemFull) this.$set(data, 'itemFull', itemFull)
             })
-            .catch(err => {
-              this.$logE('err on preload itemFull', err)
-              itemShort.queryIdPreload = null
+            .catch(err => this.$logE('err on preload itemFull', err))
+            .finally(() => {
+              data.queryIdPreload = null
             })
       }
     },
-    cancelItemFullPreload (itemShort) {
-      if (itemShort.queryIdPreload) {
-        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: itemShort.queryIdPreload, cancel: true })
+    cancelItemFullPreload () {
+      let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
+      if (data.queryIdPreload) {
+        this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: data.queryIdPreload, cancel: true })
             .catch(err => this.$log('err on cancel preload request', err))
+            .finally(() => {
+              data.queryIdPreload = null
+            })
       }
     }
   },
   created () {
-    if (this.itemShort) this.$set(this.itemShort, 'itemFull', null)
-    // this.$log('created', this.itemIndex, this.item)
+    this.$log('created', this.itemIndex, this.itemState)
+    assert((this.itemState || this.itemIndex == null) && this.itemShortOrFull, [this.itemIndex, this.itemState, this.itemShortOrFull])
+    if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
+  },
+  mounted () {
+    this.$log('mounted', this.itemIndex, this.itemState)
   }
 }
 </script>

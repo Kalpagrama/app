@@ -14,7 +14,7 @@ div(
     }`
     ).row.full-width.b-30
     item-feed(
-      :itemFull="joint"
+      :itemShortOrFull="joint"
       :showHeader="jointOpened"
       :showSpheres="false"
       :showActions="jointOpened"

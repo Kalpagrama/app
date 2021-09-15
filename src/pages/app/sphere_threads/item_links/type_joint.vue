@@ -66,7 +66,7 @@ div(
         span.text-white {{ $nodeItemType(joint.vertices[itemIndex]).name }}
       //- item-wrapper
       item-feed(
-        :itemFull="item"
+        :itemShortOrFull="item"
         :isActive="isVisible"
         :isVisible="isVisible"
         :showHeader="false"

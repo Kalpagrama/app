@@ -22,9 +22,10 @@ kalpa-layout
         ).row.full-width
           //template(v-slot:externalHeader)
           //  page-trends-nav-tabs(ref="navTabs" :pageInfo="pageInfo" :height="rootTabsHeight")
-          template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
             item-feed(
-              :itemShort="item"
+              :itemShortOrFull="item"
+              :itemState="itemState"
               :itemIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible"

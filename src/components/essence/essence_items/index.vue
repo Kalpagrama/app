@@ -42,10 +42,10 @@ div(
           :isSquare="true"
           :options=`{
                 loop: false,
-                paused: compositionPlayBackState[ii]
+                paused: data.compositionPlayBackState[ii]
               }`
-          @playing="$set(compositionPlayBackState,ii,'playing'), $set(compositionPlayBackState, ii===0?1:0, 'paused')"
-          @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing')")
+          @playing="$set(data.compositionPlayBackState,ii,'playing'), $set(data.compositionPlayBackState, ii===0?1:0, 'paused')"
+          @ended="$set(data.compositionPlayBackState,ii,'paused'), $set(data.compositionPlayBackState, ii===0?1:0, 'playing')")
         //- ===
         //- node
         div(
@@ -61,14 +61,15 @@ div(
               small.text-white {{ i.name }}
           composition(
             :composition="i.items[0]"
+            :itemState="data"
             :isActive="isActive"
             :isVisible="isVisible"
             :nodeOid="i.items[0].oid"
             :isSquare="true"
             :options=`{
-                playBackState: compositionPlayBackState[ii]
+                playBackState: data.compositionPlayBackState[ii]
               }`
-            @ended="$set(compositionPlayBackState,ii,'paused'), $set(compositionPlayBackState, ii===0?1:0, 'playing')")
+            @ended="$set(data.compositionPlayBackState,ii,'paused'), $set(data.compositionPlayBackState, ii===0?1:0, 'playing')")
         //- media content
         //- IMAGE, VIDEO, BOOK, AUDIO
         div(
@@ -112,27 +113,25 @@ div(
           ).fit
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { ContentApi } from 'src/api/content'
-
+import { assert } from 'src/system/common/utils'
 export default {
   name: 'essenceItems',
-  props: ['node', 'isActive', 'isVisible'],
-  watch: {
-    'node.oid': {
-      // virtual scroll переиспользует dom-элементы и засовывает в них новые данные (поэтому этот компонент может использоваться для показа разных композиций)
-      handler(to, from) {
-        this.$log('node changed', from, to)
-        this.compositionPlayBackState = ['playing', 'paused']
-      }
-    }
-  },
-  data () {
-    return {
-      compositionPlayBackState: ['playing', 'paused']
-    }
-  },
+  props: ['node', 'isActive', 'isVisible', 'itemState'],
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          compositionPlayBackState: ['playing', 'paused']
+        })
+      }
+      return this.itemState[key]
+    }
   },
   methods: {
     iUrl (item) {

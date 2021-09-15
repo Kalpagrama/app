@@ -18,9 +18,11 @@
             :itemHeightApprox="100"
             :itemMiddlePersist="true"
           ).row.full-width
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
               notification-item(
                 :notification="item"
+                :itemState="itemState"
+                :itemIndex="itemIndex"
                 :notificationIndex="itemIndex"
                 :isActive="isActive"
                 :isVisible="isVisible").q-mb-sm

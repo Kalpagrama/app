@@ -1,8 +1,8 @@
 <template lang="pug">
 //- component(
-  :is="playerComponent[composition.outputType]"
-  v-bind="$props")
-  slot
+//  :is="data.playerComponent[composition.outputType]"
+//  v-bind="$props")
+//  slot
 div(
   :style=`{
     borderRadius: '10px',
@@ -25,8 +25,8 @@ div(
       :composition="composition"
       :isActive="isActive"
       :isVisible="isVisible"
-      :height="height"
-      :width="width"
+      :height="data.height"
+      :width="data.width"
       :style=`{
         position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
       }`)
@@ -36,8 +36,8 @@ div(
       :isActive="isActive"
       :isVisible="isVisible"
       :objectFit="isSquare ? 'cover' : null"
-      :height="height"
-      :width="width"
+      :height="data.height"
+      :width="data.width"
       :options="options || {}"
       @playing="$emit('playing')"
       @ended="$emit('ended')"
@@ -48,8 +48,8 @@ div(
           :composition="composition"
           :isActive="isActive"
           :isVisible="isVisible"
-          :height="height"
-          :width="width"
+          :height="data.height"
+          :width="data.width"
           :player="player"
           :style=`{
             position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
@@ -60,8 +60,8 @@ div(
       :isActive="isActive"
       :isVisible="isVisible"
       :objectFit="isSquare ? 'cover' : null"
-      :height="height"
-      :width="width")
+      :height="data.height"
+      :width="data.width")
     div(
       v-else
       :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
@@ -72,14 +72,15 @@ div(
           borderRadius: '10px',
         }`
         ).fit
-  //- div(:style=`{height: '28px'}`).row.full-width
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { ContentApi } from 'src/api/content'
 import context from './context/index.vue'
 import fromVideo from './from_video/index.vue'
 import fromBook from './from_book/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'composition',
@@ -91,6 +92,7 @@ export default {
   props: [
     'compositionKey',
     'composition',
+    'itemState',
     'isVisible',
     'isActive',
     'isMini',
@@ -99,18 +101,7 @@ export default {
     'nodeOid',
     'isSquare'
   ],
-  data () {
-    return {
-      playerComponent: {
-        VIDEO: 'type-video',
-        IMAGE: 'type-image',
-        BOOK: 'type-book',
-        WEB: 'type-web',
-      },
-      height: 0,
-      width: 0,
-    }
-  },
+
   computed: {
     url () { return ContentApi.urlSelect(this.composition) },
     paddingBottom () {
@@ -130,18 +121,31 @@ export default {
         }
         return r
       }
+    },
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name + this.composition.oid
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          playerComponent: {
+            VIDEO: 'type-video',
+            IMAGE: 'type-image',
+            BOOK: 'type-book',
+            WEB: 'type-web',
+          },
+          height: 0,
+          width: 0
+        })
+      }
+      return this.itemState[key]
     }
-  },
-  watch: {
   },
   methods: {
     onResize (e) {
-      this.width = e.width
-      this.height = e.height
+      this.data.width = e.width
+      this.data.height = e.height
     }
-  },
-  mounted() {
-    // this.$log('mounted', this.options)
-  },
+  }
 }
 </script>

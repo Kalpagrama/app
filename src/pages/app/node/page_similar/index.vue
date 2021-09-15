@@ -7,9 +7,10 @@
         :query="query"
         :itemHeightApprox="60"
         :itemMiddlePersist="true").row.full-width
-        template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
           item-feed(
-            :itemShort="item"
+            :itemShortOrFull="item"
+            :itemState="itemState"
             :itemIndex="itemIndex"
             :isActive="isActive"
             :isVisible="isVisible"
@@ -21,7 +22,7 @@
       //  :query="query")
       //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
       //    item-feed(
-      //      :item="item.populatedObject"
+      //      :itemShortOrFull="item.populatedObject"
       //      :isActive="isActive"
       //      :isVisible="isVisible")
 </template>

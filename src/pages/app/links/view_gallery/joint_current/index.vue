@@ -35,7 +35,7 @@
       }`)
   //- body
   item-feed(
-    :itemFull="joint"
+    :itemShortOrFull="joint"
     :isActive="true"
     :isVisible="true"
     :showItems="true"

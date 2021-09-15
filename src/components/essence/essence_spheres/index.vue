@@ -33,11 +33,13 @@
       small(v-if="si !== node.spheres.length-1") ,
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 export default {
   name: 'essenceSpheres',
   props: {
     node: {type: Object},
+    itemState: { type: Object},
     disabled: {type: Boolean, default: false},
     color: {type: String, default: 'text-grey-8'}
   }

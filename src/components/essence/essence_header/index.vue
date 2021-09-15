@@ -58,11 +58,12 @@
 <script>
 import { ObjectApi } from 'src/api/object'
 import { UserRoleEnum } from 'src/api/user'
-
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'essenceHeader',
   props: {
     essence: {type: Object, required: true},
+    itemState: { type: Object},
     showAuthorAlways: {type: Boolean, default: false},
     showActions: {type: Boolean, default: true},
   },

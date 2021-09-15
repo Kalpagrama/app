@@ -27,9 +27,11 @@
             @pageId="pageId = $event"
             @add="createItem"
           ).row.full-width
-            template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible,isPreload}`)
+            template(v-slot:item=`{item:draft,itemState,itemIndex,isActive,isVisible,isPreload}`)
               draft-list-item(
                 :draft="draft"
+                :itemState="itemState"
+                :itemIndex="itemIndex"
                 :mode="mode"
                 @draft="draftSelectHandle"
               ).q-mb-sm

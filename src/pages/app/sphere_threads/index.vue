@@ -67,7 +67,7 @@ q-layout(
                 }`
                 ).row.full-width.items-start.content-start
                 item-feed(
-                  :itemFull="node.populatedObject"
+                  :itemShortOrFull="node.populatedObject"
                   :isActive="nodeIsVisible"
                   :isVisible="nodeIsVisible"
                   :showName="false"

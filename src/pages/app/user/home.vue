@@ -42,7 +42,7 @@
           ).row.full-width
             template(v-slot:externalHeader)
               nav-header(:user="user" @followers="showFollowDialog=true, followersFollowing='followers'" @following="showFollowDialog=true, followersFollowing='following'")
-            template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
               div(
                 v-if="pageId === 'votes' && item.votedUserRate"
                 :style=`{
@@ -70,7 +70,9 @@
                   background: rateMeta(item.votedUserRate).colorBackground,
                 }`).row.q-ml-xs.q-mr-sm
               item-feed(
-                :itemShort="item"
+                :itemShortOrFull="item"
+                :itemState="itemState"
+                :itemIndex="itemIndex"
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload").q-pb-sm

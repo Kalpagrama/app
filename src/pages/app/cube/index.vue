@@ -61,7 +61,7 @@ kalpa-layout(
               :itemIndependent="true")
               item-feed(
                 v-if="jointActive"
-                :itemFull="jointActive"
+                :itemShortOrFull="jointActive"
                 :showItems="false"
                 :showActions="false"
                 :showName="false"

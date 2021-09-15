@@ -25,6 +25,7 @@
       essence-header(
         v-if="showHeader && node.oid"
         :essence="node"
+        :itemState="data"
         :showAuthorAlways="showAuthorAlways"
         :style=`{
         order: orderHeader,
@@ -34,14 +35,16 @@
       composition(
         v-if="showItems && !$slots.items && node.items.length === 1"
         :composition="node.items[0]"
+        :itemState="data"
         :isVisible="isVisible"
         :isActive="isActive"
         :nodeOid="node.oid")
       essence-items(
         v-if="showItems && !$slots.items && node.items.length === 2"
-        v-bind="$props"
-        :itemsStyles="itemsStyles"
-        @itemActive="$emit('itemActive', $event)")
+        :node="node"
+        :itemState="data"
+        :isActive="isActive"
+        :isVisible="isVisible")
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       router-link(
@@ -63,6 +66,7 @@
       essence-spheres(
         v-if="showSpheres && node.spheres.length > 0"
         :node="node"
+        :itemState="data"
         :style=`{
         order: 3,
       }`)
@@ -70,6 +74,7 @@
     essence-actions(
       v-if="showActions && node.oid"
       :essence="node"
+      :itemState="data"
       :nodeBackgroundColor="nodeBackgroundColor"
       :nodeActionsColor="nodeActionsColor"
       :isActive="isActive"
@@ -90,6 +95,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'nodeFeed',
   components: {
@@ -100,6 +106,7 @@ export default {
   },
   props: {
     node: { type: Object },
+    itemState: { type: Object},
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
     isActive: { type: Boolean },
@@ -126,11 +133,18 @@ export default {
     borderRadius: { type: String, default: '10px' },
     actionsColor: { type: String, default: 'grey-9' }
   },
-  data () {
-    return {
-    }
-  },
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+         // key: value
+        })
+      }
+      return this.itemState[key]
+    },
     nodeName () {
       if (this.node.items.length === 1 || this.node.vertices[0] === 'ESSENCE') {
         return this.node.name
@@ -159,11 +173,6 @@ export default {
       else if (l < 40) return 16
       else return 14
     }
-  },
-  methods: {
-  },
-  async created () {
-    // this.$logW('created', this.node.name, this.node.oid)
   }
 }
 </script>

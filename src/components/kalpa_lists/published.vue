@@ -26,11 +26,12 @@
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
-        template(v-slot:item=`{item:bookmark,itemIndex:bookmarkIndex,isActive,isVisible,isPreload}`)
+        template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload}`)
           //q-btn(:label="bookmarkIndex + '::' + bookmark.name", size="xl").full-width
           bookmark-list-item(
             :bookmark="bookmark"
-            :itemIndex="bookmarkIndex"
+            :itemState="itemState"
+            :itemIndex="itemIndex"
             :mode="mode"
             @item="bookmarkSelectHandle"
           ).q-mb-sm

@@ -73,10 +73,10 @@
             //  }`
             //  ).fit
             composition(
-              @click.native="itemActive = ii"
+              @click.native="data.itemActive = ii"
               :compositionKey="`${joint.oid}-${ii}`"
               :composition="joint.items[ii].type === 'NODE' ? joint.items[ii].items[0] : joint.items[ii]"
-              :isActive="isActive && compositionPlayState[ii]==='play'"
+              :isActive="isActive && data.compositionPlayState[ii]==='play'"
               :isVisible="true"
               :isMini="true"
               :styles=`{
@@ -89,8 +89,8 @@
                 showHeader: true,
                 footerOverlay: true,
               }`
-              @playing="compositionPlayState[ii] = 'play', compositionPlayState[ii===0?1:0] = 'pause'"
-              @ended="compositionPlayState[ii] = 'pause', compositionPlayState[ii===0?1:0] = 'play'")
+              @playing="data.compositionPlayState[ii] = 'play', data.compositionPlayState[ii===0?1:0] = 'pause'"
+              @ended="data.compositionPlayState[ii] = 'pause', data.compositionPlayState[ii===0?1:0] = 'play'")
     //- vertices
     router-link(
       :to="'/cube/'+joint.items[0].oid+'?with='+joint.items[1].oid"
@@ -120,33 +120,30 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { assert } from 'src/system/common/utils'
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'jointFeed',
-  props: ['joint', 'jointIndex', 'isActive', 'isVisible'],
+  props: ['joint', 'itemState', 'jointIndex', 'isActive', 'isVisible'],
   components: {
-  },
-  data () {
-    return {
-      itemActive: 0,
-      compositionPlayState: ['play', 'pause']
-    }
   },
   computed: {
     actions () {
       return {}
-    }
-  },
-  watch: {
-    isActive: {
-      handler (to, from) {
-        this.$log('isActive', this.joint.oid, to)
+    },
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          itemActive: 0,
+          compositionPlayState: ['play', 'pause']
+        })
       }
+      return this.itemState[key]
     }
-  },
-  methods: {
-  },
-  async mounted () {
   }
 }
 </script>

@@ -25,11 +25,12 @@
       essence-header(
         v-if="showHeader && block.oid"
         :essence="block"
+        :itemState="data"
         :showAuthorAlways="showAuthorAlways"
         :style=`{
         order: orderHeader,
       }`)
-      masonry-cover(v-if="showMasonry" :block="block" :style=`{height: '350px'}` @click.native="showMasonry = false")
+      masonry-cover(v-if="data.showMasonry" :block="block" :itemState="data" :style=`{height: '350px'}` @click.native="data.showMasonry = false")
       graph-view(
         v-else
         :maxHeight="450"
@@ -56,16 +57,11 @@
           }`
         ).text-white {{ block.name }}
 
-      //.row.full-width.items-center.content-center.justify-center.q-pa-md
-      //  span(
-      //    :class=`{
-      //    'text-bold': block.name.length < 20
-      //  }`
-      //  ).text-white {{ block.name }}
       //- SPHERES
       essence-spheres(
         v-if="showSpheres && block.spheres.length > 0"
         :node="block"
+        :itemState="data"
         :style=`{
         order: 3,
       }`)
@@ -73,6 +69,7 @@
     essence-actions(
       v-if="showActions && block.oid"
       :essence="block"
+      :itemState="data"
       :nodeBackgroundColor="nodeBackgroundColor"
       :nodeActionsColor="nodeActionsColor"
       :isActive="isActive"
@@ -90,7 +87,9 @@ import essenceActions from 'src/components/essence/essence_actions.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceHeader from 'src/components/essence/essence_header'
 import masonryCover from 'src/components/kalpa_item/item_feed/block_feed/masonry_cover.vue'
+import { assert } from 'src/system/common/utils'
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'blockFeed',
   components: {
@@ -102,6 +101,7 @@ export default {
   },
   props: {
     block: { type: Object },
+    itemState: { type: Object},
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
     isActive: { type: Boolean },
@@ -128,27 +128,30 @@ export default {
     borderRadius: { type: String, default: '10px' },
     actionsColor: { type: String, default: 'grey-9' }
   },
-  data () {
-    return {
-      showMasonry: true
-    }
-  },
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          showMasonry: true
+        })
+      }
+      return this.itemState[key]
+    },
     fontSize () {
       let l = this.block.name.length
       if (l < 20) return 22
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
-    }
+    },
   },
   methods: {
     masonryClick () {
       alert('masonryClick')
     }
   },
-  mounted () {
-    // this.$log('mounted', this.block, this.isActive)
-  }
 }
 </script>

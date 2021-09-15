@@ -47,7 +47,7 @@ kalpa-layout()
               }`
               ).row.full-width
               item-feed(
-                :itemFull="node"
+                :itemShortOrFull="node"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs

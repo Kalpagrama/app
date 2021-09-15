@@ -2,7 +2,7 @@
   .row.full-width.justify-center.q-px-sm
     //- vote stats
     q-dialog(
-      v-model="voteStatsShow" position="bottom")
+      v-model="data.voteStatsShow" position="bottom")
       essence-vote-stats(
         :essence="essence"
         :style=`{
@@ -10,15 +10,15 @@
       }`
         @voteAgain="voteAgain"
         @renode="renode"
-        @close="voteStatsShow = false")
+        @close="data.voteStatsShow = false")
     q-dialog(
-      v-model="itemEditorShow"
+      v-model="data.itemEditorShow"
       :maximized="false"
       position="standard")
       item-editor(
         :item="essence"
         :publish="true"
-        @close="itemEditorShow = false")
+        @close="data.itemEditorShow = false")
     div(
       :style=`{
       position: 'relative',
@@ -72,7 +72,7 @@
       //- vote bar
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
-          v-if="voteStarted"
+          v-if="data.voteStarted"
           :style=`{
           position: 'absolute', top: '0px', zIndex: 900, left: '0px',
           height: '50px',
@@ -82,7 +82,7 @@
         ).row.full-width
       transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
         div(
-          v-if="voteStarted"
+          v-if="data.voteStarted"
           :style=`{
           position: 'absolute', top: '0px', zIndex: 1000, left: '0px',
           height: '50px',
@@ -99,7 +99,7 @@
           ).row.full-width.items-center.content-center
             //- cancel btn
             q-btn(
-              @click="voteStarted = false"
+              @click="data.voteStarted = false"
               flat dense color="grey-8" no-caps
             :style=`{
               position: 'absolute', zIndex: 2000,
@@ -115,33 +115,34 @@
             ).row.fit.items-center.content-center
               div(
                 v-for="r in $rateMeta" :key="r.value"
-                @mouseover="rateOver = r.value"
+                @mouseover="data.rateOver = r.value"
                 :style=`{
-                background: rateOver === r.value ? r.color : r.colorBackground,
+                background: data.rateOver === r.value ? r.color : r.colorBackground,
               }`
               ).col.full-height
                 div(
                   @click="vote(r.value)"
                 ).row.fit.items-center.content-center.justify-center.cursor-pointer
                   q-spinner(
-                    v-if="voteVoting === r.value"
+                    v-if="data.voteVoting === r.value"
                     color="white" size="10px")
                   small(
                     v-else
                     :style=`{fontSize: '9px', pointerEvents: 'none', userSelect: 'none'}`).text-white {{ r.name }}
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { ObjectApi } from 'src/api/object'
-
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor'
-
+import { assert } from 'src/system/common/utils'
 export default {
   name: 'essenceActions',
   props: {
     essence: { type: Object, required: true },
+    itemState: { type: Object},
     nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
     nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
     isActive: { type: Boolean },
@@ -152,33 +153,40 @@ export default {
     essenceVoteStats,
     itemEditor,
   },
-  data () {
-    return {
-      showStats: false,
-      isActiveStart: 0,
-      votesShow: false,
-      voteStarted: false,
-      voteStatsShow: false,
-      itemEditorShow: false,
-      voteVoting: null,
-      rateOver: null
+  computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          showStats: false,
+          isActiveStart: 0,
+          votesShow: false,
+          voteStarted: false,
+          voteStatsShow: false,
+          itemEditorShow: false,
+          voteVoting: null,
+          rateOver: null,
+        })
+      }
+      return this.itemState[key]
     }
   },
-  computed: {},
   watch: {
     isActive: {
       async handler (to, from) {
         if (this.$store.getters.isGuest) return
         if (to) {
-          this.isActiveStart = Date.now()
-        } else if (this.isActiveStart) {
-          let statValue = Date.now() - this.isActiveStart
+          this.data.isActiveStart = Date.now()
+        } else if (this.data.isActiveStart) {
+          let statValue = Date.now() - this.data.isActiveStart
           // this.$log('statValue', statValue)
           let stat = await ObjectApi.updateStat(this.essence.oid, 'VIEWED_TIME', statValue)
-          this.isActiveStart = 0
+          this.data.isActiveStart = 0
           // handle voteStart
-          this.voteStarted = false
-          this.voteVoting = false
+          this.data.voteStarted = false
+          this.data.voteVoting = false
         }
       }
     }
@@ -198,38 +206,38 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       } else {
         if (this.essence.rateUser !== null || this.essence.author.oid === this.$store.getters.currentUser.oid) {
-          this.voteStatsShow = true
+          this.data.voteStatsShow = true
         } else {
-          this.voteStarted = true
+          this.data.voteStarted = true
         }
       }
     },
     async voteAgain () {
       this.$log('voteAgain')
       if (this.essence.author.oid === this.$store.getters.currentUser.oid) return
-      this.voteStatsShow = false
+      this.data.voteStatsShow = false
       // await this.$wait(200)
-      this.voteStarted = true
+      this.data.voteStarted = true
     },
     async renode() {
-      this.voteStatsShow = false
+      this.data.voteStatsShow = false
       await this.$wait(200)
-      this.itemEditorShow = true
+      this.data.itemEditorShow = true
     },
     async vote (val) {
       try {
         this.$log('vote', val)
-        this.voteVoting = val
+        this.data.voteVoting = val
         // await this.$wait(1500)
         let res = await ObjectApi.vote(this.essence.oid, val)
         this.$ym('USER_VOTED')
         this.$log('vote done', res)
-        this.voteVoting = null
-        this.voteStarted = false
+        this.data.voteVoting = null
+        this.data.voteStarted = false
       } catch (e) {
         this.$log('vote error', e)
-        this.voteVoting = false
-        this.voteStarted = false
+        this.data.voteVoting = false
+        this.data.voteStarted = false
       }
     }
   }

@@ -23,7 +23,7 @@ div(
     :styles="styles")
   item-feed(
     v-if="item && item.type === 'NODE'"
-    :itemFull="item"
+    :itemShortOrFull="item"
     :isVisible="itemActive"
     :isActive="itemActive"
     :showHeader="itemOpened"

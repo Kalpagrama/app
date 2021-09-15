@@ -10,7 +10,7 @@ q-dialog(
     item-feed(
       :isActive="true"
       :isVisible="true"
-      :itemFull="node"
+      :itemShortOrFull="node"
       :style=`{
         maxWidth: 600+'px',
       }`)

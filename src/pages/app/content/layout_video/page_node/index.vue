@@ -6,7 +6,7 @@ div(
   ).row.full-width.justify-center.b-30
   div(:style=`{maxWidth: 600+'px'}`).row.full-width.items-start.content-start
     item-feed(
-      :itemFull="node"
+      :itemShortOrFull="node"
       :isActive="true"
       :isVisible="true"
       :showHeader="false"

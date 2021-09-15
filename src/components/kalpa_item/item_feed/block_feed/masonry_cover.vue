@@ -13,15 +13,14 @@
           ).fit
 </template>
 
+// этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 export default {
   name: 'masonryCover',
   components: {},
   props: {
-    block: { type: Object }
-  },
-  data () {
-    return {}
+    block: { type: Object },
+    itemState: { type: Object }
   },
   computed: {
     cellWidth () {

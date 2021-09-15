@@ -41,8 +41,8 @@
       :itemHeightApprox="60"
       :itemMiddlePersist="true"
       @count="commentsCount = $event").row.full-width
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
-        comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
+      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+        comment-item(:comment="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" @delete="commentDelete")
     //list-feed(
     //  :query="query"
     //  nextSize=44

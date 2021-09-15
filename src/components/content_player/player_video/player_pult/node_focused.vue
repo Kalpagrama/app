@@ -27,7 +27,7 @@ div(
       item-feed(
         :isActive="true"
         :isVisible="true"
-        :itemFull="player.node"
+        :itemShortOrFull="player.node"
         :style=`{
           maxWidth: 600+'px',
           background: 'rgba(20,20,20,0.95)',

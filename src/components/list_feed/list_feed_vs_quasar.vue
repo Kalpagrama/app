@@ -43,11 +43,11 @@
             ref="vs"
             :scroll-target="'#scroll-area-with-virtual-scroll-1 > .scroll'"
             dark
-            :items="items"
+            :items="vsItems"
             :virtual-scroll-item-size="itemHeightApprox"
             :virtual-scroll-sticky-size-start="stickyHeaderHeight"
             @virtual-scroll="onScroll")
-            template(v-slot:default=`{ item, index }`)
+            template(v-slot:default=`{ item: {source: item, state}, index }`)
               //-item
               div(
                 :accessKey="`${item[itemKey]}-${index}`"
@@ -62,10 +62,11 @@
               ).row.full-width
                 span(
                   v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
-                ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+                ) # {{index}} of {{vsItems.length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
                 slot(
                   name="item"
                   :item="item"
+                  :itemState="state"
                   :itemIndex="index"
                   :isActive="itemMiddleIndx === index"
                   :isVisible="!!itemsVisibility[item[itemKey]]"
@@ -101,7 +102,7 @@ export default {
   data () {
     return {
       itemsRes: null,
-      items: [],
+      vsItems: [],
       nonReactiveItems: [],
       itemsVisibility: {},
       itemMiddleIndx: null,
@@ -111,27 +112,19 @@ export default {
     }
   },
   computed: {
-    length () {
-      return this?.itemsRes?.items?.length || 0
-    },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
     },
-    // itemsCopy () {
-    //   // this.$log('itemsCopy:', this.itemsRes.items.length)
-    //   // this.$log('itemsCopy=', JSON.parse(JSON.stringify(this.itemsRes.items)))
-    //   return Object.freeze(JSON.parse(JSON.stringify(this.itemsRes.items)))
-    // }
   },
   watch: {
     query: {
       immediate: true,
       async handler (to, from) {
-        this.itemsRes = await this.$rxdb.find(to, 10500, 100500)
-        this.items = this.itemsRes.items.map(item => {
-          return item // { item, state: {} }
+        this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 10)
+        this.vsItems = this.itemsRes.items.map(item => {
+          return { source: item, state: {[this.itemKey]: item[this.itemKey]} }
         })
-        this.$log('this.items=', this.items)
+        this.$log('this.vsItems length=', this.vsItems.length)
         if (from) {
           this.itemsRes.setProperty('itemMiddleIndx', null)
           this.$nextTick(_ => {
@@ -150,39 +143,27 @@ export default {
     }
   },
   methods: {
-    itemsFn (from, size) {
-      this.$logW('itemsFn:', from, size, this.itemsRes.items.length)
-      assert(this.itemsRes)
-      if (from >= this.itemsRes.items.length) return []
-      let result = Object.freeze(cloneDeep((this.itemsRes.items.slice(from, from + size))))
-      // for (let i of result) i.itemFull = null
-      assert(result.length <= size)
-      // this.$log('result=', result)
-      return result
-    },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
     onScroll (details) {
-      if (this.length) {
-        this.itemMiddleIndx = details.index // Math.floor((details.from + details.to) / 2)
+      if (this.vsItems.length) {
+        this.itemMiddleIndx = details.index
         if (details.direction === 'increase') { // мотаем вниз
           this.preloadInterval.from = this.itemMiddleIndx
-          this.preloadInterval.to = Math.min(this.length, this.itemMiddleIndx + Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // + 2 экрана вниз
-          // this.preloadInterval.to = details.to
+          this.preloadInterval.to = Math.min(this.vsItems.length, this.itemMiddleIndx + Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // + 2 экрана вниз
         } else {
           this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // - 2 экрана вверх
-          // this.preloadInterval.from = details.from
           this.preloadInterval.to = this.itemMiddleIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
-        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
+        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.vsItems.length)
         this.scrollHeight = details.ref.$el.clientHeight
         this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
-        this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.itemsRes.items.length)
+        this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.vsItems.length)
         this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
       }
     }
@@ -190,8 +171,5 @@ export default {
   mounted () {
     this.$log('mounted', this.scrollAreaHeight, this.$q.screen.height)
   },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
-  }
 }
 </script>
