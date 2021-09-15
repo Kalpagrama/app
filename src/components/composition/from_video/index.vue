@@ -36,8 +36,8 @@
       ref="videoRef"
       type="video/mp4"
       preload="metadata"
-      :autoplay="isActive"
-      :loop="true"
+      :autoplay="false"
+      :loop="false"
       :muted="true"
       :playsinline="true"
       :style=`{
@@ -182,7 +182,7 @@ export default {
     },
     play (fromTime = null) {
       if (this.$refs.videoRef) {
-        this.$log('play', this.id, this?.composition?.layers[0]?.contentName)
+        this.$log('play. fromTime=', fromTime, this.id, this?.composition?.layers[0]?.contentName)
         if (fromTime) this.$refs.videoRef.currentTime = fromTime
         this.playPromise = this.$refs.videoRef.play()
         this.playPromise.then(() => {

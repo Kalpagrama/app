@@ -59,7 +59,7 @@
                   },
                 }`
                 :style=`{border: itemMiddleIndx === index && $store.state.ui.useDebug ? '1px solid green' : ''}`
-                @click="scrollTo(index)"
+                @click="onItemClick(index)"
               ).row.full-width
                 span(
                   v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
@@ -178,8 +178,9 @@ export default {
         this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
       }
     },
-    scrollTo(index) {
-      this.$refs.vs.scrollTo(index, 'center-force')
+    onItemClick(index) {
+      this.itemMiddleIndx = index
+      // this.$refs.vs.scrollTo(index, 'center-force')
     }
   },
   mounted () {

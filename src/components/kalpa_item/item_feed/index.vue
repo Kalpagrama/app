@@ -5,10 +5,10 @@
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
-            q-skeleton(type='QAvatar' animation="none" dark)
+            q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
           q-item-section
             q-item-label
-              q-skeleton(type='text' animation="none" dark)
+              q-skeleton(type='text' :animation="data.queryId ? 'wave' : 'none'" dark)
             q-item-label(caption='')
               q-skeleton(type='text' width='80%' animation="none" dark)
         q-item.q-px-none
@@ -94,7 +94,9 @@ export default {
         // assert(this.itemState.id === this.itemShortOrFull.oid)
         this.$set(this.itemState, key, {
           oid: this.itemShortOrFull?.object?.oid || this.itemState.itemId,
-          itemFull: null
+          itemFull: null,
+          queryId: null,
+          queryIdPreload: null
         })
       }
       return this.itemState[key]
