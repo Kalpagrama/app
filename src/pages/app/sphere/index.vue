@@ -60,7 +60,8 @@ export default {
     query () {
       let objectTypes
       if (this.pageId === 'all') {
-        objectTypes = ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER', 'JOINT', 'WORD', 'SENTENCE', 'CHAR']
+        // objectTypes = ['VIDEO', 'IMAGE', 'BOOK', 'NODE', 'BLOCK', 'USER', 'JOINT', 'WORD', 'SENTENCE', 'CHAR']
+        objectTypes = ['NODE', 'BLOCK', 'JOINT']
       } else if (this.pageId === 'nodes') {
         objectTypes = ['NODE']
       } else if (this.pageId === 'joints') {
