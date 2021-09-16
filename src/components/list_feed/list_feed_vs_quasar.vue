@@ -26,7 +26,7 @@
           width: '14px',
           opacity: 0.2,
           }`
-        ).full-width
+      ).full-width
         // headers + items
         .row.full-width
           slot(name="header")
@@ -77,19 +77,20 @@
 import { scroll } from 'quasar'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
+
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
 let rowFullWidthComponent = {
   props: [],
   template: `
     <div class="full-width">
-      <slot></slot>
+    <slot></slot>
     </div>
   `
 }
 export default {
   name: 'listFeedVirtualScroll',
-  components: {rowFullWidthComponent},
+  components: { rowFullWidthComponent },
   props: {
     scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
       type: Number,
@@ -129,44 +130,40 @@ export default {
   },
   watch: {
     'itemsRes.items': {
-      immediate: true,
       async handler (to, from) {
-        this.$log('itemsRes.items', to?.length, to)
-        this.vsItems = this?.itemsRes?.items.map(item => {
-          return { source: item, state: {itemId: item[this.itemKey]} }
-        }) || []
+        this.$log('itemsRes.items changed', !!this.$refs.vs, to?.length)
+        this.resetItemsRes(this.itemsRes)
         this.$emit('count', to?.length || 0)
       }
     },
     query: {
       immediate: true,
       async handler (to, from) {
-        this.itemsRes = null
-        this.vsItems = []
-        this.itemsVisibility = {}
-        this.itemMiddleIndx = null
-        this.preloadInterval = { from: -1, to: -1 }
-        this.scrollHeight = 0
-        this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 10)
-        this.$log('this.itemsRes.items length=', this.itemsRes.items.length)
-        // if (from) {
-        //   this.itemsRes.setProperty('itemMiddleIndx', null)
-        //   this.$nextTick(_ => {
-        //     this.$logE('refresh!!!', to)
-        //     this.$refs.vs.refresh()
-        //     this.$refs.vs.reset()
-        //   })
-        // }
-        if (this.itemsRes.getProperty('itemMiddleIndx') != null && this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
-          this.$nextTick(_ => {
-            // this.$log('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
-            this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
-          })
-        }
+        this.resetItemsRes(null)
+        this.resetItemsRes(await this.$rxdb.find(to, 100500, 100500 * 10))
       }
     }
   },
   methods: {
+    resetItemsRes (itemsRes) {
+      this.itemsVisibility = {}
+      this.itemMiddleIndx = null
+      this.preloadInterval = { from: -1, to: -1 }
+      this.scrollHeight = 0
+      this.itemsRes = itemsRes
+      this.vsItems = this.vsItems = itemsRes?.items.map(item => {
+        return { source: item, state: { itemId: item[this.itemKey] } }
+      }) || []
+      if (itemsRes) this.$log('resetItemsRes length=', this.vsItems.length)
+      if (this.$refs.vs) this.$refs.vs.refresh()
+      // if (this.$refs.vs) this.$refs.vs.reset()
+      if (itemsRes && itemsRes.getProperty('itemMiddleIndx') != null && itemsRes.getProperty('itemMiddleIndx') >= 0) {
+        this.$nextTick(_ => {
+          this.$log('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
+          this.$refs.vs.scrollTo(itemsRes.getProperty('itemMiddleIndx'), 'start-force')
+        })
+      }
+    },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
@@ -191,13 +188,13 @@ export default {
         this.$set(this.itemsVisibility, this.vsItems[this.itemMiddleIndx][this.itemKey], true)
       }
     },
-    onItemClick(index) {
+    onItemClick (index) {
       this.itemMiddleIndx = index
     }
   },
   mounted () {
     this.$log('mounted', getScrollTarget(this.$el), this.scrollAreaHeight)
     if (!this.scrollAreaHeight) assert(getScrollTarget(this.$el) === window, 'если не указана высота, то скролл умеет показываться только в window!!!')
-  },
+  }
 }
 </script>
