@@ -149,17 +149,17 @@ export default {
         this.scrollHeight = 0
         this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 10)
         this.$log('this.itemsRes.items length=', this.itemsRes.items.length)
-        if (from) {
-          this.itemsRes.setProperty('itemMiddleIndx', null)
+        // if (from) {
+        //   this.itemsRes.setProperty('itemMiddleIndx', null)
+        //   this.$nextTick(_ => {
+        //     this.$logE('refresh!!!', to)
+        //     this.$refs.vs.refresh()
+        //     this.$refs.vs.reset()
+        //   })
+        // }
+        if (this.itemsRes.getProperty('itemMiddleIndx') != null && this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
           this.$nextTick(_ => {
-            // this.$logE('refresh!!!', to)
-            // this.$refs.vs.refresh()
-            // this.$refs.vs.reset()
-          })
-        }
-        if (this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
-          this.$nextTick(_ => {
-            // this.$logW('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
+            // this.$log('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
             this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
           })
         }
@@ -185,7 +185,7 @@ export default {
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
         this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.vsItems.length)
         this.scrollHeight = details.ref.$el.clientHeight
-        this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
+        if (this.itemMiddlePersist) this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
         this.$log('onScroll. this.itemsVisibility=', this.itemsVisibility)
         this.$set(this.itemsVisibility, this.vsItems[this.itemMiddleIndx][this.itemKey], true)
