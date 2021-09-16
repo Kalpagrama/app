@@ -216,7 +216,7 @@ export default {
     if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
   },
   mounted () {
-    // this.$log('mounted', this.itemIndex, this.itemState, this)
+    // this.$log('mounted', this.itemIndex, this.itemState, this.isActive, this.isVisible)
   }
 }
 </script>

@@ -15,7 +15,7 @@
     :showHeader="showHeader"
     :showSpheres="showSpheres"
     :isActive="isActive"
-    :isVisible="isActive"
+    :isVisible="isVisible"
     :showActions="showActions")
 </template>
 
@@ -24,7 +24,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'typeNode',
-  props: ['item', 'isActive', 'showHeader', 'showSpheres', 'showActions'],
+  props: ['item', 'isVisible', 'isActive', 'showHeader', 'showSpheres', 'showActions'],
   data () {
     return {
       node: null,

@@ -77,7 +77,7 @@
           div(v-if="!selectedItemFull")
             q-spinner(size="50px" color="green")
           div(v-else )
-            item-preview(:item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
+            item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
     // меню создания связи
     q-dialog(
       v-model="jointCreatorShow"

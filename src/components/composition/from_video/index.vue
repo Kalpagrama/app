@@ -131,6 +131,7 @@ export default {
       }
     },
     isActive: {
+      immediate: true,
       handler (to, from) {
         this.data.playBackReady = false
         this.data.playBackState = 'paused'
@@ -262,7 +263,7 @@ export default {
   },
   created () {
     this.id = Date.now()
-    // this.$log('created', this.id, this?.composition?.layers[0]?.contentName)
+    // this.$log('created', this.id, this.isActive, this.isVisible, this?.composition?.layers[0]?.contentName)
   },
   beforeDestroy () {
     // отменяем загрузку видео (чтобы браузер не грузил в фоне)
