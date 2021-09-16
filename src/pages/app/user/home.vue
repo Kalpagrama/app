@@ -31,7 +31,7 @@
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="user"
-            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+            :scrollAreaHeight="0"
             searchInputState="disabled"
             :pages="pages"
             :pageId="pageId"
@@ -105,6 +105,9 @@ export default {
     }
   },
   computed: {
+    scrollAreaHeight () {
+      return this.$q.screen.height
+    },
     pages () {
       return [
         { id: 'nodes', name: this.$t('Nodes') },

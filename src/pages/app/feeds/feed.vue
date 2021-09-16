@@ -17,7 +17,7 @@
               :bookmark="bookmarkSelected"
               @close="bookmarkEditorShow = false, bookmarkSelected = null")
           tab-list-feed(
-            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+            :scrollAreaHeight="0"
             :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
@@ -49,6 +49,9 @@ export default {
   methods: {
   },
   computed: {
+    scrollAreaHeight () {
+      return this.$q.screen.height
+    },
     query () {
       let res = {
         selector: {
