@@ -109,7 +109,7 @@ div(
       borderRadius: '0 0 10px 10px',
       minHeight: '40px',
     }`
-    ).row.full-width.items-center.content-center.scroll.scroll-clear
+    ).row.full-width.items-center.content-center.scroll.scroll-disable
     div(
       :class=`{
       }`

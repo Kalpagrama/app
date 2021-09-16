@@ -67,7 +67,7 @@ div(
           overflowY: 'hidden',
           overflowX: figureEditing ? 'hidden !important' : 'auto',
         }`
-        ).row.fit.items-center.content-center.scroll.scroll-clear.q-py-sm
+        ).row.fit.items-center.content-center.scroll.scroll-disable.q-py-sm
         q-resize-observer(@resize="zoomWrapperOnResize")
         .row.no-wrap
           //- left padding
