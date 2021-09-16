@@ -193,7 +193,6 @@ export default {
     },
     onItemClick(index) {
       this.itemMiddleIndx = index
-      // this.$refs.vs.scrollTo(index, 'center-force')
     }
   },
   mounted () {

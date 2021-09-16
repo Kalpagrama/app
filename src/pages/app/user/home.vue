@@ -37,7 +37,7 @@
             :pageId="pageId"
             :query="query"
             :itemHeightApprox="500"
-            :itemMiddlePersist="true"
+            :itemMiddlePersist="false"
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)
