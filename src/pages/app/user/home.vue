@@ -1,7 +1,7 @@
 <template lang="pug">
   kalpa-layout
     template(v-slot:header=`{scrollTop}`)
-      nav-tabs(:user="user" v-if="scrollTop > 226")
+      //nav-tabs(:user="user" v-if="scrollTop > 226")
     template(v-slot:footer)
       kalpa-menu-mobile(v-if="$q.screen.lt.md")
     template(v-slot:body)
@@ -31,7 +31,7 @@
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="user"
-            :scrollAreaHeight="0"
+            :scrollAreaHeight="scrollAreaHeight"
             searchInputState="disabled"
             :pages="pages"
             :pageId="pageId"
