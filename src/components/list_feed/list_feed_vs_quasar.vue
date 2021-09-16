@@ -177,9 +177,9 @@ export default {
         this.itemMiddleIndx = details.index
         if (details.direction === 'increase') { // мотаем вниз
           this.preloadInterval.from = this.itemMiddleIndx
-          this.preloadInterval.to = Math.min(this.vsItems.length, this.itemMiddleIndx + Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // + 2 экрана вниз
+          this.preloadInterval.to = Math.min(this.vsItems.length, this.itemMiddleIndx + Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // + 2 экрана вниз
         } else {
-          this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil(this.scrollAreaHeight * 2 / this.itemHeightApprox)) // - 2 экрана вверх
+          this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // - 2 экрана вверх
           this.preloadInterval.to = this.itemMiddleIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
