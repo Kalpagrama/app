@@ -52,14 +52,14 @@ kalpa-layout()
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
               q-list(bordered).row.full-width
-                q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
+                q-expansion-item(v-model="commentsOpened"  group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
                   // template(v-slot:header)
                     // todo самый лучший коммент
                   row.full-width
-                    page-comments(:node="block")
+                    page-comments(v-if="commentsOpened" :node="block")
                 q-separator
-                q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-                  page-similar(:node="block")
+                q-expansion-item(v-model="similarOpened" group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
+                  page-similar(v-if="similarOpened" :node="block")
                 q-separator
 </template>
 
@@ -82,7 +82,9 @@ export default {
       block: null,
       nodeIsVisible: true,
       pageId: 'graph',
-      pages: [{id: 'graph', name: this.$t('Graph')}, {id: 'joints', name: this.$t('Joints')}, {id: 'comments', name: this.$t('Comments')}]
+      pages: [{id: 'graph', name: this.$t('Graph')}, {id: 'joints', name: this.$t('Joints')}, {id: 'comments', name: this.$t('Comments')}],
+      similarOpened: false,
+      commentsOpened: false
     }
   },
   computed: {

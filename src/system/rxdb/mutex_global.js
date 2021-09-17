@@ -119,27 +119,6 @@ class MutexGlobal {
          await wait(500) // ждем пока мьютекс освободится
          current = JSON.parse(localStorage.getItem('k_global_lock') || null)
       }
-      // let current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
-      //    dt: 0,
-      //    instanceId: '',
-      //    lockOwner: ''
-      // }))
-      // if (this.instanceId !== current.instanceId) {
-      //    while (Date.now() - current.dt > 0 && Date.now() - current.dt < maxGlobalLockTimeFuse) {
-      //       assert('dt' in current && 'instanceId' in current, 'bad current!')
-      //       await wait(500)
-      //       if (Date.now() % 4 === 0) logW(f, `${this.instanceId}:${lockOwner} cant globalLock! possible deadlock detected! lockOwner=${JSON.stringify(current)}.  ${Math.ceil((Date.now() - current.dt) / 1000)} sec left`)
-      //       current = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
-      //          dt: 0,
-      //          instanceId: '',
-      //          lockOwner: ''
-      //       }))
-      //    }
-      //    if (current.dt) {
-      //       logW(`${this.instanceId}:${lockOwner} break globalLock by timeout(maxGlobalLockTimeFuse) lockOwner=${JSON.stringify(current)}.!`)
-      //       localStorage.removeItem('k_global_lock')
-      //    }
-      // }
       if (!this.lockCnt) {
          localStorage.setItem('k_global_lock', JSON.stringify({
             dt: Date.now(),
@@ -153,7 +132,7 @@ class MutexGlobal {
             // todo
             let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
             if (!current || current.instanceId !== mutexGlobal.getInstanceId()) {
-               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком')
+               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. current=', current)
                let reload = confirm('другая вкладка захватила наш мьютекс тк посчитала это дедлоком(2). \n Reload?')
                if (reload) window.location.reload()
             } else { // обновляем актуальность блокировки
