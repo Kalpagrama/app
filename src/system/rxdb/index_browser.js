@@ -252,7 +252,7 @@ class RxDBWrapper {
          this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
          await this.updateCollections('create')
-         await this.workspace.create()
+         await this.workspace.create(store)
          await this.cache.create()
          this.created = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

@@ -59,6 +59,7 @@ class Workspace {
    constructor (db) {
       assert(db, '!rxdb')
       this.db = db
+      this.store = null
       this.mutex = new MutexLocal('rxdb::ws')
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
       this.reactiveUser = null
@@ -165,10 +166,12 @@ class Workspace {
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create () {
+   async create (store) {
       const f = this.create
       const t1 = performance.now()
       assert(!this.created, 'this.created')
+      assert(store)
+      this.store = store
       try {
          // синхроним изменения в цикле
          this.synchroLoop = async () => {
@@ -411,6 +414,7 @@ class Workspace {
       //       }
       //    }
       // }
+      // this.store.commit('core/stateSet', ['wsReady', true])
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 

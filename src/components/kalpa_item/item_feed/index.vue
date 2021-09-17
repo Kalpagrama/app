@@ -115,7 +115,7 @@ export default {
     },
     hasItemFull () {
       // либо изначально прередали полный объект, либо запросили и уже получили
-      return this.itemShortOrFull.items || this.data.itemFull
+      return (this.itemShortOrFull.items || this.itemShortOrFull.graph) || this.data.itemFull
     },
     item () {
       return this.data.itemFull || this.itemShortOrFull
