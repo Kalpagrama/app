@@ -138,7 +138,7 @@ export default {
         this.data.playBackLoading = false
         this.data.currentTimeChangedCnt = 0
         this.data.statusPlayerLag = null
-        this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
+        // this.$log('isActive=', to, this.id, this?.composition?.layers[0]?.contentName)
         if (to) {
           this.$nextTick(() => {
             if (this.$refs.videoRef) {

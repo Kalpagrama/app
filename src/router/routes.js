@@ -23,7 +23,7 @@ async function saveHistory (oid) {
          },
          sort: [{ createdAt: 'asc' }]
       })
-      console.log('history before=', res.items)
+      // console.log('history before=', res.items)
 
       for (let item of res.items) {
          if (item.oid === oid) await item.remove(true)
@@ -38,7 +38,7 @@ async function saveHistory (oid) {
       let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
       // console.log('history after=', res.items.map(item => item.name))
       for (let i = 0; i < res.items.length - 100; i++) { // максимум 100 в истории
-         console.log('history remove=', res.items[i].name)
+         // console.log('history remove=', res.items[i].name)
          res.items[i].remove(true)
       }
       // console.log('history after trim=', res.items.map(item => item.name))

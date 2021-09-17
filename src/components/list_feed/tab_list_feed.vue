@@ -64,7 +64,7 @@
             ).col.text-grey-8
               q-tab(
                 v-for="(p,pi) in pages" :key="p.id"
-                :name="p.id" :label="p.name" :icon="p.icon")
+                :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo(0) : null" @dblclick="pageId === p.id ? scrollTo(length()-1) : null")
       template(v-slot:footer)
         q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload}`)
@@ -125,6 +125,14 @@ export default {
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }
+    }
+  },
+  methods: {
+    scrollTo(indx) {
+      this.$refs.listFeed.scrollTo(indx)
+    },
+    length() {
+      return this.$refs.listFeed.length
     }
   }
 }

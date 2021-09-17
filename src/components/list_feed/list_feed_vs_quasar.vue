@@ -5,6 +5,7 @@
       :style=`{ position: scrollAreaHeight ? 'absolute' : 'fixed', top: '50%', left: 'calc(50% - 30px)'}`)
     //- items
     .row.full-width.items-start.content-start
+      // если указана scrollAreaHeight, то скролл будет в q-scroll-area с указанной высотой
       component(
         :is="scrollAreaHeight ? 'q-scroll-area' : 'row-full-width-component'"
         :id="scrollId"
@@ -61,7 +62,7 @@
             ).row.full-width
               span(
                 v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
-              ) # {{index}} of {{vsItems.length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+              ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
               slot(
                 name="item"
                 :item="item"
@@ -118,6 +119,9 @@ export default {
     }
   },
   computed: {
+    length () {
+      return this.vsItems.length || 0
+    },
     scrollId () {
       return 'scroll-area-with-virtual-scroll-uid-' + Date.now() + Math.random()
     },
@@ -154,13 +158,12 @@ export default {
       this.vsItems = this.vsItems = itemsRes?.items.map(item => {
         return { source: item, state: { itemId: item[this.itemKey] } }
       }) || []
-      if (itemsRes) this.$log('resetItemsRes length=', this.vsItems.length)
+      if (itemsRes) this.$log('resetItemsRes length=', this.length)
       if (this.$refs.vs) this.$refs.vs.refresh()
       // if (this.$refs.vs) this.$refs.vs.reset()
       if (itemsRes && itemsRes.getProperty('itemMiddleIndx') != null && itemsRes.getProperty('itemMiddleIndx') >= 0) {
         this.$nextTick(_ => {
-          this.$log('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
-          this.$refs.vs.scrollTo(itemsRes.getProperty('itemMiddleIndx'), 'start-force')
+          this.scrollTo(itemsRes.getProperty('itemMiddleIndx'))
         })
       }
     },
@@ -169,22 +172,25 @@ export default {
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
+    scrollTo(indx){
+      this.$log('scrollTo', indx)
+      if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
+    },
     onScroll (details) {
-      if (this.vsItems.length) {
+      if (this.length) {
         this.itemMiddleIndx = details.index
         if (details.direction === 'increase') { // мотаем вниз
           this.preloadInterval.from = this.itemMiddleIndx
-          this.preloadInterval.to = Math.min(this.vsItems.length, this.itemMiddleIndx + Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // + 2 экрана вниз
+          this.preloadInterval.to = Math.min(this.length, this.itemMiddleIndx + Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // + 2 экрана вниз
         } else {
           this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // - 2 экрана вверх
           this.preloadInterval.to = this.itemMiddleIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
-        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.vsItems.length)
+        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
         this.scrollHeight = details.ref.$el.clientHeight
         if (this.itemMiddlePersist) this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
-        this.$log('onScroll. this.itemsVisibility=', this.itemsVisibility)
         this.$set(this.itemsVisibility, this.vsItems[this.itemMiddleIndx][this.itemKey], true)
       }
     },
