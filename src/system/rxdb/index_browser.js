@@ -245,14 +245,14 @@ class RxDBWrapper {
          await this.purgeDb() // очистит бд от старых данных
 
          this.reactiveDocDbMemCache.reset()
-         this.workspace = new Workspace(this.db)
+         this.workspace = new Workspace(this.db, store)
          this.cache = new Cache(this.db)
          this.objects = new Objects(this.cache)
          this.lists = new Lists(this.cache)
          this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
          this.gqlQueries = new GqlQueries(this.cache)
          await this.updateCollections('create')
-         await this.workspace.create(store)
+         await this.workspace.create()
          await this.cache.create()
          this.created = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

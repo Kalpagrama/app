@@ -56,10 +56,10 @@ const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
 // Эти ф-ии сериализованы(вызываются строго друг за другом) (см MutexLocal)
 class Workspace {
-   constructor (db) {
+   constructor (db, store) {
       assert(db, '!rxdb')
       this.db = db
-      this.store = null
+      this.store = store
       this.mutex = new MutexLocal('rxdb::ws')
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
       this.reactiveUser = null
@@ -162,16 +162,15 @@ class Workspace {
          }
       } finally {
          this.release()
+         this.store.commit('core/stateSet', ['wsReady', false])
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create (store) {
+   async create () {
       const f = this.create
       const t1 = performance.now()
       assert(!this.created, 'this.created')
-      assert(store)
-      this.store = store
       try {
          // синхроним изменения в цикле
          this.synchroLoop = async () => {
@@ -414,7 +413,7 @@ class Workspace {
       //       }
       //    }
       // }
-      // this.store.commit('core/stateSet', ['wsReady', true])
+      this.store.commit('core/stateSet', ['wsReady', true])
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 

@@ -23,9 +23,7 @@
           :style=`{position: 'absolute', zIndex: 2, top: '0px', background: 'rgba(0,0,0,0.5)'}`
         ).row.fit
           div(:style=`{position: 'absolute', width: 'calc(50% + 15px)',}`).full-height
-            router-link(
-              :to="'/trends'"
-              :style=`{position: 'absolute',}`).row.fit.items-center.content-center
+            .row.fit.items-center.content-center
               //- logo
               div(
                 :style=`{
@@ -106,6 +104,10 @@ export default {
     },
     close () {
       this.$log('close START')
+      if (this.$route.name === 'signIn'){
+        this.$router.replace('/')
+        return
+      }
       this.$gsap.to(
         this,
         0.3,

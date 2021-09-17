@@ -45,5 +45,6 @@ export default {
    progressInfo: {
       UPLOAD: {}, // {oid: progress, oid: progress}
       CREATE: {} // {oid: progress, oid: progress}
-   }
+   },
+   wsReady: false // мастерской можно пользоваться (она загрузилась и свободна)
 }

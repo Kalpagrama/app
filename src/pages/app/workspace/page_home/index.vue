@@ -23,8 +23,8 @@ kalpa-layout
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
               round flat color="white" icon="fas fa-info")
       //- guest
-      view-guest(
-        v-if="$store.getters.isGuest")
+      view-guest(v-if="$store.getters.isGuest")
+      q-spinner(v-else-if="!$store.state.core.wsReady" size="50px" color="green").absolute-center
       //- user
       div(
         v-else

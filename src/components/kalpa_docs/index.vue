@@ -7,19 +7,19 @@
 
 <template lang="pug">
 .row.full-width.q-px-sm
-  router-link(
-    v-for="(d,di) in docs" :key="d.id"
-    flat no-caps color="white" align="left"
-    :to="'/help/'+d.id"
-    :class=`{
-    }`
-    :style=`{
-      textAlign: 'start',
-      borderRadius: '10px',
-    }`
-    @click="docClick(d,di)"
-    ).row.full-width.doc-item
-    small(:class=`[docColor]`) {{ d.name }}
+  div(v-for="(d,di) in docs" :key="d.id").row.full-width
+    router-link(
+      flat no-caps color="white" align="left"
+      :to="'/help/'+d.id"
+      :class=`{
+      }`
+      :style=`{
+        textAlign: 'start',
+        borderRadius: '10px',
+      }`
+      @click="docClick(d,di)"
+      ).doc-item
+      small(:class=`[docColor]`) {{ d.name }}
 </template>
 
 <script>
