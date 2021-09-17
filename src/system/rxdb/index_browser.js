@@ -21,6 +21,7 @@ import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services_browser'
 import { getRawIdFromId, getRxCollectionEnumFromId, makeId } from 'src/system/rxdb'
 import { ObjectApi } from 'src/api/object'
+import store from 'src/store'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
@@ -300,6 +301,7 @@ class RxDBWrapper {
       const f = this.init
       const t1 = performance.now()
       logD(f, 'start')
+      store.commit('stateSet', ['rxdbInitialized', false])
       if (!(await this.isInitializedGlobal())) {
          logD(f, 'ждем пока сработает initGlobal (она нас вызовет повторно)')
          return
@@ -322,7 +324,7 @@ class RxDBWrapper {
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },
-               setMirroredVuexObject: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
+               mirroredVuexObjectKey: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
             })
             this.workspace.setUser(currentUserDb) // для синхронизации мастерской с сервером
          } else {
@@ -341,7 +343,7 @@ class RxDBWrapper {
          assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
 
          let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
-            setMirroredVuexObject: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
+            mirroredVuexObjectKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
          })
          assert(settingsDb, '!settingsDb')
          this.getCurrentUser = () => {
@@ -349,7 +351,7 @@ class RxDBWrapper {
             return this.store.state.mirrorObjects['currentUser']
          }
          this.initialized = true
-         // this.createTestDb()
+         store.commit('stateSet', ['rxdbInitialized', true])
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE('cant init rxdb. err = ', err)
@@ -370,6 +372,7 @@ class RxDBWrapper {
          this.reactiveDocDbMemCache.reset()
          if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
+         store.commit('stateSet', ['rxdbInitialized', false])
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
@@ -727,7 +730,7 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
-      setMirroredVuexObject = null, // создаст или обновит связанный объект в vuex по этому ключу
+      mirroredVuexObjectKey = null, // создаст или обновит связанный объект в vuex по этому ключу
       queryId = Date.now(), // id запроса чтобы потом можно было отменить
       cancel = false, // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
    } = {}) {
@@ -755,7 +758,7 @@ class RxDBWrapper {
             } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveDoc || setMirroredVuexObject || cancel) {
+      if (!reactiveDoc || mirroredVuexObjectKey || cancel) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -769,7 +772,7 @@ class RxDBWrapper {
             cancel,
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactive(rxDoc, setMirroredVuexObject)
+         reactiveDoc = getReactive(rxDoc, mirroredVuexObjectKey)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })

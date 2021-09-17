@@ -23,6 +23,7 @@ const store = new Vuex.Store({
    },
    strict: process.env.DEV,
    state: {
+      rxdbInitialized: false,
       mirrorObjects: {} // отображения реактивных объектов из rxdb (меняются синхронно с объектами из rxdb (см  reactive.js))
    },
    mutations: {
@@ -31,6 +32,10 @@ const store = new Vuex.Store({
          let copy = JSON.parse(JSON.stringify(val))
          copy.vuexKey = vuexKey
          Vue.set(state.mirrorObjects, vuexKey, copy)
+      },
+      stateSet (state, [key, val]) {
+         assert(Object.prototype.hasOwnProperty.call(state, key))
+         state[key] = val
       }
    },
    getters: {
@@ -38,7 +43,7 @@ const store = new Vuex.Store({
          return state.mirrorObjects['currentUser']
       },
       isGuest: (state, getters, rootState, rootGetters) => {
-         return state.mirrorObjects['currentUser'] ? state.mirrorObjects['currentUser'].profile.role === 'GUEST' : true
+         return state.mirrorObjects['currentUser'] && state.rxdbInitialized ? state.mirrorObjects['currentUser'].profile.role === 'GUEST' : true
       },
       nodeCategories: (state, getters, rootState, rootGetters) => {
          let currentUser = state.mirrorObjects['currentUser']

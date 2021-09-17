@@ -17,8 +17,8 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 
 // dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
-function getReactive (rxDocOrObject, setMirroredVuexObject = null) {
-   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, setMirroredVuexObject) : new ReactiveObjFactory(rxDocOrObject, setMirroredVuexObject)
+function getReactive (rxDocOrObject, mirroredVuexObjectKey = null) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, mirroredVuexObjectKey) : new ReactiveObjFactory(rxDocOrObject, mirroredVuexObjectKey)
    return reactiveDocFactory.getReactive()
 }
 
@@ -68,7 +68,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor (object, setMirroredVuexObject = null) {
+   constructor (object, mirroredVuexObjectKey = null) {
       assert(typeof object === 'object')
       this.vm = new Vue({
          data: {
@@ -84,8 +84,8 @@ class ReactiveObjFactory {
          assert(typeof plainData === 'object', 'typeof payload === \'object\'')
          const reactiveDoc = plainData
          Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
-         if (setMirroredVuexObject) {
-            this.vuexKey = setMirroredVuexObject
+         if (mirroredVuexObjectKey) {
+            this.vuexKey = mirroredVuexObjectKey
             assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
             store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
          }
@@ -96,7 +96,7 @@ class ReactiveObjFactory {
 
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
-   constructor (rxDoc, setMirroredVuexObject = null) {
+   constructor (rxDoc, mirroredVuexObjectKey = null) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
@@ -104,7 +104,7 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster && !setMirroredVuexObject) {
+      if (rxDoc.reactiveItemHolderMaster && !mirroredVuexObjectKey) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
          this.setDebouncedSave = rxDoc.reactiveItemHolderMaster.setDebouncedSave
@@ -231,8 +231,8 @@ class ReactiveDocFactory {
                }
             }
             Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
-            if (setMirroredVuexObject) {
-               this.vuexKey = setMirroredVuexObject
+            if (mirroredVuexObjectKey) {
+               this.vuexKey = mirroredVuexObjectKey
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
                store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
             }
