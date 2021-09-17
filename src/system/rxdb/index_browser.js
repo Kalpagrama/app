@@ -544,7 +544,7 @@ class RxDBWrapper {
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
          await this.findMutex.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
-         assert(this.initialized, '! this.initialized2 !')
+         assert(this.initialized, '! this.initialized2 !' + JSON.stringify(mangoQuery))
          let populateObjects = mangoQuery.populateObjects
          delete mangoQuery.populateObjects // populateObjects мешает нормальному кэшированию в rxdb (нужно только тут)
          let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)

@@ -40,11 +40,11 @@ kalpa-layout
           .row.full-width.q-px-md
             widget-contents().q-mb-sm
             widget-collections().q-mb-sm
-            //widget-bookmarks().q-mb-sm
             widget-drafts().q-mb-sm
             widget-published().q-mb-sm
-            //widget-watch-later.q-mb-sm
             widget-history.q-mb-sm
+            //widget-bookmarks().q-mb-sm
+            //widget-watch-later.q-mb-sm
 </template>
 
 <script>
