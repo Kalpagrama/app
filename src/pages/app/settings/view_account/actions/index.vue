@@ -114,7 +114,7 @@ export default {
       this.$ym('USER_LOGOUT')
       this.loggingOut = true
       await AuthApi.logout()
-      await this.$router.replace('/auth')
+      await this.$router.replace('/')
     },
     async refresh () {
       // let comment = await ObjectApi.commentCreate('100958595302072330', 'Комммент')
