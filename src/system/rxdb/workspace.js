@@ -465,56 +465,6 @@ class Workspace {
       }
    }
 
-   // async processEvent_old (event) {
-   //    const f = this.processEvent
-   //    const t1 = performance.now()
-   //    try {
-   //       await this.lock('rxdb::ws::processEvent')
-   //       logD(f, 'start')
-   //       let { type, wsItem: itemServer, wsRevision } = event
-   //       assert(this.created, '!this.created')
-   //       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
-   //       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
-   //       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
-   //       itemServer.hasChanges = false
-   //       let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
-   //       await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
-   //       if (wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
-   //          logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
-   //          // здесь нельзя явно вызывать synchronizeWsWhole
-   //          this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
-   //          return
-   //       }
-   //       // ищем изменившейся item
-   //       assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
-   //       let reactiveItem = await rxdb.get(null, null, { id: itemServer.id })
-   //       // применим изменения
-   //       if (!reactiveItem || type === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
-   //          logD(f, 'Берем изменения с сервера', type)
-   //          if (reactiveItem && type === 'WS_ITEM_DELETED') {
-   //             // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
-   //             await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
-   //             await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
-   //          } else {
-   //             // logD(f, 'try update ws item')
-   //             assert(!itemServer.hasChanges, 'itemServer.hasChanges')
-   //             await this.db.ws_items.atomicUpsert(itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
-   //          }
-   //          await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
-   //       } else {
-   //          logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
-   //          // просто возьмем ревизию с сервера (нальзя полностью менять данные тк у нас могут быть данные свежее, чем на сервере)
-   //          await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
-   //       }
-   //       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-   //       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
-   //       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   //    } finally {
-   //       this.release()
-   //       // logD(f, 'unlocked')
-   //    }
-   // }
-
    async find (mangoQuery) {
       const f = this.find
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))

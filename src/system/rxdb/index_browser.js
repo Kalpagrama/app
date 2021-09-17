@@ -315,13 +315,14 @@ class RxDBWrapper {
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
          // let currentUser
-         let currentUserDb, currentUserDummy
+         let currentUserDb, currentUserDummy, currentUserDbFetched
          if (userOid) {
             currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+                  currentUserDbFetched = true
                   this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
                },
                mirroredVuexObjectKey: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
@@ -352,6 +353,7 @@ class RxDBWrapper {
          }
          this.initialized = true
          store.commit('stateSet', ['rxdbInitialized', true])
+         if (currentUserDbFetched) this.workspace.switchOnSynchro() // на тот случай, когда onFetchFunc сработает до "this.initialized = true". надо аовторно сбросить таймер ожидания
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE('cant init rxdb. err = ', err)
