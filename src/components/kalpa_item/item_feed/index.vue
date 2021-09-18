@@ -1,6 +1,5 @@
 <template lang="pug">
   div(v-if="!item.deletedAt" :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    div(v-if="$store.state.ui.useDebug").row.full-width isActive:{{isActive}} isVisible:{{isVisible}}
     div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
