@@ -33,13 +33,13 @@ export default {
   data () {
     return {
       locked: false,
-      name: ''
+      name: this.currentUser.name || ''
     }
   },
   watch: {
     name: {
       handler (to, from) {
-        if (this.locked) return
+        // if (this.locked) return
         this.$log('status TO', to)
         this.save()
       }
@@ -53,12 +53,12 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    if (this.currentUser.name) {
-      this.locked = true
-      this.name = this.currentUser.name
-      // await this.$wait(300)
-      this.locked = false
-    }
+    // if (this.currentUser.name) {
+    //   this.locked = true
+    //   this.name = this.currentUser.name
+    //   // await this.$wait(300)
+    //   this.locked = false
+    // }
   }
 }
 </script>

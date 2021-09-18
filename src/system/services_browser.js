@@ -245,27 +245,17 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
       await mutexGlobal.lock('system::systemReset')
       if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
          logW('too often systemReset!')
+         alert('Приложение не может запуститься по неизвестной причине.\n Очистка данных и перезагрузка.')
          await systemHardReset()
          return
-         // let hardReset = confirm('Too often system reset. \n Make app hard reset?')
-         // if (hardReset) {
-         //    hardResetInProgress = true
-         //    await systemHardReset()
-         // }
       }
       if (clearRxdb) await rxdb.deInitGlobal() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
       if (clearAuthData) {
+         // сообщаем другим вкладкам
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
-      } // сообщаем другим вкладкам
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   } catch (err) {
-      let hardReset = confirm('critical error on systemReset: ' + JSON.stringify(err) + '\n\n Make hardReset?')
-      if (hardReset) {
-         await systemHardReset()
       }
-   } finally {
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
       await mutexGlobal.release('system::systemReset')
@@ -273,6 +263,10 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          logW('systemReset::before reload')
          window.location.reload()
       }
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   } catch (err) {
+      alert(`Критическая ошибка ${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
+      await systemHardReset()
    }
 }
 
@@ -349,10 +343,10 @@ async function systemInit () {
 }
 
 async function systemHardReset () {
-   logW('systemHardReset')
+   logW('before systemHardReset...')
    alert('before systemHardReset')
    try {
-      await wait(1000)
+      // await wait(1000)
       if (window.indexedDB) {
          if (window.indexedDB.databases) {
             let dbs = await window.indexedDB.databases()
@@ -378,9 +372,9 @@ async function systemHardReset () {
       if (process.env.MODE === 'pwa') await pwaReset()
       localStorage.clear()
       sessionStorage.clear()
-      logW('systemHardReset complete')
-      await wait(1000)
-      alert('reload after systemHardReset...')
+      logW('systemHardReset complete. reload after systemHardReset...')
+      // await wait(1000)
+      // alert('reload after systemHardReset...')
       window.location.reload()
    } catch (err) {
       alert('error on systemHardReset... reload' + JSON.stringify(err))

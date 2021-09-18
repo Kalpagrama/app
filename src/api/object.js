@@ -155,8 +155,9 @@ class ObjectApi {
 
    static async update (oid, path, newValue) {
       const f = ObjectApi.update
-      logD(f, 'start', oid)
-      console.log('update.newValue')
+      logD(f, 'start', oid, path)
+      // console.log('update.newValue')
+      // alert('ObjectApi.update' + path)
       if (!oid) return //  TODO пытается обновить profile без пользователя (когда не вошли)
       const t1 = performance.now()
       const cb = async () => {

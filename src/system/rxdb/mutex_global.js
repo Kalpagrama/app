@@ -7,7 +7,7 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
 
-const maxGlobalLockTimeFuse = 1000 * 60 // считаем что операция не может быть дольше минуты
+const actualLockUpdateInterval = 500 // интервал обновления статуса активной блокировки
 
 // глобальный (несколько вкладок) мьютекс
 // синглтон (один экземпляр на приложение)
@@ -53,19 +53,19 @@ class MutexGlobal {
       // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
       // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
       window.addEventListener('storage', async function (event) {
-         if (this.lockCnt && event.key && event.key.in('k_global_lock')) { // Мы владели мьютексом, но какая-то вкладка сбросила нас (см maxGlobalLockTimeFuse)
+         if (this.lockCnt && event.key && event.key.in('k_global_lock')) { // Мы владели мьютексом, но какая-то вкладка сбросила нас
             if (event.newValue) {
                let current = JSON.parse(event.newValue)
                assert(current.instanceId, '!current.instanceId')
                if (current.instanceId !== mutexGlobal.getInstanceId()) {
-                  logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. before reload')
-                  let reload = confirm('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. \n Reload?')
-                  if (reload) window.location.reload()
+                  logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. before reload', current.instanceId, mutexGlobal.getInstanceId())
+                  // alert('другая вкладка стала лидером принудительно и захватила управление(0).\nReload required!')
+                  window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
                }
             } else {
                logW('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это - пожтому делаем reload)')
-               let reload = confirm('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это. \n Reload?')
-               if (reload) window.location.reload()
+               // alert('был сделан hardReset.\nReload required!')
+               window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
             }
          }
          if (event.key && event.key.in('k_leader_instance_id')) {
@@ -112,11 +112,11 @@ class MutexGlobal {
       let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
       while (current && current.locked && this.instanceId !== current.instanceId) { // мьютекс захвачен не нами. ждем пока освободится
          // если вкладка, создавшая мьютекс не обновляет его (вкладки уже нет, либо она неактивна)
-         if (Date.now() - current.dtActual > 8888) {
+         if (Date.now() - current.dtActual > actualLockUpdateInterval * 8) {
             logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!')
             break
          }
-         await wait(500) // ждем пока мьютекс освободится
+         await wait(actualLockUpdateInterval / 2) // ждем пока мьютекс освободится
          current = JSON.parse(localStorage.getItem('k_global_lock') || null)
       }
       if (!this.lockCnt) {
@@ -127,19 +127,19 @@ class MutexGlobal {
             instanceId: this.instanceId,
             lockOwner: lockOwner
          }))
-         // 2 раза в секунду обновляем актуальность блокировки (типа мы еще живы)
+         // периодически обновляем актуальность блокировки (типа мы еще живы)
          this.timerActualityId = setInterval(() => {
             // todo
             let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
             if (!current || current.instanceId !== mutexGlobal.getInstanceId()) {
-               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. current=', current)
-               let reload = confirm('другая вкладка захватила наш мьютекс тк посчитала это дедлоком(2). \n Reload?')
-               if (reload) window.location.reload()
+               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. current k_global_lock=', current, mutexGlobal.getInstanceId())
+               // alert('другая вкладка стала лидером принудительно и захватила управление(1). \n Reload required!')
+               window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
             } else { // обновляем актуальность блокировки
                current.dtActual = Date.now()
                localStorage.setItem('k_global_lock', JSON.stringify(current))
             }
-         }, 500)
+         }, actualLockUpdateInterval)
       }
       this.lockCnt++
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -155,14 +155,15 @@ class MutexGlobal {
       if (!this.lockCnt) {
          if (this.timerActualityId) clearInterval(this.timerActualityId)
          let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
-         assert('instanceId' in current)
-         if (current.instanceId === this.instanceId) { // (мог кто-то перехватить)
+         if (current && current.instanceId === this.instanceId) {
             logD(f, 'release globalLock', this.instanceId, current)
             current.locked = false
             localStorage.setItem('k_global_lock', JSON.stringify(current)) // нельзя удалять k_global_lock (см window.addEventListener('storage'... )!
-         } else if (current.instanceId) { // кто-то перехватил наш mutex. мы теперь не владеем этим мьютексом
-            logW(f, `кто то перехватил наш мьютекс: ${JSON.stringify(current)}`)
-         } // такое возможно из-за maxGlobalLockTimeFuse
+         } else { // кто-то перехватил наш mutex. мы теперь не владеем этим мьютексом
+            logW(f, `кто то перехватил наш мьютекс: ${JSON.stringify(current)}   window.location.reload...`)
+            // alert('кто то перехватил наш мьютекс. \n Reload required!')
+            window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
+         }
       }
    }
 }
