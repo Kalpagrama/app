@@ -156,7 +156,27 @@ export default {
       this.scrollHeight = 0
       this.itemsRes = itemsRes
       this.vsItems = this.vsItems = itemsRes?.items.map(item => {
-        return { source: item, state: { itemId: item[this.itemKey] } }
+        return {
+          source: item,
+          state: {
+            itemId: item[this.itemKey],
+            xxx: Math.random(),
+            // элементов в списке может быть ОЧЕНЬ много (отрендеренный итем(их реально создается мало) вызывает onResize )
+            onResize: (itemIndex, heightFrom, heightTo) => {
+              // отрендеренный компонент поменял высоту
+              // this.$log('onResize item', itemIndex, heightFrom, heightTo)
+              if (heightFrom && itemIndex < this.itemMiddleIndx) {
+                // элемент вверх изменил размер. Если ничего не делать - скролл будет дергаться
+                let diff = heightTo - heightFrom
+                if (diff) {
+                  this.$log('onResize item', itemIndex, 'diff=', diff)
+                  this.$log('getScrollPosition', getScrollPosition(this.scrollTarget))
+                  // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
+                }
+              }
+            }
+          }
+        }
       }) || []
       if (itemsRes) this.$log('resetItemsRes length=', this.length)
       if (this.$refs.vs) this.$refs.vs.refresh()
@@ -172,7 +192,7 @@ export default {
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
-    scrollTo(indx){
+    scrollTo (indx) {
       this.$log('scrollTo', indx)
       if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
     },
