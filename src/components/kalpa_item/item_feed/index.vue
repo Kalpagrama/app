@@ -3,9 +3,9 @@
     v-if="true || !item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
     //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
-    div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
-      span !!!deleted!!!
-    div(v-else-if="!hasItemFull").row.full-width
+    //div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
+    //  span !!!deleted!!!
+    div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
