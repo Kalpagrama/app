@@ -57,12 +57,9 @@
                    threshold: 0.0,
                 },
               }`
-              :style=`{border: itemMiddleIndx === index && $store.state.ui.useDebug ? '1px solid green' : ''}`
+              :style=`{position: 'relative'}`
               @click="onItemClick(index)"
             ).row.full-width
-              span(
-                v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`
-              ) # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
               slot(
                 name="item"
                 :item="item"
@@ -72,6 +69,8 @@
                 :isVisible="!!itemsVisibility[item[itemKey]]"
                 :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
               )
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-center.text-bold.text-h1.z-max {{index}}
 </template>
 
 <script>
