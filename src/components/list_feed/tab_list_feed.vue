@@ -67,8 +67,8 @@
                 :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo(0) : null" @dblclick="pageId === p.id ? scrollTo(length()-1) : null")
       template(v-slot:footer)
         q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
-      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload}`)
-        slot(name="item" :item="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible" :isPreload="isPreload")
+      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload, scrolling}`)
+        slot(name="item" :item="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible" :isPreload="isPreload" :scrolling="scrolling")
 </template>
 
 <script>

@@ -1,7 +1,9 @@
 <template lang="pug">
-  div(v-if="!item.deletedAt"
+  //component(v-if="!item.deletedAt && isVisible && hasItemFull" :is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
+  div(
+    v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
+    q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
     div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
@@ -17,7 +19,7 @@
             .row
               q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
               q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
-            .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-md
+            .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
               span {{item.name || item.vertexType}}
             .row.items-center.justify-between.no-wrap.q-px-md
               .row.items-center
@@ -26,14 +28,12 @@
               .row.items-center
                 q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
                 q-skeleton(type='text' width='30px' animation="none" dark)
-              .row.items-center
+              .row.items-center.q-pb-md.q-pb-xl
                 q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
       component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
-      div(v-if="item.deletedAt").absolute.fit.dimmed.z-top
-        span.absolute-center.text-white.text-h4 {{$t('unpublished')}}
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -59,6 +59,7 @@ export default {
     isActive: { type: Boolean, default: false },
     isVisible: { type: Boolean, default: false },
     isPreload: { type: Boolean, default: false },
+    scrolling: { type: Boolean, default: false },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
     showAuthorAlways: { type: Boolean, default: false },
@@ -123,23 +124,23 @@ export default {
     }
   },
   watch: {
-    hasItemFull: {
-      immediate: false,
-      async handler (to, from) {
-        if (process.env.NODE_ENV === 'development') {
-          // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
-          if (to) {
-            let checkChData = (parent) => {
-              assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
-              for (let ch of parent.$children) {
-                checkChData(ch)
-              }
-            }
-            this.$nextTick(() => checkChData(this))
-          }
-        }
-      }
-    },
+    // hasItemFull: {
+    //   immediate: false,
+    //   async handler (to, from) {
+    //     if (process.env.NODE_ENV === 'development') {
+    //       // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
+    //       if (to) {
+    //         let checkChData = (parent) => {
+    //           assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
+    //           for (let ch of parent.$children) {
+    //             checkChData(ch)
+    //           }
+    //         }
+    //         this.$nextTick(() => checkChData(this))
+    //       }
+    //     }
+    //   }
+    // },
     isVisible: {
       immediate: false,
       async handler (to, from) {
@@ -159,7 +160,15 @@ export default {
           else this.cancelItemFullPreload()
         }
       }
-    }
+    },
+    scrolling: {
+      immediate: false,
+      async handler (to, from) {
+        if (from && !to) {
+          if (this.isVisible || this.isPreload) this.getFullItem()
+        }
+      }
+    },
   },
   methods: {
     getFullItem () {
@@ -168,7 +177,9 @@ export default {
       if (!data.itemFull && !data.queryId) {
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
-            .then(itemFull => this.$set(data, 'itemFull', itemFull))
+            .then(itemFull => {
+              if (!this.scrolling) this.$set(data, 'itemFull', itemFull)
+            })
             .catch(err => this.$logE('err on get itemFull', err))
             .finally(() => {
               data.queryId = null
@@ -192,7 +203,7 @@ export default {
         data.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
-              if (itemFull) this.$set(data, 'itemFull', itemFull)
+              if (itemFull && !this.scrolling) this.$set(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on preload itemFull', err))
             .finally(() => {

@@ -3,6 +3,67 @@
   div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
     q-spinner-dots(v-if="!itemsRes" color="green" size="60px"
       :style=`{ position: scrollAreaHeight ? 'absolute' : 'fixed', top: '50%', left: 'calc(50% - 30px)'}`)
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="debugPosition && $store.state.ui.useDebug"
+        :style=`{
+        position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
+      }`
+      ).row.q-pa-sm.br
+        div(
+          :style=`{
+          position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
+          overflow: 'hidden',
+        }`
+        ).q-pa-sm
+          transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+            div(
+              v-if="itemsRes && debugOpened"
+              :style=`{
+              borderRadius: '10px',
+              whiteSpace: 'nowrap'
+            }`
+            ).row.text-white.bg-green.q-pa-sm.bg
+              small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
+              small.full-width scrollHeight: {{ scrollHeight }}
+              small.full-width scrolling: {{ scrolling }}
+        //- default
+        div(
+          v-if="itemsRes"
+          :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
+          q-btn(
+            @click="debugOpened = !debugOpened"
+            :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
+            round flat dense color="white" ).full-width
+            //- q-tooltip Дебаг вкл/выкл
+          q-btn(
+            @click="gotoStart"
+            :color="itemsRes.hasPrev ? 'white' : 'red'"
+            :disabled="!itemsRes.hasPrev"
+            round flat dense icon="vertical_align_top").full-width
+            //- q-tooltip В начало
+          q-btn(
+            @click="prev()"
+            :loading="itemsResStatus === 'PREV'"
+            :color="itemsRes.hasPrev ? 'white' : 'red'"
+            :disabled="!itemsRes.hasPrev"
+            round flat dense  icon="north").full-width
+            //- q-tooltip Назад
+          q-btn(
+            @click="itemMiddleScrollIntoView('BTN')"
+            round flat dense color="white" icon="adjust").full-width
+          q-btn(
+            @click="gotoCurrent"
+            round flat dense color="white").full-width
+            q-icon(name="flip").rotate-270
+            //- q-tooltip Начать с текущего
+          q-btn(
+            @click="next()"
+            :loading="itemsResStatus === 'NEXT'"
+            :color="itemsRes.hasNext ? 'white' : 'red'"
+            :disabled="!itemsRes.hasNext"
+            round flat dense  icon="south").full-width
+            //- q-tooltip Вперед
     //- items
     .row.full-width.items-start.content-start
       // если указана scrollAreaHeight, то скролл будет в q-scroll-area с указанной высотой
@@ -28,6 +89,7 @@
           opacity: 0.2,
           }`
       ).full-width
+        q-scroll-observer(:debounce="100" @scroll="onScroll")
         // headers + items
         .row.full-width
           slot(name="header")
@@ -45,7 +107,7 @@
           :items="vsItems"
           :virtual-scroll-item-size="itemHeightApprox"
           :virtual-scroll-sticky-size-start="stickyHeaderHeight"
-          @virtual-scroll="onScroll")
+          @virtual-scroll="onScrollVS")
           template(v-slot:default=`{ item: {source: item, state}, index }`)
             //-item
             div(
@@ -59,7 +121,7 @@
               }`
               :style=`{position: 'relative'}`
               @click="onItemClick(index)"
-            ).row.full-width
+            ).row.full-width.br
               slot(
                 name="item"
                 :item="item"
@@ -68,6 +130,7 @@
                 :isActive="itemMiddleIndx === index"
                 :isVisible="!!itemsVisibility[item[itemKey]]"
                 :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+                :scrolling="scrolling"
               )
               span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
               span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-center.text-bold.text-h1.z-max {{index}}
@@ -77,6 +140,7 @@
 import { scroll } from 'quasar'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
+import debounce from 'lodash/debounce'
 
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
@@ -114,10 +178,18 @@ export default {
       itemMiddleIndx: null,
       stickyHeaderHeight: 0,
       preloadInterval: { from: -1, to: -1 },
-      scrollHeight: 0
+      scrollHeight: 0,
+      scrolling: false,
+      debugOpened: false
     }
   },
   computed: {
+    debugPosition () {
+      return {
+        top: 40 + '%',
+        right: 0 + 'px'
+      }
+    },
     length () {
       return this.vsItems.length || 0
     },
@@ -126,6 +198,9 @@ export default {
     },
     scrollTarget () {
       return this.scrollAreaHeight ? `#${this.scrollId} > .scroll` : getScrollTarget(this.$el)
+    },
+    scrollTargetIsWindow () {
+      return this.scrollTarget === window
     },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
@@ -195,7 +270,17 @@ export default {
       this.$log('scrollTo', indx)
       if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
     },
-    onScroll (details) {
+    onScroll (event) {
+      // this.$log('scroll', event)
+      if (!this.debouncedScrollingClear) {
+        this.debouncedScrollingClear = debounce(() => {
+          this.scrolling = false
+        }, 500)
+      }
+      this.scrolling = true
+      this.debouncedScrollingClear()
+    },
+    onScrollVS (details) {
       if (this.length) {
         this.itemMiddleIndx = details.index
         if (details.direction === 'increase') { // мотаем вниз

@@ -14,20 +14,21 @@ kalpa-layout
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :itemHeightApprox="500"
+          :itemHeightApprox="600"
           :itemMiddlePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
         ).row.full-width
-          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
             item-feed(
               :itemShortOrFull="item"
               :itemState="itemState"
               :itemIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible"
-              :isPreload="isPreload").q-pb-xl
+              :isPreload="isPreload"
+              :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>
