@@ -27,7 +27,7 @@ export default {
   nodeCreating: false,
   listFeedGoToStart: false,
   // debug
-  useDebug: false,
+  useDebug: true,
   kalpaWelcome: null,
   authGuard: null,
   bookmarkTypes: [
