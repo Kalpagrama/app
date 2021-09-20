@@ -20,7 +20,7 @@
               q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
               q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-              span {{item.name || item.vertexType}}
+              span {{item.name || this.$nodeItemType(item.vertexType).name}}
             .row.items-center.justify-between.no-wrap.q-px-md
               .row.items-center
                 q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
@@ -124,23 +124,23 @@ export default {
     }
   },
   watch: {
-    // hasItemFull: {
-    //   immediate: false,
-    //   async handler (to, from) {
-    //     if (process.env.NODE_ENV === 'development') {
-    //       // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
-    //       if (to) {
-    //         let checkChData = (parent) => {
-    //           assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
-    //           for (let ch of parent.$children) {
-    //             checkChData(ch)
-    //           }
-    //         }
-    //         this.$nextTick(() => checkChData(this))
-    //       }
-    //     }
-    //   }
-    // },
+    hasItemFull: {
+      immediate: false,
+      async handler (to, from) {
+        if (process.env.NODE_ENV === 'development') {
+          // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
+          if (to) {
+            let checkChData = (parent) => {
+              assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
+              for (let ch of parent.$children) {
+                checkChData(ch)
+              }
+            }
+            this.$nextTick(() => checkChData(this))
+          }
+        }
+      }
+    },
     isVisible: {
       immediate: false,
       async handler (to, from) {
@@ -165,6 +165,7 @@ export default {
       immediate: false,
       async handler (to, from) {
         if (from && !to) {
+          // скролл остановился. itemFull можно заполнять только при остановленном скролле
           if (this.isVisible || this.isPreload) this.getFullItem()
         }
       }
@@ -178,6 +179,7 @@ export default {
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
             .then(itemFull => {
+              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
               if (!this.scrolling) this.$set(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on get itemFull', err))
@@ -203,6 +205,7 @@ export default {
         data.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
+              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
               if (itemFull && !this.scrolling) this.$set(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on preload itemFull', err))

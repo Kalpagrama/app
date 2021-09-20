@@ -14,7 +14,7 @@ kalpa-layout
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :itemHeightApprox="600"
+          :itemHeightApprox="500"
           :itemMiddlePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"

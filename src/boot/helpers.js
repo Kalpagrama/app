@@ -45,7 +45,7 @@ const nodeItemTypesPairs = [
 
 const nodeItemType = (type) => {
   // console.log('nodeItemType:type', type)
-  return nodeItemTypes.find(t => t.id === type)
+  return nodeItemTypes.find(t => t.id === type) || {name: '!NOTFOUND! type=' + type}
 }
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {

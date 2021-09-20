@@ -3,6 +3,7 @@
   div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
     q-spinner-dots(v-if="!itemsRes" color="green" size="60px"
       :style=`{ position: scrollAreaHeight ? 'absolute' : 'fixed', top: '50%', left: 'calc(50% - 30px)'}`)
+    // debug
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="debugPosition && $store.state.ui.useDebug"
