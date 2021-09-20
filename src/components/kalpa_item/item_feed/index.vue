@@ -32,7 +32,7 @@
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item" :showAuthorAlways="true")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
