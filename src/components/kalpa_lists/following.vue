@@ -14,7 +14,7 @@
         template(v-slot:externalHeader)
           .full-width
             span.text-grey {{$t('Following')}}
-        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           div(
             v-if="item.type === 'USER'"
             @click="$router.push('/user/'+item.oid)"

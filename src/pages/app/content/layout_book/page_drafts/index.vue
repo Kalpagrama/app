@@ -24,7 +24,7 @@
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)
-        template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible,isPreload}`)
+        template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible,isPreload, scrolling}`)
           q-btn(
             v-if="true || draft.items[0] && draft.items[0].layers"
             round outline no-caps

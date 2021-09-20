@@ -32,7 +32,7 @@
     ).fit
     //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     video(
-      v-if="false && isPlayerVisible"
+      v-if="isPlayerVisible"
       ref="videoRef"
       type="video/mp4"
       preload="metadata"

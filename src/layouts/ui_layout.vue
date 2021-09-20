@@ -15,12 +15,13 @@
         paddingBottom: '50px',
       }`
       :query="query")
-      template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+      template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         item-feed(
           :itemShortOrFull="item.populatedObject"
           :isActive="isActive_ && isActive"
           :isVisible="isVisible"
-          :isPreload="isPreload")
+          :isPreload="isPreload"
+          :scrolling="scrolling")
 </template>
 
 <script>

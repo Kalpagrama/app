@@ -41,7 +41,7 @@
       :itemHeightApprox="60"
       :itemMiddlePersist="true"
       @count="commentsCount = $event").row.full-width
-      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         comment-item(:comment="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" @delete="commentDelete")
     //list-feed(
     //  :query="query"
@@ -52,7 +52,7 @@
     //    maxWidth: $store.state.ui.pageWidth+'px',
     //  }`
     //  @count="commentsCount = $event")
-    //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload}`)
+    //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
     //    comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
 </template>
 

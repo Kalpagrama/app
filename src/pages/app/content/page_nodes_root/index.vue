@@ -16,7 +16,7 @@
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)
-        template(v-slot:item=`{item:group,itemIndex,isActive,isVisible,isPreload}`)
+        template(v-slot:item=`{item:group,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           div(
             :style=`{
               borderRadius: '10px',

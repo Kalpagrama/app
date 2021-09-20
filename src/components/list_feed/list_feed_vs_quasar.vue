@@ -122,7 +122,7 @@
               }`
               :style=`{position: 'relative'}`
               @click="onItemClick(index)"
-            ).row.full-width.br
+            ).row.full-width
               slot(
                 name="item"
                 :item="item"

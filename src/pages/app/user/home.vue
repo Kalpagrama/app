@@ -42,7 +42,7 @@
           ).row.full-width
             template(v-slot:externalHeader)
               nav-header(:user="user" @followers="showFollowDialog=true, followersFollowing='followers'" @following="showFollowDialog=true, followersFollowing='following'")
-            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               div(
                 v-if="pageId === 'votes' && item.votedUserRate"
                 :style=`{
@@ -75,7 +75,8 @@
                 :itemIndex="itemIndex"
                 :isActive="isActive"
                 :isVisible="isVisible"
-                :isPreload="isPreload").q-pb-sm
+                :isPreload="isPreload"
+                :scrolling="scrolling").q-pb-sm
 </template>
 
 <script>

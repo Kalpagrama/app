@@ -1,9 +1,8 @@
 <template lang="pug">
-  //component(v-if="!item.deletedAt && isVisible && hasItemFull" :is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
   div(
     v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
+    //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
     div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item

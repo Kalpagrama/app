@@ -18,7 +18,7 @@
             :itemHeightApprox="100"
             :itemMiddlePersist="true"
           ).row.full-width
-            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               notification-item(
                 :notification="item"
                 :itemState="itemState"

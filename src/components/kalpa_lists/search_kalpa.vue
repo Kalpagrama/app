@@ -15,7 +15,7 @@
       @pageId="pageId = $event"
       @searchInputState="$emit('searchInputState', $event)"
     ).row.full-width
-      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload}`)
+      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         div(
           @click="onSelected(item)"
           :style=`{

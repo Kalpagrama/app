@@ -20,7 +20,7 @@ kalpa-layout
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
         ).row.full-width
-          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
             item-feed(
               :itemShortOrFull="item"
               :itemState="itemState"
