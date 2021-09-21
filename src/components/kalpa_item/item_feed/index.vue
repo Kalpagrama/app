@@ -1,4 +1,6 @@
 <template lang="pug">
+  //node-feed(:is="componentName"  v-bind="$props" :itemState="data" :node="itemState.xxx")
+  //  q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
   div(
     v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
@@ -32,41 +34,7 @@
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-  component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
-  //div(
-  //  v-if="!item.deletedAt"
-  //  :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-  //  //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
-  //  div(v-if="!hasItemFull").row.full-width
-  //    q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
-  //      q-item
-  //        q-item-section(avatar)
-  //          q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
-  //        q-item-section
-  //          q-item-label
-  //            q-skeleton(type='text' :animation="data.queryId ? 'wave' : 'none'" dark)
-  //          q-item-label(caption='')
-  //            q-skeleton(type='text' width='80%' animation="none" dark)
-  //      q-item.q-px-none
-  //        q-item-section
-  //          .row
-  //            q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
-  //            q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
-  //          .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-  //            span {{item.name || this.$nodeItemType(item.vertexType || item.verices[0]).name}}
-  //          .row.items-center.justify-between.no-wrap.q-px-md
-  //            .row.items-center
-  //              q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
-  //              q-skeleton(type='text' width='30px' animation="none" dark)
-  //            .row.items-center
-  //              q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
-  //              q-skeleton(type='text' width='30px' animation="none" dark)
-  //            .row.items-center.q-pb-md.q-pb-xl
-  //              q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
-  //              q-skeleton(type='text' width='30px' animation="none" dark)
-  //
-  //  div(v-else :style=`{position: 'relative'}`).row.full-width
-  //    component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!

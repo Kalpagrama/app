@@ -25,7 +25,7 @@
               whiteSpace: 'nowrap'
             }`
             ).row.text-white.bg-green.q-pa-sm.bg
-              small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
+              small.full-width scrollTargetIsWindow: {{ !this.scrollAreaHeight }}
               small.full-width scrollHeight: {{ scrollHeight }}
               small.full-width scrolling: {{ scrolling }}
         //- default
@@ -90,7 +90,7 @@
           opacity: 0.2,
           }`
       ).full-width
-        q-scroll-observer(:debounce="100" @scroll="onScroll")
+        q-scroll-observer(:debounce="100" @scroll="onScrollObserver")
         // headers + items
         .row.full-width
           slot(name="header")
@@ -101,7 +101,6 @@
           //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
         // items list
         q-virtual-scroll(
-          v-if="itemsRes"
           ref="vs"
           :scroll-target="scrollTarget"
           dark
@@ -136,8 +135,8 @@
                 :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
                 :scrolling="scrolling"
               )
-              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
-              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'grey'}`).absolute-center.text-bold.text-h1.z-max {{index}}
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`).absolute-center.text-bold.text-h1.z-max {{index}}
 </template>
 
 <script>
@@ -202,10 +201,7 @@ export default {
       return 'scroll-area-with-virtual-scroll-uid-' + Date.now() + Math.random()
     },
     scrollTarget () {
-      return this.scrollAreaHeight ? `#${this.scrollId} > .scroll` : getScrollTarget(this.$el)
-    },
-    scrollTargetIsWindow () {
-      return this.scrollTarget === window
+      return this.scrollAreaHeight ? `#${this.scrollId} > .scroll` : 'body'
     },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
@@ -274,15 +270,15 @@ export default {
       this.$log('scrollTo', indx)
       if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
     },
-    onScroll (event) {
-      // this.$log('scroll', event)
-      if (!this.debouncedScrollingClear) {
-        this.debouncedScrollingClear = debounce(() => {
-          this.scrolling = false
-        }, 500)
-      }
-      this.scrolling = true
-      this.debouncedScrollingClear()
+    onScrollObserver (event) {
+      // // this.$log('onScrollObserver', event)
+      // if (!this.debouncedScrollingClear) {
+      //   this.debouncedScrollingClear = debounce(() => {
+      //     this.scrolling = false
+      //   }, 500)
+      // }
+      // this.scrolling = true
+      // this.debouncedScrollingClear()
     },
     onScrollVS (details) {
       if (this.length) {
@@ -307,7 +303,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', getScrollTarget(this.$el), this.scrollAreaHeight)
+    this.$log('mounted', this.scrollAreaHeight, this.itemHeightApprox)
     if (!this.scrollAreaHeight) assert(getScrollTarget(this.$el) === window, 'если не указана высота, то скролл умеет показываться только в window!!!')
   }
 }

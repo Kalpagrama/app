@@ -15,7 +15,7 @@ kalpa-layout
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :itemHeightApprox="500"
+          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
           :itemMiddlePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
@@ -74,7 +74,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
+          objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
