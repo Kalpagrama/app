@@ -120,9 +120,12 @@
                    threshold: 0.0,
                 },
               }`
-              :style=`{position: 'relative'}`
+              :style=`{
+                        // height: Math.min($store.state.ui.pageWidth, $q.screen.height) + 'px',
+                        // overflow: 'hide',
+                        position: 'relative'}`
               @click="onItemClick(index)"
-            ).row.full-width
+            ).row.full-width.br
               slot(
                 name="item"
                 :item="item"
@@ -276,7 +279,7 @@ export default {
       if (!this.debouncedScrollingClear) {
         this.debouncedScrollingClear = debounce(() => {
           this.scrolling = false
-        }, 500)
+        }, 1000)
       }
       this.scrolling = true
       this.debouncedScrollingClear()
