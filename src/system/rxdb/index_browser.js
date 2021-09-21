@@ -616,21 +616,7 @@ class RxDBWrapper {
                               logE('cant populate topObject1:' + topObject.oid, err)
                            })
                      })
-                     let internalObjectPromises = [] // внутренние объекты ядра и джоинтов (запрашиваем с упреждением чтобы все уместилось в 1 запрос на бэкенд)
-                     for (let topObject of itemsForPopulate) {
-                        internalObjectPromises.push(...topObject.internalItemOids.map(
-                              oid => this.get(RxCollectionEnum.OBJ, oid, { clientFirst: true }
-                              ).catch(err => {
-                                 // не найден внутренний элемент. Добавим родительский объект в черный список
-                                 this.hideObjectOrSource(topObject.oid, null).catch(err => logE('cant hideObjectOrSource topObject2:', topObject, err))
-                                 logE('cant populate topObject2:', topObject, err)
-                              })
-                           ))
-                     }
-
                      populatedItems = (await Promise.all(promises)).filter(el => !!el)
-                     await Promise.all(internalObjectPromises)
-
                      if (itemsForPrefetch) {
                         itemsForPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
                            clientFirst: true,
@@ -779,6 +765,7 @@ class RxDBWrapper {
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
       let reactiveObject = reactiveDoc.getPayload()
+      // -- это уже не надо. Объект с бэкенда приходит заполненный
       // const populate = async (obj, queryId) => {
       //    if (obj.type.in('NODE', 'JOINT')) {
       //       logD('populate itemFull', obj.name, obj.oid)

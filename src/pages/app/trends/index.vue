@@ -9,6 +9,7 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
+          :type="'quasar'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"

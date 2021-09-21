@@ -10,7 +10,7 @@
         :style=`{
         position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
       }`
-      ).row.q-pa-sm.br
+      ).row.q-pa-sm
         div(
           :style=`{
           position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
@@ -125,7 +125,7 @@
                         // overflow: 'hide',
                         position: 'relative'}`
               @click="onItemClick(index)"
-            ).row.full-width.br
+            ).row.full-width
               slot(
                 name="item"
                 :item="item"
@@ -145,6 +145,7 @@ import { scroll } from 'quasar'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import debounce from 'lodash/debounce'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 
@@ -238,7 +239,6 @@ export default {
           source: item,
           state: {
             itemId: item[this.itemKey],
-            xxx: Math.random(),
             // элементов в списке может быть ОЧЕНЬ много (отрендеренный итем(их реально создается мало) вызывает onResize )
             onResize: (itemIndex, heightFrom, heightTo) => {
               // отрендеренный компонент поменял высоту

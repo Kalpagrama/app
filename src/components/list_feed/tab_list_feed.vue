@@ -9,7 +9,8 @@
     //    v-for="(p,pi) in (pages)" :key="p.id" :name="p.id"
     //    :style=`{background: 'none'}`
     //  ).row.full-width.items-start.content-start.justify-center.q-pa-none
-    list-feed-vs(
+    component(
+    :is="'list-feed-' + type"
       ref="listFeed"
       :scrollAreaHeight="scrollAreaHeight"
       :query="query"
@@ -77,13 +78,13 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
-import listFeedVs from 'src/components/list_feed/list_feed_vs_quasar.vue'
-// import listFeedVs from 'src/components/list_feed/list_feed_vs_list.vue'
+import listFeedQuasar from 'src/components/list_feed/list_feed_vs_quasar.vue'
+import listFeedCustom from 'src/components/list_feed/list_feed_custom.vue'
 
 export default {
   name: 'tabListFeed',
   props: {
-    // id: { type: String, default: 'null' },
+    type: { type: String, default: 'quasar' },
     scrollAreaHeight: { type: Number },
     navHeaderText: { type: String, default: '' },
     searchString: { type: String, default: '' },
@@ -100,7 +101,8 @@ export default {
   components: {
     bookmarkListItem,
     bookmarkEditor,
-    listFeedVs,
+    listFeedQuasar,
+    listFeedCustom,
   },
   watch: {
     pageId: {

@@ -32,7 +32,7 @@
                 small.full-width scrollTop: {{ scrollTop }}
                 small.full-width scrollBottom: {{ scrollBottom }}
                 small.full-width scrollHeight: {{ scrollHeight }}
-                small.full-width itemsRes.itemsHeaderFooter: {{ itemsRes.itemsHeaderFooter.length }}
+                small.full-width count: {{ length }}
                 small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
                 q-btn(
                   @click="itemMiddleGetPosition"
@@ -89,7 +89,7 @@
         }`
       ).row.full-width.items-start.content-start
         div(
-          v-for="(item, itemIndex) in itemsRes.itemsHeaderFooter"
+          v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
           :key="item[itemKey]"
           :ref="`item-${item[itemKey]}`"
           :accessKey="`${item[itemKey]}-${itemIndex}`"
@@ -121,7 +121,9 @@
           // item
           div(
             v-else
-            :style=`{...itemStyles}`
+            :style=`{
+              position: 'relative',
+              ...itemStyles}`
             :accessKey="`${item[itemKey]}-${itemIndex}`"
             v-observe-visibility=`{
             throttle: 300,
@@ -132,14 +134,19 @@
             },
             }`
           ).row.full-width
-            span(v-if="$store.state.ui.useDebug" :dimmed="!!itemsVisibility[item[itemKey]]" :style=`{color: itemMiddle && itemMiddle.key === item[itemKey] ? 'green' : 'white'}`
-            ) # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{item.debugInfo().indxHF }} of {{item.debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
             slot(
               name="item"
               :item="item"
+              :itemState="state"
               :itemIndex="itemIndex"
               :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
-              :isVisible="!!itemsVisibility[item[itemKey]]")
+              :isVisible="!!itemsVisibility[item[itemKey]]",
+              :isPreload="true"
+              )
+            span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
+            ).absolute-top # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{debugInfo().indxHF }} of {{debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
+            span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
+            ).absolute-center.text-bold.text-h1.z-max {{itemIndex}}
       slot(name="append")
 </template>
 
@@ -210,6 +217,7 @@ export default {
       scrollHeight: 0,
       itemsRes: null,
       itemsResStatus: null,
+      vsItems: [],
       // item
       itemMiddleHistory: [],
       itemsVisibility: {}
@@ -258,7 +266,7 @@ export default {
       }
     },
     length () {
-      return this.itemsRes ? this.itemsRes.itemsHeaderFooter.length : 0
+      return this.vsItems.length
     }
   },
   watch: {
@@ -281,6 +289,28 @@ export default {
         this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
         this.itemMiddleTopUpdate()
         this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
+        this.vsItems = this.vsItems = this.itemsRes.itemsHeaderFooter.map(item => {
+          return {
+            debugInfo: item.debugInfo,
+            source: item.populatedObject || item,
+            state: {
+              itemId: item[this.itemKey],
+              onResize: (itemIndex, heightFrom, heightTo) => {
+                // отрендеренный компонент поменял высоту
+                // this.$log('onResize item', itemIndex, heightFrom, heightTo)
+                if (heightFrom && itemIndex < this.itemMiddleIndx) {
+                  // элемент вверх изменил размер. Если ничего не делать - скролл будет дергаться
+                  let diff = heightTo - heightFrom
+                  if (diff) {
+                    this.$log('onResize item', itemIndex, 'diff=', diff)
+                    this.$log('getScrollPosition', getScrollPosition(this.scrollTarget))
+                    // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
+                  }
+                }
+              }
+            }
+          }
+        }) || []
         this.$nextTick(() => {
           this.$log('itemsRes.itemsHeaderFooter $nextTick')
           if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
