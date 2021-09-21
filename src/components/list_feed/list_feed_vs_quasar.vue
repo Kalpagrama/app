@@ -279,7 +279,7 @@ export default {
       if (!this.debouncedScrollingClear) {
         this.debouncedScrollingClear = debounce(() => {
           this.scrolling = false
-        }, 1000)
+        }, 500)
       }
       this.scrolling = true
       this.debouncedScrollingClear()
@@ -295,7 +295,7 @@ export default {
           this.preloadInterval.to = this.itemMiddleIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
-        this.$log('scroll', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
+        this.$log('onScrollVS', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
         this.scrollHeight = details.ref.$el.clientHeight
         if (this.itemMiddlePersist) this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
