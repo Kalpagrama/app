@@ -2,7 +2,7 @@
 <template lang="pug">
   div(:style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
     div(ref="scrolledItems").row.full-width
-      q-resize-observer(@resize="scrollHeightResized")
+      q-resize-observer(@resize="scrollResized")
       //- debug
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
@@ -28,10 +28,9 @@
               ).row.text-white.bg-green.q-pa-sm.bg
                 small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
                 small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
-                small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
                 small.full-width scrollTop: {{ scrollTop }}
                 small.full-width scrollBottom: {{ scrollBottom }}
-                small.full-width scrollHeight: {{ scrollHeight }}
+                small.full-width scrolledItemsHeight: {{ scrolledItemsHeight }}
                 small.full-width count: {{ length }}
                 small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
                 q-btn(
@@ -208,13 +207,12 @@ export default {
       // scrollTarget
       scrollTarget: null,
       scrollTargetHeight: 0,
-      scrollTargetWidth: 0,
       // scrollTop
       scrollTop: 0,
       // scrollBottom
       scrollBottom: 0,
-      // scrollHeight
-      scrollHeight: 0,
+      // scrolledItemsHeight
+      scrolledItemsHeight: 0,
       itemsRes: null,
       itemsResStatus: null,
       vsItems: [],
@@ -239,9 +237,9 @@ export default {
       }
     },
     rootMargin () {
-      if (this.scrollHeight >= this.scrollTargetHeight) return '-50% 0px'
+      if (this.scrolledItemsHeight >= this.scrollTargetHeight) return '-50% 0px'
       else { // скролл не заполнен
-        return `-${Math.ceil(50 * (this.scrollHeight / this.scrollTargetHeight))}% 0px`
+        return `-${Math.ceil(50 * (this.scrolledItemsHeight / this.scrollTargetHeight))}% 0px`
       }
     },
     itemKey () {
@@ -334,10 +332,10 @@ export default {
         }
       }
     },
-    scrollHeight: {
+    scrolledItemsHeight: {
       async handler (to, from) {
-        // this.$log(`scrollHeight ${from}->${to}`)
-        this.itemMiddleScrollIntoView('scrollHeight IN')
+        // this.$log(`scrolledItemsHeight ${from}->${to}`)
+        this.itemMiddleScrollIntoView('scrolledItemsHeight IN')
       }
     },
     scrollTop: {
@@ -522,18 +520,17 @@ export default {
       this.nextCompleteDt = Date.now()
     },
     scrollUpdate (e) {
-      // this.$logW('scrollUpdate', e)
-      this.scrollHeight = this.$refs.scrolledItems.clientHeight // обновится чуть позже в scrollHeightResized (а сейчас scrollHeight - в неактуальном состоянии. берем актуальные данные)
+      if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
+      this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight // обновится чуть позже в scrollResized (а сейчас scrolledItemsHeight - в неактуальном состоянии. берем актуальные данные)
       this.scrollTop = getScrollPosition(this.scrollTarget)
-      this.scrollBottom = this.scrollHeight - this.scrollTargetHeight - this.scrollTop
+      this.scrollBottom = this.scrolledItemsHeight - this.scrollTargetHeight - this.scrollTop
       this.emitShowHeader(this.scrollTop)
     },
-    scrollHeightResized (e) {
-      // this.$logW('scrollHeightResized', e.height)
-      this.scrollHeight = e.height
+    scrollResized (e) {
+      this.$logW('scrollResized', e.height, this.scrollTarget ? getScrollHeight(this.scrollTarget) : '---', this.$refs.scrolledItems.clientHeight)
+      this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight
       if (!this.scrollTarget) return
       this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
-      this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
       this.scrollUpdate()
     },
     emitShowHeader (scrollTop) {
@@ -557,7 +554,7 @@ export default {
       if (this.scrollState.direction === 'down' &&
           Date.now() - this.scrollState.startTm > minScrollDur &&
           Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen) {
-        // this.$emit('progress', this.scrollTop / this.scrollHeight)
+        // this.$emit('progress', this.scrollTop / this.scrolledItemsHeight)
         if (this.scrollState.showHeader) {
           this.scrollState.showHeader = false
           this.$emit('showHeader', this.scrollState.showHeader)
@@ -568,7 +565,7 @@ export default {
       if ((scrollTop === 0) || (this.scrollState.direction === 'up' &&
           Date.now() - this.scrollState.startTm > minScrollDur &&
           Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen)) {
-        // this.$emit('progress', this.scrollTop / this.scrollHeight)
+        // this.$emit('progress', this.scrollTop / this.scrolledItemsHeight)
         if (!this.scrollState.showHeader) {
           this.scrollState.showHeader = true
           this.$emit('showHeader', this.scrollState.showHeader)
@@ -585,18 +582,16 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // alert('scrollTargetIsWindow=' + this.scrollTargetIsWindow)
     this.scrollTarget = getScrollTarget(this.$el)
     // this.$log('this.scrollTarget', this.scrollTarget)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
-    this.scrollTarget.addEventListener('resize', this.scrollHeightResized)
+    this.scrollTarget.addEventListener('resize', this.scrollResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
-    this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.scrollTarget.removeEventListener('scroll', this.scrollUpdate)
-    this.scrollTarget.removeEventListener('resize', this.scrollHeightResized)
+    this.scrollTarget.removeEventListener('resize', this.scrollResized)
   }
 }
 </script>

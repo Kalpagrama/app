@@ -9,7 +9,7 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
-          :type="'quasar'"
+          :type="'custom'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"
@@ -74,11 +74,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE'] },
+          objectTypeEnum: { $in: ['NODE', 'BLOCK'] },
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: false
+        populateObjects: false,
       }
     }
   }

@@ -26,8 +26,10 @@
             }`
             ).row.text-white.bg-green.q-pa-sm.bg
               small.full-width scrollTargetIsWindow: {{ !this.scrollAreaHeight }}
+              small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
               small.full-width scrollHeight: {{ scrollHeight }}
               small.full-width scrolling: {{ scrolling }}
+              small.full-width itemMiddleIndx: {{ itemMiddleIndx }}
         //- default
         div(
           v-if="itemsRes"
@@ -69,11 +71,12 @@
     .row.full-width.items-start.content-start
       // если указана scrollAreaHeight, то скролл будет в q-scroll-area с указанной высотой
       component(
+        ref="vsHolder"
         :is="scrollAreaHeight ? 'q-scroll-area' : 'row-full-width-component'"
         :id="scrollId"
         :visible="false"
         :delay="1500"
-        :style=`scrollAreaHeight ? {height: scrollAreaHeight + 'px'} : {}`
+        :style=`{height: scrollAreaHeight ? scrollAreaHeight + 'px' : null}`
         dark
         :thumb-style=`{
           right: '5px',
@@ -102,7 +105,7 @@
         // items list
         q-virtual-scroll(
           ref="vs"
-          :scroll-target="scrollTarget"
+          :scroll-target="scrollAreaHeight ? `#${scrollId} > .scroll` : 'body'"
           dark
           :items="vsItems"
           :virtual-scroll-item-size="itemHeightApprox"
@@ -111,6 +114,7 @@
           template(v-slot:default=`{ item: {source: item, state}, index }`)
             //-item
             div(
+              :ref="`item-${index}`"
               :accessKey="`${item[itemKey]}-${index}`"
               v-observe-visibility=`{
                 throttle: 300,
@@ -125,18 +129,31 @@
                         position: 'relative'}`
               @click="onItemClick(index)"
             ).row.full-width
-              slot(
-                name="item"
-                :item="item"
-                :itemState="state"
-                :itemIndex="index"
-                :isActive="itemMiddleIndx === index"
-                :isVisible="!!itemsVisibility[item[itemKey]]"
-                :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
-                :scrolling="scrolling"
-              )
-              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
-              span(v-if="$store.state.ui.useDebug" :style=`{color: itemMiddleIndx === index ? 'green' : 'white'}`).absolute-center.text-bold.text-h1.z-max {{index}}
+              div(
+                :key="item[itemKey]"
+                :accessKey="`${item[itemKey]}-${index}`"
+                v-observe-visibility=`{
+                  throttle: 300,
+                  callback: itemMiddleHandler,
+                  intersection: {
+                    root: null,
+                    rootMargin: rootMargin,
+                    //- threshold: 0.9,
+                  }
+                }`
+              ).row.full-width
+                slot(
+                  name="item"
+                  :item="item"
+                  :itemState="state"
+                  :itemIndex="index"
+                  :isActive="itemActiveIndx === index"
+                  :isVisible="!!itemsVisibility[item[itemKey]]"
+                  :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+                  :scrolling="scrolling"
+                )
+                span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+                span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-center.text-bold.text-h1.z-max {{index}}
 </template>
 
 <script>
@@ -179,10 +196,12 @@ export default {
       itemsRes: null,
       vsItems: [],
       itemsVisibility: {},
+      itemActiveIndx: null,
       itemMiddleIndx: null,
       stickyHeaderHeight: 0,
       preloadInterval: { from: -1, to: -1 },
       scrollHeight: 0,
+      scrollTargetHeight: 0,
       scrolling: false,
       debugOpened: false
     }
@@ -194,6 +213,12 @@ export default {
         right: 0 + 'px'
       }
     },
+    rootMargin () {
+      if (this.scrollHeight >= this.scrollTargetHeight) return '-50% 0px'
+      else { // скролл не заполнен
+        return `-${Math.ceil(50 * (this.scrollHeight / this.scrollTargetHeight))}% 0px`
+      }
+    },
     length () {
       return this.vsItems.length || 0
     },
@@ -201,7 +226,7 @@ export default {
       return 'scroll-area-with-virtual-scroll-uid-' + Date.now() + Math.random()
     },
     scrollTarget () {
-      return this.scrollAreaHeight ? `#${this.scrollId} > .scroll` : 'body'
+      return getScrollTarget(this.$refs.vs.$el)
     },
     itemKey () {
       return this.itemsRes?.itemPrimaryKey
@@ -226,6 +251,7 @@ export default {
   methods: {
     resetItemsRes (itemsRes) {
       this.itemsVisibility = {}
+      this.itemActiveIndx = null
       this.itemMiddleIndx = null
       this.preloadInterval = { from: -1, to: -1 }
       this.scrollHeight = 0
@@ -235,16 +261,16 @@ export default {
           source: item,
           state: {
             itemId: item[this.itemKey],
+            xxx: itemsRes.xxx,
             // элементов в списке может быть ОЧЕНЬ много (отрендеренный итем(их реально создается мало) вызывает onResize )
             onResize: (itemIndex, heightFrom, heightTo) => {
               // отрендеренный компонент поменял высоту
               // this.$log('onResize item', itemIndex, heightFrom, heightTo)
-              if (heightFrom && itemIndex < this.itemMiddleIndx) {
-                // элемент вверх изменил размер. Если ничего не делать - скролл будет дергаться
+              if (heightFrom && itemIndex < this.itemActiveIndx) {
+                // элемент вверху изменил размер. Если ничего не делать - скролл будет дергаться
                 let diff = heightTo - heightFrom
                 if (diff) {
                   this.$log('onResize item', itemIndex, 'diff=', diff)
-                  this.$log('getScrollPosition', getScrollPosition(this.scrollTarget))
                   // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
                 }
               }
@@ -255,56 +281,89 @@ export default {
       if (itemsRes) this.$log('resetItemsRes length=', this.length)
       if (this.$refs.vs) this.$refs.vs.refresh()
       // if (this.$refs.vs) this.$refs.vs.reset()
-      if (itemsRes && itemsRes.getProperty('itemMiddleIndx') != null && itemsRes.getProperty('itemMiddleIndx') >= 0) {
+      if (itemsRes && itemsRes.getProperty('itemActiveIndx') != null && itemsRes.getProperty('itemActiveIndx') >= 0) {
         this.$nextTick(_ => {
-          this.scrollTo(itemsRes.getProperty('itemMiddleIndx'))
+          this.scrollTo(itemsRes.getProperty('itemActiveIndx'))
         })
       }
     },
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
-      // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
+      if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
+    },
+    onItemClick (index) {
+      this.itemActiveIndx = index
     },
     scrollTo (indx) {
       this.$log('scrollTo', indx)
       if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
     },
     onScrollObserver (event) {
-      // // this.$log('onScrollObserver', event)
-      // if (!this.debouncedScrollingClear) {
-      //   this.debouncedScrollingClear = debounce(() => {
-      //     this.scrolling = false
-      //   }, 500)
-      // }
-      // this.scrolling = true
-      // this.debouncedScrollingClear()
+      this.$log('onScroll', {
+        // ipos: event.inflexionPosition,
+        pos: event.position,
+        dir: `${event.direction === 'up' ? '↑' : '↓'} ${event.directionChanged ? '⇅' : ' '}`,
+        velocity: this.prevScrollEvent ? (event.position - this.prevScrollEvent.event.position) / (Date.now() - this.prevScrollEvent.dt) : 0,
+        sh: getScrollHeight(this.scrollTarget)
+      })
+      this.scrollHeight = this.$refs.vsHolder.$el.clientHeight
+      if (this.prevScrollEvent && this.prevScrollEvent.sh !== getScrollHeight(this.scrollTarget)) {
+        // изменился размер скролла(будет скачек из=за глюка виртуалскролла)
+        // todo надо что-то сделать чтобы компенсировать скачек
+        this.$log('scroll size changed!', this.itemMiddleIndx)
+        // document.body.style.overflow = 'hidden'
+        // this.$wait(1000).then(() => {
+        //   document.body.style.overflow = ''
+        // })
+      }
+      this.prevScrollEvent = { event, dt: Date.now(), sh: getScrollHeight(this.scrollTarget) }
     },
     onScrollVS (details) {
+      this.$log('onScrollVS start', {
+        itemActiveIndx: this.itemActiveIndx,
+        // VS: details.ref.$el.clientHeight,
+        // VS: this.$refs.vs.$el.clientHeight,
+        // VSH: this.$refs.vsHolder.$el.clientHeight,
+        sh: getScrollHeight(this.scrollTarget)
+      })
       if (this.length) {
-        this.itemMiddleIndx = details.index
+        this.itemActiveIndx = details.index
         if (details.direction === 'increase') { // мотаем вниз
-          this.preloadInterval.from = this.itemMiddleIndx
-          this.preloadInterval.to = Math.min(this.length, this.itemMiddleIndx + Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // + 2 экрана вниз
+          this.preloadInterval.from = this.itemActiveIndx
+          this.preloadInterval.to = Math.min(this.length, this.itemActiveIndx + Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // + 2 экрана вниз
         } else {
-          this.preloadInterval.from = Math.max(0, this.itemMiddleIndx - Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // - 2 экрана вверх
-          this.preloadInterval.to = this.itemMiddleIndx
+          this.preloadInterval.from = Math.max(0, this.itemActiveIndx - Math.ceil((this.scrollAreaHeight || this.$q.screen.height) * 2 / this.itemHeightApprox)) // - 2 экрана вверх
+          this.preloadInterval.to = this.itemActiveIndx
         }
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
-        this.$log('onScrollVS', this.itemMiddleIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
+        // this.$log('onScrollVS', this.itemActiveIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
         this.scrollHeight = details.ref.$el.clientHeight
-        if (this.itemMiddlePersist) this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
-        // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
-        this.$set(this.itemsVisibility, this.vsItems[this.itemMiddleIndx][this.itemKey], true)
+        if (this.itemMiddlePersist) this.itemsRes.setProperty('itemActiveIndx', this.itemActiveIndx)
+        // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemActiveIndx - всегда видимо
+        this.$set(this.itemsVisibility, this.vsItems[this.itemActiveIndx][this.itemKey], true)
       }
     },
-    onItemClick (index) {
-      this.itemMiddleIndx = index
+    scrollTargetResized () {
+      this.scrollTargetHeight = this.scrollTarget === window ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
+    },
+    itemMiddleHandler (isVisible, entry) {
+      let [key, idxSting] = entry.target.accessKey.split('-')
+      if (isVisible) {
+        this.itemMiddleIndx = parseInt(idxSting)
+        this.$log('itemMiddleHandler', isVisible, idxSting, key)
+      }
     }
   },
   mounted () {
-    this.$log('mounted', this.scrollAreaHeight, this.itemHeightApprox)
+    this.$log('mounted', this.scrollAreaHeight, this.itemHeightApprox, this.scrollTarget)
     if (!this.scrollAreaHeight) assert(getScrollTarget(this.$el) === window, 'если не указана высота, то скролл умеет показываться только в window!!!')
+    this.scrollTarget.addEventListener('resize', this.scrollTargetResized)
+    this.scrollTargetResized() // начальное значение
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.scrollTarget.removeEventListener('resize', this.scrollTargetResized)
   }
 }
 </script>
