@@ -898,14 +898,14 @@ class Group {
    }
 
    // обрежет список сферху и начнет с этого элемента
-   async gotoCurrent () {
+   async gotoCurrent (count = null) {
       const f = this.gotoCurrent
       let currentId = this.getProperty('currentId')
       if (currentId) {
          logD(f, 'start. currentId=', currentId, this.reactiveGroup.id)
          let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
-            let count = this.loadedLen() // выдаем все элементы разом
+            count = Math.min(count || this.loadedLen(), this.loadedLen()) // если не указано иного - выдаем все элементы разом
             let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
             let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
             await this.fulfill(nextItems, 'whole')

@@ -15,6 +15,7 @@ kalpa-layout
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
+          :screenSize="36"
           :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
           :itemMiddlePersist="true"
           @searchString="pageInfo.searchString = $event"
@@ -78,7 +79,7 @@ export default {
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: false,
+        populateObjects: true,
       }
     }
   }

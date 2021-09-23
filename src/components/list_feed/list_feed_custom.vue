@@ -1,6 +1,8 @@
 // если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  div(:style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px'}` :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
+  div(
+    :style=`{maxHeight: scrollAreaHeight ? scrollAreaHeight+'px' : null, height: scrollAreaHeight ? scrollAreaHeight+'px' : null }`
+    :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
     div(ref="scrolledItems").row.full-width
       q-resize-observer(@resize="scrollResized")
       //- debug
@@ -48,7 +50,7 @@
               round flat dense color="white" ).full-width
               //- q-tooltip Дебаг вкл/выкл
             q-btn(
-              @click="gotoStart"
+              @click="scrollToStart"
               :color="itemsRes.hasPrev ? 'white' : 'red'"
               :disabled="!itemsRes.hasPrev"
               round flat dense icon="vertical_align_top").full-width
@@ -64,7 +66,7 @@
               @click="itemMiddleScrollIntoView('BTN')"
               round flat dense color="white" icon="adjust").full-width
             q-btn(
-              @click="gotoCurrent"
+              @click="scrollToCurrent"
               round flat dense color="white").full-width
               q-icon(name="flip").rotate-270
               //- q-tooltip Начать с текущего
@@ -79,6 +81,13 @@
       //- spinner, no itemsRes
       //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
       q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
+      // headers + items
+      .row.full-width
+        slot(name="header")
+      // sticky header
+      div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
+        q-resize-observer(@resize="stickyHeaderHeight = $event.height")
+        slot(name="sticky-header")
       //- items
       div(
         v-if="itemsRes"
@@ -145,8 +154,24 @@
             span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
             ).absolute-top # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{debugInfo().indxHF }} of {{debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
             span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
-            ).absolute-center.text-bold.text-h1.z-max {{itemIndex}}
+            ).absolute-center.text-bold.text-h1.z-max {{debugInfo().indx}}
       slot(name="append")
+    //// scrollbar
+    //div(
+    //  :style=`{
+    //     width: '20px',
+    //     borderRadius: '5px'
+    //  }`
+    //  @click="$logW('click', $event)"
+    //).columm.fixed-right.z-top.q-my-xl.br
+    //  div(
+    //    :style=`{
+    //        position: 'absolute',
+    //        top: '100px',
+    //        height: '30px',
+    //        borderRadius: '5px'
+    //     }`
+    //  ).row.full-width.br
 </template>
 
 <script>
@@ -248,9 +273,6 @@ export default {
     scrollTargetIsWindow () {
       return this.scrollTarget === window
     },
-    paginationBufferHeight () {
-      return this.scrollTargetHeight
-    },
     itemMiddle: {
       // геттер:
       get: function () {
@@ -272,6 +294,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.itemsRes = await this.$rxdb.find(to, this.nextSize, this.screenSize)
+        this.$log('itemsRes:', this.nextSize, this.screenSize, this.itemsRes)
       }
     },
     'itemsRes.itemsHeaderFooter': {
@@ -328,7 +351,7 @@ export default {
         this.$log('$store.state.ui.listFeedGoToStart TO', to)
         if (to) {
           this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
-          await this.gotoStart()
+          await this.scrollToStart()
         }
       }
     },
@@ -469,18 +492,24 @@ export default {
       }
     },
     async fillMore() {
-      if (this.scrollTop < this.paginationBufferHeight) await this.prev()
-      else if (this.scrollBottom < this.paginationBufferHeight) await this.next()
+      if (this.scrollTop < this.scrollTargetHeight) await this.prev() // если вверху меньше экрана
+      else if (this.scrollBottom < this.scrollTargetHeight) await this.next() // если внизу меньше экрана
     },
-    async gotoCurrent () {
-      this.$log('gotoCurrent')
+    async scrollToCurrent () {
+      this.$log('scrollToCurrent')
       this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
       await this.itemsRes.gotoCurrent()
     },
-    async gotoStart () {
-      this.$log('gotoStart')
+    async scrollToStart () {
+      this.$log('scrollToStart')
       this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
       await this.itemsRes.gotoStart()
+      setScrollPosition(this.scrollTarget, 0)
+    },
+    async scrollToEnd () {
+      this.$log('scrollToEnd')
+      this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
+      await this.itemsRes.gotoEnd()
       setScrollPosition(this.scrollTarget, 0)
     },
     async prev () {
@@ -527,7 +556,7 @@ export default {
       this.emitShowHeader(this.scrollTop)
     },
     scrollResized (e) {
-      this.$logW('scrollResized', e.height, this.scrollTarget ? getScrollHeight(this.scrollTarget) : '---', this.$refs.scrolledItems.clientHeight)
+      // this.$logW('scrollResized', e.height, this.scrollTarget ? getScrollHeight(this.scrollTarget) : '---', this.$refs.scrolledItems.clientHeight)
       this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight
       if (!this.scrollTarget) return
       this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight

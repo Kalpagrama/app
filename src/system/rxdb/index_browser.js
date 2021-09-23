@@ -654,8 +654,7 @@ class RxDBWrapper {
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveDocDbMemCache.set(listId, findResult)
          }
-         await findResult.gotoCurrent()
-         // findResult.xxx = await this.get(RxCollectionEnum.OBJ, '222166229522188302')
+         await findResult.gotoCurrent(autoNextSize)
 
          if (findResult.items.length === 0) await findResult.next(autoNextSize)
          this.store.commit('debug/addFindResult', { listId, findResult })

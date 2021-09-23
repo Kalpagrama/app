@@ -1,6 +1,4 @@
 <template lang="pug">
-  //node-feed(:is="componentName"  v-bind="$props" :itemState="data" :node="itemState.xxx")
-  //  q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
   div(
     v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
@@ -161,16 +159,7 @@ export default {
           else this.cancelItemFullPreload()
         }
       }
-    },
-    scrolling: {
-      immediate: false,
-      async handler (to, from) {
-        if (from && !to) {
-          // скролл остановился. itemFull можно заполнять только при остановленном скролле
-          if (this.isVisible || this.isPreload) this.getFullItem()
-        }
-      }
-    },
+    }
   },
   methods: {
     getFullItem () {
@@ -179,10 +168,7 @@ export default {
       if (!data.itemFull && !data.queryId) {
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
-            .then(itemFull => {
-              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
-              if (!this.scrolling) this.$set(data, 'itemFull', itemFull)
-            })
+            .then(itemFull => this.$set(data, 'itemFull', itemFull))
             .catch(err => this.$logE('err on get itemFull', err))
             .finally(() => {
               data.queryId = null
@@ -206,8 +192,7 @@ export default {
         data.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
-              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
-              if (itemFull && !this.scrolling) this.$set(data, 'itemFull', itemFull)
+              if (itemFull) this.$set(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on preload itemFull', err))
             .finally(() => {

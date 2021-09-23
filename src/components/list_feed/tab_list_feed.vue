@@ -10,10 +10,11 @@
     //    :style=`{background: 'none'}`
     //  ).row.full-width.items-start.content-start.justify-center.q-pa-none
     component(
-    :is="'list-feed-' + type"
+      :is="'list-feed-' + type"
       ref="listFeed"
       :scrollAreaHeight="scrollAreaHeight"
       :query="query"
+      :screenSize="screenSize"
       :itemHeightApprox="itemHeightApprox"
       :itemMiddlePersist="itemMiddlePersist"
       @count="$emit('count', $event)")
@@ -65,7 +66,7 @@
             ).col.text-grey-8
               q-tab(
                 v-for="(p,pi) in pages" :key="p.id"
-                :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo(0) : null" @dblclick="pageId === p.id ? scrollTo(length()-1) : null")
+                :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo('start') : null" @dblclick="pageId === p.id ? scrollTo('end') : null")
       template(v-slot:footer)
         q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload, scrolling}`)
@@ -92,8 +93,9 @@ export default {
     pages: { type: Array, default: [{ id: 'empty' }] },
     pageId: { type: String, default: 'empty' },
     query: { type: String, required: true },
+    screenSize: { type: Number },
     itemHeightApprox: { // средний размер одного элемента
-      type: Number,
+      type: Number
     },
     itemMiddlePersist: { type: Boolean, default: false },
     showAddBtn: { type: Boolean, default: false }
@@ -102,7 +104,7 @@ export default {
     bookmarkListItem,
     bookmarkEditor,
     listFeedQuasar,
-    listFeedCustom,
+    listFeedCustom
   },
   watch: {
     pageId: {
@@ -130,10 +132,12 @@ export default {
     }
   },
   methods: {
-    scrollTo(indx) {
-      this.$refs.listFeed.scrollTo(indx)
+    scrollTo (pos) {
+      assert(pos.in('start', 'end'))
+      if (pos === 'start') this.$refs.listFeed.scrollToStart()
+      if (pos === 'end') this.$refs.listFeed.scrollToEnd()
     },
-    length() {
+    length () {
       return this.$refs.listFeed.length
     }
   }

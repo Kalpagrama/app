@@ -258,10 +258,9 @@ export default {
       this.itemsRes = itemsRes
       this.vsItems = this.vsItems = itemsRes?.items.map(item => {
         return {
-          source: item,
+          source: item.populatedObject || item,
           state: {
             itemId: item[this.itemKey],
-            xxx: itemsRes.xxx,
             // элементов в списке может быть ОЧЕНЬ много (отрендеренный итем(их реально создается мало) вызывает onResize )
             onResize: (itemIndex, heightFrom, heightTo) => {
               // отрендеренный компонент поменял высоту
@@ -298,6 +297,14 @@ export default {
     scrollTo (indx) {
       this.$log('scrollTo', indx)
       if (this.$refs.vs && this.length > indx && indx >= 0) this.$refs.vs.scrollTo(indx, 'start-force')
+    },
+    scrollToStart () {
+      this.$log('scrollToStart')
+      this.scrollTo(0)
+    },
+    scrollToEnd () {
+      this.$log('scrollToEnd')
+      this.scrollTo(Math.max(0, this.length - 1))
     },
     onScrollObserver (event) {
       this.$log('onScroll', {
