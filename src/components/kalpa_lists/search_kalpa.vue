@@ -10,7 +10,7 @@
       :pageId="pageId"
       :query="query"
       :itemHeightApprox="100"
-      :itemMiddlePersist="itemMiddlePersist"
+      :itemActivePersist="itemActivePersist"
       @searchString="searchString = $event"
       @pageId="pageId = $event"
       @searchInputState="$emit('searchInputState', $event)"
@@ -63,7 +63,7 @@ export default {
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     searchString: { type: String, default: '' },
     searchInputState: { type: String},
     mode: { type: String },
@@ -78,7 +78,7 @@ export default {
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false
-        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdSearch', to])
+        if (this.itemActivePersist) this.$store.commit('ui/stateSet', ['pageIdSearch', to])
       }
     },
   },
@@ -145,7 +145,7 @@ export default {
   },
   mounted () {
     let pageId
-    if (this.itemMiddlePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdSearch)?.id
+    if (this.itemActivePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdSearch)?.id
     this.pageId = pageId || (this.pages ? this.pages[0]?.id : null)
   }
 }

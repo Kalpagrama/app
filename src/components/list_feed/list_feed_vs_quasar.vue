@@ -189,7 +189,7 @@ export default {
       type: Number,
       default: 100
     },
-    itemMiddlePersist: { type: Boolean, default: false }
+    itemActivePersist: { type: Boolean, default: false }
   },
   data () {
     return {
@@ -346,7 +346,7 @@ export default {
         assert(this.preloadInterval.from <= this.preloadInterval.to, this.preloadInterval)
         // this.$log('onScrollVS', this.itemActiveIndx, this.preloadInterval, details.ref.$el.clientHeight, this.length)
         this.scrollHeight = details.ref.$el.clientHeight
-        if (this.itemMiddlePersist) this.itemsRes.setProperty('itemActiveIndx', this.itemActiveIndx)
+        if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', this.itemActiveIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemActiveIndx - всегда видимо
         this.$set(this.itemsVisibility, this.vsItems[this.itemActiveIndx][this.itemKey], true)
       }

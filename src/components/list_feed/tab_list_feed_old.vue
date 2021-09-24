@@ -82,7 +82,7 @@
             :scrollAreaHeight="(scrollAreaHeight || $q.screen.height) - navHeaderHeight - externalHeaderHeight"
             :query="query"
             :nextSize="nextSize"
-            :itemMiddlePersist="itemMiddlePersist"
+            :itemActivePersist="itemActivePersist"
             :screenSize="screenSize"
             @showHeader="showTabsHeader = $event"
             @progress="progress = $event")
@@ -116,7 +116,7 @@ export default {
     query: { type: String, required: true },
     nextSize: { type: Number, default: 50 },
     screenSize: { type: Number, default: 100 },
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     showAddBtn: { type: Boolean, default: false }
   },
   components: {

@@ -9,7 +9,7 @@
       list-feed(
         ref="list-feed"
         :query="query"
-        :itemMiddlePersist="false"
+        :itemActivePersist="false"
         :style=`{
           maxWidth: 600+'px',
           //- marginBottom: '100px',

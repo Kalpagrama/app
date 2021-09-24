@@ -34,12 +34,12 @@
                 small.full-width scrollBottom: {{ scrollBottom }}
                 small.full-width scrolledItemsHeight: {{ scrolledItemsHeight }}
                 small.full-width count: {{ length }}
-                small(v-if="itemMiddle").full-width itemMiddle.top: {{ itemMiddle.top }}
+                small(v-if="itemActive").full-width itemActive.top: {{ itemActive.top }}
                 q-btn(
-                  @click="itemMiddleGetPosition"
+                  @click="itemActiveGetPosition"
                   outline dense no-caps align="lef" size="sm"
                   color="purple"
-                ).full-width.q-mb-xs itemMiddle position?
+                ).full-width.q-mb-xs itemActive position?
           //- default
           div(
             v-if="itemsRes"
@@ -63,10 +63,10 @@
               round flat dense  icon="north").full-width
               //- q-tooltip Назад
             q-btn(
-              @click="itemMiddleScrollIntoView('BTN')"
+              @click="itemActiveScrollIntoView('BTN')"
               round flat dense color="white" icon="adjust").full-width
             q-btn(
-              @click="scrollToCurrent"
+              @click="fill"
               round flat dense color="white").full-width
               q-icon(name="flip").rotate-270
               //- q-tooltip Начать с текущего
@@ -88,90 +88,50 @@
       div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
         q-resize-observer(@resize="stickyHeaderHeight = $event.height")
         slot(name="sticky-header")
-      //- items
-      div(
-        v-if="itemsRes"
-        ref="items-res-wrapper"
-        :style=`{
-        position: 'relative',
-        }`
-      ).row.full-width.items-start.content-start
-        div(
-          v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
-          :key="item[itemKey]"
-          :ref="`item-${item[itemKey]}`"
-          :accessKey="`${item[itemKey]}-${itemIndex}`"
-          :class=`{
-          //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
-           }`
-          :style=`{
-          position: 'relative'}`
-          v-observe-visibility=`{
-          throttle: 150,
-          callback: itemMiddleHandler,
+      // items
+      div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
+        :ref="`item-${itemIndex}`"
+        :key="`item-${itemIndex}`"
+        :accessKey="`${itemIndex}`"
+        v-observe-visibility=`{
+          throttle: 300,
+          callback: itemActiveHandler,
           intersection: {
             root: scrollTargetIsWindow ? null : scrollTarget,
             rootMargin: rootMargin,
             //- threshold: 0.9,
           }
         }`
-        ).row.full-width
-          //- prev loading
-          div(v-if="item[itemKey] === 'header'" :style=`{position: 'relative', height: '30px'}`).row.full-width
-            q-spinner-dots(v-if="itemsResStatus === 'PREV'" color="green" size="50px").absolute-center
-            q-btn(v-else-if="itemsRes.hasPrev" @click="prev" flat outline round color="green").fit
-              q-icon(name="expand_less" size="50px").absolute-center
-          //- next loading
-          div(v-else-if="item[itemKey] === 'footer'" :style=`{position: 'relative', height: '30px'}`).row.full-width
-            q-spinner-dots(v-if="itemsResStatus === 'NEXT'" color="green" size="50px").absolute-center
-            q-btn(v-else-if="itemsRes.hasNext" @click="next" flat outline round color="green").fit
-              q-icon(name="expand_more" size="50px").absolute-center
-          // item
-          div(
-            v-else
-            :style=`{
-              position: 'relative',
-              ...itemStyles}`
-            :accessKey="`${item[itemKey]}-${itemIndex}`"
-            v-observe-visibility=`{
+        :style=`{position: 'relative'}`
+      ).row.full-width
+        // болванка
+        div(v-if="(!itemActive || (itemIndex < itemActive.indx - 10 || itemIndex > itemActive.indx + 10))"
+          :style=`{height: itemHeightApprox + 'px'}`).row.full-width.br
+        // item
+        div(
+          v-else
+          :style=`{...itemStyles}`
+          :accessKey="`${item[itemKey]}-${itemIndex}`"
+          v-observe-visibility=`{
             throttle: 300,
             callback: itemVisibilityHandler,
             intersection: {
                root: scrollTargetIsWindow ? null : scrollTarget,
-               threshold: 0.2,
-            },
+               threshold: 0.2},
             }`
           ).row.full-width
+            //q-resize-observer(:debounce="0" @resize="updateItemHeightApprox($event.height)")
             slot(
               name="item"
               :item="item"
               :itemState="state"
               :itemIndex="itemIndex"
-              :isActive="item[itemKey] === (itemMiddle ? itemMiddle.key : undefined)"
+              :isActive="itemActive && itemActive.indx === itemIndex"
               :isVisible="!!itemsVisibility[item[itemKey]]",
               :isPreload="true"
-              )
-            span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
-            ).absolute-top # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{debugInfo().indxHF }} of {{debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
-            span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
-            ).absolute-center.text-bold.text-h1.z-max {{debugInfo().indx}}
-      slot(name="append")
-    //// scrollbar
-    //div(
-    //  :style=`{
-    //     width: '20px',
-    //     borderRadius: '5px'
-    //  }`
-    //  @click="$logW('click', $event)"
-    //).columm.fixed-right.z-top.q-my-xl.br
-    //  div(
-    //    :style=`{
-    //        position: 'absolute',
-    //        top: '100px',
-    //        height: '30px',
-    //        borderRadius: '5px'
-    //     }`
-    //  ).row.full-width.br
+            )
+        span(v-if="$store.state.ui.useDebug" :style=`{color: itemActive && itemIndex === itemActive.indx ? 'green' : 'grey'}`
+        ).absolute-top # {{itemIndex}} of {{itemsRes.loadedLen}}
 </template>
 
 <script>
@@ -193,6 +153,10 @@ export default {
       type: Object,
       required: true
     },
+    itemHeightApprox: { // средний размер одного элемента
+      type: Number,
+      default: 100
+    },
     itemStyles: {
       type: Object,
       default () {
@@ -204,25 +168,7 @@ export default {
       default () {
         return true
       }
-    },
-    nextSize: {
-      type: Number,
-      default () {
-        if (this.query.rxCollectionEnum in WsCollectionEnum) return 100
-        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_COMMENTS) return 200
-        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_SUBSCRIBERS) return 100
-        else if (this.query.rxCollectionEnum === LstCollectionEnum.LST_SUBSCRIPTIONS) return 100
-        else if (this.query.rxCollectionEnum in LstCollectionEnum) return 11
-        return 11
-      }
-    },
-    screenSize: {
-      type: Number,
-      default () {
-        return 36
-      }
     }
-
   },
   data () {
     return {
@@ -242,7 +188,7 @@ export default {
       itemsResStatus: null,
       vsItems: [],
       // item
-      itemMiddleHistory: [],
+      itemActive: null,
       itemsVisibility: {}
     }
   },
@@ -273,18 +219,6 @@ export default {
     scrollTargetIsWindow () {
       return this.scrollTarget === window
     },
-    itemMiddle: {
-      // геттер:
-      get: function () {
-        return this.itemMiddleHistory[0]
-      },
-      // сеттер:
-      set: function (newValue) {
-        if (newValue) this.itemMiddleHistory.unshift(newValue) // добавим вверх
-        else this.itemMiddleHistory.splice(0, 1) // удалим верхний
-        this.itemMiddleHistory.splice(8, this.itemMiddleHistory.length) // в истории - не больше 8 элементов
-      }
-    },
     length () {
       return this.vsItems.length
     }
@@ -293,24 +227,15 @@ export default {
     query: {
       immediate: true,
       async handler (to, from) {
-        this.itemsRes = await this.$rxdb.find(to, this.nextSize, this.screenSize)
-        // this.$log('itemsRes:', this.nextSize, this.screenSize, this.itemsRes)
+        this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 100500)
       }
     },
-    'itemsRes.itemsHeaderFooter': {
+    'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.itemsHeaderFooter:', to.length, this.itemsRes.getProperty('currentId'))
-        // удаляем те, которых нет в новом списке
-        for (let itemMiddle of this.itemMiddleHistory) {
-          itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)
-          // this.$log('ims item.name', item?.name)
-          let itemRef = this.$refs[`item-${itemMiddle.key}`]
-          if (itemRef) itemMiddle.ref = itemRef[0]
-        }
-        this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
-        this.itemMiddleTopUpdate()
-        this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
-        this.vsItems = this.vsItems = this.itemsRes.itemsHeaderFooter.map(item => {
+        this.$log('itemsRes.items:', to.length, this.itemsRes.loadedLen, this.itemsRes.fulFilledRange, this.itemsRes.getProperty('itemActiveIndx'))
+        this.itemActiveTopUpdate()
+        this.itemActiveScrollIntoView('itemsRes.items WATCHER')
+        this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
           return {
             debugInfo: item.debugInfo,
             source: item.populatedObject || item,
@@ -319,8 +244,8 @@ export default {
               onResize: (itemIndex, heightFrom, heightTo) => {
                 // отрендеренный компонент поменял высоту
                 // this.$log('onResize item', itemIndex, heightFrom, heightTo)
-                if (heightFrom && itemIndex < this.itemMiddleIndx) {
-                  // элемент вверх изменил размер. Если ничего не делать - скролл будет дергаться
+                if (heightFrom && itemIndex < this.itemActiveIndx) {
+                  // элемент вверху изменил размер. Если ничего не делать - скролл будет дергаться
                   let diff = heightTo - heightFrom
                   if (diff) {
                     this.$log('onResize item', itemIndex, 'diff=', diff)
@@ -332,13 +257,11 @@ export default {
             }
           }
         }) || []
+        this.$log('vsitems=', this.vsItems)
         this.$nextTick(() => {
-          this.$log('itemsRes.itemsHeaderFooter $nextTick')
-          if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
-            let indx = this.itemsRes.itemsHeaderFooter.findIndex(item => item[this.itemKey] === this.itemsRes.getProperty('currentId'))
-            if (indx >= 0) this.itemMiddleSet(this.itemsRes.getProperty('currentId'), indx)
-          }
-          this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER $nextTick')
+          this.$log('itemsRes.items $nextTick')
+          if (!this.itemActive && this.itemsRes.getProperty('itemActiveIndx')) this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
+          this.itemActiveScrollIntoView('itemsRes.items WATCHER $nextTick')
         })
         this.$emit('count', to.length - 2)
       }
@@ -358,58 +281,45 @@ export default {
     scrolledItemsHeight: {
       async handler (to, from) {
         // this.$log(`scrolledItemsHeight ${from}->${to}`)
-        this.itemMiddleScrollIntoView('scrolledItemsHeight IN')
+        this.itemActiveScrollIntoView('scrolledItemsHeight IN')
       }
     },
     scrollTop: {
       async handler (to, from) {
         // this.$logW(`scrollTop ${from}->${to}`)
-        // update itemMiddle.top position
-        this.itemMiddleTopUpdate()
+        // update itemActive.top position
+        this.itemActiveTopUpdate()
       }
     },
     scrollBottom: {
       async handler (to, from) {
         // this.$logW(`scrollBottom ${from}->${to}`)
-        await this.fillMore()
+        // await this.fill()
       }
-    },
+    }
   },
   methods: {
-    // debug purpose only
-    itemMiddleGetPosition () {
-      this.$log('itemMiddleGetPosition')
-      if (!this.itemMiddle) return
-      let itemMiddleOffsetTop = this.itemMiddle.ref.offsetTop
-      let itemMiddleOffsetParent = this.itemMiddle.ref.offsetParent
-      let itemMiddleRect = this.itemMiddle.ref.getBoundingClientRect()
-      this.$log('itemMiddle', { itemMiddleOffsetTop, itemMiddleOffsetParent, itemMiddleRect })
-      let itemsResWrapperRef = this.$refs['items-res-wrapper']
-      let itemsResWrapperRect = itemsResWrapperRef.getBoundingClientRect()
-      let itemsResWrapperOffsetTop = itemsResWrapperRef.offsetTop
-      let itemsResWrapperOffsetParent = itemsResWrapperRef.offsetParent
-      this.$log('itemsResWrapper', { itemsResWrapperRect, itemsResWrapperOffsetTop, itemsResWrapperOffsetParent })
-      this.$log('itemsVisibility', this.itemsVisibility)
-      if (this.itemMiddle) this.$log('itemMiddle.item.debugInfo()', this.itemMiddle.item.debugInfo())
-      // let scrollTarget
+    updateItemHeightApprox(height){
+      // возможно это и не надо
+      // if (!this.lastItemHeights) this.lastItemHeights = []
+      // this.lastItemHeights.push(height)
     },
-    // обновит itemMiddle.top для каждого элемента в itemMiddleHistory
-    itemMiddleTopUpdate () {
-      for (let itemMiddle of this.itemMiddleHistory) {
-        let top = itemMiddle.ref.getBoundingClientRect().top
+    itemActiveTopUpdate () {
+      if (this.itemActive) {
+        let top = this.itemActive.ref.getBoundingClientRect().top
         if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
-        itemMiddle.top = top
+        this.itemActive.top = top
       }
     },
-    // подмотает скролл к itemMiddle.top
-    itemMiddleScrollIntoView (from) {
+    // подмотает скролл к itemActive.top
+    itemActiveScrollIntoView (from) {
       this.$log('imsiv start', from)
       const scrollWithScrollIntoView = async () => {
         if (this.scrollTargetIsWindow) {
           // just scroll to item
-          this.itemMiddle.ref.scrollIntoView()
-          // add itemMiddle.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+          this.itemActive.ref.scrollIntoView()
+          // add itemActive.top position
+          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
         } else {
           // get window scrollTop before
           let windowScrollTopBefore = getScrollPosition(window)
@@ -418,7 +328,7 @@ export default {
           // disableBodyScroll(this.scrollTarget)
           // await this.$wait(300)
           // scrollTo item
-          this.itemMiddle.ref.scrollIntoView()
+          this.itemActive.ref.scrollIntoView()
           // unblock scrolles
           // enableBodyScroll(this.scrollTarget)
           // get window scrollTop before
@@ -426,40 +336,34 @@ export default {
           this.$log('windowScrollTopAfter', windowScrollTopAfter)
           // return window scrollTop if
           setScrollPosition(window, windowScrollTopBefore)
-          // add itemMiddle.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+          // add itemActive.top position
+          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
         }
       }
       const scrollWithOffsetTop = () => {
-        let offsetTop = this.itemMiddle.ref.offsetTop
+        let offsetTop = this.itemActive.ref.offsetTop
         this.$log('imsiv offsetTop', offsetTop)
         let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
         this.$log('imsiv offsetTopScrollTarget', offsetTopScrollTarget)
-        let top = this.itemMiddle.top
+        let top = this.itemActive.top
         this.$log('imsiv top', top)
         let scrollPosition = offsetTop - offsetTopScrollTarget - top
         this.$log('imsiv scrollPosition', scrollPosition)
         setScrollPosition(this.scrollTarget, scrollPosition)
       }
-      if (this.itemMiddle) {
+      if (this.itemActive) {
         scrollWithScrollIntoView()
         this.$log('imsiv done')
       } else {
-        this.$log('imsiv itemMiddle NOT FOUND, failed, go to TOP')
+        this.$log('imsiv itemActive NOT FOUND, failed, go to TOP')
         setScrollPosition(this.scrollTarget, 0)
       }
     },
-    itemMiddleHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemActiveHandler (isVisible, entry) {
+      // let [key, idxSting] = entry.target.accessKey.split('-')
       if (isVisible) {
-        // this.$log('isVisible', entry.target.accessKey)
-        this.itemMiddleSet(key, parseInt(idxSting))
-      } else {
-        if (this.itemMiddle && this.itemMiddle.key === key) {
-          // PPV Закомментил тк сначала приходит isVisible === false для старого элемента, а потом isVisible === true - для нового (а в промежуток вклинивается itemMiddleScrollIntoView(ей нужен itemMiddle(иначе она мотает к верху)))
-          // this.$log('itemMiddle HIDE', this.itemMiddle.idx)
-          // this.itemMiddle = null
-        }
+        // this.$log('itemActiveHandler', entry.target.accessKey)
+        this.itemActiveSet(parseInt(entry.target.accessKey))
       }
     },
     itemVisibilityHandler (isVisible, entry) {
@@ -467,86 +371,36 @@ export default {
       // this.$log('itemVisibilityChanged', isVisible, idxSting, key)
       this.$set(this.itemsVisibility, key, isVisible)
     },
-    itemMiddleSet (key, idx) {
-      this.$log('ims', idx)
-      assert(key && idx && idx >= 0)
-      if (key.in('header', 'footer')) return
-      if (this.itemActivePersist) this.itemsRes.setProperty('currentId', key)
-      let item = this.itemsRes.itemsHeaderFooter[idx]
-      // this.$log('ims item.name', item?.name)
-      let itemRef = this.$refs[`item-${key}`]
-      if (itemRef && itemRef[0]) {
-        itemRef = itemRef[0]
-        this.itemMiddle = {
-          key: key,
-          // idx: idx -  можем и запоминать, но тогда надо будет синхронищировать в вотчере при изменении itemsRes
-          ref: itemRef,
-          item: item,
-          name: item?.name,
-          top: 0
-        }
-        this.itemMiddleTopUpdate()
-        if (this.itemsRes.fulFilledRange.startFullFil >= 0 && this.itemsRes.loadedLen) this.$emit('progress', (idx + this.itemsRes.fulFilledRange.startFullFil) / this.itemsRes.loadedLen)
-      } else {
-        this.$logE('ims itemRef NOT FOUND', key, idx, item?.name, this.itemsRes)
+    itemActiveSet (indx) {
+      this.$log('itemActiveSet', indx)
+      assert(indx >= 0 && indx < this.length)
+      if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
+      let itemRef = this.$refs[`item-${indx}`]
+      assert(itemRef && itemRef[0])
+      itemRef = itemRef[0]
+      let item = indx >= this.itemsRes.fulFilledRange.startFullFil && indx < this.itemsRes.fulFilledRange.endFullFil
+          ? this.vsItems[indx - this.itemsRes.fulFilledRange.startFullFil] : null
+      this.itemActive = {
+        indx: indx,
+        ref: itemRef,
+        item: item,
+        name: item?.name,
+        top: 0
       }
-    },
-    async fillMore() {
-      if (this.scrollTop < this.scrollTargetHeight) await this.prev() // если вверху меньше экрана
-      else if (this.scrollBottom < this.scrollTargetHeight) await this.next() // если внизу меньше экрана
-    },
-    async scrollToCurrent () {
-      this.$log('scrollToCurrent')
-      this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
-      await this.itemsRes.gotoCurrent()
+      this.itemActiveTopUpdate()
+      this.$emit('progress', indx / this.itemsRes.loadedLen)
     },
     async scrollToStart () {
       this.$log('scrollToStart')
-      this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
+      this.itemActive = null
       await this.itemsRes.gotoStart()
       setScrollPosition(this.scrollTarget, 0)
     },
     async scrollToEnd () {
       this.$log('scrollToEnd')
-      this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
+      this.itemActive = null
       await this.itemsRes.gotoEnd()
       setScrollPosition(this.scrollTarget, 0)
-    },
-    async prev () {
-      if (!this.itemsRes) return
-      if (!this.itemsRes.hasPrev) return
-      if (this.itemsResStatus) return
-      if (Date.now() - this.nextCompleteDt < 2000) return // PPV при попытке промотки вверх когда список в начале - скролл оттягивается вверх, а потом вниз и поэтому может сработать next()
-      this.$log('prev')
-      this.itemsResStatus = 'PREV'
-      this.$log('prev start')
-      if (this.$store.state.ui.useDebug) this.$q.notify({ type: 'positive', message: 'Prev !', position: 'top-right' })
-      await this.itemsRes.prev(this.nextSize)
-      this.$log('prev done')
-      this.itemsResStatus = null
-      this.prevCompleteDt = Date.now()
-      this.$log('prev complete')
-    },
-    async next () {
-      if (!this.itemsRes) return
-      if (!this.itemsRes.hasNext) return
-      if (this.itemsResStatus) return
-      if (Date.now() - this.prevCompleteDt < 2000) return // PPV при попытке промотки вниз когда список закончился - скролл оттягивается вниз, а потом вверх и поэтому может сработать prev()
-      this.$log('next. this.nextSize=', this.nextSize)
-      this.itemsResStatus = 'NEXT'
-      this.$log('next start')
-      if (this.$store.state.ui.useDebug) {
-        this.$q.notify({
-          type: 'positive',
-          message: 'Next !',
-          position: 'bottom-right'
-        })
-      }
-      this.$log('before next', this.length)
-      await this.itemsRes.next(this.nextSize)
-      this.$log('next done', this.length)
-      this.itemsResStatus = null
-      this.nextCompleteDt = Date.now()
     },
     scrollUpdate (e) {
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
@@ -605,7 +459,7 @@ export default {
         this.scrollState.showHeader = true
       }
     },
-    async gotoPercent(percent) {
+    async gotoPercent (percent) {
       await this.itemsRes.gotoPercent(percent)
     }
   },

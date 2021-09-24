@@ -59,7 +59,7 @@ export default {
       type: Number,
       default: 100
     },
-    itemMiddlePersist: { type: Boolean, default: false }
+    itemActivePersist: { type: Boolean, default: false }
   },
   data () {
     return {

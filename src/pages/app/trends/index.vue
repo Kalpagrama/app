@@ -9,15 +9,14 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
-          :type="'custom'"
+          :type="'custom3'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :screenSize="36"
           :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-          :itemMiddlePersist="true"
+          :itemActivePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
@@ -79,7 +78,7 @@ export default {
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: true,
+        populateObjects: false,
       }
     }
   }

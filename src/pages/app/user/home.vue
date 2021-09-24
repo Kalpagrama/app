@@ -17,7 +17,7 @@
           :useNavHeader="false"
           :scrollAreaHeight="$q.screen.height/2"
           searchInputState="disabled"
-          :itemMiddlePersist="false"
+          :itemActivePersist="false"
           mode="select").b-30
         list-followers(
           v-if="followersFollowing === 'followers'"
@@ -25,7 +25,7 @@
           :useNavHeader="false"
           :scrollAreaHeight="$q.screen.height/2"
           searchInputState="disabled"
-          :itemMiddlePersist="false"
+          :itemActivePersist="false"
           mode="select").b-30
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -37,7 +37,7 @@
             :pageId="pageId"
             :query="query"
             :itemHeightApprox="500"
-            :itemMiddlePersist="false"
+            :itemActivePersist="false"
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)

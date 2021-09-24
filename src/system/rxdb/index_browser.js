@@ -654,7 +654,7 @@ class RxDBWrapper {
             assert(findResult, '!findResult' + JSON.stringify(findResult))
             this.reactiveDocDbMemCache.set(listId, findResult)
          }
-         await findResult.gotoCurrent(autoNextSize)
+         await findResult.goto(findResult.getProperty('itemActiveIndx') || 0, autoNextSize)
 
          if (findResult.items.length === 0) await findResult.next(autoNextSize)
          this.store.commit('debug/addFindResult', { listId, findResult })

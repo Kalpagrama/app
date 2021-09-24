@@ -16,7 +16,7 @@
       :query="query"
       :screenSize="screenSize"
       :itemHeightApprox="itemHeightApprox"
-      :itemMiddlePersist="itemMiddlePersist"
+      :itemActivePersist="itemActivePersist"
       @count="$emit('count', $event)")
       template(v-slot:header)
         //- nav header
@@ -81,6 +81,8 @@ import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
 import listFeedQuasar from 'src/components/list_feed/list_feed_vs_quasar.vue'
 import listFeedCustom from 'src/components/list_feed/list_feed_custom.vue'
+import listFeedCustom2 from 'src/components/list_feed/list_feed_custom2.vue'
+import listFeedCustom3 from 'src/components/list_feed/list_feed_custom3.vue'
 
 export default {
   name: 'tabListFeed',
@@ -97,14 +99,16 @@ export default {
     itemHeightApprox: { // средний размер одного элемента
       type: Number
     },
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     showAddBtn: { type: Boolean, default: false }
   },
   components: {
     bookmarkListItem,
     bookmarkEditor,
     listFeedQuasar,
-    listFeedCustom
+    listFeedCustom,
+    listFeedCustom2,
+    listFeedCustom3
   },
   watch: {
     pageId: {

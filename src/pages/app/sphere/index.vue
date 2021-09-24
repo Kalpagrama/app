@@ -13,7 +13,7 @@
             :pageId="pageId"
             :query="query"
             :itemHeightApprox="500"
-            :itemMiddlePersist="true"
+            :itemActivePersist="true"
             @searchString="searchString = $event"
             @pageId="pageId = $event"
           ).row.full-width
