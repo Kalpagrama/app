@@ -128,6 +128,7 @@ export default {
         if (process.env.NODE_ENV === 'development') {
           // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
           if (to) {
+            this.$log(`hasItemFull=${to} #${this.itemIndex}`)
             let checkChData = (parent) => {
               assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
               for (let ch of parent.$children) {
@@ -142,7 +143,7 @@ export default {
     isVisible: {
       immediate: true,
       async handler (to, from) {
-        this.$log(`isVisible=${to} #${this.itemIndex}`)
+        if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItem()
           else this.cancelItemFull()
@@ -152,7 +153,7 @@ export default {
     isPreload: {
       immediate: true,
       async handler (to, from) {
-        this.$log(`isPreload=${to} #${this.itemIndex}`)
+        // if (to) this.$log(`isPreload=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItemPreload()
           else this.cancelItemFullPreload()

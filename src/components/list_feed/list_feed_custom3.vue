@@ -94,7 +94,7 @@
         :key="`item-${itemIndex}`"
         :accessKey="`${itemIndex}`"
         v-observe-visibility=`{
-          throttle: 300,
+          throttle: 0,
           callback: itemActiveHandler,
           intersection: {
             root: scrollTargetIsWindow ? null : scrollTarget,
@@ -105,9 +105,9 @@
         :style=`{position: 'relative'}`
       ).row.full-width
         // болванка (должна быть минимальной. их создается очень(очень) много)
-        div(v-if="(!itemActive || (itemIndex < itemActive.indx - 10 || itemIndex > itemActive.indx + 10))"
+        div(v-if=" (!itemActive || (itemIndex < itemActive.indx - 10 || itemIndex > itemActive.indx + 10))"
           :style=`{
-               height: itemHeightApprox + 'px',
+               height: state.height + 'px',
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
          }`).row.full-width.q-mb-xl
@@ -124,6 +124,7 @@
                threshold: 0.2},
             }`
         ).row.full-width
+          q-resize-observer(@resize="itemResized(itemIndex, $event.height)")
           slot(
             name="item"
             :item="item"
@@ -178,6 +179,7 @@ export default {
       // debug
       debugOpened: false,
       showHeader: false,
+      stickyHeaderHeight: 0,
       // scrollTarget
       scrollTarget: null,
       scrollTargetHeight: 0,
@@ -236,14 +238,14 @@ export default {
     'itemsRes.items': {
       async handler (to, from) {
         this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'))
-        this.itemActiveTopUpdate()
-        this.itemActiveScrollIntoView('itemsRes.items WATCHER')
         this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
           return {
             debugInfo: item.debugInfo,
             source: item.populatedObject || item,
             state: {
-              itemId: item[this.itemKey]
+              itemId: item[this.itemKey],
+              height: this.itemHeightApprox,
+              heightPrev: 0,
             }
           }
         }) || []
@@ -251,12 +253,15 @@ export default {
         this.$nextTick(() => {
           this.$log('itemsRes.items $nextTick')
           if (!this.itemActive) {
-            let itemRef = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
-            if (itemRef) {
-              itemRef = itemRef[0]
-              this.$wait(1000).then(() => {
-                this.$log('itemsRes.items $nextTick :: scrollIntoView')
-                itemRef.scrollIntoView()
+            let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
+            if (ref) {
+              ref = ref[0]
+              ref.scrollIntoView()
+              this.$nextTick(() => {
+                let itemTopOffset = this.scrollTargetHeight / 2 - ref.clientHeight / 2
+                this.$log('itemTopOffset=', itemTopOffset)
+                setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - itemTopOffset) // перемещаем элемент в центр видимой области
+                this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
               })
             }
           }
@@ -279,7 +284,7 @@ export default {
     scrolledAreaHeight: {
       async handler (to, from) {
         // this.$log(`scrolledAreaHeight ${from}->${to}`)
-        this.itemActiveScrollIntoView('scrolledAreaHeight IN')
+        // this.itemActiveScrollIntoView('scrolledAreaHeight IN')
       }
     },
     scrollTop: {
@@ -291,10 +296,26 @@ export default {
     }
   },
   methods: {
+    itemResized(indx, height){
+      assert(this.vsItems[indx])
+      this.vsItems[height].state.heightPrev = this.vsItems[height].state.height
+      this.vsItems[height].state.height = height
+      if (this.itemActive && indx < this.itemActive.indx) {
+        // let delta = this.vsItems[height].state.height - this.vsItems[height].state.heightPrev
+        // this.$log('itemResized', {
+        //   indx,
+        //   from: this.vsItems[height].state.heightPrev,
+        //   to: this.vsItems[height].state.height,
+        //   active: this.itemActive.indx
+        // })
+        // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - delta)
+        this.itemActiveScrollIntoView('itemResized')
+      }
+    },
     itemActiveTopUpdate () {
       if (this.itemActive) {
         let top = this.itemActive.ref.getBoundingClientRect().top
-        assert(top <= this.scrollTargetHeight, 'top - это смещение элемента на видимой части экрана')
+        // assert(top <= this.scrollTargetHeight, 'top - это смещение элемента на видимой части экрана')
         if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
         this.itemActive.top = top
       }
@@ -305,9 +326,12 @@ export default {
       const scrollWithScrollIntoView = async () => {
         if (this.scrollTargetIsWindow) {
           // // just scroll to item
-          // this.itemActive.ref.scrollIntoView()
-          // // add itemActive.top position
-          // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
+          this.itemActive.ref.scrollIntoView()
+          // add itemActive.top position
+          let top = this.itemActive.top
+          // top - это смещение элемента на видимой части экрана(иногда может происходить что активный элемент находится вне экрана)). корректируем
+          if (top >= this.scrollTargetHeight) top = Math.floor(this.scrollTargetHeight / 4)
+          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
         } else {
           // get window scrollTop before
           let windowScrollTopBefore = getScrollPosition(window)
@@ -365,14 +389,15 @@ export default {
       assert(indx >= 0 && indx < this.length)
       if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
       let itemRef = this.$refs[`item-${indx}`]
+      let item = this.vsItems[indx]
       assert(itemRef && itemRef[0])
-      assert(this.vsItems[indx])
+      assert(item)
       itemRef = itemRef[0]
       this.itemActive = {
         indx: indx,
         ref: itemRef,
-        item: this.vsItems[indx],
-        name: this.vsItems[indx].name,
+        item: item,
+        name: item.name,
         top: 0
       }
       this.itemActiveTopUpdate()
