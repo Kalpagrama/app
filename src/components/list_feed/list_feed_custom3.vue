@@ -105,7 +105,7 @@
         :style=`{position: 'relative'}`
       ).row.full-width
         // болванка (должна быть минимальной. их создается очень(очень) много)
-        div(v-if=" (!itemActive || (itemIndex < itemActive.indx - 10 || itemIndex > itemActive.indx + 10))"
+        div(v-if="state.isDummy"
           :style=`{
                height: state.height + 'px',
                border: '2px solid rgb(50,50,50)',
@@ -244,8 +244,9 @@ export default {
             source: item.populatedObject || item,
             state: {
               itemId: item[this.itemKey],
+              isDummy: true,
               height: this.itemHeightApprox,
-              heightPrev: 0,
+              heightPrev: 0
             }
           }
         }) || []
@@ -267,6 +268,17 @@ export default {
           }
         })
         this.$emit('count', to.length - 2)
+      }
+    },
+    'itemActive.indx': {
+      async handler (to, from) {
+        const itemPerScreenCnt = Math.ceil(this.scrollTargetHeight / this.itemHeightApprox)
+        // this.$log(`itemActive.indx: ${from}->${to} itemPerScreenCnt=${itemPerScreenCnt}`, this.vsItems)
+        for (let indx = 0; indx <= this.length; indx++){
+          // "isDummy = true" делается на большем расстоянии чтобы не было рекурсивного зацикливания (смена isDummy может привести к смене itemActive)
+          if (indx < to - itemPerScreenCnt * 5 || indx > to + itemPerScreenCnt * 5) this.vsItems[indx].state.isDummy = true
+          if (indx >= to - itemPerScreenCnt * 3 && indx <= to + itemPerScreenCnt * 3) this.vsItems[indx].state.isDummy = false
+        }
       }
     },
     // watch it to drop position, and scrollToTop
@@ -293,23 +305,29 @@ export default {
         // update itemActive.top position
         this.itemActiveTopUpdate()
       }
-    }
+    },
   },
   methods: {
-    itemResized(indx, height){
+    isDummy (itemIndex) {
+      if (!this.itemActive) return true
+      const itemPerScreenCnt = this.scrollTargetHeight / this.itemHeightApprox
+      if (itemIndex > this.itemActive.indx - itemPerScreenCnt * 3 && itemIndex < this.itemActive.indx + itemPerScreenCnt * 3) return true
+      else return false
+    },
+    itemResized (indx, height) {
       assert(this.vsItems[indx])
-      this.vsItems[height].state.heightPrev = this.vsItems[height].state.height
-      this.vsItems[height].state.height = height
+      this.vsItems[indx].state.heightPrev = this.vsItems[indx].state.height
+      this.vsItems[indx].state.height = height
       if (this.itemActive && indx < this.itemActive.indx) {
-        // let delta = this.vsItems[height].state.height - this.vsItems[height].state.heightPrev
+        // let delta = this.vsItems[indx].state.height - this.vsItems[indx].state.heightPrev
         // this.$log('itemResized', {
         //   indx,
-        //   from: this.vsItems[height].state.heightPrev,
-        //   to: this.vsItems[height].state.height,
+        //   from: this.vsItems[indx].state.heightPrev,
+        //   to: this.vsItems[indx].state.height,
         //   active: this.itemActive.indx
         // })
         // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - delta)
-        this.itemActiveScrollIntoView('itemResized')
+        // this.itemActiveScrollIntoView('itemResized')
       }
     },
     itemActiveTopUpdate () {
@@ -322,7 +340,7 @@ export default {
     },
     // подмотает скролл к itemActive.top
     itemActiveScrollIntoView (from) {
-      this.$log('imsiv start', from)
+      this.$log('siv start', from)
       const scrollWithScrollIntoView = async () => {
         if (this.scrollTargetIsWindow) {
           // // just scroll to item
@@ -354,21 +372,21 @@ export default {
       }
       const scrollWithOffsetTop = () => {
         let offsetTop = this.itemActive.ref.offsetTop
-        this.$log('imsiv offsetTop', offsetTop)
+        this.$log('siv offsetTop', offsetTop)
         let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
-        this.$log('imsiv offsetTopScrollTarget', offsetTopScrollTarget)
+        this.$log('siv offsetTopScrollTarget', offsetTopScrollTarget)
         let top = this.itemActive.top
-        this.$log('imsiv top', top)
+        this.$log('siv top', top)
         let scrollPosition = offsetTop - offsetTopScrollTarget - top
-        this.$log('imsiv scrollPosition', scrollPosition)
+        this.$log('siv scrollPosition', scrollPosition)
         setScrollPosition(this.scrollTarget, scrollPosition)
       }
       if (this.itemActive) {
-        this.$log('imsiv this.itemActive.top=', this.itemActive.top)
+        this.$log('siv this.itemActive.top=', this.itemActive.top)
         scrollWithScrollIntoView()
-        this.$log('imsiv done')
+        this.$log('siv done')
       } else {
-        this.$log('imsiv itemActive NOT FOUND, failed, go to TOP')
+        this.$log('siv itemActive NOT FOUND, failed, go to TOP')
         setScrollPosition(this.scrollTarget, 0)
       }
     },
