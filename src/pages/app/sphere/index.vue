@@ -7,13 +7,14 @@
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="sphere"
+            :type="'customPPV'"
             :scrollAreaHeight="0"
             searchInputState="disabled"
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            :itemHeightApprox="500"
-            :itemMiddlePersist="true"
+            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.4 + 222"
+            :itemActivePersist="true"
             @searchString="searchString = $event"
             @pageId="pageId = $event"
           ).row.full-width

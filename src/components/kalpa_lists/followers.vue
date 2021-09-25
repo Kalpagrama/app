@@ -8,7 +8,7 @@
         :searchString="searchString"
         :query="query"
         :itemHeightApprox="100"
-        :itemMiddlePersist="false"
+        :itemActivePersist="false"
         @searchString="searchString = $event"
       ).row.full-width
         template(v-slot:externalHeader)

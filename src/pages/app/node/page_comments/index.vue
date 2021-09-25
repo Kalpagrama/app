@@ -39,14 +39,14 @@
       :scrollAreaHeight="0"
       :query="query"
       :itemHeightApprox="60"
-      :itemMiddlePersist="true"
+      :itemActivePersist="true"
       @count="commentsCount = $event").row.full-width
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         comment-item(:comment="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" @delete="commentDelete")
     //list-feed(
     //  :query="query"
     //  nextSize=44
-    //  :itemMiddlePersist="false"
+    //  :itemActivePersist="false"
     //  screenSize=88
     //  :style=`{
     //    maxWidth: $store.state.ui.pageWidth+'px',

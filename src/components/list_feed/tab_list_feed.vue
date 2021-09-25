@@ -9,12 +9,14 @@
     //    v-for="(p,pi) in (pages)" :key="p.id" :name="p.id"
     //    :style=`{background: 'none'}`
     //  ).row.full-width.items-start.content-start.justify-center.q-pa-none
-    list-feed-vs(
+    component(
+      :is="'list-feed-' + type"
       ref="listFeed"
       :scrollAreaHeight="scrollAreaHeight"
       :query="query"
+      :screenSize="screenSize"
       :itemHeightApprox="itemHeightApprox"
-      :itemMiddlePersist="itemMiddlePersist"
+      :itemActivePersist="itemActivePersist"
       @count="$emit('count', $event)")
       template(v-slot:header)
         //- nav header
@@ -64,7 +66,7 @@
             ).col.text-grey-8
               q-tab(
                 v-for="(p,pi) in pages" :key="p.id"
-                :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo(0) : null" @dblclick="pageId === p.id ? scrollTo(length()-1) : null")
+                :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo('start') : null" @dblclick="pageId === p.id ? scrollTo('end') : null")
       template(v-slot:footer)
         q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload, scrolling}`)
@@ -77,13 +79,14 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
-import listFeedVs from 'src/components/list_feed/list_feed_vs_quasar.vue'
-// import listFeedVs from 'src/components/list_feed/list_feed_vs_list.vue'
+import listFeedQuasar from 'src/components/list_feed/list_feed_vs_quasar.vue'
+import listFeedCustom from 'src/components/list_feed/list_feed_custom.vue'
+import listFeedCustomPPV from 'src/components/list_feed/list_feed_custom_ppv.vue'
 
 export default {
   name: 'tabListFeed',
   props: {
-    // id: { type: String, default: 'null' },
+    type: { type: String, default: 'quasar' },
     scrollAreaHeight: { type: Number },
     navHeaderText: { type: String, default: '' },
     searchString: { type: String, default: '' },
@@ -91,16 +94,19 @@ export default {
     pages: { type: Array, default: [{ id: 'empty' }] },
     pageId: { type: String, default: 'empty' },
     query: { type: String, required: true },
+    screenSize: { type: Number },
     itemHeightApprox: { // средний размер одного элемента
-      type: Number,
+      type: Number
     },
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     showAddBtn: { type: Boolean, default: false }
   },
   components: {
     bookmarkListItem,
     bookmarkEditor,
-    listFeedVs,
+    listFeedQuasar,
+    listFeedCustom,
+    listFeedCustomPPV
   },
   watch: {
     pageId: {
@@ -128,10 +134,12 @@ export default {
     }
   },
   methods: {
-    scrollTo(indx) {
-      this.$refs.listFeed.scrollTo(indx)
+    scrollTo (pos) {
+      assert(pos.in('start', 'end'))
+      if (pos === 'start') this.$refs.listFeed.scrollToStart()
+      if (pos === 'end') this.$refs.listFeed.scrollToEnd()
     },
-    length() {
+    length () {
       return this.$refs.listFeed.length
     }
   }

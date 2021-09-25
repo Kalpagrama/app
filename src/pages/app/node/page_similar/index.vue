@@ -6,7 +6,7 @@
         :scrollAreaHeight="900"
         :query="query"
         :itemHeightApprox="500"
-        :itemMiddlePersist="true").row.full-width
+        :itemActivePersist="true").row.full-width
         template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           item-feed(
             :itemShortOrFull="item"

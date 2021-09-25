@@ -16,7 +16,7 @@
             searchInputState="disabled"
             :query="query"
             :itemHeightApprox="100"
-            :itemMiddlePersist="true"
+            :itemActivePersist="true"
           ).row.full-width
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               notification-item(
