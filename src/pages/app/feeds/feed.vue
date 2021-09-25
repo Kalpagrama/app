@@ -17,11 +17,12 @@
               :bookmark="bookmarkSelected"
               @close="bookmarkEditorShow = false, bookmarkSelected = null")
           tab-list-feed(
+            :type="'customPPV'"
             :scrollAreaHeight="0"
             :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
-            :itemHeightApprox="500"
+            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.4 + 222"
             :itemActivePersist="true"
           ).row.full-width
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)

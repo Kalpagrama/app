@@ -260,20 +260,7 @@ export default {
         return {
           source: item.populatedObject || item,
           state: {
-            itemId: item[this.itemKey],
-            // элементов в списке может быть ОЧЕНЬ много (отрендеренный итем(их реально создается мало) вызывает onResize )
-            onResize: (itemIndex, heightFrom, heightTo) => {
-              // отрендеренный компонент поменял высоту
-              // this.$log('onResize item', itemIndex, heightFrom, heightTo)
-              if (heightFrom && itemIndex < this.itemActiveIndx) {
-                // элемент вверху изменил размер. Если ничего не делать - скролл будет дергаться
-                let diff = heightTo - heightFrom
-                if (diff) {
-                  this.$log('onResize item', itemIndex, 'diff=', diff)
-                  // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
-                }
-              }
-            }
+            itemId: item[this.itemKey]
           }
         }
       }) || []

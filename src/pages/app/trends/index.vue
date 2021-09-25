@@ -9,13 +9,13 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
-          :type="'custom3'"
+          :type="'customPPV'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.8 + 222"
+          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.4 + 222"
           :itemActivePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"

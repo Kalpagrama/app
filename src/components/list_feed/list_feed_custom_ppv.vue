@@ -155,7 +155,7 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
-  name: 'listFeedCustom',
+  name: 'listFeedCustomPPV',
   props: {
     scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
       type: Number,
@@ -295,12 +295,14 @@ export default {
         // скролл остановился. применим к загруженным итемам актуальную высоту
         if (!to) {
           this.$log('scroll stop', this.length)
+          let heightChanged = false
           for (let indx = 0; indx < this.length; indx++) {
             if (this.vsItems[indx].state.currentHeight !== this.vsItems[indx].state.actualHeight) {
               this.vsItems[indx].state.currentHeight = this.vsItems[indx].state.actualHeight
-              this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
+              heightChanged = true
             }
           }
+          if (heightChanged) this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
           // this.$nextTick(() => {
           //   if (this.itemActive) {
           //     this.$log('align center itemActive')
@@ -329,7 +331,8 @@ export default {
       assert(this.vsItems[indx])
       this.$log('resized #', indx, height, this.scrolling)
       // eslint-disable-next-line no-constant-condition
-      if (true || !this.scrolling) {
+      if (!this.scrolling) {
+        // скролл стоит. можно менять размер итемов
         this.vsItems[indx].state.currentHeight = height
         this.vsItems[indx].state.actualHeight = height
         this.$nextTick(() => this.itemActiveScrollIntoView('itemResized'))
