@@ -107,7 +107,7 @@
         // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="state.isDummy"
           :style=`{
-               height: state.height + 'px',
+               height: itemHeightApprox + 'px',
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
          }`).row.full-width.q-mb-xl
@@ -308,7 +308,7 @@ export default {
   methods: {
     itemResized (indx, height) {
       assert(this.vsItems[indx])
-      this.itemActiveScrollIntoView('itemResized')
+      // this.itemActiveScrollIntoView('itemResized')
     },
     itemActiveTopUpdate () {
       if (this.itemActive) {
