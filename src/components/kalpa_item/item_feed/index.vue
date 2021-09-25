@@ -2,7 +2,6 @@
   div(
     v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
     div(v-if="!hasItemFull").row.full-width
       q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
@@ -141,7 +140,7 @@ export default {
       }
     },
     isVisible: {
-      immediate: false,
+      immediate: true,
       async handler (to, from) {
         this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
@@ -151,7 +150,7 @@ export default {
       }
     },
     isPreload: {
-      immediate: false,
+      immediate: true,
       async handler (to, from) {
         this.$log(`isPreload=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {

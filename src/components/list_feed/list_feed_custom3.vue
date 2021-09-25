@@ -3,8 +3,8 @@
   div(
     :style=`{maxHeight: scrollAreaHeight ? scrollAreaHeight+'px' : null, height: scrollAreaHeight ? scrollAreaHeight+'px' : null }`
     :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
-    div(ref="scrolledItems").row.full-width
-      q-resize-observer(@resize="scrollResized")
+    div(ref="scrolledArea").row.full-width
+      q-resize-observer(@resize="scrolledAreaResized")
       //- debug
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(
@@ -32,7 +32,7 @@
                 small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
                 small.full-width scrollTop: {{ scrollTop }}
                 small.full-width scrollBottom: {{ scrollBottom }}
-                small.full-width scrolledItemsHeight: {{ scrolledItemsHeight }}
+                small.full-width scrolledAreaHeight: {{ scrolledAreaHeight }}
                 small.full-width count: {{ length }}
                 small(v-if="itemActive").full-width itemActive.top: {{ itemActive.top }}
                 q-btn(
@@ -104,9 +104,13 @@
         }`
         :style=`{position: 'relative'}`
       ).row.full-width
-        // болванка
+        // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="(!itemActive || (itemIndex < itemActive.indx - 10 || itemIndex > itemActive.indx + 10))"
-          :style=`{height: itemHeightApprox + 'px'}`).row.full-width.br
+          :style=`{
+               height: itemHeightApprox + 'px',
+               border: '2px solid rgb(50,50,50)',
+               borderRadius: '10px',
+         }`).row.full-width.q-mb-xl
         // item
         div(
           v-else
@@ -119,19 +123,18 @@
                root: scrollTargetIsWindow ? null : scrollTarget,
                threshold: 0.2},
             }`
-          ).row.full-width
-            //q-resize-observer(:debounce="0" @resize="updateItemHeightApprox($event.height)")
-            slot(
-              name="item"
-              :item="item"
-              :itemState="state"
-              :itemIndex="itemIndex"
-              :isActive="itemActive && itemActive.indx === itemIndex"
-              :isVisible="!!itemsVisibility[item[itemKey]]",
-              :isPreload="true"
-            )
+        ).row.full-width
+          slot(
+            name="item"
+            :item="item"
+            :itemState="state"
+            :itemIndex="itemIndex"
+            :isActive="itemActive && itemActive.indx === itemIndex"
+            :isVisible="!!itemsVisibility[item[itemKey]]",
+            :isPreload="true"
+          )
         span(v-if="$store.state.ui.useDebug" :style=`{color: itemActive && itemIndex === itemActive.indx ? 'green' : 'grey'}`
-        ).absolute-top # {{itemIndex}} of {{itemsRes.loadedLen}}
+        ).absolute-top # {{itemIndex}} of {{length}}
 </template>
 
 <script>
@@ -143,7 +146,7 @@ const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight }
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
-  name: 'listFeed',
+  name: 'listFeedCustom',
   props: {
     scrollAreaHeight: { // если не указано - то скролл - весь window (иначе скролл занимает отведенное место)
       type: Number,
@@ -179,11 +182,11 @@ export default {
       scrollTarget: null,
       scrollTargetHeight: 0,
       // scrollTop
-      scrollTop: 0,
+      scrollTop: 0, // расстояние от начала скроллируемого списка до первого видимого пикселя
       // scrollBottom
-      scrollBottom: 0,
-      // scrolledItemsHeight
-      scrolledItemsHeight: 0,
+      scrollBottom: 0, // расстояние от конца скроллируемого списка до последнего видлимого пикселя
+      // scrolledAreaHeight
+      scrolledAreaHeight: 0,
       itemsRes: null,
       itemsResStatus: null,
       vsItems: [],
@@ -208,9 +211,9 @@ export default {
       }
     },
     rootMargin () {
-      if (this.scrolledItemsHeight >= this.scrollTargetHeight) return '-50% 0px'
+      if (this.scrolledAreaHeight >= this.scrollTargetHeight) return '-50% 0px'
       else { // скролл не заполнен
-        return `-${Math.ceil(50 * (this.scrolledItemsHeight / this.scrollTargetHeight))}% 0px`
+        return `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`
       }
     },
     itemKey () {
@@ -232,7 +235,7 @@ export default {
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items:', to.length, this.itemsRes.loadedLen, this.itemsRes.fulFilledRange, this.itemsRes.getProperty('itemActiveIndx'))
+        this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'))
         this.itemActiveTopUpdate()
         this.itemActiveScrollIntoView('itemsRes.items WATCHER')
         this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
@@ -240,28 +243,23 @@ export default {
             debugInfo: item.debugInfo,
             source: item.populatedObject || item,
             state: {
-              itemId: item[this.itemKey],
-              onResize: (itemIndex, heightFrom, heightTo) => {
-                // отрендеренный компонент поменял высоту
-                // this.$log('onResize item', itemIndex, heightFrom, heightTo)
-                if (heightFrom && itemIndex < this.itemActiveIndx) {
-                  // элемент вверху изменил размер. Если ничего не делать - скролл будет дергаться
-                  let diff = heightTo - heightFrom
-                  if (diff) {
-                    this.$log('onResize item', itemIndex, 'diff=', diff)
-                    this.$log('getScrollPosition', getScrollPosition(this.scrollTarget))
-                    // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
-                  }
-                }
-              }
+              itemId: item[this.itemKey]
             }
           }
         }) || []
-        this.$log('vsitems=', this.vsItems)
+        // this.$log('vsitems=', this.vsItems)
         this.$nextTick(() => {
           this.$log('itemsRes.items $nextTick')
-          if (!this.itemActive && this.itemsRes.getProperty('itemActiveIndx')) this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
-          this.itemActiveScrollIntoView('itemsRes.items WATCHER $nextTick')
+          if (!this.itemActive) {
+            let itemRef = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
+            if (itemRef) {
+              itemRef = itemRef[0]
+              this.$wait(1000).then(() => {
+                this.$log('itemsRes.items $nextTick :: scrollIntoView')
+                itemRef.scrollIntoView()
+              })
+            }
+          }
         })
         this.$emit('count', to.length - 2)
       }
@@ -278,10 +276,10 @@ export default {
         }
       }
     },
-    scrolledItemsHeight: {
+    scrolledAreaHeight: {
       async handler (to, from) {
-        // this.$log(`scrolledItemsHeight ${from}->${to}`)
-        this.itemActiveScrollIntoView('scrolledItemsHeight IN')
+        // this.$log(`scrolledAreaHeight ${from}->${to}`)
+        this.itemActiveScrollIntoView('scrolledAreaHeight IN')
       }
     },
     scrollTop: {
@@ -290,23 +288,13 @@ export default {
         // update itemActive.top position
         this.itemActiveTopUpdate()
       }
-    },
-    scrollBottom: {
-      async handler (to, from) {
-        // this.$logW(`scrollBottom ${from}->${to}`)
-        // await this.fill()
-      }
     }
   },
   methods: {
-    updateItemHeightApprox(height){
-      // возможно это и не надо
-      // if (!this.lastItemHeights) this.lastItemHeights = []
-      // this.lastItemHeights.push(height)
-    },
     itemActiveTopUpdate () {
       if (this.itemActive) {
         let top = this.itemActive.ref.getBoundingClientRect().top
+        assert(top <= this.scrollTargetHeight, 'top - это смещение элемента на видимой части экрана')
         if (!this.scrollTargetIsWindow) top -= this.scrollTarget.getBoundingClientRect().top
         this.itemActive.top = top
       }
@@ -316,10 +304,10 @@ export default {
       this.$log('imsiv start', from)
       const scrollWithScrollIntoView = async () => {
         if (this.scrollTargetIsWindow) {
-          // just scroll to item
-          this.itemActive.ref.scrollIntoView()
-          // add itemActive.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
+          // // just scroll to item
+          // this.itemActive.ref.scrollIntoView()
+          // // add itemActive.top position
+          // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
         } else {
           // get window scrollTop before
           let windowScrollTopBefore = getScrollPosition(window)
@@ -352,6 +340,7 @@ export default {
         setScrollPosition(this.scrollTarget, scrollPosition)
       }
       if (this.itemActive) {
+        this.$log('imsiv this.itemActive.top=', this.itemActive.top)
         scrollWithScrollIntoView()
         this.$log('imsiv done')
       } else {
@@ -362,7 +351,7 @@ export default {
     itemActiveHandler (isVisible, entry) {
       // let [key, idxSting] = entry.target.accessKey.split('-')
       if (isVisible) {
-        // this.$log('itemActiveHandler', entry.target.accessKey)
+        this.$log('itemActiveHandler', entry.target.accessKey)
         this.itemActiveSet(parseInt(entry.target.accessKey))
       }
     },
@@ -377,18 +366,17 @@ export default {
       if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
       let itemRef = this.$refs[`item-${indx}`]
       assert(itemRef && itemRef[0])
+      assert(this.vsItems[indx])
       itemRef = itemRef[0]
-      let item = indx >= this.itemsRes.fulFilledRange.startFullFil && indx < this.itemsRes.fulFilledRange.endFullFil
-          ? this.vsItems[indx - this.itemsRes.fulFilledRange.startFullFil] : null
       this.itemActive = {
         indx: indx,
         ref: itemRef,
-        item: item,
-        name: item?.name,
+        item: this.vsItems[indx],
+        name: this.vsItems[indx].name,
         top: 0
       }
       this.itemActiveTopUpdate()
-      this.$emit('progress', indx / this.itemsRes.loadedLen)
+      this.$emit('progress', indx / this.length)
     },
     async scrollToStart () {
       this.$log('scrollToStart')
@@ -404,63 +392,16 @@ export default {
     },
     scrollUpdate (e) {
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
-      this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight // обновится чуть позже в scrollResized (а сейчас scrolledItemsHeight - в неактуальном состоянии. берем актуальные данные)
+      this.scrolledAreaHeight = this.$refs.scrolledArea.clientHeight // обновится чуть позже в scrolledAreaResized (а сейчас scrolledAreaHeight - в неактуальном состоянии. берем актуальные данные)
       this.scrollTop = getScrollPosition(this.scrollTarget)
-      this.scrollBottom = this.scrolledItemsHeight - this.scrollTargetHeight - this.scrollTop
-      this.emitShowHeader(this.scrollTop)
+      this.scrollBottom = this.scrolledAreaHeight - this.scrollTargetHeight - this.scrollTop
     },
-    scrollResized (e) {
-      // this.$logW('scrollResized', e.height, this.scrollTarget ? getScrollHeight(this.scrollTarget) : '---', this.$refs.scrolledItems.clientHeight)
-      this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight
+    scrolledAreaResized (e) {
+      // this.$logW('scrolledAreaResized', e.height, this.scrollTarget ? getScrollHeight(this.scrollTarget) : '---', this.$refs.scrolledArea.clientHeight)
+      this.scrolledAreaHeight = this.$refs.scrolledArea.clientHeight
       if (!this.scrollTarget) return
       this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
       this.scrollUpdate()
-    },
-    emitShowHeader (scrollTop) {
-      // едем вниз/вверх более 1 сек и более 200 px
-      let minScrollLen = 200
-      let minScrollDur = 1000
-      if (!this.scrollState) {
-        this.scrollState = { direction: null, startTm: 0, startPos: 0, lastScrollTop: 0, showHeader: true }
-      }
-      let scrollDirection = null
-      if (this.scrollState.lastScrollTop > scrollTop) scrollDirection = 'up'
-      if (this.scrollState.lastScrollTop < scrollTop) scrollDirection = 'down'
-      if (this.scrollState.direction !== scrollDirection) { // изменилось направление
-        this.scrollState.direction = scrollDirection
-        this.scrollState.startTm = Date.now()
-        this.scrollState.startPos = scrollTop
-      }
-      this.scrollState.lastScrollTop = scrollTop
-
-      // едем вниз более 1 сек и проехали более 200 px
-      if (this.scrollState.direction === 'down' &&
-          Date.now() - this.scrollState.startTm > minScrollDur &&
-          Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen) {
-        // this.$emit('progress', this.scrollTop / this.scrolledItemsHeight)
-        if (this.scrollState.showHeader) {
-          this.scrollState.showHeader = false
-          this.$emit('showHeader', this.scrollState.showHeader)
-        }
-      }
-
-      // едем вверх более 1 сек и проехали более 200 px
-      if ((scrollTop === 0) || (this.scrollState.direction === 'up' &&
-          Date.now() - this.scrollState.startTm > minScrollDur &&
-          Math.abs(this.scrollState.lastScrollTop - this.scrollState.startPos) > minScrollLen)) {
-        // this.$emit('progress', this.scrollTop / this.scrolledItemsHeight)
-        if (!this.scrollState.showHeader) {
-          this.scrollState.showHeader = true
-          this.$emit('showHeader', this.scrollState.showHeader)
-        }
-      }
-      // мы на самом верху
-      if (scrollTop === 0) {
-        this.scrollState.showHeader = true
-      }
-    },
-    async gotoPercent (percent) {
-      await this.itemsRes.gotoPercent(percent)
     }
   },
   mounted () {
@@ -468,13 +409,13 @@ export default {
     this.scrollTarget = getScrollTarget(this.$el)
     // this.$log('this.scrollTarget', this.scrollTarget)
     this.scrollTarget.addEventListener('scroll', this.scrollUpdate)
-    this.scrollTarget.addEventListener('resize', this.scrollResized)
+    this.scrollTarget.addEventListener('resize', this.scrolledAreaResized)
     this.scrollTargetHeight = this.scrollTargetIsWindow ? this.scrollTarget.innerHeight : this.scrollTarget.clientHeight
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.scrollTarget.removeEventListener('scroll', this.scrollUpdate)
-    this.scrollTarget.removeEventListener('resize', this.scrollResized)
+    this.scrollTarget.removeEventListener('resize', this.scrolledAreaResized)
   }
 }
 </script>
