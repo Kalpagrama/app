@@ -90,12 +90,9 @@
         }`
         :style=`{
             position: 'relative',
-            maxHeight: state.currentHeight + 'px',
-            minHeight: state.currentHeight + 'px',
-            overflow: 'hidden',
-            // transition: 'max-height 0.5s',
-            // transition: 'min-height 0.5s',
-            // height: 'auto'
+            // maxHeight: state.currentHeight + 'px',
+            // minHeight: state.currentHeight + 'px',
+            // overflow: 'hidden',
             }`
       ).row.full-width.q-pb-xl
         // болванка (должна быть минимальной. их создается очень(очень) много)
@@ -103,7 +100,8 @@
           :style=`{
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
-         }`).row.fit
+               height: itemHeightApprox + 'px',
+         }`).row.full-width
         // item (показывается с position absolute)
         div(
           v-else
@@ -116,8 +114,8 @@
                root: scrollTargetIsWindow ? null : scrollTarget,
                threshold: 0.2},
             }`
-        ).absolute-center.row.full-width
-          q-resize-observer(@resize="itemResized(itemIndex, $event.height)")
+        ).row.full-width
+          //q-resize-observer(@resize="itemResized(itemIndex, $event.height)")
           slot(
             name="item"
             :item="item"
@@ -293,18 +291,6 @@ export default {
             }
           }
           if (heightChanged) this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
-          // this.$nextTick(() => {
-          //   if (this.itemActive) {
-          //     this.$log('align center itemActive')
-          //     this.itemActive.ref.scrollIntoView()
-          //     this.$nextTick(() => {
-          //       let itemTopOffset = this.scrollTargetHeight / 2 - this.itemActive.ref.clientHeight / 2
-          //       this.$log('itemTopOffset=', itemTopOffset)
-          //       setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - itemTopOffset, 200) // перемещаем элемент в центр видимой области
-          //       this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
-          //     })
-          //   }
-          // })
         }
       }
     },
@@ -321,11 +307,11 @@ export default {
       assert(this.vsItems[indx])
       this.$log('resized #', indx, height, this.scrolling)
       // eslint-disable-next-line no-constant-condition
-      if (true || !this.scrolling) {
+      if (!this.scrolling) {
         // скролл стоит. можно менять размер итемов
         this.vsItems[indx].state.currentHeight = height
         this.vsItems[indx].state.actualHeight = height
-        // this.$nextTick(() => this.itemActiveScrollIntoView('itemResized'))
+        this.$nextTick(() => this.itemActiveScrollIntoView('itemResized'))
       } else this.vsItems[indx].state.actualHeight = height // остальное сделается после остановки скролла (scrolling=false)
     },
     itemActiveTopUpdate () {
@@ -432,13 +418,12 @@ export default {
       setScrollPosition(this.scrollTarget, 0)
     },
     scrollUpdate (e) {
-      // this.$log('scroll', e)
-      if (!this.debounceScrollingReset) {
-        this.debounceScrollingReset = debounce(() => {
-          this.scrolling = false
-        }, 500)
-      }
-      this.scrolling = true
+      // if (!this.debounceScrollingReset) {
+      //   this.debounceScrollingReset = debounce(() => {
+      //     this.scrolling = false
+      //   }, 500)
+      // }
+      // this.scrolling = true
       this.debounceScrollingReset()
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
       this.scrolledAreaHeight = this.$refs.scrolledArea.clientHeight // обновится чуть позже в scrolledAreaResized (а сейчас scrolledAreaHeight - в неактуальном состоянии. берем актуальные данные)
