@@ -245,8 +245,6 @@ export default {
             state: {
               itemId: item[this.itemKey],
               isDummy: true,
-              height: this.itemHeightApprox,
-              heightPrev: 0
             }
           }
         }) || []
@@ -274,7 +272,7 @@ export default {
       async handler (to, from) {
         const itemPerScreenCnt = Math.ceil(this.scrollTargetHeight / this.itemHeightApprox)
         // this.$log(`itemActive.indx: ${from}->${to} itemPerScreenCnt=${itemPerScreenCnt}`, this.vsItems)
-        for (let indx = 0; indx <= this.length; indx++){
+        for (let indx = 0; indx <= this.length; indx++) {
           // "isDummy = true" делается на большем расстоянии чтобы не было рекурсивного зацикливания (смена isDummy может привести к смене itemActive)
           if (indx < to - itemPerScreenCnt * 5 || indx > to + itemPerScreenCnt * 5) this.vsItems[indx].state.isDummy = true
           if (indx >= to - itemPerScreenCnt * 3 && indx <= to + itemPerScreenCnt * 3) this.vsItems[indx].state.isDummy = false
@@ -305,24 +303,12 @@ export default {
         // update itemActive.top position
         this.itemActiveTopUpdate()
       }
-    },
+    }
   },
   methods: {
     itemResized (indx, height) {
       assert(this.vsItems[indx])
-      this.vsItems[indx].state.heightPrev = this.vsItems[indx].state.height
-      this.vsItems[indx].state.height = height
-      if (this.itemActive && indx < this.itemActive.indx) {
-        // let delta = this.vsItems[indx].state.height - this.vsItems[indx].state.heightPrev
-        // this.$log('itemResized', {
-        //   indx,
-        //   from: this.vsItems[indx].state.heightPrev,
-        //   to: this.vsItems[indx].state.height,
-        //   active: this.itemActive.indx
-        // })
-        // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - delta)
-        this.itemActiveScrollIntoView('itemResized')
-      }
+      this.itemActiveScrollIntoView('itemResized')
     },
     itemActiveTopUpdate () {
       if (this.itemActive) {
