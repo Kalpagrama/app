@@ -308,12 +308,6 @@ export default {
     },
   },
   methods: {
-    isDummy (itemIndex) {
-      if (!this.itemActive) return true
-      const itemPerScreenCnt = this.scrollTargetHeight / this.itemHeightApprox
-      if (itemIndex > this.itemActive.indx - itemPerScreenCnt * 3 && itemIndex < this.itemActive.indx + itemPerScreenCnt * 3) return true
-      else return false
-    },
     itemResized (indx, height) {
       assert(this.vsItems[indx])
       this.vsItems[indx].state.heightPrev = this.vsItems[indx].state.height
@@ -327,7 +321,7 @@ export default {
         //   active: this.itemActive.indx
         // })
         // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - delta)
-        // this.itemActiveScrollIntoView('itemResized')
+        this.itemActiveScrollIntoView('itemResized')
       }
     },
     itemActiveTopUpdate () {
