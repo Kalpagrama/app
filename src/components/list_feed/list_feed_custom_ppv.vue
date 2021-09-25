@@ -56,13 +56,6 @@
               round flat dense icon="vertical_align_top").full-width
               //- q-tooltip В начало
             q-btn(
-              @click="prev()"
-              :loading="itemsResStatus === 'PREV'"
-              :color="itemsRes.hasPrev ? 'white' : 'red'"
-              :disabled="!itemsRes.hasPrev"
-              round flat dense  icon="north").full-width
-              //- q-tooltip Назад
-            q-btn(
               @click="itemActiveScrollIntoView('BTN')"
               round flat dense color="white" icon="adjust").full-width
             q-btn(
@@ -70,13 +63,6 @@
               round flat dense color="white").full-width
               q-icon(name="flip").rotate-270
               //- q-tooltip Начать с текущего
-            q-btn(
-              @click="next()"
-              :loading="itemsResStatus === 'NEXT'"
-              :color="itemsRes.hasNext ? 'white' : 'red'"
-              :disabled="!itemsRes.hasNext"
-              round flat dense  icon="south").full-width
-              //- q-tooltip Вперед
       slot(name="prepend")
       //- spinner, no itemsRes
       //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
@@ -111,14 +97,14 @@
             // transition: 'min-height 0.5s',
             // height: 'auto'
             }`
-      ).row.full-width
+      ).row.full-width.q-pb-xl
         // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="state.isDummy"
           :style=`{
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
-         }`).row.fit.q-mb-xl
-        // item
+         }`).row.fit
+        // item (показывается с position absolute)
         div(
           v-else
           :style=`{...itemStyles}`
@@ -199,7 +185,6 @@ export default {
       scrolledAreaHeight: 0,
       scrolling: false,
       itemsRes: null,
-      itemsResStatus: null,
       vsItems: [],
       // item
       itemActive: null,
@@ -241,6 +226,11 @@ export default {
     query: {
       immediate: true,
       async handler (to, from) {
+        // this.$log('query', to)
+        if (from) {
+          this.itemActive = null
+          this.vsItems.splice(0, this.vsItems.length)
+        }
         this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 100500)
       }
     },
@@ -261,7 +251,7 @@ export default {
         }) || []
         // this.$log('vsitems=', this.vsItems)
         this.$nextTick(() => {
-          this.$log('itemsRes.items $nextTick')
+          // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
           if (!this.itemActive) {
             let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
             if (ref) {
