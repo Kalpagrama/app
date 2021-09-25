@@ -94,14 +94,14 @@
             // minHeight: state.currentHeight + 'px',
             // overflow: 'hidden',
             }`
-      ).row.full-width.q-pb-xl
+      ).row.full-width
         // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="state.isDummy"
           :style=`{
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
                height: itemHeightApprox + 'px',
-         }`).row.full-width
+         }`).row.full-width.q-mb-lg
         // item
         div(
           v-else
@@ -281,18 +281,18 @@ export default {
     },
     scrolling: {
       async handler (to, from) {
-        // скролл остановился. применим к загруженным итемам актуальную высоту
-        if (!to) {
-          this.$log('scroll stop', this.length)
-          let heightChanged = false
-          for (let indx = 0; indx < this.length; indx++) {
-            if (this.vsItems[indx].state.currentHeight !== this.vsItems[indx].state.actualHeight) {
-              this.vsItems[indx].state.currentHeight = this.vsItems[indx].state.actualHeight
-              heightChanged = true
-            }
-          }
-          if (heightChanged) this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
-        }
+        // // скролл остановился. применим к загруженным итемам актуальную высоту
+        // if (!to) {
+        //   this.$log('scroll stop', this.length)
+        //   let heightChanged = false
+        //   for (let indx = 0; indx < this.length; indx++) {
+        //     if (this.vsItems[indx].state.currentHeight !== this.vsItems[indx].state.actualHeight) {
+        //       this.vsItems[indx].state.currentHeight = this.vsItems[indx].state.actualHeight
+        //       heightChanged = true
+        //     }
+        //   }
+        //   if (heightChanged) this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
+        // }
       }
     },
     scrollTop: {
