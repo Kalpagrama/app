@@ -22,7 +22,7 @@
             :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
-            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.4 + 222"
+            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
             :itemActivePersist="true"
           ).row.full-width
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)

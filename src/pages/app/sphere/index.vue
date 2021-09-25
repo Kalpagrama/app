@@ -13,7 +13,7 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.4 + 222"
+            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
             :itemActivePersist="true"
             @searchString="searchString = $event"
             @pageId="pageId = $event"
