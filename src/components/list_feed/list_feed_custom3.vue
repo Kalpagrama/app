@@ -328,11 +328,12 @@ export default {
     itemResized (indx, height) {
       assert(this.vsItems[indx])
       this.$log('resized #', indx, height, this.scrolling)
-      if (!this.scrolling) {
+      // eslint-disable-next-line no-constant-condition
+      if (true || !this.scrolling) {
         this.vsItems[indx].state.currentHeight = height
         this.vsItems[indx].state.actualHeight = height
         this.$nextTick(() => this.itemActiveScrollIntoView('itemResized'))
-      } else this.vsItems[indx].state.actualHeight = height // остальное сделается после остановки скролла
+      } else this.vsItems[indx].state.actualHeight = height // остальное сделается после остановки скролла (scrolling=false)
     },
     itemActiveTopUpdate () {
       if (this.itemActive) {
