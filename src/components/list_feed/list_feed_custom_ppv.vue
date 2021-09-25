@@ -229,6 +229,7 @@ export default {
         if (from) {
           this.itemActive = null
           this.vsItems.splice(0, this.vsItems.length)
+          this.itemRes = null
         }
         this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 100500)
       }
