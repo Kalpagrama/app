@@ -88,7 +88,7 @@
       div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
         q-resize-observer(@resize="stickyHeaderHeight = $event.height")
         slot(name="sticky-header")
-      // items
+      // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
       div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
         :ref="`item-${itemIndex}`"
         :key="`item-${itemIndex}`"
@@ -102,15 +102,18 @@
             //- threshold: 0.9,
           }
         }`
-        :style=`{position: 'relative'}`
+        :style=`{
+            position: 'relative',
+            maxHeight: state.currentHeight + 'px',
+            minHeight: state.currentHeight + 'px',
+            overflow: 'hidden'}`
       ).row.full-width
         // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="state.isDummy"
           :style=`{
-               height: itemHeightApprox + 'px',
                border: '2px solid rgb(50,50,50)',
                borderRadius: '10px',
-         }`).row.full-width.q-mb-xl
+         }`).row.fit.q-mb-xl
         // item
         div(
           v-else
@@ -123,7 +126,7 @@
                root: scrollTargetIsWindow ? null : scrollTarget,
                threshold: 0.2},
             }`
-        ).row.full-width
+        ).absolute-center.row.full-width
           q-resize-observer(@resize="itemResized(itemIndex, $event.height)")
           slot(
             name="item"
@@ -142,6 +145,7 @@
 import { scroll } from 'quasar'
 import { LstCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
 import { assert } from 'src/system/common/utils'
+import debounce from 'lodash/debounce'
 
 const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
@@ -189,6 +193,7 @@ export default {
       scrollBottom: 0, // расстояние от конца скроллируемого списка до последнего видлимого пикселя
       // scrolledAreaHeight
       scrolledAreaHeight: 0,
+      scrolling: false,
       itemsRes: null,
       itemsResStatus: null,
       vsItems: [],
@@ -245,6 +250,8 @@ export default {
             state: {
               itemId: item[this.itemKey],
               isDummy: true,
+              currentHeight: this.itemHeightApprox, // примененная высота
+              actualHeight: this.itemHeightApprox // применится после остановки скролла
             }
           }
         }) || []
@@ -279,6 +286,20 @@ export default {
         }
       }
     },
+    scrolling: {
+      async handler (to, from) {
+        // скролл остановился. применим к загруженным итемам актуальную высоту
+        if (!to) {
+          this.$log('scroll stop')
+          for (let indx = 0; indx <= this.length; indx++) {
+            if (this.vsItems[indx].state.currentHeight !== this.vsItems[indx].state.actualHeight) {
+              this.vsItems[indx].state.currentHeight = this.vsItems[indx].state.actualHeight
+              this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
+            }
+          }
+        }
+      }
+    },
     // watch it to drop position, and scrollToTop
     '$store.state.ui.listFeedGoToStart': {
       deep: true,
@@ -308,7 +329,12 @@ export default {
   methods: {
     itemResized (indx, height) {
       assert(this.vsItems[indx])
-      // this.itemActiveScrollIntoView('itemResized')
+      this.$log('resized #', indx, height, this.scrolling)
+      if (!this.scrolling) {
+        this.vsItems[indx].state.currentHeight = height
+        this.vsItems[indx].state.actualHeight = height
+        this.$nextTick(() => this.itemActiveScrollIntoView('itemResized'))
+      } else this.vsItems[indx].state.actualHeight = height // остальное сделается после остановки скролла
     },
     itemActiveTopUpdate () {
       if (this.itemActive) {
@@ -414,6 +440,14 @@ export default {
       setScrollPosition(this.scrollTarget, 0)
     },
     scrollUpdate (e) {
+      this.$log('scroll', e)
+      if (!this.debounceScrollingReset) {
+        this.debounceScrollingReset = debounce(() => {
+          this.scrolling = false
+        }, 1000)
+      }
+      this.scrolling = true
+      this.debounceScrollingReset()
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
       this.scrolledAreaHeight = this.$refs.scrolledArea.clientHeight // обновится чуть позже в scrolledAreaResized (а сейчас scrolledAreaHeight - в неактуальном состоянии. берем актуальные данные)
       this.scrollTop = getScrollPosition(this.scrollTarget)
