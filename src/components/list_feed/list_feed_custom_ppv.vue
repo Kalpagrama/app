@@ -102,7 +102,7 @@
                borderRadius: '10px',
                height: itemHeightApprox + 'px',
          }`).row.full-width
-        // item (показывается с position absolute)
+        // item
         div(
           v-else
           :style=`{...itemStyles}`
@@ -123,7 +123,8 @@
             :itemIndex="itemIndex"
             :isActive="itemActive && itemActive.indx === itemIndex"
             :isVisible="!!itemsVisibility[item[itemKey]]",
-            :isPreload="true"
+            :isPreload="true",
+            :scrolling="scrolling"
           )
         span(v-if="$store.state.ui.useDebug" :style=`{color: itemActive && itemIndex === itemActive.indx ? 'green' : 'grey'}`
         ).absolute-top # {{itemIndex}} of {{length}}
@@ -324,55 +325,56 @@ export default {
     },
     // подмотает скролл к itemActive.top
     itemActiveScrollIntoView (from) {
-      this.$log('siv start', from)
-      const scrollWithScrollIntoView = async () => {
-        if (this.scrollTargetIsWindow) {
-          // // just scroll to item
-          this.itemActive.ref.scrollIntoView()
-          // add itemActive.top position
-          let top = this.itemActive.top
-          // top - это смещение элемента на видимой части экрана(иногда может происходить что активный элемент находится вне экрана)). корректируем
-          if (top >= this.scrollTargetHeight) top = Math.floor(this.scrollTargetHeight / 4)
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
-        } else {
-          // get window scrollTop before
-          let windowScrollTopBefore = getScrollPosition(window)
-          this.$log('windowScrollTopBefore', windowScrollTopBefore)
-          // block scrolles
-          // disableBodyScroll(this.scrollTarget)
-          // await this.$wait(300)
-          // scrollTo item
-          this.itemActive.ref.scrollIntoView()
-          // unblock scrolles
-          // enableBodyScroll(this.scrollTarget)
-          // get window scrollTop before
-          let windowScrollTopAfter = getScrollPosition(window)
-          this.$log('windowScrollTopAfter', windowScrollTopAfter)
-          // return window scrollTop if
-          setScrollPosition(window, windowScrollTopBefore)
-          // add itemActive.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
-        }
-      }
-      const scrollWithOffsetTop = () => {
-        let offsetTop = this.itemActive.ref.offsetTop
-        this.$log('siv offsetTop', offsetTop)
-        let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
-        this.$log('siv offsetTopScrollTarget', offsetTopScrollTarget)
-        let top = this.itemActive.top
-        this.$log('siv top', top)
-        let scrollPosition = offsetTop - offsetTopScrollTarget - top
-        this.$log('siv scrollPosition', scrollPosition)
-        setScrollPosition(this.scrollTarget, scrollPosition)
-      }
-      if (this.itemActive) {
-        this.$log('siv this.itemActive.top=', this.itemActive.top)
-        scrollWithScrollIntoView()
-        this.$log('siv done')
-      } else {
-        this.$log('siv itemActive NOT FOUND, failed, go to TOP')
-        setScrollPosition(this.scrollTarget, 0)
-      }
+      // без него лучше работает (браузер сам подматывает при измении высоты элементов в скролле)
+      // this.$log('siv start', from)
+      // const scrollWithScrollIntoView = async () => {
+      //   if (this.scrollTargetIsWindow) {
+      //     // // just scroll to item
+      //     this.itemActive.ref.scrollIntoView()
+      //     // add itemActive.top position
+      //     let top = this.itemActive.top
+      //     // top - это смещение элемента на видимой части экрана(иногда может происходить что активный элемент находится вне экрана)). корректируем
+      //     if (top >= this.scrollTargetHeight) top = Math.floor(this.scrollTargetHeight / 4)
+      //     setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
+      //   } else {
+      //     // get window scrollTop before
+      //     let windowScrollTopBefore = getScrollPosition(window)
+      //     this.$log('windowScrollTopBefore', windowScrollTopBefore)
+      //     // block scrolles
+      //     // disableBodyScroll(this.scrollTarget)
+      //     // await this.$wait(300)
+      //     // scrollTo item
+      //     this.itemActive.ref.scrollIntoView()
+      //     // unblock scrolles
+      //     // enableBodyScroll(this.scrollTarget)
+      //     // get window scrollTop before
+      //     let windowScrollTopAfter = getScrollPosition(window)
+      //     this.$log('windowScrollTopAfter', windowScrollTopAfter)
+      //     // return window scrollTop if
+      //     setScrollPosition(window, windowScrollTopBefore)
+      //     // add itemActive.top position
+      //     setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemActive.top)
+      //   }
+      // }
+      // const scrollWithOffsetTop = () => {
+      //   let offsetTop = this.itemActive.ref.offsetTop
+      //   this.$log('siv offsetTop', offsetTop)
+      //   let offsetTopScrollTarget = this.scrollTargetIsWindow ? 0 : this.scrollTarget.offsetTop
+      //   this.$log('siv offsetTopScrollTarget', offsetTopScrollTarget)
+      //   let top = this.itemActive.top
+      //   this.$log('siv top', top)
+      //   let scrollPosition = offsetTop - offsetTopScrollTarget - top
+      //   this.$log('siv scrollPosition', scrollPosition)
+      //   setScrollPosition(this.scrollTarget, scrollPosition)
+      // }
+      // if (this.itemActive) {
+      //   this.$log('siv this.itemActive.top=', this.itemActive.top)
+      //   scrollWithScrollIntoView()
+      //   this.$log('siv done')
+      // } else {
+      //   this.$log('siv itemActive NOT FOUND, failed, go to TOP')
+      //   setScrollPosition(this.scrollTarget, 0)
+      // }
     },
     itemActiveHandler (isVisible, entry) {
       // let [key, idxSting] = entry.target.accessKey.split('-')
@@ -418,12 +420,12 @@ export default {
       setScrollPosition(this.scrollTarget, 0)
     },
     scrollUpdate (e) {
-      // if (!this.debounceScrollingReset) {
-      //   this.debounceScrollingReset = debounce(() => {
-      //     this.scrolling = false
-      //   }, 500)
-      // }
-      // this.scrolling = true
+      if (!this.debounceScrollingReset) {
+        this.debounceScrollingReset = debounce(() => {
+          this.scrolling = false
+        }, 500)
+      }
+      this.scrolling = true
       this.debounceScrollingReset()
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
       this.scrolledAreaHeight = this.$refs.scrolledArea.clientHeight // обновится чуть позже в scrolledAreaResized (а сейчас scrolledAreaHeight - в неактуальном состоянии. берем актуальные данные)
