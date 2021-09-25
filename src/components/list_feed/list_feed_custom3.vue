@@ -106,7 +106,11 @@
             position: 'relative',
             maxHeight: state.currentHeight + 'px',
             minHeight: state.currentHeight + 'px',
-            overflow: 'hidden'}`
+            overflow: 'hidden',
+            // transition: 'max-height 0.5s',
+            // transition: 'min-height 0.5s',
+            // height: 'auto'
+            }`
       ).row.full-width
         // болванка (должна быть минимальной. их создается очень(очень) много)
         div(v-if="state.isDummy"
@@ -279,7 +283,7 @@ export default {
       async handler (to, from) {
         const itemPerScreenCnt = Math.ceil(this.scrollTargetHeight / this.itemHeightApprox)
         // this.$log(`itemActive.indx: ${from}->${to} itemPerScreenCnt=${itemPerScreenCnt}`, this.vsItems)
-        for (let indx = 0; indx <= this.length; indx++) {
+        for (let indx = 0; indx < this.length; indx++) {
           // "isDummy = true" делается на большем расстоянии чтобы не было рекурсивного зацикливания (смена isDummy может привести к смене itemActive)
           if (indx < to - itemPerScreenCnt * 5 || indx > to + itemPerScreenCnt * 5) this.vsItems[indx].state.isDummy = true
           if (indx >= to - itemPerScreenCnt * 3 && indx <= to + itemPerScreenCnt * 3) this.vsItems[indx].state.isDummy = false
@@ -290,32 +294,26 @@ export default {
       async handler (to, from) {
         // скролл остановился. применим к загруженным итемам актуальную высоту
         if (!to) {
-          this.$log('scroll stop')
-          for (let indx = 0; indx <= this.length; indx++) {
+          this.$log('scroll stop', this.length)
+          for (let indx = 0; indx < this.length; indx++) {
             if (this.vsItems[indx].state.currentHeight !== this.vsItems[indx].state.actualHeight) {
               this.vsItems[indx].state.currentHeight = this.vsItems[indx].state.actualHeight
               this.$nextTick(() => this.itemActiveScrollIntoView('applyItemActualHeight'))
             }
           }
+          // this.$nextTick(() => {
+          //   if (this.itemActive) {
+          //     this.$log('align center itemActive')
+          //     this.itemActive.ref.scrollIntoView()
+          //     this.$nextTick(() => {
+          //       let itemTopOffset = this.scrollTargetHeight / 2 - this.itemActive.ref.clientHeight / 2
+          //       this.$log('itemTopOffset=', itemTopOffset)
+          //       setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - itemTopOffset, 200) // перемещаем элемент в центр видимой области
+          //       this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
+          //     })
+          //   }
+          // })
         }
-      }
-    },
-    // watch it to drop position, and scrollToTop
-    '$store.state.ui.listFeedGoToStart': {
-      deep: true,
-      // immediate: true,
-      async handler (to, from) {
-        this.$log('$store.state.ui.listFeedGoToStart TO', to)
-        if (to) {
-          this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
-          await this.scrollToStart()
-        }
-      }
-    },
-    scrolledAreaHeight: {
-      async handler (to, from) {
-        // this.$log(`scrolledAreaHeight ${from}->${to}`)
-        // this.itemActiveScrollIntoView('scrolledAreaHeight IN')
       }
     },
     scrollTop: {
@@ -440,11 +438,11 @@ export default {
       setScrollPosition(this.scrollTarget, 0)
     },
     scrollUpdate (e) {
-      this.$log('scroll', e)
+      // this.$log('scroll', e)
       if (!this.debounceScrollingReset) {
         this.debounceScrollingReset = debounce(() => {
           this.scrolling = false
-        }, 1000)
+        }, 500)
       }
       this.scrolling = true
       this.debounceScrollingReset()
