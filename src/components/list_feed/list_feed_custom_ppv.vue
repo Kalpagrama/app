@@ -66,7 +66,7 @@
       slot(name="prepend")
       //- spinner, no itemsRes
       //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
-      q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
+      q-spinner-dots(v-if="!itemsRes" color="green" size="60px").fixed-center
       // headers + items
       .row.full-width
         slot(name="header")
@@ -225,11 +225,11 @@ export default {
     query: {
       immediate: true,
       async handler (to, from) {
-        // this.$log('query', to)
+        this.$log('query', from)
         if (from) {
           this.itemActive = null
           this.vsItems.splice(0, this.vsItems.length)
-          this.itemRes = null
+          this.itemsRes = null
         }
         this.itemsRes = await this.$rxdb.find(to, 100500, 100500 * 100500)
       }
