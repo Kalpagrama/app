@@ -33,7 +33,7 @@
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item" :showAuthorAlways="true")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -62,7 +62,7 @@ export default {
     scrolling: { type: Boolean, default: false },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
-    showAuthorAlways: { type: Boolean, default: true },
+    showAuthorAlways: { type: Boolean, default: false },
     showActions: { type: Boolean, default: true },
     showSpheres: { type: Boolean, default: true },
     showSpheresAlways: { type: Boolean, default: false },

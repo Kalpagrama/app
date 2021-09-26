@@ -209,7 +209,7 @@ export default {
       if (this.$refs.videoRef) {
         // отменяем загрузку видео (чтобы браузер не грузил в фоне)
         this.$log('cancelLoad', this.$refs.videoRef.src)
-        // this.$refs.videoRef.pause()
+        this.$refs.videoRef.pause()
         this.$refs.videoRef.src = ''
         this.$refs.videoRef.load()
       }
