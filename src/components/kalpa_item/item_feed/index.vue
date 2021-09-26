@@ -62,7 +62,7 @@ export default {
     scrolling: { type: Boolean, default: false },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
-    showAuthorAlways: { type: Boolean, default: false },
+    showAuthorAlways: { type: Boolean, default: true },
     showActions: { type: Boolean, default: true },
     showSpheres: { type: Boolean, default: true },
     showSpheresAlways: { type: Boolean, default: false },

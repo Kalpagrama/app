@@ -21,8 +21,8 @@ kalpa-layout()
         .row.full-width.br
           div(:style=`{height: '200px'}`) essence + author
         // actions
-        .row.full-width.br
-          div(:style=`{height: '200px'}`) actions
+        .row.full-width.scroll.br
+          div(:style=`{height: '50px', width: '700px', overflow: 'scroll'}`) actions
         // comments
         .row.full-width.br
           div(:style=`{height: '200px'}`) comments
