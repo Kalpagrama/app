@@ -411,14 +411,12 @@ export default {
     async scrollToStart () {
       this.$log('scrollToStart')
       this.itemActive = null
-      await this.itemsRes.gotoStart()
       setScrollPosition(this.scrollTarget, 0)
     },
     async scrollToEnd () {
       this.$log('scrollToEnd')
       this.itemActive = null
-      await this.itemsRes.gotoEnd()
-      setScrollPosition(this.scrollTarget, 0)
+      setScrollPosition(this.scrollTarget, getScrollHeight(this.scrollTarget))
     },
     scrollUpdate (e) {
       if (!this.debounceScrollingReset) {
