@@ -1,7 +1,8 @@
 <template lang="pug">
 kalpa-layout
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
