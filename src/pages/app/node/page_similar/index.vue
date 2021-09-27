@@ -3,10 +3,11 @@
     div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
       //.row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       tab-list-feed(
-        :scrollAreaHeight="900"
+        :type="'customPPV'"
+        :scrollAreaHeight="0"
         :query="query"
         :itemHeightApprox="500"
-        :itemActivePersist="true").row.full-width
+        :itemActivePersist="false").row.full-width
         template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           item-feed(
             :itemShortOrFull="item"
@@ -15,7 +16,8 @@
             :isActive="isActive"
             :isVisible="isVisible"
             :isPreload="isPreload"
-            :scrolling="scrolling").q-pb-xl
+            :scrolling="scrolling"
+            :showActions="false").q-pb-md
       //list-feed(
       //  :itemStyles=`{
       //  paddingBottom: '50px',

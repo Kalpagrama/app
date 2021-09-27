@@ -11,6 +11,7 @@ const countStatFragment = gql`
         countRemakes
         countSubscribers
         countSubscriptions
+        countComments
     }
 `
 const objectShortFragment = gql`
@@ -321,6 +322,7 @@ const nodeFragment = gql`
     ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
     fragment nodeFragment on Node {
         ...objectFragment
+        description
         relatedSphereOids
         sphereFromName{...objectShortFragment}
         rate

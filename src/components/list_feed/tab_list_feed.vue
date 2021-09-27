@@ -28,7 +28,7 @@
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{navHeaderText}}
             q-btn(round flat color="white" icon="more_vert")
         //-externalHeader
-        .row.full-width.justify-center.q-px-sm.q-py-sm.b-30
+        .row.full-width.justify-center
           slot(name="externalHeader")
       template(v-slot:sticky-header)
         div(v-if="pages.length > 1").row.full-width.items-center.content-center.justify-center
