@@ -27,7 +27,6 @@
         :essence="node"
         :showAuthorAlways="showAuthorAlways"
         :style=`{
-        order: orderHeader,
       }`)
       //- ITEMS: one or two
       slot(name="items")
@@ -45,37 +44,22 @@
       q-input(
         v-if="showName && node.oid"
         v-model="node.name"
-        :style=`{
-        order: 4,
-        minHeight: '60px',
-        fontSize: fontSize+'px',
-        textAlign: 'center',
-      }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-      //- SPHERES
-      essence-spheres(
-        v-if="showSpheres && node.spheres.length > 0"
-        :node="node"
-        :style=`{
-        order: 3,
-      }`)
-    //- FOOTER: actions, slot
-    essence-actions(
-      v-if="showActions && node.oid"
-      :essence="node"
-      :nodeBackgroundColor="nodeBackgroundColor"
-      :nodeActionsColor="nodeActionsColor"
-      :isActive="isActive"
-      :isVisible="isVisible"
-      :style=`{
-      order: 5,
-    }`)
-    q-btn(
-      :label="$t('Create node')"
-      :loading="publishing"
-      :style=`{height: '50px', borderRadius: '0px'}`
-      @click="nodePublish").row.full-width.text-green.text-bold
-    slot(name="footer")
+        borderless dark dense
+        :placeholder="$t('enter major essence')"
+        :input-style=`{
+          minHeight: '60px',
+          fontSize: fontSize+'px',
+          textAlign: 'center',
+        }`).row.full-width.items-center.content-center.justify-center.q-pa-md
+      edit-spheres(:node="node")
+        //template(v-slot:left)
+        //  span assdf
+      q-btn(
+        :label="$t('Create node')"
+        :loading="publishing"
+        :style=`{height: '50px', borderRadius: '0px'}`
+        @click="nodePublish").row.full-width.text-green.text-bold
+      slot(name="footer")
 </template>
 
 <script>
@@ -87,6 +71,8 @@ import essenceItems from 'src/components/essence/essence_items'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceHeader from 'src/components/essence/essence_header'
+import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
+import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
 
 export default {
   name: 'composerNode',
@@ -95,6 +81,8 @@ export default {
     essenceActions,
     essenceSpheres,
     essenceHeader,
+    editSpheres,
+    editCategory
   },
   data () {
     return {
@@ -171,8 +159,8 @@ export default {
   methods: {
     async nodePublish () {
       if (this.action) {
-        this.$log('nodePublish', this.joint)
-        await this.action(this.joint)
+        this.$log('nodePublish', this.node)
+        await this.action(this.node)
       }
       if (this.publish) {
         try {

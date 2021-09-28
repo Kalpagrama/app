@@ -314,6 +314,13 @@ class Lists {
             if (indx === -1) {
                foundGroup.items.splice(0, 0, {
                   oid: object.oid,
+                  type: object.type,
+                  thumbUrl: object.thumbUrl,
+                  createdAt: object.createdAt,
+                  name: object.name,
+                  rate: object.rate,
+                  weight: object.weight,
+                  countStat: object.countStat,
                   figuresAbsoluteList: objectFiguresAbsoluteList,
                   internalItemOids: []
                })
