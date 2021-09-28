@@ -68,6 +68,11 @@ export default {
       itemEditorShow: false
     }
   },
+  watch: {
+    itemEditorShow(to) {
+      this.$emit('itemEditorShow', to)
+    }
+  },
   computed: {
     query () {
       return {

@@ -61,6 +61,8 @@
   composer-node(
     v-else-if="item.type === 'NODE'"
     :item="item"
+    :isActive="true"
+    :isVisible="true"
     :action="action"
     :publish="publish"
     :showActions="false"

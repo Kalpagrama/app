@@ -10,14 +10,14 @@
             .row.fit.items-center.content-center.justify-center
               span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('essences')}}
           q-btn(round flat color="white" icon="more_vert")
-        q-spinner-dots(v-if="!node" color="green" size="60px").fixed-center
+        //q-spinner-dots(v-if="!node" color="green" size="60px").fixed-center
         div(v-else :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
             item-feed(
               :itemShortOrFull="node"
-              :isActive="true"
+              :isActive="isActive"
               :isVisible="true"
               :showHeader="false"
               :showActions="false"
@@ -32,7 +32,7 @@
                 borderRadius: '20px 20px 0 0',
                 height: bottomHeight + 'px',
               }`).row.full-width.b-30
-              component(:is="'page-' + pageId" :node="node" :height="bottomHeight" @close="pageId=null")
+              component(:is="'page-' + pageId" :node="node" :height="bottomHeight" @close="pageId=null" @itemEditorShow="isActive=!$event")
           // author + essence + spheres
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
             div(v-if="!pageId" :style=`{position: 'relative', border: '1px solid grey', borderRadius: '10px'}`).row.full-width
@@ -71,7 +71,15 @@
             div(v-if="!pageId").row.full-width.items-center
               q-separator(dark).full-width
               span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
-              .col
+              .col.scroll.q-px-md
+                div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
+                  span.text-grey.text-weight-thin.text-italic.q-pr-md {{node.commentStat.topComment.text}}
+                  q-btn(v-for="(c,id) in node.commentStat.randomComments" :key="id"
+                    :to="'/user/'+c.author.oid" size="sm" round flat color="grey" no-caps padding="none"
+                    :style=`{ whiteSpace: 'nowrap' }`).q-pl-xs
+                    q-avatar(:size="'20px'")
+                      img(:src="c.author.thumbUrl" :to="'/user/'+c.author.oid")
+                    // span() {{c.author.name}}
               q-btn(round flat icon="unfold_more" color="white" @click="pageId='comments'")
           page-similar(v-if="!pageId" :node="node")
           //// суть + смыслы + автор
@@ -111,7 +119,8 @@ export default {
       node: null,
       slide: 1,
       pageId: null,
-      bottomHeight: 0
+      bottomHeight: 0,
+      isActive: true
     }
   },
   watch: {

@@ -181,6 +181,19 @@ const figureFragment = gql`
         epubHref
     }
 `
+const commentFragment = gql`
+    fragment commentFragment on Comment {
+        id
+        createdAt
+        author {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 50)
+        }
+        text
+    }
+`
 
 const compositionFragment = gql`${objectFragment} ${imageFragment} ${figureFragment}
   fragment operationFragment on LayerOperation{
@@ -319,7 +332,7 @@ const essenceFragment = gql`
     }
 `
 const nodeFragment = gql`
-    ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment}
+    ${objectFragment} ${objectShortFragment} ${videoFragment} ${bookFragment} ${imageFragment} ${sphereFragment} ${userFragment} ${compositionFragment} ${commentFragment}
     fragment nodeFragment on Node {
         ...objectFragment
         description
@@ -328,6 +341,11 @@ const nodeFragment = gql`
         rate
         weight
         rateStat {percent, weight, count}
+        commentStat{
+            lastComment{...commentFragment}
+            topComment{...commentFragment}
+            randomComments{...commentFragment}
+        }
         rateUser
         author {
             oid
@@ -476,19 +494,6 @@ const contentCutFragment = gql`
         epubCfi
         epubCfiText
         params
-    }
-`
-const commentFragment = gql`
-    fragment commentFragment on Comment {
-        id
-        createdAt
-        author {
-            oid
-            type
-            name
-            thumbUrl(preferWidth: 50)
-        }
-        text
     }
 `
 
