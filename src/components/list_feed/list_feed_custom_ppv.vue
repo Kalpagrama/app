@@ -229,6 +229,7 @@ export default {
         this.$log('query', from)
         if (from) {
           this.itemActive = null
+          this.noDummyAreaCenterIndx = null
           this.vsItems.splice(0, this.vsItems.length)
           this.itemsRes = null
         }
@@ -238,8 +239,7 @@ export default {
     'itemsRes.items': {
       async handler (to, from) {
         if (!to) return
-        this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'))
-        this.itemActive = null
+        this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)
         this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
           return {
             debugInfo: item.debugInfo,
@@ -253,7 +253,8 @@ export default {
           }
         }) || []
         // this.$log('vsitems=', this.vsItems)
-        this.noDummyAreaCenterIndx = 0
+        // this.itemActive = null
+        this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
         this.$nextTick(() => {
           // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
           if (this.itemActivePersist && !this.itemActive) {
@@ -274,6 +275,7 @@ export default {
     },
     noDummyAreaCenterIndx: {
       async handler (to, from) {
+        this.$log('noDummyAreaCenterIndx changed: ', to)
         const itemPerScreenCnt = Math.ceil(this.scrollTargetHeight / this.itemHeightApprox)
         // this.$log(`itemActive.indx: ${from}->${to} itemPerScreenCnt=${itemPerScreenCnt}`, this.vsItems)
         for (let indx = 0; indx < this.length; indx++) {
