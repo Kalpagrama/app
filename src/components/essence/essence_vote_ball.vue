@@ -83,7 +83,7 @@ div(
       }`
       ).row.full-width.justify-center
       //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => essence.rate >= r.valueMin && essence.rate < r.valueMax).name }}
-      small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ essence.rateUser !== null ? rateMax.name : 'Проголосуйте' }}
+      small(v-if="showBottomText" :style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ essence.rateUser !== null ? rateMax.name : 'Проголосуйте' }}
 </template>
 
 <script>
@@ -95,7 +95,8 @@ export default {
     showRateUser: {type: Boolean, default: true},
     showRateMax: {type: Boolean, default: true},
     showRateName: {type: Boolean, default: true},
-    showRainbow: {type: Boolean, default: true}
+    showRainbow: {type: Boolean, default: true},
+    showBottomText: {type: Boolean, default: true}
   },
   data () {
     return {

@@ -285,6 +285,40 @@ class ObjectApi {
       await ObjectApi.unsetPublished(oid)
    }
 
+   static async hide (oid) {
+      const f = ObjectApi.hide
+      logD(f, 'start')
+      const t1 = performance.now()
+      const cb = async () => {
+         assert(oid)
+         let { data: { unPublish: deletedObject } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation hide($oid: OID!) {
+                    hide (oid: $oid){
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               oid: oid
+            }
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return deletedObject
+      }
+      let deletedObject = await apiCall(f, cb)
+      let reactiveObject = await rxdb.set(RxCollectionEnum.OBJ, deletedObject, { actualAge: 'day' })
+      await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
+      let wsItemType
+      if (deletedObject.type === 'NODE') wsItemType = WsItemTypeEnum.WS_NODE
+      if (deletedObject.type === 'JOINT') wsItemType = WsItemTypeEnum.WS_JOINT
+      if (deletedObject.type === 'BLOCK') wsItemType = WsItemTypeEnum.WS_BLOCK
+      assert(wsItemType)
+      await rxdb.set(wsItemType, ObjectCreateApi.makeWsEssence(deletedObject)) // сохраним в черновиках
+      await ObjectApi.unsetPublished(oid)
+   }
+
    static async stat (oid) {
       const f = ObjectApi.stat
       logD(f, 'start')

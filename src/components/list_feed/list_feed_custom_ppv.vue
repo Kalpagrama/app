@@ -187,6 +187,7 @@ export default {
       vsItems: [],
       // item
       itemActive: null,
+      noDummyAreaCenterIndx: null,
       itemsVisibility: {}
     }
   },
@@ -228,6 +229,7 @@ export default {
         this.$log('query', from)
         if (from) {
           this.itemActive = null
+          this.noDummyAreaCenterIndx = null
           this.vsItems.splice(0, this.vsItems.length)
           this.itemsRes = null
         }
@@ -236,7 +238,8 @@ export default {
     },
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'))
+        if (!to) return
+        this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)
         this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
           return {
             debugInfo: item.debugInfo,
@@ -250,9 +253,11 @@ export default {
           }
         }) || []
         // this.$log('vsitems=', this.vsItems)
+        // this.itemActive = null
+        this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
         this.$nextTick(() => {
           // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
-          if (!this.itemActive) {
+          if (this.itemActivePersist && !this.itemActive) {
             let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
             if (ref) {
               ref = ref[0]
@@ -261,7 +266,6 @@ export default {
                 let itemTopOffset = this.scrollTargetHeight / 2 - ref.clientHeight / 2
                 this.$log('itemTopOffset=', itemTopOffset)
                 setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - itemTopOffset) // перемещаем элемент в центр видимой области
-                this.itemActiveSet(this.itemsRes.getProperty('itemActiveIndx'))
               })
             }
           }
@@ -269,12 +273,13 @@ export default {
         this.$emit('count', to.length - 2)
       }
     },
-    'itemActive.indx': {
+    noDummyAreaCenterIndx: {
       async handler (to, from) {
+        this.$log('noDummyAreaCenterIndx changed: ', to)
         const itemPerScreenCnt = Math.ceil(this.scrollTargetHeight / this.itemHeightApprox)
         // this.$log(`itemActive.indx: ${from}->${to} itemPerScreenCnt=${itemPerScreenCnt}`, this.vsItems)
         for (let indx = 0; indx < this.length; indx++) {
-          // "isDummy = true" делается на большем расстоянии чтобы не было рекурсивного зацикливания (смена isDummy может привести к смене itemActive)
+          // "isDummy = true" делается на большем расстоянии чтобы не было рекурсивного зацикливания (смена isDummy может привести к смене itemActive из-за изменения высоты элемента)
           if (indx < to - itemPerScreenCnt * 5 || indx > to + itemPerScreenCnt * 5) this.vsItems[indx].state.isDummy = true
           if (indx >= to - itemPerScreenCnt * 3 && indx <= to + itemPerScreenCnt * 3) this.vsItems[indx].state.isDummy = false
         }
@@ -299,8 +304,13 @@ export default {
     scrollTop: {
       async handler (to, from) {
         // this.$logW(`scrollTop ${from}->${to}`)
-        // update itemActive.top position
-        this.itemActiveTopUpdate()
+        if (to === 0 && this.itemActive && this.itemActive.indx !== 0) {
+          // если итемы меньше чем пол экрана, то первый итем может никогда не стать активным. Домотали до верха - делаем первый активным принудительно
+          this.itemActiveIndxReal = this.itemActive.indx // запоминаем настоящий
+          this.itemActiveSet(0)
+        }
+        if (from === 0 && this.itemActiveIndxReal) this.itemActiveSet(this.itemActiveIndxReal) // восстанавливаем
+        this.itemActiveTopUpdate() // update itemActive.top position
       }
     }
   },
@@ -379,9 +389,15 @@ export default {
     },
     itemActiveHandler (isVisible, entry) {
       // let [key, idxSting] = entry.target.accessKey.split('-')
+      let indx = parseInt(entry.target.accessKey)
       if (isVisible) {
         this.$log('itemActiveHandler', entry.target.accessKey)
-        this.itemActiveSet(parseInt(entry.target.accessKey))
+        this.itemActiveSet(indx)
+      } else {
+        if (this.itemActive && this.itemActive.indx === indx) {
+          this.$log('itemActive reset', indx)
+          this.itemActive = null
+        }
       }
     },
     itemVisibilityHandler (isVisible, entry) {
@@ -392,6 +408,7 @@ export default {
     itemActiveSet (indx) {
       this.$log('itemActiveSet', indx)
       assert(indx >= 0 && indx < this.length)
+      this.noDummyAreaCenterIndx = indx
       if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
       let itemRef = this.$refs[`item-${indx}`]
       let item = this.vsItems[indx]

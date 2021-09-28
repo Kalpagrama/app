@@ -267,7 +267,7 @@ export default {
       if (itemsRes) this.$log('resetItemsRes length=', this.length)
       if (this.$refs.vs) this.$refs.vs.refresh()
       // if (this.$refs.vs) this.$refs.vs.reset()
-      if (itemsRes && itemsRes.getProperty('itemActiveIndx') != null && itemsRes.getProperty('itemActiveIndx') >= 0) {
+      if (itemsRes && this.itemActivePersist && itemsRes.getProperty('itemActiveIndx') != null && itemsRes.getProperty('itemActiveIndx') >= 0) {
         this.$nextTick(_ => {
           this.scrollTo(itemsRes.getProperty('itemActiveIndx'))
         })
