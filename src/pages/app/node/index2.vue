@@ -13,7 +13,15 @@
         //q-spinner-dots(v-if="!node" color="green" size="60px").fixed-center
         div(v-else :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           // образ
-          div(:style=`{width: $store.state.ui.pageWidth + 'px'}`).row-full-width
+          q-dialog(
+            v-model="itemEditorShow"
+            :maximized="false"
+            position="standard")
+            item-editor(
+              :item="newNode"
+              :publish="true"
+              @close="itemEditorShow=false")
+          div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
             item-feed(
               :itemShortOrFull="node"
@@ -23,6 +31,9 @@
               :showActions="false"
               :showName="false"
               :showSpheres="false")
+            q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length").absolute-right.z-top
+            q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top
+            q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
           // fullpage
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -110,17 +121,21 @@ import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import itemEditor from 'src/components/kalpa_item/item_editor'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'pageApp_node2',
-  components: {pageSimilar, pageComments, pageDescription, pageEssences, essenceActions, essenceSpheres},
+  components: { pageSimilar, pageComments, pageDescription, pageEssences, essenceActions, essenceSpheres, itemEditor },
   data () {
     return {
       node: null,
       slide: 1,
       pageId: null,
       bottomHeight: 0,
-      isActive: true
+      isActive: true,
+      itemEditorShow: false,
+      sameEssenceNodesItemsRes: null // ядра с той же сутью
     }
   },
   watch: {
@@ -131,9 +146,19 @@ export default {
         if (to) {
           // this.$log('$route.params.oid TO', to)
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+          this.sameEssenceNodesItemsRes = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+              objectTypeEnum: { $in: ['NODE'] },
+              oidSphere: this.node.sphereFromName.oid,
+              sortStrategy: 'HOT' // 'ACTIVITY', // AGE
+            },
+            populateObjects: false
+          })
+          this.$log('sameEssenceNodesItemsRes=', this.sameEssenceNodesItemsRes)
         }
       }
-    },
+    }
   },
   computed: {
     fontSize () {
@@ -142,6 +167,24 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
+    },
+    itemsRight () {
+      if (!this.sameEssenceNodesItemsRes) return []
+      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
+      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(indxCurrent, this.sameEssenceNodesItemsRes.items.length)
+      return []
+    },
+    itemsLeft () {
+      if (!this.sameEssenceNodesItemsRes) return []
+      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
+      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, indxCurrent)
+      return []
+    },
+    newNode () {
+      if (!this.node) return null
+      let node = cloneDeep(this.node)
+      node.items = []
+      return node
     }
   },
   async mounted () {
