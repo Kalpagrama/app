@@ -1,37 +1,35 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-px-sm
-  .row.full-width
-    slot(name="top").row.full-width
-    slot(name="left")
-    .col
-      div(ref="scrolledArea").scroll
-        .row.full-width.items-center.content-center.q-py-xs.no-wrap
-          //- slot(name="left")
-          q-btn(
-            v-for="(s,si) in node.spheres" :key="si"
-            flat no-caps dense color="white"
-            :style=`{
-              whiteSpace: 'nowrap',
-            }`
-            @click="sphereDelete(s)"
-          ).q-px-xs {{ '✦'+s.name }}
-    .row
-      slot(name="right")
-  .row.full-width
+.row.full-width.items-start.content-start
+  div(ref="scrolledArea").scroll.row.full-width.items-center.content-center.no-wrap
+    q-btn(
+      v-for="(s,si) in node.spheres" :key="si"
+      flat no-caps dense color="white"
+      :style=`{
+        whiteSpace: 'nowrap',
+      }`
+      @click="sphereDelete(s)"
+    ).q-px-xs {{ '✦'+s.name }}
     q-input(
       v-model="sphere"
-      borderless dark dense
-      :placeholder="$t('enter minor essences')"
+       dark dense
+       color="green"
+      :placeholder="$t('add minor essences')"
       :input-style=`{
-            //- textAlign: 'center',
-            paddingLeft: '16px',
-          }`
+      textAlign: 'center',
+      // paddingLeft: '16px',
+    }`
+      :style=`{
+        minWidth: '100px',
+        borderRadius: '5px',
+        // border: '1px solid grey'
+      }`
       @blur="sphereAdd()"
       @keydown.enter="sphereAdd()"
     ).col
-    slot(name="spheres-right")
   .row.full-width
-    slot(name="bottom")
+      slot(name="left")
+  .row.full-width.justify-end
+      slot(name="right")
 </template>
 
 <script>

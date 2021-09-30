@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row.full-width.items-start.content-start.q-px-sm
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     q-dialog(
       v-model="itemEditorShow"
       :maximized="false"
@@ -9,11 +9,12 @@
         :publish="true"
         @close="itemEditorShow=false")
     // заголовок
-    .row.full-width
-      q-resize-observer(@resize="$event => headerHeight = $event.height")
-      .q-pa-sm.text-h6.text-bold.text-white {{$t('Essences')}}
-      .col
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    //.row.full-width
+    //  q-resize-observer(@resize="$event => headerHeight = $event.height")
+    //  .q-pa-sm.text-h6.text-bold.text-white {{$t('Essence list')}}
+    //  .col
+    //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    q-btn(round flat color="white" icon="clear" @click="$emit('close')").absolute-top-right.z-top
     //- comments
     .row.full-width.justify-center
       tab-list-feed(
@@ -24,40 +25,51 @@
         :itemActivePersist="false"
         @count="commentsCount = $event").row.full-width
         template(v-slot:externalHeader)
-          q-btn(round outline color="green" icon="add" size="lg" @click="itemEditorShow=true").full-width.q-mb-sm
-          ////- essence input
-          //div(:style=`{ borderRadius: '10px',}`).row.full-width.items-stretch.content-start.b-35
-          //  q-input(
-          //    v-model="newEssence"
-          //    autogrow dense borderless dark type="textarea" :resize="false"
-          //    :placeholder="$t('enter new essence')"
-          //    :input-style=`{
-          //        resize: 'none',
-          //        padding: '10px',
-          //        background: 'rgb(45,45,45)',
-          //        borderRadius: '10px',
-          //      }`
-          //    @keyup.enter.ctrl="essenceCreate()").col
-          //  q-btn(
-          //    flat color="green" icon="send"
-          //    :loading="essenceCreateing"
-          //    @click="essenceCreate()")
-        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-          div(:style=`{height: '60px', border: '1px solid grey', borderRadius: '10px'}`).row.full-width.items-center.q-mb-sm
-            span(:style=`{textAlign: 'center'}`).col {{item.name}}
-            essence-vote-ball(:essence="node" :showBottomText="false" @click.native="nodeVoteBallClick").q-pr-sm
+          //q-btn(round outline color="green" icon="add" size="lg" @click="itemEditorShow=true").full-width.q-mb-sm
+          item-editor(
+            :item="newNode"
+            :showHeader="false"
+            :showItems="false"
+            :publish="true"
+            @close="itemEditorShow=false").row.full-width
+        template(v-slot:item=`{item: node,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+          div(:style=`{position: 'relative', border: '1px solid grey', borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
+            //span(:style=`{textAlign: 'center'}` @click="$router.push('/node/'+node.oid)").col {{node.name}}
+            .row.full-width
+              essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState").row.full-width
+              // суть
+              .row.full-width
+                // author
+                q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pr-md
+                  q-avatar(:size="'20px'")
+                    img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
+                  span() {{node.author.name}}
+                // essence
+                .row.col.justify-center
+                  span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="$go('/node/'+node.oid), $emit('close')").text-white.cursor-pointer {{node.name}}
+              essence-actions(v-if="expandedItemIndex===itemIndex"
+                :essence="node"
+                :itemState="itemState"
+                :nodeBackgroundColor="'rgb(30,30,30)'"
+                :nodeActionsColor="'rgb(200,200,200)'"
+                :isActive="true"
+                :isVisible="true").row.full-width
+            q-btn(round flat dense :icon="expandedItemIndex===itemIndex ? 'expand_less' : 'expand_more'" color="white" @click="expandedItemIndex!==itemIndex ? expandedItemIndex=itemIndex : expandedItemIndex=null").absolute-top-right
+
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor'
+import essenceSpheres from 'src/components/essence/essence_spheres'
+import essenceActions from 'src/components/essence/essence_actions.vue'
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'pageEssences',
   components: {
-    essenceVoteBall, itemEditor
+    essenceVoteBall, itemEditor, essenceSpheres, essenceActions
   },
   props: ['node', 'height'],
   data () {
@@ -65,7 +77,8 @@ export default {
       newEssence: null,
       essenceCreating: false,
       headerHeight: 0,
-      itemEditorShow: false
+      itemEditorShow: false,
+      expandedItemIndex: null,
     }
   },
   watch: {
@@ -82,12 +95,13 @@ export default {
           oidSphere: this.node.items[0].oid,
           sortStrategy: 'HOT' // 'ACTIVITY', // AGE
         },
-        populateObjects: false,
+        populateObjects: true,
       }
     },
     newNode() {
       let node = cloneDeep(this.node)
       node.name = ''
+      node.spheres = []
       return node
     }
   },

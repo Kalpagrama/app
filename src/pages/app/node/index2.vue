@@ -11,7 +11,7 @@
               span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('essences')}}
           q-btn(round flat color="white" icon="more_vert")
         //q-spinner-dots(v-if="!node" color="green" size="60px").fixed-center
-        div(v-else :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        div(v-if="node" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           // образ
           q-dialog(
             v-model="itemEditorShow"
@@ -34,7 +34,8 @@
             q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length").absolute-right.z-top
             q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top
             q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
-          // fullpage
+
+          // fullpage (description / coments / other essences)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
               v-if="pageId"
@@ -46,41 +47,38 @@
               component(:is="'page-' + pageId" :node="node" :height="bottomHeight" @close="pageId=null" @itemEditorShow="isActive=!$event")
           // author + essence + spheres
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId" :style=`{position: 'relative', border: '1px solid grey', borderRadius: '10px'}`).row.full-width
-              q-btn(round flat icon="unfold_more" color="white" @click="pageId='essences'").absolute-top-right
+            div(v-if="!pageId").row.full-width
+              // spheres
               .row.full-width
-                q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-xs.q-pt-xs
+                .col
+                  essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState")
+                // description expand btn
+                q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
+              // суть
+              .row.full-width
+                // author
+                q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pr-md
                   q-avatar(:size="'20px'")
                     img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
                   span() {{node.author.name}}
-              .col
-              span(:style=`{
-                    fontSize: fontSize+'px',
-                    textAlign: 'center',
-                  }`).text-white.full-width.q-pl-xl {{node.name}}
-              //- SPHERES
-              essence-spheres(
-                v-if="node.spheres.length > 0"
-                :node="node"
-                :itemState="{}")
-              //essence-actions(
-              //  :essence="node"
-              //  :itemState="{}"
-              //  :nodeBackgroundColor="'rgb(30,30,30)'"
-              //  :nodeActionsColor="'rgb(200,200,200)'"
-              //  :isActive="true"
-              //  :isVisible="true")
-          // description
-          transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId").row.full-width.items-center
-              //q-separator(dark).full-width
-              span.text-grey.q-pl-sm {{node.description}} длинное описание...
-              .col
-              q-btn(round flat icon="unfold_more" color="white" @click="pageId='description'")
+                // essence
+                .row.col.justify-center
+                  span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
+                    q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length" align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
+                    //q-icon(name= "add" size="12px" color="green"
+                    //  :style=`{border: '1px solid ' + $getPaletteColor('green'), borderRadius: '4px',width: '14px', height: '12px', right: '-18px', top: '3px'
+                    //   }`).absolute-top-right
+          essence-actions(
+                :essence="node"
+                :itemState="itemState"
+                :nodeBackgroundColor="'rgb(30,30,30)'"
+                :nodeActionsColor="'rgb(200,200,200)'"
+                :isActive="true"
+                :isVisible="true")
           // comments
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId").row.full-width.items-center
-              q-separator(dark).full-width
+            div(v-if="!pageId").row.full-width.items-center.q-py-md
+              //q-separator(dark).full-width.q-mt-md
               span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
               .col.scroll.q-px-md
                 div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
@@ -91,25 +89,9 @@
                     q-avatar(:size="'20px'")
                       img(:src="c.author.thumbUrl" :to="'/user/'+c.author.oid")
                     // span() {{c.author.name}}
-              q-btn(round flat icon="unfold_more" color="white" @click="pageId='comments'")
+              q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='comments'")
+              //q-separator(dark).full-width.q-mt-md
           page-similar(v-if="!pageId" :node="node")
-          //// суть + смыслы + автор
-          //.row.full-width
-          //  div(:style=`{height: '200px'}`) essence + author
-          //// actions
-          //div(:style=`{height: '150px', width: 'auto'}`).row.full-width.no-wrap.scroll
-          //  q-btn(v-for="(n, i) in 100"  round flat color="white" icon="clear")
-          // comments
-
-          //// similar
-          //.row.full-width
-          //  div(:style=`{height: '200px'}`) similar
-          //q-expansion-item(group="somegroup" icon="chat" :label="$t('Description')" dark).col-12
-          //  // template(v-slot:header)
-          //  // todo самый лучший коммент
-          //  row.full-width
-          //    q-btn(v-for="(n, i) in 10"  round flat color="white" icon="add")
-
 </template>
 
 <script>
@@ -121,12 +103,24 @@ import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor'
 import cloneDeep from 'lodash/cloneDeep'
+import { ObjectApi } from 'src/api/object'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageApp_node2',
-  components: { pageSimilar, pageComments, pageDescription, pageEssences, essenceActions, essenceSpheres, itemEditor },
+  components: {
+    pageSimilar,
+    pageComments,
+    pageDescription,
+    pageEssences,
+    essenceActions,
+    essenceSpheres,
+    itemEditor,
+    essenceVoteBall
+  },
   data () {
     return {
       node: null,
@@ -135,7 +129,9 @@ export default {
       bottomHeight: 0,
       isActive: true,
       itemEditorShow: false,
-      sameEssenceNodesItemsRes: null // ядра с той же сутью
+      sameEssenceNodesItemsRes: null, // ядра с той же сутью
+      sameCompositionNodesItemsRes: null, // ядра с тем же образом
+      itemState: {},
     }
   },
   watch: {
@@ -155,9 +151,25 @@ export default {
             },
             populateObjects: false
           })
-          this.$log('sameEssenceNodesItemsRes=', this.sameEssenceNodesItemsRes)
+          this.sameCompositionNodesItemsRes = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+              objectTypeEnum: { $in: ['NODE'] },
+              oidSphere: this.node.items[0].oid,
+              sortStrategy: 'HOT' // 'ACTIVITY', // AGE
+            },
+            populateObjects: false,
+          })
+          this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
         }
       }
+    },
+    node (to) {
+      // this.$log('node=', to)
+      this.pageId = null
+      this.sameEssenceNodesItemsRes = null
+      this.sameCompositionNodesItemsRes = null
+      this.itemState = {}
     }
   },
   computed: {
@@ -187,8 +199,10 @@ export default {
       return node
     }
   },
+  methods: {
+  },
   async mounted () {
-    this.$log('mounted', this.node)
+    this.$log('mounted node=', this.node)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

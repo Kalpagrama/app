@@ -74,17 +74,28 @@
       q-input(
         v-if="showName && node.oid"
         v-model="node.name"
+        color="green"
         borderless dark dense
-        :placeholder="$t('enter major essence')"
+        :placeholder="$t('enter your essence')"
         :input-style=`{
-          minHeight: '60px',
+          // minHeight: '60px',
           fontSize: fontSize+'px',
           textAlign: 'center',
         }`).row.full-width.items-center.content-center.justify-center.q-pa-md
-      edit-spheres(:node="node")
-        //template(v-slot:left)
-        //  span assdf
-      q-btn(
+      edit-spheres(v-if="node.name" ref="editSpheres" :node="node")
+      //q-input(
+      //  v-model="node.description"
+      //  borderless dark dense
+      //  filled
+      //  clearable
+      //  autogrow
+      //  :label="$t('enter description')").row.full-width
+      q-expansion-item(v-if="node.name" icon="description" :label="$t('Description')" dark).full-width
+        q-editor(v-model="node.description"
+          dark
+          :definitions=`{bold: {label: 'Bold', icon: null, tip: 'My bold tooltip'}}`
+        )
+      q-btn(v-if="node.name"
         :label="$t('Create node')"
         :loading="publishing"
         :style=`{height: '50px', borderRadius: '0px'}`

@@ -66,6 +66,8 @@
     :action="action"
     :publish="publish"
     :showActions="false"
+    :showHeader="showHeader"
+    :showItems="showItems"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
 </template>
@@ -103,7 +105,15 @@ export default {
     },
     publish: {
       type: Boolean,
-    }
+    },
+    showHeader: {
+      type: Boolean,
+      default: true
+    },
+    showItems: {
+      type: Boolean,
+      default: true
+    },
 
   },
   data () {

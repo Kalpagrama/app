@@ -404,7 +404,11 @@ class ObjectApi {
                oid: oid
             }
          })
-         // todo update node in apollo cache
+         // надо запомнить сейчас, тк эвентом придет только общая оценка
+         let node = await rxdb.get(RxCollectionEnum.OBJ, oid)
+         if (node) {
+            node.rateUser = null // node реактивен!
+         }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return nodeUnrate
       }
