@@ -126,14 +126,6 @@ export default {
     editSpheres,
     editCategory
   },
-  data () {
-    return {
-      node: cloneDeep(this.item),
-      publishing: false,
-      itemFinderShow: false,
-      itemEditorShow: false
-    }
-  },
   props: {
     item: { type: Object, required: true },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
@@ -171,6 +163,22 @@ export default {
       default: false
     }
 
+  },
+  data () {
+    return {
+      node: null,
+      publishing: false,
+      itemFinderShow: false,
+      itemEditorShow: false
+    }
+  },
+  watch: {
+    item: {
+      immediate: true,
+      handler(to) {
+        this.node = cloneDeep(to)
+      }
+    }
   },
   computed: {
     nodeName () {

@@ -31,9 +31,9 @@
             :showHeader="false"
             :showItems="false"
             :publish="true"
-            @close="itemEditorShow=false").row.full-width
+            @close="resetNewNode()").row.full-width
         template(v-slot:item=`{item: node,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-          div(:style=`{position: 'relative', border: '1px solid grey', borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
+          div(:style=`{position: 'relative', minHeight: '40px', border: '1px solid grey', borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
             //span(:style=`{textAlign: 'center'}` @click="$router.push('/node/'+node.oid)").col {{node.name}}
             .row.full-width
               essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState").row.full-width
@@ -79,11 +79,15 @@ export default {
       headerHeight: 0,
       itemEditorShow: false,
       expandedItemIndex: null,
+      newNode: null,
     }
   },
   watch: {
     itemEditorShow(to) {
       this.$emit('itemEditorShow', to)
+    },
+    newNode(to) {
+      this.$log('newNode=', to)
     }
   },
   computed: {
@@ -97,18 +101,21 @@ export default {
         },
         populateObjects: true,
       }
-    },
-    newNode() {
-      let node = cloneDeep(this.node)
-      node.name = ''
-      node.spheres = []
-      return node
     }
   },
   methods: {
+    resetNewNode() {
+      this.$log('resetNewNode ')
+      let node = cloneDeep(this.node)
+      node.name = ''
+      node.description = ''
+      node.spheres = []
+      this.newNode = node
+    }
   },
-  mounted () {
-    this.$log('mounted ')
+  created () {
+    this.$log('created ')
+    this.resetNewNode()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
