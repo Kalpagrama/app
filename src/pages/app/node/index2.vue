@@ -58,19 +58,20 @@
               .row.full-width
                 .row.col.justify-center
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
-                    q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length" align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
+                    q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"
+                      align="top" dark rounded color="green") \#{{sameCompositionNodesItemsRes.items.findIndex(item=>item.oid === node.oid) + 1}} {{$t('of')}} {{sameCompositionNodesItemsRes.items.length}}
               // author
               q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
                 q-avatar(:size="'20px'")
                   img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
                 span() {{node.author.name}}
           essence-actions(
-                :essence="node"
-                :itemState="itemState"
-                :nodeBackgroundColor="'rgb(30,30,30)'"
-                :nodeActionsColor="'rgb(200,200,200)'"
-                :isActive="true"
-                :isVisible="true")
+            :essence="node"
+            :itemState="itemState"
+            :nodeBackgroundColor="'rgb(30,30,30)'"
+            :nodeActionsColor="'rgb(200,200,200)'"
+            :isActive="true"
+            :isVisible="true")
           // comments
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
             div(v-if="!pageId" @click="pageId='comments'").cursor-pointer.row.full-width.items-center.q-py-md
@@ -127,7 +128,7 @@ export default {
       itemEditorShow: false,
       sameEssenceNodesItemsRes: null, // ядра с той же сутью
       sameCompositionNodesItemsRes: null, // ядра с тем же образом
-      itemState: {},
+      itemState: {}
     }
   },
   watch: {
@@ -137,13 +138,14 @@ export default {
       async handler (to, from) {
         if (to) {
           // this.$log('$route.params.oid TO', to)
+          if (this.node && this.node.oid !== to) this.node = null
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           this.sameEssenceNodesItemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
               oidSphere: this.node.sphereFromName.oid,
-              sortStrategy: 'HOT' // 'ACTIVITY', // AGE
+              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
             },
             populateObjects: false
           })
@@ -152,16 +154,16 @@ export default {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
               oidSphere: this.node.items[0].oid,
-              sortStrategy: 'HOT' // 'ACTIVITY', // AGE
+              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
             },
-            populateObjects: false,
+            populateObjects: false
           })
           this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
         }
       }
     },
     node (to) {
-      // this.$log('node=', to)
+      this.$log('node to=', to)
       this.pageId = null
       this.sameEssenceNodesItemsRes = null
       this.sameCompositionNodesItemsRes = null
@@ -196,8 +198,7 @@ export default {
       return node
     }
   },
-  methods: {
-  },
+  methods: {},
   async mounted () {
     this.$log('mounted node=', this.node)
   },

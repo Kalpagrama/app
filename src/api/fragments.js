@@ -462,7 +462,7 @@ const objectFullFragment = gql`
         ...on Block {...blockFragment}
     }
 `
-const topObjectFragment = gql`${figureFragment}
+const topObjectFragment = gql`${figureFragment} ${countStatFragment}
     fragment topObjectFragment on TopObject {
         oid
         type
@@ -474,6 +474,7 @@ const topObjectFragment = gql`${figureFragment}
         internalItemOids
         figuresAbsoluteList{...figureFragment}
         vertexType
+        countStat {...countStatFragment}
     }
 `
 const groupFragment = gql`${figureFragment} ${topObjectFragment} ${objectShortFragment}

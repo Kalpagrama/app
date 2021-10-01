@@ -136,9 +136,11 @@ export default {
   },
   methods: {
     scrollTo (pos) {
-      assert(pos.in('start', 'end'))
+      // assert(pos.in('start', 'end'))
       if (pos === 'start') this.$refs.listFeed.scrollToStart()
-      if (pos === 'end') this.$refs.listFeed.scrollToEnd()
+      else if (pos === 'end') this.$refs.listFeed.scrollToEnd()
+      else if (typeof pos === 'number' && this.$refs.listFeed.scrollTo) this.$refs.listFeed.scrollTo(pos)
+      else throw new Error('scrollTo bad pos:' + pos)
     },
     length () {
       return this.$refs.listFeed.length

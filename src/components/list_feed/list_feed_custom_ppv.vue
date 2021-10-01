@@ -252,11 +252,10 @@ export default {
             }
           }
         }) || []
-        // this.$log('vsitems=', this.vsItems)
-        // this.itemActive = null
-        this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
+        this.noDummyAreaCenterIndx = null
         this.$nextTick(() => {
           // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
+          this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
           if (this.itemActivePersist && !this.itemActive) {
             let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
             if (ref) {
@@ -271,7 +270,7 @@ export default {
           }
         })
         this.$emit('count', to.length)
-        this.$emit('items', to)
+        this.$emit('items', this.vsItems.map(item => item.source))
       }
     },
     noDummyAreaCenterIndx: {

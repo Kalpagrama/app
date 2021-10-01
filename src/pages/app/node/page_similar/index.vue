@@ -18,16 +18,6 @@
             :isPreload="isPreload"
             :scrolling="scrolling"
             :showActions="false").q-pb-md
-      //list-feed(
-      //  :itemStyles=`{
-      //  paddingBottom: '50px',
-      //}`
-      //  :query="query")
-      //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-      //    item-feed(
-      //      :itemShortOrFull="item.populatedObject"
-      //      :isActive="isActive"
-      //      :isVisible="isVisible")
 </template>
 
 <script>

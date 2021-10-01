@@ -27,12 +27,14 @@
     //  .q-pa-sm.text-h6.text-bold.text-white {{$t('Essence list')}}
     //  .col
     //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-    div(:style=`{position: 'relative'}`).row.full-width
-      q-btn(round flat icon="add" color="green" @click="itemEditorShow=true").col
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')").absolute-right
+    div(:style=`{position: 'relative'}`).row.full-width.items-center.justify-between.q-px-md
+      span.text-grey {{$t('essence rating')}}
+      q-btn(round flat stack no-caps :label="$t('add your essence')" icon="add" color="green" @click="itemEditorShow=true").col-3
+      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
     //- comments
     .row.full-width.justify-center
       tab-list-feed(
+        ref="listFeed"
         :scrollAreaHeight="height - headerHeight"
         :type="'quasar'"
         :query="query"
@@ -48,32 +50,34 @@
           //  :publish="true"
           //  @close="resetNewNode()").row.full-width
         template(v-slot:item=`{item: node,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-          div(:style=`{minHeight: '40px', border: '1px solid grey', borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
-            div(v-if="true || !node.spheres").row.full-width.q-pa-xs
-              span(v-if="true || !node.spheres" :style=`{textAlign: 'center'}` @click="selectedEssence=node,selectedEssenceState=itemState, itemPreviewShow=true").col {{node.name}}
-              q-knob(v-model="node.rate" :min="0" :max="maxRate" show-value dark size="md" color="green" :thickness="0.09" track-color="grey-9")
-                span {{node.countVotes}}
-            div(v-else :style=`{position: 'relative'}`).row.full-width
-              essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState").row.full-width
-              // суть
-              .row.full-width
-                // author
-                q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pr-md
-                  q-avatar(:size="'20px'")
-                    img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
-                  span() {{node.author.name}}
-                // essence
-                .row.col.justify-center
-                  span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="$go('/node/'+node.oid), $emit('close')").text-white.cursor-pointer {{node.name}}
-              essence-actions(v-if="expandedItemIndex===itemIndex"
-                :essence="node"
-                :itemState="itemState"
-                :nodeBackgroundColor="'rgb(30,30,30)'"
-                :nodeActionsColor="'rgb(200,200,200)'"
-                :isActive="true"
-                :isVisible="true").row.full-width
-              q-btn(round flat dense :icon="expandedItemIndex===itemIndex ? 'expand_less' : 'expand_more'" color="white" @click="expandedItemIndex!==itemIndex ? expandedItemIndex=itemIndex : expandedItemIndex=null").absolute-top-right
-</template>
+          .row.full-width.q-px-md
+            div(:style=`{minHeight: '40px', border: '1px solid ' + (currentIndx === itemIndex ? 'green' : 'grey'), borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
+              div(v-if="true || !node.spheres" @click="$go('/node/'+node.oid), $emit('close')").row.full-width.q-pa-xs
+                span(:style=`{textAlign: 'center'}`).col {{node.name}}
+                q-circular-progress(v-if="node.countVotes > 1" :value="node.rate" :min="0" :max="maxRate" show-value dark size="sm" color="green" :thickness="0.09" track-color="grey-9"
+                  @click="/*selectedEssence=node,selectedEssenceState=itemState, itemPreviewShow=true*/")
+                  span {{node.countVotes}}
+              div(v-else :style=`{position: 'relative'}`).row.full-width
+                essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState").row.full-width
+                // суть
+                .row.full-width
+                  // author
+                  q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pr-md
+                    q-avatar(:size="'20px'")
+                      img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
+                    span() {{node.author.name}}
+                  // essence
+                  .row.col.justify-center
+                    span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="$go('/node/'+node.oid), $emit('close')").text-white.cursor-pointer {{node.name}}
+                essence-actions(v-if="expandedItemIndex===itemIndex"
+                  :essence="node"
+                  :itemState="itemState"
+                  :nodeBackgroundColor="'rgb(30,30,30)'"
+                  :nodeActionsColor="'rgb(200,200,200)'"
+                  :isActive="true"
+                  :isVisible="true").row.full-width
+                q-btn(round flat dense :icon="expandedItemIndex===itemIndex ? 'expand_less' : 'expand_more'" color="white" @click="expandedItemIndex!==itemIndex ? expandedItemIndex=itemIndex : expandedItemIndex=null").absolute-top-right
+  </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -96,13 +100,17 @@ export default {
       headerHeight: 0,
       itemEditorShow: false,
       itemPreviewShow: false,
-      essenceList: null,
+      essenceList: [],
       selectedEssence: null,
       selectedEssenceState: null,
       expandedItemIndex: null,
     }
   },
   watch: {
+    currentIndx(to) {
+      this.$log('currentIndx to:', to)
+      this.$refs.listFeed.scrollTo(to)
+    }
   },
   computed: {
     query () {
@@ -127,6 +135,10 @@ export default {
     maxRate () {
       if (this.essenceList) return this.essenceList.reduce((acc, v) => acc > v.rate ? acc : v.rate)
       return 0
+    },
+    currentIndx(){
+      if (this.essenceList) return this.essenceList.findIndex(item => item.oid === this.node.oid)
+      return -1
     }
   },
   methods: {
