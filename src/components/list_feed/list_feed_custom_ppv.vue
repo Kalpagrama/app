@@ -270,7 +270,8 @@ export default {
             }
           }
         })
-        this.$emit('count', to.length - 2)
+        this.$emit('count', to.length)
+        this.$emit('items', to)
       }
     },
     noDummyAreaCenterIndx: {

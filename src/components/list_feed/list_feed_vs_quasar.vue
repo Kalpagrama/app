@@ -238,6 +238,7 @@ export default {
         this.$log('itemsRes.items changed', !!this.$refs.vs, to)
         this.resetItemsRes(this.itemsRes)
         this.$emit('count', to?.length || 0)
+        this.$emit('items', to)
       }
     },
     query: {

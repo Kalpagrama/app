@@ -17,7 +17,8 @@
       :screenSize="screenSize"
       :itemHeightApprox="itemHeightApprox"
       :itemActivePersist="itemActivePersist"
-      @count="$emit('count', $event)")
+      @count="$emit('count', $event)"
+      @items="$emit('items', $event)")
       template(v-slot:header)
         //- nav header
         div(v-if="navHeaderText").row.full-width.justify-center.b-30

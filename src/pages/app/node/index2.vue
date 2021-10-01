@@ -56,18 +56,14 @@
                 q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
               // суть
               .row.full-width
-                // author
-                q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pr-md
-                  q-avatar(:size="'20px'")
-                    img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
-                  span() {{node.author.name}}
-                // essence
                 .row.col.justify-center
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
                     q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length" align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
-                    //q-icon(name= "add" size="12px" color="green"
-                    //  :style=`{border: '1px solid ' + $getPaletteColor('green'), borderRadius: '4px',width: '14px', height: '12px', right: '-18px', top: '3px'
-                    //   }`).absolute-top-right
+              // author
+              q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
+                q-avatar(:size="'20px'")
+                  img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
+                span() {{node.author.name}}
           essence-actions(
                 :essence="node"
                 :itemState="itemState"
@@ -77,7 +73,7 @@
                 :isVisible="true")
           // comments
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId").row.full-width.items-center.q-py-md
+            div(v-if="!pageId" @click="pageId='comments'").cursor-pointer.row.full-width.items-center.q-py-md
               //q-separator(dark).full-width.q-mt-md
               span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
               .col.scroll.q-px-md
@@ -170,6 +166,7 @@ export default {
       this.sameEssenceNodesItemsRes = null
       this.sameCompositionNodesItemsRes = null
       this.itemState = {}
+      this.isActive = true
     }
   },
   computed: {
