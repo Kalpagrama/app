@@ -61,7 +61,7 @@
               :style=`{
                 borderRadius: '10px',
               }`)
-          template(v-slot:spheres-right)
+          template(v-slot:right)
             .div(v-if="false").row
               //- Delete from notes
               q-btn(

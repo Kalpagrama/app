@@ -1,59 +1,40 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-px-sm
-  .q-pa-sm.text-h6.text-bold.text-white {{$t('Comments')}} ({{commentsCount}})
-  //- comment input
-  div(
-    :style=`{
-      minHeight: '60px',
-      borderRadius: '10px',
-      align:"center",
-    }`
-    ).row.full-width.items-start.content-start.b-35
+  // заголовок
+  .row.full-width
+    q-resize-observer(@resize="$event => headerHeight = $event.height")
+    .q-pa-sm.text-h6.text-bold.text-white {{$t('Comments')}} ({{commentsCount}})
     .col
-      //- @keyup.enter.ctrl="commentSend()"
-      q-input(
-        v-model="comment"
-        @keyup.enter.ctrl="commentSend()"
-        autogrow
-        borderless dark type="textarea" :resize="false"
-        :placeholder="$t('Join the discussion')"
-        :input-style=`{
-          resize: 'none',
-          padding: '10px',
-          background: 'rgb(45,45,45)',
-          borderRadius: '10px',
-          minHeight: '60px',
-        }`
-        ).full-width
-    q-btn(
-      flat color="green" icon="send"
-      :loading="commentSending"
-      :style=`{
-        height: '60px',
-        width: '60px',
-      }`
-      @click="commentSend()")
+    q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   //- comments
-  .row.full-width.justify-center.q-pt-sm
+  .row.full-width.justify-center
     tab-list-feed(
-      :scrollAreaHeight="0"
+      :scrollAreaHeight="height - headerHeight"
+      :type="'quasar'"
       :query="query"
       :itemHeightApprox="60"
-      :itemMiddlePersist="true"
+      :itemActivePersist="false"
       @count="commentsCount = $event").row.full-width
+      template(v-slot:externalHeader)
+          //- comment input
+          div(:style=`{ borderRadius: '10px',}`).row.full-width.items-stretch.content-start.b-35
+            q-input(
+              v-model="comment"
+              autogrow dense borderless dark type="textarea" :resize="false"
+              :placeholder="$t('Join the discussion')"
+              :input-style=`{
+                resize: 'none',
+                padding: '10px',
+                background: 'rgb(45,45,45)',
+                borderRadius: '10px',
+              }`
+              @keyup.enter.ctrl="commentSend()").col
+            q-btn(
+              flat color="green" icon="send"
+              :loading="commentSending"
+              @click="commentSend()")
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         comment-item(:comment="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" @delete="commentDelete")
-    //list-feed(
-    //  :query="query"
-    //  nextSize=44
-    //  :itemMiddlePersist="false"
-    //  screenSize=88
-    //  :style=`{
-    //    maxWidth: $store.state.ui.pageWidth+'px',
-    //  }`
-    //  @count="commentsCount = $event")
-    //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-    //    comment-item(:comment="item" :isActive="isActive" @delete="commentDelete")
 </template>
 
 <script>
@@ -66,12 +47,13 @@ export default {
   components: {
     commentItem,
   },
-  props: ['node'],
+  props: ['node', 'height'],
   data () {
     return {
       comment: '',
       commentSending: false,
-      commentsCount: 0
+      commentsCount: 0,
+      headerHeight: 0
     }
   },
   computed: {
@@ -81,14 +63,6 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_COMMENTS,
           oidSphere: this.node.oid
         }
-      }
-    }
-  },
-  watch: {
-    node: {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('node TO', to)
       }
     }
   },

@@ -109,7 +109,7 @@ export default {
             this.$log('copyLink')
             // TODO: handle copy link...
           }
-        }
+        },
         // goThreads: {
         //   name: this.$t('Go threads'),
         //   cb: async () => {
@@ -141,6 +141,15 @@ export default {
           cb: async () => {
             this.$log('essenceDelete...')
             await ObjectApi.unPublish(this.essence.oid)
+          }
+        }
+        res.hideGlobal = {
+          // name: i18n.t('Delete', 'Удалить'),
+          name: this.$t('hide global'),
+          color: 'red',
+          cb: async () => {
+            this.$log('hideGlobal...')
+            await ObjectApi.hide(this.essence.oid)
           }
         }
       } else {

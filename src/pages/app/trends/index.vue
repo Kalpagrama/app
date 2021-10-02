@@ -1,7 +1,8 @@
 <template lang="pug">
 kalpa-layout
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -9,13 +10,14 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
+          :type="'customPPV'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
           :pages="pageInfo.rootPages"
           :pageId="pageInfo.rootPageId"
           :query="query"
-          :itemHeightApprox="500"
-          :itemMiddlePersist="true"
+          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
+          :itemActivePersist="true"
           @searchString="pageInfo.searchString = $event"
           @pageId="pageInfo.rootPageId = $event"
           @searchInputState="pageInfo.searchInputState = $event"
@@ -73,11 +75,11 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'JOINT', 'BLOCK'] },
+          objectTypeEnum: { $in: ['NODE', 'BLOCK'] },
           oidSphere: this.pageInfo.rootPageId,
           sortStrategy: 'AGE' // 'ACTIVITY', // AGE
         },
-        populateObjects: false
+        populateObjects: false,
       }
     }
   }

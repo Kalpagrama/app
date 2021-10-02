@@ -386,6 +386,7 @@ class Group {
                itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
                totalCount: 0,
                itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
+               goto: this.goto.bind(this),
                gotoCurrent: this.gotoCurrent.bind(this),
                gotoStart: this.gotoStart.bind(this),
                gotoEnd: this.gotoEnd.bind(this),
@@ -897,8 +898,16 @@ class Group {
       assert(absoluteIndex >= 0, 'bad absoluteIndex')
    }
 
+   // загрузит область от indxFrom до indxFrom + count
+   async goto (indxFrom, count) {
+      assert(indxFrom >= 0 && count >= 0)
+      let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
+      let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
+      await this.fulfill(nextItems, 'whole')
+   }
+
    // обрежет список сферху и начнет с этого элемента
-   async gotoCurrent () {
+   async gotoCurrent() {
       const f = this.gotoCurrent
       let currentId = this.getProperty('currentId')
       if (currentId) {
@@ -906,14 +915,13 @@ class Group {
          let indxFrom = this.findIndx(currentId)
          if (indxFrom >= 0) {
             let count = this.loadedLen() // выдаем все элементы разом
-            let fulfillTo = Math.min(indxFrom + count, this.loadedLen()) // до куда грузить (end + 1)
-            let nextItems = this.loadedItems().slice(indxFrom, fulfillTo)
-            await this.fulfill(nextItems, 'whole')
+            await this.goto(indxFrom, count)
             let firstItem = this.reactiveGroup.items[0]
             if (firstItem && this.reactiveGroup.itemType === 'GROUP') {
                firstItem.setProperty('currentId', currentId)
                await firstItem.gotoCurrent()
             }
+            await this.goto(indxFrom, count)
          }
       }
       logD(f, 'complete', this.reactiveGroup.id)

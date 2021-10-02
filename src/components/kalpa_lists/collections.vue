@@ -22,7 +22,7 @@
       :pageId="pageId"
       :query="query"
       :itemHeightApprox="100"
-      :itemMiddlePersist="itemMiddlePersist"
+      :itemActivePersist="itemActivePersist"
       @searchString="searchString = $event"
       @pageId="pageId = $event"
     ).row.full-width
@@ -60,7 +60,7 @@ export default {
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
@@ -150,19 +150,19 @@ export default {
     'collectionsModel.collectionId': {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false
-        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdCollectionCollections', to])
+        if (this.itemActivePersist) this.$store.commit('ui/stateSet', ['pageIdCollectionCollections', to])
       }
     },
     pageId: {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false
-        if (this.itemMiddlePersist) this.$store.commit('ui/stateSet', ['pageIdCollections', to])
+        if (this.itemActivePersist) this.$store.commit('ui/stateSet', ['pageIdCollections', to])
       }
     },
   },
   async mounted () {
     let pageId, pageCollectionId
-    if (this.itemMiddlePersist) {
+    if (this.itemActivePersist) {
       pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdCollections)?.id
       pageCollectionId = this.$store.state.ui.pageIdCollectionCollections
     }

@@ -1,8 +1,7 @@
 <template lang="pug">
   div(
-    v-if="true || !item.deletedAt"
+    v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    //q-resize-observer(:debounce="0" @resize="itemState.onResize(itemIndex, itemState.height, $event.height), itemState.height = $event.height")
     //div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
     //  span !!!deleted!!!
     div(v-if="!hasItemFull").row.full-width
@@ -21,7 +20,7 @@
               q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
               q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-              span {{item.name || this.$nodeItemType(item.vertexType).name}}
+              span {{item.name || this.$nodeItemType(item.vertexType || item.verices[0]).name}}
             .row.items-center.justify-between.no-wrap.q-px-md
               .row.items-center
                 q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
@@ -34,7 +33,7 @@
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item" :showAuthorAlways="true")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -63,7 +62,7 @@ export default {
     scrolling: { type: Boolean, default: false },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
-    showAuthorAlways: { type: Boolean, default: false },
+    showAuthorAlways: { type: Boolean, default: true },
     showActions: { type: Boolean, default: true },
     showSpheres: { type: Boolean, default: true },
     showSpheresAlways: { type: Boolean, default: false },
@@ -118,7 +117,7 @@ export default {
     },
     hasItemFull () {
       // либо изначально прередали полный объект, либо запросили и уже получили
-      return (this.itemShortOrFull.items || this.itemShortOrFull.graph) || this.data.itemFull
+      return (!!this.itemShortOrFull.items || !!this.itemShortOrFull.graph) || !!this.data.itemFull
     },
     item () {
       return this.data.itemFull || this.itemShortOrFull
@@ -131,6 +130,7 @@ export default {
         if (process.env.NODE_ENV === 'development') {
           // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
           if (to) {
+            this.$log(`hasItemFull=${to} #${this.itemIndex}`)
             let checkChData = (parent) => {
               assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
               for (let ch of parent.$children) {
@@ -143,9 +143,9 @@ export default {
       }
     },
     isVisible: {
-      immediate: false,
+      immediate: true,
       async handler (to, from) {
-        this.$log(`isVisible=${to} #${this.itemIndex}`)
+        if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItem()
           else this.cancelItemFull()
@@ -153,24 +153,15 @@ export default {
       }
     },
     isPreload: {
-      immediate: false,
+      immediate: true,
       async handler (to, from) {
-        this.$log(`isPreload=${to} #${this.itemIndex}`)
+        // if (to) this.$log(`isPreload=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItemPreload()
           else this.cancelItemFullPreload()
         }
       }
-    },
-    scrolling: {
-      immediate: false,
-      async handler (to, from) {
-        if (from && !to) {
-          // скролл остановился. itemFull можно заполнять только при остановленном скролле
-          if (this.isVisible || this.isPreload) this.getFullItem()
-        }
-      }
-    },
+    }
   },
   methods: {
     getFullItem () {
@@ -179,10 +170,7 @@ export default {
       if (!data.itemFull && !data.queryId) {
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
-            .then(itemFull => {
-              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
-              if (!this.scrolling) this.$set(data, 'itemFull', itemFull)
-            })
+            .then(itemFull => this.$set(data, 'itemFull', itemFull))
             .catch(err => this.$logE('err on get itemFull', err))
             .finally(() => {
               data.queryId = null
@@ -206,8 +194,7 @@ export default {
         data.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
-              // чтобы избежать дерготни на ленте - заполняем itemFull только после остановки скролла
-              if (itemFull && !this.scrolling) this.$set(data, 'itemFull', itemFull)
+              if (itemFull) this.$set(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on preload itemFull', err))
             .finally(() => {

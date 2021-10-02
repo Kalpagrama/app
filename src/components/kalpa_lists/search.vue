@@ -22,7 +22,7 @@
         :pageId="pageId"
         :query="query"
         :itemHeightApprox="100"
-        :itemMiddlePersist="false"
+        :itemActivePersist="false"
         @searchString="searchString = $event"
         @pageId="pageId = $event"
       ).row.full-width
@@ -48,7 +48,7 @@ export default {
     scrollAreaHeight: { type: Number },
     useNavHeader: { type: Boolean, default: true },
     pageId: {type: String, default: 'content'},
-    itemMiddlePersist: { type: Boolean, default: false },
+    itemActivePersist: { type: Boolean, default: false },
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
 

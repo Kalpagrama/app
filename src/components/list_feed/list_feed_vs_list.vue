@@ -59,7 +59,7 @@ export default {
       type: Number,
       default: 100
     },
-    itemMiddlePersist: { type: Boolean, default: false }
+    itemActivePersist: { type: Boolean, default: false }
   },
   data () {
     return {
@@ -99,7 +99,7 @@ export default {
         if (this.itemsRes.getProperty('itemMiddleIndx') >= 0) {
           this.$nextTick(_ => {
             // this.$logW('scrollTo', this.itemsRes.getProperty('itemMiddleIndx'))
-            // this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
+            this.$refs.vs.scrollTo(this.itemsRes.getProperty('itemMiddleIndx'), 'start-force')
           })
         }
       }

@@ -17,7 +17,7 @@
           :useNavHeader="false"
           :scrollAreaHeight="$q.screen.height/2"
           searchInputState="disabled"
-          :itemMiddlePersist="false"
+          :itemActivePersist="false"
           mode="select").b-30
         list-followers(
           v-if="followersFollowing === 'followers'"
@@ -25,19 +25,20 @@
           :useNavHeader="false"
           :scrollAreaHeight="$q.screen.height/2"
           searchInputState="disabled"
-          :itemMiddlePersist="false"
+          :itemActivePersist="false"
           mode="select").b-30
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="user"
+            :type="'customPPV'"
             :scrollAreaHeight="0"
             searchInputState="disabled"
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            :itemHeightApprox="500"
-            :itemMiddlePersist="false"
+            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
+            :itemActivePersist="false"
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)
