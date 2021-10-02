@@ -1,12 +1,28 @@
 <style lang="sass">
 .doc-item
-  color: white
+  color: #424242
   &:hover
-    color: green !important
+    color: #4caf50 !important
 </style>
 
 <template lang="pug">
 .row.full-width.q-px-sm
+  .row.full-width
+    router-link(
+      v-if="false"
+      flat no-caps color="grey-9" align="left"
+      :to="'/about'"
+      :class=`{
+      }`
+      :style=`{
+        textAlign: 'start',
+        borderRadius: '10px',
+      }`
+      @click="$go('/about')"
+      )
+      .doc-item
+        //q-icon(name="help_outline" size="20px" color="grey-7").q-pr-sm
+        small {{$t('How it work?', 'Как работает Кальпаграма')}}
   div(v-for="(d,di) in docs" :key="d.id").row.full-width
     router-link(
       flat no-caps color="white" align="left"
@@ -19,7 +35,8 @@
       }`
       @click="docClick(d,di)"
       ).doc-item
-      small(:class=`[docColor]`) {{ d.name }}
+      //small(:class=`[docColor]`) {{ d.name }}
+      small {{ d.name }}
 </template>
 
 <script>

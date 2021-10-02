@@ -105,7 +105,7 @@
               position: 'absolute', zIndex: 2000,
               bottom: '-46px',
             }`).full-width.b-30
-              small.text-grey-8 Отмена
+              small.text-grey-8 {{$t('Cancel')}}
             //- vote rates
             div(
               :style=`{

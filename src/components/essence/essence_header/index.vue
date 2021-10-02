@@ -5,6 +5,16 @@
     order: orderHeader,
   }`
   ).row.full-width.items-center.content-center
+    //report
+    q-dialog(
+      v-model="data.reportShow"
+      :maximized="false")
+      kalpa-report(:essence="essence")
+    //hide
+    q-dialog(
+      v-model="data.hideShow"
+      :maximized="false")
+      kalpa-hide(:essence="essence")
     //- user VOTED
     q-btn(
       v-if="showAuthorAlways || essence.rateUser !== null"
@@ -59,8 +69,15 @@
 import { ObjectApi } from 'src/api/object'
 import { UserRoleEnum } from 'src/api/user'
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
+import kalpaReport from 'src/components/kalpa_report/index.vue'
+import kalpaHide from 'src/components/kalpa_hide/index.vue'
+import {assert} from '../../../system/common/utils';
 export default {
   name: 'essenceHeader',
+  components: {
+    kalpaReport,
+    kalpaHide
+  },
   props: {
     essence: {type: Object, required: true},
     itemState: { type: Object},
@@ -68,6 +85,19 @@ export default {
     showActions: {type: Boolean, default: true},
   },
   computed: {
+    data() {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
+      let key = this.$options.name
+      if (!this.itemState[key]) {
+        this.$set(this.itemState, key, {
+          reportShow: false,
+          hideShow: false
+        })
+      }
+      return this.itemState[key]
+    },
     essenceIsMine () {
       return this.essence.author.oid === this.$store.getters.currentUser.oid
     },
@@ -120,6 +150,7 @@ export default {
           cb: async () => {
             this.$log('hide...')
             await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+            this.data.hideShow = true
           }
         }
         res.report = {
@@ -127,7 +158,8 @@ export default {
           color: 'red',
           cb: () => {
             this.$log('report...')
-            let reason = prompt(this.$t('Why?'))
+            // let reason = prompt(this.$t('Why?'))
+            this.data.reportShow = true
           }
         }
       }

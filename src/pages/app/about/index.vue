@@ -13,7 +13,7 @@ q-layout(
         ).row.full-width.items-start.content-start
         //- welcome, nodes
         .row.full-width.justify-center.q-pt-md
-          kalpa-logo(:width="220" :height="220" :style=`{pointEvents: 'none'}`)
+          kalpa-logo(:width="200" :height="200" :style=`{pointEvents: 'none'}`)
         //- video
         section-video
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
@@ -39,8 +39,9 @@ q-layout(
             //    }`).q-mr-sm
         //- content
         .row.full-width.justify-center.q-mt-lg
-          q-icon(name="select_all" color="grey-5" size="300px")
-        div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
+          q-icon(name="select_all" color="grey-5" size="40px").q-pr-xs
+          p.text-h4.text-bold.text-white {{$t('Contents', 'Контент')}}
+        div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
               maxWidth: width-60+'px',
@@ -48,6 +49,15 @@ q-layout(
             }`
           ).row.full-width.items-start.content-start
             p.text-white Добавляйте контент из YouTube, Twitter, Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
+            .row.full-width
+              q-btn( flat icon="checklist_rtl" color='white'
+                @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
+                :style=`{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '10px',
+                  background: 'rgb(35,35,35)',
+                }`).q-mr-sm
             //.row.full-width
             //  div(
             //    v-for="n in 5" :key="n"
@@ -58,9 +68,12 @@ q-layout(
             //      background: 'rgb(35,35,35)',
             //    }`).q-mr-sm
         //- nodes
-        .row.full-width.justify-center.q-pt-md
-          q-icon(name="adjust" color="grey-5" size="276px")
-        div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
+        .row.full-width.justify-center.q-pt-xl
+          q-icon(name="adjust" color="grey-5" size="40px").q-pr-xs
+          p.text-h4.text-bold.text-white {{$t('Essence core', 'Смысловое ядро')}}
+        //- video
+        //node-video
+        div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
               maxWidth: width-60+'px',
@@ -68,20 +81,58 @@ q-layout(
             }`
           ).row.full-width.items-start.content-start
             p.text-white Находите смыслы и создавайте смысловые ядра, Пришло озарение ? Создайте ядро и поделитесь своим пониманием с другими. Смысловое ядро - это смысл найденный во фрагменте из видеоролика, книги или аудио, который вы опубликовали в Кальпаграме. Если вы не хотите делать найденный смысл общедоступным - вы просто сохраняете его в заметки.
-            //.row.full-width
-            //  div(
-            //    v-for="n in 5" :key="n"
-            //    :style=`{
-            //      width: '50px',
-            //      height: '50px',
-            //      borderRadius: '10px',
-            //      background: 'rgb(35,35,35)',
-            //    }`).q-mr-sm
+            .row.full-width
+              q-btn( flat icon="fas fa-play" color='white'
+                @click="nodeVideoShow = true"
+                :style=`{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '10px',
+                  background: 'rgb(35,35,35)',
+                }`).q-mr-sm
+                  q-dialog(
+                    v-model="nodeVideoShow"
+                    position="standard"
+                    :maximized="true"
+                    full-height
+                    )
+                    div(:style=`{
+                       borderRadius: '10px',
+                       background: 'rgb(35,35,35)',
+                     }`).row.full-width.q-pb-xl
+                      node-video.full-height
+                      .row.full-width.justify-center
+                        q-btn(
+                          v-close-popup color="grey-9" no-caps
+                          :style=`{
+                            position: 'absolute', bottom: '0.5%', zIndex: 100,
+                            height: '40px',
+                            maxWidth: '300px',
+                            minWidth: '300px',
+                          }`)
+                          span {{$t('Close')}}
+              q-btn( flat icon="checklist_rtl" color='white'
+                @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: false, useProfileEditor: false}])"
+                :style=`{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '10px',
+                  background: 'rgb(35,35,35)',
+                }`).q-mr-sm
+              //div(
+              //  v-for="n in 4" :key="n"
+              //  :style=`{
+              //    width: '50px',
+              //    height: '50px',
+              //    borderRadius: '10px',
+              //    background: 'rgb(35,35,35)',
+              //  }`).q-mr-sm
           //- q-icon(name="adjust" color="grey-5" size="300px")
         //- joints
         .row.full-width.justify-center.q-mt-xl
-          q-icon(name="fas fa-link" color="grey-5" size="236px")
-        div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
+          q-icon(name="fas fa-link" color="grey-5" size="40px").q-pr-xs
+          p.text-h4.text-bold.text-white {{$t('Joints')}}
+        div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
               maxWidth: width-60+'px',
@@ -103,8 +154,8 @@ q-layout(
           div(
             :style=`{
               position: 'relative',
-              width: '240px',
-              height: '240px',
+              width: '40px',
+              height: '40px',
             }`
             ).row.items-center.content-center.justify-center
             div(
@@ -129,8 +180,9 @@ q-layout(
                 padding: '4px',
               }`
               ).row.items-center.content-center.justify-center.b-30
+          p.text-h4.text-white.text-bold.q-pl-sm {{$t('Voting', 'Голосование')}}
         //- voting extended
-        div(:style=`{zIndex: 10,}`).row.full-width.justify-center.q-pt-md.q-pa-sm
+        div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
               maxWidth: width-60+'px',
@@ -192,15 +244,18 @@ q-layout(
 
 <script>
 import sectionVideo from './section_video.vue'
+import nodeVideo from './node_video.vue'
 
 export default {
   name: 'pageApp_about',
   components: {
     sectionVideo,
+    nodeVideo,
     essenceVoteBall: () => import('src/components/essence/essence_vote_ball.vue')
   },
   data () {
     return {
+      nodeVideoShow: false,
     }
   },
   computed: {
