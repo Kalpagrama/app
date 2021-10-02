@@ -158,7 +158,7 @@ export default {
           color: 'white',
           cb: async () => {
             this.$log('hide...')
-            await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+            // await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
             this.data.hideShow = true
           }
         }
