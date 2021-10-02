@@ -66,7 +66,9 @@
     :action="action"
     :publish="publish"
     :showActions="false"
+    :showAuthorAlways="true"
     :showHeader="showHeader"
+    :lockName="lockName"
     :showItems="showItems"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
@@ -113,6 +115,10 @@ export default {
     showItems: {
       type: Boolean,
       default: true
+    },
+    lockName: {
+      type: Boolean,
+      default: false
     },
 
   },

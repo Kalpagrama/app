@@ -108,14 +108,6 @@ div(
               background: 'rgb(45,45,45)',
             }`).full-width
             span.q-ml-sm {{$t('Revote')}}
-          q-btn(
-            @click="$emit('renode')"
-            outline color="green" no-caps icon="add"
-            :style=`{
-              height: '50px',
-              background: 'rgb(45,45,45)',
-            }`).full-width
-            span.q-ml-sm {{$t('Other meaning...')}}
 </template>
 
 <script>

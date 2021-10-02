@@ -52,7 +52,7 @@ export default {
   name: 'itemFeed',
   props: {
     itemShortOrFull: { type: Object },
-    itemState: { type: Object },
+    itemState: { type: Object, default: {} },
     itemIndex: { type: Number },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
@@ -90,12 +90,12 @@ export default {
   computed: {
     data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      if (!this.itemState) this.itemState = {}
+      assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
         // assert(this.itemState.id === this.itemShortOrFull.oid)
         this.$set(this.itemState, key, {
-          oid: this.itemShortOrFull?.object?.oid || this.itemState.itemId,
+          oid: this.itemShortOrFull?.oid || this.itemState.itemId,
           itemFull: null,
           queryId: null,
           queryIdPreload: null
@@ -124,9 +124,16 @@ export default {
     }
   },
   watch: {
+    itemState: {
+      handler (to, from) {
+        // this.$log('itemState to', this.item.name, cloneDeep(from), cloneDeep(to), cloneDeep(this.itemState))
+        if (!this.hasItemFull && (this.isVisible || this.isPreload)) this.getFullItem()
+      }
+    },
     hasItemFull: {
       immediate: false,
       async handler (to, from) {
+        // this.$log('hasItemFull to', to)
         if (process.env.NODE_ENV === 'development') {
           // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
           if (to) {
@@ -214,12 +221,18 @@ export default {
     }
   },
   created () {
-    // this.$log('created', this.itemIndex, this.itemState)
+    // this.$log('created', this.item.name)
     assert((this.itemState || this.itemIndex == null) && this.itemShortOrFull, [this.itemIndex, this.itemState, this.itemShortOrFull])
     if (!this.data.itemFull && this.hasItemFull) this.data.itemFull = this.item
   },
   mounted () {
-    // this.$log('mounted', this.itemIndex, this.itemState, this.isActive, this.isVisible)
+    // this.$log('mounted', this.itemIndex, this.item.name)
+  },
+  beforeDestroy () {
+    // this.$log('beforeDestroy', this.itemIndex, this.item.name)
+  },
+  beforeUpdate () {
+    // this.$log('beforeUpdate', this.itemIndex, this.item.name)
   }
 }
 </script>

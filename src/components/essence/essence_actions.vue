@@ -156,7 +156,6 @@ export default {
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      // if (!this.itemState) this.itemState = {}
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {

@@ -9,6 +9,7 @@
       }`
       @click="sphereDelete(s)"
     ).q-px-xs {{ '✦'+s.name }}
+  .row.full-width
     q-input(
       v-model="sphere"
        dark dense
@@ -25,7 +26,7 @@
       }`
       @blur="sphereAdd()"
       @keydown.enter="sphereAdd()"
-    ).col
+    ).full-width
   .row.full-width
       slot(name="left")
   .row.full-width.justify-end
