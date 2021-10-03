@@ -5,7 +5,8 @@
     //div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
     //  span !!!deleted!!!
     div(v-if="!hasItemFull").row.full-width
-      q-card(v-if="!$slots.skeleton" flat dark :style=`{width: $q.screen.width + 'px'}`)
+      slot(v-if="$scopedSlots.skeleton" name="skeleton")
+      q-card(v-else flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
             q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
@@ -32,7 +33,6 @@
                 q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
                 q-skeleton(type='text' width='30px' animation="none" dark)
 
-      slot(v-else name="skeleton")
     div(v-else :style=`{position: 'relative'}`).row.full-width
       component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
 </template>

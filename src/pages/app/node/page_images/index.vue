@@ -29,19 +29,20 @@
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-          item-feed(v-else
-            :itemIndex="itemIndex"
-            :itemShortOrFull="item"
-            :isActive="false"
-            :isVisible="true"
-            :showHeader="false"
-            :showActions="false"
-            :showName="false"
-            :showSpheres="false"
-            :style=`{border: item.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
-            template(v-slot:skeleton)
-              q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
-                q-skeleton(type="QBtn" dark).full-width
+          div(v-else @click="$go('/node/'+item.oid)").full-width
+            item-feed(
+              :itemIndex="itemIndex"
+              :itemShortOrFull="item"
+              :isActive="false"
+              :isVisible="true"
+              :showHeader="false"
+              :showActions="false"
+              :showName="false"
+              :showSpheres="false"
+              :style=`{border: item.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
+              template(v-slot:skeleton)
+                q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
+                  q-skeleton(type="QBtn" dark).full-width
         //.row.full-width.q-col-gutter-sm
         //  .col-4
         //    q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
