@@ -20,7 +20,8 @@
       q-tab-panels(
         v-model="currentIndx"
         :swipeable="true || $q.platform.is.mobile"
-        :animated="true || $q.platform.is.mobile").full-width
+        :animated="true || $q.platform.is.mobile"
+        dark).full-width
         q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none
           item-feed(
             :itemShortOrFull="node"
