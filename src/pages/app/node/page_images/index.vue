@@ -13,9 +13,9 @@
         :lockName="true"
         @close="itemEditorShow=false")
     // образ
-    div(v-if="!expanded").row.full-width
+    div(v-if="!expanded").row.full-width.position-relative
       q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
-        @click="goto(itemsLeft[itemsLeft.length - 1].oid)")
+        @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left.z-top
       item-feed(
         :itemShortOrFull="node"
         :isActive="isActive"
@@ -25,7 +25,7 @@
         :showName="false"
         :showSpheres="false").col
       q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
-        @click="goto(itemsRight[0].oid)")
+        @click="goto(itemsRight[0].oid)").absolute-right.z-top
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
           span.text-white {{$t('Image rating')}}
@@ -124,7 +124,7 @@ export default {
       this.$log('sameEssenceNodesItemsRes to', to)
     },
     node(to) {
-      this.$log('node to=', to)
+      // this.$log('node to=', to)
     }
   },
   methods: {
@@ -132,6 +132,9 @@ export default {
       this.$log('goto', oid)
       let node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
       this.$emit('node', node)
+      this.isActive = !this.isActive
+      await this.$nextTick()
+      this.isActive = !this.isActive
     }
   },
   async created () {

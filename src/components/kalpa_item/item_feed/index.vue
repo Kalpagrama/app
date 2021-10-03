@@ -177,9 +177,13 @@ export default {
     },
     itemShortOrFull(to) {
       // изменился показываемый item
+      // this.$log('itemShortOrFull to', to, this.isActive)
       this.cancelItemFull()
       this.cancelItemFullPreload()
       this.itemState = {}
+    },
+    isActive(to) {
+      // this.$log('isActive to', to)
     }
   },
   methods: {

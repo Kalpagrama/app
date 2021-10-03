@@ -48,7 +48,7 @@
                 q-avatar(:size="'20px'")
                   img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
                 span() {{node.author.name}}
-          essence-actions(
+          essence-actions(v-if="!pageId"
             :essence="node"
             :itemState="itemState"
             :nodeBackgroundColor="'rgb(30,30,30)'"
@@ -122,7 +122,7 @@ export default {
       }
     },
     async node (to) {
-      this.$log('node to=', to)
+      // this.$log('node to=', to)
       this.pageId = null
       this.sameCompositionNodesItemsRes = null
       this.itemState = {}
