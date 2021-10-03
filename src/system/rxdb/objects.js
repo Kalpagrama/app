@@ -63,7 +63,7 @@ class QueryAccumulator {
          // if (queue.findIndex(item => item.oid === oid) === -1) { так нельзя!!!!! нельзя терять resolve'ры
          //   queue.push({ oid, resolve, reject })
          // }
-         queue.push({ oid, resolve, reject, queryId}) // сохраняем КАЖДЫЙ запрос (даже если oid повторяются). каждый надо разрезолвить либо реджектить
+         queue.push({ oid, resolve, reject, queryId }) // сохраняем КАЖДЫЙ запрос (даже если oid повторяются). каждый надо разрезолвить либо реджектить
          logD('push queue. size=', this.queueSz(queue), queue.length, Array.from(new Set(queue.map(item => item.oid))))
          while (this.queueSz(queue) > queueMaxSz) {
             let firstItem = queue.shift()
@@ -114,8 +114,8 @@ class QueryAccumulator {
 
    // берет из очереди последний добавленный и отправляет на выполненеие
    next () {
-      // если предыдущий запрос еще выполняется, то подождем...
-      if (this.queryInProgress) return
+      if (this.queryInProgress) return // если предыдущий запрос еще выполняется, то подождем...
+      this.queryInProgress = true // Не более одного запроса в единицу времени
       const masterOids = this.queueMaster.map(item => item.oid)
       const secOids = this.queueSecondary.map(item => item.oid)
       // извлечь из очереди сдедующие объекты для запроса на сервер. Проверяем на наличие
@@ -131,11 +131,12 @@ class QueryAccumulator {
       for (let i = totalOids.length - 1; i >= 0 && oidsForQuery.length < BATCH_SZ; i--) {
          if (!oidsForQuery.includes(totalOids[i])) oidsForQuery.push(totalOids[i])
       }
-      if (oidsForQuery.length === 0) return
-      this.queryInProgress = true // Не более одного запроса в единицу времени
-      // logD('next. oidsForQuery=', oidsForQuery)
-      ObjectApi.objectList(oidsForQuery).then(objectList => {
+      if (oidsForQuery.length === 0) {
          this.queryInProgress = false
+         return
+      }
+      // logD('next. oidsForQuery=', oidsForQuery)
+      ObjectApi.objectList(oidsForQuery).then(async objectList => {
          for (let oid of oidsForQuery) {
             let object = objectList.find(obj => obj.oid === oid)
             // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
@@ -145,17 +146,19 @@ class QueryAccumulator {
                this.rejectItem(oid, 'deleted')
             } else { // объекта нет на сервере (мы его запрашивали, но ничего не вернулось)
                // добавим в blackList (чтобы больше не запрашивали)
-               rxdb.hideObjectOrSource(oid, null).then(() => {
-                  this.rejectItem(oid, 'notFound')
-               })
+               await rxdb.hideObjectOrSource(oid, null)
+               this.rejectItem(oid, 'notFound')
             }
          }
-         this.next()
+         // logD('!!!!!++++')
       })
          .catch(err => {
-            this.queryInProgress = false
             logE('error on fetch objectList', err)
             for (let oid of oidsForQuery) this.rejectItem(oid, 'fetchError')
+         })
+         .finally(() => {
+            this.queryInProgress = false
+            this.next()
          })
    }
 }
