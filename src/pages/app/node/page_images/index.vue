@@ -24,20 +24,26 @@
       //q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length":style=`{}`).absolute-right.z-top.br
       //q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top.br
       //q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
-    div(v-else-if="sameEssenceNodesItemsRes" :style=`{height: maxHeight + 'px'}`).scroll.full-width
-      .row.full-width.q-col-gutter-sm
-        .col-4
-          q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-        div(v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="ix").col-4
-          item-feed(
-            :itemIndex="ix"
-            :itemShortOrFull="sameEssenceNode"
-            :isActive="true"
-            :isVisible="true"
-            :showHeader="false"
-            :showActions="false"
-            :showName="false"
-            :showSpheres="false")
+    div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
+        .row.full-width.q-col-gutter-sm
+          .col-4
+            q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
+          div(
+            v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="sameEssenceNode.oid"
+            @click="$go('/node/'+sameEssenceNode.oid)").col-4
+            item-feed(
+              :itemIndex="ix"
+              :itemShortOrFull="sameEssenceNode"
+              :isActive="false"
+              :isVisible="true"
+              :showHeader="false"
+              :showActions="false"
+              :showName="false"
+              :showSpheres="false"
+              :style=`{border: sameEssenceNode.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
+              template(v-slot:skeleton)
+                q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
+                  q-skeleton(type="QBtn" dark).full-width
 </template>
 
 <script>

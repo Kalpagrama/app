@@ -30,7 +30,7 @@
     //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
     div(:style=`{position: 'relative'}`).row.full-width.items-center.justify-between.q-px-md
       span.text-grey {{$t('essence rating')}}
-      q-btn(round flat stack no-caps :label="$t('add your essence')" icon="add" color="green" @click="itemEditorShow=true").col-3
+      q-btn(round flat no-caps icon="add" color="green" @click="itemEditorShow=true").col-3
       q-btn(round flat color="white" icon="clear" @click="$emit('close')")
     //- comments
     .row.full-width.justify-center
