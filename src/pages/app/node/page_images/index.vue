@@ -18,7 +18,7 @@
         v-model="currentIndx"
         :swipeable="true || $q.platform.is.mobile"
         :animated="true || $q.platform.is.mobile"
-        dark).full-width
+        dark).full-width.q-pb-xs
         q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none
           item-feed(
             :itemShortOrFull="node"
@@ -29,7 +29,7 @@
             :showName="false"
             :showSpheres="false")
       // мини-образы
-      div(:style=`{position: 'relative', maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px'}`).row.full-width
+      div(:style=`{position: 'relative', maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
         q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="white" :label="itemsLeft.length"
           size="sm" :style=`{zIndex: '100'}` @click="currentIndx--").absolute-left
         q-virtual-scroll(ref="vs" :items="dotModel" virtual-scroll-horizontal :style=`{}`).col
@@ -37,10 +37,11 @@
             div(
               :style=`{ overflow: 'hidden', height: '50px', borderRadius: '10px',
                   border: currentIndx === itemIndex ? '2px solid green' : null,
-                  position: 'relative'
+                  position: 'relative',
+                  marginLeft: '1px', marginRight: '1px',
                }`
               @click="currentIndx = itemIndex"
-              ).row.items-center.center-start.content-center.q-mx-xs
+              ).row.items-center.center-start.content-center
               div(:style=`{maxHeight: '200px', width: '80px'}`)
                 item-feed(
                   :itemShortOrFull="sameEssenceNodesItemsRes.items[itemIndex]"
