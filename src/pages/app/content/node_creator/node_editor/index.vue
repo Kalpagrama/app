@@ -22,13 +22,13 @@
           padding: '20px',
           fontSize: fontSize+'px',
           color: 'white'}`
-          ).full-width
+        ).full-width
           q-btn(round flat color="white" icon="clear" @click="close")
         edit-spheres(:node="node")
         actions(
           :node="node" :player="player" :contentKalpa="contentKalpa" :showColor="showColor"
           @close="close"
-          )
+        )
 </template>
 
 <script>
@@ -44,14 +44,16 @@ export default {
     showColor: { type: Boolean, default: false },
     node: {
       type: Object,
-      default: {
-        name: '',
-        layout: 'HORIZONTAL',
-        items: [],
-        vertices: [],
-        spheres: [],
-        category: 'FUN',
-        temporary: true
+      default () {
+        return {
+          name: '',
+          layout: 'HORIZONTAL',
+          items: [],
+          vertices: [],
+          spheres: [],
+          category: 'FUN',
+          temporary: true
+        }
       }
     }
   },
@@ -76,7 +78,7 @@ export default {
     }
   },
   methods: {
-    close() {
+    close () {
       this.$log('close')
       this.player.selectedDraft = null
     }
@@ -84,6 +86,6 @@ export default {
   watch: {},
   created () {
     this.$log('created')
-  },
+  }
 }
 </script>

@@ -28,10 +28,14 @@
     //  .q-pa-sm.text-h6.text-bold.text-white {{$t('Essence list')}}
     //  .col
     //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-    div(:style=`{position: 'relative'}`).row.full-width.items-center.justify-between.q-px-md
-      span.text-grey {{$t('essence rating')}}
-      q-btn(round flat stack no-caps :label="$t('add your essence')" icon="add" color="green" @click="itemEditorShow=true").col-3
-      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    .row.full-width.q-px-none.q-py-sm
+      q-btn(round flat no-caps icon="add" color="green" @click="itemEditorShow=true").full-width.position-relative
+        span.text-grey.absolute-left.q-pl-md {{$t('Essence rating')}}
+        q-btn(round flat color="white" icon="clear" @click="$emit('close')").absolute-right
+    //div(:style=`{position: 'relative'}`).row.full-width.items-center.justify-between.q-px-md
+    //  span.text-grey {{$t('essence rating')}}
+    //  q-btn(round flat no-caps icon="add" color="green" @click="itemEditorShow=true").col-3
+    //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
     //- comments
     .row.full-width.justify-center
       tab-list-feed(
@@ -53,7 +57,7 @@
         template(v-slot:item=`{item: node,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           .row.full-width.q-px-md
             div(:style=`{minHeight: '40px', border: '1px solid ' + (currentIndx === itemIndex ? 'green' : 'grey'), borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
-              div(v-if="true || !node.spheres" @click="$go('/node/'+node.oid), $emit('close')").row.full-width.q-pa-xs
+              div(v-if="true" @click="$go('/node/'+node.oid), $emit('close')").row.full-width.q-pa-xs
                 span(:style=`{textAlign: 'center'}`).col {{node.name}}
                 q-circular-progress(v-if="node.countVotes > 1" :value="node.rate" :min="0" :max="maxRate" show-value dark size="sm" color="green" :thickness="0.09" track-color="grey-9"
                   @click="/*selectedEssence=node,selectedEssenceState=itemState, itemPreviewShow=true*/")
@@ -130,7 +134,7 @@ export default {
       let node = cloneDeep(this.node)
       node.name = ''
       node.description = ''
-      node.spheres = []
+      // node.spheres = []
       return node
     },
     maxRate () {

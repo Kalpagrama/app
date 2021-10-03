@@ -5,7 +5,8 @@
     //div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
     //  span !!!deleted!!!
     div(v-if="!hasItemFull").row.full-width
-      q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
+      slot(v-if="$scopedSlots.skeleton" name="skeleton")
+      q-card(v-else flat dark :style=`{width: $q.screen.width + 'px'}`)
         q-item
           q-item-section(avatar)
             q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
@@ -20,7 +21,7 @@
               q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
               q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
             .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-              span {{item.name || this.$nodeItemType(item.vertexType || item.verices[0]).name}}
+              span {{item.name || (item.vertexType || item.verices ? this.$nodeItemType(item.vertexType || item.verices[0]).name : '')}}
             .row.items-center.justify-between.no-wrap.q-px-md
               .row.items-center
                 q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
@@ -52,7 +53,12 @@ export default {
   name: 'itemFeed',
   props: {
     itemShortOrFull: { type: Object },
-    itemState: { type: Object, default: {} },
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     itemIndex: { type: Number },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
@@ -137,7 +143,7 @@ export default {
         if (process.env.NODE_ENV === 'development') {
           // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
           if (to) {
-            this.$log(`hasItemFull=${to} #${this.itemIndex}`)
+            // this.$log(`hasItemFull=${to} #${this.itemIndex}`)
             let checkChData = (parent) => {
               assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
               for (let ch of parent.$children) {
@@ -152,7 +158,7 @@ export default {
     isVisible: {
       immediate: true,
       async handler (to, from) {
-        if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
+        // if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItem()
           else this.cancelItemFull()
@@ -168,6 +174,16 @@ export default {
           else this.cancelItemFullPreload()
         }
       }
+    },
+    itemShortOrFull(to) {
+      // изменился показываемый item
+      // this.$log('itemShortOrFull to', to, this.isActive)
+      this.cancelItemFull()
+      this.cancelItemFullPreload()
+      this.itemState = {}
+    },
+    isActive(to) {
+      // this.$log('isActive to', to)
     }
   },
   methods: {
@@ -175,6 +191,7 @@ export default {
       let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
       assert(data && data.oid, data)
       if (!data.itemFull && !data.queryId) {
+        this.$log('getFullItem', this.itemIndex, this.item.name)
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
             .then(itemFull => this.$set(data, 'itemFull', itemFull))
@@ -187,6 +204,7 @@ export default {
     cancelItemFull () {
       let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
       if (data.queryId) {
+        this.$log('cancelItemFull', this.itemIndex, this.item.name)
         this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: data.queryId, cancel: true })
             .catch(err => this.$log('err on cancel request', err))
             .finally(() => {
@@ -230,6 +248,8 @@ export default {
   },
   beforeDestroy () {
     // this.$log('beforeDestroy', this.itemIndex, this.item.name)
+    this.cancelItemFull()
+    this.cancelItemFullPreload()
   },
   beforeUpdate () {
     // this.$log('beforeUpdate', this.itemIndex, this.item.name)

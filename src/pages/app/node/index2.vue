@@ -15,7 +15,7 @@
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight")
+            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight" @node="node=$event")
           // fullpage (description / coments / other essences)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -37,18 +37,18 @@
                 // description expand btn
                 q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
               // суть
-              .row.full-width
+              .row.full-width.q-pt-sm
                 .row.col.justify-center
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
                     q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"
-                      align="top" dark rounded color="green") \#{{sameCompositionNodesItemsRes.items.findIndex(item=>item.oid === node.oid) + 1}} {{$t('of')}} {{sameCompositionNodesItemsRes.items.length}}
-                    q-icon(v-else name= "add" size="12px" color="green" :style=`{border: '1px solid ' + $getPaletteColor('green'), borderRadius: '6px',width: '14px', height: '12px', right: '-18px', top: '5px'}`).absolute-top-right
+                      align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
+                    q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
               // author
               q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
                 q-avatar(:size="'20px'")
                   img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
                 span() {{node.author.name}}
-          essence-actions(
+          essence-actions(v-if="!pageId"
             :essence="node"
             :itemState="itemState"
             :nodeBackgroundColor="'rgb(30,30,30)'"
@@ -114,29 +114,32 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        if (to) {
+        if (to && (!this.node || this.node.oid !== to)) {
           // this.$log('$route.params.oid TO', to)
-          if (this.node && this.node.oid !== to) this.node = null
+          this.node = null
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.sameCompositionNodesItemsRes = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-              objectTypeEnum: { $in: ['NODE'] },
-              oidSphere: this.node.items[0].oid,
-              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
-            },
-            populateObjects: false
-          })
-          this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
         }
       }
     },
-    node (to) {
-      this.$log('node to=', to)
+    async node (to) {
+      // this.$log('node to=', to)
       this.pageId = null
       this.sameCompositionNodesItemsRes = null
       this.itemState = {}
       this.isActive = true
+      if (to) {
+        if (this.$route.params.oid !== to.oid) await this.$router.replace({ params: { oid: to.oid } })
+        this.sameCompositionNodesItemsRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+            objectTypeEnum: { $in: ['NODE'] },
+            oidSphere: this.node.items[0].oid,
+            sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
+          },
+          populateObjects: false
+        })
+        this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
+      }
     }
   },
   computed: {
@@ -146,7 +149,7 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
-    },
+    }
   },
   methods: {},
   async mounted () {

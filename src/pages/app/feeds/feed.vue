@@ -27,7 +27,7 @@
           ).row.full-width
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               item-feed(
-                :itemShortOrFull="item"
+                :itemShortOrFull="item.object"
                 :itemState="itemState"
                 :itemIndex="itemIndex"
                 :isActive="isActive"

@@ -96,7 +96,12 @@ export default {
   props: {
     compositionKey: {},
     composition: {},
-    itemState: { type: Object, default: {} },
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     isVisible: {},
     isActive: {},
     isMini: {},

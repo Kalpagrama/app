@@ -65,8 +65,10 @@ export default {
     },
     pageFilter: {
       type: Object,
-      default: {
-        whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres']
+      default () {
+        return {
+          whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres']
+        }
       }
     },
     pagesShow: { type: Boolean, default: true },

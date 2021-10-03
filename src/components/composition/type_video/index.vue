@@ -1,20 +1,20 @@
 <template lang="pug">
-div(
-  :style=`{
+  div(
+    :style=`{
     position: 'relative',
     height: styles.height,
     borderRadius: '10px',
     background: 'rgb(10,10,10)',
   }`
   ).row.full-width.items-start.content-start
-  slot
-  //- preview
-  //- loading="lazy"
-  img(
-    draggable="false"
-    :key="compositionKey"
-    :src="composition.thumbUrl"
-    :style=`{
+    slot
+    //- preview
+    //- loading="lazy"
+    img(
+      draggable="false"
+      :key="compositionKey"
+      :src="composition.thumbUrl"
+      :style=`{
       borderRadius: '10px', overflow: 'hidden',
       userSelect: 'none',
       height: styles.height,
@@ -24,23 +24,23 @@ div(
       //- opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
     }`
     ).full-width
-  //- video wrapper
-  content-player(
-    v-if="isActive && isVisible"
-    @player="playerCreated"
-    :contentKalpa=`{
+    //- video wrapper
+    content-player(
+      v-if="isActive && isVisible"
+      @player="playerCreated"
+      :contentKalpa=`{
       oid: composition.layers[0].contentOid,
       name: composition.layers[0].contentName || 'Контекст',
       url: url,
       type: 'VIDEO',
       // contentSource: 'KALPA',
     }`
-    :isActive="isActive"
-    :isVisible="isVisible"
-    :isMini="isMini"
-    :options="options"
-    :styles="styles"
-    :style=`{
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :isMini="isMini"
+      :options="options"
+      :styles="styles"
+      :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
       //- opacity: videoOpacity,
     }`).fit
@@ -48,7 +48,7 @@ div(
 
 <script>
 import contentPlayer from 'src/components/content_player/index.vue'
-import {assert} from 'src/system/common/utils'
+import { assert } from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 
 export default {
@@ -57,31 +57,36 @@ export default {
     contentPlayer
   },
   props: {
-    compositionKey: {type: String},
-    composition: {type: Object, required: true},
-    isActive: {type: Boolean},
-    isVisible: {type: Boolean},
-    isMini: {type: Boolean},
-    options: {type: Object},
-    styles: {type: Object, default: {}},
+    compositionKey: { type: String },
+    composition: { type: Object, required: true },
+    isActive: { type: Boolean },
+    isVisible: { type: Boolean },
+    isMini: { type: Boolean },
+    options: { type: Object },
+    styles: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
   },
   data () {
     return {
-      player: null,
+      player: null
     }
   },
   computed: {
-    url () { return ContentApi.urlSelect(this.composition) },
+    url () {
+      return ContentApi.urlSelect(this.composition)
+    },
     previewOpacity () {
       if (this.player) {
         if (this.player.duration) {
           return 0
-        }
-        else {
+        } else {
           return 1
         }
-      }
-      else {
+      } else {
         return 1
       }
     },
@@ -90,22 +95,20 @@ export default {
       if (arr.length > 1) {
         let [start, end] = arr[1].split(',')
         return [
-          {t: parseFloat(start)},
-          {t: parseFloat(end)},
+          { t: parseFloat(start) },
+          { t: parseFloat(end) }
         ]
-      }
-      else {
+      } else {
         return null
       }
-    },
+    }
   },
   watch: {
     isActive: {
       handler (to, from) {
         // this.$log('isActive TO', to)
         if (to) {
-        }
-        else {
+        } else {
           this.player = null
         }
       }
