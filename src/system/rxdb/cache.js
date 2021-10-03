@@ -324,10 +324,10 @@ class Cache {
          let fetch = async () => {
             if (fetchFunc) {
                let processFetchErrorFunc = async (err) => {
-                  if (err === 'queued item was evicted legally') { // ничего не делаем
+                  if (err === 'queued item was evicted by queue overflow') { // ничего не делаем
                      logW(f, `Данные не получены(${id})! запрос на сервер был отброшен(легально) по причне переполнения очереди!`, err)
                   } else if (err === 'queued item was evicted by cancel') { // ничего не делаем
-                     logW(f, `Данные не получены(${id})! запрос на сервер был отменен (cancel queryId)!`, err)
+                     logD(f, `Данные не получены(${id})! запрос на сервер был отменен (cancel queryId)!`, err)
                   } else {
                      logE(`Данные не получены (${id})! Произошла ошибка. Через минуту  можно пробовать еще. err=`, err)
                      const min = 1000 * 60

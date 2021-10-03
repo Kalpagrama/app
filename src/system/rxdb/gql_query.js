@@ -80,7 +80,7 @@ class GqlQueries {
 
       logD('objects::get start')
       let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
-      if (!rxDoc) return null // см "queued item was evicted legally"
+      if (!rxDoc) return null // см "queued item was evicted by queue overflow"
       assert(rxDoc.cached, '!rxDoc.cached')
       return rxDoc
    }

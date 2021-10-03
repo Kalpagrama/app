@@ -13,8 +13,8 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
-const QUEUE_MAX_SZ = 88 // макимальное число сущностей в очереди на запрос
-const QUEUE_MAX_SZ_PRELOAD = 8 // макимальное число сущностей в очереди на запрос на предзагрузку
+const QUEUE_MAX_SZ = 111 // макимальное число сущностей в очереди на запрос
+const QUEUE_MAX_SZ_PRELOAD = 22 // макимальное число сущностей в очереди на запрос на предзагрузку
 const BATCH_SZ = 55 // сколько за раз запрашивать с сервера
 class QueryAccumulator {
    constructor () {
@@ -68,7 +68,8 @@ class QueryAccumulator {
          while (this.queueSz(queue) > queueMaxSz) {
             let firstItem = queue.shift()
             let { oid, resolve, reject } = firstItem
-            reject('queued item was evicted legally')
+            logW('переполнение очереди. priority=', priority, this.queueSz(queue))
+            reject('queued item was evicted by queue overflow')
          }
          // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
          // wait(500).then(() => this.next()).catch(reject)
@@ -292,7 +293,7 @@ class Objects {
       const f = this.get
       logD(f, 'start', id)
       let rxDoc = await this.cache.get(id, priority >= 0 ? fetchFunc : null, clientFirst, force, onFetchFunc)
-      if (!rxDoc) return null // см "queued item was evicted legally"
+      if (!rxDoc) return null // см "queued item was evicted by queue overflow"
       assert(rxDoc.cached, '!rxDoc.cached')
       return rxDoc
    }
