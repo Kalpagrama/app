@@ -28,7 +28,7 @@
               component(:is="'page-' + pageId" :node="node" :height="bottomHeight" @close="pageId=null" @itemEditorShow="isActive=!$event")
           // author + essence + spheres
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId").row.full-width
+            div(v-if="!pageId").row.full-width.q-pt-lg
               q-resize-observer(@resize="imagesMaxHeight = $q.screen.height - $event.height")
               // spheres
               .row.full-width
@@ -37,7 +37,7 @@
                 // description expand btn
                 q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
               // суть
-              .row.full-width.q-pt-sm
+              .row.full-width
                 .row.col.justify-center
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
                     q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"

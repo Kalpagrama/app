@@ -14,9 +14,6 @@
         @close="itemEditorShow=false")
     // образ
     div(v-if="sameEssenceNodesItemsRes && !expanded" ).row.full-width.position-relative
-      //q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
-      //  :style=`{zIndex: '50'}`
-      //  @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left
       q-tab-panels(
         v-model="currentIndx"
         :swipeable="true || $q.platform.is.mobile"
@@ -30,10 +27,33 @@
             :showHeader="false"
             :showActions="false"
             :showName="false"
-            :showSpheres="false").full-width
-      //q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
-      //  :style=`{zIndex: '50'}`
-      //  @click="goto(itemsRight[0].oid)").absolute-right
+            :showSpheres="false")
+      // мини-образы
+      div(:style=`{position: 'relative', maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px'}`).row.full-width
+        q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="white" :label="itemsLeft.length"
+          size="sm" :style=`{zIndex: '100'}` @click="currentIndx--").absolute-left
+        q-virtual-scroll(ref="vs" :items="dotModel" virtual-scroll-horizontal :style=`{}`).col
+          template(v-slot="{ item, index: itemIndex}")
+            div(
+              :style=`{ overflow: 'hidden', height: '50px', borderRadius: '10px',
+                  border: currentIndx === itemIndex ? '2px solid green' : null,
+                  position: 'relative'
+               }`
+              @click="currentIndx = itemIndex"
+              ).row.items-center.center-start.content-center.q-mx-xs
+              div(:style=`{maxHeight: '200px', width: '80px'}`)
+                item-feed(
+                  :itemShortOrFull="sameEssenceNodesItemsRes.items[itemIndex]"
+                  :isActive="false"
+                  :isVisible="true"
+                  :showHeader="false"
+                  :showActions="false"
+                  :showName="false"
+                  :showSpheres="false"
+                  :styles=`{}`)
+              div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
+        q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="white" :label="itemsRight.length"
+          size="sm" :style=`{zIndex: '100'}` @click="currentIndx++").absolute-right
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
         span.text-white {{$t('Image rating')}}
@@ -123,6 +143,11 @@ export default {
     },
     itemWidth () {
       return Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth) / 3
+    },
+    dotModel () {
+      let arr = []
+      for (let i = 0; i < this.length; i++) arr.push(i)
+      return arr
     }
   },
   watch: {
@@ -137,6 +162,7 @@ export default {
     async currentIndx (to) {
       if (to >= 0) {
         assert(this.sameEssenceNodesItemsRes && this.sameEssenceNodesItemsRes.items[to])
+        this.$refs.vs.scrollTo(to, 'center-force')
         let node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.sameEssenceNodesItemsRes.items[to].oid)
         this.$emit('node', node)
       }

@@ -28,9 +28,9 @@
     //  .q-pa-sm.text-h6.text-bold.text-white {{$t('Essence list')}}
     //  .col
     //  q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-    .row.full-width.q-px-none.q-py-sm
+    .row.full-width.q-px-md.q-py-sm
       q-btn(round flat no-caps icon="add" color="green" @click="itemEditorShow=true").full-width.position-relative
-        span.text-grey.absolute-left.q-pl-md {{$t('Essence rating')}}
+        //span.text-grey.absolute-left.q-pl-md {{$t('Essence rating')}}
         q-btn(round flat color="white" icon="clear" @click="$emit('close')").absolute-right
     //div(:style=`{position: 'relative'}`).row.full-width.items-center.justify-between.q-px-md
     //  span.text-grey {{$t('essence rating')}}
