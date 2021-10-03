@@ -174,6 +174,12 @@ export default {
           else this.cancelItemFullPreload()
         }
       }
+    },
+    itemShortOrFull(to) {
+      // изменился показываемый item
+      this.cancelItemFull()
+      this.cancelItemFullPreload()
+      this.itemState = {}
     }
   },
   methods: {

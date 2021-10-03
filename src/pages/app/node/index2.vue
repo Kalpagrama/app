@@ -15,7 +15,7 @@
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight")
+            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight" @node="node=$event")
           // fullpage (description / coments / other essences)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -114,29 +114,32 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        if (to) {
+        if (to && (!this.node || this.node.oid !== to)) {
           // this.$log('$route.params.oid TO', to)
-          if (this.node && this.node.oid !== to) this.node = null
+          this.node = null
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.sameCompositionNodesItemsRes = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-              objectTypeEnum: { $in: ['NODE'] },
-              oidSphere: this.node.items[0].oid,
-              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
-            },
-            populateObjects: false
-          })
-          this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
         }
       }
     },
-    node (to) {
+    async node (to) {
       this.$log('node to=', to)
       this.pageId = null
       this.sameCompositionNodesItemsRes = null
       this.itemState = {}
       this.isActive = true
+      if (to) {
+        if (this.$route.params.oid !== to.oid) await this.$router.replace({ params: { oid: to.oid } })
+        this.sameCompositionNodesItemsRes = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+            objectTypeEnum: { $in: ['NODE'] },
+            oidSphere: this.node.items[0].oid,
+            sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
+          },
+          populateObjects: false
+        })
+        this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
+      }
     }
   },
   computed: {
@@ -146,7 +149,7 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
-    },
+    }
   },
   methods: {},
   async mounted () {

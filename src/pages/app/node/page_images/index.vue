@@ -15,7 +15,7 @@
     // образ
     div(v-if="!expanded").row.full-width
       q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
-        @click="$go('/node/'+itemsLeft[itemsLeft.length - 1].oid)")
+        @click="goto(itemsLeft[itemsLeft.length - 1].oid)")
       item-feed(
         :itemShortOrFull="node"
         :isActive="isActive"
@@ -25,13 +25,15 @@
         :showName="false"
         :showSpheres="false").col
       q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
-        @click="$go('/node/'+itemsRight[0].oid)")
+        @click="goto(itemsRight[0].oid)")
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
+      q-btn(round flat).full-width
+          span.text-white {{$t('Image rating')}}
       list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
-            q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-          div(v-else @click="$go('/node/'+item.oid)").full-width
+            q-btn(round outline icon="add" :label="$t('Add Image')" color="green" @click="itemEditorShow=true").fit
+          div(v-else @click="$go(item.oid)").full-width
             item-feed(
               :itemIndex="itemIndex"
               :itemShortOrFull="item"
@@ -94,7 +96,7 @@ export default {
       if (!this.node) return null
       let node = cloneDeep(this.node)
       node.items = []
-      node.spheres = []
+      // node.spheres = []
       return node
     },
     itemsRight () {
@@ -120,6 +122,16 @@ export default {
   watch: {
     'sameEssenceNodesItemsRes.items' (to) {
       this.$log('sameEssenceNodesItemsRes to', to)
+    },
+    node(to) {
+      this.$log('node to=', to)
+    }
+  },
+  methods: {
+    async goto(oid) {
+      this.$log('goto', oid)
+      let node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+      this.$emit('node', node)
     }
   },
   async created () {
