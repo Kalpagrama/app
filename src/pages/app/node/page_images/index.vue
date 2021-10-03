@@ -25,25 +25,42 @@
       //q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top.br
       //q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
-        .row.full-width.q-col-gutter-sm
-          .col-4
+      list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
+        template(v-slot:item=`{item}`)
+          q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-          div(
-            v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="sameEssenceNode.oid"
-            @click="$go('/node/'+sameEssenceNode.oid)").col-4
-            item-feed(
-              :itemIndex="ix"
-              :itemShortOrFull="sameEssenceNode"
-              :isActive="false"
-              :isVisible="true"
-              :showHeader="false"
-              :showActions="false"
-              :showName="false"
-              :showSpheres="false"
-              :style=`{border: sameEssenceNode.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
-              template(v-slot:skeleton)
-                q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
-                  q-skeleton(type="QBtn" dark).full-width
+          item-feed(v-else
+            :itemIndex="777"
+            :itemShortOrFull="item"
+            :isActive="false"
+            :isVisible="true"
+            :showHeader="false"
+            :showActions="false"
+            :showName="false"
+            :showSpheres="false"
+            :style=`{border: item.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
+            template(v-slot:skeleton)
+              q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
+                q-skeleton(type="QBtn" dark).full-width
+        //.row.full-width.q-col-gutter-sm
+        //  .col-4
+        //    q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
+        //  div(
+        //    v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="sameEssenceNode.oid"
+        //    @click="$go('/node/'+sameEssenceNode.oid)").col-4
+        //    item-feed(
+        //      :itemIndex="ix"
+        //      :itemShortOrFull="sameEssenceNode"
+        //      :isActive="false"
+        //      :isVisible="true"
+        //      :showHeader="false"
+        //      :showActions="false"
+        //      :showName="false"
+        //      :showSpheres="false"
+        //      :style=`{border: sameEssenceNode.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
+        //      template(v-slot:skeleton)
+        //        q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
+        //          q-skeleton(type="QBtn" dark).full-width
 </template>
 
 <script>
@@ -52,12 +69,14 @@ import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import listMasonry from 'src/components/list_masonry/index.vue'
+
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'pageImages',
   components: {
-    essenceVoteBall, itemEditor, essenceSpheres, essenceActions
+    essenceVoteBall, itemEditor, essenceSpheres, essenceActions, listMasonry
   },
   props: ['node', 'isActive', 'maxHeight'],
   data () {

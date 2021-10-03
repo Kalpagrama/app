@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   masonry(
-    :cols="2"
+    :cols="colCnt"
     :gutter="{default: 10}"
     :style=`{position: 'relative', width: 'calc(100% + 10px)'}`)
     div(
@@ -20,6 +20,7 @@
 export default {
   name: 'listMasonry',
   props: {
+    colCnt: {type: Number, default: 3},
     itemKey: {type: String, default () { return 'oid' }},
     items: {type: Array, default () { return [] }, required: true},
     itemsHidden: {type: Array, default () { return [] }},
