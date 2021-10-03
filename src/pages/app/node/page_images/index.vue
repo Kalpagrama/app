@@ -25,8 +25,8 @@
         q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none
           item-feed(
             :itemShortOrFull="node"
-            :isActive="isActive"
-            :isVisible="true"
+            :isActive="isActive && currentIndx === ix"
+            :isVisible="currentIndx === ix"
             :showHeader="false"
             :showActions="false"
             :showName="false"
@@ -41,7 +41,7 @@
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline icon="add" :label="$t('Add Image')" color="green" @click="itemEditorShow=true").fit
-          div(v-else @click="$go(item.oid)").full-width
+          div(v-else @click="currentIndx = itemIndex-1, expanded=false").full-width
             item-feed(
               :itemIndex="itemIndex"
               :itemShortOrFull="item"
@@ -51,7 +51,7 @@
               :showActions="false"
               :showName="false"
               :showSpheres="false"
-              :style=`{border: item.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
+              :style=`{border: currentIndx === itemIndex-1 ? '2px solid green' : null, borderRadius: '12px'}`)
               template(v-slot:skeleton)
                 q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
                   q-skeleton(type="QBtn" dark).full-width
@@ -85,6 +85,7 @@ import essenceActions from 'src/components/essence/essence_actions.vue'
 import listMasonry from 'src/components/list_masonry/index.vue'
 
 import cloneDeep from 'lodash/cloneDeep'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageImages',
@@ -132,21 +133,18 @@ export default {
     node (to) {
       // this.$log('node to=', to)
       if (to && this.sameEssenceNodesItemsRes) this.currentIndx = this.sameEssenceNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
+    },
+    async currentIndx (to) {
+      if (to >= 0) {
+        assert(this.sameEssenceNodesItemsRes && this.sameEssenceNodesItemsRes.items[to])
+        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.sameEssenceNodesItemsRes.items[to].oid)
+        this.$emit('node', node)
+      }
     }
   },
   methods: {
     handleSwipe (event) {
       this.$log('handleSwipe', event)
-    },
-    async goto (oid) {
-      this.$log('goto', oid)
-      let node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-      this.$emit('node', node)
-
-      // todo убрать!!! после пролистывания не играет видос, см src/components/composition/from_video/index.vue
-      this.isActive = !this.isActive
-      await this.$nextTick()
-      this.isActive = !this.isActive
     }
   },
   async created () {
