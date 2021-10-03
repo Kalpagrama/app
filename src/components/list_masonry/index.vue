@@ -13,7 +13,7 @@
         ...itemStyles,
       }`
       ).row.full-width.items-start.content-start.q-mb-sm
-      slot(name="item" :item="i")
+      slot(name="item" :item="i" :itemIndex="ii")
 </template>
 
 <script>

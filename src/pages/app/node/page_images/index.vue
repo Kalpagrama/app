@@ -26,11 +26,11 @@
       //q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
-        template(v-slot:item=`{item}`)
+        template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
           item-feed(v-else
-            :itemIndex="777"
+            :itemIndex="itemIndex"
             :itemShortOrFull="item"
             :isActive="false"
             :isVisible="true"
