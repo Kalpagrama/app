@@ -28,9 +28,10 @@
       .row.full-width.q-col-gutter-sm
         .col-4
           q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-        div(v-for="(node, ix) in sameEssenceNodesItemsRes.items" :key="ix").col-4
+        div(v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="ix").col-4
           item-feed(
-            :itemShortOrFull="node"
+            :itemIndex="ix"
+            :itemShortOrFull="sameEssenceNode"
             :isActive="true"
             :isVisible="true"
             :showHeader="false"
@@ -48,7 +49,7 @@ import essenceActions from 'src/components/essence/essence_actions.vue'
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {
-  name: 'pageEssences',
+  name: 'pageImages',
   components: {
     essenceVoteBall, itemEditor, essenceSpheres, essenceActions
   },
@@ -92,12 +93,12 @@ export default {
     'sameEssenceNodesItemsRes.items'(to) {
       this.$log('sameEssenceNodesItemsRes to', to)
     },
-    sameEssenceNodesItemsRes: {
-      deep: true,
-      handler(to, from){
-        this.$log('sameEssenceNodesItemsRes deep to', to)
-      }
-    }
+    // sameEssenceNodesItemsRes: {
+    //   deep: true,
+    //   handler(to, from){
+    //     this.$log('sameEssenceNodesItemsRes deep to', to)
+    //   }
+    // }
   },
   async created () {
     this.$log('created ')

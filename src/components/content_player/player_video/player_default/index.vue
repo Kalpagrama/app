@@ -2,10 +2,10 @@
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
-  // z-index: 100
-  // border-radius: 10px
-  // overflow: hidden
-  // pointer-events: none
+// z-index: 100
+// border-radius: 10px
+// overflow: hidden
+// pointer-events: none
 // @media (min-width: 900px)
 //   iframe[id$="_youtube_iframe"]
 //     width: 1000%
@@ -25,27 +25,27 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-video(
-  ref="videoRef"
-  type="video/youtube"
-  :src="url"
-  :playsinline="true"
-  :autoplay="true"
-  :loop="true"
-  :muted="muted"
-  :style=`{
+  video(
+    ref="videoRef"
+    type="video/youtube"
+    :src="url"
+    :playsinline="true"
+    :autoplay="true"
+    :loop="true"
+    :muted="muted"
+    :style=`{
     objectFit: 'contain'
   }`
-  @click="videoClick"
-  @loadeddata="videoLoadeddata"
-  @timeupdate="videoTimeupdate"
-  @pause="videoPaused"
-  @play="videoPlaying"
+    @click="videoClick"
+    @loadeddata="videoLoadeddata"
+    @timeupdate="videoTimeupdate"
+    @pause="videoPaused"
+    @play="videoPlaying"
   ).fit
 </template>
 
 <script>
-import {assert} from 'src/system/common/utils'
+import { assert } from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
@@ -54,11 +54,16 @@ import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 export default {
   name: 'playerDefault',
   props: {
-    contentKalpa: {type: Object, required: true},
-    isVisible: {type: Boolean, default: true},
-    isActive: {type: Boolean, default: true},
-    isMini: {type: Boolean, default: false},
-    options: {type: Object, default: {}},
+    contentKalpa: { type: Object, required: true },
+    isVisible: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: true },
+    isMini: { type: Boolean, default: false },
+    options: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
   },
   data () {
     return {
@@ -71,7 +76,7 @@ export default {
       currentTime: 0,
       node: null,
       nodeMode: null,
-      clusters: [],
+      clusters: []
     }
   },
   computed: {
@@ -87,8 +92,7 @@ export default {
     figures () {
       if (this.node) {
         return this.node.items[0].layers[0].figuresAbsolute
-      }
-      else {
+      } else {
         return null
       }
     }
@@ -115,8 +119,7 @@ export default {
       this.playingCount += 1
       if (this.playerType === 'player-youtube') {
         this.player_.play()
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) this.$refs.videoRef.play()
       }
     },
@@ -129,8 +132,7 @@ export default {
       this.$log('pause')
       if (this.playerType === 'player-youtube') {
         this.player_.pause()
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) this.$refs.videoRef.pause()
       }
     },
@@ -139,8 +141,7 @@ export default {
       if (this.playerType === 'player-youtube') {
         // this.player_.setMuted(val || !this.player_.muted)
         this.muted = val || !this.muted
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
           // this.$refs.videoRef.muted = !this.$refs.videoRef.muted
           this.muted = val || !this.muted
@@ -163,8 +164,7 @@ export default {
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
           this.currentTime = t
           this.$refs.videoRef.currentTime = t
@@ -175,8 +175,7 @@ export default {
       this.$log('videoClick', e)
       if (this.playerType === 'player-youtube') {
         // do stuff
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.playing) e.target.pause()
         else e.target.play()
       }
@@ -185,8 +184,7 @@ export default {
       // this.$log('videoLoadeddata', e)
       if (this.playerType === 'player-youtube') {
         this.duration = this.player_.duration
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
           this.duration = this.$refs.videoRef.duration
         }
@@ -206,8 +204,7 @@ export default {
       if (this.playerType === 'player-youtube') {
         this.currentTime = this.player_.currentTime
         this.duration = this.player_.duration
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
           this.currentTime = this.$refs.videoRef.currentTime
           this.duration = this.$refs.videoRef.duration
@@ -218,8 +215,7 @@ export default {
       // this.$log('videoPaused', e)
       if (this.playerType === 'player-youtube') {
         this.playing = false
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         this.playing = false
       }
     },
@@ -227,8 +223,7 @@ export default {
       // this.$log('videoPlaying', e)
       if (this.playerType === 'player-youtube') {
         this.playing = true
-      }
-      else if (this.playerType === 'player-kalpa') {
+      } else if (this.playerType === 'player-kalpa') {
         this.playing = true
       }
     },
@@ -260,7 +255,7 @@ export default {
           }
         })
       }
-      // else if (type === 'vimeo') {}
+          // else if (type === 'vimeo') {}
       // else if (type === 'instagram') {}
       else if (type === 'player-kalpa') {
       }
@@ -273,7 +268,7 @@ export default {
           if (this.$refs.videoRef) this.$refs.videoRef.removeEventListener(event, cb)
         },
         emit: (event, val) => {
-          if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, {detail: val}))
+          if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, { detail: val }))
         }
       }
     }

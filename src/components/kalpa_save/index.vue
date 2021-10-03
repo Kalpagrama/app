@@ -1,42 +1,42 @@
 <template lang="pug">
-q-btn(
-  round flat
-  icon="bookmark_outline"
-  :loading="data.bookmarkCreating"
-  :color="data.bookmark ? 'green' : color"
-  :dense="dense"
-  @click="onClick()"
+  q-btn(
+    round flat
+    icon="bookmark_outline"
+    :loading="data.bookmarkCreating"
+    :color="data.bookmark ? 'green' : color"
+    :dense="dense"
+    @click="onClick()"
   )
-  q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
-  q-dialog(
-    v-if="data.bookmark"
-    v-model="data.bookmarkCreatedDialogShow"
-    position="bottom"
-    auto-close)
-    div(
-      :style=`{
+    q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
+    q-dialog(
+      v-if="data.bookmark"
+      v-model="data.bookmarkCreatedDialogShow"
+      position="bottom"
+      auto-close)
+      div(
+        :style=`{
         position: 'relative',
         borderRadius: '20px 20px 0 0',
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
       }`
       ).row.full-width.q-px-sm.q-pt-sm.b-40
-      q-btn(
-        flat no-caps color="white" align="left"
-        :style=`{
+        q-btn(
+          flat no-caps color="white" align="left"
+          :style=`{
           height: '50px',
         }`
-        @click="saveBookmark()"
+          @click="saveBookmark()"
         ).full-width.q-mb-md
-        span.text-white {{ $t('Save to collection') }}
-  //- edit bookmark...
-  q-dialog(
-    v-if="data.bookmark"
-    v-model="data.bookmarkEditorDialogShow"
-    position="bottom")
-    bookmark-editor(
-      :bookmark="data.bookmark"
-      :showHeader="showHeader"
-      @deleted="boookmarkDeleted")
+          span.text-white {{ $t('Save to collection') }}
+    //- edit bookmark...
+    q-dialog(
+      v-if="data.bookmark"
+      v-model="data.bookmarkEditorDialogShow"
+      position="bottom")
+      bookmark-editor(
+        :bookmark="data.bookmark"
+        :showHeader="showHeader"
+        @deleted="boookmarkDeleted")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -53,15 +53,20 @@ export default {
     bookmarkEditor
   },
   props: {
-    isActive: {type: Boolean},
-    itemState: {type: Object, default: {}},
-    color: {type: String, default: 'grey-9'},
-    dense: {type: Boolean, default: false},
-    item: {type: Object, required: true},
-    showHeader: {type: Boolean},
+    isActive: { type: Boolean },
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
+    color: { type: String, default: 'grey-9' },
+    dense: { type: Boolean, default: false },
+    item: { type: Object, required: true },
+    showHeader: { type: Boolean }
   },
   computed: {
-    data() {
+    data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       assert(this.itemState)
       let key = this.$options.name
@@ -70,7 +75,7 @@ export default {
           bookmark: null,
           bookmarkCreating: false,
           bookmarkCreatedDialogShow: false,
-          bookmarkEditorDialogShow: false,
+          bookmarkEditorDialogShow: false
         })
       }
       return this.itemState[key]
@@ -91,10 +96,15 @@ export default {
     async getBookmark () {
       // this.$log('getBookmark', this.item.oid)
       if (!this.item.oid) {
-        this.$q.notify({type: 'negative', position: 'bottom', message: this.$t('Cant save this item :(')})
+        this.$q.notify({ type: 'negative', position: 'bottom', message: this.$t('Cant save this item :(') })
         return
       }
-      let {items: [bookmark]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, oid: this.item.oid}})
+      let { items: [bookmark] } = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+          oid: this.item.oid
+        }
+      })
       // this.$log('getBookmark', bookmark)
       return bookmark
     },
@@ -108,7 +118,7 @@ export default {
         thumbUrl: item.thumbUrl,
         isSubscribed: true,
         collections: [],
-        ...fields,
+        ...fields
       }
       let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
       // await this.$wait(500)
@@ -134,10 +144,10 @@ export default {
       }
       // save to collection named all...
       else {
-        this.data.bookmark = await this.createBookmark(this.item, {collections: []})
+        this.data.bookmark = await this.createBookmark(this.item, { collections: [] })
         this.data.bookmarkCreatedDialogShow = true
       }
-    },
+    }
   }
 }
 </script>

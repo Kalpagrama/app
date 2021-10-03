@@ -59,7 +59,7 @@ iframe
     div(
       v-if="settingsShow"
       :style=`{zIndex: 1000, width: '70%'}`
-      ).absolute-center
+    ).absolute-center
       player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
     //- body book area wrapper
     div(
@@ -125,55 +125,57 @@ export default {
     themes: {
       type: Object,
       required: true,
-      default: {
-        white: {
-          body: {
-            color: 'black',
-            background: 'white'
+      default () {
+        return {
+          white: {
+            body: {
+              color: 'black',
+              background: 'white'
+            },
+            '::selection': {
+              background: 'rgba(76,175,79, 0.5)'
+            },
+            name: 'WHITE'
           },
-          '::selection': {
-            background: 'rgba(76,175,79, 0.5)'
+          beige: {
+            'a:link': {
+              color: 'green'
+            },
+            'a:visited': {
+              color: 'grey'
+            },
+            'a:hover': {
+              color: 'teal !important'
+            },
+            body: {
+              color: '#000000',
+              background: '#f3e8d2'
+            },
+            '::selection': {
+              background: 'rgba(76,175,79, 0.5)'
+            },
+            name: 'BEIGE'
           },
-          name: 'WHITE'
-        },
-        beige: {
-          'a:link': {
-            color: 'green',
-          },
-          'a:visited': {
-            color: 'grey',
-          },
-          'a:hover': {
-            color: 'teal !important',
-          },
-          body: {
-            color: '#000000',
-            background: '#f3e8d2'
-          },
-          '::selection': {
-            background: 'rgba(76,175,79, 0.5)'
-          },
-          name: 'BEIGE'
-        },
-        night: {
-          'a:link': {
-            color: 'green',
-          },
-          'a:visited': {
-            color: 'grey',
-          },
-          'a:hover': {
-            color: 'teal !important',
-          },
-          body: {
-            color: 'silver',
-            background: 'rgb(30,30,30)',
-            'font-family': 'Roboto, sans-serif !important'
-          },
-          '::selection': {
-            background: 'rgba(76,175,79, 0.5)'
-          },
-          name: 'NIGHT'
+          night: {
+            'a:link': {
+              color: 'green'
+            },
+            'a:visited': {
+              color: 'grey'
+            },
+            'a:hover': {
+              color: 'teal !important'
+            },
+            body: {
+              color: 'silver',
+              background: 'rgb(30,30,30)',
+              'font-family': 'Roboto, sans-serif !important'
+            },
+            '::selection': {
+              background: 'rgba(76,175,79, 0.5)'
+            },
+            name: 'NIGHT'
+          }
         }
       }
     },
@@ -227,7 +229,7 @@ export default {
     },
     settings: {
       deep: true,
-      async handler(to, from){
+      async handler (to, from) {
         this.$log('settings=', to)
         assert(to.fontSize && to.fontSize >= 50 && to.fontSize <= 200)
         this.rendition.themes.fontSize(to.fontSize + '%')

@@ -37,12 +37,12 @@
                 // description expand btn
                 q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
               // суть
-              .row.full-width
+              .row.full-width.q-pt-sm
                 .row.col.justify-center
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
                     q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"
-                      align="top" dark rounded color="green") \#{{sameCompositionNodesItemsRes.items.findIndex(item=>item.oid === node.oid) + 1}} {{$t('of')}} {{sameCompositionNodesItemsRes.items.length}}
-                    q-icon(v-else name= "add" size="12px" color="green" :style=`{border: '1px solid ' + $getPaletteColor('green'), borderRadius: '6px',width: '14px', height: '12px', right: '-18px', top: '5px'}`).absolute-top-right
+                      align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
+                    q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
               // author
               q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
                 q-avatar(:size="'20px'")

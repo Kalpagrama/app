@@ -52,7 +52,12 @@ export default {
   name: 'itemFeed',
   props: {
     itemShortOrFull: { type: Object },
-    itemState: { type: Object, default: {} },
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     itemIndex: { type: Number },
     nodeBackgroundColor: { type: String, default: 'rgb(30,30,30)' },
     nodeActionsColor: { type: String, default: 'rgb(200,200,200)' },
