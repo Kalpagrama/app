@@ -44,7 +44,7 @@
             small.text-grey-8 {{type}} {{$date(bookmark.createdAt)}}
       //- collections
       div(v-if="!showHeader").row.full-width
-        .row.full-width.items-center.justify-center.text-white.text-h6 {{$t('Add to сollection')}}
+        .row.full-width.items-center.justify-center.text-white.text-h6 {{$t('Bookmark menu')}}
         .col
           div(:style=`{
           position: 'relative',
@@ -53,37 +53,44 @@
           ).row.full-width.justify-end
             q-btn(round flat color="white" icon="clear" v-close-popup)
       .row.full-width.items-center.content-center.text-white.q-py-xs.wrap
-        add-collection-btn(
+        collectionList(
           v-model="collectionsModel"
-          :highlightSelected="false"
+          :highlightSelected="true"
           :showDeleteButton="false"
-          :showAllCollection="false"
-          @collection-select="addCollectionToBookmark").q-ma-xs
-        q-btn(v-for="(c,ci) in bookmark.collections" :key="c" no-caps no-wrap :label="getCollectionName(c)" @click="deleteCollectionFromButton(c)").q-ma-xs
+          :showAllCollection="false").q-ma-xs
+      div(:style=`{
+        content: '',
+        width: '100%',
+        height: '1px',
+        background: 'rgb(73,66,61)',}`).q-my-xs
+      //- delete
+      .col-3.q-py-xs.no-wrap.justify-center.q-mt-xs.content-center.items-center
+        q-btn(
+          outline no-caps color="red"
+          icon="delete"
+          :loading="bookmarkDeleting"
+          :style=`{
+          height: '50px', position: 'absolute',
+        }`
+          @click="bookmarkDelete()"
+        )
+          q-tooltip(dense dark) {{$t('Delete bookmark')}}
       //- isSubscribed
-      .row.full-width.items-center.content-center.q-py-xs.no-wrap.justify-center.q-mt-xs
+      .row.q-py-xs.no-wrap.q-mt-xs.full-width.justify-center
         q-toggle(
           v-model="bookmark.isSubscribed"
           dark
           :label="$t('Receive updates')"
           :style=`{color: 'white'}`
-          color="green").full-width.justify-center
-      //- delete
-      .row.full-width.q-mt-md
-        q-btn(
-          outline no-caps color="red"
-          :loading="bookmarkDeleting"
-          :style=`{
-          height: '50px',
-        }`
-          @click="bookmarkDelete()"
-        ).full-width
-          span {{ $t('Delete bookmark') }}
+          color="green")
 </template>
 
 <script>
 import {RxCollectionEnum} from 'src/system/rxdb'
 import {objectTypeName, objectUrl} from '../../system/common/object_info';
+import differenceWith from 'lodash/differenceWith'
+import cloneDeep from 'lodash/cloneDeep'
+import {assert} from '../../system/common/utils';
 
 export default {
   name: 'bookmarkEditor',
@@ -93,7 +100,7 @@ export default {
   },
   data() {
     return {
-      collectionsModel: {collectionId: null, collections: []},
+      collectionsModel: {collectionId: null, collections: [], selectedCollectionIds: []},
       bookmarkDeleting: false,
     }
   },
@@ -105,33 +112,39 @@ export default {
       return objectTypeName(this.bookmark)
     }
   },
+  watch: {
+    'collectionsModel.selectedCollectionIds'(to){
+      this.synchronizeSelectedCollectionIds(to)
+    }
+  },
   methods: {
     getCollectionName(collectionId) {
       let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
       return collection ? collection.name : null
     },
-    async addCollectionToBookmark(collectionId) {
+    async synchronizeSelectedCollectionIds(selectedCollectionIds) {
+      assert(selectedCollectionIds)
       if (!this.bookmark.collections) this.bookmark.collections = []
-      if (!this.bookmark.collections.find(cid => cid === collectionId)) {
-        this.bookmark.collections.push(collectionId)
-      }
-      // не используем this.collectionsModel.collections, тк при добавлении новой коллекции addCollectionToBookmark вызывается раньше, чем изменяется this.collectionsModel.collections
-      let collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, collectionId)
-      if (collection) {
-        if (!collection.bookmarks) collection.bookmarks = []
-        if (!collection.bookmarks.find(bid => bid === this.bookmark.id)) {
-          collection.bookmarks.push(this.bookmark.id)
-          collection.thumbUrl = this.bookmark.thumbUrl
+      let addedCollections = differenceWith(selectedCollectionIds, this.bookmark.collections)
+      let removedCollections = differenceWith(this.bookmark.collections, selectedCollectionIds)
+      this.bookmark.collections.splice(0, this.bookmark.collections.length, ...selectedCollectionIds)
+      for (let collectionId of removedCollections){
+        let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
+        if (collection) {
+          let indxB = collection.bookmarks.findIndex(bid => bid === this.bookmark.id)
+          if (indxB >= 0) collection.bookmarks.splice(indxB, 1)
         }
       }
-    },
-    deleteCollectionFromButton(collectionId) {
-      let indxC = this.bookmark.collections.findIndex(cid => cid === collectionId)
-      if (indxC >= 0) this.bookmark.collections.splice(indxC, 1)
-      let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
-      if (collection) {
-        let indxB = collection.bookmarks.findIndex(bid => bid === this.bookmark.id)
-        if (indxB >= 0) collection.bookmarks.splice(indxB, 1)
+      for (let collectionId of addedCollections) {
+        // не используем this.collectionsModel.collections, тк при добавлении новой коллекции addCollectionToBookmark вызывается раньше, чем изменяется this.collectionsModel.collections
+        let collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, collectionId)
+        if (collection) {
+          if (!collection.bookmarks) collection.bookmarks = []
+          if (!collection.bookmarks.find(bid => bid === this.bookmark.id)) {
+            collection.bookmarks.push(this.bookmark.id)
+            collection.thumbUrl = this.bookmark.thumbUrl
+          }
+        }
       }
     },
     bookmarkLaunch() {
@@ -151,6 +164,7 @@ export default {
   },
   async mounted() {
     this.$log('mounted')
+    this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
   }
 }
 </script>

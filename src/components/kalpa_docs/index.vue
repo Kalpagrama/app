@@ -1,25 +1,42 @@
 <style lang="sass">
 .doc-item
-  color: white
+  color: #424242
   &:hover
-    color: green !important
+    color: #4caf50 !important
 </style>
 
 <template lang="pug">
 .row.full-width.q-px-sm
-  div(v-for="(d,di) in docs" :key="d.id").row.full-width
+  .row.full-width
     router-link(
-      flat no-caps color="white" align="left"
-      :to="'/help/'+d.id"
+      v-if="false"
+      flat no-caps color="grey-9" align="left"
+      :to="'/about'"
       :class=`{
       }`
       :style=`{
         textAlign: 'start',
         borderRadius: '10px',
       }`
+      @click="$go('/about')"
+      )
+      .doc-item
+        //q-icon(name="help_outline" size="20px" color="grey-7").q-pr-sm
+        small {{$t('How it work?', 'Как работает Кальпаграма')}}
+  div(v-for="(d,di) in docs" :key="d.id").row.full-width
+    router-link(
+      flat no-caps align="left"
+      :to="'/help/'+d.id"
+      :class=`{
+      }`
+      :style=`{
+        textAlign: 'end',
+        borderRadius: '10px',
+      }`
       @click="docClick(d,di)"
       ).doc-item
-      small(:class=`[docColor]`) {{ d.name }}
+      small(:style=`{color: docColor, textAlign: docAlign}`) {{ d.name }}
+      //small {{ d.name }}
 </template>
 
 <script>
@@ -38,6 +55,10 @@ export default {
     docColor: {
       type: String,
       default: 'text-grey-9'
+    },
+    docAlign: {
+      type: String,
+      default: 'left'
     },
   },
   data () {

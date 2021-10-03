@@ -1,18 +1,21 @@
 <template lang="pug">
-  q-btn-dropdown(flat icon="add", :content-style=`{borderRadius: '10px', background: 'rgb(40,40,40)'}`)
-    div(
-      :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px'}`
-    ).row.full-width
-      q-input(v-model="newCollectionName", borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
-      q-btn(round flat v-close-popup :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
-    div(:style=`{height: Math.min(value.collections.length*40, 300)+'px'}`).scroll
-      div(v-for="(c,ci) in value.collections" :key="c.id").row.full-width
-        q-btn(
-          round flat no-caps v-close-popup align="left"
-          :color="value.collectionId==c.id && highlightSelected? 'green' : 'grey-8'"
-          :label="c.name"
-          @click="value.collectionId=c.id, $emit('collection-select', c.id)"
-          ).col.full-width.q-pl-sm
+  .row.justify-end
+    q-btn(flat icon="add" :label="$t('Add collection')" no-caps color="green" :style=`{marginRight: '-10px'}`)
+     q-popup-proxy(:breakpoint="1024" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
+      div(
+        :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
+      ).row.full-width
+        q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
+        q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
+    div(:style=`{height: Math.min(value.collections.length*40, 180)+'px'}`).scroll.full-width.row
+      //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.br.wrap
+      q-chip(
+        v-for="(c,ci) in value.collections" :key="c.id"
+        no-caps clickable text-color="white" outline
+        :color="value.selectedCollectionIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
+        @click="addRemoveCollection(c)"
+      ).q-pl-sm
+        div(:style=`{maxWidth: $q.screen.width > 768 ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
         q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
 </template>
 
@@ -22,7 +25,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import {assert} from 'src/system/common/utils'
 
 export default {
-  name: 'AddCollectionBtn',
+  name: 'collectionList',
   props: {
     value: {type: Object, required: true},
     highlightSelected: {type: Boolean, default: true},
@@ -62,6 +65,11 @@ export default {
     },
   },
   methods: {
+    addRemoveCollection(c) {
+      let indx = this.value.selectedCollectionIds.findIndex(id => c.id === id)
+      if (indx >= 0) this.value.selectedCollectionIds.splice(indx, 1)
+      else this.value.selectedCollectionIds.push(c.id)
+    },
     async createCollection () {
       assert(this.newCollectionName)
       let collectionInput = {

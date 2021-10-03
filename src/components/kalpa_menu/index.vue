@@ -3,6 +3,10 @@
   cursor: pointer
   &:hover
     background: rgb(40,40,40)
+.create-item
+  color: #424242
+  &:hover
+    color: #4caf50 !important
 </style>
 
 <template lang="pug">
@@ -90,6 +94,60 @@
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
+        //- Create new
+        div(
+          v-if="!$store.getters.isGuest"
+          @click="addItemMenuShow = true"
+          :style=`{
+              height: '60px',
+              borderRadius: '10px',
+              overflow: 'hidden',
+            }`
+        ).row.full-width.menu-item.cursor-pointer
+          q-dialog(
+            v-model="addItemMenuShow"
+            position="standard"
+            :maximized="false"
+          )
+            div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
+              //span.text-green.text-h6.q-my-md {{$t('Creation Menu', 'Меню создания')}}
+              q-btn(
+                outline color="grey-8"
+                size="xl"
+                align="center"
+                :to="''"
+                :label="$t('Essence core')"
+                icon='adjust'
+                round flat no-caps
+              ).row.full-width.create-item.q-pa-sm
+              q-btn(
+                outline color="grey-8"
+                align="center"
+                size="xl"
+                :to="'/workspace/create?mode=block'"
+                :label="$t('Essence block')"
+                icon='dashboard_customize'
+                round flat no-caps
+              ).row.full-width.create-item.q-pa-sm
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+            q-icon(size="30px" name='add_circle_outline' color='white')
+          div(v-if="!mini").col.full-height
+            .row.fit.items-center.content-center
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Create')}}
+              //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
+        div(
+          @click="$go('/about')"
+          :style=`{
+              height: '60px',
+              borderRadius: '10px',
+              overflow: 'hidden',
+            }`
+        ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+            q-icon(size="30px" name='far fa-question-circle' color='grey-8')
+          div(v-if="!mini").col.full-height
+            .row.fit.items-center.content-center
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-8.text-bold {{$t('How to use?', 'Как это работает')}}
         //- docs
         .row.full-width.q-mt-sm
           kalpa-docs(
@@ -122,12 +180,14 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      addItemMenuShow: false,
+    }
   },
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('Feed'), icon: 'view_agenda'},
+        {id: 'feeds', name: this.$t('Feed'), icon: 'fas fa-home'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},

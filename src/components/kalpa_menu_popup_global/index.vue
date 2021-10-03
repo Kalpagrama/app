@@ -13,26 +13,33 @@ q-btn(
     ...styles,
   }`)
   menu-popup(:offset="offset")
-  img(
-    v-if="!$store.getters.isGuest"
-    :src="$store.getters.currentUser.profile.photoUrl"
-    :style=`{
-      width: size, minWidth: size, maxWidth: size,
-      height: size, minHeight: size, maxHeight: size,
-      borderRadius: '50%',
-    }`)
+  //img(
+  //  v-if="!$store.getters.isGuest"
+  //  :src="$store.getters.currentUser.profile.photoUrl"
+  //  :style=`{
+  //    width: size, minWidth: size, maxWidth: size,
+  //    height: size, minHeight: size, maxHeight: size,
+  //    borderRadius: '50%',
+  //  }`)
+  //div(
+  //  v-else
+  //  :style=`{
+  //    width: size, minWidth: size, maxWidth: size,
+  //    height: size, minHeight: size, maxHeight: size,
+  //    borderRadius: '50%',
+  //  }`).row.items-center.content-center.justify-center
+  //  q-icon(name="menu" color="grey-7" size="24px")
   div(
-    v-else
     :style=`{
       width: size, minWidth: size, maxWidth: size,
       height: size, minHeight: size, maxHeight: size,
       borderRadius: '50%',
     }`).row.items-center.content-center.justify-center
-    q-icon(name="menu" color="grey-7" size="24px")
+    q-icon(name="menu" color="grey-7" size="24px" :style=`{marginTop: '5px'}`)
   div(
     v-if="showLabel"
     ).row.full-width.justify-center.q-mt-xs
-    small {{$t('Menu')}}
+    small(:style=`{marginTop: '-2px', whiteSpace: 'nowrap'}`) {{$t('Menu')}}
 </template>
 
 <script>
