@@ -2,7 +2,7 @@
 .menu-item
   cursor: pointer
   &:hover
-    background: rgb(40,40,40),
+    background: rgb(40,40,40)
 .create-item
   color: #424242
   &:hover
@@ -136,7 +136,6 @@
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Create')}}
               //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
         div(
-          v-if="!$store.getters.isGuest"
           @click="$go('/about')"
           :style=`{
               height: '60px',

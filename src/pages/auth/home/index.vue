@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.window-height.window-width
-  div(v-if="isReady && $q.screen.width > 768").row.fit.items-center.content-center.justify-center
+  div(v-if="isReady && $q.screen.width > 768" @click.self="close()").row.fit.items-center.content-center.justify-center
     //- desktop layout
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(

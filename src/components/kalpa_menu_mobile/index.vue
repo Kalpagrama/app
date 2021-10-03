@@ -4,13 +4,13 @@
     :style=`{
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '20px 20px 0 0',
-      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 3px)',
     }`
-    ).row.full-width.justify-between.b-50.q-px-sm.q-pt-sm
+    ).row.full-width.justify-between.b-50.q-px-sm
     //- feed
     q-btn(
       @click="$go('/feeds/all')"
-      flat no-caps icon="view_agenda"
+      flat no-caps icon="fas fa-home"
       :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
       :style=`{
         width: size+'px',
@@ -32,12 +32,13 @@
       :style=`{
         width: size+'px',
         height: size+'px',
+        position: 'relative', bottom: '10%',
       }`
       ).row.items-center.content-center.justify-center
       q-btn(
         @click="$go('/workspace')"
         round no-caps icon="construction"
-        :color="'green'"
+        :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-7'"
         :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
     //- notifications
     q-btn(
@@ -48,8 +49,8 @@
         width: size+'px',
         height: size+'px',
       }`)
-      q-badge(color="red" floating transparent) •
-      small(:style=`{marginTop: '-4px', whiteSpace: 'nowrap'}`) {{$t('Activity')}}
+      //q-badge(color="red" floating transparent) •
+      small(:style=`{marginTop: '-2px', whiteSpace: 'nowrap'}`) {{$t('Activity')}}
     //- menu
     kalpa-menu-popup-global(
       color="grey-7"

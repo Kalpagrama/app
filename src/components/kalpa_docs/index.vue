@@ -25,18 +25,18 @@
         small {{$t('How it work?', 'Как работает Кальпаграма')}}
   div(v-for="(d,di) in docs" :key="d.id").row.full-width
     router-link(
-      flat no-caps color="white" align="left"
+      flat no-caps align="left"
       :to="'/help/'+d.id"
       :class=`{
       }`
       :style=`{
-        textAlign: 'start',
+        textAlign: 'end',
         borderRadius: '10px',
       }`
       @click="docClick(d,di)"
       ).doc-item
-      //small(:class=`[docColor]`) {{ d.name }}
-      small {{ d.name }}
+      small(:style=`{color: docColor, textAlign: docAlign}`) {{ d.name }}
+      //small {{ d.name }}
 </template>
 
 <script>
@@ -55,6 +55,10 @@ export default {
     docColor: {
       type: String,
       default: 'text-grey-9'
+    },
+    docAlign: {
+      type: String,
+      default: 'left'
     },
   },
   data () {

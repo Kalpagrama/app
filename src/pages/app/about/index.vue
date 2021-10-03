@@ -71,8 +71,6 @@ q-layout(
         .row.full-width.justify-center.q-pt-xl
           q-icon(name="adjust" color="grey-5" size="40px").q-pr-xs
           p.text-h4.text-bold.text-white {{$t('Essence core', 'Смысловое ядро')}}
-        //- video
-        //node-video
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
@@ -227,9 +225,8 @@ q-layout(
             :style=`{
               maxWidth: width-60+'px',
               textAlign: 'justify',
-              paddingBottom: '100px',
             }`
-            ).row.full-width.items-start.content-start.q-pt-md
+            ).row.full-width.items-start.content-start.q-pt-md.q-mb-xl
             p.text-white Голосуя, вы определяете насколько близко к сути ядро или связь, что так же отражается на рейтинге автора. Чем больше этот рейтинг, тем сильнее голос пользователя повлияет на рейтинг ядра или связи за которые он проголосовал. Всё что опубликовано в Кальпаграме - объединяется в глобальную карту знаний.  Раположение элементов на этой карте определено голосованием сообщества. Теперь пользователи определяют и проверяют истинность информации. Не алгоритмы и корпорации, а ВЫ решаете, что будет в центре внимания.
             //.row.full-width
             //  div(
@@ -240,6 +237,19 @@ q-layout(
             //      borderRadius: '10px',
             //      background: 'rgb(35,35,35)',
             //    }`).q-mr-sm
+        //- blocks
+        .row.full-width.justify-center
+          q-icon(name="dashboard_customize" color="grey-5" size="40px").q-pr-xs
+          p.text-h4.text-bold.text-white {{$t('Essence block')}}
+        div(:style=`{zIndex: 10,}`).row.full-width.justify-center
+          div(
+            :style=`{
+              maxWidth: width-60+'px',
+              textAlign: 'justify',
+              paddingBottom: '200px',
+            }`
+          ).row.full-width.items-start.content-start
+            p.text-white Теперь можно поделиться не только смыслом, но и всей структурой вашего понимания, соединив все "точки" в единую картину.
 </template>
 
 <script>
