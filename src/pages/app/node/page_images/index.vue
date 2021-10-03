@@ -15,7 +15,8 @@
     // образ
     div(v-if="!expanded").row.full-width.position-relative
       q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
-        @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left.z-top
+        :style=`{zIndex: '50'}`
+        @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left
       item-feed(
         :itemShortOrFull="node"
         :isActive="isActive"
@@ -25,7 +26,8 @@
         :showName="false"
         :showSpheres="false").col
       q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
-        @click="goto(itemsRight[0].oid)").absolute-right.z-top
+        :style=`{zIndex: '50'}`
+        @click="goto(itemsRight[0].oid)").absolute-right
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
           span.text-white {{$t('Image rating')}}
@@ -132,6 +134,8 @@ export default {
       this.$log('goto', oid)
       let node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
       this.$emit('node', node)
+
+      // todo убрать!!! после пролистывания не играет видос, см src/components/composition/from_video/index.vue
       this.isActive = !this.isActive
       await this.$nextTick()
       this.isActive = !this.isActive
