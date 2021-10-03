@@ -13,17 +13,19 @@
         :lockName="true"
         @close="itemEditorShow=false")
     // образ
-    item-feed(v-if="!expanded"
-      :itemShortOrFull="node"
-      :isActive="isActive"
-      :isVisible="true"
-      :showHeader="false"
-      :showActions="false"
-      :showName="false"
-      :showSpheres="false")
-      //q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length":style=`{}`).absolute-right.z-top.br
-      //q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top.br
-      //q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
+    div(v-if="!expanded").row.full-width
+      q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
+        @click="$go('/node/'+itemsLeft[itemsLeft.length - 1].oid)")
+      item-feed(
+        :itemShortOrFull="node"
+        :isActive="isActive"
+        :isVisible="true"
+        :showHeader="false"
+        :showActions="false"
+        :showName="false"
+        :showSpheres="false").col
+      q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
+        @click="$go('/node/'+itemsRight[0].oid)")
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
         template(v-slot:item=`{item, itemIndex}`)
@@ -96,35 +98,29 @@ export default {
       return node
     },
     itemsRight () {
-      if (!this.sameEssenceNodesItemsRes) return []
-      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
-      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(indxCurrent, this.sameEssenceNodesItemsRes.items.length)
+      if (this.currentIndx >= 0) return this.sameEssenceNodesItemsRes.items.slice(this.currentIndx + 1, this.sameEssenceNodesItemsRes.items.length)
       return []
     },
     itemsLeft () {
-      if (!this.sameEssenceNodesItemsRes) return []
-      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
-      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, indxCurrent)
+      if (this.currentIndx >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, this.currentIndx)
       return []
+    },
+    currentIndx () {
+      if (!this.sameEssenceNodesItemsRes) return -1
+      return this.sameEssenceNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
     },
     length () {
       if (this.sameEssenceNodesItemsRes) return this.sameEssenceNodesItemsRes.items.length
       return 0
     },
-    itemWidth(){
+    itemWidth () {
       return Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth) / 3
     }
   },
   watch: {
-    'sameEssenceNodesItemsRes.items'(to) {
+    'sameEssenceNodesItemsRes.items' (to) {
       this.$log('sameEssenceNodesItemsRes to', to)
-    },
-    // sameEssenceNodesItemsRes: {
-    //   deep: true,
-    //   handler(to, from){
-    //     this.$log('sameEssenceNodesItemsRes deep to', to)
-    //   }
-    // }
+    }
   },
   async created () {
     this.$log('created ')
@@ -136,6 +132,12 @@ export default {
         sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
       },
       populateObjects: false
+    })
+    this.$nextTick(() => {
+      this.$log('itemsRight', this.itemsRight)
+      this.$log('itemsLeft', this.itemsLeft)
+      this.$log('currentIndx', this.currentIndx)
+      this.$log('length', this.length)
     })
   },
   beforeDestroy () {
