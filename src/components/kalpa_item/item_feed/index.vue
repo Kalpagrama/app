@@ -152,7 +152,7 @@ export default {
     isVisible: {
       immediate: true,
       async handler (to, from) {
-        if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
+        // if (to) this.$log(`isVisible=${to} #${this.itemIndex}`)
         if (!this.hasItemFull) {
           if (to) this.getFullItem()
           else this.cancelItemFull()
@@ -175,6 +175,7 @@ export default {
       let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
       assert(data && data.oid, data)
       if (!data.itemFull && !data.queryId) {
+        this.$log('getFullItem', this.itemIndex, this.item.name)
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
             .then(itemFull => this.$set(data, 'itemFull', itemFull))
@@ -187,6 +188,7 @@ export default {
     cancelItemFull () {
       let data = this.data // делаем копию тк за время выполнения this.data может поменяться (virtualScroll переиспользует оболочки и засовывает в них новые данные)
       if (data.queryId) {
+        this.$log('cancelItemFull', this.itemIndex, this.item.name)
         this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid, { queryId: data.queryId, cancel: true })
             .catch(err => this.$log('err on cancel request', err))
             .finally(() => {
@@ -230,6 +232,8 @@ export default {
   },
   beforeDestroy () {
     // this.$log('beforeDestroy', this.itemIndex, this.item.name)
+    this.cancelItemFull()
+    this.cancelItemFullPreload()
   },
   beforeUpdate () {
     // this.$log('beforeUpdate', this.itemIndex, this.item.name)
