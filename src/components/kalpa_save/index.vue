@@ -54,7 +54,7 @@ export default {
   },
   props: {
     isActive: {type: Boolean},
-    itemState: {type: Object},
+    itemState: {type: Object, default: {}},
     color: {type: String, default: 'grey-9'},
     dense: {type: Boolean, default: false},
     item: {type: Object, required: true},
@@ -63,8 +63,7 @@ export default {
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      if (!this.itemState) this.itemState = {}
-      // assert(this.itemState)
+      assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
         this.$set(this.itemState, key, {

@@ -13,28 +13,9 @@
         //q-spinner-dots(v-if="!node" color="green" size="60px").fixed-center
         div(v-if="node" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           // образ
-          q-dialog(
-            v-model="itemEditorShow"
-            :maximized="false"
-            position="standard")
-            item-editor(
-              :item="newNode"
-              :publish="true"
-              @close="itemEditorShow=false")
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-            item-feed(
-              :itemShortOrFull="node"
-              :isActive="isActive"
-              :isVisible="true"
-              :showHeader="false"
-              :showActions="false"
-              :showName="false"
-              :showSpheres="false")
-            q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length").absolute-right.z-top
-            q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length").absolute-left.z-top
-            q-btn(stack round flat icon="add" no-caps color="green" :label="$t('add reflection')" @click="itemEditorShow=true").absolute-top-right.z-top
-
+            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight")
           // fullpage (description / coments / other essences)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -48,6 +29,7 @@
           // author + essence + spheres
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
             div(v-if="!pageId").row.full-width
+              q-resize-observer(@resize="imagesMaxHeight = $q.screen.height - $event.height")
               // spheres
               .row.full-width
                 .col
@@ -60,6 +42,7 @@
                   span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
                     q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"
                       align="top" dark rounded color="green") \#{{sameCompositionNodesItemsRes.items.findIndex(item=>item.oid === node.oid) + 1}} {{$t('of')}} {{sameCompositionNodesItemsRes.items.length}}
+                    q-icon(v-else name= "add" size="12px" color="green" :style=`{border: '1px solid ' + $getPaletteColor('green'), borderRadius: '6px',width: '14px', height: '12px', right: '-18px', top: '5px'}`).absolute-top-right
               // author
               q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
                 q-avatar(:size="'20px'")
@@ -98,13 +81,10 @@ import pageSimilar from './page_similar/index.vue'
 import pageComments from './page_comments/index.vue'
 import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
+import pageImages from './page_images/index.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
-import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
-import itemEditor from 'src/components/kalpa_item/item_editor'
 import cloneDeep from 'lodash/cloneDeep'
-import { ObjectApi } from 'src/api/object'
-import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageApp_node2',
@@ -115,8 +95,7 @@ export default {
     pageEssences,
     essenceActions,
     essenceSpheres,
-    itemEditor,
-    essenceVoteBall
+    pageImages
   },
   data () {
     return {
@@ -124,9 +103,8 @@ export default {
       slide: 1,
       pageId: null,
       bottomHeight: 0,
+      imagesMaxHeight: 0,
       isActive: true,
-      itemEditorShow: false,
-      sameEssenceNodesItemsRes: null, // ядра с той же сутью
       sameCompositionNodesItemsRes: null, // ядра с тем же образом
       itemState: {}
     }
@@ -140,15 +118,6 @@ export default {
           // this.$log('$route.params.oid TO', to)
           if (this.node && this.node.oid !== to) this.node = null
           this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          this.sameEssenceNodesItemsRes = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-              objectTypeEnum: { $in: ['NODE'] },
-              oidSphere: this.node.sphereFromName.oid,
-              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
-            },
-            populateObjects: false
-          })
           this.sameCompositionNodesItemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -165,7 +134,6 @@ export default {
     node (to) {
       this.$log('node to=', to)
       this.pageId = null
-      this.sameEssenceNodesItemsRes = null
       this.sameCompositionNodesItemsRes = null
       this.itemState = {}
       this.isActive = true
@@ -179,24 +147,6 @@ export default {
       else if (l < 40) return 16
       else return 14
     },
-    itemsRight () {
-      if (!this.sameEssenceNodesItemsRes) return []
-      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
-      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(indxCurrent, this.sameEssenceNodesItemsRes.items.length)
-      return []
-    },
-    itemsLeft () {
-      if (!this.sameEssenceNodesItemsRes) return []
-      let indxCurrent = this.sameEssenceNodesItemsRes.items.find(item => item.oid === this.node.oid)
-      if (indxCurrent >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, indxCurrent)
-      return []
-    },
-    newNode () {
-      if (!this.node) return null
-      let node = cloneDeep(this.node)
-      node.items = []
-      return node
-    }
   },
   methods: {},
   async mounted () {

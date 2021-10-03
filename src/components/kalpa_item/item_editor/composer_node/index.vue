@@ -64,8 +64,8 @@
         :nodeOid="node.oid")
       essence-items(
         v-if="showItems && !$slots.items && node.items.length === 2"
-        v-bind="$props").br
-      q-responsive(v-else-if="!node.items.length" :ratio="16/8").full-width.br
+        v-bind="$props")
+      q-responsive(v-else-if="!node.items.length" :ratio="16/8").full-width
         q-btn(stack no-caps round outline icon="add" color="green" size="lg"
           :label="$t('pick element for node')"
           @click="itemFinderShow = true").fit
@@ -74,6 +74,7 @@
       q-input(
         v-if="showName && node.oid"
         v-model="node.name"
+        :disable="lockName"
         color="green"
         borderless dark dense
         :placeholder="$t('enter your essence')"
@@ -134,6 +135,7 @@ export default {
     isVisible: { type: Boolean },
     showHeader: { type: Boolean, default: true },
     showName: { type: Boolean, default: true },
+    lockName: { type: Boolean, default: false },
     showAuthorAlways: { type: Boolean, default: false },
     showActions: { type: Boolean, default: true },
     showSpheres: { type: Boolean, default: true },

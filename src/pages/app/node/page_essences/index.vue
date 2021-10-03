@@ -1,3 +1,4 @@
+// сути на образ
 <template lang="pug">
   .row.full-width.items-start.content-start
     q-dialog(

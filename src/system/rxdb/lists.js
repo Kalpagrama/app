@@ -135,17 +135,8 @@ class Lists {
          }
       })
       for (let rxDoc of rxDocs) {
-         let findResult = await (new ReactiveListWithPaginationFactory()).create(rxDoc)
-         await findResult.refresh()
-         // let reactiveItem = getReactive(rxDoc).getPayload()
-         // let newItems = reactiveItem.items.filter(el => !this.isElementBlacklisted(el, blackLists))
-         // let countDiff = reactiveItem.items.length - newItems.length
-         // assert(countDiff >= 0, 'countDiff >= 0')
-         // if (countDiff) {
-         //    reactiveItem.items.splice(0, reactiveItem.items.length, ...newItems)
-         //    reactiveItem.count -= countDiff
-         //    reactiveItem.totalCount -= countDiff
-         // }
+         let findResults = (new ReactiveListWithPaginationFactory()).allReactiveGroups(rxDoc)
+         for (let findResult of findResults) await findResult.refresh()
       }
       logD(f, 'complete')
    }

@@ -1069,6 +1069,11 @@ class ReactiveListWithPaginationFactory {
       let group = rxQueryOrRxDoc.reactiveListHolderMaster[listId].group
       return group.reactiveGroup
    }
+
+   allReactiveGroups (rxQueryOrRxDoc) {
+      if (rxQueryOrRxDoc.reactiveListHolderMaster) return Object.values(rxQueryOrRxDoc.reactiveListHolderMaster).map(factory => factory.group.reactiveGroup)
+      return []
+   }
 }
 
 export {
