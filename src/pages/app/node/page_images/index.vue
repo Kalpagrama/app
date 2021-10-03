@@ -13,24 +13,29 @@
         :lockName="true"
         @close="itemEditorShow=false")
     // образ
-    div(v-if="!expanded").row.full-width.position-relative
-      q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
-        :style=`{zIndex: '50'}`
-        @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left
-      item-feed(
-        :itemShortOrFull="node"
-        :isActive="isActive"
-        :isVisible="true"
-        :showHeader="false"
-        :showActions="false"
-        :showName="false"
-        :showSpheres="false").col
-      q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
-        :style=`{zIndex: '50'}`
-        @click="goto(itemsRight[0].oid)").absolute-right
+    div(v-if="sameEssenceNodesItemsRes && !expanded" ).row.full-width.position-relative
+      //q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="green" :label="itemsLeft.length"
+      //  :style=`{zIndex: '50'}`
+      //  @click="goto(itemsLeft[itemsLeft.length - 1].oid)").absolute-left
+      q-tab-panels(
+        v-model="currentIndx"
+        :swipeable="true || $q.platform.is.mobile"
+        :animated="true || $q.platform.is.mobile").full-width
+        q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none
+          item-feed(
+            :itemShortOrFull="node"
+            :isActive="isActive"
+            :isVisible="true"
+            :showHeader="false"
+            :showActions="false"
+            :showName="false"
+            :showSpheres="false").full-width
+      //q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="green" :label="itemsRight.length"
+      //  :style=`{zIndex: '50'}`
+      //  @click="goto(itemsRight[0].oid)").absolute-right
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
-          span.text-white {{$t('Image rating')}}
+        span.text-white {{$t('Image rating')}}
       list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
@@ -90,7 +95,8 @@ export default {
     return {
       itemEditorShow: false,
       expanded: false,
-      sameEssenceNodesItemsRes: null // ядра с той же сутью
+      sameEssenceNodesItemsRes: null, // ядра с той же сутью
+      currentIndx: -1 // индекс текущего ядра в sameEssenceNodesItemsRes.items
     }
   },
   computed: {
@@ -109,10 +115,6 @@ export default {
       if (this.currentIndx >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, this.currentIndx)
       return []
     },
-    currentIndx () {
-      if (!this.sameEssenceNodesItemsRes) return -1
-      return this.sameEssenceNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
-    },
     length () {
       if (this.sameEssenceNodesItemsRes) return this.sameEssenceNodesItemsRes.items.length
       return 0
@@ -123,14 +125,19 @@ export default {
   },
   watch: {
     'sameEssenceNodesItemsRes.items' (to) {
-      this.$log('sameEssenceNodesItemsRes to', to)
+      // this.$log('sameEssenceNodesItemsRes to', to)
+      if (to && this.node) this.currentIndx = to.findIndex(item => item.oid === this.node.oid)
     },
-    node(to) {
+    node (to) {
       // this.$log('node to=', to)
+      if (to && this.sameEssenceNodesItemsRes) this.currentIndx = this.sameEssenceNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
     }
   },
   methods: {
-    async goto(oid) {
+    handleSwipe (event) {
+      this.$log('handleSwipe', event)
+    },
+    async goto (oid) {
       this.$log('goto', oid)
       let node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
       this.$emit('node', node)
