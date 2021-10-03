@@ -1,7 +1,7 @@
 // образы на суть
 <template lang="pug">
   div(:style=`{position: 'relative'}`).row.full-width
-    q-btn(round flat :icon="expanded ? 'expand_less' : 'expand_more'" color="white" :style=`{zIndex: '100'}` @click="expanded=!expanded").absolute-top-right
+    q-btn(round flat :icon="expanded ? 'expand_less' : 'expand_more'" :color="expanded ? 'green' : 'white'" :style=`{zIndex: '100'}` @click="expanded=!expanded").absolute-top-right
       //q-badge(align="bottom" dark rounded outline floating color="green") {{length}}
     q-dialog(
       v-model="itemEditorShow"
