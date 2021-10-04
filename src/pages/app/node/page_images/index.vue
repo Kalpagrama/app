@@ -13,12 +13,16 @@
         :lockName="true"
         @close="itemEditorShow=false")
     // образ
-    div(v-if="sameEssenceNodesItemsRes && !expanded" ).row.full-width.position-relative
-      q-tab-panels(
+    div(v-if="!expanded" ).row.full-width.position-relative
+      // пока не загрузились sameEssenceNodesItemsRes - показывается картинка
+      item-feed(v-if="!sameEssenceNodesItemsRes"
+        :itemShortOrFull="node" :isActive="false" :isVisible="-1"
+        :showHeader="false" :showActions="false" :showName="false" :showSpheres="false")
+      q-tab-panels(v-if="sameEssenceNodesItemsRes"
         v-model="currentIndx"
-        :swipeable="true || $q.platform.is.mobile"
-        :animated="true || $q.platform.is.mobile"
-        dark).full-width.q-pb-xs
+        :swipeable="$q.platform.is.mobile"
+        :animated="$q.platform.is.mobile"
+        dark).full-width
         q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none
           item-feed(
             :itemShortOrFull="node"
@@ -29,20 +33,23 @@
             :showName="false"
             :showSpheres="false")
       // мини-образы
-      div(:style=`{position: 'relative', maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-        q-btn(:disable="!itemsLeft.length" stack round flat icon="chevron_left" color="white" :label="itemsLeft.length"
+      div(v-if="sameEssenceNodesItemsRes").row.full-width
+        small.text-grey.text-capitalize.text-weight-thin.q-pl-xs {{$t('на смысл')}}
+        small.text-grey.text-italic.q-px-xs "{{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}"
+        small.text-grey.text-weight-thin {{$t('найдено')}}
+        small.text-green.text-bold.q-px-xs {{sameEssenceNodesItemsRes.items.length}}
+        small.text-grey.text-weight-thin {{$t('образа(ов)')}}
+      div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+        q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
           size="sm" :style=`{zIndex: '100'}` @click="currentIndx--").absolute-left
+        q-btn(round icon="add" size="sm" color="green" :style=`{borderRadius: '50%', zIndex: '100', opacity: '0.7'}` @click="itemEditorShow=true").absolute-center
         q-virtual-scroll(ref="vs" :items="dotModel" virtual-scroll-horizontal :style=`{}`).col
           template(v-slot="{ item, index: itemIndex}")
-            div(
-              :style=`{ overflow: 'hidden', height: '50px', borderRadius: '10px',
+            div(:style=`{position: 'relative', overflow: 'hidden', height: previewHeight+'px', width: previewHeight+'px', borderRadius: '10px',
                   border: currentIndx === itemIndex ? '2px solid green' : null,
-                  position: 'relative',
-                  marginLeft: '1px', marginRight: '1px',
-               }`
-              @click="currentIndx = itemIndex"
-              ).row.items-center.center-start.content-center
-              div(:style=`{maxHeight: '200px', width: '80px'}`)
+                  marginLeft: '1px', marginRight: '1px'}`
+              @click="currentIndx = itemIndex").row.items-center.center-start.content-center
+              div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
                 item-feed(
                   :itemShortOrFull="sameEssenceNodesItemsRes.items[itemIndex]"
                   :isActive="false"
@@ -50,10 +57,9 @@
                   :showHeader="false"
                   :showActions="false"
                   :showName="false"
-                  :showSpheres="false"
-                  :styles=`{}`)
+                  :showSpheres="false")
               div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
-        q-btn(:disable="!itemsRight.length" stack round flat icon="chevron_right" color="white" :label="itemsRight.length"
+        q-btn(:disable="!itemsRight.length" round flat icon="chevron_right" color="white"
           size="sm" :style=`{zIndex: '100'}` @click="currentIndx++").absolute-right
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
@@ -76,25 +82,6 @@
               template(v-slot:skeleton)
                 q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
                   q-skeleton(type="QBtn" dark).full-width
-        //.row.full-width.q-col-gutter-sm
-        //  .col-4
-        //    q-btn(round outline icon="add" color="green" @click="itemEditorShow=true").fit
-        //  div(
-        //    v-for="(sameEssenceNode, ix) in sameEssenceNodesItemsRes.items" :key="sameEssenceNode.oid"
-        //    @click="$go('/node/'+sameEssenceNode.oid)").col-4
-        //    item-feed(
-        //      :itemIndex="ix"
-        //      :itemShortOrFull="sameEssenceNode"
-        //      :isActive="false"
-        //      :isVisible="true"
-        //      :showHeader="false"
-        //      :showActions="false"
-        //      :showName="false"
-        //      :showSpheres="false"
-        //      :style=`{border: sameEssenceNode.oid === node.oid ? '2px solid green' : null, borderRadius: '12px'}`)
-        //      template(v-slot:skeleton)
-        //        q-responsive(:ratio="16/9" :style=`{borderRadius: ''}`).full-width
-        //          q-skeleton(type="QBtn" dark).full-width
 </template>
 
 <script>
@@ -113,7 +100,11 @@ export default {
   components: {
     essenceVoteBall, itemEditor, essenceSpheres, essenceActions, listMasonry
   },
-  props: ['node', 'isActive', 'maxHeight'],
+  props: {
+    node: { type: Object },
+    isActive: { type: Boolean },
+    maxHeight: { type: Number },
+  },
   data () {
     return {
       itemEditorShow: false,
@@ -149,6 +140,9 @@ export default {
       let arr = []
       for (let i = 0; i < this.length; i++) arr.push(i)
       return arr
+    },
+    previewHeight() {
+      return this.$q.screen.height / 18
     }
   },
   watch: {

@@ -28,36 +28,30 @@
               component(:is="'page-' + pageId" :node="node" :height="bottomHeight" @close="pageId=null" @itemEditorShow="isActive=!$event")
           // author + essence + spheres
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId").row.full-width.q-pt-lg
+            div(v-if="!pageId" :style=`{borderRadius: '5px', border: '1px solid rgb(40,40,40)', overflow: 'hidden'}`).row.full-width.q-mt-sm
               q-resize-observer(@resize="imagesMaxHeight = $q.screen.height - $event.height")
-              // spheres
-              .row.full-width
-                .col
-                  essence-spheres(v-if="node.spheres.length > 0" :node="node" :itemState="itemState")
-                // description expand btn
-                q-btn(v-if="node.description" round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='description'")
-              // суть
-              .row.full-width
-                .row.col.justify-center
-                  span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="pageId='essences'").text-white.cursor-pointer {{node.name}}
-                    q-badge(v-if="sameCompositionNodesItemsRes && sameCompositionNodesItemsRes.items.length > 1"
-                      align="top" dark rounded color="green") {{sameCompositionNodesItemsRes.items.length}}
-                    q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
-              // author
-              q-btn(:to="'/user/'+node.author.oid" size="sm" round flat color="grey" no-caps padding="none").q-pl-sm
-                q-avatar(:size="'20px'")
-                  img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
-                span() {{node.author.name}}
-          essence-actions(v-if="!pageId"
-            :essence="node"
-            :itemState="itemState"
-            :nodeBackgroundColor="'rgb(30,30,30)'"
-            :nodeActionsColor="'rgb(200,200,200)'"
-            :isActive="true"
-            :isVisible="true")
+              q-tab-panels(
+                v-model="currentIndx"
+                :swipeable="true || $q.platform.is.mobile"
+                :animated="true || $q.platform.is.mobile"
+                dark).full-width
+                q-tab-panel(v-for="(node,ix) in sameCompositionNodesItemsRes ? sameCompositionNodesItemsRes.items : [node]" :key="ix" :name="ix").full-width.q-pa-none
+                  page-essence(:oid="node.oid" @description="pageId='description'" @essences="pageId='essences'").q-pb-sm
+              // список других сутей
+              div(v-if="sameCompositionNodesItemsRes").row.full-width
+                q-btn(:disable="!itemsLeft.length" dense round flat icon="chevron_left" color="white"
+                  size="xs" :style=`{zIndex: '100'}` @click="currentIndx--")
+                small.text-grey.text-capitalize.text-weight-thin {{$t('еще')}}
+                small.text-green.text-bold.q-px-xs {{sameCompositionNodesItemsRes.items.length}}
+                small.text-grey.text-weight-thin {{$t('смысла(ов) на образ')}}
+                small.text-grey.text-italic.q-pl-xs "{{node.items[0].layers[0].contentName.substring(0, 12)}}{{node.items[0].layers[0].contentName.length > 12 ? '...': ''}}"
+                .col.q-px-md
+                  q-btn(dense round flat no-caps icon="add" size="xs" color="green" :label="$t('Add essence')" @click="pageId='essences'").full-width
+                q-btn(:disable="!itemsRight.length" dense round flat icon="chevron_right" color="white"
+                  size="xs" :style=`{zIndex: '100'}` @click="currentIndx++")
           // comments
           transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-            div(v-if="!pageId" @click="pageId='comments'").cursor-pointer.row.full-width.items-center.q-py-md
+            div(v-if="!pageId" @click="pageId='comments'" ).cursor-pointer.row.full-width.items-center.q-py-md
               //q-separator(dark).full-width.q-mt-md
               span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
               .col.scroll.q-px-md
@@ -71,6 +65,9 @@
                     // span() {{c.author.name}}
               q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='comments'")
               //q-separator(dark).full-width.q-mt-md
+          div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
+          small.text-grey.text-center {{$t('Ядра, связанные со смыслом')}}
+          small.text-grey.text-center.text-italic.q-px-xs "{{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}"
           page-similar(v-if="!pageId" :node="node")
 </template>
 
@@ -81,10 +78,8 @@ import pageSimilar from './page_similar/index.vue'
 import pageComments from './page_comments/index.vue'
 import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
+import pageEssence from './page_essence/index.vue'
 import pageImages from './page_images/index.vue'
-import essenceSpheres from 'src/components/essence/essence_spheres'
-import essenceActions from 'src/components/essence/essence_actions.vue'
-import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'pageApp_node2',
@@ -93,8 +88,7 @@ export default {
     pageComments,
     pageDescription,
     pageEssences,
-    essenceActions,
-    essenceSpheres,
+    pageEssence,
     pageImages
   },
   data () {
@@ -106,7 +100,7 @@ export default {
       imagesMaxHeight: 0,
       isActive: true,
       sameCompositionNodesItemsRes: null, // ядра с тем же образом
-      itemState: {}
+      currentIndx: -1 // индекс текущего ядра в sameCompositionNodesItemsRes.items
     }
   },
   watch: {
@@ -125,9 +119,9 @@ export default {
       // this.$log('node to=', to)
       this.pageId = null
       this.sameCompositionNodesItemsRes = null
-      this.itemState = {}
       this.isActive = true
       if (to) {
+        this.currentIndx = -1
         if (this.$route.params.oid !== to.oid) await this.$router.replace({ params: { oid: to.oid } })
         this.sameCompositionNodesItemsRes = await this.$rxdb.find({
           selector: {
@@ -138,6 +132,7 @@ export default {
           },
           populateObjects: false
         })
+        this.currentIndx = this.sameCompositionNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
         this.$log('sameCompositionNodesItemsRes=', this.sameCompositionNodesItemsRes)
       }
     }
@@ -149,7 +144,19 @@ export default {
       else if (l < 30) return 20
       else if (l < 40) return 16
       else return 14
-    }
+    },
+    itemsRight () {
+      if (this.currentIndx >= 0) return this.sameCompositionNodesItemsRes.items.slice(this.currentIndx + 1, this.sameCompositionNodesItemsRes.items.length)
+      return []
+    },
+    itemsLeft () {
+      if (this.currentIndx >= 0) return this.sameCompositionNodesItemsRes.items.slice(0, this.currentIndx)
+      return []
+    },
+    length () {
+      if (this.sameCompositionNodesItemsRes) return this.sameCompositionNodesItemsRes.items.length
+      return 0
+    },
   },
   methods: {},
   async mounted () {

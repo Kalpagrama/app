@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row.full-width.items-start.content-start.justify-center.q-pt-sm
+  .row.full-width.items-start.content-start.justify-center
     div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
       //.row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       tab-list-feed(
