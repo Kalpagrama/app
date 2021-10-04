@@ -44,7 +44,7 @@
                 small.text-grey.text-capitalize.text-weight-thin.q-mt-xs  {{$t('еще')}}
                 small.text-green.text-bold.q-px-xs.q-mt-xs  {{sameCompositionNodesItemsRes.items.length}}
                 small.text-grey.text-weight-thin.q-mt-xs  {{$t('смысла(ов) на образ')}}
-                small.text-grey.text-italic.q-pl-xs.q-mt-xs "{{node.items[0].layers[0].contentName.substring(0, 12)}}{{node.items[0].layers[0].contentName.length > 12 ? '...': ''}}"
+                small.text-grey.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{node.items[0].layers[0].contentName.substring(0, 12)}}{{node.items[0].layers[0].contentName.length > 12 ? '...': ''}}
                 .col.q-px-xs
                   q-btn(dense round flat no-caps no-wrap  icon="add" size="sm" color="green" :label="$t('Add essence')" @click="pageId='essences'").full-width.ellipsis
                 q-btn(:disable="!itemsRight.length" dense round flat icon="chevron_right" color="white"

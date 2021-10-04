@@ -34,10 +34,10 @@
             :showSpheres="false")
       // мини-образы
       div(v-if="sameEssenceNodesItemsRes").row.full-width
-        small.text-grey.text-capitalize.text-weight-thin.q-pl-xs {{$t('на смысл')}}
-        small.text-grey.text-italic.q-px-xs "{{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}"
+        small.text-grey.text-weight-thin.q-pl-xs {{$t('На смысл')}}
+        small.text-grey.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
         small.text-grey.text-weight-thin {{$t('найдено')}}
-        small.text-green.text-bold.q-px-xs {{sameEssenceNodesItemsRes.items.length}}
+        small.text-green.text-weight-bolder.q-px-xs {{sameEssenceNodesItemsRes.items.length}}
         small.text-grey.text-weight-thin {{$t('образа(ов)')}}
       div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
         q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
