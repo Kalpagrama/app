@@ -81,6 +81,7 @@
             item-feed(
               :itemIndex="itemIndex"
               :itemShortOrFull="item"
+              :showContext="false"
               :isActive="false"
               :isVisible="true"
               :showHeader="false"
