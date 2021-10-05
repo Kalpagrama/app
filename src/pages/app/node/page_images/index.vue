@@ -189,7 +189,7 @@ export default {
       if (to >= 0) {
         assert(this.sameEssenceNodesItemsRes && this.sameEssenceNodesItemsRes.items[to])
         this.updateImageHeight()
-        this.$refs.vs.scrollTo(to, 'center-force')
+        if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
         let node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.sameEssenceNodesItemsRes.items[to].oid)
         this.$emit('node', node)
       }
