@@ -40,7 +40,7 @@
             .row.full-width.justify-end
               div(v-if="sameCompositionNodes.length > 1" @click="pageId='essences'").row.cursor-pointer
                 small.text-green-10.text-bold.q-pr-xs.q-mt-xs  {{sameCompositionNodes.length}}
-                small.text-grey-7.text-weight-thin.q-mt-xs  {{$getNoun(sameCompositionNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
+                small.text-grey-7.text-weight-thin.q-mt-xs.q-pr-xs  {{$getNoun(sameCompositionNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                 //small(v-if="node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{node.items[0].layers[0].contentName.substring(0, 22)}}{{node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
               small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-10.text-weight-thin.q-mt-xs  {{$t('Добавить смысл на этот образ')}}
             // список других сутей
@@ -59,28 +59,11 @@
                     q-btn(:disable="!itemsRight.length" dense flat icon="chevron_right" :color="itemsRight.length ? 'grey-5':'grey-9'" :style=`{zIndex: '100', borderRadius: '50% 0px 0px 50%'}` @click="currentIndx++")
                   //template(v-slot:badge)
                   //  span(v-if="sameCompositionNodes.length > 1") {{sameCompositionNodes.length}}
-
-          //// comments
-          //div(v-if="!pageId" @click="pageId='comments'" ).cursor-pointer.row.full-width.items-center.q-py-md
-          //  //q-separator(dark).full-width.q-mt-md
-          //  span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
-          //  .col.scroll.q-px-md
-          //    div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
-          //      span.text-grey.text-weight-thin.text-italic.q-pr-md {{node.commentStat.topComment.text}}
-          //      q-btn(v-for="(c,id) in node.commentStat.randomComments" :key="id"
-          //        :to="'/user/'+c.author.oid" size="sm" round flat color="grey" no-caps padding="none"
-          //        :style=`{ whiteSpace: 'nowrap' }`).q-pl-xs
-          //        q-avatar(:size="'20px'")
-          //          img(:src="c.author.thumbUrl" :to="'/user/'+c.author.oid")
-          //        // span() {{c.author.name}}
-          //  q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="white" @click="pageId='comments'")
-          //  //q-separator(dark).full-width.q-mt-md
-
           // похожие
           //div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-          .row.full-width.q-pt-lg
+          div(v-if="!pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end
-              small.text-grey-8 {{$t('Ядра, связанные с этим смыслом')}}
+              small.text-grey-8.q-pb-xs.q-pr-xs {{$t('Ядра, связанные с этим')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}"
             page-similar(v-if="!pageId" :node="node")
 </template>
