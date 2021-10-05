@@ -39,21 +39,22 @@ div(:style=`{minHeight: '198px'}`).row.full-width
       :isActive="true"
       :isVisible="true").q-px-xl
     // comments
-    div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center.q-pt-lg
-      // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-      span.text-grey.q-pl-sm.q-py-md {{$t('Comments')}} ● {{node.countStat.countComments}}
-      .col.scroll.q-px-md
-        div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
-          span.text-grey.text-weight-thin.text-italic.q-pr-md {{node.commentStat.topComment.text}}
-          q-btn(v-for="(c,id) in node.commentStat.randomComments" :key="id"
-            :to="'/user/'+c.author.oid" size="sm" round flat color="grey" no-caps padding="none"
-            :style=`{ whiteSpace: 'nowrap' }`).q-pl-xs
-            q-avatar(:size="'20px'" :style=`{position:'relative', overflow: 'hidden'}`)
-              img(:src="c.author.thumbUrl" :to="'/user/'+c.author.oid")
-              div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
-            // span() {{c.author.name}}
-      q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="$emit('comments')")
-      //q-separator(dark).full-width.q-mt-md
+    .row.full-width.content-end.q-pb-xs
+      div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center
+        // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
+        span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
+        .col.scroll.q-px-md
+          div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
+            span.text-grey.text-weight-thin.text-italic.q-pr-md {{node.commentStat.topComment.text}}
+            q-btn(v-for="(c,id) in node.commentStat.randomComments" :key="id"
+              :to="'/user/'+c.author.oid" size="sm" round flat color="grey" no-caps padding="none"
+              :style=`{ whiteSpace: 'nowrap' }`).q-pl-xs
+              q-avatar(:size="'20px'" :style=`{position:'relative', overflow: 'hidden'}`)
+                img(:src="c.author.thumbUrl" :to="'/user/'+c.author.oid")
+                div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
+              // span() {{c.author.name}}
+        q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="$emit('comments')")
+        //q-separator(dark).full-width.q-mt-md
   div(v-else).row.full-width.q-px-sm
     .row.full-width.items-center
       q-skeleton(v-for="(i, ix) in 4" type="text" dark animation="none" :style=`{height: '20px'}`).col.q-mx-xs
