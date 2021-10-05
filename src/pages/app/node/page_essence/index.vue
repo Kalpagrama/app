@@ -42,10 +42,11 @@ div(:style=`{minHeight: '198px'}`).row.full-width
     .row.full-width.content-end
       div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center
         // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-        span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
+        span.text-grey-5.q-px-sm {{$t('Comments')}}
+        span.text-grey-8 {{node.countStat.countComments}}
         .col.scroll.q-px-md
           div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
-            span.text-grey.text-weight-thin.text-italic.q-pr-md {{node.commentStat.topComment.text}}
+            span.text-grey.text-weight-thin.text-italic.ellipsis.q-pr-md {{node.commentStat.topComment.text}}
             q-btn(v-for="(c,id) in node.commentStat.randomComments" :key="id"
               :to="'/user/'+c.author.oid" size="sm" round flat color="grey" no-caps padding="none"
               :style=`{ whiteSpace: 'nowrap' }`).q-pl-xs

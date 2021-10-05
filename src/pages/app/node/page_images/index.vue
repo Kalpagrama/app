@@ -43,7 +43,7 @@
       div(v-if="sameEssenceNodesItemsRes" @click="expanded=true").row.full-width.justify-start.cursor-pointer
         small.text-grey-8.text-weight-thin.q-pl-xs {{$t('На смысл')}}
         small.text-grey-8.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
-        small.text-grey-8.text-weight-thin {{$t('найдено')}}
+        small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodesItemsRes.items.length,$t('найден'),$t('найдено'),$t('найдено'))}}
         small.text-green-10.text-weight-bolder.q-px-xs {{sameEssenceNodesItemsRes.items.length}}
         small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodesItemsRes.items.length, $t('образ'), $t('образа'), $t('образов'))}}
       small(v-else).row.full-width ...

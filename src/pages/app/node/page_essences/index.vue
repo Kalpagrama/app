@@ -8,7 +8,7 @@
       item-editor(
         :item="newNode"
         :publish="true"
-        @close="itemEditorShow=false")
+        @close="$event?$go('/node/'+$event.oid):null, $event?$emit('close'):null, itemEditorShow=false")
     q-dialog(
       v-model="itemPreviewShow"
       :maximized="false"

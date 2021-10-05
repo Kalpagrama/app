@@ -19,7 +19,7 @@
             item-editor(
               :item="newNode"
               :publish="true"
-              @close="itemEditorShow=false")
+              @close="node = $event ? $event : node, itemEditorShow=false")
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
@@ -166,6 +166,9 @@ export default {
       this.pageId = null
       this.isActive = true
       this.compositionOid = to?.items[0].oid
+      if (to && this.sameCompositionNodes) {
+        this.currentIndx = this.sameCompositionNodes.findIndex(item => item.oid === to.oid)
+      } else this.currentIndx = -1
       if (to && this.$route.params.oid !== to.oid) await this.$router.replace({ params: { oid: to.oid } })
     },
     async currentIndx (to) {
@@ -200,9 +203,10 @@ export default {
       return []
     },
     sameCompositionNodes () {
-      if (this.sameCompositionNodesItemsRes) {
-        assert(this.node)
+      // this.$log('sameCompositionNodes calc', this?.node?.oid, cloneDeep(this?.sameCompositionNodesItemsRes?.items))
+      if (this.sameCompositionNodesItemsRes && this.node) {
         let indxCurrent = this.sameCompositionNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
+        this.$log('sameCompositionNodes calc2', indxCurrent)
         if (indxCurrent === -1) return [this.node, ...this.sameCompositionNodesItemsRes.items]
         else return this.sameCompositionNodesItemsRes.items
       } else if (this.node) return [this.node]
