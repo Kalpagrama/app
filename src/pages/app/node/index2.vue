@@ -187,13 +187,6 @@ export default {
       // node.spheres = []
       return node
     },
-    fontSize () {
-      let l = this.node.name.length
-      if (l < 20) return 22
-      else if (l < 30) return 20
-      else if (l < 40) return 16
-      else return 14
-    },
     itemsRight () {
       if (this.currentIndx >= 0) return this.sameCompositionNodes.slice(this.currentIndx + 1, this.sameCompositionNodes.length)
       return []
