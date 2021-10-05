@@ -11,11 +11,12 @@ div(
     //- top/opened
     div(
       v-show="data.heightMax > 0"
-      :style=`{overflow: 'hidden',}`
+      :style=`{overflow: 'hidden', position: 'relative'}`
       ).col.full-width
+      q-spinner(v-if="!data.contentKalpa" size="50px" color="green").absolute-center
       div(
         v-if="data.contentKalpa"
-        :style=`{overflow: 'hidden',}`
+        :style=`{overflow: 'hidden'}`
         @click.self="miniClick()"
         ).row.fit.items-start.content-start
         //- name

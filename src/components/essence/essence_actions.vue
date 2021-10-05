@@ -22,9 +22,9 @@
     div(
       :style=`{
       position: 'relative',
-      height: '66px',
+      // height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-start.contnet-start.q-pt-sm
+    }`).row.full-width.items-start.contnet-start
       //- share
       .col
         .row.full-width

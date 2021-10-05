@@ -35,6 +35,7 @@
       composition(
         v-if="showItems && !$slots.items && node.items.length === 1"
         :composition="node.items[0]"
+        :showContext="showContext"
         :itemState="data"
         :isVisible="isVisible"
         :isActive="isActive"
@@ -119,6 +120,7 @@ export default {
     showSpheresAlways: { type: Boolean, default: false },
     showCategory: { type: Boolean, default: true },
     showItems: { type: Boolean, default: true },
+    showContext: { type: Boolean },
     orderHeader: { type: Number, default: -1 },
     orderName: { type: Number, default: 1 },
     orderSpheres: { type: Number, default: 2 },

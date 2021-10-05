@@ -97,6 +97,22 @@ export default async ({ Vue, store, router: VueRouter }) => {
       Vue.prototype.$random = function (min, max) {
          return Math.floor(Math.random() * (max - min + 1)) + min
       }
+      // alert("4 " + getNoun(4, 'слон', 'слона', 'слонов')) ->>>>  4 слона
+      Vue.prototype.$getNoun = function (number, one, two, five) {
+         let n = Math.abs(number);
+         n %= 100;
+         if (n >= 5 && n <= 20) {
+            return five;
+         }
+         n %= 10;
+         if (n === 1) {
+            return one;
+         }
+         if (n >= 2 && n <= 4) {
+            return two;
+         }
+         return five;
+      }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
       // App go, last position, and feeds refresh...
