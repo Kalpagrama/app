@@ -54,9 +54,9 @@
                 :key="ix" :name="ix").full-width.q-pa-none
                 page-essence(:oid="n.oid" @description="pageId='description'" @essences="pageId='essences'" @comments="pageId='comments'")
                   template(v-slot:left)
-                    q-btn(:disable="!itemsLeft.length" dense flat icon="chevron_left" color="white" :style=`{zIndex: '100', borderRadius: '0px 50% 50% 0px'}` @click="currentIndx--")
+                    q-btn(:disable="!itemsLeft.length" dense flat icon="chevron_left" :color="itemsLeft.length ? 'grey-5':'grey-9'" :style=`{zIndex: '100', borderRadius: '0px 50% 50% 0px'}` @click="currentIndx--")
                   template(v-slot:right)
-                    q-btn(:disable="!itemsRight.length" dense flat icon="chevron_right" color="white" :style=`{zIndex: '100', borderRadius: '50% 0px 0px 50%'}` @click="currentIndx++")
+                    q-btn(:disable="!itemsRight.length" dense flat icon="chevron_right" :color="itemsRight.length ? 'grey-5':'grey-9'" :style=`{zIndex: '100', borderRadius: '50% 0px 0px 50%'}` @click="currentIndx++")
                   //template(v-slot:badge)
                   //  span(v-if="sameCompositionNodes.length > 1") {{sameCompositionNodes.length}}
           //// comments
