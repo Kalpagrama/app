@@ -40,7 +40,7 @@
                 :showName="false"
                 :showSpheres="false")
       // мини-образы
-      div(v-if="sameEssenceNodesItemsRes" @click="expanded=true").row.full-width.justify-end.cursor-pointer
+      div(v-if="sameEssenceNodesItemsRes" @click="expanded=true").row.full-width.justify-start.cursor-pointer
         small.text-grey-8.text-weight-thin.q-pl-xs {{$t('На смысл')}}
         small.text-grey-8.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
         small.text-grey-8.text-weight-thin {{$t('найдено')}}
