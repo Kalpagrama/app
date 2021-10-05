@@ -42,7 +42,7 @@
                 small.text-green-10.text-bold.q-pr-xs.q-mt-xs  {{sameCompositionNodes.length}}
                 small.text-grey-7.text-weight-thin.q-mt-xs  {{$getNoun(sameCompositionNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                 //small(v-if="node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{node.items[0].layers[0].contentName.substring(0, 22)}}{{node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
-              div(v-else) ...
+              small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-10.text-weight-thin.q-mt-xs  {{$t('Добавить смысл на этот образ')}}
             // список других сутей
             q-tab-panels(
               v-model="currentIndx"
