@@ -49,7 +49,7 @@
               :swipeable="true || $q.platform.is.mobile"
               :animated="true || $q.platform.is.mobile"
               dark
-              :style=`{borderRadius: '5px', border: '1px solid rgb(40,40,40)', overflow: 'hidden'}`).full-width
+              :style=`{borderRadius: '10px', border: '1px solid rgb(40,40,40)', overflow: 'hidden'}`).full-width
               q-tab-panel(v-for="(n,ix) in sameCompositionNodes"
                 :key="ix" :name="ix").full-width.q-pa-none
                 page-essence(:oid="n.oid" @description="pageId='description'" @essences="pageId='essences'" @comments="pageId='comments'")
