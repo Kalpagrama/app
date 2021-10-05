@@ -39,7 +39,7 @@ div(:style=`{minHeight: '198px'}`).row.full-width
       :isActive="true"
       :isVisible="true").q-px-xl
     // comments
-    .row.full-width.content-end.q-pb-xs
+    .row.full-width.content-end
       div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center
         // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
         span.text-grey.q-pl-sm {{$t('Comments')}} ● {{node.countStat.countComments}}
