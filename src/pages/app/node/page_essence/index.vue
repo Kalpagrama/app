@@ -40,7 +40,7 @@ div(:style=`{minHeight: '198px'}`).row.full-width
       :isVisible="true").q-px-xl
     // comments
     div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center.q-pt-lg
-      div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
+      // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
       span.text-grey.q-pl-sm.q-py-md {{$t('Comments')}} ● {{node.countStat.countComments}}
       .col.scroll.q-px-md
         div(v-if="node.commentStat.topComment").row.full-width.items-center.content-center.no-wrap
