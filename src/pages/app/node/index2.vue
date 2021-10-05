@@ -59,6 +59,7 @@
                     q-btn(:disable="!itemsRight.length" dense flat icon="chevron_right" :color="itemsRight.length ? 'grey-5':'grey-9'" :style=`{zIndex: '100', borderRadius: '50% 0px 0px 50%'}` @click="currentIndx++")
                   //template(v-slot:badge)
                   //  span(v-if="sameCompositionNodes.length > 1") {{sameCompositionNodes.length}}
+
           //// comments
           //div(v-if="!pageId" @click="pageId='comments'" ).cursor-pointer.row.full-width.items-center.q-py-md
           //  //q-separator(dark).full-width.q-mt-md
@@ -175,7 +176,7 @@ export default {
     }
   },
   computed: {
-    newNode() {
+    newNode () {
       // this.$log('resetNewNode ')
       let node = cloneDeep(this.node)
       node.name = ''
@@ -199,14 +200,20 @@ export default {
       return []
     },
     sameCompositionNodes () {
-      return this?.sameCompositionNodesItemsRes?.items?.length ? this.sameCompositionNodesItemsRes.items : this.node ? [this.node] : []
+      if (this.sameCompositionNodesItemsRes) {
+        assert(this.node)
+        let indxCurrent = this.sameCompositionNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
+        if (indxCurrent === -1) return [this.node, ...this.sameCompositionNodesItemsRes.items]
+        else return this.sameCompositionNodesItemsRes.items
+      } else if (this.node) return [this.node]
+      else return []
+      // return this?.sameCompositionNodesItemsRes?.items?.length ? this.sameCompositionNodesItemsRes.items : this.node ? [this.node] : []
     },
     length () {
       return this.sameCompositionNodes.length
     }
   },
-  methods: {
-  },
+  methods: {},
   async mounted () {
     this.$log('mounted')
   },
