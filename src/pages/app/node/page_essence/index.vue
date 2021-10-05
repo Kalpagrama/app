@@ -7,7 +7,7 @@ div(:style=`{minHeight: '198px'}`).row.full-width
     div(:style=`{}`).row.absolute-right
       slot(name="right")
     // description expand btn
-    q-btn(v-if="true || node.description" round flat dense icon="expand_more" color="grey-5" @click="$emit('description')" :style=`{zIndex: '100'}`).absolute-top-right
+    q-btn(v-if="node.description" round flat dense icon="expand_more" color="grey-5" @click="$emit('description')" :style=`{zIndex: '100'}`).absolute-top-right
     // сферы + суть
     .row.full-width
       .row.full-width.col

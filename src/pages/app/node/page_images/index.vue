@@ -49,7 +49,7 @@
       small(v-else).row.full-width ...
       div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
         q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
-          size="sm" :style=`{zIndex: '100'}` @click="currentIndx--").absolute-left
+          size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="currentIndx--").absolute-left
         //q-btn(round icon="add" size="sm" color="green" :style=`{borderRadius: '50%', zIndex: '100', opacity: '0.7'}` @click="itemEditorShow=true").absolute-center
         q-virtual-scroll(ref="vs" :items="dotModel" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}`).col
           template(v-slot="{ item, index: itemIndex}")
@@ -69,7 +69,7 @@
                   :showSpheres="false")
               div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
         q-btn(:disable="!itemsRight.length" round flat icon="chevron_right" color="white"
-          size="sm" :style=`{zIndex: '100'}` @click="currentIndx++").absolute-right
+          size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="currentIndx++").absolute-right
     div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
         span.text-white {{$t('Image rating')}}
