@@ -63,6 +63,7 @@
           'text-bold': node.name.length < 20
         }`
         ).text-white {{ nodeName }}
+          q-badge(v-if="node.items[0].countStat.countNodes" align="top" dark rounded color="green") {{node.items[0].countStat.countNodes}}
       //- SPHERES
       essence-spheres(
         v-if="showSpheres && node.spheres.length > 0"
