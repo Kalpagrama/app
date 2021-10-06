@@ -119,10 +119,9 @@ export default {
     },
     sameCompositionNodes: {
       handler (to, from) {
-        // this.$log('sameCompositionNodes to', cloneDeep(to))
-        if (to) {
-          this.currentIndx = to.findIndex(item => item.oid === this.node.oid)
-        } else this.currentIndx = -1
+        // this.$log('sameCompositionNodes to', to, JSON.parse(JSON.stringify(to)), cloneDeep(to))
+        if (to && this.node) this.currentIndx = to.findIndex(item => item.oid === this.node.oid)
+        else this.currentIndx = -1
       }
     },
     compositionOid: { // изменилась композиция
@@ -149,9 +148,8 @@ export default {
       this.pageId = null
       this.isActive = true
       this.compositionOid = to?.items[0].oid
-      if (to && this.sameCompositionNodes) {
-        this.currentIndx = this.sameCompositionNodes.findIndex(item => item.oid === to.oid)
-      } else this.currentIndx = -1
+      if (to) this.currentIndx = this.sameCompositionNodes.findIndex(item => item.oid === to.oid)
+      else this.currentIndx = -1
       if (to && this.$route.params.oid !== to.oid) await this.$router.replace({ params: { oid: to.oid } })
     },
     async currentIndx (to) {
@@ -180,14 +178,15 @@ export default {
     },
     sameCompositionNodes () {
       // this.$log('sameCompositionNodes calc', this?.node?.oid, cloneDeep(this?.sameCompositionNodesItemsRes?.items))
+      let res = []
       if (this.sameCompositionNodesItemsRes && this.node) {
-        let indxCurrent = this.sameCompositionNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
-        this.$log('sameCompositionNodes calc2', indxCurrent)
-        if (indxCurrent === -1) return [this.node, ...this.sameCompositionNodesItemsRes.items]
-        else return this.sameCompositionNodesItemsRes.items
-      } else if (this.node) return [this.node]
-      else return []
-      // return this?.sameCompositionNodesItemsRes?.items?.length ? this.sameCompositionNodesItemsRes.items : this.node ? [this.node] : []
+        let itemsCopy = [...this.sameCompositionNodesItemsRes.items]
+        let indx = itemsCopy.findIndex(item => item.oid === this.node.oid)
+        if (indx >= 0) itemsCopy.splice(indx, 1, this.node) // this.node уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились sameEssenceNodesItemsRes))
+        else itemsCopy.unshift(this.node) // почему-то в sameCompositionNodesItemsRes не оказалось нашего ядра...
+        res = itemsCopy
+      } else if (this.node) res = [this.node]
+      return res
     },
     length () {
       return this.sameCompositionNodes.length

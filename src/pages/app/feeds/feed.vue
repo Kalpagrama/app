@@ -33,7 +33,7 @@
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling")
+                :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>

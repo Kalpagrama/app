@@ -77,7 +77,7 @@
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling").q-pb-sm
+                :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>

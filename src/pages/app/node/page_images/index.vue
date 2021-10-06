@@ -21,18 +21,14 @@
         // item
         .row.full-width.absolute-bottom
           q-resize-observer(@resize="imageHeightReal = $event.height")
-          // пока не загрузились sameEssenceNodesItemsRes - показывается картинка
-          item-feed(v-if="!sameEssenceNodesItemsRes"
-            :itemShortOrFull="node" :isActive="false" :isVisible="-1"
-            :showHeader="false" :showActions="false" :showName="false" :showSpheres="false")
-          q-tab-panels(v-if="sameEssenceNodesItemsRes"
+          q-tab-panels(v-if="sameEssenceNodes.length"
             v-model="currentIndx"
             :swipeable="$q.platform.is.mobile"
             :animated="$q.platform.is.mobile"
             dark).full-width
-            q-tab-panel(v-for="(node,ix) in sameEssenceNodesItemsRes.items" :key="ix" :name="ix").full-width.q-pa-none.b-0
+            q-tab-panel(v-for="(n,ix) in sameEssenceNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
               item-feed(
-                :itemShortOrFull="node"
+                :itemShortOrFull="n"
                 :isActive="isActive && currentIndx === ix"
                 :isVisible="currentIndx === ix"
                 :showHeader="false"
@@ -40,18 +36,18 @@
                 :showName="false"
                 :showSpheres="false")
       // мини-образы
-      div(v-if="sameEssenceNodesItemsRes" @click="expanded=true").row.full-width.justify-start.cursor-pointer
+      div(v-if="sameEssenceNodes.length" @click="expanded=true").row.full-width.justify-start.cursor-pointer
         small.text-grey-8.text-weight-thin.q-pl-xs {{$t('На смысл')}}
         small.text-grey-8.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
-        small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodesItemsRes.items.length,$t('найден'),$t('найдено'),$t('найдено'))}}
-        small.text-green-10.text-weight-bolder.q-px-xs {{sameEssenceNodesItemsRes.items.length}}
-        small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodesItemsRes.items.length, $t('образ'), $t('образа'), $t('образов'))}}
+        small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodes.length,$t('найден'),$t('найдено'),$t('найдено'))}}
+        small.text-green-10.text-weight-bolder.q-px-xs {{sameEssenceNodes.length}}
+        small.text-grey-8.text-weight-thin {{$getNoun(sameEssenceNodes.length, $t('образ'), $t('образа'), $t('образов'))}}
       small(v-else).row.full-width ...
       div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
         q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
           size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="currentIndx--").absolute-left
         //q-btn(round icon="add" size="sm" color="green" :style=`{borderRadius: '50%', zIndex: '100', opacity: '0.7'}` @click="itemEditorShow=true").absolute-center
-        q-virtual-scroll(ref="vs" :items="dotModel" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}`).col
+        q-virtual-scroll(ref="vs" :items="sameEssenceNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}`).col
           template(v-slot="{ item, index: itemIndex}")
             div(:style=`{position: 'relative', overflow: 'hidden', height: previewHeight+'px', width: (previewHeight*1.618)+'px', borderRadius: '10px',
                   border: currentIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
@@ -59,21 +55,22 @@
               @click="currentIndx = itemIndex").row.items-center.center-start.content-center
               div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
                 item-feed(
-                  :itemShortOrFull="sameEssenceNodesItemsRes.items[itemIndex]"
+                  :itemShortOrFull="item"
                   :showContext="false"
                   :isActive="false"
-                  :isVisible="true"
+                  :isVisible="false"
                   :showHeader="false"
                   :showActions="false"
                   :showName="false"
                   :showSpheres="false")
               div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
+              q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
         q-btn(:disable="!itemsRight.length" round flat icon="chevron_right" color="white"
           size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="currentIndx++").absolute-right
-    div(v-else-if="sameEssenceNodesItemsRes" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
+    div(v-else-if="sameEssenceNodes.length" :style=`{maxHeight: maxHeight + 'px'}`).scroll.full-width
       q-btn(round flat).full-width
         span.text-white {{$t('Image rating')}}
-      list-masonry(v-if="sameEssenceNodesItemsRes" itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodesItemsRes.items]")
+      list-masonry(itemKey="oid" :items="[{oid: 'addBtn'}, ...sameEssenceNodes]")
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline no-caps icon="add" color="green" @click="itemEditorShow=true").fit
@@ -123,7 +120,8 @@ export default {
       itemEditorShow: false,
       expanded: false,
       sameEssenceNodesItemsRes: null, // ядра с той же сутью
-      currentIndx: -1 // индекс текущего ядра в sameEssenceNodesItemsRes.items
+      currentIndx: -1, // индекс текущего ядра в sameEssenceNodes
+      waitIndx: -1 // на какой превьюшке показывать спиннер
     }
   },
   computed: {
@@ -135,43 +133,50 @@ export default {
       return node
     },
     itemsRight () {
-      if (this.currentIndx >= 0) return this.sameEssenceNodesItemsRes.items.slice(this.currentIndx + 1, this.sameEssenceNodesItemsRes.items.length)
+      if (this.currentIndx >= 0) return this.sameEssenceNodes.slice(this.currentIndx + 1, this.sameEssenceNodes.length)
       return []
     },
     itemsLeft () {
-      if (this.currentIndx >= 0) return this.sameEssenceNodesItemsRes.items.slice(0, this.currentIndx)
+      if (this.currentIndx >= 0) return this.sameEssenceNodes.slice(0, this.currentIndx)
       return []
     },
     length () {
-      if (this.sameEssenceNodesItemsRes) return this.sameEssenceNodesItemsRes.items.length
-      return 0
+      return this.sameEssenceNodes.length
     },
     itemWidth () {
       return Math.min(this.$q.screen.width, this.$store.state.ui.pageWidth) / 3
     },
-    dotModel () {
-      let arr = []
-      for (let i = 0; i < this.length; i++) arr.push(i)
-      return arr
-    },
     previewHeight () {
       return this.$q.screen.height / 18
+    },
+    sameEssenceNodes () {
+      // this.$log('sameCompositionNodes calc', this?.node?.oid, cloneDeep(this?.sameEssenceNodesItemsRes?.items))
+      let res = []
+      if (this.sameEssenceNodesItemsRes && this.node) {
+        let itemsCopy = [...this.sameEssenceNodesItemsRes.items]
+        let indx = itemsCopy.findIndex(item => item.oid === this.node.oid)
+        if (indx >= 0) itemsCopy.splice(indx, 1, this.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились sameEssenceNodesItemsRes))
+        else itemsCopy.unshift(this.node) // почему-то в sameCompositionNodesItemsRes не оказалось нашего ядра...
+        res = itemsCopy
+      } else if (this.node) res = [this.node]
+      return res
     }
   },
   watch: {
-    'sameEssenceNodesItemsRes.items' (to) {
-      // this.$log('sameEssenceNodesItemsRes to', to)
+    sameEssenceNodes (to) {
+      // this.$log('sameEssenceNodes to', to)
       if (to && this.node) this.currentIndx = to.findIndex(item => item.oid === this.node.oid)
+      else this.currentIndx = -1
     },
     node (to) {
       // this.$log('node to=', to)
-      if (to && this.sameEssenceNodesItemsRes) this.currentIndx = this.sameEssenceNodesItemsRes.items.findIndex(item => item.oid === this.node.oid)
+      if (to) this.currentIndx = this.sameEssenceNodes.findIndex(item => item.oid === to.oid)
+      else this.currentIndx = -1
     },
     'node.sphereFromName.oid': {
       immediate: true,
       async handler (to, from) {
         this.sameEssenceNodesItemsRes = null
-        this.currentIndx = -1
         if (to) {
           this.sameEssenceNodesItemsRes = await this.$rxdb.find({
             selector: {
@@ -187,14 +192,16 @@ export default {
     },
     async currentIndx (to) {
       if (to >= 0) {
-        assert(this.sameEssenceNodesItemsRes && this.sameEssenceNodesItemsRes.items[to])
-        this.updateImageHeight()
-        if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
-        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.sameEssenceNodesItemsRes.items[to].oid)
+        assert(this.sameEssenceNodes[to])
+        this.waitIndx = to
+        this.updateImageHeight() // задерживаем debounce (чтобы при листании не менялась высота образа)
+        let node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.sameEssenceNodes[to].oid)
         this.$emit('node', node)
+        this.waitIndx = -1
+        if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
       }
     },
-    imageHeightReal(to) {
+    imageHeightReal (to) {
       this.updateImageHeight()
     }
   },
