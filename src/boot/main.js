@@ -51,6 +51,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
       const f = { nameExtra: 'boot::main' }
       logD(f, 'start')
       const t1 = performance.now()
+      Vue.prototype.$bus = new Vue({}) // event bus
       // Vue.use(VueVirtualScroller)
       // Vue.use(VueShowdown, {
       //   flavor: 'github',
@@ -120,12 +121,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
       Vue.prototype.$go = function (to) {
          if (isEqual(goLast, to)) {
             console.log('$go DUPLICATE')
-            console.log('$go listFeedGoToStart')
-            this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
-            // Handle if there is no listFeed component to set back to false...
-            this.$wait(1000).then(() => {
-               this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
-            })
             this.$router.push(to).catch(e => e)
          } else {
             this.$log('$go FRESH', to, goLast)

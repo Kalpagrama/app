@@ -10,6 +10,7 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
+          ref="listFeed"
           :type="'customPPV'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
@@ -83,6 +84,17 @@ export default {
         populateObjects: false,
       }
     }
+  },
+  methods: {
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
+    }
+  },
+  mounted () {
+    this.$bus.$on('btn-trends-clicked', this.onBusEvent)
+  },
+  beforeDestroy () {
+    this.$bus.$off('btn-trends-clicked', this.onBusEvent)
   }
 }
 </script>

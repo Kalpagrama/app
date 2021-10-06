@@ -17,6 +17,7 @@
               :bookmark="bookmarkSelected"
               @close="bookmarkEditorShow = false, bookmarkSelected = null")
           tab-list-feed(
+            ref="listFeed"
             :type="'customPPV'"
             :scrollAreaHeight="0"
             :navHeaderText="$t('Feed')"
@@ -49,6 +50,9 @@ export default {
     }
   },
   methods: {
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
+    }
   },
   computed: {
     scrollAreaHeight () {
@@ -70,9 +74,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$bus.$on('btn-home-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$bus.$off('btn-home-clicked', this.onBusEvent)
   }
 }
 </script>

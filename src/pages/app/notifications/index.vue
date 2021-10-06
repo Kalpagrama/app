@@ -11,6 +11,7 @@
           //- user
           tab-list-feed(
             v-if="!$store.getters.isGuest && sphereOid"
+            ref="listFeed"
             :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
             :navHeaderText="$t('Activity')"
             searchInputState="disabled"
@@ -59,8 +60,19 @@ export default {
   },
   methods: {
     headerClick () {
-      this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
+      // this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
+    },
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
     }
   },
+  mounted () {
+    this.$log('mounted')
+    this.$bus.$on('btn-notifications-clicked', this.onBusEvent)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.$bus.$off('btn-notifications-clicked', this.onBusEvent)
+  }
 }
 </script>

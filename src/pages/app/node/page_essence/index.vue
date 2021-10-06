@@ -1,5 +1,6 @@
 // сферы + суть + автор + голосовалка
 <template lang="pug">
+// высота задается чтобы при смене болванки на реальный элемент не было скачков
 div(:style=`{minHeight: '215px'}`).row.full-width
   div(v-if="node" :style=`{minHeight: '215px', position: 'relative'}`).row.full-width
     div(:style=`{}`).row.absolute-left

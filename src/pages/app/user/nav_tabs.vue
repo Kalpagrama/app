@@ -73,7 +73,7 @@ export default {
   methods: {
     tabClick (t) {
       this.$log('tabClick', t)
-      this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
+      // this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
     }
   },
 }
