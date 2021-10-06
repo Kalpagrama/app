@@ -183,6 +183,7 @@ export default {
     'node.sphereFromName.oid': {
       immediate: true,
       async handler (to, from) {
+        // this.$log('node.sphereFromName.oid to', to)
         this.sameEssenceNodesItemsRes = null
         if (to) {
           this.sameEssenceNodesItemsRes = await this.$rxdb.find({
@@ -198,6 +199,7 @@ export default {
       }
     },
     async currentIndx (to) {
+      // this.$log('currentIndx to', to)
       if (to >= 0) {
         assert(this.sameEssenceNodes[to])
         this.waitIndx = to

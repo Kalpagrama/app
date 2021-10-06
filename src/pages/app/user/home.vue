@@ -38,7 +38,7 @@
             :pageId="pageId"
             :query="query"
             :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-            :itemActivePersist="false"
+            :itemActivePersist="true"
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)
