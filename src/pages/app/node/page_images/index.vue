@@ -47,7 +47,7 @@
         q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
           size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="currentIndx--").absolute-left
         //q-btn(round icon="add" size="sm" color="green" :style=`{borderRadius: '50%', zIndex: '100', opacity: '0.7'}` @click="itemEditorShow=true").absolute-center
-        q-virtual-scroll(ref="vs" :items="sameEssenceNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}`).col
+        q-virtual-scroll(ref="vs" :items="sameEssenceNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
           template(v-slot="{ item, index: itemIndex}")
             div(:style=`{position: 'relative', overflow: 'hidden', height: previewHeight+'px', width: (previewHeight*1.618)+'px', borderRadius: '10px',
                   border: currentIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
@@ -58,7 +58,7 @@
                   :itemShortOrFull="item"
                   :showContext="false"
                   :isActive="false"
-                  :isVisible="false"
+                  :isVisible="true"
                   :showHeader="false"
                   :showActions="false"
                   :showName="false"
@@ -74,13 +74,19 @@
         template(v-slot:item=`{item, itemIndex}`)
           q-responsive(v-if="item.oid == 'addBtn'" :ratio="16/9" :style=`{borderRadius: ''}`).full-width
             q-btn(round outline no-caps icon="add" color="green" @click="itemEditorShow=true").fit
-          div(v-else @click="currentIndx = itemIndex-1, expanded=false").full-width
+          div(v-else
+            :accessKey="`${item.oid}-${itemIndex}`"
+            v-observe-visibility=`{
+              throttle: 150,
+              callback: masonryItemVisibilityCallback,
+            }`
+            @click="currentIndx = itemIndex-1, expanded=false").full-width
             item-feed(
               :itemIndex="itemIndex"
               :itemShortOrFull="item"
               :showContext="false"
               :isActive="false"
-              :isVisible="true"
+              :isVisible="masonryVisibleItems[item.oid]"
               :showHeader="false"
               :showActions="false"
               :showName="false"
@@ -121,7 +127,8 @@ export default {
       expanded: false,
       sameEssenceNodesItemsRes: null, // ядра с той же сутью
       currentIndx: -1, // индекс текущего ядра в sameEssenceNodes
-      waitIndx: -1 // на какой превьюшке показывать спиннер
+      waitIndx: -1, // на какой превьюшке показывать спиннер
+      masonryVisibleItems: {}
     }
   },
   computed: {
@@ -205,7 +212,17 @@ export default {
       this.updateImageHeight()
     }
   },
-  methods: {},
+  methods: {
+    onVsScroll (details) {
+      // this.$log('onVsScroll', details.index)
+      // this.$log('onVsScroll range', details.from, details.to)
+    },
+    masonryItemVisibilityCallback (isVisible, entry) {
+      let [oid, index] = entry.target.accessKey.split('-')
+      this.$log('masonryItemVisibilityCallback', isVisible, oid, index)
+      this.$set(this.masonryVisibleItems, oid, isVisible)
+    },
+  },
   async created () {
     this.$log('created ')
     this.updateImageHeight = debounce(() => {
