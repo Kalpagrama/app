@@ -77,7 +77,8 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE', 'BLOCK'] },
           oidSphere: this.pageInfo.rootPageId,
-          sortStrategy: 'AGE' // 'ACTIVITY', // AGE
+          sortStrategy: 'AGE', // 'ACTIVITY', // AGE
+          stack: 'item0'
         },
         populateObjects: false,
       }
