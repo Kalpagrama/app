@@ -35,6 +35,7 @@
       composition(
         v-if="showItems && !$slots.items && node.items.length === 1"
         :composition="node.items[0]"
+        :showContext="showContext"
         :itemState="data"
         :isVisible="isVisible"
         :isActive="isActive"
@@ -62,6 +63,7 @@
           'text-bold': node.name.length < 20
         }`
         ).text-white {{ nodeName }}
+          q-badge(v-if="node.items[0].countStat.countNodes>1" align="top" dark rounded color="green") {{node.items[0].countStat.countNodes}}
       //- SPHERES
       essence-spheres(
         v-if="showSpheres && node.spheres.length > 0"
@@ -119,6 +121,7 @@ export default {
     showSpheresAlways: { type: Boolean, default: false },
     showCategory: { type: Boolean, default: true },
     showItems: { type: Boolean, default: true },
+    showContext: { type: Boolean },
     orderHeader: { type: Number, default: -1 },
     orderName: { type: Number, default: 1 },
     orderSpheres: { type: Number, default: 2 },
@@ -136,7 +139,6 @@ export default {
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      // if (!this.itemState) this.itemState = {}
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {

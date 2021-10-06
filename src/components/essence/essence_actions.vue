@@ -22,9 +22,9 @@
     div(
       :style=`{
       position: 'relative',
-      height: '66px',
+      // height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-start.contnet-start.q-pt-sm
+    }`).row.full-width.items-start.contnet-start
       //- share
       .col
         .row.full-width
@@ -105,7 +105,7 @@
               position: 'absolute', zIndex: 2000,
               bottom: '-46px',
             }`).full-width.b-30
-              small.text-grey-8 Отмена
+              small.text-grey-8 {{$t('Cancel')}}
             //- vote rates
             div(
               :style=`{
@@ -142,7 +142,12 @@ export default {
   name: 'essenceActions',
   props: {
     essence: { type: Object, required: true },
-    itemState: { type: Object},
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
     nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
     isActive: { type: Boolean },
@@ -156,7 +161,6 @@ export default {
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      // if (!this.itemState) this.itemState = {}
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {

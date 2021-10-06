@@ -17,6 +17,7 @@
               :bookmark="bookmarkSelected"
               @close="bookmarkEditorShow = false, bookmarkSelected = null")
           tab-list-feed(
+            ref="listFeed"
             :type="'customPPV'"
             :scrollAreaHeight="0"
             :navHeaderText="$t('Feed')"
@@ -27,13 +28,13 @@
           ).row.full-width
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               item-feed(
-                :itemShortOrFull="item"
+                :itemShortOrFull="item.object"
                 :itemState="itemState"
                 :itemIndex="itemIndex"
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling")
+                :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>
@@ -49,6 +50,9 @@ export default {
     }
   },
   methods: {
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
+    }
   },
   computed: {
     scrollAreaHeight () {
@@ -70,9 +74,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$bus.$on('btn-home-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$bus.$off('btn-home-clicked', this.onBusEvent)
   }
 }
 </script>

@@ -31,6 +31,7 @@
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="user"
+            ref="listFeed"
             :type="'customPPV'"
             :scrollAreaHeight="0"
             searchInputState="disabled"
@@ -38,7 +39,7 @@
             :pageId="pageId"
             :query="query"
             :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-            :itemActivePersist="false"
+            :itemActivePersist="true"
             @pageId="pageId = $event"
           ).row.full-width
             template(v-slot:externalHeader)
@@ -77,7 +78,7 @@
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling").q-pb-sm
+                :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>
@@ -175,13 +176,18 @@ export default {
     onScroll (e) {
       // this.$log('onScroll', e.position)
       this.scrollTop = e.position
+    },
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
     }
   },
   mounted () {
     this.$log('mounted')
+    this.$bus.$on('btn-user-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$bus.$off('btn-user-clicked', this.onBusEvent)
   }
 }
 </script>

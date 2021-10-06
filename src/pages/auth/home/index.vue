@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.window-height.window-width
-  div(v-if="isReady && $q.screen.width > 768").row.fit.items-center.content-center.justify-center
+  div(v-if="isReady && $q.screen.width > 768" @click.self="close()").row.fit.items-center.content-center.justify-center
     //- desktop layout
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -64,8 +64,8 @@
     ).row.fit
     div(:style=`{zIndex: 2}`).row.fit
       q-btn(
-        round flat color="white" icon="clear" @click="close"
-        :style=`{position: 'absolute', zIndex: 100, right: '0px'}`
+        round flat color="white" icon="clear" @click="close" size='20px'
+        :style=`{position: 'absolute', zIndex: 100, right: '0px', top: '13%'}`
         )
       //- logo
       kalpa-logo(
@@ -73,7 +73,7 @@
         :height="100"
         :style=`{
             transform: 'rotate(' + scrollTop / 2 + 'deg)',
-          }`).rotating-slow.q-mb-xs
+          }`).rotating-slow.q-mt-xl
       span( :style=`{fontSize: '22px',}`).text-white.text-bold.text-center.full-width {{$t('Kalpagrama')}}
       // - tong
       div().q.ma

@@ -4,30 +4,29 @@
     :style=`{
       position: 'relative',
       height: contentHeight ? 'auto' : contentHeight+'px',
-      maxWidth: 500+'px',
+      maxWidth: 700+'px',
       //- marginBottom: '500px',
     }`
     v-observe-visibility=`{
       throttle: 150,
       callback: contentIsVisibleCallback,
       }`
-    ).row.full-width.items-start.content-start.q-mt-xl.q-mb-md
+    ).row.full-width.items-start.content-start
     q-resize-observer(@resize="contentHeightCallback")
-    img(
-      v-if="true || !contentIsVisible"
-      src="https://thumbs-yandexdev.kalpa.store/m0/60/155408298210803763_600_thumb.jpg?rev=3"
-      :style=`{
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`
-      ).full-width
+    //img(
+    //  v-if="true || !contentIsVisible"
+    //  src="https://contents-yandexdev.kalpa.store/27/az/231512242036717573_1920_content.jpg?rev=5"
+    //  :style=`{
+    //    borderRadius: '10px',
+    //    overflow: 'hidden',
+    //  }`
+    //  ).full-width
     content-player(
       v-if="contentIsVisible"
       :contentKalpa=`{
         oid: contentOid,
         name: 'Кальпаграма',
-        // url: 'https://www.youtube.com/embed/6n6mYnKo1fw',
-        url: 'https://www.youtube.com/embed/6n6mYnKo1fw',
+        url: 'https://static-api-dev-kalpa-app.kalpa.store/local_object_storage/contents/8q/d0/231850638999339026_360p_content.mp4?rev=9',
         type: 'VIDEO',
         // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',
@@ -44,9 +43,10 @@
       :styles=`{
         height: '100%',
         objectFit: 'contain',
+        borderRadius: '10px',
       }`
       :style=`{
-        position: 'absolute', zIndex: 100, top: '0px',
+        position: 'absolute', zIndex: 100, top: '0px', borderRadius: '10px',
       }`).fit
 </template>
 

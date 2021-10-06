@@ -120,6 +120,7 @@ class ObjectCreateApi {
       // nodeInput.name = essence.name || (essence.spheres.length ? essence.spheres[0].name : null)
       // assert(nodeInput.name, '!nodeInput.name')
       essenceInput.name = essence.name
+      essenceInput.description = essence.description
       essenceInput.category = essence.category
 
       essenceInput.spheres = essence.spheres.map(s => {

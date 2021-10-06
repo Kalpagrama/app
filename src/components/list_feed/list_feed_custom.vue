@@ -343,18 +343,6 @@ export default {
         this.$emit('count', to.length - 2)
       }
     },
-    // watch it to drop position, and scrollToTop
-    '$store.state.ui.listFeedGoToStart': {
-      deep: true,
-      // immediate: true,
-      async handler (to, from) {
-        this.$log('$store.state.ui.listFeedGoToStart TO', to)
-        if (to) {
-          this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
-          await this.scrollToStart()
-        }
-      }
-    },
     scrolledItemsHeight: {
       async handler (to, from) {
         // this.$log(`scrolledItemsHeight ${from}->${to}`)

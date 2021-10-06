@@ -3,7 +3,7 @@
   div(
     :style=`{maxHeight: scrollAreaHeight ? scrollAreaHeight+'px' : null, height: scrollAreaHeight ? scrollAreaHeight+'px' : null }`
     :class=`{ scroll: !!scrollAreaHeight}`).row.full-width.items-start.content-start
-    div(ref="scrolledArea").row.full-width
+    div(ref="scrolledArea").row.full-width.relative-position
       q-resize-observer(@resize="scrolledAreaResized")
       //- debug
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -66,7 +66,7 @@
       slot(name="prepend")
       //- spinner, no itemsRes
       //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
-      q-spinner-dots(v-if="!itemsRes" color="green" size="60px").fixed-center
+      q-spinner-dots(v-if="!itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
       // headers + items
       .row.full-width
         slot(name="header")
@@ -252,11 +252,10 @@ export default {
             }
           }
         }) || []
-        // this.$log('vsitems=', this.vsItems)
-        // this.itemActive = null
-        this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
+        this.noDummyAreaCenterIndx = null
         this.$nextTick(() => {
           // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
+          this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
           if (this.itemActivePersist && !this.itemActive) {
             let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
             if (ref) {
@@ -270,7 +269,8 @@ export default {
             }
           }
         })
-        this.$emit('count', to.length - 2)
+        this.$emit('count', to.length)
+        this.$emit('items', this.vsItems.map(item => item.source))
       }
     },
     noDummyAreaCenterIndx: {

@@ -24,8 +24,10 @@ div(
     borderless dark
     type="email" inputmode="email"
     autocomplete="username" name="username"
-    autocorrect="off" autocapitalize="on" autofocus="on"
+    autocorrect="off" autocapitalize="on"
     :placeholder="$t('Enter your email')"
+    :autofocus="true"
+    :disable="emailEnterDisable"
     :input-style=`{
       padding: '16px',
       fontSize: '18px',
@@ -110,8 +112,9 @@ div(
   .row.full-width.q-py-md.text-grey-6
     kalpa-docs(
       :title="$t('If you proceed, you agree with our terms')"
-      titleColor="grey-2"
-      docColor="grey-6")
+      titleColor="white"
+      docColor="white"
+      docAlign="center")
 </template>
 
 <script>
@@ -125,6 +128,7 @@ export default {
       email: '',
       emailSending: false,
       emailSent: false,
+      emailEnterDisable: false,
       hasPermanentPassword: false,
       needConfirm: false,
       needInvite: false,
@@ -146,6 +150,7 @@ export default {
       this.email = ''
       this.emailSending = false
       this.emailSent = false
+      this.emailEnterDisable = false
       this.hasPermanentPassword = false
       this.needConfirm = false
       this.needInvite = false
@@ -169,6 +174,7 @@ export default {
         this.$log('emailSend done')
         this.emailSending = false
         this.emailSent = true
+        this.emailEnterDisable = true
       }
       catch (e) {
         this.$log('emailSend error', e)

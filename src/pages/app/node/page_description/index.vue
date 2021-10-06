@@ -3,7 +3,9 @@
   .q-pa-sm.text-h6.text-bold.text-white {{$t('Description')}}
   .col
   q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-  span.text-white askldflksad jfal ksjdhflkasjdhf lksajdfhk lsajhfklsajdfhslka djfhksaldjfhklsdj fhlskdfjhls kdjfhlksadjhflks adjh flksadjfhalksfj lskjgfldkjgldskgf dsflg dsfgjhdslkf h dsfkgh sdlkhgldks ghdlskfgh hdskfgh lkjsdhfg sdfg hklsdjfhg sdkjfhg lksdfgh lsdjfhg lkdsjfghldskjfgh sdfkjgh lsdkfjgh
+  .row.full-width
+    //span.text-white {{node.description}}
+    div(v-html="node.description").text-grey
 </template>
 
 <script>

@@ -70,7 +70,7 @@ q-menu(
     div(
       v-if="!$store.getters.isGuest"
       v-close-popup
-      @click="$go('/user/'+$store.getters.currentUser.oid)"
+      @click="$bus.$emit('btn-user-clicked'), $go('/user/'+$store.getters.currentUser.oid)"
       :style=`{
         borderRadius: '20px',
       }`
@@ -92,7 +92,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('Feed'), icon: 'view_agenda'},
+        {id: 'feeds', name: this.$t('Feed'), icon: 'fas fa-home'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},

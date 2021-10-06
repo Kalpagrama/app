@@ -1,42 +1,42 @@
 <template lang="pug">
-div(
-  :style=`{
+  div(
+    :style=`{
     position: 'relative',
     borderRadius: '10px',
   }`
   ).row.fit.items-start.content-start.justify-center.b-40
-  q-resize-observer(@resize="height = $event.height")
-  //- footer
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    context-bar(
-      v-if="isActive"
-      :contentKalpa=`{oid: composition.layers[0].contentOid, name: composition.layers[0].contentName}`
-      :height="height")
-  //- footer gradient
-  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="textContainerOverflowHidden"
-      @click="textContainerOverflowToggle"
-      :style=`{
+    q-resize-observer(@resize="height = $event.height")
+    //- footer
+    transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      context-bar(
+        v-if="isActive"
+        :contentKalpa=`{oid: composition.layers[0].contentOid, name: composition.layers[0].contentName}`
+        :height="height")
+    //- footer gradient
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="textContainerOverflowHidden"
+        @click="textContainerOverflowToggle"
+        :style=`{
         position: 'absolute', zIndex: 10, bottom: '0px', left: '0px',
         height: '50%',
         background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
         borderRadius: '0px 0px 10px 10px',
       }`
       ).row.full-width.cursor-pointer
-  //- body
-  div(
-    ref="text-container"
-    :style=`{
+    //- body
+    div(
+      ref="text-container"
+      :style=`{
       maxHeight: 'calc(100% - 48px)',
       overflow: textContainerOverflowHidden ? 'hidden' : 'scroll',
       //- paddingTop: '50px',
     }`
     ).row.fit.items-start.content-start.q-px-md.q-pt-md
-    div(
-      ref="text-wrapper"
+      div(
+        ref="text-wrapper"
       ).row.full-width
-      p.text-white.text-caption {{ name }}
+        p.text-white.text-caption {{ name }}
 </template>
 
 <script>
@@ -45,16 +45,21 @@ import contextBar from './context_bar.vue'
 export default {
   name: 'typeBook',
   components: {
-    contextBar,
+    contextBar
   },
   props: {
-    compositionKey: {type: String},
-    composition: {type: Object, required: true},
-    isActive: {type: Boolean},
-    isVisible: {type: Boolean},
-    isMini: {type: Boolean},
-    options: {type: Object},
-    styles: {type: Object, default: {}},
+    compositionKey: { type: String },
+    composition: { type: Object, required: true },
+    isActive: { type: Boolean },
+    isVisible: { type: Boolean },
+    isMini: { type: Boolean },
+    options: { type: Object },
+    styles: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
   },
   data () {
     return {
@@ -62,7 +67,7 @@ export default {
       textContainerOverflowHidden: true,
       textWrapperRef: null,
       textMoreShow: false,
-      height: 0,
+      height: 0
     }
   },
   computed: {
@@ -79,12 +84,11 @@ export default {
       handler (to, from) {
         this.$log('isActive TO', to)
         if (to) {
-        }
-        else {
+        } else {
           this.textWrapperOverflowHidden = true
         }
       }
-    },
+    }
   },
   methods: {
     contextClick () {
@@ -100,28 +104,27 @@ export default {
         // scroll a little bit!
         this.textContainerOverflowHidden = false
         this.$gsap.to(
-          this.textContainerRef,
-          1.5,
-          {
-            scrollTop: this.textContainerRef.scrollTop + 50,
-            onComplete: () => {
-              this.$log('textContainerOverflowToggle DONE')
+            this.textContainerRef,
+            1.5,
+            {
+              scrollTop: this.textContainerRef.scrollTop + 50,
+              onComplete: () => {
+                this.$log('textContainerOverflowToggle DONE')
+              }
             }
-          }
         )
-      }
-      else {
+      } else {
         // scrollto back to top!
         this.textContainerOverflowHidden = true
         this.$gsap.to(
-          this.textContainerRef,
-          0.3,
-          {
-            scrollTop: 0,
-            onComplete: () => {
-              this.$log('textContainerOverflowToggle DONE')
+            this.textContainerRef,
+            0.3,
+            {
+              scrollTop: 0,
+              onComplete: () => {
+                this.$log('textContainerOverflowToggle DONE')
+              }
             }
-          }
         )
       }
     }

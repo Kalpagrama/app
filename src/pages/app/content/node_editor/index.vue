@@ -37,7 +37,7 @@
           :style=`{
             borderRadius: '10px',
           }`)
-      template(v-slot:spheres-right)
+      template(v-slot:right)
         .row
           //- Delete from notes
           q-btn(
@@ -119,7 +119,7 @@
               :style=`{
                 borderRadius: '10px',
               }`)
-          template(v-slot:spheres-right)
+          template(v-slot:right)
             div(v-if="node.name.length > 0").row
               //- Delete from notes
               q-btn(

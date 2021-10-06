@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row.full-width.items-start.content-start.justify-center.q-pt-sm
+  .row.full-width.items-start.content-start.justify-center
     div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
       //.row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
       tab-list-feed(
@@ -18,16 +18,6 @@
             :isPreload="isPreload"
             :scrolling="scrolling"
             :showActions="false").q-pb-md
-      //list-feed(
-      //  :itemStyles=`{
-      //  paddingBottom: '50px',
-      //}`
-      //  :query="query")
-      //  template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-      //    item-feed(
-      //      :itemShortOrFull="item.populatedObject"
-      //      :isActive="isActive"
-      //      :isVisible="isVisible")
 </template>
 
 <script>

@@ -36,6 +36,7 @@ div(
         composition(
           v-if="i.__typename === 'Composition'"
           :composition="i"
+          :showContext="showContext"
           :isActive="isActive"
           :isVisible="isVisible"
           :nodeOid="null"
@@ -61,6 +62,7 @@ div(
               small.text-white {{ i.name }}
           composition(
             :composition="i.items[0]"
+            :showContext="showContext"
             :itemState="data"
             :isActive="isActive"
             :isVisible="isVisible"
@@ -119,11 +121,10 @@ import { ContentApi } from 'src/api/content'
 import { assert } from 'src/system/common/utils'
 export default {
   name: 'essenceItems',
-  props: ['node', 'isActive', 'isVisible', 'itemState'],
+  props: ['node', 'isActive', 'isVisible', 'itemState', 'showContext'],
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      // if (!this.itemState) this.itemState = {}
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {

@@ -61,9 +61,15 @@
   composer-node(
     v-else-if="item.type === 'NODE'"
     :item="item"
+    :isActive="true"
+    :isVisible="true"
     :action="action"
     :publish="publish"
     :showActions="false"
+    :showAuthorAlways="true"
+    :showHeader="showHeader"
+    :lockName="lockName"
+    :showItems="showItems"
     :height="$q.screen.height"
     @close="$emit('close', $event)")
 </template>
@@ -101,7 +107,19 @@ export default {
     },
     publish: {
       type: Boolean,
-    }
+    },
+    showHeader: {
+      type: Boolean,
+      default: true
+    },
+    showItems: {
+      type: Boolean,
+      default: true
+    },
+    lockName: {
+      type: Boolean,
+      default: false
+    },
 
   },
   data () {
