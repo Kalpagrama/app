@@ -45,8 +45,9 @@ export default {
     },
   },
   async mounted () {
-    this.$log('mounted')
-    this.itemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid)
+    this.$log('mounted', this.item)
+    if (this.item.oid) this.itemFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid)
+    else this.itemFull = this.item
     this.$log('itemFull=', this.itemFull)
   }
 }

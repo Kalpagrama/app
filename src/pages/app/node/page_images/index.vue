@@ -7,7 +7,7 @@
       v-model="itemEditorShow"
       :maximized="false"
       position="standard")
-      item-editor(
+      essence-editor(
         :item="newNode"
         :publish="true"
         :lockName="true"
@@ -100,7 +100,6 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
-import itemEditor from 'src/components/kalpa_item/item_editor'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import listMasonry from 'src/components/list_masonry/index.vue'
@@ -112,7 +111,7 @@ import { assert } from 'src/system/common/utils'
 export default {
   name: 'pageImages',
   components: {
-    essenceVoteBall, itemEditor, essenceSpheres, essenceActions, listMasonry
+    essenceVoteBall, essenceSpheres, essenceActions, listMasonry
   },
   props: {
     node: { type: Object },

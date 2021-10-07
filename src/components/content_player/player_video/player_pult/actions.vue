@@ -48,6 +48,7 @@ div(
 
 <script>
 import figuresControls from './figures_controls.vue'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'playerPult__actions',
@@ -95,7 +96,7 @@ export default {
                 },
               ],
               operation: { items: null, operations: null, type: 'CONCAT'},
-              __typename: 'Composition',
+              type: ObjectTypeEnum.COMPOSITION,
             },
           ]
         }

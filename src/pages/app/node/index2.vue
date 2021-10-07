@@ -16,10 +16,21 @@
             v-model="itemEditorShow"
             :maximized="false"
             position="standard")
-            item-editor(
+            essence-editor(
               :item="newNode"
               :publish="true"
               @close="node = $event ? $event : node, itemEditorShow=false")
+          q-dialog(
+            v-model="essenceListShow"
+            :maximized="false"
+            position="standard")
+            page-essences2(
+              :node="node"
+              :sameCompositionNodes="sameCompositionNodes"
+              :currentIndx="currentIndx"
+              :height="bottomHeight"
+              @close="essenceListShow=false"
+              @itemEditorShow="isActive=!$event").b-20
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
@@ -38,7 +49,7 @@
           div(v-if="!pageId").row.full-width.q-mt-sm
             q-resize-observer(@resize="imagesMaxHeight = $q.screen.height - $event.height")
             .row.full-width.justify-center
-              div(v-if="sameCompositionNodes.length > 1" @click="pageId='essences'").row.cursor-pointer
+              div(v-if="sameCompositionNodes.length > 1" @click="essenceListShow=true/*pageId='essences'*/").row.cursor-pointer
                 small.text-green-10.text-bold.q-px-xs.q-mt-xs  {{sameCompositionNodes.length}}
                 small.text-grey-7.text-weight-thin.q-mt-xs.q-pr-xs  {{$getNoun(sameCompositionNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                 //small(v-if="node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{node.items[0].layers[0].contentName.substring(0, 22)}}{{node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
@@ -71,11 +82,11 @@
 <script>
 
 import { RxCollectionEnum } from 'src/system/rxdb'
-import itemEditor from 'src/components/kalpa_item/item_editor'
 import pageSimilar from './page_similar/index.vue'
 import pageComments from './page_comments/index.vue'
 import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
+import pageEssences2 from './page_essences/index2.vue'
 import pageEssence from './page_essence/index.vue'
 import pageImages from './page_images/index.vue'
 import { assert } from 'src/system/common/utils'
@@ -88,15 +99,16 @@ export default {
     pageComments,
     pageDescription,
     pageEssences,
+    pageEssences2,
     pageEssence,
     pageImages,
-    itemEditor
   },
   data () {
     return {
       node: null,
       compositionOid: null,
       itemEditorShow: false,
+      essenceListShow: false,
       pageId: null,
       bottomHeight: 0,
       imagesMaxHeight: 0,

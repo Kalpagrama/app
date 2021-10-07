@@ -34,7 +34,7 @@ div(
         //- ===
         //- composition
         composition(
-          v-if="i.__typename === 'Composition'"
+          v-if="i.type === 'COMPOSITION'"
           :composition="i"
           :showContext="showContext"
           :isActive="isActive"

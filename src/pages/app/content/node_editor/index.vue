@@ -162,6 +162,7 @@ import { UserApi } from 'src/api/user'
 
 import editSpheres from './edit_spheres.vue'
 import editCategory from './edit_category.vue'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'nodeEditor',
@@ -212,7 +213,7 @@ export default {
             },
           ],
           operation: { items: null, operations: null, type: 'CONCAT'},
-          __typename: 'Composition',
+          type: ObjectTypeEnum.COMPOSITION,
         }
       }
       // IMAGE select all image, or whole ?
@@ -231,7 +232,7 @@ export default {
             }
           ],
           operation: { items: null, operations: null, type: 'CONCAT'},
-          __typename: 'Composition',
+          type: ObjectTypeEnum.COMPOSITION,
         }
       }
       // BOOK
@@ -250,7 +251,7 @@ export default {
             },
           ],
           operation: { items: null, operations: null, type: 'CONCAT'},
-          __typename: 'Composition',
+          type: ObjectTypeEnum.COMPOSITION,
         }
       }
       // AUDIO: like video 30 sec from currentTime

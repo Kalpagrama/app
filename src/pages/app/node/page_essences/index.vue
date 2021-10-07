@@ -5,7 +5,7 @@
       v-model="itemEditorShow"
       :maximized="false"
       position="standard")
-      item-editor(
+      essence-editor(
         :item="newNode"
         :publish="true"
         @close="$event?$go('/node/'+$event.oid):null, $event?$emit('close'):null, itemEditorShow=false")
@@ -48,7 +48,7 @@
         @items="essenceList = $event").row.full-width
         template(v-slot:externalHeader)
           //q-btn(round outline color="green" icon="add" size="lg" @click="itemEditorShow=true").full-width.q-mb-sm
-          //item-editor(
+          //essence-editor(
           //  :item="newNode"
           //  :showHeader="false"
           //  :showItems="false"
@@ -56,7 +56,7 @@
           //  @close="resetNewNode()").row.full-width
         template(v-slot:item=`{item: node,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           .row.full-width.q-px-md
-            div(:style=`{minHeight: '40px', border: '1px solid ' + (currentIndx === itemIndex ? 'green' : 'grey'), borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
+            div(:style=`{minHeight: '40px', border: '1px solid ' + (currentIndx === itemIndex ? $getPaletteColor('green-7') : $getPaletteColor('grey-9')), borderRadius: '10px'}`).cursor-pointer.row.full-width.items-center.q-mb-sm
               div(v-if="true" @click="$go('/node/'+node.oid), $emit('close')").row.full-width.q-pa-xs
                 span(:style=`{textAlign: 'center'}`).col {{node.name}}
                 q-circular-progress(v-if="node.countVotes > 1" :value="node.rate" :min="0" :max="maxRate" show-value dark size="sm" color="green" :thickness="0.09" track-color="grey-9"
@@ -87,7 +87,6 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
-import itemEditor from 'src/components/kalpa_item/item_editor'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import cloneDeep from 'lodash/cloneDeep'
@@ -95,7 +94,7 @@ import cloneDeep from 'lodash/cloneDeep'
 export default {
   name: 'pageEssences',
   components: {
-    essenceVoteBall, itemEditor, essenceSpheres, essenceActions
+    essenceVoteBall, essenceSpheres, essenceActions
   },
   props: ['node', 'height'],
   data () {

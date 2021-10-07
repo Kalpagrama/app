@@ -94,7 +94,7 @@
     //- ===
     //- composition
     div(
-      v-else-if="item.__typename === 'Composition'"
+      v-else-if="item.type === 'COMPOSITION'"
       :style=`{
         position: 'relative',
       }`

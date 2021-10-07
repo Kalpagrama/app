@@ -14,7 +14,7 @@ div(
       :pageFilter=`{
           whiteList: ['nodes'],
       }`
-      @item="itemFound"
+      @item="onItemFound"
       @close="itemFinderShow = false"
       ).b-30
   //- item editor
@@ -24,10 +24,9 @@ div(
     :maximized="true"
     :no-esc-dismiss="true")
     item-editor(
-      v-if="joint.items[1]"
-      :joint="joint"
-      :item="joint.items[1]"
-      @remove="itemRemove"
+      v-if="itemFound"
+      :item="itemFound"
+      @composition="$log('composition=', $event), ($event ? $set(joint.items, 1, $event) : $delete(joint.items, 1)), itemEditorShow = false"
       @close="itemEditorShow = false")
   //- body
   .row.full-width.justify-center.q-px-sm
@@ -122,6 +121,7 @@ export default {
       jointPublishing: false,
       itemFinderShow: false,
       itemEditorShow: false,
+      itemFound: null,
     }
   },
   computed: {
@@ -148,16 +148,23 @@ export default {
           this.$emit('blurred')
         }
       }
+    },
+    'join.items': {
+      handler(to, from) {
+        this.$log('join.items', to)
+      }
     }
   },
   methods: {
-    async itemFound (item) {
-      this.$log('itemFound', item)
-      this.$set(this.joint.items, 1, item)
+    async onItemFound (item) {
+      this.$log('onItemFound', item)
       this.itemFinderShow = false
       // if content type is video or book
       if (['VIDEO', 'BOOK'].includes(item.type)) {
+        this.itemFound = item
         this.itemEditorShow = true
+      } else {
+        this.$set(this.joint.items, 1, item)
       }
     },
     itemRemove () {
