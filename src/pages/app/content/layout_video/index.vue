@@ -36,6 +36,12 @@ div(
     }`
     @player="playerReady"
     ).fit.bg-black
+    template(v-slot:video-footer)
+      // кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
+      figures-controls(
+        v-if="pageId === 'node-editor' && $q.screen.lt.md"
+        :player="player" :contentKalpa="contentKalpa"
+        :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
     //- Desktop page wrapper
     template(v-slot:pult)
       div(
@@ -116,6 +122,7 @@ import pageNode from './page_node/index.vue'
 import pageNodeEditor from '../node_editor/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
+import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
 
 export default {
   name: 'layoutVideo',
@@ -128,6 +135,7 @@ export default {
     pageDrafts,
     pageInfo,
     navBottom,
+    figuresControls
   },
   data () {
     return {
