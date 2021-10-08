@@ -15,6 +15,9 @@ export default {
   props: ['item'],
   data () {
     return {}
+  },
+  mounted () {
+    this.$log('mounted', this.item)
   }
 }
 </script>

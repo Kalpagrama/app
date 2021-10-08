@@ -13,7 +13,7 @@ div(
     position: 'relative',
     ...styles,
   }`
-  ).row.full-width
+  ).row.full-width.justify-center
   //- preview your crop...
   div(
     v-if="false && figure"
@@ -58,10 +58,8 @@ div(
     }`)
   //- footer
   div(
-    :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '8px',
-    }`
-    ).row.full-width.justify-center.q-px-sm
+    :style=`{ position: 'absolute', zIndex: 1000, bottom: '8px'}`
+    ).row.justify-center
     slot(name="tint-bar" :tintFocused="true")
     div(
       :style=`{
