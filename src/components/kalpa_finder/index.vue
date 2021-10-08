@@ -123,10 +123,10 @@ export default {
     },
     pages () {
       return [
-        { id: 'published', name: this.$t('published') },
+        { id: 'published', name: this.$t('Published') },
+        { id: 'contents', name: this.$t('Content') },
         { id: 'collections', name: this.$t('collections') },
         { id: 'search-kalpa', name: this.$t('Kalpagrama') },
-        { id: 'contents', name: this.$t('Content') },
         { id: 'gif', name: this.$t('Gif') }
       ]
     }

@@ -27,7 +27,7 @@
     :figures="null"
     :height="$q.screen.height-0"
     @composition="$emit('composition', $event), $emit('close')"
-    @close="contetnClosed('BOOK')")
+    @close="$emit('close')")
   //- ===
   //- composition VIDEO
   composer-video(

@@ -23,43 +23,22 @@ kalpa-layout(
           objectFit: 'contain',
         }`
         ).full-width.bg-black
+        template(v-slot:left)
+          q-btn(
+            @click="$emit('close')"
+            flat no-caps color="red"
+            :style=`{borderRadius: '16px'}`) {{$t('Close')}}
+        template(v-slot:right)
+          q-btn(
+            @click="compositionUpdate"
+            flat no-caps color="green"
+            :style=`{ borderRadius: '16px'}`) {{$t('Ready')}}
         template(v-slot:tint-bar=`{tintFocused}`)
-          div(
-            v-if="player"
-            ).row.full-width.justify-center.q-pa-md
-            div(
-              :style=`{
-                maxWidth: 600+'px',
-                background: 'rgba(30,30,30,0.9)',
-                borderRadius: '30px',
-              }`
-              ).row.full-width.items-center.content-center
-              //- top
-              .row.full-width.q-pa-md
-                span(:style=`{fontSize: '22px'}`).text-white.text-bold.q-ml-sm {{$t('Pick fragment')}}
-              //- center
-              .row.full-width.items-start.content-start.q-px-md
-                .col.q-pr-lg
-                  p.text-white.q-ml-sm {{$t('Why pick fragment on looong video is important! You need to concentrate and to communicate better')}}
-              //- bottom
-              .row.full-width.q-pb-sm.q-px-md
-                q-btn(
-                  v-if="true"
-                  @click="$emit('close')"
-                  flat no-caps color="red"
-                  :style=`{
-                    borderRadius: '40px',
-                  }`
-                  ).q-mr-sm {{$t('Close')}}
-                .col
-                q-btn(
-                  @click="compositionUpdate"
-                  no-caps color="green"
-                  :disable="!player.figure"
-                  :style=`{
-                    borderRadius: '40px',
-                  }`
-                  ).q-px-sm {{$t('Ready')}}
+          div(v-if="player && !player.figure").row.full-width.justify-center.items-center.content-center
+            div(:style=`{background: 'rgba(0,0,0,0.3)', borderRadius: '10px'}`).row
+              span.text-white {{$t('Выберите фрагмент')}}
+              q-icon(name="crop" color="grey" size="xs").q-px-xs
+              span.text-white {{$t(', либо нажмите готово')}}
 </template>
 
 <script>
@@ -105,7 +84,7 @@ export default {
             id: Date.now().toString(),
             contentOid: this.contentKalpa.oid,
             contentName: this.contentKalpa.name,
-            figuresAbsolute: this.player.figure
+            figuresAbsolute: this.player.figure || []
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},

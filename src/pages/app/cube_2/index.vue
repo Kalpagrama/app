@@ -53,7 +53,7 @@ div(
   div(ref="scroll-wrapper").col.full-width.scroll
     //- itemRoot
     .row.full-width.justify-center.q-px-sm
-      div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-start.content-start.br
+      div(:style=`{maxWidth: 500+'px'}`).row.full-width.items-start.content-start
         .row.full-width
           small.text-white rows: {{ rows }}
         q-resize-observer(@resize="$event => itemWidth = $event.width")
