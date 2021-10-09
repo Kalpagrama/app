@@ -28,16 +28,43 @@ kalpa-layout
       //- user
       div(
         v-else
-        :style=`{
-          paddingTop: '8px',
-        }`
         ).row.full-width.justify-center.q-px-sm
-        div(
-          :style=`{
-            maxWidth: $store.state.ui.pageWidth+'px',
-          }`).row.full-width.items-start.content-start
-          widget-upload().q-mb-md
-          .row.full-width.q-px-md
+        div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
+          widget-upload(@uploaded="$router.push('/content/' + $event.oid)").q-my-sm
+            template(v-slot:bottom)
+              q-btn(outline no-caps color="grey"
+                @click="addItemMenuShow = true"
+                :style=`{
+                          height: '50px',
+                          overflow: 'hidden',
+                           }`).full-width.br-10
+                span().text-h6 {{$t('Create')}}
+                q-dialog(
+                  v-model="addItemMenuShow"
+                  position="standard"
+                  :maximized="false"
+                )
+                  div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
+                    //span.text-green.text-h6.q-my-md {{$t('Creation Menu', 'Меню создания')}}
+                    q-btn(
+                      outline color="grey-8"
+                      size="xl"
+                      align="center"
+                      :to="''"
+                      :label="$t('Essence core')"
+                      icon='adjust'
+                      round flat no-caps
+                    ).row.full-width.create-item.q-pa-sm
+                    q-btn(
+                      outline color="grey-8"
+                      align="center"
+                      size="xl"
+                      :to="'/workspace/create?mode=block'"
+                      :label="$t('Essence block')"
+                      icon='dashboard_customize'
+                      round flat no-caps
+                    ).row.full-width.create-item.q-pa-sm
+          .row.full-width
             widget-contents().q-mb-sm
             widget-collections().q-mb-sm
             widget-drafts().q-mb-sm

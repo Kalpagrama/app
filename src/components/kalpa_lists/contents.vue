@@ -1,5 +1,5 @@
 <template lang="pug">
-    .row.full-width.items-start.content-start.justify-center
+    .row.full-width.items-start.content-start.justify-center.q-px-sm
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         //- bookmark editor
         q-dialog(
@@ -25,6 +25,8 @@
           @searchString="searchString = $event"
           @pageId="pageId = $event"
         ).row.full-width
+          template(v-slot:externalHeader)
+            widget-upload(@uploaded="bookmarkSelectHandle($event)")
           template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
             bookmark-list-item(
               :bookmark="bookmark"
@@ -41,6 +43,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 
 export default {
   name: 'listContents',
@@ -53,6 +56,7 @@ export default {
   components: {
     bookmarkListItem,
     bookmarkEditor,
+    widgetUpload,
   },
   data () {
     return {
