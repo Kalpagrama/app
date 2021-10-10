@@ -7,9 +7,6 @@ div(:style=`{position: 'relative'}`).row.full-width
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
-      :pageFilter=`{
-            whiteList: ['nodes'],
-        }`
       @item="onItemFound"
       @close="itemFinderShow = false"
     ).b-30

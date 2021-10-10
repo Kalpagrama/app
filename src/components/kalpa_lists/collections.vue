@@ -26,11 +26,11 @@
       @searchString="searchString = $event"
       @pageId="pageId = $event"
     ).row.full-width
-      template(v-slot:externalHeader)
+      template(v-slot:stickyHeaderTop)
         q-tabs(
           v-model="collectionsModel.collectionId"
           switch-indicator="false" no-caps dense
-        active-color="green"
+          active-color="green"
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
         ).full-width.text-grey-8
           // add collection btn
@@ -84,11 +84,13 @@ export default {
   },
   computed: {
     pages() {
+      this.$logE(this?.pageFilter?.whiteList)
       return [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
+        { id: 'blocks', name: this.$t('Blocks') },
+        { id: 'contents', name: this.$t('Contents') },
       ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
     },
     // запрос за элементами коллекции
@@ -96,7 +98,7 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-          type: { $in: ['IMAGE', 'VIDEO', 'BOOK', 'NODE', 'JOINT'] }
+          type: { $in: ['IMAGE', 'VIDEO', 'BOOK', 'NODE', 'JOINT', 'BLOCK'] }
         },
         sort: [{ createdAt: 'desc' }]
       }
@@ -111,6 +113,8 @@ export default {
         res.selector.type = { $in: ['JOINT'] }
       } else if (this.pageId === 'blocks') {
         res.selector.type = { $in: ['BLOCK'] }
+      } else if (this.pageId === 'contents') {
+        res.selector.type = { $in: ['IMAGE', 'VIDEO', 'BOOK'] }
       }
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')

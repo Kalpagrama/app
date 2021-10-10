@@ -32,6 +32,8 @@
         .row.full-width.justify-center
           slot(name="externalHeader")
       template(v-slot:sticky-header)
+        .row.full-width.items-center.content-center.justify-center.b-30
+          slot(name="stickyHeaderTop")
         div(v-if="pages.length > 1").row.full-width.items-center.content-center.justify-center
           //- search bar
           //search String
@@ -68,6 +70,8 @@
               q-tab(
                 v-for="(p,pi) in pages" :key="p.id"
                 :name="p.id" :label="p.name" :icon="p.icon" @click="pageId === p.id ? scrollTo('start') : null" @dblclick="pageId === p.id ? scrollTo('end') : null")
+        .row.full-width.items-center.content-center.justify-center.b-30
+          slot(name="stickyHeaderBottom")
       template(v-slot:footer)
         q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
       template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload, scrolling}`)

@@ -44,7 +44,7 @@
             //  @started="pageStarted = true")
             q-tooltip(dense dark) {{$t('Upload content')}}
             //span.text-grey-6 {{$t('Create')}}
-        div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-py-xs
+        div(:style=`{textAlign: 'center'}`).row.full-width
           small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
         slot(name="bottom")
 </template>
@@ -62,7 +62,6 @@ export default {
   },
   data () {
     return {
-      addItemMenuShow: false,
       url: '',
       urlLoading: false,
       urlInputFocused: false,

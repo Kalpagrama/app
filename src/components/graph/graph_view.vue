@@ -42,9 +42,6 @@
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
         :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
-        :pageFilter=`{
-          whiteList: ['nodes', 'joints', 'blocks'],
-        }`
         @item="addItemToGraph"
         @close="itemFinderShow = false"
       ).b-30

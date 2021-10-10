@@ -291,7 +291,7 @@ class ObjectApi {
       const t1 = performance.now()
       const cb = async () => {
          assert(oid)
-         let { data: { unPublish: deletedObject } } = await apollo.clients.api.mutate({
+         let { data: { hide: deletedObject } } = await apollo.clients.api.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
                 mutation hide($oid: OID!) {
@@ -308,7 +308,7 @@ class ObjectApi {
          return deletedObject
       }
       let deletedObject = await apiCall(f, cb)
-      let reactiveObject = await rxdb.set(RxCollectionEnum.OBJ, deletedObject, { actualAge: 'day' })
+      // let reactiveObject = await rxdb.set(RxCollectionEnum.OBJ, deletedObject, { actualAge: 'day' })
       await rxdb.lists.addRemoveObjectToLists('OBJECT_DELETED', deletedObject.relatedSphereOids, deletedObject)
       let wsItemType
       if (deletedObject.type === 'NODE') wsItemType = WsItemTypeEnum.WS_NODE

@@ -5,7 +5,7 @@ kalpa-layout
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+      .row.full-width.justify-center.b-30.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           div(
             :style=`{
@@ -32,13 +32,7 @@ kalpa-layout
         div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
           widget-upload(@uploaded="$router.push('/content/' + $event.oid)").q-my-sm
             template(v-slot:bottom)
-              q-btn(outline no-caps color="grey"
-                @click="addItemMenuShow = true"
-                :style=`{
-                          height: '50px',
-                          overflow: 'hidden',
-                           }`).full-width.br-10
-                span().text-h6 {{$t('Create')}}
+              q-btn(outline no-caps color="grey" :label="$t('Create')" @click="addItemMenuShow = true").full-width.br-10.q-mt-sm
                 q-dialog(
                   v-model="addItemMenuShow"
                   position="standard"
@@ -87,6 +81,11 @@ import viewGuest from './view_guest/index.vue'
 
 export default {
   name: 'pageHome',
+  data () {
+    return {
+      addItemMenuShow: false,
+    }
+  },
   components: {
     widgetCollections,
     widgetBookmarks,

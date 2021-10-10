@@ -1,5 +1,5 @@
 <template lang="pug">
-    .row.full-width.items-start.content-start.justify-center.q-px-sm
+    .row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         //- bookmark editor
         q-dialog(
@@ -26,7 +26,7 @@
           @pageId="pageId = $event"
         ).row.full-width
           template(v-slot:externalHeader)
-            widget-upload(@uploaded="bookmarkSelectHandle($event)")
+            widget-upload(@uploaded="bookmarkSelectHandle($event)").q-mt-sm
           template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
             bookmark-list-item(
               :bookmark="bookmark"

@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith.q-px-sm
     //header + tabs
     .row.full-width.items-start.content-start.justify-center.q-px-sm
       q-resize-observer(@resize="headerHeight = $event.height")
