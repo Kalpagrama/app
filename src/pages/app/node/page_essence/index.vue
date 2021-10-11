@@ -39,6 +39,7 @@ div(:style=`{minHeight: '215px'}`).row.full-width
       :nodeActionsColor="'rgb(200,200,200)'"
       :isActive="true"
       :isVisible="true").q-px-xl
+    widget-images(:node="node" @node="node=$event")
     // comments
     .row.full-width.content-end.q-pt-md
       div(@click="$emit('comments')").cursor-pointer.row.full-width.items-center
@@ -71,13 +72,15 @@ div(:style=`{minHeight: '215px'}`).row.full-width
 <script>
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import widgetImages from '../widget_images/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'pageEssences',
   components: {
     essenceSpheres,
-    essenceActions
+    essenceActions,
+    widgetImages
   },
   props: ['oid'],
   data () {

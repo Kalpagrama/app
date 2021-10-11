@@ -167,7 +167,7 @@ const routes = [
             name: 'node',
             path: 'node/:oid',
             // alias: 'node2/:oid',
-            component: () => import('src/pages/app/node/index2.vue'),
+            component: () => import('src/pages/app/node/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {
                if (to) saveHistory(to.params.oid)

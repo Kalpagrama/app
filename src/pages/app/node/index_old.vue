@@ -34,7 +34,7 @@
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-            page-images(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight" @node="node=$event")
+            page-image(:node="node" :isActive="isActive" :maxHeight="imagesMaxHeight" @node="node=$event")
           // fullpage (description / coments / other essences)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -88,7 +88,8 @@ import pageDescription from './page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
 import pageEssences2 from './page_essences/index2.vue'
 import pageEssence from './page_essence/index.vue'
-import pageImages from './page_images/index.vue'
+import pageImage from './page_image/index.vue'
+
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -101,7 +102,7 @@ export default {
     pageEssences,
     pageEssences2,
     pageEssence,
-    pageImages,
+    pageImage,
   },
   data () {
     return {
