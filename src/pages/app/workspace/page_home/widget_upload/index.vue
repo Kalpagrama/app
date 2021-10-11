@@ -77,7 +77,7 @@
         //              round flat no-caps
         //              ).row.full-width.q-pa-sm
       div(:style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pt-xs
-        small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
+        small.text-grey-5 {{$t('You can add content from YouTube, Instagram, Vimeo etc')}}
   .row.full-width.q-px-md
     q-btn(outline no-caps color="grey"
       @click="addItemMenuShow = true"

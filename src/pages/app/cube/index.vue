@@ -5,40 +5,61 @@ kalpa-layout(
   }`
   )
   template(v-slot:footer)
-    .row.full-width.justify-center
-      div(
-        :style=`{
-          maxWidth: rowItemWidth+16+'px',
-          borderRadius: '20px 20px 0 0',
-          paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
-        }`
-        ).row.full-width.items-center.content-center.q-px-sm.b-50.q-pt-sm
-        q-btn(
-          v-if="!jointCreatorShow"
-          @click="$routerKalpa.back()"
-          flat color="grey-7" icon="west" no-caps
-          :style=`{
-            width: '46px', height: '46px',
-          }`)
-          small {{$t('Back')}}
+    kalpa-menu-mobile(v-if="!$store.state.ui.userTyping")
+      template(v-slot:leftButton)
+        navMobile
+      template(v-if="!jointCreatorShow" v-slot:center)
         .col
+        //q-btn(
+        //  v-if="!jointCreatorShow"
+        //  @click="jointCreateStart()"
+        //  round color="green" icon="add"
+        //  :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
         q-btn(
-          v-if="!jointCreatorShow"
           @click="jointCreateStart()"
-          round color="green" icon="add"
-          :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
+          color="green" icon="add" flat no-caps
+          :label="$t('Add joint')"
+          :style=`{}`)
+        .col
+      template(v-if="jointCreatorShow" v-slot:all)
         q-btn(
-          v-if="jointCreatorShow"
           @click="jointCreateCancel()"
           flat no-caps color="white"
           :style=`{height: '46px',}`) {{$t('Cancel')}}
-        .col
-        kalpa-menu-popup-global(
-          v-if="!jointCreatorShow"
-          color="grey-7"
-          :style=`{
-            width: '46px', height: '46px',
-          }`)
+    //.row.full-width.justify-center
+    //  div(
+    //    :style=`{
+    //      maxWidth: rowItemWidth+16+'px',
+    //      borderRadius: '20px 20px 0 0',
+    //      paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+    //    }`
+    //    ).row.full-width.items-center.content-center.q-px-sm.b-50.q-pt-sm
+    //    q-btn(
+    //      v-if="!jointCreatorShow"
+    //      @click="$routerKalpa.back()"
+    //      flat color="grey-7" icon="west" no-caps
+    //      :style=`{
+    //        width: '46px', height: '46px',
+    //      }`)
+    //      small {{$t('Back')}}
+    //    .col
+    //    q-btn(
+    //      v-if="!jointCreatorShow"
+    //      @click="jointCreateStart()"
+    //      round color="green" icon="add"
+    //      :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
+    //    q-btn(
+    //      v-if="jointCreatorShow"
+    //      @click="jointCreateCancel()"
+    //      flat no-caps color="white"
+    //      :style=`{height: '46px',}`) {{$t('Cancel')}}
+    //    .col
+    //    kalpa-menu-popup-global(
+    //      v-if="!jointCreatorShow"
+    //      color="grey-7"
+    //      :style=`{
+    //        width: '46px', height: '46px',
+    //      }`)
   template(v-slot:body)
     .row.full-width.items-start.content-start
       div(
@@ -105,11 +126,13 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import jointsRow from './joints_row/index.vue'
 import jointItem from './joints_row/joint_item.vue'
 import jointCreator from './joint_creator/index.vue'
+import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 
 export default {
   name: 'pageApp_joint',
   components: {
     jointsRow,
+    navMobile,
     jointItem,
     jointCreator,
   },

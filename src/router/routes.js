@@ -55,7 +55,7 @@ const routes = [
    {
       path: '/auth',
       redirect: '/auth/sign-in',
-      component: () => import('layouts/auth_layout.vue'),
+      component: () => import('src/layouts/auth_layout.vue'),
       children: [
          { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/home/index.vue') }
          // { name: 'signIn', path: 'sign-in', component: () => import('src/pages/auth/sign_in.vue') }
@@ -64,10 +64,11 @@ const routes = [
          // alert('/auth beforeEnter... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
          window.KALPA_LOAD_COMPLETE = true // чтобы крутилка не показывалась
-         if (localStorage.getItem('k_user_oid')) {
-            logD('user is Auth! goto /root')
-            return next('/')
-         } else return next()
+         return next('/')
+         // if (localStorage.getItem('k_user_oid')) {
+         //    logD('user is Auth! goto /root')
+         //    return next('/')
+         // } else return next()
       }
    },
    {

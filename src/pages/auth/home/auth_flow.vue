@@ -10,15 +10,17 @@ select:-webkit-autofill
 div(
   :style=`{
     position: 'relative',
+    marginTop: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '70px' : '0px'
   }`
-  ).row.full-width.items-start.content-start.q-mb-xl
+  ).row.full-width.items-start.content-start.q-mb-xl.justify-start
   //- header
-  .row.full-width.q-pb-md.q-pt-sm
-    span(:style=`{fontSize: '20px',}`).text-white.text-bold {{$t('Welcome')}}
+  .row.full-width.wrap
+    span(:style=`{fontSize: '20px',}`).text-white.text-bold.full-width {{$t('Welcome')}}
+    span(v-if="!emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Для входа или регистрации введите вашу почту')}}
   //- email
-  .row.full-width
+  div(v-if="!emailSent").row.full-width
     .row.full-width.justify-start.q-py-xs.q-px-sm
-      span(:style=`{opacity:email? 1:0}`).text-white {{$t('Enter your email')}}
+      //span(:style=`{opacity:email? 1:0}`).text-white {{$t('Enter your email')}}
     q-input(
     v-model="email"
     borderless dark
@@ -55,17 +57,18 @@ div(
       //span(:style=`{fontSize: '18px',}`).text-bold {{$t('Next')}}
   //- email sent
   div(
-    v-if="emailSent").row.full-width.q-pt-lg
+    v-if="emailSent").row.full-width
     //- header, description
     .row.full-width.justify-start.q-py-xs.q-px-sm
-      span(v-if="needConfirm").text-white {{$t('We sent you one time code, enter it')}}
+      span(v-if="needConfirm" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('We sent you a one-time code by email, enter it')}}
       span(v-if="hasPermanentPassword").text-white {{$t('Enter your permanent password')}}
     //- password input
     q-input(
       v-model="password"
       borderless dark
-      placeholder="Enter password"
+      :placeholder="$t('Enter password', 'Введите пароль')"
       :type="passwordShow ? 'text' : 'password'"
+      :inputmode="needConfirm ? 'numeric' : 'text'"
       :autofocus="true"
       :disable="false"
       :input-style=`{
@@ -83,13 +86,15 @@ div(
       }`
       @keyup.enter="passwordSend()"
       ).full-width
-    //- password helpers
-    .row.full-width.q-px-xs.q-pt-xs
-      q-btn(flat dense no-caps color="white") {{'Forgot password?'}}
-      .col
-      q-btn(
-        @click="passwordShow = !passwordShow"
-        flat dense no-caps color="white") {{ passwordShow ? 'Hide password' : 'Show password' }}
+      //- password helpers
+      div(:style=`{position: 'absolute'}`).row.fit.justify-end.content-center.items-center
+        q-icon(
+          :name="passwordShow ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="passwordShow = !passwordShow"
+          color="white" size="sm").q-mr-md
+    //.row.full-width.q-px-xs.q-pt-xs
+    //  //q-btn(flat dense no-caps color="white") {{'Forgot password?'}}
     //- password send
     q-btn(
       outline no-caps color="green"
@@ -109,12 +114,13 @@ div(
         }`
         @click="reset()")
         span(:style=`{fontSize: '14px'}`) {{ $t('Reset form') }}
-  .row.full-width.q-py-md.text-grey-6
+  div(v-if="!emailSent"
+    :style=`{fontSize: '10px', marginTop: $q.screen.width > 320 ? '30%' : '0%'}`).row.full-width.q-py-md
+    small(:style=`{fontSize: '10px'}`).text-grey {{ $t('If you proceed, you agree with our terms') }}
     kalpa-docs(
+      :style=`{fontSize: '12px'}`
       :title="$t('If you proceed, you agree with our terms')"
-      titleColor="white"
-      docColor="white"
-      docAlign="center")
+      docColor="doc-item2")
 </template>
 
 <script>

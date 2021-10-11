@@ -3,7 +3,7 @@ q-menu(
   anchor="top right" self="bottom right" dark
   :max-height="$q.screen.height+'px'"
   :offset="offset || [0,0]")
-  div(:style=`{width: '300px',borderRadius: '20px',}`).row.shadow-20
+  div(:style=`{width: '270px',borderRadius: '20px',}`).row.shadow-20
     //- header
     div(
       @click="$go('/about')"
@@ -17,7 +17,7 @@ q-menu(
       div(v-if="!mini").col
         div(
           ).row.fit.items-center.content-center.cursor-pointer
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama')}}
+          span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Kalpagrama')}}
           .row.full-width
             small.text-grey-4 {{$t('Connect the dots')}}
     //- body
@@ -26,7 +26,7 @@ q-menu(
         paddingLeft: '14px',
         paddingRight: '14px',
       }`
-      ).row.full-width.items-start.content-start.q-py-sm
+      ).row.full-width.items-start.content-start
       div(
         @click="$go('/'+p.id)"
         v-for="(p,pi) in pages" :key="p"
@@ -37,12 +37,76 @@ q-menu(
           borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm.cursor-pointer
-        q-icon(:name="p.icon" size="24px" color="white" :style=`{marginRight: '18px'}`).q-ml-xs
+        q-icon(:name="p.icon" size="24px" color="grey-5" :style=`{marginRight: '18px'}`).q-ml-xs
         span(
           :style=`{
             textDecotation: 'none',
           }`
-          ).text-white {{ p.name }}
+          ).text-grey-5 {{ p.name }}
+    //- Create new
+    div(
+      v-if="!$store.getters.isGuest && $q.screen.height > 570"
+      @click="addItemMenuShow = true"
+      v-close-popup
+      :style=`{
+        paddingLeft: '14px',
+        paddingRight: '14px',
+      }`
+    ).row.full-width.items-start.content-start.q-pb-sm
+      q-dialog(
+        v-model="addItemMenuShow"
+        position="standard"
+        :maximized="false"
+        )
+        div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
+          //span.text-green.text-h6.q-my-md {{$t('Creation Menu', 'Меню создания')}}
+          q-btn(
+            outline color="grey-8"
+            size="xl"
+            align="center"
+            :to="''"
+            :label="$t('Essence core')"
+            icon='adjust'
+            round flat no-caps
+            ).row.full-width.create-item.q-pa-sm
+          q-btn(
+            outline color="grey-8"
+            align="center"
+            size="xl"
+            :to="'/workspace/create?mode=block'"
+            :label="$t('Essence block')"
+            icon='dashboard_customize'
+            round flat no-caps
+            ).row.full-width.create-item.q-pa-sm
+      div(:style=`{
+          height: '50px',
+          background: 'rgb(33,33,33)',
+          borderRadius: '10px',
+        }`
+      ).row.full-width.items-center.content-center.q-pa-sm.cursor-pointer
+        q-icon(name='add_circle_outline' size="24px" color="grey-5" :style=`{marginRight: '18px'}`).q-ml-xs
+        span(
+          :style=`{
+            textDecotation: 'none',
+          }`
+        ).text-grey-5 {{$t('Create')}}
+    div(
+      :style=`{
+        paddingLeft: '14px',
+        paddingRight: '14px',
+      }`
+    ).row.full-width.items-start.content-start
+      div(
+        @click="$go('/about')"
+        v-close-popup
+        :style=`{
+          height: '50px',
+          background: 'rgb(33,33,33)',
+          borderRadius: '10px',
+        }`
+      ).row.full-width.items-center.content-center.q-pa-sm.q-mb-sm.cursor-pointer
+        q-icon(name='help_outline' size="24px" color="grey-5" :style=`{marginRight: '18px'}`).q-ml-xs
+        span.text-grey-5 {{ $t('How to use?') }}
     //- footer GUEST
     div(
       v-if="$store.getters.isGuest"
@@ -62,10 +126,10 @@ q-menu(
             maxWidth: '40px', maxHeight: '40px',
             borderRadius: '50%',
           }`).row.items-center.content-center.justify-center.b-50
-          q-icon(name="person" size="26px" color="grey-8")
+          q-icon(name="person" size="26px" color="grey-5")
       div(v-if="!mini").col.full-height
         .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
+          span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Login')}}
     //- footer USER
     div(
       v-if="!$store.getters.isGuest"
@@ -81,7 +145,7 @@ q-menu(
       .col.full-heigh
         .row.fit.items-center.content-center
           span(
-            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
+            :style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$store.getters.currentUser.name}}
           //- small.text-grey-4.full-width @username
 </template>
 
@@ -89,10 +153,15 @@ q-menu(
 export default {
   name: 'menuPopup',
   props: ['offset'],
+  data () {
+    return {
+      addItemMenuShow: false,
+    }
+  },
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('Feed'), icon: 'fas fa-home'},
+        {id: 'feeds', name: this.$t('Feed'), icon: 'home'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},

@@ -12,6 +12,7 @@ export default {
   pageWidthMini: 400,
   pageWidthMedi: 600,
   pageWidthMaxi: 800,
+  pageMinWidthDesktop: 768,
   // user
   userTyping: false,
   userScrolling: false,

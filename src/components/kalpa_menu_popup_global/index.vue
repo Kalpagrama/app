@@ -35,7 +35,11 @@ q-btn(
       height: size, minHeight: size, maxHeight: size,
       borderRadius: '50%',
     }`).row.items-center.content-center.justify-center
-    q-icon(name="menu" color="grey-7" size="24px" :style=`{marginTop: '5px'}`)
+    q-icon(
+      name="menu"
+      :color="$route.name.split('.')[0] === 'content' ? 'white' : 'grey-7'"
+      size="24px"
+      :style=`{marginTop: '5px'}`)
   div(
     v-if="showLabel"
     ).row.full-width.justify-center.q-mt-xs

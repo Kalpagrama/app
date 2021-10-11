@@ -27,7 +27,7 @@
         oid: contentOid,
         name: 'Кальпаграма',
         // url: 'https://www.youtube.com/embed/6n6mYnKo1fw',
-        url: 'https://www.youtube.com/embed/6n6mYnKo1fw',
+        url: 'https://08a9ca80-f18e-4a00-8984-5edfca89184b.akamaized.net/pv/lb/235447603884507141_360p_content.mp4?rev=15',
         type: 'VIDEO',
         // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',

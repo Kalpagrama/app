@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.window-height.window-width
-  div(v-if="isReady && $q.screen.width > 768" @click.self="close()").row.fit.items-center.content-center.justify-center
+  div(v-if="isReady && $q.screen.width > $store.state.ui.pageMinWidthDesktop" @click.self="close()").row.fit.items-center.content-center.justify-center
     //- desktop layout
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -49,7 +49,7 @@
   div(
     v-else
     @click="() => {}"
-  ).row.full-height
+  ).row.full-height.no-scroll
     img(
       draggable="false"
       :src="'/images/rainbow.jpg'"
@@ -62,7 +62,7 @@
     div(
       :style=`{position: 'fixed', top: '0px', background: 'rgba(0,0,0,0.5)'}`
     ).row.fit
-    div(:style=`{zIndex: 2}`).row.fit
+    div(:style=`{zIndex: 2}`).row.content-start.q-mt-xl
       q-btn(
         round flat color="white" icon="clear" @click="close" size='20px'
         :style=`{position: 'absolute', zIndex: 100, right: '0px', top: '13%'}`

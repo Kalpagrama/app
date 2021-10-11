@@ -101,16 +101,16 @@ div(
             @click="pageId = null"
             ).full-width
             span.text-bold {{ $t('Edit fragment') }}
-        //- Nav for all platforms
-        nav-bottom(
-          :pageId="pageId" @pageId="pageIdChange")
+        kalpa-menu-mobile(:style=`{background: 'rgba(50,50,50,0)',}`)
+          template(v-slot:all)
+            nav-bottom(:pageId="pageId" @pageId="pageIdChange")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'src/components/content_player/index.vue'
-import navBottom from '../nav_bottom.vue'
+import navBottom from 'src/components/kalpa_menu_mobile/nav_bottom.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageNode from './page_node/index.vue'
 import pageNodeEditor from '../node_editor/index.vue'

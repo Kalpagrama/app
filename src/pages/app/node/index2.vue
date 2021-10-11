@@ -1,5 +1,12 @@
 <template lang="pug">
   kalpa-layout()
+    template(v-slot:footer)
+      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+        template(v-slot:leftButton)
+          navMobile
+        template(v-slot:center)
+          .row.content-center
+            span.text-grey-7 {{$t('Essence core')}}
     template(v-slot:body)
       //- nav header
       .row.full-width.items-start.content-start.justify-center
@@ -85,11 +92,13 @@ import pageImages from './page_images/index.vue'
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
 import cloneDeep from 'lodash/cloneDeep'
+import navMobile from '../../../components/kalpa_menu_mobile/nav_mobile';
 
 export default {
   name: 'pageApp_node2',
   components: {
     pageSimilar,
+    navMobile,
     pageComments,
     pageDescription,
     pageEssences,

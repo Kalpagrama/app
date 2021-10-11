@@ -22,7 +22,7 @@ div(
         .row.full-width.q-px-md.q-py-sm
           span(
             :class=`{
-              //- 'q-my-lg': $q.screen.width > 768,
+              //- 'q-my-lg': $q.screen.width > $store.state.ui.pageMinWidthDesktop,
             }`
             :style=`{
               fontSize: width > 500 ? '16px' : '12px',

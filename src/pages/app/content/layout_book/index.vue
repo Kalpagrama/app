@@ -71,10 +71,12 @@ div(
               :icon="footerShow ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
   //- footer
   .row.full-width.justify-center
-    nav-bottom(
-      v-show="footerShow"
-      :style=`{maxWidth: 650+'px'}`
-      :pageId="pageId" @pageId="pageId = $event").row.full-width.justify-center
+    kalpa-menu-mobile(:style=`{background: 'rgba(50,50,50,0)',}`)
+      template(v-slot:all)
+        nav-bottom(
+          v-show="footerShow"
+          :style=`{maxWidth: 650+'px'}`
+          :pageId="pageId" @pageId="pageId = $event").row.full-width.justify-center
 </template>
 
 <script>
@@ -85,7 +87,7 @@ import contentPlayer from 'src/components/content_player/index.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
-import navBottom from '../nav_bottom.vue'
+import navBottom from 'src/components/kalpa_menu_mobile/nav_bottom.vue'
 
 import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
 import { assert } from 'src/system/common/utils'

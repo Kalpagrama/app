@@ -26,7 +26,7 @@
       div(v-if="!mini").col
         div(
           ).row.fit.items-center.content-center.cursor-pointer
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama')}}
+          span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Kalpagrama')}}
           .row.full-width
             small.text-grey-4 {{$t('Connect the dots')}}
   //- body
@@ -49,10 +49,10 @@
           }`
           ).row.full-width.items-center.menu-item.q-mb-sm
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
-            q-icon(size="30px" :name="p.icon" :color="p.color || 'white'")
+            q-icon(size="30px" :name="p.icon" :color="p.color || 'grey-5'")
           span(
             v-if="!mini"
-            :style=`{fontSize: '18px'}`).text-bold.text-white {{ p.name }}
+            :style=`{fontSize: '18px'}`).text-bold.text-grey-5 {{ p.name }}
         //- user
         div(
           v-if="!$store.getters.isGuest"
@@ -70,7 +70,7 @@
             user-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$store.getters.currentUser.name}}
               //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
         //- login for GUEST
         div(
@@ -90,10 +90,10 @@
                 maxWidth: '40px', maxHeight: '40px',
                 borderRadius: '50%',
               }`).row.items-center.content-center.justify-center.b-50
-              q-icon(name="person" size="26px" color="grey-8")
+              q-icon(name="person" size="26px" color="grey-5")
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Login')}}
+              span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Login')}}
         //- Create new
         div(
           v-if="!$store.getters.isGuest"
@@ -130,11 +130,12 @@
                 round flat no-caps
               ).row.full-width.create-item.q-pa-sm
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-icon(size="30px" name='add_circle_outline' color='white')
+            q-icon(size="30px" name='add_circle_outline' color='grey-5')
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-white.text-bold {{$t('Create')}}
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('Create')}}
               //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
+        //How it work?
         div(
           @click="$go('/about')"
           :style=`{
@@ -144,10 +145,10 @@
             }`
         ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-icon(size="30px" name='far fa-question-circle' color='grey-8')
+            q-icon(size="37px" name="help_outline" color="grey-5")
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-8.text-bold {{$t('How to use?', 'Как это работает')}}
+              span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('How to use?', 'Как это работает')}}
         //- docs
         .row.full-width.q-mt-sm
           kalpa-docs(
@@ -157,7 +158,7 @@
               maxWidth: '210px',
             }`).q-py-sm
         //- version
-        div(v-if="!mini").row.full-width.items-center.q-pa-sm
+        div(v-if="!mini").row.full-width.items-center
           small(
             :style=`{userSelect: 'none', marginLeft: '0px'}`
             ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
@@ -187,7 +188,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('Feed'), icon: 'fas fa-home'},
+        {id: 'feeds', name: this.$t('Feed'), icon: 'home'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},

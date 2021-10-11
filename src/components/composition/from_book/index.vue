@@ -62,7 +62,7 @@ export default {
     },
     fontSize () {
       let l = this.epubCfiTextLength
-      if (this.$q.screen.width > 768) {
+      if (this.$q.screen.width > this.$store.state.ui.pageMinWidthDesktop) {
         if (l < 100) return 36
         else if (l < 140) return 32
         else if (l < 180) return 28

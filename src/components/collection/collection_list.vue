@@ -1,13 +1,13 @@
 <template lang="pug">
-  .row.justify-end
-    q-btn(flat icon="add" :label="$t('Add collection')" no-caps color="green" :style=`{marginRight: '-10px'}`)
-     q-popup-proxy(:breakpoint="1024" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
-      div(
-        :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
-      ).row.full-width
-        q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
-        q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
-    div(:style=`{height: Math.min(value.collections.length*40, 180)+'px'}`).scroll.full-width.row
+  .row.justify-start.full-width
+    div(:style=`{maxHeight: '180px'}`).scroll.full-width.row
+      q-chip(outline icon="add" :label="$t('Add collection')" clickable no-caps color="green")
+        q-popup-proxy(v-model="showMenu" :breakpoint="1024" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
+          div(
+            :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
+          ).row.full-width
+            q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
+            q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
       //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.br.wrap
       q-chip(
         v-for="(c,ci) in value.collections" :key="c.id"
@@ -15,7 +15,7 @@
         :color="value.selectedCollectionIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
         @click="addRemoveCollection(c)"
       ).q-pl-sm
-        div(:style=`{maxWidth: $q.screen.width > 768 ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
+        div(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
         q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
 </template>
 
@@ -35,6 +35,7 @@ export default {
   data () {
     return {
       collectionsRes: null,
+      showMenu: false,
       newCollectionName: ''
     }
   },
@@ -70,7 +71,7 @@ export default {
       if (indx >= 0) this.value.selectedCollectionIds.splice(indx, 1)
       else this.value.selectedCollectionIds.push(c.id)
     },
-    async createCollection () {
+    async createCollection (add = false) {
       assert(this.newCollectionName)
       let collectionInput = {
         name: this.newCollectionName
@@ -79,6 +80,9 @@ export default {
       this.value.collectionId = newCollection.id
       this.newCollectionName = ''
       this.$emit('collection-select', this.value.collectionId)
+      this.showMenu = false
+      if (add) this.addRemoveCollection(newCollection)
+      return this.value.collectionId
     },
     async removeCollection (id) {
       await this.$rxdb.remove(id)

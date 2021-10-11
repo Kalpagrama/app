@@ -3,7 +3,7 @@
     template(v-slot:header=`{scrollTop}`)
       //nav-tabs(:user="user" v-if="scrollTop > 226")
     template(v-slot:footer)
-      kalpa-menu-mobile(v-if="$q.screen.lt.md")
+      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
     template(v-slot:body)
       //- followers
       q-dialog(
@@ -52,7 +52,7 @@
                 marginBottom: '-10px',
                 paddingBottom: '18px',
               }`
-              ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm
+              ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm.br
                 img(
                   draggable="false"
                   :src="user.thumbUrl"

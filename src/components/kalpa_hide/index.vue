@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     fontSize() {
-      if (this.$q.screen.width > 768) return 14
+      if (this.$q.screen.width > this.$store.state.ui.pageMinWidthDesktop) return 14
       else return 12
     },
   },

@@ -4,7 +4,7 @@
     :style=`{
       position: 'relative',
       height: contentHeight ? 'auto' : contentHeight+'px',
-      maxWidth: 700+'px',
+      maxWidth: 500+'px',
       //- marginBottom: '500px',
     }`
     v-observe-visibility=`{
@@ -26,7 +26,7 @@
       :contentKalpa=`{
         oid: contentOid,
         name: 'Кальпаграма',
-        url: 'https://static-api-dev-kalpa-app.kalpa.store/local_object_storage/contents/8q/d0/231850638999339026_360p_content.mp4?rev=9',
+        url: 'https://08a9ca80-f18e-4a00-8984-5edfca89184b.akamaized.net/ub/ix/235445674840211459_360p_content.mp4?rev=15',
         type: 'VIDEO',
         // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',

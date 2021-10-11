@@ -12,27 +12,27 @@
     //- :icon="bookmark ? 'bookmark_outline' : 'bookmark_outline'"
     //- q-badge(floating transparent)
     //- q-icon(
-      v-if="bookmark"
-      name="notifications_none"
-      size="12px"
-      :color="'white'"
-      :style=`{
-        position: 'absolute', zIndex: 10,
-        top: '13px',
-        //- top: '2px', right: '2px',
-        //- top: '-2px', left: '15px',
-      }`)
-    //- q-menu(
-      dark)
-      .row
-        img(
-          :style=`{
-            height: '50px',
-            borderRadius: '10px',
-          }`
-          ).br
-        .row.full-width
-          span {{ name }}
+    //  v-if="bookmark"
+    //  name="notifications_none"
+    //  size="12px"
+    //  :color="'white'"
+    //  :style=`{
+    //    position: 'absolute', zIndex: 10,
+    //    top: '13px',
+    //    //- top: '2px', right: '2px',
+    //    //- top: '-2px', left: '15px',
+    //  }`)
+    ////- q-menu(
+    //  dark)
+    //  .row
+    //    img(
+    //      :style=`{
+    //        height: '50px',
+    //        borderRadius: '10px',
+    //      }`
+    //      ).br
+    //    .row.full-width
+    //      span {{ name }}
 </template>
 
 <script>
