@@ -51,6 +51,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
       const f = { nameExtra: 'boot::main' }
       logD(f, 'start')
       const t1 = performance.now()
+      Vue.prototype.$bus = new Vue({}) // event bus
       // Vue.use(VueVirtualScroller)
       // Vue.use(VueShowdown, {
       //   flavor: 'github',
@@ -97,6 +98,22 @@ export default async ({ Vue, store, router: VueRouter }) => {
       Vue.prototype.$random = function (min, max) {
          return Math.floor(Math.random() * (max - min + 1)) + min
       }
+      // alert("4 " + getNoun(4, 'слон', 'слона', 'слонов')) ->>>>  4 слона
+      Vue.prototype.$getNoun = function (number, one, two, five) {
+         let n = Math.abs(number);
+         n %= 100;
+         if (n >= 5 && n <= 20) {
+            return five;
+         }
+         n %= 10;
+         if (n === 1) {
+            return one;
+         }
+         if (n >= 2 && n <= 4) {
+            return two;
+         }
+         return five;
+      }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
       // App go, last position, and feeds refresh...
@@ -104,12 +121,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
       Vue.prototype.$go = function (to) {
          if (isEqual(goLast, to)) {
             console.log('$go DUPLICATE')
-            console.log('$go listFeedGoToStart')
-            this.$store.commit('ui/stateSet', ['listFeedGoToStart', true])
-            // Handle if there is no listFeed component to set back to false...
-            this.$wait(1000).then(() => {
-               this.$store.commit('ui/stateSet', ['listFeedGoToStart', false])
-            })
             this.$router.push(to).catch(e => e)
          } else {
             this.$log('$go FRESH', to, goLast)

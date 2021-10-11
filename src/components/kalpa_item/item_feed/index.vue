@@ -74,6 +74,7 @@ export default {
     showSpheresAlways: { type: Boolean, default: false },
     showCategory: { type: Boolean, default: true },
     showItems: { type: Boolean, default: true },
+    showContext: { type: Boolean, default: true },
     orderHeader: { type: Number, default: -1 },
     orderName: { type: Number, default: 1 },
     orderSpheres: { type: Number, default: 2 },

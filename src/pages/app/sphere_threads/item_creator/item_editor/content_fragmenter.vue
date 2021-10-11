@@ -57,6 +57,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'src/components/content_player/index.vue'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'contentFragmenter',
@@ -100,7 +101,7 @@ export default {
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
-        __typename: 'Composition',
+        type: ObjectTypeEnum.COMPOSITION,
       }
       this.$emit('composition', compositionInput)
     },

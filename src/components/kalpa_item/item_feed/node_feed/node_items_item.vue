@@ -64,7 +64,7 @@ div(
         ).row.full-width.justify-center.cursor-pointer
   //- COMPOSITION
   composition(
-    v-else-if="item && item.__typename === 'Composition'"
+    v-else-if="item && item.type === 'COMPOSITION'"
     :composition="item"
     :isActive="itemActive"
     :isVisible="true"
@@ -142,7 +142,7 @@ export default {
         }
       }
       // composition
-      else if (this.item.__typename === 'Composition') {
+      else if (this.item.type === 'COMPOSITION') {
         // return '/content/' + this.item.layers[0].contentOid + '?node=' + this.oid
         return {
           link: '/content/' + this.item.layers[0].contentOid,

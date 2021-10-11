@@ -42,9 +42,6 @@
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for graph')",
         :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
-        :pageFilter=`{
-          whiteList: ['nodes', 'joints', 'blocks'],
-        }`
         @item="addItemToGraph"
         @close="itemFinderShow = false"
       ).b-30
@@ -83,14 +80,14 @@
       v-model="jointCreatorShow"
       position="standard"
       :maximized="false"
-      @close="newJoint = null"
+      @hide="newJoint = null"
     )
-      item-editor(
-        :joint="newJoint"
+      essence-editor(
         :item="newJoint"
         :action="addItemToGraph"
         :publish="publish"
-        @remove="$log('item-editor @remove')"
+        @composition="($event ? $set(newJoint.items, 1, $event) : $delete(newJoint.items, 1)), jointCreatorShow = false"
+        @close="jointCreatorShow = false"
         :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
             borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
             }`)
@@ -136,7 +133,6 @@
 
 <script>
 import itemPreview from 'src/components/kalpa_item/item_preview'
-import itemEditor from 'src/components/kalpa_item/item_editor'
 import * as d3 from 'd3';
 import { assert } from 'src/system/common/utils'
 import debounce from 'lodash/debounce'
@@ -148,7 +144,6 @@ export default {
   name: 'graphView',
   components: {
     itemPreview,
-    itemEditor
   },
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект

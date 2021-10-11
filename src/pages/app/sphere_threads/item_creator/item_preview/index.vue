@@ -29,7 +29,7 @@
         span(:style=`{lineHeight: 1.2}`).text-white {{ item.name }}
   //- composition
   div(
-    v-else-if="item.__typename === 'Composition'"
+    v-else-if="item.type === 'COMPOSITION'"
     ).row.full-width.items-start.content-start
     type-video(
       v-if="item.outputType === 'VIDEO'"

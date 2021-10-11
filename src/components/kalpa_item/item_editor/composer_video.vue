@@ -14,9 +14,7 @@ div(:style=`{height: height+'px'}`).row.full-width
       template(v-slot:footer)
         .row.full-width.q-pa-sm
       template(v-slot:pult)
-        div(
-          v-if="player"
-          ).row.full-width.justify-center
+        div(v-if="player").row.full-width.justify-center
           div(
             :style=`{
               maxWidth: 600+'px',
@@ -25,23 +23,16 @@ div(:style=`{height: height+'px'}`).row.full-width
             }`
             ).row.full-width.items-center.content-center
             //- top
-            .row.full-width.q-pa-md
-              span(:style=`{fontSize: '22px'}`).text-white.text-bold.q-ml-sm {{$t('Pick fragment')}}
+            //.row.full-width.q-pa-md
+            //  span(:style=`{fontSize: '22px'}`).text-white.text-bold.q-ml-sm {{$t('Pick fragment')}}
             //- center
-            div(
-              :style=`{
-                lineHeight: 1,
-              }`
-              ).row.full-width.items-start.content-start.q-px-md.q-mb-sm
-              div(v-if="$store.getters.currentUser.profile.lang === 'RUS'").col.q-px-sm
+            div(v-if="!player.figures" :style=`{ lineHeight: 1,}`).row.full-width.items-start.content-start.q-px-md.q-py-sm
+              .col.q-px-sm
                 span.text-white {{$t('Click')}}
-                q-btn(
-                  round flat dense icon="add_circle_outline" color="green")
+                q-icon(name="add_circle_outline" color="green" size="sm")
                 span.text-white {{$t('at the bottom to select a fragment from the video.')}}
-              div(v-if="$store.getters.currentUser.profile.lang === 'ENG'").col.q-pr-lg
-                p.text-white.q-ml-sm {{$t('Why pick fragment on looong video is important! You need to concentrate and to communicate better')}}
             //- bottom
-            .row.full-width.q-pb-sm.q-px-md
+            .row.full-width.q-py-sm.q-px-md
               q-btn(
                 v-if="true"
                 @click="$emit('close')"
@@ -52,6 +43,7 @@ div(:style=`{height: height+'px'}`).row.full-width
                 ).q-mr-sm {{$t('Close')}}
               .col
               q-btn(
+                flat
                 @click="compositionUpdate"
                 no-caps color="green"
                 :disable="!player.figures"
@@ -64,6 +56,7 @@ div(:style=`{height: height+'px'}`).row.full-width
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'src/components/content_player'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'composerVideo',
@@ -115,7 +108,7 @@ export default {
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
-        __typename: 'Composition',
+        type: ObjectTypeEnum.COMPOSITION,
       }
       this.$log('compositionUpdate', compositionInput)
       this.$emit('composition', compositionInput)

@@ -105,7 +105,7 @@
       :style=`{
         height: '60px',
       }`
-      ).row.full-width.br
+      ).row.full-width
       small(v-for="(s,si) in joint.spheres" :key="si").text-white {{ s.name }}
   //- actions
   div(

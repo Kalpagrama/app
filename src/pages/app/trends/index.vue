@@ -10,6 +10,7 @@ kalpa-layout
           :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
         tab-list-feed(
           v-else
+          ref="listFeed"
           :type="'customPPV'"
           :scrollAreaHeight="0"
           :searchInputState="pageInfo.searchInputState"
@@ -77,11 +78,23 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE', 'BLOCK'] },
           oidSphere: this.pageInfo.rootPageId,
-          sortStrategy: 'AGE' // 'ACTIVITY', // AGE
+          sortStrategy: 'AGE', // 'ACTIVITY', // AGE
+          stack: 'item0'
         },
         populateObjects: false,
       }
     }
+  },
+  methods: {
+    onBusEvent(ev) {
+      this.$refs.listFeed.scrollTo('start')
+    }
+  },
+  mounted () {
+    this.$bus.$on('btn-trends-clicked', this.onBusEvent)
+  },
+  beforeDestroy () {
+    this.$bus.$off('btn-trends-clicked', this.onBusEvent)
   }
 }
 </script>

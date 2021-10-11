@@ -15,16 +15,16 @@
       v-model="data.itemEditorShow"
       :maximized="false"
       position="standard")
-      item-editor(
+      essence-editor(
         :item="essence"
         :publish="true"
         @close="data.itemEditorShow = false")
     div(
       :style=`{
       position: 'relative',
-      height: '66px',
+      // height: '66px',
       maxWidth: '500px',
-    }`).row.full-width.items-start.contnet-start.q-pt-sm
+    }`).row.full-width.items-start.contnet-start
       //- share
       .col
         .row.full-width
@@ -136,13 +136,18 @@
 import { ObjectApi } from 'src/api/object'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
-import itemEditor from 'src/components/kalpa_item/item_editor'
+import essenceEditor from 'src/components/kalpa_item/item_editor/essence_editor'
 import { assert } from 'src/system/common/utils'
 export default {
   name: 'essenceActions',
   props: {
     essence: { type: Object, required: true },
-    itemState: { type: Object},
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
     nodeActionsColor: {type: String, default: 'rgb(200,200,200)'},
     isActive: { type: Boolean },
@@ -151,7 +156,7 @@ export default {
   components: {
     essenceVoteBall,
     essenceVoteStats,
-    itemEditor,
+    essenceEditor,
   },
   computed: {
     data() {

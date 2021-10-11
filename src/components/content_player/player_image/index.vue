@@ -13,14 +13,14 @@ div(
     position: 'relative',
     ...styles,
   }`
-  ).row.full-width
+  ).row.full-width.justify-center
   //- preview your crop...
   div(
     v-if="false && figure"
     :style=`{
       position: 'absolute', zIndex: 1000,
     }`
-    ).row.fit.items-start.content-start.b-30.br
+    ).row.fit.items-start.content-start.b-30
     img(
       @click="url = null"
       :src="urlCropped"
@@ -58,43 +58,41 @@ div(
     }`)
   //- footer
   div(
-    :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '8px',
-    }`
-    ).row.full-width.justify-center.q-px-sm
+    :style=`{ position: 'absolute', zIndex: 1000, bottom: '8px'}`
+    ).row.justify-center
     slot(name="tint-bar" :tintFocused="true")
     div(
       :style=`{
-        maxWidth: '300px',
+        // maxWidth: '300px',
         borderRadius: '20px',
         background: 'rgba(40,40,40,0.9)',
       }`
-      ).row.full-width.q-pa-sm
-      q-btn(round flat dense color="white" icon="refresh" @click="cancelCrop")
-      .col
+      ).row.q-pa-sm
+      slot(name="left")
       q-btn(
         v-if="!figure"
         no-caps round flat
         icon="crop" color="grey"
         @click="startCrop")
       q-btn(
-        v-if="figure"
+        v-else
         no-caps round flat
         icon="crop" color="green"
         @click="cancelCrop")
-      .col
-      q-btn(
-        v-if="!selectedDraft"
-        @click="createNodeDraft()"
-        round flat dense
-        :color="cropping ? 'white' : 'green'"
-        :icon="cropping ? 'clear' : 'add_circle_outline'")
-      q-btn(
-        v-if="selectedDraft"
-        @click="selectedDraft = null"
-        round flat dense
-        color="white"
-        icon="clear")
+      div(v-if="!$scopedSlots.right").row
+        q-btn(
+          v-if="!selectedDraft"
+          @click="createNodeDraft()"
+          round flat dense
+          :color="cropping ? 'white' : 'green'"
+          :icon="cropping ? 'clear' : 'add_circle_outline'")
+        q-btn(
+          v-else
+          @click="selectedDraft = null"
+          round flat dense
+          color="white"
+          icon="clear")
+      slot(name="right")
 </template>
 
 <script>

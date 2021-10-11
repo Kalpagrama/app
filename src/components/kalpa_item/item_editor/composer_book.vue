@@ -65,6 +65,7 @@ kalpa-layout(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from 'src/components/content_player'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'composerBook',
@@ -108,7 +109,7 @@ export default {
           },
         ],
         operation: { items: null, operations: null, type: 'CONCAT'},
-        __typename: 'Composition',
+        type: ObjectTypeEnum.COMPOSITION,
       }
       this.$emit('composition', compositionInput)
     }

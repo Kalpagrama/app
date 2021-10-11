@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith.q-px-sm
     //header + tabs
     .row.full-width.items-start.content-start.justify-center.q-px-sm
       q-resize-observer(@resize="headerHeight = $event.height")
@@ -54,6 +54,7 @@
 import listPublished from 'src/components/kalpa_lists/published.vue'
 import listCollections from 'src/components/kalpa_lists/collections.vue'
 import listSearchKalpa from 'src/components/kalpa_lists/search_kalpa.vue'
+import listContents from 'src/components/kalpa_lists/contents.vue'
 import listGif from './page_gif/index.vue'
 
 export default {
@@ -83,6 +84,7 @@ export default {
     listPublished,
     listCollections,
     listSearchKalpa,
+    listContents,
     listGif
   },
   data () {
@@ -121,7 +123,8 @@ export default {
     },
     pages () {
       return [
-        { id: 'published', name: this.$t('published') },
+        { id: 'published', name: this.$t('Published') },
+        { id: 'contents', name: this.$t('Content') },
         { id: 'collections', name: this.$t('collections') },
         { id: 'search-kalpa', name: this.$t('Kalpagrama') },
         { id: 'gif', name: this.$t('Gif') }

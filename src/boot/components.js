@@ -23,6 +23,8 @@ import kalpaTree from 'src/components/kalpa_tree/index.vue'
 // essence
 import composition from 'src/components/composition/index.vue'
 import itemFeed from 'src/components/kalpa_item/item_feed/index.vue'
+import essenceEditor from 'src/components/kalpa_item/item_editor/essence_editor'
+import itemEditor from 'src/components/kalpa_item/item_editor'
 // user
 import userAvatar from 'src/components/user_avatar/index.vue'
 
@@ -48,6 +50,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   // essence
   Vue.component('composition', composition)
   Vue.component('itemFeed', itemFeed)
+  Vue.component('essenceEditor', essenceEditor)
+  Vue.component('itemEditor', itemEditor)
   // user
   Vue.component('userAvatar', userAvatar)
 

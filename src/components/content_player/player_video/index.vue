@@ -4,6 +4,8 @@
       player-default(
         v-bind="$props"
         @player="player = $event, $emit('player', $event)")
+      .row.full-width.absolute-bottom.justify-center
+        slot(name="video-footer")
       //- Pult
       div(:style=`{position: 'absolute', zIndex: 11, bottom: '0px', }`).row.full-width.justify-center
         div(:style=`{maxWidth: 600+'px',}`).row.full-width

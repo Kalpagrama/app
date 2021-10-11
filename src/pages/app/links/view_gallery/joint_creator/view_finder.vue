@@ -9,9 +9,6 @@ div(
   kalpa-finder(
     :height="$q.screen.height"
     @contentKalpa="itemFound"
-    :pageFilter=`{
-          whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres'],
-    }`
     :style=`{
       height: '500px',
     }`)

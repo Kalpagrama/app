@@ -14,7 +14,7 @@
           //- borderRadius: '10px',
           //- overflow: 'hidden',
         }`
-        ).row.no-wrap.br
+        ).row.no-wrap
         //- currentTime
         div(
           :style=`{

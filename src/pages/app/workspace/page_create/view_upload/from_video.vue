@@ -4,7 +4,7 @@
     :src="fileSrc"
     :style=`{
     }`
-    ).full-width.br
+    ).full-width
 </template>
 
 <script>

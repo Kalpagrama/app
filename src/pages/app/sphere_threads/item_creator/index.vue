@@ -13,9 +13,6 @@ q-layout(
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
-      :pageFilter=`{
-          whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres'],
-      }`
       @item="itemFound"
       @close="itemFinderShow = false"
       ).b-30

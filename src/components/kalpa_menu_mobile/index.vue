@@ -8,7 +8,7 @@
         //- feed
         slot(name="leftButton")
           q-btn(
-            @click="$go('/feeds/all')"
+            @click="$bus.$emit('btn-home-clicked'), $go('/feeds/all')"
             flat no-caps icon="home"
             :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
             :style=`{
@@ -19,7 +19,7 @@
         slot(name="center")
           //- trends
           q-btn(
-            @click="$go('/trends')"
+            @click="$bus.$emit('btn-trends-clicked'), $go('/trends')"
             flat no-caps icon="search"
             :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
             :style=`{
@@ -58,7 +58,7 @@
               :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
           //- notifications
           q-btn(
-            @click="$go('/notifications')"
+            @click="$bus.$emit('btn-notifications-clicked'), $go('/notifications')"
             flat no-caps icon="notifications_none"
             :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"
             :style=`{

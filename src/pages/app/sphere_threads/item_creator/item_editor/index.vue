@@ -13,8 +13,8 @@ q-layout(
     :maximized="true")
     content-fragmenter(
       v-if="item"
-      :oid="item.__typename === 'Composition' ? item.layers[0].contentOid : item.oid"
-      :figures="item.__typename === 'Composition' ? item.layers[0].figuresAbsolute : null"
+      :oid="item.type === 'COMPOSITION' ? item.layers[0].contentOid : item.oid"
+      :figures="item.type === 'COMPOSITION' ? item.layers[0].figuresAbsolute : null"
       @composition="contentFragmentDone"
       @close="contentFragmenterShow = false")
   //- header
@@ -58,7 +58,7 @@ q-layout(
           @click="contentFragmentStart").full-width.q-mb-sm {{$t('Fragment it')}}
       //- composition actions
       div(
-        v-if="item.__typename === 'Composition'"
+        v-if="item.type === 'COMPOSITION'"
         ).row.full-width.q-pa-sm
         q-btn(
           outline no-caps color="white"

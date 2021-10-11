@@ -20,7 +20,7 @@
           :data-sources="itemsCopy"
           :estimate-size="itemHeightApprox"
           :page-mode="false"
-        ).full-width.br
+        ).full-width
           template(v-slot:item=`{ item, index, scope }`)
             //item-component(:index="index", :source="item")
             slot(

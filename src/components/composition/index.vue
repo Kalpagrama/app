@@ -20,7 +20,7 @@
     }`
     ).row.full-width.bg-black
       context(
-        v-if="composition.outputType !== 'VIDEO'"
+        v-if="showContext && composition.outputType !== 'VIDEO'"
         :nodeOid="nodeOid"
         :composition="composition"
         :itemState="data"
@@ -45,7 +45,7 @@
         @ended="$emit('ended')"
       )
         template(v-slot:footer=`{player}`)
-          context(
+          context(v-if="showContext"
             :nodeOid="nodeOid"
             :composition="composition"
             :itemState="data"
@@ -96,6 +96,7 @@ export default {
   props: {
     compositionKey: {},
     composition: {},
+    showContext: { type: Boolean, default: true },
     itemState: {
       type: Object,
       default () {

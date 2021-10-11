@@ -8,8 +8,8 @@
     :figures="null"
     :height="$q.screen.height-0"
     :fromComposition="false"
-    @composition="contentComposed('VIDEO', $event)"
-    @close="contentClosed('VIDEO')")
+    @composition="$emit('composition', $event), $emit('close')"
+    @close="$emit('composition', null), $emit('close')")
   //- content BOOK
   composer-book(
     v-else-if="['BOOK'].includes(item.type)"
@@ -17,7 +17,7 @@
     :action="action"
     :figures="null"
     :height="$q.screen.height-0"
-    @composition="contentComposed('BOOK', $event)"
+    @composition="$emit('composition', $event), $emit('close')"
     @close="contetnClosed('BOOK')")
   //- content IMAGE
   composer-image(
@@ -26,29 +26,29 @@
     :action="action"
     :figures="null"
     :height="$q.screen.height-0"
-    @composition="contentComposed('BOOK', $event)"
-    @close="contetnClosed('BOOK')")
+    @composition="$emit('composition', $event), $emit('close')"
+    @close="$emit('close')")
   //- ===
   //- composition VIDEO
   composer-video(
-    v-else-if="item.__typename === 'Composition' && item.outputType === 'VIDEO'"
+    v-else-if="item.type === 'COMPOSITION' && item.outputType === 'VIDEO'"
     :oid="item.layers[0].contentOid"
     :action="action"
     :figures="item.layers[0].figuresAbsolute"
     :height="$q.screen.height-0"
     :fromComposition="true"
-    @composition="compositionChanged('VIDEO', $event)"
-    @close="compositionClosed('VIDEO')")
+    @composition="$emit('composition', $event), $emit('close')"
+    @close="$emit('close')")
   //- composition BOOK
   composer-book(
-    v-else-if="item.__typename === 'Composition' && item.outputType === 'BOOK'"
+    v-else-if="item.type === 'COMPOSITION' && item.outputType === 'BOOK'"
     :oid="item.layers[0].contentOid"
     :action="action"
     :figures="item.layers[0].figuresAbsolute"
     :height="$q.screen.height"
     :fromComposition="true"
-    @composition="compositionChanged('BOOK', $event)"
-    @close="compositionClosed('BOOK')")
+    @composition="$emit('composition', $event), $emit('close')"
+    @close="$emit('close')")
   //- composition AUDIO
   composer-joint(
     v-else-if="item.type === 'JOINT'"
@@ -83,7 +83,7 @@ import composerNode from 'src/components/kalpa_item/item_editor/composer_node'
 // import composerAudio from './composer_audio.vue'
 
 export default {
-  name: 'composer',
+  name: 'itemEditor',
   components: {
     composerBook,
     composerImage,
@@ -93,10 +93,6 @@ export default {
     // composerAudio,
   },
   props: {
-    joint: {
-      type: Object,
-      required: true
-    },
     item: {
       type: Object,
       required: true
@@ -129,39 +125,14 @@ export default {
     }
   },
   methods: {
-    // Composition
-    compositionChanged (type, composition) {
-      this.$log('compositionChanged', composition)
-      this.$set(this.joint.items, 1, composition)
-      this.$emit('close')
-    },
-    compositionClosed (type) {
-      this.$log('compositionClosed')
-      this.$emit('close')
-    },
-    // Content
-    contentComposed (type, composition) {
-      this.$log('contentComposed', composition)
-      this.$set(this.joint.items, 1, composition)
-      this.$emit('close')
-    },
-    contentClosed (type) {
-      this.$log('contentClosed')
-      // its bad? delete it? cos videos and books are too looong
-      if (['VIDEO', 'BOOK'].includes(type)) {
-        this.$delete(this.joint.items, 1)
-        this.$emit('close')
-      }
-      else {
-        this.$emit('close')
-      }
-    },
-    // Transforms
+  },
+  beforeCreate () {
+    this.$log('beforeCreate')
   },
   created () {
     this.$log('created')
     // TODO save first composition version, to Redo the shit
-    // if (this.item.__typename === 'Composition') {
+    // if (this.item.type === 'COMPOSITION') {
     //   this.composition = JSON.parse(JSON.stringify(this.item))
     // }
   },

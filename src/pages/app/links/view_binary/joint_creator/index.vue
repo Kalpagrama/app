@@ -175,7 +175,7 @@ div(
         }`
         :style=`{}`).fit
     div(
-      v-if="joint.items[1].__typename === 'Composition' || joint.items[1].__typename === 'Video'"
+      v-if="joint.items[1].type === 'COMPOSITION' || joint.items[1].__typename === 'Video'"
       :style=`{
         height: '46px',
       }`

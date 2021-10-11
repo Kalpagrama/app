@@ -66,7 +66,7 @@
       slot(name="prepend")
       //- spinner, no itemsRes
       //div(v-if="!itemsRes"  :style=`{position: 'absolute', zIndex: 'auto', top: '50%', left: '50%'}`)
-      q-spinner-dots(v-if="true || !itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
+      q-spinner-dots(v-if="!itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
       // headers + items
       .row.full-width
         slot(name="header")

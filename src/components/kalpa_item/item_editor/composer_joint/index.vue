@@ -8,9 +8,6 @@
       kalpa-finder(
         :height="$q.screen.height"
         :headerTitle="$t('Pick new element for joint')",
-        :pageFilter=`{
-          whiteList: ['nodes'],
-        }`
         @item="itemFound"
         @close="itemFinderShow = false"
       ).b-30
