@@ -57,7 +57,7 @@
             v-if="followingConfirmed && !itsMe"
             @click="followingToggle()"
             outline no-caps
-            :color="following ? 'red' : 'green'"
+            :color="following ? 'grey-8' : 'green'"
             :style=`{
               borderRadius: '30px',
             }`)

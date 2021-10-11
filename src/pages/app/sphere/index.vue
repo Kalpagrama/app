@@ -54,12 +54,12 @@ export default {
     pages () {
       return [
         {id: 'all', name: this.$t('All')},
-        {id: 'contents', name: this.$t('Media')},
+        // {id: 'contents', name: this.$t('Media')},
         {id: 'nodes', name: this.$t('Nodes')},
         {id: 'joints', name: this.$t('Joints')},
         {id: 'blocks', name: this.$t('Blocks')},
-        {id: 'spheres', name: this.$t('Spheres')},
-        {id: 'users', name: this.$t('Users')}
+        // {id: 'spheres', name: this.$t('Spheres')},
+        // {id: 'users', name: this.$t('Users')}
       ]
     },
     query () {
