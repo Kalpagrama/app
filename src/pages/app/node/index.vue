@@ -26,14 +26,14 @@
               :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
               :maxHeight="imageMaxHeight"
-              @node="setNode($event)")
+              @node="setNode($event, false)")
               template(v-slot:bottom)
-                  div(v-if="state.essencesNodes.length > 1" @click="pageId='essences'").row.cursor-pointer.q-pa-sm
-                    small.text-green-8.text-bold {{state.essencesNodes.length}}
-                    small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
-                    q-icon(dense name="expand_more" color="grey-5"  size="14px")
-                    //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
-                  small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-5.text-weight-thin.q-my-xs.q-px-xs  {{$t('Добавить смысл на этот образ')}}
+                div(v-if="state.essencesNodes.length > 1" @click="pageId='essences'").row.cursor-pointer.q-pa-sm
+                  small.text-green-8.text-bold {{state.essencesNodes.length}}
+                  small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
+                  q-icon(dense name="expand_more" color="grey-5"  size="14px")
+                  //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
+                small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-5.text-weight-thin.q-my-xs.q-px-xs  {{$t('Добавить смысл на этот образ')}}
           // fullpage (description / coments / other essences / other images)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -52,7 +52,7 @@
                 :imagesNodesIndx="imagesNodesIndx"
                 :newNode="newNodeSameImage"
                 @close="pageId=null"
-                @set-node="setNode($event)"
+                @set-node="setNode($event, pageId === 'images' ? false : true)"
                 @itemEditorShow="state.imageActive=!$event")
           // author + essence + spheres
           div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
@@ -74,17 +74,17 @@
                     @essences-show="pageId='essences'"
                     @images-show="pageId='images'"
                     @comments-show="pageId='comments'"
-                    @set-node="setNode($event)").b-30
+                    @set-node="setNode($event, true)").b-30
                     template(v-slot:actions-left)
-                      q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix-1])")
+                      q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix-1],true)")
                     template(v-slot:actions-right)
-                      q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix+1])")
+                      q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix+1],true)")
             // список образов + комменты
             widget-images(
               :node="state.node"
               :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event)" @images-show="pageId='images'").q-pt-md
+              @set-node="setNode($event, false)" @images-show="pageId='images'").q-pt-md
             // comments
             .row.full-width.content-end.q-pt-md
               div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
@@ -133,7 +133,7 @@ export default {
     pageImages,
     pageEssence,
     pageImage,
-    widgetImages,
+    widgetImages
   },
   data () {
     return {
@@ -147,7 +147,7 @@ export default {
       itemEditorShow: false,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
-      imageMaxHeight: 0, // максимальная высота образа
+      imageMaxHeight: 0 // максимальная высота образа
     }
   },
   computed: {
@@ -176,16 +176,16 @@ export default {
       if (this.essencesNodesIndx >= 0) return this.state.essencesNodes.slice(0, this.essencesNodesIndx)
       return []
     },
-    essencesNodesIndx(){
+    essencesNodesIndx () {
       return this.state.essencesNodes.findIndex(item => item.oid === this.state?.node?.oid)
     },
-    imagesNodesIndx(){
+    imagesNodesIndx () {
       return this.state.imagesNodes.findIndex(item => item.oid === this.state?.node?.oid)
     },
-    compositionOid() {
+    compositionOid () {
       return this.state?.node?.items[0].oid || null
     },
-    essenceOid(){
+    essenceOid () {
       return this.state?.node?.sphereFromName.oid
     }
   },
@@ -195,7 +195,7 @@ export default {
       async handler (to, from) {
         if (to && (!this.state.node || this.state.node.oid !== to)) {
           this.$log('$route.params.oid TO', to)
-          await this.setNode({oid: to})
+          await this.setNode({ oid: to }, true)
         }
       }
     },
@@ -224,7 +224,7 @@ export default {
         }
       }
     },
-    essenceOid: { // изменилась главная суть. ищем образы на эту суть
+    'state.essenceOid': { // изменилась главная суть. ищем образы на эту суть
       async handler (to, from) {
         this.$log('essenceOid to=', to)
         // this.state.imagesNodesRes = null
@@ -239,7 +239,7 @@ export default {
             populateObjects: false
           })
           // за время выполнения запроса essenceOid могло поменяться (не делаем лишних присваиваний иначе currentIndx === -1 и суть промаргивает)
-          if (this.essenceOid === to) {
+          if (this.state.essenceOid === to) {
             this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
             let res = itemsRes.items
             if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
@@ -250,7 +250,7 @@ export default {
       }
     },
     'state.node.oid': {
-      async handler(to, from) {
+      async handler (to, from) {
         this.$log('node.oid to=', to)
         // this.pageId = null
         this.state.imageActive = true
@@ -259,10 +259,16 @@ export default {
     }
   },
   methods: {
-    async setNode(item){
+    async setNode (item, canChangeEssence = true) {
       if (item && item.oid !== this.state?.node?.oid) {
         // this.state.node = null
         this.state.node = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+        if (canChangeEssence) this.state.essenceOid = this.state.node.sphereFromName.oid
+        else {
+          // образы на суть необязательно находятся в ядрах с таким же именем, но у них тогда обязательно должна быть такая сфера
+          assert(this.state.essenceOid)
+          assert(this.state.node.spheres.find(s => s.oid === this.state.essenceOid))
+        }
       }
     }
   },
