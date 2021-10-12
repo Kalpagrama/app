@@ -7,6 +7,7 @@
 <template lang="pug">
 q-btn(
   flat no-caps
+  :ripple="false"
   :round="isRound"
   :color="color"
   :style=`{
