@@ -23,14 +23,14 @@
             page-image(
               :isActive="state.imageActive"
               :node="state.node"
-              :imagesNodes="imagesNodes"
+              :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
               :maxHeight="imageMaxHeight"
               @node="setNode($event)")
               template(v-slot:bottom)
-                  div(v-if="essencesNodes.length > 1" @click="pageId='essences'").row.cursor-pointer.q-pa-sm
-                    small.text-green-8.text-bold {{essencesNodes.length}}
-                    small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
+                  div(v-if="state.essencesNodes.length > 1" @click="pageId='essences'").row.cursor-pointer.q-pa-sm
+                    small.text-green-8.text-bold {{state.essencesNodes.length}}
+                    small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                     q-icon(dense name="expand_more" color="grey-5"  size="14px")
                     //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
                   small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-5.text-weight-thin.q-my-xs.q-px-xs  {{$t('Добавить смысл на этот образ')}}
@@ -46,8 +46,8 @@
               component(:is="'page-' + pageId"
                 :node="state.node"
                 :height="bottomHeight"
-                :essencesNodes="essencesNodes"
-                :imagesNodes="imagesNodes"
+                :essencesNodes="state.essencesNodes"
+                :imagesNodes="state.imagesNodes"
                 :essencesNodesIndx="essencesNodesIndx"
                 :imagesNodesIndx="imagesNodesIndx"
                 :newNode="newNodeSameImage"
@@ -63,28 +63,26 @@
               :swipeable="true || $q.platform.is.mobile"
               :animated="true || $q.platform.is.mobile"
               dark
-              :style=`{minHeight: '143px'}`).full-width
-              q-tab-panel(v-for="(n,ix) in essencesNodes"
+              :style=`{minHeight: '150px'}`).full-width
+              q-tab-panel(v-for="(n,ix) in state.essencesNodes"
                 :key="n.oid" :name="n.oid").full-width.q-pa-none
                 transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
                   page-essence(:oid="n.oid"
-                    :imagesNodes="imagesNodes"
+                    :imagesNodes="state.imagesNodes"
                     :imagesNodesIndx="imagesNodesIndx"
                     @description-show="pageId='description'"
                     @essences-show="pageId='essences'"
                     @images-show="pageId='images'"
                     @comments-show="pageId='comments'"
-                    @set-node="setNode($event)")
+                    @set-node="setNode($event)").b-30
                     template(v-slot:actions-left)
-                      q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="setNode(essencesNodes[ix-1])")
+                      q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix-1])")
                     template(v-slot:actions-right)
-                      q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(essencesNodes[ix+1])")
-                      //template(v-slot:badge)
-                      //  span(v-if="essencesNodes.length > 1") {{essencesNodes.length}}
+                      q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix+1])")
             // список образов + комменты
             widget-images(
               :node="state.node"
-              :imagesNodes="imagesNodes"
+              :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
               @set-node="setNode($event)" @images-show="pageId='images'").q-pt-md
             // comments
@@ -107,7 +105,7 @@
             .row.full-width.justify-end
               small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
-            page-similar(v-if="!pageId" :node="state.node")
+            page-similar(v-if="false && !pageId" :node="state.node")
 </template>
 
 <script>
@@ -141,8 +139,8 @@ export default {
     return {
       state: {
         node: null,
-        imagesNodesRes: null, // ядра с той же сутью(список образов)
-        essencesNodesRes: null, // ядра с тем же образом(список сутей)
+        imagesNodes: [], // ядра с той же сутью(список образов)
+        essencesNodes: [], // ядра с тем же образом(список сутей)
         imageActive: true // главный образ играется
       },
       itemEditorShow: false,
@@ -169,48 +167,19 @@ export default {
       // node.spheres = []
       return node
     },
-    essencesNodes () {
-      return this.state?.essencesNodesRes?.items || []
-      // eslint-disable-next-line no-unreachable
-      let res = []
-      if (this.state.essencesNodesRes && this.state.node) {
-        let itemsCopy = [...this.state.essencesNodesRes.items]
-        let indx = itemsCopy.findIndex(item => item.oid === this.state.node.oid)
-        if (indx >= 0) itemsCopy.splice(indx, 1, this.state.node) // this.state.node уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-        else itemsCopy.unshift(this.state.node) // почему-то в essencesNodesRes не оказалось нашего ядра...
-        res = itemsCopy
-      } else if (this.state.node) res = [this.state.node]
-      this.$log('essencesNodes calc', res)
-      return res
-    },
-    imagesNodes () {
-      // this.$log('imagesNodes calc', this.state?.node?.oid, cloneDeep(this?.imagesNodesRes?.items))
-      return this.state?.imagesNodesRes?.items || []
-      // eslint-disable-next-line no-unreachable
-      let res = []
-      if (this.state.imagesNodesRes && this.state.node) {
-        let itemsCopy = [...this.state.imagesNodesRes.items]
-        let indx = itemsCopy.findIndex(item => item.oid === this.state.node.oid)
-        if (indx >= 0) itemsCopy.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-        else itemsCopy.unshift(this.state.node) // почему-то в essencesNodesRes не оказалось нашего ядра...
-        res = itemsCopy
-      } else if (this.state.node) res = [this.state.node]
-      this.$log('imagesNodes calc', res)
-      return res
-    },
     essenceRight () {
-      if (this.essencesNodesIndx >= 0) return this.essencesNodes.slice(this.essencesNodesIndx + 1, this.essencesNodes.length)
+      if (this.essencesNodesIndx >= 0) return this.state.essencesNodes.slice(this.essencesNodesIndx + 1, this.state.essencesNodes.length)
       return []
     },
     essenceLeft () {
-      if (this.essencesNodesIndx >= 0) return this.essencesNodes.slice(0, this.essencesNodesIndx)
+      if (this.essencesNodesIndx >= 0) return this.state.essencesNodes.slice(0, this.essencesNodesIndx)
       return []
     },
     essencesNodesIndx(){
-      return this.essencesNodes.findIndex(item => item.oid === this.state?.node?.oid)
+      return this.state.essencesNodes.findIndex(item => item.oid === this.state?.node?.oid)
     },
     imagesNodesIndx(){
-      return this.imagesNodes.findIndex(item => item.oid === this.state?.node?.oid)
+      return this.state.imagesNodes.findIndex(item => item.oid === this.state?.node?.oid)
     },
     compositionOid() {
       return this.state?.node?.items[0].oid || null
@@ -244,11 +213,17 @@ export default {
             populateObjects: false
           })
           // за время выполнения запроса compositionOid могло поменяться (не делаем лишних присваиваний иначе currentIndx === -1 и суть промаргивает)
-          if (this.compositionOid === to) this.state.essencesNodesRes = itemsRes
+          if (this.compositionOid === to) {
+            this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+            let res = itemsRes.items
+            if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
+            this.$log('essencesNodes calc res=', cloneDeep(res))
+            this.state.essencesNodes = res
+          }
         }
       }
     },
-    essenceOid: { // изменилась главная суть
+    essenceOid: { // изменилась главная суть. ищем образы на эту суть
       async handler (to, from) {
         this.$log('essenceOid to=', to)
         // this.state.imagesNodesRes = null
@@ -263,7 +238,13 @@ export default {
             populateObjects: false
           })
           // за время выполнения запроса essenceOid могло поменяться (не делаем лишних присваиваний иначе currentIndx === -1 и суть промаргивает)
-          if (this.essenceOid === to) this.state.imagesNodesRes = itemsRes
+          if (this.essenceOid === to) {
+            this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+            let res = itemsRes.items
+            if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
+            this.$log('imagesNodes calc res=', cloneDeep(res))
+            this.state.imagesNodes = res
+          }
         }
       }
     },
