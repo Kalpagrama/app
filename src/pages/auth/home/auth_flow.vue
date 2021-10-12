@@ -109,7 +109,7 @@ div(
     .row.full-width.q-pa-xs
       q-btn(
         v-if="emailSent"
-        flat dense no-caps color="red"
+        flat dense no-caps color="grey-5"
         :style=`{
         }`
         @click="reset()")
