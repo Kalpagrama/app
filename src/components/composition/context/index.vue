@@ -5,7 +5,7 @@ div(
     minHeight: '27px',
     //- background: 'rgba(0,0,0,0.5)',
     background: wrapperBackground,
-    borderRadius: '10px',
+    // borderRadius: '10px',
   }`
   ).column.full-width.items-end.content-end.justify-end
     //- top/opened

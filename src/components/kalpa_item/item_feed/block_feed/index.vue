@@ -64,7 +64,7 @@
         :itemState="data"
         :style=`{
         order: 3,
-      }`)
+      }`).q-py-xs
     //- FOOTER: actions, slot
     essence-actions(
       v-if="showActions && block.oid"

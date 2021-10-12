@@ -25,7 +25,7 @@
       :style=`{
       position: 'absolute',
       objectFit: objectFit || 'contain',
-      borderRadius: '10px',
+      // borderRadius: '10px',
       zIndex: data.currentTimeChangedCnt > 0 ? 'auto' : 100
       // background: 'rgb(35,35,35)',
     }`
@@ -43,7 +43,7 @@
       :style=`{
       position: 'absolute',
       objectFit: objectFit || 'contain',
-      borderRadius: '10px',
+      // borderRadius: '10px',
     }`
       @click="videoClick"
       @timeupdate="videoTimeupdate"

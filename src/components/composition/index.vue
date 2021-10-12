@@ -5,8 +5,8 @@
   //  slot
   div(
     :style=`{
-    borderRadius: '10px',
-    overflow: 'hidden',
+    // borderRadius: '10px',
+    // overflow: 'hidden',
   }`
   ).row.full-width.bg-black
     q-resize-observer(@resize="onResize")
@@ -15,8 +15,7 @@
       position: 'relative',
       paddingBottom: paddingBottom+'%',
       background: 'rgb(40,40,40)',
-      borderRadius: '10px',
-      //- overflow: 'hidden',
+      // borderRadius: '10px',
     }`
     ).row.full-width.bg-black
       context(
@@ -73,7 +72,7 @@
           :src="url"
           :style=`{
           objectFit: isSquare ? 'fit' : 'contain',
-          borderRadius: '10px',
+          // borderRadius: '10px',
         }`
         ).fit
 </template>

@@ -8,6 +8,8 @@
   div(
     :style=`{
       position: 'relative',
+      borderRadius: '10px',
+      overflow: 'hidden',
       ...styles,
     }`
   ).row.full-width.items-start.content-start
@@ -17,8 +19,7 @@
       :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
-      borderRadius: borderRadius,
-      ...styles,
+      // ...styles,
     }`).row.full-width.items-start.content-start
       slot(name="wrapper-inside")
       //- HEADER: author, createdAt, actions, date, views
@@ -71,7 +72,7 @@
         :itemState="data"
         :style=`{
         order: 3,
-      }`)
+      }`).q-py-xs
     //- FOOTER: actions, slot
     essence-actions(
       v-if="showActions && node.oid"

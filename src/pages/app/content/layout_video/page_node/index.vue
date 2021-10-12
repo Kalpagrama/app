@@ -24,7 +24,7 @@ div(
 
 <script>
 export default {
-  name: 'pageNode',
+  name: 'layoutVideoPageNode',
   props: ['player', 'contentKalpa', 'node'],
   data () {
     return {
