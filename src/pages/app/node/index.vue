@@ -107,7 +107,7 @@
             .row.full-width.justify-end
               small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
-            page-similar(v-if="false && !pageId" :node="state.node")
+            page-similar(v-if="!pageId" :node="state.node")
 </template>
 
 <script>
