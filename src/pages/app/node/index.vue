@@ -37,7 +37,7 @@
                   .col
                   q-pagination(v-model="state.essencesNodesIndxPage"
                     dark flat dense active-color="green-9" color="grey-5" padding="0px"
-                    :max="state.essencesNodes.length" :max-pages="8"
+                    :max="state.essencesNodes.length" :max-pages="7"
                     size="12px"
                     boundary-numbers)
                   .col
