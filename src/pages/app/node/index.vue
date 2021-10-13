@@ -38,7 +38,7 @@
                   q-pagination(v-model="state.essencesNodesIndxPage"
                     dark flat dense active-color="green-9" color="grey-5" padding="0px"
                     :max="state.essencesNodes.length" :max-pages="7"
-                    size="10px"
+                    size="9px"
                     boundary-numbers)
                   .col
                   q-icon(dense name="add" color="green-9" size="sm" @click="itemEditorShow=true").cursor-pointer.q-pr-xs
