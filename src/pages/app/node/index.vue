@@ -16,7 +16,7 @@
             essence-editor(
               :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
               :publish="true"
-              @close="setNode($event || node), itemEditorShow=false")
+              @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")
           // образ
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
@@ -26,14 +26,28 @@
               :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
               :maxHeight="imageMaxHeight"
-              @node="setNode($event, false)")
+              @set-node="setNode($event.oid, false)")
               template(v-slot:bottom)
-                div(v-if="state.essencesNodes.length > 1" @click="pageId='essences'").row.cursor-pointer.q-pa-sm
-                  small.text-green-8.text-bold {{state.essencesNodes.length}}
-                  small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
-                  q-icon(dense name="expand_more" color="grey-5"  size="14px")
+                div(v-if="state.essencesNodes.length > 1").row.full-width.items-center
+                  //small.text-green-8.text-bold {{state.essencesNodes.length}}
+                  //small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
+                  div(@click="pageId='essences'").row.cursor-pointer
+                    small.text-grey-7.text-weight-thin.q-pl-xs {{$t('все смыслы')}}
+                    q-icon(dense name="expand_more" color="grey-5"  size="14px")
+                  .col
+                  q-pagination(v-model="state.essencesNodesIndxPage"
+                    dark flat dense active-color="green-9" color="grey-5" padding="0px"
+                    :max="state.essencesNodes.length" :max-pages="8"
+                    size="12px"
+                    boundary-numbers)
+                  .col
+                  q-icon(dense name="add" color="green-9" size="sm" @click="itemEditorShow=true").cursor-pointer.q-pr-xs
                   //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
-                small(v-else @click="itemEditorShow=true").cursor-pointer.text-green-5.text-weight-thin.q-my-xs.q-px-xs  {{$t('Добавить смысл на этот образ')}}
+                div(v-else @click="itemEditorShow=true").row.full-width.cursor-pointer.items-center
+                  small.text-grey-7.text-weight-thin.q-pl-xs  {{$t('Добавить смысл на этот образ')}}
+                  .col
+                  q-icon(dense name="add" color="green-9" size="sm").q-pr-xs
+
           // fullpage (description / coments / other essences / other images)
           transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
             div(
@@ -52,20 +66,20 @@
                 :imagesNodesIndx="imagesNodesIndx"
                 :newNode="newNodeSameImage"
                 @close="pageId=null"
-                @set-node="setNode($event, pageId === 'images' ? false : true)"
+                @set-node="setNode($event.oid, pageId === 'images' ? false : true)"
                 @itemEditorShow="state.imageActive=!$event")
           // author + essence + spheres
           div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
             q-resize-observer(@resize="imageMaxHeight = $q.screen.height - $event.height")
             // список других сутей
             q-tab-panels(
-              v-model="state.node.oid"
+              v-model="state.essencesNodesIndx"
               :swipeable="true || $q.platform.is.mobile"
               :animated="true || $q.platform.is.mobile"
               dark
               :style=`{minHeight: '160px', maxHeight: '160px'}`).full-width
               q-tab-panel(v-for="(n,ix) in state.essencesNodes"
-                :key="n.oid" :name="n.oid").full-width.q-pa-none
+                :key="ix" :name="ix").full-width.q-pa-none
                 page-essence(:oid="n.oid"
                   :imagesNodes="state.imagesNodes"
                   :imagesNodesIndx="imagesNodesIndx"
@@ -73,17 +87,17 @@
                   @essences-show="pageId='essences'"
                   @images-show="pageId='images'"
                   @comments-show="pageId='comments'"
-                  @set-node="setNode($event, true)").b-30
+                  @set-node="setNode($event.oid, true)").b-30
                   template(v-slot:actions-left)
-                    q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix-1],true)")
+                    q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix-1")
                   template(v-slot:actions-right)
-                    q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix+1],true)")
+                    q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
             // список образов
             widget-images(
               :node="state.node"
               :imagesNodes="state.imagesNodes"
               :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event, false)" @images-show="pageId='images'").q-pt-md
+              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
             // comments
             .row.full-width.content-end.q-pt-md
               div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
@@ -140,6 +154,8 @@ export default {
         essenceOid: null, // oid смысла обычно === node.sphereFromName.oid (либо = одной из сфер)
         imagesNodes: [], // ядра с той же сутью(список образов)
         essencesNodes: [], // ядра с тем же образом(список сутей)
+        essencesNodesIndx: -1,
+        essencesNodesIndxPage: -1,
         imageActive: true // главный образ играется
       },
       itemEditorShow: false,
@@ -188,15 +204,28 @@ export default {
     }
   },
   watch: {
+    'state.essencesNodesIndx': {
+      handler(to, from) {
+        assert(this.state.essencesNodes[to])
+        this.setNode(this.state.essencesNodes[to].oid, true)
+      }
+    },
+    'state.essencesNodesIndxPage': {
+      handler(to, from) {
+        assert(this.state.essencesNodes[to - 1])
+        this.setNode(this.state.essencesNodes[to - 1].oid, true)
+      }
+    },
     essencesNodesIndx(to, from){
-      this.$log('essencesNodesIndx from->to', from, to, cloneDeep(this.state.essencesNodes))
+      this.state.essencesNodesIndx = to
+      this.state.essencesNodesIndxPage = to + 1
     },
     '$route.params.oid': {
       immediate: true,
       async handler (to, from) {
         if (to && (!this.state.node || this.state.node.oid !== to)) {
           this.$log('$route.params.oid TO', to)
-          await this.setNode({ oid: to }, true)
+          await this.setNode(to, true)
         }
       }
     },
@@ -217,12 +246,6 @@ export default {
           })
           // за время выполнения запроса compositionOid могло поменяться (не делаем лишних присваиваний иначе данные промаргивают)
           if (this.compositionOid === to) {
-            // // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-            // let res = [...itemsRes.items]
-            // if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-            // this.state.essencesNodes = res
-            // // this.$log('essencesNodes calc res=', cloneDeep(this.state.essencesNodes), this.essencesNodesIndx)
-
             // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
             let res = [...itemsRes.items]
             if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
@@ -274,15 +297,11 @@ export default {
     },
   },
   methods: {
-    async setNode (item, canChangeEssence = true) {
-      let newOid = item?.oid
-      // this.$log('setNode', canChangeEssence, this.state?.node?.oid, item?.oid, newOid)
-      if (item && item.oid !== this.state?.node?.oid) {
-        let newNode = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
-        // this.$log('setNode2', item.oid, newOid, newNode.oid)
-        // if (newNode.oid !== item.oid) alert('!!!!!! newNode.oid !== item.oid') // ХЗ что это!!!
-        this.state.node = newNode
-        if (canChangeEssence) this.state.essenceOid = this.state.node.sphereFromName.oid
+    async setNode (oid, canChangeMainEssence = true) {
+      // this.$log('setNode', canChangeMainEssence, this.state?.node?.oid, oid)
+      if (oid !== this.state?.node?.oid) {
+        this.state.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
+        if (canChangeMainEssence) this.state.essenceOid = this.state.node.sphereFromName.oid
         else {
           // образы на суть необязательно находятся в ядрах с таким же именем, но у них тогда обязательно должна быть такая сфера
           assert(this.state.essenceOid)

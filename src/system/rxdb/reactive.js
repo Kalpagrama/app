@@ -3,7 +3,7 @@ import { assert, wait } from 'src/system/common/utils'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { getRawIdFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
@@ -94,11 +94,22 @@ class ReactiveObjFactory {
    }
 }
 
+function TMP_CHECK(rxDoc, sss){
+   if (rxDoc?.cached?.data?.oid){
+      let oid = getRawIdFromId(rxDoc.id)
+      if (oid !== rxDoc?.cached?.data?.oid) {
+         alert('oid=' + oid + sss)
+         logE(sss + '!!!!WTF!!!!', cloneDeep(rxDoc.toJSON()))
+         throw new Error('!!!!WTF!!!!' + oid + ':' + rxDoc?.cached?.data?.oid)
+      }
+   }
+}
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
    constructor (rxDoc, mirroredVuexObjectKey = null) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
+      // TMP_CHECK(rxDoc, '1')
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
       if (rxDoc.wsItemType) this.itemType = 'wsItem'
       else if (rxDoc.cached) this.itemType = 'object'
@@ -332,6 +343,7 @@ class ReactiveDocFactory {
                      if (synchro && this.itemType === 'wsItem') newData.hasChanges = true // итем изменился локально. надо отправить изменеия на сервер
                      return newData
                   })
+                  // TMP_CHECK(updatedRxDoc, '2')
                   this.setRev(updatedRxDoc._rev)
                   // logD(f, `rxDoc changed ${updatedRxDoc.id} ${updatedRxDoc._rev}`)
                } catch (err) {

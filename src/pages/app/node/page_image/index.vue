@@ -16,12 +16,12 @@
       .row.full-width.absolute-bottom.b-0
         q-resize-observer(@resize="imageHeightReal = $event.height")
         q-tab-panels(
-          v-model="node.oid"
+          v-model="imagesNodesIndx"
           :swipeable="true || $q.platform.is.mobile"
           :animated="true || $q.platform.is.mobile"
           dark
-          @transition="onTransition").full-width
-          q-tab-panel(v-for="(n,ix) in imagesNodes" :key="n.oid" :name="n.oid").full-width.q-pa-none.b-0
+          @transition="$emit('set-node', imagesNodes[$event])").full-width
+          q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
             transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
               item-feed(
                 :itemShortOrFull="n"
@@ -74,14 +74,6 @@ export default {
     // imagesNodes(to, from) {
     //   this.$log('imagesNodes to: ', to, from)
     // }
-  },
-  methods: {
-    onTransition(newVal, oldVal){
-      let indx = newVal
-      let newNode = this.imagesNodes[indx]
-      this.$log('onTransition: ', indx, newNode)
-      this.$emit('node', newNode)
-    }
   },
   async created () {
     this.$log('created ')
