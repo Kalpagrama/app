@@ -31,7 +31,7 @@
                 div(v-if="state.essencesNodes.length > 1").row.full-width.items-center
                   //small.text-green-8.text-bold {{state.essencesNodes.length}}
                   //small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
-                  div(@click="pageId='essences'").row.cursor-pointer
+                  div(@click="pageId=pageId==='essences'? null : 'essences'").row.cursor-pointer
                     small.text-grey-7.text-weight-thin.q-pl-xs {{$t('все смыслы')}}
                     q-icon(dense name="expand_more" color="grey-5"  size="14px")
                   .col
