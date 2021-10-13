@@ -15,23 +15,24 @@
       // верх образа обрезается(потом отресайзится см updateImageHeight)
       .row.full-width.absolute-bottom.b-0
         q-resize-observer(@resize="imageHeightReal = $event.height")
-        q-tab-panels(v-if="imagesNodes.length"
-          v-model="imagesNodesIndx"
+        q-tab-panels(
+          v-model="node.oid"
           :swipeable="true || $q.platform.is.mobile"
           :animated="true || $q.platform.is.mobile"
           dark
           @transition="onTransition").full-width
-          q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
-            item-feed(
-              :itemShortOrFull="n"
-              :isActive="isActive"
-              :isVisible="true"
-              :showHeader="false"
-              :showActions="false"
-              :showName="false"
-              :showSpheres="false"
-              :styles=`{borderRadius: '10px 10px 0px 0px',}`
-              )
+          q-tab-panel(v-for="(n,ix) in imagesNodes" :key="n.oid" :name="n.oid").full-width.q-pa-none.b-0
+            transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
+              item-feed(
+                :itemShortOrFull="n"
+                :isActive="isActive"
+                :isVisible="true"
+                :showHeader="false"
+                :showActions="false"
+                :showName="false"
+                :showSpheres="false"
+                :styles=`{borderRadius: '10px 10px 0px 0px',}`
+                )
         .row.full-width
           slot(name="bottom")
 </template>
@@ -69,7 +70,10 @@ export default {
     },
     imagesNodesIndx(to){
       this.updateImageHeight() // чтобы картинка не дергалась
-    }
+    },
+    // imagesNodes(to, from) {
+    //   this.$log('imagesNodes to: ', to, from)
+    // }
   },
   methods: {
     onTransition(newVal, oldVal){

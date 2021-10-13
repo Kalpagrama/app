@@ -694,7 +694,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum === RxCollectionEnum.GQL_QUERY) {
          rxDoc = await this.gqlQueries.get(id, clientFirst, force, onFetchFunc, params)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'findOne', rawId)
+         rxDoc = await rxdbOperationProxyExec(this.db.meta, 'findOne', id)
       } else if (rxCollectionEnum === RxCollectionEnum.LOCAL) {
          assert(fetchFunc)
          rxDoc = await this.cache.get(id, fetchFunc)
@@ -765,6 +765,7 @@ class RxDBWrapper {
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
+      // logW(f, 'end', rxCollectionEnum, idOrRawId, cloneDeep(reactiveDoc))
       let reactiveObject = reactiveDoc.getPayload()
       // -- это уже не надо. Объект с бэкенда приходит заполненный
       // const populate = async (obj, queryId) => {
@@ -803,7 +804,7 @@ class RxDBWrapper {
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
          assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
          rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
-            id: data.id,
+            id: makeId(rxCollectionEnum, data.id),
             valueString: data.valueString
          })
       } else {

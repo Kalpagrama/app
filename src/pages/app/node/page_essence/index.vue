@@ -85,10 +85,10 @@ export default {
     }
   },
   async created () {
-    // this.$log('created')
+    this.$log('created')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

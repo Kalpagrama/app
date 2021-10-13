@@ -14,8 +14,10 @@
         size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx-1])").absolute-left
       q-virtual-scroll(ref="vs" :items="imagesNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
         template(v-slot="{ item, index: itemIndex}")
-          div(:style=`{position: 'relative', overflow: 'hidden', height: previewHeight+'px', width: (previewHeight*1.618)+'px', borderRadius: '10px',
-                  border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
+          //transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
+          div(:style=`{position: 'relative', overflow: 'hidden',
+                  height: previewHeight+'px', width: (previewHeight*1.618)+'px',
+                  borderRadius: '10px', border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
                   marginLeft: '1px', marginRight: '1px'}`
             @click="itemIndex!==imagesNodesIndx?waitIndx=itemIndex:null, $emit('set-node', imagesNodes[itemIndex])").row.items-center.center-start.content-center
             div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
@@ -44,7 +46,7 @@ export default {
   props: ['node', 'imagesNodes', 'imagesNodesIndx'],
   data () {
     return {
-      waitIndx: -1, // на какой превьюшке показывать спиннер
+      waitIndx: -1 // на какой превьюшке показывать спиннер
     }
   },
   computed: {
@@ -68,18 +70,23 @@ export default {
   },
   watch: {
     async imagesNodesIndx (to) {
-      // this.$log('imagesNodesIndx to', to)
+      // this.$log('imagesNodesIndx to', to, !!this.$refs.vs)
       if (to >= 0) {
         this.waitIndx = -1
-        if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
+        this.$nextTick(() => {
+          if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
+        })
       }
     }
+    // imagesNodes(to, from){
+    //   this.$log('imagesNodes from->to', from, to)
+    // }
   },
   methods: {
     onVsScroll (details) {
       // this.$log('onVsScroll', details.index)
       // this.$log('onVsScroll range', details.from, details.to)
-    },
+    }
   },
   async created () {
     this.$log('created ')
