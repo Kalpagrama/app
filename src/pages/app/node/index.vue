@@ -80,28 +80,29 @@
                     template(v-slot:actions-right)
                       q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="setNode(state.essencesNodes[ix+1],true)")
             // список образов + комменты
-            widget-images(
-              :node="state.node"
-              :imagesNodes="state.imagesNodes"
-              :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event, false)" @images-show="pageId='images'").q-pt-md
-            // comments
-            .row.full-width.content-end.q-pt-md
-              div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
-                // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-                span.text-grey-5.q-px-sm {{$t('Comments')}}
-                span.text-grey-8 {{state.node.countStat.countComments}}
-                .col
-                q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
-                div(v-if="state.node.commentStat.topComment").row.full-width.items-center
-                  q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mx-xs.q-mb-xs
-                    img(:src="state.node.commentStat.topComment.author.thumbUrl" :to="'/user/'+state.node.commentStat.topComment.author.oid")
-                    div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
-                  .col.content-center.q-px-xs
-                    small.text-grey.text-weight-thin.text-italic.q-pr-md {{state.node.commentStat.topComment.text.substring(0, 77)}}{{state.node.commentStat.topComment.text.length>77?'...':''}}
+            transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+              div(v-if="!slideInHide").row.full-width
+                widget-images(
+                  :node="state.node"
+                  :imagesNodes="state.imagesNodes"
+                  :imagesNodesIndx="imagesNodesIndx"
+                  @set-node="setNode($event, false)" @images-show="pageId='images'").q-pt-md
+                // comments
+                .row.full-width.content-end.q-pt-md
+                  div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
+                    // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
+                    span.text-grey-5.q-px-sm {{$t('Comments')}}
+                    span.text-grey-8 {{state.node.countStat.countComments}}
+                    .col
+                    q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
+                    div(v-if="state.node.commentStat.topComment").row.full-width.items-center
+                      q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mx-xs.q-mb-xs
+                        img(:src="state.node.commentStat.topComment.author.thumbUrl" :to="'/user/'+state.node.commentStat.topComment.author.oid")
+                        div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
+                      .col.content-center.q-px-xs
+                        small.text-grey.text-weight-thin.text-italic.q-pr-md {{state.node.commentStat.topComment.text.substring(0, 77)}}{{state.node.commentStat.topComment.text.length>77?'...':''}}
           // похожие
-          //div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-          div(v-if="!pageId").row.full-width.q-pt-lg
+          div(v-if="false && !pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end
               small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
@@ -147,7 +148,8 @@ export default {
       itemEditorShow: false,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
-      imageMaxHeight: 0 // максимальная высота образа
+      imageMaxHeight: 0, // максимальная высота образа
+      slideInHide: null
     }
   },
   computed: {
@@ -204,6 +206,7 @@ export default {
         this.$log('compositionOid to=', to)
         // this.state.essencesNodesRes = null
         if (to) {
+          this.state.essencesNodes = [this.state.node]
           let itemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -215,11 +218,11 @@ export default {
           })
           // за время выполнения запроса compositionOid могло поменяться (не делаем лишних присваиваний иначе currentIndx === -1 и суть промаргивает)
           if (this.compositionOid === to) {
-            this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-            let res = itemsRes.items
+            // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+            let res = [...itemsRes.items]
             if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-            this.$log('essencesNodes calc res=', cloneDeep(res))
             this.state.essencesNodes = res
+            // this.$log('essencesNodes calc res=', cloneDeep(this.state.essencesNodes), this.essencesNodesIndx)
           }
         }
       }
@@ -229,6 +232,7 @@ export default {
         this.$log('essenceOid to=', to)
         // this.state.imagesNodesRes = null
         if (to) {
+          this.state.imagesNodes = [this.state.node]
           let itemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -240,10 +244,10 @@ export default {
           })
           // за время выполнения запроса essenceOid могло поменяться (не делаем лишних присваиваний иначе currentIndx === -1 и суть промаргивает)
           if (this.state.essenceOid === to) {
-            this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+            // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
             let res = itemsRes.items
             if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-            this.$log('imagesNodes calc res=', cloneDeep(res))
+            // this.$log('imagesNodes calc res=', cloneDeep(res))
             this.state.imagesNodes = res
           }
         }
@@ -256,10 +260,20 @@ export default {
         this.state.imageActive = true
         if (to && this.$route.params.oid !== to) await this.$router.replace({ params: { oid: to } })
       }
+    },
+    async essencesNodesIndx (to, from) {
+      this.$log('essencesNodesIndx TO', from, to)
+      if (Math.abs(from - to) === 1) {
+        if (from > to) this.slideInHide = 'left'
+        else this.slideInHide = 'right'
+        await this.$nextTick()
+        this.slideInHide = null
+      }
     }
   },
   methods: {
     async setNode (item, canChangeEssence = true) {
+      this.$log('setNode', item, canChangeEssence)
       if (item && item.oid !== this.state?.node?.oid) {
         // this.state.node = null
         this.state.node = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)

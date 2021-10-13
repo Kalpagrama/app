@@ -68,6 +68,12 @@ export default {
     }
   },
   watch: {
+    oid: {
+      immediate: true,
+      async handler(to, from){
+        this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+      }
+    }
   },
   computed: {
     fontSize () {
@@ -79,7 +85,7 @@ export default {
     }
   },
   async created () {
-    this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oid)
+    // this.$log('created')
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

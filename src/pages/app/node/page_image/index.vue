@@ -19,7 +19,8 @@
           v-model="imagesNodesIndx"
           :swipeable="true || $q.platform.is.mobile"
           :animated="true || $q.platform.is.mobile"
-          dark).full-width
+          dark
+          @transition="onTransition").full-width
           q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
             item-feed(
               :itemShortOrFull="n"
@@ -68,6 +69,14 @@ export default {
     },
     imagesNodesIndx(to){
       this.updateImageHeight() // чтобы картинка не дергалась
+    }
+  },
+  methods: {
+    onTransition(newVal, oldVal){
+      let indx = newVal
+      let newNode = this.imagesNodes[indx]
+      this.$log('onTransition: ', indx, newNode)
+      this.$emit('node', newNode)
     }
   },
   async created () {
