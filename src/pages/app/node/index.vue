@@ -78,8 +78,7 @@
               :animated="true || $q.platform.is.mobile"
               dark
               :style=`{minHeight: '160px', maxHeight: '160px'}`).full-width
-              q-tab-panel(v-for="(n,ix) in state.essencesNodes"
-                :key="ix" :name="ix").full-width.q-pa-none
+              q-tab-panel(v-for="(n,ix) in state.essencesNodes" :key="ix" :name="ix").full-width.q-pa-none
                 page-essence(:oid="n.oid"
                   :imagesNodes="state.imagesNodes"
                   :imagesNodesIndx="imagesNodesIndx"
@@ -89,9 +88,9 @@
                   @comments-show="pageId='comments'"
                   @set-node="setNode($event.oid, true)").b-30
                   template(v-slot:actions-left)
-                    q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix-1")
+                    //q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix-1")
                   template(v-slot:actions-right)
-                    q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
+                    //q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
             // список образов
             widget-images(
               :node="state.node"
@@ -204,8 +203,14 @@ export default {
     }
   },
   watch: {
+    'state.essencesNodes': {
+      handler(to, from) {
+        this.$log('state.essencesNodes TO', to)
+      }
+    },
     'state.essencesNodesIndx': {
       handler(to, from) {
+        this.$log('state.essencesNodesIndx TO', to)
         assert(this.state.essencesNodes[to])
         this.setNode(this.state.essencesNodes[to].oid, true)
       }
@@ -234,7 +239,7 @@ export default {
         this.$log('compositionOid to=', to)
         // this.state.essencesNodesRes = null
         if (to) {
-          this.state.essencesNodes = [this.state.node]
+          // this.state.essencesNodes = [this.state.node]
           let itemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
