@@ -10,7 +10,7 @@
       small.text-grey-7.text-weight-thin {{$getNoun(length, $t('образ'), $t('образа'), $t('образов'))}}
       q-icon(dense name="expand_more" color="grey-5"  size="14px")
     div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-      q-btn(:disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
+      q-btn(v-if="false" :disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
         size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx-1])").absolute-left
       q-virtual-scroll(ref="vs" :items="imagesNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
         template(v-slot="{ item, index: itemIndex}")
@@ -30,7 +30,7 @@
                 :showSpheres="false")
             div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
             q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
-      q-btn(:disable="!itemsRight.length" round flat icon="chevron_right" color="white"
+      q-btn(v-if="false" :disable="!itemsRight.length" round flat icon="chevron_right" color="white"
         size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx+1])").absolute-right
 </template>
 

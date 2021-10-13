@@ -102,7 +102,7 @@
                       .col.content-center.q-px-xs
                         small.text-grey.text-weight-thin.text-italic.q-pr-md {{state.node.commentStat.topComment.text.substring(0, 77)}}{{state.node.commentStat.topComment.text.length>77?'...':''}}
           // похожие
-          div(v-if="false && !pageId").row.full-width.q-pt-lg
+          div(v-if="!pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end
               small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
