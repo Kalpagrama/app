@@ -102,15 +102,15 @@ class Lists {
          assert(rxDoc.props.mangoQuery.selector.oidSphere, '!oidSphere')
          let objectsWithRelatedSpheres = await Lists.getObjectsWithRelatedSpheres()
          let processedOids = []
-         for (let { type, relatedSphereOids, oidObject } of objectsWithRelatedSpheres) {
-            assert(oidObject && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
+         for (let { type, relatedSphereOids, oid, name } of objectsWithRelatedSpheres) {
+            assert(oid && relatedSphereOids && type.in('OBJECT_DELETED', 'OBJECT_CREATED'), '!getObjectsWithRelatedSpheres')
             if (relatedSphereOids.includes(rxDoc.props.mangoQuery.selector.oidSphere)) { // созданный / удаленный объект на этой сфере
-               await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oidObject })
-               processedOids.push(oidObject)
+               await this.addRemoveObjectToRxDoc(type, rxDoc, { oid: oid })
+               processedOids.push(oid)
             }
          }
          // удаляем из списка те, что добавились в ленты
-         objectsWithRelatedSpheres = objectsWithRelatedSpheres.filter(item => !processedOids.includes(item.oidObject))
+         objectsWithRelatedSpheres = objectsWithRelatedSpheres.filter(item => !processedOids.includes(item.oid))
          await rxdb.set(RxCollectionEnum.META, {
             id: 'objectsWithRelatedSpheres',
             valueString: JSON.stringify(objectsWithRelatedSpheres)
@@ -336,7 +336,7 @@ class Lists {
       const t1 = performance.now()
       let objectsWithRelatedSpheres = await Lists.getObjectsWithRelatedSpheres()
       objectsWithRelatedSpheres.splice(10, objectsWithRelatedSpheres.length) // не более 10 последних
-      objectsWithRelatedSpheres.push({ type, relatedSphereOids, oidObject: object.oid })
+      objectsWithRelatedSpheres.push({ type, relatedSphereOids, oid: object.oid, name: object.name })
       await rxdb.set(RxCollectionEnum.META, {
          id: 'objectsWithRelatedSpheres',
          valueString: JSON.stringify(objectsWithRelatedSpheres)
