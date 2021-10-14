@@ -41,6 +41,11 @@
           small(:style=`{marginTop: '-7px'}`).text-grey-7.text-italic 4тыс подписчиков
       //q-btn(round flat padding="none" no-caps=false size="sm" color="green-8" :label="$t('подписаться')").col
       small(size="sm").row.items-center.text-grey-7.text-italic {{node.countStat.countViews}} {{$getNoun(node.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
+    //widget-images(
+    //  :node="node"
+    //  :imagesNodes="imagesNodes"
+    //  :imagesNodesIndx="imagesNodesIndx"
+    //  @set-node="$emit('set-node', $event)" @images-show="$emit('images-show', $event)").full-width.q-pt-md
   div(v-else).row.full-width.q-px-sm
     .row.full-width.items-center
       q-skeleton(v-for="(i, ix) in 4" type="text" dark animation="none" :style=`{height: '20px'}`).col.q-mx-xs
@@ -53,6 +58,7 @@
 <script>
 import essenceSpheres from 'src/components/essence/essence_spheres'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import widgetImages from '../widget_images/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -60,6 +66,7 @@ export default {
   components: {
     essenceSpheres,
     essenceActions,
+    widgetImages,
   },
   props: ['oid', 'imagesNodes', 'imagesNodesIndx'],
   data () {

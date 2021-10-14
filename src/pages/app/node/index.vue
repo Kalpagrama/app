@@ -71,26 +71,35 @@
           // author + essence + spheres
           div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
             q-resize-observer(@resize="imageMaxHeight = $q.screen.height - $event.height")
-            // список других сутей
-            q-tab-panels(
-              v-model="state.essencesNodesIndx"
-              :swipeable="true || $q.platform.is.mobile"
-              :animated="true || $q.platform.is.mobile"
-              dark
-              :style=`{minHeight: '160px', maxHeight: '160px'}`).full-width
-              q-tab-panel(v-for="(n,ix) in state.essencesNodes" :key="ix" :name="ix").full-width.q-pa-none
-                page-essence(:oid="n.oid"
-                  :imagesNodes="state.imagesNodes"
-                  :imagesNodesIndx="imagesNodesIndx"
-                  @description-show="pageId='description'"
-                  @essences-show="pageId='essences'"
-                  @images-show="pageId='images'"
-                  @comments-show="pageId='comments'"
-                  @set-node="setNode($event.oid, true)").b-30
-                  template(v-slot:actions-left)
-                    //q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix-1")
-                  template(v-slot:actions-right)
-                    //q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
+            // пока идет переключение - показывать state.node, иначе - q-tab-panels со всеми смыслами
+            div(:style=`{minHeight: '155px', maxHeight: '155px'}`).row.full-width.content-start
+              page-essence(v-if="state.essencesNodesIndx === -1"
+                :oid="state.node.oid"
+                :imagesNodes="state.imagesNodes"
+                :imagesNodesIndx="imagesNodesIndx"
+                @description-show="pageId='description'"
+                @essences-show="pageId='essences'"
+                @images-show="pageId='images'"
+                @comments-show="pageId='comments'"
+                @set-node="setNode($event.oid, true)").b-30
+              q-tab-panels(v-else
+                v-model="state.essencesNodesIndx"
+                :swipeable="true || $q.platform.is.mobile"
+                :animated="true || $q.platform.is.mobile"
+                dark).full-width
+                q-tab-panel(v-for="(n,ix) in state.essencesNodes" :key="ix" :name="ix").full-width.q-pa-none
+                  page-essence(:oid="n.oid"
+                    :imagesNodes="state.imagesNodes"
+                    :imagesNodesIndx="imagesNodesIndx"
+                    @description-show="pageId='description'"
+                    @essences-show="pageId='essences'"
+                    @images-show="pageId='images'"
+                    @comments-show="pageId='comments'"
+                    @set-node="setNode($event.oid, true)").b-30
+                    template(v-slot:actions-left)
+                      //q-btn(:disable="!essenceLeft.length" dense flat icon="chevron_left" :color="essenceLeft.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix-1")
+                    template(v-slot:actions-right)
+                      //q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
             // список образов
             widget-images(
               :node="state.node"
@@ -211,14 +220,18 @@ export default {
     'state.essencesNodesIndx': {
       handler(to, from) {
         this.$log('state.essencesNodesIndx TO', to)
-        assert(this.state.essencesNodes[to])
-        this.setNode(this.state.essencesNodes[to].oid, true)
+        if (to >= 0){
+          assert(this.state.essencesNodes[to])
+          this.setNode(this.state.essencesNodes[to].oid, true)
+        }
       }
     },
     'state.essencesNodesIndxPage': {
       handler(to, from) {
-        assert(this.state.essencesNodes[to - 1])
-        this.setNode(this.state.essencesNodes[to - 1].oid, true)
+        if (to >= 1){
+          assert(this.state.essencesNodes[to - 1])
+          this.setNode(this.state.essencesNodes[to - 1].oid, true)
+        }
       }
     },
     essencesNodesIndx(to, from){
