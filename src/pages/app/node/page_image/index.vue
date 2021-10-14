@@ -20,7 +20,7 @@
           :swipeable="true || $q.platform.is.mobile"
           :animated="true || $q.platform.is.mobile"
           dark
-          @transition="$emit('set-node', imagesNodes[$event])").full-width
+          @transition="$event >= 0 ? $emit('set-node', imagesNodes[$event]):null").full-width
           q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
             transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
               item-feed(

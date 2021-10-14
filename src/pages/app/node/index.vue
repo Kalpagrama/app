@@ -28,7 +28,9 @@
               :maxHeight="imageMaxHeight"
               @set-node="setNode($event.oid, false)")
               template(v-slot:bottom)
-                div(v-if="state.essencesNodes.length > 1").row.full-width.items-center
+                div(v-if="state.essencesNodesInProgress").row.full-width.justify-center
+                  q-spinner-dots(size="20px" color="green")
+                div(v-else-if="state.essencesNodes.length > 1").row.full-width.items-center
                   //small.text-green-8.text-bold {{state.essencesNodes.length}}
                   //small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                   div(@click="pageId=pageId==='essences'? null : 'essences'").row.cursor-pointer
@@ -104,6 +106,7 @@
             widget-images(
               :node="state.node"
               :imagesNodes="state.imagesNodes"
+              :imagesNodesInProgress="state.imagesNodesInProgress"
               :imagesNodesIndx="imagesNodesIndx"
               @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
             // comments
@@ -161,7 +164,9 @@ export default {
         node: null,
         essenceOid: null, // oid смысла обычно === node.sphereFromName.oid (либо = одной из сфер)
         imagesNodes: [], // ядра с той же сутью(список образов)
+        imagesNodesInProgress: false,
         essencesNodes: [], // ядра с тем же образом(список сутей)
+        essencesNodesInProgress: false,
         essencesNodesIndx: -1,
         essencesNodesIndxPage: -1,
         imageActive: true // главный образ играется
@@ -252,7 +257,8 @@ export default {
         this.$log('compositionOid to=', to)
         // this.state.essencesNodesRes = null
         if (to) {
-          // this.state.essencesNodes = [this.state.node]
+          // this.state.essencesNodes = [this.state.node] -- не надо. иначе суть дергается при смене образа
+          this.state.essencesNodesInProgress = true
           let itemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -262,6 +268,7 @@ export default {
             },
             populateObjects: false
           })
+          this.state.essencesNodesInProgress = false
           // за время выполнения запроса compositionOid могло поменяться (не делаем лишних присваиваний иначе данные промаргивают)
           if (this.compositionOid === to) {
             // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
@@ -281,7 +288,8 @@ export default {
         this.$log('essenceOid to=', to)
         // this.state.imagesNodesRes = null
         if (to) {
-          this.state.imagesNodes = [this.state.node]
+          // this.state.imagesNodes = [this.state.node] -- не надо. иначе образы дергается 2 раза при смене сути
+          this.state.imagesNodesInProgress = true
           let itemsRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
@@ -291,6 +299,7 @@ export default {
             },
             populateObjects: false
           })
+          this.state.imagesNodesInProgress = false
           // за время выполнения запроса essenceOid могло поменяться (не делаем лишних присваиваний иначе данные промаргивают)
           if (this.state.essenceOid === to) {
             // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))

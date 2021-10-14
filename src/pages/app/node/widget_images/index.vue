@@ -2,7 +2,9 @@
 <template lang="pug">
   div(:style=`{position: 'relative'}`).row.full-width
     // мини-образы
-    div(v-if="length" @click="$emit('images-show')").row.full-width.justify-start.cursor-pointer.q-pb-xs
+    div(v-if="imagesNodesInProgress").row.full-width.justify-center
+      q-spinner-dots(size="20px" color="green")
+    div(v-else-if="length" @click="$emit('images-show')").row.full-width.justify-start.cursor-pointer.q-pb-xs
       small.text-grey-7.text-weight-thin.q-pl-xs {{$t('На смысл')}}
       small.text-grey-7.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
       small.text-grey-7.text-weight-thin {{$getNoun(length,$t('найден'),$t('найдено'),$t('найдено'))}}
@@ -43,7 +45,7 @@ import { assert } from 'src/system/common/utils'
 export default {
   name: 'pageImages',
   components: {},
-  props: ['node', 'imagesNodes', 'imagesNodesIndx'],
+  props: ['node', 'imagesNodes', 'imagesNodesIndx', 'imagesNodesInProgress'],
   data () {
     return {
       waitIndx: -1 // на какой превьюшке показывать спиннер
