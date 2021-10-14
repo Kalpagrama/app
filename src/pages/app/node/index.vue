@@ -163,8 +163,10 @@ export default {
       state: {
         node: null,
         essenceOid: null, // oid смысла обычно === node.sphereFromName.oid (либо = одной из сфер)
+        imagesNodesRes: null,
         imagesNodes: [], // ядра с той же сутью(список образов)
         imagesNodesInProgress: false,
+        essencesNodesRes: null,
         essencesNodes: [], // ядра с тем же образом(список сутей)
         essencesNodesInProgress: false,
         essencesNodesIndx: -1,
@@ -219,12 +221,12 @@ export default {
   watch: {
     'state.essencesNodes': {
       handler(to, from) {
-        this.$log('state.essencesNodes TO', to)
+        // this.$log('state.essencesNodes TO', to)
       }
     },
     'state.essencesNodesIndx': {
       handler(to, from) {
-        this.$log('state.essencesNodesIndx TO', to)
+        // this.$log('state.essencesNodesIndx TO', to)
         if (to >= 0){
           assert(this.state.essencesNodes[to])
           this.setNode(this.state.essencesNodes[to].oid, true)
@@ -243,23 +245,42 @@ export default {
       this.state.essencesNodesIndx = to
       this.state.essencesNodesIndxPage = to + 1
     },
-    '$route.params.oid': {
-      immediate: true,
-      async handler (to, from) {
-        if (to && (!this.state.node || this.state.node.oid !== to)) {
-          this.$log('$route.params.oid TO', to)
-          await this.setNode(to, true)
+    'state.imagesNodesRes.items': {
+      handler(to, from){
+        if (to) {
+          // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+          let res = [...to]
+          if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
+          let indx = res.findIndex(item => item.oid === this.state.node.oid)
+          assert(indx >= 0)
+          res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
+          this.state.imagesNodes.splice(0, this.state.imagesNodes.length, ...res)
+          // this.$log('this.state.imagesNodes=', cloneDeep(this.state.imagesNodes))
+        }
+      }
+    },
+    'state.essencesNodesRes.items': {
+      handler(to, from){
+        if (to) {
+          // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
+          let res = [...to]
+          if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
+          let indx = res.findIndex(item => item.oid === this.state.node.oid)
+          assert(indx >= 0)
+          res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
+          this.state.essencesNodes.splice(0, this.state.essencesNodes.length, ...res)
+          // this.$log('this.state.essencesNodes=', cloneDeep(this.state.essencesNodes))
         }
       }
     },
     compositionOid: { // изменилась композиция
       async handler (to, from) {
-        this.$log('compositionOid to=', to)
+        // this.$log('compositionOid to=', to)
         // this.state.essencesNodesRes = null
         if (to) {
           // this.state.essencesNodes = [this.state.node] -- не надо. иначе суть дергается при смене образа
           this.state.essencesNodesInProgress = true
-          let itemsRes = await this.$rxdb.find({
+          this.state.essencesNodesRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
@@ -269,28 +290,17 @@ export default {
             populateObjects: false
           })
           this.state.essencesNodesInProgress = false
-          // за время выполнения запроса compositionOid могло поменяться (не делаем лишних присваиваний иначе данные промаргивают)
-          if (this.compositionOid === to) {
-            // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-            let res = [...itemsRes.items]
-            if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-            let indx = res.findIndex(item => item.oid === this.state.node.oid)
-            assert(indx >= 0)
-            res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-            this.state.essencesNodes.splice(0, this.state.essencesNodes.length, ...res)
-            this.$log('this.state.essencesNodes=', cloneDeep(this.state.essencesNodes))
-          }
         }
       }
     },
     'state.essenceOid': { // изменилась главная суть. ищем образы на эту суть
       async handler (to, from) {
-        this.$log('essenceOid to=', to)
+        // this.$log('essenceOid to=', to)
         // this.state.imagesNodesRes = null
         if (to) {
           // this.state.imagesNodes = [this.state.node] -- не надо. иначе образы дергается 2 раза при смене сути
           this.state.imagesNodesInProgress = true
-          let itemsRes = await this.$rxdb.find({
+          this.state.imagesNodesRes = await this.$rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
@@ -300,17 +310,6 @@ export default {
             populateObjects: false
           })
           this.state.imagesNodesInProgress = false
-          // за время выполнения запроса essenceOid могло поменяться (не делаем лишних присваиваний иначе данные промаргивают)
-          if (this.state.essenceOid === to) {
-            // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-            let res = [...itemsRes.items]
-            if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-            let indx = res.findIndex(item => item.oid === this.state.node.oid)
-            assert(indx >= 0)
-            res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-            this.state.imagesNodes.splice(0, this.state.imagesNodes.length, ...res)
-            this.$log('this.state.imagesNodes=', cloneDeep(this.state.imagesNodes))
-          }
         }
       }
     },
@@ -320,6 +319,15 @@ export default {
         // this.pageId = null
         this.state.imageActive = true
         if (to && this.$route.params.oid !== to) await this.$router.replace({ params: { oid: to } })
+      }
+    },
+    '$route.params.oid': {
+      immediate: true,
+      async handler (to, from) {
+        if (to && (!this.state.node || this.state.node.oid !== to)) {
+          // this.$log('$route.params.oid TO', to)
+          await this.setNode(to, true)
+        }
       }
     },
   },
