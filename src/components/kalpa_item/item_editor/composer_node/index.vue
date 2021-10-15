@@ -29,7 +29,7 @@
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       q-input(
-        v-if="showName && node.oid"
+        v-if="showName"
         v-model="node.name"
         :disable="lockName"
         color="green"

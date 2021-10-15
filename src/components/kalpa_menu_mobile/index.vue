@@ -9,7 +9,7 @@
       slot(name="all")
         .row.full-width.justify-between.q-px-sm
           //- feed
-          slot(name="leftButton")
+          slot(name="left-button")
             q-btn(
               @click="$bus.$emit('btn-home-clicked'), $go('/feeds/all')"
               flat no-caps icon="home"

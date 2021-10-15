@@ -6,8 +6,8 @@ kalpa-layout(
   )
   template(v-slot:footer)
     kalpa-menu-mobile(v-if="!$store.state.ui.userTyping")
-      template(v-slot:leftButton)
-        navMobile
+      template(v-slot:left-button)
+        nav-mobile
       template(v-if="!jointCreatorShow" v-slot:center)
         .col
         //q-btn(

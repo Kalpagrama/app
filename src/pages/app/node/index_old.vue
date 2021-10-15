@@ -2,8 +2,8 @@
   kalpa-layout()
     template(v-slot:footer)
       kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-        template(v-slot:leftButton)
-          navMobile
+        template(v-slot:left-button)
+          nav-mobile
         template(v-slot:center)
           .row.content-center
             span.text-grey-7 {{$t('Essence core')}}

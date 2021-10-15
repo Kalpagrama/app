@@ -7,13 +7,15 @@
               position: 'relative', height: '140px',
               borderRadius: '10px 10px 0 0',
             }`).row.full-width.b-40
-            //- img(
-              :src="sphere.thumbUrl"
+            img(
+              v-if="topNode"
+              :src="topNode.thumbUrl"
               :style=`{
                 objectFit: 'cover',
               }`
               ).fit
             q-btn(
+              v-if="$q.screen.lt.md"
               @click="$routerKalpa.back()"
               round flat color="white" icon="west"
               :style=`{
@@ -21,6 +23,7 @@
                 top: '8px', left: '8px',
               }`)
             kalpa-menu-actions(
+              v-if="$q.screen.lt.md"
               :actions="actions" icon="more_vert"
               color="white"
               :style=`{
@@ -75,7 +78,7 @@
 <script>
 export default {
   name: 'pageHeader',
-  props: ['sphere'],
+  props: ['sphere', 'topNode'],
   computed: {
     fontSize () {
       if (!this.sphere) return 14

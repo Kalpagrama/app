@@ -2,8 +2,20 @@
   kalpa-layout
     template(v-slot:footer)
       kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+        template(v-slot:center)
+          q-btn(flat ripple=false icon="add" color="green" :label="$t('Добавить свой образ')" @click="itemEditorShow=true")
+        template(v-slot:left-button)
+          nav-mobile
     template(v-slot:body)
       .row.full-width.items-start.content-start.justify-center
+        q-dialog(
+          v-model="itemEditorShow"
+          :maximized="false"
+          position="standard")
+          essence-editor(
+            :item="newNode"
+            :publish="true"
+            @close="itemEditorShow=false")
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           tab-list-feed(
             v-if="sphere"
@@ -17,9 +29,10 @@
             :itemActivePersist="true"
             @searchString="searchString = $event"
             @pageId="pageId = $event"
+            @items="items = $event"
           ).row.full-width
             template(v-slot:externalHeader)
-              page-header(v-if="sphere" :sphere="sphere").q-mb-sm
+              page-header(v-if="sphere" :sphere="sphere" :topNode="topNode").q-mb-sm
             template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
               item-feed(
                 :itemShortOrFull="item"
@@ -33,31 +46,46 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 
 import pageHeader from './page_header.vue'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'pageApp__sphere',
   components: {
     pageHeader,
+    navMobile
   },
   data () {
     return {
       sphere: null,
       pageId: 'all',
+      itemEditorShow: false,
+      items: [],
+      topNode: null
     }
   },
   computed: {
+    newNode () {
+      return {
+        name: this?.sphere?.name,
+        type: ObjectTypeEnum.NODE,
+        items: [],
+        spheres: [],
+        countStat: {}
+      }
+    },
     scrollAreaHeight () {
       return this.$q.screen.height
     },
     pages () {
       return [
-        {id: 'all', name: this.$t('All')},
+        { id: 'all', name: this.$t('All') },
         // {id: 'contents', name: this.$t('Media')},
-        {id: 'nodes', name: this.$t('Nodes')},
-        {id: 'joints', name: this.$t('Joints')},
-        {id: 'blocks', name: this.$t('Blocks')},
+        { id: 'nodes', name: this.$t('Nodes') },
+        { id: 'joints', name: this.$t('Joints') },
+        { id: 'blocks', name: this.$t('Blocks') }
         // {id: 'spheres', name: this.$t('Spheres')},
         // {id: 'users', name: this.$t('Users')}
       ]
@@ -89,7 +117,7 @@ export default {
           // querySearch: this.searchString,
           sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
         },
-        populateObjects: false,
+        populateObjects: false
       }
     }
   },
@@ -102,9 +130,14 @@ export default {
           // this.$log('$route.params.oid TO', to)
           this.sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           if (!this.$route.params.page) {
-            this.$router.replace({params: {page: 'nodes'}})
+            this.$router.replace({ params: { page: 'nodes' } })
           }
         }
+      }
+    },
+    async items (to) {
+      if (to.length) {
+        this.topNode = await this.$rxdb.get(RxCollectionEnum.OBJ, to[0].oid)
       }
     }
   },
