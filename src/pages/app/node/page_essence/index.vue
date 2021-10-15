@@ -27,7 +27,7 @@
           :nodeBackgroundColor="'rgb(30,30,30)'"
           :nodeActionsColor="'rgb(200,200,200)'"
           :isActive="true"
-          :isVisible="true").q-pb-md
+          :isVisible="true").q-pb-lg
       slot(name="actions-right")
     // author + просмотры
     .row.full-width.justify-between.q-px-sm
