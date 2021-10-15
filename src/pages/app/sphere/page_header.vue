@@ -15,7 +15,7 @@
               }`
               ).fit
             q-btn(
-              v-if="$q.screen.lt.md"
+              v-if="$q.screen.gt.md"
               @click="$routerKalpa.back()"
               round flat color="white" icon="west"
               :style=`{
@@ -23,7 +23,7 @@
                 top: '8px', left: '8px',
               }`)
             kalpa-menu-actions(
-              v-if="$q.screen.lt.md"
+              v-if="$q.screen.gt.md"
               :actions="actions" icon="more_vert"
               color="white"
               :style=`{
