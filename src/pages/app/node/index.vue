@@ -74,7 +74,7 @@
           div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
             q-resize-observer(@resize="imageMaxHeight = $q.screen.height - $event.height")
             // пока идет переключение - показывать state.node, иначе - q-tab-panels со всеми смыслами
-            div(:style=`{minHeight: '155px', maxHeight: '155px'}`).row.full-width.content-start
+            div(:style=`{minHeight: '155px', maxHeight: '255px'}`).row.full-width.content-start
               page-essence(v-if="state.essencesNodesIndx === -1"
                 :oid="state.node.oid"
                 :imagesNodes="state.imagesNodes"
