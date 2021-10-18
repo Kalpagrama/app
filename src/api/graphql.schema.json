@@ -78,6 +78,17 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "Float2",
+        "description": null,
+        "specifiedByUrl": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
         "name": "GenderEnum",
         "description": null,
@@ -4315,7 +4326,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Float",
+                "name": "Float2",
                 "ofType": null
               }
             },
@@ -4328,7 +4339,7 @@
             "args": [],
             "type": {
               "kind": "SCALAR",
-              "name": "Float",
+              "name": "Float2",
               "ofType": null
             },
             "isDeprecated": false,
@@ -4355,7 +4366,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Float",
+                "name": "Float2",
                 "ofType": null
               }
             },
@@ -4368,7 +4379,7 @@
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Float",
+              "name": "Float2",
               "ofType": null
             },
             "defaultValue": null,
@@ -9132,7 +9143,7 @@
             "args": [],
             "type": {
               "kind": "OBJECT",
-              "name": "UserWeght",
+              "name": "UserWeight",
               "ofType": null
             },
             "isDeprecated": false,
@@ -10934,93 +10945,13 @@
       },
       {
         "kind": "OBJECT",
-        "name": "UserWeght",
+        "name": "UserWeight",
         "description": "Вес пользователя",
         "specifiedByUrl": null,
         "fields": [
           {
             "name": "A",
-            "description": " константа, определяемая системой(учитывает уровень заполненности профиля пользователя, степень открытости личной сферы и пр.) A ∈ (0,1]",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "rateObjAvgVal",
-            "description": "средний рейтинг ядер пользователя (с учетом их веса) [от 0 до 1]",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "objRates",
-            "description": "список ядер этого пользователя. objRates: {4563-4234-123123-123123: { rate: 0.55, weight: 0.0255229},4563-4234-123123-123123: { rate: 0.650003,weight: 0.0231659}} oid,rate,weight - это характеристики ядра",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "RawJSON",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "objCnt",
-            "description": "число созданных ядер",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "objRankSumVal",
-            "description": "-- Σ(NodeWeight*rate), где nodeWeight*rate- это rank оценки",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "objWeightSumVal",
-            "description": "-- Σ(nodeWeight)",
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -11036,7 +10967,7 @@
           },
           {
             "name": "xPos",
-            "description": "положение на шкале от 0 до N, где N нелинейно зависит от числа пользователей в системе (например, при 10 пользователях n = 10, при 100 - 50, при 1000 - 100, при 10000 - 200) т.е. N = 8888- (8888/(x+8888))*8888. на малых х функция ведет себя почти линейно(y=x) на больших x функция бесконечно стремится к 8888. При голосовании за ядро пользователя xPos смещается вправо или влево. Направление смещения опредляется rateObjAvgVal. Если оценка, поставленная ядру больше, чем rateObjAvgVal, то xPos смещается вправо пропорционально разнице оценки и rateObjAvgVal. И наоборот. Т.е Δx =  оценка ядру - rateObjAvgVal. При этом xPos >= 0 и xPos =< N",
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -11051,8 +10982,72 @@
             "deprecationReason": null
           },
           {
+            "name": "totalWeight",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalRank",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalRate",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "rateVolatileVal",
-            "description": "определяется линейной функцией y = xPos/N, где N и xPos - см. выше rateVolatileVal ∈ [0,1]",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objCnt",
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -11068,7 +11063,7 @@
           },
           {
             "name": "weightVal",
-            "description": "MAX(0.0001, rateObjAvgVal* rateVolatileVal * A)",
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -12260,6 +12255,38 @@
           },
           {
             "name": "rate",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objectWeight",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objectRate",
             "description": null,
             "args": [],
             "type": {
