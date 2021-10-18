@@ -470,6 +470,8 @@ const topObjectFragment = gql`${figureFragment} ${countStatFragment}
         countVotes
         weight
         rate
+        linkWeight
+        linkRate
         votedUserRate
         internalItemOids
         figuresAbsoluteList{...figureFragment}

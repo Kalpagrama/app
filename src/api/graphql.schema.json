@@ -12270,7 +12270,7 @@
             "deprecationReason": null
           },
           {
-            "name": "objectWeight",
+            "name": "linkWeight",
             "description": null,
             "args": [],
             "type": {
@@ -12286,7 +12286,7 @@
             "deprecationReason": null
           },
           {
-            "name": "objectRate",
+            "name": "linkRate",
             "description": null,
             "args": [],
             "type": {
