@@ -103,12 +103,12 @@
                     template(v-slot:actions-right)
                       //q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
             // список образов
-            widget-images(
-              :node="state.node"
-              :imagesNodes="state.imagesNodes"
-              :imagesNodesInProgress="state.imagesNodesInProgress"
-              :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
+            //widget-images(
+            //  :node="state.node"
+            //  :imagesNodes="state.imagesNodes"
+            //  :imagesNodesInProgress="state.imagesNodesInProgress"
+            //  :imagesNodesIndx="imagesNodesIndx"
+            //  @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
             // comments
             .row.full-width.content-end.q-pt-md
               div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
@@ -123,6 +123,12 @@
                     div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
                   .col.content-center.q-px-xs
                     small.text-grey.text-weight-thin.text-italic.q-pr-md {{state.node.commentStat.topComment.text.substring(0, 77)}}{{state.node.commentStat.topComment.text.length>77?'...':''}}
+            widget-images(
+              :node="state.node"
+              :imagesNodes="state.imagesNodes"
+              :imagesNodesInProgress="state.imagesNodesInProgress"
+              :imagesNodesIndx="imagesNodesIndx"
+              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-xs.b-30
           // похожие
           div(v-if="!pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end

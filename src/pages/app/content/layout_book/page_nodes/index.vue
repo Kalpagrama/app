@@ -19,7 +19,7 @@
       q-btn(
         v-if="item.items[0] && item.items[0].layers"
         round outline no-caps
-        :color="$rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).colorName"
+        :color="$rateMeta.find(r => item.rate >= r.valueMin && item.rate <= r.valueMax).colorName"
         @click="player.showItem(item), $emit('close')"
       ).row.full-width.q-mb-md.node
         // цитата + СУТЬ
@@ -32,7 +32,7 @@
       //  v-if="item.items[0] && item.items[0].layers"
       //  round outline no-caps
       //  :style=`{
-      //      border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate < r.valueMax).color,
+      //      border: '2px solid ' + $rateMeta.find(r => item.rate >= r.valueMin && item.rate <= r.valueMax).color,
       //      }`
       //  @click="player.showItem(item), $emit('close')"
       //).row.full-width.q-mb-md.node
