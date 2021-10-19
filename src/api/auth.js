@@ -225,7 +225,8 @@ class AuthApi {
       }
       let res = await apiCall(f, cb)
 
-      await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
+      // PPV отключил, тк ws подключается к серверу до userAuthenticate(в итоге сервер ничего не шлет до первой перезагрузки)
+      // await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
       return res
    }
 
@@ -296,6 +297,7 @@ class AuthApi {
          if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken) // вне cb (иначе дедлок)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
+
       return res
    }
 
