@@ -12,7 +12,8 @@
           :style=`{minHeight: '40px', border: '1px solid ' + (essencesNodesIndx === itemIndex ? $getPaletteColor('green-7') : $getPaletteColor('grey-9')), borderRadius: '10px'}`
           @click="$emit('set-node', node), $emit('close')").cursor-pointer.row.full-width.items-center.q-mb-sm.q-px-xs.b-35
           span.text-grey-5 {{itemIndex+1}}
-          span(:style=`{textAlign: 'center'}`).text-grey-5.col {{node.name}} cnt:{{node.countStat.countVotes}} weight:{{node.weight}} rate:{{node.rate}} linkWeight:{{node.linkWeight}} linkRate:{{node.linkRate}}
+          span(:style=`{textAlign: 'center'}`).text-grey-5.col {{node.name}}
+          //span(:style=`{textAlign: 'center'}`).text-grey-5.col cnt:{{node.countStat.countVotes}} weight:{{node.weight}} rate:{{node.rate}} linkWeight:{{node.linkWeight}} linkRate:{{node.linkRate}}
           q-circular-progress(v-if="node.countStat.countVotes > 1" :value="node.weight" :min="0" :max="maxWeght * 1.3" show-value
           dark size="sm" color="green-10" :thickness="0.3" track-color="grey-9" :center-color="$getRateMeta(node.rate).colorName" @click="")
             span.text-grey-5 {{node.countStat.countVotes}}

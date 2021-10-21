@@ -12222,6 +12222,22 @@
             "deprecationReason": null
           },
           {
+            "name": "authorOid",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "OID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "countVotes",
             "description": null,
             "args": [],

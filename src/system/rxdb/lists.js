@@ -65,6 +65,7 @@ class Lists {
       assert(el, 'bad el')
       if (el.oid && blackLists.blackListObjectOids.includes(el.oid)) return true
       if (el.author && blackLists.blackListAuthorOids.includes(el.author.oid)) return true
+      if (el.authorOid && blackLists.blackListAuthorOids.includes(el.authorOid)) return true
       return false
    }
 
