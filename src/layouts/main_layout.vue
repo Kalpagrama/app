@@ -69,9 +69,12 @@ export default {
       }
     }
   },
-  methods: {
-  },
   watch: {
+    // '$store.state.ui.authGuard': {
+    //   async handler (to, from) {
+    //     alert('$store.state.ui.authGuard=' + JSON.stringify(this.$store.state.ui.authGuard))
+    //   }
+    // },
     '$store.getters.currentUser.profile.tutorial': {
       immediate: true,
       async handler (to, from) {

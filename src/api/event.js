@@ -8,6 +8,7 @@ import { apiCall } from 'src/api/index'
 import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import { notify } from 'src/boot/notify'
+import store from 'src/store/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
@@ -134,6 +135,7 @@ class EventApi {
                   if (result === false) throw new Error(`Error on userAuthenticate: ${failReason}`)
                   else {
                      notify('info', 'Welcome to KALPAGRAMA!')
+                     store.commit('ui/stateSet', ['authGuard', null])
                      await router.replace('/')
                   }
                } else await rxdb.processEvent(event)
@@ -157,7 +159,6 @@ class EventApi {
       const cb = async () => {
          if (EventApi.subscription) {
             assert(apollo.clients.ws, '!apollo.clients.ws2')
-            // assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
             EventApi.subscription.unsubscribe()
          }
          apollo.clients.ws.closeConnection()

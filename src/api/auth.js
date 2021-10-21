@@ -224,9 +224,7 @@ class AuthApi {
          }
       }
       let res = await apiCall(f, cb)
-
-      // PPV отключил, тк в этом случае ws подключается к серверу до userAuthenticate(в итоге сервер ничего не шлет до первой перезагрузки)
-      // await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
+      await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
       return res
    }
 
@@ -297,7 +295,9 @@ class AuthApi {
          if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken) // вне cb (иначе дедлок)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
-
+      // переподключаемся (предыдущее подключение было вне авторизованной зоны.)
+      await EventApi.deInit()
+      await EventApi.init()
       return res
    }
 
