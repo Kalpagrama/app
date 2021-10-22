@@ -71,7 +71,7 @@
                 @set-node="setNode($event.oid, pageId === 'images' ? false : true)"
                 @itemEditorShow="state.imageActive=!$event")
           // author + essence + spheres
-          div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
+          div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-mt-md.br-10
             q-resize-observer(@resize="imageMaxHeight = $q.screen.height - $event.height")
             // пока идет переключение - показывать state.node, иначе - q-tab-panels со всеми смыслами
             div(:style=`{minHeight: '155px'}`).row.full-width.content-start
@@ -128,7 +128,7 @@
               :imagesNodes="state.imagesNodes"
               :imagesNodesInProgress="state.imagesNodesInProgress"
               :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-xs.b-30
+              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md.b-30
           // похожие
           div(v-if="!pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end
