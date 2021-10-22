@@ -154,9 +154,10 @@ export default {
       handler (to, from) {
         if (to && from) {
           this.data.currentTimeChangedCnt++
-          if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t) {
+          if (to >= this.urlMeta[1].t - 0.3 || to < this.urlMeta[0].t - 1) {
+            if (to < this.urlMeta[0].t - 1) this.$logW('range miss hit:', to, JSON.stringify(this.urlMeta))
+            // this.$log('ended:', this.urlMeta[0].t, this.urlMeta[1].t, this.urlMeta[1].t - 0.3, this.urlMeta[0].t)
             this.play(this.urlMeta[0].t)
-            this.$log('ended:', this?.composition?.layers[0]?.contentName)
             this.$emit('ended')
           }
         }
@@ -182,11 +183,11 @@ export default {
     },
     play (fromTime = null) {
       if (this.$refs.videoRef) {
-        this.$log('play. fromTime=', fromTime, this.id, this?.composition?.layers[0]?.contentName)
+        // this.$log('play. fromTime=', fromTime, this.id, this?.composition?.layers[0]?.contentName)
         if (fromTime) this.$refs.videoRef.currentTime = fromTime
         this.playPromise = this.$refs.videoRef.play()
         this.playPromise.then(() => {
-          this.$log('play OK!', this?.composition?.layers[0]?.contentName)
+          // this.$log('play OK!', this?.composition?.layers[0]?.contentName)
         }).catch(err => {
           this.$logD('error om play video. this.$refs.videoRef=', this.$refs.videoRef)
           this.$logE('error om play video', err)
