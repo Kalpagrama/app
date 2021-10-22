@@ -3,7 +3,8 @@ component(
   v-if="contentKalpa"
   :is="'layout-'+layoutId"
   :key="contentKalpa.oid"
-  :contentKalpa="contentKalpa")
+  :contentKalpa="contentKalpa"
+  :draftId="$route.query.draftId")
 </template>
 
 <script>

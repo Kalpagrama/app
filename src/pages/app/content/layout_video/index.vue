@@ -126,7 +126,7 @@ import figuresControls from 'src/components/content_player/player_video/player_p
 
 export default {
   name: 'layoutVideo',
-  props: ['contentKalpa'],
+  props: ['contentKalpa', 'draftId'],
   components: {
     contentPlayer,
     pageNodes,
@@ -231,9 +231,10 @@ export default {
       this.player.setState('nodeMode', 'edit')
     },
     async playerReady (player) {
-      this.$log('playerReady')
-      // this.player = player
+      this.$log('playerReady', this.draft)
       this.$set(this, 'player', player)
+      if (this.draftId) this.draftFocused(await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.draftId))
+
       // Handle player.autoplay
       this.$nextTick(() => {
         // this.$q.notify('Player.play !')
