@@ -235,7 +235,7 @@ export default {
   watch: {
     'itemsRes.items': {
       async handler (to, from) {
-        this.$log('itemsRes.items changed', !!this.$refs.vs, to)
+        // this.$log('itemsRes.items changed', !!this.$refs.vs, to)
         this.resetItemsRes(this.itemsRes)
         this.$emit('count', to?.length || 0)
         this.$emit('items', this.vsItems.map(item => item.source))

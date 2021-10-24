@@ -113,6 +113,7 @@ class AuthApi {
                      lang
                      alias
                      icon
+                     type
                      name
                      sphere{
                          oid

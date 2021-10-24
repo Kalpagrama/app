@@ -283,6 +283,12 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'category',
+            path: 'category/:categoryId',
+            component: () => import('src/pages/app/trends/category.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'content',
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid }),

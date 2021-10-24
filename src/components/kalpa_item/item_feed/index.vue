@@ -2,36 +2,34 @@
   div(
     v-if="!item.deletedAt"
     :style=`{maxWidth: $q.screen.width + 'px'}`).row.full-width
-    //div(v-if="item.deletedAt" :style=`{height: '50px'}`).br
-    //  span !!!deleted!!!
     div(v-if="!hasItemFull").row.full-width
-      slot(v-if="$scopedSlots.skeleton" name="skeleton")
-      q-card(v-else flat dark :style=`{width: $q.screen.width + 'px'}`)
-        q-item
-          q-item-section(avatar)
-            q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
-          q-item-section
-            q-item-label
-              q-skeleton(type='text' :animation="data.queryId ? 'wave' : 'none'" dark)
-            q-item-label(caption='')
-              q-skeleton(type='text' width='80%' animation="none" dark)
-        q-item.q-px-none
-          q-item-section
-            .row
-              q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
-              q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
-            .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-              span {{item.name || (item.vertexType || item.verices ? this.$nodeItemType(item.vertexType || item.verices[0]).name : '')}}
-            .row.items-center.justify-between.no-wrap.q-px-md
-              .row.items-center
-                q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="none" dark)
-              .row.items-center
-                q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="none" dark)
-              .row.items-center.q-pb-md.q-pb-xl
-                q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
-                q-skeleton(type='text' width='30px' animation="none" dark)
+      slot(name="skeleton")
+        q-card(flat dark :style=`{width: $q.screen.width + 'px'}`)
+          q-item
+            q-item-section(avatar)
+              q-skeleton(type='QAvatar' animation="none" dark :style=`{position: 'relative'}`).relative
+            q-item-section
+              q-item-label
+                q-skeleton(type='text' :animation="data.queryId ? 'wave' : 'none'" dark)
+              q-item-label(caption='')
+                q-skeleton(type='text' width='80%' animation="none" dark)
+          q-item.q-px-none
+            q-item-section
+              .row
+                q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
+                q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
+              .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
+                span {{item.name || (item.vertexType || item.verices ? this.$nodeItemType(item.vertexType || item.verices[0]).name : '')}}
+              .row.items-center.justify-between.no-wrap.q-px-md
+                .row.items-center
+                  q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
+                  q-skeleton(type='text' width='30px' animation="none" dark)
+                .row.items-center
+                  q-icon.q-mr-sm(name='repeat' color='grey-4' size='18px')
+                  q-skeleton(type='text' width='30px' animation="none" dark)
+                .row.items-center.q-pb-md.q-pb-xl
+                  q-icon.q-mr-sm(name='favorite_border' color='grey-4' size='18px')
+                  q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
       component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
@@ -43,6 +41,7 @@
 <script>
 import blockFeed from 'src/components/kalpa_item/item_feed/block_feed'
 import nodeFeed from 'src/components/kalpa_item/item_feed/node_feed'
+import nodeFeedTiny from 'src/components/kalpa_item/item_feed/node_feed/node_feed_tiny'
 import joinFeed from 'src/components/kalpa_item/item_feed/joint_feed'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
@@ -75,6 +74,7 @@ export default {
     showCategory: { type: Boolean, default: true },
     showItems: { type: Boolean, default: true },
     showContext: { type: Boolean, default: true },
+    showBadge: {type: Boolean, default: true},
     orderHeader: { type: Number, default: -1 },
     orderName: { type: Number, default: 1 },
     orderSpheres: { type: Number, default: 2 },
@@ -87,12 +87,14 @@ export default {
     },
     styles: { type: Object },
     borderRadius: { type: String, default: '10px' },
-    actionsColor: { type: String, default: 'grey-9' }
+    actionsColor: { type: String, default: 'grey-9' },
+    height: { type: Number },
   },
   components: {
     blockFeed,
     nodeFeed,
-    joinFeed
+    joinFeed,
+    nodeFeedTiny
   },
   computed: {
     data () {
@@ -113,10 +115,11 @@ export default {
     componentName () {
       switch (this.item.type) {
         case ObjectTypeEnum.NODE:
-          return 'node-feed'
+          return this.height < 300 ? 'node-feed-tiny' : 'node-feed'
         case ObjectTypeEnum.JOINT:
-          return 'node-feed'
+          return this.height < 300 ? 'node-feed-tiny' : 'node-feed'
         case ObjectTypeEnum.BLOCK:
+          assert(!this.height, 'not impl')
           return 'block-feed'
         default:
           throw new Error('bad this.item.type:' + this.item.type)

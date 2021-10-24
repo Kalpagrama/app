@@ -1,37 +1,74 @@
 <template lang="pug">
-kalpa-layout
-  template(v-slot:footer)
-    //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-    kalpa-menu-mobile(v-if="$q.screen.lt.md")
-  template(v-slot:body)
-    .row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        list-search-kalpa(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
-          :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="pageInfo.searchInputState = $event")
-        tab-list-feed(
-          v-else
-          ref="listFeed"
-          :type="'customPPV'"
-          :scrollAreaHeight="0"
-          :searchInputState="pageInfo.searchInputState"
-          :pages="pageInfo.rootPages"
-          :pageId="pageInfo.rootPageId"
-          :query="query"
-          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-          :itemActivePersist="true"
-          @searchString="pageInfo.searchString = $event"
-          @pageId="pageInfo.rootPageId = $event"
-          @searchInputState="pageInfo.searchInputState = $event"
-        ).row.full-width
-          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
-            item-feed(
-              :itemShortOrFull="item"
-              :itemState="itemState"
-              :itemIndex="itemIndex"
-              :isActive="isActive"
-              :isVisible="isVisible"
-              :isPreload="isPreload"
-              :scrolling="scrolling").q-pb-xl
+  kalpa-layout
+    template(v-slot:footer)
+      //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+      kalpa-menu-mobile(v-if="$q.screen.lt.md")
+    template(v-slot:body)
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          div(v-if="pageInfo.searchInputState === 'enabled'").row.full-width
+            //search String
+            q-input(
+              v-model="pageInfo.searchString"
+              flat borderless dark dense
+              icon="search"
+              :placeholder="$t('Type here to search...')"
+              :debounce="500"
+              :style=`{height: '40px'}`
+              :input-style=`{
+                      width: '500px',
+                      color: 'grey',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                    }`
+              @focus="pageInfo.searchInputState = 'opened'"
+            ).row.full-width.b-30
+              template(v-slot:prepend)
+                q-icon(name="search" :color="'green'" size="25px").q-mx-md
+              template(v-slot:append)
+                //q-btn(round flat dense color="white" icon="clear" @click="pageInfo.searchString = '', pageInfo.searchInputState = 'enabled'" ).q-mr-md
+            // горизонтальная полоса
+            span.text-grey-5.text-h5.q-py-sm {{$t('Популярные смыслы')}}
+            list-feed-custom-horizontalPPV(
+              ref="listFeed"
+              :scrollAreaWidth="$store.state.ui.pageWidth"
+              :scrollAreaHeight="150"
+              :query="queryPopular"
+              :itemWidthApprox="150*1.618"
+              :itemHeightApprox="150"
+              :itemActivePersist="itemActivePersist"
+              @count="$emit('count', $event)"
+              @items="$emit('items', $event)")
+              template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
+                item-feed(
+                  :itemShortOrFull="item"
+                  :itemState="itemState"
+                  :itemIndex="itemIndex"
+                  :isActive="isActive"
+                  :isVisible="isVisible"
+                  :isPreload="isPreload"
+                  :scrolling="scrolling"
+                  :showContext="false"
+                  :height="150").q-px-xs
+                  template(v-slot:skeleton=`{queryInProgress}`)
+                    div(:style=`{width: 150*1.618+'px', height: '150px'}`)
+                      q-skeleton(type='rect' height='80%' :animation="queryInProgress ? 'wave' : 'none'" dark)
+                      .row.full-width.justify-center.q-pt-sm
+                        q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
+            span.text-grey-5.text-h5.q-py-sm {{$t('Категории')}}
+            .row.full-width
+              div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
+                q-responsive(:ratio="1.618" :style=`{borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
+                  img(
+                    :src="c.icon"
+                    :style=`{
+                      // height: '60px',
+                      // opacity: 0.2,
+                      objectFit: 'cover',
+                      borderRadius: '10px'}`)
+                  div(@click="$go('/category/'+c.type)").absolute-center.row.content-center.items-center.justify-center.cursor-pointer
+                    span(:style=`{textShadow: '1px 1px 2px '+$getPaletteColor('grey-10')}`).text-grey-4.text-h5 {{c.alias}}
+          list-search-kalpa(v-else-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
+            :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="$logW('searchInputState', $event), pageInfo.searchInputState = $event")
 </template>
 
 <script>
@@ -40,6 +77,7 @@ import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import pageTrendsNavTabs from 'src/pages/app/trends/nav_tabs.vue'
 import listSearchKalpa from 'src/components/kalpa_lists/search_kalpa.vue'
+import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
@@ -48,7 +86,8 @@ export default {
     bookmarkListItem,
     bookmarkEditor,
     pageTrendsNavTabs,
-    listSearchKalpa
+    listSearchKalpa,
+    listFeedCustomHorizontalPPV
   },
   data () {
     return {
@@ -56,13 +95,8 @@ export default {
       bookmarkEditorShow: false,
       showHeader: true,
       pageInfo: {
-        rootPages: [
-          ...this.$store.getters.nodeCategories.map(c => {
-            return { id: c.sphere.oid, name: c.alias, label: c.alias }
-          })],
-        rootPageId: this.$route.query.rootPageId || this.$store.getters.nodeCategories[0].sphere.oid,
         searchInputState: 'enabled',
-        searchString: '',
+        searchString: ''
       }
     }
   },
@@ -70,23 +104,21 @@ export default {
     scrollAreaHeight () {
       return this.$q.screen.height
     },
-    query () {
-      assert(this.pageInfo.rootPageId !== 'search')
-      this.$log('query::this.pageInfo.rootPageId', this.pageInfo.rootPageId)
+    queryPopular () {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: ['NODE', 'BLOCK'] },
-          oidSphere: this.pageInfo.rootPageId,
-          sortStrategy: 'AGE', // 'ACTIVITY', // AGE
+          objectTypeEnum: { $in: ['NODE'] },
+          oidSphere: this.$store.getters.nodeCategories[0].sphere.oid,
+          sortStrategy: 'ACTIVITY', // 'ACTIVITY', // AGE
           stack: 'item0'
         },
-        populateObjects: false,
+        populateObjects: false
       }
     }
   },
   methods: {
-    onBusEvent(ev) {
+    onBusEvent (ev) {
       this.$refs.listFeed.scrollTo('start')
     }
   },
