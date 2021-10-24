@@ -59,7 +59,7 @@
                         q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
             span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Категории')}}
             .row.full-width
-              div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
+              div(v-for="(c, ix) in $store.getters.nodeCategories.filter(c=>c.type !== 'ALL')").col-6.q-pa-xs
                 q-responsive(:ratio="1.618" :style=`{borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
                   img(
                     :src="c.icon"
