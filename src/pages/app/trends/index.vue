@@ -4,7 +4,8 @@
       //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
       kalpa-menu-mobile(v-if="$q.screen.lt.md")
     template(v-slot:body)
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      .row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-center
           div(v-if="pageInfo.searchInputState === 'enabled'").row.full-width
             //search String
             q-input(
@@ -27,7 +28,7 @@
               template(v-slot:append)
                 //q-btn(round flat dense color="white" icon="clear" @click="pageInfo.searchString = '', pageInfo.searchInputState = 'enabled'" ).q-mr-md
             // горизонтальная полоса
-            span.text-grey-5.text-h5.q-py-sm {{$t('Популярные смыслы')}}
+            span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}}
             list-feed-custom-horizontalPPV(
               ref="listFeed"
               :scrollAreaWidth="$store.state.ui.pageWidth"
@@ -54,7 +55,7 @@
                       q-skeleton(type='rect' height='80%' :animation="queryInProgress ? 'wave' : 'none'" dark)
                       .row.full-width.justify-center.q-pt-sm
                         q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
-            span.text-grey-5.text-h5.q-py-sm {{$t('Категории')}}
+            span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Категории')}}
             .row.full-width
               div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
                 q-responsive(:ratio="1.618" :style=`{borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
