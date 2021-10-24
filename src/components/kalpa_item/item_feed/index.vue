@@ -19,7 +19,7 @@
                 q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm
                 q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 2.2)+'px'" animation="none" dark bordered).col.q-mb-sm.q-ml-sm
               .row.text-grey.text-h5.items-center.content-center.justify-center.q-py-lg
-                span {{item.name || (item.vertexType || item.verices ? this.$nodeItemType(item.vertexType || item.verices[0]).name : '')}}
+                span {{item.name || (item.vertexType || item.verices ? $nodeItemType(item.vertexType || item.verices[0]).name : '')}}
               .row.items-center.justify-between.no-wrap.q-px-md
                 .row.items-center
                   q-icon.q-mr-sm(name='chat_bubble_outline' color='grey-4' size='18px')
@@ -32,7 +32,7 @@
                   q-skeleton(type='text' width='30px' animation="none" dark)
 
     div(v-else :style=`{position: 'relative'}`).row.full-width
-      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item")
+      component(:is="componentName"  v-bind="$props" :itemState="data" :block="item" :node="item" :item="item")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -42,6 +42,7 @@
 import blockFeed from 'src/components/kalpa_item/item_feed/block_feed'
 import nodeFeed from 'src/components/kalpa_item/item_feed/node_feed'
 import nodeFeedTiny from 'src/components/kalpa_item/item_feed/node_feed/node_feed_tiny'
+import anyFeedTiny from 'src/components/kalpa_item/item_feed/any_feed/any_feed_tiny'
 import joinFeed from 'src/components/kalpa_item/item_feed/joint_feed'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
@@ -94,7 +95,8 @@ export default {
     blockFeed,
     nodeFeed,
     joinFeed,
-    nodeFeedTiny
+    nodeFeedTiny,
+    anyFeedTiny
   },
   computed: {
     data () {
@@ -122,7 +124,8 @@ export default {
           assert(!this.height, 'not impl')
           return 'block-feed'
         default:
-          throw new Error('bad this.item.type:' + this.item.type)
+          assert(this.height, 'not impl')
+          return this.height < 300 ? 'any-feed-tiny' : ''
       }
     },
     hasItemFull () {

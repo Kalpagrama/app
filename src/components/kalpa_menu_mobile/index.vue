@@ -11,10 +11,10 @@
           //- feed
           slot(name="left-button")
             q-btn(
-              @click="$bus.$emit('btn-home-clicked'), $go('/feeds/all')"
+              @click="$bus.$emit('btn-home-clicked'), $go('/home')"
               flat no-caps icon="home"
               :ripple="false"
-              :color="$route.name.split('.')[0] === 'feeds' ? 'green' : 'grey-7'"
+              :color="$route.name.split('.')[0] === 'home' ? 'green' : 'grey-7'"
               :style=`{
               width: size+'px',
               height: size+'px',

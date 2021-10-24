@@ -138,9 +138,9 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'feeds',
-            path: 'feeds/:id?',
-            component: () => import('src/pages/app/feeds/index.vue'),
+            name: 'home',
+            path: 'home',
+            component: () => import('src/pages/app/home/index.vue'),
             meta: { roleMinimal: 'MEMBER' }
          },
          {
