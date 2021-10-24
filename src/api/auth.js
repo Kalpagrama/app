@@ -39,7 +39,8 @@ class AuthApi {
          case 'MODERATOR':
             return role.in('MODERATOR', 'ADMIN')
          case 'ADMIN':
-            return role.in('ADMIN')
+            alert('asdasdasd')
+            return false // role.in('ADMIN')
          default:
             throw new Error('bad role' + roleMinimal)
       }

@@ -141,7 +141,7 @@ const routes = [
             name: 'feeds',
             path: 'feeds/:id?',
             component: () => import('src/pages/app/feeds/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'ADMIN' }
          },
          {
             name: 'settings',
@@ -393,13 +393,7 @@ const routes = [
       beforeEnter: async (to, from, next) => {
          // logD('router :: try systemInit...')
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
-         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-            logD('router::need more privileges')
-            return next('/auth') // если маршрут требует повышения - переходим на форму входа
-         } else {
-            logD('router:: its ok! ')
-            return next()
-         }
+         return next()
       }
    }
 ]
