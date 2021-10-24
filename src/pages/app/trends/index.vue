@@ -69,7 +69,7 @@
                       objectFit: 'cover',
                       borderRadius: '10px'}`)
                   div(:style=`{background: 'rgba(0,0,0,0.3)'}` @click="$go('/category/'+c.type)").absolute-center.row.content-center.items-center.justify-center.cursor-pointer
-                    span(:style=`{textShadow: '1px 1px 2px '+$getPaletteColor('grey-10')}`).text-grey-4.text-h5 {{c.alias}}
+                    span(:style=`{textShadow: '1px 1px 2px '+$getPaletteColor('grey-10')}`).text-grey-4.text-bold.text-h5 {{c.alias}}
           list-search-kalpa(v-else-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
             :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="$logW('searchInputState', $event), pageInfo.searchInputState = $event")
 </template>

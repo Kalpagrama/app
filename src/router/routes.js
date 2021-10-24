@@ -141,7 +141,7 @@ const routes = [
             name: 'feeds',
             path: 'feeds/:id?',
             component: () => import('src/pages/app/feeds/index.vue'),
-            meta: { roleMinimal: 'ADMIN' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'settings',
@@ -162,7 +162,7 @@ const routes = [
                   component: () => import('src/pages/app/settings/view_docs/index.vue')
                }
             ],
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'node',
@@ -322,13 +322,13 @@ const routes = [
             name: 'notifications',
             path: 'notifications',
             component: () => import('src/pages/app/notifications/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          // workspace
          {
             path: 'workspace',
             component: () => import('src/pages/app/workspace/index.vue'),
-            meta: { roleMinimal: 'GUEST' },
+            meta: { roleMinimal: 'MEMBER' },
             children: [
                {
                   name: 'workspace',

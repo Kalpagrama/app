@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import {assert} from 'src/system/common/utils'
 import routes from './routes'
+import {i18n} from 'src/boot/i18n'
 import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
@@ -9,7 +10,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
 Vue.use(VueRouter)
 
-export default function (/* { store, ssrContext } */) {
+export default function ({ store, ssrContext }) {
   const router = new VueRouter({
     scrollBehavior (to, from, savedPosition) {
       // console.log('scrollBehavior', to, from)
@@ -45,15 +46,14 @@ export default function (/* { store, ssrContext } */) {
         await AuthApi.userAuthenticate(null)
       }
     }
-    next(redirectUrl)
-    // if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-    //   alert('router::need more privileges')
-    //   logD('router::need more privileges')
-    //   return next('/auth') // если маршрут требует повышения - переходим на форму входа
-    // } else {
-    //   logD('router:: its ok! ')
-    //   return next()
-    // }
+    if (redirectUrl) return next(redirectUrl)
+    if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
+      store.commit('ui/stateSet', ['authGuard', { message: i18n.t('Для перехода на эту страницу нужно войти...') }])
+      logD('router::need more privileges')
+      return next(false)
+    } else {
+      return next()
+    }
   })
   return router
 }
