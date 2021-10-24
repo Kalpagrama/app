@@ -10,7 +10,7 @@
         // суть
         .row.full-width.q-py-xs
           .row.col.justify-center.items-center
-            span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="$emit('essences-show')").text-white.cursor-pointer {{node.name}}
+            span(:style=`{fontSize: fontSize+'px', textAlign: 'center', position: 'relative'}` @click="$go('/sphere/'+node.sphereFromName.oid)").text-white.cursor-pointer {{node.name}}
               q-badge(v-if="showBadge && $slots.badge" align="top" dark rounded color="green")
                 slot(name="badge")
               //q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
