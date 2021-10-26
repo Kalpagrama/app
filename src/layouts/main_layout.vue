@@ -8,12 +8,12 @@ q-layout(
     position="bottom")
     kalpa-auth-guard(@close="authGuardShow = null")
   q-dialog(
-    v-model="kalpaWelcomeShow"
+    v-model="kalpaTutorialShow"
     maximized
     position="bottom")
-    kalpa-welcome(
-      :config="$store.state.ui.kalpaWelcome"
-      @close="kalpaWelcomeShow = null")
+    kalpa-tutorial(
+      :config="$store.state.ui.kalpaTutorial"
+      @close="kalpaTutorialShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
@@ -60,12 +60,13 @@ export default {
         this.$store.commit('ui/stateSet', ['authGuard', null])
       }
     },
-    kalpaWelcomeShow: {
+    kalpaTutorialShow: {
       get () {
-        return this.$store.state.ui.kalpaWelcome !== null
+        // this.$store.commit('ui/stateSet', ['kalpaTutorial', {showTutorial: true}])
+        return this.$store.state.ui.kalpaTutorial !== null
       },
       set (val) {
-        this.$store.commit('ui/stateSet', ['kalpaWelcome', null])
+        this.$store.commit('ui/stateSet', ['kalpaTutorial', null])
       }
     }
   },
@@ -75,7 +76,7 @@ export default {
       async handler (to, from) {
         this.$log('user.profile.tutorial changed to', to)
         if (to && !to.main) {
-          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: true, useProfileEditor: true}])
+          this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'main', useIntro: true, useProfileEditor: true}])
         }
       }
     }

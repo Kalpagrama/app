@@ -12,7 +12,7 @@
             :scrollAreaWidth="$store.state.ui.pageWidth"
             :scrollAreaHeight="150"
             :query="querySubscriptions"
-            :itemWidthApprox="150"
+            :itemWidthApprox="150*1.618"
             :itemHeightApprox="150"
             :itemActivePersist="itemActivePersist"
             @count="$emit('count', $event)"
@@ -29,7 +29,7 @@
                 :showContext="false"
                 :height="150").q-px-xs
                 template(v-slot:skeleton=`{queryInProgress}`)
-                  div(:style=`{width: 150+'px', height: '150px'}`).relative-position
+                  div(:style=`{width: 150*1.618+'px', height: '150px'}`).relative-position
                     q-skeleton(type='rect' height='100%' :animation="queryInProgress ? 'wave' : 'none'" dark).br-10
                     .row.full-width.absolute-bottom.justify-center
                       span.text-grey-5.text-h6 {{item.name}}

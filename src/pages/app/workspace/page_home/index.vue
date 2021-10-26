@@ -4,6 +4,7 @@ kalpa-layout
     kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
   template(v-slot:body)
     .row.full-width.items-start.content-start
+      //iframe(src="https://kalpa.app/trends" height="900px" width="500px")
       //- header
       .row.full-width.justify-center.b-30.q-px-sm
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
@@ -20,7 +21,7 @@ kalpa-layout
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Workspace')}}
             //- tutorial
             q-btn(
-              @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
+              @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
               round flat color="white" icon="fas fa-info")
       //- guest
       view-guest(v-if="$store.getters.isGuest")

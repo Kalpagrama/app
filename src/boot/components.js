@@ -1,6 +1,6 @@
 // kalpa
 import kalpaLayout from 'src/components/kalpa_layout/index.vue'
-import kalpaWelcome from 'src/components/kalpa_welcome/index.vue'
+import kalpaTutorial from 'src/components/kalpa_tutorial/index.vue'
 import kalpaShare from 'src/components/kalpa_share/index.vue'
 import kalpaLogo from 'src/components/kalpa_logo/index.vue'
 import kalpaFinder from 'src/components/kalpa_finder/index.vue'
@@ -31,7 +31,7 @@ import userAvatar from 'src/components/user_avatar/index.vue'
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   // kalpa
   Vue.component('kalpaLayout', kalpaLayout)
-  Vue.component('kalpaWelcome', kalpaWelcome)
+  Vue.component('kalpaTutorial', kalpaTutorial)
   Vue.component('kalpaShare', kalpaShare)
   Vue.component('kalpaLogo', kalpaLogo)
   Vue.component('kalpaFinder', kalpaFinder)

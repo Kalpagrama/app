@@ -48,7 +48,7 @@ export default {
       async handler (to, from) {
         this.$log('tutorial changed to', to)
         if (to && !to.content_first) {
-          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'content_first', useIntro: true, useProfileEditor: true}])
+          this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'content_first', useIntro: true, useProfileEditor: true}])
         }
       }
     }

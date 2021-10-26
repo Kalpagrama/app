@@ -99,7 +99,7 @@ div(
 import { ObjectApi } from 'src/api/object'
 
 export default {
-  name: 'kalpaWelcome',
+  name: 'kalpaTutorial',
   props: {
     config: {
       type: Object,
@@ -162,6 +162,9 @@ export default {
       this.$log('next')
       this.$refs['slides-carousel'].next()
     },
+  },
+  created () {
+    this.$log('created')
   },
   async mounted () {
     this.$log('mounted')

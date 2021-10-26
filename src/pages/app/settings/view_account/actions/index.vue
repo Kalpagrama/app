@@ -15,7 +15,7 @@
       span {{$t('Feedback')}}
     //- show main tutorial
     q-btn(
-      @click="showKalpaWelcome()"
+      @click="showKalpaTutorial()"
       flat color="grey-6" no-caps
       :style=`{
         height: '50px',
@@ -105,9 +105,9 @@ export default {
       el.style.display = 'block'
       window.Chatra('openChat', true)
     },
-    showKalpaWelcome () {
-      this.$log('showKalpaWelcome')
-      this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'main', useIntro: false, useProfileEditor: false}])
+    showKalpaTutorial () {
+      this.$log('showKalpaTutorial')
+      this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'main', useIntro: false, useProfileEditor: false}])
     },
     async logout () {
       this.$log('logout')
