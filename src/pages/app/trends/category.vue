@@ -80,7 +80,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE', 'BLOCK', 'JOINT'] },
           oidSphere: this.$store.getters.nodeCategories.find(c => c.type === this.pageInfo.categoryId).sphere.oid,
-          sortStrategy: 'HOT', // 'ACTIVITY', // AGE
+          sortStrategy: this.pageInfo.categoryId === 'ALL' ? 'AGE' : 'HOT', // 'ACTIVITY', // AGE
           stack: 'item0'
         },
         populateObjects: false

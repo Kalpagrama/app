@@ -59,7 +59,7 @@
                         q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
             span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Категории')}}
             .row.full-width
-              div(v-for="(c, ix) in $store.getters.nodeCategories.filter(c=>c.type !== 'ALL')").col-6.q-pa-xs
+              div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
                 q-responsive(:ratio="1.618" :style=`{overflow: 'hidden', borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
                   img(
                     :src="c.icon"
@@ -70,8 +70,8 @@
                       borderRadius: '10px'}`)
                   div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="$go('/category/'+c.type)").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
                     div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
-                      span(v-if="$q.screen.lt.md" :style=`{fontSize: '17px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-4.text-bold {{c.alias}}
-                      span(v-else :style=`{textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-4.text-bold.text-h5 {{c.alias}}
+                      span(v-if="$q.screen.lt.md" :style=`{fontSize: '17px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold {{c.alias}}
+                      span(v-else :style=`{textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-h5 {{c.alias}}
           list-search-kalpa(v-else-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
             :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="$logW('searchInputState', $event), pageInfo.searchInputState = $event")
 </template>
