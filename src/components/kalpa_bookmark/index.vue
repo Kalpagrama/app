@@ -84,7 +84,7 @@ export default {
         this.$log('start')
         if (this.$store.getters.isGuest) {
           let authGuard = {
-            message: 'Чтобы добавить в закладки, войдите в аккаунт.'
+            message: 'Чтобы добавить в закладки, войдите в аккаунт'
           }
           this.$store.commit('ui/stateSet', ['authGuard', authGuard])
         }

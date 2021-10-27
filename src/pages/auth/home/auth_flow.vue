@@ -15,6 +15,7 @@ div(
   ).row.full-width.items-start.content-start.q-mb-xl.justify-start
   //- header
   .row.full-width.wrap
+    span(:style=`{fontSize: '10px',}`).text-white.full-width.q-mb-md {{message}}
     span(:style=`{fontSize: '20px',}`).text-white.text-bold.full-width {{$t('Welcome')}}
     span(v-if="!emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Для входа или регистрации введите вашу почту')}}
   //- email
@@ -26,7 +27,7 @@ div(
     borderless dark
     type="email" inputmode="email"
     autocomplete="username" name="username"
-    autocorrect="off" autocapitalize="on"
+    autocorrect="off" autocapitalize="none"
     :placeholder="$t('Enter your email')"
     :autofocus="true"
     :disable="emailEnterDisable"
@@ -47,12 +48,18 @@ div(
     v-if="!emailSent"
     ).row.full-width.q-pt-lg
     q-btn(
-      outline no-caps color="green"
+      outline no-caps color="green-4"
       :label="$t('Next')"
       :disable="!emailIsValid"
       :loading="emailSending"
       size="lg"
       @click="emailSend()"
+      ).full-width.text-bold.q-mb-sm
+    q-btn(
+      v-if="$q.screen.width < $store.state.ui.pageMinWidthDesktop"
+      outline v-close-popup no-caps color="grey-6"
+      :label="$t('Cancel')"
+      size="lg"
       ).full-width.text-bold
       //span(:style=`{fontSize: '18px',}`).text-bold {{$t('Next')}}
   //- email sent
@@ -63,31 +70,33 @@ div(
       span(v-if="needConfirm" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('We sent you a one-time code by email, enter it')}}
       span(v-if="hasPermanentPassword").text-white {{$t('Enter your permanent password')}}
     //- password input
-    q-input(
-      v-model="password"
-      borderless dark
-      :placeholder="$t('Enter password', 'Введите пароль')"
-      :type="passwordShow ? 'text' : 'password'"
-      :inputmode="needConfirm ? 'numeric' : 'text'"
-      :autofocus="true"
-      :disable="false"
-      :input-style=`{
-        padding: '16px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        color: 'white',
-        //- background: 'rgb(70,70,70)',
-        //- borderRadius: '10px',
-        //- border: '2px solid rgb(50,50,50)',
-        background: 'rgba(0,0,0, 0.2)',
-        borderRadius: '10px',
-        // border: '2px solid rgba(90,90,90,0.6)',
-      }`
-      @keyup.enter="passwordSend()"
-      ).full-width
-      //- password helpers
-      div(:style=`{position: 'absolute'}`).row.fit.justify-end.content-center.items-center
+    .row.full-width.justify-end.content-center.items-center
+      q-input(
+        v-model="password"
+        borderless dark
+        :placeholder="$t('Enter password', 'Введите пароль')"
+        :type="passwordShow ? 'text' : 'password'"
+        :inputmode="needConfirm ? 'numeric' : 'text'"
+        autocomplete="on" name="password"
+        :autofocus="true"
+        :disable="false"
+        :input-style=`{
+          padding: '16px',
+          fontSize: '18px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          color: 'white',
+          //- background: 'rgb(70,70,70)',
+          //- borderRadius: '10px',
+          //- border: '2px solid rgb(50,50,50)',
+          background: 'rgba(0,0,0, 0.2)',
+          borderRadius: '10px',
+          // border: '2px solid rgba(90,90,90,0.6)',
+        }`
+        @keyup.enter="passwordSend()"
+        ).full-width
+        //- password helpers
+      div(:style=`{position: 'absolute'}`).row
         q-icon(
           :name="passwordShow ? 'visibility_off' : 'visibility'"
           class="cursor-pointer"
@@ -97,13 +106,19 @@ div(
     //  //q-btn(flat dense no-caps color="white") {{'Forgot password?'}}
     //- password send
     q-btn(
-      outline no-caps color="green"
+      outline no-caps color="green-4"
       :loading="passwordSending"
       :disable="password.length < 4"
       :label="$t('Login')"
       size="lg"
       @click="passwordSend()"
-      ).full-width.q-mt-md
+      ).full-width.q-mt-md.q-mb-sm
+    q-btn(
+      v-if="$q.screen.width < $store.state.ui.pageMinWidthDesktop"
+      outline v-close-popup no-caps color="grey-6"
+      :label="$t('Cancel')"
+      size="lg"
+    ).full-width.text-bold
       //span(:style=`{fontSize: '18px'}`).text-bold {{ $t('Login') }}
     //- reset
     .row.full-width.q-pa-xs
@@ -115,7 +130,7 @@ div(
         @click="reset()")
         span(:style=`{fontSize: '14px'}`) {{ $t('Reset form') }}
   div(v-if="!emailSent"
-    :style=`{fontSize: '10px', marginTop: $q.screen.width > 320 ? '30%' : '0%'}`).row.full-width.q-py-md
+    :style=`{fontSize: '10px', marginTop: $q.screen.width > 320 ? '10%' : '0%'}`).row.full-width.q-py-md
     small(:style=`{fontSize: '10px'}`).text-grey {{ $t('If you proceed, you agree with our terms') }}
     kalpa-docs(
       :style=`{fontSize: '12px'}`
@@ -128,7 +143,7 @@ import { AuthApi } from 'src/api/auth'
 
 export default {
   name: 'authFlow',
-  props: ['onSuccess'],
+  props: ['onSuccess', 'message'],
   data () {
     return {
       email: '',
@@ -217,5 +232,8 @@ export default {
       }
     }
   },
+  mounted(){
+    this.$log('mounted')
+  }
 }
 </script>

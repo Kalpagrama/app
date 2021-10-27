@@ -60,6 +60,7 @@
       v-if="mode !== 'select' && showMenuBtn"
       round flat color="grey-8" icon="delete"
       @click="removeDraft"
+      :loading="loading"
     ).justify-center.q-mt-md.q-mr-xs
 </template>
 
@@ -81,7 +82,8 @@ export default {
   },
   data () {
     return {
-      thumbUrlErrored: false
+      thumbUrlErrored: false,
+      loading: false
     }
   },
   computed: {
@@ -91,6 +93,7 @@ export default {
   },
   methods: {
     async removeDraft () {
+      this.loading = true
       await this.draft.remove(true)
     },
     async thumbUrlErrorHandle (e) {

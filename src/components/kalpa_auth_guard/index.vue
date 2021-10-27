@@ -1,5 +1,6 @@
 <template lang="pug">
 page-auth(
+  :message="message"
   :onSuccess="onSuccess"
   @close="$emit('close')"
 )
@@ -10,6 +11,7 @@ import pageAuth from 'src/pages/auth/home/index.vue'
 
 export default {
   name: 'kalpaAuthGuard',
+  props: ['message'],
   components: {
     pageAuth,
   },
@@ -23,6 +25,9 @@ export default {
       this.$log('onSuccess')
       this.$emit('close')
     }
+  },
+  mounted() {
+    this.$log('mounted', this.message)
   }
 }
 </script>

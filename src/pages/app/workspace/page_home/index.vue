@@ -5,7 +5,7 @@ kalpa-layout
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.b-30.q-px-sm
+      .row.full-width.justify-center.b-30
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           div(
             :style=`{
@@ -21,7 +21,7 @@ kalpa-layout
             //- tutorial
             q-btn(
               @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: false, useProfileEditor: false}])"
-              round flat color="white" icon="fas fa-info")
+              round flat color="white" icon="help_outline")
       //- guest
       view-guest(v-if="$store.getters.isGuest")
       q-spinner(v-else-if="!$store.state.core.wsReady" size="50px" color="green").absolute-center

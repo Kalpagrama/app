@@ -23,7 +23,7 @@
         //- nav header
         div(v-if="navHeaderText").row.full-width.justify-center.b-30
           div( :style=`{ height: '60px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-40
-            q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+            q-btn( flat color="white" icon="west" @click="$routerKalpa.back()")
             .col.full-height
               .row.fit.items-center.content-center.justify-center
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{navHeaderText}}

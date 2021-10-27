@@ -58,11 +58,14 @@ div(
         swipeable animated navigation arrows
         infinite
         :autoplay="15000"
-        control-color="white"
+        control-color="green"
         :style=`{
           position: 'absolute',
           zIndex: 10,
         }`).fit
+        template(v-slot:navigation-icon="{ active, btnProps, onClick  }")
+          q-btn(v-if="active" size="sm" :icon="btnProps.icon" color="green" flat round dense @click="onClick")
+          q-btn(v-else size="sm" :icon="btnProps.icon" color="grey" flat round dense @click="onClick")
         q-carousel-slide(
           v-for="(s,si) in slides" :key="s.id"
           :name="s.id"

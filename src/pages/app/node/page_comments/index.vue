@@ -68,24 +68,32 @@ export default {
   },
   methods: {
     async commentSend () {
-      try {
-        this.$log('commentSend')
-        this.commentSending = true
-        // checks
-        if (this.comment.length === 0) throw new Error(this.$t('Empty comment!'))
-        const commentInput = this.comment
-        this.comment = ''
-        const comment = await ObjectApi.commentCreate(this.node.oid, commentInput)
-        // this.comment = ''
-        this.$log('commentSend comment', comment)
-        this.$log('commentSend done')
-        // this.comment = ''
-        this.commentSending = false
+      if (this.$store.getters.isGuest) {
+        let authGuard = {
+          message: 'Чтобы добавить комментарий, войдите в аккаунт'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
-      catch (e) {
-        this.$log('commentSend error', e)
-        this.commentSending = false
-        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+      else {
+        try {
+          this.$log('commentSend')
+          this.commentSending = true
+          // checks
+          if (this.comment.length === 0) throw new Error(this.$t('Empty comment!'))
+          const commentInput = this.comment
+          this.comment = ''
+          const comment = await ObjectApi.commentCreate(this.node.oid, commentInput)
+          // this.comment = ''
+          this.$log('commentSend comment', comment)
+          this.$log('commentSend done')
+          // this.comment = ''
+          this.commentSending = false
+        }
+        catch (e) {
+          this.$log('commentSend error', e)
+          this.commentSending = false
+          this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        }
       }
     },
     async commentDelete (comment) {

@@ -12,24 +12,24 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      //.row.full-width.justify-center.b-30.q-pa-sm
-      //  div(
-      //    :style=`{
-      //      maxWidth: $store.state.ui.pageWidth+'px',
-      //      borderRadius: '10px',
-      //    }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-      //    q-icon(name="hub" color="white" size="30px").q-ma-sm
-      //    .col
-      //    h1.text-white.text-bold {{$t('Graph')}}
-      //    .col
-      //    //- tutorial
-      //    q-btn(
-      //      @click=""
-      //      round flat color="white" icon="fas fa-info")
-      //    //q-btn(
-      //    //  @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
-      //    //  round flat color="white" icon="fas fa-info")
-      ////- body
+      div(v-if="!$q.screen.lt.md").row.full-width.justify-center.b-30.q-pa-sm
+        div(
+          :style=`{
+            maxWidth: $store.state.ui.pageWidth+'px',
+            borderRadius: '10px',
+          }`).row.full-width.items-center.content-center.q-pa-sm.b-40
+          q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
+          .col
+          h1.text-white.text-bold {{$t('Graph view')}}
+          .col
+          //- tutorial
+          q-btn(
+            @click=""
+            round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
+          //q-btn(
+          //  @click="$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+          //  round flat color="white" icon="fas fa-info")
+      //- body
       div(
         v-if="oid"
         :style=`{

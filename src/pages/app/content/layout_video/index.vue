@@ -107,7 +107,7 @@ div(
             @click="pageId = null"
             ).full-width
             span.text-bold {{ $t('Edit fragment') }}
-        kalpa-menu-mobile(:style=`{background: 'rgba(50,50,50,0)',}`)
+        kalpa-menu-mobile(:styles=`{background: 'rgba(50,50,50,0)',}`)
           template(v-slot:all)
             nav-bottom(:pageId="pageId" @pageId="pageIdChange")
 </template>

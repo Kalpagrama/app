@@ -1,14 +1,17 @@
 <template lang="pug">
-  .row.justify-start.full-width
-    div(:style=`{maxHeight: '180px'}`).scroll.full-width.row
-      q-chip(outline icon="add" :label="$t('Add collection')" clickable no-caps color="green")
-        q-popup-proxy(v-model="showMenu" :breakpoint="1024" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
-          div(
-            :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
-          ).row.full-width
-            q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
-            q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
-      //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.br.wrap
+  .row.justify-start.full-width.q-pt-md
+    .col
+    span {{$t('Сохранить в коллекцию')}}
+    .col
+    q-btn(flat icon="add" dense no-caps color="green" @click="showMenu=true").q-mr-md
+      q-dialog(v-model="showMenu" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
+        div(
+          :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
+        ).row.full-width
+          q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
+          q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
+    //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.br.wrap
+    div(:style=`{maxHeight: '180px'}`).row.scroll.full-width
       q-chip(
         v-for="(c,ci) in value.collections" :key="c.id"
         no-caps clickable text-color="white" outline

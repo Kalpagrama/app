@@ -6,13 +6,13 @@
   //- body
   .row.full-width
     //- q-btn(
-      @click="feedbackOpened = true"
-      flat color="grey-6" no-caps
-      :style=`{
-        height: '50px',
-      }`
-      ).full-width.b-40.q-mb-sm
-      span {{$t('Feedback')}}
+    //  @click="feedbackOpened = true"
+    //  flat color="grey-6" no-caps
+    //  :style=`{
+    //    height: '50px',
+    //  }`
+    //  ).full-width.b-40.q-mb-sm
+    //  span {{$t('Feedback')}}
     //- show main tutorial
     q-btn(
       @click="showKalpaWelcome()"
@@ -34,6 +34,7 @@
       span {{$t('Clear cache')}}
     //- toggle debug
     q-btn(
+      v-if="$store.getters.currentUser.profile.role.in('MODERATOR', 'ADMIN')"
       @click="$store.commit('ui/stateSet', ['useDebug', !$store.state.ui.useDebug])"
       flat  no-caps
       :color="$store.state.ui.useDebug ? 'red' : 'grey-6'"
@@ -47,14 +48,14 @@
         ) {{$store.state.ui.useDebug ? $t('Disable debug') : $t('Enable debug') }}
     //- show report?
     //- q-btn(
-      @click="setDebugOutput()"
-      flat color="grey-6" no-caps
-      :style=`{
-        height: '50px',
-      }`
-      ).full-width.b-40.q-mb-md
-      span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
-      span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
+    //  @click="setDebugOutput()"
+    //  flat color="grey-6" no-caps
+    //  :style=`{
+    //    height: '50px',
+    //  }`
+    //  ).full-width.b-40.q-mb-md
+    //  span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
+    //  span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
     //- chat
     q-btn(
       @click="toggleChat()"
@@ -81,6 +82,7 @@ import { initLogRocket, LogLevelEnum, window } from 'src/system/log'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { ObjectApi } from 'src/api/object'
 import { ObjectCreateApi } from 'src/api/object_create'
+import {UserRoleEnum} from '../../../../../api/user';
 
 export default {
   name: 'actions',

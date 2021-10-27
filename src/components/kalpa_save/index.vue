@@ -137,15 +137,23 @@ export default {
     async onClick () {
       // this.$log('onClick', this.item)
       // is we got this bookmark ?
-      this.data.bookmark = await this.getBookmark()
-      // got bookmark already!, move it to another collections/dimension
-      if (this.data.bookmark) {
-        this.data.bookmarkEditorDialogShow = true
+      if (this.$store.getters.isGuest) {
+        let authGuard = {
+          message: 'Чтобы добавить в закладки, войдите в аккаунт'
+        }
+        this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
-      // save to collection named all...
       else {
-        this.data.bookmark = await this.createBookmark(this.item, { collections: [] })
-        this.data.bookmarkCreatedDialogShow = true
+        this.data.bookmark = await this.getBookmark()
+        // got bookmark already!, move it to another collections/dimension
+        if (this.data.bookmark) {
+          this.data.bookmarkEditorDialogShow = true
+        }
+        // save to collection named all...
+        else {
+          this.data.bookmark = await this.createBookmark(this.item, {collections: []})
+          this.data.bookmarkCreatedDialogShow = true
+        }
       }
     }
   }

@@ -19,7 +19,7 @@ div(
         actions(:currentUser="currentUser")
         .row.full-width.q-pa-sm
           kalpa-docs()
-          .row.full-width.q-py-lg.q-px-sm
+          .row.full-width.q-py-lg
             small(
               :style=`{userSelect: 'none'}`
               ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
