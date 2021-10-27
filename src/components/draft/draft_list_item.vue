@@ -57,7 +57,7 @@
               small.text-grey-8 {{ $date(draft.createdAt) }}
     //- right
     q-btn(
-      v-if="mode !== 'select' && showMenuBtn"
+      v-if="showMenuBtn"
       round flat color="grey-8" icon="delete"
       @click="removeDraft"
       :loading="loading"

@@ -138,10 +138,10 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
-            name: 'feeds',
-            path: 'feeds/:id?',
-            component: () => import('src/pages/app/feeds/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            name: 'home',
+            path: 'home',
+            component: () => import('src/pages/app/home/index.vue'),
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'settings',
@@ -162,7 +162,7 @@ const routes = [
                   component: () => import('src/pages/app/settings/view_docs/index.vue')
                }
             ],
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          {
             name: 'node',
@@ -283,6 +283,12 @@ const routes = [
             meta: { roleMinimal: 'GUEST' }
          },
          {
+            name: 'category',
+            path: 'category/:categoryId',
+            component: () => import('src/pages/app/trends/category.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'content',
             path: 'content/:oid',
             props: (route) => ({ oid: route.params.oid }),
@@ -316,13 +322,13 @@ const routes = [
             name: 'notifications',
             path: 'notifications',
             component: () => import('src/pages/app/notifications/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
+            meta: { roleMinimal: 'MEMBER' }
          },
          // workspace
          {
             path: 'workspace',
             component: () => import('src/pages/app/workspace/index.vue'),
-            meta: { roleMinimal: 'GUEST' },
+            meta: { roleMinimal: 'MEMBER' },
             children: [
                {
                   name: 'workspace',
@@ -387,13 +393,7 @@ const routes = [
       beforeEnter: async (to, from, next) => {
          // logD('router :: try systemInit...')
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
-         if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-            logD('router::need more privileges')
-            return next('/auth') // если маршрут требует повышения - переходим на форму входа
-         } else {
-            logD('router:: its ok! ')
-            return next()
-         }
+         return next()
       }
    }
 ]

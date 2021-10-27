@@ -7,8 +7,8 @@
       .row.full-width.justify-center.q-mt-sm
         span.text-grey.text-center.q-mb-md.q-mt-md.q-px-sm {{$t('This publication will be hidden. From now on, we will show less of this content. Why did the publication seem uninteresting to you?')}}
         q-btn(
-          v-for="(b,bi) in buttons" :key="b"
-          :label="b.name" no-caps flat :style=`{borderRadius: '0px', fontSize: fontSize+'px', width: '100%'}` @click="hide(b.id)")
+          v-for="(r,i) in reasons" :key="i"
+          :label="r.name" no-caps flat :style=`{borderRadius: '0px', fontSize: fontSize+'px', width: '100%'}` @click="hide(r.id)")
       div(:style=`{
         content: '',
         width: '100%',
@@ -27,11 +27,11 @@ export default {
   props: ['essence'],
   data () {
     return {
-      buttons: [
-        {id: 'a', name: this.$t('I see too many similar publications')},
-        {id: 'b', name: this.$t('I like this topic, but not this post')},
-        {id: 'c', name: this.$t('This topic is not interesting to me')},
-        {id: 'd', name: this.$t("I don't want to see the publications of this account")}]
+      reasons: [
+        {id: 'b', name: this.$t('Мне нравится эта тема, но не эта публикация')},
+        {id: 'c', name: this.$t('Эта тема мне не интересна')},
+        {id: 'd', name: this.$t('Не хочу видеть публикации этого автора')},
+        {id: 'e', name: this.$t('Иное')}]
     }
   },
   computed: {
@@ -41,8 +41,15 @@ export default {
     },
   },
   methods: {
-    async hide(id){
-      await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+    async hide(reasonId){
+      switch (reasonId){
+        case 'd':
+          await this.$rxdb.hideObjectOrSource(null, this.essence.author.oid)
+          break
+        default:
+          await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+          break
+      }
     }
   }
 }

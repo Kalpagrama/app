@@ -5,17 +5,37 @@
     template(v-slot:body)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          //- bookmark editor
-          q-dialog(
-            v-model="bookmarkEditorShow"
-            :full-width="$q.screen.xs"
-            :full-height="$q.screen.xs"
-            :maximized="$q.screen.xs"
-            :square="$q.screen.xs"
-            @hide="bookmarkSelected = null")
-            bookmark-editor(
-              :bookmark="bookmarkSelected"
-              @close="bookmarkEditorShow = false, bookmarkSelected = null")
+          // подписки
+          span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
+          list-feed-custom-horizontalPPV(
+            ref="listFeed"
+            :scrollAreaWidth="$store.state.ui.pageWidth"
+            :scrollAreaHeight="150"
+            :query="querySubscriptions"
+            :itemWidthApprox="150*1.618"
+            :itemHeightApprox="150"
+            :itemActivePersist="itemActivePersist"
+            @count="$emit('count', $event)"
+            @items="$emit('items', $event)")
+            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
+              item-feed(
+                :itemShortOrFull="item"
+                :itemState="itemState"
+                :itemIndex="itemIndex"
+                :isActive="isActive"
+                :isVisible="isVisible"
+                :isPreload="isPreload"
+                :scrolling="scrolling"
+                :showContext="false"
+                :height="150").q-px-xs
+                template(v-slot:skeleton=`{queryInProgress}`)
+                  div(:style=`{width: 150*1.618+'px', height: '150px'}`).relative-position
+                    q-skeleton(type='rect' height='100%' :animation="queryInProgress ? 'wave' : 'none'" dark).br-10
+                    .row.full-width.absolute-bottom.justify-center
+                      span.text-grey-5.text-h6 {{item.name}}
+                    //.row.full-width.justify-center.q-pt-sm
+                      q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
+          span.text-grey-5.text-h5.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
           tab-list-feed(
             ref="listFeed"
             :type="'customPPV'"
@@ -38,11 +58,13 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 
 export default {
   name: 'feeds_feed',
   props: ['feed'],
   components: {
+    listFeedCustomHorizontalPPV
   },
   data () {
     return {
@@ -69,6 +91,16 @@ export default {
         populateObjects: false
       }
       return res
+    },
+    querySubscriptions () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
+          oidSphere: this.$store.getters.currentUser.oid,
+          // objectTypeEnum: {$in: ['USER']}
+        },
+        populateObjects: false,
+      }
     }
   },
   mounted () {

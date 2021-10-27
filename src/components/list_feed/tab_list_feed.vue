@@ -56,11 +56,11 @@
             template(v-slot:prepend)
               q-icon(name="search" :color="'green'" size="25px").q-mx-md
             template(v-slot:append)
-              q-btn(round flat dense color="white" icon="clear" @click="searchString = '', searchInputState = 'enabled'" ).q-mr-md
+              q-btn(round flat dense color="grey-5" icon="clear" @click="searchInputState = 'enabled'" ).q-mr-md
 
           //- tabs
           .row.full-width.q-px-md.b-30
-            q-btn(v-if="searchInputState === 'enabled'" flat no-caps color="grey" icon="search" @click="searchInputState = 'opened'").no-border-radius
+            q-btn(v-if="searchInputState === 'enabled'" flat no-caps color="grey" icon="search" @click="searchInputState = 'opened', searchString = ''").no-border-radius
             q-tabs(
               v-model="pageId"
               align="justify"
@@ -132,7 +132,7 @@ export default {
     searchInputState: {
       immediate: true,
       handler (to, from) {
-        // this.$logW('searchInputState:', to)
+        this.$logW('searchInputState:', to)
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }

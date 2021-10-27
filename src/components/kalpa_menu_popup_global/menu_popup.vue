@@ -161,7 +161,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'feeds', name: this.$t('Feed'), icon: 'home'},
+        {id: 'home', name: this.$t('Home'), icon: 'home'},
         {id: 'trends', name: this.$t('Search'), icon: 'search'},
         {id: 'workspace', name: this.$t('Workspace'), icon: 'construction'},
         {id: 'notifications', name: this.$t('Activity'), icon: 'notifications_none'},

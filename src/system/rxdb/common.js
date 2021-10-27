@@ -120,7 +120,7 @@ function rxdbOperationProxy (collection, operation, ...params) {
 }
 
 async function rxdbOperationProxyExec (collection, operation, ...params) {
-   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params2 : ' + JSON.stringify({isRxCollection: isRxCollection(collection), operation}))
+   assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params2 : ' + JSON.stringify({has: !!collection, props: Object.keys(collection || {empty: '_empty_'}), isRxCollection: isRxCollection(collection), operation}))
    const f = rxdbOperationProxyExec
    // logDT(f, collection.name, operation)
    const t1 = performance.now()

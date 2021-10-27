@@ -17,7 +17,7 @@ export default {
       async handler (to, from) {
         this.$log('user.profile.tutorial changed to', to)
         if (to && !to.workspace_first) {
-          this.$store.commit('ui/stateSet', ['kalpaWelcome', {id: 'workspace_first', useIntro: true, useProfileEditor: true}])
+          this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'workspace_first', useIntro: true, useProfileEditor: true}])
         }
       }
     }

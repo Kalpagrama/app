@@ -59,7 +59,7 @@ div(
     //    top: '12px', left: '-16px',
     //    width: '10px', height: '10px',
     //    borderRadius: '50%',
-    //    background: $rateMeta.find(r => node.rateUser >= r.valueMin && node.rateUser < r.valueMax).colorBackground,
+    //    background: $rateMeta.find(r => node.rateUser >= r.valueMin && node.rateUser <= r.valueMax).colorBackground,
     //  }`
     //  ).row
     //- voteCounts
@@ -79,7 +79,7 @@ div(
     //    bottom: '-18px',
     //  }`
     //  ).row.full-width.justify-center
-    //  //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax).name }}
+    //  //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => node.rate >= r.valueMin && node.rate <= r.valueMax).name }}
     //  small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ node.rateUser !== null ? rateMax.name : 'Проголосуйте' }}
 </template>
 
@@ -103,7 +103,7 @@ export default {
       return this.node.author.oid === this.$store.getters.currentUser.oid
     },
     rateMax () {
-      // $rateMeta.find(r => node.rate >= r.valueMin && node.rate < r.valueMax)
+      // $rateMeta.find(r => node.rate >= r.valueMin && node.rate <= r.valueMax)
       let percentMax = null
       let percentMaxIndex = 0
       this.node.rateStat.map((r, ri) => {

@@ -85,7 +85,7 @@ div(
                   width: '26px',
                   height: '26px',
                   borderRadius: '50%',
-                  background: $rateMeta.find(r => v.rate >= r.valueMin && v.rate < r.valueMax).color,
+                  background: $rateMeta.find(r => v.rate >= r.valueMin && v.rate <= r.valueMax).color,
                 }`
                 ).q-mr-sm
       //- footer
@@ -182,7 +182,7 @@ export default {
     })
     let rateMax = this.$rateMeta[percentMaxIndex]
     // let rateMax = this.$rateMeta.find(r => {
-    //   return this.essence.rate >= r.valueMin && this.essence.rate < r.valueMax
+    //   return this.essence.rate >= r.valueMin && this.essence.rate <= r.valueMax
     // })
     if (rateMax) {
       this.rateIdMax = rateMax.value

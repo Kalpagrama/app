@@ -13,12 +13,16 @@
           @click="$emit('set-node', node), $emit('close')").cursor-pointer.row.full-width.items-center.q-mb-sm.q-px-xs.b-35
           span.text-grey-5 {{itemIndex+1}}
           span(:style=`{textAlign: 'center'}`).text-grey-5.col {{node.name}}
-          q-circular-progress(v-if="node.countVotes > 1" :value="node.rate" :min="0" :max="maxRate" show-value dark size="sm" color="green" :thickness="0.09" track-color="grey-9" @click="")
-            span {{node.countVotes}}
+          //span(:style=`{textAlign: 'center'}`).text-grey-5.col cnt:{{node.countStat.countVotes}} weight:{{node.weight}} rate:{{node.rate}} linkWeight:{{node.linkWeight}} linkRate:{{node.linkRate}}
+          q-circular-progress(v-if="node.countStat.countVotes > 1" :value="node.weight" :min="0" :max="maxWeght * 1.3" show-value
+          dark size="sm" color="green-10" :thickness="0.3" track-color="grey-9" :center-color="$getRateMeta(node.rate).colorName" @click="")
+            span.text-grey-5 {{node.countStat.countVotes}}
 
   </template>
 
 <script>
+
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageEssences',
@@ -30,8 +34,8 @@ export default {
     }
   },
   computed: {
-    maxRate () {
-      return this.essencesNodes.reduce((acc, v) => acc > v.rate ? acc : v.rate)
+    maxWeght () {
+      return this.essencesNodes.reduce((acc, v) => acc > v.rate ? acc : v.weight)
     }
   },
   mounted () {

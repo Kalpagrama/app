@@ -1,12 +1,13 @@
 import { EventApi } from 'src/api/event'
+import { assert } from 'src/system/common/utils'
 
 // node rate meta
 const rateMeta = [
-  {name: EventApi.verbalizeRate(0.2), value: 0, valueMin: 0, valueMax: 0.2, colorName: 'red', color: 'rgba(244,67,53,0.7)', colorBackground: 'rgba(244,67,53,0.4)', order: 5},
-  {name: EventApi.verbalizeRate(0.4), value: 0.25, valueMin: 0.2, valueMax: 0.4, colorName: 'amber', color: 'rgba(255,193,6,0.7)', colorBackground: 'rgba(255,193,6,0.4)', order: 4},
-  {name: EventApi.verbalizeRate(0.6), value: 0.5, valueMin: 0.4, valueMax: 0.6, colorName: 'green', color: 'rgba(76,175,79,0.7)', colorBackground: 'rgba(76,175,79,0.4)', order: 3},
-  {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, colorName: 'blue', color: 'rgba(32,150,243,0.7)', colorBackground: 'rgba(32,150,243,0.4)', order: 2},
-  {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 100500, colorName: 'purple', color: 'rgba(156,39,176,0.7)', colorBackground: 'rgba(156,39,176,0.4)', order: 1}
+  {name: EventApi.verbalizeRate(0.2), value: 0, valueMin: 0, valueMax: 0.2, colorName: 'red-8', color: 'rgba(244,67,53,0.7)', colorBackground: 'rgba(244,67,53,0.4)', order: 5},
+  {name: EventApi.verbalizeRate(0.4), value: 0.25, valueMin: 0.2, valueMax: 0.4, colorName: 'amber-8', color: 'rgba(255,193,6,0.7)', colorBackground: 'rgba(255,193,6,0.4)', order: 4},
+  {name: EventApi.verbalizeRate(0.6), value: 0.5, valueMin: 0.4, valueMax: 0.6, colorName: 'green-8', color: 'rgba(76,175,79,0.7)', colorBackground: 'rgba(76,175,79,0.4)', order: 3},
+  {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, colorName: 'blue-8', color: 'rgba(32,150,243,0.7)', colorBackground: 'rgba(32,150,243,0.4)', order: 2},
+  {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 1, colorName: 'purple-8', color: 'rgba(156,39,176,0.7)', colorBackground: 'rgba(156,39,176,0.4)', order: 1}
 ]
 
 const nodeItemTypes = [
@@ -50,6 +51,11 @@ const nodeItemType = (type) => {
 
 export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   Vue.prototype.$rateMeta = rateMeta
+  Vue.prototype.$getRateMeta = (rate) => {
+    let res = rateMeta.find(r => rate >= r.valueMin && rate <= r.valueMax)
+    assert(res)
+    return res
+  }
   Vue.prototype.$nodeItemTypes = nodeItemTypes
   Vue.prototype.$nodeItemType = nodeItemType
   Vue.prototype.$nodeItemTypesPairs = nodeItemTypesPairs

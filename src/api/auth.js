@@ -113,6 +113,7 @@ class AuthApi {
                      lang
                      alias
                      icon
+                     type
                      name
                      sphere{
                          oid
@@ -224,7 +225,6 @@ class AuthApi {
          }
       }
       let res = await apiCall(f, cb)
-
       await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
       return res
    }
@@ -296,6 +296,9 @@ class AuthApi {
          if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken) // вне cb (иначе дедлок)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
+      // переподключаемся (предыдущее подключение было вне авторизованной зоны.)
+      await EventApi.deInit()
+      await EventApi.init()
       return res
    }
 

@@ -60,7 +60,7 @@
               template(v-slot:bottom)
                 div(v-if="state.essencesNodesInProgress").row.full-width.justify-center
                   q-spinner-dots(size="20px" color="green")
-                div(v-else-if="state.essencesNodes.length > 1").row.full-width.items-center
+                div(v-else-if="true || state.essencesNodes.length > 1").row.full-width.items-center
                   //small.text-green-8.text-bold {{state.essencesNodes.length}}
                   //small.text-grey-7.text-weight-thin.q-pl-xs  {{$getNoun(state.essencesNodes.length, $t('смысл'), $t('смысла'), $t('смыслов'))}} {{$t('на этот образ')}}
                   div(@click="pageId=pageId==='essences'? null : 'essences'").row.cursor-pointer
@@ -104,7 +104,7 @@
                 @set-node="setNode($event.oid, pageId === 'images' ? false : true)"
                 @itemEditorShow="state.imageActive=!$event")
           // author + essence + spheres
-          div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-pt-xs.br-10
+          div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}`).row.full-width.q-mt-md.br-10
             q-resize-observer(@resize="imageMaxHeight = $q.screen.height - $event.height")
             // пока идет переключение - показывать state.node, иначе - q-tab-panels со всеми смыслами
             div(:style=`{minHeight: '155px'}`).row.full-width.content-start
@@ -136,12 +136,12 @@
                     template(v-slot:actions-right)
                       //q-btn(:disable="!essenceRight.length" dense flat icon="chevron_right" :color="essenceRight.length ? 'grey-5':'grey-9'" @click="state.essencesNodesIndx = ix+1")
             // список образов
-            widget-images(
-              :node="state.node"
-              :imagesNodes="state.imagesNodes"
-              :imagesNodesInProgress="state.imagesNodesInProgress"
-              :imagesNodesIndx="imagesNodesIndx"
-              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
+            //widget-images(
+            //  :node="state.node"
+            //  :imagesNodes="state.imagesNodes"
+            //  :imagesNodesInProgress="state.imagesNodesInProgress"
+            //  :imagesNodesIndx="imagesNodesIndx"
+            //  @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md
             // comments
             .row.full-width.content-end.q-pt-md
               div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
@@ -156,6 +156,12 @@
                     div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
                   .col.content-center.q-px-xs
                     small.text-grey.text-weight-thin.text-italic.q-pr-md {{state.node.commentStat.topComment.text.substring(0, 77)}}{{state.node.commentStat.topComment.text.length>77?'...':''}}
+            widget-images(
+              :node="state.node"
+              :imagesNodes="state.imagesNodes"
+              :imagesNodesInProgress="state.imagesNodesInProgress"
+              :imagesNodesIndx="imagesNodesIndx"
+              @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md.b-30
           // похожие
           div(v-if="!pageId").row.full-width.q-pt-lg
             .row.full-width.justify-end

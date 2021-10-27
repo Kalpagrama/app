@@ -8,85 +8,41 @@
   div(
     :style=`{
       position: 'relative',
-      borderRadius: '10px',
       overflow: 'hidden',
-      ...styles,
-    }`
-  ).row.full-width.items-start.content-start
-    slot(name="wrapper")
-    //- wrapper
-    div(
-      :style=`{
-      position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: '0px 0px 10px 10px',
-      // ...styles,
-    }`).row.full-width.items-start.content-start
-      slot(name="wrapper-inside")
-      //- HEADER: author, createdAt, actions, date, views
-      essence-header(
-        v-if="showHeader && node.oid"
-        :essence="node"
-        :itemState="data"
-        :showAuthorAlways="showAuthorAlways"
-        :style=`{
-        order: orderHeader,
-      }`)
-      //- ITEMS: one or two
-      slot(name="items")
-      composition(
-        v-if="showItems && !$slots.items && node.items.length === 1"
-        :composition="node.items[0]"
-        :showContext="showContext"
-        :itemState="data"
-        :isVisible="isVisible"
-        :isActive="isActive"
-        :nodeOid="node.oid")
-      essence-items(
-        v-if="showItems && !$slots.items && node.items.length === 2"
-        :node="node"
-        :itemState="data"
-        :isActive="isActive"
-        :isVisible="isVisible")
+      borderRadius: '10px',
+      minHeight: height + 'px',
+      maxHeight: height + 'px',
+      minWidth: height*1.6 + 'px',
+      // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
+    }`).b-0
+    //image
+    composition(
+      v-if="showItems && !$slots.items && node.items.length === 1"
+      :composition="node.items[0]"
+      :showContext="showContext"
+      :itemState="data"
+      :isVisible="isVisible"
+      :isActive="isActive"
+      :nodeOid="node.oid")
+    essence-items(
+      v-if="showItems && !$slots.items && node.items.length === 2"
+      :node="node"
+      :itemState="data"
+      :isActive="isActive"
+      :isVisible="isVisible")
+    div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
+    div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
       //- NAME: dynamic link/ dynamic fontSize
-      slot(name="name")
       router-link(
         v-if="showName && node.oid"
         :to="nodeEssenceLink"
         :style=`{
-        order: 4,
-        minHeight: '60px',
-        fontSize: fontSize+'px',
-        textAlign: 'center',
-      }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-        span(
-          :class=`{
-          'text-bold': node.name.length < 20
+          minHeight: '60px',
+          fontSize: fontSize+'px',
+          textAlign: 'center',
         }`
-        ).text-white {{ nodeName }}
-          q-badge(v-if="showBadge && node.items[0].countStat.countNodes>1" align="top" dark rounded color="green") {{node.items[0].countStat.countNodes}}
-      //- SPHERES
-      essence-spheres(
-        v-if="showSpheres && node.spheres.length > 0"
-        :node="node"
-        :itemState="data"
-        :style=`{
-        order: 3,
-      }`).q-py-xs
-    //- FOOTER: actions, slot
-    essence-actions(
-      v-if="showActions && node.oid"
-      :essence="node"
-      :itemState="data"
-      :nodeBackgroundColor="nodeBackgroundColor"
-      :nodeActionsColor="nodeActionsColor"
-      :isActive="isActive"
-      :isVisible="isVisible"
-      :style=`{
-      order: 5,
-    }`)
-    slot(name="footer")
+      ).row.full-width.items-center.content-end.justify-center
+        span.text-grey-5 {{ nodeName }}
 </template>
 
 <script>
@@ -101,7 +57,7 @@ import cloneDeep from 'lodash/cloneDeep'
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
-  name: 'nodeFeed',
+  name: 'userFeed',
   components: {
     essenceItems,
     essenceActions,
@@ -137,7 +93,8 @@ export default {
     },
     styles: { type: Object },
     borderRadius: { type: String, default: '10px' },
-    actionsColor: { type: String, default: 'grey-9' }
+    actionsColor: { type: String, default: 'grey-9' },
+    height: { type: Number, required: true }
   },
   computed: {
     data() {
@@ -146,7 +103,7 @@ export default {
       let key = this.$options.name
       if (!this.itemState[key]) {
         this.$set(this.itemState, key, {
-         // key: value
+          // key: value
         })
       }
       return this.itemState[key]

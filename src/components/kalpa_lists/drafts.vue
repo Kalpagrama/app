@@ -48,7 +48,7 @@ export default {
     height: { type: Number },
     useNavHeader: { type: Boolean, default: true },
     searchInputState: { type: String },
-    mode: { type: String },
+    mode: { type: String, default: 'select' },
     pagesFilter: { type: Function }
   },
   components: {
@@ -116,7 +116,7 @@ export default {
     draftSelectHandle (draft) {
       this.$log('draftSelectHandle', draft)
       if (this.mode === 'select') {
-        this.$emit('draft', draft)
+        this.$go('/content/' + draft.items[0].layers[0].contentOid + '?draftId=' + draft.id)
       } else {
         this.draftSelected = draft
       }
