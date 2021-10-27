@@ -4,14 +4,28 @@ kalpa-layout()
     kalpa-menu-mobile(v-if="$q.screen.lt.md")
   template(v-slot:body)
     .row.full-width.items-start.content-start
-      view-guest(
-        v-if="$store.getters.isGuest")
-      div(
-        v-else
-        :style=`{
-          paddingTop: '8px',
-        }`).row.full-width.justify-center
-        feed(:feed="feed")
+      .row.full-width.justify-center.b-30.q-mb-sm
+        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          .row.full-width
+            div(
+              :style=`{
+                    height: '60px',
+                    borderRadius: '10px',
+                  }`
+            ).row.full-width.items-center.content-center.q-pa-sm.b-40.justify-between
+              q-btn(round flat color="white" icon="home")
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Feed')}}
+              //- tutorial
+              q-btn(
+                round flat color="white" icon="more_vert")
+          view-guest(
+          v-if="$store.getters.isGuest")
+          div(
+          v-else
+          :style=`{
+            paddingTop: '8px',
+          }`).row.full-width.justify-center
+          feed(:feed="feed")
 </template>
 
 <script>

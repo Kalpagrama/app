@@ -6,7 +6,7 @@
       v-model="bookmarkEditorShow"
       :full-width="$q.screen.xs"
       :full-height="$q.screen.xs"
-      :maximized="$q.screen.xs"
+      position="bottom"
       :square="$q.screen.xs"
       @hide="bookmarkSelected = null")
       bookmark-editor(

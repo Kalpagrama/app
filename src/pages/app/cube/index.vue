@@ -208,7 +208,7 @@ export default {
       this.$log('jointCreateStart')
       if (this.$store.getters.isGuest) {
         let authGuard = {
-          message: 'Чтобы создать связь, войдите в аккаунт.'
+          message: 'Чтобы создать связь, войдите в аккаунт'
         }
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }

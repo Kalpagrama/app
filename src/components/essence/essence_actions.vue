@@ -44,7 +44,11 @@
               @click="contextGo()")
               q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Context')}}
               q-icon(name="select_all" size="22px")
-      essence-vote-ball(v-if="essence.type.in('JOINT', 'NODE', 'BLOCK')" :essence="essence" @click.native="nodeVoteBallClick").q-mt-xs.q-mx-lg
+      // Vote ball
+      essence-vote-ball(v-if="essence.type.in('JOINT', 'NODE', 'BLOCK')"
+        :essence="essence"
+        @click.native="nodeVoteBallClick"
+        ).q-mt-xs.q-mx-lg
       //- joints/chains
       router-link(
         v-if="essence.type === 'NODE'"
@@ -206,7 +210,7 @@ export default {
       this.$log('nodeVoteBallClick', this.essence.rateUser)
       if (this.$store.getters.isGuest) {
         let authGuard = {
-          message: 'Чтобы проголосать и увидеть автора и статистику голосований, войдите в аккаунт.'
+          message: 'Чтобы проголосать и увидеть статистику голосований войдите'
         }
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       } else {

@@ -20,7 +20,6 @@
             ref="listFeed"
             :type="'customPPV'"
             :scrollAreaHeight="0"
-            :navHeaderText="$t('Feed')"
             searchInputState="disabled"
             :query="query"
             :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
