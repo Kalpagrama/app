@@ -28,7 +28,7 @@
       ).row.full-width
         template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           bookmark-list-item(
-            :bookmark="bookmark"
+            :item="bookmark"
             :itemState="itemState"
             :itemIndex="itemIndex"
             :mode="mode"
