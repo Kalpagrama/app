@@ -176,6 +176,8 @@
             q-toggle(
               v-model="bookmark.isSubscribed"
               dark
+              checked-icon="check"
+              unchecked-icon="clear"
               :label="$t('Receive updates')"
               :style=`{color: 'white'}`
               color="green")

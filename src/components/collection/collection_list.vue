@@ -1,7 +1,7 @@
 <template lang="pug">
   .row.justify-start.full-width.q-pt-md
     .col
-    span {{$t('Сохранить в коллекцию')}}
+    span.q-pl-xl {{$t('Сохранить в коллекцию')}}
     .col
     q-btn(flat icon="add" dense no-caps color="green" @click="showMenu=true").q-mr-md
       q-dialog(v-model="showMenu" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)

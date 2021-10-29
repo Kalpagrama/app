@@ -55,7 +55,7 @@
         transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
             v-if="followingConfirmed && !itsMe"
-            @click="followingToggle()"
+            @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы подписаться авторизуйтесь'}]) : followingToggle()"
             outline no-caps
             :color="following ? 'grey-8' : 'green'"
             :style=`{

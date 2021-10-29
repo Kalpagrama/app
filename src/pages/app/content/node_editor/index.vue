@@ -27,7 +27,7 @@
         }`
         ).full-width
     //- category and spheres
-    edit-spheres(:node="node")
+    edit-spheres(:sphereOwner="node")
       template(v-slot:left)
         edit-category(
           :node="node"
@@ -108,7 +108,7 @@
       .row.full-width.q-pt-sm
         edit-spheres(
           v-if="node.name.length > 0"
-          :node="node")
+          :sphereOwner="node")
           template(v-slot:left)
             edit-category(
               v-if="node.name.length > 0"

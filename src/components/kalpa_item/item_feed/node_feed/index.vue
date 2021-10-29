@@ -69,7 +69,7 @@
       //- SPHERES
       essence-spheres(
         v-if="showSpheres && node.spheres.length > 0"
-        :node="node"
+        :sphereOwner="node"
         :itemState="data"
         :style=`{
         order: 3,
