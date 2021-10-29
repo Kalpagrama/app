@@ -151,7 +151,7 @@ export default {
   },
   mounted () {
     this.$log('mounted', this.$route.params)
-    this.pageId = this.$route.params.page || 'contents'
+    this.pageId = this.$route.params.page || 'nodes'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
