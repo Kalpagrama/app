@@ -21,14 +21,14 @@ div(
       :style=`{
         minHeight: '50px',
       }`
-      @click="mode === 'select' ? $emit('item', bookmark) : null"
+      @click="mode === 'select' ? $emit('item', item) : null"
       ).row.full-width.items-start.content-start.cursor-pointer
       //- preview, but not for sphere...
       img(
-        v-if="bookmark.type !== 'SPHERE' && !thumbUrlErrored"
+        v-if="item.type !== 'SPHERE' && !thumbUrlErrored"
         @error="thumbUrlErrorHandle"
         draggable="false"
-        :src="bookmark.thumbUrl"
+        :src="item.thumbUrl"
         :style=`{
           height: '50px',
           minWidth: '90px',
@@ -48,18 +48,18 @@ div(
       //- right side
       .col
         div(:style=`{minHeight: '50px',}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
-          //- bookmark name
+          //- item name
           div(:style=`{minHeight:'32px',}`).row.full-width
-            span(:style=`{lineHeight: 1.1,}`).text-white {{ bookmark.name }}
+            span(:style=`{lineHeight: 1.1,}`).text-white {{ item.name }}
           .row.full-width.q-py-xs
             small.text-grey-8 {{ type }}
             .col
-            small.text-grey-8 {{ $date(bookmark.createdAt) }}
+            small.text-grey-8 {{ $date(item.createdAt) }}
   //- right
   q-btn(
     v-if="mode !== 'select' && showMenuBtn"
     round flat color="grey-8" icon="more_vert"
-    @click="$emit('item', bookmark)"
+    @click="$emit('item', item)"
     ).q-mt-xs.q-mr-xs
 </template>
 
@@ -70,12 +70,8 @@ import {objectTypeName, objectUrl} from '../../system/common/object_info';
 export default {
   name: 'bookmarkListItem',
   props: {
-    bookmark: {
+    item: {
       type: Object,
-      required: true,
-    },
-    itemIndex: {
-      type: Number,
       required: true,
     },
     mode: {
@@ -89,19 +85,12 @@ export default {
       thumbUrlErrored: false
     }
   },
-  watch: {
-    // itemIndex: {
-    //   handler(to, from){
-    //     this.$log('itemIndex changed', from, to)
-    //   }
-    // }
-  },
   computed: {
     link() {
-      return objectUrl(this.bookmark)
+      return objectUrl(this.item)
     },
     type() {
-      return objectTypeName(this.bookmark)
+      return objectTypeName(this.item)
     },
     actions () {
       return {
@@ -116,7 +105,7 @@ export default {
           name: 'Удалить',
           cb: async () => {
             this.$log('delete')
-            await this.bookmark.remove(true)
+            await this.item.remove(true)
           }
         }
       }
@@ -125,15 +114,14 @@ export default {
   methods: {
     async thumbUrlErrorHandle (e) {
       this.$log('thumbUrlErrorHandle', e)
-      // get bookmarkFresh to refresh thumbs and names and any dynamic info...
-      let bookmarkFresh = await this.$rxdb.get(RxCollectionEnum.OBJ, this.bookmark.oid)
-      this.bookmark.thumbUrl = bookmarkFresh.thumbUrl
-      this.bookmark.name = bookmarkFresh.name
+      // get itemFresh to refresh thumbs and names and any dynamic info...
+      let itemFresh = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.oid)
+      this.item.thumbUrl = itemFresh.thumbUrl
+      this.item.name = itemFresh.name
     }
   },
   mounted () {
-    // this.origIndx = this.itemIndex
-    // this.$log('mounted!!!', this.itemIndex)
+    // this.$log('mounted!!!',)
   }
 }
 </script>

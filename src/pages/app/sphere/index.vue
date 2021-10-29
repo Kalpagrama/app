@@ -41,9 +41,14 @@
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling").q-pb-xl
+                :scrolling="scrolling")
+              .row.full-width
+                div(v-if="item.type === 'NODE' || item.type === 'BLOCK' || item.type === 'JOINT'").q-pb-xl
+                div(v-else).q-pb-md
+
 </template>
 
+//  @item="$go('/content/'+item.oid)
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
@@ -60,7 +65,7 @@ export default {
   data () {
     return {
       sphere: null,
-      pageId: 'all',
+      pageId: null,
       itemEditorShow: false,
       items: [],
       topNode: null
@@ -81,11 +86,12 @@ export default {
     },
     pages () {
       return [
-        { id: 'all', name: this.$t('All') },
+        // { id: 'all', name: this.$t('All') },
         // {id: 'contents', name: this.$t('Media')},
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
+        { id: 'blocks', name: this.$t('Blocks') },
+        { id: 'contents', name: this.$t('Контент') }
         // {id: 'spheres', name: this.$t('Spheres')},
         // {id: 'users', name: this.$t('Users')}
       ]
@@ -129,10 +135,12 @@ export default {
         if (to) {
           // this.$log('$route.params.oid TO', to)
           this.sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
-          if (!this.$route.params.page) {
-            this.$router.replace({ params: { page: 'nodes' } })
-          }
         }
+      }
+    },
+    pageId: {
+      handler (to, from) {
+        this.$router.replace({ params: { page: to } })
       }
     },
     async items (to) {
@@ -142,7 +150,8 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.$route.params)
+    this.pageId = this.$route.params.page || 'nodes'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

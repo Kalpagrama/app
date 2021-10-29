@@ -68,7 +68,7 @@ class ContentApi {
       return await apiCall(f, cb)
    }
 
-   static async contentCreateFromFile (file, name, description) {
+   static async contentCreateFromFile (file, name, description, spheres) {
       const f = ContentApi.contentCreateFromFile
       logD(f, 'start', file, name, description)
       assert(name)
@@ -83,8 +83,8 @@ class ContentApi {
          let { data: { contentCreateFromFile } } = await apollo.clients.upload.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
-                mutation ($file: Upload!, $length: Float!, $name: String!, $description: String!) {
-                    contentCreateFromFile(file: $file, length: $length, name: $name, description: $description) {
+                mutation ($file: Upload!, $length: Float!, $name: String!, $description: String!, $spheres: [ObjectShortInput!]!) {
+                    contentCreateFromFile(file: $file, length: $length, name: $name, description: $description, spheres: $spheres) {
                         ...objectFullFragment
                     }
                 }
@@ -93,6 +93,7 @@ class ContentApi {
                file: file,
                length: file.size,
                name,
+               spheres,
                description,
             }
          })

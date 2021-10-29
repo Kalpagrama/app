@@ -7,6 +7,16 @@
         :style=`{
       }`
       ).full-width.br-10
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        figures-editor(
+          :player="player"
+          :convert="convertPxToTime"
+          :style=`{
+                  left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
+                  width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
+                }`
+          @first="zoomWorking = true, figureEditing = true"
+          @final="zoomWorking = false, figureEditing = false")
       q-input(
         v-model="contentVideo.name"
         borderless dark dense
@@ -40,7 +50,7 @@
         ref="editSpheres"
         :sphereOwner="contentVideo"
         :maxSphereCnt="10"
-        :placeholderText="$t('Добавьте связанные смыслы')"
+        :placeholderText="$t('Добавьте ключевые слова')"
         ).q-my-sm
       .row.full-width
         .col
@@ -100,8 +110,8 @@ export default {
           this.$log('content', content)
         }
         // go to this content...
-        await this.$router.push('/content/' + contentKalpa.oid)
-        // this.$router.push('/workspace/contents')
+        // await this.$router.push('/content/' + contentKalpa.oid)
+        await this.$router.push('/workspace/contents')
       } finally {
         this.loading = false
       }

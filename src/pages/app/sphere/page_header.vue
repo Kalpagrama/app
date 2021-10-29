@@ -8,8 +8,8 @@
               borderRadius: '10px 10px 0 0',
             }`).row.full-width.b-40
             img(
-              v-if="topNode"
-              :src="topNode.thumbUrl"
+              v-if="topNode || category"
+              :src="category ? category.icon : topNode.thumbUrl"
               :style=`{
                 objectFit: 'cover',
               }`
@@ -80,6 +80,9 @@ export default {
   name: 'pageHeader',
   props: ['sphere', 'topNode'],
   computed: {
+    category () {
+      return this.$store.getters.nodeCategories.find(c => c.sphere.oid === this.sphere.oid)
+    },
     fontSize () {
       if (!this.sphere) return 14
       let l = this.sphere.name.length

@@ -68,7 +68,7 @@
                       // opacity: 0.2,
                       objectFit: 'cover',
                       borderRadius: '10px'}`)
-                  div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="$go('/category/'+c.type)").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
+                  div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="$go(categoryLink(c))").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
                     div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
                       span(v-if="$q.screen.lt.md" :style=`{fontSize: '17px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold {{c.alias}}
                       span(v-else :style=`{textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-h5 {{c.alias}}
@@ -123,6 +123,9 @@ export default {
     }
   },
   methods: {
+    categoryLink(c){
+      return '/sphere/' + c.sphere.oid
+    },
     onBusEvent (ev) {
       this.$refs.listFeed.scrollTo('start')
     }

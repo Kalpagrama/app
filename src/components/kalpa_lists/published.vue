@@ -29,7 +29,7 @@
         template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           //q-btn(:label="bookmarkIndex + '::' + bookmark.name", size="xl").full-width
           bookmark-list-item(
-            :bookmark="bookmark"
+            :item="bookmark"
             :itemState="itemState"
             :itemIndex="itemIndex"
             :mode="mode"
