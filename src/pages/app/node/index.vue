@@ -3,12 +3,41 @@
     template(v-slot:footer)
       kalpa-menu-mobile(v-if="$q.screen.lt.md || pageId==='images' || pageId==='essences'")
         template(v-if="pageId==='essences' || pageId==='images'" v-slot:all)
-          q-btn(v-if="pageId==='essences'" flat ripple=false icon="add" color="green" :label="$t('Добавить свой смысл')" @click="itemEditorShow=true")
-          q-btn(v-if="pageId==='images'" flat ripple=false icon="add" color="green" :label="$t('Добавить свой образ')" @click="itemEditorShow=true")
+          //q-btn(v-if="pageId==='essences'" flat ripple=false icon="add" color="green" :label="$t('Добавить свой смысл')" @click="itemEditorShow=true")
+          q-btn(v-if="pageId==='essences'"
+            flat ripple=false icon="add" color="green" :label="$t('Добавить свой смысл')"
+            @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true")
+          q-btn(v-if="pageId==='images'"
+            flat ripple=false icon="add" color="green" :label="$t('Добавить свой образ')"
+            @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить образ авторизуйтесь'}]) : itemEditorShow=true")
+        template(v-if="pageId!=='essences' || pageId!=='images'" v-slot:left-button)
+          nav-mobile(
+            :pageId="pageId"
+            @pageId="pageIdChange")
+        template(v-if="pageId!=='essences' || pageId!=='images'" v-slot:center)
+          .row.content-center
+            span.text-grey-7 {{$t('Essence core')}}
     template(v-slot:body)
       .row.full-width.items-start.content-start.justify-center
         q-spinner-dots(v-if="!state.node" color="green" size="60px").fixed-center
         div(v-if="state.node" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+          div(v-if="!$q.screen.lt.md").row.full-width.justify-center.b-30
+            div(
+              :style=`{
+                maxWidth: $store.state.ui.pageWidth+'px',
+                borderRadius: '10px',
+              }`).row.full-width.items-center.content-center.q-pa-sm.b-30
+              q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
+              .col
+              h1.text-white.text-bold {{$t('Смысловое ядро')}}
+              .col
+              //- tutorial
+              q-btn(
+                @click=""
+                round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
+              //q-btn(
+              //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+              //  round flat color="white" icon="fas fa-info")
           q-dialog(
             v-model="itemEditorShow"
             :maximized="false"
@@ -18,6 +47,7 @@
               :publish="true"
               @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")
           // образ
+          //q-btn(v-if="!$q.screen.lt.md" @click="$routerKalpa.back()" flat round color="white" icon="west" no-caps :style=`{position: 'absolute', zIndex: 100}`)
           div(:style=`{width: $store.state.ui.pageWidth + 'px', position: 'relative'}`).row-full-width
             q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
             page-image(
@@ -43,9 +73,12 @@
                     size="9px"
                     boundary-numbers)
                   .col
-                  q-icon(dense name="add" color="green-9" size="sm" @click="itemEditorShow=true").cursor-pointer.q-pr-xs
+                  q-icon(
+                    dense name="add" color="green-9" size="sm"
+                    @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true"
+                    ).cursor-pointer.q-pr-xs
                   //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
-                div(v-else @click="itemEditorShow=true").row.full-width.cursor-pointer.items-center
+                div(v-else @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true").row.full-width.cursor-pointer.items-center
                   small.text-grey-7.text-weight-thin.q-pl-xs  {{$t('Добавить смысл на этот образ')}}
                   .col
                   q-icon(dense name="add" color="green-9" size="sm").q-pr-xs
@@ -147,6 +180,7 @@ import pageEssences from './page_essences/index.vue'
 import pageImages from './page_images/index.vue'
 import pageEssence from './page_essence/index.vue'
 import pageImage from './page_image/index.vue'
+import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 import widgetImages from './widget_images/index.vue'
 
 import { assert } from 'src/system/common/utils'
@@ -157,6 +191,7 @@ export default {
   components: {
     pageSimilar,
     pageComments,
+    navMobile,
     pageDescription,
     pageEssences,
     pageImages,

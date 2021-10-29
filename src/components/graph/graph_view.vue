@@ -58,7 +58,7 @@
             // border: '2px solid green',
           }`).row.full-width.b-40
         div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
-          q-btn(icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
+          q-btn(v-if="!$store.getters.isGuest" icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
           //q-btn(
           //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
           //  icon="mediation" flat color="grey"
@@ -66,7 +66,7 @@
           //  :label="selectedItemFull.countStat.countJoints || 0"
           //  @click="discover(graphD3.selectedItem)").q-mx-sm
           q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
-          q-btn(v-close-popup icon="add_link" flat color="grey" @click="connectNodes(graphD3.selectedItem, null)").q-mx-sm
+          q-btn(v-close-popup icon="add_link" flat color="grey" @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : connectNodes(graphD3.selectedItem, null)").q-mx-sm
           .col
           q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
         .row.full-width.items-center.content-center.justify-center.q-pa-sm
@@ -119,10 +119,10 @@
       svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
       // добавление элемента на граф
       .col
-        div(:style=`{position: 'relative'}`).row.justify-end.content-end.full-height
+        div(v-if="showMiniAddBtn && showGraph" :style=`{position: 'relative'}`).row.justify-end.content-end.full-height
           q-icon(
             name="add_circle_outline" color="green" size="lg"
-            @click="menuShow = false, itemFinderShow = true"
+            @click="menuShow = false, $store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить элемент авторизуйтесь'}]) : itemFinderShow = true"
           ).cursor-pointer.row.q-pa-xs
             q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Pick new element')}}
 
@@ -148,6 +148,7 @@ export default {
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект
     showAddBtn: { type: Boolean, default: true },
+    showMiniAddBtn: { type: Boolean, default: true },
     getJoints: { type: Function, default: null },
     publish: { type: Boolean, default: false }, // при false - будет создавать реальные связи в системе
     oidRoot: { type: String, required: true },
@@ -473,7 +474,12 @@ export default {
         }
 
         onLongClick (event) {
-          thiz.menuShow = true
+          if (thiz.$store.getters.isGuest) {
+            thiz.$store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы открыть меню, войдите в аккаунт'}])
+          }
+          else {
+            thiz.menuShow = true
+          }
         }
       }
 

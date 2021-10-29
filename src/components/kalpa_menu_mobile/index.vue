@@ -5,7 +5,7 @@
       maxWidth: this.$store.state.ui.pageWidth + 'px',
       maxHeight: '50px',
       minHeight: '50px',
-      ...style}`).row.full-width.justify-center
+      ...styles}`).row.full-width.justify-center
       slot(name="all")
         .row.full-width.justify-between.q-px-sm
           //- feed
@@ -90,7 +90,7 @@ export default {
   name: 'kalpaMenuMobile',
   props: {
     homeButton: {type: Boolean, default: true},
-    style: {
+    styles: {
       type: Object,
       default() {
         return {

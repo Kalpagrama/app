@@ -2,9 +2,8 @@
 .row.window-height.window-width
   div(v-if="isReady && $q.screen.width > $store.state.ui.pageMinWidthDesktop" @click.self="close()").row.fit.items-center.content-center.justify-center
     //- desktop layout
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
       div(
-        @click.self="close()"
         :style=`{
           position: 'relative',
           maxWidth: '900px',
@@ -42,7 +41,7 @@
               //- tint
 
           div(:style=`{width: 'calc(50% + 15px)', position: 'absolute', zIndex: 100, right: '0px', borderLeft: '0px solid rgba(90,90,90,0.6)'}`).full-height.q.ma-sm
-            auth-flow(:onSuccess="onSuccess").q-pa-lg.full-height.scroll
+            auth-flow(:message="message" :onSuccess="onSuccess").q-pa-lg.full-height.scroll
           div(:style=`{position: 'absolute', zIndex: 100, right: '0px'}`).q-ma-xs
             q-btn(round flat color="white" icon="clear" @click="close")
     //- mobile layout
@@ -63,10 +62,10 @@
       :style=`{position: 'fixed', top: '0px', background: 'rgba(0,0,0,0.5)'}`
     ).row.fit
     div(:style=`{zIndex: 2}`).row.content-start.q-mt-xl
-      q-btn(
-        round flat color="white" icon="clear" @click="close" size='20px'
-        :style=`{position: 'absolute', zIndex: 100, right: '0px', top: '13%'}`
-        )
+      //q-btn(
+      //  round flat color="white" icon="clear" @click="close" size='20px'
+      //  :style=`{position: 'absolute', zIndex: 100, right: '0px', top: '13%'}`
+      //  )
       //- logo
       kalpa-logo(
         :width="100"
@@ -78,6 +77,7 @@
       // - tong
       div().q.ma
         auth-flow(
+          :message="message"
           :onSuccess="onSuccess").no-scroll.q-pa-lg
 </template>
 
@@ -89,7 +89,7 @@ export default {
   components: {
     authFlow,
   },
-  props: ['onSuccess'],
+  props: ['onSuccess', 'message'],
   data () {
     return {
       isReady: true,

@@ -34,6 +34,7 @@
       graph-view(
         v-else
         :maxHeight="450"
+        :showMiniAddBtn="blockIsMine"
         :graphD3="block.graph"
         detailPosition="standard"
         @changed="block.setChanged(true)"
@@ -139,6 +140,9 @@ export default {
         })
       }
       return this.itemState[key]
+    },
+    blockIsMine () {
+      return this.block.author.oid === this.$store.getters.currentUser.oid
     },
     fontSize () {
       let l = this.block.name.length

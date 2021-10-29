@@ -1,20 +1,24 @@
 <template lang="pug">
 kalpa-layout()
   template(v-slot:footer)
-    nav-mobile(
-      v-if="$q.screen.lt.md"
-      :pageId="pageId"
-      @pageId="pageIdChange")
+    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+      template(v-slot:left-button)
+        nav-mobile(
+          :pageId="pageId"
+          @pageId="pageIdChange")
+      template(v-slot:center)
+        .row.content-center
+          span.text-grey-7 {{$t('Essence block')}}
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header
-      .row.full-width.justify-center.b-30.q-pa-sm
+      div(v-if="!$q.screen.lt.md").row.full-width.justify-center.b-30.q-pa-sm
         div(
           :style=`{
             maxWidth: $store.state.ui.pageWidth+'px',
             borderRadius: '10px',
           }`).row.full-width.items-center.content-center.q-pa-sm.b-40
-          q-icon(name="hub" color="white" size="30px").q-ml-sm
+          q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
           .col
           h1.text-white.text-bold {{$t('Essence block')}}
           .col
@@ -24,7 +28,7 @@ kalpa-layout()
           //  round flat color="white" icon="fas fa-info")
           q-btn(
             @click=""
-            round flat color="white" icon="fas fa-info")
+            round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
       //- body
       div(
         v-if="block"
@@ -66,7 +70,7 @@ kalpa-layout()
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import navMobile from 'src/pages/app/node/nav_mobile.vue'
+import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 import pageComments from '../node/page_comments';
 import pageSimilar from '../node/page_similar';
 

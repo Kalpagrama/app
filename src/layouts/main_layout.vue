@@ -4,9 +4,8 @@ q-layout(
   :container="false")
   q-dialog(
     v-model="authGuardShow"
-    maximized
-    position="bottom")
-    kalpa-auth-guard(@close="authGuardShow = null")
+    maximized)
+    kalpa-auth-guard(@close="authGuardShow = null" :message="$store.state.ui.authGuard ? $store.state.ui.authGuard.message : ''")
   q-dialog(
     v-model="kalpaTutorialShow"
     maximized

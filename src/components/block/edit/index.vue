@@ -34,7 +34,7 @@
           borderless dark
           ref="nameInput"
           type="textarea" autogrow
-        :placeholder="$t('what is this block about')"
+          :placeholder="$t('what is this block about')"
           :autofocus="false"
           :input-style=`{
           paddingTop: '16px',

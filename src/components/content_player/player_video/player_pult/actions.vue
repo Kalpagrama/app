@@ -66,7 +66,7 @@ export default {
       this.$log('nodeCreate')
       if (this.$store.getters.isGuest) {
         let authGuard = {
-          message: 'Чтобы создать ядро, войдите в аккаунт.'
+          message: 'Чтобы создать ядро, войдите в аккаунт'
         }
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }

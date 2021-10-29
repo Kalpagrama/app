@@ -188,7 +188,7 @@ export default {
       this.$log('relatedContentClick', content)
       if (this.$store.getters.isGuest) {
         let authGuard = {
-          message: 'Чтобы перейти на похожий контент, войдите в аккаунт.'
+          message: 'Чтобы перейти на похожий контент, войдите в аккаунт'
         }
         this.$store.commit('ui/stateSet', ['authGuard', authGuard])
       }
