@@ -18,14 +18,35 @@ div(
         //- header
         .row.full-width
           .row.full-width.q-py-md
+            img(
+              draggable="false"
+              :src="contentKalpa.thumbUrl"
+              :style=`{
+                height: '160px',
+                maxWidth: '120px',
+                objectFit: 'cover',
+                borderRadius: '10px',
+              }`
+              )
+          .row.full-width.q-py-md
             span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ contentKalpa.name }}
+          .row.full-width.q-py-md
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ contentKalpa.description }}
+          .row.full-width.q-py-md
+            essence-spheres(
+              v-if="showSpheres && node.spheres.length > 0"
+              :sphereOwner="contentKalpa"
+              :itemState="data"
+              :style=`{
+                order: 3,
+              }`).q-py-xs
           //- stats
           .row.full-width.q-pb-sm
             span.text-grey-3.q-mr-xs {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
             span.text-grey-3.q-mr-xs • {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
           //- origin
           div(
-            v-if="contentKalpa.contentProvider !== 'KALPA'"
+            v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
             ).row.full-width.items-center.content-center
               q-btn(
                 @click="goOriginal"
@@ -130,6 +151,7 @@ export default {
   name: 'pageInfoRoot',
   props: {
     contentKalpa: {type: Object, required: true},
+    itemState: { type: Object},
     isActive: {type: Boolean},
     player: {type: Object, required: true},
     styles: {

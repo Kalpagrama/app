@@ -16,7 +16,7 @@
               //q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
         // spheres
         div(:style=`{minHeight: '32px'}`).row.full-width.content-start
-          essence-spheres(:node="node" :itemState="itemState")
+          essence-spheres(:sphereOwner="node" :itemState="itemState")
     // голосовалка
     .row.full-width.q-px-xs
       slot(name="actions-left")

@@ -15,7 +15,7 @@
             :pageId="pageId"
             @pageId="pageIdChange")
         template(v-if="pageId!=='essences' || pageId!=='images'" v-slot:center)
-          .row.content-center
+          .row.content-center.items-center.justify-center
             span.text-grey-7 {{$t('Essence core')}}
     template(v-slot:body)
       .row.full-width.items-start.content-start.justify-center
@@ -164,7 +164,7 @@
               @set-node="setNode($event.oid, false)" @images-show="pageId='images'").q-pt-md.b-30
           // похожие
           div(v-if="!pageId").row.full-width.q-pt-lg
-            .row.full-width.justify-end
+            .row.full-width.justify-start
               small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
             //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
             page-similar(v-if="!pageId" :node="state.node")

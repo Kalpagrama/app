@@ -8,7 +8,7 @@
             height: headerHeight + 'px',
             maxWidth: $store.state.ui.pageWidth+'px',
             background: 'rgb(40,40,40)',
-            borderRadius: '0px',
+            borderRadius: '10px',
           }`
           ).row.full-width.items-center.content-center.q-pa-sm
             q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")

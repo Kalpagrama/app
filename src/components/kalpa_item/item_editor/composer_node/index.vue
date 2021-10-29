@@ -40,7 +40,7 @@
           fontSize: fontSize+'px',
           textAlign: 'center',
         }`).row.full-width.items-center.content-center.justify-center.q-pa-md
-      edit-spheres(v-if="node.name" ref="editSpheres" :node="node")
+      edit-spheres(v-if="node.name" ref="editSpheres" :sphereOwner="node")
       //q-input(
       //  v-model="node.description"
       //  borderless dark dense

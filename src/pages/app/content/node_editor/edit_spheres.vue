@@ -2,7 +2,7 @@
 .row.full-width.items-start.content-start
   div(ref="scrolledArea").scroll.row.full-width.items-center.content-center.no-wrap
     q-btn(
-      v-for="(s,si) in node.spheres" :key="si"
+      v-for="(s,si) in sphereOwner.spheres" :key="si"
       flat no-caps dense color="white"
       :style=`{
         whiteSpace: 'nowrap',
@@ -14,7 +14,7 @@
       v-model="sphere"
        dark dense
        color="green"
-      :placeholder="$t('add minor essences')"
+      :placeholder="placeholder"
       :input-style=`{
       textAlign: 'center',
       // paddingLeft: '16px',
@@ -38,11 +38,20 @@ import { scroll } from 'quasar'
 const { getScrollTarget, setHorizontalScrollPosition, getScrollWidth } = scroll
 
 export default {
-  name: 'nodeEditor__editSpheres',
-  props: ['node'],
+  name: 'editSpheres',
+  props: {
+    sphereOwner: {type: Object, required: true},
+    maxSphereCnt: {type: Number, default: 5},
+    placeholderText: {type: String},
+  },
   data () {
     return {
       sphere: ''
+    }
+  },
+  computed: {
+    placeholder() {
+      return this.placeholderText || this.$t('Добавьте дополнительные смыслы')
     }
   },
   methods: {
@@ -50,29 +59,29 @@ export default {
       this.$log('sphereAdd')
       // checks
       if (this.sphere.length === 0) return
-      if (this.node.name === this.sphere) {
+      if (this.sphereOwner.name === this.sphere) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('major essence is equal minor')})
         this.sphere = ''
         return
       }
-      if (this.node.spheres.find(s => s.name === this.sphere)) {
+      if (this.sphereOwner.spheres.find(s => s.name === this.sphere)) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Already added!')})
         this.sphere = ''
         return
       }
-      if (this.node.spheres.length >= 5) {
-        this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum 5 spheres!')})
+      if (this.sphereOwner.spheres.length >= this.maxSphereCnt) {
+        this.$q.notify({type: 'negative', position: 'top', message: this.$t('Maximum ' + this.maxSphereCnt + ' spheres!')})
         return
       }
       // do stuff
-      this.node.spheres.push({name: this.sphere})
+      this.sphereOwner.spheres.push({name: this.sphere})
       this.sphere = ''
       let scrollTarget = getScrollTarget(this.$refs.scrolledArea)
       setHorizontalScrollPosition(scrollTarget, getScrollWidth(scrollTarget), 1000)
     },
     sphereDelete (s) {
       this.$log('sphereDelete', s)
-      this.node.spheres = this.node.spheres.filter(i => i.name !== s.name)
+      this.sphereOwner.spheres = this.sphereOwner.spheres.filter(i => i.name !== s.name)
     },
   }
 }
