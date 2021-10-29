@@ -94,6 +94,7 @@
               }`).row.full-width.b-30
               component(:is="'page-' + pageId"
                 :node="state.node"
+                :item="state.node"
                 :height="bottomHeight"
                 :essencesNodes="state.essencesNodes"
                 :imagesNodes="state.imagesNodes"

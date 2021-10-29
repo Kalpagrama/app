@@ -60,7 +60,7 @@ kalpa-layout()
                   // template(v-slot:header)
                     // todo самый лучший коммент
                   row.full-width
-                    page-comments(v-if="commentsOpened" :node="block")
+                    page-comments(v-if="commentsOpened" :item="block")
                 q-separator
                 q-expansion-item(v-model="similarOpened" group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
                   page-similar(v-if="similarOpened" :node="block")

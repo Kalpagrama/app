@@ -47,7 +47,7 @@ export default {
   components: {
     commentItem,
   },
-  props: ['node', 'height'],
+  props: ['item', 'height'],
   data () {
     return {
       comment: '',
@@ -61,7 +61,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_COMMENTS,
-          oidSphere: this.node.oid
+          oidSphere: this.item.oid
         }
       }
     }
@@ -82,7 +82,7 @@ export default {
           if (this.comment.length === 0) throw new Error(this.$t('Empty comment!'))
           const commentInput = this.comment
           this.comment = ''
-          const comment = await ObjectApi.commentCreate(this.node.oid, commentInput)
+          const comment = await ObjectApi.commentCreate(this.item.oid, commentInput)
           // this.comment = ''
           this.$log('commentSend comment', comment)
           this.$log('commentSend done')
@@ -100,7 +100,7 @@ export default {
       try {
         this.$log('commentDelete')
         this.commentSending = true
-        const res = await ObjectApi.commentDelete(this.node.oid, comment)
+        const res = await ObjectApi.commentDelete(this.item.oid, comment)
         this.$log('commentDelete done')
         this.commentSending = false
       }

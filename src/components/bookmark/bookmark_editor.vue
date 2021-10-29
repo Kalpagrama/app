@@ -27,14 +27,16 @@
             borderRadius: '10px',
           }`).b-50.justify-center
           .col
-            .row.full-width.justify-end.content-center.items-center.q-pt-xs
+            .row.full-width.justify-center.content-center.items-center.q-pt-xs.br
               q-btn(v-if="false" outline no-caps color="green" :label="$t('Редактировать')" @click="showEditMenu=true")
-            //  q-toggle(
-            //    v-model="paidСontent"
-            //    dark
-            //    :label="$t('Платный контент')"
-            //    :style=`{color: 'white'}`
-            //    color="green").q-mr-md
+              q-toggle(
+                v-if="item.author"
+                v-model="paidСontent"
+                dark
+                size="30px"
+                :style=`{color: 'white'}`
+                color="green")
+                small {{$t('Платный контент')}}
             //.row.full-width.justify-end.content-start.items-start
             //  .row
             //    q-input(v-if="paidСontent"

@@ -67,12 +67,12 @@
             //  // template(v-slot:header)
             //    // todo самый лучший коммент
             //  row.full-width
-            //    page-comments(:node="block")
+            //    page-comments(:item="block")
             //q-separator
             //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
             //  page-similar(:node="block")
             //q-separator
-          page-comments(v-if="pageId === 'comments'" :node="item")
+          page-comments(v-if="pageId === 'comments'" :item="item")
           //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
           item-description(v-if="pageId === 'description'" :item="item" :height="700")
           //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
