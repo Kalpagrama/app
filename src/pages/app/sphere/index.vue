@@ -139,8 +139,8 @@ export default {
       }
     },
     pageId: {
-      handler (to, from) {
-        this.$router.replace({ query: { pageId: to } })
+      async handler (to, from) {
+        if (this.$route.query.pageId !== to) await this.$router.replace({ query: { pageId: to } })
       }
     },
     async items (to) {
