@@ -124,7 +124,7 @@ export default {
   },
   methods: {
     categoryLink(c){
-      return '/sphere/' + c.sphere.oid
+      return '/sphere/' + c.sphere.oid + '/' + (c.type === 'ALL' ? 'AGE' : 'HOT')
     },
     onBusEvent (ev) {
       this.$refs.listFeed.scrollTo('start')

@@ -256,7 +256,7 @@ const routes = [
          },
          {
             name: 'sphere',
-            path: 'sphere/:oid/:page?',
+            path: 'sphere/:oid/:sort?',
             component: () => import('src/pages/app/sphere/index.vue'),
             meta: { roleMinimal: 'GUEST' },
             beforeEnter: async (to, from, next) => {

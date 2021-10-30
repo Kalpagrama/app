@@ -25,7 +25,7 @@
             :pages="pages"
             :pageId="pageId"
             :query="query"
-            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
+            :itemHeightApprox="pageId === 'contents' ? 30 : (Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222)"
             :itemActivePersist="true"
             @searchString="searchString = $event"
             @pageId="pageId = $event"
@@ -41,10 +41,11 @@
                 :isActive="isActive"
                 :isVisible="isVisible"
                 :isPreload="isPreload"
-                :scrolling="scrolling")
+                :scrolling="scrolling"
+                :height="pageId === 'contents' ? 30 : undefined")
               .row.full-width
-                div(v-if="item.type === 'NODE' || item.type === 'BLOCK' || item.type === 'JOINT'").q-pb-xl
-                div(v-else).q-pb-md
+                div(v-if="pageId === 'contents'").q-pb-md
+                div(v-else).q-pb-xl
 
 </template>
 
@@ -121,7 +122,7 @@ export default {
           oidSphere: this.sphere.oid,
           objectTypeEnum: { $in: objectTypes },
           // querySearch: this.searchString,
-          sortStrategy: 'ACTIVITY' // 'ACTIVITY', // AGE
+          sortStrategy: this.$route.params.sort || 'ACTIVITY' // 'ACTIVITY', // AGE HOT
         },
         populateObjects: false
       }
@@ -133,14 +134,13 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to) {
-          // this.$log('$route.params.oid TO', to)
           this.sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
         }
       }
     },
     pageId: {
       handler (to, from) {
-        this.$router.replace({ params: { page: to } })
+        this.$router.replace({ query: { pageId: to } })
       }
     },
     async items (to) {
@@ -150,8 +150,8 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.$route.params)
-    this.pageId = this.$route.params.page || 'nodes'
+    this.$log('mounted', this.$route.params, this.$route.query)
+    this.pageId = this.$route.query.pageId || 'nodes'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
