@@ -10,7 +10,7 @@
         ).row.full-width
           q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
           q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
-    //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.br.wrap
+    //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.wrap
     div(:style=`{maxHeight: '180px'}`).row.scroll.full-width
       q-chip(
         v-for="(c,ci) in value.collections" :key="c.id"

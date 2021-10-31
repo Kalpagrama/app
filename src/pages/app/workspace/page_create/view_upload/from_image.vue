@@ -170,7 +170,6 @@ export default {
           oid: contentKalpa.oid,
           name: '',
           thumbUrl: contentKalpa.thumbUrl,
-          paid: false
         }
         this.$log('contentInput', contentInput)
         // create

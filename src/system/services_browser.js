@@ -149,7 +149,6 @@ async function shareIn ({ contentUrl } = {}) {
             oid: content.oid,
             name: content.name,
             thumbUrl: content.thumbUrl,
-            paid: false,
          }
          await rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
          // alert('shareIn3')

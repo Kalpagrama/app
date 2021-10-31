@@ -15,6 +15,7 @@
       minWidth: height*1.6 + 'px',
       // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
     }`).b-0
+      q-resize-observer(@resize="data.nodeWidth = $event.width")
       //image
       composition(
         v-if="showItems && !$slots.items && node.items.length === 1"
@@ -39,10 +40,11 @@
           :style=`{
           minHeight: '60px',
           fontSize: fontSize+'px',
+          fontWeight: fontWeight,
           textAlign: 'center',
         }`
         ).row.full-width.items-center.content-end.justify-center
-          span.text-grey-5 {{ nodeName }}
+          span.text-grey-5.ellipsis.q-px-sm {{ nodeName }}
 </template>
 
 <script>
@@ -104,6 +106,7 @@ export default {
       if (!this.itemState[key]) {
         this.$set(this.itemState, key, {
          // key: value
+          nodeWidth: 100
         })
       }
       return this.itemState[key]
@@ -130,11 +133,19 @@ export default {
       return this.$store.getters.nodeCategories.find(c => c.type === this.node.category)
     },
     fontSize () {
+      this.$logW('data.nodeWidth1', this.data.nodeWidth)
       let l = this.node.name.length
-      if (l < 20) return 22
-      else if (l < 30) return 20
-      else if (l < 40) return 16
+      let w = this.data.nodeWidth
+      if (l < 20 && w > 300) return 22
+      else if (l < 30 && w > 300) return 20
+      else if (l < 40 && w > 300) return 16
+      else if (l <= 20 && w < 300) return 12
+      else if (l > 20 && w < 300) return 12
       else return 14
+    },
+    fontWeight () {
+      this.$logW('data.nodeWidth1', this.data.nodeWidth)
+      return 800
     }
   }
 }

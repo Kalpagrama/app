@@ -1,6 +1,6 @@
 <template lang="pug">
   .row
-    slot(name="action" :start="start" :content="content")
+    slot(v-if="!formOnly" name="action" :start="start" :content="content")
       q-btn(
         v-if="!$scopedSlots.action"
         round flat no-caps
@@ -41,6 +41,14 @@
                 icon='shopping_cart'
                 round flat no-caps
               )
+    payanyway-form(v-if="formOnly"
+      :amount="12.34"
+      :transactionId="Date.now()"
+      :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
+      :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
+      :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
+      @success="onSuccessPay"
+    )
 </template>
 
 <script>
@@ -57,6 +65,7 @@ export default {
     name: { type: String },
     thumbUrl: { type: String },
     isActive: { type: Boolean },
+    formOnly: { type: Boolean, default: false },
     fields: { type: Object },
     inactiveColor: { type: String, default: 'white' },
     activeColor: { type: String, default: 'green' }
@@ -122,7 +131,6 @@ export default {
               name: this.name,
               thumbUrl: this.thumbUrl,
               ...this.fields || {},
-              paid: false
             }
             content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
           }
@@ -130,7 +138,6 @@ export default {
           this.$log('start done')
           this.content = content
           // todo веменное решение! Надо переделать так, чтобы этим занимался бэкенд.
-          this.content.paid = true
           this.loading = false
           await this.$router.push('/workspace/contents')
         }

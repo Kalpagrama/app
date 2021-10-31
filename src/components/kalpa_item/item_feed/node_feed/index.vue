@@ -13,6 +13,7 @@
       ...styles,
     }`
   ).row.full-width.items-start.content-start
+    q-resize-observer(@resize="data.nodeWidth = $event.width")
     slot(name="wrapper")
     //- wrapper
     div(
@@ -147,7 +148,7 @@ export default {
       let key = this.$options.name
       if (!this.itemState[key]) {
         this.$set(this.itemState, key, {
-         // key: value
+          nodeWidth: 100
         })
       }
       return this.itemState[key]
@@ -174,6 +175,7 @@ export default {
       return this.$store.getters.nodeCategories.find(c => c.type === this.node.category)
     },
     fontSize () {
+      this.$logW('data.nodeWidth', this.data.nodeWidth)
       let l = this.node.name.length
       if (l < 20) return 22
       else if (l < 30) return 20

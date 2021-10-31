@@ -3,7 +3,7 @@
     template(v-slot:footer)
       kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
         template(v-slot:center)
-          q-btn(flat ripple=false icon="add" color="green" :label="$t('Добавить свой образ')" @click="itemEditorShow=true")
+          q-btn(flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
         template(v-slot:left-button)
           nav-mobile
     template(v-slot:body)

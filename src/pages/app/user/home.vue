@@ -53,7 +53,7 @@
                 marginBottom: '-10px',
                 paddingBottom: '18px',
               }`
-              ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm.br
+              ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm
                 img(
                   draggable="false"
                   :src="user.thumbUrl"
@@ -62,7 +62,7 @@
                   height: '16px',
                   borderRadius: '50%',
                 }`).q-mx-sm
-                small.text-grey-5.q-mr-xs {{ user.name }} проголосовал
+                small.text-grey-5.q-mr-xs {{ user.name }} {{$t('проголосовал(а)')}}
                 small.text-grey-5 "{{ rateMeta(item.votedUserRate).name }}"
                 div(
                   :style=`{

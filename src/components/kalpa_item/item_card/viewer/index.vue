@@ -9,10 +9,10 @@ component(
 </template>
 
 <script>
-import typeBook from 'src/components/kalpa_item/item_card/type_book.vue'
-import typeImage from 'src/components/kalpa_item/item_card/type_image.vue'
-import typeVideo from 'src/components/kalpa_item/item_card/type_video.vue'
-import typeBlock from 'src/components/kalpa_item/item_card/type_block.vue'
+import typeBook from 'src/components/kalpa_item/item_card/viewer/type_book.vue'
+import typeImage from 'src/components/kalpa_item/item_card/viewer/type_image.vue'
+import typeVideo from 'src/components/kalpa_item/item_card/viewer/type_video.vue'
+import typeBlock from 'src/components/kalpa_item/item_card/viewer/type_block.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {

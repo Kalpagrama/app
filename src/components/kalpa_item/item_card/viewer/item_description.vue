@@ -6,7 +6,7 @@
 
 <script>
 import {assert} from 'src/system/common/utils'
-import {ContentApi} from '../../../api/content';
+import {ContentApi} from '../../../../api/content';
 
 export default {
   name: 'itemDescription',

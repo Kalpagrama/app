@@ -5,7 +5,7 @@
                borderWidth: '2px',
                borderRadius: '15px',
                overflow: 'hidden',
-      }`)
+      }`).b-30
     //q-btn(label="test").text-white
     div(id="payment-form")
 </template>

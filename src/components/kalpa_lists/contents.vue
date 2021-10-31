@@ -3,48 +3,15 @@
       div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         //- bookmark editor
         q-dialog(
-          v-model="bookmarkEditorShow"
+          v-model="videoEditorShow"
           @hide="bookmarkSelected = null")
-          bookmark-editor(
+          video-editor(
+            v-if="bookmarkSelected"
             :style=`{borderRadius: '20px',}`
             :showBottomMenu="false"
-            :hideCollection="ddd"
+            :contentOid="bookmarkSelected.oid"
             :bookmark="bookmarkSelected"
-            @close="bookmarkEditorShow = false, bookmarkSelected = null")
-            //template(v-slot:bottomMenu)
-              //q-btn(label="Открыть" @click="ddd=!ddd")
-              //div(v-if="ddd" transition-show="slide-up" transition-hide="slide-down").row
-              //  q-input(
-              //    v-model="name"
-              //    color="green"
-              //    borderless dark dense
-              //    :placeholder="$t('enter content name', 'Введите название контента')"
-              //    :input-style=`{
-              //    background: 'rgb(45,45,45)',
-              //    borderRadius: '10px',
-              //    padding: '10px',
-              //    minHeight: '60px',
-              //    fontSize: fontSize+'px',
-              //    textAlign: 'left',
-              //    }`).row.full-width.q-pa-md
-              //  q-input(
-              //    v-model="name"
-              //    borderless dark
-              //    ref="nameInput"
-              //    type="textarea" autogrow
-              //    :placeholder="$t('Введите описание')"
-              //    :autofocus="false"
-              //    :input-style=`{
-              //    background: 'rgb(45,45,45)',
-              //    padding: '10px',
-              //    borderRadius: '10px',
-              //    fontSize: fontSize+'px',
-              //    lineHeight: 1.3,
-              //    minHeight: '100px',
-              //  }`
-              //  ).full-width.q-pa-md
-              //  .row.full-width.justify-end.q-pr-md
-              //    q-btn(outline color="green" :label="$t('Save')")
+            @close="videoEditorShow = false, bookmarkSelected = null")
         tab-list-feed(
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
           :navHeaderText="useNavHeader ? $t('Contents') : ''"
@@ -75,6 +42,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
+import videoEditor from 'src/components/kalpa_item/item_card/editor/video-editor.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 
@@ -85,18 +53,19 @@ export default {
     useNavHeader: {type: Boolean, default: true},
     ddd: {type: Boolean, default: true},
     searchInputState: {type: String},
-    mode: {type: String},
+    mode: {type: String, default: 'edit'},
   },
   components: {
     bookmarkListItem,
     bookmarkEditor,
+    videoEditor,
     widgetUpload,
   },
   data () {
     return {
       pageId: 'video',
       bookmarkSelected: null,
-      bookmarkEditorShow: false,
+      videoEditorShow: false,
       searchString: '',
     }
   },
@@ -142,7 +111,7 @@ export default {
       }
       else {
         this.bookmarkSelected = bookmark
-        this.bookmarkEditorShow = true
+        this.videoEditorShow = true
       }
     }
   }

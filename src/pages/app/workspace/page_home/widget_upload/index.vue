@@ -44,8 +44,8 @@
             //  @started="pageStarted = true")
             q-tooltip(dense dark) {{$t('Upload content')}}
             //span.text-grey-6 {{$t('Create')}}
-        div(:style=`{textAlign: 'center'}`).row.full-width
-          small.text-grey-5 {{$t('You can add from YouTube, Instagram, Vimeo etc')}}
+        div(:style=`{textAlign: 'center'}`).row.full-width.content-center.justify-center.items-center
+          small.text-grey-5 {{$t('Вы можете добавлять с YouTube.')}}
         slot(name="bottom")
 </template>
 
@@ -101,8 +101,7 @@ export default {
           type: contentKalpa.type,
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl,
-          paid: false,
+          thumbUrl: contentKalpa.thumbUrl
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
