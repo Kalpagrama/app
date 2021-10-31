@@ -101,8 +101,7 @@ export default {
           type: contentKalpa.type,
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl,
-          paid: false,
+          thumbUrl: contentKalpa.thumbUrl
         }
         bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)

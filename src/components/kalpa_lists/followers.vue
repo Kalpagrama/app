@@ -1,6 +1,6 @@
 <template lang="pug">
   .row.full-width.items-start.content-start.justify-center
-    div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.br-20.q-pa-sm
       tab-list-feed(
         :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
         :navHeaderText="useNavHeader ? $t('Followers') : ''"
@@ -12,7 +12,7 @@
         @searchString="searchString = $event"
       ).row.full-width
         template(v-slot:externalHeader)
-          .full-width
+          .full-width.q-pl-sm
             span.text-grey {{$t('Followers')}}
         template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           div(

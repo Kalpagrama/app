@@ -25,7 +25,6 @@ export default {
         oid: contentKalpa.oid,
         name: contentKalpa.name,
         thumbUrl: contentKalpa.thumbUrl,
-        paid: false
       }
       this.$log('contentInput', contentInput)
       // create

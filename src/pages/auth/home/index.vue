@@ -48,7 +48,7 @@
   div(
     v-else
     @click="() => {}"
-  ).row.full-height.no-scroll
+  ).row.full-height.no-scroll.b-60
     img(
       draggable="false"
       :src="'/images/rainbow.jpg'"

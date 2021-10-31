@@ -80,11 +80,11 @@
 </template>
 
 <script>
-import pageComments from 'src/pages/app/node/page_comments/index.vue'
-import itemDescription from 'src/components/kalpa_item/item_card/item_description.vue'
+import pageComments from 'src/pages/app/node/page_comments'
+import itemDescription from 'src/components/kalpa_item/item_card/viewer/item_description.vue'
 // import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
 // import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
-import pageSimilar from 'src/pages/app/node/page_similar/index.vue'
+import pageSimilar from 'src/pages/app/node/page_similar'
 import {ContentApi} from 'src/api/content';
 
 export default {

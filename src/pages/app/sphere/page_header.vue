@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.q-pt-sm.q-px-sm
+.row.full-width.justify-center.q-px-sm
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
           //- sphere avatar(s)
           div(

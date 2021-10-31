@@ -148,18 +148,19 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment}
     duration
     strips
     author{...objectShortFragment}
+    description
 #    contentSource
     relatedContent
     subtitlesRus: subtitles(lang: RUS)
     subtitlesEng: subtitles(lang: ENG)
-
-    payStruct{price}
+    payInfo{price}
   }
 `
 const bookFragment = gql`${objectFragment} ${objectShortFragment}
   fragment bookFragment on Book {
     ...objectFragment
     author{...objectShortFragment}
+    description
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -168,13 +169,14 @@ const bookFragment = gql`${objectFragment} ${objectShortFragment}
     contentProvider
     providerInfo
     urlWithFormats{ format url }
-    payStruct{price}
+    payInfo{price}
   }
 `
 const imageFragment = gql`${objectFragment} ${objectShortFragment}
   fragment imageFragment on Image {
     ...objectFragment
     author{...objectShortFragment}
+    description
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -183,7 +185,7 @@ const imageFragment = gql`${objectFragment} ${objectShortFragment}
     contentProvider
     urlWithFormats{ format url }
     urlOriginal
-    payStruct{price}
+    payInfo{price}
   }
 `
 

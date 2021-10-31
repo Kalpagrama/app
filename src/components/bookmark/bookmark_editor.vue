@@ -27,37 +27,29 @@
             borderRadius: '10px',
           }`).b-50.justify-center
           .col
-            .row.full-width.justify-center.content-center.items-center.q-pt-xs.br
+            .row.full-width.justify-center.content-center.items-center.q-pt-xs
               q-btn(v-if="false" outline no-caps color="green" :label="$t('Редактировать')" @click="showEditMenu=true")
-              q-toggle(
-                v-if="item.author"
-                v-model="paidСontent"
-                dark
-                size="30px"
-                :style=`{color: 'white'}`
-                color="green")
-                small {{$t('Платный контент')}}
-            //.row.full-width.justify-end.content-start.items-start
-            //  .row
-            //    q-input(v-if="paidСontent"
-            //      v-model="number"
-            //      prefix="₽"
-            //      mask="#"
-            //      reverse-fill-mask
-            //      fill-mask="0"
-            //      color="green"
-            //      borderless dark dense outlined
-            //      :style=`{position: 'absolute', left: "330px", maxWidth: '150px'}`
-            //      :placeholder="$t('enter the cost', 'Введите стоимость')"
-            //      :input-style=`{
-            //        // background: 'rgb(45,45,45)',
-            //        borderRadius: '10px',
-            //        padding: '10px',
-            //        maxWidth: '150px',
-            //        minHeight: '30px',
-            //        fontSize: fontSize+'px',
-            //        textAlign: 'center',
-            //        }`).row.full-width
+            .row.full-width.justify-end.content-start.items-start
+              .row
+                q-input(v-if="bookmark.payInfo"
+                  v-model="bookmark.payInfo.price"
+                  prefix="₽"
+                  mask="#"
+                  reverse-fill-mask
+                  fill-mask="0"
+                  color="green"
+                  borderless dark dense outlined
+                  :debounce="1000"
+                  :placeholder="$t('enter the cost', 'Введите стоимость')"
+                  :input-style=`{
+                    // background: 'rgb(45,45,45)',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    maxWidth: '150px',
+                    minHeight: '30px',
+                    fontSize: fontSize+'px',
+                    textAlign: 'center',
+                    }`).row.full-width
           .row.justify-end.content-start.items-start
             .row.full-width
               q-btn(round flat color="white" icon="clear" v-close-popup :style=`{marginRight: '-5px'}`)
@@ -191,6 +183,7 @@ import {objectTypeName, objectUrl} from '../../system/common/object_info';
 import differenceWith from 'lodash/differenceWith'
 import cloneDeep from 'lodash/cloneDeep'
 import {assert} from '../../system/common/utils';
+import {ObjectApi} from '../../api/object';
 
 export default {
   name: 'bookmarkEditor',
@@ -199,7 +192,6 @@ export default {
     showHeader: {type: Boolean, default: true},
     showBottomMenu: {type: Boolean, default: true},
     showEditMenu: {type: Boolean, default: false},
-    paidСontent: {type: Boolean, default: false},
   },
   data() {
     return {

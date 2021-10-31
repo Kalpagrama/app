@@ -116,8 +116,8 @@ export const wsSchemaItem = {
     operation: {
       type: 'object'
     },
-    paid: { // контент куплен
-      type: 'boolean'
+    payInfo: { // платный контент
+      type: 'object'
     },
     // ---- collection ----
     bookmarks: { // список id букмарков в этой коллекции

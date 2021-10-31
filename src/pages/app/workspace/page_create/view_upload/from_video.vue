@@ -101,8 +101,7 @@ export default {
             type: ObjectTypeEnum.VIDEO,
             oid: contentKalpa.oid,
             name: '',
-            thumbUrl: contentKalpa.thumbUrl,
-            paid: false
+            thumbUrl: contentKalpa.thumbUrl
           }
           this.$log('contentInput', contentInput)
           // create

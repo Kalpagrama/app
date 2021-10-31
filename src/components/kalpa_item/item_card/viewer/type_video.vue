@@ -1,55 +1,95 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
-    //- video
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     div(
       :style=`{
       position: 'relative',
       background: 'rgb(35,35,35)',
       borderRadius: '10px',
+      overflow: $q.screen.lt.md ? 'visible' : 'hidden',
     }`
-    ).row.full-width.items-start.content-start
+    ).row.full-width
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-      img(
-        v-if="!playerReady"
-        :src="item.thumbUrl"
-        :style=`{
-        borderRadius: '10px',
-      }`
-      ).full-width
-      content-player(
-        v-if="item.type === 'VIDEO'"
-        @player="playerReady"
-        :contentKalpa="item"
-        :isActive="true"
-        :isVisible="true"
-        :isMini="false"
-        :style=`{
-      position: 'absolute', zIndex: 100, top: '0px', borderRadius: '10px',
-    }`
-      ).fit
+      // видео
+      .row.full-width
+        div(:style=`{overflow: $q.screen.lt.md ? 'visible' : 'hidden',  borderRadius: '10px',}`).row.full-width.relative-position
+          img(
+            :src="item.thumbUrl"
+            :style=`{
+              opacity: playerReady ? 0 : 1
+            // borderRadius: '10px',
+          }`
+          ).full-width
+          content-player(
+            v-if="item.type === 'VIDEO'"
+            @player="playerReady=true"
+            :contentKalpa="item"
+            :isActive="true"
+            :isVisible="true"
+            :isMini="false"
+            :style=`{zIndex: 100}`
+          ).fit.absolute-top
+          div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 35%)', zIndex: 110}`).fit.absolute-bottom
+        div(v-if="true" :style=`{position: 'absolute', zIndex: 120, bottom: '0px', left: '0px'}`).row.full-width.q-pb-xs.q-px-xs
+          .row.col
+            small(:style=`{lineHeight: 1.2}`).text-grey-4.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+          .row.q-mr-sm
+            q-btn(
+              no-caps outline dense
+              size="sm"
+              color="green"
+              :label="$t('Полный доступ')"
+              @click="showDialog = true"
+            ).full-width.q-px-sm
+              q-dialog(
+                v-model="showDialog"
+                position="standard"
+                :maximized="false")
+                kalpa-pay(
+                  v-if="item"
+                  :oid="item.oid"
+                  :type="item.type"
+                  :name="item.name"
+                  :thumbUrl="item.thumbUrl"
+                  :isActive="true"
+                  :formOnly="true"
+                  inactiveColor="grey-3"
+                  :fields=`{contentType: item.type}`
+                  @content="$event => $emit('content', $event)")
       // fullpage (description / coments / nodes)
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      div(
-        v-if="pageId"
-        :style=`{
-                position: 'relative',
-                borderRadius: '20px 20px 0 0',
-                height: bottomHeight + 'px',
-              }`).row.full-width.b-30
-        component(:is="'page-' + pageId"
-          :item="item"
-          :contentKalpa="item"
-          :height="bottomHeight"
-          @close="pageId=null")
+    // transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="pageId"
+      :style=`{
+              position: 'relative',
+              borderRadius: '20px 20px 0 0',
+              height: bottomHeight + 'px',
+            }`).row.full-width.b-30
+      component(:is="'page-' + pageId"
+        :item="item"
+        :contentKalpa="item"
+        :height="bottomHeight"
+        @close="pageId=null")
     div(v-if="!pageId").row.full-width
-      .row.full-width.items-center.content-center.wrap.q-pt-sm.q-pl-sm
+      div(v-if="false").row.full-width.q-pt-xs.q-px-xs
+        .row.col
+          small(:style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+        .row.q-mr-sm
+          q-btn(
+            no-caps outline
+            size="xs"
+            color="green"
+            :label="$t('Полный доступ')"
+            @click="$router.push('/content/' + item.oid)"
+          ).full-width
+      div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm
         //q-icon(name="select_all" color="white" size="36px").q-mr-sm
         .row.col
           span(:style=`{lineHeight: 1.2, fontSize: '15px'}`).text-white.text-bold.full-width {{ item.name }}
-          small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
-        q-btn(v-if="item.description" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
+          //small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
+        q-btn(v-if="" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
+          q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Описание')}}
       .row.item-center.q-px-sm
-        small(size="sm").row.items-center.text-grey-7.text-italic {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
+        small(size="sm").row.items-center.text-grey-7.text-italic.q-pt-xs {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
         //.q-pa-sm.text-white {{ item.countStat.countSubscribers }}
         //  q-icon(name="bookmark_outline" color="white" size="20px").q-mx-xs
         //    q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Bookmarks')}}
@@ -59,19 +99,20 @@
         //.q-pa-sm.text-white {{ item.countStat.countJoints }}
         //  q-icon(name="fas fa-link" color="white" size="20px").q-mx-xs
         //    q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Joints')}}
-      .row.full-width.justify-between.q-px-sm
-        q-btn(:to="'/user/'+item.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-pr-sm
+      .row.full-width.q-py-md
+        q-btn(:to="'/user/'+item.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
           q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
             //img(:src="item.author.thumbUrl" :to="'/user/'+item.author.oid")
             img(:src="item.author.thumbUrl" :to="'/user/'+item.author.oid")
             div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
           .column.items-start
-            span.text-grey-5 {{item.author.name}}
-            small(v-if="author" :style=`{marginTop: '-7px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$t('подписчиков')}}
-        //q-btn(round flat padding="none" no-caps=false size="sm" color="green-8" :label="$t('подписаться')").col
+            span(:style=`{fontSize: '12px'}`).text-grey-5 {{item.author.name}}
+            small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
+        .col
+        q-btn(flat no-caps=false size="sm" color="green-8" :label="$t('подписаться')")
       .row.full-width.items-center
-        span(@click="pageId='nodes'").text-grey-5.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}}
-        q-icon(dense name="expand_more" color="grey-5"  size="14px")
+        span(@click="pageId='nodes'").text-grey-5.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}} {{ item.countStat.countNodes }}
+        q-icon(@click="pageId='nodes'" dense name="expand_more" color="grey-5"  size="14px")
         list-feed-custom-horizontalPPV(
           ref="listFeed"
           :scrollAreaWidth="$store.state.ui.pageWidth"
@@ -107,7 +148,7 @@
           span.text-grey-8 {{item.countStat.countComments}}
           .col
           q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
-           div(v-if="item.commentStat.topComment").row.full-width.items-center
+          div(v-if="item.commentStat.topComment").row.full-width.items-center
             q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mx-xs.q-mb-xs
               img(:src="item.commentStat.topComment.author.thumbUrl" :to="'/user/'+item.commentStat.topComment.author.oid")
               div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
@@ -155,25 +196,25 @@
         //    item-description(v-if="pageId === 'description'" :item="item" :height="700")
         //    //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
         //    //page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
-      .row
-        q-btn(
-          no-caps
-          color="green"
-          :label="$t('Получить доступ к полной версии')"
-          @click="$router.push('/content/' + item.oid)"
-        ).col.full-width.q-mx-xs
+      //.row
+      //  q-btn(
+      //    no-caps
+      //    color="green"
+      //    :label="$t('Полный доступ')"
+      //    @click="$router.push('/content/' + item.oid)"
+      //  ).col.full-width.q-mx-xs
         //kalpa-save(:item="item" :isActive="true" :showHeader="false" inactiveColor="grey-9").q-mx-xs
 </template>
 
 <script>
 import {ContentApi} from 'src/api/content'
-import contentPlayer from 'src/components/content_player/index.vue'
-import pageComments from '../../../pages/app/node/page_comments';
-import pageDescription from 'src/components/kalpa_item/item_card/video/page_description.vue'
-import pageSimilar from '../../../pages/app/node/page_similar';
+import contentPlayer from 'src/components/content_player'
+import pageComments from '../../../../pages/app/node/page_comments';
+import pageDescription from 'src/components/kalpa_item/item_card/viewer/video/page_description.vue'
+import pageSimilar from '../../../../pages/app/node/page_similar';
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
-import pageNodes from 'src/pages/app/content/layout_video/page_nodes/index.vue'
-import {RxCollectionEnum} from '../../../system/rxdb';
+import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
+import {RxCollectionEnum} from '../../../../system/rxdb';
 
 export default {
   name: 'typeVideo',
@@ -189,6 +230,7 @@ export default {
   data() {
     return {
       playerReady: false,
+      showDialog: false,
       pageId: null, // description|comments|nodes
       bottomHeight: null,
       author: null,
@@ -218,7 +260,7 @@ export default {
     }
   },
   async mounted() {
-    this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
+    // this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
     this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.author.oid)
   }
 }
