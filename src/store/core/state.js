@@ -20,7 +20,7 @@ export default {
       LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,
       LogSystemModulesEnum.AUTH,
-      LogSystemModulesEnum.API,
+      // LogSystemModulesEnum.API,
       LogSystemModulesEnum.ROUTER,
       LogSystemModulesEnum.VUEX,
       LogSystemModulesEnum.VUEX_CACHE,
@@ -30,10 +30,10 @@ export default {
       LogSystemModulesEnum.RXDB_REACTIVE,
       LogSystemModulesEnum.RXDB_WS,
       LogSystemModulesEnum.RXDB_CACHE,
-      LogSystemModulesEnum.RXDB_OBJ,
+      // LogSystemModulesEnum.RXDB_OBJ,
       LogSystemModulesEnum.RXDB_GQL,
       LogSystemModulesEnum.RXDB_LST,
-      // LogSystemModulesEnum.RXDB_EVENT,
+      LogSystemModulesEnum.RXDB_EVENT,
       LogSystemModulesEnum.MUTEX,
       LogSystemModulesEnum.BOOT,
       LogSystemModulesEnum.CP,
@@ -42,9 +42,5 @@ export default {
       hello: 'goodbye'
    },
    count: 0,
-   progressInfo: {
-      UPLOAD: {}, // {oid: progress, oid: progress}
-      CREATE: {} // {oid: progress, oid: progress}
-   },
    wsReady: false // мастерской можно пользоваться (она загрузилась и свободна)
 }

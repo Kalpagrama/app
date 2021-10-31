@@ -33,21 +33,22 @@
         order: orderHeader,
       }`)
       //- ITEMS: one or two
-      slot(name="items")
-      composition(
-        v-if="showItems && !$slots.items && node.items.length === 1"
-        :composition="node.items[0]"
-        :showContext="showContext"
-        :itemState="data"
-        :isVisible="isVisible"
-        :isActive="isActive"
-        :nodeOid="node.oid")
-      essence-items(
-        v-if="showItems && !$slots.items && node.items.length === 2"
-        :node="node"
-        :itemState="data"
-        :isActive="isActive"
-        :isVisible="isVisible")
+      div(:id="'item_image_for_render'").row.full-width
+        slot(name="items")
+        composition(
+          v-if="showItems && !$slots.items && node.items.length === 1"
+          :composition="node.items[0]"
+          :showContext="showContext"
+          :itemState="data"
+          :isVisible="isVisible"
+          :isActive="isActive"
+          :nodeOid="node.oid")
+        essence-items(
+          v-if="showItems && !$slots.items && node.items.length === 2"
+          :node="node"
+          :itemState="data"
+          :isActive="isActive"
+          :isVisible="isVisible")
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       router-link(

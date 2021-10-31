@@ -93,10 +93,10 @@ export default {
     }
   },
   mounted () {
-    this.$bus.$on('btn-trends-clicked', this.onBusEvent)
+    this.$eventBus.$on('btn-trends-clicked', this.onBusEvent)
   },
   beforeDestroy () {
-    this.$bus.$off('btn-trends-clicked', this.onBusEvent)
+    this.$eventBus.$off('btn-trends-clicked', this.onBusEvent)
   }
 }
 </script>

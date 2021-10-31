@@ -1,5 +1,6 @@
 <template lang="pug">
 component(
+  :id="'item_full_for_render'"
   v-if="item"
   :is="componentName"
   :item="item"

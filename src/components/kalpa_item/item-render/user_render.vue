@@ -5,7 +5,7 @@ div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start.j
     position: 'absolute', zIndex: 100, top: '0px',
   }`
   ).row.full-wdith.q-pa-sm
-    div(
+    div(v-if="false"
       :style=`{
       borderRadius: '10px',
       textAlign: 'center',

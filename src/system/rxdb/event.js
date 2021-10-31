@@ -70,7 +70,7 @@ class Event {
                this.notifyError(event)
                break
             case 'PROGRESS':
-               store.commit('core/processEvent', event)
+               await this.objects.processEvent(event)
                break
             case 'NOTICE':
                break

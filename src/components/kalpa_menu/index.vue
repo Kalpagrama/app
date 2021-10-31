@@ -59,7 +59,7 @@
         //- user
         div(
           v-if="!$store.getters.isGuest"
-          @click="$bus.$emit('btn-user-clicked'), $go('/user/'+$store.getters.currentUser.oid)"
+          @click="$eventBus.$emit('btn-user-clicked'), $go('/user/'+$store.getters.currentUser.oid)"
           :class=`{
             'b-60': $route.path.split('/')[1] === 'user' && $route.params.oid === $store.getters.currentUser.oid
           }`
@@ -196,7 +196,7 @@ export default {
           name: this.$t('Home'),
           icon: 'home',
           action: () => {
-            this.$bus.$emit('btn-home-clicked')
+            this.$eventBus.$emit('btn-home-clicked')
             this.$go('/home')
           }
         },
@@ -205,7 +205,7 @@ export default {
           name: this.$t('Search'),
           icon: 'search',
           action: () => {
-            this.$bus.$emit('btn-trends-clicked')
+            this.$eventBus.$emit('btn-trends-clicked')
             this.$go('/trends')
           }
         },
@@ -214,7 +214,7 @@ export default {
           name: this.$t('Workspace'),
           icon: 'construction',
           action: () => {
-            this.$bus.$emit('btn-workspace-clicked')
+            this.$eventBus.$emit('btn-workspace-clicked')
             this.$go('/workspace')
           }
         },
@@ -223,7 +223,7 @@ export default {
           name: this.$t('Activity'),
           icon: 'notifications_none',
           action: () => {
-            this.$bus.$emit('btn-notifications-clicked')
+            this.$eventBus.$emit('btn-notifications-clicked')
             this.$go('/notifications')
           }
         },
@@ -232,7 +232,7 @@ export default {
           name: this.$t('Settings'),
           icon: 'settings',
           action: () => {
-            this.$bus.$emit('btn-settings-clicked')
+            this.$eventBus.$emit('btn-settings-clicked')
             this.$go('/settings')
           }
         }

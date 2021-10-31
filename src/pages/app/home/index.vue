@@ -105,11 +105,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$bus.$on('btn-home-clicked', this.onBusEvent)
+    this.$eventBus.$on('btn-home-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$bus.$off('btn-home-clicked', this.onBusEvent)
+    this.$eventBus.$off('btn-home-clicked', this.onBusEvent)
   }
 }
 </script>

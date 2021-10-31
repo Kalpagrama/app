@@ -32,6 +32,7 @@
       kalpa-menu-actions(:actions="actions" icon="more_vert")
     //- items wrapper
     div(
+      :id="'item_image_for_render'"
       :style=`{
         position: 'relative',
         paddingLeft: '3px',

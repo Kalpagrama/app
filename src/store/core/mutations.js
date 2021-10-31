@@ -9,17 +9,3 @@ export function stateSet (state, [key, val]) {
   assert(Object.prototype.hasOwnProperty.call(state, key))
   state[key] = val
 }
-
-export function processEvent (state, event){
-  switch (event.type){
-    case 'PROGRESS':
-      if (state.progressInfo[event.action] === undefined) {
-        Vue.set(state.progressInfo, event.action, {})
-      }
-      Vue.set(state.progressInfo[event.action], event.oid, event.progress)
-      logD('progress event! progressInfo===' + state.progressInfo[event.action][event.oid])
-      break
-    default:
-      break
-  }
-}

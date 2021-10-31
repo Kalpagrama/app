@@ -30,15 +30,16 @@
         :style=`{
         order: orderHeader,
       }`)
-      masonry-cover(v-if="data.showMasonry" :block="block" :itemState="data" :style=`{height: '350px'}` @click.native="data.showMasonry = false")
-      graph-view(
-        v-else
-        :maxHeight="450"
-        :showMiniAddBtn="blockIsMine"
-        :graphD3="block.graph"
-        detailPosition="standard"
-        @changed="block.setChanged(true)"
-        :style=`{background: 'rgb(40,40,40)'}`)
+      div(:id="'item_image_for_render'").row.full-width
+        masonry-cover(v-if="data.showMasonry" :block="block" :itemState="data" :style=`{height: '350px'}` @click.native="data.showMasonry = false")
+        graph-view(
+          v-else
+          :maxHeight="450"
+          :showMiniAddBtn="blockIsMine"
+          :graphD3="block.graph"
+          detailPosition="standard"
+          @changed="block.setChanged(true)"
+          :style=`{background: 'rgb(40,40,40)'}`)
       //- NAME: dynamic link/ dynamic fontSize
 
       slot(name="name")

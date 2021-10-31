@@ -134,7 +134,7 @@ q-menu(
     div(
       v-if="!$store.getters.isGuest"
       v-close-popup
-      @click="$bus.$emit('btn-user-clicked'), $go('/user/'+$store.getters.currentUser.oid)"
+      @click="$eventBus.$emit('btn-user-clicked'), $go('/user/'+$store.getters.currentUser.oid)"
       :style=`{
         borderRadius: '20px',
       }`

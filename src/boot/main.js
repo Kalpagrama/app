@@ -46,12 +46,14 @@ const time = (sec, addSeconds = true) => {
    return result
 }
 
+let eventBus
+
 export default async ({ Vue, store, router: VueRouter }) => {
    try {
       const f = { nameExtra: 'boot::main' }
       logD(f, 'start')
       const t1 = performance.now()
-      Vue.prototype.$bus = new Vue({}) // event bus
+      Vue.prototype.$eventBus = eventBus = new Vue({}) // event bus
       // Vue.use(VueVirtualScroller)
       // Vue.use(VueShowdown, {
       //   flavor: 'github',
@@ -156,4 +158,4 @@ export default async ({ Vue, store, router: VueRouter }) => {
    }
 }
 
-export { time }
+export { time, eventBus }

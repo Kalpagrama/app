@@ -81,11 +81,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$bus.$on('btn-notifications-clicked', this.onBusEvent)
+    this.$eventBus.$on('btn-notifications-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$bus.$off('btn-notifications-clicked', this.onBusEvent)
+    this.$eventBus.$off('btn-notifications-clicked', this.onBusEvent)
   }
 }
 </script>

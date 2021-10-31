@@ -11,7 +11,7 @@
           //- feed
           slot(name="left-button")
             q-btn(
-              @click="$bus.$emit('btn-home-clicked'), $go('/home')"
+              @click="$eventBus.$emit('btn-home-clicked'), $go('/home')"
               flat no-caps icon="home"
               :ripple="false"
               :color="$route.name.split('.')[0] === 'home' ? 'green' : 'grey-7'"
@@ -23,7 +23,7 @@
           slot(name="center")
             //- trends
             q-btn(
-              @click="$bus.$emit('btn-trends-clicked'), $go('/trends')"
+              @click="$eventBus.$emit('btn-trends-clicked'), $go('/trends')"
               flat no-caps icon="search"
               :ripple="false"
               :color="$route.name.split('.')[0] === 'trends' ? 'green' : 'grey-7'"
@@ -65,7 +65,7 @@
                 :style=`{width: size+'px', height: size+'px', borderRadius: '50%',}`)
             //- notifications
             q-btn(
-              @click="$bus.$emit('btn-notifications-clicked'), $go('/notifications')"
+              @click="$eventBus.$emit('btn-notifications-clicked'), $go('/notifications')"
               flat no-caps icon="notifications_none"
               :ripple="false"
               :color="$route.name.split('.')[0] === 'notifications' ? 'green' : 'grey-7'"

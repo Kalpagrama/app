@@ -3,7 +3,7 @@ import { apollo } from 'src/boot/apollo'
 import {assert} from 'src/system/common/utils'
 import { fragments } from 'src/api/fragments'
 import { apiCall } from 'src/api/index'
-import { rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import gql from 'graphql-tag'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
@@ -71,7 +71,9 @@ class ContentApi {
    static async contentCreateFromFile (file, name, description, spheres) {
       const f = ContentApi.contentCreateFromFile
       logD(f, 'start', file, name, description)
-      assert(name)
+      name = name || ''
+      description = description || ''
+      spheres = spheres || []
       const t1 = performance.now()
       const cb = async () => {
          assert(file)
@@ -83,24 +85,25 @@ class ContentApi {
          let { data: { contentCreateFromFile } } = await apollo.clients.upload.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
-                mutation ($file: Upload!, $length: Float!, $name: String!, $description: String!, $spheres: [ObjectShortInput!]!) {
-                    contentCreateFromFile(file: $file, length: $length, name: $name, description: $description, spheres: $spheres) {
+                mutation ($file: Upload!, $size: Float!, $name: String!, $description: String!, $spheres: [ObjectShortInput!]!) {
+                    contentCreateFromFile(file: $file, size: $size, name: $name, description: $description, spheres: $spheres) {
                         ...objectFullFragment
                     }
                 }
             `,
             variables: {
                file: file,
-               length: file.size,
+               size: file.size,
                name,
                spheres,
                description,
             }
          })
-         logD('contentCreateFromFile complete')
+         logD('contentCreateFromFile complete', contentCreateFromFile.oid)
+         let reactiveContent = await rxdb.set(RxCollectionEnum.OBJ, contentCreateFromFile, { actualAge: 'day' })
          return contentCreateFromFile
       }
-      return await apiCall(f, cb)
+      return await apiCall(f, cb, false) // это долгий запрос
    }
 
    static async contentCutCreate (contentOid, epubCfi, epubCfiText, params) {

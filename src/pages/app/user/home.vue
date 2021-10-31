@@ -183,11 +183,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$bus.$on('btn-user-clicked', this.onBusEvent)
+    this.$eventBus.$on('btn-user-clicked', this.onBusEvent)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$bus.$off('btn-user-clicked', this.onBusEvent)
+    this.$eventBus.$off('btn-user-clicked', this.onBusEvent)
   }
 }
 </script>

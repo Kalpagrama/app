@@ -7,58 +7,60 @@
         :style=`{
       }`
       ).full-width.br-10
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        figures-editor(
-          :player="player"
-          :convert="convertPxToTime"
-          :style=`{
-                  left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
-                  width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
-                }`
-          @first="zoomWorking = true, figureEditing = true"
-          @final="zoomWorking = false, figureEditing = false")
-      q-input(
-        v-model="contentVideo.name"
-        borderless dark dense
-        :placeholder="$t('Название видео')"
-        counter maxlength="108"
-        type="textarea" autogrow
-        :input-style=`{
-              padding: '16px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              background: 'rgb(35,35,35)',
-              borderRadius: '10px',
-              minHeight: '50px',
-            }`
-      ).full-width.q-mt-xs
-      q-input(
-        v-model="contentVideo.description"
-        borderless dark dense
-        :placeholder="$t('Описание видео')"
-        counter maxlength="5000"
-        type="textarea" autogrow
-        :input-style=`{
-              padding: '16px',
-              fontSize: '12px',
-              background: 'rgb(35,35,35)',
-              borderRadius: '10px',
-              minHeight: '100px',
-            }`
-      ).full-width.q-my-sm
-      edit-spheres(
-        ref="editSpheres"
-        :sphereOwner="contentVideo"
-        :maxSphereCnt="10"
-        :placeholderText="$t('Добавьте ключевые слова')"
-        ).q-my-sm
       .row.full-width
         .col
-        q-btn(
+        q-btn(v-if="!createdContent"
           @click="uploadContent"
           :loading="loading"
           :disable="loading"
           flat no-caps color="green") {{$t('Upload')}}
+      div(v-if="createdContent").row.full-width
+        q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
+        //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //  figures-editor(
+        //    :player="player"
+        //    :convert="convertPxToTime"
+        //    :style=`{
+        //            left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
+        //            width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
+        //          }`
+        //    @first="zoomWorking = true, figureEditing = true"
+        //    @final="zoomWorking = false, figureEditing = false")
+        q-input(
+          v-model="contentVideo.name"
+          borderless dark dense
+          :placeholder="$t('Название видео')"
+          counter maxlength="108"
+          type="textarea" autogrow
+          :input-style=`{
+                padding: '16px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                background: 'rgb(35,35,35)',
+                borderRadius: '10px',
+                minHeight: '50px',
+              }`
+        ).full-width.q-mt-xs
+        q-input(
+          v-model="contentVideo.description"
+          borderless dark dense
+          :placeholder="$t('Описание видео')"
+          counter maxlength="5000"
+          type="textarea" autogrow
+          :input-style=`{
+                padding: '16px',
+                fontSize: '12px',
+                background: 'rgb(35,35,35)',
+                borderRadius: '10px',
+                minHeight: '100px',
+              }`
+        ).full-width.q-my-sm
+        edit-spheres(
+          ref="editSpheres"
+          :sphereOwner="contentVideo"
+          :maxSphereCnt="10"
+          :placeholderText="$t('Добавьте ключевые слова')"
+          ).q-my-sm
 </template>
 
 <script>
@@ -66,6 +68,7 @@ import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectTypeEnum } from 'src/system/common/enums'
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   components: {
@@ -75,8 +78,10 @@ export default {
   props: ['file', 'fileSrc'],
   data () {
     return {
+      progressValue: 0,
       contentVideo: {name: '', description: '', spheres: []},
-      loading: false
+      loading: false,
+      createdContent: null
     }
   },
   methods: {
@@ -86,6 +91,10 @@ export default {
         this.loading = true
         let contentKalpa = await ContentApi.contentCreateFromFile(this.file, this.contentVideo.name, this.contentVideo.description, this.contentVideo.spheres)
         this.$log('contentKalpa', contentKalpa)
+        if (!this.createdContent || this.createdContent.oid !== contentKalpa.oid){
+          // так бывает если повторно закачиваем тот же ролик (бэкенд отдает старый(закачанный ранее))
+          this.createdContent = await this.$rxdb.get(RxCollectionEnum.OBJ, contentKalpa.oid)
+        }
         // check bookmark with contentKalpa.oid
         let { items: [content] } = await this.$rxdb.find({
           selector: {
@@ -93,29 +102,46 @@ export default {
             oid: contentKalpa.oid
           }
         })
-        if (content) {
-        }
         // create bookmark
-        else {
+        if (!content) {
           let contentInput = {
             type: ObjectTypeEnum.VIDEO,
             oid: contentKalpa.oid,
             name: '',
-            thumbUrl: contentKalpa.thumbUrl,
-            paid: false
+            thumbUrl: contentKalpa.thumbUrl
           }
           this.$log('contentInput', contentInput)
           // create
-          content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+          let contentBookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
           this.$log('content', content)
         }
         // go to this content...
         // await this.$router.push('/content/' + contentKalpa.oid)
-        await this.$router.push('/workspace/contents')
+        // await this.$router.push('/workspace/contents')
       } finally {
         this.loading = false
       }
+    },
+    async onCreateEvent(event) {
+      assert(event && event.object)
+      if (event.object.type === ObjectTypeEnum.VIDEO){
+        this.createdContent = await this.$rxdb.get(RxCollectionEnum.OBJ, event.object.oid) // получим полный созданный объект
+      }
+    },
+    onProgressEvent(event) {
+      this.$log('onProgressEvent', 'event', event)
+      this.progressValue = event.progress
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$eventBus.$on('event-object-created', this.onCreateEvent)
+    this.$eventBus.$on('event-progress', this.onProgressEvent)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.$eventBus.$off('event-object-created', this.onCreateEvent)
+    this.$eventBus.$off('event-progress', this.onProgressEvent)
   }
 }
 </script>
