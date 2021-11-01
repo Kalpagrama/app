@@ -253,10 +253,14 @@ export default {
     },
     content: {
       deep: true,
-      handler(to) {
+      async handler(to) {
+        this.$log('content changed!', cloneDeep(this.content))
+        alert('content changed!')
         this.contentCopy = cloneDeep(this.content)
         this.bookmark.name = this.content.name
         this.bookmark.thumbUrl = this.content.thumbUrl
+        await this.$nextTick()
+        alert('content changed end!')
       }
     }
   },
@@ -339,17 +343,18 @@ export default {
   },
   async mounted() {
     this.$log('mounted')
-    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
-    this.isPaid = this.content.payInfo.price > 0
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+        rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
         oid: this.contentOid,
       }
     })
     assert(bookmark)
     this.bookmark = bookmark
     this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
+    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
+    this.isPaid = this.content.payInfo.price > 0
+
     this.$nextTick(() => { this.initialized = true })
   }
 }
