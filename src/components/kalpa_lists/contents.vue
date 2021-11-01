@@ -41,7 +41,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
-import videoEditor from 'src/components/kalpa_item/item_card/editor/video-editor.vue'
+import videoEditor from 'src/components/kalpa_item/item_card/editor/video_editor.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 
