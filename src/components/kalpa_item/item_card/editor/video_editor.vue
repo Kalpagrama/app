@@ -56,7 +56,7 @@
                           width: '400px'
                           }`
                           ).row.full-width.q-pa-sm.justify-center.content-center.items-center
-                    video(
+                    video(v-if="contentCopy.previewUrl"
                       ref="video"
                       controls
                       :src="contentCopy.previewUrl"
@@ -64,11 +64,15 @@
                         maxHeight: "300px"
                     }`
                     ).full-width.br-10
-                    q-btn(
+                    q-btn(v-if="!contentCopy.previewUrl"
                       @click="$refs.inputPreview.click()"
                       flat no-caps color="green"
                       :label="$t('Загрузить')"
                       icon="add")
+                    q-btn(v-if="contentCopy.previewUrl"
+                      @click="$refs.inputPreview.click()"
+                      flat no-caps color="green"
+                      :label="$t('Изменить')")
                   .row.full-width
                     .col
                     .row.q-pa-sm
