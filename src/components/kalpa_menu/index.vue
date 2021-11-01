@@ -118,11 +118,19 @@
                 outline color="grey-8"
                 size="xl"
                 align="center"
-                :to="''"
                 :label="$t('Essence core')"
                 icon='adjust'
                 round flat no-caps
+                @click="itemEditorShow = true, addItemMenuShow = false"
               ).row.full-width.create-item.q-pa-sm
+                //q-dialog(
+                //  v-model="itemEditorShow"
+                //  :maximized="false"
+                //  position="standard")
+                //  essence-editor(
+                //    :item="newNode"
+                //    :publish="true"
+                //    @close="itemEditorShow=false")
               q-btn(
                 outline color="grey-8"
                 align="center"
@@ -185,7 +193,8 @@ export default {
   },
   data () {
     return {
-      addItemMenuShow: false
+      addItemMenuShow: false,
+      itemEditorShow: false,
     }
   },
   computed: {
