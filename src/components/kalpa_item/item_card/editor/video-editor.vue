@@ -37,22 +37,46 @@
             input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
             input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
             q-btn(outline dense no-caps color="grey" :label="$t('Обложка')" @click="$refs.inputThumb.click()").q-px-sm
-            q-btn(outline dense no-caps color="grey" :label="$t('Трейлер')" ).q-px-sm
+            q-btn(outline dense no-caps color="grey" :label="$t('Трейлер')" @click="previewLoaderShow=true" ).q-px-sm
               q-dialog(v-model="previewLoaderShow")
-                div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px' }`).row.full-width.q-mt-sm
-                  video(
-                    controls
-                    :src="contentCopy.previewUrl"
-                    :style=`{
-                  }`
-                  ).full-width.br-10
-                    .row.full-width
-                      .col
-                      q-btn(v-if="!createdContent"
-                        @click="$refs.inputPreview.click()"
+                div(:style=`{
+                          maxWidth: $store.state.ui.pageWidth+'px',
+                          position: 'relative',
+                          borderRadius: '20px',
+                          width: '400px'
+                          }`
+                ).row.b-40
+                  .row.full-width.justify-center.text-white.text-subtitle2.q-pt-md.q-pb-sm
+                    span {{$t('Трейлер')}}
+                  div( :style=`{
+                          maxWidth: $store.state.ui.pageWidth+'px',
+                          position: 'relative',
+                          borderRadius: '20px',
+                          height: '350px',
+                          width: '400px'
+                          }`
+                          ).row.full-width.q-pa-sm.justify-center.content-center.items-center
+                    video(
+                      ref="video"
+                      controls
+                      :src="contentCopy.previewUrl"
+                      :style=`{
+                        maxHeight: "300px"
+                    }`
+                    ).full-width.br-10
+                    q-btn(
+                      @click="$refs.inputPreview.click()"
+                      flat no-caps color="green"
+                      :label="$t('Загрузить')"
+                      icon="add")
+                  .row.full-width
+                    .col
+                    .row.q-pa-sm
+                      q-btn(
                         :loading="loading"
                         :disable="loading"
-                        flat no-caps color="green") {{$t('Upload')}}
+                        v-close-popup
+                        outline no-caps color="green") {{$t('Готово')}}
 
       //- form
       .row.full-width
@@ -303,7 +327,7 @@ export default {
     },
     async previewChanged (e) {
       this.$log('previewChanged', e)
-      this.contentCopy.previewUrl = URL.createObjectURL(e.target.files[0])
+      this.$set(this.contentCopy, 'previewUrl', URL.createObjectURL(e.target.files[0]))
       this.filePreview = e.target.files[0]
       // destroy value ?
       this.$refs.inputPreview.value = null
