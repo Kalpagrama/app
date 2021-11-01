@@ -6,6 +6,7 @@ import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb/index_browser'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { getReactive } from 'src/system/rxdb/reactive'
+import { eventBus } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
@@ -70,7 +71,7 @@ class Event {
                this.notifyError(event)
                break
             case 'PROGRESS':
-               await this.objects.processEvent(event)
+               eventBus.$emit('event-progress', event)
                break
             case 'NOTICE':
                break
@@ -80,6 +81,7 @@ class Event {
             case 'OBJECT_CREATED':
                await this.objects.processEvent(event) // обновить  статистику на ядре
                await this.lists.processEvent(event) // поместить объект во все ленты
+               eventBus.$emit('event-object-created', event)
                break
             case 'OBJECT_DELETED':
                await this.objects.processEvent(event) // обновить ядро

@@ -85,25 +85,25 @@
                         width: '400px'
                         }`
                         ).row.full-width.q-pa-sm.justify-center.content-center.items-center
-                  video(v-if="contentCopy.previewUrl"
+                  video(v-if="previewUrl"
                     ref="video"
                     controls
-                    :src="contentCopy.previewUrl"
+                    :src="previewUrl"
                     :style=`{
                       maxHeight: "300px"
                   }`
                   ).full-width.br-10
-                  q-btn(v-if="!contentCopy.previewUrl"
+                  q-btn(v-if="!previewUrl"
                     @click="$refs.inputPreview.click()"
                     outline no-caps color="green"
                     :label="$t('Загрузить')"
                     :style=`{height: "300px", width: "300px"}`
                     icon="add")
-                  q-btn(v-if="contentCopy.previewUrl"
+                  q-btn(v-if="previewUrl"
                     @click="$refs.inputPreview.click()"
                     flat no-caps color="green"
                     :label="$t('Изменить')")
-                  q-btn(v-if="contentCopy.previewUrl"
+                  q-btn(v-if="previewUrl"
                     @click="previewDelete"
                     flat no-caps color="grey"
                     :label="$t('Удалить')")
@@ -273,13 +273,21 @@ export default {
       return this.contentCopy.thumbUrl !== this.content.thumbUrl
     },
     previewUrlChanged() {
-      return this.contentCopy.previewUrl !== this.content.previewUrl
+      return this.previewUrlOrig !== this.previewUrl
     },
     link() {
       return objectUrl(this.content)
     },
     type() {
       return objectTypeName(this.content)
+    },
+    previewUrl() {
+      let res = this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
+      return res
+    },
+    previewUrlOrig() {
+      let res = this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
+      return res
     }
   },
   watch: {
@@ -292,10 +300,12 @@ export default {
     },
     content: {
       deep: true,
-      handler(to) {
+      async handler(to) {
+        this.$log('content changed!', cloneDeep(this.content))
         this.contentCopy = cloneDeep(this.content)
         this.bookmark.name = this.content.name
         this.bookmark.thumbUrl = this.content.thumbUrl
+        await this.$nextTick()
       }
     }
   },
@@ -370,28 +380,30 @@ export default {
     },
     async previewChanged (e) {
       this.$log('previewChanged', e)
-      this.$set(this.contentCopy, 'previewUrl', URL.createObjectURL(e.target.files[0]))
+      assert(e.target.files[0])
+      this.$set(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(e.target.files[0])}])
       this.filePreview = e.target.files[0]
       // destroy value ?
       this.$refs.inputPreview.value = null
     },
     async previewDelete () {
-      this.contentCopy.previewUrl = null
+      this.$set(this.contentCopy, 'previewUrlWithFormats', null)
     }
   },
   async mounted() {
     this.$log('mounted')
-    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
-    this.isPaid = this.content.payInfo.price > 0
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+        rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
         oid: this.contentOid,
       }
     })
     assert(bookmark)
     this.bookmark = bookmark
     this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
+    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
+    this.isPaid = this.content.payInfo.price > 0
+
     this.$nextTick(() => { this.initialized = true })
   }
 }
