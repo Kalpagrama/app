@@ -52,7 +52,7 @@
                           maxWidth: $store.state.ui.pageWidth+'px',
                           position: 'relative',
                           borderRadius: '20px',
-                          height: '350px',
+                          maxHeight: '350px',
                           width: '400px'
                           }`
                           ).row.full-width.q-pa-sm.justify-center.content-center.items-center
@@ -66,13 +66,18 @@
                     ).full-width.br-10
                     q-btn(v-if="!contentCopy.previewUrl"
                       @click="$refs.inputPreview.click()"
-                      flat no-caps color="green"
+                      outline no-caps color="green"
                       :label="$t('Загрузить')"
+                      :style=`{height: "300px", width: "300px"}`
                       icon="add")
                     q-btn(v-if="contentCopy.previewUrl"
                       @click="$refs.inputPreview.click()"
                       flat no-caps color="green"
                       :label="$t('Изменить')")
+                    q-btn(v-if="contentCopy.previewUrl"
+                      @click="previewDelete"
+                      flat no-caps color="grey"
+                      :label="$t('Удалить')")
                   .row.full-width
                     .col
                     .row.q-pa-sm
@@ -336,6 +341,9 @@ export default {
       // destroy value ?
       this.$refs.inputPreview.value = null
     },
+    async previewDelete () {
+      this.contentCopy.previewUrl = null
+    }
   },
   async mounted() {
     this.$log('mounted')
