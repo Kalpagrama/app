@@ -5,7 +5,7 @@
     borderRadius: '20px',
     // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
   }`
-  ).row.full-width.b-40.no-scroll
+  ).row.full-width.b-40
     //- body
     div(v-if="contentCopy"
       :style=`{
@@ -34,8 +34,26 @@
           }`).row.full-width.b-50.justify-center
         .row
           .column.q-px-sm.q-gutter-md.reverse
-            q-btn(outline dense no-caps color="grey" :label="$t('Обложка')").q-px-sm
-            q-btn(outline dense no-caps color="grey" :label="$t('Трейлер')").q-px-sm
+            input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
+            input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
+            q-btn(outline dense no-caps color="grey" :label="$t('Обложка')" @click="$refs.inputThumb.click()").q-px-sm
+            q-btn(outline dense no-caps color="grey" :label="$t('Трейлер')" ).q-px-sm
+              q-dialog(v-model="previewLoaderShow")
+                div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px' }`).row.full-width.q-mt-sm
+                  video(
+                    controls
+                    :src="contentCopy.previewUrl"
+                    :style=`{
+                  }`
+                  ).full-width.br-10
+                    .row.full-width
+                      .col
+                      q-btn(v-if="!createdContent"
+                        @click="$refs.inputPreview.click()"
+                        :loading="loading"
+                        :disable="loading"
+                        flat no-caps color="green") {{$t('Upload')}}
+
       //- form
       .row.full-width
         .row.full-width.q-pl-lg
@@ -158,7 +176,6 @@ export default {
   name: 'videoEditor',
   props: {
     contentOid: {type: String, required: true},
-    bookmark: {type: Object, required: true},
     showBottomMenu: {type: Boolean, default: true},
   },
   data() {
@@ -169,11 +186,12 @@ export default {
       content: null,
       contentCopy: null,
       loading: false,
+      previewLoaderShow: false,
     }
   },
   computed: {
     needSave() {
-      return this.nameChanged || this.descriptionChanged || this.priceChanged
+      return this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged
     },
     nameChanged() {
       return this.contentCopy.name !== this.content.name
@@ -183,6 +201,12 @@ export default {
     },
     priceChanged() {
       return this.contentCopy.payInfo.price !== this.content.payInfo.price
+    },
+    thumbUrlChanged() {
+      return this.contentCopy.thumbUrl !== this.content.thumbUrl
+    },
+    previewUrlChanged() {
+      return this.contentCopy.previewUrl !== this.content.previewUrl
     },
     link() {
       return objectUrl(this.content)
@@ -203,6 +227,8 @@ export default {
       deep: true,
       handler(to) {
         this.contentCopy = cloneDeep(this.content)
+        this.bookmark.name = this.content.name
+        this.bookmark.thumbUrl = this.content.thumbUrl
       }
     }
   },
@@ -255,19 +281,47 @@ export default {
         if (this.nameChanged) await ObjectApi.update(this.content.oid, 'name', this.contentCopy.name)
         if (this.descriptionChanged) await ObjectApi.update(this.content.oid, 'description', this.contentCopy.description)
         if (this.priceChanged) await ObjectApi.update(this.content.oid, 'payInfo.price', this.contentCopy.payInfo.price)
+        if (this.thumbUrlChanged) {
+          assert(this.fileThumb)
+          await ObjectApi.update(this.content.oid, 'thumb', this.fileThumb)
+        }
+        if (this.previewUrlChanged) {
+          assert(this.filePreview)
+          await ObjectApi.update(this.content.oid, 'preview', this.filePreview)
+        }
+        this.$emit('close')
       } finally {
         this.loading = false
-        this.$emit('close')
       }
-    }
+    },
+    async thumbChanged (e) {
+      this.$log('thumbChanged', e)
+      this.contentCopy.thumbUrl = URL.createObjectURL(e.target.files[0])
+      this.fileThumb = e.target.files[0]
+      // destroy value ?
+      this.$refs.inputThumb.value = null
+    },
+    async previewChanged (e) {
+      this.$log('previewChanged', e)
+      this.contentCopy.previewUrl = URL.createObjectURL(e.target.files[0])
+      this.filePreview = e.target.files[0]
+      // destroy value ?
+      this.$refs.inputPreview.value = null
+    },
   },
   async mounted() {
     this.$log('mounted')
-    this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
     this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
-    this.name = this.content.name
-    this.description = this.content.description
-    this.payInfo = cloneDeep(this.content.payInfo)
+    this.isPaid = this.content.payInfo.price > 0
+    let { items: [bookmark] } = await this.$rxdb.find({
+      selector: {
+        rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
+        oid: this.contentOid,
+      }
+    })
+    assert(bookmark)
+    this.bookmark = bookmark
+    this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
     this.$nextTick(() => { this.initialized = true })
   }
 }
