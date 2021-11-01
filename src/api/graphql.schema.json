@@ -10425,6 +10425,30 @@
             "deprecationReason": null
           },
           {
+            "name": "previewUrlWithFormats",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UrlWithFormat",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "contentProvider",
             "description": "кто изначальный провайдер контента?",
             "args": [],
