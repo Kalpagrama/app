@@ -165,10 +165,11 @@ class ObjectApi {
          let rev = objFull.rev
          // if (path.startsWith('settings.')) rev = objFull.settings.rev
          assert(objFull, '!objFull')
-         let file
+         let file, size
          let apolloClient = apollo.clients.api
          if (newValue instanceof File) {
             file = newValue
+            size = file.size
             newValue = null
             apolloClient = apollo.clients.upload
          }
@@ -176,13 +177,13 @@ class ObjectApi {
          let { data: { objectChange } } = await apolloClient.mutate({
             mutation: gql`
                 ${fragments.objectFullFragment}
-                mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON, $file: Upload, $rev: Int!) {
-                    objectChange (oid: $oid, path: $path, newValue: $newValue, file: $file, rev: $rev){
+                mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON, $file: Upload, $size: Float, $rev: Int!) {
+                    objectChange (oid: $oid, path: $path, newValue: $newValue, file: $file, size: $size, rev: $rev){
                         ...objectFullFragment
                     }
                 }
             `,
-            variables: { oid, path, newValue, file, rev }
+            variables: { oid, path, newValue, file, size, rev }
          })
          await rxdb.set(RxCollectionEnum.OBJ, objectChange, { actualAge: 'day' })
          return objectChange

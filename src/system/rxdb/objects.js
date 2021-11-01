@@ -7,7 +7,6 @@ import { makeId, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
-import { eventBus } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
@@ -308,16 +307,6 @@ class Objects {
       logD(f, 'start', event)
       const t1 = performance.now()
       switch (event.type) {
-         case 'PROGRESS': {
-            eventBus.$emit('event-progress', event)
-            // let reactiveItem = await rxdb.get(RxCollectionEnum.OBJ, event.oid, { priority: -1 }) // берем только те что есть в кэше ( с сервера не запрашиваем)
-            // if (reactiveItem) {
-            //    logD('reactiveItem before=', cloneDeep(reactiveItem), event.rev)
-            //    await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.oid), 'uploadProgress', event.progress, false)
-            //    logD('reactiveItem after=', cloneDeep(reactiveItem), event.rev)
-            // } else logD('reactiveItem not found')
-            break
-         }
          case 'OBJECT_CHANGED': {
             // if (!event.path /* || (event.path === 'uploadStage' && event.value === 'COMPLETE') */) { // объект изменился целиком
             //    let obj = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid, { force: true })
@@ -350,7 +339,6 @@ class Objects {
                   } // обновляем статистику джойнтов на ядре
                }
             }
-            eventBus.$emit('event-object-created', event)
             break
          case 'VOTED': {
             assert(event.rate && event.rateStat, 'bad event!')
