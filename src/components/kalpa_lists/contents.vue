@@ -10,7 +10,6 @@
             :style=`{borderRadius: '20px',}`
             :showBottomMenu="false"
             :contentOid="bookmarkSelected.oid"
-            :bookmark="bookmarkSelected"
             @close="videoEditorShow = false, bookmarkSelected = null")
         tab-list-feed(
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
