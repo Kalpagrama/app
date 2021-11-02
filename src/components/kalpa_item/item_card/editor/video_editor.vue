@@ -18,7 +18,7 @@
       :style=`{
         maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : (!$store.state.ui.userTyping ? $q.screen.height*86/100 : $q.screen.height)+'px',
         overflow: "auto"
-    }`).row.full-width.br
+    }`).row.full-width
       //- tabs
       .row.full-width
         q-tabs(
@@ -33,8 +33,8 @@
         //- tab panels
         q-tab-panels(
           v-model="pageId"
-          :swipeable="$q.platform.is.mobile"
-          :animated="$q.platform.is.mobile"
+          :swipeable="$q.platform.is.mobile || true"
+          :animated="$q.platform.is.mobile || true"
           :style=`{}`).full-width.b-40
           q-tab-panel(
             v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
@@ -177,43 +177,43 @@
                 template(v-slot="append")
                   .row.content-center.items-center
                     q-icon(name="fas fa-ruble-sign" color="grey-5")
-    //- buttons
-    div(v-if="$q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
-            paddingLeft: $q.screen.xs ? '10px' : '10px',
-            paddingRight: $q.screen.xs ? '10px' : '10px'
-      }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm.br
-      //.row.q-mb-sm
-      //  q-btn(
-      //    no-caps :ripple="false" color="grey"
-      //    flat  icon="delete"
-      //    :loading="contentDeleting"
-      //    :style=`{
-      //    height: '40px',
-      //  }`
-      //    @click="contentDelete"
-      //  )
-      //    q-tooltip(dense dark) {{$t('Delete content')}}
-      //.col
-      q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
-      q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
-      slot(v-if="showBottomMenu" name="bottomMenu")
-        div(v-if="showBottomMenu").row.full-width
-          div(:style=`{
-            content: '',
-            width: '100%',
-            height: '1px',
-            background: 'rgb(73,66,61)',}`).q-my-xs
-          //- delete
-          q-btn(
-            no-caps :ripple="false" color="grey"
-            flat  icon="delete"
-            :loading="contentDeleting"
-            :style=`{
-            height: '50px', position: 'absolute', marginTop: '12px'
-          }`
-            @click="contentDelete"
-          )
-            q-tooltip(dense dark) {{$t('Delete content')}}
+      //- buttons
+      div(v-if="false && $q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
+              paddingLeft: $q.screen.xs ? '10px' : '10px',
+              paddingRight: $q.screen.xs ? '10px' : '10px'
+        }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm
+        //.row.q-mb-sm
+        //  q-btn(
+        //    no-caps :ripple="false" color="grey"
+        //    flat  icon="delete"
+        //    :loading="contentDeleting"
+        //    :style=`{
+        //    height: '40px',
+        //  }`
+        //    @click="contentDelete"
+        //  )
+        //    q-tooltip(dense dark) {{$t('Delete content')}}
+        //.col
+        q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
+        q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
+        slot(v-if="showBottomMenu" name="bottomMenu")
+          div(v-if="showBottomMenu").row.full-width
+            div(:style=`{
+              content: '',
+              width: '100%',
+              height: '1px',
+              background: 'rgb(73,66,61)',}`).q-my-xs
+            //- delete
+            q-btn(
+              no-caps :ripple="false" color="grey"
+              flat  icon="delete"
+              :loading="contentDeleting"
+              :style=`{
+              height: '50px', position: 'absolute', marginTop: '12px'
+            }`
+              @click="contentDelete"
+            )
+              q-tooltip(dense dark) {{$t('Delete content')}}
 </template>
 
 <script>
