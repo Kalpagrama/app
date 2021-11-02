@@ -9,7 +9,7 @@
       img(
         v-if="user"
         draggable="false"
-        :src="user.profile.photoUrl"
+        :src="user.coverUrl"
         :style=`{
           objectFit: 'cover',
         }`
@@ -47,7 +47,7 @@
       ).row.full-width.items-center.content-center.justify-between.q-px-sm.b-40
       //- header: back, avatar, name, rating
       div(:style=`{height: '50px',}`).row.full-width.items-center.content-center.justify-between
-        user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
+        user-avatar(v-if="user" :url="user.thumbUrl" :width="36" :height="36")
         .col
           span(v-if="user" :style=`{}`).text-white.text-bold.q-ml-sm {{ user.name }}
           //- .row.full-width.q-px-sm

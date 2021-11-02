@@ -54,9 +54,9 @@ export default {
           .toBlob(async (blob) => {
             this.$log('save blob', blob)
             this.saving = false
-            let file = new File([blob], 'user_avatar_' + Date.now().toString())
+            let file = new File([blob], 'user_avatar_' + Date.now().toString(), {type: 'image/png'})
             this.$emit('avatar', file)
-          })
+          }, 'image/png')
       }
       catch (e) {
         this.$log('save error', e)

@@ -141,7 +141,7 @@ q-menu(
       ).row.full-width.items-center.content-center.q-pa-sm.menu-item
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         user-avatar(
-          :url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
+          :url="$store.getters.currentUser.thumbUrl" :width="40" :height="40")
       .col.full-heigh
         .row.fit.items-center.content-center
           span(

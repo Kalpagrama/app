@@ -92,7 +92,7 @@ export default {
     async avatarEdited (file) {
       this.$log('avatarEdited', file)
       this.avatarEditorOpened = false
-      await ObjectApi.update(this.currentUser.oid, 'profile.photo', file)
+      await ObjectApi.update(this.currentUser.oid, 'photo', file)
     },
   },
   mounted () {
