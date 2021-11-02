@@ -137,6 +137,8 @@ const sphereFragment = gql`${objectFragment}
 const videoFragment = gql`${objectFragment} ${objectShortFragment}
   fragment videoFragment on Video {
     ...objectFragment
+    author{...objectShortFragment}
+    contentAuthor{...objectShortFragment}
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -148,7 +150,6 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment}
     urlOriginal
     duration
     strips
-    author{...objectShortFragment}
     description
 #    contentSource
     relatedContent
@@ -161,6 +162,7 @@ const bookFragment = gql`${objectFragment} ${objectShortFragment}
   fragment bookFragment on Book {
     ...objectFragment
     author{...objectShortFragment}
+    contentAuthor{...objectShortFragment}
     description
     commentStat{
             lastComment{...commentFragment}

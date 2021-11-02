@@ -10358,7 +10358,7 @@
           },
           {
             "name": "author",
-            "description": null,
+            "description": "кто загрузил в систему",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -10368,6 +10368,18 @@
                 "name": "ObjectShort",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contentAuthor",
+            "description": "действительный автор контента(кто его создал)",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "ObjectShort",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -10862,7 +10874,7 @@
           },
           {
             "name": "author",
-            "description": null,
+            "description": "кто загрузил в систему",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -10872,6 +10884,18 @@
                 "name": "ObjectShort",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contentAuthor",
+            "description": "действительный автор контента(кто его создал)",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "ObjectShort",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

@@ -1,123 +1,110 @@
 <template lang="pug">
-  div(
+  div(v-if="contentCopy"
     :style=`{
-    position: 'relative',
-    borderRadius: '20px',
+    position: 'fixed',
+    borderRadius: '10px',
+    paddingTop: $q.screen.xs ? '0px' : '10px',
+    paddingBottom: $q.screen.xs ? '0px' : '10px'
     // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
   }`
   ).row.full-width.b-40
-    //- body
-    div(v-if="contentCopy"
-      :style=`{
-      zIndex: 10,
-      //- background: 'rgba(0,0,0,0.5)',
-      // borderRadius: '20px 20px 0 0',
-      // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
-    }`
-    ).row.full-width.q-px-xs.q-pt-sm
-      // name
-      .row.full-width
-        .col
-        .row.justify-center.content-center.items-center.q-pl-lg
-          span.text-white.text-subtitle2.q-pl-lg {{$t('Сведения о контенте')}}
-        .col
-        q-btn(round flat color="white" icon="clear" v-close-popup)
-      //- img
+    // name
+    div(:style=`{}`
+        ).row.full-width.justify-center.content-end.items-end.q-pb-xs
+      .text-white.text-subtitle2 {{$t('Сведения о контенте')}}
+      //q-btn(round flat color="white" icon="clear" v-close-popup)
+    //- img
     div(
       :style=`{
-        maxHeight: ($q.screen.height-150)+'px'
-    }`).row.full-width.q-px-sm.q-pt-xs.q-pb-xs.scroll
-      //- tabs sticky
-      div(
-        :style=`{
-                  position: 'sticky', top: '0px', zIndex: 1000,
-                }`).row.full-width.q-px-md.b-40
+        maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : (!$store.state.ui.userTyping ? $q.screen.height*86/100 : $q.screen.height)+'px',
+        overflow: "auto"
+    }`).row.full-width.br
+      //- tabs
+      .row.full-width
         q-tabs(
           v-model="pageId"
-          no-caps dense
+         :breakpoint="500" switch-indicator
+          no-caps dense size="xs"
           active-color="green"
         ).full-width.text-grey-8
           q-tab(
             v-for="(p,pi) in pages" :key="p.id"
             :name="p.id" :label="p.name")
-      //- tab panels
-      q-tab-panels(
-        v-model="pageId"
-        :swipeable="$q.platform.is.mobile"
-        :animated="$q.platform.is.mobile"
-        :style=`{}`).full-width.b-40
-        q-tab-panel(
-          v-for="(p,pi) in pages" :key="p.id" :name="p.id"
-          :style=`{
-                    background: 'none',
-                    minHeight: '20vh',
-                  }`
-        ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-      .row
-        img(
-          :src="contentCopy.thumbUrl"
-          :style=`{
-          maxHeight: '150px',
-          objectFit: 'contain',
-          borderRadius: '10px',
-        }`).row.full-width.b-50.justify-center
-      .row
-        .column.q-px-sm.q-gutter-md.reverse
-          input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
-          input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
-          q-btn(outline dense no-caps color="grey" :label="$t('Обложка')" @click="$refs.inputThumb.click()").q-px-sm
-          q-btn(outline dense no-caps color="grey" :label="$t('Трейлер')" @click="previewLoaderShow=true" ).q-px-sm
-            q-dialog(v-model="previewLoaderShow")
-              div(:style=`{
-                        maxWidth: $store.state.ui.pageWidth+'px',
-                        position: 'relative',
-                        borderRadius: '20px',
-                        width: '400px'
-                        }`
-              ).row.b-40
-                .row.full-width.justify-center.text-white.text-subtitle2.q-pt-md.q-pb-sm
-                  span {{$t('Трейлер')}}
-                div( :style=`{
-                        maxWidth: $store.state.ui.pageWidth+'px',
-                        position: 'relative',
-                        borderRadius: '20px',
-                        maxHeight: '350px',
-                        width: '400px'
-                        }`
-                        ).row.full-width.q-pa-sm.justify-center.content-center.items-center
+        //- tab panels
+        q-tab-panels(
+          v-model="pageId"
+          :swipeable="$q.platform.is.mobile"
+          :animated="$q.platform.is.mobile"
+          :style=`{}`).full-width.b-40
+          q-tab-panel(
+            v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
+            div(v-if="pageId === 'cover'").row.full-width.items-start.content-start.justify-center
+              div(:style=`{height: "230px",}`).row.relative-position.items-center.content-center.justify-center.no-scroll
+                div(:style=`{height: "200px",}`).row.relative-position.items-center.content-center.justify-center
+                  div(:style=`{height: "200px", width: "350px",}`).row.relative-position.items-center.content-center.justify-center
+                    img(
+                      :src="contentCopy.thumbUrl"
+                      draggable="false"
+                      :style=`{
+                      maxHeight: '100%',
+                      maxWidth: '100%',
+                      objectFit: 'contain',
+                      borderRadius: '20px',
+                    }`)
+                  q-btn(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
+                .row.full-width.items-start.content-start.justify-center
+                  q-btn(
+                    @click="$refs.inputThumb.click()"
+                    flat no-caps color="grey"
+                    :label="$t('Изменить')"
+                    :style=`{}`)
+            div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
+              div(:style=`{height: "230px",}`).row.items-start.content-start.justify-center.relative-position.no-scroll
+                div(:style=`{height: "200px",}`).row.items-start.content-start.justify-center.relative-position
                   video(v-if="previewUrl"
                     ref="video"
+                    autoplay
                     controls
+                    :playsinline="true"
                     :src="previewUrl"
-                    :style=`{
-                      maxHeight: "300px"
-                  }`
-                  ).full-width.br-10
+                    :style=`{maxHeight: '200px',}`
+                  ).full-width.br-20
                   q-btn(v-if="!previewUrl"
                     @click="$refs.inputPreview.click()"
-                    outline no-caps color="green"
+                    flat no-caps color="green" stack
                     :label="$t('Загрузить')"
-                    :style=`{height: "300px", width: "300px"}`
-                    icon="add")
-                  q-btn(v-if="previewUrl"
-                    @click="$refs.inputPreview.click()"
-                    flat no-caps color="green"
-                    :label="$t('Изменить')")
+                    icon="add"
+                    :style=`{
+                        height: "200px",
+                        width: "350px",
+                        border: '2px solid rgb(60,60,60)'
+                    }`).br-20
+                  //q-btn(v-if="previewUrl"
+                  //  @click="$refs.inputPreview.click()"
+                  //  flat no-caps color="green"
+                  //  :style=`{position: "absolute", top: "0px", right: "0px"}`
+                  //  :label="$t('Изменить')")
+                .row.full-width.items-start.content-start.justify-center
                   q-btn(v-if="previewUrl"
                     @click="previewDelete"
-                    flat no-caps color="grey"
-                    :label="$t('Удалить')")
-                .row.full-width
-                  .col
-                  .row.q-pa-sm
-                    q-btn(
-                      :loading="loading"
-                      :disable="loading"
-                      v-close-popup
-                      outline no-caps color="green") {{$t('Готово')}}
-
+                    flat no-caps color="red"
+                    :label="$t('Удалить')"
+                    :style=`{}`)
+            //q-dialog(v-model="previewLoaderShow")
+            //  div(:style=`{
+            //            maxWidth: $store.state.ui.pageWidth+'px',
+            //            position: 'relative',
+            //            borderRadius: '20px',
+            //            width: '400px'
+            //            }`
+            //  ).row.b-40
+      input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
+      input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
       //- form
-      .row.full-width
+      div(:style=`{
+            paddingLeft: $q.screen.xs ? '0px' : '10px',
+            paddingRight: $q.screen.xs ? '0px' : '10px'
+      }`).row.full-width
         .row.full-width.q-pl-lg
           small.text-grey-6 {{$t('Название')}}
         q-input(
@@ -191,7 +178,10 @@
                   .row.content-center.items-center
                     q-icon(name="fas fa-ruble-sign" color="grey-5")
     //- buttons
-    .row.full-width.justify-end.content-start.items-start.q-py-sm.q-pr-sm
+    div(v-if="$q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
+            paddingLeft: $q.screen.xs ? '10px' : '10px',
+            paddingRight: $q.screen.xs ? '10px' : '10px'
+      }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm.br
       //.row.q-mb-sm
       //  q-btn(
       //    no-caps :ripple="false" color="grey"
@@ -206,7 +196,7 @@
       //.col
       q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
       q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
-      slot(name="bottomMenu")
+      slot(v-if="showBottomMenu" name="bottomMenu")
         div(v-if="showBottomMenu").row.full-width
           div(:style=`{
             content: '',
@@ -387,7 +377,9 @@ export default {
       this.$refs.inputPreview.value = null
     },
     async previewDelete () {
-      this.$set(this.contentCopy, 'previewUrlWithFormats', null)
+      // this.$set(this.contentCopy, 'previewUrlWithFormats', null)
+      if (this.$refs.video.played) this.$refs.video.pause()
+      else this.$refs.video.play()
     }
   },
   async mounted() {

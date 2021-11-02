@@ -4,10 +4,10 @@
         //- bookmark editor
         q-dialog(
           v-model="videoEditorShow"
+          :maximized="$q.screen.xs"
           @hide="bookmarkSelected = null")
           video-editor(
             v-if="bookmarkSelected"
-            :style=`{borderRadius: '20px',}`
             :showBottomMenu="false"
             :contentOid="bookmarkSelected.oid"
             @close="videoEditorShow = false, bookmarkSelected = null")
