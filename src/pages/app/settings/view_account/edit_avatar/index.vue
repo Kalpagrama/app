@@ -35,8 +35,8 @@
         //  round flat color="white" icon="attach_file" size="lg"
         //  :style=`{borderRadius: '50%',}`)
         img(
-          v-if="$store.getters.currentUser.thumbUrl"
-          :src="$store.getters.currentUser.thumbUrl"
+          v-if="$store.getters.currentUser.photoUrl"
+          :src="$store.getters.currentUser.photoUrl"
           :style=`{
             width: '100%', height: '100%',
             borderRadius: '50%', overflow: 'hidden',
@@ -92,7 +92,7 @@ export default {
     async avatarEdited (file) {
       this.$log('avatarEdited', file)
       this.avatarEditorOpened = false
-      await ObjectApi.update(this.currentUser.oid, 'profile.photo', file)
+      await ObjectApi.update(this.currentUser.oid, 'photo', file)
     },
   },
   mounted () {

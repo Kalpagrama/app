@@ -70,7 +70,7 @@
           }`
         ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            user-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
+            user-avatar(:url="$store.getters.currentUser.thumbUrl" :width="40" :height="40")
           div(v-if="!mini").col.full-height
             .row.fit.items-center.content-center
               span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$store.getters.currentUser.name}}

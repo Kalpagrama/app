@@ -72,13 +72,13 @@ const userFragment = gql`
     settings
     wsRevision
     wsVersion
+    photoUrl
+    coverUrl
     subscriptions{...objectShortFragment}
     profile{
       tutorial
       about
       status
-      photoUrl
-      coverUrl
       city
       country
       dateBirth
@@ -112,8 +112,6 @@ const dummyUserFragment = gql`
       tutorial
       about
       status
-      photoUrl
-      coverUrl
       city
       country
       dateBirth

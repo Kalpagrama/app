@@ -10,7 +10,7 @@
         v-if="!$store.getters.isGuest"
         :to="'/user/'+$store.getters.currentUser.oid")
         img(
-          :src="$store.getters.currentUser.profile.photoUrl"
+          :src="$store.getters.currentUser.thumbUrl"
           :style=`{
             width: '30px',
             height: '30px',
