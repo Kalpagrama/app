@@ -141,14 +141,14 @@
             .col
             q-btn(v-if="contentCopy.payInfo.price > 0"
               flat color="white" no-caps dense
-              @click="paidUsersList = true"
+              @click="paidUsersListShow = true"
               :ripple="false"
               :style=`{borderRadius: '10px', marginTop: '3px'}`)
               span(:style=`{fontSize: $q.screen.width > 320 ? '14px' : '11px'}`).text-body1 {{$t('Список оплативших')}}
               q-dialog(
-                  v-model="paidUsersList"
-                  :maximized="$q.screen.xs")
-                paid-users
+                  v-model="paidUsersListShow"
+                  :maximized="true")
+                paid-users(:content="content" @close="paidUsersListShow=false")
             .col
           div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
             .row.full-width
@@ -235,7 +235,7 @@ export default {
       content: null,
       contentCopy: null,
       loading: false,
-      paidUsersList: false,
+      paidUsersListShow: false,
       pageId: 'cover',
       pages: [
         {id: 'cover', name: this.$t('Сover', 'Обложка')},
@@ -390,9 +390,11 @@ export default {
     this.bookmark = bookmark
     this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
     this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
-    this.isPaid = this.content.payInfo.price > 0
-
-    this.$nextTick(() => { this.initialized = true })
+    this.$nextTick(() => {
+      this.$logD('this.isPaid = this.content.payInfo.price > 0')
+      this.isPaid = this.content.payInfo.price > 0
+      this.initialized = true
+    })
   }
 }
 </script>
