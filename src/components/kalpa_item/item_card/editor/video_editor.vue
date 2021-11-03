@@ -16,7 +16,7 @@
     //- img
     div(
       :style=`{
-        maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : (!$store.state.ui.userTyping ? $q.screen.height*86/100 : $q.screen.height)+'px',
+        maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
         overflow: "auto"
     }`).row.full-width
       //- tabs
@@ -39,9 +39,9 @@
           q-tab-panel(
             v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
             div(v-if="pageId === 'cover'").row.full-width.items-start.content-start.justify-center
-              div(:style=`{height: "230px",}`).row.relative-position.items-center.content-center.justify-center.no-scroll
-                div(:style=`{height: "200px",}`).row.relative-position.items-center.content-center.justify-center
-                  div(:style=`{height: "200px", width: "350px",}`).row.relative-position.items-center.content-center.justify-center
+              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).row.relative-position.items-center.content-center.justify-center.no-scroll
+                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width}`).row.relative-position.items-center.content-center.justify-center
+                  div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: "350px",}`).row.relative-position.items-center.content-center.justify-center
                     img(
                       :src="contentCopy.thumbUrl"
                       draggable="false"
@@ -56,18 +56,19 @@
                   q-btn(
                     @click="$refs.inputThumb.click()"
                     flat no-caps color="grey"
+                    :ripple="false"
                     :label="$t('Изменить')"
                     :style=`{}`)
             div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
-              div(:style=`{height: "230px",}`).row.items-start.content-start.justify-center.relative-position.no-scroll
-                div(:style=`{height: "200px",}`).row.items-start.content-start.justify-center.relative-position
+              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).row.full-width.items-start.content-start.justify-center.relative-position.no-scroll
+                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).row.items-start.content-start.justify-center.relative-position
                   video(v-if="previewUrl"
                     ref="video"
                     autoplay
                     controls
                     :playsinline="true"
                     :src="previewUrl"
-                    :style=`{maxHeight: '200px',}`
+                    :style=`{maxHeight: $q.screen.width > 320 ? "200px" : "160px",}`
                   ).full-width.br-20
                   q-btn(v-if="!previewUrl"
                     @click="$refs.inputPreview.click()"
@@ -75,29 +76,15 @@
                     :label="$t('Загрузить')"
                     icon="add"
                     :style=`{
-                        height: "200px",
-                        width: "350px",
                         border: '2px solid rgb(60,60,60)'
-                    }`).br-20
-                  //q-btn(v-if="previewUrl"
-                  //  @click="$refs.inputPreview.click()"
-                  //  flat no-caps color="green"
-                  //  :style=`{position: "absolute", top: "0px", right: "0px"}`
-                  //  :label="$t('Изменить')")
+                    }`).br-20.fit
                 .row.full-width.items-start.content-start.justify-center
                   q-btn(v-if="previewUrl"
                     @click="previewDelete"
                     flat no-caps color="red"
+                    :ripple="false"
                     :label="$t('Удалить')"
                     :style=`{}`)
-            //q-dialog(v-model="previewLoaderShow")
-            //  div(:style=`{
-            //            maxWidth: $store.state.ui.pageWidth+'px',
-            //            position: 'relative',
-            //            borderRadius: '20px',
-            //            width: '400px'
-            //            }`
-            //  ).row.b-40
       input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
       input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
       //- form
@@ -109,6 +96,7 @@
           small.text-grey-6 {{$t('Название')}}
         q-input(
           v-model="contentCopy.name"
+          ref="nameInput"
           color="green"
           borderless dark dense
           type="textarea" autogrow
@@ -121,7 +109,6 @@
           padding: '10px',
           marginBottom: '-5px',
           minHeight: '40px',
-          fontSize: fontSize+'px',
           textAlign: 'left',
           }`).row.full-width.q-px-sm
         .row.full-width.q-pl-lg
@@ -129,7 +116,7 @@
         q-input(
           v-model="contentCopy.description"
           borderless dark
-          ref="nameInput"
+          ref="descriptionInput"
           type="textarea" autogrow
           counter maxlength="5000"
           :placeholder="$t('Введите описание')"
@@ -139,61 +126,66 @@
           padding: '10px',
           marginBottom: '-5px',
           borderRadius: '10px',
-          fontSize: fontSize+'px',
           lineHeight: 1.3,
           minHeight: '100px',
         }`
         ).full-width.q-px-sm
         .row.full-width.justify-start.q-pl-sm
-          .row.full-width.justify-start.content-start.items-start.q-mb-sm
+          .row.full-width.justify-start.content-center.items-center.q-mb-sm
             q-toggle(
               v-model="isPaid"
-              dark dense
+              dark
               :label="$t('Платный контент')"
               :style=`{color: 'white'}`
-              color="green").q-pl-sm.q-pb-xs
-          div(:style=`{minHeight: '60px'}`).row.full-width
-            .row
-              q-input(v-if="contentCopy.payInfo.price > 0"
+              color="green")
+            .col
+            q-btn(v-if="contentCopy.payInfo.price > 0"
+              flat color="white" no-caps dense
+              @click="paidUsersList = true"
+              :ripple="false"
+              :style=`{borderRadius: '10px', marginTop: '3px'}`)
+              span(:style=`{fontSize: $q.screen.width > 320 ? '14px' : '11px'}`).text-body1 {{$t('Список оплативших')}}
+              q-dialog(
+                  v-model="paidUsersList"
+                  :maximized="$q.screen.xs")
+                paid-users
+            .col
+          div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
+            .row.full-width
+              q-input(v-if="false && contentCopy.payInfo.price > 0"
                 v-model="contentCopy.payInfo.price"
                 mask="#"
                 reverse-fill-mask
                 fill-mask="0"
                 color="green"
                 :debounce="1000"
-                borderless dark dense outlined
-                :style=`{borderRadius: '10px'}`
+                dark outlined dense
+                :style=`{borderRadius: '10px', height: '40px'}`
                 :placeholder="$t('enter the cost', 'Введите стоимость')"
                 :input-style=`{
                 // background: 'rgb(45,45,45)',
-                borderRadius: '10px',
-                padding: '10px',
-                paddingLeft: '10px',
+                // borderRadius: '10px',
                 maxWidth: '150px',
                 minHeight: '30px',
-                fontSize: fontSize+'px',
                 textAlign: 'center',
-                }`).row.b-50.q-mb-md
+                }`).row.b-50.q-mr-sm
                 template(v-slot="append")
                   .row.content-center.items-center
                     q-icon(name="fas fa-ruble-sign" color="grey-5")
       //- buttons
-      div(v-if="false && $q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
+      div(v-if="$q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
               paddingLeft: $q.screen.xs ? '10px' : '10px',
               paddingRight: $q.screen.xs ? '10px' : '10px'
         }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm
-        //.row.q-mb-sm
-        //  q-btn(
-        //    no-caps :ripple="false" color="grey"
-        //    flat  icon="delete"
-        //    :loading="contentDeleting"
-        //    :style=`{
-        //    height: '40px',
-        //  }`
-        //    @click="contentDelete"
-        //  )
-        //    q-tooltip(dense dark) {{$t('Delete content')}}
-        //.col
+        .row.q-mb-sm
+          q-btn(
+            no-caps :ripple="false" color="grey"
+            flat icon="delete"
+            :loading="contentDeleting"
+            :style=`{height: '40px',}`
+            @click="contentDelete")
+            q-tooltip(dense dark) {{$t('Delete content', 'Удалить контент')}}
+        .col
         q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
         q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
         slot(v-if="showBottomMenu" name="bottomMenu")
@@ -220,6 +212,7 @@
 import {RxCollectionEnum} from 'src/system/rxdb'
 import {objectTypeName, objectUrl} from 'src/system/common/object_info.js';
 import differenceWith from 'lodash/differenceWith'
+import paidUsers from 'src/components/kalpa_lists/paid_users.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import {assert} from 'src/system/common/utils.js';
 import {ObjectApi} from 'src/api/object.js';
@@ -231,6 +224,9 @@ export default {
     contentOid: {type: String, required: true},
     showBottomMenu: {type: Boolean, default: true},
   },
+  components: {
+    paidUsers
+  },
   data() {
     return {
       isPaid: false,
@@ -239,7 +235,7 @@ export default {
       content: null,
       contentCopy: null,
       loading: false,
-      previewLoaderShow: false,
+      paidUsersList: false,
       pageId: 'cover',
       pages: [
         {id: 'cover', name: this.$t('Сover', 'Обложка')},
