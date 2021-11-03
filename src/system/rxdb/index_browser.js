@@ -656,7 +656,7 @@ class RxDBWrapper {
          }
          await findResult.goto(0, autoNextSize)
 
-         if (findResult.items.length === 0) await findResult.next(autoNextSize)
+         if (findResult.items.length === 0) await findResult.next_(autoNextSize)
          this.store.commit('debug/addFindResult', { listId, findResult })
          assert(findResult && findResult.next, '!findResult.next')
          return findResult

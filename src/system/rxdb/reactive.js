@@ -405,6 +405,7 @@ class Group {
                // next: this.next.bind(this),
                // prev: this.prev.bind(this),
                next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+               next_: this.next.bind(this),
                prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
                gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
                hasNext: false,
