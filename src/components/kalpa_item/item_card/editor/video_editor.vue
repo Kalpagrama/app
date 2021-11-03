@@ -4,7 +4,7 @@
     position: 'fixed',
     borderRadius: '10px',
     paddingTop: $q.screen.xs ? '0px' : '10px',
-    paddingBottom: $q.screen.xs ? '0px' : '10px'
+    paddingBottom: $q.screen.xs ? '0px' : '0px'
     // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
   }`
   ).row.full-width.b-40
@@ -39,9 +39,9 @@
           q-tab-panel(
             v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
             div(v-if="pageId === 'cover'").row.full-width.items-start.content-start.justify-center
-              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).row.relative-position.items-center.content-center.justify-center.no-scroll
-                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width}`).row.relative-position.items-center.content-center.justify-center
-                  div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: "350px",}`).row.relative-position.items-center.content-center.justify-center
+              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.items-center.content-center.justify-center.no-scroll
+                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width}`).relative-position.row.items-center.content-center.justify-center
+                  div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: "350px",}`).relative-position.row.items-center.content-center.justify-center
                     img(
                       :src="contentCopy.thumbUrl"
                       draggable="false"
@@ -60,8 +60,8 @@
                     :label="$t('Изменить')"
                     :style=`{}`)
             div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
-              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).row.full-width.items-start.content-start.justify-center.relative-position.no-scroll
-                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).row.items-start.content-start.justify-center.relative-position
+              div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
+                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
                   video(v-if="previewUrl"
                     ref="video"
                     autoplay
@@ -77,7 +77,7 @@
                     icon="add"
                     :style=`{
                         border: '2px solid rgb(60,60,60)'
-                    }`).br-20.fit
+                    }`).fit.br-20
                 .row.full-width.items-start.content-start.justify-center
                   q-btn(v-if="previewUrl"
                     @click="previewDelete"
@@ -99,7 +99,7 @@
           ref="nameInput"
           color="green"
           borderless dark dense
-          type="textarea" autogrow
+          type="text" autogrow
           counter maxlength="108"
           :style=`{minHeight: '60px'}`
           :placeholder="$t('enter content name', 'Введите название контента')"
@@ -148,7 +148,9 @@
               q-dialog(
                   v-model="paidUsersList"
                   :maximized="$q.screen.xs")
-                paid-users
+                paid-users(
+                  @close="paidUsersList = false"
+                )
             .col
           div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
             .row.full-width
@@ -173,7 +175,7 @@
                   .row.content-center.items-center
                     q-icon(name="fas fa-ruble-sign" color="grey-5")
       //- buttons
-      div(v-if="$q.screen.xs ? !$store.state.ui.userTyping : true" :style=`{
+      div(v-if="true" :style=`{
               paddingLeft: $q.screen.xs ? '10px' : '10px',
               paddingRight: $q.screen.xs ? '10px' : '10px'
         }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm
