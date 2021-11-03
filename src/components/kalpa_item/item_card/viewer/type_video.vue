@@ -40,21 +40,25 @@
               :label="$t('Полный доступ')"
               @click="showDialog = true"
             ).full-width.q-px-sm
-              q-dialog(
-                v-model="showDialog"
-                position="standard"
-                :maximized="false")
-                kalpa-pay(
-                  v-if="item"
-                  :oid="item.oid"
-                  :type="item.type"
-                  :name="item.name"
-                  :thumbUrl="item.thumbUrl"
-                  :isActive="true"
-                  :formOnly="true"
-                  inactiveColor="grey-3"
-                  :fields=`{contentType: item.type}`
-                  @content="$event => $emit('content', $event)")
+              q-dialog(v-model="showDialog" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
+                div(:style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`).row.full-width
+                  q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="enterPromoCode(true)").col.full-width
+                  q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="enterPromoCode(true)")
+              //q-dialog(
+              //  v-model="showDialog"
+              //  position="standard"
+              //  :maximized="false")
+              //  kalpa-pay(
+              //    v-if="item"
+              //    :oid="item.oid"
+              //    :type="item.type"
+              //    :name="item.name"
+              //    :thumbUrl="item.thumbUrl"
+              //    :isActive="true"
+              //    :formOnly="true"
+              //    inactiveColor="grey-3"
+              //    :fields=`{contentType: item.type}`
+              //    @content="$event => $emit('content', $event)")
       // fullpage (description / coments / nodes)
     // transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
@@ -234,6 +238,7 @@ export default {
       pageId: null, // description|comments|nodes
       bottomHeight: null,
       author: null,
+      promoCode: '',
       // pages: [
       //   {id: 'description', name: this.$t('Description')},
       //   {id: 'comments', name: this.$t('Comments')},

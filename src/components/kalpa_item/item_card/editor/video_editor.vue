@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(v-if="contentCopy"
+  div(
     :style=`{
     position: 'fixed',
     borderRadius: '10px',
@@ -7,14 +7,16 @@
     paddingBottom: $q.screen.xs ? '0px' : '0px'
     // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
   }`
-  ).row.full-width.b-40
-    // name
+  ).relative-position.row.full-width.b-40
+    // header
     div(:style=`{}`
         ).row.full-width.justify-center.content-end.items-end.q-pb-xs
       .text-white.text-subtitle2 {{$t('Сведения о контенте')}}
       //q-btn(round flat color="white" icon="clear" v-close-popup)
-    //- img
-    div(
+    div(v-if="!contentCopy" :style=`{minHeight: '400px'}`).row.fit.items-center.justify-center.content-center
+      q-spinner(size="50px" color="green")
+    // body
+    div(v-if="contentCopy"
       :style=`{
         maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
         overflow: "auto"
@@ -149,8 +151,6 @@
                   v-model="paidUsersListShow"
                   :maximized="true")
                 paid-users(:content="content" @close="paidUsersListShow=false")
-                  @close="paidUsersList = false"
-                )
             .col
           div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
             .row.full-width
@@ -174,40 +174,36 @@
                 template(v-slot="append")
                   .row.content-center.items-center
                     q-icon(name="fas fa-ruble-sign" color="grey-5")
-      //- buttons
-      div(v-if="true" :style=`{
-              paddingLeft: $q.screen.xs ? '10px' : '10px',
-              paddingRight: $q.screen.xs ? '10px' : '10px'
-        }`).row.full-width.justify-end.content-center.items-center.q-py-xs.q-pr-sm
-        .row.q-mb-sm
-          q-btn(
-            no-caps :ripple="false" color="grey"
-            flat icon="delete"
-            :loading="contentDeleting"
-            :style=`{height: '40px',}`
-            @click="contentDelete")
-            q-tooltip(dense dark) {{$t('Delete content', 'Удалить контент')}}
-        .col
-        q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
-        q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
-        slot(v-if="showBottomMenu" name="bottomMenu")
-          div(v-if="showBottomMenu").row.full-width
-            div(:style=`{
+    // buttons
+    .row.full-width.justify-end.content-center.items-center.q-pt-sm.q-pb-xs.q-px-sm.q-mb-xs
+      .row
+        q-btn(v-if="$store.getters.currentUser.profile.role.in('MODERATOR', 'ADMIN')"
+          no-caps :ripple="false" color="grey" round
+          flat icon="delete"
+          :loading="contentDeleting"
+          @click="contentDelete")
+          q-tooltip(dense dark) {{$t('Delete content', 'Удалить контент')}}
+      .col
+      q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
+      q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
+      slot(v-if="showBottomMenu" name="bottomMenu")
+        div(v-if="showBottomMenu").row.full-width
+          div(:style=`{
               content: '',
               width: '100%',
               height: '1px',
               background: 'rgb(73,66,61)',}`).q-my-xs
-            //- delete
-            q-btn(
-              no-caps :ripple="false" color="grey"
-              flat  icon="delete"
-              :loading="contentDeleting"
-              :style=`{
+          //- delete
+          q-btn(
+            no-caps :ripple="false" color="grey"
+            flat  icon="delete"
+            :loading="contentDeleting"
+            :style=`{
               height: '50px', position: 'absolute', marginTop: '12px'
             }`
-              @click="contentDelete"
-            )
-              q-tooltip(dense dark) {{$t('Delete content')}}
+            @click="contentDelete"
+          )
+            q-tooltip(dense dark) {{$t('Delete content')}}
 </template>
 
 <script>
@@ -246,7 +242,7 @@ export default {
   },
   computed: {
     needSave() {
-      return this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged
+      return this.content && (this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
     },
     nameChanged() {
       return this.contentCopy.name !== this.content.name
@@ -375,9 +371,7 @@ export default {
       this.$refs.inputPreview.value = null
     },
     async previewDelete () {
-      // this.$set(this.contentCopy, 'previewUrlWithFormats', null)
-      if (this.$refs.video.played) this.$refs.video.pause()
-      else this.$refs.video.play()
+      this.$set(this.contentCopy, 'previewUrlWithFormats', [])
     }
   },
   async mounted() {
