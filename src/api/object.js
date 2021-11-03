@@ -495,6 +495,34 @@ class ObjectApi {
       } catch (err) {
       }
    }
+
+   // оплатить контент, либо ввести промокод
+   static async pay (oid, promoCode) {
+      const f = ObjectApi.vote
+      const t1 = performance.now()
+      const cb = async () => {
+         assert(oid)
+         assert(AuthApi.hasPermitionForAction(ActionEnum.PAY))
+         let { data: { pay } } = await apollo.clients.api.mutate({
+            mutation: gql`
+                mutation pay ($oid: OID!, $promoCode: String!) {
+                    pay (reason: BUY_CONTENT, oid: $oid, promoCode: $promoCode){
+                        payData
+                        result
+                    }
+                }
+            `,
+            variables: {
+               oid: oid,
+               promoCode: promoCode
+            }
+         })
+         // надо запомнить сейчас, тк эвентом придет только общая оценка
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         return pay.result === 'OK'
+      }
+      return await apiCall(f, cb)
+   }
 }
 
 export { ObjectApi }
