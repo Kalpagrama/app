@@ -375,17 +375,20 @@ export default {
     }
   },
   async mounted() {
-    this.$log('mounted')
+    this.$log('mounted', this.contentOid)
+    // await this.$wait(3000)
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
         oid: this.contentOid,
       }
     })
+    this.$log('mounted1', bookmark)
     assert(bookmark)
     this.bookmark = bookmark
     this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
     this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
+    this.$log('mounted2', this.content)
     this.$nextTick(() => {
       this.$logD('this.isPaid = this.content.payInfo.price > 0')
       this.isPaid = this.content.payInfo.price > 0

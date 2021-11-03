@@ -74,7 +74,7 @@ export default {
   components: {
     editSpheres,
   },
-  name: 'fromImage',
+  name: 'fromVideo',
   props: ['file', 'fileSrc'],
   data () {
     return {
@@ -112,12 +112,11 @@ export default {
           }
           this.$log('contentInput', contentInput)
           // create
-          let contentBookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+          content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
           this.$log('content', content)
         }
-        // go to this content...
-        // await this.$router.push('/content/' + contentKalpa.oid)
-        // await this.$router.push('/workspace/contents')
+        assert(content && content.oid)
+        await this.$router.replace('/workspace/contents/' + content.oid)
       } finally {
         this.loading = false
       }

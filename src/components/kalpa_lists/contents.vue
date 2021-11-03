@@ -5,12 +5,12 @@
         q-dialog(
           v-model="videoEditorShow"
           :maximized="$q.screen.xs"
-          @hide="bookmarkSelected = null")
+          @hide="videoEditorContentOid = null, $router.replace('/workspace/contents')")
           video-editor(
-            v-if="bookmarkSelected"
+            v-if="videoEditorContentOid"
             :showBottomMenu="false"
-            :contentOid="bookmarkSelected.oid"
-            @close="videoEditorShow = false, bookmarkSelected = null")
+            :contentOid="videoEditorContentOid"
+            @close="videoEditorShow = false, videoEditorContentOid = null")
         tab-list-feed(
           :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
           :navHeaderText="useNavHeader ? $t('Contents') : ''"
@@ -63,9 +63,9 @@ export default {
   data () {
     return {
       pageId: 'video',
-      bookmarkSelected: null,
       videoEditorShow: false,
       searchString: '',
+      videoEditorContentOid: null
     }
   },
   computed: {
@@ -102,6 +102,17 @@ export default {
       return res
     }
   },
+  watch: {
+    '$route.params.contentOid': {
+      immediate: true,
+      handler(to) {
+        if (to) {
+          this.videoEditorContentOid = to
+          this.videoEditorShow = true
+        }
+      }
+    }
+  },
   methods: {
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
@@ -109,7 +120,7 @@ export default {
         this.$emit('item', bookmark)
       }
       else {
-        this.bookmarkSelected = bookmark
+        this.videoEditorContentOid = bookmark.oid
         this.videoEditorShow = true
       }
     }

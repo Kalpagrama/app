@@ -372,7 +372,7 @@ const routes = [
                },
                {
                   name: 'workspace.contents',
-                  path: 'contents',
+                  path: 'contents/:contentOid?',
                   props: (route) => ({ listName: route.name.split('.')[1] }),
                   component: () => import('src/pages/app/list/index.vue')
                },

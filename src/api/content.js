@@ -158,6 +158,7 @@ class ContentApi {
    static urlSelect (object) {
       let url = object.url
       if (!url && object.urlWithFormats) url = ContentApi.urlSelect_internal(object.urlWithFormats)
+      if (!url && object.previewUrlWithFormats) url = ContentApi.urlSelect_internal(object.previewUrlWithFormats)
       if (!url) url = object.urlOriginal
       if (!url) url = object.thumbUrl
       return url

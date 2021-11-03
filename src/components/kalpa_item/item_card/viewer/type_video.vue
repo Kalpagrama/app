@@ -1,4 +1,5 @@
 <template lang="pug">
+.row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     div(
       :style=`{
@@ -31,9 +32,10 @@
           div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 35%)', zIndex: 110}`).fit.absolute-bottom
         div(v-if="true" :style=`{position: 'absolute', zIndex: 120, bottom: '0px', left: '0px'}`).row.full-width.q-pb-xs.q-px-xs
           .row.col
-            small(:style=`{lineHeight: 1.2}`).text-grey-4.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+            small(v-if="!paid" :style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+            small(v-if="paid" :style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Доступна полная версия')}}
           .row.q-mr-sm
-            q-btn(
+            q-btn(v-if="!paid"
               no-caps outline dense
               size="sm"
               color="green"
@@ -42,8 +44,15 @@
             ).full-width.q-px-sm
               q-dialog(v-model="showDialog" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
                 div(:style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`).row.full-width
-                  q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="enterPromoCode(true)").col.full-width
-                  q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="enterPromoCode(true)")
+                  q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
+                  q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
+            q-btn(v-if="paid"
+              no-caps outline
+              size="xs"
+              color="green"
+              :label="$t('Смотреть')"
+              @click="$router.push('/content/' + item.oid)"
+            ).full-width
               //q-dialog(
               //  v-model="showDialog"
               //  position="standard"
@@ -76,13 +85,21 @@
     div(v-if="!pageId").row.full-width
       div(v-if="false").row.full-width.q-pt-xs.q-px-xs
         .row.col
-          small(:style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+          small(v-if="!paid" :style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
+          small(v-if="paid" :style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Доступна полная версия')}}
         .row.q-mr-sm
           q-btn(
             no-caps outline
             size="xs"
             color="green"
             :label="$t('Полный доступ')"
+            @click="$router.push('/content/' + item.oid)"
+          ).full-width
+          q-btn(
+            no-caps outline
+            size="xs"
+            color="green"
+            :label="$t('Смотреть')"
             @click="$router.push('/content/' + item.oid)"
           ).full-width
       div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm
@@ -219,6 +236,8 @@ import pageSimilar from '../../../../pages/app/node/page_similar';
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
 import {RxCollectionEnum} from '../../../../system/rxdb';
+import {assert} from '../../../../system/common/utils';
+import {ObjectApi} from '../../../../api/object';
 
 export default {
   name: 'typeVideo',
@@ -251,6 +270,9 @@ export default {
     url() {
       return ContentApi.urlSelect(this.item)
     },
+    paid () {
+      return this.item.payInfo.paid
+    },
     queryPopular () {
       return {
         selector: {
@@ -267,6 +289,12 @@ export default {
   async mounted() {
     // this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
     this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.author.oid)
+  },
+  methods: {
+    async sendPromoCode(promoCode) {
+      assert(promoCode)
+      let result = await ObjectApi.pay(this.item.oid, promoCode)
+    }
   }
 }
 </script>

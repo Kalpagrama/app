@@ -43,6 +43,11 @@ export default {
         }
       }
     },
+    'contentKalpa.payInfo.paid': {
+      async handler (to, from) {
+        if (!to) this.$go('/cover/' + this.contentKalpa.oid)
+      }
+    },
     '$store.getters.currentUser.profile.tutorial': {
       immediate: true,
       async handler (to, from) {
