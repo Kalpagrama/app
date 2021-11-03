@@ -43,6 +43,15 @@ fragment ObjectShortEssenceFragment on ObjectShortEssence {
   countStat{...countStatFragment}
 }
 `
+const ObjectShortPaidFragment = gql`  ${objectShortFragment}
+fragment ObjectShortPaidFragment on ObjectShortPaid {
+  ...objectShortFragment
+  price
+  promoCode
+  paidDate
+
+}
+`
 
 const objectFragment = gql`${objectShortFragment} ${countStatFragment}
   fragment objectFragment on Object {
@@ -132,7 +141,7 @@ const sphereFragment = gql`${objectFragment}
     ...objectFragment
   }
 `
-const videoFragment = gql`${objectFragment} ${objectShortFragment}
+const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortPaidFragment}
   fragment videoFragment on Video {
     ...objectFragment
     author{...objectShortFragment}
@@ -153,10 +162,10 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment}
     relatedContent
     subtitlesRus: subtitles(lang: RUS)
     subtitlesEng: subtitles(lang: ENG)
-    payInfo{price}
+    payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
   }
 `
-const bookFragment = gql`${objectFragment} ${objectShortFragment}
+const bookFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortPaidFragment}
   fragment bookFragment on Book {
     ...objectFragment
     author{...objectShortFragment}
@@ -170,10 +179,10 @@ const bookFragment = gql`${objectFragment} ${objectShortFragment}
     contentProvider
     providerInfo
     urlWithFormats{ format url }
-    payInfo{price}
+    payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
   }
 `
-const imageFragment = gql`${objectFragment} ${objectShortFragment}
+const imageFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortPaidFragment}
   fragment imageFragment on Image {
     ...objectFragment
     author{...objectShortFragment}
@@ -186,7 +195,7 @@ const imageFragment = gql`${objectFragment} ${objectShortFragment}
     contentProvider
     urlWithFormats{ format url }
     urlOriginal
-    payInfo{price}
+    payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
   }
 `
 
