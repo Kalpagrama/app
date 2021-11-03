@@ -53,7 +53,7 @@
                       objectFit: 'contain',
                       borderRadius: '20px',
                     }`)
-                  q-btn(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
+                  div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
                 .row.full-width.items-start.content-start.justify-center
                   q-btn(
                     @click="$refs.inputThumb.click()"
@@ -376,7 +376,6 @@ export default {
   },
   async mounted() {
     this.$log('mounted', this.contentOid)
-    // await this.$wait(3000)
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_CONTENT,

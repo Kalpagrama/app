@@ -26,41 +26,41 @@
         //          }`
         //    @first="zoomWorking = true, figureEditing = true"
         //    @final="zoomWorking = false, figureEditing = false")
-        q-input(
-          v-model="contentVideo.name"
-          borderless dark dense
-          :placeholder="$t('Название видео')"
-          counter maxlength="108"
-          type="textarea" autogrow
-          :input-style=`{
-                padding: '16px',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px',
-                minHeight: '50px',
-              }`
-        ).full-width.q-mt-xs
-        q-input(
-          v-model="contentVideo.description"
-          borderless dark dense
-          :placeholder="$t('Описание видео')"
-          counter maxlength="5000"
-          type="textarea" autogrow
-          :input-style=`{
-                padding: '16px',
-                fontSize: '12px',
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px',
-                minHeight: '100px',
-              }`
-        ).full-width.q-my-sm
-        edit-spheres(
-          ref="editSpheres"
-          :sphereOwner="contentVideo"
-          :maxSphereCnt="10"
-          :placeholderText="$t('Добавьте ключевые слова')"
-          ).q-my-sm
+        //q-input(
+        //  v-model="contentVideo.name"
+        //  borderless dark dense
+        //  :placeholder="$t('Название видео')"
+        //  counter maxlength="108"
+        //  type="textarea" autogrow
+        //  :input-style=`{
+        //        padding: '16px',
+        //        fontSize: '14px',
+        //        fontWeight: 'bold',
+        //        background: 'rgb(35,35,35)',
+        //        borderRadius: '10px',
+        //        minHeight: '50px',
+        //      }`
+        //).full-width.q-mt-xs
+        //q-input(
+        //  v-model="contentVideo.description"
+        //  borderless dark dense
+        //  :placeholder="$t('Описание видео')"
+        //  counter maxlength="5000"
+        //  type="textarea" autogrow
+        //  :input-style=`{
+        //        padding: '16px',
+        //        fontSize: '12px',
+        //        background: 'rgb(35,35,35)',
+        //        borderRadius: '10px',
+        //        minHeight: '100px',
+        //      }`
+        //).full-width.q-my-sm
+        //edit-spheres(
+        //  ref="editSpheres"
+        //  :sphereOwner="contentVideo"
+        //  :maxSphereCnt="10"
+        //  :placeholderText="$t('Добавьте ключевые слова')"
+        //  ).q-my-sm
 </template>
 
 <script>
