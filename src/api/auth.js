@@ -15,7 +15,8 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 let currentWebPushToken
 
 const ActionEnum = Object.freeze({
-   VOTE: 'VOTE'
+   VOTE: 'VOTE',
+   PAY: 'PAY',
 })
 
 class AuthApi {
@@ -50,6 +51,7 @@ class AuthApi {
       let hasPermition = false
       switch (action) {
          case ActionEnum.VOTE:
+         case ActionEnum.PAY:
             if (object && object.author.oid === rxdb.getCurrentUser().oid) hasPermition = false
             else hasPermition = AuthApi.userMatchMinimalRole('MEMBER')
             break
