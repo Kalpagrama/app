@@ -169,23 +169,23 @@ async function initLogger (store, ssrContext) {
 }
 
 async function initLogRocket(oidUser, username, userEmail, issueDescription, store) {
-   const LogRocket = require('logrocket')
-   LogRocket.init('qdibsv/kalpa-main')
-   // await wait(500)
-   // if (LogRocket.startNewSession && LogRocket.sessionURL) {
-   //    LogRocket.startNewSession()
-   //    await wait(2000)
-   // }
-   LogRocket.identify(oidUser, {
-      name: (username || userEmail),
-      email: userEmail,
-      // Add your own custom user variables here, ie:
-      ['descr::' + (new Date()).toLocaleString()]: issueDescription
-      // issueDescription
-   })
-   LogRocket.getSessionURL(sessionURL => {
-      store.commit('core/stateSet', ['logRocketSessionUrl', sessionURL])
-   });
+   // const LogRocket = require('logrocket')
+   // LogRocket.init('qdibsv/kalpa-main')
+   // // await wait(500)
+   // // if (LogRocket.startNewSession && LogRocket.sessionURL) {
+   // //    LogRocket.startNewSession()
+   // //    await wait(2000)
+   // // }
+   // LogRocket.identify(oidUser, {
+   //    name: (username || userEmail),
+   //    email: userEmail,
+   //    // Add your own custom user variables here, ie:
+   //    ['descr::' + (new Date()).toLocaleString()]: issueDescription
+   //    // issueDescription
+   // })
+   // LogRocket.getSessionURL(sessionURL => {
+   //    store.commit('core/stateSet', ['logRocketSessionUrl', sessionURL])
+   // });
 }
 
 export {

@@ -25,16 +25,17 @@
 </template>
 
 <script>
-import viewArticle from './view_article/index.vue'
+// import viewArticle from './view_article/index.vue'
 import viewUpload from './view_upload/index.vue'
 import viewBlock from './view_block/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { WsItemTypeEnum } from 'src/system/rxdb/common'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'workspace_pageCreate',
   components: {
-    viewArticle,
+    // viewArticle,
     viewUpload,
     viewBlock
   },
@@ -51,6 +52,7 @@ export default {
         case 'upload':
           return 'upload'
         case 'article':
+          assert(false, 'отключено')
           return 'article'
         case 'block':
           return 'block'
@@ -60,7 +62,7 @@ export default {
     },
     pageName () {
       let pageName = this.$t('Create')
-      if (this.pageId === 'article') pageName += ' ' + this.$t('article')
+      // if (this.pageId === 'article') pageName += ' ' + this.$t('article')
       if (this.pageId === 'block') pageName += ' ' + this.$t('essence block')
       return pageName
     }

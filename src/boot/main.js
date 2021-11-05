@@ -15,7 +15,6 @@ import isEqual from 'lodash/isEqual'
 // import Vue from 'vue'
 // import VueVirtualScroller from 'vue-virtual-scroller'
 // import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-// import 'tiptap/src/style.css'
 const contentful = require('contentful')
 
 // image editors
