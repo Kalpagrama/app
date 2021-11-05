@@ -58,7 +58,7 @@
     "lodash": "^4.17.15",
     "logrocket": "^2.0.0",
     "lru-cache": "^6.0.0",
-    "mediaelement": "^5.0.4",
+    "mediaelement": "^4.2.14",
     "pouchdb-adapter-idb": "^7.2.2",
     "pouchdb-adapter-memory": "^7.2.2",
     "pug": "^3.0.0",
